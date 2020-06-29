@@ -1,9 +1,9 @@
 // @flow
 import assert from 'assert'
-// replace webpack-specific require.context with Node-based glob in tests
-import path from 'path'
 import glob from 'glob'
 import uniq from 'lodash/uniq'
+// replace webpack-specific require.context with Node-based glob in tests
+import path from 'path'
 
 import type { LabwareList } from '../types'
 

@@ -1,8 +1,9 @@
 // @flow
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { Pipette as ProtocolPipette } from '../robot/types'
+
 import type { RobotApiRequestMeta } from '../robot-api/types'
+import type { Pipette as ProtocolPipette } from '../robot/types'
 
 // common types
 

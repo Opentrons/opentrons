@@ -1,33 +1,33 @@
 // @flow
+import type { StepType } from '../../form-types'
 import {
+  type FormError,
+  blockTemperatureHoldRequired,
+  blockTemperatureRequired,
   composeErrors,
+  engageHeightRangeExceeded,
+  engageHeightRequired,
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
-  pauseForTimeOrUntilTold,
-  wellRatioMoveLiquid,
-  magnetActionRequired,
-  engageHeightRequired,
-  engageHeightRangeExceeded,
-  type FormError,
-  moduleIdRequired,
-  targetTemperatureRequired,
-  blockTemperatureRequired,
-  lidTemperatureRequired,
-  profileVolumeRequired,
-  profileTargetLidTempRequired,
-  blockTemperatureHoldRequired,
   lidTemperatureHoldRequired,
+  lidTemperatureRequired,
+  magnetActionRequired,
+  moduleIdRequired,
+  pauseForTimeOrUntilTold,
+  profileTargetLidTempRequired,
+  profileVolumeRequired,
+  targetTemperatureRequired,
+  wellRatioMoveLiquid,
 } from './errors'
 import {
-  composeWarnings,
-  belowPipetteMinimumVolume,
-  maxDispenseWellVolume,
-  minDisposalVolume,
   type FormWarning,
   type FormWarningType,
+  belowPipetteMinimumVolume,
+  composeWarnings,
+  maxDispenseWellVolume,
+  minDisposalVolume,
 } from './warnings'
-import type { StepType } from '../../form-types'
 
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'

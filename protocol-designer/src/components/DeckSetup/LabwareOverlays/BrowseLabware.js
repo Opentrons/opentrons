@@ -1,13 +1,14 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import { connect } from 'react-redux'
 import { Icon } from '@opentrons/components'
+import cx from 'classnames'
 import forEach from 'lodash/forEach'
-import { i18n } from '../../../localization'
-import type { ThunkDispatch } from '../../../types'
-import type { LabwareOnDeck } from '../../../step-forms'
+import * as React from 'react'
+import { connect } from 'react-redux'
+
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
+import { i18n } from '../../../localization'
+import type { LabwareOnDeck } from '../../../step-forms'
+import type { ThunkDispatch } from '../../../types'
 import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../../../ui/steps'
 import styles from './LabwareOverlays.css'
 

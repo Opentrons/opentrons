@@ -1,13 +1,12 @@
 // @flow
 // bottom button bar for modals
 // TODO(mc, 2018-08-18): maybe make this the default AlertModal behavior
-import * as React from 'react'
-import cx from 'classnames'
-
-import { OutlineButton } from '@opentrons/components'
-import styles from './styles.css'
-
 import type { ButtonProps } from '@opentrons/components'
+import { OutlineButton } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
+
+import styles from './styles.css'
 
 type Props = {|
   buttons: Array<?ButtonProps>,

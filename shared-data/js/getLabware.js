@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
 import mapValues from 'lodash/mapValues'
+
 // TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
 import definitions from '../build/labware.json'
 import {

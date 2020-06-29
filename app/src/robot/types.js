@@ -1,39 +1,37 @@
 // @flow
 // common robot types
 
+import type { Mount } from '@opentrons/components'
 import type {
-  PipetteModelSpecs,
-  PipetteChannels,
   LabwareDefinition2,
+  PipetteChannels,
+  PipetteModelSpecs,
 } from '@opentrons/shared-data'
 
-import type { Mount } from '@opentrons/components'
-
-import typeof {
-  DISCONNECTED,
-  CONNECTING,
-  CONNECTED,
-  DISCONNECTING,
-  LOADED,
-  RUNNING,
-  FINISHED,
-  STOPPED,
-  PAUSED,
-  ERROR,
-  UNCONFIRMED,
-  MOVING_TO_SLOT,
-  JOGGING,
-  DROPPING_TIP,
-  OVER_SLOT,
-  PICKING_UP,
-  PICKED_UP,
-  CONFIRMING,
-  CONFIRMED,
-  DOOR_OPEN,
-  DOOR_CLOSED,
-} from './constants'
-
 import * as ApiTypes from './api-types'
+import typeof {
+  CONFIRMED,
+  CONFIRMING,
+  CONNECTED,
+  CONNECTING,
+  DISCONNECTED,
+  DISCONNECTING,
+  DOOR_CLOSED,
+  DOOR_OPEN,
+  DROPPING_TIP,
+  ERROR,
+  FINISHED,
+  JOGGING,
+  LOADED,
+  MOVING_TO_SLOT,
+  OVER_SLOT,
+  PAUSED,
+  PICKED_UP,
+  PICKING_UP,
+  RUNNING,
+  STOPPED,
+  UNCONFIRMED,
+} from './constants'
 
 export * from './api-types'
 

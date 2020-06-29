@@ -1,17 +1,18 @@
 // @flow
-import * as React from 'react'
-import { shallow, mount } from 'enzyme'
-import fileSaver from 'file-saver'
-import { PrimaryButton, AlertModal, OutlineButton } from '@opentrons/components'
+import { AlertModal, OutlineButton, PrimaryButton } from '@opentrons/components'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import { FileSidebar, v4WarningContent } from '../FileSidebar'
-import { useBlockingHint } from '../../Hints/useBlockingHint'
+import { mount, shallow } from 'enzyme'
+import fileSaver from 'file-saver'
+import * as React from 'react'
+
 import type { HintArgs } from '../../Hints/useBlockingHint'
+import { useBlockingHint } from '../../Hints/useBlockingHint'
+import { FileSidebar, v4WarningContent } from '../FileSidebar'
 
 jest.mock('file-saver')
 jest.mock('../../Hints/useBlockingHint')

@@ -4,9 +4,10 @@ import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
-import { modulePipetteCollision } from '../utils/modulePipetteCollision'
+
 import { getInitialRobotStateStandard, makeContext } from '../__fixtures__'
 import { _getFeatureFlag } from '../utils/_getFeatureFlag'
+import { modulePipetteCollision } from '../utils/modulePipetteCollision'
 jest.mock('../utils/_getFeatureFlag')
 
 const mock_getFeatureFlag: JestMockFn<[string], boolean> = _getFeatureFlag

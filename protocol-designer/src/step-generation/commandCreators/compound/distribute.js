@@ -1,17 +1,18 @@
 // @flow
+import { getWellsDepth } from '@opentrons/shared-data'
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import { getWellsDepth } from '@opentrons/shared-data'
+
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { aspirate, dispense, blowout, replaceTip, touchTip } from '../atomic'
-import { mixUtil } from './mix'
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import type {
-  DistributeArgs,
   CommandCreator,
   CurriedCommandCreator,
+  DistributeArgs,
 } from '../../types'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import { aspirate, blowout, dispense, replaceTip, touchTip } from '../atomic'
+import { mixUtil } from './mix'
 
 export const distribute: CommandCreator<DistributeArgs> = (
   args,

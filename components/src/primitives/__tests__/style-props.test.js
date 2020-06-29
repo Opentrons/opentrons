@@ -1,12 +1,11 @@
 // @flow
-import * as React from 'react'
 import { shallow } from 'enzyme'
+import * as React from 'react'
 import styled from 'styled-components'
 
-import * as Styles from '../../styles'
-import { styleProps, isntStyleProp } from '..'
-
 import type { PrimitiveComponent } from '..'
+import { isntStyleProp, styleProps } from '..'
+import * as Styles from '../../styles'
 
 const TestStyles: PrimitiveComponent<HTMLDivElement> = styled.div.withConfig({
   shouldForwardProp: isntStyleProp,

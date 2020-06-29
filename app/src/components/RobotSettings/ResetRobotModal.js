@@ -1,26 +1,23 @@
 // @flow
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { AlertModal, LabeledCheckbox } from '@opentrons/components'
 import last from 'lodash/last'
-
-import {
-  useDispatchApiRequest,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-} from '../../robot-api'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   fetchResetConfigOptions,
   getResetConfigOptions,
   resetConfig,
 } from '../../robot-admin'
-
-import { AlertModal, LabeledCheckbox } from '@opentrons/components'
-import { Portal } from '../portal'
-
-import type { State, Dispatch } from '../../types'
 import type { ResetConfigRequest } from '../../robot-admin/types'
+import {
+  getRequestById,
+  PENDING,
+  SUCCESS,
+  useDispatchApiRequest,
+} from '../../robot-api'
+import type { Dispatch, State } from '../../types'
+import { Portal } from '../portal'
 
 export type ResetRobotModalProps = {|
   robotName: string,

@@ -1,13 +1,14 @@
 // @flow
 // TODO(mc, 2020-02-19): no longer used; remove
-import * as React from 'react'
-import cx from 'classnames'
-import uniq from 'lodash/uniq'
 import {
   getLabwareV1Def,
   getWellPropsForSVGLabwareV1,
   wellIsRect,
 } from '@opentrons/shared-data'
+import cx from 'classnames'
+import uniq from 'lodash/uniq'
+import * as React from 'react'
+
 import { wellNameSplit } from '../utils'
 import styles from './LabwareLabels.css'
 

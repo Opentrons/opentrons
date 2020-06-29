@@ -1,15 +1,14 @@
 // @flow
 import { TestScheduler } from 'rxjs/testing'
 
-import * as RobotApiHttp from '../http'
+import { mockRequestMeta, mockRobot } from '../__fixtures__'
 import * as DiscoverySelectors from '../../discovery/selectors'
-import { mockRobot, mockRequestMeta } from '../__fixtures__'
-
 import type { State } from '../../types'
+import * as RobotApiHttp from '../http'
 import type {
-  RobotHost,
   RobotApiRequestOptions,
   RobotApiResponse,
+  RobotHost,
 } from '../types'
 
 jest.mock('../http')

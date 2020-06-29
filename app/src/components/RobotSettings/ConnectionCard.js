@@ -1,20 +1,19 @@
 // @flow
 // RobotSettings card for wifi status
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-
 import { Card, useInterval } from '@opentrons/components'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { CONNECTABLE } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 import {
   fetchStatus,
   getInternetStatus,
   getNetworkInterfaces,
 } from '../../networking'
+import type { Dispatch, State } from '../../types'
+import { ConnectionInfo, ConnectionStatusMessage } from './connection'
 import { SelectNetwork } from './SelectNetwork'
-import { ConnectionStatusMessage, ConnectionInfo } from './connection'
-
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
 
 type Props = {| robot: ViewableRobot |}
 

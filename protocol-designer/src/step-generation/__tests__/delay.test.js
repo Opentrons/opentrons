@@ -1,6 +1,6 @@
 // @flow
-import { delay } from '../commandCreators/atomic/delay'
 import { getSuccessResult } from '../__fixtures__'
+import { delay } from '../commandCreators/atomic/delay'
 
 const getRobotInitialState = (): any => {
   // This particular state shouldn't matter for delay

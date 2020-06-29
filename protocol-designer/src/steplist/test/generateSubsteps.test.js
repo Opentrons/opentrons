@@ -1,8 +1,8 @@
 // @flow
-import { generateSubsteps } from '../generateSubsteps'
-import { makeInitialRobotState } from '../../step-generation/utils'
-import { makeContext } from '../../step-generation/__fixtures__'
 import { THERMOCYCLER_STATE } from '../../constants'
+import { makeContext } from '../../step-generation/__fixtures__'
+import { makeInitialRobotState } from '../../step-generation/utils'
+import { generateSubsteps } from '../generateSubsteps'
 
 describe('generateSubsteps', () => {
   const stepId = 'step123'

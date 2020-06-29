@@ -3,19 +3,18 @@
 // DEPRECATED(mc, 2020-01-13)
 import { createSelector } from 'reselect'
 
-import type { State, Action, ThunkPromiseAction } from '../types'
-import type { BaseRobot, RobotService, Mount } from '../robot'
-import type { ApiCall, ApiRequestError } from './types'
+import type { BaseRobot, Mount, RobotService } from '../robot'
+import type { Action, State, ThunkPromiseAction } from '../types'
+import { chainActions } from '../util'
 import type {
+  ApiFailureAction,
   ApiRequestAction,
   ApiSuccessAction,
-  ApiFailureAction,
   ClearApiResponseAction,
 } from './actions'
-
-import { chainActions } from '../util'
-import { apiRequest, apiSuccess, apiFailure, clearApiResponse } from './actions'
+import { apiFailure, apiRequest, apiSuccess, clearApiResponse } from './actions'
 import { client } from './client'
+import type { ApiCall, ApiRequestError } from './types'
 
 export type JogAxis = 'x' | 'y' | 'z'
 

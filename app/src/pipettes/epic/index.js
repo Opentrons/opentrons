@@ -1,10 +1,11 @@
 // @flow
 import { combineEpics } from 'redux-observable'
-import { fetchPipettesEpic } from './fetchPipettesEpic'
-import { fetchPipettesOnConnectEpic } from './fetchPipettesOnConnectEpic'
-import { fetchPipetteSettingsEpic } from './fetchPipetteSettingsEpic'
-import { updatePipetteSettingsEpic } from './updatePipetteSettingsEpic'
+
 import type { Epic } from '../../types'
+import { fetchPipettesEpic } from './fetchPipettesEpic'
+import { fetchPipetteSettingsEpic } from './fetchPipetteSettingsEpic'
+import { fetchPipettesOnConnectEpic } from './fetchPipettesOnConnectEpic'
+import { updatePipetteSettingsEpic } from './updatePipetteSettingsEpic'
 
 export const pipettesEpic: Epic = combineEpics(
   fetchPipettesEpic,

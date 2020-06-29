@@ -1,49 +1,44 @@
 // @flow
-import { ofType } from 'redux-observable'
-
-import { GET } from '../../robot-api/constants'
-import { mapToRobotApiRequest } from '../../robot-api/operators'
-import {
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_V2,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
-  THERMOCYCLER_MODULE_V1,
-} from '@opentrons/shared-data'
-
 import type {
   MagneticModuleModel,
   TemperatureModuleModel,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import {
+  MAGDECK,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  TEMPDECK,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
+} from '@opentrons/shared-data'
+import { ofType } from 'redux-observable'
 
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-
-import type { Epic } from '../../types'
-
+import { GET } from '../../robot-api/constants'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-
-import type { FetchModulesAction, AttachedModule } from '../types'
+import { mapToRobotApiRequest } from '../../robot-api/operators'
+import type { Epic } from '../../types'
+import * as Actions from '../actions'
 import type {
   ApiAttachedModule,
   ApiAttachedModuleLegacy,
-  TemperatureData,
   MagneticData,
-  ThermocyclerData,
-  TemperatureStatus,
   MagneticStatus,
+  TemperatureData,
+  TemperatureStatus,
+  ThermocyclerData,
   ThermocyclerStatus,
 } from '../api-types'
+import * as Constants from '../constants'
+import type { AttachedModule, FetchModulesAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchModulesAction> = action => ({
   method: GET,

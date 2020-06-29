@@ -2,18 +2,17 @@
 import { ofType } from 'redux-observable'
 import { interval } from 'rxjs'
 import {
-  mergeMap,
-  withLatestFrom,
   filter,
   map,
+  mergeMap,
   takeWhile,
+  withLatestFrom,
 } from 'rxjs/operators'
 
-import { getConnectedRobotName } from '../../robot/selectors'
-import { fetchModules } from '../actions'
-
-import type { Epic } from '../../types'
 import type { ConnectResponseAction } from '../../robot/actions'
+import { getConnectedRobotName } from '../../robot/selectors'
+import type { Epic } from '../../types'
+import { fetchModules } from '../actions'
 
 const POLL_MODULE_INTERVAL_MS = 5000
 

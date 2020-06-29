@@ -1,8 +1,14 @@
 // @flow
 import assert from 'assert'
 import zip from 'lodash/zip'
+
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import type {
+  CommandCreator,
+  CurriedCommandCreator,
+  TransferArgs,
+} from '../../types'
 import {
   blowoutUtil,
   curryCommandCreator,
@@ -10,11 +16,6 @@ import {
 } from '../../utils'
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
-import type {
-  TransferArgs,
-  CurriedCommandCreator,
-  CommandCreator,
-} from '../../types'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,

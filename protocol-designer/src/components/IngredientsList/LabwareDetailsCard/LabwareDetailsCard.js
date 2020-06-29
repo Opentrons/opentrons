@@ -1,9 +1,10 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
+
 import { i18n } from '../../../localization'
-import { PDTitledList, PDListItem } from '../../lists'
 import { EditableTextField } from '../../EditableTextField'
+import { PDListItem, PDTitledList } from '../../lists'
 import styles from './labwareDetailsCard.css'
 
 type Props = {

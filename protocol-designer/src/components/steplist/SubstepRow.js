@@ -1,22 +1,22 @@
 // @flow
-import * as React from 'react'
+import { swatchColors, Tooltip, useHoverTooltip } from '@opentrons/components'
 import map from 'lodash/map'
 import noop from 'lodash/noop'
-import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
+import reduce from 'lodash/reduce'
+import * as React from 'react'
 
-import { swatchColors, Tooltip, useHoverTooltip } from '@opentrons/components'
 import type { LocationLiquidState } from '../../step-generation'
 import type {
   SubstepIdentifier,
   SubstepWellData,
-  WellIngredientVolumeData,
   WellIngredientNames,
+  WellIngredientVolumeData,
 } from '../../steplist/types'
-import { IngredPill } from './IngredPill'
 import { PDListItem } from '../lists'
+import { IngredPill } from './IngredPill'
 import styles from './StepItem.css'
-import { formatVolume, formatPercentage } from './utils'
+import { formatPercentage, formatVolume } from './utils'
 
 type SubstepRowProps = {|
   volume?: ?number | ?string,

@@ -1,17 +1,17 @@
 // @flow
 // info panel for labware calibration page
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { AlertModal, PrimaryButton, SpinnerModal } from '@opentrons/components'
 import { push } from 'connected-react-router'
-import { PrimaryButton, AlertModal, SpinnerModal } from '@opentrons/components'
 import some from 'lodash/some'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
+import pcrSealSrc from '../../img/place_pcr_seal.png'
+import { getModuleType, THERMOCYCLER_MODULE_TYPE } from '../../modules'
 import { selectors as robotSelectors } from '../../robot'
 import type { Dispatch } from '../../types'
-import pcrSealSrc from '../../img/place_pcr_seal.png'
 import { Portal } from '../portal'
 import styles from './styles.css'
-import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
 
 const IS_HOMING_MESSAGE = 'Returning tip and homing robot'
 

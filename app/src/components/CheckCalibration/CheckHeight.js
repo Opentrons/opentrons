@@ -1,16 +1,15 @@
 // @flow
-import * as React from 'react'
-import { PrimaryButton, Icon, type Mount } from '@opentrons/components'
+import { type Mount, Icon, PrimaryButton } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import * as React from 'react'
 
-import type { RobotCalibrationCheckComparison } from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import type { RobotCalibrationCheckComparison } from '../../sessions/types'
 import { JogControls } from '../JogControls'
+import { BadOutcomeBody } from './BadOutcomeBody'
+import { EndOfStepComparison } from './EndOfStepComparisons'
 import styles from './styles.css'
 import { getBadOutcomeHeader } from './utils'
-import { EndOfStepComparison } from './EndOfStepComparisons'
-import { BadOutcomeBody } from './BadOutcomeBody'
-
 import slot5LeftMultiDemoAsset from './videos/SLOT_5_LEFT_MULTI_Z.webm'
 import slot5LeftSingleDemoAsset from './videos/SLOT_5_LEFT_SINGLE_Z.webm'
 import slot5RightMultiDemoAsset from './videos/SLOT_5_RIGHT_MULTI_Z.webm'

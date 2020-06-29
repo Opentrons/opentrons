@@ -1,20 +1,20 @@
 // @flow
 import {
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  DEFAULT_PIPETTE,
+  DEST_LABWARE,
+  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  dropTipHelper,
   getErrorResult,
   getFlowRateAndOffsetParams,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
   makeAspirateHelper,
+  makeContext,
   makeDispenseHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
-  dropTipHelper,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  SOURCE_LABWARE,
 } from '../__fixtures__'
 import { transfer } from '../commandCreators/compound/transfer'
 

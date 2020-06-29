@@ -1,26 +1,24 @@
 // @flow
+import {
+  ALIGN_START,
+  COLOR_WARNING,
+  Flex,
+  FONT_WEIGHT_SEMIBOLD,
+  Icon,
+  Link,
+  OutlineButton,
+  Text,
+} from '@opentrons/components'
 import * as React from 'react'
 import styled from 'styled-components'
 
-import {
-  Flex,
-  Icon,
-  Text,
-  Link,
-  OutlineButton,
-  ALIGN_START,
-  COLOR_WARNING,
-  FONT_WEIGHT_SEMIBOLD,
-} from '@opentrons/components'
-
-import {
-  U2E_DRIVER_UPDATE_URL,
-  EVENT_U2E_DRIVER_LINK_CLICKED,
-  U2E_DRIVER_OUTDATED_MESSAGE,
-  U2E_DRIVER_OUTDATED_CTA,
-} from '../../system-info'
-
 import { useTrackEvent } from '../../analytics'
+import {
+  EVENT_U2E_DRIVER_LINK_CLICKED,
+  U2E_DRIVER_OUTDATED_CTA,
+  U2E_DRIVER_OUTDATED_MESSAGE,
+  U2E_DRIVER_UPDATE_URL,
+} from '../../system-info'
 
 const GET_UPDATE = 'get update'
 

@@ -1,6 +1,7 @@
 // slot map  component tests
 import React from 'react'
 import Renderer from 'react-test-renderer'
+
 import { SlotMap } from '..'
 
 describe('SlotMap', () => {

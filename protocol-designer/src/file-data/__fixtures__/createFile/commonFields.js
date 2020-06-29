@@ -1,12 +1,13 @@
 // @flow
 // Named arguments to createFile selector. This data would be the result of several selectors.
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+
 import type { DismissedWarningState } from '../../../dismiss/reducers'
-import type { IngredientsState } from '../../../labware-ingred/reducers'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
+import type { IngredientsState } from '../../../labware-ingred/reducers'
 import type { LabwareEntities, PipetteEntities } from '../../../step-forms'
 import type { LabwareLiquidState } from '../../../step-generation'
 import type { FileMetadataFields } from '../../types'

@@ -1,17 +1,23 @@
 // @flow
-import { createSelector } from 'reselect'
+import type { Options } from '@opentrons/components'
 import forEach from 'lodash/forEach'
 import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 import reduce from 'lodash/reduce'
+import { createSelector } from 'reselect'
 
-import type { Options } from '@opentrons/components'
 import type { LabwareLiquidState } from '../step-generation'
 import type {
-  RootState,
+  BaseState,
+  DeckSlot,
+  MemoizedSelector,
+  Selector,
+} from './../types'
+import type {
   ContainersState,
   DrillDownLabwareId,
   IngredientsState,
+  RootState,
   SelectedContainerId,
   SelectedLiquidGroupState,
 } from './reducers'
@@ -21,12 +27,6 @@ import type {
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import type {
-  BaseState,
-  MemoizedSelector,
-  Selector,
-  DeckSlot,
-} from './../types'
 
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 type RootSlice = { labwareIngred: RootState }

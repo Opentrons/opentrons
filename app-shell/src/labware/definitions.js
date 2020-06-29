@@ -1,10 +1,10 @@
 // @flow
-import path from 'path'
-import fs from 'fs-extra'
+import type { UncheckedLabwareFile } from '@opentrons/app/src/custom-labware/types'
 import { shell } from 'electron'
+import fs from 'fs-extra'
+import path from 'path'
 
 import type { Dirent } from '../types'
-import type { UncheckedLabwareFile } from '@opentrons/app/src/custom-labware/types'
 
 const RE_JSON_EXT = /\.json$/i
 

@@ -1,8 +1,9 @@
 // protocol actions tests
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import * as ConfigSelectors from '../../config/selectors'
+
 import { openProtocol } from '..'
+import * as ConfigSelectors from '../../config/selectors'
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)

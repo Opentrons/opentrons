@@ -1,15 +1,13 @@
 // @flow
-import { createSelector } from 'reselect'
-
 import assert from 'assert'
+import { createSelector } from 'reselect'
 
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'
-import { getActiveItem } from '../ui/steps/selectors'
-import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../steplist'
-
-import type { Selector } from '../types'
 import type { CommandsAndRobotState } from '../step-generation'
+import { PRESAVED_STEP_ID, START_TERMINAL_ITEM_ID } from '../steplist'
+import type { Selector } from '../types'
+import { getActiveItem } from '../ui/steps/selectors'
 
 const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   activeItem,

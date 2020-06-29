@@ -1,14 +1,14 @@
 // @flow
-import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+import type { Reducer } from 'redux'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { userFacingFlags, DEPRECATED_FLAGS, type Flags } from './types'
 
-import type { Reducer } from 'redux'
 import type { RehydratePersistedAction } from '../persist'
-import type { SetFeatureFlagAction } from './actions'
 import type { Action } from '../types'
+import type { SetFeatureFlagAction } from './actions'
+import { type Flags, DEPRECATED_FLAGS, userFacingFlags } from './types'
 
 // NOTE: these values will always be overridden by persisted values,
 // whenever the browser has seen the feature flag before and persisted it.

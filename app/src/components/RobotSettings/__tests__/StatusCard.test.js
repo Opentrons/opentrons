@@ -1,18 +1,17 @@
 // @flow
+import { Icon, LabeledValue, OutlineButton } from '@opentrons/components'
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
 
 import * as Fixtures from '../../../discovery/__fixtures__'
+import type { ViewableRobot } from '../../../discovery/types'
 import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../../robot'
-import { OutlineButton, Icon, LabeledValue } from '@opentrons/components'
-import { StatusCard } from '../StatusCard'
-
 import type { State } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
+import { StatusCard } from '../StatusCard'
 
 jest.mock('../../../robot/selectors')
 

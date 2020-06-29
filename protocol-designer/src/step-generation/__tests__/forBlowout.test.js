@@ -1,12 +1,12 @@
 // @flow
-import { forBlowout as _forBlowout } from '../getNextRobotStateAndWarnings/forBlowout'
-import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  makeContext,
-  getRobotStateWithTipStandard,
   DEFAULT_PIPETTE,
+  getRobotStateWithTipStandard,
+  makeContext,
   SOURCE_LABWARE,
 } from '../__fixtures__'
+import { makeImmutableStateUpdater } from '../__utils__'
+import { forBlowout as _forBlowout } from '../getNextRobotStateAndWarnings/forBlowout'
 
 const forBlowout = makeImmutableStateUpdater(_forBlowout)
 

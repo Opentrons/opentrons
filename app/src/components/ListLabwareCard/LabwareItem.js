@@ -1,20 +1,18 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
+import { format } from 'date-fns'
 import startCase from 'lodash/startCase'
 import { basename } from 'path'
-import { format } from 'date-fns'
+import * as React from 'react'
 
 import {
-  INVALID_LABWARE_FILE,
   DUPLICATE_LABWARE_FILE,
+  INVALID_LABWARE_FILE,
   OPENTRONS_LABWARE_FILE,
 } from '../../custom-labware'
-
-import { Warning } from './Warning'
-import styles from './styles.css'
-
 import type { CheckedLabwareFile } from '../../custom-labware/types'
+import styles from './styles.css'
+import { Warning } from './Warning'
 
 // TODO(mc, 2019-11-21): i18n
 const NA = 'N/A'

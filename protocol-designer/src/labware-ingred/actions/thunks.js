@@ -1,16 +1,16 @@
 // @flow
 import assert from 'assert'
-import { uuid } from '../../utils'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../ui/labware'
-import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 
+import { selectors as stepFormSelectors } from '../../step-forms'
+import type { ThunkAction } from '../../types'
+import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { uuid } from '../../utils'
+import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import type {
-  CreateContainerArgs,
   CreateContainerAction,
+  CreateContainerArgs,
   DuplicateLabwareAction,
 } from './actions'
-import type { ThunkAction } from '../../types'
 
 export const createContainer: (
   args: CreateContainerArgs

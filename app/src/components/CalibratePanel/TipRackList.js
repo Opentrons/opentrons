@@ -1,19 +1,17 @@
 // @flow
+import { TitledList } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
+import type { ContextRouter } from 'react-router-dom'
 import { withRouter } from 'react-router-dom'
 
-import { TitledList } from '@opentrons/components'
-import { LabwareListItem } from './LabwareListItem'
-
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-} from '../../robot'
-
-import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
 import type { Labware, Mount } from '../../robot'
+import {
+  actions as robotActions,
+  selectors as robotSelectors,
+} from '../../robot'
+import type { Dispatch, State } from '../../types'
+import { LabwareListItem } from './LabwareListItem'
 
 type OP = ContextRouter
 

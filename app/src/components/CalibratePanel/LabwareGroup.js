@@ -1,8 +1,8 @@
 // @flow
+import { SidePanelGroup } from '@opentrons/components'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
-import { SidePanelGroup } from '@opentrons/components'
 import { selectors as robotSelectors } from '../../robot'
 
 const TITLE = 'Labware Calibration'

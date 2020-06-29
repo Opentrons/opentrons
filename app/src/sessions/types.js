@@ -1,35 +1,33 @@
 // @flow
 
+import type {
+  RobotApiRequestMeta,
+  RobotApiV2ErrorResponseBody,
+  RobotApiV2ResponseBody,
+} from '../robot-api/types'
+import * as CalCheckConstants from './calibration-check/constants'
+import * as CalCheckTypes from './calibration-check/types'
 import typeof {
   CREATE_SESSION,
-  CREATE_SESSION_SUCCESS,
-  CREATE_SESSION_FAILURE,
-  DELETE_SESSION,
-  DELETE_SESSION_SUCCESS,
-  DELETE_SESSION_FAILURE,
-  FETCH_SESSION,
-  FETCH_SESSION_SUCCESS,
-  FETCH_SESSION_FAILURE,
-  FETCH_ALL_SESSIONS,
-  FETCH_ALL_SESSIONS_SUCCESS,
-  FETCH_ALL_SESSIONS_FAILURE,
-  ENSURE_SESSION,
   CREATE_SESSION_COMMAND,
-  CREATE_SESSION_COMMAND_SUCCESS,
   CREATE_SESSION_COMMAND_FAILURE,
+  CREATE_SESSION_COMMAND_SUCCESS,
+  CREATE_SESSION_FAILURE,
+  CREATE_SESSION_SUCCESS,
+  DELETE_SESSION,
+  DELETE_SESSION_FAILURE,
+  DELETE_SESSION_SUCCESS,
+  ENSURE_SESSION,
+  FETCH_ALL_SESSIONS,
+  FETCH_ALL_SESSIONS_FAILURE,
+  FETCH_ALL_SESSIONS_SUCCESS,
+  FETCH_SESSION,
+  FETCH_SESSION_FAILURE,
+  FETCH_SESSION_SUCCESS,
   SESSION_TYPE_CALIBRATION_CHECK,
   SESSION_TYPE_TIP_LENGTH_CALIBRATION,
 } from './constants'
-
-import type {
-  RobotApiRequestMeta,
-  RobotApiV2ResponseBody,
-  RobotApiV2ErrorResponseBody,
-} from '../robot-api/types'
-
-import * as CalCheckTypes from './calibration-check/types'
 import * as TipLengthCalTypes from './tip-length-calibration/types'
-import * as CalCheckConstants from './calibration-check/constants'
 
 export type * from './calibration-check/types'
 export type * from './tip-length-calibration/types'

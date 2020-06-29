@@ -2,14 +2,14 @@
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import { client } from '../client'
 import {
-  superDeprecatedRobotApiReducer as reducer,
-  startDeckCalibration,
   deckCalibrationCommand,
-  makeGetDeckCalibrationStartState,
   makeGetDeckCalibrationCommandState,
+  makeGetDeckCalibrationStartState,
+  startDeckCalibration,
+  superDeprecatedRobotApiReducer as reducer,
 } from '..'
+import { client } from '../client'
 
 jest.mock('../client')
 

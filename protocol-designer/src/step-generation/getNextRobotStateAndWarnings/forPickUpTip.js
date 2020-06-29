@@ -1,7 +1,8 @@
 // @flow
-import assert from 'assert'
 import { getIsTiprack } from '@opentrons/shared-data'
 import type { PipetteAccessParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import assert from 'assert'
+
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forPickUpTip(

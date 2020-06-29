@@ -1,32 +1,29 @@
 // @flow
 // app info card with version and updated
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
-
-import {
-  fetchSettings,
-  updateSetting,
-  getRobotSettings,
-} from '../../robot-settings'
-
-import { CONNECTABLE } from '../../discovery'
-import { downloadLogs } from '../../shell/robot-logs/actions'
-import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
-import { Portal } from '../portal'
 import {
   AlertModal,
   Card,
+  Icon,
   LabeledButton,
   LabeledToggle,
-  Icon,
 } from '@opentrons/components'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
-import { UploadRobotUpdate } from './UploadRobotUpdate'
-
-import type { State, Dispatch } from '../../types'
+import { CONNECTABLE } from '../../discovery'
 import type { ViewableRobot } from '../../discovery/types'
+import {
+  fetchSettings,
+  getRobotSettings,
+  updateSetting,
+} from '../../robot-settings'
 import type { RobotSettings } from '../../robot-settings/types'
+import { downloadLogs } from '../../shell/robot-logs/actions'
+import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
+import type { Dispatch, State } from '../../types'
+import { Portal } from '../portal'
+import { UploadRobotUpdate } from './UploadRobotUpdate'
 
 export type AdvancedSettingsCardProps = {|
   robot: ViewableRobot,

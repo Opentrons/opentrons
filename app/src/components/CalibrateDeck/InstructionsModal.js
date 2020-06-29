@@ -1,19 +1,17 @@
 // @flow
+import { ModalPage, SpinnerModalPage } from '@opentrons/components'
+import { push } from 'connected-react-router'
+import capitalize from 'lodash/capitalize'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 import { Link } from 'react-router-dom'
-import capitalize from 'lodash/capitalize'
 
 import { deckCalibrationCommand as dcCommand } from '../../http-api-client'
 import { restartRobot } from '../../robot-admin'
-
+import type { Dispatch } from '../../types'
 import { chainActions } from '../../util'
-import { ModalPage, SpinnerModalPage } from '@opentrons/components'
 import { AttachTip } from './AttachTip'
 import { ConfirmPosition } from './ConfirmPosition'
-
-import type { Dispatch } from '../../types'
 import type { CalibrateDeckStartedProps } from './types'
 
 type OP = CalibrateDeckStartedProps

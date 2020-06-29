@@ -1,15 +1,13 @@
 // @flow
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-import * as RobotApiHttp from '../../../robot-api/http'
-
-import * as Fixtures from '../../__fixtures__'
-import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
-
+import * as Fixtures from '../../__fixtures__'
+import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
+import * as RobotApiHttp from '../../../robot-api/http'
 import type {
-  RobotHost,
   RobotApiRequestOptions,
+  RobotHost,
 } from '../../../robot-api/types'
+import * as Actions from '../../actions'
 
 jest.mock('../../../robot-api/http')
 

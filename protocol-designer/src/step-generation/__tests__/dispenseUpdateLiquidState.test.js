@@ -1,15 +1,14 @@
 // @flow
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
-
+import produce from 'immer'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
-import produce from 'immer'
-import { createEmptyLiquidState, createTipLiquidState } from '../utils'
-import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../__fixtures__'
 
+import { DEFAULT_PIPETTE, makeContext, SOURCE_LABWARE } from '../__fixtures__'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import { createEmptyLiquidState, createTipLiquidState } from '../utils'
 
 let dispenseSingleCh150ToA1Args
 let invariantContext

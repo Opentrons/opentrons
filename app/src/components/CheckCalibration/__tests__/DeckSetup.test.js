@@ -1,9 +1,9 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
+import * as React from 'react'
 import { act } from 'react-dom/test-utils'
-import { mockRobotCalibrationCheckSessionDetails } from '../../../sessions/__fixtures__'
 
+import { mockRobotCalibrationCheckSessionDetails } from '../../../sessions/__fixtures__'
 import { DeckSetup } from '../DeckSetup'
 
 jest.mock('../../../getLabware')

@@ -2,16 +2,15 @@
 import {
   CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
   CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
-  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
   CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
+  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
   CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
   CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
   CHECK_TRANSFORM_TYPE_UNKNOWN,
 } from '../constants'
-
 import type {
-  RobotCalibrationCheckSessionDetails,
   RobotCalibrationCheckComparison,
+  RobotCalibrationCheckSessionDetails,
 } from '../types'
 
 export const badZComparison: RobotCalibrationCheckComparison = {

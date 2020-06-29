@@ -1,8 +1,8 @@
 // @flow
-import { combineReducers, type Reducer } from 'redux'
+import { type Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
-import type { BaseState, Action } from '../../types'
+import type { Action, BaseState } from '../../types'
 import type {
   NavigateToPageAction,
   ToggleNewProtocolModalAction,

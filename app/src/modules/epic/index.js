@@ -1,11 +1,11 @@
 // @flow
 import { combineEpics } from 'redux-observable'
-import { fetchModulesEpic } from './fetchModulesEpic'
-import { sendModuleCommandEpic } from './sendModuleCommandEpic'
-import { updateModuleEpic } from './updateModuleEpic'
-import { pollModulesWhileConnectedEpic } from './pollModulesWhileConnectedEpic'
 
 import type { Epic } from '../../types'
+import { fetchModulesEpic } from './fetchModulesEpic'
+import { pollModulesWhileConnectedEpic } from './pollModulesWhileConnectedEpic'
+import { sendModuleCommandEpic } from './sendModuleCommandEpic'
+import { updateModuleEpic } from './updateModuleEpic'
 
 export const modulesEpic: Epic = combineEpics(
   fetchModulesEpic,

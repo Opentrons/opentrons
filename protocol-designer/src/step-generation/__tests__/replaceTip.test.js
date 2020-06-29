@@ -1,14 +1,15 @@
 // @flow
 import merge from 'lodash/merge'
+
 import {
-  getInitialRobotStateStandard,
-  makeContext,
-  getTiprackTipstate,
-  getTipColumn,
-  getSuccessResult,
-  pickUpTipHelper,
-  dropTipHelper,
   DEFAULT_PIPETTE,
+  dropTipHelper,
+  getInitialRobotStateStandard,
+  getSuccessResult,
+  getTipColumn,
+  getTiprackTipstate,
+  makeContext,
+  pickUpTipHelper,
 } from '../__fixtures__'
 import { replaceTip } from '../commandCreators/atomic/replaceTip'
 

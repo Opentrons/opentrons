@@ -1,6 +1,6 @@
 // @flow
-import * as React from 'react'
 import { Link, OutlineButton } from '@opentrons/components'
+import * as React from 'react'
 
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'

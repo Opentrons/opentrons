@@ -1,11 +1,11 @@
 // @flow
+import type { JogAxis } from '../../http-api-client'
 import {
   CHECK_TRANSFORM_TYPE_DECK,
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_UNKNOWN,
 } from '../../sessions'
 import type { CheckTransformType } from '../../sessions/types'
-import type { JogAxis } from '../../http-api-client'
 
 const BAD = 'Bad'
 const DETECTED = 'detected'

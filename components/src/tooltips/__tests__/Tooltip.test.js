@@ -1,9 +1,9 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
+import * as React from 'react'
 
 import { TOOLTIP_TOP } from '../constants'
-import { Tooltip, Arrow } from '../Tooltip'
+import { Arrow, Tooltip } from '../Tooltip'
 
 const placement = TOOLTIP_TOP
 const tooltipId = 'tooltip-id'

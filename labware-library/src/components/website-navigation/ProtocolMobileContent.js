@@ -1,10 +1,10 @@
 // @flow
-import * as React from 'react'
 import map from 'lodash/map'
-import { NavLink } from './NavLink'
-import styles from './styles.css'
+import * as React from 'react'
 
 import { protocolLinkProps } from './nav-data'
+import { NavLink } from './NavLink'
+import styles from './styles.css'
 
 type Props = {||}
 

@@ -1,15 +1,14 @@
 // @flow
-import assert from 'assert'
-import * as React from 'react'
-import reduce from 'lodash/reduce'
-
-import { SingleLabware } from './SingleLabware'
-import { wellFillFromWellContents } from './utils'
-import type { ContentsByWell } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import assert from 'assert'
+import reduce from 'lodash/reduce'
+import * as React from 'react'
 
+import type { ContentsByWell } from '../../labware-ingred/types'
+import type { WellIngredientNames } from '../../steplist/types'
+import { SingleLabware } from './SingleLabware'
+import { wellFillFromWellContents } from './utils'
 import { WellTooltip } from './WellTooltip'
 
 type Props = {|

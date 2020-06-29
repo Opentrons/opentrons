@@ -2,39 +2,36 @@
 // opentrons robot service discovery client
 // finds robots on the network via mdns
 
-import EventEmitter from 'events'
 import escape from 'escape-string-regexp'
-import toRegex from 'to-regex'
+import EventEmitter from 'events'
 import differenceBy from 'lodash/differenceBy'
 import xorBy from 'lodash/xorBy'
+import type { Browser, BrowserService } from 'mdns-js'
+import toRegex from 'to-regex'
 
 import { createMdnsBrowser, getKnownIps } from './mdns-browser'
-import { poll, stop, type PollRequest } from './poller'
-import {
-  createServiceList,
-  upsertServiceList,
-  updateServiceListByIp,
-} from './service-list'
-
+import { type PollRequest, poll, stop } from './poller'
 import {
   DEFAULT_PORT,
-  updateService,
   fromMdnsBrowser,
   fromResponse,
   makeCandidate,
   toCandidate,
+  updateService,
 } from './service'
-
-import type { Browser, BrowserService } from 'mdns-js'
-
+import {
+  createServiceList,
+  updateServiceListByIp,
+  upsertServiceList,
+} from './service-list'
 import type {
   Candidate,
+  HealthResponse,
+  Logger,
+  LogLevel,
+  ServerHealthResponse,
   Service,
   ServiceList,
-  HealthResponse,
-  ServerHealthResponse,
-  LogLevel,
-  Logger,
 } from './types'
 
 export * from './types'

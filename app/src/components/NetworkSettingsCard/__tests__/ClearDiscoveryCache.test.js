@@ -1,11 +1,12 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
+import { LabeledButton } from '@opentrons/components'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
-import { LabeledButton } from '@opentrons/components'
-import { ClearDiscoveryCache } from '../ClearDiscoveryCache'
+import * as React from 'react'
+import { Provider } from 'react-redux'
+
 import { clearDiscoveryCache } from '../../../discovery'
+import { ClearDiscoveryCache } from '../ClearDiscoveryCache'
 
 describe('ClearDiscoveryCache', () => {
   const dispatch = jest.fn()

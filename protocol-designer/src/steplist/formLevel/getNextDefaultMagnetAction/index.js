@@ -1,6 +1,7 @@
 // @flow
 import last from 'lodash/last'
-import type { StepIdType, FormData, MagnetAction } from '../../../form-types'
+
+import type { FormData, MagnetAction, StepIdType } from '../../../form-types'
 
 export function getNextDefaultMagnetAction(
   savedForms: { [StepIdType]: FormData },

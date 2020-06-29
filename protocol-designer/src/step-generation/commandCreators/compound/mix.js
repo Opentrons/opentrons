@@ -1,17 +1,18 @@
 // @flow
 import flatMap from 'lodash/flatMap'
+
+import * as errorCreators from '../../errorCreators'
+import type {
+  CommandCreator,
+  CurriedCommandCreator,
+  MixArgs,
+} from '../../types'
 import {
-  repeatArray,
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
+  repeatArray,
 } from '../../utils'
-import * as errorCreators from '../../errorCreators'
-import type {
-  MixArgs,
-  CommandCreator,
-  CurriedCommandCreator,
-} from '../../types'
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */

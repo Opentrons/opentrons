@@ -1,36 +1,34 @@
 // @flow
 // robot selectors
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { format } from 'date-fns'
 import padStart from 'lodash/padStart'
 import some from 'lodash/some'
 import { createSelector } from 'reselect'
-import { format } from 'date-fns'
 
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getCustomLabwareDefinitions } from '../custom-labware/selectors'
-import { getLabwareDefBySlot } from '../protocol/selectors'
 import { getLatestLabwareDef } from '../getLabware'
-import * as Constants from './constants'
-
+import { getLabwareDefBySlot } from '../protocol/selectors'
 import type { State } from '../types'
+import * as Constants from './constants'
+import type { CalibrationRequest } from './reducer/calibration'
+import type { ConnectionState } from './reducer/connection'
 import type {
-  Mount,
-  Slot,
-  Pipette,
-  StatePipette,
-  Labware,
-  StateLabware,
+  CommandNode,
   ConnectionStatus,
+  Labware,
   LabwareCalibrationStatus,
   LabwareType,
+  Mount,
+  Pipette,
+  SessionModule,
   SessionStatus,
   SessionStatusInfo,
-  SessionModule,
+  Slot,
+  StateLabware,
+  StatePipette,
   TiprackByMountMap,
-  CommandNode,
 } from './types'
-
-import type { ConnectionState } from './reducer/connection'
-import type { CalibrationRequest } from './reducer/calibration'
 
 const calibration = (state: State) => state.robot.calibration
 const connection = (state: State) => state.robot.connection

@@ -1,10 +1,11 @@
 // @flow
 
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import * as React from 'react'
-import cx from 'classnames'
-import styles from './FilePipettesModal.css'
 import { InstrumentDiagram } from '@opentrons/components'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
+
+import styles from './FilePipettesModal.css'
 
 type Props = {
   leftPipette: ?string,

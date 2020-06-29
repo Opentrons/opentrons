@@ -1,12 +1,13 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import type { ThunkDispatch } from '../../types'
-import { i18n } from '../../localization'
-import { actions as stepsActions } from '../../ui/steps'
-import { actions as steplistActions } from '../../steplist'
-import { Portal } from '../portals/TopPortal'
+
 import type { StepIdType } from '../../form-types'
+import { i18n } from '../../localization'
+import { actions as steplistActions } from '../../steplist'
+import type { ThunkDispatch } from '../../types'
+import { actions as stepsActions } from '../../ui/steps'
+import { Portal } from '../portals/TopPortal'
 import styles from './StepItem.css'
 
 const MENU_OFFSET_PX = 5

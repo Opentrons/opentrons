@@ -1,6 +1,7 @@
 // @flow
 
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+
 import * as utils from '../utils'
 
 describe('utils', () => {

@@ -1,14 +1,14 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import { useSelector } from 'react-redux'
 import { Icon } from '@opentrons/components'
-import { getHoveredStepLabware, getHoveredStepId } from '../../../ui/steps'
-import { getSavedStepForms } from '../../../step-forms/selectors'
-import { THERMOCYCLER_PROFILE } from '../../../constants'
+import cx from 'classnames'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
-import styles from './LabwareOverlays.css'
+import { THERMOCYCLER_PROFILE } from '../../../constants'
 import type { LabwareOnDeck } from '../../../step-forms'
+import { getSavedStepForms } from '../../../step-forms/selectors'
+import { getHoveredStepId, getHoveredStepLabware } from '../../../ui/steps'
+import styles from './LabwareOverlays.css'
 
 type LabwareHighlightProps = {|
   labwareOnDeck: LabwareOnDeck,

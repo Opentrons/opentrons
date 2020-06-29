@@ -2,18 +2,17 @@
 // connected component for an item in a RobotList
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { withRouter, type ContextRouter } from 'react-router-dom'
+import { type ContextRouter, withRouter } from 'react-router-dom'
 
+import { getBuildrootUpdateAvailable, UPGRADE } from '../../buildroot'
+import { CONNECTABLE } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../robot'
-import { getBuildrootUpdateAvailable, UPGRADE } from '../../buildroot'
-import { CONNECTABLE } from '../../discovery'
+import type { Dispatch, State } from '../../types'
 import { RobotListItem } from './RobotListItem.js'
-
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
 
 export type RobotItemProps = {|
   ...ContextRouter,

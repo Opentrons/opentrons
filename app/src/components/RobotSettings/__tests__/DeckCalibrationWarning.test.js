@@ -1,12 +1,11 @@
 // @flow
-import * as React from 'react'
+import { COLOR_ERROR, COLOR_WARNING, Flex, Icon } from '@opentrons/components'
 import { mount } from 'enzyme'
+import * as React from 'react'
 
 import * as Calibration from '../../../calibration'
-import { Flex, Icon, COLOR_WARNING, COLOR_ERROR } from '@opentrons/components'
-import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
-
 import type { DeckCalibrationStatus } from '../../../calibration/types'
+import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
 
 describe('Calibration Warning Component', () => {
   const render = (status: DeckCalibrationStatus | null) => {

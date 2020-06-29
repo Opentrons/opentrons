@@ -1,15 +1,16 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
+
+import type { PathOption } from '../../../../form-types'
+import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
+import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
+import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import { i18n } from '../../../../localization'
-import { FieldConnector } from '../FieldConnector'
 import styles from '../../StepEditForm.css'
 import type { FocusHandlers } from '../../types'
-import type { PathOption } from '../../../../form-types'
-import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
-import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
-import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
+import { FieldConnector } from '../FieldConnector'
 
 const PATH_ANIMATION_IMAGES = {
   single: require('../../../../images/path_single.gif'),

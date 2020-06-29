@@ -1,10 +1,9 @@
 // @flow
+import { PrimaryButton } from '@opentrons/components'
 import * as React from 'react'
 
-import { PrimaryButton } from '@opentrons/components'
 import { JogControls } from '../JogControls'
 import { Instructions } from './Instructions'
-
 import type { CalibrateDeckStartedProps } from './types'
 
 export type ConfirmPositionProps = {|

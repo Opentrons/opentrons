@@ -1,43 +1,44 @@
 // @flow
-import assert from 'assert'
-import reduce from 'lodash/reduce'
-import omit from 'lodash/omit'
-import * as React from 'react'
-import cx from 'classnames'
-import { Formik } from 'formik'
-import * as Yup from 'yup'
-import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import {
-  Modal,
   FormGroup,
   InputField,
+  Modal,
   OutlineButton,
 } from '@opentrons/components'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
+import assert from 'assert'
+import cx from 'classnames'
+import { Formik } from 'formik'
+import type { FormikProps } from 'formik/@flow-typed'
+import omit from 'lodash/omit'
+import reduce from 'lodash/reduce'
+import * as React from 'react'
+import * as Yup from 'yup'
+
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
-import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
-import { ModuleFields } from './ModuleFields'
-import { PipetteFields } from './PipetteFields'
-import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
-import styles from './FilePipettesModal.css'
-import formStyles from '../../forms/forms.css'
-import modalStyles from '../modal.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../../types'
 import type { NewProtocolFields } from '../../../load-file'
+import { i18n } from '../../../localization'
 import type {
-  PipetteOnDeck,
+  FormModulesByType,
   FormPipette,
   FormPipettesByMount,
-  FormModulesByType,
+  PipetteOnDeck,
 } from '../../../step-forms'
-import type { FormikProps } from 'formik/@flow-typed'
+import { getIsCrashablePipetteSelected } from '../../../step-forms'
+import type { DeckSlot } from '../../../types'
+import formStyles from '../../forms/forms.css'
+import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
+import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
+import modalStyles from '../modal.css'
+import styles from './FilePipettesModal.css'
+import { ModuleFields } from './ModuleFields'
+import { PipetteFields } from './PipetteFields'
 
 export type PipetteFieldsData = $Diff<
   PipetteOnDeck,

@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { Card } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import * as React from 'react'
+
 import { SystemInfoCard } from '..'
 import { U2EAdapterInfo } from '../U2EAdapterInfo'
 

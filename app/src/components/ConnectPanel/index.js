@@ -1,29 +1,26 @@
 // @flow
+import { SidePanel } from '@opentrons/components'
+import orderBy from 'lodash/orderBy'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import orderBy from 'lodash/orderBy'
 
 import {
-  startDiscovery,
-  getScanning,
   getConnectableRobots,
   getReachableRobots,
+  getScanning,
   getUnreachableRobots,
+  startDiscovery,
 } from '../../discovery'
-
-import type { State, Dispatch } from '../../types'
-
-import { SidePanel } from '@opentrons/components'
-import { RobotList } from './RobotList'
-import { RobotItem } from './RobotItem'
-import { ScanStatus } from './ScanStatus'
-import { UnreachableRobotItem } from './UnreachableRobotItem'
-
 import type {
-  Robot,
   ReachableRobot,
+  Robot,
   UnreachableRobot,
 } from '../../discovery/types'
+import type { Dispatch, State } from '../../types'
+import { RobotItem } from './RobotItem'
+import { RobotList } from './RobotList'
+import { ScanStatus } from './ScanStatus'
+import { UnreachableRobotItem } from './UnreachableRobotItem'
 
 type SP = {|
   robots: Array<Robot>,

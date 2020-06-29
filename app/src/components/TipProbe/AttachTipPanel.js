@@ -1,20 +1,18 @@
 // @flow
+import { PrimaryButton } from '@opentrons/components'
+import cx from 'classnames'
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import cx from 'classnames'
 
-import { CalibrationInfoContent } from '../CalibrationInfoContent'
-import { PrimaryButton } from '@opentrons/components'
-
+import attachMulti from '../../img/attach_tip_multi.png'
+import attachSingle from '../../img/attach_tip_single.png'
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import attachSingle from '../../img/attach_tip_single.png'
-import attachMulti from '../../img/attach_tip_multi.png'
-import styles from './tip-probe.css'
-
 import type { Dispatch } from '../../types'
+import { CalibrationInfoContent } from '../CalibrationInfoContent'
+import styles from './tip-probe.css'
 import type { TipProbeProps } from './types'
 
 type Props = TipProbeProps

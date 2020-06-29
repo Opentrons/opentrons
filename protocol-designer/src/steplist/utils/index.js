@@ -1,6 +1,6 @@
 // @flow
 import { mergeWhen } from './mergeWhen'
-import { orderWells, getOrderedWells } from './orderWells'
+import { getOrderedWells, orderWells } from './orderWells'
 
 export { mergeWhen, orderWells, getOrderedWells }
 

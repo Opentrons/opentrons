@@ -1,23 +1,22 @@
 // @flow
 // robot session (protocol) state and reducer
 import omit from 'lodash/omit'
-import { actionTypes } from '../actions'
-
-import type { Action } from '../../types'
-import type {
-  Command,
-  StatePipette,
-  StateLabware,
-  SessionModule,
-  Mount,
-  Slot,
-  DoorState,
-  SessionStatus,
-  SessionStatusInfo,
-} from '../types'
 
 import type { InvalidProtocolFileAction } from '../../protocol/types'
+import type { Action } from '../../types'
 import type { SessionUpdateAction } from '../actions'
+import { actionTypes } from '../actions'
+import type {
+  Command,
+  DoorState,
+  Mount,
+  SessionModule,
+  SessionStatus,
+  SessionStatusInfo,
+  Slot,
+  StateLabware,
+  StatePipette,
+} from '../types'
 
 type Request = {
   inProgress: boolean,

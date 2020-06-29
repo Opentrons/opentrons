@@ -1,21 +1,22 @@
 // @flow
 import flatMap from 'lodash/flatMap'
-import { mix } from '../commandCreators/compound/mix'
+
 import {
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
-  replaceTipCommands,
-  getFlowRateAndOffsetParams,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  makeAspirateHelper,
-  makeDispenseHelper,
   blowoutHelper,
+  DEFAULT_PIPETTE,
+  DEST_LABWARE,
+  getErrorResult,
+  getFlowRateAndOffsetParams,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeAspirateHelper,
+  makeContext,
+  makeDispenseHelper,
   makeTouchTipHelper,
+  replaceTipCommands,
+  SOURCE_LABWARE,
 } from '../__fixtures__'
+import { mix } from '../commandCreators/compound/mix'
 import type { MixArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()

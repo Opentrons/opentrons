@@ -2,16 +2,16 @@
 import { app, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 
-import { createUi } from './ui'
-import { initializeMenu } from './menu'
-import { createLogger } from './log'
+import { registerBuildrootUpdate } from './buildroot'
+import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
+import { createLogger } from './log'
+import { initializeMenu } from './menu'
 import { registerRobotLogs } from './robot-logs'
-import { registerUpdate } from './update'
-import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
-import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import { createUi } from './ui'
+import { registerUpdate } from './update'
 
 const config = getConfig()
 const log = createLogger('main')

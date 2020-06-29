@@ -1,15 +1,15 @@
 // @flow
 import merge from 'lodash/merge'
-import { makeImmutableStateUpdater } from '../__utils__'
-import {
-  getInitialRobotStateStandard,
-  makeContext,
-  getTipColumn,
-  DEFAULT_PIPETTE,
-} from '../__fixtures__'
-import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
 
+import {
+  DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  getTipColumn,
+  makeContext,
+} from '../__fixtures__'
+import { makeImmutableStateUpdater } from '../__utils__'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
 
 const forPickUpTip = makeImmutableStateUpdater(_forPickUpTip)
 

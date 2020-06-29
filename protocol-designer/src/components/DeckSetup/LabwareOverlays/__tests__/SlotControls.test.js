@@ -1,14 +1,15 @@
 // @flow
 
-import React from 'react'
-import { shallow } from 'enzyme'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { shallow } from 'enzyme'
+import React from 'react'
+
 import { DND_TYPES } from '../../../../constants'
-import * as labwareModuleCompatibility from '../../../../utils/labwareModuleCompatibility'
 import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { SlotControlsComponent } from '../SlotControls'
+import * as labwareModuleCompatibility from '../../../../utils/labwareModuleCompatibility'
 import { BlockedSlot } from '../BlockedSlot'
+import { SlotControlsComponent } from '../SlotControls'
 
 describe('SlotControlsComponent', () => {
   let props, getLabwareIsCompatibleSpy

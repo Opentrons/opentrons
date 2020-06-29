@@ -1,23 +1,21 @@
 // @flow
-import fse from 'fs-extra'
+import * as ConfigActions from '@opentrons/app/src/config'
+import * as CustomLabware from '@opentrons/app/src/custom-labware'
+import type {
+  CustomLabwareListActionSource as ListSource,
+  DuplicateLabwareFile,
+  UncheckedLabwareFile,
+} from '@opentrons/app/src/custom-labware/types'
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import { app, shell } from 'electron'
+import fse from 'fs-extra'
+
 import { getFullConfig, handleConfigChange } from '../config'
 import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
+import type { Action, Dispatch } from '../types'
+import { sameIdentity } from './compare'
 import * as Definitions from './definitions'
 import { validateLabwareFiles, validateNewLabwareFile } from './validation'
-import { sameIdentity } from './compare'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
-import * as CustomLabware from '@opentrons/app/src/custom-labware'
-import * as ConfigActions from '@opentrons/app/src/config'
-
-import type {
-  UncheckedLabwareFile,
-  DuplicateLabwareFile,
-  CustomLabwareListActionSource as ListSource,
-} from '@opentrons/app/src/custom-labware/types'
-
-import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 

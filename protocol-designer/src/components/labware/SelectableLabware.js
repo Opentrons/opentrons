@@ -1,21 +1,20 @@
 // @flow
-import * as React from 'react'
+import type { Channels, WellGroup, WellMouseEvent } from '@opentrons/components'
 import reduce from 'lodash/reduce'
+import * as React from 'react'
 
+import type { GenericRect } from '../../collision-types'
+import { SELECTABLE_WELL_CLASS } from '../../constants'
+import type { ContentsByWell } from '../../labware-ingred/types'
+import type { WellIngredientNames } from '../../steplist/types'
 import {
   arrayToWellGroup,
   getCollidingWells,
   getWellSetForMultichannel,
 } from '../../utils'
-import { SELECTABLE_WELL_CLASS } from '../../constants'
-import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
+import { SingleLabware } from './SingleLabware'
 import { WellTooltip } from './WellTooltip'
-
-import type { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
-import type { ContentsByWell } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
-import type { GenericRect } from '../../collision-types'
 
 export type Props = {|
   labwareProps: $Diff<

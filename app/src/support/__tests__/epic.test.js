@@ -1,12 +1,12 @@
 // @flow
 // support profile epic test
 import { TestScheduler } from 'rxjs/testing'
-import { configInitialized } from '../../config'
-import * as Profile from '../profile'
-import { supportEpic } from '../epic'
 
-import type { Action, State } from '../../types'
+import { configInitialized } from '../../config'
 import type { Config } from '../../config/types'
+import type { Action, State } from '../../types'
+import { supportEpic } from '../epic'
+import * as Profile from '../profile'
 import type { SupportConfig, SupportProfileUpdate } from '../types'
 
 jest.mock('../profile')

@@ -1,32 +1,31 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import { connect } from 'react-redux'
-import clamp from 'lodash/clamp'
-import round from 'lodash/round'
 import {
+  FormGroup,
+  HandleKeypress,
+  Icon,
+  InputField,
   Modal,
   OutlineButton,
   PrimaryButton,
-  FormGroup,
-  InputField,
-  Icon,
-  HandleKeypress,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { Portal } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.css'
-import { actions } from '../../../../steplist'
-import { TipPositionZAxisViz } from './TipPositionZAxisViz'
+import cx from 'classnames'
+import clamp from 'lodash/clamp'
+import round from 'lodash/round'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
-import styles from './TipPositionInput.css'
-import * as utils from './utils'
 import {
-  getIsTouchTipField,
   type TipOffsetFields,
+  getIsTouchTipField,
 } from '../../../../form-types'
-
+import { i18n } from '../../../../localization'
+import { actions } from '../../../../steplist'
 import type { ThunkDispatch } from '../../../../types'
+import modalStyles from '../../../modals/modal.css'
+import { Portal } from '../../../portals/MainPageModalPortal'
+import styles from './TipPositionInput.css'
+import { TipPositionZAxisViz } from './TipPositionZAxisViz'
+import * as utils from './utils'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10

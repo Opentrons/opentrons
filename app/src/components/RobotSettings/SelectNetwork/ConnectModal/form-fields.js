@@ -3,20 +3,19 @@ import get from 'lodash/get'
 
 import * as Constants from '../constants'
 import * as Copy from '../i18n'
-
 import type {
-  WifiNetwork,
-  WifiKey,
+  ConnectFormErrors,
+  ConnectFormField,
+  ConnectFormSecurityField,
+  ConnectFormTextField,
+  ConnectFormValues,
   EapOption,
   WifiAuthField,
   WifiConfigureRequest,
-  WifiSecurityType,
   WifiEapConfig,
-  ConnectFormValues,
-  ConnectFormErrors,
-  ConnectFormField,
-  ConnectFormTextField,
-  ConnectFormSecurityField,
+  WifiKey,
+  WifiNetwork,
+  WifiSecurityType,
 } from '../types'
 
 export const renderLabel = (label: string, required: boolean): string =>

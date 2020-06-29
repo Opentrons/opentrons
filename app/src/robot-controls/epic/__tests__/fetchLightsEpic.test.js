@@ -1,20 +1,19 @@
 // @flow
+import type { Observable } from 'rxjs'
 import { TestScheduler } from 'rxjs/testing'
 
+import { robotControlsEpic } from '..'
+import * as Fixtures from '../../__fixtures__'
+import * as DiscoverySelectors from '../../../discovery/selectors'
 import { mockRobot } from '../../../robot-api/__fixtures__'
 import * as RobotApiHttp from '../../../robot-api/http'
-import * as DiscoverySelectors from '../../../discovery/selectors'
-import * as Fixtures from '../../__fixtures__'
-import * as Actions from '../../actions'
-import * as Types from '../../types'
-import { robotControlsEpic } from '..'
-
-import type { Observable } from 'rxjs'
 import type {
-  RobotHost,
   RobotApiRequestOptions,
   RobotApiResponse,
+  RobotHost,
 } from '../../../robot-api/types'
+import * as Actions from '../../actions'
+import * as Types from '../../types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')

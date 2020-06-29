@@ -1,9 +1,10 @@
 // @flow
-import type { RootState as IngredRoot } from './labware-ingred/reducers'
-import type { RootState as StepformRoot } from './step-forms'
-import type { RootState as DismissRoot } from './dismiss'
 import type { ProtocolFile as ProtocolFileV3 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { ProtocolFile as ProtocolFileV4 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+
+import type { RootState as DismissRoot } from './dismiss'
+import type { RootState as IngredRoot } from './labware-ingred/reducers'
+import type { RootState as StepformRoot } from './step-forms'
 
 export type PDMetadata = {
   // pipetteId to tiprackModel

@@ -1,7 +1,8 @@
 // @flow
-import range from 'lodash/range'
-import { getLabwareHasQuirk, sortWells } from '.'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import range from 'lodash/range'
+
+import { getLabwareHasQuirk, sortWells } from '.'
 
 // TODO Ian 2018-03-13 pull pipette offsets/positions from some pipette definitions data
 const OFFSET_8_CHANNEL = 9 // offset in mm between tips

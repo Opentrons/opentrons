@@ -1,14 +1,14 @@
 // @flow
 import {
-  TEMPERATURE_AT_TARGET,
-  TEMPERATURE_APPROACHING_TARGET,
-  TEMPERATURE_DEACTIVATED,
-} from '../../constants'
-import { awaitTemperature } from '../commandCreators/atomic/awaitTemperature'
-import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../__fixtures__'
+import {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
+} from '../../constants'
+import { awaitTemperature } from '../commandCreators/atomic/awaitTemperature'
 
 describe('awaitTemperature', () => {
   const temperatureModuleId = 'temperatureModuleId'

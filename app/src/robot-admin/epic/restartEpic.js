@@ -2,18 +2,17 @@
 import { ofType } from 'redux-observable'
 import { mapTo } from 'rxjs/operators'
 
-import { POST } from '../../robot-api/constants'
-import { mapToRobotApiRequest } from '../../robot-api/operators'
-import { getRobotRestartPath } from '../../robot-settings'
 import { startDiscovery } from '../../discovery'
-import * as Constants from '../constants'
-import * as Actions from '../actions'
-
-import type { Epic } from '../../types'
+import { POST } from '../../robot-api/constants'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import { mapToRobotApiRequest } from '../../robot-api/operators'
+import { getRobotRestartPath } from '../../robot-settings'
+import type { Epic } from '../../types'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
 import type { RestartRobotAction } from '../types'
 
 const RESTART_DISCOVERY_TIMEOUT_MS = 60000

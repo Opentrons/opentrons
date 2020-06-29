@@ -1,20 +1,18 @@
 // @flow
 // RobotSettings card for robot status
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { Card, Icon, LabeledValue, OutlineButton } from '@opentrons/components'
 import capitalize from 'lodash/capitalize'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-} from '../../robot'
-
-import { Card, LabeledValue, OutlineButton, Icon } from '@opentrons/components'
 import { CONNECTABLE } from '../../discovery'
-import { CardContentHalf } from '../layout'
-
-import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
+import {
+  actions as robotActions,
+  selectors as robotSelectors,
+} from '../../robot'
+import type { Dispatch } from '../../types'
+import { CardContentHalf } from '../layout'
 
 type Props = {| robot: ViewableRobot |}
 

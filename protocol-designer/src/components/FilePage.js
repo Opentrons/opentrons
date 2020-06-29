@@ -1,8 +1,4 @@
 // @flow
-import * as React from 'react'
-import { Formik } from 'formik'
-import { format } from 'date-fns'
-
 import {
   Card,
   FormGroup,
@@ -11,20 +7,23 @@ import {
   OutlineButton,
   PrimaryButton,
 } from '@opentrons/components'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import cx from 'classnames'
+import { format } from 'date-fns'
+import { Formik } from 'formik'
+import type { FormikProps } from 'formik/@flow-typed'
+import * as React from 'react'
+
+import formStyles from '../components/forms/forms.css'
+import modalStyles from '../components/modals/modal.css'
+import type { FileMetadataFields } from '../file-data'
 import { i18n } from '../localization'
-import { Portal } from './portals/MainPageModalPortal'
-import { EditPipettesModal } from './modals/EditPipettesModal'
-import { EditModulesCard } from './modules'
+import type { ModulesForEditModulesCard } from '../step-forms'
 import { EditModules } from './EditModules'
 import styles from './FilePage.css'
-import modalStyles from '../components/modals/modal.css'
-import formStyles from '../components/forms/forms.css'
-
-import type { FormikProps } from 'formik/@flow-typed'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { FileMetadataFields } from '../file-data'
-import type { ModulesForEditModulesCard } from '../step-forms'
+import { EditPipettesModal } from './modals/EditPipettesModal'
+import { EditModulesCard } from './modules'
+import { Portal } from './portals/MainPageModalPortal'
 
 export type Props = {|
   formValues: FileMetadataFields,

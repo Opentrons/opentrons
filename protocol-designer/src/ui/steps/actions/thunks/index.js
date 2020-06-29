@@ -1,26 +1,24 @@
 // @flow
 import assert from 'assert'
+
+import { PAUSE_UNTIL_TEMP } from '../../../../constants'
+import type { FormData, StepIdType, StepType } from '../../../../form-types'
+import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
 import {
   getUnsavedForm,
   getUnsavedFormIsPristineSetTempForm,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
-
-import { PAUSE_UNTIL_TEMP } from '../../../../constants'
-import { uuid } from '../../../../utils'
-import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
-import { getSelectedStepId } from '../../selectors'
-import { addStep } from '../actions'
 import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../../../tutorial'
-
-import * as uiModuleSelectors from '../../../../ui/modules/selectors'
-import type { DuplicateStepAction } from '../types'
-
-import type { StepType, StepIdType, FormData } from '../../../../form-types'
 import type { ThunkAction } from '../../../../types'
+import * as uiModuleSelectors from '../../../../ui/modules/selectors'
+import { uuid } from '../../../../utils'
+import { getSelectedStepId } from '../../selectors'
+import { addStep } from '../actions'
+import type { DuplicateStepAction } from '../types'
 
 export const addAndSelectStepWithHints: ({
   stepType: StepType,

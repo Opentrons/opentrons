@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
+
 import { NavLink } from './NavLink'
 import styles from './styles.css'
-
 import type { Submenu } from './types'
 
 type Props = {|

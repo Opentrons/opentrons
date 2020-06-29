@@ -3,7 +3,8 @@ import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
-import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
+
+import { getInitialRobotStateStandard, makeContext } from '../__fixtures__'
 import { engageMagnet } from '../commandCreators/atomic/engageMagnet'
 
 const moduleId = 'magneticModuleId'

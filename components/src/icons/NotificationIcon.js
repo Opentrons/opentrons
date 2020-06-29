@@ -1,10 +1,9 @@
 // @flow
 import * as React from 'react'
 
+import type { IconName, IconProps } from './Icon'
 import { Icon } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
-
-import type { IconProps, IconName } from './Icon'
 
 export type NotificationIconProps = {|
   ...IconProps,

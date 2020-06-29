@@ -1,27 +1,28 @@
 // @flow
-import * as React from 'react'
-import last from 'lodash/last'
-import { useSelector, useDispatch } from 'react-redux'
 import {
-  OutlineButton,
+  AlertModal,
   HoverTooltip,
   Icon,
-  AlertModal,
+  OutlineButton,
 } from '@opentrons/components'
-import { Portal } from '../portal'
-import { getConnectedRobotName } from '../../robot/selectors'
-import {
-  useDispatchApiRequest,
-  getRequestById,
-  getErrorResponseMessage,
-  PENDING,
-  FAILURE,
-  dismissRequest,
-} from '../../robot-api'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { updateModule } from '../../modules'
 import type { UpdateModuleAction } from '../../modules/types'
-import type { State, Dispatch } from '../../types'
+import {
+  dismissRequest,
+  FAILURE,
+  getErrorResponseMessage,
+  getRequestById,
+  PENDING,
+  useDispatchApiRequest,
+} from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
+import { getConnectedRobotName } from '../../robot/selectors'
+import type { Dispatch, State } from '../../types'
+import { Portal } from '../portal'
 import styles from './styles.css'
 
 const FW_IS_UP_TO_DATE = 'Module Firmware is up to date'

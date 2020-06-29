@@ -1,11 +1,11 @@
 // @flow
+import { SpinnerModalPage } from '@opentrons/components'
 import * as React from 'react'
 
-import { HOMING, MOVING } from '../../robot-controls'
 import { RIGHT } from '../../pipettes'
-import { SpinnerModalPage } from '@opentrons/components'
-import type { MovementStatus } from '../../robot-controls/types'
 import type { Mount } from '../../pipettes/types'
+import { HOMING, MOVING } from '../../robot-controls'
+import type { MovementStatus } from '../../robot-controls/types'
 
 // TODO(mc, 2020-01-06): i18n
 const LEFT_PIP = 'Left pipette'

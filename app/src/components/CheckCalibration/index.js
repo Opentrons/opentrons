@@ -1,35 +1,34 @@
 // @flow
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import last from 'lodash/last'
+import type { TitleBarProps } from '@opentrons/components'
 import {
-  ModalPage,
-  SpinnerModalPage,
-  LEFT,
-  RIGHT,
   type Mount,
+  LEFT,
+  ModalPage,
+  RIGHT,
+  SpinnerModalPage,
   useConditionalConfirm,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
-import * as Sessions from '../../sessions'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import type { TitleBarProps } from '@opentrons/components'
-import type { State, Dispatch } from '../../types'
-import type { RequestState } from '../../robot-api/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import { getRequestById, PENDING, useDispatchApiRequest } from '../../robot-api'
+import type { RequestState } from '../../robot-api/types'
+import * as Sessions from '../../sessions'
 import * as SessionTypes from '../../sessions/types'
-
-import { Introduction } from './Introduction'
-import { DeckSetup } from './DeckSetup'
-import { TipPickUp } from './TipPickUp'
-import { ResultsSummary } from './ResultsSummary'
-import { CheckXYPoint } from './CheckXYPoint'
-import { CheckHeight } from './CheckHeight'
+import type { Dispatch, State } from '../../types'
 import { BadCalibration } from './BadCalibration'
+import { CheckHeight } from './CheckHeight'
+import { CheckXYPoint } from './CheckXYPoint'
 import { ConfirmExitModal } from './ConfirmExitModal'
-import { formatJogVector } from './utils'
+import { DeckSetup } from './DeckSetup'
+import { Introduction } from './Introduction'
+import { ResultsSummary } from './ResultsSummary'
 import styles from './styles.css'
+import { TipPickUp } from './TipPickUp'
+import { formatJogVector } from './utils'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Robot calibration check'
 const MOVE_TO_NEXT = 'move to next check'

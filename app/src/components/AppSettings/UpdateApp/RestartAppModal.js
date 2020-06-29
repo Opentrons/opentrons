@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 
-import { Portal } from '../../portal'
 import { ScrollableAlertModal } from '../../modals'
+import { Portal } from '../../portal'
 import { UpdateAppMessage } from './UpdateAppMessage'
 
 export type RestartAppModalProps = {|

@@ -1,21 +1,19 @@
 // @flow
+import { LabeledButton, LabeledToggle } from '@opentrons/components'
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
 
-import * as RobotControls from '../../../robot-controls'
-import * as RobotAdmin from '../../../robot-admin'
 import * as Calibration from '../../../calibration'
-import * as RobotSelectors from '../../../robot/selectors'
-
-import { ControlsCard } from '../ControlsCard'
-import { CheckCalibrationControl } from '../CheckCalibrationControl'
-import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
-import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
-
-import type { State } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
+import * as RobotAdmin from '../../../robot-admin'
+import * as RobotControls from '../../../robot-controls'
+import * as RobotSelectors from '../../../robot/selectors'
+import type { State } from '../../../types'
+import { CheckCalibrationControl } from '../CheckCalibrationControl'
+import { ControlsCard } from '../ControlsCard'
+import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
 
 jest.mock('../../../robot-controls/selectors')
 jest.mock('../../../robot/selectors')

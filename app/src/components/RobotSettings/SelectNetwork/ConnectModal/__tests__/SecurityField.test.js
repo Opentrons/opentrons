@@ -1,14 +1,13 @@
 // @flow
-import * as React from 'react'
+import { SelectField } from '@opentrons/components'
 import { mount } from 'enzyme'
+import * as React from 'react'
 
 import * as Fixtures from '../../../../../networking/__fixtures__'
-import { SelectField } from '@opentrons/components'
-import { SecurityField } from '../SecurityField'
-import * as FormState from '../form-state'
-
-import { LABEL_SECURITY_NONE, LABEL_SECURITY_PSK } from '../../i18n'
 import { SECURITY_NONE, SECURITY_WPA_PSK } from '../../constants'
+import { LABEL_SECURITY_NONE, LABEL_SECURITY_PSK } from '../../i18n'
+import * as FormState from '../form-state'
+import { SecurityField } from '../SecurityField'
 
 jest.mock('../form-state')
 

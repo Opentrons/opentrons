@@ -1,14 +1,13 @@
 // @flow
 // info panel and controls for labware calibration page
 import * as React from 'react'
+import type { ContextRouter } from 'react-router-dom'
 import { withRouter } from 'react-router-dom'
 
+import type { Labware } from '../../robot/types'
 import { DeckMap } from '../DeckMap'
 import { InfoBox } from './InfoBox'
 import styles from './styles.css'
-
-import type { ContextRouter } from 'react-router-dom'
-import type { Labware } from '../../robot/types'
 
 type Props = {| ...ContextRouter, labware: ?Labware |}
 

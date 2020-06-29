@@ -1,8 +1,7 @@
 // @flow
-import { robotApiReducer } from '../reducer'
-
-import type { RobotApiState } from '../types'
 import { mockFailedRequestState } from '../__fixtures__'
+import { robotApiReducer } from '../reducer'
+import type { RobotApiState } from '../types'
 
 type ReducerSpec = {|
   name: string,

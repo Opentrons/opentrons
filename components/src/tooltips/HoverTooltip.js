@@ -2,12 +2,11 @@
 
 import * as React from 'react'
 
-import { DeprecatedTooltip } from './DeprecatedTooltip'
-
 import type {
-  TooltipChildProps,
   DeprecatedTooltipProps,
+  TooltipChildProps,
 } from './DeprecatedTooltip'
+import { DeprecatedTooltip } from './DeprecatedTooltip'
 
 const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 0

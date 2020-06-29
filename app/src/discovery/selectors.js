@@ -1,4 +1,5 @@
 // @flow
+import type { Service } from '@opentrons/discovery-client'
 import concat from 'lodash/concat'
 import filter from 'lodash/filter'
 import find from 'lodash/find'
@@ -13,19 +14,17 @@ import semver from 'semver'
 // TODO(mc, 2018-10-10): fix circular dependency with RPC API client
 // that requires us to bypass the robot entry point here
 import { getConnectedRobotName } from '../robot/selectors'
-
-import type { Service } from '@opentrons/discovery-client'
 import type { State } from '../types'
 import type {
-  ResolvedRobot,
-  Robot,
-  ReachableRobot,
-  UnreachableRobot,
-  ViewableRobot,
   AnyRobot,
   ConnectableStatus,
+  ReachableRobot,
   ReachableStatus,
+  ResolvedRobot,
+  Robot,
+  UnreachableRobot,
   UnreachableStatus,
+  ViewableRobot,
 } from './types'
 
 type GroupedRobotsMap = {

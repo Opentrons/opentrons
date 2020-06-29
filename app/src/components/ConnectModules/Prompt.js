@@ -1,8 +1,7 @@
 // @flow
 // prompt for ReviewModulesModal of labware calibration page
+import { AlertItem, OutlineButton } from '@opentrons/components'
 import * as React from 'react'
-
-import { OutlineButton, AlertItem } from '@opentrons/components'
 
 import styles from './styles.css'
 

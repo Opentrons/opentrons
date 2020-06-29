@@ -1,8 +1,8 @@
 // @flows
 import assert from 'assert'
-import path from 'path'
 // replace webpack-specific require.context with Node-based glob in tests
 import glob from 'glob'
+import path from 'path'
 
 const DECK_FIXTURE_PATTERN = path.join(
   __dirname,

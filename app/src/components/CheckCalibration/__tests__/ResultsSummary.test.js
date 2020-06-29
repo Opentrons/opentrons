@@ -1,21 +1,21 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
+import { saveAs } from 'file-saver'
 import omit from 'lodash/omit'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
+
 import * as Calibration from '../../../calibration'
 import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
-import * as Fixtures from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
+import * as Fixtures from '../../../sessions/__fixtures__'
+import type {
+  RobotCalibrationCheckComparisonsByStep,
+  RobotCalibrationCheckInstrumentsByMount,
+} from '../../../sessions/types'
 import type { State } from '../../../types'
 import { ResultsSummary } from '../ResultsSummary'
-import { saveAs } from 'file-saver'
-
-import type {
-  RobotCalibrationCheckInstrumentsByMount,
-  RobotCalibrationCheckComparisonsByStep,
-} from '../../../sessions/types'
 
 jest.mock('file-saver')
 jest.mock('../../../calibration/selectors')

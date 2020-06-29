@@ -1,30 +1,29 @@
 // @flow
+import { AIR } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import {
+  getIsTiprack,
+  getLabwareDefURI,
+  getWellNamePerMultiTip,
+  getWellsDepth,
+} from '@opentrons/shared-data'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import assert from 'assert'
 import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
-import {
-  getIsTiprack,
-  getLabwareDefURI,
-  getWellsDepth,
-  getWellNamePerMultiTip,
-} from '@opentrons/shared-data'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { PipetteEntity, LabwareEntity } from '../../step-forms'
+import type { LabwareEntity, PipetteEntity } from '../../step-forms'
+import { blowout } from '../commandCreators/atomic/blowout'
 import type {
-  LocationLiquidState,
+  CurriedCommandCreator,
   InvariantContext,
+  LocationLiquidState,
   RobotState,
   SourceAndDest,
-  CurriedCommandCreator,
 } from '../types'
 import { curryCommandCreator } from './curryCommandCreator'
-import { blowout } from '../commandCreators/atomic/blowout'
-
-import { AIR } from '@opentrons/components'
 export { AIR }
 
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'

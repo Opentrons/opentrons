@@ -2,7 +2,6 @@ import omit from 'lodash/omit'
 import range from 'lodash/range'
 
 import { createRegularLabware } from '..'
-
 import fixture_regular_example_1 from '../../../labware/fixtures/2/fixture_regular_example_1.json'
 import fixture_regular_example_2 from '../../../labware/fixtures/2/fixture_regular_example_2.json'
 

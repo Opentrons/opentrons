@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
-import { NavLink } from './NavLink'
-import styles from './styles.css'
 
 import {
+  consumableLinks,
   hardwareLinks,
   labwareLinks,
-  consumableLinks,
   productCTALink,
 } from './nav-data'
+import { NavLink } from './NavLink'
+import styles from './styles.css'
 
 type Props = {||}
 

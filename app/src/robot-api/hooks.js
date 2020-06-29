@@ -1,8 +1,8 @@
 // @flow
 // hooks for components that depend on API state
-import { useReducer, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import uniqueId from 'lodash/uniqueId'
+import { useCallback, useReducer } from 'react'
+import { useDispatch } from 'react-redux'
 
 /**
  * React hook to attach a unique request ID to and dispatch an API action

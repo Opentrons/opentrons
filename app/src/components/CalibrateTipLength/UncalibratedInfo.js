@@ -1,7 +1,7 @@
 // @flow
+import { PrimaryButton } from '@opentrons/components'
 import * as React from 'react'
 
-import { PrimaryButton } from '@opentrons/components'
 import { CalibrationInfoContent } from '../CalibrationInfoContent'
 import type { CalibrateTipLengthChildProps } from './types'
 

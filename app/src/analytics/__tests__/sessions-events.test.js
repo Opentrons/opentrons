@@ -1,12 +1,10 @@
 // @flow
 
-import { makeEvent } from '../make-event'
-
 import * as Sessions from '../../sessions'
 import * as sessionsFixtures from '../../sessions/__fixtures__'
-
-import type { State } from '../../types'
 import type { SessionAnalyticsProps } from '../../sessions/types'
+import type { State } from '../../types'
+import { makeEvent } from '../make-event'
 
 jest.mock('../../sessions/selectors')
 

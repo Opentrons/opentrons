@@ -1,13 +1,12 @@
 // @flow
+import { combineEpics, ofType } from 'redux-observable'
 import { of } from 'rxjs'
-import { filter, switchMap, delay } from 'rxjs/operators'
-import { ofType, combineEpics } from 'redux-observable'
+import { delay, filter, switchMap } from 'rxjs/operators'
 
 import { UI_INITIALIZED } from '../shell'
-import { DISCOVERY_START, startDiscovery, finishDiscovery } from './actions'
-
-import type { Epic } from '../types'
 import type { UiInitializedAction } from '../shell/types'
+import type { Epic } from '../types'
+import { DISCOVERY_START, finishDiscovery, startDiscovery } from './actions'
 import type { DiscoveryAction, StartDiscoveryAction } from './types'
 
 export const DISCOVERY_TIMEOUT_MS = 30000

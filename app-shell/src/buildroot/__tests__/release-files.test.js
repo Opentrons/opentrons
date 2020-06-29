@@ -1,8 +1,8 @@
 // @flow
 // TODO(mc, 2020-06-11): test all release-files functions
-import path from 'path'
 import { promises as fs } from 'fs'
 import fse from 'fs-extra'
+import path from 'path'
 import tempy from 'tempy'
 
 import { cleanupReleaseFiles } from '../release-files'

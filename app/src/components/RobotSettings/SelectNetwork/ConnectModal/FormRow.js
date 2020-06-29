@@ -1,10 +1,9 @@
 // @flow
 // presentational components for the wifi connect form
-import * as React from 'react'
-import styled from 'styled-components'
 import { FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
-
+import * as React from 'react'
 import type { StyledComponent } from 'styled-components'
+import styled from 'styled-components'
 
 export type FormRowProps = {|
   label: string,

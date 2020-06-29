@@ -1,8 +1,8 @@
 // @flow
 // play pause run buttons for sidepanel
+import { HoverTooltip, OutlineButton } from '@opentrons/components'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { OutlineButton, HoverTooltip } from '@opentrons/components'
 
 import styles from './styles.css'
 

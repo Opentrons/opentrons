@@ -1,7 +1,7 @@
 // @flow
 // tests for main navbar link list
+import { mount, shallow } from 'enzyme'
 import * as React from 'react'
-import { shallow, mount } from 'enzyme'
 
 import { NavList } from '..'
 

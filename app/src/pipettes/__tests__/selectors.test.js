@@ -1,9 +1,10 @@
 // @flow
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
+
 import * as Fixtures from '../__fixtures__'
-import * as Selectors from '../selectors'
 import type { State } from '../../types'
+import * as Selectors from '../selectors'
 
 type SelectorSpec = {|
   name: string,

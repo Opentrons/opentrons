@@ -2,7 +2,6 @@
 
 import * as Actions from '../actions'
 import { alertsReducer } from '../reducer'
-
 import type { AlertId } from '../types'
 
 const MOCK_ALERT_ID: AlertId = ('mockAlert': any)

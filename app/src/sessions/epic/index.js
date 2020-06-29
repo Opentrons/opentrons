@@ -1,14 +1,14 @@
 // @flow
 import { combineEpics } from 'redux-observable'
-import { createSessionEpic } from './createSessionEpic'
-import { ensureSessionEpic } from './ensureSessionEpic'
-import { fetchSessionEpic } from './fetchSessionEpic'
-import { fetchAllSessionsEpic } from './fetchAllSessionsEpic'
-import { fetchAllSessionsOnConnectEpic } from './fetchAllSessionsOnConnectEpic'
-import { createSessionCommandEpic } from './createSessionCommandEpic'
-import { deleteSessionEpic } from './deleteSessionEpic'
 
 import type { Epic } from '../../types'
+import { createSessionCommandEpic } from './createSessionCommandEpic'
+import { createSessionEpic } from './createSessionEpic'
+import { deleteSessionEpic } from './deleteSessionEpic'
+import { ensureSessionEpic } from './ensureSessionEpic'
+import { fetchAllSessionsEpic } from './fetchAllSessionsEpic'
+import { fetchAllSessionsOnConnectEpic } from './fetchAllSessionsOnConnectEpic'
+import { fetchSessionEpic } from './fetchSessionEpic'
 
 export const sessionsEpic: Epic = combineEpics(
   createSessionEpic,

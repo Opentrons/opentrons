@@ -1,20 +1,18 @@
 // @flow
+import { AlertModal } from '@opentrons/components'
 import * as React from 'react'
 
-import { AlertModal } from '@opentrons/components'
-import { Portal } from '../portal'
-import styles from './styles.css'
-
 import {
-  INVALID_LABWARE_FILE,
   DUPLICATE_LABWARE_FILE,
+  INVALID_LABWARE_FILE,
   OPENTRONS_LABWARE_FILE,
 } from '../../custom-labware'
-
 import type {
-  FailedLabwareFile,
   DuplicateLabwareFile,
+  FailedLabwareFile,
 } from '../../custom-labware/types'
+import { Portal } from '../portal'
+import styles from './styles.css'
 
 // TODO(mc, 2019-11-20): i18n
 // buttons

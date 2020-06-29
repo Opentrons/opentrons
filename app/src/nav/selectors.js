@@ -1,14 +1,13 @@
 // @flow
 import { createSelector } from 'reselect'
 
+import { getBuildrootUpdateAvailable } from '../buildroot'
+import { getFeatureFlags } from '../config'
 import { getConnectedRobot } from '../discovery'
 import { getProtocolPipettesMatch } from '../pipettes'
 import { selectors as RobotSelectors } from '../robot'
-import { getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
 import { getU2EWindowsDriverStatus, OUTDATED } from '../system-info'
-import { getFeatureFlags } from '../config'
-
 import type { State } from '../types'
 import type { NavLocation } from './types'
 

@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-
 import type { WellDefinition } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
+
 import styles from './Well.css'
 
 export type TipProps = {|

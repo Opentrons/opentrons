@@ -1,11 +1,10 @@
 // @flow
-import * as Constants from './constants'
-
 import type { RobotHost } from '../robot-api/types'
+import * as Constants from './constants'
 import type {
   BuildrootAction,
-  UpdateSessionStep,
   UpdateSessionStage,
+  UpdateSessionStep,
 } from './types'
 
 export function setBuildrootUpdateSeen(robotName: string): BuildrootAction {

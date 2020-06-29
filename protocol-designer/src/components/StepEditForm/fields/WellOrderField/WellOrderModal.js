@@ -1,26 +1,25 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import { connect } from 'react-redux'
-
-import { i18n } from '../../../../localization'
-import { Portal } from '../../../portals/MainPageModalPortal'
 import {
+  DropdownField,
+  FormGroup,
   Modal,
   OutlineButton,
   PrimaryButton,
-  FormGroup,
-  DropdownField,
 } from '@opentrons/components'
-import modalStyles from '../../../modals/modal.css'
-import { actions } from '../../../../steplist'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { BaseState, ThunkDispatch } from '../../../../types'
-import type { WellOrderOption } from '../../../../form-types'
+import cx from 'classnames'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
-import { WellOrderViz } from './WellOrderViz'
-import styles from './WellOrderInput.css'
+import type { WellOrderOption } from '../../../../form-types'
+import { i18n } from '../../../../localization'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { actions } from '../../../../steplist'
+import type { BaseState, ThunkDispatch } from '../../../../types'
+import modalStyles from '../../../modals/modal.css'
+import { Portal } from '../../../portals/MainPageModalPortal'
 import stepEditStyles from '../../StepEditForm.css'
+import styles from './WellOrderInput.css'
+import { WellOrderViz } from './WellOrderViz'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'

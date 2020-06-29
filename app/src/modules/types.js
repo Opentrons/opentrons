@@ -1,18 +1,17 @@
 // @flow
 
-import type { RobotApiRequestMeta } from '../robot-api/types'
 import type {
+  MagneticModuleModel,
   TemperatureModuleModel,
   ThermocyclerModuleModel,
-  MagneticModuleModel,
 } from '@opentrons/shared-data'
-
 import {
-  TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import type { RobotApiRequestMeta } from '../robot-api/types'
 import * as ApiTypes from './api-types'
 export * from './api-types'
 

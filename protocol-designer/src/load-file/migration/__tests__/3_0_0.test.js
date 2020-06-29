@@ -1,5 +1,5 @@
-import { migrateFile } from '../3_0_0'
 import example_1_1_0 from '../../../../fixtures/protocol/1/example_1_1_0.json'
+import { migrateFile } from '../3_0_0'
 
 jest.mock('../../../labware-defs/utils')
 jest.mock('../utils/v1LabwareModelToV2Def')

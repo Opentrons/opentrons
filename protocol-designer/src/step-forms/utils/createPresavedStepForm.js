@@ -1,32 +1,33 @@
 // @flow
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+
+import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { FormPatch } from '../../steplist/actions/types'
+import { maskField } from '../../steplist/fieldLevel'
 import {
   createBlankForm,
+  getNextDefaultBlockIsActive,
+  getNextDefaultBlockTemperature,
   getNextDefaultEngageHeight,
+  getNextDefaultLidIsActive,
+  getNextDefaultLidOpen,
+  getNextDefaultLidTemperature,
   getNextDefaultMagnetAction,
   getNextDefaultPipetteId,
   getNextDefaultTemperatureModuleId,
   getNextDefaultThermocyclerModuleId,
-  getNextDefaultBlockIsActive,
-  getNextDefaultBlockTemperature,
-  getNextDefaultLidIsActive,
-  getNextDefaultLidTemperature,
-  getNextDefaultLidOpen,
   handleFormChange,
 } from '../../steplist/formLevel'
 import {
-  getModuleOnDeckByType,
   getMagnetLabwareEngageHeight,
+  getModuleOnDeckByType,
 } from '../../ui/modules/utils'
-import { maskField } from '../../steplist/fieldLevel'
-import type { FormData, StepType, StepIdType } from '../../form-types'
+import type { OrderedStepIdsState, SavedStepFormState } from '../reducers'
 import type {
-  PipetteEntities,
-  LabwareEntities,
   InitialDeckSetup,
+  LabwareEntities,
+  PipetteEntities,
 } from '../types'
-import type { FormPatch } from '../../steplist/actions/types'
-import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
 
 export type CreatePresavedStepFormArgs = {|
   stepId: StepIdType,

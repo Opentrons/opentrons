@@ -1,20 +1,19 @@
 // @flow
-import * as React from 'react'
-import capitalize from 'lodash/capitalize'
-
 import { ModalPage } from '@opentrons/components'
-import { PipetteSelection } from './PipetteSelection'
-import { InstructionStep } from './InstructionStep'
-import { CheckPipettesButton } from './CheckPipettesButton'
-import styles from './styles.css'
-
 import type {
-  PipetteNameSpecs,
-  PipetteModelSpecs,
   PipetteDisplayCategory,
+  PipetteModelSpecs,
+  PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { shouldLevel } from '@opentrons/shared-data'
+import capitalize from 'lodash/capitalize'
+import * as React from 'react'
+
 import type { Mount } from '../../pipettes/types'
+import { CheckPipettesButton } from './CheckPipettesButton'
+import { InstructionStep } from './InstructionStep'
+import { PipetteSelection } from './PipetteSelection'
+import styles from './styles.css'
 import type { Direction } from './types'
 
 const ATTACH_CONFIRM = 'have robot check connection'

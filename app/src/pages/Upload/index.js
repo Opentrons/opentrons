@@ -2,18 +2,16 @@
 // upload progress container
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
-
-import { selectors as robotSelectors } from '../../robot'
-import { getProtocolFilename } from '../../protocol'
-import { getConnectedRobot } from '../../discovery'
-import { getCustomLabware } from '../../custom-labware'
-
-import { FileInfo } from './FileInfo'
-
 import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
+
+import { getCustomLabware } from '../../custom-labware'
+import { getConnectedRobot } from '../../discovery'
 import type { Robot } from '../../discovery/types'
+import { getProtocolFilename } from '../../protocol'
+import { selectors as robotSelectors } from '../../robot'
+import type { Dispatch, State } from '../../types'
+import { FileInfo } from './FileInfo'
 
 type OP = ContextRouter
 

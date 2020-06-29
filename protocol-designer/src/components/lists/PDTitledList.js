@@ -1,7 +1,8 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import { TitledList } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
+
 import styles from './styles.css'
 
 type Props = React.ElementProps<typeof TitledList>

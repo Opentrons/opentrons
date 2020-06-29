@@ -1,14 +1,15 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { WellSelectionInput } from './WellSelectionInput'
+
+import type { StepFieldName } from '../../../../form-types'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import { getDisabledFields } from '../../../../steplist/formLevel'
 import type { BaseState, ThunkDispatch } from '../../../../types'
-import type { StepFieldName } from '../../../../form-types'
 import type { FocusHandlers } from '../../types'
 import { showFieldErrors } from '../FieldConnector'
+import { WellSelectionInput } from './WellSelectionInput'
 
 type Props = React.ElementConfig<typeof WellSelectionInput>
 

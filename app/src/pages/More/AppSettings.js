@@ -1,26 +1,24 @@
 // @flow
 // view info about the app and update
+import { push } from 'connected-react-router'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Route, Switch, Redirect, type ContextRouter } from 'react-router-dom'
-import { push } from 'connected-react-router'
+import { type ContextRouter, Redirect, Route, Switch } from 'react-router-dom'
 
-import {
-  getShellUpdateState,
-  getAvailableShellUpdate,
-  checkShellUpdate,
-  downloadShellUpdate,
-  applyShellUpdate,
-  setShellUpdateSeen,
-} from '../../shell'
-
-import { Page } from '../../components/Page'
 import { AppSettings as AppSettingsContents } from '../../components/AppSettings'
 import { UpdateApp } from '../../components/AppSettings/UpdateApp'
 import { ErrorModal } from '../../components/modals'
-
-import type { State, Dispatch } from '../../types'
+import { Page } from '../../components/Page'
+import {
+  applyShellUpdate,
+  checkShellUpdate,
+  downloadShellUpdate,
+  getAvailableShellUpdate,
+  getShellUpdateState,
+  setShellUpdateSeen,
+} from '../../shell'
 import type { ShellUpdateState } from '../../shell/types'
+import type { Dispatch, State } from '../../types'
 
 type OP = ContextRouter
 

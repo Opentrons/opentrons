@@ -3,12 +3,12 @@ import React from 'react'
 import Renderer from 'react-test-renderer'
 
 import {
-  Modal,
   AlertModal,
   ContinueModal,
+  Modal,
   ModalPage,
-  SpinnerModalPage,
   Overlay,
+  SpinnerModalPage,
 } from '..'
 
 describe('modals', () => {

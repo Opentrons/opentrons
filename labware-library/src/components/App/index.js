@@ -1,19 +1,18 @@
 // @flow
 // main application wrapper component
+import cx from 'classnames'
 import * as React from 'react'
 import { hot } from 'react-hot-loader/root'
-import cx from 'classnames'
-
-import { DefinitionRoute } from '../../definitions'
-import { useFilters } from '../../filters'
-import { Nav, Breadcrumbs } from '../Nav'
-import { Sidebar } from '../Sidebar'
-import { Page } from './Page'
-import { LabwareList } from '../LabwareList'
-import { LabwareDetails } from '../LabwareDetails'
-import styles from './styles.css'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
+import { DefinitionRoute } from '../../definitions'
+import { useFilters } from '../../filters'
+import { LabwareDetails } from '../LabwareDetails'
+import { LabwareList } from '../LabwareList'
+import { Breadcrumbs, Nav } from '../Nav'
+import { Sidebar } from '../Sidebar'
+import { Page } from './Page'
+import styles from './styles.css'
 
 export function AppComponent(props: DefinitionRouteRenderProps): React.Node {
   const { definition, location } = props

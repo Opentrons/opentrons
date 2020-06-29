@@ -1,9 +1,9 @@
 // @flow
+import { mount, shallow } from 'enzyme'
 import * as React from 'react'
-import { shallow, mount } from 'enzyme'
 
-import { ToggleField } from '../ToggleField'
 import { Icon } from '../../icons'
+import { ToggleField } from '../ToggleField'
 
 describe('ToggleField', () => {
   it('renders an Icon', () => {

@@ -1,25 +1,24 @@
 // @flow
-import noop from 'lodash/noop'
-import { app } from 'electron'
-import * as Fixtures from '@opentrons/app/src/system-info/__fixtures__'
-import * as SystemInfo from '@opentrons/app/src/system-info'
 import { uiInitialized } from '@opentrons/app/src/shell'
-import * as OS from '../../os'
-import * as UsbDevices from '../usb-devices'
-import * as NetworkInterfaces from '../network-interfaces'
+import * as SystemInfo from '@opentrons/app/src/system-info'
+import * as Fixtures from '@opentrons/app/src/system-info/__fixtures__'
+import { app } from 'electron'
+import noop from 'lodash/noop'
+
 import { registerSystemInfo } from '..'
-
-import type {
-  Device,
-  UsbDeviceMonitor,
-  UsbDeviceMonitorOptions,
-} from '../usb-devices'
-
+import * as OS from '../../os'
 import type {
   NetworkInterface,
   NetworkInterfaceMonitor,
   NetworkInterfaceMonitorOptions,
 } from '../network-interfaces'
+import * as NetworkInterfaces from '../network-interfaces'
+import type {
+  Device,
+  UsbDeviceMonitor,
+  UsbDeviceMonitorOptions,
+} from '../usb-devices'
+import * as UsbDevices from '../usb-devices'
 
 jest.mock('../../os')
 jest.mock('../usb-devices')

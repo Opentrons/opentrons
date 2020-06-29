@@ -1,9 +1,9 @@
 // @flow
-import * as React from 'react'
 import { shallow } from 'enzyme'
+import * as React from 'react'
 
-import { SlotMap } from '../SlotMap'
 import { Icon } from '../../icons'
+import { SlotMap } from '../SlotMap'
 
 describe('SlotMap', () => {
   it('component renders 11 slots', () => {

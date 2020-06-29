@@ -1,8 +1,8 @@
 // @flow
 // Named arguments to createFile selector. This data would be the result of several selectors.
-import type { SavedStepFormState, ModuleEntities } from '../../../step-forms'
-import type { RobotState, Timeline } from '../../../step-generation'
 import type { StepIdType } from '../../../form-types'
+import type { ModuleEntities, SavedStepFormState } from '../../../step-forms'
+import type { RobotState, Timeline } from '../../../step-generation'
 
 export const initialRobotState: RobotState = {
   labware: {

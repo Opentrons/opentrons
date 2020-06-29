@@ -1,19 +1,20 @@
 // @flow
-import assert from 'assert'
-import * as React from 'react'
-import difference from 'lodash/difference'
-import { i18n } from '../../localization'
-import { PROFILE_CYCLE } from '../../form-types'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../step-generation/utils'
-import styles from './StepEditForm.css'
 import type { Options } from '@opentrons/components'
+import assert from 'assert'
+import difference from 'lodash/difference'
+import * as React from 'react'
+
+import type { FormData, ProfileItem } from '../../form-types'
+import { PROFILE_CYCLE } from '../../form-types'
+import { i18n } from '../../localization'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '../../step-generation/utils'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../steplist/formLevel/warnings'
 import type { StepFormErrors } from '../../steplist/types'
-import type { FormData, ProfileItem } from '../../form-types'
+import styles from './StepEditForm.css'
 
 export function getBlowoutLocationOptionsForForm(
   disposalLabwareOptions: Options,

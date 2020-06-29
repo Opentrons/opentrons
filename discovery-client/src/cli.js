@@ -1,6 +1,6 @@
 // @flow
-import { createDiscoveryClient } from '.'
 import { version } from '../package.json'
+import { createDiscoveryClient } from '.'
 
 const LOG_LVLS = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']
 const noop = () => {}

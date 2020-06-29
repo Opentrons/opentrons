@@ -1,8 +1,9 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
-import { Icon, type IconProps } from '../icons'
+import * as React from 'react'
+
 import { IconButton } from '../buttons'
+import { type IconProps, Icon } from '../icons'
 import styles from './alerts.css'
 
 export type AlertItemProps = {|

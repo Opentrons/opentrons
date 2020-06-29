@@ -1,27 +1,26 @@
 // @flow
 // buildroot update files
-import path from 'path'
-import { readFile, ensureDir } from 'fs-extra'
-import { app } from 'electron'
-
+import type {
+  BuildrootAction,
+  BuildrootUpdateInfo,
+} from '@opentrons/app/src/buildroot/types'
 import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
-import { createLogger } from '../log'
+import { app } from 'electron'
+import { ensureDir, readFile } from 'fs-extra'
+import path from 'path'
+
 import { getConfig } from '../config'
+import { createLogger } from '../log'
+import type { Action, Dispatch } from '../types'
 import { CURRENT_VERSION } from '../update'
-import { downloadManifest, getReleaseSet } from './release-manifest'
 import {
+  cleanupReleaseFiles,
   getReleaseFiles,
   readUserFileInfo,
-  cleanupReleaseFiles,
 } from './release-files'
+import { downloadManifest, getReleaseSet } from './release-manifest'
+import type { ReleaseSetFilepaths, ReleaseSetUrls } from './types'
 import { startPremigration, uploadSystemFile } from './update'
-
-import type { Action, Dispatch } from '../types'
-import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
-import type {
-  BuildrootUpdateInfo,
-  BuildrootAction,
-} from '@opentrons/app/src/buildroot/types'
 
 const log = createLogger('buildroot/index')
 

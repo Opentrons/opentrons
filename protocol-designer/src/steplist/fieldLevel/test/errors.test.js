@@ -1,6 +1,6 @@
 import {
-  minFieldValue,
   maxFieldValue,
+  minFieldValue,
   temperatureRangeFieldValue,
 } from '../errors'
 

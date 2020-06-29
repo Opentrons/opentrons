@@ -1,17 +1,16 @@
 // @flow
-import * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
+import * as React from 'react'
 
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import { getLatestLabwareDef } from '../../getLabware'
-import { JogControls } from '../JogControls'
-import type { CalibrateTipLengthChildProps } from './types'
-import styles from './styles.css'
-
+import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 // TODO: put these assets in a shared location?
 import multiDemoAsset from '../CheckCalibration/videos/A1_Multi_Channel_REV1.webm'
 import singleDemoAsset from '../CheckCalibration/videos/A1_Single_Channel_REV1.webm'
+import { JogControls } from '../JogControls'
+import styles from './styles.css'
+import type { CalibrateTipLengthChildProps } from './types'
 
 const TIP_PICK_UP_HEADER = 'Position pipette over '
 const TIP_PICK_UP_BUTTON_TEXT = 'Pick up tip'

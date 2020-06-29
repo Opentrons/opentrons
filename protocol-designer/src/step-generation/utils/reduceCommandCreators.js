@@ -1,13 +1,14 @@
 // @flow
-import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+
+import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import type {
+  CommandCreatorError,
+  CommandCreatorResult,
+  CommandCreatorWarning,
+  CurriedCommandCreator,
   InvariantContext,
   RobotState,
-  CommandCreatorError,
-  CommandCreatorWarning,
-  CommandCreatorResult,
-  CurriedCommandCreator,
 } from '../types'
 
 type CCReducerAcc = {|

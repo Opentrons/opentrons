@@ -1,5 +1,5 @@
 // @flow
-import { createSelector } from 'reselect'
+import type { Options } from '@opentrons/components'
 import {
   getLabwareDisplayName,
   MAGNETIC_MODULE_TYPE,
@@ -7,17 +7,18 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import mapValues from 'lodash/mapValues'
+import { createSelector } from 'reselect'
+
 import { getInitialDeckSetup } from '../../step-forms/selectors'
+import type { Selector } from '../../types'
 import { getLabwareNicknamesById } from '../labware/selectors'
 import {
-  getModuleLabwareOptions,
   getLabwareOnModule,
-  getModuleOnDeckByType,
-  getModuleHasLabware,
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
+  getModuleHasLabware,
+  getModuleLabwareOptions,
+  getModuleOnDeckByType,
 } from './utils'
-import type { Options } from '@opentrons/components'
-import type { Selector } from '../../types'
 
 export const getLabwareNamesByModuleId: Selector<{
   [moduleId: string]: ?{ nickname: ?string, displayName: string },

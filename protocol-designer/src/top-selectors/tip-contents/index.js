@@ -1,28 +1,29 @@
 // @flow
-import { createSelector } from 'reselect'
+import type { WellGroup } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import mapValues from 'lodash/mapValues'
 import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
-import mapValues from 'lodash/mapValues'
-import { getWellSetForMultichannel } from '../../utils'
+import type { OutputSelector } from 'reselect'
+import { createSelector } from 'reselect'
+
+import { selectors as fileDataSelectors } from '../../file-data'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import * as StepGeneration from '../../step-generation'
-import { allSubsteps as getAllSubsteps } from '../substeps'
 import {
-  START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
+  START_TERMINAL_ITEM_ID,
 } from '../../steplist'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import type { BaseState, Selector } from '../../types'
 import {
   getActiveItem,
   getHoveredStepId,
   getHoveredSubstep,
 } from '../../ui/steps'
-import { selectors as fileDataSelectors } from '../../file-data'
-import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { OutputSelector } from 'reselect'
-import type { BaseState, Selector } from '../../types'
+import { getWellSetForMultichannel } from '../../utils'
+import { allSubsteps as getAllSubsteps } from '../substeps'
 
 type GetTipCallback = (
   wellName: string

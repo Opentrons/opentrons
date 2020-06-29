@@ -1,20 +1,21 @@
 // @flow
 import * as Yup from 'yup'
-import { getAllLoadNames, getAllDisplayNames } from '../definitions'
-import { getDefaultLoadName, getDefaultDisplayName } from './formSelectors'
+
+import { getAllDisplayNames, getAllLoadNames } from '../definitions'
 import {
-  labwareTypeOptions,
-  wellBottomShapeOptions,
-  wellShapeOptions,
+  type ProcessedLabwareFields,
   IRREGULAR_LABWARE_ERROR,
   LABELS,
+  labwareTypeOptions,
   MAX_X_DIMENSION,
-  MIN_X_DIMENSION,
   MAX_Y_DIMENSION,
-  MIN_Y_DIMENSION,
   MAX_Z_DIMENSION,
-  type ProcessedLabwareFields,
+  MIN_X_DIMENSION,
+  MIN_Y_DIMENSION,
+  wellBottomShapeOptions,
+  wellShapeOptions,
 } from './fields'
+import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
 
 const ALL_DISPLAY_NAMES = new Set(
   getAllDisplayNames().map(n => n.toLowerCase().trim())

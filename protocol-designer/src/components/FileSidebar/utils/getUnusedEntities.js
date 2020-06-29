@@ -1,6 +1,7 @@
 // @flow
-import some from 'lodash/some'
 import reduce from 'lodash/reduce'
+import some from 'lodash/some'
+
 import type { SavedStepFormState } from '../../../step-forms'
 
 /** Pull out all entities never specified by step forms. Assumes that all forms share the entityKey */

@@ -2,12 +2,11 @@
 // fixtures for /wifi/disconnect
 
 import { POST } from '../../robot-api'
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
-
-import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { NetworkingDisconnectResponse } from '../types'
 
 export const mockNetworkingDisconnect: NetworkingDisconnectResponse = {

@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
 
-import { OutlineButton, type ButtonProps } from '../buttons'
+import { type ButtonProps, OutlineButton } from '../buttons'
 import { LabeledControl } from './LabeledControl'
 import styles from './styles.css'
 

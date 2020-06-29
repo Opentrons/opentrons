@@ -1,12 +1,11 @@
 // @flow
 // SidePanelGroup component
-import * as React from 'react'
 import cx from 'classnames'
-
-import styles from './lists.css'
-import { Icon } from '../icons'
+import * as React from 'react'
 
 import type { IconName } from '../icons'
+import { Icon } from '../icons'
+import styles from './lists.css'
 
 export type SidePanelGroupProps = {|
   /** text of title */

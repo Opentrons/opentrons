@@ -1,16 +1,15 @@
 // @flow
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
 
-import * as Networking from '../../../networking'
 import { CONNECTABLE } from '../../../discovery'
+import type { ViewableRobot } from '../../../discovery/types'
+import * as Networking from '../../../networking'
+import type { State } from '../../../types'
+import { ConnectionStatusMessage } from '../connection'
 import { ConnectionCard } from '../ConnectionCard'
 import { SelectNetwork } from '../SelectNetwork'
-import { ConnectionStatusMessage } from '../connection'
-
-import type { State } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
 
 jest.mock('../../../networking/selectors')
 jest.mock('../../../components/RobotSettings/SelectNetwork', () => ({

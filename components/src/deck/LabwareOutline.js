@@ -1,8 +1,9 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
+import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
+
 import styles from './Labware.css'
 
 export type LabwareOutlineProps = {|

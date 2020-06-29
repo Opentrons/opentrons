@@ -1,7 +1,7 @@
 // @flow
 // "table" of data, usually filled with LabelText and Value children
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
 
 import styles from './styles.css'
 

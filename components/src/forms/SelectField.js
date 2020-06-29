@@ -1,12 +1,11 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
 import find from 'lodash/find'
-
-import { Select } from './Select'
-import styles from './SelectField.css'
+import * as React from 'react'
 
 import type { SelectProps } from './Select'
+import { Select } from './Select'
+import styles from './SelectField.css'
 
 export type SelectFieldProps = {|
   /** optional HTML id for container */

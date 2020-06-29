@@ -1,9 +1,9 @@
 // @flow
-import * as React from 'react'
-import { IconButton, Icon } from '@opentrons/components'
-import styles from './styles.css'
-
 import type { IconName } from '@opentrons/components'
+import { Icon, IconButton } from '@opentrons/components'
+import * as React from 'react'
+
+import styles from './styles.css'
 
 export type IpItemProps = {|
   candidate: string,

@@ -1,12 +1,11 @@
 // @flow
 import { TestScheduler } from 'rxjs/testing'
 
+import { robotSettingsEpic } from '..'
 import * as RobotAdminSelectors from '../../../robot-admin/selectors'
+import type { State } from '../../../types'
 import * as Actions from '../../actions'
 import * as Selectors from '../../selectors'
-import { robotSettingsEpic } from '..'
-
-import type { State } from '../../../types'
 
 jest.mock('../../../robot-admin/selectors')
 jest.mock('../../selectors')

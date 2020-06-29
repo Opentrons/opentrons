@@ -1,26 +1,23 @@
 // @flow
 import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
-import range from 'lodash/range'
-import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
+import mapValues from 'lodash/mapValues'
+import range from 'lodash/range'
 
-import { substepTimeline } from './substepTimeline'
-import * as steplistUtils from './utils'
-import {
-  consolidate,
-  distribute,
-  transfer,
-  mix,
-  curryCommandCreator,
-} from '../step-generation'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-
 import type { StepIdType } from '../form-types'
 import type {
   CurriedCommandCreator,
   InvariantContext,
   RobotState,
+} from '../step-generation'
+import {
+  consolidate,
+  curryCommandCreator,
+  distribute,
+  mix,
+  transfer,
 } from '../step-generation'
 import type {
   ConsolidateArgs,
@@ -28,14 +25,16 @@ import type {
   MixArgs,
   TransferArgs,
 } from '../step-generation/types'
+import { substepTimeline } from './substepTimeline'
 import type {
   NamedIngred,
+  SourceDestSubstepItem,
   StepArgsAndErrors,
   StepItemSourceDestRow,
-  SourceDestSubstepItem,
   SubstepItemData,
   SubstepTimelineFrame,
 } from './types'
+import * as steplistUtils from './utils'
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 

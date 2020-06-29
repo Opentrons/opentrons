@@ -1,9 +1,10 @@
 // @flow
-import * as React from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import cx from 'classnames'
+import * as React from 'react'
+
 import { RobotCoordsText } from '../RobotCoordsText'
 import styles from './WellLabels.css'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // magic layout numbers to make the letters close to the edges of the labware
 const LETTER_COLUMN_X = 4

@@ -1,6 +1,7 @@
 // @flow
 import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 import fixtureIrregular from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1'
+
 import {
   getIfConsistent,
   getSpacingIfUniform,

@@ -1,15 +1,15 @@
 // @flow
-import { expectTimelineError } from '../__utils__/testMatchers'
-import { touchTip } from '../commandCreators/atomic/touchTip'
 import {
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
-  makeContext,
   getSuccessResult,
-  getErrorResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../__fixtures__'
+import { expectTimelineError } from '../__utils__/testMatchers'
+import { touchTip } from '../commandCreators/atomic/touchTip'
 
 describe('touchTip', () => {
   let invariantContext

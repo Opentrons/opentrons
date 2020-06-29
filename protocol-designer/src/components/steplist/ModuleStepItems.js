@@ -1,17 +1,18 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import {
-  Tooltip,
-  useHoverTooltip,
-  TOOLTIP_FIXED,
   type UseHoverTooltipTargetProps,
+  Tooltip,
+  TOOLTIP_FIXED,
+  useHoverTooltip,
 } from '@opentrons/components'
+import type { ModuleRealType } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
+
 import { i18n } from '../../localization'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
 
 export type ModuleStepItemRowProps = {|
   label?: ?string,

@@ -2,6 +2,7 @@
 // deck outline path
 // TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
+
 import styles from './Deck.css'
 
 const OUTLINE_PATH =

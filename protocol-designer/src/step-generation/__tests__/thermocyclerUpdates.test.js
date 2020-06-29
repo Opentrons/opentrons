@@ -1,33 +1,34 @@
 // @flow
-import merge from 'lodash/merge'
 import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT } from '../../constants'
-import {
-  forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
-  forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
-  forThermocyclerAwaitBlockTemperature as _forThermocyclerAwaitBlockTemperature,
-  forThermocyclerAwaitLidTemperature as _forThermocyclerAwaitLidTemperature,
-  forThermocyclerDeactivateBlock as _forThermocyclerDeactivateBlock,
-  forThermocyclerDeactivateLid as _forThermocyclerDeactivateLid,
-  forThermocyclerRunProfile as _forThermocyclerRunProfile,
-  forThermocyclerCloseLid as _forThermocyclerCloseLid,
-  forThermocyclerOpenLid as _forThermocyclerOpenLid,
-} from '../getNextRobotStateAndWarnings/thermocyclerUpdates'
-import {
-  makeImmutableStateUpdater,
-  type ImmutableStateUpdater,
-} from '../__utils__'
-import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
 import type {
   ModuleOnlyParams,
   TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import merge from 'lodash/merge'
+
+import { getInitialRobotStateStandard, makeContext } from '../__fixtures__'
+import {
+  type ImmutableStateUpdater,
+  makeImmutableStateUpdater,
+} from '../__utils__'
+import { SPAN7_8_10_11_SLOT } from '../../constants'
 import type { ThermocyclerModuleState } from '../../step-forms/types'
+import {
+  forThermocyclerAwaitBlockTemperature as _forThermocyclerAwaitBlockTemperature,
+  forThermocyclerAwaitLidTemperature as _forThermocyclerAwaitLidTemperature,
+  forThermocyclerCloseLid as _forThermocyclerCloseLid,
+  forThermocyclerDeactivateBlock as _forThermocyclerDeactivateBlock,
+  forThermocyclerDeactivateLid as _forThermocyclerDeactivateLid,
+  forThermocyclerOpenLid as _forThermocyclerOpenLid,
+  forThermocyclerRunProfile as _forThermocyclerRunProfile,
+  forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
+  forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
+} from '../getNextRobotStateAndWarnings/thermocyclerUpdates'
 
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature

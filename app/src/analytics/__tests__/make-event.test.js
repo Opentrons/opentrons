@@ -1,10 +1,10 @@
 // events map tests
-import { makeEvent } from '../make-event'
+import * as discoverySelectors from '../../discovery/selectors'
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import * as discoverySelectors from '../../discovery/selectors'
+import { makeEvent } from '../make-event'
 import * as selectors from '../selectors'
 
 jest.mock('../selectors')

@@ -1,10 +1,11 @@
 // @flow
+import type { RobotWorkSpaceRenderProps } from '@opentrons/components'
 import * as React from 'react'
 import { DragLayer } from 'react-dnd'
-import { LabwareOnDeck } from '../LabwareOnDeck'
+
 import { DND_TYPES } from '../../../constants'
 import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
-import type { RobotWorkSpaceRenderProps } from '@opentrons/components'
+import { LabwareOnDeck } from '../LabwareOnDeck'
 import styles from './DragPreview.css'
 
 type DragPreviewProps = {

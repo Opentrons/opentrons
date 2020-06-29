@@ -1,12 +1,11 @@
 // @flow
-import * as React from 'react'
+import { CONTEXT_MENU, CONTEXT_VALUE, SelectField } from '@opentrons/components'
 import { mount } from 'enzyme'
-import { SelectField, CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
-
-import * as Fixtures from '../../../../../networking/__fixtures__'
-import { LABEL_JOIN_OTHER_NETWORK, DISCONNECT_FROM_SSID } from '../../i18n'
+import * as React from 'react'
 
 import { SelectSsid } from '..'
+import * as Fixtures from '../../../../../networking/__fixtures__'
+import { DISCONNECT_FROM_SSID, LABEL_JOIN_OTHER_NETWORK } from '../../i18n'
 import { NetworkOptionLabel } from '../NetworkOptionLabel'
 
 const mockWifiList = [

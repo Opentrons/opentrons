@@ -1,30 +1,29 @@
 // @flow
-import * as React from 'react'
-import type { Dispatch } from 'redux'
-import { connect } from 'react-redux'
-
-import { TitleBar, Icon, type IconName } from '@opentrons/components'
+import type { TitleBarProps } from '@opentrons/components'
+import { type IconName, Icon, TitleBar } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import styles from './TitleBar.css'
-import { i18n } from '../localization'
-import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import type { Dispatch } from 'redux'
+
+import { END_TERMINAL_TITLE, START_TERMINAL_TITLE } from '../constants'
+import { selectors as fileDataSelectors } from '../file-data'
+import { stepIconsByType } from '../form-types'
+import { closeIngredientSelector } from '../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-import { selectors as uiLabwareSelectors } from '../ui/labware'
+import { i18n } from '../localization'
+import { type Page, selectors } from '../navigation'
 import { selectors as stepFormSelectors } from '../step-forms'
+import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../steplist'
+import type { BaseState } from '../types'
+import { selectors as uiLabwareSelectors } from '../ui/labware'
 import {
+  actions as stepsActions,
   getSelectedStepTitleInfo,
   getSelectedTerminalItemId,
   getWellSelectionLabwareKey,
-  actions as stepsActions,
 } from '../ui/steps'
-import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../steplist'
-import { selectors as fileDataSelectors } from '../file-data'
-import { closeIngredientSelector } from '../labware-ingred/actions'
-import { stepIconsByType } from '../form-types'
-import { selectors, type Page } from '../navigation'
-
-import type { TitleBarProps } from '@opentrons/components'
-import type { BaseState } from '../types'
+import styles from './TitleBar.css'
 
 type Props = React.ElementProps<typeof TitleBar>
 

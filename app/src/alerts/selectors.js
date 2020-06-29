@@ -1,9 +1,8 @@
 // @flow
-import { createSelector } from 'reselect'
 import without from 'lodash/without'
+import { createSelector } from 'reselect'
 
 import { getConfig } from '../config'
-
 import type { State } from '../types'
 import type { AlertId } from './types'
 

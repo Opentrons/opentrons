@@ -1,31 +1,27 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
-
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { SpinnerModalPage } from '@opentrons/components'
+import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { mount } from 'enzyme'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
 
 import * as Calibration from '../../../calibration'
-import * as Sessions from '../../../sessions'
+import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
 import * as RobotApi from '../../../robot-api'
-
+import type { RequestState } from '../../../robot-api/types'
+import * as Sessions from '../../../sessions'
+import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
+import type { RobotCalibrationCheckStep } from '../../../sessions/types'
+import type { State } from '../../../types'
+import { CheckHeight } from '../CheckHeight'
+import { CheckXYPoint } from '../CheckXYPoint'
+import { ConfirmExitModal } from '../ConfirmExitModal'
+import { DeckSetup } from '../DeckSetup'
 import { CheckCalibration } from '../index'
 import { Introduction } from '../Introduction'
-import { DeckSetup } from '../DeckSetup'
-import { TipPickUp } from '../TipPickUp'
-import { CheckXYPoint } from '../CheckXYPoint'
-import { CheckHeight } from '../CheckHeight'
 import { ResultsSummary } from '../ResultsSummary'
-import { ConfirmExitModal } from '../ConfirmExitModal'
-
-import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
-import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
-
-import type { State } from '../../../types'
-import type { RequestState } from '../../../robot-api/types'
-import type { RobotCalibrationCheckStep } from '../../../sessions/types'
+import { TipPickUp } from '../TipPickUp'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')

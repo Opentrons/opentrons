@@ -1,13 +1,12 @@
 // @flow
+import classnames from 'classnames'
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
-import classnames from 'classnames'
 
-import styles from './navbar.css'
 import { Button } from '../buttons'
-import { NotificationIcon } from '../icons'
-
 import type { IconName } from '../icons'
+import { NotificationIcon } from '../icons'
+import styles from './navbar.css'
 
 export type NavTabProps = {|
   /** optional click event for nav button */

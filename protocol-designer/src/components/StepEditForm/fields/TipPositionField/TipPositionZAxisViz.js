@@ -1,10 +1,9 @@
 // @flow
-import * as React from 'react'
 import round from 'lodash/round'
+import * as React from 'react'
 
 import PIPETTE_TIP_IMAGE from '../../../../images/pipette_tip.svg'
 import WELL_CROSS_SECTION_IMAGE from '../../../../images/well_cross_section.svg'
-
 import styles from './TipPositionInput.css'
 
 const WELL_HEIGHT_PIXELS = 48

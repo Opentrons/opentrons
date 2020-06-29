@@ -1,21 +1,19 @@
 // @flow
+import { LabeledValue } from '@opentrons/components'
+import { format } from 'date-fns'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { format } from 'date-fns'
 
 import {
-  getProtocolName,
   getProtocolAuthor,
+  getProtocolDescription,
   getProtocolLastUpdated,
   getProtocolMethod,
-  getProtocolDescription,
+  getProtocolName,
 } from '../../protocol'
-
-import { LabeledValue } from '@opentrons/components'
+import type { Dispatch, State } from '../../types'
+import { CardRow, SectionContentHalf } from '../layout'
 import { InfoSection } from './InfoSection'
-import { SectionContentHalf, CardRow } from '../layout'
-
-import type { State, Dispatch } from '../../types'
 
 type OP = {||}
 

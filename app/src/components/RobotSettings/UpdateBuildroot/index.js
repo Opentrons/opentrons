@@ -1,22 +1,21 @@
 // @flow
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
+import {
+  buildrootUpdateIgnored,
+  clearBuildrootSession,
+  getBuildrootSession,
+  getBuildrootUpdateAvailable,
+  getRobotSystemType,
+  setBuildrootUpdateSeen,
+  startBuildrootUpdate,
+} from '../../../buildroot'
+import type { ViewableRobot } from '../../../discovery/types'
+import type { Dispatch, State } from '../../../types'
+import { InstallModal } from './InstallModal'
 import { VersionInfoModal } from './VersionInfoModal'
 import { ViewUpdateModal } from './ViewUpdateModal'
-import { InstallModal } from './InstallModal'
-import {
-  startBuildrootUpdate,
-  setBuildrootUpdateSeen,
-  buildrootUpdateIgnored,
-  getBuildrootSession,
-  clearBuildrootSession,
-  getRobotSystemType,
-  getBuildrootUpdateAvailable,
-} from '../../../buildroot'
-
-import type { State, Dispatch } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
 
 export type UpdateBuildrootProps = {|
   robot: ViewableRobot,

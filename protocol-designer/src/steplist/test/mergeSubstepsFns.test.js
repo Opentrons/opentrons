@@ -1,7 +1,7 @@
 // @flow
 import {
-  mergeSubstepRowsSingleChannel,
   mergeSubstepRowsMultiChannel,
+  mergeSubstepRowsSingleChannel,
 } from '../generateSubsteps'
 
 const ingred1Id = 'ingred1Id'

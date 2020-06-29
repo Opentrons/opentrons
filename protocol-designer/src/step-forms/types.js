@@ -2,21 +2,22 @@
 import type { Mount } from '@opentrons/components'
 import type {
   LabwareDefinition2,
-  PipetteNameSpecs,
-  ModuleRealType,
   ModuleModel,
+  ModuleRealType,
+  PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type { DeckSlot } from '../types'
-import typeof {
-  TEMPERATURE_DEACTIVATED,
-  TEMPERATURE_AT_TARGET,
-  TEMPERATURE_APPROACHING_TARGET,
-} from '../constants'
 import typeof {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import typeof {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
+} from '../constants'
+import type { DeckSlot } from '../types'
 
 export type FormPipette = {| pipetteName: ?string, tiprackDefURI: ?string |}
 export type FormPipettesByMount = {|

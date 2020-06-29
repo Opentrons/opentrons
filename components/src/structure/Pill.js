@@ -1,10 +1,9 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
-
-import styles from './Pill.css'
+import * as React from 'react'
 
 import type { UseHoverTooltipResult } from '../tooltips'
+import styles from './Pill.css'
 
 export type PillProps = {|
   /** background color of pill (any CSS color string) */

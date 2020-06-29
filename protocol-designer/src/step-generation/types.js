@@ -5,15 +5,16 @@ import type {
   EngageMagnetParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import typeof { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../constants'
+
+import typeof { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 import type { ProfileItem } from '../form-types'
 import type {
-  LabwareTemporalProperties,
-  ModuleTemporalProperties,
-  PipetteTemporalProperties,
   LabwareEntities,
+  LabwareTemporalProperties,
   ModuleEntities,
+  ModuleTemporalProperties,
   PipetteEntities,
+  PipetteTemporalProperties,
 } from '../step-forms'
 
 // ===== MIX-IN TYPES =====

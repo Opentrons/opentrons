@@ -1,9 +1,9 @@
 // @flow
 import { registerSelectors } from '../utils'
-import { rootReducer } from './reducers'
-import type { RootState, SavedStepFormState } from './reducers'
-import * as selectors from './selectors'
 import * as actions from './actions'
+import type { RootState, SavedStepFormState } from './reducers'
+import { rootReducer } from './reducers'
+import * as selectors from './selectors'
 export * from './utils'
 export * from './types'
 

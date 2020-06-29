@@ -2,27 +2,25 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 
-import type {
-  SessionCommandString,
-  SessionCommandData,
-} from '../../sessions/types'
-import * as Sessions from '../../sessions'
 import { useDispatchApiRequest } from '../../robot-api'
-import { CalibrationInfoBox } from '../CalibrationInfoBox'
-
-import { UncalibratedInfo } from './UncalibratedInfo'
-import { Introduction } from './Introduction'
-import { DeckSetup } from './DeckSetup'
-import { MeasureNozzle } from './MeasureNozzle'
-import { TipPickUp } from './TipPickUp'
-import { InspectingTip } from './InspectingTip'
-import { MeasureTip } from './MeasureTip'
-import { CompleteConfirmation } from './CompleteConfirmation'
-
+import * as Sessions from '../../sessions'
 import type {
-  CalibrateTipLengthParentProps,
+  SessionCommandData,
+  SessionCommandString,
+} from '../../sessions/types'
+import { CalibrationInfoBox } from '../CalibrationInfoBox'
+import { CompleteConfirmation } from './CompleteConfirmation'
+import { DeckSetup } from './DeckSetup'
+import { InspectingTip } from './InspectingTip'
+import { Introduction } from './Introduction'
+import { MeasureNozzle } from './MeasureNozzle'
+import { MeasureTip } from './MeasureTip'
+import { TipPickUp } from './TipPickUp'
+import type {
   CalibrateTipLengthChildProps,
+  CalibrateTipLengthParentProps,
 } from './types'
+import { UncalibratedInfo } from './UncalibratedInfo'
 
 const PANEL_BY_STEP: {
   [string]: React.ComponentType<CalibrateTipLengthChildProps>,

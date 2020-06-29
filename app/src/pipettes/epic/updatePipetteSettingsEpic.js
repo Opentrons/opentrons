@@ -1,20 +1,16 @@
 // @flow
-import { ofType } from 'redux-observable'
 import mapValues from 'lodash/mapValues'
+import { ofType } from 'redux-observable'
 
 import { PATCH } from '../../robot-api/constants'
-import { mapToRobotApiRequest } from '../../robot-api/operators'
-
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-
-import type { Epic } from '../../types'
-
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-
+import { mapToRobotApiRequest } from '../../robot-api/operators'
+import type { Epic } from '../../types'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
 import type { UpdatePipetteSettingsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdatePipetteSettingsAction> = action => ({

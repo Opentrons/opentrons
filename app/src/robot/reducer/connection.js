@@ -1,11 +1,10 @@
 // @flow
 // robot connection state and reducer
 import type { Action } from '../../types'
-
 import type {
+  ClearConnectResponseAction,
   ConnectAction,
   ConnectResponseAction,
-  ClearConnectResponseAction,
   DisconnectAction,
   DisconnectResponseAction,
 } from '../actions'

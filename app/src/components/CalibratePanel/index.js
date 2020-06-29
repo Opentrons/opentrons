@@ -1,12 +1,12 @@
 // @flow
+import { SidePanel } from '@opentrons/components'
 import * as React from 'react'
 
-import { SidePanel } from '@opentrons/components'
-import { PipetteList } from './PipetteList'
 import { LabwareGroup } from './LabwareGroup'
-import { TipRackList } from './TipRackList'
 import { LabwareList } from './LabwareList'
+import { PipetteList } from './PipetteList'
 import styles from './styles.css'
+import { TipRackList } from './TipRackList'
 
 export function CalibratePanel(): React.Node {
   return (

@@ -1,11 +1,12 @@
 // @flow
-import type { ContextRouter } from 'react-router-dom'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { RobotService, Mount } from '../../robot'
+import type { ContextRouter } from 'react-router-dom'
+
 import type {
   DeckCalCommandState,
   DeckCalStartState,
 } from '../../http-api-client'
+import type { Mount, RobotService } from '../../robot'
 import type { Jog } from '../JogControls'
 
 export type CalibrationStep = '1' | '2' | '3' | '4' | '5' | '6'

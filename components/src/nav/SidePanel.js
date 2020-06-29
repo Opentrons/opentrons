@@ -1,7 +1,8 @@
 // @flow
 // collapsable side panel
-import * as React from 'react'
 import classnames from 'classnames'
+import * as React from 'react'
+
 import { IconButton } from '../buttons'
 import styles from './SidePanel.css'
 

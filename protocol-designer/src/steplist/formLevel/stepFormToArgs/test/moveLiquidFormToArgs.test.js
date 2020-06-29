@@ -1,18 +1,19 @@
 // @flow
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import {
-  moveLiquidFormToArgs,
-  getMixData,
-  type HydratedMoveLiquidFormData,
-} from '../moveLiquidFormToArgs'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../../../step-generation/utils'
 import { getOrderedWells } from '../../../utils'
+import {
+  type HydratedMoveLiquidFormData,
+  getMixData,
+  moveLiquidFormToArgs,
+} from '../moveLiquidFormToArgs'
 jest.mock('../../../utils')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests

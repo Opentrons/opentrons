@@ -1,7 +1,7 @@
 // @flow
+import { LabeledButton } from '@opentrons/components'
 import * as React from 'react'
 
-import { LabeledButton } from '@opentrons/components'
 import { AddManualIpModal } from './AddManualIpModal'
 
 // TODO(mc, 2020-04-27): i18n

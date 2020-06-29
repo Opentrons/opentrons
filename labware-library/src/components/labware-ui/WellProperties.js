@@ -1,26 +1,23 @@
 // @flow
-import * as React from 'react'
-
 import { Icon } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
+import * as React from 'react'
+
 import { getUniqueWellProperties } from '../../labwareInference'
 import {
   MAX_VOLUME,
   SHAPE,
-  WELL_BOTTOM_VALUES,
   VARIOUS,
+  WELL_BOTTOM_VALUES,
 } from '../../localization'
-
-import { getWellLabel } from './labels'
-import { LabelText, Value, LABEL_TOP } from '../ui'
-
-import styles from './styles.css'
-
 import type {
   LabwareDefinition,
-  LabwareWellGroupProperties,
   LabwareVolumeUnits,
+  LabwareWellGroupProperties,
 } from '../../types'
+import { LABEL_TOP, LabelText, Value } from '../ui'
+import { getWellLabel } from './labels'
+import styles from './styles.css'
 
 export type AllWellPropertiesProps = {|
   definition: LabwareDefinition,

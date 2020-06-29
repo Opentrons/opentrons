@@ -1,10 +1,11 @@
 // @flow
-import { i18n } from '../../../localization'
-import * as React from 'react'
 import { AlertModal, OutlineButton } from '@opentrons/components'
+import * as React from 'react'
+
+import type { FileUploadMessage } from '../../../load-file'
+import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
 import { getModalContents } from './modalContents'
-import type { FileUploadMessage } from '../../../load-file'
 
 type Props = {
   message: ?FileUploadMessage,

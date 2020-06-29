@@ -2,8 +2,7 @@
 import uniqBy from 'lodash/uniqBy'
 
 import { WELL_TYPE_BY_CATEGORY } from '../../localization'
-
-import type { LabwareWellGroupProperties, LabwareDefinition } from '../../types'
+import type { LabwareDefinition, LabwareWellGroupProperties } from '../../types'
 
 export type LabelSpec = LabwareDefinition | LabwareWellGroupProperties
 

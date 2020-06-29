@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
-import { UploadInput } from './UploadInput'
+
 import { ConfirmUploadModal } from './ConfirmUploadModal'
+import { UploadInput } from './UploadInput'
 import { UploadMenu } from './UploadMenu'
 
 export type UploadProps = {|

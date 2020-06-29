@@ -1,6 +1,6 @@
 // @flow
-import * as React from 'react'
 import { Card } from '@opentrons/components'
+import * as React from 'react'
 
 import { U2EAdapterInfo } from './U2EAdapterInfo'
 

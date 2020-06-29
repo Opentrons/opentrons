@@ -1,32 +1,29 @@
 // @flow
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { goBack, push } from 'connected-react-router'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push, goBack } from 'connected-react-router'
-import { Switch, Route, withRouter } from 'react-router-dom'
-
 import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
-import type { OP, SP, DP, CalibrateDeckProps, CalibrationStep } from './types'
+import { Route, Switch, withRouter } from 'react-router-dom'
 
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { chainActions } from '../../util'
-import { createLogger } from '../../logger'
-
-import { home, ROBOT } from '../../robot-controls'
 import {
-  startDeckCalibration,
-  deckCalibrationCommand,
   clearDeckCalibration,
+  deckCalibrationCommand,
   makeGetDeckCalibrationCommandState,
   makeGetDeckCalibrationStartState,
+  startDeckCalibration,
 } from '../../http-api-client'
-
+import { createLogger } from '../../logger'
+import { home, ROBOT } from '../../robot-controls'
+import type { Dispatch, State } from '../../types'
+import { chainActions } from '../../util'
 import { ErrorModal } from '../modals'
 import { ClearDeckAlert } from './ClearDeckAlert'
+import { ExitAlertModal } from './ExitAlertModal'
+import { InstructionsModal } from './InstructionsModal'
 import { InUseModal } from './InUseModal'
 import { NoPipetteModal } from './NoPipetteModal'
-import { InstructionsModal } from './InstructionsModal'
-import { ExitAlertModal } from './ExitAlertModal'
+import type { CalibrateDeckProps, CalibrationStep, DP, OP, SP } from './types'
 
 const log = createLogger(__filename)
 

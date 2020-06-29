@@ -1,7 +1,8 @@
 // @flow
-import assert from 'assert'
-import { getPipetteNameSpecs, getTiprackVolume } from '@opentrons/shared-data'
 import type { Options } from '@opentrons/components'
+import { getPipetteNameSpecs, getTiprackVolume } from '@opentrons/shared-data'
+import assert from 'assert'
+
 import type { PipetteEntity } from '../step-forms/types'
 
 const supportedPipetteNames = [

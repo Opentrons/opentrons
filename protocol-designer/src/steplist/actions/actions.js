@@ -1,5 +1,5 @@
 // @flow
-import type { StepIdType, FormData } from '../../form-types'
+import type { FormData, StepIdType } from '../../form-types'
 import type { ChangeFormPayload } from './types'
 
 export type ChangeSavedStepFormAction = {|

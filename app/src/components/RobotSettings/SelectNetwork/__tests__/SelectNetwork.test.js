@@ -1,24 +1,21 @@
 // @flow
 
+import { mount } from 'enzyme'
 import * as React from 'react'
+import { act } from 'react-dom/test-utils'
 import { Provider } from 'react-redux'
 
-import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
-
+import { SelectNetwork } from '..'
 import * as Networking from '../../../../networking'
-import * as RobotApi from '../../../../robot-api'
 import * as Fixtures from '../../../../networking/__fixtures__'
-import * as Constants from '../constants'
-
+import * as RobotApi from '../../../../robot-api'
+import type { State } from '../../../../types'
 import { Portal } from '../../../portal'
-import { SelectSsid } from '../SelectSsid'
 import { ConnectModal } from '../ConnectModal'
+import * as Constants from '../constants'
 import { DisconnectModal } from '../DisconnectModal'
 import { ResultModal } from '../ResultModal'
-import { SelectNetwork } from '..'
-
-import type { State } from '../../../../types'
+import { SelectSsid } from '../SelectSsid'
 
 jest.mock('../../../../networking/selectors')
 jest.mock('../../../../robot-api/selectors')

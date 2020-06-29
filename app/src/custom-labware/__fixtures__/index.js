@@ -1,6 +1,7 @@
 // @flow
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
 import * as Types from '../types'
 
 export const mockDefinition: LabwareDefinition2 = {

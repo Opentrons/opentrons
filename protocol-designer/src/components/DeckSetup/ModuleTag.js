@@ -1,34 +1,35 @@
 // @flow
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import {
+  type ModuleRealType,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  type ModuleRealType,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
-import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import cx from 'classnames'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+
 import {
   STD_SLOT_X_DIM,
   STD_SLOT_Y_DIM,
-  TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
-import * as uiSelectors from '../../ui/steps'
-import { getLabwareOnModule } from '../../ui/modules/utils'
-import { makeTemperatureText } from '../../utils'
-import { getModuleVizDims } from './getModuleVizDims'
-import styles from './ModuleTag.css'
-import type { ModuleOrientation } from '../../types'
+import { i18n } from '../../localization'
 import type {
   ModuleTemporalProperties,
   TemperatureModuleState,
 } from '../../step-forms'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
+import type { ModuleOrientation } from '../../types'
+import { getLabwareOnModule } from '../../ui/modules/utils'
+import * as uiSelectors from '../../ui/steps'
+import { makeTemperatureText } from '../../utils'
+import { getModuleVizDims } from './getModuleVizDims'
+import styles from './ModuleTag.css'
 
 type Props = {|
   x: number,

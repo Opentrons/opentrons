@@ -1,27 +1,25 @@
 // @flow
-import { createSelector } from 'reselect'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import min from 'lodash/min'
+import omitBy from 'lodash/omitBy'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
-import omitBy from 'lodash/omitBy'
+import { createSelector } from 'reselect'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import * as StepGeneration from '../../step-generation'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { timelineFrameBeforeActiveItem } from '../timelineFrames'
-import { getSelectedWells } from '../../well-selection/selectors'
 import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
-
-import type { Selector } from '../../types'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import type {
+  ContentsByWell,
   WellContents,
   WellContentsByLabware,
-  ContentsByWell,
 } from '../../labware-ingred/types'
-
+import { selectors as stepFormSelectors } from '../../step-forms'
+import * as StepGeneration from '../../step-generation'
+import type { Selector } from '../../types'
+import { getSelectedWells } from '../../well-selection/selectors'
+import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
 import { getWellContentsAllLabware } from './getWellContentsAllLabware'

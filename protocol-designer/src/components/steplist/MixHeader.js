@@ -1,10 +1,11 @@
 // @flow
-import * as React from 'react'
+import { Tooltip, TOOLTIP_FIXED, useHoverTooltip } from '@opentrons/components'
 import cx from 'classnames'
-import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
+import * as React from 'react'
+
 import { PDListItem } from '../lists'
-import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
+import styles from './StepItem.css'
 
 type Props = {
   volume: ?string,

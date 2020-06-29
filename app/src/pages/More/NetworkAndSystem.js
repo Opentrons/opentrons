@@ -3,8 +3,8 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { Page } from '../../components/Page'
 import { NetworkSettingsCard } from '../../components/NetworkSettingsCard'
+import { Page } from '../../components/Page'
 import { SystemInfoCard } from '../../components/SystemInfoCard'
 
 // TODO(mc, 2020-04-27): i18n

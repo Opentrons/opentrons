@@ -1,11 +1,11 @@
 // @flow
+import type { Reducer } from 'redux'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
-import type { Reducer } from 'redux'
+import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 import type { Action } from '../../types'
 import type { FileMetadataFields, SaveFileMetadataAction } from '../types'
-import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 
 const defaultFields = {
   protocolName: '',

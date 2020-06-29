@@ -1,16 +1,15 @@
 // @flow
 // robot reducer
+import type { Reducer } from 'redux'
 import { combineReducers } from 'redux'
 
-import { connectionReducer } from './connection'
-import { sessionReducer } from './session'
-import { calibrationReducer } from './calibration'
-
-import type { Reducer } from 'redux'
 import type { Action } from '../../types'
-import type { ConnectionState } from './connection'
-import type { SessionState } from './session'
 import type { CalibrationState } from './calibration'
+import { calibrationReducer } from './calibration'
+import type { ConnectionState } from './connection'
+import { connectionReducer } from './connection'
+import type { SessionState } from './session'
+import { sessionReducer } from './session'
 
 export type RobotState = {|
   connection: ConnectionState,

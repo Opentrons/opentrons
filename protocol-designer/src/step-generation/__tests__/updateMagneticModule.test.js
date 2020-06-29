@@ -1,14 +1,15 @@
 // @flow
-import cloneDeep from 'lodash/cloneDeep'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
+import cloneDeep from 'lodash/cloneDeep'
+
+import { getInitialRobotStateStandard, makeContext } from '../__fixtures__'
 import { makeImmutableStateUpdater } from '../__utils__'
-import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
 import {
-  forEngageMagnet as _forEngageMagnet,
   forDisengageMagnet as _forDisengageMagnet,
+  forEngageMagnet as _forEngageMagnet,
 } from '../getNextRobotStateAndWarnings/magnetUpdates'
 
 const forEngageMagnet = makeImmutableStateUpdater(_forEngageMagnet)

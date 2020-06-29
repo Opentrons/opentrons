@@ -1,11 +1,10 @@
 // @flow
+import { CheckboxField, FormGroup, InputField } from '@opentrons/components'
+import { type FieldProps, Field } from 'formik'
 import * as React from 'react'
-import { Field, type FieldProps } from 'formik'
-import { FormGroup, InputField, CheckboxField } from '@opentrons/components'
-
-import styles from './styles.css'
 
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
+import styles from './styles.css'
 
 export type FormColumnProps = {|
   children: React.Node,

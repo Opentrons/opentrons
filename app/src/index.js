@@ -1,21 +1,19 @@
 // client entry point and application manifest
+import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import React from 'react'
 import ReactDom from 'react-dom'
 import { Provider } from 'react-redux'
-import { createStore, applyMiddleware, compose } from 'redux'
-import thunk from 'redux-thunk'
-
-import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
+import { applyMiddleware, compose, createStore } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
-
-import { createLogger } from './logger'
-import { uiInitialized } from './shell'
-import { apiClientMiddleware as robotApiMiddleware } from './robot/api-client'
-import { rootReducer, history } from './reducer'
-import { rootEpic } from './epic'
+import thunk from 'redux-thunk'
 
 // components
 import { App } from './components/App'
+import { rootEpic } from './epic'
+import { createLogger } from './logger'
+import { history, rootReducer } from './reducer'
+import { apiClientMiddleware as robotApiMiddleware } from './robot/api-client'
+import { uiInitialized } from './shell'
 
 const log = createLogger(__filename)
 

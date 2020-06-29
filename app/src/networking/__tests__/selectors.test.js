@@ -1,11 +1,11 @@
 // @flow
 import noop from 'lodash/noop'
-import * as Discovery from '../../discovery'
-import * as Selectors from '../selectors'
-import * as Constants from '../constants'
-import * as Fixtures from '../__fixtures__'
 
+import * as Fixtures from '../__fixtures__'
+import * as Discovery from '../../discovery'
 import type { State } from '../../types'
+import * as Constants from '../constants'
+import * as Selectors from '../selectors'
 
 jest.mock('../../config/selectors')
 jest.mock('../../discovery/selectors')

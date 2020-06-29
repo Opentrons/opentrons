@@ -1,11 +1,11 @@
 import mdns from 'mdns-js'
 
 import { createDiscoveryClient } from '..'
+import { MOCK_BROWSER_SERVICE } from '../__fixtures__/mdns-browser-service'
+import { MOCK_SERVICE } from '../__fixtures__/service'
 import * as poller from '../poller'
 import * as service from '../service'
 import * as serviceList from '../service-list'
-import { MOCK_BROWSER_SERVICE } from '../__fixtures__/mdns-browser-service'
-import { MOCK_SERVICE } from '../__fixtures__/service'
 
 jest.mock('mdns-js')
 jest.mock('../poller')

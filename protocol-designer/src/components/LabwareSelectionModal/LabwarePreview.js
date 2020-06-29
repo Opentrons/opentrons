@@ -1,17 +1,18 @@
 // @flow
-import * as React from 'react'
-import reduce from 'lodash/reduce'
 import {
   Icon,
-  LabwareRender,
   LabeledValue,
+  LabwareRender,
   RobotWorkSpace,
 } from '@opentrons/components'
 import {
-  getLabwareDisplayName,
-  getLabwareDefIsStandard,
   type LabwareDefinition2,
+  getLabwareDefIsStandard,
+  getLabwareDisplayName,
 } from '@opentrons/shared-data'
+import reduce from 'lodash/reduce'
+import * as React from 'react'
+
 import { i18n } from '../../localization'
 import styles from './styles.css'
 

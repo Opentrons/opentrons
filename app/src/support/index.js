@@ -2,7 +2,6 @@
 // user support module
 import { createLogger } from '../logger'
 import { initializeProfile } from './profile'
-
 import type { SupportConfig } from './types'
 
 const log = createLogger(__filename)

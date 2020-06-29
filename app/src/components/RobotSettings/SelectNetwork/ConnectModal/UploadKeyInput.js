@@ -1,12 +1,11 @@
 // @flow
-import * as React from 'react'
-import styled from 'styled-components'
-import { useSelector } from 'react-redux'
 import last from 'lodash/last'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
+import { getWifiKeyByRequestId, postWifiKeys } from '../../../../networking'
 import { useDispatchApiRequest } from '../../../../robot-api'
-import { postWifiKeys, getWifiKeyByRequestId } from '../../../../networking'
-
 import type { State } from '../../../../types'
 
 export type UploadKeyInputProps = {|

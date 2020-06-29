@@ -1,6 +1,6 @@
 // @flow
+import { Icon, ListItem, SidePanel } from '@opentrons/components'
 import * as React from 'react'
-import { SidePanel, ListItem, Icon } from '@opentrons/components'
 
 import styles from './styles.css'
 

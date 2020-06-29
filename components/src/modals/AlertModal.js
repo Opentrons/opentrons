@@ -1,9 +1,9 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
 
-import { OutlineButton, type ButtonProps } from '../buttons'
-import { Icon, type IconName } from '../icons'
+import { type ButtonProps, OutlineButton } from '../buttons'
+import { type IconName, Icon } from '../icons'
 import { Modal } from './Modal'
 import styles from './modals.css'
 

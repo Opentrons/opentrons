@@ -1,21 +1,21 @@
 // @flow
+import { FormGroup, InputField } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { FormGroup, InputField } from '@opentrons/components'
+import type { Dispatch } from 'redux'
+
+import type { StepFieldName, StepIdType } from '../../../../form-types'
 import { i18n } from '../../../../localization'
-import { WellSelectionModal } from './WellSelectionModal'
-import { Portal } from '../../../portals/MainPageModalPortal'
+import type { BaseState } from '../../../../types'
 import {
   actions as stepsActions,
   getSelectedStepId,
   getWellSelectionLabwareKey,
 } from '../../../../ui/steps'
+import { Portal } from '../../../portals/MainPageModalPortal'
 import styles from '../../StepEditForm.css'
-
-import type { Dispatch } from 'redux'
-import type { StepIdType, StepFieldName } from '../../../../form-types'
-import type { BaseState } from '../../../../types'
 import type { FocusHandlers } from '../../types'
+import { WellSelectionModal } from './WellSelectionModal'
 
 type SP = {|
   stepId: ?StepIdType,

@@ -1,18 +1,16 @@
 // @flow
+import { TitledList } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { TitledList } from '@opentrons/components'
-import { LabwareListItem } from './LabwareListItem'
-
+import type { Labware, Mount, SessionModule, Slot } from '../../robot'
 import {
-  selectors as robotSelectors,
   actions as robotActions,
+  selectors as robotSelectors,
 } from '../../robot'
-
-import type { State, Dispatch } from '../../types'
-import type { Labware, Mount, Slot, SessionModule } from '../../robot'
+import type { Dispatch, State } from '../../types'
+import { LabwareListItem } from './LabwareListItem'
 
 type SP = {|
   disabled: boolean,

@@ -1,40 +1,40 @@
 // @flow
-import cloneDeep from 'lodash/cloneDeep'
-import mapValues from 'lodash/mapValues'
 import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  fixtureP10Single,
-  fixtureP10Multi,
-  fixtureP300Single,
-  fixtureP300Multi,
-} from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import {
+  fixtureP10Multi,
+  fixtureP10Single,
+  fixtureP300Multi,
+  fixtureP300Single,
+} from '@opentrons/shared-data/pipette/fixtures/name'
+import cloneDeep from 'lodash/cloneDeep'
+import mapValues from 'lodash/mapValues'
 
+import type { InvariantContext, RobotState, RobotStateAndWarnings } from '../'
 import {
   SPAN7_8_10_11_SLOT,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
+import { makeInitialRobotState } from '../utils'
 import {
   DEFAULT_PIPETTE,
+  DEST_LABWARE,
+  FIXED_TRASH_ID,
   MULTI_PIPETTE,
   SOURCE_LABWARE,
-  DEST_LABWARE,
   TROUGH_LABWARE,
-  FIXED_TRASH_ID,
 } from './commandFixtures'
-import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
-import type { InvariantContext, RobotState, RobotStateAndWarnings } from '../'
 
 // Eg {A1: true, B1: true, ...}
 type WellTipState = { [wellName: string]: boolean }

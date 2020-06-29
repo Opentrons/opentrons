@@ -1,27 +1,25 @@
 // @flow
 // setup pipettes component
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-
-import * as Sessions from '../../sessions'
-import { selectors as robotSelectors } from '../../robot'
-import { PIPETTE_MOUNTS, fetchPipettes } from '../../pipettes'
-import { getConnectedRobot } from '../../discovery'
-import { getFeatureFlags } from '../../config'
-import { mockTipLengthCalibrationSessionAttributes } from '../../sessions/__fixtures__'
-
-import { Page } from '../../components/Page'
-import { TipProbe } from '../../components/TipProbe'
-import { CalibrateTipLength } from '../../components/CalibrateTipLength'
-import {
-  PipetteTabs,
-  Pipettes as PipettesContents,
-} from '../../components/calibrate-pipettes'
-import { SessionHeader } from '../../components/SessionHeader'
-
+import { useDispatch, useSelector } from 'react-redux'
 import type { ContextRouter } from 'react-router-dom'
-import type { Dispatch } from '../../types'
+
+import {
+  Pipettes as PipettesContents,
+  PipetteTabs,
+} from '../../components/calibrate-pipettes'
+import { CalibrateTipLength } from '../../components/CalibrateTipLength'
+import { Page } from '../../components/Page'
+import { SessionHeader } from '../../components/SessionHeader'
+import { TipProbe } from '../../components/TipProbe'
+import { getFeatureFlags } from '../../config'
+import { getConnectedRobot } from '../../discovery'
+import { fetchPipettes, PIPETTE_MOUNTS } from '../../pipettes'
 import type { Mount } from '../../pipettes/types'
+import { selectors as robotSelectors } from '../../robot'
+import * as Sessions from '../../sessions'
+import { mockTipLengthCalibrationSessionAttributes } from '../../sessions/__fixtures__'
+import type { Dispatch } from '../../types'
 
 type Props = ContextRouter
 

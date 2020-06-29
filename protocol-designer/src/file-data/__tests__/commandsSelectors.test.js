@@ -1,15 +1,15 @@
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+
 import {
+  DEFAULT_PIPETTE,
+  DEST_LABWARE,
   getInitialRobotStateStandard,
   makeContext,
-  DEFAULT_PIPETTE,
   MULTI_PIPETTE,
   SOURCE_LABWARE,
-  DEST_LABWARE,
 } from '../../step-generation/__fixtures__'
-
 import { getLabwareLiquidState, getRobotStateTimeline } from '../selectors'
 jest.mock('../../labware-defs/utils')
 

@@ -1,7 +1,8 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
+import * as React from 'react'
 import { act } from 'react-dom/test-utils'
+
 import { mockRobotCalibrationCheckSessionDetails } from '../../../sessions/__fixtures__'
 import { TipPickUp } from '../TipPickUp'
 

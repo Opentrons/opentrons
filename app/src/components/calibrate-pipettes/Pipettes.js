@@ -1,14 +1,13 @@
 // @flow
-import * as React from 'react'
+import type { InstrumentInfoProps } from '@opentrons/components'
+import { InstrumentGroup } from '@opentrons/components'
 import cx from 'classnames'
+import * as React from 'react'
 
 import { PIPETTE_MOUNTS } from '../../pipettes'
-import { InstrumentGroup } from '@opentrons/components'
-import styles from './styles.css'
-
-import type { InstrumentInfoProps } from '@opentrons/components'
-import type { Pipette, TiprackByMountMap } from '../../robot/types'
 import type { Mount } from '../../pipettes/types'
+import type { Pipette, TiprackByMountMap } from '../../robot/types'
+import styles from './styles.css'
 
 export type PipettesProps = {|
   currentMount: Mount | null,

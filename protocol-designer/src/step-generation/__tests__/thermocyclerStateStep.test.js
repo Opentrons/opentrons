@@ -1,13 +1,13 @@
 // @flow
-import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
-import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import {
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../__fixtures__'
-import type { Diff } from '../utils/thermocyclerStateDiff'
-import type { ThermocyclerStateStepArgs } from '../types'
 import type { ThermocyclerModuleState } from '../../step-forms/types'
+import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
+import type { ThermocyclerStateStepArgs } from '../types'
+import type { Diff } from '../utils/thermocyclerStateDiff'
+import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 
 jest.mock('../utils/thermocyclerStateDiff')
 

@@ -1,15 +1,13 @@
 // @flow
+import { PrimaryButton } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import { PrimaryButton } from '@opentrons/components'
-import { CalibrationInfoContent } from '../CalibrationInfoContent'
-
-import { actions as robotActions } from '../../robot'
-import removeSingle from '../../img/remove_tip_single.png'
 import removeMulti from '../../img/remove_tip_multi.png'
-
+import removeSingle from '../../img/remove_tip_single.png'
+import { actions as robotActions } from '../../robot'
 import type { Dispatch } from '../../types'
+import { CalibrationInfoContent } from '../CalibrationInfoContent'
 import type { TipProbeProps } from './types'
 
 type OP = TipProbeProps

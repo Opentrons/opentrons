@@ -1,14 +1,14 @@
 // @flow
 import {
-  getNextRobotStateAndWarningsSingleCommand,
   getNextRobotStateAndWarnings,
+  getNextRobotStateAndWarningsSingleCommand,
 } from '../getNextRobotStateAndWarnings'
+import type { InvariantContext } from '../types'
 import {
+  commandCreatorsTimeline,
   curryCommandCreator,
   reduceCommandCreators,
-  commandCreatorsTimeline,
 } from '../utils'
-import type { InvariantContext } from '../types'
 
 jest.mock('../getNextRobotStateAndWarnings')
 

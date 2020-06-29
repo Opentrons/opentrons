@@ -1,27 +1,25 @@
 // @flow
 // app info card with version and updated
+import type { DropdownOption } from '@opentrons/components'
+import { Card, LabeledSelect, LabeledToggle } from '@opentrons/components'
+import startCase from 'lodash/startCase'
 import * as React from 'react'
 import { connect } from 'react-redux'
+import type { ContextRouter } from 'react-router-dom'
 import { withRouter } from 'react-router-dom'
-import startCase from 'lodash/startCase'
 
 import {
+  DEV_INTERNAL_FLAGS,
   getDevtoolsEnabled,
   getFeatureFlags,
   getUpdateChannel,
   getUpdateChannelOptions,
-  updateConfigValue,
-  toggleDevtools,
   toggleDevInternalFlag,
-  DEV_INTERNAL_FLAGS,
+  toggleDevtools,
+  updateConfigValue,
 } from '../../config'
-
-import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
-
-import type { ContextRouter } from 'react-router-dom'
-import type { DropdownOption } from '@opentrons/components'
-import type { State, Dispatch } from '../../types'
 import type { Config, DevInternalFlag, UpdateChannel } from '../../config/types'
+import type { Dispatch, State } from '../../types'
 
 type OP = {|
   ...ContextRouter,

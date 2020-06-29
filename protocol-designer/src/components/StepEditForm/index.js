@@ -1,35 +1,33 @@
 // @flow
-import * as React from 'react'
-import { useDispatch, connect } from 'react-redux'
+import { useConditionalConfirm } from '@opentrons/components'
+import cx from 'classnames'
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
-import cx from 'classnames'
+import * as React from 'react'
+import { connect, useDispatch } from 'react-redux'
 
-import { useConditionalConfirm } from '@opentrons/components'
-import { actions } from '../../steplist'
-import { actions as stepsActions } from '../../ui/steps'
+import type { FormData, StepFieldName, StepType } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { actions } from '../../steplist'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
+import type { BaseState } from '../../types'
+import { actions as stepsActions } from '../../ui/steps'
 import formStyles from '../forms/forms.css'
-import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import { ConfirmDeleteStepModal } from '../modals/ConfirmDeleteStepModal'
-
+import { MoreOptionsModal } from '../modals/MoreOptionsModal'
+import { ButtonRow } from './ButtonRow'
+import { FormAlerts } from './FormAlerts'
 import {
+  MagnetForm,
   MixForm,
   MoveLiquidForm,
   PauseForm,
-  MagnetForm,
   TemperatureForm,
   ThermocyclerForm,
 } from './forms'
-import { FormAlerts } from './FormAlerts'
-import { ButtonRow } from './ButtonRow'
 import styles from './StepEditForm.css'
-
-import type { BaseState } from '../../types'
-import type { FormData, StepType, StepFieldName } from '../../form-types'
 
 const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<any> } = {
   mix: MixForm,

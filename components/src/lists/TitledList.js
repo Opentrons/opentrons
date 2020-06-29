@@ -1,10 +1,10 @@
 // @flow
 // TitledList component
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
 
-import styles from './lists.css'
 import { type IconName, Icon } from '../icons'
+import styles from './lists.css'
 
 export type TitledListProps = {|
   /** text of title */

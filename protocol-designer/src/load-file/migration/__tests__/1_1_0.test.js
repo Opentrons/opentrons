@@ -1,15 +1,16 @@
-import omit from 'lodash/omit'
-import mapValues from 'lodash/mapValues'
 import each from 'lodash/each'
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+
 import oldProtocol from '../../../../fixtures/protocol/1/doItAll.json'
 import {
-  renameOrderedSteps,
   addInitialDeckSetupStep,
   INITIAL_DECK_SETUP_STEP_ID,
-  updateStepFormKeys,
-  TCD_DEPRECATED_FIELD_NAMES,
   MIX_DEPRECATED_FIELD_NAMES,
+  renameOrderedSteps,
   replaceTCDStepsWithMoveLiquidStep,
+  TCD_DEPRECATED_FIELD_NAMES,
+  updateStepFormKeys,
 } from '../1_1_0.js'
 
 describe('renameOrderedSteps', () => {

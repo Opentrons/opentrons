@@ -1,5 +1,5 @@
 // @flow
-import type { PauseArgs, CommandCreator } from '../../types'
+import type { CommandCreator, PauseArgs } from '../../types'
 
 export const delay: CommandCreator<PauseArgs> = (
   args,

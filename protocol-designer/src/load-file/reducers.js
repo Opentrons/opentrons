@@ -1,9 +1,10 @@
 // @flow
-import { combineReducers, type Reducer } from 'redux'
+import { type Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import type { Action } from '../types'
-import type { FileUploadMessage, LoadFileAction } from './types'
 import type { FileUploadMessageAction } from './actions'
+import type { FileUploadMessage, LoadFileAction } from './types'
 
 // Keep track of file upload errors / messages
 type FileUploadMessageState = ?FileUploadMessage

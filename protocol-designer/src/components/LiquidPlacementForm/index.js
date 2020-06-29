@@ -1,20 +1,21 @@
 // @flow
-import * as React from 'react'
-import { connect } from 'react-redux'
 import assert from 'assert'
 import isEmpty from 'lodash/isEmpty'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import type { Dispatch } from 'redux'
+
 import {
   removeWellsContents,
   setWellContents,
 } from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
-import { getSelectedWells } from '../../well-selection/selectors'
-import { deselectAllWells } from '../../well-selection/actions'
-import { LiquidPlacementForm as LiquidPlacementFormComponent } from './LiquidPlacementForm'
-import type { Dispatch } from 'redux'
-import type { LiquidPlacementFormValues } from './LiquidPlacementForm'
 import type { BaseState } from '../../types'
+import { deselectAllWells } from '../../well-selection/actions'
+import { getSelectedWells } from '../../well-selection/selectors'
+import type { LiquidPlacementFormValues } from './LiquidPlacementForm'
+import { LiquidPlacementForm as LiquidPlacementFormComponent } from './LiquidPlacementForm'
 
 type Props = React.ElementProps<typeof LiquidPlacementFormComponent>
 

@@ -1,12 +1,13 @@
 // @flow
 // PD-specific info about labware<>module compatibilty
-import assert from 'assert'
+import type { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
+import assert from 'assert'
+
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type { LabwareOnDeck } from '../step-forms'
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')

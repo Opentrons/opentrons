@@ -1,13 +1,13 @@
 // @flow
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
 import configureMockStore from 'redux-mock-store'
 
 import * as RobotSelectors from '../../robot/selectors'
+import type { State } from '../../types'
 import * as Actions from '../actions'
 import { useSendModuleCommand } from '../hooks'
-import type { State } from '../../types'
 
 jest.mock('../../robot/selectors')
 

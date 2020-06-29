@@ -1,21 +1,18 @@
 // @flow
 import * as React from 'react'
 
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import { i18n } from '../../../../localization'
-
-import type { FocusHandlers } from '../../types'
-
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import {
-  TextField,
-  CheckboxRowField,
   BlowoutLocationField,
-  TipPositionField,
+  CheckboxRowField,
   FlowRateField,
+  TextField,
+  TipPositionField,
   WellOrderField,
 } from '../../fields'
-
 import styles from '../../StepEditForm.css'
+import type { FocusHandlers } from '../../types'
 
 type Props = {
   className?: ?string,

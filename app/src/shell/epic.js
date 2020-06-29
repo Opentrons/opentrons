@@ -1,12 +1,11 @@
 // @flow
 import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
-import { filter, tap, ignoreElements } from 'rxjs/operators'
+import { filter, ignoreElements, tap } from 'rxjs/operators'
 
 import { createLogger } from '../logger'
+import type { Action, Epic } from '../types'
 import { remote } from './remote'
-
-import type { Epic, Action } from '../types'
 
 const { ipcRenderer } = remote
 

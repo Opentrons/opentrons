@@ -1,13 +1,14 @@
 // @flow
+import { type HoverTooltipHandlers, HoverTooltip } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { HoverTooltip, type HoverTooltipHandlers } from '@opentrons/components'
-import { actions } from '../../../steplist'
+
+import type { StepFieldName } from '../../../form-types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
+import { actions } from '../../../steplist'
 import { getFieldErrors, maskField } from '../../../steplist/fieldLevel'
 import { getDisabledFields } from '../../../steplist/formLevel'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import type { StepFieldName } from '../../../form-types'
 import { getTooltipForField } from '../utils'
 
 type FieldRenderProps = {

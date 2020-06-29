@@ -1,15 +1,14 @@
 // @flow
 import type { FormikErrors } from 'formik'
 
-import type { WifiNetwork, EapOption, WifiKey } from '../../../networking/types'
-
+import type { EapOption, WifiKey, WifiNetwork } from '../../../networking/types'
 import typeof {
   CONNECT,
   DISCONNECT,
-  JOIN_OTHER,
-  FIELD_TYPE_TEXT,
   FIELD_TYPE_KEY_FILE,
   FIELD_TYPE_SECURITY,
+  FIELD_TYPE_TEXT,
+  JOIN_OTHER,
 } from './constants'
 
 export type {

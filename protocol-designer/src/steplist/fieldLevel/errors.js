@@ -1,5 +1,6 @@
 // @flow
 import isArray from 'lodash/isArray'
+
 import { i18n } from '../../localization'
 /*******************
  ** Error Messages **

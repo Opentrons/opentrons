@@ -1,25 +1,22 @@
 // @flow
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import some from 'lodash/some'
+import { Module as ModuleItem, RobotWorkSpace } from '@opentrons/components'
+import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { type DeckSlotId } from '@opentrons/shared-data'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
-import { type DeckSlotId } from '@opentrons/shared-data'
+import some from 'lodash/some'
+import * as React from 'react'
+import { connect } from 'react-redux'
 import type { ContextRouter } from 'react-router-dom'
-
-import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-
-import type { State, Dispatch } from '../../types'
-import {
-  selectors as robotSelectors,
-  type Labware,
-  type SessionModule,
-} from '../../robot'
+import { withRouter } from 'react-router-dom'
 
 import { getMissingModules } from '../../modules'
-
+import {
+  type Labware,
+  type SessionModule,
+  selectors as robotSelectors,
+} from '../../robot'
+import type { Dispatch, State } from '../../types'
 import { LabwareItem } from './LabwareItem'
 
 export * from './LabwareItem'

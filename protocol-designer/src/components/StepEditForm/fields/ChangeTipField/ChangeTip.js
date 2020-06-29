@@ -1,17 +1,18 @@
 // @flow
-import * as React from 'react'
 import {
   FormGroup,
   SelectField,
   Tooltip,
-  useHoverTooltip,
   TOOLTIP_FIXED,
+  useHoverTooltip,
 } from '@opentrons/components'
+import * as React from 'react'
+
 import { i18n } from '../../../../localization'
-import { FieldConnector } from '../FieldConnector'
-import styles from '../../StepEditForm.css'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { ChangeTipOptions } from '../../../../step-generation/types'
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
+import styles from '../../StepEditForm.css'
+import { FieldConnector } from '../FieldConnector'
 
 // NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed
 type Props = {

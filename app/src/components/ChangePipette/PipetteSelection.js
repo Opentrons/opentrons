@@ -1,7 +1,7 @@
 // @flow
+import { PipetteSelect } from '@opentrons/components'
 import * as React from 'react'
 
-import { PipetteSelect } from '@opentrons/components'
 import styles from './styles.css'
 
 const LABEL = 'Select the pipette you wish to attach:'

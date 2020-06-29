@@ -1,50 +1,50 @@
 // @flow
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { Form, Formik, useFormikContext } from 'formik'
-import cx from 'classnames'
 import {
-  Modal,
-  FormGroup,
   BUTTON_TYPE_SUBMIT,
+  FormGroup,
+  Modal,
   OutlineButton,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import type { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
 import {
-  THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import cx from 'classnames'
+import { Form, Formik, useFormikContext } from 'formik'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { i18n } from '../../../localization'
 import {
-  getSlotsBlockedBySpanning,
-  getSlotIsEmpty,
+  getAllModuleSlotsByType,
+  SUPPORTED_MODULE_SLOTS,
+} from '../../../modules/moduleData'
+import {
+  actions as stepFormActions,
+  selectors as stepFormSelectors,
+} from '../../../step-forms'
+import type { ModuleOnDeck } from '../../../step-forms/types'
+import {
   getLabwareOnSlot,
+  getSlotIsEmpty,
+  getSlotsBlockedBySpanning,
 } from '../../../step-forms/utils'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
-import {
-  selectors as stepFormSelectors,
-  actions as stepFormActions,
-} from '../../../step-forms'
-import {
-  SUPPORTED_MODULE_SLOTS,
-  getAllModuleSlotsByType,
-} from '../../../modules/moduleData'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
 import { PDAlert } from '../../alerts/PDAlert'
+import type { ModelModuleInfo } from '../../EditModules'
 import { isModuleWithCollisionIssue } from '../../modules'
 import modalStyles from '../modal.css'
+import { ConnectedSlotMap } from './ConnectedSlotMap'
 import styles from './EditModules.css'
+import { useResetSlotOnModelChange } from './form-state'
 import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
-import { ConnectedSlotMap } from './ConnectedSlotMap'
-import { useResetSlotOnModelChange } from './form-state'
-
-import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../../step-forms/types'
-import type { ModelModuleInfo } from '../../EditModules'
 
 type EditModulesModalProps = {|
   moduleType: ModuleRealType,

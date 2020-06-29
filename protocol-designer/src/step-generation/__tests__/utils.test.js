@@ -5,27 +5,27 @@ import {
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 import {
   fixtureP10Single,
   fixtureP300Multi,
 } from '@opentrons/shared-data/pipette/fixtures/name'
 
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import type { RobotState } from '../'
+import { FIXED_TRASH_ID } from '../__fixtures__'
 import { TEMPERATURE_DEACTIVATED } from '../../constants'
+import { thermocyclerPipetteCollision } from '../utils'
 import {
-  splitLiquid,
-  mergeLiquid,
   AIR,
-  repeatArray,
   makeInitialRobotState,
+  mergeLiquid,
+  repeatArray,
+  splitLiquid,
 } from '../utils/misc'
 import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
-import { FIXED_TRASH_ID } from '../__fixtures__'
-import { thermocyclerPipetteCollision } from '../utils'
-import type { RobotState } from '../'
 
 describe('splitLiquid', () => {
   const singleIngred = {

@@ -1,6 +1,6 @@
 // @flow
-import * as React from 'react'
 import classnames from 'classnames'
+import * as React from 'react'
 
 import { ICON_DATA_BY_NAME } from './icon-data'
 import styles from './icons.css'

@@ -1,7 +1,8 @@
 // @flow
+import { Icon } from '@opentrons/components'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Icon } from '@opentrons/components'
+
 import { selectors as featureFlagSelectors } from '../feature-flags'
 
 export const PrereleaseModeIndicator = (): React.Node => {

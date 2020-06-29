@@ -1,11 +1,11 @@
 // @flow
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { AlertModal, SpinnerModal } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import * as React from 'react'
+
 import { ErrorModal } from '../../../modals'
+import { CONNECT, DISCONNECT, JOIN_OTHER } from '../constants'
 import { ResultModal } from '../ResultModal'
-import { DISCONNECT, CONNECT, JOIN_OTHER } from '../constants'
 
 describe("SelectNetwork's ResultModal", () => {
   const mockSsid = 'foobar'

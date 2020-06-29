@@ -1,33 +1,31 @@
 // @flow
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import mapValues from 'lodash/mapValues'
 import { useConditionalConfirm } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
+import mapValues from 'lodash/mapValues'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { selectors as uiLabwareSelectors } from '../ui/labware'
+import { ConfirmDeleteStepModal } from '../components/modals/ConfirmDeleteStepModal'
+import { StepItem, StepItemContents } from '../components/steplist/StepItem'
+import { selectors as dismissSelectors } from '../dismiss'
+import { selectors as fileDataSelectors } from '../file-data'
+import type { StepIdType } from '../form-types'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
+import {
+  type LabwareEntity,
+  selectors as stepFormSelectors,
+} from '../step-forms'
+import type { SubstepIdentifier } from '../steplist/types'
 import * as substepSelectors from '../top-selectors/substeps'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
-import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-import { selectors as dismissSelectors } from '../dismiss'
+import { selectors as uiLabwareSelectors } from '../ui/labware'
 import {
-  selectors as stepFormSelectors,
-  type LabwareEntity,
-} from '../step-forms'
-import {
-  getCollapsedSteps,
-  getHoveredSubstep,
-  getHoveredStepId,
-  getSelectedStepId,
   actions as stepsActions,
+  getCollapsedSteps,
+  getHoveredStepId,
+  getHoveredSubstep,
+  getSelectedStepId,
 } from '../ui/steps'
-import { selectors as fileDataSelectors } from '../file-data'
-
-import { StepItem, StepItemContents } from '../components/steplist/StepItem'
-import { ConfirmDeleteStepModal } from '../components/modals/ConfirmDeleteStepModal'
-
-import type { SubstepIdentifier } from '../steplist/types'
-import type { StepIdType } from '../form-types'
 
 type Props = {|
   stepId: StepIdType,

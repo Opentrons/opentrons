@@ -1,6 +1,6 @@
 // @flow
-import * as Types from './types'
 import { DISMISS_REQUEST } from './constants'
+import * as Types from './types'
 
 export const dismissRequest = (
   requestId: string

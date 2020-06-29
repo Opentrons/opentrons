@@ -1,22 +1,23 @@
 // @flow
-import Ajv from 'ajv'
-import isEmpty from 'lodash/isEmpty'
+import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
 import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
 import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
-import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
-import { createFile } from '../selectors'
+import Ajv from 'ajv'
+import isEmpty from 'lodash/isEmpty'
+
 import {
-  fileMetadata,
   dismissedWarnings,
+  fileMetadata,
   ingredients,
   ingredLocations,
+  labwareDefsByURI,
   labwareEntities,
   labwareNicknamesById,
-  labwareDefsByURI,
   pipetteEntities,
 } from '../__fixtures__/createFile/commonFields'
 import * as engageMagnet from '../__fixtures__/createFile/engageMagnet'
 import * as noModules from '../__fixtures__/createFile/noModules'
+import { createFile } from '../selectors'
 
 const getAjvValidator = _protocolSchema => {
   const ajv = new Ajv({

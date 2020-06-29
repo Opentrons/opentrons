@@ -1,11 +1,11 @@
 // @flow
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
-import thunk from 'redux-thunk'
-import { makePersistSubscriber, rehydratePersistedAction } from './persist'
-import { fileUploadMessage } from './load-file/actions'
-
 import type { Store } from 'redux'
-import type { BaseState, Action, ThunkDispatch } from './types'
+import { applyMiddleware, combineReducers, compose, createStore } from 'redux'
+import thunk from 'redux-thunk'
+
+import { fileUploadMessage } from './load-file/actions'
+import { makePersistSubscriber, rehydratePersistedAction } from './persist'
+import type { Action, BaseState, ThunkDispatch } from './types'
 
 const ReselectTools =
   process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined

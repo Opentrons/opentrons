@@ -1,32 +1,29 @@
 // @flow
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import last from 'lodash/last'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import { getAttachedPipettes } from '../../pipettes'
+import { getRequestById, PENDING, useDispatchApiRequest } from '../../robot-api'
 import {
-  home,
-  move,
+  CHANGE_PIPETTE,
   getMovementStatus,
+  home,
   HOMING,
+  move,
   MOVING,
   PIPETTE,
-  CHANGE_PIPETTE,
 } from '../../robot-controls'
-
+import type { Mount } from '../../robot/types'
+import type { Dispatch, State } from '../../types'
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
+import { ConfirmPipette } from './ConfirmPipette'
+import { ATTACH, CLEAR_DECK, CONFIRM, DETACH, INSTRUCTIONS } from './constants'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
-import { ConfirmPipette } from './ConfirmPipette'
-import { RequestInProgressModal } from './RequestInProgressModal'
 import { LevelPipette } from './LevelPipette'
-
-import { ATTACH, DETACH, CLEAR_DECK, INSTRUCTIONS, CONFIRM } from './constants'
-
-import type { State, Dispatch } from '../../types'
-import type { Mount } from '../../robot/types'
+import { RequestInProgressModal } from './RequestInProgressModal'
 import type { WizardStep } from './types'
 
 type Props = {|

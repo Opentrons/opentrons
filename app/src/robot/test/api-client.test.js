@@ -1,22 +1,20 @@
 // tests for the api client
+import { push } from 'connected-react-router'
 import functions from 'lodash/functions'
 import omit from 'lodash/omit'
-import { push } from 'connected-react-router'
 
-import { client } from '../api-client/client'
-import { Client as RpcClient } from '../../rpc/client'
 import { actions, constants } from '../'
+import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
+import { getLabwareDefBySlot } from '../../protocol/selectors'
 import * as AdminActions from '../../robot-admin/actions'
-
+import { Client as RpcClient } from '../../rpc/client'
+import { client } from '../api-client/client'
+import { MockCalibrationManager } from './__fixtures__/calibration-manager'
 import {
   MockSession,
-  MockSessionNoStateInfo,
   MockSessionNoDoorInfo,
+  MockSessionNoStateInfo,
 } from './__fixtures__/session'
-import { MockCalibrationManager } from './__fixtures__/calibration-manager'
-
-import { getLabwareDefBySlot } from '../../protocol/selectors'
-import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 
 jest.mock('../../rpc/client')
 jest.mock('../../protocol/selectors')

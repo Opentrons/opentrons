@@ -1,19 +1,17 @@
 // @flow
 // jog controls component
-import * as React from 'react'
-import cx from 'classnames'
-
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
-
 import {
+  type IconName,
+  type KeypressHandler,
+  HandleKeypress,
+  Icon,
   PrimaryButton,
   RadioGroup,
-  Icon,
-  HandleKeypress,
-  type KeypressHandler,
-  type IconName,
 } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
 
+import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 
 export type Jog = (

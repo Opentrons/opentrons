@@ -1,17 +1,16 @@
 // @flow
+import { FormGroup } from '@opentrons/components'
+import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import cx from 'classnames'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { FormGroup } from '@opentrons/components'
-import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
-import { selectors as uiModuleSelectors } from '../../../ui/modules'
-import { i18n } from '../../../localization'
-import { maskField } from '../../../steplist/fieldLevel'
-
-import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
-import styles from '../StepEditForm.css'
 
 import type { FormData } from '../../../form-types'
+import { i18n } from '../../../localization'
+import { maskField } from '../../../steplist/fieldLevel'
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
+import { ConditionalOnField, RadioGroupField, TextField } from '../fields'
+import styles from '../StepEditForm.css'
 import type { FocusHandlers } from '../types'
 
 type MagnetFormProps = { focusHandlers: FocusHandlers, formData: FormData }

@@ -1,16 +1,16 @@
 // @flow
-import { thermocyclerPipetteCollision } from '../utils'
+import type { RobotState } from '../'
 import {
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
-  makeContext,
-  getErrorResult,
   getSuccessResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../__fixtures__'
 import { dispense } from '../commandCreators/atomic/dispense'
-import type { RobotState } from '../'
+import { thermocyclerPipetteCollision } from '../utils'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 

@@ -1,34 +1,30 @@
 // @flow
 
-import * as Fixtures from '../../../../../networking/__fixtures__'
-
 import {
-  CONFIGURE_FIELD_SSID,
   CONFIGURE_FIELD_PSK,
   CONFIGURE_FIELD_SECURITY_TYPE,
+  CONFIGURE_FIELD_SSID,
+  SECURITY_NONE,
   SECURITY_WPA_EAP,
   SECURITY_WPA_PSK,
-  SECURITY_NONE,
 } from '../../../../../networking'
-
+import * as Fixtures from '../../../../../networking/__fixtures__'
 import {
-  FIELD_TYPE_TEXT,
   FIELD_TYPE_KEY_FILE,
   FIELD_TYPE_SECURITY,
+  FIELD_TYPE_TEXT,
 } from '../../constants'
-
 import {
+  LABEL_PSK,
   LABEL_SECURITY,
   LABEL_SSID,
-  LABEL_PSK,
   SELECT_AUTHENTICATION_METHOD,
   SELECT_FILE,
 } from '../../i18n'
-
 import {
+  connectFormToConfigureRequest,
   getConnectFormFields,
   validateConnectFormFields,
-  connectFormToConfigureRequest,
 } from '../form-fields'
 
 describe('getConnectFormFields', () => {

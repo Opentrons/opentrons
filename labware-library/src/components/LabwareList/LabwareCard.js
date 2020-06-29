@@ -1,27 +1,25 @@
 // @flow
 // labware display card
-import * as React from 'react'
-import uniq from 'lodash/uniq'
-
-import { getPublicPath } from '../../public-path'
 import { Icon } from '@opentrons/components'
-import { Link } from '../ui'
-import {
-  getWellLabel,
-  Gallery,
-  LoadName,
-  Tags,
-  WellCount,
-  AllWellProperties,
-} from '../labware-ui'
+import uniq from 'lodash/uniq'
+import * as React from 'react'
 
 import {
   CATEGORY_LABELS_BY_CATEGORY,
   MANUFACTURER_VALUES,
 } from '../../localization'
-import styles from './styles.css'
-
+import { getPublicPath } from '../../public-path'
 import type { LabwareDefinition } from '../../types'
+import {
+  AllWellProperties,
+  Gallery,
+  getWellLabel,
+  LoadName,
+  Tags,
+  WellCount,
+} from '../labware-ui'
+import { Link } from '../ui'
+import styles from './styles.css'
 
 export type LabwareCardProps = {| definition: LabwareDefinition |}
 

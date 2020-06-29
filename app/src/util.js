@@ -1,8 +1,8 @@
 // @flow
 // utility functions
 // DEPRECATED(mc, 2020-01-13): do not add to nor import from this file
-import type { Action, ThunkAction, ThunkPromiseAction } from './types'
 import { createLogger } from './logger'
+import type { Action, ThunkAction, ThunkPromiseAction } from './types'
 
 type Chainable = Action | ThunkAction | ThunkPromiseAction
 

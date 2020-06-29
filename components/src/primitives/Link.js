@@ -1,9 +1,8 @@
 // @flow
+import type { StyledComponent } from 'styled-components'
 import styled from 'styled-components'
 
-import { styleProps, isntStyleProp } from './style-props'
-
-import type { StyledComponent } from 'styled-components'
+import { isntStyleProp, styleProps } from './style-props'
 import type { StyleProps } from './types'
 
 export type LinkProps = {|

@@ -1,21 +1,21 @@
 import EventEmitter from 'events'
+
+import {
+  ACK,
+  CONTROL_MESSAGE,
+  NACK,
+  NOTIFICATION,
+  PONG,
+  RESULT,
+  statuses,
+} from './message-types'
+import { RemoteError } from './remote-error'
+import { RemoteObject } from './remote-object'
 // TODO(mc, 2017-08-29): Disable winston and uuid because of worker-loader bug
 // preventing webpackification of built-in node modules (os and crypto)
 // import log from 'winston'
 // import uuid from 'uuid/v4'
-
 import { WebSocketClient } from './websocket-client'
-import { RemoteObject } from './remote-object'
-import { RemoteError } from './remote-error'
-import {
-  statuses,
-  RESULT,
-  ACK,
-  NACK,
-  NOTIFICATION,
-  CONTROL_MESSAGE,
-  PONG,
-} from './message-types'
 
 // TODO(mc, 2017-08-29): see note about uuid above
 let _uniqueId = 0

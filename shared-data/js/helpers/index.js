@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
 import uniq from 'lodash/uniq'
+
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import type { LabwareDefinition2 } from '../types'
 

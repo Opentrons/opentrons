@@ -13,7 +13,15 @@ module.exports = {
     'prettier/standard',
   ],
 
-  plugins: ['flowtype', 'react', 'react-hooks', 'json', 'prettier', 'jest'],
+  plugins: [
+    'flowtype',
+    'react',
+    'react-hooks',
+    'json',
+    'prettier',
+    'jest',
+    'simple-import-sort',
+  ],
 
   rules: {
     camelcase: 'off',
@@ -24,6 +32,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'no-extra-boolean-cast': 'off',
     'import/no-default-export': 'error',
+    'simple-import-sort/sort': 'error',
   },
 
   globals: {},

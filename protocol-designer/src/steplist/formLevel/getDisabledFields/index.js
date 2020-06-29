@@ -1,8 +1,9 @@
 // @flow
 import { defaultMemoize } from 'reselect'
-import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
-import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
+
 import type { FormData } from '../../../form-types'
+import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
+import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
 
 function _getDisabledFields(rawForm: FormData): Set<string> {
   switch (rawForm.stepType) {

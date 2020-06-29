@@ -6,26 +6,25 @@ import round from 'lodash/round'
 
 import labwareSchema from '../../labware/schemas/2.json'
 import {
-  toWellName,
+  ensureVolumeUnits,
+  getAsciiVolumeUnits,
+  getDisplayVolume,
   sortWells,
   splitWellsOnColumn,
-  getDisplayVolume,
-  getAsciiVolumeUnits,
-  ensureVolumeUnits,
+  toWellName,
 } from '../helpers/index'
-
 import type {
-  LabwareDefinition2 as Definition,
-  LabwareMetadata as Metadata,
-  LabwareDimensions as Dimensions,
   LabwareBrand as Brand,
-  LabwareParameters as Params,
-  LabwareWell as Well,
-  LabwareWellProperties as InputWell,
-  LabwareWellMap as WellMap,
-  LabwareWellGroup as WellGroup,
+  LabwareDefinition2 as Definition,
+  LabwareDimensions as Dimensions,
+  LabwareMetadata as Metadata,
   LabwareOffset as Offset,
+  LabwareParameters as Params,
   LabwareVolumeUnits as VolumeUnits,
+  LabwareWell as Well,
+  LabwareWellGroup as WellGroup,
+  LabwareWellMap as WellMap,
+  LabwareWellProperties as InputWell,
 } from '../types'
 
 // NOTE: leaving this 'beta' to reduce conflicts with future labware cloud namespaces

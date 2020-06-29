@@ -1,9 +1,9 @@
 // @flow
+import { AlertModal } from '@opentrons/components'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { AlertModal } from '@opentrons/components'
-import { Portal } from '../portal'
 
+import { Portal } from '../portal'
 import styles from './styles.css'
 
 type Props = {|

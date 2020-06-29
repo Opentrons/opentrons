@@ -1,18 +1,17 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-
+import { HoverTooltip, ListItem } from '@opentrons/components'
 import {
+  type ModuleModel,
   getLabwareDisplayName,
   getModuleDisplayName,
   getModuleType,
   THERMOCYCLER_MODULE_TYPE,
-  type ModuleModel,
 } from '@opentrons/shared-data'
-import { ListItem, HoverTooltip } from '@opentrons/components'
-import styles from './styles.css'
+import cx from 'classnames'
+import * as React from 'react'
 
 import type { Labware } from '../../robot'
+import styles from './styles.css'
 
 export type LabwareListItemProps = {|
   ...Labware,

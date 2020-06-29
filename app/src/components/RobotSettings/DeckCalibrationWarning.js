@@ -1,23 +1,22 @@
 // @flow
-import * as React from 'react'
+import type { StyleProps } from '@opentrons/components'
 import {
-  Icon,
+  ALIGN_CENTER,
   Box,
-  Flex,
-  Text,
-  FONT_SIZE_BODY_1,
-  COLOR_WARNING,
   COLOR_ERROR,
+  COLOR_WARNING,
+  Flex,
+  FONT_SIZE_BODY_1,
+  Icon,
   SIZE_2,
-  SPACING_AUTO,
   SPACING_1,
   SPACING_2,
-  ALIGN_CENTER,
+  SPACING_AUTO,
+  Text,
 } from '@opentrons/components'
+import * as React from 'react'
 
 import * as Calibration from '../../calibration'
-
-import type { StyleProps } from '@opentrons/components'
 import type { DeckCalibrationStatus } from '../../calibration/types'
 
 export type DeckCalibrationWarningProps = {|

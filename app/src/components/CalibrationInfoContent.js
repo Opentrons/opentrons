@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+
 import styles from './calibration-info.css'
 
 export type CalibrationInfoContentProps = {|

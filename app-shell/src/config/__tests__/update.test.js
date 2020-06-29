@@ -1,8 +1,8 @@
 // @flow
 import * as Cfg from '@opentrons/app/src/config'
-import { shouldUpdate, getNextValue } from '../update'
 
 import type { Config } from '../types'
+import { getNextValue, shouldUpdate } from '../update'
 
 const CONFIG: $Shape<Config> = {
   devtools: false,

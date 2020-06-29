@@ -1,6 +1,6 @@
 // @flow
-import type { ThermocyclerStateStepArgs } from '../types'
 import type { ThermocyclerModuleState } from '../../step-forms/types'
+import type { ThermocyclerStateStepArgs } from '../types'
 
 export type Diff = {
   lidOpen: boolean,

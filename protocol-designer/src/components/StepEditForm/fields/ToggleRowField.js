@@ -1,12 +1,11 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-
 import { ToggleField } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
 
+import type { StepFieldName } from '../../../steplist/fieldLevel'
 import styles from '../StepEditForm.css'
 import { FieldConnector } from './FieldConnector'
-import type { StepFieldName } from '../../../steplist/fieldLevel'
 
 type ToggleRowProps = {|
   offLabel?: string,

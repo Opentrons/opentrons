@@ -1,22 +1,22 @@
 // @flow
-import * as React from 'react'
 import {
-  OutlineButton,
   AlertModal,
-  InputField,
   CheckboxField,
   HoverTooltip,
+  InputField,
+  OutlineButton,
 } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import * as React from 'react'
+
+import { THERMOCYCLER_MODULE_TYPE } from '../../modules'
+import type {
+  ModuleCommand,
+  TemperatureModule,
+  ThermocyclerModule,
+} from '../../modules/types'
 import { Portal } from '../portal'
 import styles from './styles.css'
-
-import type {
-  ThermocyclerModule,
-  TemperatureModule,
-  ModuleCommand,
-} from '../../modules/types'
-import { THERMOCYCLER_MODULE_TYPE } from '../../modules'
-import { getModuleDisplayName } from '@opentrons/shared-data'
 
 type Props = {|
   module: ThermocyclerModule | TemperatureModule,

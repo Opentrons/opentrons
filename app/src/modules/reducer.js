@@ -1,8 +1,8 @@
 // @flow
 import keyBy from 'lodash/keyBy'
-import * as Constants from './constants'
 
 import type { Action } from '../types'
+import * as Constants from './constants'
 import type { ModulesState, PerRobotModulesState } from './types'
 
 const INITIAL_STATE: ModulesState = {}

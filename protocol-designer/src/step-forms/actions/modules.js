@@ -1,7 +1,8 @@
 // @flow
-import { uuid } from '../../utils'
 import type { ModuleRealType } from '@opentrons/shared-data'
+
 import type { DeckSlot } from '../../types'
+import { uuid } from '../../utils'
 
 export type CreateModuleAction = {|
   type: 'CREATE_MODULE',

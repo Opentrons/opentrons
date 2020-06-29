@@ -1,11 +1,11 @@
 // @flow
+import * as SharedData from '@opentrons/shared-data'
 import noop from 'lodash/noop'
 
-import * as SharedData from '@opentrons/shared-data'
-import * as Selectors from '../selectors'
 import * as Fixtures from '../__fixtures__'
 import * as RobotSelectors from '../../robot/selectors'
 import type { State } from '../../types'
+import * as Selectors from '../selectors'
 
 jest.mock('@opentrons/shared-data')
 jest.mock('../../robot/selectors')

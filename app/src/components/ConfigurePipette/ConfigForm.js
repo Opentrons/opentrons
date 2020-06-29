@@ -1,32 +1,29 @@
 // @flow
-import * as React from 'react'
-import { Formik, Form } from 'formik'
-
-import startCase from 'lodash/startCase'
-import mapValues from 'lodash/mapValues'
-import forOwn from 'lodash/forOwn'
-import keys from 'lodash/keys'
-import pick from 'lodash/pick'
-import omit from 'lodash/omit'
-import set from 'lodash/set'
-import isEmpty from 'lodash/isEmpty'
-
 import { Icon } from '@opentrons/components'
-import { FormButtonBar } from './FormButtonBar'
-import {
-  ConfigFormGroup,
-  FormColumn,
-  ConfigQuirkGroup,
-} from './ConfigFormGroup'
-
+import { Form, Formik } from 'formik'
 import type { FormikProps } from 'formik/@flow-typed'
+import forOwn from 'lodash/forOwn'
+import isEmpty from 'lodash/isEmpty'
+import keys from 'lodash/keys'
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+import pick from 'lodash/pick'
+import set from 'lodash/set'
+import startCase from 'lodash/startCase'
+import * as React from 'react'
+
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
   PipetteSettingsFieldsUpdate,
 } from '../../pipettes/types'
-
 import type { FormValues } from './ConfigFormGroup'
+import {
+  ConfigFormGroup,
+  ConfigQuirkGroup,
+  FormColumn,
+} from './ConfigFormGroup'
+import { FormButtonBar } from './FormButtonBar'
 
 export type DisplayFieldProps = {|
   ...PipetteSettingsField,

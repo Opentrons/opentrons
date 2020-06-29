@@ -1,8 +1,8 @@
 // @flow
 // Card component with drop shadow
 
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
 
 import styles from './structure.css'
 

@@ -1,9 +1,7 @@
 // @flow
-import * as React from 'react'
-import cloneDeep from 'lodash/cloneDeep'
 import {
-  LabwareRender,
   LabwareOutline,
+  LabwareRender,
   RobotCoordsForeignDiv,
   RobotWorkSpace,
 } from '@opentrons/components'
@@ -11,9 +9,12 @@ import {
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
-import { labwareFormSchema } from '../labwareFormSchema'
-import { fieldsToLabware } from '../fieldsToLabware'
+import cloneDeep from 'lodash/cloneDeep'
+import * as React from 'react'
+
 import type { LabwareFields, ProcessedLabwareFields } from '../fields'
+import { fieldsToLabware } from '../fieldsToLabware'
+import { labwareFormSchema } from '../labwareFormSchema'
 import styles from './ConditionalLabwareRender.css'
 
 type Props = {|

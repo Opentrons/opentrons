@@ -1,14 +1,13 @@
 // @flow
-import * as React from 'react'
-
 import { usePrevious } from '@opentrons/components'
-import { ProgressSpinner, ProgressBar } from './progress'
-import styles from './styles.css'
+import * as React from 'react'
 
 import type {
   BuildrootUpdateSession,
   RobotSystemType,
 } from '../../../buildroot/types'
+import { ProgressBar, ProgressSpinner } from './progress'
+import styles from './styles.css'
 
 export type InstallModalContentsProps = {|
   robotSystemType: RobotSystemType | null,

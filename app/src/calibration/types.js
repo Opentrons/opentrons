@@ -1,17 +1,15 @@
 // @flow
 
 import type {
-  RobotApiRequestMeta,
   RobotApiErrorResponse,
+  RobotApiRequestMeta,
 } from '../robot-api/types'
-
-import type { CalibrationStatus } from './types'
-
 import typeof {
   FETCH_CALIBRATION_STATUS,
-  FETCH_CALIBRATION_STATUS_SUCCESS,
   FETCH_CALIBRATION_STATUS_FAILURE,
+  FETCH_CALIBRATION_STATUS_SUCCESS,
 } from './constants'
+import type { CalibrationStatus } from './types'
 
 export * from './api-types'
 

@@ -1,12 +1,24 @@
 // @flow
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import assert from 'assert'
 import produce from 'immer'
+
+import type {
+  InvariantContext,
+  RobotState,
+  RobotStateAndWarnings,
+} from '../types'
 import { forAspirate } from './forAspirate'
-import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
+import { forDispense } from './forDispense'
 import { forDropTip } from './forDropTip'
 import { forPickUpTip } from './forPickUpTip'
-import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
+import { forDisengageMagnet, forEngageMagnet } from './magnetUpdates'
+import {
+  forAwaitTemperature,
+  forDeactivateTemperature,
+  forSetTemperature,
+} from './temperatureUpdates'
 import {
   forThermocyclerAwaitBlockTemperature,
   forThermocyclerAwaitLidTemperature,
@@ -19,18 +31,6 @@ import {
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
 } from './thermocyclerUpdates'
-
-import {
-  forAwaitTemperature,
-  forSetTemperature,
-  forDeactivateTemperature,
-} from './temperatureUpdates'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type {
-  InvariantContext,
-  RobotState,
-  RobotStateAndWarnings,
-} from '../types'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(

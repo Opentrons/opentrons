@@ -1,6 +1,7 @@
 // @flow
 // logger
 import { useRef } from 'react'
+
 import { remote } from './shell/remote'
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell

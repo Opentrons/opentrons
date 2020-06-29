@@ -5,12 +5,11 @@ import uniqBy from 'lodash/uniqBy'
 import stableSort from 'stable'
 
 import {
-  makeService,
-  updateService,
   clearServiceIfConflict,
+  makeService,
   matchService,
+  updateService,
 } from './service'
-
 import type { Service, ServiceList, ServiceUpdate } from './types'
 
 export function createServiceList(list: ServiceList = []): ServiceList {

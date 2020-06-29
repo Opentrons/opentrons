@@ -1,7 +1,8 @@
 // @flow
-import { getUniqueWellProperties } from '../labwareInference'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareFields, BooleanString } from './fields'
+
+import { getUniqueWellProperties } from '../labwareInference'
+import type { BooleanString, LabwareFields } from './fields'
 
 // NOTE: this is just String() with some typing for flow
 const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')

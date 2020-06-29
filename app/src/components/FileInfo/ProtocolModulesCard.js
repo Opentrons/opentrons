@@ -1,27 +1,24 @@
 // @flow
 // setup modules component
+import { Icon } from '@opentrons/components'
+import {
+  checkModuleCompatibility,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import {
-  getModuleDisplayName,
-  checkModuleCompatibility,
-} from '@opentrons/shared-data'
-import { selectors as robotSelectors } from '../../robot'
+import type { Robot } from '../../discovery/types'
 import { getAttachedModules } from '../../modules'
-
-import { InfoSection } from './InfoSection'
+import type { AttachedModule } from '../../modules/types'
+import { selectors as robotSelectors } from '../../robot'
+import type { SessionModule } from '../../robot/types'
+import type { Dispatch, State } from '../../types'
 import { SectionContentHalf } from '../layout'
+import { InfoSection } from './InfoSection'
 import { InstrumentItem } from './InstrumentItem'
 import { MissingItemWarning } from './MissingItemWarning'
-
-import { Icon } from '@opentrons/components'
 import styles from './styles.css'
-
-import type { State, Dispatch } from '../../types'
-import type { SessionModule } from '../../robot/types'
-import type { Robot } from '../../discovery/types'
-import type { AttachedModule } from '../../modules/types'
 
 type OP = {| robot: Robot |}
 

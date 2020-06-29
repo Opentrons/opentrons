@@ -1,72 +1,72 @@
 // @flow
-import type { ElementProps } from 'react'
-import assert from 'assert'
-import mapValues from 'lodash/mapValues'
-import reduce from 'lodash/reduce'
-import { createSelector } from 'reselect'
+import type {
+  DropdownOption,
+  InstrumentInfoProps,
+  Mount,
+} from '@opentrons/components'
+import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
 import {
-  getPipetteNameSpecs,
-  getLabwareDisplayName,
   getLabwareDefURI,
+  getLabwareDisplayName,
+  getPipetteNameSpecs,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import assert from 'assert'
+import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
+import type { ElementProps } from 'react'
+import { createSelector } from 'reselect'
+
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
+import type { FormData, StepIdType } from '../../form-types'
 import {
-  getFormWarnings,
+  type LabwareDefByDefURI,
+  selectors as labwareDefSelectors,
+} from '../../labware-defs'
+import type { InvariantContext } from '../../step-generation'
+import { getFieldErrors, hydrateField } from '../../steplist/fieldLevel'
+import type { FormWarning } from '../../steplist/formLevel'
+import {
   getFormErrors,
+  getFormWarnings,
   stepFormToArgs,
 } from '../../steplist/formLevel'
 import {
-  getProfileFormErrors,
   type ProfileFormError,
+  getProfileFormErrors,
 } from '../../steplist/formLevel/profileErrors'
-import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
-import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
-import { denormalizePipetteEntities } from '../utils'
-import {
-  selectors as labwareDefSelectors,
-  type LabwareDefByDefURI,
-} from '../../labware-defs'
-
-import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
-import type {
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
-import type { FormWarning } from '../../steplist/formLevel'
-import type { BaseState, Selector, DeckSlot } from '../../types'
-import type { FormData, StepIdType } from '../../form-types'
 import type { StepArgsAndErrors, StepFormErrors } from '../../steplist/types'
-import type {
-  InitialDeckSetup,
-  NormalizedLabwareById,
-  NormalizedLabware,
-  LabwareOnDeck,
-  LabwareEntity,
-  LabwareEntities,
-  MagneticModuleState,
-  ModuleOnDeck,
-  ModuleEntity,
-  ModuleEntities,
-  ModulesForEditModulesCard,
-  PipetteEntities,
-  PipetteOnDeck,
-  FormPipettesByMount,
-  TemperatureModuleState,
-  ThermocyclerModuleState,
-} from '../types'
+import type { BaseState, DeckSlot, Selector } from '../../types'
 import type {
   PresavedStepFormState,
   RootState,
   SavedStepFormState,
 } from '../reducers'
-import type { InvariantContext } from '../../step-generation'
+import type {
+  FormPipettesByMount,
+  InitialDeckSetup,
+  LabwareEntities,
+  LabwareEntity,
+  LabwareOnDeck,
+  MagneticModuleState,
+  ModuleEntities,
+  ModuleEntity,
+  ModuleOnDeck,
+  ModulesForEditModulesCard,
+  NormalizedLabware,
+  NormalizedLabwareById,
+  PipetteEntities,
+  PipetteOnDeck,
+  TemperatureModuleState,
+  ThermocyclerModuleState,
+} from '../types'
+import { denormalizePipetteEntities } from '../utils'
+import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 

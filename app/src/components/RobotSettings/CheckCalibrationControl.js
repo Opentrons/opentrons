@@ -1,34 +1,32 @@
 // @flow
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import last from 'lodash/last'
-import * as RobotApi from '../../robot-api'
-import * as Sessions from '../../sessions'
-
 import {
-  Icon,
-  Flex,
-  Box,
-  Text,
-  SecondaryBtn,
   ALIGN_CENTER,
+  BORDER_SOLID_LIGHT,
+  Box,
+  COLOR_WARNING,
+  Flex,
+  FONT_SIZE_BODY_1,
+  FONT_WEIGHT_SEMIBOLD,
+  Icon,
+  SecondaryBtn,
   SIZE_2,
   SPACING_1,
   SPACING_2,
   SPACING_3,
-  BORDER_SOLID_LIGHT,
-  COLOR_WARNING,
-  FONT_SIZE_BODY_1,
-  FONT_WEIGHT_SEMIBOLD,
+  Text,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
-import { Portal } from '../portal'
-import { CheckCalibration } from '../CheckCalibration'
-import { TitledControl } from '../TitledControl'
-
+import * as RobotApi from '../../robot-api'
+import * as Sessions from '../../sessions'
 import type { State } from '../../types'
+import { CheckCalibration } from '../CheckCalibration'
+import { Portal } from '../portal'
+import { TitledControl } from '../TitledControl'
 
 export type CheckCalibrationControlProps = {|
   robotName: string,

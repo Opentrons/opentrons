@@ -1,12 +1,12 @@
 // @flow
-import { i18n } from '../../localization'
-import { getDefaultsForStepType } from './getDefaultsForStepType'
 import type {
-  StepType,
-  StepIdType,
   BlankForm,
   FormData,
+  StepIdType,
+  StepType,
 } from '../../form-types'
+import { i18n } from '../../localization'
+import { getDefaultsForStepType } from './getDefaultsForStepType'
 
 type NewFormArgs = {
   stepId: StepIdType,

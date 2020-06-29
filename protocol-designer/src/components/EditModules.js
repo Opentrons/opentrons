@@ -1,15 +1,16 @@
 // @flow
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import {
-  selectors as stepFormSelectors,
-  actions as stepFormActions,
-} from '../step-forms'
-import { moveDeckItem } from '../labware-ingred/actions/actions'
-import { useBlockingHint } from './Hints/useBlockingHint'
-import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
-import { EditModulesModal } from './modals/EditModulesModal'
 import type { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { moveDeckItem } from '../labware-ingred/actions/actions'
+import {
+  actions as stepFormActions,
+  selectors as stepFormSelectors,
+} from '../step-forms'
+import { useBlockingHint } from './Hints/useBlockingHint'
+import { EditModulesModal } from './modals/EditModulesModal'
+import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
 
 type EditModulesProps = {|
   moduleToEdit: {|

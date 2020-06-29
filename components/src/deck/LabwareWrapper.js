@@ -1,7 +1,8 @@
 // @flow
 // TODO(mc, 2020-02-19): no longer used; remove
-import * as React from 'react'
 import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
+import * as React from 'react'
+
 import styles from './LabwareWrapper.css'
 
 const defs = { roundSlotClipPath: 'roundSlotClipPath' } // TODO: import these defs instead of hard-coding in applications? Or should they be passed to children?

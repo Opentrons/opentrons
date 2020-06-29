@@ -3,10 +3,9 @@
 import * as React from 'react'
 
 import type { Labware, Pipette } from '../../robot'
-
 import { InstructionStep } from '../InstructionStep'
-import { getInstructionsByType, getDiagramSrc } from './instructions-data'
 import styles from '../InstructionStep/styles.css'
+import { getDiagramSrc, getInstructionsByType } from './instructions-data'
 
 export type LabwareCalibrationProps = {|
   labware: Labware,

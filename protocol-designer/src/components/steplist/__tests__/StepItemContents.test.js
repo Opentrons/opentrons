@@ -1,11 +1,12 @@
 // @flow
-import React from 'react'
-import { shallow } from 'enzyme'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import { shallow } from 'enzyme'
+import React from 'react'
+
 import { THERMOCYCLER_STATE } from '../../../constants'
-import { StepItemContents } from '../StepItem'
 import { ModuleStepItems } from '../ModuleStepItems'
 import type { StepItemContentsProps } from '../StepItem'
+import { StepItemContents } from '../StepItem'
 
 describe('StepItemContents', () => {
   let props

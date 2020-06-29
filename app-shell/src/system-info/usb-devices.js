@@ -1,11 +1,11 @@
 // @flow
 import assert from 'assert'
 import execa from 'execa'
-import usbDetection from 'usb-detection'
-import { isWindows } from '../os'
-import { createLogger } from '../log'
-
 import type { Device } from 'usb-detection'
+import usbDetection from 'usb-detection'
+
+import { createLogger } from '../log'
+import { isWindows } from '../os'
 
 export type { Device }
 

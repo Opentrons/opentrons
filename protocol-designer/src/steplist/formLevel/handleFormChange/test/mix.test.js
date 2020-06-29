@@ -1,8 +1,9 @@
 // @flow
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import { dependentFieldsUpdateMix } from '../dependentFieldsUpdateMix'
+
 import { DEFAULT_MM_FROM_BOTTOM_DISPENSE } from '../../../../constants'
+import { dependentFieldsUpdateMix } from '../dependentFieldsUpdateMix'
 
 let pipetteEntities
 let labwareEntities

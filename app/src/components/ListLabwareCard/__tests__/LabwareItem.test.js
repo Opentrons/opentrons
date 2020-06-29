@@ -1,16 +1,15 @@
 // @flow
+import { mount, shallow } from 'enzyme'
 import * as React from 'react'
-import { shallow, mount } from 'enzyme'
 
-import * as CustomLabwareFixtures from '../../../custom-labware/__fixtures__'
 import * as CustomLabware from '../../../custom-labware'
-import { LabwareItem } from '../LabwareItem'
-import { Warning } from '../Warning'
-
+import * as CustomLabwareFixtures from '../../../custom-labware/__fixtures__'
 import type {
   InvalidLabwareFile,
   ValidLabwareFile,
 } from '../../../custom-labware/types'
+import { LabwareItem } from '../LabwareItem'
+import { Warning } from '../Warning'
 
 describe('LabwareItem', () => {
   const invalidFile: InvalidLabwareFile = {

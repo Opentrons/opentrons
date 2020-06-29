@@ -1,18 +1,19 @@
 // @flow
 import * as React from 'react'
-import type { Dispatch } from 'redux'
 import { connect } from 'react-redux'
+import type { Dispatch } from 'redux'
+
+import { actions as dismissActions } from '../../dismiss'
+import { selectors as fileDataSelectors } from '../../file-data'
+import type { StepIdType } from '../../form-types'
 import { i18n } from '../../localization'
+import type { CommandCreatorError } from '../../step-generation/types'
+import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
+import type { BaseState } from '../../types'
+import { getSelectedStepId } from '../../ui/steps'
+import { type Props, Alerts } from './Alerts'
 import { ErrorContents } from './ErrorContents'
 import { WarningContents } from './WarningContents'
-import { actions as dismissActions } from '../../dismiss'
-import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
-import { getSelectedStepId } from '../../ui/steps'
-import { selectors as fileDataSelectors } from '../../file-data'
-import { Alerts, type Props } from './Alerts'
-import type { CommandCreatorError } from '../../step-generation/types'
-import type { BaseState } from '../../types'
-import type { StepIdType } from '../../form-types'
 
 type SP = {|
   errors: $PropertyType<Props, 'errors'>,

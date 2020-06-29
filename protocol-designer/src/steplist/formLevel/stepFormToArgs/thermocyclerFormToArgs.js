@@ -1,15 +1,15 @@
 // @flow
-import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../constants'
-import { PROFILE_STEP } from '../../../form-types'
-import type {
-  ThermocyclerProfileStepArgs,
-  ThermocyclerStateStepArgs,
-} from '../../../step-generation/types'
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../constants'
 import type {
   FormData,
   ProfileItem,
   ProfileStepItem,
 } from '../../../form-types'
+import { PROFILE_STEP } from '../../../form-types'
+import type {
+  ThermocyclerProfileStepArgs,
+  ThermocyclerStateStepArgs,
+} from '../../../step-generation/types'
 
 type FlatProfileSteps = $PropertyType<
   ThermocyclerProfileStepArgs,

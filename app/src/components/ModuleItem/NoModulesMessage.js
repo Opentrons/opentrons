@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+
 import { CardContentFull } from '../layout'
 import styles from './styles.css'
 

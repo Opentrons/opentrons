@@ -1,18 +1,18 @@
 // @flow
 // labware dimensions for details page
-import * as React from 'react'
 import round from 'lodash/round'
+import * as React from 'react'
+
 import {
   FOOTPRINT,
-  MM,
   LABWARE_X_DIM,
   LABWARE_Y_DIM,
   LABWARE_Z_DIM,
+  MM,
 } from '../../localization'
-import { LabeledValueTable, LowercaseText } from '../ui'
-import { getFootprintDiagram } from '../measurement-guide'
-
 import type { LabwareDefinition } from '../../types'
+import { getFootprintDiagram } from '../measurement-guide'
+import { LabeledValueTable, LowercaseText } from '../ui'
 
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)

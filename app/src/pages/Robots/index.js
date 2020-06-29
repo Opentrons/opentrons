@@ -1,24 +1,21 @@
 // @flow
 // connect and configure robots page
+import { Splash } from '@opentrons/components'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useRouteMatch, Redirect } from 'react-router-dom'
+import { Redirect, useRouteMatch } from 'react-router-dom'
 
-import { createLogger } from '../../logger'
-
+import { getBuildrootRobot } from '../../buildroot'
+import { Page } from '../../components/Page'
 import {
   CONNECTABLE,
   getConnectedRobot,
   getViewableRobots,
 } from '../../discovery'
-
-import { getBuildrootRobot } from '../../buildroot'
+import { createLogger } from '../../logger'
 import { getShellUpdateState } from '../../shell'
-
-import { Splash } from '@opentrons/components'
-import { Page } from '../../components/Page'
-import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
+import { RobotSettings } from './RobotSettings'
 
 const log = createLogger(__filename)
 

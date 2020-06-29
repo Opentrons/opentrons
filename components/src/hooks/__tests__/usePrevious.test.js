@@ -1,6 +1,7 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
+import * as React from 'react'
+
 import { usePrevious } from '..'
 
 describe('usePrevious hook', () => {

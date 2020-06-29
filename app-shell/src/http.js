@@ -1,12 +1,11 @@
 // @flow
 // fetch wrapper to throw if response is not ok
-import fs from 'fs'
-import { Transform, Readable } from 'stream'
-import pump from 'pump'
-import _fetch from 'node-fetch'
 import FormData from 'form-data'
-
+import fs from 'fs'
 import type { Request, RequestInit, Response } from 'node-fetch'
+import _fetch from 'node-fetch'
+import pump from 'pump'
+import { Readable, Transform } from 'stream'
 
 type RequestInput = Request | string
 

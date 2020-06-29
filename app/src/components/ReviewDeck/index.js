@@ -1,20 +1,19 @@
 // @flow
 // deck review modal for labware calibration page
+import { AlertModal, PrimaryButton } from '@opentrons/components'
+import some from 'lodash/some'
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import some from 'lodash/some'
-import { PrimaryButton, AlertModal } from '@opentrons/components'
 
-import type { Dispatch } from '../../types'
+import secureTCLatchSrc from '../../img/secure_tc_latch.png'
+import { getModuleType, THERMOCYCLER_MODULE_TYPE } from '../../modules'
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import secureTCLatchSrc from '../../img/secure_tc_latch.png'
-import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
-
-import { Portal } from '../portal'
+import type { Dispatch } from '../../types'
 import { DeckMap } from '../DeckMap'
+import { Portal } from '../portal'
 import { Prompt } from './Prompt'
 import styles from './styles.css'
 

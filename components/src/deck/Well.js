@@ -1,10 +1,10 @@
 // @flow
-import * as React from 'react'
+import { type WellDefinition, wellIsRect } from '@opentrons/shared-data'
 import cx from 'classnames'
+import * as React from 'react'
 
-import { wellIsRect, type WellDefinition } from '@opentrons/shared-data'
-import styles from './Well.css'
 import { SELECTABLE_WELL_CLASS } from '../constants.js'
+import styles from './Well.css'
 
 export type SingleWell = {|
   wellName: string,

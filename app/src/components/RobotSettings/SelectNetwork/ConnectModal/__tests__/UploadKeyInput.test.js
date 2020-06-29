@@ -1,14 +1,13 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
 
-import * as Fixtures from '../../../../../networking/__fixtures__'
 import * as Networking from '../../../../../networking'
-import { UploadKeyInput } from '../UploadKeyInput'
-
+import * as Fixtures from '../../../../../networking/__fixtures__'
 import type { State } from '../../../../../types'
+import { UploadKeyInput } from '../UploadKeyInput'
 
 jest.mock('../../../../../networking/selectors')
 

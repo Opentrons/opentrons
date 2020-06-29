@@ -1,10 +1,9 @@
 // @flow
 
+import type { Mount } from '../pipettes/types'
+import type { RobotApiRequestMeta } from '../robot-api/types'
 import * as Constants from './constants'
 import * as Types from './types'
-
-import type { RobotApiRequestMeta } from '../robot-api/types'
-import type { Mount } from '../pipettes/types'
 
 export const fetchLights = (robotName: string): Types.FetchLightsAction => ({
   type: Constants.FETCH_LIGHTS,

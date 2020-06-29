@@ -1,9 +1,10 @@
 // @flow
-import * as React from 'react'
 import { AlertModal, OutlineButton, PrimaryButton } from '@opentrons/components'
+import * as React from 'react'
+
 import { i18n } from '../../localization'
-import modalStyles from './modal.css'
 import styles from './AutoAddPauseUntilTempStepModal.css'
+import modalStyles from './modal.css'
 
 type Props = {|
   displayTemperature: string,

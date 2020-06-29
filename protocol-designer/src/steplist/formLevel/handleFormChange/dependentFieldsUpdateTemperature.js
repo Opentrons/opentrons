@@ -1,9 +1,10 @@
 // @flow
 import pick from 'lodash/pick'
-import { chainPatchUpdaters, fieldHasChanged } from './utils'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
+
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
+import { chainPatchUpdaters, fieldHasChanged } from './utils'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>

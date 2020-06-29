@@ -1,8 +1,9 @@
 // @flow
 
-import * as React from 'react'
-import { Manager, Reference, Popper } from 'react-popper'
 import cx from 'classnames'
+import * as React from 'react'
+import { Manager, Popper, Reference } from 'react-popper'
+
 import styles from './tooltips.css'
 
 const DISTANCE_FROM_REFERENCE = 8

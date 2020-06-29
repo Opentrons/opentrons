@@ -1,23 +1,20 @@
 // @flow
+import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../../sessions'
 import { mockTipLengthCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
-
-import { CalibrateTipLength } from '../index'
-import { Introduction } from '../Introduction'
-import { DeckSetup } from '../DeckSetup'
-import { MeasureNozzle } from '../MeasureNozzle'
-import { TipPickUp } from '../TipPickUp'
-import { InspectingTip } from '../InspectingTip'
-import { MeasureTip } from '../MeasureTip'
-import { CompleteConfirmation } from '../CompleteConfirmation'
-
 import type { TipLengthCalibrationStep } from '../../../sessions/types'
+import { CompleteConfirmation } from '../CompleteConfirmation'
+import { DeckSetup } from '../DeckSetup'
+import { CalibrateTipLength } from '../index'
+import { InspectingTip } from '../InspectingTip'
+import { Introduction } from '../Introduction'
+import { MeasureNozzle } from '../MeasureNozzle'
+import { MeasureTip } from '../MeasureTip'
+import { TipPickUp } from '../TipPickUp'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')

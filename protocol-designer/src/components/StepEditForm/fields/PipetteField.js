@@ -1,12 +1,13 @@
 // @flow
+import { type Options, DropdownField, FormGroup } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { FormGroup, DropdownField, type Options } from '@opentrons/components'
+
+import type { StepType } from '../../../form-types'
 import { i18n } from '../../../localization'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { BaseState } from '../../../types'
-import type { StepType } from '../../../form-types'
 import styles from '../StepEditForm.css'
 import type { FocusHandlers } from '../types'
 import { FieldConnector } from './FieldConnector'

@@ -1,14 +1,12 @@
 // @flow
+import { SidePanel } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import { getProtocolFilename, openProtocol } from '../../protocol'
 import { selectors as robotSelectors } from '../../robot'
-import { openProtocol, getProtocolFilename } from '../../protocol'
-
-import { SidePanel } from '@opentrons/components'
+import type { Dispatch, State } from '../../types'
 import { Upload } from './Upload'
-
-import type { State, Dispatch } from '../../types'
 
 type SP = {|
   filename: ?string,

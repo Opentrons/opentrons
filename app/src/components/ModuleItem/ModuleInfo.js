@@ -1,11 +1,10 @@
 // @flow
+import { LabeledValue } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import * as React from 'react'
 
-import { getModuleDisplayName } from '@opentrons/shared-data'
-import { LabeledValue } from '@opentrons/components'
-import styles from './styles.css'
-
 import type { AttachedModule } from '../../modules/types'
+import styles from './styles.css'
 
 type Props = {|
   module: AttachedModule,

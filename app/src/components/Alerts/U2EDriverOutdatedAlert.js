@@ -1,22 +1,22 @@
 // @flow
-import * as React from 'react'
-import { Link as InternalLink } from 'react-router-dom'
-import styled from 'styled-components'
-
 import {
   AlertModal,
   CheckboxField,
   Link,
   useToggle,
 } from '@opentrons/components'
+import * as React from 'react'
+import { Link as InternalLink } from 'react-router-dom'
+import styled from 'styled-components'
+
 import { useTrackEvent } from '../../analytics'
 import {
-  U2E_DRIVER_UPDATE_URL,
-  U2E_DRIVER_OUTDATED_MESSAGE,
-  U2E_DRIVER_DESCRIPTION,
-  U2E_DRIVER_OUTDATED_CTA,
   EVENT_U2E_DRIVER_ALERT_DISMISSED,
   EVENT_U2E_DRIVER_LINK_CLICKED,
+  U2E_DRIVER_DESCRIPTION,
+  U2E_DRIVER_OUTDATED_CTA,
+  U2E_DRIVER_OUTDATED_MESSAGE,
+  U2E_DRIVER_UPDATE_URL,
 } from '../../system-info'
 import type { AlertProps } from './types'
 

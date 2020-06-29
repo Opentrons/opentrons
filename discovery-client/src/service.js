@@ -1,16 +1,16 @@
 // @flow
 // create Services from different sources
-import net from 'net'
 import defaultTo from 'lodash/defaultTo'
 import isEqual from 'lodash/isEqual'
-
 import type { BrowserService, ServiceType } from 'mdns-js'
+import net from 'net'
+
 import type {
-  Service,
-  ServiceUpdate,
   Candidate,
   HealthResponse,
   ServerHealthResponse,
+  Service,
+  ServiceUpdate,
 } from './types'
 
 const nameExtractor = (st: ServiceType) =>

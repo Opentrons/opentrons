@@ -1,9 +1,9 @@
 // @flow
 // sessions constants, actions, selectors, and types
 import type {
+  CalibrationCheckSession,
   Session,
   SessionType,
-  CalibrationCheckSession,
   TipLengthCalibrationSession,
 } from './types'
 

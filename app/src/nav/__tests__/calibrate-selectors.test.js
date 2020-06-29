@@ -2,10 +2,9 @@
 import noop from 'lodash/noop'
 
 import * as RobotSelectors from '../../robot/selectors'
-import * as NavSelectors from '../selectors'
-import * as CalibrateSelectors from '../calibrate-selectors'
-
 import type { State } from '../../types'
+import * as CalibrateSelectors from '../calibrate-selectors'
+import * as NavSelectors from '../selectors'
 
 type SelectorSpec = {|
   name: string,

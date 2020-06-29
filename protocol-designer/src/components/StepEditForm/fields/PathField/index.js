@@ -1,15 +1,15 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Path } from './Path'
-import { i18n } from '../../../../localization'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getWellRatio } from '../../../../steplist/utils'
-import { volumeInCapacityForMulti } from '../../../../steplist/formLevel/handleFormChange/utils'
 
-import type { PipetteEntities } from '../../../../step-forms'
 import type { FormData, PathOption } from '../../../../form-types'
+import { i18n } from '../../../../localization'
+import type { PipetteEntities } from '../../../../step-forms'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { volumeInCapacityForMulti } from '../../../../steplist/formLevel/handleFormChange/utils'
+import { getWellRatio } from '../../../../steplist/utils'
 import type { BaseState } from '../../../../types'
+import { Path } from './Path'
 
 type Props = React.ElementProps<typeof Path>
 type SP = {| disabledPathMap: $PropertyType<Props, 'disabledPathMap'> |}

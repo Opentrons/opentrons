@@ -1,10 +1,9 @@
 // @flow
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-
-import * as Discovery from '../../../discovery'
-import * as Fixtures from '../../__fixtures__'
-import * as Actions from '../../actions'
 import { networkingEpic } from '..'
+import * as Fixtures from '../../__fixtures__'
+import * as Discovery from '../../../discovery'
+import { runEpicTest, setupEpicTestMocks } from '../../../robot-api/__utils__'
+import * as Actions from '../../actions'
 
 const makeTriggerAction = robotName =>
   Actions.postWifiConfigure(robotName, {

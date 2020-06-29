@@ -4,7 +4,6 @@ import magneticModuleV2 from '../module/definitions/2/magneticModuleV2.json'
 import temperatureModuleV1 from '../module/definitions/2/temperatureModuleV1.json'
 import temperatureModuleV2 from '../module/definitions/2/temperatureModuleV2.json'
 import thermocyclerModuleV1 from '../module/definitions/2/thermocyclerModuleV1.json'
-
 import {
   MAGDECK,
   MAGNETIC_MODULE_V1,
@@ -15,7 +14,6 @@ import {
   THERMOCYCLER,
   THERMOCYCLER_MODULE_V1,
 } from './constants'
-
 import type { ModuleModel, ModuleRealType, ModuleType } from './types'
 
 // The module objects in v2 Module Definitions representing a single module model

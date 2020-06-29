@@ -1,7 +1,7 @@
 // @flow
 
-import { mockUsbDevice, mockRealtekDevice } from '../__fixtures__'
-import { isRealtekU2EAdapter, getDriverStatus } from '../utils'
+import { mockRealtekDevice, mockUsbDevice } from '../__fixtures__'
+import { getDriverStatus, isRealtekU2EAdapter } from '../utils'
 
 describe('system info utilities', () => {
   describe('isRealtekU2EAdapter', () => {

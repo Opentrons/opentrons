@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+
 import styles from './StepDescription.css'
 
 type StepDescriptionProps = {|

@@ -3,13 +3,11 @@
 import * as React from 'react'
 
 import { getUniqueWellProperties } from '../../labwareInference'
-import { getWellLabel, WellProperties, ManufacturerStats } from '../labware-ui'
-import { DetailsBox } from '../ui'
-import { WellDimensions } from './WellDimensions'
-
-import styles from './styles.css'
-
 import type { LabwareDefinition } from '../../types'
+import { getWellLabel, ManufacturerStats, WellProperties } from '../labware-ui'
+import { DetailsBox } from '../ui'
+import styles from './styles.css'
+import { WellDimensions } from './WellDimensions'
 
 export type InsertDetailsProps = {|
   definition: LabwareDefinition,

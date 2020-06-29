@@ -3,7 +3,6 @@ import React from 'react'
 import Renderer from 'react-test-renderer'
 
 import { Icon, NotificationIcon } from '..'
-
 import { ICON_DATA_BY_NAME } from '../icons/icon-data'
 
 const icons = Object.keys(ICON_DATA_BY_NAME)

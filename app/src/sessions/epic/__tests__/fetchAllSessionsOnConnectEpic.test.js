@@ -2,9 +2,8 @@
 import { TestScheduler } from 'rxjs/testing'
 
 import * as DiscoverySelectors from '../../../discovery/selectors'
-import * as RobotSelectors from '../../../robot/selectors'
 import { mockRobot } from '../../../robot-api/__fixtures__'
-
+import * as RobotSelectors from '../../../robot/selectors'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '../../epic'
 

@@ -1,9 +1,8 @@
 // @flow
 
 import * as Fixtures from '../__fixtures__'
-import * as selectors from '../selectors'
-
 import type { State } from '../../types'
+import * as selectors from '../selectors'
 import type { ValidLabwareFile } from '../types'
 
 type SelectorSpec = {|

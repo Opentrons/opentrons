@@ -3,11 +3,11 @@
 // - Apply the style props to CSS
 // - Don't pass the style props down to the DOM
 
-import * as React from 'react'
 import { shallow } from 'enzyme'
+import * as React from 'react'
 
+import { Box, Flex, Link, Text } from '..'
 import * as Styles from '../../styles'
-import { Box, Flex, Text, Link } from '..'
 
 const COMPONENTS = [
   { Component: Box, name: 'Box' },

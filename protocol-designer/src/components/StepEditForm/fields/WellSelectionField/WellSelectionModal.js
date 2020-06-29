@@ -1,31 +1,28 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import { useDispatch, useSelector } from 'react-redux'
-import omit from 'lodash/omit'
-
-import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
-import { sortWells } from '@opentrons/shared-data'
-
-import { arrayToWellGroup } from '../../../../utils'
-import { changeFormInput } from '../../../../steplist/actions'
-import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
-import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
-
-import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
 import type { WellGroup } from '@opentrons/components'
+import { LabeledValue, Modal, OutlineButton } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type { ContentsByWell } from '../../../../labware-ingred/types'
-import type { WellIngredientNames } from '../../../../steplist/types'
-import type { StepFieldName } from '../../../../form-types'
+import { sortWells } from '@opentrons/shared-data'
+import cx from 'classnames'
+import omit from 'lodash/omit'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import styles from './WellSelectionModal.css'
+import type { StepFieldName } from '../../../../form-types'
+import { selectors } from '../../../../labware-ingred/selectors'
+import type { ContentsByWell } from '../../../../labware-ingred/types'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { changeFormInput } from '../../../../steplist/actions'
+import type { WellIngredientNames } from '../../../../steplist/types'
+import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
+import { arrayToWellGroup } from '../../../../utils'
+import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 import modalStyles from '../../../modals/modal.css'
+import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
+import styles from './WellSelectionModal.css'
 
 type WellSelectionModalProps = {|
   isOpen: boolean,

@@ -1,17 +1,16 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { selectors } from '../navigation'
-import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 
-import { ConnectedStepList } from './ConnectedStepList'
-import { IngredientsList } from './IngredientsList'
 import { FileSidebar } from '../components/FileSidebar'
 import { LiquidsSidebar } from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
-
-import type { BaseState } from '../types'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import type { Page } from '../navigation'
+import { selectors } from '../navigation'
+import type { BaseState } from '../types'
+import { ConnectedStepList } from './ConnectedStepList'
+import { IngredientsList } from './IngredientsList'
 
 type Props = {
   page: Page,

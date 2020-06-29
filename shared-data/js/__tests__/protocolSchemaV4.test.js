@@ -2,12 +2,13 @@
 /** Ensure that protocol schema v4 definition itself is functions as intended,
  *  and that all v4 protocol fixtures will validate */
 import Ajv from 'ajv'
-import path from 'path'
 import glob from 'glob'
 import omit from 'lodash/omit'
-import protocolSchema from '../../protocol/schemas/4.json'
+import path from 'path'
+
 import labwareV2Schema from '../../labware/schemas/2.json'
 import simpleV4Fixture from '../../protocol/fixtures/4/simpleV4.json'
+import protocolSchema from '../../protocol/schemas/4.json'
 
 const fixturesGlobPath = path.join(
   __dirname,

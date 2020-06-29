@@ -1,9 +1,10 @@
 // @flow
+import { mount } from 'enzyme'
 import React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-import { FilePage } from '../FilePage'
+
 import { EditModules } from '../EditModules'
+import { FilePage } from '../FilePage'
 import { EditModulesCard } from '../modules'
 
 jest.mock('../EditModules')

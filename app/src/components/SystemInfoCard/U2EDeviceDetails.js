@@ -1,18 +1,17 @@
 // @flow
-import * as React from 'react'
-import styled from 'styled-components'
-
 import {
   Box,
   Flex,
-  Text,
   FONT_STYLE_ITALIC,
   SPACING_1,
   SPACING_2,
+  Text,
 } from '@opentrons/components'
+import * as React from 'react'
+import styled from 'styled-components'
 
 import { IFACE_FAMILY_IPV4 } from '../../system-info'
-import type { UsbDevice, NetworkInterface } from '../../system-info/types'
+import type { NetworkInterface, UsbDevice } from '../../system-info/types'
 
 // TODO(mc, 2020-04-28): i18n
 const U2E_ADAPTER_DESCRIPTION =

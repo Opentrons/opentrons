@@ -1,25 +1,24 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import { useSelector } from 'react-redux'
-import { selectors as uiModuleSelectors } from '../../../ui/modules'
-
 import { FormGroup, HoverTooltip } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import cx from 'classnames'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+
 import {
   PAUSE_UNTIL_RESUME,
-  PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
 } from '../../../constants'
+import { i18n } from '../../../localization'
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import {
   ConditionalOnField,
-  TextField,
   RadioGroupField,
   StepFormDropdown,
+  TextField,
 } from '../fields'
 import { FieldConnector } from '../fields/FieldConnector'
 import styles from '../StepEditForm.css'
-
 import type { FocusHandlers } from '../types'
 
 type PauseFormProps = {| focusHandlers: FocusHandlers |}

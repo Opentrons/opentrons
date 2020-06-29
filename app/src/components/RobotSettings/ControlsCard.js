@@ -1,36 +1,33 @@
 // @flow
 // "Robot Controls" card
+import {
+  BORDER_SOLID_LIGHT,
+  Card,
+  LabeledButton,
+  LabeledToggle,
+  SecondaryBtn,
+  SPACING_2,
+  Text,
+  useInterval,
+} from '@opentrons/components'
+import { push } from 'connected-react-router'
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { push } from 'connected-react-router'
-import {
-  useInterval,
-  Card,
-  Text,
-  LabeledToggle,
-  LabeledButton,
-  SecondaryBtn,
-  BORDER_SOLID_LIGHT,
-  SPACING_2,
-} from '@opentrons/components'
 
-import { startDeckCalibration } from '../../http-api-client'
-
-import {
-  home,
-  fetchLights,
-  updateLights,
-  getLightsOn,
-  ROBOT,
-} from '../../robot-controls'
 import * as Calibration from '../../calibration'
-import { restartRobot } from '../../robot-admin'
-import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
-
-import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
-
+import { startDeckCalibration } from '../../http-api-client'
+import { selectors as robotSelectors } from '../../robot'
+import { restartRobot } from '../../robot-admin'
+import {
+  fetchLights,
+  getLightsOn,
+  home,
+  ROBOT,
+  updateLights,
+} from '../../robot-controls'
+import type { Dispatch, State } from '../../types'
 import { TitledControl } from '../TitledControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
 import { DeckCalibrationWarning } from './DeckCalibrationWarning'

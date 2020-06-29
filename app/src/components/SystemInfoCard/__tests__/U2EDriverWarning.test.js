@@ -1,14 +1,13 @@
 // @flow
-import * as React from 'react'
-import { mount } from 'enzyme'
-
 import {
+  ALIGN_START,
+  COLOR_WARNING,
   Flex,
   Icon,
   Text,
-  ALIGN_START,
-  COLOR_WARNING,
 } from '@opentrons/components'
+import { mount } from 'enzyme'
+import * as React from 'react'
 
 import * as Analytics from '../../../analytics'
 import { U2E_DRIVER_UPDATE_URL } from '../../../system-info'

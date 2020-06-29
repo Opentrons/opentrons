@@ -1,8 +1,8 @@
 // @flow
 // internal link that preserves query parameters
 import * as React from 'react'
-import { withRouter, Link as BaseLink } from 'react-router-dom'
 import type { ContextRouter } from 'react-router-dom'
+import { Link as BaseLink, withRouter } from 'react-router-dom'
 
 export type LinkProps = {|
   ...ContextRouter,

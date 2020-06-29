@@ -1,8 +1,8 @@
-import * as selectors from '../selectors'
 import {
-  getViewableRobots,
   getRobotApiVersion,
+  getViewableRobots,
 } from '../../discovery/selectors'
+import * as selectors from '../selectors'
 
 jest.mock('../../discovery/selectors')
 

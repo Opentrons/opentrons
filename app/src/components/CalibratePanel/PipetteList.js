@@ -1,12 +1,12 @@
 // @flow
+import { TitledList } from '@opentrons/components'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { selectors as robotSelectors } from '../../robot'
-import { PIPETTE_MOUNTS } from '../../pipettes'
 import { getCalibratePipettesLocations } from '../../nav'
-import { TitledList } from '@opentrons/components'
+import { PIPETTE_MOUNTS } from '../../pipettes'
+import { selectors as robotSelectors } from '../../robot'
 import { PipetteListItem } from './PipetteListItem'
 
 // TODO(mc, 2019-12-10): i18n

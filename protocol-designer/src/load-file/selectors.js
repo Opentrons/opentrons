@@ -1,5 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
+
 import type { BaseState, Selector } from '../types'
 import type { RootState } from './reducers'
 

@@ -1,15 +1,16 @@
 // @flow
 
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 import {
   MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
-import * as labwareModuleCompatibility from '../../../utils/labwareModuleCompatibility'
+import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+
 import { TEMPERATURE_AT_TARGET } from '../../../constants'
+import * as labwareModuleCompatibility from '../../../utils/labwareModuleCompatibility'
 import { getSwapBlocked } from '../DeckSetup'
 
 describe('DeckSetup', () => {

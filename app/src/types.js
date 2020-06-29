@@ -1,46 +1,41 @@
 /* eslint-disable no-use-before-define */
 // @flow
 // application types
-import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
-import type { RouterState, RouterAction } from 'connected-react-router'
+import type { RouterAction, RouterState } from 'connected-react-router'
+import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux'
 import type { Observable } from 'rxjs'
 
-import type { RobotApiState, RobotApiAction } from './robot-api/types'
-import type { RobotAdminState, RobotAdminAction } from './robot-admin/types'
+import type { AlertsAction, AlertsState } from './alerts/types'
+import type { BuildrootAction, BuildrootState } from './buildroot/types'
+import type { CalibrationAction, CalibrationState } from './calibration/types'
+import type { ConfigAction, ConfigState } from './config/types'
 import type {
-  RobotControlsState,
-  RobotControlsAction,
-} from './robot-controls/types'
-import type { BuildrootState, BuildrootAction } from './buildroot/types'
-import type { PipettesState, PipettesAction } from './pipettes/types'
-import type { ModulesState, ModulesAction } from './modules/types'
-import type {
-  State as SuperDeprecatedRobotApiState,
-  HttpApiAction as SuperDeprecatedRobotApiAction,
-} from './http-api-client'
-import type { RobotState, Action as RobotAction } from './robot'
-import type { ShellState, ShellAction } from './shell/types'
-import type { ConfigState, ConfigAction } from './config/types'
-import type { DiscoveryState, DiscoveryAction } from './discovery/types'
-import type { NetworkingState, NetworkingAction } from './networking/types'
-import type { ProtocolState, ProtocolAction } from './protocol/types'
-import type {
-  CustomLabwareState,
   CustomLabwareAction,
+  CustomLabwareState,
 } from './custom-labware/types'
-
+import type { DiscoveryAction, DiscoveryState } from './discovery/types'
 import type {
-  RobotSettingsState,
+  HttpApiAction as SuperDeprecatedRobotApiAction,
+  State as SuperDeprecatedRobotApiState,
+} from './http-api-client'
+import type { ModulesAction, ModulesState } from './modules/types'
+import type { NetworkingAction, NetworkingState } from './networking/types'
+import type { PipettesAction, PipettesState } from './pipettes/types'
+import type { ProtocolAction, ProtocolState } from './protocol/types'
+import type { Action as RobotAction, RobotState } from './robot'
+import type { RobotAdminAction, RobotAdminState } from './robot-admin/types'
+import type { RobotApiAction, RobotApiState } from './robot-api/types'
+import type {
+  RobotControlsAction,
+  RobotControlsState,
+} from './robot-controls/types'
+import type {
   RobotSettingsAction,
+  RobotSettingsState,
 } from './robot-settings/types'
-
-import type { CalibrationState, CalibrationAction } from './calibration/types'
-
-import type { SystemInfoState, SystemInfoAction } from './system-info/types'
-
-import type { AlertsState, AlertsAction } from './alerts/types'
-
-import type { SessionState, SessionsAction } from './sessions/types'
+import type { SessionsAction, SessionState } from './sessions/types'
+import type { ShellAction, ShellState } from './shell/types'
+import type { SystemInfoAction, SystemInfoState } from './system-info/types'
 
 export type State = $ReadOnly<{|
   robot: RobotState,

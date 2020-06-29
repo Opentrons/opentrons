@@ -3,19 +3,17 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  getBuildrootUpdateInfo,
-  getBuildrootDownloadProgress,
   getBuildrootDownloadError,
+  getBuildrootDownloadProgress,
+  getBuildrootUpdateInfo,
 } from '../../../buildroot'
-
-import { MigrationWarningModal } from './MigrationWarningModal'
-import { DownloadUpdateModal } from './DownloadUpdateModal'
-import { ReleaseNotesModal } from './ReleaseNotesModal'
-
 import type {
   BuildrootUpdateType,
   RobotSystemType,
 } from '../../../buildroot/types'
+import { DownloadUpdateModal } from './DownloadUpdateModal'
+import { MigrationWarningModal } from './MigrationWarningModal'
+import { ReleaseNotesModal } from './ReleaseNotesModal'
 
 export type ViewUpdateModalProps = {|
   robotName: string,

@@ -3,12 +3,11 @@
 // TODO(mc, 2018-07-02): these generic actions, along with a generic API
 // reducer should handle all API state, as opposed to bespoke reducers
 // in each API client submodule
-import { client } from './client'
-
-import type { ThunkPromiseAction } from '../types'
 import type { BaseRobot, RobotService } from '../robot'
-import type { ApiRequestError } from './types'
+import type { ThunkPromiseAction } from '../types'
 import type { Method } from './client'
+import { client } from './client'
+import type { ApiRequestError } from './types'
 
 export type ApiRequestAction<Path: string, Body: ?{}> = {|
   type: 'api:REQUEST',

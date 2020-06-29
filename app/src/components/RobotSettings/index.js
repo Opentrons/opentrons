@@ -2,13 +2,13 @@
 // robot status panel with connect button
 import * as React from 'react'
 
-import { CardContainer, CardRow } from '../layout'
-import { StatusCard } from './StatusCard'
-import { InformationCard } from './InformationCard'
-import { ControlsCard } from './ControlsCard'
-import { ConnectionCard } from './ConnectionCard'
-import { AdvancedSettingsCard } from './AdvancedSettingsCard'
 import type { ViewableRobot } from '../../discovery/types'
+import { CardContainer, CardRow } from '../layout'
+import { AdvancedSettingsCard } from './AdvancedSettingsCard'
+import { ConnectionCard } from './ConnectionCard'
+import { ControlsCard } from './ControlsCard'
+import { InformationCard } from './InformationCard'
+import { StatusCard } from './StatusCard'
 
 export { ConnectAlertModal } from './ConnectAlertModal'
 

@@ -1,7 +1,7 @@
 // @flow
+import { Icon, PrimaryButton } from '@opentrons/components'
 import * as React from 'react'
 
-import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './upload-panel.css'
 
 export type UploadInputProps = {|

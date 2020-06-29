@@ -1,21 +1,20 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-
+import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import {
-  getModuleDisplayName,
   type ModuleModel,
+  getModuleDisplayName,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import cx from 'classnames'
+import * as React from 'react'
 
 import { Icon } from '../icons'
-import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 import styles from './Module.css'
+import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 
 export type ModuleProps = {|
   /** module model */

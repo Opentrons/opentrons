@@ -2,7 +2,6 @@
 // robot settings fixtures
 
 import { mockRobot } from '../../robot-api/__fixtures__'
-
 import type { RobotSettings } from '../types'
 
 export const mockRobotSettings: RobotSettings = [

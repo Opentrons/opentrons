@@ -1,9 +1,10 @@
 // @flow
 import assert from 'assert'
+
 import type { HydratedMagnetFormData } from '../../../form-types'
 import type {
-  EngageMagnetArgs,
   DisengageMagnetArgs,
+  EngageMagnetArgs,
 } from '../../../step-generation'
 
 type MagnetArgs = EngageMagnetArgs | DisengageMagnetArgs

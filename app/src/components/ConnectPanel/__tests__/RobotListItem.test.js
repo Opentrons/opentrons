@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { NotificationIcon, ToggleButton } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import * as React from 'react'
+
 import { RobotListItem } from '../RobotListItem'
 
 describe('ConnectPanel RobotListItem', () => {

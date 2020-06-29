@@ -1,44 +1,38 @@
 // @flow
+import type { OutputSelector } from 'reselect'
 import { createSelector } from 'reselect'
 
 import {
-  getProtocolType,
-  getProtocolCreatorApp,
-  getProtocolApiVersion,
-  getProtocolName,
-  getProtocolSource,
-  getProtocolAuthor,
-  getProtocolContents,
-} from '../protocol'
-
+  getBuildrootRobot,
+  getBuildrootSession,
+  getBuildrootUpdateVersion,
+  getRobotSystemType,
+} from '../buildroot'
 import {
-  getViewableRobots,
   getConnectedRobot,
   getRobotApiVersion,
   getRobotFirmwareVersion,
+  getViewableRobots,
 } from '../discovery'
-
-import {
-  getBuildrootUpdateVersion,
-  getBuildrootRobot,
-  getBuildrootSession,
-  getRobotSystemType,
-} from '../buildroot'
-
-import { getRobotSettings } from '../robot-settings'
 import { getAttachedPipettes } from '../pipettes'
-import { getPipettes, getModules } from '../robot/selectors'
-
-import { hash } from './hash'
-
-import type { OutputSelector } from 'reselect'
+import {
+  getProtocolApiVersion,
+  getProtocolAuthor,
+  getProtocolContents,
+  getProtocolCreatorApp,
+  getProtocolName,
+  getProtocolSource,
+  getProtocolType,
+} from '../protocol'
+import { getRobotSettings } from '../robot-settings'
+import { getModules, getPipettes } from '../robot/selectors'
 import type { State } from '../types'
-
+import { hash } from './hash'
 import type {
   AnalyticsConfig,
+  BuildrootAnalyticsData,
   ProtocolAnalyticsData,
   RobotAnalyticsData,
-  BuildrootAnalyticsData,
 } from './types'
 
 type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>

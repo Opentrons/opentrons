@@ -1,18 +1,16 @@
 // @flow
 import noop from 'lodash/noop'
 
+import * as BuildrootSelectors from '../../buildroot/selectors'
 import * as DiscoverySelectors from '../../discovery/selectors'
+import type { Robot, ViewableRobot } from '../../discovery/types'
 import * as PipetteSelectors from '../../pipettes/selectors'
 import * as RobotSelectors from '../../robot/selectors'
-import * as BuildrootSelectors from '../../buildroot/selectors'
 import * as ShellSelectors from '../../shell'
-import * as SystemInfoSelectors from '../../system-info/selectors'
-import * as Selectors from '../selectors'
-
 import { NOT_APPLICABLE, OUTDATED } from '../../system-info'
-
+import * as SystemInfoSelectors from '../../system-info/selectors'
 import type { State } from '../../types'
-import type { Robot, ViewableRobot } from '../../discovery/types'
+import * as Selectors from '../selectors'
 
 type SelectorSpec = {|
   name: string,

@@ -1,12 +1,4 @@
 // @flow
-import assert from 'assert'
-import { handleActions } from 'redux-actions'
-import mapValues from 'lodash/mapValues'
-import cloneDeep from 'lodash/cloneDeep'
-import merge from 'lodash/merge'
-import omit from 'lodash/omit'
-import omitBy from 'lodash/omitBy'
-import reduce from 'lodash/reduce'
 import {
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
@@ -15,28 +7,97 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import type {
+  FileLabware,
+  FileModule,
+  FilePipette,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import assert from 'assert'
+import cloneDeep from 'lodash/cloneDeep'
+import mapValues from 'lodash/mapValues'
+import merge from 'lodash/merge'
+import omit from 'lodash/omit'
+import omitBy from 'lodash/omitBy'
+import reduce from 'lodash/reduce'
+import type { Reducer } from 'redux'
+import { handleActions } from 'redux-actions'
+
 import {
-  rootReducer as labwareDefsRootReducer,
-  type RootState as LabwareDefsRootState,
-} from '../../labware-defs'
-import { uuid } from '../../utils'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
+  INITIAL_DECK_SETUP_STEP_ID,
   SPAN7_8_10_11_SLOT,
 } from '../../constants'
 import { getPDMetadata } from '../../file-types'
+import type {
+  FormData,
+  ProfileCycleItem,
+  ProfileItem,
+  ProfileStepItem,
+  StepIdType,
+  StepType,
+} from '../../form-types'
+import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
+import {
+  type RootState as LabwareDefsRootState,
+  rootReducer as labwareDefsRootReducer,
+} from '../../labware-defs'
+import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
+import type {
+  CreateContainerAction,
+  DeleteContainerAction,
+  DuplicateLabwareAction,
+  SwapSlotContentsAction,
+} from '../../labware-ingred/actions'
+import type { LoadFileAction } from '../../load-file'
+import type {
+  AddProfileCycleAction,
+  AddProfileStepAction,
+  CancelStepFormAction,
+  ChangeFormInputAction,
+  ChangeSavedStepFormAction,
+  DeleteProfileCycleAction,
+  DeleteProfileStepAction,
+  DeleteStepAction,
+  EditProfileCycleAction,
+  EditProfileStepAction,
+  PopulateFormAction,
+  ReorderStepsAction,
+} from '../../steplist/actions'
 import {
   getDefaultsForStepType,
   handleFormChange,
 } from '../../steplist/formLevel'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
-import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
-  _getInitialDeckSetupRootState,
-} from '../selectors'
+import { getLabwareOnModule } from '../../ui/modules/utils'
+import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
+import type {
+  AddStepAction,
+  DuplicateStepAction,
+  ReorderSelectedStepAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
+} from '../../ui/steps/actions/types'
+import { uuid } from '../../utils'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import type {
+  CreateModuleAction,
+  CreatePipettesAction,
+  DeleteModuleAction,
+  DeletePipettesAction,
+  EditModuleAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions'
+import {
+  _getInitialDeckSetupRootState,
+  _getLabwareEntitiesRootState,
+  _getPipetteEntitiesRootState,
+} from '../selectors'
+import type {
+  ModuleEntities,
+  NormalizedLabware,
+  NormalizedLabwareById,
+  NormalizedPipetteById,
+} from '../types'
 import {
   createPresavedStepForm,
   getDeckItemIdInSlot,
@@ -46,66 +107,6 @@ import {
   createInitialProfileCycle,
   createInitialProfileStep,
 } from '../utils/createInitialProfileItems'
-import { getLabwareOnModule } from '../../ui/modules/utils'
-import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import type { Reducer } from 'redux'
-import type { LoadFileAction } from '../../load-file'
-import type {
-  CreateContainerAction,
-  DeleteContainerAction,
-  DuplicateLabwareAction,
-  SwapSlotContentsAction,
-} from '../../labware-ingred/actions'
-import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type {
-  FormData,
-  StepIdType,
-  StepType,
-  ProfileItem,
-  ProfileCycleItem,
-  ProfileStepItem,
-} from '../../form-types'
-import type {
-  FileLabware,
-  FilePipette,
-  FileModule,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type {
-  CancelStepFormAction,
-  ChangeFormInputAction,
-  ChangeSavedStepFormAction,
-  DeleteStepAction,
-  PopulateFormAction,
-  ReorderStepsAction,
-  AddProfileCycleAction,
-  AddProfileStepAction,
-  DeleteProfileCycleAction,
-  DeleteProfileStepAction,
-  EditProfileCycleAction,
-  EditProfileStepAction,
-} from '../../steplist/actions'
-import type {
-  AddStepAction,
-  DuplicateStepAction,
-  ReorderSelectedStepAction,
-  SelectStepAction,
-  SelectTerminalItemAction,
-} from '../../ui/steps/actions/types'
-import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import type {
-  NormalizedPipetteById,
-  NormalizedLabware,
-  NormalizedLabwareById,
-  ModuleEntities,
-} from '../types'
-import type {
-  CreatePipettesAction,
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
-  CreateModuleAction,
-  EditModuleAction,
-  DeleteModuleAction,
-} from '../actions'
 
 type FormState = FormData | null
 

@@ -1,19 +1,18 @@
 // @flow
 // redux action types to analytics events map
+import * as brActions from '../buildroot/constants'
+import * as CustomLabware from '../custom-labware'
+import { getConnectedRobot } from '../discovery'
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
-import { getConnectedRobot } from '../discovery'
-import * as CustomLabware from '../custom-labware'
-import * as SystemInfo from '../system-info'
-import * as brActions from '../buildroot/constants'
 import * as Sessions from '../sessions'
+import * as SystemInfo from '../system-info'
+import type { Action, State } from '../types'
 import {
+  getBuildrootAnalyticsData,
   getProtocolAnalyticsData,
   getRobotAnalyticsData,
-  getBuildrootAnalyticsData,
 } from './selectors'
-
-import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
 
 const log = createLogger(__filename)

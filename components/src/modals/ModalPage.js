@@ -1,13 +1,12 @@
 // @flow
 // titled modal page component
-import * as React from 'react'
 import cx from 'classnames'
-
-import { TitleBar } from '../structure'
-import { Overlay } from './Overlay'
-import styles from './modals.css'
+import * as React from 'react'
 
 import type { TitleBarProps } from '../structure'
+import { TitleBar } from '../structure'
+import styles from './modals.css'
+import { Overlay } from './Overlay'
 
 export type ModalPageProps = {|
   /** Props for title bar at top of modal page */

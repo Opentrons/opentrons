@@ -1,7 +1,6 @@
 // @flow
 // analytics module
 import { toggleConfigValue, updateConfigValue } from '../config'
-
 import type {
   ToggleConfigValueAction,
   UpdateConfigValueAction,

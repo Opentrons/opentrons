@@ -1,14 +1,14 @@
 // @flow
 import assert from 'assert'
+
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../../constants'
-
 import {
-  getIsTouchTipField,
   type TipOffsetFields,
+  getIsTouchTipField,
 } from '../../../../form-types'
 
 // TODO: Ian + Brian 2019-02-13 this should switch on stepType, not use field

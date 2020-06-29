@@ -1,17 +1,18 @@
 // @flow
-import { connect } from 'react-redux'
-import * as React from 'react'
 import mapValues from 'lodash/mapValues'
-import type { BaseState, ThunkDispatch } from '../types'
+import * as React from 'react'
+import { connect } from 'react-redux'
+
 import { FilePage } from '../components/FilePage'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
+import { selectors as featureFlagSelectors } from '../feature-flags'
+import type { FileMetadataFields } from '../file-data'
 import { actions, selectors as fileSelectors } from '../file-data'
+import { actions as navActions } from '../navigation'
+import type { InitialDeckSetup } from '../step-forms'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { actions as steplistActions } from '../steplist'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
-import type { InitialDeckSetup } from '../step-forms'
-import type { FileMetadataFields } from '../file-data'
-import { actions as navActions } from '../navigation'
-import { selectors as featureFlagSelectors } from '../feature-flags'
+import type { BaseState, ThunkDispatch } from '../types'
 
 type Props = React.ElementProps<typeof FilePage>
 

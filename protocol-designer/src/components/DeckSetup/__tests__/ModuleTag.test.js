@@ -4,24 +4,23 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { mount, render } from 'enzyme'
 import React from 'react'
 import { Provider } from 'react-redux'
-import { render, mount } from 'enzyme'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../../constants'
-import { ModuleStatus, ModuleTag } from '../ModuleTag'
-
-import * as timelineFramesSelectors from '../../../top-selectors/timelineFrames'
+import type { InitialDeckSetup, ModuleEntities } from '../../../step-forms'
 import { selectors as stepFormSelectors } from '../../../step-forms'
-import * as uiSelectors from '../../../ui/steps'
-
-import type { BaseState } from '../../../types'
 import type { CommandsAndRobotState } from '../../../step-generation'
-import type { ModuleEntities, InitialDeckSetup } from '../../../step-forms'
+import * as timelineFramesSelectors from '../../../top-selectors/timelineFrames'
+import type { BaseState } from '../../../types'
+import * as uiSelectors from '../../../ui/steps'
+import { ModuleStatus, ModuleTag } from '../ModuleTag'
 
 jest.mock('../../../ui/steps')
 jest.mock('../../../top-selectors/timelineFrames')

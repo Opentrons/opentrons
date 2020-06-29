@@ -1,27 +1,25 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import { FormGroup } from '@opentrons/components'
-import { AspDispSection } from './AspDispSection'
+import cx from 'classnames'
+import * as React from 'react'
 
 import { i18n } from '../../../localization'
-
 import {
-  TextField,
-  CheckboxRowField,
   BlowoutLocationField,
-  PipetteField,
-  VolumeField,
-  LabwareField,
   ChangeTipField,
+  CheckboxRowField,
   FlowRateField,
-  WellSelectionField,
+  LabwareField,
+  PipetteField,
+  TextField,
   TipPositionField,
+  VolumeField,
   WellOrderField,
+  WellSelectionField,
 } from '../fields'
-
-import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
+import type { FocusHandlers } from '../types'
+import { AspDispSection } from './AspDispSection'
 
 type Props = {| focusHandlers: FocusHandlers |}
 type State = {| collapsed?: boolean |}

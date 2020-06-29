@@ -1,17 +1,15 @@
 // @flow
-import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
+import { createSelector } from 'reselect'
+
 import { getAllWellsForLabware } from '../../constants'
-import * as StepGeneration from '../../step-generation'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import type {
   LabwareOnDeck,
   LabwareTemporalProperties,
@@ -20,6 +18,9 @@ import type {
   PipetteOnDeck,
   PipetteTemporalProperties,
 } from '../../step-forms'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import * as StepGeneration from '../../step-generation'
+import type { BaseState, Selector } from '../../types'
 
 const getInvariantContext: Selector<StepGeneration.InvariantContext> = createSelector(
   stepFormSelectors.getLabwareEntities,

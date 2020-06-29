@@ -1,12 +1,11 @@
 // @flow
-import semver from 'semver'
 import { createSelector } from 'reselect'
+import semver from 'semver'
 
-import { getViewableRobots, getRobotApiVersion } from '../discovery/selectors'
-import * as Constants from './constants'
-
-import type { State } from '../types'
+import { getRobotApiVersion, getViewableRobots } from '../discovery/selectors'
 import type { ViewableRobot } from '../discovery/types'
+import type { State } from '../types'
+import * as Constants from './constants'
 import type {
   BuildrootUpdateInfo,
   BuildrootUpdateSession,

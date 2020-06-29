@@ -1,20 +1,19 @@
 // @flow
-import { createSelector } from 'reselect'
+import type { ModuleModel } from '@opentrons/shared-data'
+import {
+  checkModuleCompatibility,
+  getModuleType,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import sortBy from 'lodash/sortBy'
+import { createSelector } from 'reselect'
 
 import { selectors as RobotSelectors } from '../robot'
+import type { SessionModule } from '../robot/types'
+import type { State } from '../types'
+import { PREPARABLE_MODULE_TYPES } from './constants'
 import * as Copy from './i18n'
 import * as Types from './types'
-
-import type { State } from '../types'
-import type { SessionModule } from '../robot/types'
-import { PREPARABLE_MODULE_TYPES } from './constants'
-import {
-  THERMOCYCLER_MODULE_TYPE,
-  getModuleType,
-  checkModuleCompatibility,
-} from '@opentrons/shared-data'
-import type { ModuleModel } from '@opentrons/shared-data'
 
 export { getModuleType } from '@opentrons/shared-data'
 

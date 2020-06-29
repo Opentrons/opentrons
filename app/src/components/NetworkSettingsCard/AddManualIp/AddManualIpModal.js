@@ -1,10 +1,10 @@
 // @flow
+import { AlertModal } from '@opentrons/components'
 import * as React from 'react'
 
-import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../portal'
-import { ManualIpForm } from './ManualIpForm'
 import { IpList } from './IpList'
+import { ManualIpForm } from './ManualIpForm'
 
 export type AddManualIpProps = {|
   closeModal: () => mixed,

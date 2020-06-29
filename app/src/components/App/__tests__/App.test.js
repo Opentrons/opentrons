@@ -1,18 +1,18 @@
 // @flow
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { mount } from 'enzyme'
-import { App } from '../App'
 
-import { SidePanel } from '../../../pages/SidePanel'
-import { Robots } from '../../../pages/Robots'
-import { More } from '../../../pages/More'
-import { Upload } from '../../../pages/Upload'
 import { Calibrate } from '../../../pages/Calibrate'
+import { More } from '../../../pages/More'
+import { Robots } from '../../../pages/Robots'
 import { Run } from '../../../pages/Run'
+import { SidePanel } from '../../../pages/SidePanel'
+import { Upload } from '../../../pages/Upload'
+import { Alerts } from '../../Alerts'
 import { NavBar } from '../../nav-bar'
 import { PortalRoot } from '../../portal'
-import { Alerts } from '../../Alerts'
+import { App } from '../App'
 
 jest.mock('../../../pages/SidePanel', () => ({ SidePanel: () => <></> }))
 jest.mock('../../../pages/Robots', () => ({ Robots: () => <></> }))

@@ -1,9 +1,9 @@
 // @flow
+import { LabeledButton } from '@opentrons/components'
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
 
-import { LabeledButton } from '@opentrons/components'
 import { AddManualIp } from '..'
 import { AddManualIpModal } from '../AddManualIpModal'
 

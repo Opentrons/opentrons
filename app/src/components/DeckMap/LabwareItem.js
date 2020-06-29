@@ -1,25 +1,22 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import { Link } from 'react-router-dom'
-
+import {
+  humanizeLabwareType,
+  Icon,
+  Labware as LabwareComponent,
+  LabwareRender,
+  RobotCoordsForeignDiv,
+} from '@opentrons/components'
 import {
   getLabwareDisplayName,
   SLOT_RENDER_HEIGHT,
   SLOT_RENDER_WIDTH,
 } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
+import { Link } from 'react-router-dom'
 
-import {
-  RobotCoordsForeignDiv,
-  LabwareRender,
-  Labware as LabwareComponent,
-  Icon,
-  humanizeLabwareType,
-} from '@opentrons/components'
-
-import { type Labware } from '../../robot'
 import { getLegacyLabwareDef } from '../../getLabware'
-
+import { type Labware } from '../../robot'
 import styles from './styles.css'
 
 export type LabwareItemProps = {|

@@ -1,16 +1,17 @@
 // @flow
-import values from 'lodash/values'
-import { i18n } from '../../localization'
-import {
-  MAGNETIC_MODULE_V1,
-  getLabwareDefaultEngageHeight,
-  type ModuleRealType,
-} from '@opentrons/shared-data'
 import type { Options } from '@opentrons/components'
+import {
+  type ModuleRealType,
+  getLabwareDefaultEngageHeight,
+  MAGNETIC_MODULE_V1,
+} from '@opentrons/shared-data'
+import values from 'lodash/values'
+
+import { i18n } from '../../localization'
 import type {
-  ModuleOnDeck,
-  LabwareOnDeck,
   InitialDeckSetup,
+  LabwareOnDeck,
+  ModuleOnDeck,
 } from '../../step-forms/types'
 
 export function getModuleOnDeckByType(

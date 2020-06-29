@@ -1,8 +1,8 @@
 // tests for service and candidate creation utils
 import { setIn } from '@thi.ng/paths'
 
-import * as service from '../service'
 import { MOCK_BROWSER_SERVICE } from '../__fixtures__/mdns-browser-service'
+import * as service from '../service'
 
 describe('service utils', () => {
   describe('makeService', () => {

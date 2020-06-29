@@ -1,11 +1,11 @@
 // @flow
 import typeof { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
+import type { StepIdType } from '../form-types'
 import type {
   CommandCreatorArgs,
   PauseArgs,
   ThermocyclerProfileStepArgs,
 } from '../step-generation'
-import type { StepIdType } from '../form-types'
 import type { FormError } from './formLevel/errors'
 
 // timeline start and end

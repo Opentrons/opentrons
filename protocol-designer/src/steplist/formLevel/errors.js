@@ -1,19 +1,20 @@
 // @flow
-import * as React from 'react'
-import { getWellRatio } from '../utils'
-import { canPipetteUseLabware } from '../../utils'
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+import * as React from 'react'
+
 import {
-  MIN_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V1,
-  MIN_ENGAGE_HEIGHT_V2,
   MAX_ENGAGE_HEIGHT_V2,
+  MIN_ENGAGE_HEIGHT_V1,
+  MIN_ENGAGE_HEIGHT_V2,
   PAUSE_UNTIL_RESUME,
-  PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import type { StepFieldName } from '../../form-types'
+import { canPipetteUseLabware } from '../../utils'
+import { getWellRatio } from '../utils'
 
 /*******************
  ** Error Messages **

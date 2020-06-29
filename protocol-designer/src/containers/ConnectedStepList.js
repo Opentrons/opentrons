@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import type { BaseState, ThunkDispatch } from '../types'
-import type { StepIdType } from '../form-types'
 
-import { actions as steplistActions } from '../steplist'
-import { actions as stepsActions } from '../ui/steps'
-import { selectors as stepFormSelectors } from '../step-forms'
 import { StepList } from '../components/steplist'
+import type { StepIdType } from '../form-types'
+import { selectors as stepFormSelectors } from '../step-forms'
+import { actions as steplistActions } from '../steplist'
+import type { BaseState, ThunkDispatch } from '../types'
+import { actions as stepsActions } from '../ui/steps'
 
 type Props = React.ElementProps<typeof StepList>
 

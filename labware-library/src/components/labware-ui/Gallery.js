@@ -1,11 +1,10 @@
 // @flow
+import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
 import * as React from 'react'
 
-import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
+import type { LabwareDefinition } from '../../types'
 import { labwareImages } from './labware-images'
 import styles from './styles.css'
-
-import type { LabwareDefinition } from '../../types'
 
 export type GalleryProps = {|
   definition: LabwareDefinition,

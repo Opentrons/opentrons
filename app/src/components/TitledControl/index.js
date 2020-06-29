@@ -1,20 +1,19 @@
 // @flow
-import * as React from 'react'
+import type { StyleProps } from '@opentrons/components'
 import {
+  ALIGN_START,
   Box,
   Flex,
-  Text,
   FLEX_NONE,
-  ALIGN_START,
-  SPACING_AUTO,
+  FONT_SIZE_BODY_1,
+  FONT_WEIGHT_SEMIBOLD,
   SPACING_1,
   SPACING_2,
   SPACING_3,
-  FONT_SIZE_BODY_1,
-  FONT_WEIGHT_SEMIBOLD,
+  SPACING_AUTO,
+  Text,
 } from '@opentrons/components'
-
-import type { StyleProps } from '@opentrons/components'
+import * as React from 'react'
 
 export type TitledControlProps = {|
   title: string,

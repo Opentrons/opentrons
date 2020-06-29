@@ -1,10 +1,11 @@
 // @flow
 
-import React from 'react'
-import * as Formik from 'formik'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
 import { DropdownField } from '@opentrons/components'
+import { mount } from 'enzyme'
+import * as Formik from 'formik'
+import React from 'react'
+import { Provider } from 'react-redux'
+
 import { SlotDropdown } from '../SlotDropdown'
 
 jest.mock('formik')

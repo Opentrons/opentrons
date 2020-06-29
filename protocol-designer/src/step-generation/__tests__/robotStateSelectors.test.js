@@ -1,19 +1,20 @@
 // @flow
 import { getLabwareDefURI, MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+
 import {
-  makeContext,
-  makeState,
-  getTipColumn,
-  getTiprackTipstate,
-  DEFAULT_PIPETTE,
-} from '../__fixtures__'
-import {
-  sortLabwareBySlot,
-  getNextTiprack,
   _getNextTip,
   getModuleState,
+  getNextTiprack,
+  sortLabwareBySlot,
 } from '../'
+import {
+  DEFAULT_PIPETTE,
+  getTipColumn,
+  getTiprackTipstate,
+  makeContext,
+  makeState,
+} from '../__fixtures__'
 let invariantContext
 
 beforeEach(() => {

@@ -2,13 +2,13 @@
 import { TestScheduler } from 'rxjs/testing'
 
 import * as Cfg from '../../config'
+import { analyticsEpic } from '../epic'
+import { makeEvent } from '../make-event'
 import {
   initializeMixpanel,
-  trackEvent,
   setMixpanelTracking,
+  trackEvent,
 } from '../mixpanel'
-import { makeEvent } from '../make-event'
-import { analyticsEpic } from '../epic'
 
 jest.mock('../make-event')
 jest.mock('../mixpanel')

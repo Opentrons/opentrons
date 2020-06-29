@@ -1,12 +1,13 @@
 // @flow
 import { createSelector } from 'reselect'
-import { selectors as stepFormSelectors } from '../step-forms'
+
 import { selectors as fileDataSelectors } from '../file-data'
-import { selectors as uiModulesSelectors } from '../ui/modules'
-import { generateSubsteps } from '../steplist/generateSubsteps' // TODO Ian 2018-04-11 move generateSubsteps closer to this substeps.js file?
-import type { Selector } from '../types'
 import type { StepIdType } from '../form-types'
+import { selectors as stepFormSelectors } from '../step-forms'
+import { generateSubsteps } from '../steplist/generateSubsteps' // TODO Ian 2018-04-11 move generateSubsteps closer to this substeps.js file?
 import type { SubstepItemData } from '../steplist/types'
+import type { Selector } from '../types'
+import { selectors as uiModulesSelectors } from '../ui/modules'
 
 type AllSubsteps = { [StepIdType]: ?SubstepItemData }
 export const allSubsteps: Selector<AllSubsteps> = createSelector(

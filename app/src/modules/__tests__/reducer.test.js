@@ -1,8 +1,7 @@
 // @flow
 import * as Fixtures from '../__fixtures__'
-import { modulesReducer } from '../reducer'
-
 import type { Action } from '../../types'
+import { modulesReducer } from '../reducer'
 import type { ModulesState } from '../types'
 
 type ReducerSpec = {|

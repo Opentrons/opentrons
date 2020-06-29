@@ -1,17 +1,16 @@
 // @flow
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import {
-  getAllPipetteNames,
-  getPipetteNameSpecs,
   GEN1,
   GEN2,
+  getAllPipetteNames,
+  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
-import { PipetteSelect } from '../PipetteSelect'
-import { Select } from '../../forms'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import { Select } from '../../forms'
+import { PipetteSelect } from '../PipetteSelect'
 
 describe('PipetteSelect', () => {
   it('renders a Select', () => {

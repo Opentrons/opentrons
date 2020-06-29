@@ -1,10 +1,9 @@
 // @flow
 import {
-  PAUSE_UNTIL_TIME,
-  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
 } from '../../../constants'
-
 import type { FormData } from '../../../form-types'
 import type { AwaitTemperatureArgs, PauseArgs } from '../../../step-generation'
 

@@ -4,7 +4,6 @@ import * as React from 'react'
 import { InstructionStep } from '../InstructionStep'
 import styles from '../InstructionStep/styles.css'
 import calibrationTipSrc from './images/initial-calib-tip.svg'
-
 import type { CalibrationStep } from './types'
 
 export type InstructionsProps = {|

@@ -3,26 +3,26 @@
 // TODO(mc, 2018-01-10): refactor to use combineReducers
 import mapValues from 'lodash/mapValues'
 
-import type { Action, Error } from '../../types'
 import { HOME } from '../../robot-controls'
-import type { Mount, Slot } from '../types'
-import { actionTypes } from '../actions'
+import type { Action, Error } from '../../types'
 import type {
-  ConfirmProbedAction,
-  PipetteCalibrationAction,
-  LabwareCalibrationAction,
-  CalibrationSuccessAction,
   CalibrationFailureAction,
-  SetModulesReviewedAction,
-  ReturnTipResponseAction,
-  ReturnTipAction,
-  SetDeckPopulatedAction,
+  CalibrationSuccessAction,
+  ConfirmLabwareAction,
+  ConfirmProbedAction,
+  LabwareCalibrationAction,
   MoveToFrontAction,
   MoveToFrontResponseAction,
+  PipetteCalibrationAction,
   ProbeTipAction,
   ProbeTipResponseAction,
-  ConfirmLabwareAction,
+  ReturnTipAction,
+  ReturnTipResponseAction,
+  SetDeckPopulatedAction,
+  SetModulesReviewedAction,
 } from '../actions'
+import { actionTypes } from '../actions'
+import type { Mount, Slot } from '../types'
 
 // calibration request types
 // TODO(mc, 2018-01-10): these should match up with the request actions;

@@ -8,7 +8,7 @@ import {
   FIXED_TRASH_ID,
   THERMOCYCLER_STATE,
 } from '../../constants'
-import type { StepType, StepFieldName } from '../../form-types'
+import type { StepFieldName, StepType } from '../../form-types'
 
 // TODO: Ian 2019-01-17 move this somewhere more central - see #2926
 export function getDefaultsForStepType(

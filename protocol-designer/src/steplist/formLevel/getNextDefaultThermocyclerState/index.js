@@ -1,6 +1,7 @@
 // @flow
 import last from 'lodash/last'
-import type { StepIdType, FormData } from '../../../form-types'
+
+import type { FormData, StepIdType } from '../../../form-types'
 
 export function getNextDefaultBlockIsActive(
   savedForms: { [StepIdType]: FormData },

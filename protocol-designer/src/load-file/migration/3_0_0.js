@@ -1,16 +1,17 @@
 // @flow
+import { getLabwareDefURI } from '@opentrons/shared-data'
+import type {
+  FileLabware,
+  FilePipette,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
+
+import type { PDMetadata, PDProtocolFile as PDProtocolFileV1 } from './1_1_0'
 import { v1LabwareModelToV2Def } from './utils/v1LabwareModelToV2Def'
-import { getLabwareDefURI } from '@opentrons/shared-data'
-import type {
-  ProtocolFile,
-  FileLabware,
-  FilePipette,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type { PDProtocolFile as PDProtocolFileV1, PDMetadata } from './1_1_0'
 
 // NOTE: PDMetadata type did not change btw 1.1.0 and 3.0.0
 export type PDProtocolFile = ProtocolFile<PDMetadata>

@@ -1,11 +1,10 @@
 // @flow
+import type { Channels } from '@opentrons/components'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import last from 'lodash/last'
 import pick from 'lodash/pick'
-import { getWellsForTips } from '../step-generation/utils'
-import { getNextRobotStateAndWarningsSingleCommand } from '../step-generation/getNextRobotStateAndWarnings'
 
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { Channels } from '@opentrons/components'
+import { getNextRobotStateAndWarningsSingleCommand } from '../step-generation/getNextRobotStateAndWarnings'
 import type {
   CommandCreatorError,
   CommandsAndWarnings,
@@ -13,7 +12,8 @@ import type {
   InvariantContext,
   RobotState,
 } from '../step-generation/types'
-import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
+import { getWellsForTips } from '../step-generation/utils'
+import type { SourceDestData, SubstepTimelineFrame, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(commands: Array<Command>): ?TipLocation {

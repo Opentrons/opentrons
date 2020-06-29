@@ -2,13 +2,10 @@
 // labware details page title and category
 import * as React from 'react'
 
-import { LabelText, Value, LABEL_LEFT } from '../ui'
-
 import { CATEGORY, CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
-
-import styles from './styles.css'
-
 import type { LabwareDefinition } from '../../types'
+import { LABEL_LEFT, LabelText, Value } from '../ui'
+import styles from './styles.css'
 
 export type LabwareTitleProps = {|
   definition: LabwareDefinition,

@@ -1,18 +1,16 @@
 // @flow
 
-import { POST, DELETE, GET } from '../../robot-api'
+import { DELETE, GET, POST } from '../../robot-api'
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import {
   makeResponseFixtures,
   mockV2ErrorResponse,
 } from '../../robot-api/__fixtures__'
+import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
+import * as Constants from '../constants'
+import * as Types from '../types'
 import { mockRobotCalibrationCheckSessionDetails } from './calibration-check'
 import { mockTipLengthCalibrationSessionDetails } from './tip-length-calibration'
-
-import type { ResponseFixtures } from '../../robot-api/__fixtures__'
-import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
-
-import * as Types from '../types'
-import * as Constants from '../constants'
 
 export * from './calibration-check'
 export * from './tip-length-calibration'

@@ -1,14 +1,14 @@
 // @flow
-import { combineReducers, type Reducer } from 'redux'
-import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
+import { type Reducer, combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
 
-import type { Action } from '../types'
-import type { RehydratePersistedAction } from '../persist'
-import type { HintKey } from './index'
-import type { AddHintAction, RemoveHintAction } from './actions'
 import type { NavigateToPageAction } from '../navigation/actions'
+import type { RehydratePersistedAction } from '../persist'
+import type { Action } from '../types'
+import type { AddHintAction, RemoveHintAction } from './actions'
+import type { HintKey } from './index'
 
 type HintReducerState = Array<HintKey>
 const hints = handleActions(

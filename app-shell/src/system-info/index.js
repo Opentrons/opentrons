@@ -1,20 +1,20 @@
 // @flow
 // system info module
-import { app } from 'electron'
 import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import * as SystemInfo from '@opentrons/app/src/system-info'
+import type { UsbDevice } from '@opentrons/app/src/system-info/types'
+import { app } from 'electron'
+
 import { createLogger } from '../log'
 import { isWindows } from '../os'
-import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
+import type { Action, Dispatch } from '../types'
+import type { NetworkInterfaceMonitor } from './network-interfaces'
 import {
   createNetworkInterfaceMonitor,
   getActiveInterfaces,
 } from './network-interfaces'
-
-import type { UsbDevice } from '@opentrons/app/src/system-info/types'
-import type { Action, Dispatch } from '../types'
-import type { UsbDeviceMonitor, Device } from './usb-devices'
-import type { NetworkInterfaceMonitor } from './network-interfaces'
+import type { Device, UsbDeviceMonitor } from './usb-devices'
+import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
 
 export { createNetworkInterfaceMonitor }
 

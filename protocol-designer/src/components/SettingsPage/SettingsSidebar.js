@@ -1,11 +1,11 @@
 // @flow
-import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
+import * as React from 'react'
 import { connect } from 'react-redux'
 
-import type { BaseState, ThunkDispatch } from '../../types'
-import { actions, selectors, type Page } from '../../navigation'
 import { i18n } from '../../localization'
+import { type Page, actions, selectors } from '../../navigation'
+import type { BaseState, ThunkDispatch } from '../../types'
 import { PDTitledList } from '../lists'
 import styles from './SettingsPage.css'
 

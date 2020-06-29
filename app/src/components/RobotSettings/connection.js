@@ -1,14 +1,14 @@
 // @flow
 // UI components for displaying connection info
-import * as React from 'react'
 import cx from 'classnames'
-import { CardContentHalf } from '../layout'
-import styles from './styles.css'
+import * as React from 'react'
 
 import type {
   InternetStatus,
   SimpleInterfaceStatus,
 } from '../../networking/types'
+import { CardContentHalf } from '../layout'
+import styles from './styles.css'
 
 type ConnectionStatusProps = { type: string, status: ?InternetStatus }
 

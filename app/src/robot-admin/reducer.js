@@ -1,10 +1,10 @@
 // @flow
 import mapValues from 'lodash/mapValues'
-import { DISCOVERY_UPDATE_LIST } from '../discovery/actions'
-import * as Constants from './constants'
 
+import { DISCOVERY_UPDATE_LIST } from '../discovery/actions'
 import type { Action } from '../types'
-import type { RobotAdminState, PerRobotAdminState } from './types'
+import * as Constants from './constants'
+import type { PerRobotAdminState, RobotAdminState } from './types'
 
 const INITIAL_STATE: RobotAdminState = {}
 

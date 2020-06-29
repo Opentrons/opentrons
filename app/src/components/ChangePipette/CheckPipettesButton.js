@@ -1,21 +1,19 @@
 // @flow
+import { Icon, PrimaryButton } from '@opentrons/components'
+import last from 'lodash/last'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import last from 'lodash/last'
 
+import { fetchPipettes } from '../../pipettes'
+import type { FetchPipettesAction } from '../../pipettes/types'
 import {
-  useDispatchApiRequest,
   getRequestById,
   PENDING,
   SUCCESS,
+  useDispatchApiRequest,
 } from '../../robot-api'
-
-import { fetchPipettes } from '../../pipettes'
-import { PrimaryButton, Icon } from '@opentrons/components'
-
-import type { State } from '../../types'
 import type { RequestState } from '../../robot-api/types'
-import type { FetchPipettesAction } from '../../pipettes/types'
+import type { State } from '../../types'
 
 export type CheckPipetteButtonProps = {|
   robotName: string,

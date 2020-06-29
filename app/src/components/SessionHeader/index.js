@@ -4,8 +4,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { getProtocolFilename } from '../../protocol'
-
-import type { State, Dispatch } from '../../types'
+import type { Dispatch, State } from '../../types'
 
 type SP = {| sessionName: ?string |}
 

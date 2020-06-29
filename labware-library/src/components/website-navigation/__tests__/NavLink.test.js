@@ -1,7 +1,7 @@
 // @flow
 // tests for Logo image component
-import * as React from 'react'
 import { shallow } from 'enzyme'
+import * as React from 'react'
 
 import { NavLink } from '../NavLink'
 

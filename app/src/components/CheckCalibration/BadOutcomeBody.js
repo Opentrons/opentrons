@@ -1,6 +1,6 @@
 // @flow
-import * as React from 'react'
 import { Link } from '@opentrons/components'
+import * as React from 'react'
 
 import {
   CHECK_TRANSFORM_TYPE_DECK,

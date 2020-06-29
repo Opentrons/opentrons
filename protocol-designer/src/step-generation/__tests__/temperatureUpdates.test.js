@@ -1,19 +1,19 @@
 // @flow
 import {
-  TEMPERATURE_DEACTIVATED,
-  TEMPERATURE_APPROACHING_TARGET,
-  TEMPERATURE_AT_TARGET,
-} from '../../constants'
-import {
-  forSetTemperature as _forSetTemperature,
-  forDeactivateTemperature as _forDeactivateTemperature,
-  forAwaitTemperature as _forAwaitTemperature,
-} from '../getNextRobotStateAndWarnings/temperatureUpdates'
-import { makeImmutableStateUpdater } from '../__utils__/makeImmutableStateUpdater'
-import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../__fixtures__/robotStateFixtures'
+import { makeImmutableStateUpdater } from '../__utils__/makeImmutableStateUpdater'
+import {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
+} from '../../constants'
+import {
+  forAwaitTemperature as _forAwaitTemperature,
+  forDeactivateTemperature as _forDeactivateTemperature,
+  forSetTemperature as _forSetTemperature,
+} from '../getNextRobotStateAndWarnings/temperatureUpdates'
 
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)
 const forDeactivateTemperature = makeImmutableStateUpdater(

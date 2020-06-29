@@ -1,11 +1,11 @@
 // @flow
 import noop from 'lodash/noop'
-import * as Fixtures from '../__fixtures__'
-import * as Selectors from '../selectors'
-import * as RobotSelectors from '../../robot/selectors'
-import * as Types from '../types'
 
+import * as Fixtures from '../__fixtures__'
+import * as RobotSelectors from '../../robot/selectors'
 import type { State } from '../../types'
+import * as Selectors from '../selectors'
+import * as Types from '../types'
 
 jest.mock('../../robot/selectors')
 

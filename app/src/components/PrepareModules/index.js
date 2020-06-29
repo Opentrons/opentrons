@@ -1,24 +1,23 @@
 // @flow
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
 import {
-  useTimeout,
-  PrimaryButton,
   AlertModal,
   Icon,
+  PrimaryButton,
+  useTimeout,
 } from '@opentrons/components'
+import * as React from 'react'
+import { useDispatch } from 'react-redux'
 
 import {
-  THERMOCYCLER_MODULE_TYPE,
-  sendModuleCommand,
   getModuleType,
+  sendModuleCommand,
+  THERMOCYCLER_MODULE_TYPE,
 } from '../../modules'
+import type { AttachedModule } from '../../modules/types'
+import type { Dispatch } from '../../types'
 import { DeckMap } from '../DeckMap'
 import { Portal } from '../portal'
 import styles from './styles.css'
-
-import type { Dispatch } from '../../types'
-import type { AttachedModule } from '../../modules/types'
 
 const LID_OPEN_DELAY_MS = 30 * 1000
 type Props = {| robotName: string, modules: Array<AttachedModule> |}

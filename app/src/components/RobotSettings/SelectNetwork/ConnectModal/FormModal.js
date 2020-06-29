@@ -1,22 +1,21 @@
 // @flow
-import * as React from 'react'
+import { BUTTON_TYPE_SUBMIT, FONT_SIZE_BODY_1 } from '@opentrons/components'
+import type { HTMLFormAttributes } from 'formik'
 import { Form } from 'formik'
+import * as React from 'react'
+import type { StyledComponent } from 'styled-components'
 import styled, { css } from 'styled-components'
 
-import { FONT_SIZE_BODY_1, BUTTON_TYPE_SUBMIT } from '@opentrons/components'
 import { ScrollableAlertModal } from '../../../modals'
-import { TextField } from './TextField'
-import { KeyFileField } from './KeyFileField'
-import { SecurityField } from './SecurityField'
 import { FIELD_TYPE_KEY_FILE, FIELD_TYPE_SECURITY } from '../constants'
 import * as Copy from '../i18n'
-
-import type { HTMLFormAttributes } from 'formik'
-import type { StyledComponent } from 'styled-components'
 import type { ConnectFormField, WifiNetwork } from '../types'
-import type { TextFieldProps } from './TextField'
 import type { KeyFileFieldProps } from './KeyFileField'
+import { KeyFileField } from './KeyFileField'
 import type { SecurityFieldProps } from './SecurityField'
+import { SecurityField } from './SecurityField'
+import type { TextFieldProps } from './TextField'
+import { TextField } from './TextField'
 
 const fieldStyle = css`
   min-width: 12rem;

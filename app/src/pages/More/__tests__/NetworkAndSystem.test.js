@@ -1,9 +1,9 @@
 // @flow
-import React from 'react'
 import { shallow } from 'enzyme'
+import React from 'react'
 
-import { Page } from '../../../components/Page'
 import { NetworkSettingsCard } from '../../../components/NetworkSettingsCard'
+import { Page } from '../../../components/Page'
 import { SystemInfoCard } from '../../../components/SystemInfoCard'
 import { NetworkAndSystem } from '../NetworkAndSystem'
 

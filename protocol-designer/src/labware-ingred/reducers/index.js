@@ -1,38 +1,37 @@
 // @flow
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+import pickBy from 'lodash/pickBy'
+import type { Reducer } from 'redux'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import omit from 'lodash/omit'
-import mapValues from 'lodash/mapValues'
-import pickBy from 'lodash/pickBy'
 
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
-
-import type { Reducer } from 'redux'
-import type { Action, DeckSlot } from '../../types'
-import type {
-  SingleLabwareLiquidState,
-  LocationLiquidState,
-  LabwareLiquidState,
-} from '../../step-generation'
-import type { LiquidGroupsById, DisplayLabware } from '../types'
 import type { LoadFileAction } from '../../load-file'
 import type {
-  RemoveWellsContentsAction,
-  CreateContainerAction,
-  DeleteLiquidGroupAction,
-  DuplicateLabwareAction,
-  EditLiquidGroupAction,
-  SelectLiquidAction,
-  SetWellContentsAction,
-  RenameLabwareAction,
-  DeleteContainerAction,
-  OpenAddLabwareModalAction,
-  OpenIngredientSelectorAction,
+  LabwareLiquidState,
+  LocationLiquidState,
+  SingleLabwareLiquidState,
+} from '../../step-generation'
+import type { Action, DeckSlot } from '../../types'
+import type {
   CloseIngredientSelectorAction,
+  CreateContainerAction,
+  DeleteContainerAction,
+  DeleteLiquidGroupAction,
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
+  DuplicateLabwareAction,
+  EditLiquidGroupAction,
+  OpenAddLabwareModalAction,
+  OpenIngredientSelectorAction,
+  RemoveWellsContentsAction,
+  RenameLabwareAction,
+  SelectLiquidAction,
+  SetWellContentsAction,
 } from '../actions'
+import type { DisplayLabware, LiquidGroupsById } from '../types'
 
 // REDUCERS
 

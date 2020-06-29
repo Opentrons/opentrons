@@ -1,9 +1,8 @@
 // @flow
 import { createAction } from 'redux-actions'
 
-import { selectors } from '../selectors'
-
 import type { DeckSlot, ThunkAction } from '../../types'
+import { selectors } from '../selectors'
 import type { IngredInputs } from '../types'
 
 // ===== Labware selector actions =====

@@ -1,11 +1,11 @@
 // @flow
 import {
-  makeStateArgsStandard,
-  makeContext,
-  makeState,
-  getSuccessResult,
   DEFAULT_PIPETTE,
   FIXED_TRASH_ID,
+  getSuccessResult,
+  makeContext,
+  makeState,
+  makeStateArgsStandard,
 } from '../__fixtures__'
 import { dropTip } from '../commandCreators/atomic/dropTip'
 

@@ -1,37 +1,37 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import sum from 'lodash/sum'
 import { Icon } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
-import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
-import { i18n } from '../../localization'
-import { makeLidLabelText, makeTemperatureText } from '../../utils'
-import { PDListItem, PDTitledList } from '../lists'
-import { StepDescription } from '../StepDescription'
-import { AspirateDispenseHeader } from './AspirateDispenseHeader'
-import { MixHeader } from './MixHeader'
-import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
-import { PauseStepItems } from './PauseStepItems'
-import { SourceDestSubstep } from './SourceDestSubstep'
-import styles from './StepItem.css'
+import cx from 'classnames'
+import sum from 'lodash/sum'
+import * as React from 'react'
 
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
 import type {
   FormData,
-  StepType,
   ProfileCycleItem,
   ProfileStepItem,
+  StepType,
 } from '../../form-types'
+import { PROFILE_CYCLE, stepIconsByType } from '../../form-types'
+import { i18n } from '../../localization'
 import type {
   SubstepIdentifier,
   SubstepItemData,
   WellIngredientNames,
 } from '../../steplist/types'
+import { makeLidLabelText, makeTemperatureText } from '../../utils'
+import { PDListItem, PDTitledList } from '../lists'
+import { StepDescription } from '../StepDescription'
+import { AspirateDispenseHeader } from './AspirateDispenseHeader'
+import { MixHeader } from './MixHeader'
+import { ModuleStepItemRow, ModuleStepItems } from './ModuleStepItems'
+import { PauseStepItems } from './PauseStepItems'
+import { SourceDestSubstep } from './SourceDestSubstep'
+import styles from './StepItem.css'
 
 export type StepItemProps = {|
   description?: ?string,

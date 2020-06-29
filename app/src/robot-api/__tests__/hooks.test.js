@@ -1,9 +1,10 @@
 // @flow
-import * as React from 'react'
-import * as ReactRedux from 'react-redux'
-import { act } from 'react-dom/test-utils'
-import uniqueId from 'lodash/uniqueId'
 import { mount } from 'enzyme'
+import uniqueId from 'lodash/uniqueId'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
+import * as ReactRedux from 'react-redux'
+
 import { useDispatchApiRequest } from '../hooks'
 
 jest.mock('react-redux')

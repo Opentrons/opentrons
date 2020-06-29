@@ -1,15 +1,14 @@
 // @flow
+import assert from 'assert'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import assert from 'assert'
 
-import { LiquidEditForm } from './LiquidEditForm'
-import { LiquidsPageInfo } from './LiquidsPageInfo'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-
 import type { LiquidGroup } from '../../labware-ingred/types'
 import type { BaseState, ThunkDispatch } from '../../types'
+import { LiquidEditForm } from './LiquidEditForm'
+import { LiquidsPageInfo } from './LiquidsPageInfo'
 
 type Props = React.ElementProps<typeof LiquidEditForm>
 type WrapperProps = { showForm: boolean, formKey: string, formProps: Props }

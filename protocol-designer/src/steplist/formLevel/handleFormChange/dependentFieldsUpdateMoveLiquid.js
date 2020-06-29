@@ -1,32 +1,33 @@
 // @flow
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import assert from 'assert'
 import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
-import {
-  chainPatchUpdaters,
-  fieldHasChanged,
-  getChannels,
-  getDefaultWells,
-  getAllWellsFromPrimaryWells,
-  getMaxDisposalVolumeForMultidispense,
-  volumeInCapacityForMulti,
-  DISPOSAL_VOL_DIGITS,
-} from './utils'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
-import { getWellRatio } from '../../utils'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../../step-generation/utils'
+
 import type { FormData, StepFieldName } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '../../../step-generation/utils'
+import type { FormPatch } from '../../actions/types'
+import { getWellRatio } from '../../utils'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
+import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
+import {
+  chainPatchUpdaters,
+  DISPOSAL_VOL_DIGITS,
+  fieldHasChanged,
+  getAllWellsFromPrimaryWells,
+  getChannels,
+  getDefaultWells,
+  getMaxDisposalVolumeForMultidispense,
+  volumeInCapacityForMulti,
+} from './utils'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>

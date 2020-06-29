@@ -2,12 +2,12 @@
 // DEPRECATED - do not add to nor import from this module if you can help it
 // TODO(mc, 2019-12-17): remove when able
 // robot HTTP API client module
-import { combineReducers } from 'redux'
-import { calibrationReducer } from './calibration'
-
 import type { Reducer } from 'redux'
+import { combineReducers } from 'redux'
+
 import type { Action } from '../types'
 import type { CalibrationAction, CalState } from './calibration'
+import { calibrationReducer } from './calibration'
 
 export type State = {|
   calibration: CalState,

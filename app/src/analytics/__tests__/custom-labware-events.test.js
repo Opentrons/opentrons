@@ -1,11 +1,9 @@
 // @flow
 
-import { makeEvent } from '../make-event'
-
 import * as CustomLabware from '../../custom-labware'
 import * as LabwareFixtures from '../../custom-labware/__fixtures__'
-
-import type { State, Action } from '../../types'
+import type { Action, State } from '../../types'
+import { makeEvent } from '../make-event'
 import type { AnalyticsEvent } from '../types'
 
 type EventSpec = {|

@@ -1,6 +1,7 @@
 // @flow
-import * as React from 'react'
 import { AlertItem, OutlineButton } from '@opentrons/components'
+import * as React from 'react'
+
 import { i18n } from '../../localization'
 // TODO: Ian 2019-03-27 the use of Component Library `Alert` is being
 // stretched beyond its intentions here, we should reconcile PD + Run App uses of Alert later

@@ -1,5 +1,5 @@
 // @flow
-import { swatchColors, MIXED_WELL_COLOR, AIR } from '@opentrons/components'
+import { AIR, MIXED_WELL_COLOR, swatchColors } from '@opentrons/components'
 
 export const humanizeLabwareType = (labwareType: string): string => {
   return labwareType.replace(/-|_/g, ' ')

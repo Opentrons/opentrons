@@ -1,9 +1,10 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
-import { usePopper } from '../usePopper'
-import * as Types from '../types'
+import * as React from 'react'
+
 import * as Constants from '../constants'
+import * as Types from '../types'
+import { usePopper } from '../usePopper'
 
 const onStateUpdate = jest.fn()
 

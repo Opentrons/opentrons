@@ -1,6 +1,6 @@
 // @flow
 import type { Error } from '../types'
-import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
+import type { RobotLogsAction, RobotLogsState } from './robot-logs/types'
 
 export type Remote = {|
   ipcRenderer: {| send: (string, ...args: Array<mixed>) => void |},

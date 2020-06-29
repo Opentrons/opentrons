@@ -1,11 +1,12 @@
 // @flow
 // Placeholder modal for missing/downloading/errored update files
 
-import * as React from 'react'
+import type { ButtonProps } from '@opentrons/components'
 import { AlertModal } from '@opentrons/components'
+import * as React from 'react'
+
 import { ProgressBar } from './progress'
 import styles from './styles.css'
-import type { ButtonProps } from '@opentrons/components'
 
 export type DownloadUpdateModalProps = {|
   notNowButton: ButtonProps,

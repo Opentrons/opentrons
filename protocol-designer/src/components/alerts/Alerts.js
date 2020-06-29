@@ -1,6 +1,7 @@
 // @flow
-import * as React from 'react'
 import assert from 'assert'
+import * as React from 'react'
+
 import { PDAlert } from './PDAlert'
 import type { AlertData, AlertType } from './types'
 

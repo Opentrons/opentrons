@@ -1,9 +1,9 @@
 // @flow
-import * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
+import * as React from 'react'
 
-import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import { JogControls } from '../JogControls'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
 

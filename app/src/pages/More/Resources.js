@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+
 import { Page } from '../../components/Page'
 import { Resources as ResourcesContents } from '../../components/Resources'
 

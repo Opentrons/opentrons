@@ -1,6 +1,7 @@
 // @flow
+import { Icon, ListItem } from '@opentrons/components'
 import * as React from 'react'
-import { ListItem, Icon } from '@opentrons/components'
+
 import styles from './upload-panel.css'
 
 export function UploadMenu(): React.Node {

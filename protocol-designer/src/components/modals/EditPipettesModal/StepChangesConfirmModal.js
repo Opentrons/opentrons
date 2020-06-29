@@ -1,11 +1,10 @@
 // @flow
+import { AlertModal, OutlineButton } from '@opentrons/components'
 import * as React from 'react'
 
-import { AlertModal, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../../localization'
-
-import styles from './StepChangesConfirmModal.css'
 import modalStyles from '../modal.css'
+import styles from './StepChangesConfirmModal.css'
 
 type Props = { onCancel: () => void, onConfirm: () => void }
 

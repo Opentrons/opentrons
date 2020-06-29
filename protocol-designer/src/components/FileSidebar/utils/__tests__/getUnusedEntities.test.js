@@ -1,15 +1,16 @@
 // @flow
 import {
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+} from '@opentrons/shared-data'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
-  TEMPERATURE_MODULE_V1,
-} from '@opentrons/shared-data'
+
 import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
 import { getUnusedEntities } from '../getUnusedEntities'
 

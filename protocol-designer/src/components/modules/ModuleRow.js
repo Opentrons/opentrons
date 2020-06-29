@@ -1,7 +1,4 @@
 // @flow
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import upperFirst from 'lodash/upperFirst'
 import {
   LabeledValue,
   OutlineButton,
@@ -9,18 +6,21 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { actions as stepFormActions } from '../../step-forms'
-import {
-  SPAN7_8_10_11_SLOT,
-  DEFAULT_MODEL_FOR_MODULE_TYPE,
-} from '../../constants'
-import { ModuleDiagram } from './ModuleDiagram'
-import { isModuleWithCollisionIssue } from './utils'
-import styles from './styles.css'
-
 import type { ModuleRealType } from '@opentrons/shared-data'
+import upperFirst from 'lodash/upperFirst'
+import * as React from 'react'
+import { useDispatch } from 'react-redux'
+
+import {
+  DEFAULT_MODEL_FOR_MODULE_TYPE,
+  SPAN7_8_10_11_SLOT,
+} from '../../constants'
+import { i18n } from '../../localization'
 import type { ModuleOnDeck } from '../../step-forms'
+import { actions as stepFormActions } from '../../step-forms'
+import { ModuleDiagram } from './ModuleDiagram'
+import styles from './styles.css'
+import { isModuleWithCollisionIssue } from './utils'
 
 type Props = {|
   moduleOnDeck?: ModuleOnDeck,

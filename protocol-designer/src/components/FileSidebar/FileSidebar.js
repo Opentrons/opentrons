@@ -1,28 +1,28 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import { saveAs } from 'file-saver'
 import {
-  PrimaryButton,
   AlertModal,
   OutlineButton,
+  PrimaryButton,
   SidePanel,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { useBlockingHint } from '../Hints/useBlockingHint'
-import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
-import { Portal } from '../portals/MainPageModalPortal'
-import modalStyles from '../modals/modal.css'
-import { getUnusedEntities } from './utils'
-import styles from './FileSidebar.css'
+import cx from 'classnames'
+import { saveAs } from 'file-saver'
+import * as React from 'react'
 
 import type { PDProtocolFile } from '../../file-types'
+import { i18n } from '../../localization'
 import type {
   InitialDeckSetup,
-  SavedStepFormState,
   ModuleOnDeck,
   PipetteOnDeck,
+  SavedStepFormState,
 } from '../../step-forms'
+import { useBlockingHint } from '../Hints/useBlockingHint'
+import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import modalStyles from '../modals/modal.css'
+import { Portal } from '../portals/MainPageModalPortal'
+import styles from './FileSidebar.css'
+import { getUnusedEntities } from './utils'
 
 type Props = {|
   loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,

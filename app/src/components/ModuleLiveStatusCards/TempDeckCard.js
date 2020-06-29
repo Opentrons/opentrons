@@ -1,14 +1,13 @@
 // @flow
-import * as React from 'react'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import * as React from 'react'
 
+import type { ModuleCommand, TemperatureModule } from '../../modules/types'
+import { TemperatureControl } from '../ModuleControls'
 import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'
-import { TemperatureControl } from '../ModuleControls'
 import styles from './styles.css'
-
-import type { TemperatureModule, ModuleCommand } from '../../modules/types'
 
 type Props = {|
   module: TemperatureModule,

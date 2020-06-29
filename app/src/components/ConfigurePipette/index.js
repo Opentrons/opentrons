@@ -1,30 +1,27 @@
 // @flow
+import last from 'lodash/last'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import last from 'lodash/last'
 
-import {
-  SUCCESS,
-  FAILURE,
-  PENDING,
-  useDispatchApiRequest,
-  getRequestById,
-} from '../../robot-api'
+import { useFeatureFlag } from '../../config'
 import {
   getAttachedPipettes,
   getAttachedPipetteSettings,
   updatePipetteSettings,
 } from '../../pipettes'
-import { useFeatureFlag } from '../../config'
-
-import { ScrollableAlertModal } from '../modals'
-import { ConfigMessage } from './ConfigMessage'
-import { ConfigForm } from './ConfigForm'
-import { ConfigErrorBanner } from './ConfigErrorBanner'
-
-import type { State } from '../../types'
-
 import type { Mount, PipetteSettingsFieldsUpdate } from '../../pipettes/types'
+import {
+  FAILURE,
+  getRequestById,
+  PENDING,
+  SUCCESS,
+  useDispatchApiRequest,
+} from '../../robot-api'
+import type { State } from '../../types'
+import { ScrollableAlertModal } from '../modals'
+import { ConfigErrorBanner } from './ConfigErrorBanner'
+import { ConfigForm } from './ConfigForm'
+import { ConfigMessage } from './ConfigMessage'
 
 // TODO(mc, 2019-12-09): i18n
 const PIPETTE_SETTINGS = 'Pipette Settings'

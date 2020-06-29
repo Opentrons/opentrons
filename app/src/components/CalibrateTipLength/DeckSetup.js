@@ -1,23 +1,23 @@
 // @flow
-import * as React from 'react'
-import map from 'lodash/map'
 import {
-  OutlineButton,
-  RobotWorkSpace,
-  LabwareRender,
   LabwareNameOverlay,
+  LabwareRender,
+  OutlineButton,
   RobotCoordsForeignDiv,
+  RobotWorkSpace,
 } from '@opentrons/components'
+import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import {
-  type LabwareDefinition2,
   type DeckSlot,
+  type LabwareDefinition2,
   getLabwareDisplayName,
 } from '@opentrons/shared-data'
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import map from 'lodash/map'
+import * as React from 'react'
 
 import { getLatestLabwareDef } from '../../getLabware'
-import type { CalibrateTipLengthChildProps } from './types'
 import styles from './styles.css'
+import type { CalibrateTipLengthChildProps } from './types'
 
 const DECK_SETUP_WITH_BLOCK_PROMPT =
   'Place full tip rack and Calibration Block on the deck within their designated slots as illustrated below.'

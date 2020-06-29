@@ -1,6 +1,7 @@
 // @flow
-import * as React from 'react'
 import { Icon } from '@opentrons/components'
+import * as React from 'react'
+
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import styles from './styles.css'
 

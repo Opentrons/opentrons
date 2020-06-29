@@ -1,7 +1,8 @@
 // @flow
-import * as React from 'react'
-import { useField } from 'formik'
 import { SlotMap } from '@opentrons/components'
+import { useField } from 'formik'
+import * as React from 'react'
+
 import styles from './EditModules.css'
 
 type ConnectedSlotMapProps = {|

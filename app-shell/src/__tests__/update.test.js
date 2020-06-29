@@ -1,10 +1,11 @@
 // app-shell self-update tests
 import {
-  autoUpdater,
   __mockReset as __updaterMockReset,
+  autoUpdater,
 } from 'electron-updater'
-import { registerUpdate } from '../update'
+
 import { getConfig } from '../config'
+import { registerUpdate } from '../update'
 
 jest.mock('electron-updater')
 jest.mock('../log')

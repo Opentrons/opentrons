@@ -1,26 +1,24 @@
 // @flow
-import * as React from 'react'
 import {
-  FormGroup,
+  type Options,
   CheckboxField,
   DropdownField,
-  type Options,
+  FormGroup,
 } from '@opentrons/components'
-import { connect } from 'react-redux'
 import cx from 'classnames'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 import { i18n } from '../../../localization'
-import { getMaxDisposalVolumeForMultidispense } from '../../../steplist/formLevel/handleFormChange/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
+import { getMaxDisposalVolumeForMultidispense } from '../../../steplist/formLevel/handleFormChange/utils'
+import type { BaseState } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
+import styles from '../StepEditForm.css'
+import type { FocusHandlers } from '../types'
 import { getBlowoutLocationOptionsForForm } from '../utils'
-
 import { FieldConnector } from './FieldConnector'
 import { TextField } from './TextField'
-
-import type { BaseState } from '../../../types'
-import type { FocusHandlers } from '../types'
-import styles from '../StepEditForm.css'
 
 type OP = {| focusHandlers: FocusHandlers |}
 

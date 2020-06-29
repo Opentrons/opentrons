@@ -1,35 +1,36 @@
 // @flow
-import * as React from 'react'
-import startCase from 'lodash/startCase'
-import reduce from 'lodash/reduce'
 import {
-  useOnClickOutside,
   CheckboxField,
   Icon,
   OutlineButton,
+  useOnClickOutside,
 } from '@opentrons/components'
 import {
-  getLabwareDefURI,
-  getLabwareDefIsStandard,
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
   type LabwareDefinition2,
   type ModuleRealType,
+  getLabwareDefIsStandard,
+  getLabwareDefURI,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
+import reduce from 'lodash/reduce'
+import startCase from 'lodash/startCase'
+import * as React from 'react'
+
 import { SPAN7_8_10_11_SLOT } from '../../constants'
-import { getLabwareIsCompatible as _getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
-import { Portal } from '../portals/TopPortal'
-import { PDTitledList } from '../lists'
+import { i18n } from '../../localization'
+import type { DeckSlot } from '../../types'
+import { getLabwareIsCompatible as _getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import { PDTitledList } from '../lists'
+import { Portal } from '../portals/TopPortal'
 import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
 import styles from './styles.css'
-import type { DeckSlot } from '../../types'
-import type { LabwareDefByDefURI } from '../../labware-defs'
 
 type Props = {|
   onClose: (e?: any) => mixed,

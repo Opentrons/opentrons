@@ -1,7 +1,7 @@
 // @flow
 // upload summary component
-import * as React from 'react'
 import { Icon } from '@opentrons/components'
+import * as React from 'react'
 
 import styles from './styles.css'
 

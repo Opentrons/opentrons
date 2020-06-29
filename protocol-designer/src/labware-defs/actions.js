@@ -1,20 +1,21 @@
 // @flow
-import assert from 'assert'
-import Ajv from 'ajv'
-import isEqual from 'lodash/isEqual'
-import flatten from 'lodash/flatten'
-import values from 'lodash/values'
-import uniqBy from 'lodash/uniqBy'
-import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   getLabwareDefURI,
   OPENTRONS_LABWARE_NAMESPACE,
 } from '@opentrons/shared-data'
+import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import Ajv from 'ajv'
+import assert from 'assert'
+import flatten from 'lodash/flatten'
+import isEqual from 'lodash/isEqual'
+import uniqBy from 'lodash/uniqBy'
+import values from 'lodash/values'
+
 import { getIsTiprack } from '../../../shared-data/js/getLabware'
-import * as labwareDefSelectors from './selectors'
-import { getAllWellSetsForLabware } from '../utils'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ThunkAction } from '../types'
+import { getAllWellSetsForLabware } from '../utils'
+import * as labwareDefSelectors from './selectors'
 import type { LabwareUploadMessage } from './types'
 
 export type LabwareUploadMessageAction = {|

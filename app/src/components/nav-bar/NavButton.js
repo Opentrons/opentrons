@@ -1,12 +1,11 @@
 // @flow
 // nav button container
-import * as React from 'react'
-import { withRouter } from 'react-router-dom'
 import { NavButton as GenericNavButton } from '@opentrons/components'
-
+import * as React from 'react'
 import type { ContextRouter } from 'react-router-dom'
-import type { NavLocation } from '../../nav/types'
+import { withRouter } from 'react-router-dom'
 
+import type { NavLocation } from '../../nav/types'
 import styles from './styles.css'
 
 export type NavButtonProps = {|

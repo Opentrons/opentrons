@@ -1,19 +1,19 @@
 // @flow
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { DragSource, DropTarget, DragLayer } from 'react-dnd'
 import isEqual from 'lodash/isEqual'
+import * as React from 'react'
+import { DragLayer, DragSource, DropTarget } from 'react-dnd'
+import { connect } from 'react-redux'
 
 import { DND_TYPES } from '../../constants'
 import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
-import { PDTitledList } from '../lists'
 import {
-  stepIconsByType,
   type StepIdType,
   type StepType,
+  stepIconsByType,
 } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import type { BaseState } from '../../types'
+import { PDTitledList } from '../lists'
 import { ContextMenu } from './ContextMenu'
 import styles from './StepItem.css'
 

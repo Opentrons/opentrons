@@ -1,6 +1,6 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
 
 import { Icon } from '..'
 import styles from './forms.css'

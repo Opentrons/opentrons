@@ -2,12 +2,11 @@
 // fixtures for /networking/status
 
 import { GET } from '../../robot-api'
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
-
-import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { NetworkingStatusResponse } from '../types'
 
 export const mockWifiInterface = {

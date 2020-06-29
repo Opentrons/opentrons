@@ -1,14 +1,13 @@
 // @flow
-import * as React from 'react'
 import { FormGroup } from '@opentrons/components'
+import * as React from 'react'
+
 import { i18n } from '../../../../localization'
-import { LabwareField, WellSelectionField } from '../../fields'
-import { AspDispSection } from '../AspDispSection'
-
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FocusHandlers } from '../../types'
-
+import { LabwareField, WellSelectionField } from '../../fields'
 import styles from '../../StepEditForm.css'
+import type { FocusHandlers } from '../../types'
+import { AspDispSection } from '../AspDispSection'
 
 type Props = {
   className?: ?string,

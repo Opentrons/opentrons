@@ -1,23 +1,22 @@
 // @flow
-import Ajv from 'ajv'
-import sortBy from 'lodash/sortBy'
-import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { sameIdentity } from './compare'
-
 import {
-  INVALID_LABWARE_FILE,
   DUPLICATE_LABWARE_FILE,
+  INVALID_LABWARE_FILE,
   OPENTRONS_LABWARE_FILE,
   VALID_LABWARE_FILE,
 } from '@opentrons/app/src/custom-labware/selectors'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  UncheckedLabwareFile,
   CheckedLabwareFile,
-  ValidLabwareFile,
   OpentronsLabwareFile,
+  UncheckedLabwareFile,
+  ValidLabwareFile,
 } from '@opentrons/app/src/custom-labware/types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import Ajv from 'ajv'
+import sortBy from 'lodash/sortBy'
+
+import { sameIdentity } from './compare'
 
 const ajv = new Ajv()
 const validateDefinition = ajv.compile(labwareSchema)

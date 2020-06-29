@@ -1,12 +1,13 @@
 // @flow
 import last from 'lodash/last'
+
 import { getNextRobotStateAndWarningsSingleCommand } from '../getNextRobotStateAndWarnings'
 import type {
+  CurriedCommandCreator,
   InvariantContext,
   RobotState,
-  Timeline,
-  CurriedCommandCreator,
   RobotStateAndWarnings,
+  Timeline,
 } from '../types'
 export const commandCreatorsTimeline = (
   commandCreators: Array<CurriedCommandCreator>,

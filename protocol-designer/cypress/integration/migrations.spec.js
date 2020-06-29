@@ -1,6 +1,7 @@
 import 'cypress-file-upload'
-import cloneDeep from 'lodash/cloneDeep'
+
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
+import cloneDeep from 'lodash/cloneDeep'
 
 describe('Protocol fixtures migrate and match snapshots', () => {
   beforeEach(() => {

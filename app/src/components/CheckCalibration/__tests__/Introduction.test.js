@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
-import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
 import { AlertModal } from '@opentrons/components'
+import { mount } from 'enzyme'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
 
 import { Introduction } from '../Introduction'
 

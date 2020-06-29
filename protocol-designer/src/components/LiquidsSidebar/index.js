@@ -1,15 +1,15 @@
 // @flow
+import { PrimaryButton, SidePanel, swatchColors } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { i18n } from '../../localization'
-import { PrimaryButton, SidePanel, swatchColors } from '@opentrons/components'
-import { PDTitledList } from '../lists'
-import listButtonStyles from '../listButtons.css'
 
+import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import type { OrderedLiquids } from '../../labware-ingred/types'
-import * as labwareIngredActions from '../../labware-ingred/actions'
+import { i18n } from '../../localization'
 import type { BaseState, ThunkDispatch } from '../../types'
+import listButtonStyles from '../listButtons.css'
+import { PDTitledList } from '../lists'
 
 type SP = {|
   liquids: OrderedLiquids,

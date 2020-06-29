@@ -1,12 +1,13 @@
 // @flow
+import { Icon, useOnClickOutside } from '@opentrons/components'
+import cx from 'classnames'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import cx from 'classnames'
-import { Icon, useOnClickOutside } from '@opentrons/components'
+
 import { renameLabware } from '../../../labware-ingred/actions'
-import type { BaseState, ThunkDispatch } from '../../../types'
 import { i18n } from '../../../localization'
 import type { LabwareOnDeck } from '../../../step-forms'
+import type { BaseState, ThunkDispatch } from '../../../types'
 import styles from './LabwareOverlays.css'
 
 type OP = {|

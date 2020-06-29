@@ -1,16 +1,15 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
 import omit from 'lodash/omit'
+import * as React from 'react'
 
-import { Icon, type IconName } from '../icons'
-import styles from './buttons.css'
-
+import { type IconName, Icon } from '../icons'
 import {
-  BUTTON_TYPE_SUBMIT,
-  BUTTON_TYPE_RESET,
   BUTTON_TYPE_BUTTON,
+  BUTTON_TYPE_RESET,
+  BUTTON_TYPE_SUBMIT,
 } from '../primitives'
+import styles from './buttons.css'
 
 export type ButtonProps = {
   /** click handler */

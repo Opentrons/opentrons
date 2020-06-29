@@ -2,7 +2,7 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import { VerticalNavBar, NavButton, SidePanel } from '..'
+import { NavButton, SidePanel, VerticalNavBar } from '..'
 
 describe('VerticalNavBar', () => {
   it('renders correctly', () => {

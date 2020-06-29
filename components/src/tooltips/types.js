@@ -6,7 +6,7 @@ import type {
   Options as PopperOptions,
 } from '@popperjs/core/lib/types'
 
-import type { UseHoverOptions, HoverHandlers } from '../interaction-enhancers'
+import type { HoverHandlers, UseHoverOptions } from '../interaction-enhancers'
 
 export type Placement = $PropertyType<PopperOptions, 'placement'>
 

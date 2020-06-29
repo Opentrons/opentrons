@@ -1,12 +1,13 @@
 // @flow
-import * as React from 'react'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
+import * as React from 'react'
+
+import type { StepType } from '../../../form-types'
 import { i18n } from '../../../localization'
+import styles from '../StepEditForm.css'
+import type { FocusHandlers } from '../types'
 import { getTooltipForField } from '../utils'
 import { TextField } from './TextField'
-import type { StepType } from '../../../form-types'
-import type { FocusHandlers } from '../types'
-import styles from '../StepEditForm.css'
 
 type Props = {|
   stepType: StepType,

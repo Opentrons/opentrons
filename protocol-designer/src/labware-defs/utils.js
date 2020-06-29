@@ -1,9 +1,10 @@
 // @flow
-import groupBy from 'lodash/groupBy'
 import {
-  getLabwareDefURI,
   type LabwareDefinition2,
+  getLabwareDefURI,
 } from '@opentrons/shared-data'
+import groupBy from 'lodash/groupBy'
+
 import type { LabwareDefByDefURI } from './types'
 
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,

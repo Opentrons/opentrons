@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react'
 
-import { AlertModal } from './AlertModal'
-
 import type { AlertModalProps } from './AlertModal'
+import { AlertModal } from './AlertModal'
 
 export type ContinueModalProps = {|
   ...$Diff<AlertModalProps, { buttons: mixed }>,

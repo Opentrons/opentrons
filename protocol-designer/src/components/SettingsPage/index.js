@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import { type Page, selectors } from '../../navigation'
 import type { BaseState } from '../../types'
-import { selectors, type Page } from '../../navigation'
 import { SettingsApp } from './SettingsApp'
 
 export { SettingsSidebar } from './SettingsSidebar'

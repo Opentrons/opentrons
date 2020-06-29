@@ -2,23 +2,21 @@
 // fixtures for /wifi/eap-options
 
 import { GET } from '../../robot-api'
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
-
 import {
-  EAP_OPTIONS_PATH,
-  AUTH_TYPE_STRING,
-  AUTH_TYPE_PASSWORD,
   AUTH_TYPE_FILE,
+  AUTH_TYPE_PASSWORD,
+  AUTH_TYPE_STRING,
+  EAP_OPTIONS_PATH,
 } from '../constants'
-
-import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type {
-  WifiAuthField,
   EapOption,
   FetchEapOptionsResponse,
+  WifiAuthField,
 } from '../types'
 
 export const mockEapStringField: WifiAuthField = {

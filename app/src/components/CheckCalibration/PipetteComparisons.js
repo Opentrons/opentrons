@@ -1,25 +1,24 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import {
   Icon,
   Tooltip,
-  useHoverTooltip,
   TOOLTIP_TOP,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
 
 import * as Sessions from '../../sessions'
-import { DifferenceValue } from './DifferenceValue'
-import { ThresholdValue } from './ThresholdValue'
-import styles from './styles.css'
-
 import type {
-  RobotCalibrationCheckInstrument,
-  RobotCalibrationCheckStep,
   RobotCalibrationCheckComparison,
   RobotCalibrationCheckComparisonsByStep,
+  RobotCalibrationCheckInstrument,
+  RobotCalibrationCheckStep,
 } from '../../sessions/types'
+import { DifferenceValue } from './DifferenceValue'
+import styles from './styles.css'
+import { ThresholdValue } from './ThresholdValue'
 
 const PASS = 'pass'
 const FAIL = 'fail'

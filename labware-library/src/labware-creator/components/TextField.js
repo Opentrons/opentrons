@@ -1,10 +1,11 @@
 // @flow
-import * as React from 'react'
-import { Field } from 'formik'
 import { InputField } from '@opentrons/components'
+import { Field } from 'formik'
+import * as React from 'react'
+
 import { reportFieldEdit } from '../analyticsUtils'
+import { type LabwareFields, LABELS } from '../fields'
 import { getIsHidden } from '../formSelectors'
-import { LABELS, type LabwareFields } from '../fields'
 import fieldStyles from './fieldStyles.css'
 
 type InputFieldProps = React.ElementProps<typeof InputField>

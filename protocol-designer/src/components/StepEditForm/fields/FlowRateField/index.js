@@ -1,12 +1,13 @@
 // @flow
 import * as React from 'react'
-import { FlowRateInput } from './FlowRateInput'
 import { connect } from 'react-redux'
-import { actions as steplistActions } from '../../../../steplist'
+
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getDisabledFields } from '../../../../steplist/formLevel'
+import { actions as steplistActions } from '../../../../steplist'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
+import { getDisabledFields } from '../../../../steplist/formLevel'
 import type { BaseState, ThunkDispatch } from '../../../../types'
+import { FlowRateInput } from './FlowRateInput'
 
 type Props = {|
   ...$Exact<React.ElementProps<typeof FlowRateInput>>,

@@ -1,11 +1,10 @@
 // @flow
-import * as React from 'react'
 import classnames from 'classnames'
-
-import { Button } from './Button'
-import styles from './buttons.css'
+import * as React from 'react'
 
 import type { ButtonProps } from './Button'
+import { Button } from './Button'
+import styles from './buttons.css'
 
 /**
  * Flat-styled button with a default width of `9rem` and no background fill

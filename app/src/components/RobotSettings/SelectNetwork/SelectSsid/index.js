@@ -1,17 +1,15 @@
 // @flow
-import * as React from 'react'
-import styled from 'styled-components'
-
-import { SelectField, CONTEXT_MENU } from '@opentrons/components'
-import * as Copy from '../i18n'
-import { NetworkOptionLabel, NetworkActionLabel } from './NetworkOptionLabel'
-
 import type {
   SelectFieldProps,
   SelectOptionOrGroup,
 } from '@opentrons/components'
+import { CONTEXT_MENU, SelectField } from '@opentrons/components'
+import * as React from 'react'
+import styled from 'styled-components'
 
+import * as Copy from '../i18n'
 import type { WifiNetwork } from '../types'
+import { NetworkActionLabel, NetworkOptionLabel } from './NetworkOptionLabel'
 
 export type SelectSsidProps = {|
   list: Array<WifiNetwork>,

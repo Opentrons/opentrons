@@ -1,15 +1,14 @@
 // @flow
-import * as React from 'react'
-
 import type {
   PipetteChannels,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../robot'
-import type { Direction } from './types'
+import * as React from 'react'
 
+import type { Mount } from '../../robot'
 import screwdriverSrc from './images/screwdriver.svg'
 import styles from './styles.css'
+import type { Direction } from './types'
 
 type Diagram = 'screws' | 'tab'
 

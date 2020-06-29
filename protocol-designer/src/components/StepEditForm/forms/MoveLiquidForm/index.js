@@ -1,17 +1,18 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
-import { i18n } from '../../../../localization'
+import * as React from 'react'
+
 import type {
-  StepType,
   HydratedMoveLiquidFormDataLegacy,
+  StepType,
 } from '../../../../form-types'
+import { i18n } from '../../../../localization'
 import {
-  VolumeField,
-  PipetteField,
   ChangeTipField,
   DisposalVolumeField,
   PathField,
+  PipetteField,
+  VolumeField,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
 import type { FocusHandlers } from '../../types'

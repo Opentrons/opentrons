@@ -1,11 +1,12 @@
 // @flow
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
+
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
-  ConsolidateArgs,
   CommandCreator,
+  ConsolidateArgs,
   CurriedCommandCreator,
 } from '../../types'
 import {

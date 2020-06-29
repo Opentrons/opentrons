@@ -3,16 +3,15 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  THERMOCYCLER_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-  useSendModuleCommand,
   getAttachedModulesForConnectedRobot,
   getModuleControlsDisabled,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  useSendModuleCommand,
 } from '../../modules'
-
-import { TempDeckCard } from './TempDeckCard'
 import { MagDeckCard } from './MagDeckCard'
+import { TempDeckCard } from './TempDeckCard'
 import { ThermocyclerCard } from './ThermocyclerCard'
 
 export const ModuleLiveStatusCards = (): React.Node => {

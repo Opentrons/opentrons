@@ -1,13 +1,11 @@
 // @flow
 
+import type { Config } from '../../config/types'
 import * as Protocol from '../../protocol'
 import * as RobotSelectors from '../../robot/selectors'
-import * as Hash from '../hash'
-
-import * as Selectors from '../selectors'
-
 import type { State } from '../../types'
-import type { Config } from '../../config/types'
+import * as Hash from '../hash'
+import * as Selectors from '../selectors'
 
 type MockState = $Shape<{| ...State, config: null | $Shape<Config> |}>
 

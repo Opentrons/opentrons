@@ -2,14 +2,12 @@
 // fixtures for /wifi/keys
 
 import { GET, POST } from '../../robot-api'
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
-
 import { WIFI_KEYS_PATH } from '../constants'
-
-import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { FetchWifiKeysResponse, PostWifiKeysResponse } from '../types'
 
 export const mockWifiKey = {

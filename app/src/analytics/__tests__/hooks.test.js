@@ -1,16 +1,15 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
+import * as React from 'react'
+import { Provider } from 'react-redux'
 
 import * as Cfg from '../../config'
-import * as Mixpanel from '../mixpanel'
-import { useTrackEvent } from '../hooks'
-
-import type { State } from '../../types'
 import type { Config } from '../../config/types'
-import type { AnalyticsEvent, AnalyticsConfig } from '../types'
+import type { State } from '../../types'
+import { useTrackEvent } from '../hooks'
+import * as Mixpanel from '../mixpanel'
+import type { AnalyticsConfig, AnalyticsEvent } from '../types'
 
 jest.mock('../../config')
 jest.mock('../mixpanel')

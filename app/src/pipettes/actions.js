@@ -1,9 +1,8 @@
 // @flow
 
+import type { RobotApiRequestMeta } from '../robot-api/types'
 import * as Constants from './constants'
 import * as Types from './types'
-
-import type { RobotApiRequestMeta } from '../robot-api/types'
 
 export const fetchPipettes = (
   robotName: string,

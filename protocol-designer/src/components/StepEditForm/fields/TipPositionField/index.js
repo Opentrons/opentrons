@@ -1,24 +1,25 @@
 // @flow
-import * as React from 'react'
-import { connect } from 'react-redux'
 import {
+  type UseHoverTooltipResult,
   FormGroup,
   InputField,
   Tooltip,
   useHoverTooltip,
-  type UseHoverTooltipResult,
 } from '@opentrons/components'
 import { getWellsDepth } from '@opentrons/shared-data'
+import * as React from 'react'
+import { connect } from 'react-redux'
+
+import type { StepFieldName, TipOffsetFields } from '../../../../form-types'
+import { getIsTouchTipField } from '../../../../form-types'
 import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledFields } from '../../../../steplist/formLevel'
+import type { BaseState } from '../../../../types'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './TipPositionInput.css'
 import { TipPositionModal } from './TipPositionModal'
-import { getIsTouchTipField } from '../../../../form-types'
 import { getDefaultMmFromBottom } from './utils'
-import type { BaseState } from '../../../../types'
-import type { StepFieldName, TipOffsetFields } from '../../../../form-types'
 
 function getLabwareFieldForPositioningField(
   fieldName: TipOffsetFields

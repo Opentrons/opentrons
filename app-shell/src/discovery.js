@@ -1,29 +1,25 @@
 // @flow
 // app shell discovery module
-import { app } from 'electron'
-import Store from 'electron-store'
-import throttle from 'lodash/throttle'
-
+import {
+  CLEAR_CACHE,
+  DISCOVERY_FINISH,
+  DISCOVERY_REMOVE,
+  DISCOVERY_START,
+} from '@opentrons/app/src/discovery/actions'
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
+import type { Service } from '@opentrons/discovery-client'
 import {
   createDiscoveryClient,
   SERVICE_EVENT,
   SERVICE_REMOVED_EVENT,
 } from '@opentrons/discovery-client'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
-import {
-  DISCOVERY_START,
-  DISCOVERY_FINISH,
-  DISCOVERY_REMOVE,
-  CLEAR_CACHE,
-} from '@opentrons/app/src/discovery/actions'
+import { app } from 'electron'
+import Store from 'electron-store'
+import throttle from 'lodash/throttle'
 
 import { getConfig, getOverrides, handleConfigChange } from './config'
 import { createLogger } from './log'
 import { createNetworkInterfaceMonitor } from './system-info'
-
-import type { Service } from '@opentrons/discovery-client'
-
 import type { Action, Dispatch } from './types'
 
 const log = createLogger('discovery')

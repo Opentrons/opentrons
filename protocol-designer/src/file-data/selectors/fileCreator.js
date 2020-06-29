@@ -1,31 +1,32 @@
 // @flow
-import { createSelector } from 'reselect'
+import type {
+  Command,
+  FileLabware,
+  FileModule,
+  FilePipette,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import flatMap from 'lodash/flatMap'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import uniq from 'lodash/uniq'
-import { getFileMetadata } from './fileFields'
-import { getInitialRobotState, getRobotStateTimeline } from './commands'
-import { selectors as dismissSelectors } from '../../dismiss'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
-import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { createSelector } from 'reselect'
+
 import {
+  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-import type {
-  FilePipette,
-  FileLabware,
-  FileModule,
-  Command,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { ModuleEntity } from '../../step-forms'
-import type { Selector } from '../../types'
+import { selectors as dismissSelectors } from '../../dismiss'
 import type { PDProtocolFile } from '../../file-types'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
+import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
+import type { ModuleEntity } from '../../step-forms'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import type { Selector } from '../../types'
+import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { getInitialRobotState, getRobotStateTimeline } from './commands'
+import { getFileMetadata } from './fileFields'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')

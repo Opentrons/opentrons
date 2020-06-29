@@ -1,13 +1,14 @@
 // @flow
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
-import { thermocyclerProfileStep } from '../commandCreators/compound/thermocyclerProfileStep'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+
 import {
   getErrorResult,
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../__fixtures__'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { ThermocyclerModuleState } from '../../step-forms/types'
+import { thermocyclerProfileStep } from '../commandCreators/compound/thermocyclerProfileStep'
 import type { ThermocyclerProfileStepArgs } from '../types'
 
 const temperatureModuleId = 'temperatureModuleId'

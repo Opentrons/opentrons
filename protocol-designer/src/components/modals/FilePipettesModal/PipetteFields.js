@@ -1,25 +1,24 @@
 // @flow
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import {
+  type Mount,
   DropdownField,
   FormGroup,
-  PipetteSelect,
   OutlineButton,
-  type Mount,
+  PipetteSelect,
 } from '@opentrons/components'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
-import { i18n } from '../../../localization'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { PipetteDiagram } from './PipetteDiagram'
-
-import styles from './FilePipettesModal.css'
-import formStyles from '../../forms/forms.css'
-
+import { i18n } from '../../../localization'
 import type { FormPipettesByMount } from '../../../step-forms'
+import formStyles from '../../forms/forms.css'
+import styles from './FilePipettesModal.css'
+import { PipetteDiagram } from './PipetteDiagram'
 
 export type Props = {|
   initialTabIndex?: number,

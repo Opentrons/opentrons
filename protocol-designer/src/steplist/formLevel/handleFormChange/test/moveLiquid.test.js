@@ -1,14 +1,14 @@
 // @flow
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '../../../../step-generation'
 import {
   dependentFieldsUpdateMoveLiquid,
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
-
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../../../step-generation'
 
 const fixture_tiprack_10_ul = {
   parameters: { isTiprack: true },

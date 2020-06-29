@@ -1,23 +1,21 @@
 // @flow
 import * as React from 'react'
 
-import { i18n } from '../../../../localization'
 import {
-  THERMOCYCLER_STATE,
   THERMOCYCLER_PROFILE,
+  THERMOCYCLER_STATE,
 } from '../../../../constants.js'
-
+import type { FormData } from '../../../../form-types'
+import { i18n } from '../../../../localization'
 import {
   ConditionalOnField,
   ProfileItemRows,
   RadioGroupField,
 } from '../../fields'
-import { StateFields } from './StateFields'
-import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
-
-import type { FormData } from '../../../../form-types'
 import type { FocusHandlers } from '../../types'
+import { ProfileSettings } from './ProfileSettings'
+import { StateFields } from './StateFields'
 
 type TCFormProps = {| focusHandlers: FocusHandlers, formData: FormData |}
 

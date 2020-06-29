@@ -1,7 +1,8 @@
 // @flow
-import * as React from 'react'
-import { mount } from 'enzyme'
 import { Icon } from '@opentrons/components'
+import { mount } from 'enzyme'
+import * as React from 'react'
+
 import { IconCta } from '..'
 
 const NAME = 'some-call-to-action'

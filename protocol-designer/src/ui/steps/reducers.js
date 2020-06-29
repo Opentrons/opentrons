@@ -1,19 +1,20 @@
 // @flow
-import { combineReducers, type Reducer } from 'redux'
-import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
+import { type Reducer, combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+
 import { getPDMetadata } from '../../file-types'
+import type { StepIdType } from '../../form-types'
+import type { LoadFileAction } from '../../load-file'
+import type { DeleteStepAction } from '../../steplist/actions'
 import {
-  START_TERMINAL_ITEM_ID,
-  PRESAVED_STEP_ID,
   type SubstepIdentifier,
   type TerminalItemId,
+  PRESAVED_STEP_ID,
+  START_TERMINAL_ITEM_ID,
 } from '../../steplist/types'
 import type { Action } from '../../types'
-import type { LoadFileAction } from '../../load-file'
-import type { StepIdType } from '../../form-types'
 import type { SaveStepFormAction } from '../steps/actions/thunks'
-import type { DeleteStepAction } from '../../steplist/actions'
 import type {
   AddStepAction,
   HoverOnStepAction,

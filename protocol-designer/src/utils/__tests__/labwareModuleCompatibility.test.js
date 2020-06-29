@@ -1,4 +1,5 @@
 import fixture_96_plate_def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+
 import { getLabwareIsCustom } from '../labwareModuleCompatibility'
 
 describe('labwareModuleCompatibility', () => {

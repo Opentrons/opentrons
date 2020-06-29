@@ -1,8 +1,7 @@
 // @flow
-import { RESTART_PENDING_STATUS, RESTARTING_STATUS } from './constants'
-
 import type { State } from '../types'
-import type { RobotAdminStatus, ResetConfigOption } from './types'
+import { RESTART_PENDING_STATUS, RESTARTING_STATUS } from './constants'
+import type { ResetConfigOption, RobotAdminStatus } from './types'
 
 const robotState = (state: State, name: string) => state.robotAdmin[name]
 

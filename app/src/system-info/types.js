@@ -3,13 +3,13 @@
 
 import typeof {
   INITIALIZED,
-  USB_DEVICE_ADDED,
-  USB_DEVICE_REMOVED,
   NETWORK_INTERFACES_CHANGED,
   NOT_APPLICABLE,
+  OUTDATED,
   UNKNOWN,
   UP_TO_DATE,
-  OUTDATED,
+  USB_DEVICE_ADDED,
+  USB_DEVICE_REMOVED,
 } from './constants'
 
 export type UsbDevice = {|

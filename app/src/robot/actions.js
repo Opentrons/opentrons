@@ -1,8 +1,8 @@
 // @flow
 // robot actions and action types
-import type { Error } from '../types'
 import type { ProtocolData } from '../protocol/types'
-import type { Mount, Slot, Axis, Direction, SessionUpdate } from './types'
+import type { Error } from '../types'
+import type { Axis, Direction, Mount, SessionUpdate, Slot } from './types'
 
 export type ConnectAction = {|
   type: 'robot:CONNECT',

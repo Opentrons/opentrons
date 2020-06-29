@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+
 import { poll, stop } from '../poller'
 
 jest.mock('node-fetch')

@@ -1,8 +1,8 @@
 // @flow
 import cookie from 'cookie'
 
-import { initializeMixpanel, mixpanelOptIn, mixpanelOptOut } from './mixpanel'
 import { initializeFullstory, shutdownFullstory } from './fullstory'
+import { initializeMixpanel, mixpanelOptIn, mixpanelOptOut } from './mixpanel'
 import type { AnalyticsState } from './types'
 
 const COOKIE_KEY_NAME = 'ot_ll_analytics' // NOTE: cookie is named "LL" but only LC uses it now

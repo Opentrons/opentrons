@@ -1,8 +1,7 @@
 // @flow
-import os from 'os'
-import isEqual from 'lodash/isEqual'
-
 import type { NetworkInterface } from '@opentrons/app/src/system-info/types'
+import isEqual from 'lodash/isEqual'
+import os from 'os'
 
 export type { NetworkInterface }
 

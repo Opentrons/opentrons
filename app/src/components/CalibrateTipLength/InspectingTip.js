@@ -1,8 +1,9 @@
 // @flow
-import * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
-import type { CalibrateTipLengthChildProps } from './types'
+import * as React from 'react'
+
 import styles from './styles.css'
+import type { CalibrateTipLengthChildProps } from './types'
 
 const CONFIRM_TIP_BODY = 'Did pipette pick up tips successfully?'
 const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, continue'

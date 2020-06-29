@@ -1,6 +1,7 @@
 // @flow
+import { Icon, Link, PrimaryButton } from '@opentrons/components'
 import * as React from 'react'
-import { Icon, PrimaryButton, Link } from '@opentrons/components'
+
 import styles from './styles.css'
 
 const BAD_ROBOT_CALIBRATION_CHECK_HEADER = 'Unable to check robot calibration'

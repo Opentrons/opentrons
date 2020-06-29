@@ -1,18 +1,17 @@
 // @flow
-import { createSelector } from 'reselect'
-import every from 'lodash/every'
-import some from 'lodash/some'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import {
   getPipetteModelSpecs,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
+import every from 'lodash/every'
+import some from 'lodash/some'
+import { createSelector } from 'reselect'
 
 import { getPipettes as getProtocolPipettes } from '../robot/selectors'
+import type { State } from '../types'
 import * as Constants from './constants'
 import * as Types from './types'
-
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { State } from '../types'
 
 export const getAttachedPipettes: (
   state: State,

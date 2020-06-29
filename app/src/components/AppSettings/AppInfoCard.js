@@ -1,17 +1,16 @@
 // @flow
 // app info card with version and updated
-import * as React from 'react'
-import { Link } from 'react-router-dom'
-
-import { CURRENT_VERSION } from '../../shell'
 import {
   Card,
   LabeledValue,
   OutlineButton,
   useMountEffect,
 } from '@opentrons/components'
-import { CardContentHalf } from '../layout'
+import * as React from 'react'
+import { Link } from 'react-router-dom'
 
+import { CURRENT_VERSION } from '../../shell'
+import { CardContentHalf } from '../layout'
 import styles from './styles.css'
 
 export type AppInfoCardProps = {|

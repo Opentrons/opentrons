@@ -1,6 +1,6 @@
 import {
-  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '../../../../constants'
 import { pauseFormToArgs } from '../pauseFormToArgs'

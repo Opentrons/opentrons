@@ -1,6 +1,6 @@
 // @flow
-import { _hasFieldLevelErrors } from '../selectors'
 import { getFieldErrors } from '../../steplist/fieldLevel'
+import { _hasFieldLevelErrors } from '../selectors'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 jest.mock('../../steplist/fieldLevel')
 jest.mock('../utils/getProfileItemsHaveErrors')

@@ -1,16 +1,14 @@
 // @flow
 // info panel for labware calibration page
-import * as React from 'react'
-import capitalize from 'lodash/capitalize'
-
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { Icon } from '@opentrons/components'
-import styles from './styles.css'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import capitalize from 'lodash/capitalize'
+import * as React from 'react'
 
 import { selectors as robotSelectors } from '../../robot'
-import { InfoBoxButton } from './InfoBoxButton'
-
 import type { Labware, LabwareType } from '../../robot/types'
+import { InfoBoxButton } from './InfoBoxButton'
+import styles from './styles.css'
 
 export type InfoBoxProps = {| labware: ?Labware |}
 

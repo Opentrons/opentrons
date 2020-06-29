@@ -1,20 +1,18 @@
 // @flow
+import { AlertModal } from '@opentrons/components'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import type { BuildrootUpdateType } from '../../../buildroot/types'
 import { getRobotApiVersion } from '../../../discovery'
+import type { ViewableRobot } from '../../../discovery/types'
 import { CURRENT_VERSION, getShellUpdateState } from '../../../shell'
-
-import { AlertModal } from '@opentrons/components'
+import { SkipAppUpdateMessage } from './SkipAppUpdateMessage'
+import styles from './styles.css'
+import { SyncRobotMessage } from './SyncRobotMessage'
 import { UpdateAppMessage } from './UpdateAppMessage'
 import { VersionList } from './VersionList'
-import { SkipAppUpdateMessage } from './SkipAppUpdateMessage'
-import { SyncRobotMessage } from './SyncRobotMessage'
-import styles from './styles.css'
-
-import type { BuildrootUpdateType } from '../../../buildroot/types'
-import type { ViewableRobot } from '../../../discovery/types'
 
 export type VersionInfoModalProps = {|
   robot: ViewableRobot,

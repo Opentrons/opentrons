@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react'
 
+import type { DropdownFieldProps } from '../forms'
 import { DropdownField } from '../forms'
 import { LabeledControl } from './LabeledControl'
 import styles from './styles.css'
-
-import type { DropdownFieldProps } from '../forms'
 
 export type LabeledSelectProps = {|
   ...DropdownFieldProps,

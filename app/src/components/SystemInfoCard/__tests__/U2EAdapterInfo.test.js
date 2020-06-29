@@ -1,20 +1,19 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
+import * as React from 'react'
+import { Provider } from 'react-redux'
 
-import * as Fixtures from '../../../system-info/__fixtures__'
 import * as SystemInfo from '../../../system-info'
-import { U2EAdapterInfo } from '../U2EAdapterInfo'
-import { U2EDriverWarning } from '../U2EDriverWarning'
-
-import type { State } from '../../../types'
+import * as Fixtures from '../../../system-info/__fixtures__'
 import type {
-  UsbDevice,
   DriverStatus,
   U2EInterfaceMap,
+  UsbDevice,
 } from '../../../system-info/types'
+import type { State } from '../../../types'
+import { U2EAdapterInfo } from '../U2EAdapterInfo'
+import { U2EDriverWarning } from '../U2EDriverWarning'
 
 jest.mock('../../../system-info/selectors')
 jest.mock('../../../analytics')

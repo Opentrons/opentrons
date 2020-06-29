@@ -1,12 +1,10 @@
 // @flow
+import { FormGroup } from '@opentrons/components'
 import * as React from 'react'
 
-import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { TextField } from '../../fields'
-
 import styles from '../../StepEditForm.css'
-
 import type { FocusHandlers } from '../../types'
 
 type Props = {| focusHandlers: FocusHandlers |}

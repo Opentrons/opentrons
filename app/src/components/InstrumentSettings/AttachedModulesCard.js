@@ -1,18 +1,17 @@
 // @flow
 // attached modules container card
+import { Card, useInterval } from '@opentrons/components'
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Card, useInterval } from '@opentrons/components'
 import {
   fetchModules,
   getAttachedModules,
   getModuleControlsDisabled,
 } from '../../modules'
 import { getConnectedRobotName } from '../../robot/selectors'
+import type { Dispatch, State } from '../../types'
 import { ModulesCardContents } from './ModulesCardContents'
-
-import type { State, Dispatch } from '../../types'
 
 type Props = {| robotName: string |}
 

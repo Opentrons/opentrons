@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
-import { Icon } from '../icons'
+import * as React from 'react'
 
+import { Icon } from '../icons'
 import styles from './forms.css'
 
 export type RadioGroupProps = {|

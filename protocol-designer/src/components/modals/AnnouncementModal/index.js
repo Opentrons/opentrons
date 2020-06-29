@@ -1,17 +1,18 @@
 // @flow
 
-import * as React from 'react'
-import cx from 'classnames'
 import { Modal, OutlineButton } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
+
 import { i18n } from '../../../localization'
 import {
-  setLocalStorageItem,
   getLocalStorageItem,
   localStorageAnnouncementKey,
+  setLocalStorageItem,
 } from '../../../persist'
 import modalStyles from '../modal.css'
-import { announcements } from './announcements'
 import styles from './AnnouncementModal.css'
+import { announcements } from './announcements'
 
 export const AnnouncementModal = (): React.Node => {
   const { announcementKey, message, heading, image } = announcements[

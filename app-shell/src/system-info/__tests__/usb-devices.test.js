@@ -1,9 +1,9 @@
 // @flow
 
+import * as Fixtures from '@opentrons/app/src/system-info/__fixtures__'
 import execa from 'execa'
 import usbDetection from 'usb-detection'
 
-import * as Fixtures from '@opentrons/app/src/system-info/__fixtures__'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 
 jest.mock('execa')

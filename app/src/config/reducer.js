@@ -1,9 +1,9 @@
 // @flow
 
 import { setIn } from '@thi.ng/paths'
-import { INITIALIZED, VALUE_UPDATED } from './constants'
 
 import type { Action } from '../types'
+import { INITIALIZED, VALUE_UPDATED } from './constants'
 import type { ConfigState } from './types'
 
 // config reducer

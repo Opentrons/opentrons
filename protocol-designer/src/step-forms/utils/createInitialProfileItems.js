@@ -1,6 +1,6 @@
 // @flow
+import type { ProfileCycleItem, ProfileStepItem } from '../../form-types'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import type { ProfileStepItem, ProfileCycleItem } from '../../form-types'
 
 export const createInitialProfileCycle = (id: string): ProfileCycleItem => ({
   id,

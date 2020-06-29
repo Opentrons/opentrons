@@ -1,13 +1,12 @@
 // @flow
+import { PrimaryButton } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { PrimaryButton } from '@opentrons/components'
-import { CalibrationInfoContent } from '../CalibrationInfoContent'
 import { selectors as robotSelectors } from '../../robot'
-
-import type { State, Dispatch } from '../../types'
+import type { Dispatch, State } from '../../types'
+import { CalibrationInfoContent } from '../CalibrationInfoContent'
 import type { TipProbeProps } from './types'
 
 type OP = TipProbeProps

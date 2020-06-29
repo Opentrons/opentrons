@@ -2,11 +2,10 @@
 // TODO(mc, 2020-03-11): i18n
 
 import {
-  SECURITY_WPA_PSK,
-  SECURITY_WPA_EAP,
   SECURITY_NONE,
+  SECURITY_WPA_EAP,
+  SECURITY_WPA_PSK,
 } from '../../../networking'
-
 import type { WifiNetwork } from './types'
 
 const SECURITY_DESC = {

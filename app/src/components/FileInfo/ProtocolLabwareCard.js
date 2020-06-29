@@ -1,15 +1,14 @@
 // @flow
 // setup labware component
+import countBy from 'lodash/countBy'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import countBy from 'lodash/countBy'
 
+import type { Labware } from '../../robot'
 import { selectors as robotSelectors } from '../../robot'
+import type { Dispatch, State } from '../../types'
 import { InfoSection } from './InfoSection'
 import { LabwareTable } from './LabwareTable'
-
-import type { State, Dispatch } from '../../types'
-import type { Labware } from '../../robot'
 
 type SP = {| labware: Array<Labware> |}
 

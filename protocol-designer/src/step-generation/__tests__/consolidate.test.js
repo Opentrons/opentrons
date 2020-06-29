@@ -1,29 +1,30 @@
 // @flow
-import { consolidate } from '../commandCreators/compound/consolidate'
-import {
-  getInitialRobotStateStandard,
-  getRobotStatePickedUpTipStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  FIXED_TRASH_ID,
-  getFlowRateAndOffsetParams,
-  makeAspirateHelper,
-  makeDispenseHelper,
-  makeTouchTipHelper,
-  blowoutHelper,
-  pickUpTipHelper,
-  dropTipHelper,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-  DISPENSE_OFFSET_FROM_BOTTOM_MM,
-} from '../__fixtures__'
 import type {
   AspirateParams,
   DispenseParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+
+import {
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  blowoutHelper,
+  DEFAULT_PIPETTE,
+  DEST_LABWARE,
+  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  dropTipHelper,
+  FIXED_TRASH_ID,
+  getErrorResult,
+  getFlowRateAndOffsetParams,
+  getInitialRobotStateStandard,
+  getRobotStatePickedUpTipStandard,
+  getSuccessResult,
+  makeAspirateHelper,
+  makeContext,
+  makeDispenseHelper,
+  makeTouchTipHelper,
+  pickUpTipHelper,
+  SOURCE_LABWARE,
+} from '../__fixtures__'
+import { consolidate } from '../commandCreators/compound/consolidate'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()

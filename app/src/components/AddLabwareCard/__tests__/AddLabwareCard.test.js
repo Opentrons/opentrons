@@ -1,17 +1,16 @@
 // @flow
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
 
+import { AddLabwareCard } from '..'
 import * as CustomLabware from '../../../custom-labware'
 import * as CustomLabwareFixtures from '../../../custom-labware/__fixtures__'
-import { AddLabwareCard } from '..'
-import { ManagePath } from '../ManagePath'
+import type { FailedLabwareFile } from '../../../custom-labware/types'
+import type { State } from '../../../types'
 import { AddLabware } from '../AddLabware'
 import { AddLabwareFailureModal } from '../AddLabwareFailureModal'
-
-import type { State } from '../../../types'
-import type { FailedLabwareFile } from '../../../custom-labware/types'
+import { ManagePath } from '../ManagePath'
 
 jest.mock('../../../custom-labware/selectors')
 

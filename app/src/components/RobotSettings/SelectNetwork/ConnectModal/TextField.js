@@ -1,16 +1,15 @@
 // @flow
+import {
+  CheckboxField,
+  INPUT_TYPE_PASSWORD,
+  INPUT_TYPE_TEXT,
+  InputField,
+} from '@opentrons/components'
 import * as React from 'react'
 
-import {
-  InputField,
-  CheckboxField,
-  INPUT_TYPE_TEXT,
-  INPUT_TYPE_PASSWORD,
-} from '@opentrons/components'
-
-import { FormRow } from './FormRow'
-import { useConnectFormField } from './form-state'
 import { LABEL_SHOW_PASSWORD } from '../i18n'
+import { useConnectFormField } from './form-state'
+import { FormRow } from './FormRow'
 
 export type TextFieldProps = {|
   id: string,

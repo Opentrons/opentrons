@@ -1,8 +1,8 @@
 // @flow
 // robot HTTP API client
 
-import type { Error } from '../types'
 import type { RobotService } from '../robot'
+import type { Error } from '../types'
 import type { ApiRequestError } from './types'
 
 export type Method = 'GET' | 'POST' | 'PATCH'

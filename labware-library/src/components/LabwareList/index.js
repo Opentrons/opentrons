@@ -1,14 +1,13 @@
 // @flow
 // main LabwareList component
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import * as React from 'react'
 
-import { getLabwareDefURI } from '@opentrons/shared-data'
 import { getFilteredDefinitions } from '../../filters'
+import type { FilterParams } from '../../types'
 import { LabwareCard } from './LabwareCard'
 import { NoResults } from './NoResults'
 import styles from './styles.css'
-
-import type { FilterParams } from '../../types'
 
 export type LabwareListProps = {|
   filters: FilterParams,

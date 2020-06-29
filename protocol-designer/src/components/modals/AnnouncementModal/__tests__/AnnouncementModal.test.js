@@ -1,12 +1,13 @@
 // @flow
 
-import React from 'react'
-import { shallow } from 'enzyme'
 import { Modal, OutlineButton } from '@opentrons/components'
-import * as persist from '../../../../persist'
+import { shallow } from 'enzyme'
+import React from 'react'
+
 import { AnnouncementModal } from '../'
-import * as announcements from '../announcements'
+import * as persist from '../../../../persist'
 import type { Announcement } from '../announcements'
+import * as announcements from '../announcements'
 
 jest.mock('../../../../persist.js')
 

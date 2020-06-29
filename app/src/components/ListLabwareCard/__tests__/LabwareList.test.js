@@ -1,10 +1,10 @@
 // @flow
+import { mount, shallow } from 'enzyme'
 import * as React from 'react'
-import { shallow, mount } from 'enzyme'
 
 import * as Fixtures from '../../../custom-labware/__fixtures__'
-import { LabwareList } from '../LabwareList'
 import { LabwareItem } from '../LabwareItem'
+import { LabwareList } from '../LabwareList'
 
 describe('LabwareList', () => {
   const emptyProps = { labware: [], errorMessage: null }

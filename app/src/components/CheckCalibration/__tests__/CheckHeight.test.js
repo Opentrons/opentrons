@@ -1,12 +1,12 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
+import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 
 import {
-  CHECK_TRANSFORM_TYPE_UNKNOWN,
-  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_DECK,
+  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+  CHECK_TRANSFORM_TYPE_UNKNOWN,
 } from '../../../sessions'
 import { CheckHeight } from '../CheckHeight'
 

@@ -1,10 +1,10 @@
 // @flow
 
 import type {
-  StartDiscoveryAction,
+  ClearDiscoveryCacheAction,
   FinishDiscoveryAction,
   RemoveRobotAction,
-  ClearDiscoveryCacheAction,
+  StartDiscoveryAction,
 } from './types'
 
 export const DISCOVERY_START: 'discovery:START' = 'discovery:START'

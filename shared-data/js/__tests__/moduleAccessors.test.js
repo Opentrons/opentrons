@@ -1,22 +1,21 @@
 // @flow
 
 import {
-  getModuleDef2,
-  getModuleType,
-  getModuleDisplayName,
-  normalizeModuleModel,
-} from '../modules'
-
-import {
+  MAGDECK,
+  MAGNETIC_MODULE_V1,
   MODULE_MODELS,
   MODULE_TYPES,
   TEMPDECK,
-  MAGDECK,
-  THERMOCYCLER,
-  MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V1,
+  THERMOCYCLER,
   THERMOCYCLER_MODULE_V1,
 } from '../constants'
+import {
+  getModuleDef2,
+  getModuleDisplayName,
+  getModuleType,
+  normalizeModuleModel,
+} from '../modules'
 
 describe('all valid models work', () => {
   MODULE_MODELS.forEach(model => {

@@ -1,12 +1,11 @@
 // @flow
-import * as React from 'react'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import * as React from 'react'
 
+import type { MagneticModule } from '../../modules/types'
 import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'
 import styles from './styles.css'
-
-import type { MagneticModule } from '../../modules/types'
 
 type Props = {|
   module: MagneticModule,

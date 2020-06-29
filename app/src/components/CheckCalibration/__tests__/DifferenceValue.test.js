@@ -1,11 +1,11 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
-import * as Fixtures from '../../../sessions/__fixtures__'
-import * as Sessions from '../../../sessions'
-import { DifferenceValue } from '../DifferenceValue'
+import * as React from 'react'
 
+import * as Sessions from '../../../sessions'
+import * as Fixtures from '../../../sessions/__fixtures__'
 import type { RobotCalibrationCheckStep } from '../../../sessions/types'
+import { DifferenceValue } from '../DifferenceValue'
 
 const {
   badZComparison,

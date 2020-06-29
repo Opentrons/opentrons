@@ -1,6 +1,7 @@
 // @flow
-import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
+import * as React from 'react'
+
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
 /*******************

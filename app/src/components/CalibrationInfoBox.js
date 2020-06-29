@@ -1,7 +1,8 @@
 // @flow
-import * as React from 'react'
-import classnames from 'classnames'
 import { Icon } from '@opentrons/components'
+import classnames from 'classnames'
+import * as React from 'react'
+
 import styles from './calibration-info.css'
 
 export type CalibrationInfoBoxProps = {|

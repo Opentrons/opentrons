@@ -1,14 +1,15 @@
 // @flow
 import {
-  fixtureP10Single,
   fixtureP10Multi,
+  fixtureP10Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
+
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
 import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate'
-import { makeWellSetHelpers } from '../wellSets'
 import { findWellAt } from '../getWellNamePerMultiTip'
+import { makeWellSetHelpers } from '../wellSets'
 
 describe('findWellAt', () => {
   it('should determine if given (x, y) is within a rectangular well', () => {

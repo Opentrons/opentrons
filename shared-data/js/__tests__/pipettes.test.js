@@ -1,5 +1,5 @@
 // tests for pipette info accessors in `shared-data/js/pipettes.js`
-import { getPipetteNameSpecs, getPipetteModelSpecs } from '../pipettes'
+import { getPipetteModelSpecs, getPipetteNameSpecs } from '../pipettes'
 
 const PIPETTE_NAMES = [
   'p10_single',

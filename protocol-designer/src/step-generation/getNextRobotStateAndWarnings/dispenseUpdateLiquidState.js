@@ -2,18 +2,19 @@
 import assert from 'assert'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {
-  splitLiquid,
-  mergeLiquid,
-  getWellsForTips,
-  getLocationTotalVolume,
-} from '../utils/misc'
+
 import type {
-  RobotState,
   InvariantContext,
   LocationLiquidState,
+  RobotState,
   SourceAndDest,
 } from '../types'
+import {
+  getLocationTotalVolume,
+  getWellsForTips,
+  mergeLiquid,
+  splitLiquid,
+} from '../utils/misc'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
 type DispenseUpdateLiquidStateArgs = {|

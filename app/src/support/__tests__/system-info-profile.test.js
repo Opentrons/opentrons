@@ -1,12 +1,10 @@
 // @flow
 
-import { makeProfileUpdate } from '../profile'
-
 import * as SystemInfo from '../../system-info'
 import * as Fixtures from '../../system-info/__fixtures__'
-
-import type { State } from '../../types'
 import type { U2EAnalyticsProps } from '../../system-info/types'
+import type { State } from '../../types'
+import { makeProfileUpdate } from '../profile'
 
 jest.mock('../../system-info/selectors')
 

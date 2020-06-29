@@ -1,13 +1,12 @@
 // @flow
-import * as React from 'react'
-
-import { Popper, Reference, Manager } from 'react-popper'
 import cx from 'classnames'
+import * as React from 'react'
+import { Manager, Popper, Reference } from 'react-popper'
+
 import type { LocationLiquidState } from '../../step-generation'
-import { PillTooltipContents } from '../steplist/SubstepRow'
 import type { WellIngredientNames } from '../../steplist/types'
 import { Portal } from '../portals/TopPortal'
-
+import { PillTooltipContents } from '../steplist/SubstepRow'
 import styles from './labware.css'
 
 const DEFAULT_TOOLTIP_OFFSET = 22

@@ -1,6 +1,7 @@
 // robot api client
 // takes a dispatch (send) function and returns a receive handler
 // TODO(mc, 2018-01-26): typecheck with flow
+import { normalizeModuleModel } from '@opentrons/shared-data'
 import { push } from 'connected-react-router'
 import find from 'lodash/find'
 import functionsIn from 'lodash/functionsIn'
@@ -9,18 +10,16 @@ import mapKeys from 'lodash/mapKeys'
 import pick from 'lodash/pick'
 import union from 'lodash/union'
 
+import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
+import { getConnectableRobots } from '../../discovery/selectors'
+import { fileIsBundle, fileIsPython } from '../../protocol/protocol-data'
+import { getProtocolFile } from '../../protocol/selectors'
+// bypass the robot entry point here to avoid shell module
+import { RESTART as ROBOT_RESTART_ACTION } from '../../robot-admin'
 import { Client as RpcClient } from '../../rpc/client'
 import { actions, actionTypes } from '../actions'
 import * as constants from '../constants'
 import * as selectors from '../selectors'
-
-// bypass the robot entry point here to avoid shell module
-import { RESTART as ROBOT_RESTART_ACTION } from '../../robot-admin'
-import { getConnectableRobots } from '../../discovery/selectors'
-import { getProtocolFile } from '../../protocol/selectors'
-import { fileIsBundle, fileIsPython } from '../../protocol/protocol-data'
-import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
-import { normalizeModuleModel } from '@opentrons/shared-data'
 
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1

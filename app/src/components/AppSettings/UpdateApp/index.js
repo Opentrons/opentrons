@@ -1,11 +1,10 @@
 // @flow
+import { SpinnerModal } from '@opentrons/components'
 import * as React from 'react'
 
-import { SpinnerModal } from '@opentrons/components'
-import { UpdateAppModal } from './UpdateAppModal'
-import { RestartAppModal } from './RestartAppModal'
-
 import type { ShellUpdateState } from '../../../shell/types'
+import { RestartAppModal } from './RestartAppModal'
+import { UpdateAppModal } from './UpdateAppModal'
 
 export type UpdateAppProps = {|
   update: ShellUpdateState,

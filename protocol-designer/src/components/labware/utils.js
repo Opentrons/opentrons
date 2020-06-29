@@ -1,6 +1,7 @@
 // @flow
+import { type WellFill, ingredIdsToColor } from '@opentrons/components'
 import reduce from 'lodash/reduce'
-import { ingredIdsToColor, type WellFill } from '@opentrons/components'
+
 import type { ContentsByWell, WellContents } from '../../labware-ingred/types'
 
 export const wellFillFromWellContents = (

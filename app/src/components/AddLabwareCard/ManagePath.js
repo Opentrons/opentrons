@@ -1,8 +1,8 @@
 // @flow
 
+import { InputField, LabeledButton } from '@opentrons/components'
 import * as React from 'react'
 
-import { LabeledButton, InputField } from '@opentrons/components'
 import { IconCta } from '../IconCta'
 import { ConfirmResetPathModal } from './ConfirmResetPathModal'
 import styles from './styles.css'

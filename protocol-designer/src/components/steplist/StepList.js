@@ -1,17 +1,15 @@
 // @flow
-import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
+import * as React from 'react'
 
+import { END_TERMINAL_TITLE } from '../../constants'
+import type { StepIdType } from '../../form-types'
+import { END_TERMINAL_ITEM_ID } from '../../steplist'
+import { StepCreationButton } from '../StepCreationButton'
+import { DraggableStepItems } from './DraggableStepItems'
 import { PresavedStepItem } from './PresavedStepItem'
 import { StartingDeckStateTerminalItem } from './StartingDeckStateTerminalItem'
 import { TerminalItem } from './TerminalItem'
-import { END_TERMINAL_TITLE } from '../../constants'
-import { END_TERMINAL_ITEM_ID } from '../../steplist'
-
-import { StepCreationButton } from '../StepCreationButton'
-import { DraggableStepItems } from './DraggableStepItems'
-
-import type { StepIdType } from '../../form-types'
 
 type Props = {|
   orderedStepIds: Array<StepIdType>,

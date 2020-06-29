@@ -1,10 +1,11 @@
 // @flow
-import * as React from 'react'
-import { DropdownField, type Options } from '@opentrons/components'
+import { type Options, DropdownField } from '@opentrons/components'
 import cx from 'classnames'
+import * as React from 'react'
+
 import type { StepFieldName } from '../../../steplist/fieldLevel'
-import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
+import type { FocusHandlers } from '../types'
 import { FieldConnector } from './FieldConnector'
 
 export type StepFormDropdownProps = {

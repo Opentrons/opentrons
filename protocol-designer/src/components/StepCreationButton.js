@@ -1,29 +1,30 @@
 // @flow
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import cx from 'classnames'
 import {
-  Tooltip,
-  PrimaryButton,
-  useHoverTooltip,
-  TOOLTIP_RIGHT,
-  TOOLTIP_FIXED,
   AlertModal,
+  PrimaryButton,
+  Tooltip,
+  TOOLTIP_FIXED,
+  TOOLTIP_RIGHT,
+  useHoverTooltip,
 } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { type StepType, stepIconsByType } from '../form-types'
 import { i18n } from '../localization'
-import { actions as stepsActions } from '../ui/steps'
 import {
-  selectors as stepFormSelectors,
   getIsModuleOnDeck,
+  selectors as stepFormSelectors,
 } from '../step-forms'
-import { Portal } from './portals/MainPageModalPortal'
-import { stepIconsByType, type StepType } from '../form-types'
+import { actions as stepsActions } from '../ui/steps'
 import styles from './listButtons.css'
+import { Portal } from './portals/MainPageModalPortal'
 
 type StepButtonComponentProps = {|
   children: React.Node,

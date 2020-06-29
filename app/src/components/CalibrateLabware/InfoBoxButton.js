@@ -1,21 +1,18 @@
 // @flow
 // info panel for labware calibration page
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { push } from 'connected-react-router'
-
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-} from '../../robot'
-
 import { PrimaryButton } from '@opentrons/components'
-import styles from './styles.css'
+import { push } from 'connected-react-router'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import type { Mount, Labware } from '../../robot'
+import type { Labware, Mount } from '../../robot'
+import {
+  actions as robotActions,
+  selectors as robotSelectors,
+} from '../../robot'
 import type { Dispatch } from '../../types'
-
 import { ProceedToRun } from './ProceedToRun'
+import styles from './styles.css'
 
 export type InfoBoxButtonProps = {| labware: ?Labware |}
 

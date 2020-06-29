@@ -1,12 +1,11 @@
 // @flow
 
 // Table Title with expandable measurement diagrams
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
 
-import { LabelText, LABEL_LEFT } from './LabelText'
 import { ClickableIcon } from './ClickableIcon'
-
+import { LABEL_LEFT, LabelText } from './LabelText'
 import styles from './styles.css'
 
 type TableTitleProps = {|

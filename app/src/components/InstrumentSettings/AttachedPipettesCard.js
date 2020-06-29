@@ -1,23 +1,21 @@
 // @flow
 // attached pipettes container card
+import { Card, useInterval } from '@opentrons/components'
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  LEFT,
-  RIGHT,
   fetchPipettes,
   fetchPipetteSettings,
   getAttachedPipettes,
   getAttachedPipetteSettings,
+  LEFT,
+  RIGHT,
 } from '../../pipettes'
-
-import { PipetteInfo } from './PipetteInfo'
-import { CardContentFlex } from '../layout'
-import { Card, useInterval } from '@opentrons/components'
-
-import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../pipettes/types'
+import type { Dispatch, State } from '../../types'
+import { CardContentFlex } from '../layout'
+import { PipetteInfo } from './PipetteInfo'
 
 type Props = {|
   robotName: string,

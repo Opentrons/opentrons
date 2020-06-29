@@ -1,9 +1,9 @@
 // @flow
 // mdns browser wrapper
-import mdns, { ServiceType } from 'mdns-js'
-import type { Browser, NetworkConnection } from 'mdns-js'
-import keys from 'lodash/keys'
 import flatMap from 'lodash/flatMap'
+import keys from 'lodash/keys'
+import type { Browser, NetworkConnection } from 'mdns-js'
+import mdns, { ServiceType } from 'mdns-js'
 
 monkeyPatchThrowers()
 

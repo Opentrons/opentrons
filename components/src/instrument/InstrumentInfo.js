@@ -1,16 +1,15 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import type {
-  PipetteNameSpecs,
   PipetteModelSpecs,
+  PipetteNameSpecs,
 } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
 
 import type { Mount } from '../robot-types'
 import { InfoItem } from './InfoItem.js'
-import { InstrumentDiagram } from './InstrumentDiagram'
-
 import styles from './instrument.css'
+import { InstrumentDiagram } from './InstrumentDiagram'
 
 export type InstrumentInfoProps = {|
   /** 'left' or 'right' */

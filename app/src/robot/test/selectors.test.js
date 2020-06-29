@@ -1,10 +1,10 @@
 // robot selectors test
-import { format } from 'date-fns'
 import { setIn } from '@thi.ng/paths'
-import { selectors, constants } from '../'
+import { format } from 'date-fns'
 
-import { getLabwareDefBySlot } from '../../protocol/selectors'
+import { constants, selectors } from '../'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
+import { getLabwareDefBySlot } from '../../protocol/selectors'
 
 jest.mock('../../protocol/selectors')
 jest.mock('../../custom-labware/selectors')

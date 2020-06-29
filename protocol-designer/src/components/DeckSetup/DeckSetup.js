@@ -1,52 +1,50 @@
 // @flow
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import compact from 'lodash/compact'
-import values from 'lodash/values'
 import {
-  useOnClickOutside,
-  RobotWorkSpace,
   type RobotWorkSpaceRenderProps,
+  RobotWorkSpace,
+  useOnClickOutside,
 } from '@opentrons/components'
-import {
-  getLabwareHasQuirk,
-  type DeckSlot as DeckDefSlot,
-  type ModuleRealType,
-} from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import {
-  PSEUDO_DECK_SLOTS,
+  type DeckSlot as DeckDefSlot,
+  type ModuleRealType,
+  getLabwareHasQuirk,
+} from '@opentrons/shared-data'
+import compact from 'lodash/compact'
+import values from 'lodash/values'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+
+import {
   GEN_ONE_MULTI_PIPETTES,
   MODULES_WITH_COLLISION_ISSUES,
+  PSEUDO_DECK_SLOTS,
 } from '../../constants'
-import type { TerminalItemId } from '../../steplist'
-import {
-  getLabwareIsCompatible,
-  getLabwareIsCustom,
-} from '../../utils/labwareModuleCompatibility'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
-import {
-  getModuleVizDims,
-  inferModuleOrientationFromSlot,
-} from './getModuleVizDims'
-
 import { selectors as featureFlagSelectors } from '../../feature-flags'
-import { getSlotsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
-import { BrowseLabwareModal } from '../labware'
-import { ModuleViz } from './ModuleViz'
-import { ModuleTag } from './ModuleTag'
-import { SlotWarning } from './SlotWarning'
-import { LabwareOnDeck } from './LabwareOnDeck'
-import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
-
+import type { LabwareDefByDefURI } from '../../labware-defs'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
 import type {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../step-forms'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-
+import { getSlotIsEmpty, getSlotsBlockedBySpanning } from '../../step-forms'
+import type { TerminalItemId } from '../../steplist'
+import {
+  getLabwareIsCompatible,
+  getLabwareIsCustom,
+} from '../../utils/labwareModuleCompatibility'
+import { BrowseLabwareModal } from '../labware'
 import styles from './DeckSetup.css'
+import {
+  getModuleVizDims,
+  inferModuleOrientationFromSlot,
+} from './getModuleVizDims'
+import { LabwareOnDeck } from './LabwareOnDeck'
+import { DragPreview, LabwareControls, SlotControls } from './LabwareOverlays'
+import { ModuleTag } from './ModuleTag'
+import { ModuleViz } from './ModuleViz'
+import { SlotWarning } from './SlotWarning'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',

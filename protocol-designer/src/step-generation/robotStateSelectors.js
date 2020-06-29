@@ -1,18 +1,19 @@
 // @flow
-import assert from 'assert'
-// TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
-import { orderWells } from '../steplist/utils/orderWells.js'
-import min from 'lodash/min'
-import sortBy from 'lodash/sortBy'
 import {
   getTiprackVolume,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from './'
+import assert from 'assert'
+import min from 'lodash/min'
+import sortBy from 'lodash/sortBy'
+
 import type {
   ModuleTemporalProperties,
   ThermocyclerModuleState,
 } from '../step-forms'
+// TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
+import { orderWells } from '../steplist/utils/orderWells.js'
+import type { InvariantContext, RobotState } from './'
 
 export function sortLabwareBySlot(
   labwareState: $PropertyType<RobotState, 'labware'>

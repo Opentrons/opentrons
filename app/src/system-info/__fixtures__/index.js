@@ -1,5 +1,5 @@
 // @flow
-import type { UsbDevice, NetworkInterface } from '../types'
+import type { NetworkInterface, UsbDevice } from '../types'
 
 export const mockUsbDevice: UsbDevice = {
   locationId: 1,

@@ -1,26 +1,25 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import flatMap from 'lodash/flatMap'
-import map from 'lodash/map'
-import snakeCase from 'lodash/snakeCase'
-import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
-import {
-  SLOTNAME_MATRIX,
-  SLOT_SPACING_MM,
-  SLOT_OFFSET_MM,
-  TRASH_SLOTNAME,
-} from './constants'
-import { DeckOutline } from './DeckOutline'
-import { EmptyDeckSlot } from './EmptyDeckSlot'
-
-import styles from './Deck.css'
-
 import type {
   DeckDefinition,
   DeckLayer,
   DeckSlotId,
 } from '@opentrons/shared-data'
+import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
+import cx from 'classnames'
+import flatMap from 'lodash/flatMap'
+import map from 'lodash/map'
+import snakeCase from 'lodash/snakeCase'
+import * as React from 'react'
+
+import {
+  SLOT_OFFSET_MM,
+  SLOT_SPACING_MM,
+  SLOTNAME_MATRIX,
+  TRASH_SLOTNAME,
+} from './constants'
+import styles from './Deck.css'
+import { DeckOutline } from './DeckOutline'
+import { EmptyDeckSlot } from './EmptyDeckSlot'
 
 export type LabwareComponentProps = {|
   slot: DeckSlotId,

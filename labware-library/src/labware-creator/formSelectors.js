@@ -1,14 +1,15 @@
 // @flow
 import {
-  createRegularLoadName,
   createDefaultDisplayName,
+  createRegularLoadName,
 } from '@opentrons/shared-data'
+
 import {
-  aluminumBlockAutofills,
-  getImplicitAutofillValues,
-  DISPLAY_VOLUME_UNITS,
-  tubeRackAutofills,
   type LabwareFields,
+  aluminumBlockAutofills,
+  DISPLAY_VOLUME_UNITS,
+  getImplicitAutofillValues,
+  tubeRackAutofills,
 } from './fields'
 
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange

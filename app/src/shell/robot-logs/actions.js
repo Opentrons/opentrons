@@ -1,7 +1,7 @@
 // @flow
 
-import type { ThunkAction } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
+import type { ThunkAction } from '../../types'
 
 export function downloadLogs(robot: ViewableRobot): ThunkAction {
   return (dispatch, getState) => {

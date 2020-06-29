@@ -1,10 +1,10 @@
 // @flow
 // Robot and Instrument links specific to RobotListItem
+import type { HoverTooltipHandlers } from '@opentrons/components'
+import cx from 'classnames'
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
 
-import type { HoverTooltipHandlers } from '@opentrons/components'
-import cx from 'classnames'
 import styles from './styles.css'
 
 export type RobotLinkProps = {|

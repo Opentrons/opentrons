@@ -1,15 +1,14 @@
 // @flow
-import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 import * as Formik from 'formik'
-
-import {
-  useResetFormOnSecurityChange,
-  useConnectFormField,
-} from '../form-state'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
 
 import type { ConnectFormFieldProps } from '../../types'
+import {
+  useConnectFormField,
+  useResetFormOnSecurityChange,
+} from '../form-state'
 
 // TODO(mc, 2020-03-13): DANGER: mocking Formik hooks here is code smell,
 // but unfortunately the async nature of validation in Formik v2 basically

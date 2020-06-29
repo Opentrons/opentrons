@@ -1,16 +1,16 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import type { DeckSlot } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
 
-import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 import type { LabwareOnDeck } from '../../../step-forms'
+import { type TerminalItemId, START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 import { BrowseLabware } from './BrowseLabware'
 import { EditLabware } from './EditLabware'
-import { LabwareName } from './LabwareName'
 import { LabwareHighlight } from './LabwareHighlight'
+import { LabwareName } from './LabwareName'
 import styles from './LabwareOverlays.css'
 
 type LabwareControlsProps = {|

@@ -1,16 +1,15 @@
 // @flow
 // Card for displaying/initiating factory calibration
+import { Card, OutlineButton } from '@opentrons/components'
+import { push } from 'connected-react-router'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 
 import { CONNECTABLE } from '../../discovery'
-import { startDeckCalibration } from '../../http-api-client'
-import { Card, OutlineButton } from '@opentrons/components'
-import { CardContentFlex, CardContentFull } from '../layout'
-
-import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
+import { startDeckCalibration } from '../../http-api-client'
+import type { Dispatch } from '../../types'
+import { CardContentFlex, CardContentFull } from '../layout'
 
 type OP = {|
   robot: ViewableRobot,

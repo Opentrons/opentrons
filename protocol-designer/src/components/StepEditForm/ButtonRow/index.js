@@ -1,9 +1,9 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import { OutlineButton, PrimaryButton } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import cx from 'classnames'
+import * as React from 'react'
 
+import { i18n } from '../../../localization'
 import modalStyles from '../../modals/modal.css'
 import styles from './styles.css'
 

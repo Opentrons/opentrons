@@ -1,17 +1,17 @@
 // @flow
 // TODO(mc, 2020-02-19): still used but deprecated; remove when able
-import * as React from 'react'
-import map from 'lodash/map'
-import assert from 'assert'
-import {
-  SLOT_RENDER_WIDTH,
-  SLOT_RENDER_HEIGHT,
-  getLabwareV1Def as getLabware,
-} from '@opentrons/shared-data'
 import type { LabwareDefinition1 } from '@opentrons/shared-data'
+import {
+  getLabwareV1Def as getLabware,
+  SLOT_RENDER_HEIGHT,
+  SLOT_RENDER_WIDTH,
+} from '@opentrons/shared-data'
+import assert from 'assert'
+import map from 'lodash/map'
+import * as React from 'react'
 
-import { LabwareOutline } from './LabwareOutline'
 import { FallbackLabware } from './FallbackLabware'
+import { LabwareOutline } from './LabwareOutline'
 import { Tip } from './Tip'
 import { Well } from './Well'
 

@@ -1,12 +1,13 @@
 // @flow
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+
 import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
   START_TERMINAL_ITEM_ID,
 } from '../../../steplist/types'
-import { getHoveredStepLabware, getSelectedStepTitleInfo } from '../selectors'
 import * as utils from '../../modules/utils'
+import { getHoveredStepLabware, getSelectedStepTitleInfo } from '../selectors'
 
 function createArgsForStepId(stepId, stepArgs) {
   return {

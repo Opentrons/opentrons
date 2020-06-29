@@ -1,7 +1,11 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { LabwareSelectionModal as LabwareSelectionModalComponent } from './LabwareSelectionModal'
+
+import {
+  actions as labwareDefActions,
+  selectors as labwareDefSelectors,
+} from '../../labware-defs'
 // import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
   closeLabwareSelector,
@@ -9,14 +13,11 @@ import {
 } from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import {
-  actions as labwareDefActions,
-  selectors as labwareDefSelectors,
-} from '../../labware-defs'
-import {
-  selectors as stepFormSelectors,
   type ModuleOnDeck,
+  selectors as stepFormSelectors,
 } from '../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../types'
+import { LabwareSelectionModal as LabwareSelectionModalComponent } from './LabwareSelectionModal'
 
 type Props = React.ElementProps<typeof LabwareSelectionModalComponent>
 

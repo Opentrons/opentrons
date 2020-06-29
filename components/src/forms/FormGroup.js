@@ -1,9 +1,10 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
+
 import { Icon } from '../icons'
-import styles from './forms.css'
 import type { HoverTooltipHandlers } from '../tooltips'
+import styles from './forms.css'
 
 export type FormGroupProps = {|
   /** text label */

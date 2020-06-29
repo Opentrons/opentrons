@@ -1,15 +1,15 @@
 // @flow
+import { FlatButton, FormGroup, InputField, Modal } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { FlatButton, FormGroup, InputField, Modal } from '@opentrons/components'
 
+import type { FormData } from '../../form-types'
 import { i18n } from '../../localization'
 import { actions as steplistActions } from '../../steplist'
 import type { StepFieldName } from '../../steplist/fieldLevel'
-import type { FormData } from '../../form-types'
 import type { ThunkDispatch } from '../../types'
-import styles from './MoreOptionsModal.css'
 import modalStyles from './modal.css'
+import styles from './MoreOptionsModal.css'
 
 type OP = {|
   close: (event: ?SyntheticEvent<>) => mixed,

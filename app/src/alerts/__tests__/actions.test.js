@@ -1,6 +1,5 @@
 // @flow
 import * as Actions from '../actions'
-
 import type { AlertId, AlertsAction } from '../types'
 
 const MOCK_ALERT_ID: AlertId = ('mockAlert': any)

@@ -1,48 +1,45 @@
 // @flow
 // connect and configure robots page
+import { SpinnerModalPage } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
+import type { ContextRouter } from 'react-router-dom'
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 
 import {
-  selectors as robotSelectors,
-  actions as robotActions,
-} from '../../robot'
-import { CONNECTABLE, REACHABLE } from '../../discovery'
-import {
-  getBuildrootUpdateSeen,
   getBuildrootRobot,
-  getBuildrootUpdateInProgress,
   getBuildrootUpdateAvailable,
+  getBuildrootUpdateInProgress,
+  getBuildrootUpdateSeen,
 } from '../../buildroot'
-
-import { getRobotRestarting } from '../../robot-admin'
-import {
-  getMovementStatus,
-  getMovementError,
-  clearMovementStatus,
-  HOMING,
-} from '../../robot-controls'
-import { getRobotRestartRequired } from '../../robot-settings'
-
-import { SpinnerModalPage } from '@opentrons/components'
+import { CalibrateDeck } from '../../components/CalibrateDeck'
 import { ErrorModal } from '../../components/modals'
 import { Page } from '../../components/Page'
 import {
-  RobotSettings as RobotSettingsContents,
   ConnectAlertModal,
+  RobotSettings as RobotSettingsContents,
 } from '../../components/RobotSettings'
-import { UpdateBuildroot } from '../../components/RobotSettings/UpdateBuildroot'
-import { CalibrateDeck } from '../../components/CalibrateDeck'
 import { ConnectBanner } from '../../components/RobotSettings/ConnectBanner'
 import { ReachableRobotBanner } from '../../components/RobotSettings/ReachableRobotBanner'
-import { RestartRequiredBanner } from '../../components/RobotSettings/RestartRequiredBanner'
 import { ResetRobotModal } from '../../components/RobotSettings/ResetRobotModal'
-
-import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
+import { RestartRequiredBanner } from '../../components/RobotSettings/RestartRequiredBanner'
+import { UpdateBuildroot } from '../../components/RobotSettings/UpdateBuildroot'
+import { CONNECTABLE, REACHABLE } from '../../discovery'
 import type { ViewableRobot } from '../../discovery/types'
+import {
+  actions as robotActions,
+  selectors as robotSelectors,
+} from '../../robot'
+import { getRobotRestarting } from '../../robot-admin'
+import {
+  clearMovementStatus,
+  getMovementError,
+  getMovementStatus,
+  HOMING,
+} from '../../robot-controls'
+import { getRobotRestartRequired } from '../../robot-settings'
 import type { ShellUpdateState } from '../../shell/types'
+import type { Dispatch, State } from '../../types'
 
 type OP = {|
   ...ContextRouter,

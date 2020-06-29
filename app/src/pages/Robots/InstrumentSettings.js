@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 
-import { LEFT, RIGHT } from '../../pipettes'
-import { InstrumentSettings as SettingsContent } from '../../components/InstrumentSettings'
 import { ChangePipette } from '../../components/ChangePipette'
 import { ConfigurePipette } from '../../components/ConfigurePipette'
+import { InstrumentSettings as SettingsContent } from '../../components/InstrumentSettings'
 import { Page } from '../../components/Page'
+import { LEFT, RIGHT } from '../../pipettes'
 
 export type InstrumentSettingsProps = {|
   robotName: string,

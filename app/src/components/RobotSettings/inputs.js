@@ -1,13 +1,12 @@
 // @flow
 // input component convenience wrappers
 // TODO(mc, 2018-10-18): delete this file in favor of Formik
-import * as React from 'react'
-
 import {
-  InputField,
-  DropdownField,
   type DropdownOption,
+  DropdownField,
+  InputField,
 } from '@opentrons/components'
+import * as React from 'react'
 
 export type FormProps = {
   onSubmit: () => mixed,

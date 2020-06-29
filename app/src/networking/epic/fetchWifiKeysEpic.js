@@ -2,15 +2,14 @@
 import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
-import { mapToRobotApiRequest } from '../../robot-api/operators'
-import { fetchWifiKeysSuccess, fetchWifiKeysFailure } from '../actions'
-import { FETCH_WIFI_KEYS, WIFI_KEYS_PATH } from '../constants'
-
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import { mapToRobotApiRequest } from '../../robot-api/operators'
 import type { Epic } from '../../types'
+import { fetchWifiKeysFailure, fetchWifiKeysSuccess } from '../actions'
+import { FETCH_WIFI_KEYS, WIFI_KEYS_PATH } from '../constants'
 import type { FetchWifiKeysAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchWifiKeysAction> = action => ({

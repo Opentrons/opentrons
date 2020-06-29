@@ -1,6 +1,7 @@
 // @flow
-import * as React from 'react'
 import { RadioGroup } from '@opentrons/components'
+import * as React from 'react'
+
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { FocusHandlers } from '../types'
 import { FieldConnector } from './FieldConnector'

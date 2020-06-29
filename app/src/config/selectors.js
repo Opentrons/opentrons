@@ -1,5 +1,6 @@
 // @flow
 import type { DropdownOption } from '@opentrons/components'
+
 import type { State } from '../types'
 import type { Config, FeatureFlags, UpdateChannel } from './types'
 

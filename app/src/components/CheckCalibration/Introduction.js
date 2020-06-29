@@ -1,6 +1,6 @@
 // @flow
+import { AlertModal, PrimaryButton } from '@opentrons/components'
 import * as React from 'react'
-import { PrimaryButton, AlertModal } from '@opentrons/components'
 
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'

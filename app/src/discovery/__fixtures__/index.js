@@ -1,8 +1,7 @@
 // @flow
 
 import { CONNECTABLE, REACHABLE } from '../selectors'
-
-import type { Service, ResolvedRobot, Robot, ReachableRobot } from '../types'
+import type { ReachableRobot, ResolvedRobot, Robot, Service } from '../types'
 
 export const mockHealthResponse = {
   name: 'robot-name',

@@ -3,10 +3,9 @@
 // props are string type for flexibility, but try to use constants for safety
 
 import pick from 'lodash/pick'
+import type { Styles } from 'styled-components'
 
 import * as Types from './types'
-
-import type { Styles } from 'styled-components'
 
 const COLOR_PROPS = ['color', 'backgroundColor', 'opacity']
 

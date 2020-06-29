@@ -1,11 +1,10 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
-
-import { Button } from './Button'
-import styles from './buttons.css'
+import * as React from 'react'
 
 import type { ButtonProps } from './Button'
+import { Button } from './Button'
+import styles from './buttons.css'
 
 /**
  * Button with no background fill and a dark border.

@@ -1,6 +1,6 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
+import * as React from 'react'
 
 import * as Fixtures from '../../../../../networking/__fixtures__'
 import { SECURITY_NONE } from '../../constants'

@@ -1,10 +1,10 @@
 // @flow
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { Card } from '@opentrons/components'
-import { AddManualIp } from '../AddManualIp'
+import { shallow } from 'enzyme'
+import * as React from 'react'
+
 import { NetworkSettingsCard } from '..'
+import { AddManualIp } from '../AddManualIp'
 import { ClearDiscoveryCache } from '../ClearDiscoveryCache'
 import { DisableDiscoveryCache } from '../DisableDiscoveryCache'
 

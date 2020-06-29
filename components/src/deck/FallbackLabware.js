@@ -1,10 +1,10 @@
 // @flow
+import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
 import * as React from 'react'
-import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
-import { LabwareOutline } from './LabwareOutline'
-import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 
 import styles from './Labware.css'
+import { LabwareOutline } from './LabwareOutline'
+import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 
 // TODO: BC 2019-06-18 remove when old Labware component is no longer used anywhere
 /**

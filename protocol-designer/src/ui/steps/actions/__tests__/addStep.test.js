@@ -1,6 +1,6 @@
 // @flow
-import { addStep } from '../actions'
 import { uuid } from '../../../../utils'
+import { addStep } from '../actions'
 jest.mock('../../../../utils')
 
 const uuidMock: JestMockFn<[], string> = uuid

@@ -1,16 +1,17 @@
 // @flow
-import * as React from 'react'
+import { type IconName, Icon } from '@opentrons/components'
+import {
+  type LabwareDefinition2,
+  getLabwareDefIsStandard,
+  getLabwareDefURI,
+  getLabwareDisplayName,
+} from '@opentrons/shared-data'
 import cx from 'classnames'
+import * as React from 'react'
+
 import { i18n } from '../../localization'
-import { Icon, type IconName } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './styles.css'
-import {
-  getLabwareDefURI,
-  getLabwareDefIsStandard,
-  getLabwareDisplayName,
-  type LabwareDefinition2,
-} from '@opentrons/shared-data'
 
 type Props = {|
   disabled?: ?boolean,

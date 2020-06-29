@@ -1,31 +1,26 @@
 // @flow
 // RobotSettings card for robot status
+import {
+  Card,
+  HoverTooltip,
+  LabeledValue,
+  OutlineButton,
+  useInterval,
+} from '@opentrons/components'
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import { getBuildrootRobot, getBuildrootUpdateAvailable } from '../../buildroot'
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
 } from '../../discovery'
-
-import { getBuildrootRobot, getBuildrootUpdateAvailable } from '../../buildroot'
-
-import { checkShellUpdate } from '../../shell'
-
-import {
-  Card,
-  LabeledValue,
-  OutlineButton,
-  HoverTooltip,
-  useInterval,
-} from '@opentrons/components'
-
-import { CardRow, CardContentThird } from '../layout'
-
-import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
+import { checkShellUpdate } from '../../shell'
+import type { Dispatch, State } from '../../types'
+import { CardContentThird, CardRow } from '../layout'
 
 export type InformationCardProps = {|
   robot: ViewableRobot,

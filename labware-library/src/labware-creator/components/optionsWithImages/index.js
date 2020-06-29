@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
+
 import {
+  type Options,
   wellBottomShapeOptions,
   wellShapeOptions,
-  type Options,
 } from '../../fields'
 import styles from './optionsWithImages.css'
 

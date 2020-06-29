@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { AlertModal } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import * as React from 'react'
+
 import { DisconnectModal } from '../DisconnectModal'
 
 describe("SelectNetwork's DisconnectModal", () => {

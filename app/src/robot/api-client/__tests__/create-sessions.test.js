@@ -1,13 +1,14 @@
 // session creation tests for the RPC API client
 import EventEmitter from 'events'
-import { client } from '../client'
+
+import * as LabwareSelectors from '../../../custom-labware/selectors'
+import * as DiscoverySelectors from '../../../discovery/selectors'
+import * as ProtocolSelectors from '../../../protocol/selectors'
 import { Client as RpcClient } from '../../../rpc/client'
 import { actions as RobotActions } from '../../actions'
-import * as ProtocolSelectors from '../../../protocol/selectors'
-import * as DiscoverySelectors from '../../../discovery/selectors'
-import * as LabwareSelectors from '../../../custom-labware/selectors'
 import * as RobotSelectors from '../../selectors'
 import { MockSession } from '../../test/__fixtures__/session'
+import { client } from '../client'
 
 jest.mock('../../../rpc/client')
 jest.mock('../../../protocol/selectors')

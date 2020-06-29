@@ -1,7 +1,7 @@
 // @flow
-import * as React from 'react'
-import { useField } from 'formik'
 import { DropdownField } from '@opentrons/components/src/forms/DropdownField'
+import { useField } from 'formik'
+import * as React from 'react'
 
 type ModelDropdownProps = {|
   fieldName: string,

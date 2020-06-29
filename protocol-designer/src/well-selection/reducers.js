@@ -1,15 +1,15 @@
 // @flow
+import type { WellGroup } from '@opentrons/components'
 import omit from 'lodash/omit'
+import type { Reducer } from 'redux'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
-import type { Reducer } from 'redux'
-import type { WellGroup } from '@opentrons/components'
 import type { Action } from '../types'
 import type {
+  DeselectWellsAction,
   HighlightWellsAction,
   SelectWellsAction,
-  DeselectWellsAction,
 } from './actions'
 type SelectedWellsState = {
   highlighted: WellGroup,

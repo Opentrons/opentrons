@@ -1,12 +1,11 @@
 // @flow
 import * as React from 'react'
 
-import { Table, TableEntry, TABLE_COLUMN } from './Table'
-import { LabelText, LABEL_LEFT } from './LabelText'
-import { Value } from './Value'
-import { TableTitle } from './TableTitle'
-
+import { LABEL_LEFT, LabelText } from './LabelText'
 import type { TableDirection } from './Table'
+import { Table, TABLE_COLUMN, TableEntry } from './Table'
+import { TableTitle } from './TableTitle'
+import { Value } from './Value'
 
 export type ValueEntry = {|
   label: React.Node,

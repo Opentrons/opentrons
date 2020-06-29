@@ -1,15 +1,16 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
-import { Formik, Form } from 'formik'
-import * as Fixtures from '../../../../../networking/__fixtures__'
+import { Form, Formik } from 'formik'
+import * as React from 'react'
+
 import * as Networking from '../../../../../networking'
+import * as Fixtures from '../../../../../networking/__fixtures__'
 import { ScrollableAlertModal } from '../../../../modals'
 import * as Constants from '../../constants'
-import { TextField } from '../TextField'
+import { FormModal } from '../FormModal'
 import { KeyFileField } from '../KeyFileField'
 import { SecurityField } from '../SecurityField'
-import { FormModal } from '../FormModal'
+import { TextField } from '../TextField'
 
 // KeyFileField is wired to redux, so mock it out
 jest.mock('../KeyFileField', () => ({ KeyFileField: () => null }))

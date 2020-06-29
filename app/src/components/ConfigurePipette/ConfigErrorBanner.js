@@ -1,6 +1,7 @@
 // @flow
-import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
+import * as React from 'react'
+
 import styles from './styles.css'
 
 type Props = {|

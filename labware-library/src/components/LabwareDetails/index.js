@@ -2,12 +2,11 @@
 // full-width labware details
 import * as React from 'react'
 
-import { Gallery, Tags, LoadName } from '../labware-ui'
-import { LabwareTitle } from './LabwareTitle'
-import { LabwareDetailsBox } from './LabwareDetailsBox'
-import styles from './styles.css'
-
 import type { LabwareDefinition } from '../../types'
+import { Gallery, LoadName, Tags } from '../labware-ui'
+import { LabwareDetailsBox } from './LabwareDetailsBox'
+import { LabwareTitle } from './LabwareTitle'
+import styles from './styles.css'
 
 export type LabwareDetailsProps = {|
   definition: LabwareDefinition,

@@ -1,12 +1,13 @@
 // @flow
-import * as React from 'react'
 import { SelectField } from '@opentrons/components'
 import { Field } from 'formik'
+import * as React from 'react'
+
 import { reportFieldEdit } from '../analyticsUtils'
-import { LABELS } from '../fields'
 import type { LabwareFields, Options } from '../fields'
-import fieldStyles from './fieldStyles.css'
+import { LABELS } from '../fields'
 import styles from './Dropdown.css'
+import fieldStyles from './fieldStyles.css'
 
 export type DropdownProps = {|
   name: $Keys<LabwareFields>,

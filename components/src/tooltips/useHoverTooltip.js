@@ -1,9 +1,8 @@
 // @flow
 
 import { useHover } from '../interaction-enhancers'
-import { useTooltip } from './useTooltip'
-
 import type { UseHoverTooltipOptions, UseHoverTooltipResult } from './types'
+import { useTooltip } from './useTooltip'
 
 const ENTER_DELAY_MS = 300
 const LEAVE_DELAY_MS = 0

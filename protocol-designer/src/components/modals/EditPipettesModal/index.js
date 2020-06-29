@@ -1,26 +1,26 @@
 // @flow
-import * as React from 'react'
-import { connect } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
-import { uuid } from '../../../utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
-import { actions as steplistActions } from '../../../steplist'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import type { StepIdType } from '../../../form-types'
+import type {
+  FormPipettesByMount,
+  NormalizedPipette,
+  PipetteOnDeck,
+} from '../../../step-forms'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
 } from '../../../step-forms'
-import { FilePipettesModal } from '../FilePipettesModal'
+import { actions as steplistActions } from '../../../steplist'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import type {
-  PipetteOnDeck,
-  FormPipettesByMount,
-  NormalizedPipette,
-} from '../../../step-forms'
-import type { StepIdType } from '../../../form-types'
+import { uuid } from '../../../utils'
+import { FilePipettesModal } from '../FilePipettesModal'
 
 type Props = React.ElementProps<typeof FilePipettesModal>
 

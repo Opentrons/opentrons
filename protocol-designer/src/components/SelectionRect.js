@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 
-import styles from './SelectionRect.css'
 import type { DragRect, GenericRect } from '../collision-types'
+import styles from './SelectionRect.css'
 
 type Props = {|
   onSelectionMove?: (e: MouseEvent, GenericRect) => mixed,

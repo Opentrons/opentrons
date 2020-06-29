@@ -1,11 +1,11 @@
 // @flow
-import assert from 'assert'
-import * as React from 'react'
-import cx from 'classnames'
-import styles from './Well.css'
-
 import type { LabwareWell } from '@opentrons/shared-data'
+import assert from 'assert'
+import cx from 'classnames'
+import * as React from 'react'
+
 import type { WellMouseEvent } from './types'
+import styles from './Well.css'
 
 export type WellProps = {|
   /** if included, overrides the default classname */

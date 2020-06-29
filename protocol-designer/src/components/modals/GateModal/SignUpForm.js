@@ -1,7 +1,8 @@
 // @flow
 
-import * as React from 'react'
 import { makeWidget } from '@typeform/embed'
+import * as React from 'react'
+
 import { isProduction } from '../../../networking/opentronsWebApi'
 import styles from '../modal.css'
 

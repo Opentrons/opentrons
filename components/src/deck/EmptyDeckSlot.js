@@ -3,10 +3,9 @@
 import * as React from 'react'
 
 import { CenteredTextSvg } from './CenteredTextSvg'
+import type { LabwareWrapperProps } from './LabwareWrapper'
 import { LabwareWrapper } from './LabwareWrapper'
 import styles from './LabwareWrapper.css'
-
-import type { LabwareWrapperProps } from './LabwareWrapper'
 
 export type EmptyDeckSlotProps = {|
   ...LabwareWrapperProps,

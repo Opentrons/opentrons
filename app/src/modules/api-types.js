@@ -2,12 +2,12 @@
 
 import {
   type MagneticModuleModel,
+  type ModuleModel,
   type TemperatureModuleModel,
   type ThermocyclerModuleModel,
-  typeof TEMPDECK,
   typeof MAGDECK,
+  typeof TEMPDECK,
   typeof THERMOCYCLER,
-  type ModuleModel,
 } from '@opentrons/shared-data'
 
 export type ApiBaseModule = {|

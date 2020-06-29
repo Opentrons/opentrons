@@ -1,7 +1,6 @@
 // @flow
 import { mockRobot } from '../../robot-api/__fixtures__'
 import * as actions from '../actions'
-
 import type { BuildrootAction } from '../types'
 
 type ActionSpec = {|

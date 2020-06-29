@@ -2,8 +2,8 @@
 // resources page layout
 import * as React from 'react'
 
-import { ResourceCard } from './ResourceCard'
 import { CardContainer, CardRow } from '../layout'
+import { ResourceCard } from './ResourceCard'
 
 export function Resources(): React.Node {
   return (

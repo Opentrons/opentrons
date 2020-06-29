@@ -1,20 +1,18 @@
 // @flow
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
+import * as Cfg from '@opentrons/app/src/config'
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import Store from 'electron-store'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
-import * as Cfg from '@opentrons/app/src/config'
-
 import { createLogger } from '../log'
-import { DEFAULTS_V0, migrate } from './migrate'
-import { shouldUpdate, getNextValue } from './update'
-
 import type { Action, Dispatch, Logger } from '../types'
+import { DEFAULTS_V0, migrate } from './migrate'
 import type { Config, Overrides } from './types'
+import { getNextValue, shouldUpdate } from './update'
 
 export type * from './types'
 

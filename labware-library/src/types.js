@@ -1,9 +1,9 @@
 // @flow
 import type {
-  LabwareDefinition2 as LabwareDefinition,
-  LabwareWellShapeProperties,
-  LabwareWellGroupMetadata,
   LabwareBrand,
+  LabwareDefinition2 as LabwareDefinition,
+  LabwareWellGroupMetadata,
+  LabwareWellShapeProperties,
 } from '@opentrons/shared-data'
 
 export type {

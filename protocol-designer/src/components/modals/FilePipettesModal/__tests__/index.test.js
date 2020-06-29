@@ -1,22 +1,23 @@
 // @flow
 
-import React from 'react'
-import { Formik } from 'formik'
-import { shallow } from 'enzyme'
+import { InputField, Modal, OutlineButton } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { Modal, InputField, OutlineButton } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import { Formik } from 'formik'
+import React from 'react'
+
+import { type Props, FilePipettesModal } from '../'
 import { i18n } from '../../../../localization'
 import { CrashInfoBox } from '../../../modules'
 import { StepChangesConfirmModal } from '../../EditPipettesModal/StepChangesConfirmModal'
-import { PipetteFields } from '../PipetteFields'
 import { ModuleFields } from '../ModuleFields'
-import { FilePipettesModal, type Props } from '../'
+import { PipetteFields } from '../PipetteFields'
 
 describe('FilePipettesModal', () => {
   const tiprackDefURI = 'tiprack_300'

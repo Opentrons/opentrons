@@ -1,19 +1,18 @@
 // @flow
-import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
+import * as React from 'react'
+import { Provider } from 'react-redux'
+import { StaticRouter } from 'react-router-dom'
 
+import * as Buildroot from '../../../buildroot'
 import * as Fixtures from '../../../discovery/__fixtures__'
 import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../../robot'
-import * as Buildroot from '../../../buildroot'
+import type { State } from '../../../types'
 import { RobotItem } from '../RobotItem'
 import { RobotListItem } from '../RobotListItem'
-
-import type { State } from '../../../types'
 
 jest.mock('../../../buildroot/selectors')
 jest.mock('../../../robot/selectors')

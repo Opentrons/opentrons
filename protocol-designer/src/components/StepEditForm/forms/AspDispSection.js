@@ -1,6 +1,7 @@
 // @flow
+import { HoverTooltip, IconButton } from '@opentrons/components'
 import * as React from 'react'
-import { IconButton, HoverTooltip } from '@opentrons/components'
+
 import { i18n } from '../../../localization'
 import styles from '../StepEditForm.css'
 

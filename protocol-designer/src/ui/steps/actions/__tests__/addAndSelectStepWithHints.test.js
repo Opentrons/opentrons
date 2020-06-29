@@ -1,9 +1,9 @@
 // @flow
-import { addAndSelectStepWithHints } from '../thunks'
+import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { addHint } from '../../../../tutorial/actions'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
-import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { uuid } from '../../../../utils'
+import { addAndSelectStepWithHints } from '../thunks'
 jest.mock('../../../../tutorial/actions')
 jest.mock('../../../../ui/modules/selectors')
 jest.mock('../../../../labware-ingred/selectors')

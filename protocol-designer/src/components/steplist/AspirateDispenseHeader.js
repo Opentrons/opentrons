@@ -1,15 +1,16 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import {
   Icon,
   Tooltip,
-  useHoverTooltip,
   TOOLTIP_FIXED,
+  useHoverTooltip,
 } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
+
 import { PDListItem } from '../lists'
-import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
+import styles from './StepItem.css'
 
 type AspirateDispenseHeaderProps = {
   sourceLabwareNickname: ?string,

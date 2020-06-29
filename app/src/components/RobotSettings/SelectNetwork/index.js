@@ -1,22 +1,19 @@
 // @flow
+import { useInterval } from '@opentrons/components'
+import last from 'lodash/last'
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
 
-import * as RobotApi from '../../../robot-api'
 import * as Networking from '../../../networking'
-
-import { useInterval } from '@opentrons/components'
+import * as RobotApi from '../../../robot-api'
+import type { Dispatch, State } from '../../../types'
 import { Portal } from '../../portal'
-import { SelectSsid } from './SelectSsid'
 import { ConnectModal } from './ConnectModal'
+import { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
 import { DisconnectModal } from './DisconnectModal'
 import { ResultModal } from './ResultModal'
-
-import { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
-
-import type { State, Dispatch } from '../../../types'
-import type { WifiConfigureRequest, NetworkChangeState } from './types'
+import { SelectSsid } from './SelectSsid'
+import type { NetworkChangeState, WifiConfigureRequest } from './types'
 
 type SelectNetworkProps = {| robotName: string |}
 

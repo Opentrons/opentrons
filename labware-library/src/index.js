@@ -1,14 +1,14 @@
 // @flow
 // labware library entry
+import './styles.global.css'
+
 import * as React from 'react'
 import { hydrate, render } from 'react-dom'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
 import { App } from './components/App'
 import { LabwareCreator } from './labware-creator'
-
 import { getPublicPath } from './public-path'
-import './styles.global.css'
 
 const $root = document.getElementById('root')
 

@@ -1,7 +1,6 @@
 // @flow
-import { filenameToType, parseProtocolData } from './protocol-data'
-
 import type { Action } from '../types'
+import { filenameToType, parseProtocolData } from './protocol-data'
 import type { ProtocolState } from './types'
 
 const INITIAL_STATE: ProtocolState = { file: null, contents: null, data: null }

@@ -1,13 +1,12 @@
 // @flow
+import type { ButtonProps } from '@opentrons/components'
 import * as React from 'react'
 
-import { Portal } from '../../portal'
-import { ScrollableAlertModal } from '../../modals'
-import { UpdateAppMessage } from './UpdateAppMessage'
-import { ReleaseNotes } from '../../ReleaseNotes'
-
 import type { ShellUpdateState } from '../../../shell/types'
-import type { ButtonProps } from '@opentrons/components'
+import { ScrollableAlertModal } from '../../modals'
+import { Portal } from '../../portal'
+import { ReleaseNotes } from '../../ReleaseNotes'
+import { UpdateAppMessage } from './UpdateAppMessage'
 
 export type UpdateAppModalProps = {|
   update: ShellUpdateState,

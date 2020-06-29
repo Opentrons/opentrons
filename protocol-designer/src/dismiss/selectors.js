@@ -1,13 +1,14 @@
 // @flow
-import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
+import { createSelector } from 'reselect'
+
 import { selectors as stepFormSelectors } from '../step-forms'
-import { getSelectedStepId } from '../ui/steps/selectors'
 import type { FormWarning } from '../steplist'
 import type { BaseState, Selector } from '../types'
+import { getSelectedStepId } from '../ui/steps/selectors'
 import type {
-  RootState,
   DismissedWarningsAllSteps,
+  RootState,
   WarningType,
 } from './reducers'
 

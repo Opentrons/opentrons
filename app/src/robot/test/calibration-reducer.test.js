@@ -1,6 +1,6 @@
 // calibration reducer tests
+import { actionTypes, robotReducer as reducer } from '..'
 import { HOME } from '../../robot-controls'
-import { robotReducer as reducer, actionTypes } from '..'
 
 const EXPECTED_INITIAL_STATE = {
   deckPopulated: null,

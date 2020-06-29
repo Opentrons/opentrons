@@ -1,10 +1,10 @@
 // @flow
-import os from 'os'
 import noop from 'lodash/noop'
+import os from 'os'
 
 import {
-  getActiveInterfaces,
   createNetworkInterfaceMonitor,
+  getActiveInterfaces,
 } from '../network-interfaces'
 
 jest.mock('os')

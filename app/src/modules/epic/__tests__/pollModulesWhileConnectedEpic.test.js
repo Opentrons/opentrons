@@ -1,15 +1,14 @@
 // @flow
 import { TestScheduler } from 'rxjs/testing'
 
+import * as Fixtures from '../../__fixtures__'
 import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../../robot'
-import * as Fixtures from '../../__fixtures__'
+import type { State } from '../../../types'
 import * as Actions from '../../actions'
 import { modulesEpic } from '../../epic'
-
-import type { State } from '../../../types'
 
 jest.mock('../../../robot/selectors')
 

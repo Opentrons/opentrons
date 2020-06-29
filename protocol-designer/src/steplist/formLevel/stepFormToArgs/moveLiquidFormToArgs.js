@@ -1,25 +1,25 @@
 // @flow
-import assert from 'assert'
 import { getWellsDepth } from '@opentrons/shared-data'
+import assert from 'assert'
+
 import {
-  DEST_WELL_BLOWOUT_DESTINATION,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-} from '../../../step-generation/utils'
-import {
+  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
-import { getOrderedWells } from '../../utils'
-
 import type { HydratedMoveLiquidFormData } from '../../../form-types'
 import type {
   ConsolidateArgs,
   DistributeArgs,
-  TransferArgs,
   InnerMixArgs,
+  TransferArgs,
 } from '../../../step-generation'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '../../../step-generation/utils'
+import { getOrderedWells } from '../../utils'
 
 export function getMixData(
   hydratedFormData: *,

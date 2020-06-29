@@ -2,75 +2,69 @@
 // epics to control the buildroot migration / update flow
 import every from 'lodash/every'
 import { combineEpics, ofType } from 'redux-observable'
-import { of, interval, concat, EMPTY } from 'rxjs'
+import { concat, EMPTY, interval, of } from 'rxjs'
 import {
   filter,
   map,
   mapTo,
-  switchMap,
   mergeMap,
+  switchMap,
   takeUntil,
   withLatestFrom,
 } from 'rxjs/operators'
 
-// imported directly to avoid circular dependencies between discovery and shell
-import { getAllRobots, getRobotApiVersion } from '../discovery/selectors'
 import {
-  startDiscovery,
   finishDiscovery,
   removeRobot,
+  startDiscovery,
 } from '../discovery/actions'
-
-import { GET, POST, fetchRobotApi } from '../robot-api'
-import { RESTART_PATH } from '../robot-admin'
+// imported directly to avoid circular dependencies between discovery and shell
+import { getAllRobots, getRobotApiVersion } from '../discovery/selectors'
+import type { ViewableRobot } from '../discovery/types'
 import { actions as robotActions } from '../robot'
-
+import { RESTART_PATH } from '../robot-admin'
+import { fetchRobotApi, GET, POST } from '../robot-api'
+import type { RobotApiResponse } from '../robot-api/types'
+import type { Epic, State } from '../types'
 import {
-  getBuildrootTargetVersion,
-  getBuildrootSession,
-  getBuildrootRobotName,
-  getBuildrootRobot,
-} from './selectors'
-
-import {
-  startBuildrootUpdate,
-  startBuildrootPremigration,
-  readUserBuildrootFile,
+  buildrootStatus,
   createSession,
   createSessionSuccess,
-  buildrootStatus,
-  uploadBuildrootFile,
+  readUserBuildrootFile,
   setBuildrootSessionStep,
+  startBuildrootPremigration,
+  startBuildrootUpdate,
   unexpectedBuildrootError,
+  uploadBuildrootFile,
 } from './actions'
-
 import {
-  PREMIGRATION_RESTART,
-  GET_TOKEN,
-  PROCESS_FILE,
-  COMMIT_UPDATE,
-  RESTART,
-  RESTARTING,
-  FINISHED,
   AWAITING_FILE,
-  DONE,
-  READY_FOR_RESTART,
-  BR_START_UPDATE,
-  BR_USER_FILE_INFO,
   BR_CREATE_SESSION,
   BR_CREATE_SESSION_SUCCESS,
+  BR_START_UPDATE,
+  BR_USER_FILE_INFO,
+  COMMIT_UPDATE,
+  DONE,
+  FINISHED,
+  GET_TOKEN,
+  PREMIGRATION_RESTART,
+  PROCESS_FILE,
+  READY_FOR_RESTART,
+  RESTART,
+  RESTARTING,
 } from './constants'
-
-import type { State, Epic } from '../types'
-import type { ViewableRobot } from '../discovery/types'
-import type { RobotApiResponse } from '../robot-api/types'
-
+import {
+  getBuildrootRobot,
+  getBuildrootRobotName,
+  getBuildrootSession,
+  getBuildrootTargetVersion,
+} from './selectors'
 import type {
   BuildrootAction,
-  StartBuildrootUpdateAction,
+  BuildrootUpdateSession,
   CreateSessionAction,
   CreateSessionSuccessAction,
-  BuildrootUpdateSession,
+  StartBuildrootUpdateAction,
 } from './types'
 
 export const POLL_INTERVAL_MS = 2000

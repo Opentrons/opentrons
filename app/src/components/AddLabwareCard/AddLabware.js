@@ -1,8 +1,7 @@
 // @flow
 
-import * as React from 'react'
-
 import { LabeledButton } from '@opentrons/components'
+import * as React from 'react'
 
 // TODO(mc, 2019-11-18): i18n
 const ADD_NEW_LABWARE_DEFINITIONS = 'Add New Labware Definitions'

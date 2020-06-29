@@ -1,14 +1,13 @@
 // @flow
+import { Field, Form, Formik } from 'formik'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { getConfig, addManualIp } from '../../../config'
-import { startDiscovery } from '../../../discovery'
 
-import { Formik, Form, Field } from 'formik'
-import { IpField } from './IpField'
-
-import type { State, Dispatch } from '../../../types'
+import { addManualIp, getConfig } from '../../../config'
 import type { DiscoveryCandidates } from '../../../config/types'
+import { startDiscovery } from '../../../discovery'
+import type { Dispatch, State } from '../../../types'
+import { IpField } from './IpField'
 
 type OP = {||}
 

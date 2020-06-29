@@ -1,10 +1,11 @@
 // @flow
-import intersection from 'lodash/intersection'
-import zipWith from 'lodash/zipWith'
-import uniq from 'lodash/uniq'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import compact from 'lodash/compact'
 import flatten from 'lodash/flatten'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import intersection from 'lodash/intersection'
+import uniq from 'lodash/uniq'
+import zipWith from 'lodash/zipWith'
+
 import type { WellOrderOption } from '../../form-types'
 
 // labware definitions in shared-data have an ordering

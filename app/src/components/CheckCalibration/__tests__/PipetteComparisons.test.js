@@ -1,6 +1,7 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
+import * as React from 'react'
+
 import * as Sessions from '../../../sessions'
 import * as Fixtures from '../../../sessions/__fixtures__'
 import type {

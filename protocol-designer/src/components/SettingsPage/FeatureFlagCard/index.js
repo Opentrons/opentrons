@@ -1,15 +1,15 @@
 // @flow
+import type { ElementProps } from 'react'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { FeatureFlagCard as FeatureFlagCardComponent } from './FeatureFlagCard'
+import type { Dispatch } from 'redux'
+
 import {
   actions as featureFlagActions,
   selectors as featureFlagSelectors,
 } from '../../../feature-flags'
-
-import type { Dispatch } from 'redux'
-import type { ElementProps } from 'react'
 import type { BaseState } from '../../../types'
+import { FeatureFlagCard as FeatureFlagCardComponent } from './FeatureFlagCard'
 
 type Props = ElementProps<typeof FeatureFlagCardComponent>
 

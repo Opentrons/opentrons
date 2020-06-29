@@ -1,8 +1,9 @@
 // @flow
-import { useEffect } from 'react'
-import { useFormikContext } from 'formik'
-import { isModuleWithCollisionIssue } from '../../modules/utils'
 import { usePrevious } from '@opentrons/components'
+import { useFormikContext } from 'formik'
+import { useEffect } from 'react'
+
+import { isModuleWithCollisionIssue } from '../../modules/utils'
 
 export const useResetSlotOnModelChange = (supportedModuleSlot: string) => {
   const { values, setValues } = useFormikContext()

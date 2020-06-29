@@ -1,40 +1,41 @@
 // @flow
-import React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
-import * as Formik from 'formik'
 import { OutlineButton, SlotMap } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
+import { mount } from 'enzyme'
+import * as Formik from 'formik'
+import React from 'react'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
+
+import { EditModulesModal } from '..'
 import {
   getMockDeckSetup,
   getMockMagneticModule,
   getMockTemperatureModule,
 } from '../../../../../fixtures/state/deck'
+import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
+import { selectors as featureSelectors } from '../../../../feature-flags'
+import * as moduleData from '../../../../modules/moduleData'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
 } from '../../../../step-forms'
 import {
   getLabwareOnSlot,
-  getSlotsBlockedBySpanning,
   getSlotIsEmpty,
+  getSlotsBlockedBySpanning,
 } from '../../../../step-forms/utils'
-import * as moduleData from '../../../../modules/moduleData'
-import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
-import { selectors as featureSelectors } from '../../../../feature-flags'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
-import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
-import { EditModulesModal } from '..'
+import { isModuleWithCollisionIssue } from '../../../modules/utils'
+import { ConnectedSlotMap } from '../ConnectedSlotMap'
 import { ModelDropdown } from '../ModelDropdown'
 import { SlotDropdown } from '../SlotDropdown'
-import { ConnectedSlotMap } from '../ConnectedSlotMap'
 
 jest.mock('../../../../utils/labwareModuleCompatibility')
 jest.mock('../../../../feature-flags')

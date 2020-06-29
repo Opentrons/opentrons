@@ -1,22 +1,22 @@
 // @flow
-import { createSelector } from 'reselect'
 import last from 'lodash/last'
+import { createSelector } from 'reselect'
 
+import type { FormData, StepIdType, StepType } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
-  PRESAVED_STEP_ID,
   type SubstepIdentifier,
   type TerminalItemId,
+  PRESAVED_STEP_ID,
 } from '../../steplist/types'
+import type { BaseState, Selector } from '../../types'
 import { getLabwareOnModule } from '../modules/utils'
 import {
-  initialSelectedItemState,
+  type CollapsedStepsState,
   type SelectableItem,
   type StepsState,
-  type CollapsedStepsState,
+  initialSelectedItemState,
 } from './reducers'
-import type { FormData, StepIdType, StepType } from '../../form-types'
-import type { BaseState, Selector } from '../../types'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 

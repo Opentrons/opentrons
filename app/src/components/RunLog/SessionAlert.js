@@ -1,9 +1,10 @@
 // @flow
+import { AlertItem } from '@opentrons/components'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { AlertItem } from '@opentrons/components'
-import { getSessionError } from '../../robot/selectors'
+
 import type { SessionStatus, SessionStatusInfo } from '../../robot'
+import { getSessionError } from '../../robot/selectors'
 import styles from './styles.css'
 
 const buildPauseMessage = (message: ?string): string =>

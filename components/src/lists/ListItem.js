@@ -1,11 +1,11 @@
 // @flow
 // ListItem component to be used as a child of TitledList
+import classnames from 'classnames'
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
-import classnames from 'classnames'
 
-import styles from './lists.css'
 import { type IconName, Icon } from '../icons'
+import styles from './lists.css'
 
 type ListItemProps = {|
   /** click handler */

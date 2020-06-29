@@ -1,14 +1,13 @@
 import { TestScheduler } from 'rxjs/testing'
 
-import { mockRobot as robot } from '../../robot-api/__fixtures__'
-import { startDiscovery } from '../../discovery'
-import * as RobotApiHttp from '../../robot-api/http'
 import * as Fixtures from '../__fixtures__'
-import * as epics from '../epic'
+import { startDiscovery } from '../../discovery'
+import { mockRobot as robot } from '../../robot-api/__fixtures__'
+import * as RobotApiHttp from '../../robot-api/http'
 import * as actions from '../actions'
-import * as selectors from '../selectors'
-
+import * as epics from '../epic'
 import { INITIAL_STATE } from '../reducer'
+import * as selectors from '../selectors'
 
 jest.mock('../selectors')
 jest.mock('../../robot-api/http')

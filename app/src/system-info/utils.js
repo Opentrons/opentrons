@@ -1,9 +1,8 @@
 // @flow
 // system-info helpers and utilities
 
-import { NOT_APPLICABLE, UNKNOWN, UP_TO_DATE, OUTDATED } from './constants'
-
-import type { UsbDevice, DriverStatus } from './types'
+import { NOT_APPLICABLE, OUTDATED, UNKNOWN, UP_TO_DATE } from './constants'
+import type { DriverStatus, UsbDevice } from './types'
 
 // NOTE(mc, 2020-05-05): this will cause false alerts on Windows 7; Realtek's
 // versioning scheme seems to be WindowsVersion.Something.Something.Something

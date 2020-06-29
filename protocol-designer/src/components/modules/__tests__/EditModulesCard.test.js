@@ -1,8 +1,5 @@
 // @flow
 
-import React from 'react'
-import { mount } from 'enzyme'
-import { Provider } from 'react-redux'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
@@ -10,16 +7,19 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { SUPPORTED_MODULE_TYPES } from '../../../modules'
-import { TEMPERATURE_DEACTIVATED } from '../../../constants'
-import { EditModulesCard } from '../EditModulesCard'
-import { CrashInfoBox } from '../CrashInfoBox'
-import { ModuleRow } from '../ModuleRow'
+import { mount } from 'enzyme'
+import React from 'react'
+import { Provider } from 'react-redux'
 
-import type { BaseState } from '../../../types'
+import { TEMPERATURE_DEACTIVATED } from '../../../constants'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { SUPPORTED_MODULE_TYPES } from '../../../modules'
 import type { FormPipettesByMount } from '../../../step-forms'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import type { BaseState } from '../../../types'
+import { CrashInfoBox } from '../CrashInfoBox'
+import { EditModulesCard } from '../EditModulesCard'
+import { ModuleRow } from '../ModuleRow'
 
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')

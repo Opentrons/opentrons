@@ -1,15 +1,16 @@
 // @flow
-import * as React from 'react'
-import round from 'lodash/round'
 import {
   AlertModal,
   FormGroup,
-  RadioGroup,
   InputField,
+  RadioGroup,
 } from '@opentrons/components'
+import round from 'lodash/round'
+import * as React from 'react'
+
 import { i18n } from '../../../../localization'
-import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
+import { Portal } from '../../../portals/MainPageModalPortal'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './FlowRateInput.css'
 

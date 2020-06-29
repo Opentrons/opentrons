@@ -1,7 +1,7 @@
 // @flow
-import pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/pipetteModelSpecs.json'
-import type { PipetteNameSpecs, PipetteModelSpecs } from './types'
+import pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
+import type { PipetteModelSpecs, PipetteNameSpecs } from './types'
 
 type SortableProps = 'maxVolume' | 'channels'
 

@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react'
+
 import styles from './AnnouncementModal.css'
 
 export type Announcement = {|

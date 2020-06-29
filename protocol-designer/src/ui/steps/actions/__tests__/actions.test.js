@@ -1,6 +1,7 @@
 // @flow
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
+
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { selectStep } from '../actions'
 jest.mock('../../../../step-forms')

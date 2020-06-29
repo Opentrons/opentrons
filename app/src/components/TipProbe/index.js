@@ -1,22 +1,20 @@
 // @flow
 // TipProbe controls
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-
 import { usePrevious } from '@opentrons/components'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { actions as robotActions } from '../../robot'
 import { getCalibrationRequest } from '../../robot/selectors'
-
-import { ErrorModal } from '../modals'
-import { CalibrationInfoBox } from '../CalibrationInfoBox'
-import { UnprobedPanel } from './UnprobedPanel'
-import { InstrumentMovingPanel } from './InstrumentMovingPanel'
-import { AttachTipPanel } from './AttachTipPanel'
-import { RemoveTipPanel } from './RemoveTipPanel'
-import { ContinuePanel } from './ContinuePanel'
-
 import type { Dispatch } from '../../types'
+import { CalibrationInfoBox } from '../CalibrationInfoBox'
+import { ErrorModal } from '../modals'
+import { AttachTipPanel } from './AttachTipPanel'
+import { ContinuePanel } from './ContinuePanel'
+import { InstrumentMovingPanel } from './InstrumentMovingPanel'
+import { RemoveTipPanel } from './RemoveTipPanel'
 import type { TipProbeProps, TipProbeState } from './types'
+import { UnprobedPanel } from './UnprobedPanel'
 
 const PROBE_ERROR_HEADING = 'Error during tip probe'
 const PROBE_ERROR_DESCRIPTION =

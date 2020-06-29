@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+
 import { getPublicPath } from '../../public-path'
-import { LinkOut } from './LinkOut'
 import { LINK_CUSTOM_LABWARE_FORM } from '../fields'
 import styles from '../styles.css'
+import { LinkOut } from './LinkOut'
 
 const LINK_CUSTOM_LABWARE_GUIDE =
   'https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions'

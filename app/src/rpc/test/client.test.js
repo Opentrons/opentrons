@@ -1,19 +1,19 @@
 // RPC client tests
-import util from 'util'
 import EventEmitter from 'events'
 import portfinder from 'portfinder'
+import util from 'util'
 import WS from 'ws'
 
-import { Client } from '../client'
-import { RemoteObject } from '../remote-object'
 import {
-  statuses,
-  RESULT,
   ACK,
+  CONTROL_MESSAGE,
   NACK,
   NOTIFICATION,
-  CONTROL_MESSAGE,
+  RESULT,
+  statuses,
 } from '../../rpc/message-types'
+import { Client } from '../client'
+import { RemoteObject } from '../remote-object'
 
 jest.mock('../remote-object')
 

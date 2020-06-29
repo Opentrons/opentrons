@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
 import { AppContainer } from 'react-hot-loader'
+import { Provider } from 'react-redux'
 
-import { configureStore } from './configureStore'
 import { App } from './components/App'
+import { configureStore } from './configureStore'
 import { initialize } from './initialize'
 const store = configureStore()
 

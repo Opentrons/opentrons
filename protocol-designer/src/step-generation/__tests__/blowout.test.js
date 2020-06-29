@@ -1,15 +1,15 @@
 // @flow
-import { expectTimelineError } from '../__utils__/testMatchers'
-import { blowout } from '../commandCreators/atomic/blowout'
 import {
-  makeContext,
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
-  getErrorResult,
   getSuccessResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../__fixtures__'
+import { expectTimelineError } from '../__utils__/testMatchers'
+import { blowout } from '../commandCreators/atomic/blowout'
 
 describe('blowout', () => {
   let invariantContext

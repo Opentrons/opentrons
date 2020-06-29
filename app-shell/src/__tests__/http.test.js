@@ -1,5 +1,5 @@
-import mockFetch from 'node-fetch'
 import isError from 'lodash/isError'
+import mockFetch from 'node-fetch'
 
 import * as Http from '../http'
 

@@ -1,15 +1,15 @@
 // @flow
-import * as React from 'react'
 import { shallow } from 'enzyme'
+import * as React from 'react'
 
 import {
   Btn,
+  BUTTON_TYPE_RESET,
+  BUTTON_TYPE_SUBMIT,
+  LightSecondaryBtn,
   PrimaryBtn,
   SecondaryBtn,
-  LightSecondaryBtn,
   TertiaryBtn,
-  BUTTON_TYPE_SUBMIT,
-  BUTTON_TYPE_RESET,
 } from '..'
 
 describe('Btn primitive component', () => {

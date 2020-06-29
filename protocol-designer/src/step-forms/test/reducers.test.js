@@ -1,41 +1,42 @@
 // @flow
 import {
   MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import {
-  orderedStepIds,
+  INITIAL_DECK_SETUP_STEP_ID,
+  PAUSE_UNTIL_TEMP,
+  SPAN7_8_10_11_SLOT,
+} from '../../constants'
+import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
+import { moveDeckItem } from '../../labware-ingred/actions'
+import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import type { DeckSlot } from '../../types'
+import { uuid } from '../../utils'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import {
   labwareInvariantProperties,
   moduleInvariantProperties,
+  orderedStepIds,
   presavedStepForm,
   savedStepForms,
   unsavedForm,
 } from '../reducers'
 import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
+  _getLabwareEntitiesRootState,
+  _getPipetteEntitiesRootState,
 } from '../selectors'
-import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
-import { moveDeckItem } from '../../labware-ingred/actions'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  SPAN7_8_10_11_SLOT,
-  PAUSE_UNTIL_TEMP,
-} from '../../constants'
-import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
-import {
-  createPresavedStepForm,
-  type CreatePresavedStepFormArgs,
-} from '../utils/createPresavedStepForm'
 import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-import { uuid } from '../../utils'
-import type { DeckSlot } from '../../types'
+import {
+  type CreatePresavedStepFormArgs,
+  createPresavedStepForm,
+} from '../utils/createPresavedStepForm'
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')
 jest.mock('../../steplist/formLevel/handleFormChange')

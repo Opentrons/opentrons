@@ -1,13 +1,12 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
 
-import type { ThermocyclerModule, ModuleCommand } from '../../modules/types'
+import type { ModuleCommand, ThermocyclerModule } from '../../modules/types'
 import { formatSeconds } from '../../robot/selectors' // TODO: move helper from robot selector to helper file
 import { TemperatureControl, TemperatureData } from '../ModuleControls'
-
 import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'
 import styles from './styles.css'

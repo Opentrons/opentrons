@@ -1,23 +1,23 @@
 // @flow
-import * as React from 'react'
-import { Formik } from 'formik'
-import * as Yup from 'yup'
-// TODO: Ian 2018-10-19 move the processors out of steplist (chore)
-import * as fieldProcessors from '../../steplist/fieldLevel/processing'
+import type { Options } from '@opentrons/components'
 import {
   DropdownField,
-  InputField,
   FormGroup,
+  InputField,
   OutlineButton,
   PrimaryButton,
 } from '@opentrons/components'
+import { Formik } from 'formik'
+import type { FormikProps } from 'formik/@flow-typed'
+import * as React from 'react'
+import * as Yup from 'yup'
+
 import { i18n } from '../../localization'
-import styles from './LiquidPlacementForm.css'
+// TODO: Ian 2018-10-19 move the processors out of steplist (chore)
+import * as fieldProcessors from '../../steplist/fieldLevel/processing'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
-
-import type { Options } from '@opentrons/components'
-import type { FormikProps } from 'formik/@flow-typed'
+import styles from './LiquidPlacementForm.css'
 
 type ValidFormValues = {|
   selectedLiquidId: string,

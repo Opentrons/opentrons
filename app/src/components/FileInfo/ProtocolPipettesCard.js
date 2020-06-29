@@ -1,24 +1,22 @@
 // @flow
 // setup pipettes component
+import { Icon } from '@opentrons/components'
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Icon } from '@opentrons/components'
 import {
-  PIPETTE_MOUNTS,
   fetchPipettes,
   getProtocolPipettesInfo,
   getProtocolPipettesMatch,
   getSomeProtocolPipettesInexact,
+  PIPETTE_MOUNTS,
 } from '../../pipettes'
-import { InstrumentItem } from './InstrumentItem'
+import type { Dispatch, State } from '../../types'
 import { SectionContentHalf } from '../layout'
 import { InfoSection } from './InfoSection'
+import { InstrumentItem } from './InstrumentItem'
 import { MissingItemWarning } from './MissingItemWarning'
-
 import styles from './styles.css'
-
-import type { State, Dispatch } from '../../types'
 
 export type ProtocolPipettesCardProps = {| robotName: string |}
 

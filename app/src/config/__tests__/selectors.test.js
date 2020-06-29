@@ -1,8 +1,7 @@
 // @flow
 
-import * as Selectors from '../selectors'
-
 import type { State } from '../../types'
+import * as Selectors from '../selectors'
 import type { Config } from '../types'
 
 type MockState = $Shape<{| ...State, config: $Shape<Config> | null |}>

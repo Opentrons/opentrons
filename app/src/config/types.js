@@ -1,14 +1,13 @@
 // @flow
 import typeof {
-  INITIALIZED,
-  VALUE_UPDATED,
-  UPDATE_VALUE,
-  RESET_VALUE,
-  TOGGLE_VALUE,
   ADD_UNIQUE_VALUE,
+  INITIALIZED,
+  RESET_VALUE,
   SUBTRACT_VALUE,
+  TOGGLE_VALUE,
+  UPDATE_VALUE,
+  VALUE_UPDATED,
 } from './constants'
-
 import type { Config } from './schema-types'
 export type * from './schema-types'
 

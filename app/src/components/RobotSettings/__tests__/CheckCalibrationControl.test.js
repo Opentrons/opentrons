@@ -1,21 +1,19 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
+import { Icon, Tooltip } from '@opentrons/components'
 import { mount } from 'enzyme'
 import { noop } from 'lodash'
+import * as React from 'react'
+import { Provider } from 'react-redux'
 
-import * as Sessions from '../../../sessions'
 import * as RobotApi from '../../../robot-api'
 import { mockRobot } from '../../../robot-api/__fixtures__'
-
-import { Icon, Tooltip } from '@opentrons/components'
+import type { RequestState } from '../../../robot-api/types'
+import * as Sessions from '../../../sessions'
+import type { State } from '../../../types'
+import { CheckCalibration } from '../../CheckCalibration'
 import { Portal } from '../../portal'
 import { TitledControl } from '../../TitledControl'
-import { CheckCalibration } from '../../CheckCalibration'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
-
-import type { State } from '../../../types'
-import type { RequestState } from '../../../robot-api/types'
 
 jest.mock('../../../robot-api/selectors')
 jest.mock('../../CheckCalibration', () => ({

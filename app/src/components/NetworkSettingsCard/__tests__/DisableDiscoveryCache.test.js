@@ -1,15 +1,14 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
+import { LabeledToggle } from '@opentrons/components'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
+import * as React from 'react'
+import { Provider } from 'react-redux'
 
 import * as Cfg from '../../../config'
-import { LabeledToggle } from '@opentrons/components'
-import { DisableDiscoveryCache } from '../DisableDiscoveryCache'
-
-import type { State } from '../../../types'
 import type { Config } from '../../../config/types'
+import type { State } from '../../../types'
+import { DisableDiscoveryCache } from '../DisableDiscoveryCache'
 
 jest.mock('../../../config/selectors')
 

@@ -1,9 +1,10 @@
 // @flow
-import uuidv1 from 'uuid/v1'
-import { makeWellSetHelpers, type WellSetHelpers } from '@opentrons/shared-data'
-import { i18n } from '../localization'
 import type { WellGroup } from '@opentrons/components'
+import { type WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
+import uuidv1 from 'uuid/v1'
+
 import type { BoundingRect, GenericRect } from '../collision-types'
+import { i18n } from '../localization'
 
 export const registerSelectors: any => void =
   process.env.NODE_ENV === 'development'

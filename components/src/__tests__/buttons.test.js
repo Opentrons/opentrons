@@ -5,9 +5,9 @@ import Renderer from 'react-test-renderer'
 import {
   Button,
   FlatButton,
-  PrimaryButton,
-  OutlineButton,
   IconButton,
+  OutlineButton,
+  PrimaryButton,
 } from '..'
 
 describe('buttons', () => {

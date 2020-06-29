@@ -1,11 +1,10 @@
 // @flow
 // prompt for ReviewDeck of labware calibration page
+import { OutlineButton } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import * as React from 'react'
 
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { OutlineButton } from '@opentrons/components'
-import { selectors as robotSelectors, type Labware } from '../../robot'
-
+import { type Labware, selectors as robotSelectors } from '../../robot'
 import styles from './styles.css'
 
 export type PromptProps = {|

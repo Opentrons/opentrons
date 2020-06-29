@@ -1,10 +1,9 @@
 // @flow
+import { AlertItem, SpinnerModal, Splash } from '@opentrons/components'
 import * as React from 'react'
 
-import { Splash, SpinnerModal, AlertItem } from '@opentrons/components'
-import { Page } from '../../components/Page'
 import { FileInfo as FileInfoContents } from '../../components/FileInfo'
-
+import { Page } from '../../components/Page'
 import type { Robot } from '../../discovery/types'
 
 // TODO(mc, 2019-11-25): i18n

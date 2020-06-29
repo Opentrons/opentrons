@@ -1,18 +1,18 @@
 // @flow
 // labware definition helpers
 // TODO(mc, 2019-03-18): move to shared-data?
-import * as React from 'react'
-import { Route } from 'react-router-dom'
+import {
+  type LabwareDefinition2,
+  LABWAREV2_DO_NOT_LIST,
+} from '@opentrons/shared-data'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
-import {
-  LABWAREV2_DO_NOT_LIST,
-  type LabwareDefinition2,
-} from '@opentrons/shared-data'
-import { getPublicPath } from './public-path'
-
+import * as React from 'react'
 import type { ContextRouter } from 'react-router-dom'
-import type { LabwareList, LabwareDefinition } from './types'
+import { Route } from 'react-router-dom'
+
+import { getPublicPath } from './public-path'
+import type { LabwareDefinition, LabwareList } from './types'
 
 // require all definitions in the labware/definitions/2 directory
 // require.context is webpack-specific method

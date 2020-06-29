@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react'
 
-import { ModuleItem, NoModulesMessage } from '../ModuleItem'
-
 import type { AttachedModule } from '../../modules/types'
+import { ModuleItem, NoModulesMessage } from '../ModuleItem'
 
 type Props = {|
   modules: Array<AttachedModule>,

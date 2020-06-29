@@ -1,17 +1,16 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
+import * as React from 'react'
+import { Provider } from 'react-redux'
 
-import * as AppAlerts from '../../../alerts'
 import { Alerts } from '..'
-import { LostConnectionAlert } from '../../LostConnectionAlert'
-import { AnalyticsSettingsModal } from '../../analytics-settings'
-import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
-
-import type { State } from '../../../types'
+import * as AppAlerts from '../../../alerts'
 import type { AlertId } from '../../../alerts/types'
+import type { State } from '../../../types'
+import { AnalyticsSettingsModal } from '../../analytics-settings'
+import { LostConnectionAlert } from '../../LostConnectionAlert'
+import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 
 jest.mock('../../LostConnectionAlert', () => ({
   LostConnectionAlert: () => <></>,

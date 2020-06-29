@@ -1,7 +1,7 @@
 // @flow
+import { Card } from '@opentrons/components'
 import * as React from 'react'
 
-import { Card } from '@opentrons/components'
 import { AddManualIp } from './AddManualIp'
 import { ClearDiscoveryCache } from './ClearDiscoveryCache'
 import { DisableDiscoveryCache } from './DisableDiscoveryCache'

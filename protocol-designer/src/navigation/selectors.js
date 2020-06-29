@@ -1,7 +1,6 @@
 // @flow
 import type { BaseState, Selector } from '../types'
 import { rootSelector as navigationRootSelector } from './reducers'
-
 import type { Page } from './types'
 
 export const getNewProtocolModal: Selector<boolean> = (state: BaseState) =>

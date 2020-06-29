@@ -1,17 +1,16 @@
 // @flow
-import * as React from 'react'
-import { connect } from 'react-redux'
 import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
 import cx from 'classnames'
+import * as React from 'react'
+import { connect } from 'react-redux'
+
+import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
 import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
-import { WellOrderModal } from './WellOrderModal'
-
 import type { BaseState } from '../../../../types'
-
 import stepEditStyles from '../../StepEditForm.css'
 import styles from './WellOrderInput.css'
+import { WellOrderModal } from './WellOrderModal'
 
 type OP = {|
   className?: ?string,

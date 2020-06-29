@@ -1,25 +1,25 @@
 // @flow
+import { OutlineButton, PrimaryButton } from '@opentrons/components'
+import { saveAs } from 'file-saver'
+import find from 'lodash/find'
+import partition from 'lodash/partition'
+import pick from 'lodash/pick'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { PrimaryButton, OutlineButton } from '@opentrons/components'
-import find from 'lodash/find'
-import pick from 'lodash/pick'
-import partition from 'lodash/partition'
-import type { State } from '../../types'
-import * as Sessions from '../../sessions'
-import * as Calibration from '../../calibration'
-import styles from './styles.css'
-import { PipetteComparisons } from './PipetteComparisons'
-import { BadOutcomeBody } from './BadOutcomeBody'
-import { saveAs } from 'file-saver'
-import { getBadOutcomeHeader } from './utils'
 
+import * as Calibration from '../../calibration'
 import type { CalibrationStatus } from '../../calibration/types'
+import * as Sessions from '../../sessions'
 import type {
-  RobotCalibrationCheckComparisonsByStep,
   RobotCalibrationCheckComparison,
+  RobotCalibrationCheckComparisonsByStep,
   RobotCalibrationCheckInstrument,
 } from '../../sessions/types'
+import type { State } from '../../types'
+import { BadOutcomeBody } from './BadOutcomeBody'
+import { PipetteComparisons } from './PipetteComparisons'
+import styles from './styles.css'
+import { getBadOutcomeHeader } from './utils'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
 const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'

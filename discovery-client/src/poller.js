@@ -5,8 +5,8 @@ import fetch from 'node-fetch'
 
 import type {
   Candidate,
-  Logger,
   HealthResponse,
+  Logger,
   ServerHealthResponse,
 } from './types'
 

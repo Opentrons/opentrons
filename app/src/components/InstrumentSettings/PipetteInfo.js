@@ -1,16 +1,15 @@
 // @flow
-import * as React from 'react'
-import { Link } from 'react-router-dom'
-import cx from 'classnames'
-
 import {
+  InstrumentDiagram,
   LabeledValue,
   OutlineButton,
-  InstrumentDiagram,
 } from '@opentrons/components'
-import styles from './styles.css'
+import cx from 'classnames'
+import * as React from 'react'
+import { Link } from 'react-router-dom'
 
-import type { Mount, AttachedPipette } from '../../pipettes/types'
+import type { AttachedPipette, Mount } from '../../pipettes/types'
+import styles from './styles.css'
 
 export type PipetteInfoProps = {|
   mount: Mount,

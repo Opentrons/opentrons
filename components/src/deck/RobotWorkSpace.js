@@ -1,8 +1,9 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
-import { DeckFromData } from './Deck'
 import type { DeckDefinition } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
+
+import { DeckFromData } from './Deck'
 import styles from './RobotWorkSpace.css'
 import type { RobotWorkSpaceRenderProps } from './types'
 

@@ -1,27 +1,26 @@
 // @flow
-import * as React from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
-import { createGlobalStyle } from 'styled-components'
-
 import 'typeface-open-sans'
 
 import {
-  Flex,
   Box,
   C_DARK_GRAY,
-  POSITION_RELATIVE,
-  POSITION_FIXED,
   DIRECTION_ROW,
+  Flex,
+  POSITION_FIXED,
+  POSITION_RELATIVE,
 } from '@opentrons/components'
+import * as React from 'react'
+import { Redirect, Route, Switch } from 'react-router-dom'
+import { createGlobalStyle } from 'styled-components'
 
-import { Robots } from '../../pages/Robots'
-import { More } from '../../pages/More'
-import { Upload } from '../../pages/Upload'
 import { Calibrate } from '../../pages/Calibrate'
+import { More } from '../../pages/More'
+import { Robots } from '../../pages/Robots'
 import { Run } from '../../pages/Run'
 import { SidePanel } from '../../pages/SidePanel'
-import { NavBar } from '../nav-bar'
+import { Upload } from '../../pages/Upload'
 import { Alerts } from '../Alerts'
+import { NavBar } from '../nav-bar'
 import { PortalRoot as ModalPortalRoot } from '../portal'
 
 const GlobalStyle = createGlobalStyle`

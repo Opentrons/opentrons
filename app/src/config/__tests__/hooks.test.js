@@ -1,13 +1,12 @@
 // @flow
-import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
-
-import * as Selectors from '../selectors'
-import { useFeatureFlag } from '../hooks'
+import * as React from 'react'
+import { Provider } from 'react-redux'
 
 import type { State } from '../../types'
+import { useFeatureFlag } from '../hooks'
+import * as Selectors from '../selectors'
 import type { FeatureFlags } from '../types'
 
 jest.mock('../selectors')

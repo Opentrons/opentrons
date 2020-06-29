@@ -3,19 +3,16 @@ import { ofType } from 'redux-observable'
 import { of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
-import { GET, POST, fetchRobotApi } from '../../robot-api'
-import { withRobotHost } from '../../robot-api/operators'
 import { getAttachedPipettes } from '../../pipettes'
-
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-
-import type { State, Action, Epic } from '../../types'
+import { fetchRobotApi, GET, POST } from '../../robot-api'
+import { withRobotHost } from '../../robot-api/operators'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
 } from '../../robot-api/types'
-
+import type { Action, Epic, State } from '../../types'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
 import type { MoveAction, PositionsResponse } from '../types'
 
 const mapActionToRequest = (

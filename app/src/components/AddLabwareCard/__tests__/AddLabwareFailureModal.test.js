@@ -1,15 +1,14 @@
 // @flow
-import * as React from 'react'
-import { shallow, mount } from 'enzyme'
-
 import { AlertModal } from '@opentrons/components'
+import { mount, shallow } from 'enzyme'
+import * as React from 'react'
+
+import * as LabwareFixtures from '../../../custom-labware/__fixtures__'
 import { Portal } from '../../portal'
 import {
   AddLabwareFailureModal,
   AddLabwareFailureModalTemplate,
 } from '../AddLabwareFailureModal'
-
-import * as LabwareFixtures from '../../../custom-labware/__fixtures__'
 
 describe('AddLabwareFailureModal', () => {
   const mockDirectory = '/path/to/labware'

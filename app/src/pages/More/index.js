@@ -1,7 +1,7 @@
 // @flow
 // more nav button routes
 import * as React from 'react'
-import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom'
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
 
 import { AppSettings } from './AppSettings'
 import { CustomLabware } from './CustomLabware'

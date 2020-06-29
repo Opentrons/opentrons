@@ -3,11 +3,11 @@
 
 import type {
   Method,
-  RobotHost,
   RobotApiRequestMeta,
   RobotApiResponseMeta,
   RobotApiV2Error,
   RobotApiV2ErrorResponseBody,
+  RobotHost,
 } from '../types'
 
 export type ResponseFixturesOptions<SuccessBody, FailureBody> = {|

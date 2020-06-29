@@ -1,9 +1,10 @@
 // @flow
 import assert from 'assert'
+
 import type { HydratedTemperatureFormData } from '../../../form-types'
 import type {
-  SetTemperatureArgs,
   DeactivateTemperatureArgs,
+  SetTemperatureArgs,
 } from '../../../step-generation'
 
 type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs

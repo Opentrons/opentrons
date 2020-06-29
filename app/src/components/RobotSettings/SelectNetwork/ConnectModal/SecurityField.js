@@ -1,13 +1,12 @@
 // @flow
-import * as React from 'react'
 import { SelectField } from '@opentrons/components'
+import * as React from 'react'
 
 import { SECURITY_NONE, SECURITY_WPA_PSK } from '../constants'
 import { LABEL_SECURITY_NONE, LABEL_SECURITY_PSK } from '../i18n'
+import type { EapOption } from '../types'
 import { useConnectFormField } from './form-state'
 import { FormRow } from './FormRow'
-
-import type { EapOption } from '../types'
 
 export type SecurityFieldProps = {|
   id: string,

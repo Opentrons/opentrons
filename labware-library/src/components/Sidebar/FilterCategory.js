@@ -1,18 +1,16 @@
 // @flow
 // filter labware by category
+import cx from 'classnames'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import cx from 'classnames'
 
-import { getAllCategories, buildFiltersUrl } from '../../filters'
-import styles from './styles.css'
-
+import { buildFiltersUrl, getAllCategories } from '../../filters'
 import {
-  PLURAL_CATEGORY_LABELS_BY_CATEGORY,
   CATEGORY,
+  PLURAL_CATEGORY_LABELS_BY_CATEGORY,
 } from '../../localization'
-
 import type { FilterParams } from '../../types'
+import styles from './styles.css'
 
 export type FilterCategoryProps = {|
   filters: FilterParams,

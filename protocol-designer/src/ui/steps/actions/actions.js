@@ -1,22 +1,23 @@
 // @flow
 import forEach from 'lodash/forEach'
+
+import type { StepIdType, StepType } from '../../../form-types'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import type { SubstepIdentifier, TerminalItemId } from '../../../steplist/types'
+import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
 import { uuid } from '../../../utils'
 import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../constants'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import type { StepIdType, StepType } from '../../../form-types'
-import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
-import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
 import type {
   AddStepAction,
+  ClearWellSelectionLabwareKeyAction,
   ExpandAddStepButtonAction,
-  ToggleStepCollapsedAction,
   HoverOnStepAction,
   HoverOnSubstepAction,
-  SelectTerminalItemAction,
   HoverOnTerminalItemAction,
-  SetWellSelectionLabwareKeyAction,
-  ClearWellSelectionLabwareKeyAction,
   SelectStepAction,
+  SelectTerminalItemAction,
+  SetWellSelectionLabwareKeyAction,
+  ToggleStepCollapsedAction,
 } from './types'
 
 // adds an incremental integer ID for Step reducers.

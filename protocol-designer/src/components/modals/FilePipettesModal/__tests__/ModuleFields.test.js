@@ -1,14 +1,15 @@
 // @flow
 
-import React from 'react'
-import { shallow } from 'enzyme'
-import {
-  MAGNETIC_MODULE_V2,
-  THERMOCYCLER_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-} from '@opentrons/shared-data'
 import { CheckboxField } from '@opentrons/components'
+import {
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import { shallow } from 'enzyme'
+import React from 'react'
+
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
 import { ModuleDiagram } from '../../../modules'
 import { ModuleFields } from '../ModuleFields'

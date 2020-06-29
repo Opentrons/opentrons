@@ -1,22 +1,23 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Alerts, type Props } from '../alerts/Alerts'
+import type { Dispatch } from 'redux'
+
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../dismiss'
-import { getSelectedStepId } from '../../ui/steps'
+import type { StepIdType } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import type { StepFieldName } from '../../steplist/fieldLevel'
+import type { BaseState } from '../../types'
+import { getSelectedStepId } from '../../ui/steps'
+import { type Props, Alerts } from '../alerts/Alerts'
 import {
   getVisibleFormErrors,
   getVisibleFormWarnings,
   getVisibleProfileFormLevelErrors,
 } from './utils'
-import type { Dispatch } from 'redux'
-import type { StepIdType } from '../../form-types'
-import type { StepFieldName } from '../../steplist/fieldLevel'
-import type { BaseState } from '../../types'
 
 /* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
  * see #1814 for reference

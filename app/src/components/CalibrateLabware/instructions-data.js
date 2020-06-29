@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+
 import type { LabwareCalibrationProps } from './ConfirmPositionDiagram'
 
 type Step = 'one' | 'two'

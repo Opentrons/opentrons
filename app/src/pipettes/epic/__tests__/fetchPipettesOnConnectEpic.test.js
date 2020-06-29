@@ -1,10 +1,9 @@
 // @flow
 import { TestScheduler } from 'rxjs/testing'
 
+import * as Fixtures from '../../__fixtures__'
 import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as RobotSelectors from '../../../robot/selectors'
-import * as Fixtures from '../../__fixtures__'
-
 import * as Actions from '../../actions'
 import { pipettesEpic } from '../../epic'
 

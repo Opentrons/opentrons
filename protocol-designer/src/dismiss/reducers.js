@@ -1,16 +1,15 @@
 // @flow
+import omit from 'lodash/omit'
+import type { Reducer } from 'redux'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import omit from 'lodash/omit'
 
 import { getPDMetadata } from '../file-types'
-
-import type { Reducer } from 'redux'
-import type { DismissFormWarning, DismissTimelineWarning } from './actions'
-import type { BaseState, Action } from '../types'
+import type { StepIdType } from '../form-types'
 import type { LoadFileAction } from '../load-file'
 import type { DeleteStepAction } from '../steplist/actions'
-import type { StepIdType } from '../form-types'
+import type { Action, BaseState } from '../types'
+import type { DismissFormWarning, DismissTimelineWarning } from './actions'
 
 export type WarningType = string
 

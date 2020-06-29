@@ -1,8 +1,7 @@
 // @flow
 // TODO(mc, 2020-02-19): no longer used; remove
+import { type ModuleModel, getModuleDisplayName } from '@opentrons/shared-data'
 import * as React from 'react'
-
-import { getModuleDisplayName, type ModuleModel } from '@opentrons/shared-data'
 
 import styles from './Module.css'
 

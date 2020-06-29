@@ -1,12 +1,11 @@
 // @flow
 import { GET } from '../../robot-api'
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
 import { CALIBRATION_STATUS_PATH, DECK_CAL_STATUS_IDENTITY } from '../constants'
-
-import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { CalibrationStatus } from '../types'
 
 export const mockCalibrationStatus: CalibrationStatus = {

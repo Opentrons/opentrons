@@ -1,10 +1,9 @@
 // @flow
 
 import * as Cfg from '../../config'
-import * as Selectors from '../selectors'
-
-import type { State } from '../../types'
 import type { Config } from '../../config/types'
+import type { State } from '../../types'
+import * as Selectors from '../selectors'
 import type { AlertId } from '../types'
 
 jest.mock('../../config/selectors')

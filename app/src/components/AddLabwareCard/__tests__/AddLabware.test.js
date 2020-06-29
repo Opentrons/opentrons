@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
 import { mount } from 'enzyme'
+import * as React from 'react'
 
-import { AddLabware, ADD_LABWARE_NAME } from '../AddLabware'
+import { ADD_LABWARE_NAME, AddLabware } from '../AddLabware'
 
 describe('AddLabware', () => {
   const mockOnAddLabware = jest.fn()

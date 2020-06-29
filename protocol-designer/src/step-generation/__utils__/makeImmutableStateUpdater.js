@@ -1,6 +1,7 @@
 // @flow
 import produce from 'immer'
-import type { RobotState, RobotStateAndWarnings, InvariantContext } from '../'
+
+import type { InvariantContext, RobotState, RobotStateAndWarnings } from '../'
 
 export type ImmutableStateUpdater<P> = (
   params: P,

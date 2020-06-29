@@ -2,16 +2,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import type { SessionStatus, SessionStatusInfo } from '../../robot'
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-
-import { CommandList } from './CommandList'
-
-import type { State, Dispatch } from '../../types'
-import type { SessionStatus, SessionStatusInfo } from '../../robot'
+import type { Dispatch, State } from '../../types'
 import type { CommandListProps } from './CommandList'
+import { CommandList } from './CommandList'
 
 export { ConfirmCancelModal } from './ConfirmCancelModal'
 

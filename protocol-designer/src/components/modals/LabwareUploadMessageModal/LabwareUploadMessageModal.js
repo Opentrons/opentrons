@@ -1,15 +1,16 @@
 // @flow
+import {
+  type ButtonProps,
+  AlertModal,
+  OutlineButton,
+} from '@opentrons/components'
 import assert from 'assert'
 import cx from 'classnames'
 import * as React from 'react'
-import {
-  AlertModal,
-  OutlineButton,
-  type ButtonProps,
-} from '@opentrons/components'
+
+import type { LabwareUploadMessage } from '../../../labware-defs'
 import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
-import type { LabwareUploadMessage } from '../../../labware-defs'
 
 const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
   const { message } = props

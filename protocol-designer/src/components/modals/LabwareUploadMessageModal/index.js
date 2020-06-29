@@ -2,13 +2,14 @@
 import assert from 'assert'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import {
-  selectors as labwareDefSelectors,
-  actions as labwareDefActions,
-} from '../../../labware-defs'
-import { LabwareUploadMessageModal as LabwareUploadMessageModalComponent } from './LabwareUploadMessageModal'
 import type { Dispatch } from 'redux'
+
+import {
+  actions as labwareDefActions,
+  selectors as labwareDefSelectors,
+} from '../../../labware-defs'
 import type { BaseState } from '../../../types'
+import { LabwareUploadMessageModal as LabwareUploadMessageModalComponent } from './LabwareUploadMessageModal'
 
 type Props = React.ElementProps<typeof LabwareUploadMessageModalComponent>
 

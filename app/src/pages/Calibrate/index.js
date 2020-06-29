@@ -2,14 +2,13 @@
 // calibrate page routes
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom'
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
 
-import type { State, Dispatch } from '../../types'
-import type { Pipette, Labware } from '../../robot'
-
+import type { Labware, Pipette } from '../../robot'
 import { selectors as robotSelectors } from '../../robot'
-import { Pipettes as CalibratePipettes } from './Pipettes'
+import type { Dispatch, State } from '../../types'
 import { Labware as CalibrateLabware } from './Labware'
+import { Pipettes as CalibratePipettes } from './Pipettes'
 
 type OP = {||}
 

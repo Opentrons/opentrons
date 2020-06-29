@@ -1,7 +1,8 @@
 // @flow
-import get from 'lodash/get'
 import assert from 'assert'
+import get from 'lodash/get'
 import type { Store } from 'redux'
+
 import { dismissedHintsPersist } from './tutorial/reducers'
 
 export type RehydratePersistedAction = {|

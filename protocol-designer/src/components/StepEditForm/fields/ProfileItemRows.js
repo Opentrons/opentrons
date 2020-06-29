@@ -1,30 +1,31 @@
 // @flow
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import cx from 'classnames'
 import {
+  Icon,
   InputField,
   OutlineButton,
-  Icon,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import type {
+  ProfileCycleItem,
+  ProfileItem,
+  ProfileStepItem,
+} from '../../../form-types'
+import { PROFILE_CYCLE } from '../../../form-types'
 import { i18n } from '../../../localization'
 import { getUnsavedForm } from '../../../step-forms/selectors'
 import * as steplistActions from '../../../steplist/actions'
-import { PROFILE_CYCLE } from '../../../form-types'
 import {
   getProfileFieldErrors,
   maskProfileField,
 } from '../../../steplist/fieldLevel'
-import { getDynamicFieldFocusHandlerId } from '../utils'
 import styles from '../StepEditForm.css'
-import type {
-  ProfileStepItem,
-  ProfileItem,
-  ProfileCycleItem,
-} from '../../../form-types'
 import type { FocusHandlers } from '../types'
+import { getDynamicFieldFocusHandlerId } from '../utils'
 
 export const showProfileFieldErrors = ({
   fieldId,

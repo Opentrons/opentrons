@@ -1,13 +1,11 @@
 // @flow
-import * as React from 'react'
+import { FormGroup } from '@opentrons/components'
 import cx from 'classnames'
+import * as React from 'react'
 
 import { i18n } from '../../../../localization'
-import { FormGroup } from '@opentrons/components'
-import { ConditionalOnField, ToggleRowField, TextField } from '../../fields'
-
+import { ConditionalOnField, TextField, ToggleRowField } from '../../fields'
 import styles from '../../StepEditForm.css'
-
 import type { FocusHandlers } from '../../types'
 
 type Props = {| focusHandlers: FocusHandlers, isEndingHold?: boolean |}

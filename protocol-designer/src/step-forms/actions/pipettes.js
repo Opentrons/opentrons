@@ -1,6 +1,6 @@
 // @flow
-import type { NormalizedPipetteById } from '../types'
 import type { StepIdType } from '../../form-types'
+import type { NormalizedPipetteById } from '../types'
 
 export type CreatePipettesAction = {|
   type: 'CREATE_PIPETTES',

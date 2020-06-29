@@ -1,11 +1,10 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
-
-import { Button } from './Button'
-import styles from './buttons.css'
+import * as React from 'react'
 
 import type { ButtonProps } from './Button'
+import { Button } from './Button'
+import styles from './buttons.css'
 
 /**
  * Primary application button. Fills its container and has a dark

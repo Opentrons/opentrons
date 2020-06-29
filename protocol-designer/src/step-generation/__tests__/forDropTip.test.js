@@ -1,13 +1,12 @@
 // @flow
 import {
-  makeStateArgsStandard,
-  makeContext,
-  makeState,
   DEFAULT_PIPETTE,
   FIXED_TRASH_ID,
+  makeContext,
+  makeState,
+  makeStateArgsStandard,
 } from '../__fixtures__'
 import { makeImmutableStateUpdater } from '../__utils__'
-
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
 
 const forDropTip = makeImmutableStateUpdater(_forDropTip)

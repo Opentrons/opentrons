@@ -1,7 +1,7 @@
 // shell/update tests
 
-import * as ShellUpdate from '../update'
 import { shellUpdateReducer } from '../reducer'
+import * as ShellUpdate from '../update'
 
 describe('shell/update', () => {
   describe('action creators', () => {

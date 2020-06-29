@@ -1,60 +1,38 @@
 // @flow
-import assert from 'assert'
-import Ajv from 'ajv'
-import cx from 'classnames'
-import * as React from 'react'
-import { Formik } from 'formik'
-import mapValues from 'lodash/mapValues'
-import { saveAs } from 'file-saver'
-import JSZip from 'jszip'
-import { reportEvent } from '../analytics'
-import { reportErrors } from './analyticsUtils'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
-import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
-import {
-  labwareTypeOptions,
-  tubeRackInsertOptions,
-  aluminumBlockAutofills,
-  aluminumBlockTypeOptions,
-  aluminumBlockChildTypeOptions,
-  getDefaultFormState,
-  getImplicitAutofillValues,
-  yesNoOptions,
-  tubeRackAutofills,
-  SUGGESTED_X,
-  SUGGESTED_Y,
-  SUGGESTED_XY_RANGE,
-  MAX_SUGGESTED_Z,
-  LINK_CUSTOM_LABWARE_FORM,
-} from './fields'
-import { labwareDefToFields } from './labwareDefToFields'
-import { labwareFormSchema } from './labwareFormSchema'
-import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
-import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
-import { fieldsToLabware } from './fieldsToLabware'
-import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
-import { ConditionalLabwareRender } from './components/ConditionalLabwareRender'
-import { Dropdown } from './components/Dropdown'
-import { IntroCopy } from './components/IntroCopy'
-import { LinkOut } from './components/LinkOut'
-import { RadioField } from './components/RadioField'
-import { Section } from './components/Section'
-import { TextField } from './components/TextField'
-import { HeightGuidingText } from './components/HeightGuidingText'
-import { ImportLabware } from './components/ImportLabware'
-import { ImportErrorModal } from './components/ImportErrorModal'
-import {
-  wellShapeOptionsWithIcons,
-  wellBottomShapeOptionsWithIcons,
-} from './components/optionsWithImages'
-import styles from './styles.css'
-
-import type { FormikProps, FormikTouched } from 'formik/@flow-typed'
 import type {
   LabwareDefinition2,
   WellBottomShape,
 } from '@opentrons/shared-data'
+import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import Ajv from 'ajv'
+import assert from 'assert'
+import cx from 'classnames'
+import { saveAs } from 'file-saver'
+import { Formik } from 'formik'
+import type { FormikProps, FormikTouched } from 'formik/@flow-typed'
+import JSZip from 'jszip'
+import mapValues from 'lodash/mapValues'
+import * as React from 'react'
+
+import { reportEvent } from '../analytics'
+import { reportErrors } from './analyticsUtils'
+import { ConditionalLabwareRender } from './components/ConditionalLabwareRender'
+import { Dropdown } from './components/Dropdown'
+import { HeightGuidingText } from './components/HeightGuidingText'
+import { ImportErrorModal } from './components/ImportErrorModal'
+import { ImportLabware } from './components/ImportLabware'
+import { IntroCopy } from './components/IntroCopy'
+import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
+import { LinkOut } from './components/LinkOut'
+import {
+  wellBottomShapeOptionsWithIcons,
+  wellShapeOptionsWithIcons,
+} from './components/optionsWithImages'
+import { RadioField } from './components/RadioField'
+import { Section } from './components/Section'
+import { TextField } from './components/TextField'
+import { makeMaskToDecimal, maskLoadName, maskToInteger } from './fieldMasks'
 import type {
   ImportError,
   LabwareFields,
@@ -62,6 +40,28 @@ import type {
   ProcessedLabwareFields,
   WellShape,
 } from './fields'
+import {
+  aluminumBlockAutofills,
+  aluminumBlockChildTypeOptions,
+  aluminumBlockTypeOptions,
+  getDefaultFormState,
+  getImplicitAutofillValues,
+  labwareTypeOptions,
+  LINK_CUSTOM_LABWARE_FORM,
+  MAX_SUGGESTED_Z,
+  SUGGESTED_X,
+  SUGGESTED_XY_RANGE,
+  SUGGESTED_Y,
+  tubeRackAutofills,
+  tubeRackInsertOptions,
+  yesNoOptions,
+} from './fields'
+import { fieldsToLabware } from './fieldsToLabware'
+import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
+import { labwareDefToFields } from './labwareDefToFields'
+import { labwareFormSchema } from './labwareFormSchema'
+import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
+import styles from './styles.css'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)

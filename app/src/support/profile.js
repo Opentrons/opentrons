@@ -2,15 +2,14 @@
 // functions for managing the user's Intercom profile
 import { version as appVersion } from '../../package.json'
 import { FF_PREFIX, getRobotAnalyticsData } from '../analytics'
+import type { Config } from '../config/types'
 import { getConnectedRobot } from '../discovery'
 import { createLogger } from '../logger'
 import * as Pipettes from '../pipettes'
 import * as RobotSettings from '../robot-settings'
 import * as SystemInfo from '../system-info'
-import * as Constants from './constants'
-
 import type { Action, State } from '../types'
-import type { Config } from '../config/types'
+import * as Constants from './constants'
 import type { SupportProfileUpdate } from './types'
 
 type SupportConfig = $PropertyType<Config, 'support'>

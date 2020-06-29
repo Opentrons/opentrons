@@ -2,7 +2,6 @@
 import * as React from 'react'
 
 import { ScanButton } from './ScanButton'
-
 import styles from './styles.css'
 
 export type ScanStatusProps = {|

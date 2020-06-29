@@ -3,7 +3,7 @@ import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import Renderer from 'react-test-renderer'
 
-import { SidePanelGroup, TitledList, ListItem } from '..'
+import { ListItem, SidePanelGroup, TitledList } from '..'
 
 describe('TitledList', () => {
   it('adds an h3 with the title', () => {

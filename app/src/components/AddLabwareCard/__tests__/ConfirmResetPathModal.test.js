@@ -1,13 +1,13 @@
 // @flow
-import * as React from 'react'
-import { shallow, mount } from 'enzyme'
-
 import { AlertModal } from '@opentrons/components'
+import { mount, shallow } from 'enzyme'
+import * as React from 'react'
+
 import { Portal } from '../../portal'
 import {
+  CANCEL_NAME,
   ConfirmResetPathModal,
   ConfirmResetPathModalTemplate,
-  CANCEL_NAME,
   RESET_SOURCE_NAME,
 } from '../ConfirmResetPathModal'
 

@@ -1,22 +1,22 @@
 // @flow
+import {
+  getLabwareDefIsStandard,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 import omit from 'lodash/omit'
+import pickBy from 'lodash/pickBy'
+import type { Reducer } from 'redux'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import pickBy from 'lodash/pickBy'
-import {
-  getLabwareDefURI,
-  getLabwareDefIsStandard,
-} from '@opentrons/shared-data'
 
-import type { Reducer } from 'redux'
+import type { LoadFileAction } from '../load-file'
 import type { Action } from '../types'
-import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
 import type {
   CreateCustomLabwareDef,
   LabwareUploadMessageAction,
   ReplaceCustomLabwareDef,
 } from './actions'
-import type { LoadFileAction } from '../load-file'
+import type { LabwareDefByDefURI, LabwareUploadMessage } from './types'
 
 const customDefs = handleActions(
   {

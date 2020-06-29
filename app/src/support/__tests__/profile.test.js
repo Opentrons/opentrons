@@ -1,8 +1,7 @@
 // @flow
 import { version } from '../../../package.json'
-import { initializeProfile, updateProfile } from '../profile'
-
 import type { Config } from '../../config/types'
+import { initializeProfile, updateProfile } from '../profile'
 
 type SupportConfig = $PropertyType<Config, 'support'>
 

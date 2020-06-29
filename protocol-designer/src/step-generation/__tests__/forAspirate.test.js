@@ -1,15 +1,14 @@
 // @flow
-import { AIR, createTipLiquidState } from '../utils/misc'
-import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
   SOURCE_LABWARE,
   TROUGH_LABWARE,
 } from '../__fixtures__'
-
+import { makeImmutableStateUpdater } from '../__utils__'
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
+import { AIR, createTipLiquidState } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)

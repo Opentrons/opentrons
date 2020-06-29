@@ -1,24 +1,25 @@
 // @flow
-import mapValues from 'lodash/mapValues'
 import * as componentLib from '@opentrons/components'
+import type {
+  DeckSlot as DeckDefSlot,
+  LabwareDefinition2,
+  ModuleModel,
+  ModuleRealType,
+} from '@opentrons/shared-data'
 import {
   MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
+  THERMOCYCLER,
+  THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import mapValues from 'lodash/mapValues'
+
 import { i18n } from './localization'
-import type {
-  LabwareDefinition2,
-  DeckSlot as DeckDefSlot,
-  ModuleRealType,
-  ModuleModel,
-} from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this constants file
 export const {

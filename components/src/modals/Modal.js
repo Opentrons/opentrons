@@ -1,10 +1,10 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
+import * as React from 'react'
 import { RemoveScroll } from 'react-remove-scroll'
 
-import { Overlay } from './Overlay'
 import styles from './modals.css'
+import { Overlay } from './Overlay'
 
 export type ModalProps = {|
   /** handler to close the modal (attached to `Overlay` onClick) */

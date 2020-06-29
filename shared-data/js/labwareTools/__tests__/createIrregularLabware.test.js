@@ -1,15 +1,14 @@
 import omit from 'lodash/omit'
 import range from 'lodash/range'
 
-import {
-  createIrregularLabware,
-  _irregularWellName,
-  _generateIrregularLoadName,
-  _calculateWellCoord,
-} from '../index.js'
-import { splitWellsOnColumn, sortWells } from '../../helpers/index.js'
-
 import fixture_irregular_example_1 from '../../../labware/fixtures/2/fixture_irregular_example_1.json'
+import { sortWells, splitWellsOnColumn } from '../../helpers/index.js'
+import {
+  _calculateWellCoord,
+  _generateIrregularLoadName,
+  _irregularWellName,
+  createIrregularLabware,
+} from '../index.js'
 
 // NOTE: loadName needs to be replaced here b/c fixture has a non-default loadName
 const exampleLabware1 = {

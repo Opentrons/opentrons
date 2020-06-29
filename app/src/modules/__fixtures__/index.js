@@ -1,7 +1,7 @@
 // @flow
 
-import * as Types from '../types'
 import * as ApiTypes from '../api-types'
+import * as Types from '../types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 

@@ -1,33 +1,33 @@
 // @flow
-import * as React from 'react'
-import { connect } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
+import * as React from 'react'
+import { connect } from 'react-redux'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
-import { uuid } from '../../../utils'
-import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { selectors, actions as navigationActions } from '../../../navigation'
+import * as labwareDefActions from '../../../labware-defs/actions'
+import * as labwareDefSelectors from '../../../labware-defs/selectors'
+import type { LabwareDefByDefURI } from '../../../labware-defs/types'
+import * as labwareIngredActions from '../../../labware-ingred/actions'
+import type { NewProtocolFields } from '../../../load-file'
 import {
   actions as fileActions,
   selectors as loadFileSelectors,
 } from '../../../load-file'
-import * as labwareDefSelectors from '../../../labware-defs/selectors'
-import * as labwareDefActions from '../../../labware-defs/actions'
-
-import * as labwareIngredActions from '../../../labware-ingred/actions'
+import { i18n } from '../../../localization'
+import { actions as navigationActions, selectors } from '../../../navigation'
+import type { NormalizedPipette, PipetteOnDeck } from '../../../step-forms'
 import { actions as stepFormActions } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
+import type { BaseState, ThunkDispatch } from '../../../types'
+import { uuid } from '../../../utils'
 import {
-  FilePipettesModal as FilePipettesModalComponent,
   type ModuleCreationArgs,
   type PipetteFieldsData,
+  FilePipettesModal as FilePipettesModalComponent,
 } from '../FilePipettesModal'
-import type { BaseState, ThunkDispatch } from '../../../types'
-import type { NewProtocolFields } from '../../../load-file'
-import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
-import type { LabwareDefByDefURI } from '../../../labware-defs/types'
 
 type Props = React.ElementProps<typeof FilePipettesModalComponent>
 

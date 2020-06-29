@@ -1,21 +1,19 @@
 // @flow
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-
 import {
   Box,
-  Text,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   SPACING_2,
   SPACING_3,
+  Text,
 } from '@opentrons/components'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 import * as SystemInfo from '../../system-info'
-import { U2EDriverWarning } from './U2EDriverWarning'
-import { U2EDeviceDetails } from './U2EDeviceDetails'
-
 import type { State } from '../../types'
+import { U2EDeviceDetails } from './U2EDeviceDetails'
+import { U2EDriverWarning } from './U2EDriverWarning'
 
 const U2E_ADAPTER_INFORMATION = 'USB-to-Ethernet Adapter Information'
 

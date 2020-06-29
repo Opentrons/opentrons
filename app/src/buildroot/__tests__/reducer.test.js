@@ -1,5 +1,5 @@
 import { mockRobot } from '../../robot-api/__fixtures__'
-import { INITIAL_STATE, buildrootReducer } from '../reducer'
+import { buildrootReducer, INITIAL_STATE } from '../reducer'
 
 const BASE_SESSION = {
   robotName: mockRobot.name,

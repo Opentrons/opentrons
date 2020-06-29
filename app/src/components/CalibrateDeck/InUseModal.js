@@ -1,7 +1,6 @@
 // @flow
-import * as React from 'react'
-
 import { AlertModal, CheckboxField } from '@opentrons/components'
+import * as React from 'react'
 
 export type InUseModalProps = {|
   close: () => mixed,

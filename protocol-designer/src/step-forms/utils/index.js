@@ -1,30 +1,31 @@
 // @flow
-import assert from 'assert'
-import reduce from 'lodash/reduce'
-import values from 'lodash/values'
-import find from 'lodash/find'
+import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
 import {
   getPipetteNameSpecs,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import assert from 'assert'
+import find from 'lodash/find'
+import reduce from 'lodash/reduce'
+import values from 'lodash/values'
+
 import {
+  GEN_ONE_MULTI_PIPETTES,
   SPAN7_8_10_11_SLOT,
   TC_SPAN_SLOTS,
-  GEN_ONE_MULTI_PIPETTES,
 } from '../../constants'
-import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { DeckSlot } from '../../types'
 import type {
+  FormPipette,
+  FormPipettesByMount,
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
   NormalizedPipette,
   NormalizedPipetteById,
-  PipetteEntity,
   PipetteEntities,
-  InitialDeckSetup,
-  ModuleOnDeck,
-  FormPipettesByMount,
-  FormPipette,
-  LabwareOnDeck as LabwareOnDeckType,
+  PipetteEntity,
 } from '../types'
 
 export { createPresavedStepForm } from './createPresavedStepForm'

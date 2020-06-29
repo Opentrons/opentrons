@@ -1,18 +1,18 @@
 // @flow
-import * as React from 'react'
-import styles from './URLDeck.css'
-
 import {
-  RobotWorkSpace,
   Labware as LegacyLabwareRender,
   LabwareNameOverlay,
   LabwareRender,
   Module,
   RobotCoordsForeignDiv,
+  RobotWorkSpace,
 } from '@opentrons/components'
-import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import type { ModuleModel, DeckSlotId } from '@opentrons/shared-data'
+import type { DeckSlotId, ModuleModel } from '@opentrons/shared-data'
+import * as React from 'react'
+
+import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
+import styles from './URLDeck.css'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
 type UrlData = {

@@ -1,18 +1,16 @@
 // @flow
-import { createSelector } from 'reselect'
 import find from 'lodash/find'
 import map from 'lodash/map'
 import orderBy from 'lodash/orderBy'
 import uniqBy from 'lodash/uniqBy'
 import { long2ip } from 'netmask'
+import { createSelector } from 'reselect'
 import Semver from 'semver'
 
 import { getFeatureFlags } from '../config'
 import { getRobotApiVersionByName } from '../discovery'
-
-import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'
-
 import type { State } from '../types'
+import { INTERFACE_ETHERNET, INTERFACE_WIFI } from './constants'
 import * as Types from './types'
 
 export function getInternetStatus(

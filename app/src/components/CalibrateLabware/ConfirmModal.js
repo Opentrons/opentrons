@@ -1,12 +1,11 @@
 // @flow
 // labware calibration controls modal
-import * as React from 'react'
+import { ModalPage } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import cx from 'classnames'
+import * as React from 'react'
 
 import type { Labware } from '../../robot'
-
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { ModalPage } from '@opentrons/components'
 import { ConfirmModalContents } from './ConfirmModalContents'
 import styles from './styles.css'
 

@@ -3,6 +3,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, DeactivateTemperatureArgs } from '../../types'
 

@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react'
-import styles from './styles.css'
-import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../buildroot'
+
+import { DOWNGRADE, REINSTALL, UPGRADE } from '../../../buildroot'
 import type { BuildrootUpdateType } from '../../../buildroot/types'
+import styles from './styles.css'
 
 export type SyncRobotMessageProps = {|
   updateType: BuildrootUpdateType,

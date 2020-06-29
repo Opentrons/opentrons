@@ -1,19 +1,19 @@
 // @flow
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import * as React from 'react'
+
 import {
-  WellLabels,
-  StyledWells,
   FilledWells,
   StaticLabware,
+  StyledWells,
+  WellLabels,
 } from './labwareInternals'
-import styles from './LabwareRender.css'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  WellMouseEvent,
   WellFill,
   WellGroup,
+  WellMouseEvent,
 } from './labwareInternals/types'
+import styles from './LabwareRender.css'
 
 export type LabwareRenderProps = {|
   definition: LabwareDefinition2,

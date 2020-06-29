@@ -1,8 +1,7 @@
 // @flow
 
-import { robotAdminReducer } from '../reducer'
-
 import type { Action } from '../../types'
+import { robotAdminReducer } from '../reducer'
 import type { RobotAdminState } from '../types'
 
 type ReducerSpec = {|

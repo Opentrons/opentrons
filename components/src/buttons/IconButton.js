@@ -1,14 +1,12 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
-
-import { Icon } from '../icons'
-import { FlatButton } from './FlatButton'
-
-import styles from './buttons.css'
+import * as React from 'react'
 
 import type { IconProps } from '../icons'
+import { Icon } from '../icons'
 import type { ButtonProps } from './Button'
+import styles from './buttons.css'
+import { FlatButton } from './FlatButton'
 
 type Props = {|
   ...$Exact<ButtonProps>,

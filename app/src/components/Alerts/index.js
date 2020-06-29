@@ -1,15 +1,14 @@
 // @flow
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import head from 'lodash/head'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as AppAlerts from '../../alerts'
-import { LostConnectionAlert } from '../LostConnectionAlert'
-import { AnalyticsSettingsModal } from '../analytics-settings'
-import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
-
-import type { State, Dispatch } from '../../types'
 import type { AlertId } from '../../alerts/types'
+import type { Dispatch, State } from '../../types'
+import { AnalyticsSettingsModal } from '../analytics-settings'
+import { LostConnectionAlert } from '../LostConnectionAlert'
+import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 
 export function Alerts(): React.Node {
   const dispatch = useDispatch<Dispatch>()

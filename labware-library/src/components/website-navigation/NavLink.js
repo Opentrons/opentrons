@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
 import cx from 'classnames'
-import styles from './styles.css'
+import * as React from 'react'
 
+import styles from './styles.css'
 import type { Link } from './types'
 
 type Props = {|

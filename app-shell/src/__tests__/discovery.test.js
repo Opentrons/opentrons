@@ -1,13 +1,13 @@
 // tests for the app-shell's discovery module
-import EventEmitter from 'events'
+import { finishDiscovery, startDiscovery } from '@opentrons/app/src/discovery'
+import { createDiscoveryClient } from '@opentrons/discovery-client'
 import { app } from 'electron'
 import Store from 'electron-store'
+import EventEmitter from 'events'
 import noop from 'lodash/noop'
 
-import { createDiscoveryClient } from '@opentrons/discovery-client'
-import { startDiscovery, finishDiscovery } from '@opentrons/app/src/discovery'
-import { registerDiscovery } from '../discovery'
 import { getConfig, getOverrides, handleConfigChange } from '../config'
+import { registerDiscovery } from '../discovery'
 import { createNetworkInterfaceMonitor } from '../system-info'
 
 jest.mock('electron')

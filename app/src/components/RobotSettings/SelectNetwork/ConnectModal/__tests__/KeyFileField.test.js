@@ -1,14 +1,13 @@
 // @flow
-import * as React from 'react'
+import { SelectField } from '@opentrons/components'
 import { shallow } from 'enzyme'
+import * as React from 'react'
 
 import * as Fixtures from '../../../../../networking/__fixtures__'
-import { SelectField } from '@opentrons/components'
-import { UploadKeyInput } from '../UploadKeyInput'
-import { KeyFileField } from '../KeyFileField'
-import * as FormState from '../form-state'
-
 import { LABEL_ADD_NEW_KEY } from '../../i18n'
+import * as FormState from '../form-state'
+import { KeyFileField } from '../KeyFileField'
+import { UploadKeyInput } from '../UploadKeyInput'
 
 jest.mock('../form-state')
 

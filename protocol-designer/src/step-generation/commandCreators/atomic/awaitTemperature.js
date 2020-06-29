@@ -1,12 +1,13 @@
 // @flow
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+
 import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
-import type { CommandCreator, AwaitTemperatureArgs } from '../../types'
 import { getModuleState } from '../../robotStateSelectors'
+import type { AwaitTemperatureArgs, CommandCreator } from '../../types'
 
 /** Set temperature target for specified module. */
 export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (

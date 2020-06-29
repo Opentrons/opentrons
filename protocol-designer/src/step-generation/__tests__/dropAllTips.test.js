@@ -1,17 +1,17 @@
 // @flow
+import {
+  DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  getSuccessResult,
+  makeContext,
+} from '../__fixtures__'
+import { dropAllTips } from '../commandCreators/atomic/dropAllTips'
+import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import type {
   CommandsAndWarnings,
   InvariantContext,
   RobotState,
 } from '../types'
-import {
-  makeContext,
-  getInitialRobotStateStandard,
-  getSuccessResult,
-  DEFAULT_PIPETTE,
-} from '../__fixtures__'
-import { dropAllTips } from '../commandCreators/atomic/dropAllTips'
-import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 

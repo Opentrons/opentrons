@@ -1,6 +1,7 @@
 // @flow
-import assert from 'assert'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import assert from 'assert'
+
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, DisengageMagnetArgs } from '../../types'
 

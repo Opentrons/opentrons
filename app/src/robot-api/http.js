@@ -1,15 +1,15 @@
 // @flow
 // simple fetch wrapper to format URL for robot and parse JSON response
-import { of, from } from 'rxjs'
-import { map, switchMap, catchError } from 'rxjs/operators'
 import mapValues from 'lodash/mapValues'
 import toString from 'lodash/toString'
-
 import type { Observable } from 'rxjs'
+import { from, of } from 'rxjs'
+import { catchError, map, switchMap } from 'rxjs/operators'
+
 import type {
-  RobotHost,
   RobotApiRequestOptions,
   RobotApiResponse,
+  RobotHost,
 } from './types'
 
 export function robotApiUrl(

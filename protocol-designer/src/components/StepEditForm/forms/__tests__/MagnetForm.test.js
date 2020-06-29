@@ -1,7 +1,8 @@
+import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+import { mount } from 'enzyme'
 import React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+
 import { selectors as uiModuleSelectors } from '../../../../ui/modules'
 import * as fields from '../../fields'
 import { MagnetForm } from '../MagnetForm'

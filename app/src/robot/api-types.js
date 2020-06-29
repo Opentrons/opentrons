@@ -1,10 +1,10 @@
 // @flow
 //
 import {
-  typeof TEMPDECK,
-  typeof MAGDECK,
-  typeof THERMOCYCLER,
   type ModuleModel,
+  typeof MAGDECK,
+  typeof TEMPDECK,
+  typeof THERMOCYCLER,
 } from '@opentrons/shared-data'
 
 export type Slot =

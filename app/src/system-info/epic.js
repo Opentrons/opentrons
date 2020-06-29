@@ -1,11 +1,10 @@
 // @flow
-import { map, mapTo, pairwise, filter } from 'rxjs/operators'
+import { filter, map, mapTo, pairwise } from 'rxjs/operators'
 
 import * as Alerts from '../alerts'
+import type { Epic } from '../types'
 import { OUTDATED } from './constants'
 import { getU2EWindowsDriverStatus } from './selectors'
-
-import type { Epic } from '../types'
 
 // dispatch an outdated alert action if the U2E Windows driver status changes
 // and the value that it changes to is OUTDATED

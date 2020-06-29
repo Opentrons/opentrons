@@ -1,6 +1,7 @@
 // @flow
 
 import i18next from 'i18next'
+
 import { en } from './en'
 
 // TODO(IL, 2020-06-08): use a proper type def for i18next module -- but flow-types seems wrong

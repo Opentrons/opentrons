@@ -1,10 +1,10 @@
 // @flow
+import { Button } from '@opentrons/components'
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
 import configureMockStore from 'redux-mock-store'
 
-import { Button } from '@opentrons/components'
 import { ModuleUpdate } from '../ModuleUpdate'
 
 const mockStore = configureMockStore([])

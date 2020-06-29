@@ -1,14 +1,13 @@
 // @flow
 // LabwareList tests
-import * as React from 'react'
 import { shallow } from 'enzyme'
+import * as React from 'react'
 
 import { LabwareList } from '..'
+import * as definitions from '../../../definitions'
+import type { LabwareList as LabwareListType } from '../../../types'
 import { LabwareCard } from '../LabwareCard'
 import { NoResults } from '../NoResults'
-import * as definitions from '../../../definitions'
-
-import type { LabwareList as LabwareListType } from '../../../types'
 
 jest.mock('../../../definitions')
 

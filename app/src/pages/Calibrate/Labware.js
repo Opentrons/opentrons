@@ -2,24 +2,22 @@
 // setup labware page
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Route, Redirect, withRouter } from 'react-router-dom'
+import type { ContextRouter } from 'react-router-dom'
+import { Redirect, Route, withRouter } from 'react-router-dom'
 
-import { selectors as robotSelectors } from '../../robot'
-import { getRobotSettings } from '../../robot-settings'
-import { getUnpreparedModules } from '../../modules'
-
-import { Page } from '../../components/Page'
 import { CalibrateLabware } from '../../components/CalibrateLabware'
-import { SessionHeader } from '../../components/SessionHeader'
-import { ReviewDeck } from '../../components/ReviewDeck'
 import { ConfirmModal } from '../../components/CalibrateLabware/ConfirmModal'
 import { ConnectModules } from '../../components/ConnectModules'
+import { Page } from '../../components/Page'
 import { PrepareModules } from '../../components/PrepareModules'
-
-import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
-import type { Labware as RobotLabware } from '../../robot/types'
+import { ReviewDeck } from '../../components/ReviewDeck'
+import { SessionHeader } from '../../components/SessionHeader'
+import { getUnpreparedModules } from '../../modules'
 import type { AttachedModule } from '../../modules/types'
+import { selectors as robotSelectors } from '../../robot'
+import { getRobotSettings } from '../../robot-settings'
+import type { Labware as RobotLabware } from '../../robot/types'
+import type { Dispatch, State } from '../../types'
 
 type OP = ContextRouter
 

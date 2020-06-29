@@ -1,19 +1,17 @@
 // @flow
+import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import { getMissingModules } from '../../modules'
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import { getMissingModules } from '../../modules'
-
-import { SidePanel, SidePanelGroup } from '@opentrons/components'
-import { RunTimer } from './RunTimer'
-import { RunControls } from './RunControls'
+import type { Dispatch, State } from '../../types'
 import { ModuleLiveStatusCards } from '../ModuleLiveStatusCards'
-
-import type { State, Dispatch } from '../../types'
+import { RunControls } from './RunControls'
+import { RunTimer } from './RunTimer'
 
 type SP = {|
   isRunning: boolean,

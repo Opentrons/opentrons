@@ -1,17 +1,18 @@
 // @flow
-import * as React from 'react'
+import { AlertItem } from '@opentrons/components'
+import { connect } from 'formik'
 import compact from 'lodash/compact'
 import uniq from 'lodash/uniq'
-import { connect } from 'formik'
-import { AlertItem } from '@opentrons/components'
+import * as React from 'react'
+
+import {
+  type LabwareFields,
+  IRREGULAR_LABWARE_ERROR,
+  LINK_CUSTOM_LABWARE_FORM,
+} from '../fields'
 import { getIsHidden } from '../formSelectors'
 import { LinkOut } from './LinkOut'
 import styles from './Section.css'
-import {
-  IRREGULAR_LABWARE_ERROR,
-  LINK_CUSTOM_LABWARE_FORM,
-  type LabwareFields,
-} from '../fields'
 
 // TODO: Make this DRY, don't require fields (in children) and also fieldList.
 type Props = {|

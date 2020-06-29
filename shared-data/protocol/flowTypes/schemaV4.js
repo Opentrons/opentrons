@@ -1,13 +1,14 @@
 // @flow
 import type { DeckSlotId, ModuleModel } from '@opentrons/shared-data'
+
 import type {
-  ProtocolFile as V3ProtocolFile,
   _AspDispAirgapParams,
   BlowoutParams,
-  TouchTipParams,
-  PipetteAccessParams,
-  MoveToSlotParams,
   DelayParams,
+  MoveToSlotParams,
+  PipetteAccessParams,
+  ProtocolFile as V3ProtocolFile,
+  TouchTipParams,
 } from './schemaV3'
 export type { BlowoutParams, FilePipette, FileLabware } from './schemaV3'
 

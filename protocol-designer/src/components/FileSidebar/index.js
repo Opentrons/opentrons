@@ -1,17 +1,18 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { i18n } from '../../localization'
-import { actions, selectors } from '../../navigation'
+
 import { selectors as fileDataSelectors } from '../../file-data'
-import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   actions as loadFileActions,
   selectors as loadFileSelectors,
 } from '../../load-file'
-import { FileSidebar as FileSidebarComponent } from './FileSidebar'
+import { i18n } from '../../localization'
+import { actions, selectors } from '../../navigation'
+import type { InitialDeckSetup, SavedStepFormState } from '../../step-forms'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../types'
-import type { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
+import { FileSidebar as FileSidebarComponent } from './FileSidebar'
 
 type Props = React.ElementProps<typeof FileSidebarComponent>
 

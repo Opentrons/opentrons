@@ -1,16 +1,14 @@
 // @flow
 
-import * as React from 'react'
+import { Tooltip, TOOLTIP_TOP, useHoverTooltip } from '@opentrons/components'
 import cx from 'classnames'
-
-import { Tooltip, useHoverTooltip, TOOLTIP_TOP } from '@opentrons/components'
-import { ThresholdValue } from './ThresholdValue'
-import { IndividualAxisDifferenceValue } from './DifferenceValue'
+import * as React from 'react'
 
 import type { Axis } from '../../robot/types'
 import type { RobotCalibrationCheckComparison } from '../../sessions/types'
-
+import { IndividualAxisDifferenceValue } from './DifferenceValue'
 import styles from './styles.css'
+import { ThresholdValue } from './ThresholdValue'
 
 type EndOfStepComparisonsProps = {|
   comparison: RobotCalibrationCheckComparison,

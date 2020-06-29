@@ -1,13 +1,13 @@
 // @flow
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
 
 import { ConfirmResetPathModal } from '../ConfirmResetPathModal'
 import {
+  CHANGE_SOURCE_NAME,
   ManagePath,
   OPEN_SOURCE_NAME,
-  CHANGE_SOURCE_NAME,
   RESET_SOURCE_NAME,
 } from '../ManagePath'
 

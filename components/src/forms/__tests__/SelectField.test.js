@@ -1,9 +1,9 @@
 // @flow
-import * as React from 'react'
 import { shallow } from 'enzyme'
+import * as React from 'react'
 
-import { SelectField } from '../SelectField'
 import { Select } from '../Select'
+import { SelectField } from '../SelectField'
 
 describe('SelectField', () => {
   it('renders a Select', () => {

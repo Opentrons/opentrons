@@ -1,22 +1,22 @@
 // @flow
 
-import React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
 import {
-  PipetteSelect,
   DropdownField,
   OutlineButton,
+  PipetteSelect,
 } from '@opentrons/components'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import { actions as labwareDefActions } from '../../../../labware-defs'
-import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
-import { PipetteFields } from '../PipetteFields'
-import { PipetteDiagram } from '../PipetteDiagram'
+import { mount } from 'enzyme'
+import React from 'react'
+import { Provider } from 'react-redux'
 
 import type { LabwareDefByDefURI } from '../../../../labware-defs'
+import { actions as labwareDefActions } from '../../../../labware-defs'
+import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
 import type { ThunkAction } from '../../../../types'
+import { PipetteDiagram } from '../PipetteDiagram'
+import { PipetteFields } from '../PipetteFields'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')

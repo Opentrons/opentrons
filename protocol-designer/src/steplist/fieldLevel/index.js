@@ -1,37 +1,37 @@
 // @flow
 import {
-  requiredField,
-  minimumWellCount,
-  nonZero,
-  composeErrors,
-  minFieldValue,
-  maxFieldValue,
-  temperatureRangeFieldValue,
-  realNumber,
-} from './errors'
-import {
-  maskToInteger,
-  maskToFloat,
-  onlyPositiveNumbers,
-  defaultTo,
-  composeMaskers,
-  trimDecimals,
-  type ValueMasker,
-  type ValueCaster,
-} from './processing'
-import {
-  MIN_TEMP_MODULE_TEMP,
+  MAX_TC_BLOCK_TEMP,
+  MAX_TC_DURATION_SECONDS,
+  MAX_TC_LID_TEMP,
   MAX_TEMP_MODULE_TEMP,
   MIN_TC_BLOCK_TEMP,
-  MAX_TC_BLOCK_TEMP,
-  MIN_TC_LID_TEMP,
-  MAX_TC_LID_TEMP,
   MIN_TC_DURATION_SECONDS,
-  MAX_TC_DURATION_SECONDS,
+  MIN_TC_LID_TEMP,
+  MIN_TEMP_MODULE_TEMP,
 } from '../../constants'
 import type { StepFieldName } from '../../form-types'
 import type { LabwareEntity, PipetteEntity } from '../../step-forms'
 import type { InvariantContext } from '../../step-generation'
+import {
+  composeErrors,
+  maxFieldValue,
+  minFieldValue,
+  minimumWellCount,
+  nonZero,
+  realNumber,
+  requiredField,
+  temperatureRangeFieldValue,
+} from './errors'
+import {
+  type ValueCaster,
+  type ValueMasker,
+  composeMaskers,
+  defaultTo,
+  maskToFloat,
+  maskToInteger,
+  onlyPositiveNumbers,
+  trimDecimals,
+} from './processing'
 
 export type { StepFieldName }
 

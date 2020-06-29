@@ -1,23 +1,21 @@
 // @flow
-import * as React from 'react'
 import { Formik, useFormikContext } from 'formik'
-
-import { useResetFormOnSecurityChange } from './form-state'
-import {
-  getConnectFormFields,
-  validateConnectFormFields,
-  connectFormToConfigureRequest,
-} from './form-fields'
-
-import { FormModal } from './FormModal'
+import * as React from 'react'
 
 import type {
   ConnectFormValues,
-  WifiConfigureRequest,
-  WifiNetwork,
-  WifiKey,
   EapOption,
+  WifiConfigureRequest,
+  WifiKey,
+  WifiNetwork,
 } from '../types'
+import {
+  connectFormToConfigureRequest,
+  getConnectFormFields,
+  validateConnectFormFields,
+} from './form-fields'
+import { useResetFormOnSecurityChange } from './form-state'
+import { FormModal } from './FormModal'
 
 export type ConnectModalProps = {|
   robotName: string,

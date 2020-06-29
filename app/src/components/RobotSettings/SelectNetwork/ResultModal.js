@@ -1,12 +1,11 @@
 // @flow
 
+import { AlertModal, SpinnerModal } from '@opentrons/components'
 import * as React from 'react'
 
-import { AlertModal, SpinnerModal } from '@opentrons/components'
 import { ErrorModal } from '../../modals'
 import { DISCONNECT } from './constants'
 import * as Copy from './i18n'
-
 import type { NetworkChangeType } from './types'
 
 export type ResultModalProps = {|

@@ -1,12 +1,11 @@
 // @flow
 /** A full-page icon in a muted color */
-import * as React from 'react'
 import cx from 'classnames'
-
-import { Icon } from '../icons'
-import styles from './Splash.css'
+import * as React from 'react'
 
 import type { IconName } from '../icons'
+import { Icon } from '../icons'
+import styles from './Splash.css'
 
 export type SplashProps = {|
   /** optional alternative icon name. Defaults to 'logo'. */

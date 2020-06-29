@@ -1,9 +1,9 @@
 // @flow
 
-import { i18n } from './localization'
-import { selectors as loadFileSelectors } from './load-file'
 import { selectors as analyticsSelectors } from './analytics'
 import { initializeFullstory } from './analytics/fullstory'
+import { selectors as loadFileSelectors } from './load-file'
+import { i18n } from './localization'
 
 export const initialize = (store: Object) => {
   if (process.env.NODE_ENV === 'production') {

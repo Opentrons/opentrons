@@ -1,11 +1,9 @@
 // @flow
 import omit from 'lodash/omit'
 
-import * as Constants from './constants'
-
 import type { Action } from '../types'
-
-import type { SessionState, PerRobotSessionState } from './types'
+import * as Constants from './constants'
+import type { PerRobotSessionState, SessionState } from './types'
 
 const INITIAL_STATE: SessionState = {}
 

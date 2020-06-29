@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react'
+
 import { i18n } from '../../localization'
-import styles from './StepItem.css'
 import type { PauseArgs } from '../../step-generation'
+import styles from './StepItem.css'
 type Props = {
   pauseArgs: PauseArgs,
 }

@@ -1,9 +1,10 @@
 // @flow
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+
 import { getWellNamePerMultiTip } from '../helpers/getWellNamePerMultiTip'
 
 describe('96 plate', () => {

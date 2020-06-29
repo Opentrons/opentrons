@@ -1,22 +1,22 @@
 // @flow
 import {
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  blowoutHelper,
+  DEFAULT_PIPETTE,
+  DEST_LABWARE,
+  dropTipHelper,
+  FIXED_TRASH_ID,
+  getErrorResult,
+  getFlowRateAndOffsetParams,
   getRobotInitialStateNoTipsRemain,
   getRobotStateWithTipStandard,
-  makeContext,
   getSuccessResult,
-  getErrorResult,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  FIXED_TRASH_ID,
-  getFlowRateAndOffsetParams,
   makeAspirateHelper,
+  makeContext,
   makeDispenseHelper,
-  blowoutHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
-  dropTipHelper,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  SOURCE_LABWARE,
 } from '../__fixtures__'
 import { distribute } from '../commandCreators/compound/distribute'
 import type { DistributeArgs } from '../types'
