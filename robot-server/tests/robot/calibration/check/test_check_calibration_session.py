@@ -1,63 +1,78 @@
-import asyncio
 from unittest.mock import patch, call
 
-import opentrons.calibration.session
 import pytest
 from opentrons import types
+from opentrons.hardware_control import API, ThreadManager
 
-from opentrons.calibration import util
-from opentrons.calibration.check import session
-
-
-@pytest.fixture
-def check_calibration_session(hardware) -> session.CheckCalibrationSession:
-    hw = hardware._backend
-    hw._attached_instruments[types.Mount.LEFT] = {
-        'model': 'p10_single_v1', 'id': 'fake10pip'}
-    hw._attached_instruments[types.Mount.RIGHT] = {
-        'model': 'p300_single_v1', 'id': 'fake300pip'}
-    asyncio.get_event_loop().run_until_complete(
-        session.CheckCalibrationSession.build(hardware)
-    )
-    return session.CheckCalibrationSession(hardware)
+from robot_server.robot.calibration import util
+from robot_server.robot.calibration.check import session
+from robot_server.robot.calibration.session import NoPipetteException
 
 
 @pytest.fixture
-def check_calibration_session_shared_tips(hardware) \
+async def check_calibration_session(loop) -> session.CheckCalibrationSession:
+    attached_instruments = {
+        types.Mount.LEFT: {
+            'model': 'p10_single_v1',
+            'id': 'fake10pip'
+        },
+        types.Mount.RIGHT: {
+            'model': 'p300_single_v1',
+            'id': 'fake300pip'
+        }
+    }
+
+    simulator = ThreadManager(API.build_hardware_simulator,
+                              attached_instruments=attached_instruments)
+    return await session.CheckCalibrationSession.build(simulator)
+
+
+@pytest.fixture
+async def check_calibration_session_shared_tips(loop) \
         -> session.CheckCalibrationSession:
-    hw = hardware._backend
-    hw._attached_instruments[types.Mount.LEFT] = {
-        'model': 'p300_multi_v1', 'id': 'fake300multipip'}
-    hw._attached_instruments[types.Mount.RIGHT] = {
-        'model': 'p300_single_v1', 'id': 'fake300pip'}
-    asyncio.get_event_loop().run_until_complete(
-        session.CheckCalibrationSession.build(hardware)
-    )
-    return session.CheckCalibrationSession(hardware)
+    attached_instruments = {
+        types.Mount.LEFT: {
+            'model': 'p300_multi_v1',
+            'id': 'fake300multipip'
+        },
+        types.Mount.RIGHT: {
+            'model': 'p300_single_v1',
+            'id': 'fake300pip'
+        }
+    }
+
+    simulator = ThreadManager(API.build_hardware_simulator,
+                              attached_instruments=attached_instruments)
+    return await session.CheckCalibrationSession.build(simulator)
 
 
 @pytest.fixture
-def check_calibration_session_only_right(hardware) \
+async def check_calibration_session_only_right(loop) \
         -> session.CheckCalibrationSession:
-    hw = hardware._backend
-    hw._attached_instruments[types.Mount.RIGHT] = {
-        'model': 'p300_single_v1', 'id': 'fake300pip'}
-    asyncio.get_event_loop().run_until_complete(
-        session.CheckCalibrationSession.build(hardware)
-    )
-    return session.CheckCalibrationSession(hardware)
+    attached_instruments = {
+        types.Mount.RIGHT: {
+            'model': 'p300_single_v1',
+            'id': 'fake300pip'
+        }
+    }
+
+    simulator = ThreadManager(API.build_hardware_simulator,
+                              attached_instruments=attached_instruments)
+    return await session.CheckCalibrationSession.build(simulator)
 
 
 @pytest.fixture
-def check_calibration_session_only_left(hardware) \
+async def check_calibration_session_only_left(loop) \
         -> session.CheckCalibrationSession:
-    hw = hardware._backend
-    hw._attached_instruments[types.Mount.LEFT] = {
-        'model': 'p300_single_v1', 'id': 'fake300pip'}
-    asyncio.get_event_loop().run_until_complete(
-        session.CheckCalibrationSession.build(hardware)
-    )
-    return session.CheckCalibrationSession(hardware)
+    attached_instruments = {
+        types.Mount.LEFT: {
+            'model': 'p300_single_v1',
+            'id': 'fake300pip'
+        }
+    }
+    simulator = ThreadManager(API.build_hardware_simulator,
+                              attached_instruments=attached_instruments)
+    return await session.CheckCalibrationSession.build(simulator)
 
 
 BAD_DIFF_VECTOR = types.Point(30, 30, 30)
@@ -338,9 +353,11 @@ async def test_session_started_to_bad_state(check_calibration_session):
         )
 
 
-async def test_session_no_pipettes_error(hardware):
-    with pytest.raises(opentrons.calibration.session.NoPipetteException):
-        await session.CheckCalibrationSession.build(hardware)
+async def test_session_no_pipettes_error():
+    simulator = ThreadManager(API.build_hardware_simulator)
+
+    with pytest.raises(NoPipetteException):
+        await session.CheckCalibrationSession.build(simulator)
 
 
 async def test_session_started_to_end_state(check_calibration_session):

@@ -1,14 +1,15 @@
 import pytest
 from unittest.mock import MagicMock, PropertyMock, patch
 
-from opentrons.calibration.check.session import CheckCalibrationSession, \
-    CalibrationCheckState, CalibrationCheckTrigger
-from opentrons.calibration.check.models import JogPosition
-from opentrons.calibration.helper_classes import PipetteInfo, PipetteRank
+from robot_server.robot.calibration.check.session import \
+    CheckCalibrationSession, CalibrationCheckState, CalibrationCheckTrigger
+from robot_server.robot.calibration.check.models import JogPosition
+from robot_server.robot.calibration.helper_classes import PipetteInfo,\
+    PipetteRank
 from opentrons import types
-from opentrons.calibration.session import CalibrationException, \
+from robot_server.robot.calibration.session import CalibrationException, \
     NoPipetteException
-from opentrons.calibration.util import StateMachineError
+from robot_server.robot.calibration.util import StateMachineError
 
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.configuration import SessionConfiguration
@@ -67,7 +68,7 @@ def mock_cal_session(hardware):
     m.trigger_transition = MagicMock(side_effect=async_mock)
     m.delete_session = MagicMock(side_effect=async_mock)
 
-    path = 'opentrons.calibration.check.session.' \
+    path = 'robot_server.robot.calibration.check.session.' \
            'CheckCalibrationSession.current_state_name'
     with patch(path, new_callable=PropertyMock) as p:
         p.return_value = CalibrationCheckState.preparingFirstPipette.value

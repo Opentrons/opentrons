@@ -1,4 +1,4 @@
-from opentrons.calibration.tip_length.state_machine import \
+from robot_server.robot.calibration.tip_length.state_machine import \
     TipCalibrationStateMachine
 
 from .base_session import BaseSession, SessionMetaData

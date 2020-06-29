@@ -1,7 +1,7 @@
 import pytest
 from typing import List, Tuple
 
-from opentrons.calibration.tip_length import state_machine
+from robot_server.robot.calibration.tip_length import state_machine
 
 
 valid_transitions: List[Tuple[str, str, str]] = [
