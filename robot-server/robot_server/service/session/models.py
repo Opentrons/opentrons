@@ -117,7 +117,7 @@ class BasicSessionCommand(BaseModel):
 class SessionCommand(BasicSessionCommand):
     """A session command response"""
     status: CommandStatus
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(..., default_factory=datetime.utcnow)
     started_at: typing.Optional[datetime]
     completed_at: typing.Optional[datetime]
 
