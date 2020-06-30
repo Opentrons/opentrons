@@ -2,13 +2,10 @@
 import takeWhile from 'lodash/takeWhile'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import * as StepGeneration from '../step-generation'
-import type { StepArgsAndErrors } from '../steplist/types'
+import type { StepArgsAndErrorsById } from '../steplist/types'
 
 export type GenerateRobotStateTimelineArgs = {|
-  allStepArgsAndErrors: {
-    [string]: StepArgsAndErrors,
-    ...,
-  },
+  allStepArgsAndErrors: StepArgsAndErrorsById,
   orderedStepIds: Array<string>,
   initialRobotState: StepGeneration.RobotState,
   invariantContext: StepGeneration.InvariantContext,

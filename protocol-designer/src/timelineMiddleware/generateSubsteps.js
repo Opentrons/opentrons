@@ -1,24 +1,20 @@
 // @flow
-import { generateSubsteps as generateSubstepsUtil } from '../steplist/generateSubsteps' // TODO(IL, 2020-06-29): disambiguate the 2 generateSubsteps fns, consider moving files around
+import { generateSubstepItem } from '../steplist/generateSubstepItem'
 import type {
   Timeline,
   RobotState,
   InvariantContext,
 } from '../step-generation/types'
-import type { StepArgsAndErrors, Substeps } from '../steplist/types'
+import type { LabwareNameByModuleId } from '../ui/modules/selectors'
+import type { StepArgsAndErrorsById, Substeps } from '../steplist/types'
 
 export type GenerateSubstepsArgs = {|
-  allStepArgsAndErrors: {
-    [string]: StepArgsAndErrors,
-    ...,
-  }, // TODO IMMEDIATELY import this type, don't copy it. From stepFormSelectors.getArgsAndErrorsByStepId
+  allStepArgsAndErrors: StepArgsAndErrorsById,
   invariantContext: InvariantContext,
   orderedStepIds: Array<string>,
   robotStateTimeline: Timeline,
   initialRobotState: RobotState,
-  labwareNamesByModuleId: {
-    [moduleId: string]: ?{ nickname: ?string, displayName: string },
-  }, // TODO IMMEDIATELY: import this type, don't copy it. From uiModulesSelectors.getLabwareNamesByModuleId,
+  labwareNamesByModuleId: LabwareNameByModuleId,
 |}
 
 export const generateSubsteps = (args: GenerateSubstepsArgs): Substeps => {
@@ -40,7 +36,7 @@ export const generateSubsteps = (args: GenerateSubstepsArgs): Substeps => {
     const robotState =
       timeline[timelineIndex] && timeline[timelineIndex].robotState
 
-    const substeps = generateSubstepsUtil(
+    const substeps = generateSubstepItem(
       allStepArgsAndErrors[stepId],
       invariantContext,
       robotState,

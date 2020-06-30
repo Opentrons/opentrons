@@ -330,8 +330,7 @@ function transferLikeSubsteps(args: {|
   }
 }
 
-// TODO IMMEDIATELY: rename, and move into the timeline middleware dir
-export function generateSubsteps(
+export function generateSubstepItem(
   stepArgsAndErrors: ?StepArgsAndErrors,
   invariantContext: InvariantContext,
   robotState: ?RobotState,

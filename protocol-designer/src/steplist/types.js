@@ -174,3 +174,5 @@ export type StepArgsAndErrors = {
   errors: boolean,
   stepArgs: CommandCreatorArgs | null, // TODO: incompleteData field when this is null?
 }
+
+export type StepArgsAndErrorsById = { [stepId: string]: StepArgsAndErrors, ... }

@@ -20,26 +20,31 @@ import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimelin
 import type { GenerateSubstepsArgs } from './generateSubsteps'
 import type { Timeline } from '../step-generation'
 
+// worker itself will spread the robotStateTimeline in
 type SubstepsArgsNoTimeline = $Diff<
   GenerateSubstepsArgs,
   { robotStateTimeline: any }
 >
 
-const getSelectorResults = (
-  state: BaseState
-): GenerateRobotStateTimelineArgs => ({
+const hasChanged = (nextValues, memoizedValues): boolean =>
+  Object.keys(nextValues).some(
+    (selectorKey: string) =>
+      nextValues[selectorKey] !== memoizedValues?.[selectorKey]
+  )
+
+const getTimelineArgs = (state: BaseState): GenerateRobotStateTimelineArgs => ({
   allStepArgsAndErrors: getArgsAndErrorsByStepId(state),
   orderedStepIds: getOrderedStepIds(state),
   invariantContext: getInvariantContext(state),
   initialRobotState: getInitialRobotState(state),
-  // featureFlagData: getFeatureFlagData(state),
+  // featureFlagData: getFeatureFlagData(state), // TODO: break memoization when FF changes
 })
 
-type MemoSubsteps = $Diff<
-  GenerateSubstepsArgs,
-  {| ...GenerateRobotStateTimelineArgs, ...{| robotStateTimeline: any |} |}
->
-const getSubstepSelectorResults = (state: BaseState): MemoSubsteps => ({
+const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
+  allStepArgsAndErrors: getArgsAndErrorsByStepId(state),
+  orderedStepIds: getOrderedStepIds(state),
+  invariantContext: getInvariantContext(state),
+  initialRobotState: getInitialRobotState(state),
   labwareNamesByModuleId: getLabwareNamesByModuleId(state),
 })
 
@@ -65,40 +70,38 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
   const postToWorker = (message: WorkerMessage): void =>
     worker.postMessage(message)
 
-  let prevMemoTimeline: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
-  let prevMemoSubsteps: MemoSubsteps | null = null
-  let cachedSuccessAction: ComputeRobotStateTimelineSuccessAction | null = null
+  let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
+  let prevSubstepsArgs: SubstepsArgsNoTimeline | null = null
+  let prevSuccessAction: ComputeRobotStateTimelineSuccessAction | null = null
+
   const timelineNeedsRecompute = (state: BaseState): boolean => {
-    if (prevMemoTimeline === null) {
+    if (prevTimelineArgs === null) {
       // initial call, must populate memoized value
-      prevMemoTimeline = getSelectorResults(state)
+      prevTimelineArgs = getTimelineArgs(state)
       return true
     }
-    const nextSelectorResults = getSelectorResults(state)
+    const nextSelectorResults = getTimelineArgs(state)
 
-    const needsRecompute = Object.keys(nextSelectorResults).some(
-      (selectorKey: string) =>
-        nextSelectorResults[selectorKey] !== prevMemoTimeline?.[selectorKey]
-    )
+    const needsRecompute = hasChanged(nextSelectorResults, prevTimelineArgs)
 
-    prevMemoTimeline = nextSelectorResults // update memoized value
+    prevTimelineArgs = nextSelectorResults // update memoized value
     return needsRecompute
   }
 
   const substepsNeedsRecompute = (state: BaseState): boolean => {
-    if (prevMemoSubsteps === null) {
-      prevMemoSubsteps = getSubstepSelectorResults(state)
+    if (prevSubstepsArgs === null) {
+      // initial call, must populate memoized value
+      prevSubstepsArgs = getSubstepsArgs(state)
       return true
     }
-    const nextSubstepSelectorResults = getSubstepSelectorResults(state)
+    const nextSubstepSelectorResults = getSubstepsArgs(state)
 
-    const needsRecompute = Object.keys(nextSubstepSelectorResults).some(
-      (selectorKey: string) =>
-        nextSubstepSelectorResults[selectorKey] !==
-        prevMemoSubsteps?.[selectorKey]
+    const needsRecompute = hasChanged(
+      nextSubstepSelectorResults,
+      prevSubstepsArgs
     )
 
-    prevMemoSubsteps = nextSubstepSelectorResults // update memoized value
+    prevSubstepsArgs = nextSubstepSelectorResults // update memoized value
     return needsRecompute
   }
 
@@ -110,36 +113,36 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     const shouldRecomputeTimeline = timelineNeedsRecompute(nextState)
     const shouldRecomputeSubsteps = substepsNeedsRecompute(nextState)
 
+    // TODO: how to stop re-assigning this event handler every middleware call? We need
+    // the `next` fn, so we can't do it outside the middleware body
+    worker.onmessage = e => {
+      prevSuccessAction = computeRobotStateTimelineSuccess(e.data)
+      next(prevSuccessAction)
+    }
+
     if (shouldRecomputeTimeline) {
       next(computeRobotStateTimelineRequest())
-      worker.onmessage = e => {
-        cachedSuccessAction = computeRobotStateTimelineSuccess(e.data)
-        next(cachedSuccessAction)
-      }
 
-      if (prevMemoTimeline !== null && prevMemoSubsteps !== null) {
-        const timelineArgs: GenerateRobotStateTimelineArgs = prevMemoTimeline
-        const substepsArgs: SubstepsArgsNoTimeline = {
-          ...prevMemoTimeline,
-          ...prevMemoSubsteps,
-        }
+      if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
+        const timelineArgs: GenerateRobotStateTimelineArgs = prevTimelineArgs
+        const substepsArgs: SubstepsArgsNoTimeline = prevSubstepsArgs
         postToWorker({ timeline: null, timelineArgs, substepsArgs })
       } else {
         console.error(
-          'something weird happened, prevMemoTimeline and prevMemoSubsteps should never be null here'
+          'something weird happened, prevTimelineArgs and prevSubstepsArgs should never be null here'
         )
       }
-    } else if (shouldRecomputeSubsteps && cachedSuccessAction) {
+    } else if (shouldRecomputeSubsteps && prevSuccessAction) {
       // Timeline did not change, but a substeps-specific selector did
-      if (prevMemoTimeline !== null && prevMemoSubsteps !== null) {
+      if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
         postToWorker({
-          timeline: cachedSuccessAction.payload.standardTimeline,
+          timeline: prevSuccessAction.payload.standardTimeline,
           timelineArgs: null,
-          substepsArgs: { ...prevMemoTimeline, ...prevMemoSubsteps },
+          substepsArgs: prevSubstepsArgs,
         })
       } else {
         console.error(
-          'something weird happened, prevMemoTimeline and prevMemoSubsteps should never be null here'
+          'something weird happened, prevTimelineArgs and prevSubstepsArgs should never be null here'
         )
       }
     }
