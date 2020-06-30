@@ -120,7 +120,7 @@ def _load_well_object_from_db(db, well_data):
     x -= (well.x_size() / 2)
     y -= (well.y_size() / 2)
     well_coordinates = (x, y, z)
-    return (well, location, well_coordinates)
+    return well, location, well_coordinates
 
 
 def _list_all_containers_by_name(db):
