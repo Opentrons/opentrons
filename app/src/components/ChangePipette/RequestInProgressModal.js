@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
 
+import { SpinnerModalPage } from '@opentrons/components'
 import { HOMING, MOVING } from '../../robot-controls'
 import { RIGHT } from '../../pipettes'
-import { SpinnerModalPage } from '@opentrons/components'
 import type { MovementStatus } from '../../robot-controls/types'
 import type { Mount } from '../../pipettes/types'
 

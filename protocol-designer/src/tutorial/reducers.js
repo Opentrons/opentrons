@@ -6,9 +6,9 @@ import uniq from 'lodash/uniq'
 
 import type { Action } from '../types'
 import type { RehydratePersistedAction } from '../persist'
-import type { HintKey } from './index'
-import type { AddHintAction, RemoveHintAction } from './actions'
 import type { NavigateToPageAction } from '../navigation/actions'
+import type { AddHintAction, RemoveHintAction } from './actions'
+import type { HintKey } from './index'
 
 type HintReducerState = Array<HintKey>
 const hints = handleActions(

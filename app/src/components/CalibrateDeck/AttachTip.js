@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import type { CalibrateDeckStartedProps, CalibrationStep } from './types'
 import { PrimaryButton } from '@opentrons/components'
+import type { CalibrateDeckStartedProps, CalibrationStep } from './types'
 
 import styles from './styles.css'
 

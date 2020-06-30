@@ -4,8 +4,8 @@ import { handleActions } from 'redux-actions'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { SetOptIn } from './actions'
 import type { RehydratePersistedAction } from '../persist'
+import type { SetOptIn } from './actions'
 
 type OptInState = boolean | null
 const optInInitialState = null

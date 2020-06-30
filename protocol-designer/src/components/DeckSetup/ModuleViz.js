@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
-import { getModuleVizDims } from './getModuleVizDims'
-import styles from './ModuleViz.css'
 import type { ModuleOnDeck } from '../../step-forms'
 import type { ModuleOrientation } from '../../types'
+import { getModuleVizDims } from './getModuleVizDims'
+import styles from './ModuleViz.css'
 
 type Props = {|
   x: number,

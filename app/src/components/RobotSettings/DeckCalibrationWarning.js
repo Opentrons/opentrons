@@ -15,9 +15,9 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
+import type { StyleProps } from '@opentrons/components'
 import * as Calibration from '../../calibration'
 
-import type { StyleProps } from '@opentrons/components'
 import type { DeckCalibrationStatus } from '../../calibration/types'
 
 export type DeckCalibrationWarningProps = {|

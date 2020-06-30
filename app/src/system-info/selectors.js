@@ -1,9 +1,9 @@
 // @flow
 import { createSelector } from 'reselect'
+import type { State } from '../types'
 import { isRealtekU2EAdapter, getDriverStatus } from './utils'
 import { NOT_APPLICABLE, IFACE_FAMILY_IPV4 } from './constants'
 
-import type { State } from '../types'
 import type {
   UsbDevice,
   DriverStatus,

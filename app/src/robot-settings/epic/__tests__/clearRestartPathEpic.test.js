@@ -4,9 +4,8 @@ import { TestScheduler } from 'rxjs/testing'
 import * as RobotAdminSelectors from '../../../robot-admin/selectors'
 import * as Actions from '../../actions'
 import * as Selectors from '../../selectors'
-import { robotSettingsEpic } from '..'
-
 import type { State } from '../../../types'
+import { robotSettingsEpic } from '..'
 
 jest.mock('../../../robot-admin/selectors')
 jest.mock('../../selectors')

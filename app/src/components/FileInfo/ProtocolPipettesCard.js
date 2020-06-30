@@ -11,14 +11,13 @@ import {
   getProtocolPipettesMatch,
   getSomeProtocolPipettesInexact,
 } from '../../pipettes'
-import { InstrumentItem } from './InstrumentItem'
 import { SectionContentHalf } from '../layout'
+import type { State, Dispatch } from '../../types'
+import { InstrumentItem } from './InstrumentItem'
 import { InfoSection } from './InfoSection'
 import { MissingItemWarning } from './MissingItemWarning'
 
 import styles from './styles.css'
-
-import type { State, Dispatch } from '../../types'
 
 export type ProtocolPipettesCardProps = {| robotName: string |}
 

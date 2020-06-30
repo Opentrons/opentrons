@@ -2,7 +2,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { FormGroup } from '@opentrons/components'
-import { AspDispSection } from './AspDispSection'
 
 import { i18n } from '../../../localization'
 
@@ -22,6 +21,7 @@ import {
 
 import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
+import { AspDispSection } from './AspDispSection'
 
 type Props = {| focusHandlers: FocusHandlers |}
 type State = {| collapsed?: boolean |}

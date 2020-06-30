@@ -3,10 +3,10 @@ import * as React from 'react'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { getTooltipForField } from '../utils'
-import { TextField } from './TextField'
 import type { StepType } from '../../../form-types'
 import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
+import { TextField } from './TextField'
 
 type Props = {|
   stepType: StepType,

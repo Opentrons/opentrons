@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
 
+import { AlertModal, LabeledCheckbox } from '@opentrons/components'
 import {
   useDispatchApiRequest,
   getRequestById,
@@ -16,7 +17,6 @@ import {
   resetConfig,
 } from '../../robot-admin'
 
-import { AlertModal, LabeledCheckbox } from '@opentrons/components'
 import { Portal } from '../portal'
 
 import type { State, Dispatch } from '../../types'

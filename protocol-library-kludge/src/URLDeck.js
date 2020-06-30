@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import styles from './URLDeck.css'
 
 import {
   RobotWorkSpace,
@@ -10,9 +9,10 @@ import {
   Module,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
-import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import type { ModuleModel, DeckSlotId } from '@opentrons/shared-data'
+import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
+import styles from './URLDeck.css'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
 type UrlData = {

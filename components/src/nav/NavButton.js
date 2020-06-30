@@ -3,10 +3,10 @@ import * as React from 'react'
 import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
-import styles from './navbar.css'
 import { Button } from '../buttons'
 import { NotificationIcon, type IconName } from '../icons'
 import { HoverTooltip } from '../tooltips'
+import styles from './navbar.css'
 
 export type NavButtonProps = {|
   /** optional click event for nav button */

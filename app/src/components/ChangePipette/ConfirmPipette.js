@@ -3,16 +3,15 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { Icon, PrimaryButton, ModalPage } from '@opentrons/components'
-import { getDiagramsSrc } from './InstructionStep'
-import { CheckPipettesButton } from './CheckPipettesButton'
-import styles from './styles.css'
-
 import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 import type { Mount } from '../../pipettes/types'
+import { getDiagramsSrc } from './InstructionStep'
+import { CheckPipettesButton } from './CheckPipettesButton'
+import styles from './styles.css'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'

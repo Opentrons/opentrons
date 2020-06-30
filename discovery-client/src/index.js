@@ -8,6 +8,7 @@ import toRegex from 'to-regex'
 import differenceBy from 'lodash/differenceBy'
 import xorBy from 'lodash/xorBy'
 
+import type { Browser, BrowserService } from 'mdns-js'
 import { createMdnsBrowser, getKnownIps } from './mdns-browser'
 import { poll, stop, type PollRequest } from './poller'
 import {
@@ -24,8 +25,6 @@ import {
   makeCandidate,
   toCandidate,
 } from './service'
-
-import type { Browser, BrowserService } from 'mdns-js'
 
 import type {
   Candidate,

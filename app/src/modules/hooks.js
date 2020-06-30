@@ -1,11 +1,11 @@
 // @flow
 import { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { sendModuleCommand } from './actions'
 import { getConnectedRobotName } from '../robot/selectors'
 import { useLogger } from '../logger'
 
 import type { Dispatch } from '../types'
+import { sendModuleCommand } from './actions'
 import type { ModuleCommand } from './types'
 
 /**

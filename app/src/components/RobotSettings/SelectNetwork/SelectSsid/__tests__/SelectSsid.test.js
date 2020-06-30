@@ -6,8 +6,8 @@ import { SelectField, CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
 import * as Fixtures from '../../../../../networking/__fixtures__'
 import { LABEL_JOIN_OTHER_NETWORK, DISCONNECT_FROM_SSID } from '../../i18n'
 
-import { SelectSsid } from '..'
 import { NetworkOptionLabel } from '../NetworkOptionLabel'
+import { SelectSsid } from '..'
 
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },

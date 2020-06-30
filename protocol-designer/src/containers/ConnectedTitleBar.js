@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import { TitleBar, Icon, type IconName } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import styles from './TitleBar.css'
+import type { TitleBarProps } from '@opentrons/components'
 import { i18n } from '../localization'
 import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
@@ -23,8 +23,8 @@ import { closeIngredientSelector } from '../labware-ingred/actions'
 import { stepIconsByType } from '../form-types'
 import { selectors, type Page } from '../navigation'
 
-import type { TitleBarProps } from '@opentrons/components'
 import type { BaseState } from '../types'
+import styles from './TitleBar.css'
 
 type Props = React.ElementProps<typeof TitleBar>
 

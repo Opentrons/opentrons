@@ -4,8 +4,12 @@ import flatMap from 'lodash/flatMap'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import uniq from 'lodash/uniq'
-import { getFileMetadata } from './fileFields'
-import { getInitialRobotState, getRobotStateTimeline } from './commands'
+import type {
+  FilePipette,
+  FileLabware,
+  FileModule,
+  Command,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import { selectors as dismissSelectors } from '../../dismiss'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
@@ -17,15 +21,11 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-import type {
-  FilePipette,
-  FileLabware,
-  FileModule,
-  Command,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { ModuleEntity } from '../../step-forms'
 import type { Selector } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
+import { getInitialRobotState, getRobotStateTimeline } from './commands'
+import { getFileMetadata } from './fileFields'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')

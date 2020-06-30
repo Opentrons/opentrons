@@ -2,9 +2,8 @@
 import * as React from 'react'
 
 import * as Sessions from '../../sessions'
-import styles from './styles.css'
-
 import type { RobotCalibrationCheckStep } from '../../sessions/types'
+import styles from './styles.css'
 
 const axisIndicesByStep: { [RobotCalibrationCheckStep]: Array<number>, ... } = {
   [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT]: [2],

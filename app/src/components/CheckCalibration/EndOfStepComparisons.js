@@ -4,11 +4,10 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { Tooltip, useHoverTooltip, TOOLTIP_TOP } from '@opentrons/components'
-import { ThresholdValue } from './ThresholdValue'
-import { IndividualAxisDifferenceValue } from './DifferenceValue'
-
 import type { Axis } from '../../robot/types'
 import type { RobotCalibrationCheckComparison } from '../../sessions/types'
+import { ThresholdValue } from './ThresholdValue'
+import { IndividualAxisDifferenceValue } from './DifferenceValue'
 
 import styles from './styles.css'
 

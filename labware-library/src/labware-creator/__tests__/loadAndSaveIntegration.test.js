@@ -1,10 +1,10 @@
 // @flow
-import { labwareDefToFields } from '../labwareDefToFields'
-import { fieldsToLabware } from '../fieldsToLabware'
-import { labwareFormSchema } from '../labwareFormSchema'
 import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
 import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'
+import { labwareDefToFields } from '../labwareDefToFields'
+import { fieldsToLabware } from '../fieldsToLabware'
+import { labwareFormSchema } from '../labwareFormSchema'
 
 jest.mock('../../definitions')
 

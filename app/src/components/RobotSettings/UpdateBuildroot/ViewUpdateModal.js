@@ -8,14 +8,13 @@ import {
   getBuildrootDownloadError,
 } from '../../../buildroot'
 
-import { MigrationWarningModal } from './MigrationWarningModal'
-import { DownloadUpdateModal } from './DownloadUpdateModal'
-import { ReleaseNotesModal } from './ReleaseNotesModal'
-
 import type {
   BuildrootUpdateType,
   RobotSystemType,
 } from '../../../buildroot/types'
+import { MigrationWarningModal } from './MigrationWarningModal'
+import { DownloadUpdateModal } from './DownloadUpdateModal'
+import { ReleaseNotesModal } from './ReleaseNotesModal'
 
 export type ViewUpdateModalProps = {|
   robotName: string,

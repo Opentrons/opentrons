@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
+import type { Dispatch } from 'redux'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import * as wellSelectionSelectors from '../top-selectors/well-contents'
 import { removeWellsContents } from '../labware-ingred/actions'
-import type { Dispatch } from 'redux'
 import type { BaseState } from '../types'
 
 import { IngredientsList as IngredientsListComponent } from '../components/IngredientsList'

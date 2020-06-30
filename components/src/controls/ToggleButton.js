@@ -3,9 +3,8 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { IconButton } from '../buttons'
-import styles from './styles.css'
-
 import type { ButtonProps } from '../buttons'
+import styles from './styles.css'
 
 export type ToggleButtonProps = {|
   ...$Exact<ButtonProps>,

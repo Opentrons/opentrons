@@ -5,8 +5,6 @@ import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
 
-import { substepTimeline } from './substepTimeline'
-import * as steplistUtils from './utils'
 import {
   consolidate,
   distribute,
@@ -28,6 +26,8 @@ import type {
   MixArgs,
   TransferArgs,
 } from '../step-generation/types'
+import * as steplistUtils from './utils'
+import { substepTimeline } from './substepTimeline'
 import type {
   NamedIngred,
   StepArgsAndErrors,

@@ -3,6 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { format } from 'date-fns'
 
+import { LabeledValue } from '@opentrons/components'
 import {
   getProtocolName,
   getProtocolAuthor,
@@ -10,12 +11,10 @@ import {
   getProtocolMethod,
   getProtocolDescription,
 } from '../../protocol'
-
-import { LabeledValue } from '@opentrons/components'
-import { InfoSection } from './InfoSection'
 import { SectionContentHalf, CardRow } from '../layout'
 
 import type { State, Dispatch } from '../../types'
+import { InfoSection } from './InfoSection'
 
 type OP = {||}
 

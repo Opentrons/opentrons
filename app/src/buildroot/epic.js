@@ -25,6 +25,9 @@ import { GET, POST, fetchRobotApi } from '../robot-api'
 import { RESTART_PATH } from '../robot-admin'
 import { actions as robotActions } from '../robot'
 
+import type { State, Epic } from '../types'
+import type { ViewableRobot } from '../discovery/types'
+import type { RobotApiResponse } from '../robot-api/types'
 import {
   getBuildrootTargetVersion,
   getBuildrootSession,
@@ -60,10 +63,6 @@ import {
   BR_CREATE_SESSION,
   BR_CREATE_SESSION_SUCCESS,
 } from './constants'
-
-import type { State, Epic } from '../types'
-import type { ViewableRobot } from '../discovery/types'
-import type { RobotApiResponse } from '../robot-api/types'
 
 import type {
   BuildrootAction,

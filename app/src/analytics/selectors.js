@@ -1,6 +1,7 @@
 // @flow
 import { createSelector } from 'reselect'
 
+import type { OutputSelector } from 'reselect'
 import {
   getProtocolType,
   getProtocolCreatorApp,
@@ -29,10 +30,8 @@ import { getRobotSettings } from '../robot-settings'
 import { getAttachedPipettes } from '../pipettes'
 import { getPipettes, getModules } from '../robot/selectors'
 
-import { hash } from './hash'
-
-import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
+import { hash } from './hash'
 
 import type {
   AnalyticsConfig,

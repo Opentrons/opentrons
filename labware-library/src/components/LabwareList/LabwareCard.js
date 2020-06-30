@@ -3,8 +3,8 @@
 import * as React from 'react'
 import uniq from 'lodash/uniq'
 
-import { getPublicPath } from '../../public-path'
 import { Icon } from '@opentrons/components'
+import { getPublicPath } from '../../public-path'
 import { Link } from '../ui'
 import {
   getWellLabel,
@@ -19,9 +19,8 @@ import {
   CATEGORY_LABELS_BY_CATEGORY,
   MANUFACTURER_VALUES,
 } from '../../localization'
-import styles from './styles.css'
-
 import type { LabwareDefinition } from '../../types'
+import styles from './styles.css'
 
 export type LabwareCardProps = {| definition: LabwareDefinition |}
 

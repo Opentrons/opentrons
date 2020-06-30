@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
-import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { Well } from './Well'
 
 export type FilledWellsProps = {|
   definition: LabwareDefinition2,

@@ -1,7 +1,7 @@
 // @flow
+import type { RobotHost } from '../robot-api/types'
 import * as Constants from './constants'
 
-import type { RobotHost } from '../robot-api/types'
 import type {
   BuildrootAction,
   UpdateSessionStep,

@@ -5,6 +5,11 @@ import flatMap from 'lodash/flatMap'
 import map from 'lodash/map'
 import snakeCase from 'lodash/snakeCase'
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
+import type {
+  DeckDefinition,
+  DeckLayer,
+  DeckSlotId,
+} from '@opentrons/shared-data'
 import {
   SLOTNAME_MATRIX,
   SLOT_SPACING_MM,
@@ -15,12 +20,6 @@ import { DeckOutline } from './DeckOutline'
 import { EmptyDeckSlot } from './EmptyDeckSlot'
 
 import styles from './Deck.css'
-
-import type {
-  DeckDefinition,
-  DeckLayer,
-  DeckSlotId,
-} from '@opentrons/shared-data'
 
 export type LabwareComponentProps = {|
   slot: DeckSlotId,

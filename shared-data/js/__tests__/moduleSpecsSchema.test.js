@@ -1,9 +1,9 @@
+import path from 'path'
 import Ajv from 'ajv'
+import glob from 'glob'
 import moduleSpecsSchemaV1 from '../../module/schemas/1.json'
 import moduleSpecsV1 from '../../module/definitions/1.json'
 import moduleSpecsSchemaV2 from '../../module/schemas/2.json'
-import path from 'path'
-import glob from 'glob'
 
 const ajv = new Ajv({
   allErrors: true,

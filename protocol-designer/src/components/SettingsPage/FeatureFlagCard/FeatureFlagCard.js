@@ -1,8 +1,8 @@
 // @flow
 import sortBy from 'lodash/sortBy'
 import * as React from 'react'
-import { i18n } from '../../../localization'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
+import { i18n } from '../../../localization'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
 import modalStyles from '../../modals/modal.css'

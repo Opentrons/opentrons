@@ -3,11 +3,10 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { SpinnerModal } from '@opentrons/components'
-import { SessionAlert } from './SessionAlert'
 import { Portal } from '../portal'
-import styles from './styles.css'
-
 import type { SessionStatus, SessionStatusInfo } from '../../robot'
+import { SessionAlert } from './SessionAlert'
+import styles from './styles.css'
 
 export type CommandListProps = {|
   commands: Array<any>,

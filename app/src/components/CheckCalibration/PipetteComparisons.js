@@ -10,16 +10,15 @@ import {
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import * as Sessions from '../../sessions'
-import { DifferenceValue } from './DifferenceValue'
-import { ThresholdValue } from './ThresholdValue'
-import styles from './styles.css'
-
 import type {
   RobotCalibrationCheckInstrument,
   RobotCalibrationCheckStep,
   RobotCalibrationCheckComparison,
   RobotCalibrationCheckComparisonsByStep,
 } from '../../sessions/types'
+import { DifferenceValue } from './DifferenceValue'
+import { ThresholdValue } from './ThresholdValue'
+import styles from './styles.css'
 
 const PASS = 'pass'
 const FAIL = 'fail'

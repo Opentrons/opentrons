@@ -2,7 +2,6 @@
 import * as React from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import { i18n } from '../../localization'
 import {
   Card,
   CheckboxField,
@@ -11,11 +10,12 @@ import {
   OutlineButton,
   PrimaryButton,
 } from '@opentrons/components'
-import styles from './LiquidEditForm.css'
+import type { FormikProps } from 'formik/@flow-typed'
 import formStyles from '../forms/forms.css'
 
-import type { FormikProps } from 'formik/@flow-typed'
+import { i18n } from '../../localization'
 import type { LiquidGroup } from '../../labware-ingred/types'
+import styles from './LiquidEditForm.css'
 
 type Props = {
   ...$Exact<LiquidGroup>,

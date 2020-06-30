@@ -3,7 +3,6 @@ import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
-import styles from './styles.css'
 
 import {
   INVALID_LABWARE_FILE,
@@ -15,6 +14,7 @@ import type {
   FailedLabwareFile,
   DuplicateLabwareFile,
 } from '../../custom-labware/types'
+import styles from './styles.css'
 
 // TODO(mc, 2019-11-20): i18n
 // buttons

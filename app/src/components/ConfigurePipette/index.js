@@ -18,13 +18,11 @@ import {
 import { useFeatureFlag } from '../../config'
 
 import { ScrollableAlertModal } from '../modals'
+import type { State } from '../../types'
+import type { Mount, PipetteSettingsFieldsUpdate } from '../../pipettes/types'
 import { ConfigMessage } from './ConfigMessage'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
-
-import type { State } from '../../types'
-
-import type { Mount, PipetteSettingsFieldsUpdate } from '../../pipettes/types'
 
 // TODO(mc, 2019-12-09): i18n
 const PIPETTE_SETTINGS = 'Pipette Settings'

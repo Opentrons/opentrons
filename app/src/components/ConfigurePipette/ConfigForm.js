@@ -12,19 +12,18 @@ import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
 
 import { Icon } from '@opentrons/components'
-import { FormButtonBar } from './FormButtonBar'
-import {
-  ConfigFormGroup,
-  FormColumn,
-  ConfigQuirkGroup,
-} from './ConfigFormGroup'
-
 import type { FormikProps } from 'formik/@flow-typed'
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
   PipetteSettingsFieldsUpdate,
 } from '../../pipettes/types'
+import { FormButtonBar } from './FormButtonBar'
+import {
+  ConfigFormGroup,
+  FormColumn,
+  ConfigQuirkGroup,
+} from './ConfigFormGroup'
 
 import type { FormValues } from './ConfigFormGroup'
 

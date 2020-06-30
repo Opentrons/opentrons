@@ -6,13 +6,16 @@ import cx from 'classnames'
 import { connect } from 'react-redux'
 import { DropTarget } from 'react-dnd'
 import noop from 'lodash/noop'
+import type {
+  DeckSlot as DeckSlotDefinition,
+  ModuleRealType,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { DND_TYPES } from '../../../constants'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
 } from '../../../utils/labwareModuleCompatibility'
-import { BlockedSlot } from './BlockedSlot'
 import {
   openAddLabwareModal,
   moveDeckItem,
@@ -23,10 +26,7 @@ import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 import type { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { LabwareOnDeck } from '../../../step-forms'
-import type {
-  DeckSlot as DeckSlotDefinition,
-  ModuleRealType,
-} from '@opentrons/shared-data'
+import { BlockedSlot } from './BlockedSlot'
 import styles from './LabwareOverlays.css'
 
 type DNDP = {|

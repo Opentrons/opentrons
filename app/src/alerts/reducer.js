@@ -1,9 +1,9 @@
 // @flow
 import union from 'lodash/union'
 import without from 'lodash/without'
+import type { Action } from '../types'
 import * as Constants from './constants'
 
-import type { Action } from '../types'
 import type { AlertsState } from './types'
 
 const INITIAL_STATE = {

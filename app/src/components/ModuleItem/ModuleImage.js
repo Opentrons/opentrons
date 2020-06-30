@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react'
 
-import styles from './styles.css'
-
 import type { ModuleModel } from '@opentrons/shared-data'
+import styles from './styles.css'
 
 type Props = {|
   model: ModuleModel,

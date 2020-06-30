@@ -4,11 +4,11 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { noop } from 'lodash'
 
+import { Icon, Tooltip } from '@opentrons/components'
 import * as Sessions from '../../../sessions'
 import * as RobotApi from '../../../robot-api'
 import { mockRobot } from '../../../robot-api/__fixtures__'
 
-import { Icon, Tooltip } from '@opentrons/components'
 import { Portal } from '../../portal'
 import { TitledControl } from '../../TitledControl'
 import { CheckCalibration } from '../../CheckCalibration'

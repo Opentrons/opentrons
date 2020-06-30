@@ -3,13 +3,13 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { buildFiltersUrl, FILTER_OFF } from '../../filters'
 import { Icon } from '@opentrons/components'
-import styles from './styles.css'
+import { buildFiltersUrl, FILTER_OFF } from '../../filters'
 
 import { CLEAR_FILTERS } from '../../localization'
 
 import type { FilterParams } from '../../types'
+import styles from './styles.css'
 
 export type FilterResetProps = {|
   filters: FilterParams,

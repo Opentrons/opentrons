@@ -7,12 +7,12 @@ import {
   getLabwareDisplayName,
   getLabwareHasQuirk,
 } from '@opentrons/shared-data'
+import type { Options } from '@opentrons/components'
 import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { getModuleUnderLabware } from '../modules/utils'
-import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 import type { LabwareEntity } from '../../step-forms'
 

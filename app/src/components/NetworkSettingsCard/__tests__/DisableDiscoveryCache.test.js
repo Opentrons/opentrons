@@ -4,8 +4,8 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
 
-import * as Cfg from '../../../config'
 import { LabeledToggle } from '@opentrons/components'
+import * as Cfg from '../../../config'
 import { DisableDiscoveryCache } from '../DisableDiscoveryCache'
 
 import type { State } from '../../../types'

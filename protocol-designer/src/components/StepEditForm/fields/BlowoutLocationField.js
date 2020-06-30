@@ -6,11 +6,11 @@ import cx from 'classnames'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
-import { FieldConnector } from './FieldConnector'
 import styles from '../StepEditForm.css'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { BaseState } from '../../../types'
 import type { FocusHandlers } from '../types'
+import { FieldConnector } from './FieldConnector'
 
 // TODO: 2019-01-24 i18n for these options
 

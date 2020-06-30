@@ -3,11 +3,11 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { getConfig, removeManualIp } from '../../../config'
 import { getViewableRobots } from '../../../discovery'
-import { IpItem } from './IpItem'
 
 import type { State, Dispatch } from '../../../types'
 import type { DiscoveryCandidates } from '../../../config/types'
 import type { Robot, ReachableRobot } from '../../../discovery/types'
+import { IpItem } from './IpItem'
 
 type OP = {||}
 

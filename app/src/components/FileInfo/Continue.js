@@ -3,8 +3,8 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { getCalibrateLocation } from '../../nav'
 import { PrimaryButton, HoverTooltip } from '@opentrons/components'
+import { getCalibrateLocation } from '../../nav'
 import styles from './styles.css'
 
 export function Continue(): React.Node {

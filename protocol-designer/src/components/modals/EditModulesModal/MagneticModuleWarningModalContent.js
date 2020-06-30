@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import styles from './MagneticModuleWarningModalContent.css'
 import { KnowledgeBaseLink } from '../../KnowledgeBaseLink'
+import styles from './MagneticModuleWarningModalContent.css'
 
 export const MagneticModuleWarningModalContent = (): React.Node => (
   <div className={styles.content}>

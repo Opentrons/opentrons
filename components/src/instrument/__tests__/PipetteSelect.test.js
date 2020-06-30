@@ -8,10 +8,9 @@ import {
   GEN1,
   GEN2,
 } from '@opentrons/shared-data'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import { PipetteSelect } from '../PipetteSelect'
 import { Select } from '../../forms'
-
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
 
 describe('PipetteSelect', () => {
   it('renders a Select', () => {

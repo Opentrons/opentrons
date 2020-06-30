@@ -3,10 +3,10 @@
 // TODO(mc, 2019-12-17): remove when able
 // robot HTTP API client module
 import { combineReducers } from 'redux'
-import { calibrationReducer } from './calibration'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
+import { calibrationReducer } from './calibration'
 import type { CalibrationAction, CalState } from './calibration'
 
 export type State = {|

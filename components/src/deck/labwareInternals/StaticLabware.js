@@ -5,11 +5,11 @@ import * as React from 'react'
 import flatMap from 'lodash/flatMap'
 import cx from 'classnames'
 
+import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import { LabwareOutline } from '../LabwareOutline'
 import { Well } from './Well'
 import styles from './StaticLabware.css'
 
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 
 export type StaticLabwareProps = {|

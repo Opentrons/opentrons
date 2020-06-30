@@ -4,17 +4,6 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
-import {
-  chainPatchUpdaters,
-  fieldHasChanged,
-  getChannels,
-  getDefaultWells,
-  getAllWellsFromPrimaryWells,
-  getMaxDisposalVolumeForMultidispense,
-  volumeInCapacityForMulti,
-  DISPOSAL_VOL_DIGITS,
-} from './utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { getWellRatio } from '../../utils'
 import {
@@ -27,6 +16,17 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
+import {
+  chainPatchUpdaters,
+  fieldHasChanged,
+  getChannels,
+  getDefaultWells,
+  getAllWellsFromPrimaryWells,
+  getMaxDisposalVolumeForMultidispense,
+  volumeInCapacityForMulti,
+  DISPOSAL_VOL_DIGITS,
+} from './utils'
+import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>

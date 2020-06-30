@@ -7,8 +7,8 @@ import {
   CheckboxField,
   HoverTooltip,
 } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Portal } from '../portal'
-import styles from './styles.css'
 
 import type {
   ThermocyclerModule,
@@ -16,7 +16,7 @@ import type {
   ModuleCommand,
 } from '../../modules/types'
 import { THERMOCYCLER_MODULE_TYPE } from '../../modules'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import styles from './styles.css'
 
 type Props = {|
   module: ThermocyclerModule | TemperatureModule,

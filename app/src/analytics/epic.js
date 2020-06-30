@@ -13,12 +13,12 @@ import {
 } from 'rxjs/operators'
 
 import * as Cfg from '../config'
+import type { State, Action, Epic } from '../types'
+import type { ConfigInitializedAction } from '../config/types'
 import { getAnalyticsConfig } from './selectors'
 import { initializeMixpanel, setMixpanelTracking, trackEvent } from './mixpanel'
 import { makeEvent } from './make-event'
 
-import type { State, Action, Epic } from '../types'
-import type { ConfigInitializedAction } from '../config/types'
 import type { TrackEventArgs, AnalyticsEvent, AnalyticsConfig } from './types'
 
 const initialzeAnalyticsEpic: Epic = (action$, state$) => {

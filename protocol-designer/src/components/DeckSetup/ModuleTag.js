@@ -22,13 +22,13 @@ import {
 import * as uiSelectors from '../../ui/steps'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { makeTemperatureText } from '../../utils'
-import { getModuleVizDims } from './getModuleVizDims'
-import styles from './ModuleTag.css'
 import type { ModuleOrientation } from '../../types'
 import type {
   ModuleTemporalProperties,
   TemperatureModuleState,
 } from '../../step-forms'
+import { getModuleVizDims } from './getModuleVizDims'
+import styles from './ModuleTag.css'
 
 type Props = {|
   x: number,

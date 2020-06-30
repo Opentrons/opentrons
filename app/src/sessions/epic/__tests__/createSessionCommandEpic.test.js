@@ -4,12 +4,11 @@ import * as RobotApiHttp from '../../../robot-api/http'
 
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { sessionsEpic } from '..'
-
 import type {
   RobotHost,
   RobotApiRequestOptions,
 } from '../../../robot-api/types'
+import { sessionsEpic } from '..'
 
 jest.mock('../../../robot-api/http')
 

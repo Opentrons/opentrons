@@ -2,15 +2,14 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { MultiChannelSubstep } from './MultiChannelSubstep'
-import { SubstepRow } from './SubstepRow'
-import styles from './StepItem.css'
-
 import type {
   SourceDestSubstepItem,
   SubstepIdentifier,
   WellIngredientNames,
 } from '../../steplist/types'
+import { MultiChannelSubstep } from './MultiChannelSubstep'
+import { SubstepRow } from './SubstepRow'
+import styles from './StepItem.css'
 
 export type StepSubItemProps = {|
   substeps: SourceDestSubstepItem,

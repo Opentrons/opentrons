@@ -2,10 +2,10 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
+import type { CSSRules } from 'styled-components'
 import { FONT_BODY_1_LIGHT, C_DARK_GRAY } from '../styles'
 import { ARROW_SIZE_PX } from './styles'
 
-import type { CSSRules } from 'styled-components'
 import type { Placement } from './types'
 
 const TOOLTIP_CSS = css`

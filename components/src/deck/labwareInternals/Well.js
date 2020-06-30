@@ -2,9 +2,9 @@
 import assert from 'assert'
 import * as React from 'react'
 import cx from 'classnames'
+import type { LabwareWell } from '@opentrons/shared-data'
 import styles from './Well.css'
 
-import type { LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 
 export type WellProps = {|

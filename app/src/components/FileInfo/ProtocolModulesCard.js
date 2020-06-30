@@ -7,21 +7,20 @@ import {
   getModuleDisplayName,
   checkModuleCompatibility,
 } from '@opentrons/shared-data'
+import { Icon } from '@opentrons/components'
 import { selectors as robotSelectors } from '../../robot'
 import { getAttachedModules } from '../../modules'
 
-import { InfoSection } from './InfoSection'
 import { SectionContentHalf } from '../layout'
-import { InstrumentItem } from './InstrumentItem'
-import { MissingItemWarning } from './MissingItemWarning'
-
-import { Icon } from '@opentrons/components'
-import styles from './styles.css'
 
 import type { State, Dispatch } from '../../types'
 import type { SessionModule } from '../../robot/types'
 import type { Robot } from '../../discovery/types'
 import type { AttachedModule } from '../../modules/types'
+import styles from './styles.css'
+import { MissingItemWarning } from './MissingItemWarning'
+import { InstrumentItem } from './InstrumentItem'
+import { InfoSection } from './InfoSection'
 
 type OP = {| robot: Robot |}
 

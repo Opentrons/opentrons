@@ -1,13 +1,13 @@
 // @flow
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { dropTip } from './dropTip'
 import {
   curryCommandCreator,
   reduceCommandCreators,
   modulePipetteCollision,
 } from '../../utils'
 import type { CurriedCommandCreator, CommandCreator } from '../../types'
+import { dropTip } from './dropTip'
 
 type PickUpTipArgs = {| pipette: string, tiprack: string, well: string |}
 const _pickUpTip: CommandCreator<PickUpTipArgs> = (

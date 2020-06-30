@@ -10,10 +10,10 @@ import {
 } from '../../robot'
 import { getBuildrootUpdateAvailable, UPGRADE } from '../../buildroot'
 import { CONNECTABLE } from '../../discovery'
-import { RobotListItem } from './RobotListItem.js'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
+import { RobotListItem } from './RobotListItem.js'
 
 export type RobotItemProps = {|
   ...ContextRouter,

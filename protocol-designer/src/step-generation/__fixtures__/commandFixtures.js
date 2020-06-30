@@ -1,5 +1,4 @@
 // @flow
-import { tiprackWellNamesFlat } from './data'
 import type {
   AspirateParams,
   BlowoutParams,
@@ -8,6 +7,7 @@ import type {
   Command,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
+import { tiprackWellNamesFlat } from './data'
 
 /** Used to wrap command creators in tests, effectively casting their results
  **  to normal response or error response

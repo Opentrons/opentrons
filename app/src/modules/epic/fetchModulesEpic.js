@@ -1,8 +1,6 @@
 // @flow
 import { ofType } from 'redux-observable'
 
-import { GET } from '../../robot-api/constants'
-import { mapToRobotApiRequest } from '../../robot-api/operators'
 import {
   MAGDECK,
   TEMPDECK,
@@ -16,12 +14,13 @@ import {
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-
 import type {
   MagneticModuleModel,
   TemperatureModuleModel,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import { GET } from '../../robot-api/constants'
+import { mapToRobotApiRequest } from '../../robot-api/operators'
 
 import * as Actions from '../actions'
 import * as Constants from '../constants'

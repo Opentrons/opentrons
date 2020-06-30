@@ -12,13 +12,13 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { i18n } from './localization'
 import type {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
   ModuleRealType,
   ModuleModel,
 } from '@opentrons/shared-data'
+import { i18n } from './localization'
 import type { DeckSlot, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this constants file
 export const {

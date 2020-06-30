@@ -3,10 +3,10 @@ import {
   GEN_ONE_MULTI_PIPETTES,
   MODULES_WITH_COLLISION_ISSUES,
 } from '../../constants'
-import { _getFeatureFlag } from './_getFeatureFlag'
 import type { PipetteEntity } from '../../step-forms/types'
 import type { DeckSlot } from '../../types'
 import type { InvariantContext, RobotState } from '../types'
+import { _getFeatureFlag } from './_getFeatureFlag'
 export const modulePipetteCollision = (args: {|
   pipette: ?string,
   labware: ?string,

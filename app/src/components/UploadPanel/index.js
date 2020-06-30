@@ -2,13 +2,12 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import { SidePanel } from '@opentrons/components'
 import { selectors as robotSelectors } from '../../robot'
 import { openProtocol, getProtocolFilename } from '../../protocol'
 
-import { SidePanel } from '@opentrons/components'
-import { Upload } from './Upload'
-
 import type { State, Dispatch } from '../../types'
+import { Upload } from './Upload'
 
 type SP = {|
   filename: ?string,

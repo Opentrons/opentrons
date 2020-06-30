@@ -3,8 +3,8 @@ import path from 'path'
 import fs from 'fs-extra'
 import { shell } from 'electron'
 
-import type { Dirent } from '../types'
 import type { UncheckedLabwareFile } from '@opentrons/app/src/custom-labware/types'
+import type { Dirent } from '../types'
 
 const RE_JSON_EXT = /\.json$/i
 

@@ -2,12 +2,12 @@
 import assert from 'assert'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
-import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
-import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import type {
   LabwareDefinition2,
   PipetteChannels,
 } from '@opentrons/shared-data'
+import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
+import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import type { FormPatch } from '../../actions/types'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { LabwareEntities, PipetteEntities } from '../../../step-forms'

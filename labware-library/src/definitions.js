@@ -9,9 +9,9 @@ import {
   LABWAREV2_DO_NOT_LIST,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { ContextRouter } from 'react-router-dom'
 import { getPublicPath } from './public-path'
 
-import type { ContextRouter } from 'react-router-dom'
 import type { LabwareList, LabwareDefinition } from './types'
 
 // require all definitions in the labware/definitions/2 directory

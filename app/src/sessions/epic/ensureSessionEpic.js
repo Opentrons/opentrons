@@ -11,6 +11,7 @@ import * as Constants from '../constants'
 import type { State, Epic } from '../../types'
 import type { RobotHost } from '../../robot-api/types'
 
+import type { EnsureSessionAction } from '../types'
 import {
   mapActionToRequest as mapActionToFetchAllRequest,
   mapResponseToAction as mapFetchAllResponseToAction,
@@ -20,8 +21,6 @@ import {
   mapActionToRequest as mapActionToCreateRequest,
   mapResponseToAction as mapCreateResponseToAction,
 } from './createSessionEpic'
-
-import type { EnsureSessionAction } from '../types'
 
 // this epic exists to ensure that a session of a given type exists in state
 // it will fetch all sessions and, if the correct session type doesn't already

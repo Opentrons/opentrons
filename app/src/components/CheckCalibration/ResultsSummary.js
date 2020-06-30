@@ -5,21 +5,20 @@ import { PrimaryButton, OutlineButton } from '@opentrons/components'
 import find from 'lodash/find'
 import pick from 'lodash/pick'
 import partition from 'lodash/partition'
+import { saveAs } from 'file-saver'
 import type { State } from '../../types'
 import * as Sessions from '../../sessions'
 import * as Calibration from '../../calibration'
-import styles from './styles.css'
-import { PipetteComparisons } from './PipetteComparisons'
-import { BadOutcomeBody } from './BadOutcomeBody'
-import { saveAs } from 'file-saver'
-import { getBadOutcomeHeader } from './utils'
-
 import type { CalibrationStatus } from '../../calibration/types'
 import type {
   RobotCalibrationCheckComparisonsByStep,
   RobotCalibrationCheckComparison,
   RobotCalibrationCheckInstrument,
 } from '../../sessions/types'
+import styles from './styles.css'
+import { PipetteComparisons } from './PipetteComparisons'
+import { BadOutcomeBody } from './BadOutcomeBody'
+import { getBadOutcomeHeader } from './utils'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
 const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'

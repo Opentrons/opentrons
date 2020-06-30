@@ -9,14 +9,14 @@ import {
   type TerminalItemId,
 } from '../../steplist/types'
 import { getLabwareOnModule } from '../modules/utils'
+import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { BaseState, Selector } from '../../types'
 import {
   initialSelectedItemState,
   type SelectableItem,
   type StepsState,
   type CollapsedStepsState,
 } from './reducers'
-import type { FormData, StepIdType, StepType } from '../../form-types'
-import type { BaseState, Selector } from '../../types'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 

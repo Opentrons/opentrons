@@ -3,12 +3,12 @@
 import * as React from 'react'
 
 import { CardContainer, CardRow } from '../layout'
+import type { ViewableRobot } from '../../discovery/types'
 import { StatusCard } from './StatusCard'
 import { InformationCard } from './InformationCard'
 import { ControlsCard } from './ControlsCard'
 import { ConnectionCard } from './ConnectionCard'
 import { AdvancedSettingsCard } from './AdvancedSettingsCard'
-import type { ViewableRobot } from '../../discovery/types'
 
 export { ConnectAlertModal } from './ConnectAlertModal'
 

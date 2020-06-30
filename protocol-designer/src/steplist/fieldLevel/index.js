@@ -1,5 +1,18 @@
 // @flow
 import {
+  MIN_TEMP_MODULE_TEMP,
+  MAX_TEMP_MODULE_TEMP,
+  MIN_TC_BLOCK_TEMP,
+  MAX_TC_BLOCK_TEMP,
+  MIN_TC_LID_TEMP,
+  MAX_TC_LID_TEMP,
+  MIN_TC_DURATION_SECONDS,
+  MAX_TC_DURATION_SECONDS,
+} from '../../constants'
+import type { StepFieldName } from '../../form-types'
+import type { LabwareEntity, PipetteEntity } from '../../step-forms'
+import type { InvariantContext } from '../../step-generation'
+import {
   requiredField,
   minimumWellCount,
   nonZero,
@@ -19,19 +32,6 @@ import {
   type ValueMasker,
   type ValueCaster,
 } from './processing'
-import {
-  MIN_TEMP_MODULE_TEMP,
-  MAX_TEMP_MODULE_TEMP,
-  MIN_TC_BLOCK_TEMP,
-  MAX_TC_BLOCK_TEMP,
-  MIN_TC_LID_TEMP,
-  MAX_TC_LID_TEMP,
-  MIN_TC_DURATION_SECONDS,
-  MAX_TC_DURATION_SECONDS,
-} from '../../constants'
-import type { StepFieldName } from '../../form-types'
-import type { LabwareEntity, PipetteEntity } from '../../step-forms'
-import type { InvariantContext } from '../../step-generation'
 
 export type { StepFieldName }
 

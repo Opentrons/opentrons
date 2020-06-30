@@ -1,8 +1,8 @@
 // @flow
 import uniqBy from 'lodash/uniqBy'
+import type { Node } from 'react'
 import { THERMOCYCLER_PROFILE } from '../../constants'
 import { PROFILE_STEP, type ProfileStepItem } from '../../form-types'
-import type { Node } from 'react'
 
 // TODO: real HydratedFormData type
 type HydratedFormData = any

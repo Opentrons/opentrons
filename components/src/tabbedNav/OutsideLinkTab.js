@@ -2,11 +2,11 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import styles from './navbar.css'
 import { Button } from '../buttons'
 import { NotificationIcon } from '../icons'
 
 import type { IconName } from '../icons'
+import styles from './navbar.css'
 
 export type OutsideLinkTabProps = {|
   /** optional click event for nav button */

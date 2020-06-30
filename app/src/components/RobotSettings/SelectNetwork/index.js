@@ -3,11 +3,12 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
+import { useInterval } from '@opentrons/components'
 import * as RobotApi from '../../../robot-api'
 import * as Networking from '../../../networking'
 
-import { useInterval } from '@opentrons/components'
 import { Portal } from '../../portal'
+import type { State, Dispatch } from '../../../types'
 import { SelectSsid } from './SelectSsid'
 import { ConnectModal } from './ConnectModal'
 import { DisconnectModal } from './DisconnectModal'
@@ -15,7 +16,6 @@ import { ResultModal } from './ResultModal'
 
 import { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
 
-import type { State, Dispatch } from '../../../types'
 import type { WifiConfigureRequest, NetworkChangeState } from './types'
 
 type SelectNetworkProps = {| robotName: string |}

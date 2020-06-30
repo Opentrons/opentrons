@@ -8,12 +8,12 @@ import { DefinitionRoute } from '../../definitions'
 import { useFilters } from '../../filters'
 import { Nav, Breadcrumbs } from '../Nav'
 import { Sidebar } from '../Sidebar'
-import { Page } from './Page'
 import { LabwareList } from '../LabwareList'
 import { LabwareDetails } from '../LabwareDetails'
+import type { DefinitionRouteRenderProps } from '../../definitions'
 import styles from './styles.css'
 
-import type { DefinitionRouteRenderProps } from '../../definitions'
+import { Page } from './Page'
 
 export function AppComponent(props: DefinitionRouteRenderProps): React.Node {
   const { definition, location } = props

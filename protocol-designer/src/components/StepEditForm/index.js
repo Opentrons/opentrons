@@ -16,6 +16,8 @@ import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import { ConfirmDeleteStepModal } from '../modals/ConfirmDeleteStepModal'
 
+import type { BaseState } from '../../types'
+import type { FormData, StepType, StepFieldName } from '../../form-types'
 import {
   MixForm,
   MoveLiquidForm,
@@ -27,9 +29,6 @@ import {
 import { FormAlerts } from './FormAlerts'
 import { ButtonRow } from './ButtonRow'
 import styles from './StepEditForm.css'
-
-import type { BaseState } from '../../types'
-import type { FormData, StepType, StepFieldName } from '../../form-types'
 
 const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<any> } = {
   mix: MixForm,

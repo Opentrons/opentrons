@@ -3,9 +3,8 @@
 import * as React from 'react'
 
 import { PrimaryButton } from '@opentrons/components'
-import styles from './styles.css'
-
 import type { Labware, Pipette } from '../../robot/types'
+import styles from './styles.css'
 
 export type ConfirmPickupPromptProps = {|
   labware: Labware,

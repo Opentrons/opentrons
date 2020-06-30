@@ -1,5 +1,4 @@
 // @flow
-import { SPAN7_8_10_11_SLOT } from '../constants'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -7,6 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import type { ModuleRealType } from '@opentrons/shared-data'
 import type { DropdownOption } from '@opentrons/components'
+import { SPAN7_8_10_11_SLOT } from '../constants'
 
 export const SUPPORTED_MODULE_TYPES: Array<ModuleRealType> = [
   MAGNETIC_MODULE_TYPE,

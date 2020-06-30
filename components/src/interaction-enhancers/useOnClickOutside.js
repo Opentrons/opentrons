@@ -1,6 +1,6 @@
 // @flow
-import { useEffect, useRef } from 'react'
 import assert from 'assert'
+import { useEffect, useRef } from 'react'
 
 export type UseOnClickOutsideOptions = $Shape<{|
   onClickOutside?: MouseEvent => mixed,

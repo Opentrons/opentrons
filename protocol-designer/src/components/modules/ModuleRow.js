@@ -9,18 +9,17 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { actions as stepFormActions } from '../../step-forms'
 import {
   SPAN7_8_10_11_SLOT,
   DEFAULT_MODEL_FOR_MODULE_TYPE,
 } from '../../constants'
+import type { ModuleOnDeck } from '../../step-forms'
 import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
-
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../step-forms'
 
 type Props = {|
   moduleOnDeck?: ModuleOnDeck,

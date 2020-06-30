@@ -2,9 +2,9 @@
 import { filter, map } from 'rxjs/operators'
 
 import { addUniqueConfigValue } from '../config'
+import type { Action, Epic } from '../types'
 import { ALERT_DISMISSED } from './constants'
 
-import type { Action, Epic } from '../types'
 import type { AlertDismissedAction } from './types'
 
 // dispatch an updateConfig action to add the alertId to the permanent ignore

@@ -3,8 +3,8 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import * as React from 'react'
 import cx from 'classnames'
-import styles from './FilePipettesModal.css'
 import { InstrumentDiagram } from '@opentrons/components'
+import styles from './FilePipettesModal.css'
 
 type Props = {
   leftPipette: ?string,

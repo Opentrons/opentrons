@@ -1,12 +1,12 @@
 // @flow
 import values from 'lodash/values'
-import { i18n } from '../../localization'
 import {
   MAGNETIC_MODULE_V1,
   getLabwareDefaultEngageHeight,
   type ModuleRealType,
 } from '@opentrons/shared-data'
 import type { Options } from '@opentrons/components'
+import { i18n } from '../../localization'
 import type {
   ModuleOnDeck,
   LabwareOnDeck,

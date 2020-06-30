@@ -7,12 +7,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT } from '../../../constants'
-import { getDisposalLabwareOptions, getLabwareOptions } from '../selectors'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import { getDisposalLabwareOptions, getLabwareOptions } from '../selectors'
+import { SPAN7_8_10_11_SLOT } from '../../../constants'
 
 describe('labware selectors', () => {
   let names

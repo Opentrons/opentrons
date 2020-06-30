@@ -5,13 +5,13 @@ import { mount } from 'enzyme'
 
 import * as CustomLabware from '../../../custom-labware'
 import * as CustomLabwareFixtures from '../../../custom-labware/__fixtures__'
-import { AddLabwareCard } from '..'
 import { ManagePath } from '../ManagePath'
 import { AddLabware } from '../AddLabware'
 import { AddLabwareFailureModal } from '../AddLabwareFailureModal'
 
 import type { State } from '../../../types'
 import type { FailedLabwareFile } from '../../../custom-labware/types'
+import { AddLabwareCard } from '..'
 
 jest.mock('../../../custom-labware/selectors')
 

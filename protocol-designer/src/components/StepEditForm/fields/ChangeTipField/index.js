@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { ChangeTip } from './ChangeTip'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getWellRatio } from '../../../../steplist/utils'
 
 import type { BaseState } from '../../../../types'
 import type { FormData } from '../../../../form-types'
 import type { ChangeTipOptions } from '../../../../step-generation/types'
+import { ChangeTip } from './ChangeTip'
 
 type Props = React.ElementProps<typeof ChangeTip>
 type OP = {| name: $PropertyType<Props, 'name'> |}

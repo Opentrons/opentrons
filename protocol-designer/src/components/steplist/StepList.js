@@ -2,16 +2,15 @@
 import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
 
+import { END_TERMINAL_TITLE } from '../../constants'
+import { END_TERMINAL_ITEM_ID } from '../../steplist'
+import { StepCreationButton } from '../StepCreationButton'
+import type { StepIdType } from '../../form-types'
 import { PresavedStepItem } from './PresavedStepItem'
 import { StartingDeckStateTerminalItem } from './StartingDeckStateTerminalItem'
 import { TerminalItem } from './TerminalItem'
-import { END_TERMINAL_TITLE } from '../../constants'
-import { END_TERMINAL_ITEM_ID } from '../../steplist'
 
-import { StepCreationButton } from '../StepCreationButton'
 import { DraggableStepItems } from './DraggableStepItems'
-
-import type { StepIdType } from '../../form-types'
 
 type Props = {|
   orderedStepIds: Array<StepIdType>,

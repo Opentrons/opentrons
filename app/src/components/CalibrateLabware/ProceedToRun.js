@@ -10,8 +10,8 @@ import { selectors as robotSelectors } from '../../robot'
 import type { Dispatch } from '../../types'
 import pcrSealSrc from '../../img/place_pcr_seal.png'
 import { Portal } from '../portal'
-import styles from './styles.css'
 import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
+import styles from './styles.css'
 
 const IS_HOMING_MESSAGE = 'Returning tip and homing robot'
 

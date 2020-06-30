@@ -3,6 +3,8 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
+import { Card, useInterval } from '@opentrons/components'
+import { CardContentFlex } from '../layout'
 import {
   LEFT,
   RIGHT,
@@ -12,12 +14,9 @@ import {
   getAttachedPipetteSettings,
 } from '../../pipettes'
 
-import { PipetteInfo } from './PipetteInfo'
-import { CardContentFlex } from '../layout'
-import { Card, useInterval } from '@opentrons/components'
-
 import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../pipettes/types'
+import { PipetteInfo } from './PipetteInfo'
 
 type Props = {|
   robotName: string,

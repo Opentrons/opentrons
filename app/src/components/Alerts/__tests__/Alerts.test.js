@@ -5,13 +5,13 @@ import { mount } from 'enzyme'
 import noop from 'lodash/noop'
 
 import * as AppAlerts from '../../../alerts'
-import { Alerts } from '..'
 import { LostConnectionAlert } from '../../LostConnectionAlert'
 import { AnalyticsSettingsModal } from '../../analytics-settings'
 import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 
 import type { State } from '../../../types'
 import type { AlertId } from '../../../alerts/types'
+import { Alerts } from '..'
 
 jest.mock('../../LostConnectionAlert', () => ({
   LostConnectionAlert: () => <></>,

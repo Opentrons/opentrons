@@ -8,7 +8,6 @@ import { withRobotHost } from '../../robot-api/operators'
 
 import * as Actions from '../actions'
 import * as Constants from '../constants'
-import { mapActionToRequest as mapActionToFetchSessionRequest } from './fetchSessionEpic'
 
 import type { State, Epic } from '../../types'
 import type {
@@ -17,6 +16,7 @@ import type {
   RobotApiResponse,
 } from '../../robot-api/types'
 import type { CreateSessionCommandAction } from '../types'
+import { mapActionToRequest as mapActionToFetchSessionRequest } from './fetchSessionEpic'
 
 const mapActionToRequest = (
   action: CreateSessionCommandAction

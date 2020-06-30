@@ -3,10 +3,9 @@
 import * as React from 'react'
 
 import { Icon, HoverTooltip } from '@opentrons/components'
+import type { UnreachableRobot } from '../../discovery/types'
 import { RobotLink } from './RobotLink'
 import styles from './styles.css'
-
-import type { UnreachableRobot } from '../../discovery/types'
 
 export function UnreachableRobotItem(props: UnreachableRobot): React.Node {
   const { displayName } = props

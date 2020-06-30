@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { Well } from './Well'
 import type { WellGroup } from './types'
 
 export type StyledWellProps = {|

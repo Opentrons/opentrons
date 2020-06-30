@@ -1,4 +1,10 @@
 // @flow
+import type {
+  AtomicProfileStep,
+  ModuleOnlyParams,
+  TemperatureParams,
+  TCProfileParams,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
 import { thermocyclerAwaitBlockTemperature } from '../commandCreators/atomic/thermocyclerAwaitBlockTemperature'
@@ -10,12 +16,6 @@ import { thermocyclerCloseLid } from '../commandCreators/atomic/thermocyclerClos
 import { thermocyclerOpenLid } from '../commandCreators/atomic/thermocyclerOpenLid'
 import { getSuccessResult } from '../__fixtures__'
 
-import type {
-  AtomicProfileStep,
-  ModuleOnlyParams,
-  TemperatureParams,
-  TCProfileParams,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { CommandCreator } from '../types'
 
 const getRobotInitialState = (): any => {

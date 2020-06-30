@@ -4,9 +4,9 @@ import { createSelector } from 'reselect'
 
 import { LEFT, RIGHT } from '../pipettes'
 import { selectors as RobotSelectors } from '../robot'
+import type { State } from '../types'
 import { getCalibrateLocation } from './selectors'
 
-import type { State } from '../types'
 import type { SubnavLocation } from './types'
 
 // TODO(mc, 2019-12-10): i18n

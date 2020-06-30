@@ -4,10 +4,10 @@ import { combineEpics, ofType } from 'redux-observable'
 import { tap, filter, withLatestFrom, ignoreElements } from 'rxjs/operators'
 
 import * as Cfg from '../config'
-import { initializeProfile, makeProfileUpdate, updateProfile } from './profile'
 
 import type { Epic } from '../types'
 import type { ConfigInitializedAction } from '../config/types'
+import { initializeProfile, makeProfileUpdate, updateProfile } from './profile'
 
 const initializeSupportEpic: Epic = action$ => {
   return action$.pipe(

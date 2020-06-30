@@ -14,11 +14,10 @@ import {
 } from '../../custom-labware'
 
 import { CardCopy } from '../layout'
+import type { Dispatch } from '../../types'
 import { ManagePath } from './ManagePath'
 import { AddLabware } from './AddLabware'
 import { AddLabwareFailureModal } from './AddLabwareFailureModal'
-
-import type { Dispatch } from '../../types'
 
 // TODO(mc, 2019-10-17): i18n
 const LABWARE_MANAGEMENT = 'Labware Management'

@@ -13,12 +13,12 @@ import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledFields } from '../../../../steplist/formLevel'
 import stepFormStyles from '../../StepEditForm.css'
-import styles from './TipPositionInput.css'
-import { TipPositionModal } from './TipPositionModal'
 import { getIsTouchTipField } from '../../../../form-types'
-import { getDefaultMmFromBottom } from './utils'
 import type { BaseState } from '../../../../types'
 import type { StepFieldName, TipOffsetFields } from '../../../../form-types'
+import styles from './TipPositionInput.css'
+import { TipPositionModal } from './TipPositionModal'
+import { getDefaultMmFromBottom } from './utils'
 
 function getLabwareFieldForPositioningField(
   fieldName: TipOffsetFields

@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
 
-import styles from './styles.css'
 import { TitleBar } from '@opentrons/components'
 
 import type { TitleBarProps } from '@opentrons/components'
+import styles from './styles.css'
 
 export type PageProps = {|
   titleBarProps?: TitleBarProps,

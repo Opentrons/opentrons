@@ -2,20 +2,20 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
+import type { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
 import {
   arrayToWellGroup,
   getCollidingWells,
   getWellSetForMultichannel,
 } from '../../utils'
 import { SELECTABLE_WELL_CLASS } from '../../constants'
-import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
-import { WellTooltip } from './WellTooltip'
 
-import type { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
 import type { ContentsByWell } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
 import type { GenericRect } from '../../collision-types'
+import { WellTooltip } from './WellTooltip'
+import { SingleLabware } from './SingleLabware'
 
 export type Props = {|
   labwareProps: $Diff<

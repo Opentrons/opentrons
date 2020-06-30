@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 
-import * as Calibration from '../../../calibration'
 import { Flex, Icon, COLOR_WARNING, COLOR_ERROR } from '@opentrons/components'
+import * as Calibration from '../../../calibration'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
 
 import type { DeckCalibrationStatus } from '../../../calibration/types'

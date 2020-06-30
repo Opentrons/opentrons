@@ -5,27 +5,24 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import isEmpty from 'lodash/isEmpty'
 
+import type { Dispatch } from 'redux'
+import type { WellGroup } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { selectWells, deselectWells } from '../well-selection/actions'
+import { getSelectedWells } from '../well-selection/selectors'
+import * as wellContentsSelectors from '../top-selectors/well-contents'
+import { selectors } from '../labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '../step-forms'
+import { LiquidPlacementForm } from '../components/LiquidPlacementForm'
 import {
   wellFillFromWellContents,
   SelectableLabware,
 } from '../components/labware'
-import { LiquidPlacementForm } from '../components/LiquidPlacementForm'
-import { WellSelectionInstructions } from './WellSelectionInstructions'
-
-import { selectors } from '../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../step-forms'
-import * as wellContentsSelectors from '../top-selectors/well-contents'
-import { getSelectedWells } from '../well-selection/selectors'
-import { selectWells, deselectWells } from '../well-selection/actions'
-
-import styles from './LiquidPlacementModal.css'
-
-import type { Dispatch } from 'redux'
-import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState } from '../types'
 import type { ContentsByWell } from '../labware-ingred/types'
 import type { WellIngredientNames } from '../steplist'
+import styles from './LiquidPlacementModal.css'
+import { WellSelectionInstructions } from './WellSelectionInstructions'
 
 type SP = {|
   selectedWells: WellGroup,

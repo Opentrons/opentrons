@@ -4,16 +4,15 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { push } from 'connected-react-router'
 
+import { PrimaryButton } from '@opentrons/components'
 import {
   selectors as robotSelectors,
   actions as robotActions,
 } from '../../robot'
 
-import { PrimaryButton } from '@opentrons/components'
-import styles from './styles.css'
-
 import type { Mount, Labware } from '../../robot'
 import type { Dispatch } from '../../types'
+import styles from './styles.css'
 
 import { ProceedToRun } from './ProceedToRun'
 

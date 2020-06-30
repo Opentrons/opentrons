@@ -7,8 +7,8 @@ import { getHoveredStepLabware, getHoveredStepId } from '../../../ui/steps'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { THERMOCYCLER_PROFILE } from '../../../constants'
 
-import styles from './LabwareOverlays.css'
 import type { LabwareOnDeck } from '../../../step-forms'
+import styles from './LabwareOverlays.css'
 
 type LabwareHighlightProps = {|
   labwareOnDeck: LabwareOnDeck,

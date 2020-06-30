@@ -2,13 +2,13 @@
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
-import { InstallModalContents } from './InstallModalContents'
 
 import type { ViewableRobot } from '../../../discovery/types'
 import type {
   BuildrootUpdateSession,
   RobotSystemType,
 } from '../../../buildroot/types'
+import { InstallModalContents } from './InstallModalContents'
 
 export type InstallModalProps = {|
   robot: ViewableRobot,

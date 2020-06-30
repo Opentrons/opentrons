@@ -1,6 +1,6 @@
 // @flow
-import type { ElementProps } from 'react'
 import assert from 'assert'
+import type { ElementProps } from 'react'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
@@ -12,6 +12,12 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
+import type {
+  DropdownOption,
+  Mount,
+  InstrumentInfoProps,
+} from '@opentrons/components'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   TEMPERATURE_DEACTIVATED,
@@ -33,12 +39,6 @@ import {
   type LabwareDefByDefURI,
 } from '../../labware-defs'
 
-import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
-import type {
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
 import type { FormData, StepIdType } from '../../form-types'

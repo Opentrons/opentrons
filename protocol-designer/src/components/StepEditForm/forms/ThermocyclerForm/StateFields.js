@@ -2,8 +2,8 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { i18n } from '../../../../localization'
 import { FormGroup } from '@opentrons/components'
+import { i18n } from '../../../../localization'
 import { ConditionalOnField, ToggleRowField, TextField } from '../../fields'
 
 import styles from '../../StepEditForm.css'

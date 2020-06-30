@@ -7,18 +7,18 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
   getIsCrashablePipetteSelected,
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
+import type { ModulesForEditModulesCard } from '../../step-forms'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { ModulesForEditModulesCard } from '../../step-forms'
 
 type Props = {
   modules: ModulesForEditModulesCard,

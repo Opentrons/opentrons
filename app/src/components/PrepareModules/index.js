@@ -15,10 +15,10 @@ import {
 } from '../../modules'
 import { DeckMap } from '../DeckMap'
 import { Portal } from '../portal'
-import styles from './styles.css'
 
 import type { Dispatch } from '../../types'
 import type { AttachedModule } from '../../modules/types'
+import styles from './styles.css'
 
 const LID_OPEN_DELAY_MS = 30 * 1000
 type Props = {| robotName: string, modules: Array<AttachedModule> |}

@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { FormGroup } from '@opentrons/components'
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { i18n } from '../../../localization'
 
 import {

@@ -3,10 +3,9 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import type { Labware } from '../../robot'
-
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ModalPage } from '@opentrons/components'
+import type { Labware } from '../../robot'
 import { ConfirmModalContents } from './ConfirmModalContents'
 import styles from './styles.css'
 

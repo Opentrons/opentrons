@@ -7,10 +7,10 @@ import * as labwareIngredActions from '../../labware-ingred/actions'
 import { getSelectedTerminalItemId } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import type { InitialDeckSetup } from '../../step-forms'
-import { DeckSetup as DeckSetupComponent } from './DeckSetup'
 
 import type { TerminalItemId } from '../../steplist'
 import type { BaseState, ThunkDispatch } from '../../types'
+import { DeckSetup as DeckSetupComponent } from './DeckSetup'
 
 type Props = React.ElementProps<typeof DeckSetupComponent>
 

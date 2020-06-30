@@ -8,9 +8,8 @@ import {
   MANUFACTURER_VALUES,
 } from '../../localization'
 import { ExternalLink, LabelText, Value, LABEL_TOP } from '../ui'
-import styles from './styles.css'
-
 import type { LabwareBrand } from '../../types'
+import styles from './styles.css'
 
 export type ManufacturerStatsProps = {|
   brand: LabwareBrand,

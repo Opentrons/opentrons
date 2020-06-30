@@ -4,6 +4,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import type {
+  ModuleOnlyParams,
+  TCProfileParams,
+  TemperatureParams,
+  ThermocyclerSetTargetBlockTemperatureArgs,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
 import {
   forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
@@ -21,12 +27,6 @@ import {
   type ImmutableStateUpdater,
 } from '../__utils__'
 import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
-import type {
-  ModuleOnlyParams,
-  TCProfileParams,
-  TemperatureParams,
-  ThermocyclerSetTargetBlockTemperatureArgs,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { ThermocyclerModuleState } from '../../step-forms/types'
 
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(

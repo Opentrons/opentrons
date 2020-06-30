@@ -4,9 +4,9 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
+import { PageTabs } from '@opentrons/components'
 import { getCalibratePipettesLocations } from '../../nav'
 import { PIPETTE_MOUNTS } from '../../pipettes'
-import { PageTabs } from '@opentrons/components'
 
 export type PipetteTabsProps = {|
   currentMount: ?string,

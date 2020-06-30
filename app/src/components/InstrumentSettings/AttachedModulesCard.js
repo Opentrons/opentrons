@@ -10,9 +10,8 @@ import {
   getModuleControlsDisabled,
 } from '../../modules'
 import { getConnectedRobotName } from '../../robot/selectors'
-import { ModulesCardContents } from './ModulesCardContents'
-
 import type { State, Dispatch } from '../../types'
+import { ModulesCardContents } from './ModulesCardContents'
 
 type Props = {| robotName: string |}
 

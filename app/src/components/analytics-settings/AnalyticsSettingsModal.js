@@ -2,13 +2,13 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
+import { Modal } from '@opentrons/components'
 import { getAnalyticsOptInSeen, setAnalyticsOptInSeen } from '../../analytics'
 
-import { Modal } from '@opentrons/components'
-import { ModalButton } from './ModalButton'
-import { AnalyticsToggle } from './AnalyticsToggle'
 import { Portal } from '../portal'
 import type { Dispatch } from '../../types'
+import { ModalButton } from './ModalButton'
+import { AnalyticsToggle } from './AnalyticsToggle'
 
 const TITLE = 'Privacy Settings'
 const CONTINUE = 'continue'

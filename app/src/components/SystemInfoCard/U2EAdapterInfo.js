@@ -12,10 +12,9 @@ import {
 } from '@opentrons/components'
 
 import * as SystemInfo from '../../system-info'
+import type { State } from '../../types'
 import { U2EDriverWarning } from './U2EDriverWarning'
 import { U2EDeviceDetails } from './U2EDeviceDetails'
-
-import type { State } from '../../types'
 
 const U2E_ADAPTER_INFORMATION = 'USB-to-Ethernet Adapter Information'
 

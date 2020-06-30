@@ -3,11 +3,11 @@ import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 
 import { ListItem, HoverTooltip } from '@opentrons/components'
-import styles from './styles.css'
 
 import type { IconName } from '@opentrons/components'
 import type { Pipette as ProtocolPipette } from '../../robot/types'
 import type { Mount } from '../../pipettes/types'
+import styles from './styles.css'
 
 export type PipetteListItemProps = {|
   mount: Mount,

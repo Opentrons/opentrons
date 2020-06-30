@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
@@ -9,10 +10,8 @@ import {
 } from '../../../constants'
 import { ModuleDiagram } from '../../modules'
 
-import styles from './FilePipettesModal.css'
-
-import type { ModuleRealType } from '@opentrons/shared-data'
 import type { FormModulesByType } from '../../../step-forms'
+import styles from './FilePipettesModal.css'
 
 type Props = {|
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed

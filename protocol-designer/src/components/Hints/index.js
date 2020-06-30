@@ -7,11 +7,11 @@ import { actions as stepsActions } from '../../ui/steps'
 import type { TerminalItemId } from '../../steplist'
 import { actions, selectors } from '../../tutorial'
 import { Portal } from '../portals/MainPageModalPortal'
-import styles from './hints.css'
 import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
 import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
 import type { HintKey } from '../../tutorial'
 import type { BaseState, ThunkDispatch } from '../../types'
+import styles from './hints.css'
 
 type SP = {| hintKey: ?HintKey |}
 type DP = {|

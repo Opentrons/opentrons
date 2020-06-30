@@ -5,12 +5,11 @@ import capitalize from 'lodash/capitalize'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { Icon } from '@opentrons/components'
+import { selectors as robotSelectors } from '../../robot'
+import type { Labware, LabwareType } from '../../robot/types'
 import styles from './styles.css'
 
-import { selectors as robotSelectors } from '../../robot'
 import { InfoBoxButton } from './InfoBoxButton'
-
-import type { Labware, LabwareType } from '../../robot/types'
 
 export type InfoBoxProps = {| labware: ?Labware |}
 

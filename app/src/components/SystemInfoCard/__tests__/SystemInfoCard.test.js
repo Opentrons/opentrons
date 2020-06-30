@@ -3,8 +3,8 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 
 import { Card } from '@opentrons/components'
-import { SystemInfoCard } from '..'
 import { U2EAdapterInfo } from '../U2EAdapterInfo'
+import { SystemInfoCard } from '..'
 
 jest.mock('../U2EAdapterInfo', () => ({
   U2EAdapterInfo: () => <></>,

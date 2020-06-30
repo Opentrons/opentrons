@@ -3,10 +3,10 @@ import semver from 'semver'
 import { createSelector } from 'reselect'
 
 import { getViewableRobots, getRobotApiVersion } from '../discovery/selectors'
-import * as Constants from './constants'
 
 import type { State } from '../types'
 import type { ViewableRobot } from '../discovery/types'
+import * as Constants from './constants'
 import type {
   BuildrootUpdateInfo,
   BuildrootUpdateSession,

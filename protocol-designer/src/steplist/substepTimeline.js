@@ -1,11 +1,11 @@
 // @flow
 import last from 'lodash/last'
 import pick from 'lodash/pick'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { Channels } from '@opentrons/components'
 import { getWellsForTips } from '../step-generation/utils'
 import { getNextRobotStateAndWarningsSingleCommand } from '../step-generation/getNextRobotStateAndWarnings'
 
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { Channels } from '@opentrons/components'
 import type {
   CommandCreatorError,
   CommandsAndWarnings,

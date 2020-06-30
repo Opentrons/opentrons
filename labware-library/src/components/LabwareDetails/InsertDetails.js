@@ -5,11 +5,10 @@ import * as React from 'react'
 import { getUniqueWellProperties } from '../../labwareInference'
 import { getWellLabel, WellProperties, ManufacturerStats } from '../labware-ui'
 import { DetailsBox } from '../ui'
+import type { LabwareDefinition } from '../../types'
 import { WellDimensions } from './WellDimensions'
 
 import styles from './styles.css'
-
-import type { LabwareDefinition } from '../../types'
 
 export type InsertDetailsProps = {|
   definition: LabwareDefinition,

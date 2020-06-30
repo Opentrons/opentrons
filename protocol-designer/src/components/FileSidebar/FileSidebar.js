@@ -13,9 +13,6 @@ import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { Portal } from '../portals/MainPageModalPortal'
 import modalStyles from '../modals/modal.css'
-import { getUnusedEntities } from './utils'
-import styles from './FileSidebar.css'
-
 import type { PDProtocolFile } from '../../file-types'
 import type {
   InitialDeckSetup,
@@ -23,6 +20,8 @@ import type {
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
+import { getUnusedEntities } from './utils'
+import styles from './FileSidebar.css'
 
 type Props = {|
   loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,

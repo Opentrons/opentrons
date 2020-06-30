@@ -1,7 +1,7 @@
 // @flow
-import { migration } from './migration'
 import type { PDProtocolFile } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
+import { migration } from './migration'
 import type {
   FileUploadErrorType,
   FileUploadMessage,

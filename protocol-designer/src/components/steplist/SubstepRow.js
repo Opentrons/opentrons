@@ -13,8 +13,8 @@ import type {
   WellIngredientVolumeData,
   WellIngredientNames,
 } from '../../steplist/types'
-import { IngredPill } from './IngredPill'
 import { PDListItem } from '../lists'
+import { IngredPill } from './IngredPill'
 import styles from './StepItem.css'
 import { formatVolume, formatPercentage } from './utils'
 

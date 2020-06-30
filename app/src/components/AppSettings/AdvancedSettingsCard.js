@@ -5,6 +5,10 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import startCase from 'lodash/startCase'
 
+import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
+
+import type { ContextRouter } from 'react-router-dom'
+import type { DropdownOption } from '@opentrons/components'
 import {
   getDevtoolsEnabled,
   getFeatureFlags,
@@ -15,11 +19,6 @@ import {
   toggleDevInternalFlag,
   DEV_INTERNAL_FLAGS,
 } from '../../config'
-
-import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
-
-import type { ContextRouter } from 'react-router-dom'
-import type { DropdownOption } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import type { Config, DevInternalFlag, UpdateChannel } from '../../config/types'
 

@@ -3,8 +3,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
-
 import {
   PrimaryButton,
   RadioGroup,
@@ -13,6 +11,7 @@ import {
   type KeypressHandler,
   type IconName,
 } from '@opentrons/components'
+import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 
 import styles from './styles.css'
 

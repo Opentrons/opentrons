@@ -2,7 +2,6 @@
 import Ajv from 'ajv'
 import sortBy from 'lodash/sortBy'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { sameIdentity } from './compare'
 
 import {
   INVALID_LABWARE_FILE,
@@ -18,6 +17,7 @@ import type {
   ValidLabwareFile,
   OpentronsLabwareFile,
 } from '@opentrons/app/src/custom-labware/types'
+import { sameIdentity } from './compare'
 
 const ajv = new Ajv()
 const validateDefinition = ajv.compile(labwareSchema)

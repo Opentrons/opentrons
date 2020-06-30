@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
-import { FileUploadMessageModal as FileUploadMessageModalComponent } from './FileUploadMessageModal'
 import { connect } from 'react-redux'
+import type { Dispatch } from 'redux'
 import {
   selectors as loadFileSelectors,
   actions as loadFileActions,
 } from '../../../load-file'
-import type { Dispatch } from 'redux'
 import type { BaseState } from '../../../types'
+import { FileUploadMessageModal as FileUploadMessageModalComponent } from './FileUploadMessageModal'
 
 type Props = React.ElementProps<typeof FileUploadMessageModalComponent>
 

@@ -4,9 +4,8 @@ import { fromEvent } from 'rxjs'
 import { filter, tap, ignoreElements } from 'rxjs/operators'
 
 import { createLogger } from '../logger'
-import { remote } from './remote'
-
 import type { Epic, Action } from '../types'
+import { remote } from './remote'
 
 const { ipcRenderer } = remote
 

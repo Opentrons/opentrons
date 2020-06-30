@@ -25,11 +25,11 @@ import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import type { DeckSlot } from '../../types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
 import styles from './styles.css'
-import type { DeckSlot } from '../../types'
-import type { LabwareDefByDefURI } from '../../labware-defs'
 
 type Props = {|
   onClose: (e?: any) => mixed,

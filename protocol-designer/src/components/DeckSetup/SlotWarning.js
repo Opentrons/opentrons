@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
-import { i18n } from '../../localization'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
-import styles from './SlotWarning.css'
+import { i18n } from '../../localization'
 import type { ModuleOrientation } from '../../types'
+import styles from './SlotWarning.css'
 
 type Props = {|
   x: number,

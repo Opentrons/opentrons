@@ -6,10 +6,10 @@ import head from 'lodash/head'
 import * as AppAlerts from '../../alerts'
 import { LostConnectionAlert } from '../LostConnectionAlert'
 import { AnalyticsSettingsModal } from '../analytics-settings'
-import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 
 import type { State, Dispatch } from '../../types'
 import type { AlertId } from '../../alerts/types'
+import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 
 export function Alerts(): React.Node {
   const dispatch = useDispatch<Dispatch>()

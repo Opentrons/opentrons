@@ -6,11 +6,11 @@ import {
   MIXED_WELL_COLOR,
   type UseHoverTooltipResult,
 } from '@opentrons/components'
-import styles from './StepItem.css'
 import type {
   WellIngredientVolumeData,
   WellIngredientNames,
 } from '../../steplist'
+import styles from './StepItem.css'
 
 type Props = {
   ingreds: WellIngredientVolumeData,

@@ -1,9 +1,9 @@
 const assert = require('assert')
 const fs = require('fs')
 const path = require('path')
+const { promisify } = require('util')
 const camelCase = require('lodash/camelCase')
 const JSDOM = require('jsdom').JSDOM
-const { promisify } = require('util')
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 

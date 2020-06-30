@@ -3,9 +3,9 @@
 import * as React from 'react'
 
 import { AnalyticsSettingsCard } from '../analytics-settings'
+import { CardContainer, CardRow } from '../layout'
 import { AdvancedSettingsCard } from './AdvancedSettingsCard'
 import { AppInfoCard } from './AppInfoCard'
-import { CardContainer, CardRow } from '../layout'
 
 export type AppSettingsProps = {|
   availableVersion: ?string,

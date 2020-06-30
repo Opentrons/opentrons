@@ -4,9 +4,9 @@ import { shallow } from 'enzyme'
 
 import { Card } from '@opentrons/components'
 import { AddManualIp } from '../AddManualIp'
-import { NetworkSettingsCard } from '..'
 import { ClearDiscoveryCache } from '../ClearDiscoveryCache'
 import { DisableDiscoveryCache } from '../DisableDiscoveryCache'
+import { NetworkSettingsCard } from '..'
 
 describe('NetworkSettingsCard', () => {
   it('should render a card with the proper title', () => {

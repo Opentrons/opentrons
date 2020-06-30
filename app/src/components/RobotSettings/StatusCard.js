@@ -4,12 +4,12 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import capitalize from 'lodash/capitalize'
 
+import { Card, LabeledValue, OutlineButton, Icon } from '@opentrons/components'
 import {
   selectors as robotSelectors,
   actions as robotActions,
 } from '../../robot'
 
-import { Card, LabeledValue, OutlineButton, Icon } from '@opentrons/components'
 import { CONNECTABLE } from '../../discovery'
 import { CardContentHalf } from '../layout'
 

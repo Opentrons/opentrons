@@ -3,8 +3,8 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 
-import { CalibrationInfoContent } from '../CalibrationInfoContent'
 import { PrimaryButton } from '@opentrons/components'
+import { CalibrationInfoContent } from '../CalibrationInfoContent'
 
 import {
   actions as robotActions,
@@ -12,9 +12,9 @@ import {
 } from '../../robot'
 import attachSingle from '../../img/attach_tip_single.png'
 import attachMulti from '../../img/attach_tip_multi.png'
+import type { Dispatch } from '../../types'
 import styles from './tip-probe.css'
 
-import type { Dispatch } from '../../types'
 import type { TipProbeProps } from './types'
 
 type Props = TipProbeProps

@@ -5,13 +5,13 @@ import uniq from 'lodash/uniq'
 import { connect } from 'formik'
 import { AlertItem } from '@opentrons/components'
 import { getIsHidden } from '../formSelectors'
-import { LinkOut } from './LinkOut'
-import styles from './Section.css'
 import {
   IRREGULAR_LABWARE_ERROR,
   LINK_CUSTOM_LABWARE_FORM,
   type LabwareFields,
 } from '../fields'
+import { LinkOut } from './LinkOut'
+import styles from './Section.css'
 
 // TODO: Make this DRY, don't require fields (in children) and also fieldList.
 type Props = {|

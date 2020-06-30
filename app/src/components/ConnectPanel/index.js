@@ -3,6 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import orderBy from 'lodash/orderBy'
 
+import { SidePanel } from '@opentrons/components'
 import {
   startDiscovery,
   getScanning,
@@ -13,17 +14,15 @@ import {
 
 import type { State, Dispatch } from '../../types'
 
-import { SidePanel } from '@opentrons/components'
-import { RobotList } from './RobotList'
-import { RobotItem } from './RobotItem'
-import { ScanStatus } from './ScanStatus'
-import { UnreachableRobotItem } from './UnreachableRobotItem'
-
 import type {
   Robot,
   ReachableRobot,
   UnreachableRobot,
 } from '../../discovery/types'
+import { RobotList } from './RobotList'
+import { RobotItem } from './RobotItem'
+import { ScanStatus } from './ScanStatus'
+import { UnreachableRobotItem } from './UnreachableRobotItem'
 
 type SP = {|
   robots: Array<Robot>,

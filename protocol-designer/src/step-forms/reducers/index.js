@@ -15,6 +15,12 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import type { Reducer } from 'redux'
+import type {
+  FileLabware,
+  FilePipette,
+  FileModule,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import {
   rootReducer as labwareDefsRootReducer,
   type RootState as LabwareDefsRootState,
@@ -48,7 +54,6 @@ import {
 } from '../utils/createInitialProfileItems'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import type { Reducer } from 'redux'
 import type { LoadFileAction } from '../../load-file'
 import type {
   CreateContainerAction,
@@ -65,11 +70,6 @@ import type {
   ProfileCycleItem,
   ProfileStepItem,
 } from '../../form-types'
-import type {
-  FileLabware,
-  FilePipette,
-  FileModule,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
   CancelStepFormAction,
   ChangeFormInputAction,

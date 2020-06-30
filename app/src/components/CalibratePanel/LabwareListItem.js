@@ -10,9 +10,8 @@ import {
   type ModuleModel,
 } from '@opentrons/shared-data'
 import { ListItem, HoverTooltip } from '@opentrons/components'
-import styles from './styles.css'
-
 import type { Labware } from '../../robot'
+import styles from './styles.css'
 
 export type LabwareListItemProps = {|
   ...Labware,

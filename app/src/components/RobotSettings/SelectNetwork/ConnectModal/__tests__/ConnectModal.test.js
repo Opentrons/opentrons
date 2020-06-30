@@ -6,7 +6,6 @@ import { shallow, mount } from 'enzyme'
 import * as Fixtures from '../../../../../networking/__fixtures__'
 import * as FormFields from '../form-fields'
 
-import { ConnectModal, ConnectModalComponent } from '..'
 import { FormModal } from '../FormModal'
 
 import type {
@@ -15,6 +14,7 @@ import type {
   WifiKey,
   ConnectFormValues,
 } from '../../types'
+import { ConnectModal, ConnectModalComponent } from '..'
 
 jest.mock('../form-fields')
 

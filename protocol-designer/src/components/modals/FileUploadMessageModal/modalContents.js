@@ -1,9 +1,9 @@
 // @flow
 import assert from 'assert'
 import * as React from 'react'
+import type { FileUploadMessage } from '../../../load-file'
 import styles from './modalContents.css'
 import type { ModalContents } from './types'
-import type { FileUploadMessage } from '../../../load-file'
 
 const INVALID_FILE_TYPE: ModalContents = {
   title: 'Incorrect file type',

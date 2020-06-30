@@ -1,7 +1,7 @@
 // @flow
-import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 
 export function forDispense(
   params: DispenseParams,

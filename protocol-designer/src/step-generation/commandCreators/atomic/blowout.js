@@ -1,6 +1,6 @@
 // @flow
-import * as errorCreators from '../../errorCreators'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import * as errorCreators from '../../errorCreators'
 import type { CommandCreatorError, CommandCreator } from '../../types'
 
 export const blowout: CommandCreator<BlowoutParams> = (

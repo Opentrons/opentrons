@@ -5,11 +5,10 @@ import { connect } from 'react-redux'
 import countBy from 'lodash/countBy'
 
 import { selectors as robotSelectors } from '../../robot'
-import { InfoSection } from './InfoSection'
-import { LabwareTable } from './LabwareTable'
-
 import type { State, Dispatch } from '../../types'
 import type { Labware } from '../../robot'
+import { InfoSection } from './InfoSection'
+import { LabwareTable } from './LabwareTable'
 
 type SP = {| labware: Array<Labware> |}
 

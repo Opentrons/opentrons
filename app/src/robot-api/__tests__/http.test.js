@@ -8,10 +8,10 @@ import portfinder from 'portfinder'
 import fetch from 'node-fetch'
 import FormData from 'form-data'
 
+import type { $Application } from 'express'
 import { robotApiUrl, fetchRobotApi } from '../http'
 import { GET, POST, PATCH, DELETE } from '../constants'
 
-import type { $Application } from 'express'
 import type { RobotHost } from '../types'
 
 jest.unmock('node-fetch')

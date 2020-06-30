@@ -1,12 +1,11 @@
 // @flow
 import * as React from 'react'
 
-import { TemperatureControl } from './TemperatureControl'
 import { THERMOCYCLER_MODULE_TYPE, useSendModuleCommand } from '../../modules'
+import type { TemperatureModule, ThermocyclerModule } from '../../modules/types'
+import { TemperatureControl } from './TemperatureControl'
 import { TemperatureData } from './TemperatureData'
 import styles from './styles.css'
-
-import type { TemperatureModule, ThermocyclerModule } from '../../modules/types'
 
 type Props = {|
   module: TemperatureModule | ThermocyclerModule,

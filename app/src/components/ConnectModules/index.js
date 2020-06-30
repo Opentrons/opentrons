@@ -9,10 +9,9 @@ import {
 } from '../../robot'
 
 import { DeckMap } from '../DeckMap'
+import type { State, Dispatch } from '../../types'
 import { Prompt } from './Prompt'
 import styles from './styles.css'
-
-import type { State, Dispatch } from '../../types'
 
 type OP = {| robotName: string |}
 

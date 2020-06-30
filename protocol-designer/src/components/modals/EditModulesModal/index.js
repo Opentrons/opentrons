@@ -16,6 +16,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
   getSlotsBlockedBySpanning,
@@ -36,15 +37,13 @@ import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
 import { PDAlert } from '../../alerts/PDAlert'
 import { isModuleWithCollisionIssue } from '../../modules'
 import modalStyles from '../modal.css'
+import type { ModuleOnDeck } from '../../../step-forms/types'
+import type { ModelModuleInfo } from '../../EditModules'
 import styles from './EditModules.css'
 import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
 import { ConnectedSlotMap } from './ConnectedSlotMap'
 import { useResetSlotOnModelChange } from './form-state'
-
-import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../../step-forms/types'
-import type { ModelModuleInfo } from '../../EditModules'
 
 type EditModulesModalProps = {|
   moduleType: ModuleRealType,

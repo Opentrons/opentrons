@@ -2,10 +2,9 @@
 import assert from 'assert'
 import execa from 'execa'
 import usbDetection from 'usb-detection'
+import type { Device } from 'usb-detection'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
-
-import type { Device } from 'usb-detection'
 
 export type { Device }
 

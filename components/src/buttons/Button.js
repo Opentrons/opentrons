@@ -4,13 +4,12 @@ import cx from 'classnames'
 import omit from 'lodash/omit'
 
 import { Icon, type IconName } from '../icons'
-import styles from './buttons.css'
-
 import {
   BUTTON_TYPE_SUBMIT,
   BUTTON_TYPE_RESET,
   BUTTON_TYPE_BUTTON,
 } from '../primitives'
+import styles from './buttons.css'
 
 export type ButtonProps = {
   /** click handler */

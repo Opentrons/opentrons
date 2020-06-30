@@ -7,13 +7,13 @@ import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
 import * as Sessions from '../sessions'
+import type { State, Action } from '../types'
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,
   getBuildrootAnalyticsData,
 } from './selectors'
 
-import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
 
 const log = createLogger(__filename)

@@ -7,7 +7,6 @@ import { uiInitialized } from '@opentrons/app/src/shell'
 import * as OS from '../../os'
 import * as UsbDevices from '../usb-devices'
 import * as NetworkInterfaces from '../network-interfaces'
-import { registerSystemInfo } from '..'
 
 import type {
   Device,
@@ -20,6 +19,7 @@ import type {
   NetworkInterfaceMonitor,
   NetworkInterfaceMonitorOptions,
 } from '../network-interfaces'
+import { registerSystemInfo } from '..'
 
 jest.mock('../../os')
 jest.mock('../usb-devices')

@@ -1,7 +1,6 @@
 // @flow
-import pipetteNameSpecFixtures from './pipetteNameSpecFixtures.json'
-
 import type { PipetteNameSpecs } from '../../../js/types'
+import pipetteNameSpecFixtures from './pipetteNameSpecFixtures.json'
 
 export const fixtureP10Single: $Shape<PipetteNameSpecs> =
   pipetteNameSpecFixtures['p10_single']

@@ -9,9 +9,9 @@ import {
   actions as loadFileActions,
   selectors as loadFileSelectors,
 } from '../../load-file'
-import { FileSidebar as FileSidebarComponent } from './FileSidebar'
 import type { BaseState, ThunkDispatch } from '../../types'
 import type { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
+import { FileSidebar as FileSidebarComponent } from './FileSidebar'
 
 type Props = React.ElementProps<typeof FileSidebarComponent>
 

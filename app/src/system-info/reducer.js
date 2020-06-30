@@ -1,9 +1,9 @@
 // @flow
 // system-info reducer
 
+import type { Action } from '../types'
 import * as Constants from './constants'
 
-import type { Action } from '../types'
 import type { SystemInfoState } from './types'
 
 const INITIAL_STATE: SystemInfoState = {

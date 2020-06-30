@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
+import { PrimaryButton, Icon } from '@opentrons/components'
 import {
   useDispatchApiRequest,
   getRequestById,
@@ -11,7 +12,6 @@ import {
 } from '../../robot-api'
 
 import { fetchPipettes } from '../../pipettes'
-import { PrimaryButton, Icon } from '@opentrons/components'
 
 import type { State } from '../../types'
 import type { RequestState } from '../../robot-api/types'

@@ -10,9 +10,9 @@ import Semver from 'semver'
 import { getFeatureFlags } from '../config'
 import { getRobotApiVersionByName } from '../discovery'
 
+import type { State } from '../types'
 import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'
 
-import type { State } from '../types'
 import * as Types from './types'
 
 export function getInternetStatus(

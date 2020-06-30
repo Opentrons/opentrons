@@ -16,9 +16,8 @@ import { SelectSsid } from '../SelectSsid'
 import { ConnectModal } from '../ConnectModal'
 import { DisconnectModal } from '../DisconnectModal'
 import { ResultModal } from '../ResultModal'
-import { SelectNetwork } from '..'
-
 import type { State } from '../../../../types'
+import { SelectNetwork } from '..'
 
 jest.mock('../../../../networking/selectors')
 jest.mock('../../../../robot-api/selectors')

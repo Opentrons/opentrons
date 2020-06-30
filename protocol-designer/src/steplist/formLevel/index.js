@@ -1,4 +1,5 @@
 // @flow
+import type { StepType } from '../../form-types'
 import {
   composeErrors,
   incompatibleAspirateLabware,
@@ -27,7 +28,6 @@ import {
   type FormWarning,
   type FormWarningType,
 } from './warnings'
-import type { StepType } from '../../form-types'
 
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'

@@ -3,15 +3,13 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 import { SelectField, CONTEXT_MENU } from '@opentrons/components'
-import * as Copy from '../i18n'
-import { NetworkOptionLabel, NetworkActionLabel } from './NetworkOptionLabel'
-
 import type {
   SelectFieldProps,
   SelectOptionOrGroup,
 } from '@opentrons/components'
-
+import * as Copy from '../i18n'
 import type { WifiNetwork } from '../types'
+import { NetworkOptionLabel, NetworkActionLabel } from './NetworkOptionLabel'
 
 export type SelectSsidProps = {|
   list: Array<WifiNetwork>,

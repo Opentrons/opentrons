@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import styles from './styles.css'
 import { CollapsibleItem } from '@opentrons/components'
+import styles from './styles.css'
 
 type Props = {|
   /** Title for the card */

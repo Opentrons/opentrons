@@ -1,13 +1,12 @@
 // @flow
 // main application sidebar
 import * as React from 'react'
+import type { FilterParams } from '../../types'
 import { LabwareGuide } from './LabwareGuide'
 import { FilterManufacturer } from './FilterManufacturer'
 import { FilterCategory } from './FilterCategory'
 import { FilterReset } from './FilterReset'
 import styles from './styles.css'
-
-import type { FilterParams } from '../../types'
 
 export type SidebarProps = {|
   filters: FilterParams,

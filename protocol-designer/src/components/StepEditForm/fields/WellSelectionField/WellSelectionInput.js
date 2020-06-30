@@ -2,8 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { FormGroup, InputField } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { WellSelectionModal } from './WellSelectionModal'
+import type { Dispatch } from 'redux'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   actions as stepsActions,
@@ -12,10 +11,11 @@ import {
 } from '../../../../ui/steps'
 import styles from '../../StepEditForm.css'
 
-import type { Dispatch } from 'redux'
+import { i18n } from '../../../../localization'
 import type { StepIdType, StepFieldName } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
 import type { FocusHandlers } from '../../types'
+import { WellSelectionModal } from './WellSelectionModal'
 
 type SP = {|
   stepId: ?StepIdType,

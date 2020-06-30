@@ -2,10 +2,10 @@
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
-import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 import type { BuildrootUpdateType } from '../../../buildroot/types'
+import styles from './styles.css'
 
 export type MigrationWarningModalProps = {|
   notNowButton: ButtonProps,

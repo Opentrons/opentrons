@@ -3,6 +3,7 @@ import assert from 'assert'
 import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
 import uniq from 'lodash/uniq'
+import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import {
   AIR,
   mergeLiquid,
@@ -11,7 +12,6 @@ import {
   totalVolume,
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
-import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forAspirate(

@@ -2,18 +2,17 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
 import { getMissingModules } from '../../modules'
 
-import { SidePanel, SidePanelGroup } from '@opentrons/components'
+import { ModuleLiveStatusCards } from '../ModuleLiveStatusCards'
+import type { State, Dispatch } from '../../types'
 import { RunTimer } from './RunTimer'
 import { RunControls } from './RunControls'
-import { ModuleLiveStatusCards } from '../ModuleLiveStatusCards'
-
-import type { State, Dispatch } from '../../types'
 
 type SP = {|
   isRunning: boolean,

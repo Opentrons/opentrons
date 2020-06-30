@@ -5,6 +5,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
+  Card,
+  LabeledValue,
+  OutlineButton,
+  HoverTooltip,
+  useInterval,
+} from '@opentrons/components'
+import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
@@ -13,14 +20,6 @@ import {
 import { getBuildrootRobot, getBuildrootUpdateAvailable } from '../../buildroot'
 
 import { checkShellUpdate } from '../../shell'
-
-import {
-  Card,
-  LabeledValue,
-  OutlineButton,
-  HoverTooltip,
-  useInterval,
-} from '@opentrons/components'
 
 import { CardRow, CardContentThird } from '../layout'
 

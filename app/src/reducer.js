@@ -6,6 +6,8 @@ import { connectRouter } from 'connected-react-router'
 import { combineReducers } from 'redux'
 
 // oldest robot api state
+import type { Reducer } from 'redux'
+import type { HashHistory } from 'history/createHashHistory'
 import { robotReducer } from './robot'
 
 // oldest api state
@@ -62,8 +64,6 @@ import { sessionReducer } from './sessions/reducer'
 // calibration data state
 import { calibrationReducer } from './calibration/reducer'
 
-import type { Reducer } from 'redux'
-import type { HashHistory } from 'history/createHashHistory'
 import type { State, Action } from './types'
 
 export const history: HashHistory = createHistory()

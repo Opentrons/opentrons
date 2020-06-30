@@ -13,6 +13,7 @@ import {
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import { AIR } from '@opentrons/components'
 import type { PipetteEntity, LabwareEntity } from '../../step-forms'
 import type {
   LocationLiquidState,
@@ -21,10 +22,9 @@ import type {
   SourceAndDest,
   CurriedCommandCreator,
 } from '../types'
-import { curryCommandCreator } from './curryCommandCreator'
 import { blowout } from '../commandCreators/atomic/blowout'
+import { curryCommandCreator } from './curryCommandCreator'
 
-import { AIR } from '@opentrons/components'
 export { AIR }
 
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'

@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react'
 
+import type { ButtonProps } from '@opentrons/components'
 import { BottomButtonBar } from '../modals'
 
 import styles from './styles.css'
-
-import type { ButtonProps } from '@opentrons/components'
 
 export type FormButtonBarProps = {|
   buttons: Array<?ButtonProps>,

@@ -5,10 +5,10 @@ import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 
+import type { Reducer } from 'redux'
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 
-import type { Reducer } from 'redux'
 import type { Action, DeckSlot } from '../../types'
 import type {
   SingleLabwareLiquidState,

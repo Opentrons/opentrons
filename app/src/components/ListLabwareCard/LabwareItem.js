@@ -1,8 +1,8 @@
 // @flow
+import { basename } from 'path'
 import * as React from 'react'
 import cx from 'classnames'
 import startCase from 'lodash/startCase'
-import { basename } from 'path'
 import { format } from 'date-fns'
 
 import {
@@ -11,10 +11,9 @@ import {
   OPENTRONS_LABWARE_FILE,
 } from '../../custom-labware'
 
+import type { CheckedLabwareFile } from '../../custom-labware/types'
 import { Warning } from './Warning'
 import styles from './styles.css'
-
-import type { CheckedLabwareFile } from '../../custom-labware/types'
 
 // TODO(mc, 2019-11-21): i18n
 const NA = 'N/A'

@@ -24,6 +24,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'no-extra-boolean-cast': 'off',
     'import/no-default-export': 'error',
+    'import/order': 'error',
   },
 
   globals: {},

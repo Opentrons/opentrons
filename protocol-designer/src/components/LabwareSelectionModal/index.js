@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { LabwareSelectionModal as LabwareSelectionModalComponent } from './LabwareSelectionModal'
 // import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
   closeLabwareSelector,
@@ -17,6 +16,7 @@ import {
   type ModuleOnDeck,
 } from '../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../types'
+import { LabwareSelectionModal as LabwareSelectionModalComponent } from './LabwareSelectionModal'
 
 type Props = React.ElementProps<typeof LabwareSelectionModalComponent>
 

@@ -2,9 +2,8 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import { Icon, NotificationIcon } from '..'
-
 import { ICON_DATA_BY_NAME } from '../icons/icon-data'
+import { Icon, NotificationIcon } from '..'
 
 const icons = Object.keys(ICON_DATA_BY_NAME)
 

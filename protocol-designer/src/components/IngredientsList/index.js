@@ -7,10 +7,10 @@ import { sortWells } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { PDTitledList, PDListItem } from '../lists'
 import { StepDescription } from '../StepDescription'
-import { LabwareDetailsCard } from './LabwareDetailsCard'
-import styles from './IngredientsList.css'
 import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
 import type { SingleLabwareLiquidState } from '../../step-generation'
+import { LabwareDetailsCard } from './LabwareDetailsCard'
+import styles from './IngredientsList.css'
 
 type RemoveWellsContents = (args: {|
   liquidGroupId: string,

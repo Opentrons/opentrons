@@ -3,6 +3,8 @@ import { createSelector } from 'reselect'
 
 import reduce from 'lodash/reduce'
 
+import type { WellGroup } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import {
@@ -10,8 +12,6 @@ import {
   getHighlightedWells,
 } from '../../well-selection/selectors'
 
-import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 import type {
   ContentsByWell,

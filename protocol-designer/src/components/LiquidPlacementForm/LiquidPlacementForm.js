@@ -3,7 +3,6 @@ import * as React from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 // TODO: Ian 2018-10-19 move the processors out of steplist (chore)
-import * as fieldProcessors from '../../steplist/fieldLevel/processing'
 import {
   DropdownField,
   InputField,
@@ -11,13 +10,13 @@ import {
   OutlineButton,
   PrimaryButton,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import styles from './LiquidPlacementForm.css'
-import formStyles from '../forms/forms.css'
-import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
-
 import type { Options } from '@opentrons/components'
 import type { FormikProps } from 'formik/@flow-typed'
+import * as fieldProcessors from '../../steplist/fieldLevel/processing'
+import { i18n } from '../../localization'
+import formStyles from '../forms/forms.css'
+import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
+import styles from './LiquidPlacementForm.css'
 
 type ValidFormValues = {|
   selectedLiquidId: string,

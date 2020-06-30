@@ -7,11 +7,11 @@ import {
   TOOLTIP_FIXED,
   type UseHoverTooltipTargetProps,
 } from '@opentrons/components'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
 
 export type ModuleStepItemRowProps = {|
   label?: ?string,

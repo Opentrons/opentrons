@@ -4,9 +4,8 @@
 
 import pick from 'lodash/pick'
 
-import * as Types from './types'
-
 import type { Styles } from 'styled-components'
+import * as Types from './types'
 
 const COLOR_PROPS = ['color', 'backgroundColor', 'opacity']
 

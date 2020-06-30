@@ -1,7 +1,7 @@
 /** Ensure that protocol schema v4 definition itself is functions as intended,
  *  and that all v4 protocol fixtures will validate */
-import Ajv from 'ajv'
 import path from 'path'
+import Ajv from 'ajv'
 import glob from 'glob'
 
 import deckSchemaV1 from '../../deck/schemas/1.json'

@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react'
 
+import type { CheckedLabwareFile } from '../../custom-labware/types'
 import { LabwareItem } from './LabwareItem'
 import { Warning } from './Warning'
 import styles from './styles.css'
-
-import type { CheckedLabwareFile } from '../../custom-labware/types'
 
 // TODO(mc, 2019-10-22): i18n
 const CATEGORY = 'Category'

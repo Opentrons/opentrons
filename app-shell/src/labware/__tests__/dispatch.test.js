@@ -2,22 +2,20 @@
 
 import fse from 'fs-extra'
 import electron from 'electron'
-import * as Cfg from '../../config'
-import * as Dialogs from '../../dialogs'
-import * as Defs from '../definitions'
-import * as Val from '../validation'
-import { registerLabware } from '..'
-
 import { uiInitialized } from '@opentrons/app/src/shell/actions'
 import * as CustomLabware from '@opentrons/app/src/custom-labware'
 import * as CustomLabwareFixtures from '@opentrons/app/src/custom-labware/__fixtures__'
-
 import type { Config } from '@opentrons/app/src/config/types'
 import type {
   UncheckedLabwareFile,
   CheckedLabwareFile,
   DuplicateLabwareFile,
 } from '@opentrons/app/src/custom-labware/types'
+import * as Cfg from '../../config'
+import * as Dialogs from '../../dialogs'
+import * as Defs from '../definitions'
+import * as Val from '../validation'
+import { registerLabware } from '..'
 
 jest.mock('fs-extra')
 jest.mock('electron')

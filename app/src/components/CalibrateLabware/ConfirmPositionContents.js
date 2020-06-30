@@ -3,15 +3,15 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import { PrimaryButton } from '@opentrons/components'
 import type { Dispatch } from '../../types'
 import type { Pipette, Labware } from '../../robot'
 
 import { actions as robotActions } from '../../robot'
-import { PrimaryButton } from '@opentrons/components'
-import { ConfirmPositionDiagram } from './ConfirmPositionDiagram'
 import { JogControls } from '../JogControls'
 
 import type { Jog } from '../JogControls'
+import { ConfirmPositionDiagram } from './ConfirmPositionDiagram'
 
 type OP = {|
   labware: Labware,

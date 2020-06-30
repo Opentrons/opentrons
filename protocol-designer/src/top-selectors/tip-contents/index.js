@@ -3,6 +3,10 @@ import { createSelector } from 'reselect'
 import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
+import type { WellGroup } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { OutputSelector } from 'reselect'
 import { getWellSetForMultichannel } from '../../utils'
 import * as StepGeneration from '../../step-generation'
 import { allSubsteps as getAllSubsteps } from '../substeps'
@@ -18,10 +22,6 @@ import {
   getHoveredSubstep,
 } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
-import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { OutputSelector } from 'reselect'
 import type { BaseState, Selector } from '../../types'
 
 type GetTipCallback = (

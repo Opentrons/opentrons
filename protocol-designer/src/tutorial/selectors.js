@@ -1,9 +1,9 @@
 // @flow
 import { createSelector } from 'reselect'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import isEmpty from 'lodash/isEmpty'
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
 import { getUnsavedForm } from '../step-forms/selectors'
-import isEmpty from 'lodash/isEmpty'
 import type { BaseState, Selector } from '../types'
 import type { HintKey } from '.'
 

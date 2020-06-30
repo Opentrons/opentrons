@@ -9,9 +9,9 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getCustomLabwareDefinitions } from '../custom-labware/selectors'
 import { getLabwareDefBySlot } from '../protocol/selectors'
 import { getLatestLabwareDef } from '../getLabware'
+import type { State } from '../types'
 import * as Constants from './constants'
 
-import type { State } from '../types'
 import type {
   Mount,
   Slot,

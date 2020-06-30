@@ -7,8 +7,10 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import mapValues from 'lodash/mapValues'
+import type { Options } from '@opentrons/components'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../labware/selectors'
+import type { Selector } from '../../types'
 import {
   getModuleLabwareOptions,
   getLabwareOnModule,
@@ -16,8 +18,6 @@ import {
   getModuleHasLabware,
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
 } from './utils'
-import type { Options } from '@opentrons/components'
-import type { Selector } from '../../types'
 
 export const getLabwareNamesByModuleId: Selector<{
   [moduleId: string]: ?{ nickname: ?string, displayName: string },

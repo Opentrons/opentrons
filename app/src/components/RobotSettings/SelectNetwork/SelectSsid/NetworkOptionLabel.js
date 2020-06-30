@@ -2,10 +2,10 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Icon, FONT_BODY_1_DARK } from '@opentrons/components'
-import { SECURITY_NONE } from '../../../../networking'
 
 import type { StyledComponent } from 'styled-components'
 import type { IconName, IconProps } from '@opentrons/components'
+import { SECURITY_NONE } from '../../../../networking'
 import type { WifiNetwork } from '../../../../networking/types'
 
 const SIGNAL_LEVEL_LOW = 25

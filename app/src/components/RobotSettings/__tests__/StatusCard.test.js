@@ -3,12 +3,12 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
+import { OutlineButton, Icon, LabeledValue } from '@opentrons/components'
 import * as Fixtures from '../../../discovery/__fixtures__'
 import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../../robot'
-import { OutlineButton, Icon, LabeledValue } from '@opentrons/components'
 import { StatusCard } from '../StatusCard'
 
 import type { State } from '../../../types'

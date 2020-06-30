@@ -6,7 +6,6 @@ import * as React from 'react'
 import cx from 'classnames'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import {
   Modal,
   FormGroup,
@@ -19,16 +18,15 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
+import type { FormikProps } from 'formik/@flow-typed'
+import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
-import { ModuleFields } from './ModuleFields'
-import { PipetteFields } from './PipetteFields'
 import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
-import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
 import type { DeckSlot } from '../../../types'
 import type { NewProtocolFields } from '../../../load-file'
 import type {
@@ -37,7 +35,9 @@ import type {
   FormPipettesByMount,
   FormModulesByType,
 } from '../../../step-forms'
-import type { FormikProps } from 'formik/@flow-typed'
+import styles from './FilePipettesModal.css'
+import { PipetteFields } from './PipetteFields'
+import { ModuleFields } from './ModuleFields'
 
 export type PipetteFieldsData = $Diff<
   PipetteOnDeck,

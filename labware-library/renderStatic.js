@@ -10,8 +10,8 @@
 //
 // React-snap does not yet support this, see https://github.com/stereobooster/react-snap/issues/397
 // so we will re-parse the HTML files and replace their URLs with relative ones.
-const { run } = require('react-snap')
 const path = require('path')
+const { run } = require('react-snap')
 const fs = require('fs-extra')
 const globby = require('globby')
 const rehype = require('rehype')

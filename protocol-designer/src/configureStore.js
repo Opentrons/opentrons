@@ -1,10 +1,10 @@
 // @flow
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
+import type { Store } from 'redux'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 
-import type { Store } from 'redux'
 import type { BaseState, Action, ThunkDispatch } from './types'
 
 const ReselectTools =

@@ -9,13 +9,13 @@ import { getCalibrationRequest } from '../../robot/selectors'
 
 import { ErrorModal } from '../modals'
 import { CalibrationInfoBox } from '../CalibrationInfoBox'
+import type { Dispatch } from '../../types'
 import { UnprobedPanel } from './UnprobedPanel'
 import { InstrumentMovingPanel } from './InstrumentMovingPanel'
 import { AttachTipPanel } from './AttachTipPanel'
 import { RemoveTipPanel } from './RemoveTipPanel'
 import { ContinuePanel } from './ContinuePanel'
 
-import type { Dispatch } from '../../types'
 import type { TipProbeProps, TipProbeState } from './types'
 
 const PROBE_ERROR_HEADING = 'Error during tip probe'

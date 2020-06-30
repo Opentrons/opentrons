@@ -2,10 +2,9 @@
 import * as React from 'react'
 
 import { SpinnerModal } from '@opentrons/components'
+import type { ShellUpdateState } from '../../../shell/types'
 import { UpdateAppModal } from './UpdateAppModal'
 import { RestartAppModal } from './RestartAppModal'
-
-import type { ShellUpdateState } from '../../../shell/types'
 
 export type UpdateAppProps = {|
   update: ShellUpdateState,

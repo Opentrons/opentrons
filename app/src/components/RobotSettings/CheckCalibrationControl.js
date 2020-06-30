@@ -2,9 +2,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
-import * as RobotApi from '../../robot-api'
-import * as Sessions from '../../sessions'
-
 import {
   Icon,
   Flex,
@@ -23,6 +20,8 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import * as RobotApi from '../../robot-api'
+import * as Sessions from '../../sessions'
 
 import { Portal } from '../portal'
 import { CheckCalibration } from '../CheckCalibration'

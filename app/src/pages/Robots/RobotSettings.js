@@ -4,6 +4,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 
+import { SpinnerModalPage } from '@opentrons/components'
+import type { ContextRouter } from 'react-router-dom'
 import {
   selectors as robotSelectors,
   actions as robotActions,
@@ -25,7 +27,6 @@ import {
 } from '../../robot-controls'
 import { getRobotRestartRequired } from '../../robot-settings'
 
-import { SpinnerModalPage } from '@opentrons/components'
 import { ErrorModal } from '../../components/modals'
 import { Page } from '../../components/Page'
 import {
@@ -39,7 +40,6 @@ import { ReachableRobotBanner } from '../../components/RobotSettings/ReachableRo
 import { RestartRequiredBanner } from '../../components/RobotSettings/RestartRequiredBanner'
 import { ResetRobotModal } from '../../components/RobotSettings/ResetRobotModal'
 
-import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 import type { ShellUpdateState } from '../../shell/types'

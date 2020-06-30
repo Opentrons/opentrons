@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   WellLabels,
   StyledWells,
@@ -8,7 +9,6 @@ import {
 } from './labwareInternals'
 import styles from './LabwareRender.css'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   WellMouseEvent,
   WellFill,

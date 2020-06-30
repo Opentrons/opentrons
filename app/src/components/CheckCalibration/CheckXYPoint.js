@@ -5,11 +5,11 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import type { RobotCalibrationCheckComparison } from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import { JogControls } from '../JogControls'
 import { getBadOutcomeHeader } from './utils'
 import styles from './styles.css'
 import { EndOfStepComparison } from './EndOfStepComparisons'
 import { BadOutcomeBody } from './BadOutcomeBody'
-import { JogControls } from '../JogControls'
 
 import slot1LeftMultiDemoAsset from './videos/SLOT_1_LEFT_MULTI_X-Y.webm'
 import slot1LeftSingleDemoAsset from './videos/SLOT_1_LEFT_SINGLE_X-Y.webm'

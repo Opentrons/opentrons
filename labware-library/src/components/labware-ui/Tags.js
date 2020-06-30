@@ -4,9 +4,8 @@ import * as React from 'react'
 
 import { LabelText, Value, LABEL_LEFT } from '../ui'
 import { TAGS } from '../../localization'
-import styles from './styles.css'
-
 import type { LabwareDefinition } from '../../types'
+import styles from './styles.css'
 
 export type TagsProps = {|
   definition: LabwareDefinition,

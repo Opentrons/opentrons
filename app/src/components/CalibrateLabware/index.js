@@ -3,12 +3,11 @@
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
 
+import type { ContextRouter } from 'react-router-dom'
 import { DeckMap } from '../DeckMap'
+import type { Labware } from '../../robot/types'
 import { InfoBox } from './InfoBox'
 import styles from './styles.css'
-
-import type { ContextRouter } from 'react-router-dom'
-import type { Labware } from '../../robot/types'
 
 type Props = {| ...ContextRouter, labware: ?Labware |}
 

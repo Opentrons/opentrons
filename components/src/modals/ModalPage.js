@@ -4,10 +4,9 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { TitleBar } from '../structure'
+import type { TitleBarProps } from '../structure'
 import { Overlay } from './Overlay'
 import styles from './modals.css'
-
-import type { TitleBarProps } from '../structure'
 
 export type ModalPageProps = {|
   /** Props for title bar at top of modal page */

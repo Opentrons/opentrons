@@ -4,16 +4,16 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import { TitledList } from '@opentrons/components'
-import { LabwareListItem } from './LabwareListItem'
 
+import type { ContextRouter } from 'react-router-dom'
 import {
   selectors as robotSelectors,
   actions as robotActions,
 } from '../../robot'
 
-import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 import type { Labware, Mount } from '../../robot'
+import { LabwareListItem } from './LabwareListItem'
 
 type OP = ContextRouter
 

@@ -1,9 +1,9 @@
 // @flow
-import { getIsV4Protocol } from '../selectors/fileCreator'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
+import { getIsV4Protocol } from '../selectors/fileCreator'
 import type { ModuleEntities } from '../../step-forms'
 
 describe('getIsV4Protocol selector', () => {

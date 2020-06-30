@@ -8,9 +8,9 @@ import {
   INPUT_TYPE_PASSWORD,
 } from '@opentrons/components'
 
+import { LABEL_SHOW_PASSWORD } from '../i18n'
 import { FormRow } from './FormRow'
 import { useConnectFormField } from './form-state'
-import { LABEL_SHOW_PASSWORD } from '../i18n'
 
 export type TextFieldProps = {|
   id: string,

@@ -1,7 +1,7 @@
 // @flow
+import type { Action } from '../types'
 import * as Constants from './constants'
 
-import type { Action } from '../types'
 import type { BuildrootState, BuildrootUpdateSession } from './types'
 
 export const INITIAL_STATE: BuildrootState = {

@@ -4,12 +4,12 @@
 // is controlling the flow that this modal will block, via useBlockingHint.
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { actions, selectors } from '../../tutorial'
 import { ContinueModal, CheckboxField } from '@opentrons/components'
+import { actions, selectors } from '../../tutorial'
 import { Portal } from '../portals/MainPageModalPortal'
 import { i18n } from '../../localization'
-import styles from './hints.css'
 import type { HintKey } from '../../tutorial'
+import styles from './hints.css'
 
 export type HintProps = {|
   hintKey: HintKey,

@@ -6,11 +6,11 @@ import cx from 'classnames'
 import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
-import { WellOrderModal } from './WellOrderModal'
 
 import type { BaseState } from '../../../../types'
 
 import stepEditStyles from '../../StepEditForm.css'
+import { WellOrderModal } from './WellOrderModal'
 import styles from './WellOrderInput.css'
 
 type OP = {|

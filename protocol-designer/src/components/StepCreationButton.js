@@ -21,8 +21,8 @@ import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
 } from '../step-forms'
-import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, type StepType } from '../form-types'
+import { Portal } from './portals/MainPageModalPortal'
 import styles from './listButtons.css'
 
 type StepButtonComponentProps = {|

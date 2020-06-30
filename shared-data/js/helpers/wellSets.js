@@ -14,8 +14,8 @@
 // If a labware has no possible well sets, then it is not compatible with multi-channel pipettes.
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import uniq from 'lodash/uniq'
-import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
+import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 
 type WellSetByPrimaryWell = Array<Array<string>>
 

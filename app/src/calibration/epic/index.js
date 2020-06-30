@@ -1,8 +1,7 @@
 // @flow
 
 import { combineEpics } from 'redux-observable'
-import { fetchCalibrationStatusEpic } from './fetchCalibrationStatusEpic'
-
 import type { Epic } from '../../types'
+import { fetchCalibrationStatusEpic } from './fetchCalibrationStatusEpic'
 
 export const calibrationEpic: Epic = combineEpics(fetchCalibrationStatusEpic)

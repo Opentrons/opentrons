@@ -8,15 +8,14 @@ import { Client as RpcClient } from '../../rpc/client'
 import { actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
 
+import { getLabwareDefBySlot } from '../../protocol/selectors'
+import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 import {
   MockSession,
   MockSessionNoStateInfo,
   MockSessionNoDoorInfo,
 } from './__fixtures__/session'
 import { MockCalibrationManager } from './__fixtures__/calibration-manager'
-
-import { getLabwareDefBySlot } from '../../protocol/selectors'
-import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 
 jest.mock('../../rpc/client')
 jest.mock('../../protocol/selectors')

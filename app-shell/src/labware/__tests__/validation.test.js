@@ -1,8 +1,8 @@
 // @flow
-import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 
 import validLabwareA from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import validLabwareB from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 
 describe('validateLabwareFiles', () => {
   it('handles unparseable and invalid labware files', () => {

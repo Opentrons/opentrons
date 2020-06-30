@@ -9,12 +9,12 @@ import {
   reduceCommandCreators,
 } from '../../utils'
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
-import { mixUtil } from './mix'
 import type {
   TransferArgs,
   CurriedCommandCreator,
   CommandCreator,
 } from '../../types'
+import { mixUtil } from './mix'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,

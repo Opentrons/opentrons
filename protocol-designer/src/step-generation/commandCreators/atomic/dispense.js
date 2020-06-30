@@ -1,10 +1,10 @@
 // @flow
+import type { DispenseParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import * as errorCreators from '../../errorCreators'
 import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
 } from '../../utils'
-import type { DispenseParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Dispense with given args. Requires tip. */

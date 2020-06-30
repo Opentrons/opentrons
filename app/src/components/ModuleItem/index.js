@@ -1,16 +1,16 @@
 // @flow
 import * as React from 'react'
 
-import { ModuleImage } from './ModuleImage'
-import { ModuleInfo } from './ModuleInfo'
-import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../ModuleControls'
-import styles from './styles.css'
 import type { AttachedModule } from '../../modules/types'
 import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '../../modules'
+import { ModuleImage } from './ModuleImage'
+import { ModuleInfo } from './ModuleInfo'
+import { ModuleUpdate } from './ModuleUpdate'
+import styles from './styles.css'
 
 type Props = {|
   module: AttachedModule,

@@ -2,8 +2,8 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { Icon } from '..'
 import styles from './forms.css'
+import { Icon } from '..'
 
 export type DropdownOption = {|
   name: string,

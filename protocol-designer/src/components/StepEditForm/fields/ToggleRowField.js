@@ -5,8 +5,8 @@ import cx from 'classnames'
 import { ToggleField } from '@opentrons/components'
 
 import styles from '../StepEditForm.css'
-import { FieldConnector } from './FieldConnector'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
+import { FieldConnector } from './FieldConnector'
 
 type ToggleRowProps = {|
   offLabel?: string,

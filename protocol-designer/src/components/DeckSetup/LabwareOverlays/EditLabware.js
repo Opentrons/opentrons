@@ -6,7 +6,6 @@ import { Icon } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { DragSource, DropTarget } from 'react-dnd'
 import { i18n } from '../../../localization'
-import { NameThisLabware } from './NameThisLabware'
 import { DND_TYPES } from '../../../constants'
 import {
   openIngredientSelector,
@@ -17,6 +16,7 @@ import {
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import type { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
+import { NameThisLabware } from './NameThisLabware'
 import styles from './LabwareOverlays.css'
 
 type OP = {|

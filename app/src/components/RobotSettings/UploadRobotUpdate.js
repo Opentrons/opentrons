@@ -4,9 +4,8 @@ import { useDispatch } from 'react-redux'
 
 import { LabeledButton } from '@opentrons/components'
 import { startBuildrootUpdate } from '../../buildroot'
-import styles from './styles.css'
-
 import type { Dispatch } from '../../types'
+import styles from './styles.css'
 
 export type UploadRobotUpdateProps = {|
   robotName: string,

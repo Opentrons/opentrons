@@ -14,13 +14,6 @@ import { i18n } from '../../localization'
 import { makeLidLabelText, makeTemperatureText } from '../../utils'
 import { PDListItem, PDTitledList } from '../lists'
 import { StepDescription } from '../StepDescription'
-import { AspirateDispenseHeader } from './AspirateDispenseHeader'
-import { MixHeader } from './MixHeader'
-import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
-import { PauseStepItems } from './PauseStepItems'
-import { SourceDestSubstep } from './SourceDestSubstep'
-import styles from './StepItem.css'
-
 import type {
   FormData,
   StepType,
@@ -32,6 +25,12 @@ import type {
   SubstepItemData,
   WellIngredientNames,
 } from '../../steplist/types'
+import { AspirateDispenseHeader } from './AspirateDispenseHeader'
+import { MixHeader } from './MixHeader'
+import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
+import { PauseStepItems } from './PauseStepItems'
+import { SourceDestSubstep } from './SourceDestSubstep'
+import styles from './StepItem.css'
 
 export type StepItemProps = {|
   description?: ?string,

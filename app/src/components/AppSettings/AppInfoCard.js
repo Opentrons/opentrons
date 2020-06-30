@@ -3,13 +3,13 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { CURRENT_VERSION } from '../../shell'
 import {
   Card,
   LabeledValue,
   OutlineButton,
   useMountEffect,
 } from '@opentrons/components'
+import { CURRENT_VERSION } from '../../shell'
 import { CardContentHalf } from '../layout'
 
 import styles from './styles.css'

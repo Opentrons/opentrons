@@ -12,9 +12,9 @@ import {
   SUBTRACT_VALUE,
 } from '@opentrons/app/src/config'
 
+import type { ConfigValueChangeAction } from '@opentrons/app/src/config/types'
 import { DEFAULTS } from './migrate'
 
-import type { ConfigValueChangeAction } from '@opentrons/app/src/config/types'
 import type { Config, Overrides } from './types'
 
 export function shouldUpdate(path: string, overrides: Overrides): boolean {

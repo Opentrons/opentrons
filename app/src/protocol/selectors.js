@@ -4,12 +4,12 @@ import startCase from 'lodash/startCase'
 import { createSelector } from 'reselect'
 import { getter } from '@thi.ng/paths'
 import { getProtocolSchemaVersion } from '@opentrons/shared-data'
-import { fileIsJson } from './protocol-data'
-import { createLogger } from '../logger'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ProtocolFile as SchemaV3ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import { createLogger } from '../logger'
 import type { State } from '../types'
+import { fileIsJson } from './protocol-data'
 import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
 
 type StringGetter = (?ProtocolData) => ?string

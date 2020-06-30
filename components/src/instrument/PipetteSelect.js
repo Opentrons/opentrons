@@ -1,18 +1,17 @@
 // @flow
 import * as React from 'react'
 import groupBy from 'lodash/groupBy'
-import { Flex } from '../primitives'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
   GEN1,
   GEN2,
 } from '@opentrons/shared-data'
-import { Select, CONTEXT_VALUE } from '../forms'
-import styles from './PipetteSelect.css'
-
-import type { SelectOption } from '../forms'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import { Flex } from '../primitives'
+import { Select, CONTEXT_VALUE } from '../forms'
+import type { SelectOption } from '../forms'
+import styles from './PipetteSelect.css'
 
 export type PipetteSelectProps = {|
   /** currently selected value, optional in case selecting triggers immediate action */

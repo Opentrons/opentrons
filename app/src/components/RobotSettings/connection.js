@@ -3,12 +3,11 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { CardContentHalf } from '../layout'
-import styles from './styles.css'
-
 import type {
   InternetStatus,
   SimpleInterfaceStatus,
 } from '../../networking/types'
+import styles from './styles.css'
 
 type ConnectionStatusProps = { type: string, status: ?InternetStatus }
 

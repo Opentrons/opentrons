@@ -1,14 +1,14 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import { castField } from '../../../steplist/fieldLevel'
+import type { FormData } from '../../../form-types'
+import type { CommandCreatorArgs } from '../../../step-generation'
 import { mixFormToArgs } from './mixFormToArgs'
 import { pauseFormToArgs } from './pauseFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
 import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
 import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
-import type { FormData } from '../../../form-types'
-import type { CommandCreatorArgs } from '../../../step-generation'
 
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting

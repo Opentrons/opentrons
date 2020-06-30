@@ -10,11 +10,10 @@ import {
   getInternetStatus,
   getNetworkInterfaces,
 } from '../../networking'
-import { SelectNetwork } from './SelectNetwork'
-import { ConnectionStatusMessage, ConnectionInfo } from './connection'
-
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
+import { SelectNetwork } from './SelectNetwork'
+import { ConnectionStatusMessage, ConnectionInfo } from './connection'
 
 type Props = {| robot: ViewableRobot |}
 

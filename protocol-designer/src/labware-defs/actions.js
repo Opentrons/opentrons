@@ -10,11 +10,11 @@ import {
   getLabwareDefURI,
   OPENTRONS_LABWARE_NAMESPACE,
 } from '@opentrons/shared-data'
-import { getIsTiprack } from '../../../shared-data/js/getLabware'
-import * as labwareDefSelectors from './selectors'
-import { getAllWellSetsForLabware } from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { getIsTiprack } from '../../../shared-data/js/getLabware'
+import { getAllWellSetsForLabware } from '../utils'
 import type { ThunkAction } from '../types'
+import * as labwareDefSelectors from './selectors'
 import type { LabwareUploadMessage } from './types'
 
 export type LabwareUploadMessageAction = {|

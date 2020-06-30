@@ -5,12 +5,11 @@ import { connect } from 'react-redux'
 
 import { selectors as robotSelectors } from '../../robot'
 
+import type { State, Dispatch } from '../../types'
+import type { Pipette, Labware } from '../../robot/types'
 import { ConfirmPositionContents } from './ConfirmPositionContents'
 import { ConfirmPickupContents } from './ConfirmPickupContents'
 import { InProgressContents } from './InProgressContents'
-
-import type { State, Dispatch } from '../../types'
-import type { Pipette, Labware } from '../../robot/types'
 
 type OP = {| labware: Labware, calibrateToBottom: boolean |}
 

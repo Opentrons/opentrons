@@ -1,6 +1,6 @@
 // sets up the main window ui
-import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
+import { app, shell, BrowserWindow } from 'electron'
 import { getConfig } from './config'
 import { createLogger } from './log'
 

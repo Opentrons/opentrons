@@ -1,6 +1,6 @@
 // @flow
-import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import type {
   InvariantContext,
   RobotState,

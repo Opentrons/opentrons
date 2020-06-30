@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
+import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import { getWellRatio } from '../utils'
 import { canPipetteUseLabware } from '../../utils'
-import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import {
   MIN_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V1,

@@ -5,15 +5,15 @@ import { push } from 'connected-react-router'
 import { Link } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
 
+import { ModalPage, SpinnerModalPage } from '@opentrons/components'
 import { deckCalibrationCommand as dcCommand } from '../../http-api-client'
 import { restartRobot } from '../../robot-admin'
 
 import { chainActions } from '../../util'
-import { ModalPage, SpinnerModalPage } from '@opentrons/components'
+import type { Dispatch } from '../../types'
 import { AttachTip } from './AttachTip'
 import { ConfirmPosition } from './ConfirmPosition'
 
-import type { Dispatch } from '../../types'
 import type { CalibrateDeckStartedProps } from './types'
 
 type OP = CalibrateDeckStartedProps

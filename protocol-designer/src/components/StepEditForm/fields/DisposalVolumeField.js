@@ -15,12 +15,11 @@ import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 
-import { FieldConnector } from './FieldConnector'
-import { TextField } from './TextField'
-
 import type { BaseState } from '../../../types'
 import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
+import { TextField } from './TextField'
+import { FieldConnector } from './FieldConnector'
 
 type OP = {| focusHandlers: FocusHandlers |}
 

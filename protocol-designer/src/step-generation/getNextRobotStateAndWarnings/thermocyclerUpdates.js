@@ -1,13 +1,13 @@
 // @flow
 import last from 'lodash/last'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
-import { getModuleState } from '../robotStateSelectors'
 import type {
   ModuleOnlyParams,
   TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import { getModuleState } from '../robotStateSelectors'
 import type {
   InvariantContext,
   RobotStateAndWarnings,

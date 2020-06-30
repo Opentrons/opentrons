@@ -3,7 +3,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Card, useInterval } from '@opentrons/components'
 
-import { LabwareList } from './LabwareList'
 import {
   fetchCustomLabware,
   getCustomLabware,
@@ -11,6 +10,7 @@ import {
 } from '../../custom-labware'
 
 import type { Dispatch } from '../../types'
+import { LabwareList } from './LabwareList'
 
 const LABWARE_REFRESH_INTERVAL_MS = 5000
 

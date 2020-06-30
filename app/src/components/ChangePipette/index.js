@@ -17,6 +17,8 @@ import {
 } from '../../robot-controls'
 
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
+import type { State, Dispatch } from '../../types'
+import type { Mount } from '../../robot/types'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
 import { ConfirmPipette } from './ConfirmPipette'
@@ -25,8 +27,6 @@ import { LevelPipette } from './LevelPipette'
 
 import { ATTACH, DETACH, CLEAR_DECK, INSTRUCTIONS, CONFIRM } from './constants'
 
-import type { State, Dispatch } from '../../types'
-import type { Mount } from '../../robot/types'
 import type { WizardStep } from './types'
 
 type Props = {|

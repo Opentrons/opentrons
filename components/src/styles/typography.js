@@ -2,9 +2,8 @@
 
 import { css } from 'styled-components'
 
-import { C_DARK_GRAY, C_WHITE } from './colors'
-
 import type { CSSRules } from 'styled-components'
+import { C_DARK_GRAY, C_WHITE } from './colors'
 
 // font size values
 export const FONT_SIZE_HUGE = '3rem'

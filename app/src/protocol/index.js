@@ -1,6 +1,7 @@
 // @flow
 // protocol state and loading actions
 import { getFeatureFlags } from '../config/selectors'
+import type { ThunkAction } from '../types'
 import {
   fileToProtocolFile,
   parseProtocolData,
@@ -8,7 +9,6 @@ import {
   fileIsBundle,
 } from './protocol-data'
 
-import type { ThunkAction } from '../types'
 import type {
   OpenProtocolAction,
   UploadProtocolAction,

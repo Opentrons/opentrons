@@ -2,11 +2,10 @@
 // robot status panel with connect button
 import * as React from 'react'
 
+import { CardContainer, CardRow } from '../layout'
+import type { Mount } from '../../pipettes/types'
 import { AttachedPipettesCard } from './AttachedPipettesCard'
 import { AttachedModulesCard } from './AttachedModulesCard'
-import { CardContainer, CardRow } from '../layout'
-
-import type { Mount } from '../../pipettes/types'
 
 type Props = {|
   robotName: string,

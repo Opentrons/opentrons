@@ -1,15 +1,15 @@
 // @flow
+import assert from 'assert'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import assert from 'assert'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { LabwareDetailsCard as LabwareDetailsCardComponent } from './LabwareDetailsCard'
+import type { ElementProps } from 'react'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import type { ElementProps } from 'react'
 import type { BaseState, ThunkDispatch } from '../../../types'
+import { LabwareDetailsCard as LabwareDetailsCardComponent } from './LabwareDetailsCard'
 
 type Props = ElementProps<typeof LabwareDetailsCardComponent>
 

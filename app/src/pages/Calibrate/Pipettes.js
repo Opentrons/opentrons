@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
+import type { ContextRouter } from 'react-router-dom'
 import * as Sessions from '../../sessions'
 import { selectors as robotSelectors } from '../../robot'
 import { PIPETTE_MOUNTS, fetchPipettes } from '../../pipettes'
@@ -19,7 +20,6 @@ import {
 } from '../../components/calibrate-pipettes'
 import { SessionHeader } from '../../components/SessionHeader'
 
-import type { ContextRouter } from 'react-router-dom'
 import type { Dispatch } from '../../types'
 import type { Mount } from '../../pipettes/types'
 

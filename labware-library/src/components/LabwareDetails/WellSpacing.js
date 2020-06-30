@@ -14,12 +14,11 @@ import {
   MM,
 } from '../../localization'
 
-import styles from './styles.css'
-
 import { LabeledValueTable, LowercaseText } from '../ui'
 import { getSpacingDiagram } from '../measurement-guide'
 
 import type { LabwareWellGroupProperties } from '../../types'
+import styles from './styles.css'
 
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)

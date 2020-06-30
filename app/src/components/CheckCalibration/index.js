@@ -11,10 +11,10 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import type { TitleBarProps } from '@opentrons/components'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import * as Sessions from '../../sessions'
 
-import type { TitleBarProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import type { RequestState } from '../../robot-api/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'

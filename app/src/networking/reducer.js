@@ -4,9 +4,9 @@ import keyBy from 'lodash/keyBy'
 import union from 'lodash/union'
 import uniq from 'lodash/uniq'
 
+import type { Action } from '../types'
 import * as Constants from './constants'
 
-import type { Action } from '../types'
 import type { NetworkingState, PerRobotNetworkingState } from './types'
 
 const INITIAL_STATE: NetworkingState = {}

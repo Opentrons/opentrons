@@ -4,7 +4,6 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { Icon, ModalPage, PrimaryButton } from '@opentrons/components'
-import styles from './styles.css'
 
 import type {
   PipetteNameSpecs,
@@ -13,6 +12,7 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { Mount } from '../../pipettes/types'
+import styles from './styles.css'
 
 // TODO: i18n
 const EXIT_BUTTON_MESSAGE = 'confirm pipette is leveled'

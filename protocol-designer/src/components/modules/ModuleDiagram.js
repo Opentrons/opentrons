@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import styles from './styles.css'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -13,6 +12,7 @@ import {
   THERMOCYCLER_MODULE_V1,
   type ModuleModel,
 } from '@opentrons/shared-data'
+import styles from './styles.css'
 
 type Props = {
   type: ModuleRealType,

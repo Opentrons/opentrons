@@ -5,9 +5,8 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { OutlineButton } from '@opentrons/components'
-import styles from './styles.css'
-
 import type { ButtonProps } from '@opentrons/components'
+import styles from './styles.css'
 
 type Props = {|
   buttons: Array<?ButtonProps>,

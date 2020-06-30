@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useRouteMatch, Redirect } from 'react-router-dom'
 
+import { Splash } from '@opentrons/components'
 import { createLogger } from '../../logger'
 
 import {
@@ -15,7 +16,6 @@ import {
 import { getBuildrootRobot } from '../../buildroot'
 import { getShellUpdateState } from '../../shell'
 
-import { Splash } from '@opentrons/components'
 import { Page } from '../../components/Page'
 import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'

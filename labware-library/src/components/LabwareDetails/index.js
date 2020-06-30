@@ -3,11 +3,10 @@
 import * as React from 'react'
 
 import { Gallery, Tags, LoadName } from '../labware-ui'
+import type { LabwareDefinition } from '../../types'
 import { LabwareTitle } from './LabwareTitle'
 import { LabwareDetailsBox } from './LabwareDetailsBox'
 import styles from './styles.css'
-
-import type { LabwareDefinition } from '../../types'
 
 export type LabwareDetailsProps = {|
   definition: LabwareDefinition,

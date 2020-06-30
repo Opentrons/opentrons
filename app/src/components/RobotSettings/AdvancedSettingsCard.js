@@ -5,6 +5,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
+  AlertModal,
+  Card,
+  LabeledButton,
+  LabeledToggle,
+  Icon,
+} from '@opentrons/components'
+import {
   fetchSettings,
   updateSetting,
   getRobotSettings,
@@ -14,19 +21,12 @@ import { CONNECTABLE } from '../../discovery'
 import { downloadLogs } from '../../shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
 import { Portal } from '../portal'
-import {
-  AlertModal,
-  Card,
-  LabeledButton,
-  LabeledToggle,
-  Icon,
-} from '@opentrons/components'
-
-import { UploadRobotUpdate } from './UploadRobotUpdate'
 
 import type { State, Dispatch } from '../../types'
+
 import type { ViewableRobot } from '../../discovery/types'
 import type { RobotSettings } from '../../robot-settings/types'
+import { UploadRobotUpdate } from './UploadRobotUpdate'
 
 export type AdvancedSettingsCardProps = {|
   robot: ViewableRobot,

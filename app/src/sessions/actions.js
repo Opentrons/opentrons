@@ -1,11 +1,11 @@
 // @flow
 
-import * as Types from './types'
-import * as Constants from './constants'
 import type {
   RobotApiRequestMeta,
   RobotApiV2ErrorResponseBody,
 } from '../robot-api/types'
+import * as Types from './types'
+import * as Constants from './constants'
 
 export const createSession = (
   robotName: string,

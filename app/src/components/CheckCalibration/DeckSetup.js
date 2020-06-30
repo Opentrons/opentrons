@@ -10,11 +10,10 @@ import {
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import { getLatestLabwareDef } from '../../getLabware'
-import styles from './styles.css'
-
 import type { LabwareDefinition2, DeckSlot } from '@opentrons/shared-data'
+import { getLatestLabwareDef } from '../../getLabware'
 import type { RobotCalibrationCheckLabware } from '../../sessions/types'
+import styles from './styles.css'
 
 const DECK_SETUP_PROMPT =
   'Place full tip rack(s) on the deck, in their designated slots, as illustrated below.'

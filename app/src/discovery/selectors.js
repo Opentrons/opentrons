@@ -12,9 +12,9 @@ import semver from 'semver'
 
 // TODO(mc, 2018-10-10): fix circular dependency with RPC API client
 // that requires us to bypass the robot entry point here
+import type { Service } from '@opentrons/discovery-client'
 import { getConnectedRobotName } from '../robot/selectors'
 
-import type { Service } from '@opentrons/discovery-client'
 import type { State } from '../types'
 import type {
   ResolvedRobot,

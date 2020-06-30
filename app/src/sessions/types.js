@@ -1,5 +1,10 @@
 // @flow
 
+import type {
+  RobotApiRequestMeta,
+  RobotApiV2ResponseBody,
+  RobotApiV2ErrorResponseBody,
+} from '../robot-api/types'
 import typeof {
   CREATE_SESSION,
   CREATE_SESSION_SUCCESS,
@@ -20,12 +25,6 @@ import typeof {
   SESSION_TYPE_CALIBRATION_CHECK,
   SESSION_TYPE_TIP_LENGTH_CALIBRATION,
 } from './constants'
-
-import type {
-  RobotApiRequestMeta,
-  RobotApiV2ResponseBody,
-  RobotApiV2ErrorResponseBody,
-} from '../robot-api/types'
 
 import * as CalCheckTypes from './calibration-check/types'
 import * as TipLengthCalTypes from './tip-length-calibration/types'

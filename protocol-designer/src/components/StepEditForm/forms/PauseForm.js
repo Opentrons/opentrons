@@ -2,9 +2,9 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
+import { FormGroup, HoverTooltip } from '@opentrons/components'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 
-import { FormGroup, HoverTooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
   PAUSE_UNTIL_RESUME,

@@ -6,10 +6,10 @@ import flatMap from 'lodash/flatMap'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
 
+import type { Location } from 'react-router-dom'
 import { getAllDefinitions } from './definitions'
 import { getPublicPath } from './public-path'
 
-import type { Location } from 'react-router-dom'
 import type { FilterParams, LabwareDefinition, LabwareList } from './types'
 
 export const FILTER_OFF = 'all'

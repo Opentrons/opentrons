@@ -7,12 +7,12 @@ import { thermocyclerRunProfile } from '../atomic/thermocyclerRunProfile'
 import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
 import { thermocyclerAwaitProfileComplete } from '../atomic/thermocyclerAwaitProfileComplete'
 import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
-import { thermocyclerStateStep } from './thermocyclerStateStep'
 import type {
   CommandCreator,
   CurriedCommandCreator,
   ThermocyclerProfileStepArgs,
 } from '../../types'
+import { thermocyclerStateStep } from './thermocyclerStateStep'
 
 export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs> = (
   args,

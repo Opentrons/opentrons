@@ -4,13 +4,13 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import omit from 'lodash/omit'
+import { saveAs } from 'file-saver'
 import * as Calibration from '../../../calibration'
 import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
 import * as Fixtures from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
 import type { State } from '../../../types'
 import { ResultsSummary } from '../ResultsSummary'
-import { saveAs } from 'file-saver'
 
 import type {
   RobotCalibrationCheckInstrumentsByMount,

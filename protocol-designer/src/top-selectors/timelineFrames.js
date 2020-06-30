@@ -1,7 +1,6 @@
 // @flow
-import { createSelector } from 'reselect'
-
 import assert from 'assert'
+import { createSelector } from 'reselect'
 
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'

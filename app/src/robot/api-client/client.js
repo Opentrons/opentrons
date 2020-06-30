@@ -9,6 +9,7 @@ import mapKeys from 'lodash/mapKeys'
 import pick from 'lodash/pick'
 import union from 'lodash/union'
 
+import { normalizeModuleModel } from '@opentrons/shared-data'
 import { Client as RpcClient } from '../../rpc/client'
 import { actions, actionTypes } from '../actions'
 import * as constants from '../constants'
@@ -20,7 +21,6 @@ import { getConnectableRobots } from '../../discovery/selectors'
 import { getProtocolFile } from '../../protocol/selectors'
 import { fileIsBundle, fileIsPython } from '../../protocol/protocol-data'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
-import { normalizeModuleModel } from '@opentrons/shared-data'
 
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1

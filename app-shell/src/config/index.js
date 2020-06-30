@@ -10,10 +10,10 @@ import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import * as Cfg from '@opentrons/app/src/config'
 
 import { createLogger } from '../log'
+import type { Action, Dispatch, Logger } from '../types'
 import { DEFAULTS_V0, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
 
-import type { Action, Dispatch, Logger } from '../types'
 import type { Config, Overrides } from './types'
 
 export type * from './types'

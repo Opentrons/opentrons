@@ -18,11 +18,10 @@ import {
   CLEAR_CACHE,
 } from '@opentrons/app/src/discovery/actions'
 
+import type { Service } from '@opentrons/discovery-client'
 import { getConfig, getOverrides, handleConfigChange } from './config'
 import { createLogger } from './log'
 import { createNetworkInterfaceMonitor } from './system-info'
-
-import type { Service } from '@opentrons/discovery-client'
 
 import type { Action, Dispatch } from './types'
 

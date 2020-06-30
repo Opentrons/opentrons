@@ -10,13 +10,13 @@ import {
 
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
+import type { LoadFileAction } from '../load-file'
 import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
 import type {
   CreateCustomLabwareDef,
   LabwareUploadMessageAction,
   ReplaceCustomLabwareDef,
 } from './actions'
-import type { LoadFileAction } from '../load-file'
 
 const customDefs = handleActions(
   {

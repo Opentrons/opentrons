@@ -2,13 +2,13 @@
 import React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
-import { EditModules } from '../EditModules'
 import { Provider } from 'react-redux'
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import { EditModules } from '../EditModules'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as tutorialSelectors } from '../../tutorial'
 import { BlockingHint } from '../Hints/useBlockingHint'
 import { EditModulesModal } from '../modals/EditModulesModal'
-import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 jest.mock('../../step-forms/selectors')
 jest.mock('../../tutorial')

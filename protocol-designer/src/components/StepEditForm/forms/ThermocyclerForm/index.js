@@ -12,12 +12,12 @@ import {
   ProfileItemRows,
   RadioGroupField,
 } from '../../fields'
-import { StateFields } from './StateFields'
-import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
 
 import type { FormData } from '../../../../form-types'
 import type { FocusHandlers } from '../../types'
+import { ProfileSettings } from './ProfileSettings'
+import { StateFields } from './StateFields'
 
 type TCFormProps = {| focusHandlers: FocusHandlers, formData: FormData |}
 

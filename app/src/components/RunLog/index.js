@@ -7,10 +7,9 @@ import {
   selectors as robotSelectors,
 } from '../../robot'
 
-import { CommandList } from './CommandList'
-
 import type { State, Dispatch } from '../../types'
 import type { SessionStatus, SessionStatusInfo } from '../../robot'
+import { CommandList } from './CommandList'
 import type { CommandListProps } from './CommandList'
 
 export { ConfirmCancelModal } from './ConfirmCancelModal'

@@ -5,9 +5,14 @@ import { readFile, ensureDir } from 'fs-extra'
 import { app } from 'electron'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
+import type {
+  BuildrootUpdateInfo,
+  BuildrootAction,
+} from '@opentrons/app/src/buildroot/types'
 import { createLogger } from '../log'
 import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
+import type { Action, Dispatch } from '../types'
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import {
   getReleaseFiles,
@@ -16,12 +21,7 @@ import {
 } from './release-files'
 import { startPremigration, uploadSystemFile } from './update'
 
-import type { Action, Dispatch } from '../types'
 import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
-import type {
-  BuildrootUpdateInfo,
-  BuildrootAction,
-} from '@opentrons/app/src/buildroot/types'
 
 const log = createLogger('buildroot/index')
 

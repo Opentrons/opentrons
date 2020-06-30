@@ -1,10 +1,9 @@
 // @flow
 import { combineReducers } from 'redux'
 
-import { robotLogsReducer } from './robot-logs/reducer'
-
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
+import { robotLogsReducer } from './robot-logs/reducer'
 import type { ShellState, ShellUpdateState } from './types'
 
 const INITIAL_STATE: ShellUpdateState = {

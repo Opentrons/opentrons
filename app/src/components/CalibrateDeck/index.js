@@ -5,10 +5,9 @@ import { push, goBack } from 'connected-react-router'
 import { Switch, Route, withRouter } from 'react-router-dom'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
-import type { OP, SP, DP, CalibrateDeckProps, CalibrationStep } from './types'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import type { State, Dispatch } from '../../types'
 import { chainActions } from '../../util'
 import { createLogger } from '../../logger'
 
@@ -22,6 +21,7 @@ import {
 } from '../../http-api-client'
 
 import { ErrorModal } from '../modals'
+import type { OP, SP, DP, CalibrateDeckProps, CalibrationStep } from './types'
 import { ClearDeckAlert } from './ClearDeckAlert'
 import { InUseModal } from './InUseModal'
 import { NoPipetteModal } from './NoPipetteModal'

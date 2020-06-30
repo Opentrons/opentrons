@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom'
 import cx from 'classnames'
 import { OutlineButton } from '@opentrons/components'
 
-import styles from './styles.css'
 import { SectionContentHalf } from '../layout'
+import styles from './styles.css'
 
 export type MissingItemWarningProps = {|
   instrumentType: string,

@@ -1,15 +1,15 @@
 // @flow
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+import type {
+  TemperatureParams,
+  ModuleOnlyParams,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import { getModuleState } from '../robotStateSelectors'
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_AT_TARGET,
 } from '../../constants'
-import type {
-  TemperatureParams,
-  ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 function _setTemperatureAndStatus(moduleState, temperature, status) {

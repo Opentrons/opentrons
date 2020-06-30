@@ -3,13 +3,13 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-import { ListLabwareCard } from '..'
 import { LabwareList } from '../LabwareList'
 import * as LabwareFixtures from '../../../custom-labware/__fixtures__'
 import * as LabwareSelectors from '../../../custom-labware/selectors'
 import * as LabwareActions from '../../../custom-labware/actions'
 
 import type { State } from '../../../types'
+import { ListLabwareCard } from '..'
 
 jest.mock('../../../custom-labware/selectors')
 

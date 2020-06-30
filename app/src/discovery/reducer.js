@@ -2,9 +2,9 @@
 // robot discovery state
 import groupBy from 'lodash/groupBy'
 import { UI_INITIALIZED } from '../shell'
+import type { Action } from '../types'
 import * as actions from './actions'
 
-import type { Action } from '../types'
 import type { Service, RobotsMap, DiscoveryState } from './types'
 
 export const normalizeRobots = (robots: Array<Service> = []): RobotsMap => {

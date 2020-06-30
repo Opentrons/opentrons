@@ -4,8 +4,8 @@ import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 
 import { LabeledButton } from '@opentrons/components'
-import { AddManualIp } from '..'
 import { AddManualIpModal } from '../AddManualIpModal'
+import { AddManualIp } from '..'
 
 jest.mock('../AddManualIpModal', () => ({
   AddManualIpModal: () => <></>,

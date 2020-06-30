@@ -1,4 +1,8 @@
 // @flow
+import type {
+  AspirateParams,
+  DispenseParams,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import { consolidate } from '../commandCreators/compound/consolidate'
 import {
   getInitialRobotStateStandard,
@@ -20,10 +24,6 @@ import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DISPENSE_OFFSET_FROM_BOTTOM_MM,
 } from '../__fixtures__'
-import type {
-  AspirateParams,
-  DispenseParams,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()

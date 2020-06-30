@@ -5,14 +5,14 @@ import {
   makeResponseFixtures,
   mockV2ErrorResponse,
 } from '../../robot-api/__fixtures__'
-import { mockRobotCalibrationCheckSessionDetails } from './calibration-check'
-import { mockTipLengthCalibrationSessionDetails } from './tip-length-calibration'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 
 import * as Types from '../types'
 import * as Constants from '../constants'
+import { mockTipLengthCalibrationSessionDetails } from './tip-length-calibration'
+import { mockRobotCalibrationCheckSessionDetails } from './calibration-check'
 
 export * from './calibration-check'
 export * from './tip-length-calibration'

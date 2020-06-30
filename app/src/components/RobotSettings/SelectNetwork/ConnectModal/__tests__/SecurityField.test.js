@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 
-import * as Fixtures from '../../../../../networking/__fixtures__'
 import { SelectField } from '@opentrons/components'
+import * as Fixtures from '../../../../../networking/__fixtures__'
 import { SecurityField } from '../SecurityField'
 import * as FormState from '../form-state'
 

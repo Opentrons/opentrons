@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import { TitledList } from '@opentrons/components'
-import { LabwareListItem } from './LabwareListItem'
 
 import {
   selectors as robotSelectors,
@@ -13,6 +12,7 @@ import {
 
 import type { State, Dispatch } from '../../types'
 import type { Labware, Mount, Slot, SessionModule } from '../../robot'
+import { LabwareListItem } from './LabwareListItem'
 
 type SP = {|
   disabled: boolean,

@@ -1,8 +1,8 @@
 // @flow
 // TODO(mc, 2020-02-19): still used but deprecated; remove when able
+import assert from 'assert'
 import * as React from 'react'
 import map from 'lodash/map'
-import assert from 'assert'
 import {
   SLOT_RENDER_WIDTH,
   SLOT_RENDER_HEIGHT,

@@ -11,16 +11,15 @@ import {
   VARIOUS,
 } from '../../localization'
 
-import { getWellLabel } from './labels'
 import { LabelText, Value, LABEL_TOP } from '../ui'
-
-import styles from './styles.css'
-
 import type {
   LabwareDefinition,
   LabwareWellGroupProperties,
   LabwareVolumeUnits,
 } from '../../types'
+import { getWellLabel } from './labels'
+
+import styles from './styles.css'
 
 export type AllWellPropertiesProps = {|
   definition: LabwareDefinition,

@@ -5,14 +5,13 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
+import type { RobotCalibrationCheckLabware } from '../../sessions/types'
+import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import multiA1DemoAsset from './videos/A1_Multi_Channel_REV1.webm'
 import singleA1DemoAsset from './videos/A1_Single_Channel_REV1.webm'
 import multiB1DemoAsset from './videos/B1_Multi_Channel_REV1.webm'
 import singleB1DemoAsset from './videos/B1_Single_Channel_REV1.webm'
-
-import type { RobotCalibrationCheckLabware } from '../../sessions/types'
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 
 const TIP_PICK_UP_HEADER = 'Position pipette over '
 const TIP_PICK_UP_BUTTON_TEXT = 'Pick up tip'

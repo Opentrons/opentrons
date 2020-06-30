@@ -4,15 +4,14 @@ import cx from 'classnames'
 
 import { Icon } from '@opentrons/components'
 import { PDListItem } from '../lists'
-import { SubstepRow } from './SubstepRow'
-import styles from './StepItem.css'
-import { formatVolume } from './utils'
-
 import type {
   StepItemSourceDestRow,
   SubstepIdentifier,
   WellIngredientNames,
 } from '../../steplist/types'
+import { SubstepRow } from './SubstepRow'
+import styles from './StepItem.css'
+import { formatVolume } from './utils'
 
 const DEFAULT_COLLAPSED_STATE = true
 

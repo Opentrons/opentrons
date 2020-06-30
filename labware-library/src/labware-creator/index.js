@@ -7,10 +7,15 @@ import { Formik } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
-import { reportEvent } from '../analytics'
-import { reportErrors } from './analyticsUtils'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import type { FormikProps, FormikTouched } from 'formik/@flow-typed'
+import type {
+  LabwareDefinition2,
+  WellBottomShape,
+} from '@opentrons/shared-data'
+import { reportEvent } from '../analytics'
+import { reportErrors } from './analyticsUtils'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
@@ -50,11 +55,6 @@ import {
 } from './components/optionsWithImages'
 import styles from './styles.css'
 
-import type { FormikProps, FormikTouched } from 'formik/@flow-typed'
-import type {
-  LabwareDefinition2,
-  WellBottomShape,
-} from '@opentrons/shared-data'
 import type {
   ImportError,
   LabwareFields,

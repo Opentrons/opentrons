@@ -3,16 +3,15 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
+import { AlertModal } from '@opentrons/components'
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
 import { getAllRobots } from '../../discovery'
-import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
-import { ModalCopy } from './ModalCopy'
-
 import type { State, Dispatch } from '../../types'
+import { ModalCopy } from './ModalCopy'
 
 export function LostConnectionAlert(): React.Node {
   const history = useHistory()

@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import { clearDiscoveryCache } from '../../discovery'
 import { LabeledButton } from '@opentrons/components'
+import { clearDiscoveryCache } from '../../discovery'
 import type { Dispatch } from '../../types'
 
 // TODO(spp, 2020-05-08): i18n
