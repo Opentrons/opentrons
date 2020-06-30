@@ -62,7 +62,8 @@ async def test_clear_config(mock_config, sync_hardware):
     dc_main.clear_configuration_and_reload(sync_hardware)
 
     config = sync_hardware.config
-    assert config == robot_configs.build_config({}, {})
+    assert config == robot_configs.build_config(
+        robot_configs.DEFAULT_DECK_CALIBRATION, {})
 
 
 @pytest.mark.skipif(aionotify is None,

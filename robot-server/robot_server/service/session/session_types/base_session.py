@@ -3,8 +3,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
-from opentrons.calibration.check.models import SessionType
-
 from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
@@ -82,7 +80,7 @@ class BaseSession(ABC):
 
     @property
     @abstractmethod
-    def session_type(self) -> SessionType:
+    def session_type(self) -> models.SessionType:
         pass
 
     def __str__(self) -> str:

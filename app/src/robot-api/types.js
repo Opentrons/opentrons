@@ -55,23 +55,9 @@ export type DismissRequestAction = {|
 
 export type RobotApiAction = DismissRequestAction
 
-// API request tracking state
-
-export type RequestState =
-  | $ReadOnly<{| status: 'pending' |}>
-  | $ReadOnly<{| status: 'success', response: RobotApiResponseMeta |}>
-  | $ReadOnly<{|
-      status: 'failure',
-      response: RobotApiResponseMeta,
-      error: { message?: string },
-    |}>
-
-export type RobotApiState = $Shape<
-  $ReadOnly<{|
-    [requestId: string]: void | RequestState,
-  |}>
->
-
+// parameterized response type
+// DataT parameter must be a subtype of RobotApiV2ResponseData
+// MetaT defaults to void if unspecified
 export type ResourceLink = {|
   href: string,
   meta?: $Shape<{| [string]: string | void |}>,
@@ -88,9 +74,6 @@ export type RobotApiV2ResponseData = {|
   +attributes: { ... },
 |}
 
-// parameterized response type
-// DataT parameter must be a subtype of RobotApiV2ResponseData
-// MetaT defaults to void if unspecified
 export type RobotApiV2ResponseBody<
   DataT: RobotApiV2ResponseData | $ReadOnlyArray<RobotApiV2ResponseData>,
   MetaT = void
@@ -113,6 +96,23 @@ export type RobotApiV2Error = {|
   meta?: { ... },
 |}
 
-export type RobotApiV2ErrorResponseBody = {
+export type RobotApiV2ErrorResponseBody = {|
   errors: Array<RobotApiV2Error>,
-}
+|}
+
+// API request tracking state
+
+export type RequestState =
+  | $ReadOnly<{| status: 'pending' |}>
+  | $ReadOnly<{| status: 'success', response: RobotApiResponseMeta |}>
+  | $ReadOnly<{|
+      status: 'failure',
+      response: RobotApiResponseMeta,
+      error: {| message?: string |} | RobotApiV2ErrorResponseBody,
+    |}>
+
+export type RobotApiState = $Shape<
+  $ReadOnly<{|
+    [requestId: string]: void | RequestState,
+  |}>
+>

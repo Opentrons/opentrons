@@ -1,0 +1,181 @@
+---
+test_name: GET Labware Calibrations, No Calibrations
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Labware Calibrations GET request returns an empty list
+    request:
+      url: "{host:s}:{port:d}/labware/calibrations"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        meta: null
+        links: null
+        data: []
+---
+test_name: GET Labware Calibrations, All Calibrations
+marks:
+  - usefixtures:
+      - run_server
+      - set_up_index_file_temporary_directory
+stages:
+  - name: GET request returns all calibrations from fixture
+    request:
+      url: "{host:s}:{port:d}/labware/calibrations"
+      method: GET
+    response:
+      status_code: 200
+      strict: false
+      json:
+        meta: null
+        links: null
+        data: 
+          - attributes: 
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+          - attributes:
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+          - attributes:
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+          - attributes:
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+          - attributes:
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+
+---
+test_name: GET Labware Calibrations, Filter LoadName
+marks:
+  - usefixtures:
+      - run_server
+      - set_up_index_file_temporary_directory
+stages:
+  - name: GET request returns the calibration for deep well plate
+    request:
+      url: "{host:s}:{port:d}/labware/calibrations"
+      method: GET
+      params:
+        loadName: 'nest_96_wellplate_2ml_deep'
+    response:
+      status_code: 200
+      json:
+        meta: null
+        links: null
+        data: 
+          - attributes:
+              calibrationData: !anydict
+              loadName: 'nest_96_wellplate_2ml_deep'
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+---
+test_name: GET Labware Calibrations, Filter Version & namespace
+marks:
+  - usefixtures:
+      - run_server
+      - set_up_index_file_temporary_directory
+stages:
+  - name: Labware Calibrations GET request returns an empty list
+    request:
+      url: "{host:s}:{port:d}/labware/calibrations"
+      method: GET
+      params:
+        version: 1
+        namespace: "opentrons"
+    response:
+      status_code: 200
+      json:
+        links: null
+        meta: null
+        data:
+          - attributes: 
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+          - attributes:
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+          - attributes:
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+          - attributes:
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+          - attributes:
+              calibrationData: !anydict
+              loadName: !anystr
+              parent: !anystr
+              namespace: 'opentrons'
+              version: 1
+            id: !anystr
+            type: 'LabwareCalibration'
+---
+test_name: GET Labware Calibrations, Version Does Not Exist
+marks:
+  - usefixtures:
+      - run_server
+      - set_up_index_file_temporary_directory
+stages:
+  - name: Labware Calibrations GET request returns an empty list
+    request:
+      url: "{host:s}:{port:d}/labware/calibrations"
+      method: GET
+      params:
+        version: 2
+    response:
+      status_code: 200
+      json:
+        links: null
+        meta: null
+        data: []

@@ -37,6 +37,22 @@
       "ASK_FOR_LABWARE_OVERWRITE": "Duplicate labware name",
       "USES_STANDARD_NAMESPACE": "Standard (non-custom) Opentrons labware",
       "ONLY_TIPRACK": "Incompatible file type"
+    },
+    "message": {
+      "EXACT_LABWARE_MATCH": "This labware is identical to one you have already uploaded.",
+      "INVALID_JSON_FILE": "The Protocol Designer only accepts custom JSON labware definitions made with our Labware Creator",
+      "NOT_JSON": "The Protocol Designer only accepts custom JSON labware definitions made with our Labware Creator. This is not a .json file!",
+      "ONLY_TIPRACK": "This labware definition is not a Tip Rack.",
+      "USES_STANDARD_NAMESPACE": "This labware definition appears to be an Opentrons standard labware. Please upload only custom labware."
+    },
+    "name_conflict": {
+      "shared_display_name": "Shared display name: ",
+      "shared_load_name": "Shared load name: ",
+      "shares_name": "This labware shares an API Load name and/or a display name with {{customOrStandard}} labware that has already been uploaded.",
+      "re_export": "If you wish to add this labware then please return to the Labware Creator and export it again with a unique load name and display name.",
+      "overwrite": "If you intended to replace your previous labware with this new version then proceed with the Overwrite button below.",
+      "mismatched": "the new labware has a different arrangement of wells than the definition it is replacing. Clicking the Overwrite button will deselect all wells in any existing steps that use the overwritten definition. You will have to edit each of those steps and re-select the wells.",
+      "warning": "WARNING:"
     }
   },
   "new_protocol": {

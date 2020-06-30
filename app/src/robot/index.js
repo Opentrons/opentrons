@@ -4,8 +4,6 @@
 import * as selectors from './selectors'
 import * as constants from './constants'
 
-export { apiClientMiddleware } from './api-client'
-
 export type { Action } from './actions'
 
 export * from './types'

@@ -137,5 +137,9 @@ context('File Import', () => {
           })
         })
       })
+
+    cy.window()
+      .its('__lastSavedFileName__')
+      .should('equal', 'testpro_15_wellplate_5ul.zip')
   })
 })

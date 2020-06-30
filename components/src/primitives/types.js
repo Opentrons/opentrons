@@ -42,6 +42,8 @@ export type BorderProps = {|
   borderBottom?: string,
   borderLeft?: string,
   borderRadius?: string | number,
+  borderWidth?: string | number,
+  borderColor?: string,
 |}
 
 export type FlexboxProps = {|
@@ -63,6 +65,15 @@ export type LayoutProps = {|
   maxHeight?: string | number,
 |}
 
+export type PositionProps = {|
+  position?: string,
+  zIndex?: string | number,
+  top?: string | number,
+  right?: string | number,
+  bottom?: string | number,
+  left?: string | number,
+|}
+
 export type StyleProps = {|
   ...ColorProps,
   ...TypographyProps,
@@ -70,6 +81,7 @@ export type StyleProps = {|
   ...BorderProps,
   ...FlexboxProps,
   ...LayoutProps,
+  ...PositionProps,
 |}
 
 export type PrimitiveComponent<Instance> = StyledComponent<

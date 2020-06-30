@@ -71,6 +71,8 @@ import { Box, SPACING_AUTO, SPACING_3 } from '@opentrons/components'
 const Heading = () => <Box marginX={SPACING_AUTO} paddingY={SPACING_3} />
 ```
 
+Note: If you specify both of a shorthand prop and the explicit prop (e.g. `marginX` and `marginLeft`), the more explicit prop will be preferred.
+
 ### borders
 
 | prop name      | css property    |
@@ -81,6 +83,8 @@ const Heading = () => <Box marginX={SPACING_AUTO} paddingY={SPACING_3} />
 | `borderBottom` | `border-bottom` |
 | `borderLeft`   | `border-left`   |
 | `borderRadius` | `border-radius` |
+| `borderWidth`  | `border-width`  |
+| `borderColor`  | `border-color`  |
 
 ```js static
 import {
@@ -139,6 +143,25 @@ const Heading = () => (
 import { Box, SIZE_4, OVERFLOW_HIDDEN } from '@opentrons/components'
 
 const Heading = () => <Box size={SIZE_4} overflow={OVERFLOW_HIDDEN} />
+```
+
+### position
+
+| prop name  | css property |
+| ---------- | ------------ |
+| `position` | `position`   |
+| `zIndex`   | `z-index`    |
+| `top`      | `top`        |
+| `right`    | `right`      |
+| `bottom`   | `bottom`     |
+| `left`     | `left`       |
+
+```js static
+import { Box, POSITION_ABSOLUTE } from '@opentrons/components'
+
+const Fill = () => (
+  <Box position={POSITION_ABSOLUTE} top={0} right={0} bottom={0} left={0} />
+)
 ```
 
 ## creating custom primitives

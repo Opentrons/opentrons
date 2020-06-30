@@ -1,10 +1,8 @@
 import logging
 
-from . import endpoints as endp
 from opentrons import config
 from .endpoints import (networking, control, settings, update,
                         deck_calibration)
-from .endpoints.calibration import check
 
 
 log = logging.getLogger(__name__)
@@ -14,10 +12,6 @@ class HTTPServer(object):
     def __init__(self, app, log_file_path):
         self.app = app
         self.log_file_path = log_file_path
-        self.app.router.add_get(
-            '/openapi', endp.get_openapi_spec)
-        self.app.router.add_get(
-            '/health', endp.health)
         self.app.router.add_get(
             '/networking/status', networking.status)
         # TODO(mc, 2018-10-12): s/wifi/networking
@@ -100,48 +94,3 @@ class HTTPServer(object):
         )
         self.app.router.add_get(
             '/settings/robot', settings.get_robot_settings)
-
-
-class CalibrationRoutes(object):
-    def __init__(self, app):
-        self.app = app
-        self.app.router.add_get(
-            '/{type}/session', check.get_session)
-        self.app.router.add_post(
-            '/{type}/session',
-            check.create_session,
-            name="sessionStart")
-        self.app.router.add_post(
-            '/{type}/session/loadLabware',
-            check.load_labware,
-            name="loadLabware")
-        self.app.router.add_post(
-            '/{type}/session/preparePipette',
-            check.prepare_pipette,
-            name="preparePipette")
-        self.app.router.add_post(
-            '/{type}/session/pickUpTip',
-            check.pick_up_tip,
-            name="pickUpTip")
-        self.app.router.add_post(
-            '/{type}/session/confirmTip',
-            check.confirm_tip,
-            name='confirmTip')
-        self.app.router.add_post(
-            '/{type}/session/invalidateTip',
-            check.invalidate_tip,
-            name="invalidateTip")
-        self.app.router.add_post(
-            '/{type}/session/jog', check.jog, name="jog")
-        self.app.router.add_post(
-            '/{type}/session/comparePoint',
-            check.compare_point,
-            name="comparePoint")
-        self.app.router.add_post(
-            '/{type}/session/confirmStep',
-            check.confirm_step,
-            name="confirmStep")
-        self.app.router.add_delete(
-            '/{type}/session',
-            check.delete_session,
-            name="sessionExit")

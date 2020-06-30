@@ -70,7 +70,7 @@ CALIBRATION_CROSS_COORDS = {
     }
 }
 CALIBRATION_CROSS_SLOTS = ['1', '3', '7']
-TEST_LABWARE_SLOT = '3'
+TEST_LABWARE_SLOT = '2'
 
 RATE = 0.25  # % of default speeds
 SLOWER_RATE = 0.1
@@ -95,6 +95,7 @@ def uniq(l):
         if i not in res:
             res.append(i)
     return res
+
 
 def run(protocol: protocol_api.ProtocolContext):
     tiprack = protocol.load_labware(TIPRACK_LOADNAME, TIPRACK_SLOT)
@@ -160,6 +161,9 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.move_to(edge_location)
             protocol.pause(f'Moved to {edge_name} edge')
 
+    # go to bottom last. (If there is more than one well, use the last well first
+    # because the pipette is already at the last well at this point)
+    for well_loc in reversed(well_locs):
         set_speeds(RATE)
         pipette.move_to(well.bottom())
         protocol.pause("Moved to the bottom of the well")

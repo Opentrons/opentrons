@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Callable, Dict, TYPE_CHECKING
+from typing import Callable, Dict, TYPE_CHECKING, List
 
 from typing_extensions import Protocol, TypedDict
 
@@ -136,6 +136,40 @@ JsonV4ThermocyclerDispatch = TypedDict(
 class TipLengthCalibration(TypedDict):
     tipLength: float
     lastModified: datetime
+
+
+class ModuleDict(TypedDict):
+    parent: str
+    fullParent: str
+
+
+class CalibrationIndexDict(TypedDict):
+    """
+    The dict that is returned from
+    the index.json file.
+    """
+    uri: str
+    slot: str
+    module: ModuleDict
+
+
+class OffsetDict(TypedDict):
+    offset: List[float]
+    lastModified: str
+
+
+class TipLengthDict(TypedDict):
+    length: float
+    lastModified: str
+
+
+class CalibrationDict(TypedDict):
+    """
+    The dict that is returned from a labware
+    offset file.
+    """
+    default: OffsetDict
+    tipLength: TipLengthDict
 
 
 PipTipLengthCalibration = Dict[str, TipLengthCalibration]

@@ -993,13 +993,7 @@
   "groups": [
     {
       "metadata": {
-        "displayName": "Overlappy 96 Well Plate 200 µL",
-        "displayCategory": "wellPlate",
         "wellBottomShape": "flat"
-      },
-      "brand": {
-        "brand": "overlappy",
-        "brandId": []
       },
       "wells": [
         "A1",

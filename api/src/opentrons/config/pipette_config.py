@@ -5,7 +5,8 @@ import numbers
 from typing import (Any, Dict, List, Union, Tuple,
                     Sequence, TYPE_CHECKING)
 
-from opentrons.config import feature_flags as ff, CONFIG
+from opentrons import config
+from opentrons.config import feature_flags as ff
 from opentrons_shared_data.pipette import (
     model_config, name_config, fuse_specs)
 
@@ -274,7 +275,7 @@ def save_overrides(pipette_id: str,
     :param model: The model of pipette
     :return: None
     """
-    override_dir = CONFIG['pipette_config_overrides_dir']
+    override_dir = config.CONFIG['pipette_config_overrides_dir']
     model_configs = configs[model]
     model_configs_quirks = {key: True for key in model_configs['quirks']}
     try:
@@ -325,7 +326,7 @@ def change_quirks(override_quirks, existing, model_configs):
 
 
 def load_overrides(pipette_id: str) -> Dict[str, Any]:
-    overrides = CONFIG['pipette_config_overrides_dir']
+    overrides = config.CONFIG['pipette_config_overrides_dir']
     fi = (overrides/f'{pipette_id}.json').open()
     try:
         return json.load(fi)
@@ -370,7 +371,7 @@ def ensure_value(
 def known_pipettes() -> Sequence[str]:
     """ List pipette IDs for which we have known overrides """
     return [fi.stem
-            for fi in CONFIG['pipette_config_overrides_dir'].iterdir()
+            for fi in config.CONFIG['pipette_config_overrides_dir'].iterdir()
             if fi.is_file() and '.json' in fi.suffixes]
 
 

@@ -4,6 +4,7 @@ import ReactSelect, { components as reactSelectComponents } from 'react-select'
 import cx from 'classnames'
 
 import { Icon } from '../icons'
+import { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
 import styles from './Select.css'
 
 export { reactSelectComponents }
@@ -11,9 +12,6 @@ export { reactSelectComponents }
 export const PLACEMENT_AUTO: 'auto' = 'auto'
 export const PLACEMENT_BOTTOM: 'bottom' = 'bottom'
 export const PLACEMENT_TOP: 'top' = 'top'
-
-export const POSITION_ABSOLUTE: 'absolute' = 'absolute'
-export const POSITION_FIXED: 'fixed' = 'fixed'
 
 export const CONTEXT_MENU: 'menu' = 'menu'
 export const CONTEXT_VALUE: 'value' = 'value'

@@ -330,7 +330,7 @@ async def test_no_pipette(dummy_instruments, loop):
         assert not hw_api._current_volume[types.Mount.RIGHT]
 
 
-async def test_pick_up_tip(dummy_instruments, loop):
+async def test_pick_up_tip(dummy_instruments, loop, is_robot):
     hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     mount = types.Mount.LEFT

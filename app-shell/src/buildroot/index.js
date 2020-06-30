@@ -4,11 +4,16 @@ import path from 'path'
 import { readFile, ensureDir } from 'fs-extra'
 import { app } from 'electron'
 
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import { createLogger } from '../log'
 import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
-import { getReleaseFiles, readUserFileInfo } from './release-files'
+import {
+  getReleaseFiles,
+  readUserFileInfo,
+  cleanupReleaseFiles,
+} from './release-files'
 import { startPremigration, uploadSystemFile } from './update'
 
 import type { Action, Dispatch } from '../types'
@@ -28,6 +33,7 @@ let updateSet: ReleaseSetFilepaths | null = null
 export function registerBuildrootUpdate(dispatch: Dispatch): Action => void {
   return function handleAction(action: Action) {
     switch (action.type) {
+      case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
         if (!checkingForUpdates) {
           checkingForUpdates = true
@@ -170,6 +176,10 @@ export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<mixed> {
       .catch((error: Error) =>
         dispatch({ type: 'buildroot:DOWNLOAD_ERROR', payload: error.message })
       )
+      .then(() => cleanupReleaseFiles(DIRECTORY, CURRENT_VERSION))
+      .catch((error: Error) => {
+        log.warn('Unable to cleanup old release files', { error })
+      })
   })
 }
 

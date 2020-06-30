@@ -203,7 +203,7 @@ const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
           className={styles.inner_carat}
           onClick={() => setContentCollapsed(!contentCollapsed)}
         >
-          <Icon name={contentCollapsed ? 'chevron-up' : 'chevron-down'} />
+          <Icon name={contentCollapsed ? 'chevron-down' : 'chevron-up'} />
         </span>
       </PDListItem>
       {!contentCollapsed && props.children}

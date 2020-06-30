@@ -1,6 +1,9 @@
 # opentrons platform travis config
 cache: false
 
+addons:
+  chrome: stable
+
 stages:
   - test
   - name: app

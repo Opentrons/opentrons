@@ -1,10 +1,12 @@
 from enum import Enum
 import typing
 from uuid import uuid4
+from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
-from opentrons.calibration.check import models as calibration_models
-from opentrons.calibration.check.session import CalibrationCheckTrigger
+from robot_server.robot.calibration.check import models as calibration_models
+from robot_server.robot.calibration.check.session import \
+    CalibrationCheckTrigger
 
 from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
@@ -22,17 +24,36 @@ class EmptyModel(BaseModel):
     pass
 
 
+class SessionType(str, Enum):
+    """The available session types"""
+    null = 'null'
+    default = 'default'
+    calibration_check = 'calibrationCheck'
+    tip_length_calibration = 'tipLengthCalibration'
+
+
 SessionDetails = typing.Union[
     calibration_models.CalibrationSessionStatus,
     EmptyModel
 ]
 
 
+class CommandStatus(str, Enum):
+    """The command status"""
+    executed = "executed"
+    queued = "queued"
+    failed = "failed"
+
+
 class CommandName(str, Enum):
     """The available session commands"""
+    home_all_motors = "home_all_motors"
+    home_pipette = "home_pipette"
+    toggle_lights = "toggle_lights"
     load_labware = CalibrationCheckTrigger.load_labware.value
     prepare_pipette = CalibrationCheckTrigger.prepare_pipette.value
-    jog = (CalibrationCheckTrigger.jog.value, calibration_models.JogPosition)
+    jog = (CalibrationCheckTrigger.jog.value,
+           calibration_models.JogPosition)
     pick_up_tip = CalibrationCheckTrigger.pick_up_tip.value
     confirm_tip_attached = CalibrationCheckTrigger.confirm_tip_attached.value
     invalidate_tip = CalibrationCheckTrigger.invalidate_tip.value
@@ -61,7 +82,7 @@ CommandDataType = typing.Union[
 
 class BasicSession(BaseModel):
     """Minimal session description"""
-    sessionType: calibration_models.SessionType =\
+    sessionType: SessionType =\
         Field(...,
               description="The type of the session")
 
@@ -73,15 +94,14 @@ class Session(BasicSession):
               description="Detailed session specific status")
 
 
-class SessionCommand(BaseModel):
+class BasicSessionCommand(BaseModel):
     """A session command"""
     data: CommandDataType
     # For validation, command MUST appear after data
     command: CommandName = Field(...,
                                  description="The command description")
-    status: typing.Optional[str]
 
-    @validator('command', always=True)
+    @validator('command', always=True, allow_reuse=True)
     def check_data_type(cls, v, values):
         """Validate that the command and data match"""
         d = values.get('data')
@@ -89,6 +109,14 @@ class SessionCommand(BaseModel):
             raise ValueError(f"Invalid command data for command type {v}. "
                              f"Expecting {v.model}")
         return v
+
+
+class SessionCommand(BasicSessionCommand):
+    """A session command response"""
+    status: CommandStatus
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    started_at: typing.Optional[datetime]
+    completed_at: typing.Optional[datetime]
 
 
 # Session create and query requests/responses
@@ -104,7 +132,7 @@ MultiSessionResponse = ResponseModel[
 
 # Session command requests/responses
 CommandRequest = RequestModel[
-    RequestDataModel[SessionCommand]
+    RequestDataModel[BasicSessionCommand]
 ]
 CommandResponse = ResponseModel[
     ResponseDataModel[SessionCommand], dict

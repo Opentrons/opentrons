@@ -16,33 +16,37 @@ import os
 import shutil
 
 from pathlib import Path
+from dataclasses import dataclass
 from collections import defaultdict
 from hashlib import sha256
 from itertools import takewhile, dropwhile
 from typing import (
-    Any, AnyStr, List, Dict, Optional, Union, Sequence, Tuple, TYPE_CHECKING)
+    Any, AnyStr, List, Dict,
+    Optional, Union, Sequence, Tuple,
+    TYPE_CHECKING, NewType)
 
 import jsonschema  # type: ignore
 
 from .util import ModifiedList, requires_version, first_parent
+from opentrons.config import get_tip_length_cal_path
 from opentrons.types import Location, Point
-from opentrons.config import CONFIG, get_tip_length_cal_path
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
+from .constants import (OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE,
+                        STANDARD_DEFS_PATH, OFFSETS_PATH, USER_DEFS_PATH)
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)
-    from .dev_types import TipLengthCalibration, PipTipLengthCalibration
+    from .dev_types import (
+        TipLengthCalibration, PipTipLengthCalibration,
+        CalibrationDict, CalibrationIndexDict)
     from opentrons_shared_data.labware.dev_types import (
         LabwareDefinition, LabwareParameters, WellDefinition)
 
 
 MODULE_LOG = logging.getLogger(__name__)
 
-# TODO: Ian 2019-05-23 where to store these constants?
-OPENTRONS_NAMESPACE = 'opentrons'
-CUSTOM_NAMESPACE = 'custom_beta'
-STANDARD_DEFS_PATH = Path("labware/definitions/2")
+CalibrationID = NewType('CalibrationID', str)
 
 
 class OutOfTipsError(Exception):
@@ -79,6 +83,73 @@ class DateTimeDecoder(json.JSONDecoder):
             return obj
         except TypeError:
             return self.dict_to_obj(obj)
+
+
+@dataclass
+class OffsetData:
+    """
+    Class to categorize the shape of a
+    given calibration data.
+    TODO(6/8): Move to a separate file
+    """
+    value: List[float]
+    last_modified: Optional[str]
+
+
+@dataclass
+class TipLengthData:
+    """
+    Class to categorize the shape of a
+    given calibration data.
+    TODO(6/8): Move to a separate file
+    """
+    value: Optional[float] = None
+    last_modified: Optional[str] = None
+
+
+@dataclass
+class ParentOptions:
+    """
+    Class to store whether a labware calibration has
+    a module, as well the original parent (slot).
+    As of now, the slot is not saved in association
+    with labware calibrations.
+    TODO(6/8): Move to a separate file
+    """
+    slot: str
+    module: str = ''
+
+
+@dataclass
+class CalibrationTypes:
+    """
+    Class to categorize what calibration
+    data might be stored for a labware.
+    TODO(6/8): Move to a separate file
+    """
+    offset: OffsetData
+    tip_length: TipLengthData
+
+
+@dataclass
+class CalibrationInformation:
+    """
+    Class to store important calibration
+    info for labware.
+    TODO(6/8): Move to a separate file
+    """
+    calibration: CalibrationTypes
+    definition: 'LabwareDefinition'
+    parent: ParentOptions
+    labware_id: str
+    uri: str
+
+
+@dataclass
+class UriDetails:
+    namespace: str
+    load_name: str
+    version: int
 
 
 class Well:
@@ -852,7 +923,15 @@ def _hash_labware_def(labware_def: 'LabwareDefinition') -> str:
 
 
 def _add_to_index_offset_file(labware: Labware, lw_hash: str):
-    index_file = CONFIG['labware_calibration_offsets_dir_v2'] / 'index.json'
+    """
+    A helper method to create or add to an index file so that calibration
+    files can be looked up by their hash to reveal the labware uri and
+    parent information of a given file.
+
+    :param labware: A labware object
+    :param lw_hash: The labware hash of the calibration
+    """
+    index_file = OFFSETS_PATH / 'index.json'
     uri = labware.uri
     if index_file.exists():
         blob = _read_file(str(index_file))
@@ -862,12 +941,15 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
     mod_parent = _get_parent_identifier(labware.parent)
     slot = first_parent(labware)
     if mod_parent:
-        mod_dict = {mod_parent: f'{slot}-{mod_parent}'}
+        mod_dict = {
+            'parent': mod_parent,
+            'fullParent': f'{slot}-{mod_parent}'}
     else:
         mod_dict = {}
-    blob[uri] = {
-            "id": f'{lw_hash}',
-            "slot": f'{lw_hash}{mod_parent}',
+    full_id = f'{lw_hash}{mod_parent}'
+    blob[full_id] = {
+            "uri": f'{uri}',
+            "slot": full_id,
             "module": mod_dict
         }
     with index_file.open('w') as f:
@@ -875,13 +957,11 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
 
 
 def _get_labware_offset_path(labware: Labware):
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
-    calibration_path.mkdir(parents=True, exist_ok=True)
+    OFFSETS_PATH.mkdir(parents=True, exist_ok=True)
 
     parent_id = _get_parent_identifier(labware.parent)
     labware_hash = _hash_labware_def(labware._definition)
-    _add_to_index_offset_file(labware, labware_hash)
-    return calibration_path/f'{labware_hash}{parent_id}.json'
+    return OFFSETS_PATH/f'{labware_hash}{parent_id}.json'
 
 
 def save_calibration(labware: Labware, delta: Point):
@@ -892,6 +972,8 @@ def save_calibration(labware: Labware, delta: Point):
     modify the delta and the lastModified fields under the "default" key.
     """
     labware_offset_path = _get_labware_offset_path(labware)
+    labware_hash = _hash_labware_def(labware._definition)
+    _add_to_index_offset_file(labware, labware_hash)
     calibration_data = _helper_offset_data_format(
         str(labware_offset_path), delta)
     with labware_offset_path.open('w') as f:
@@ -974,15 +1056,25 @@ def load_tip_length_calibration(
         pip_id: str, labware: Labware) -> 'TipLengthCalibration':
     assert labware._is_tiprack, \
         'cannot load tip length for non-tiprack labware'
+    parent_id = _get_parent_identifier(labware.parent)
+    labware_hash = _hash_labware_def(labware._definition)
+    return get_tip_length_data(
+        pip_id=pip_id,
+        labware_hash=labware_hash + parent_id,
+        labware_load_name=labware.load_name)
+
+
+# TODO: AA - move out of protocol_api
+def get_tip_length_data(
+        pip_id: str, labware_hash: str, labware_load_name: str
+) -> 'TipLengthCalibration':
     try:
         pip_tip_length_path = get_tip_length_cal_path()/f'{pip_id}.json'
-        parent_id = _get_parent_identifier(labware.parent)
-        labware_hash = _hash_labware_def(labware._definition)
         tip_length_data = _read_cal_file(str(pip_tip_length_path))
-        return tip_length_data[labware_hash + parent_id]
+        return tip_length_data[labware_hash]
     except (FileNotFoundError, AttributeError):
         raise TipLengthCalNotFound(
-            f'Tip length of {labware.load_name} has not been '
+            f'Tip length of {labware_load_name} has not been '
             f'calibrated for this pipette: {pip_id} and cannot'
             'be loaded')
 
@@ -1059,7 +1151,13 @@ def _helper_tip_length_data_format(filepath: str, length: float) -> dict:
     return calibration_data
 
 
-def _read_file(filepath: str) -> dict:
+def _read_file(filepath: str):
+    # TODO(6/16): We should use tagged unions for
+    # both the calibration and tip length dicts to better
+    # categorize the Typed Dicts used here.
+    # This can be done when the labware endpoints
+    # are refactored to grab tip length calibration
+    # from the correct locations.
     with open(filepath, 'r') as f:
         calibration_data = json.load(f)
     return calibration_data
@@ -1073,7 +1171,7 @@ def _get_path_to_labware(
         return get_shared_data_root() / STANDARD_DEFS_PATH \
                / load_name / f'{version}.json'
     if not base_path:
-        base_path = CONFIG['labware_user_definitions_dir_v2']
+        base_path = USER_DEFS_PATH
     def_path = base_path / namespace / load_name / f'{version}.json'
     return def_path
 
@@ -1119,9 +1217,8 @@ def save_definition(
 
 
 def delete_all_custom_labware() -> None:
-    custom_def_dir = CONFIG['labware_user_definitions_dir_v2']
-    if custom_def_dir.is_dir():
-        shutil.rmtree(custom_def_dir)
+    if USER_DEFS_PATH.is_dir():
+        shutil.rmtree(USER_DEFS_PATH)
 
 
 def _get_labware_definition_from_bundle(
@@ -1296,10 +1393,66 @@ def get_all_labware_definitions() -> List[str]:
     _check_for_subdirectories(get_shared_data_root() / STANDARD_DEFS_PATH)
 
     # check for custom labware
-    for namespace in os.scandir(CONFIG['labware_user_definitions_dir_v2']):
+    for namespace in os.scandir(USER_DEFS_PATH):
         _check_for_subdirectories(namespace)
 
     return labware_list
+
+
+def _format_calibration_type(
+        data: 'CalibrationDict') -> 'CalibrationTypes':
+    offset = OffsetData(
+        value=data['default']['offset'],
+        last_modified=data['default']['lastModified']
+    )
+    # TODO(6/16): Tip calibration no longer exists in
+    # the labware calibraiton file. We should
+    # have a follow-up PR to grab tip lengths
+    # based on the loaded pips + labware
+    return CalibrationTypes(
+            offset=offset,
+            tip_length=TipLengthData()
+        )
+
+
+def _format_parent(data: 'CalibrationIndexDict') -> ParentOptions:
+    options = ParentOptions(slot=data['slot'])
+    if data['module']:
+        options.module = data['module']['parent']
+    return options
+
+
+def get_all_calibrations() -> List[CalibrationInformation]:
+    """
+    A helper function that will list all of the given calibrations
+    in a succinct way.
+
+    :return: A list of dictionary objects representing all of the
+    labware calibration files found on the robot.
+    TODO(6/8): Move to another location
+    """
+    all_calibrations: List[CalibrationInformation] = []
+    index_path = OFFSETS_PATH / 'index.json'
+    if not index_path.exists():
+        return all_calibrations
+    index_file = _read_file(str(index_path))
+    for key, data in index_file.items():
+        cal_path = OFFSETS_PATH / f'{key}.json'
+        if cal_path.exists():
+            cal_blob = _read_file(str(cal_path))
+            calibration = _format_calibration_type(cal_blob)
+            details = details_from_uri(data['uri'])
+            definition = get_labware_definition(
+                details.load_name, details.namespace, details.version)
+            all_calibrations.append(
+                CalibrationInformation(
+                    calibration=calibration,
+                    definition=definition,
+                    parent=_format_parent(data),
+                    labware_id=key,
+                    uri=data['uri']
+                ))
+    return all_calibrations
 
 
 def clear_calibrations():
@@ -1307,12 +1460,42 @@ def clear_calibrations():
     Delete all calibration files for labware. This includes deleting tip-length
     data for tipracks.
     """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
+    calibration_path = OFFSETS_PATH
     try:
         targets = [
             f for f in calibration_path.iterdir() if f.suffix == '.json']
         for target in targets:
             target.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def _remove_offset_from_index(calibration_id: CalibrationID):
+    """
+    Helper function to remove an individual offset file.
+
+    :param calibration_id: labware hash
+    :raises FileNotFoundError: If index file does not exist or
+    the specified id is not in the index file.
+    """
+    index_path = OFFSETS_PATH / 'index.json'
+    blob = _read_file(str(index_path))
+
+    del blob[calibration_id]
+    with index_path.open('w') as f:
+        json.dump(blob, f)
+
+
+def delete_offset_file(calibration_id: CalibrationID):
+    """
+    Given a labware's hash, delete the file and remove it from the index file.
+
+    :param calibration_id: labware hash
+    """
+    offset = OFFSETS_PATH / f'{calibration_id}.json'
+    try:
+        _remove_offset_from_index(calibration_id)
+        offset.unlink()
     except FileNotFoundError:
         pass
 
@@ -1376,6 +1559,15 @@ def uri_from_details(namespace: str, load_name: str, version: Union[str, int],
     :returns str: The URI.
     """
     return f'{namespace}{delimiter}{load_name}{delimiter}{version}'
+
+
+def details_from_uri(uri: str, delimiter='/') -> UriDetails:
+    """
+    Unpack a labware URI to get the namespace, loadname and version
+    """
+    info = uri.split(delimiter)
+    return UriDetails(
+        namespace=info[0], load_name=info[1], version=int(info[2]))
 
 
 def uri_from_definition(definition: 'LabwareDefinition', delimiter='/') -> str:

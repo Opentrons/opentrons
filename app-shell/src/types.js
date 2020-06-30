@@ -2,7 +2,7 @@
 
 // TODO(mc, 2018-08-08): figure out type exports from app
 import type { Action, Error as PlainError } from '@opentrons/app/src/types'
-
+import type { Logger } from '@opentrons/app/src/logger'
 export type { Action, PlainError }
 
 // Node.js::fs::Dirent missing from flow lib
@@ -19,3 +19,5 @@ export type Dirent = {|
 |}
 
 export type Dispatch = Action => void
+
+export type { Logger }

@@ -327,6 +327,9 @@ describe('style props', () => {
       const wrapper = shallow(<TestStyles display={Styles.DISPLAY_NONE} />)
       expect(wrapper).toHaveStyleRule('display', 'none')
 
+      wrapper.setProps({ display: Styles.DISPLAY_BLOCK })
+      expect(wrapper).toHaveStyleRule('display', 'block')
+
       wrapper.setProps({ display: Styles.DISPLAY_INLINE })
       expect(wrapper).toHaveStyleRule('display', 'inline')
 
@@ -335,6 +338,15 @@ describe('style props', () => {
 
       wrapper.setProps({ display: Styles.DISPLAY_FLEX })
       expect(wrapper).toHaveStyleRule('display', 'flex')
+
+      wrapper.setProps({ display: Styles.DISPLAY_TABLE })
+      expect(wrapper).toHaveStyleRule('display', 'table')
+
+      wrapper.setProps({ display: Styles.DISPLAY_TABLE_ROW })
+      expect(wrapper).toHaveStyleRule('display', 'table-row')
+
+      wrapper.setProps({ display: Styles.DISPLAY_TABLE_CELL })
+      expect(wrapper).toHaveStyleRule('display', 'table-cell')
     })
 
     it('should be able to set width', () => {
@@ -390,6 +402,50 @@ describe('style props', () => {
     it('should be able to set overflow-y', () => {
       const wrapper = shallow(<TestStyles overflowY={Styles.OVERFLOW_HIDDEN} />)
       expect(wrapper).toHaveStyleRule('overflow-y', 'hidden')
+    })
+  })
+
+  describe('position props', () => {
+    it('should be able to set position', () => {
+      const wrapper = shallow(<TestStyles position={Styles.POSITION_STATIC} />)
+      expect(wrapper).toHaveStyleRule('position', 'static')
+
+      wrapper.setProps({ position: Styles.POSITION_RELATIVE })
+      expect(wrapper).toHaveStyleRule('position', 'relative')
+
+      wrapper.setProps({ position: Styles.POSITION_ABSOLUTE })
+      expect(wrapper).toHaveStyleRule('position', 'absolute')
+
+      wrapper.setProps({ position: Styles.POSITION_FIXED })
+      expect(wrapper).toHaveStyleRule('position', 'fixed')
+
+      wrapper.setProps({ position: Styles.POSITION_STICKY })
+      expect(wrapper).toHaveStyleRule('position', 'sticky')
+    })
+
+    it('should be able to set z-index', () => {
+      const wrapper = shallow(<TestStyles zIndex={99} />)
+      expect(wrapper).toHaveStyleRule('z-index', '99')
+    })
+
+    it('should be able to set top', () => {
+      const wrapper = shallow(<TestStyles top={0} />)
+      expect(wrapper).toHaveStyleRule('top', '0')
+    })
+
+    it('should be able to set right', () => {
+      const wrapper = shallow(<TestStyles right={0} />)
+      expect(wrapper).toHaveStyleRule('right', '0')
+    })
+
+    it('should be able to set bottom', () => {
+      const wrapper = shallow(<TestStyles bottom={0} />)
+      expect(wrapper).toHaveStyleRule('bottom', '0')
+    })
+
+    it('should be able to set left', () => {
+      const wrapper = shallow(<TestStyles left={0} />)
+      expect(wrapper).toHaveStyleRule('left', '0')
     })
   })
 })

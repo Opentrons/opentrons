@@ -9,14 +9,14 @@ import * as Constants from '../constants'
 
 import type { Epic } from '../../types'
 
-import type {
-  ActionToRequestMapper,
-  ResponseToActionMapper,
-} from '../../robot-api/operators'
+import type { ResponseToActionMapper } from '../../robot-api/operators'
+import type { RobotApiRequestOptions } from '../../robot-api/types'
 
-import type { FetchSessionAction } from '../types'
+import type { FetchSessionAction, CreateSessionCommandAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchSessionAction> = action => ({
+export const mapActionToRequest = (
+  action: FetchSessionAction | CreateSessionCommandAction
+): RobotApiRequestOptions => ({
   method: GET,
   path: `${Constants.SESSIONS_PATH}/${action.payload.sessionId}`,
 })

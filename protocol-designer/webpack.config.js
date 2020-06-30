@@ -37,6 +37,13 @@ const envVars = passThruEnvVars.reduce(
   { ...envVarsWithDefaults }
 )
 
+const testAliases =
+  process.env.CYPRESS === '1'
+    ? {
+        'file-saver': path.resolve(__dirname, 'cypress/mocks/file-saver.js'),
+      }
+    : {}
+
 console.log(`PD version: ${OT_PD_VERSION || 'UNKNOWN!'}`)
 
 module.exports = merge(baseConfig, {
@@ -78,4 +85,8 @@ module.exports = merge(baseConfig, {
     }),
     new ScriptExtHtmlWebpackPlugin({ defaultAttribute: 'defer' }),
   ],
+
+  resolve: {
+    alias: testAliases,
+  },
 })

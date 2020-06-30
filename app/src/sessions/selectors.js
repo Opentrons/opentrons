@@ -1,6 +1,5 @@
 // @flow
 import type { State } from '../types'
-import * as Calibration from '../calibration'
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -18,11 +17,11 @@ export const getRobotSessionById: (
   return (getRobotSessions(state, robotName) || {})[sessionId] ?? null
 }
 
-export const getRobotSessionOfType: (
+export function getRobotSessionOfType(
   state: State,
   robotName: string,
   sessionType: Types.SessionType
-) => Types.Session | null = (state, robotName, sessionType) => {
+): Types.Session | null {
   const sessionsById = getRobotSessions(state, robotName) || {}
   const foundSessionId =
     Object.keys(sessionsById).find(
@@ -55,7 +54,7 @@ export const getAnalyticsPropsForRobotSessionById: (
     const normalizedStepData = Object.keys(comparisonsByStep).reduce(
       (
         acc: Types.CalibrationCheckAnalyticsData,
-        stepName: Calibration.RobotCalibrationCheckStep
+        stepName: Types.RobotCalibrationCheckStep
       ) => {
         const {
           differenceVector,

@@ -143,7 +143,7 @@ describe('robot session check actions', () => {
       args: [
         'robot-name',
         '1234',
-        Fixtures.mockSessionCommandResponse,
+        Fixtures.mockSessionResponse,
         { requestId: 'abc' },
       ],
       expected: {
@@ -151,7 +151,7 @@ describe('robot session check actions', () => {
         payload: {
           robotName: 'robot-name',
           sessionId: '1234',
-          ...Fixtures.mockSessionCommandResponse,
+          ...Fixtures.mockSessionResponse,
         },
         meta: { requestId: 'abc' },
       },
@@ -168,6 +168,16 @@ describe('robot session check actions', () => {
           error: mockV2ErrorResponse,
         },
         meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'sessions:ENSURE_SESSION',
+      creator: Actions.ensureSession,
+      args: ['robot-name', 'calibrationCheck'],
+      expected: {
+        type: 'sessions:ENSURE_SESSION',
+        payload: { robotName: 'robot-name', sessionType: 'calibrationCheck' },
+        meta: {},
       },
     },
   ]

@@ -4,17 +4,18 @@ from datetime import datetime
 
 import typing
 
-from opentrons.calibration.check.models import SessionType, JogPosition
+from robot_server.robot.calibration.check.models import JogPosition
 from pydantic.main import BaseModel
 
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.session.command_execution import CommandExecutor, \
     Command
 from robot_server.service.session.command_execution.command import \
-    CommandResult, CompletedCommand, CommandContent, CommandMeta
+    CommandResult, CompletedCommand, CommandContent, CommandMeta, CommandStatus
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
-from robot_server.service.session.models import CommandName, EmptyModel
+from robot_server.service.session.models import CommandName, EmptyModel, \
+    SessionType
 from robot_server.service.session.session_types import NullSession, \
     SessionMetaData
 
@@ -67,7 +68,8 @@ def mock_command_executor():
         return CompletedCommand(content=command.content,
                                 meta=command.meta,
                                 result=CommandResult(
-                                    status="done",
+                                    status=CommandStatus.executed,
+                                    started_at=datetime(2019, 1, 1),
                                     completed_at=datetime(2020, 1, 1))
                                 )
 
@@ -310,7 +312,10 @@ def test_execute_command(api_client,
             'attributes': {
                 'command': 'jog',
                 'data': {'vector': [1.0, 2.0, 3.0]},
-                'status': 'done'
+                'status': 'executed',
+                'created_at': '2000-01-01T00:00:00',
+                'started_at': '2019-01-01T00:00:00',
+                'completed_at': '2020-01-01T00:00:00',
             },
             'type': 'SessionCommand',
             'id': command_id,
@@ -357,7 +362,10 @@ def test_execute_command_no_body(api_client,
             'attributes': {
                 'command': 'loadLabware',
                 'data': {},
-                'status': 'done'
+                'status': 'executed',
+                'created_at': '2000-01-01T00:00:00',
+                'started_at': '2019-01-01T00:00:00',
+                'completed_at': '2020-01-01T00:00:00',
             },
             'type': 'SessionCommand',
             'id': command_id
@@ -418,7 +426,7 @@ def test_execute_command_session_inactive(
         mock_session_meta,
         mock_command_executor):
     """Test that only the active session can execute commands"""
-    session_manager_with_session._active_session_id = None
+    session_manager_with_session._active.active_id = None
 
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",

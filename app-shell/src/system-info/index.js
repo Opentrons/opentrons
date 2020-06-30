@@ -16,6 +16,8 @@ import type { Action, Dispatch } from '../types'
 import type { UsbDeviceMonitor, Device } from './usb-devices'
 import type { NetworkInterfaceMonitor } from './network-interfaces'
 
+export { createNetworkInterfaceMonitor }
+
 const RE_REALTEK = /realtek/i
 const IFACE_POLL_INTERVAL_MS = 30000
 

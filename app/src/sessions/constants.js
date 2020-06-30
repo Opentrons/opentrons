@@ -1,5 +1,8 @@
 // @flow
 
+export * from './calibration-check/constants'
+export * from './tip-length-calibration/constants'
+
 export const SESSIONS_PATH: '/sessions' = '/sessions'
 
 export const SESSIONS_COMMANDS_PATH_EXTENSION: '/commands' = '/commands'
@@ -42,6 +45,9 @@ export const FETCH_ALL_SESSIONS_SUCCESS: 'sessions:FETCH_ALL_SESSIONS_SUCCESS' =
 export const FETCH_ALL_SESSIONS_FAILURE: 'sessions:FETCH_ALL_SESSIONS_FAILURE' =
   'sessions:FETCH_ALL_SESSIONS_FAILURE'
 
+export const ENSURE_SESSION: 'sessions:ENSURE_SESSION' =
+  'sessions:ENSURE_SESSION'
+
 export const CREATE_SESSION_COMMAND: 'sessions:CREATE_SESSION_COMMAND' =
   'sessions:CREATE_SESSION_COMMAND'
 
@@ -51,4 +57,7 @@ export const CREATE_SESSION_COMMAND_SUCCESS: 'sessions:CREATE_SESSION_COMMAND_SU
 export const CREATE_SESSION_COMMAND_FAILURE: 'sessions:CREATE_SESSION_COMMAND_FAILURE' =
   'sessions:CREATE_SESSION_COMMAND_FAILURE'
 
-export const SESSION_TYPE_CALIBRATION_CHECK = 'calibrationCheck'
+export const SESSION_TYPE_CALIBRATION_CHECK: 'calibrationCheck' =
+  'calibrationCheck'
+export const SESSION_TYPE_TIP_LENGTH_CALIBRATION: 'tipLengthCalibration' =
+  'tipLengthCalibration'

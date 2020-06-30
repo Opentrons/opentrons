@@ -1,5 +1,6 @@
 // @flow
 import * as Fixtures from '../__fixtures__'
+import * as Actions from '../actions'
 import { sessionReducer } from '../reducer'
 
 import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
@@ -135,6 +136,39 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
+    name: 'handles sessions:CREATE_SESSION_COMMAND_SUCCESS with existing',
+    action: Actions.createSessionCommandSuccess(
+      'eggplant-parm',
+      Fixtures.mockSessionId,
+      Fixtures.mockSessionResponse,
+      {}
+    ),
+    state: {
+      'eggplant-parm': {
+        robotSessions: {
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
+        },
+      },
+    },
+    expected: {
+      'eggplant-parm': {
+        robotSessions: {
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
+        },
+      },
+    },
+  },
+  {
     name: 'handles sessions:FETCH_ALL_SESSIONS_SUCCESS with none existing',
     action: {
       type: 'sessions:FETCH_ALL_SESSIONS_SUCCESS',
@@ -177,7 +211,7 @@ const SPECS: Array<ReducerSpec> = [
       'rock-lobster': {
         robotSessions: {
           fake_stale_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'fake_stale_session_id',
           },
         },
@@ -212,11 +246,11 @@ const SPECS: Array<ReducerSpec> = [
       'eggplant-parm': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'existing_fake_session_id',
           },
           [Fixtures.mockSessionId]: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: Fixtures.mockSessionId,
           },
         },
@@ -226,7 +260,7 @@ const SPECS: Array<ReducerSpec> = [
       'eggplant-parm': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'existing_fake_session_id',
           },
         },
@@ -250,11 +284,11 @@ const SPECS: Array<ReducerSpec> = [
       'frumious-bandersnatch': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
             id: 'existing_fake_session_id',
           },
           [Fixtures.mockSessionId]: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
             id: Fixtures.mockSessionId,
           },
         },
@@ -264,7 +298,7 @@ const SPECS: Array<ReducerSpec> = [
       'frumious-bandersnatch': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
             id: 'existing_fake_session_id',
           },
         },
@@ -288,11 +322,11 @@ const SPECS: Array<ReducerSpec> = [
       'detestable-moss': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'existing_fake_session_id',
           },
           [Fixtures.mockSessionId]: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: Fixtures.mockSessionId,
           },
         },
@@ -302,7 +336,7 @@ const SPECS: Array<ReducerSpec> = [
       'detestable-moss': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'existing_fake_session_id',
           },
         },

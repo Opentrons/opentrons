@@ -54,7 +54,7 @@ class ManualIpFormComponent extends React.Component<Props> {
 
 function mapStateToProps(state: State): SP {
   return {
-    candidates: getConfig(state).discovery.candidates,
+    candidates: getConfig(state)?.discovery.candidates ?? [],
   }
 }
 

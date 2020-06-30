@@ -130,7 +130,7 @@ const DIAGRAMS_BOTTOM: {
     },
     multi: {
       one: require('./images/step-1-trough-multi@3x.png'),
-      two: require('./images/step-2-trough-multi@3x.png'),
+      two: require('./images/step-2-trough-bottom@3x.png'),
     },
   },
   tuberack: {

@@ -9,7 +9,7 @@ import type { AlertId } from '../types'
 
 jest.mock('../../config/selectors')
 
-const getConfig: JestMockFn<[State], $Shape<Config>> = Cfg.getConfig
+const getConfig: JestMockFn<[State], $Shape<Config> | null> = Cfg.getConfig
 
 const MOCK_ALERT_1: AlertId = ('mockAlert1': any)
 const MOCK_ALERT_2: AlertId = ('mockAlert2': any)
@@ -33,6 +33,14 @@ describe('alerts selectors', () => {
       MOCK_ALERT_1,
       MOCK_ALERT_2,
     ])
+  })
+
+  it('should show no active alerts until config is loaded', () => {
+    getConfig.mockReturnValue(null)
+    state = ({
+      alerts: { active: [MOCK_ALERT_1, MOCK_ALERT_2], ignored: [] },
+    }: $Shape<State>)
+    expect(Selectors.getActiveAlerts(state)).toEqual([])
   })
 
   it('should filter ignored alerts from active alerts', () => {

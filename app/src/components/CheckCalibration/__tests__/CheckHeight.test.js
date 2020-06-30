@@ -7,7 +7,7 @@ import {
   CHECK_TRANSFORM_TYPE_UNKNOWN,
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_DECK,
-} from '../../../calibration'
+} from '../../../sessions'
 import { CheckHeight } from '../CheckHeight'
 
 describe('CheckHeight', () => {
@@ -31,15 +31,12 @@ describe('CheckHeight', () => {
 
   const getVideo = wrapper => wrapper.find(`source`)
 
-  const getDeckCalArticleLink = wrapper =>
-    wrapper.find(
-      'a[href="https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck"]'
-    )
-
-  const getContactSupport = wrapper =>
-    wrapper.find(
-      'p[children="Please contact Opentrons support for next steps."]'
-    )
+  const getBadOutcomeBody = wrapper => wrapper.find('BadOutcomeBody')
+  const getOutcomeHeader = wrapper =>
+    wrapper
+      .find('h3')
+      .at(1)
+      .text()
 
   beforeEach(() => {
     render = (props = {}) => {
@@ -53,6 +50,7 @@ describe('CheckHeight', () => {
           exceedsThreshold: false,
           transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
         },
+        pipetteModel = 'p300_single_v2.1',
       } = props
       return mount(
         <CheckHeight
@@ -62,6 +60,7 @@ describe('CheckHeight', () => {
           mount={mountProp}
           nextButtonText="Go To Next Check"
           comparePoint={mockComparePoint}
+          pipetteModel={pipetteModel}
           goToNextCheck={mockGoToNextCheck}
           jog={mockJog}
           exit={mockExit}
@@ -73,15 +72,15 @@ describe('CheckHeight', () => {
     jest.resetAllMocks()
   })
 
-  it('displays proper demo asset', () => {
+  it('displays proper asset', () => {
     const assetMap = {
       left: {
-        multi: 'SLOT_5_LEFT_MULTI_Z_(640X480)_REV3.webm',
-        single: 'SLOT_5_LEFT_SINGLE_Z_(640X480)_REV3.webm',
+        multi: 'SLOT_5_LEFT_MULTI_Z.webm',
+        single: 'SLOT_5_LEFT_SINGLE_Z.webm',
       },
       right: {
-        multi: 'SLOT_5_RIGHT_MULTI_Z_(640X480)_REV3.webm',
-        single: 'SLOT_5_RIGHT_SINGLE_Z_(640X480)_REV3.webm',
+        multi: 'SLOT_5_RIGHT_MULTI_Z.webm',
+        single: 'SLOT_5_RIGHT_SINGLE_Z.webm',
       },
     }
 
@@ -156,11 +155,23 @@ describe('CheckHeight', () => {
     wrapper.update()
 
     expect(mockGoToNextCheck).toHaveBeenCalled()
-    expect(getDeckCalArticleLink(wrapper).exists()).toBe(true)
-    expect(getContactSupport(wrapper).exists()).toBe(false)
   })
 
-  it('does not render deck cal blurb when exceeds threshold and transform type is instr offset', () => {
+  it('renders deck calibration when exceeds threshold and transform type is deck calibration', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_DECK,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+    expect(getBadOutcomeBody(wrapper).exists()).toBe(true)
+    expect(getOutcomeHeader(wrapper)).toEqual(
+      expect.stringMatching(/Bad deck calibration data detected/)
+    )
+  })
+
+  it('renders instrument offset blurb when exceeds threshold and transform type is instrument offset', () => {
     const comparison = {
       differenceVector: [0, 0, 0],
       thresholdVector: [1, 1, 1],
@@ -169,11 +180,13 @@ describe('CheckHeight', () => {
     }
     const wrapper = render({ isInspecting: true, comparison })
 
-    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
-    expect(getContactSupport(wrapper).exists()).toBe(true)
+    expect(getBadOutcomeBody(wrapper).exists()).toBe(true)
+    expect(getOutcomeHeader(wrapper)).toEqual(
+      expect.stringMatching(/Bad pipette offset calibration data detected/)
+    )
   })
 
-  it('does not render deck cal blurb when exceeds threshold and transform type is unknown', () => {
+  it('renders unknown blurb when exceeds threshold and transform type is unknown', () => {
     const comparison = {
       differenceVector: [0, 0, 0],
       thresholdVector: [1, 1, 1],
@@ -181,8 +194,11 @@ describe('CheckHeight', () => {
       transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
     }
     const wrapper = render({ isInspecting: true, comparison })
-
-    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
-    expect(getContactSupport(wrapper).exists()).toBe(true)
+    expect(getBadOutcomeBody(wrapper).exists()).toBe(true)
+    expect(getOutcomeHeader(wrapper)).toEqual(
+      expect.stringMatching(
+        /Bad deck calibration data or pipette offset calibration data detected/
+      )
+    )
   })
 })

@@ -5,7 +5,8 @@ import {
   makeResponseFixtures,
   mockV2ErrorResponse,
 } from '../../robot-api/__fixtures__'
-import { mockRobotCalibrationCheckSessionDetails } from '../../calibration/__fixtures__'
+import { mockRobotCalibrationCheckSessionDetails } from './calibration-check'
+import { mockTipLengthCalibrationSessionDetails } from './tip-length-calibration'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
@@ -13,16 +14,24 @@ import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 import * as Types from '../types'
 import * as Constants from '../constants'
 
+export * from './calibration-check'
+export * from './tip-length-calibration'
+
 export const mockSessionId: string = 'fake_session_id'
 export const mockOtherSessionId: string = 'other_fake_session_id'
 
-export const mockSessionAttributes: Types.SessionResponseAttributes = {
+export const mockCalibrationCheckSessionAttributes: Types.CalibrationCheckSessionResponseAttributes = {
   sessionType: Constants.SESSION_TYPE_CALIBRATION_CHECK,
   details: mockRobotCalibrationCheckSessionDetails,
 }
 
+export const mockTipLengthCalibrationSessionAttributes: Types.TipLengthCalibrationSessionResponseAttributes = {
+  sessionType: Constants.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+  details: mockTipLengthCalibrationSessionDetails,
+}
+
 export const mockSession: Types.Session = {
-  ...mockSessionAttributes,
+  ...mockCalibrationCheckSessionAttributes,
   id: mockSessionId,
 }
 
@@ -41,7 +50,7 @@ export const mockSessionResponse: Types.SessionResponse = {
   data: {
     id: mockSessionId,
     type: 'Session',
-    attributes: mockSessionAttributes,
+    attributes: mockCalibrationCheckSessionAttributes,
   },
 }
 
@@ -50,12 +59,12 @@ export const mockMultiSessionResponse: Types.MultiSessionResponse = {
     {
       id: mockSessionId,
       type: 'Session',
-      attributes: mockSessionAttributes,
+      attributes: mockCalibrationCheckSessionAttributes,
     },
     {
       id: mockOtherSessionId,
       type: 'Session',
-      attributes: mockSessionAttributes,
+      attributes: mockCalibrationCheckSessionAttributes,
     },
   ],
 }

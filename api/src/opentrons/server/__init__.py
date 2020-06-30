@@ -15,11 +15,7 @@ from opentrons.api.routers import MainRouter
 from opentrons.hardware_control import ThreadManager
 
 from .rpc import RPCServer
-from .http import HTTPServer, CalibrationRoutes
-
-from opentrons.calibration.session import SessionManager as CalSessionManager
-from .endpoints.calibration.middlewares import \
-        session_middleware as cal_session_middleware
+from .http import HTTPServer
 
 log = logging.getLogger(__name__)
 
@@ -67,12 +63,6 @@ def init(hardware: ThreadManager = None,
         app, MainRouter(
             hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
-    calibration_app = web.Application(middlewares=[cal_session_middleware])
-    calibration_app['com.opentrons.http'] = CalibrationRoutes(calibration_app)
-    calibration_app['com.opentrons.session_manager'] = CalSessionManager()
-    app.add_subapp('/calibration/', calibration_app)
-
-    app['calibration'] = calibration_app
 
     async def dispose_response_file_tempdir(app):
         temppath = app.get('com.opentrons.response_file_tempdir')

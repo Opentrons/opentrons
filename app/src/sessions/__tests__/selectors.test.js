@@ -33,14 +33,15 @@ const SPECS: Array<SelectorSpec> = [
       sessions: {
         'germanium-cobweb': {
           robotSessions: {
-            [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
+            [Fixtures.mockSessionId]:
+              Fixtures.mockCalibrationCheckSessionAttributes,
           },
         },
       },
     },
     args: ['germanium-cobweb'],
     expected: {
-      [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
+      [Fixtures.mockSessionId]: Fixtures.mockCalibrationCheckSessionAttributes,
     },
   },
   {
@@ -50,7 +51,8 @@ const SPECS: Array<SelectorSpec> = [
       sessions: {
         'germanium-cobweb': {
           robotSessions: {
-            [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
+            [Fixtures.mockSessionId]:
+              Fixtures.mockCalibrationCheckSessionAttributes,
           },
         },
       },
@@ -65,13 +67,14 @@ const SPECS: Array<SelectorSpec> = [
       sessions: {
         'germanium-cobweb': {
           robotSessions: {
-            [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
+            [Fixtures.mockSessionId]:
+              Fixtures.mockCalibrationCheckSessionAttributes,
           },
         },
       },
     },
     args: ['germanium-cobweb', Fixtures.mockSessionId],
-    expected: Fixtures.mockSessionAttributes,
+    expected: Fixtures.mockCalibrationCheckSessionAttributes,
   },
   {
     name:
@@ -81,7 +84,8 @@ const SPECS: Array<SelectorSpec> = [
       sessions: {
         'germanium-cobweb': {
           robotSessions: {
-            [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
+            [Fixtures.mockSessionId]:
+              Fixtures.mockCalibrationCheckSessionAttributes,
           },
         },
       },
@@ -98,7 +102,7 @@ const SPECS: Array<SelectorSpec> = [
         'germanium-cobweb': {
           robotSessions: {
             [Fixtures.mockSessionId]: {
-              ...Fixtures.mockSessionAttributes,
+              ...Fixtures.mockCalibrationCheckSessionAttributes,
               sessionType: 'FakeUntrackedSessionType',
             },
           },
@@ -117,7 +121,7 @@ const SPECS: Array<SelectorSpec> = [
         'germanium-cobweb': {
           robotSessions: {
             [Fixtures.mockSessionId]: {
-              ...Fixtures.mockSessionAttributes,
+              ...Fixtures.mockCalibrationCheckSessionAttributes,
               sessionType: 'FakeUntrackedSessionType',
             },
           },

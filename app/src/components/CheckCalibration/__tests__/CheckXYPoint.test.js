@@ -8,7 +8,7 @@ import {
   CHECK_TRANSFORM_TYPE_UNKNOWN,
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_DECK,
-} from '../../../calibration'
+} from '../../../sessions'
 import { CheckXYPoint } from '../CheckXYPoint'
 
 describe('CheckXYPoint', () => {
@@ -25,15 +25,12 @@ describe('CheckXYPoint', () => {
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
-  const getDeckCalArticleLink = wrapper =>
-    wrapper.find(
-      'a[href="https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck"]'
-    )
-
-  const getContactSupport = wrapper =>
-    wrapper.find(
-      'p[children="Please contact Opentrons support for next steps."]'
-    )
+  const getBadOutcomeBody = wrapper => wrapper.find('BadOutcomeBody')
+  const getOutcomeHeader = wrapper =>
+    wrapper
+      .find('h3')
+      .at(1)
+      .text()
 
   const getVideo = wrapper => wrapper.find(`source`)
 
@@ -50,6 +47,7 @@ describe('CheckXYPoint', () => {
           exceedsThreshold: false,
           transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
         },
+        pipetteModel = 'p300_single_v2.1',
         nextButtonText = 'continue',
       } = props
       return mount(
@@ -59,6 +57,7 @@ describe('CheckXYPoint', () => {
           mount={mountProp}
           isInspecting={isInspecting}
           comparison={comparison}
+          pipetteModel={pipetteModel}
           nextButtonText={nextButtonText}
           exit={mockExit}
           comparePoint={mockComparePoint}
@@ -72,19 +71,19 @@ describe('CheckXYPoint', () => {
     jest.resetAllMocks()
   })
 
-  it('displays proper demo asset', () => {
-    const slot1LeftMultiSrc = 'SLOT_1_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot1LeftSingleSrc = 'SLOT_1_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot1RightMultiSrc = 'SLOT_1_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot1RightSingleSrc = 'SLOT_1_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot3LeftMultiSrc = 'SLOT_3_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot3LeftSingleSrc = 'SLOT_3_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot3RightMultiSrc = 'SLOT_3_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot3RightSingleSrc = 'SLOT_3_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot7LeftMultiSrc = 'SLOT_7_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
+  it('displays proper asset', () => {
+    const slot1LeftMultiSrc = 'SLOT_1_LEFT_MULTI_X-Y.webm'
+    const slot1LeftSingleSrc = 'SLOT_1_LEFT_SINGLE_X-Y.webm'
+    const slot1RightMultiSrc = 'SLOT_1_RIGHT_MULTI_X-Y.webm'
+    const slot1RightSingleSrc = 'SLOT_1_RIGHT_SINGLE_X-Y.webm'
+    const slot3LeftMultiSrc = 'SLOT_3_LEFT_MULTI_X-Y.webm'
+    const slot3LeftSingleSrc = 'SLOT_3_LEFT_SINGLE_X-Y.webm'
+    const slot3RightMultiSrc = 'SLOT_3_RIGHT_MULTI_X-Y.webm'
+    const slot3RightSingleSrc = 'SLOT_3_RIGHT_SINGLE_X-Y.webm'
+    const slot7LeftMultiSrc = 'SLOT_7_LEFT_MULTI_X-Y.webm'
+    const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y.webm'
+    const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y.webm'
+    const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y.webm'
     const assetMap: { [string]: { [Mount]: { ... }, ... }, ... } = {
       '1': {
         left: {
@@ -179,11 +178,23 @@ describe('CheckXYPoint', () => {
     wrapper.update()
 
     expect(mockGoToNextCheck).toHaveBeenCalled()
-    expect(getDeckCalArticleLink(wrapper).exists()).toBe(true)
-    expect(getContactSupport(wrapper).exists()).toBe(false)
   })
 
-  it('does not render deck cal blurb when exceeds threshold and transform type is instr offset', () => {
+  it('renders deck calibration when exceeds threshold and transform type is deck calibration', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_DECK,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+    expect(getBadOutcomeBody(wrapper).exists()).toBe(true)
+    expect(getOutcomeHeader(wrapper)).toEqual(
+      expect.stringMatching(/Bad deck calibration data detected/)
+    )
+  })
+
+  it('renders instrument offset blurb when exceeds threshold and transform type is instrument offset', () => {
     const comparison = {
       differenceVector: [0, 0, 0],
       thresholdVector: [1, 1, 1],
@@ -192,11 +203,13 @@ describe('CheckXYPoint', () => {
     }
     const wrapper = render({ isInspecting: true, comparison })
 
-    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
-    expect(getContactSupport(wrapper).exists()).toBe(true)
+    expect(getBadOutcomeBody(wrapper).exists()).toBe(true)
+    expect(getOutcomeHeader(wrapper)).toEqual(
+      expect.stringMatching(/Bad pipette offset calibration data detected/)
+    )
   })
 
-  it('does not render deck cal blurb when exceeds threshold and transform type is unknown', () => {
+  it('renders unknown blurb when exceeds threshold and transform type is unknown', () => {
     const comparison = {
       differenceVector: [0, 0, 0],
       thresholdVector: [1, 1, 1],
@@ -204,8 +217,11 @@ describe('CheckXYPoint', () => {
       transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
     }
     const wrapper = render({ isInspecting: true, comparison })
-
-    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
-    expect(getContactSupport(wrapper).exists()).toBe(true)
+    expect(getBadOutcomeBody(wrapper).exists()).toBe(true)
+    expect(getOutcomeHeader(wrapper)).toEqual(
+      expect.stringMatching(
+        /Bad deck calibration data or pipette offset calibration data detected/
+      )
+    )
   })
 })

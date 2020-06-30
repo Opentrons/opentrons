@@ -104,6 +104,18 @@ describe('primitive components with style props', () => {
         expect(wrapper).toHaveStyleRule('flex', Styles.FLEX_NONE)
         expect(domNode.prop('flex')).toBe(undefined)
       })
+
+      it('should take position props', () => {
+        const [wrapper, domNode] = render({
+          position: Styles.POSITION_ABSOLUTE,
+          top: 0,
+        })
+
+        expect(wrapper).toHaveStyleRule('position', Styles.POSITION_ABSOLUTE)
+        expect(wrapper).toHaveStyleRule('top', '0')
+        expect(domNode.prop('position')).toBe(undefined)
+        expect(domNode.prop('top')).toBe(undefined)
+      })
     })
   })
 })

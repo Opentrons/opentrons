@@ -6,6 +6,8 @@ import base64
 from opentrons.api import session
 from opentrons.api.session import (
     _accumulate, _dedupe)
+from opentrons.hardware_control import ThreadedAsyncForbidden
+
 from tests.opentrons.conftest import state
 from functools import partial
 from opentrons.protocols.types import APIVersion
@@ -454,7 +456,7 @@ def run(ctx):
     def run_while_running():
         """The entry point to threads that try to run while a protocol is
         running"""
-        with pytest.raises(RuntimeError):
+        with pytest.raises(ThreadedAsyncForbidden):
             session.run()
 
     # Do this twice to prove we run again after completion.
