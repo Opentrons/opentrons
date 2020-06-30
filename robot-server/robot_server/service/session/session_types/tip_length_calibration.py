@@ -1,5 +1,5 @@
-from robot_server.robot.calibration.tip_length.state_machine import \
-    TipCalibrationStateMachine
+from robot_server.robot.calibration.tip_length.user_flow import \
+    TipCalibrationUserFlow
 
 from .base_session import BaseSession, SessionMetaData
 from ..command_execution import CommandQueue, CommandExecutor, \
@@ -13,7 +13,7 @@ class TipLengthCalibration(BaseSession):
 
     def __init__(self, configuration: SessionConfiguration,
                  instance_meta: SessionMetaData,
-                 tip_length_calibration: TipCalibrationStateMachine
+                 tip_length_calibration: TipCalibrationUserFlow
                  ):
         super().__init__(configuration, instance_meta)
         self._tip_length_calibration = tip_length_calibration
@@ -26,7 +26,7 @@ class TipLengthCalibration(BaseSession):
                      instance_meta: SessionMetaData) -> 'BaseSession':
         return cls(configuration=configuration,
                    instance_meta=instance_meta,
-                   tip_length_calibration=TipCalibrationStateMachine())
+                   tip_length_calibration=TipCalibrationUserFlow())
 
     @property
     def command_executor(self) -> CommandExecutor:
