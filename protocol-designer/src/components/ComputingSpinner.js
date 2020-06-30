@@ -9,7 +9,7 @@ export const ComputingSpinner = (): React.Node => {
   const showSpinner = useSelector(fileDataSelectors.getTimelineIsBeingComputed)
   return (
     showSpinner && (
-      <div className={styles.overlay}>
+      <div className={styles.overlay} data-test="ComputingSpinner">
         <Icon name="ot-spinner" className={styles.spinner_icon} spin />
       </div>
     )
