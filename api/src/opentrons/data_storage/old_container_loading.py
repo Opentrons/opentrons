@@ -84,8 +84,9 @@ def get_persisted_container(container_name: str) -> Container:
     container_data = persisted_containers_dict.get(container_name)
     if not container_data:
         raise ValueError(
-            ('Container type "{}" not found in files: {}')
-            .format(container_name, containers_file_list)
+            'Container type "{}" not found in files: {}'.format(
+                container_name, containers_file_list
+            )
         )
     return create_container_obj_from_dict(container_data)
 
