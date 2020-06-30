@@ -2,7 +2,7 @@ from robot_server.robot.calibration.check.session import\
     CheckCalibrationSession
 from robot_server.robot.calibration.check import models as calibration_models
 from robot_server.robot.calibration.session import CalibrationException
-from robot_server.robot.calibration.util import StateMachineError
+from robot_server.robot.calibration.check.util import StateMachineError
 
 from robot_server.service.session import models
 from robot_server.service.session.command_execution import \

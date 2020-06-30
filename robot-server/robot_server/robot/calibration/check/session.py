@@ -8,7 +8,7 @@ from robot_server.robot.calibration.session import CalibrationSession, \
     CalibrationException, HEIGHT_SAFETY_BUFFER
 from opentrons.types import Mount, Point, Location
 
-from robot_server.robot.calibration.util import StateMachine, WILDCARD
+from robot_server.robot.calibration.check.util import StateMachine, WILDCARD
 from robot_server.robot.calibration.check.models import ComparisonStatus, \
     OffsetVector
 from robot_server.robot.calibration.helper_classes import (

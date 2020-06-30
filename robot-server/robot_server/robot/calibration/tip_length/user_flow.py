@@ -2,7 +2,8 @@ import typing
 import asyncio
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import ThreadManager
-from robot_server.robot.calibration.util import WILDCARD
+from robot_server.robot.calibration.tip_length.util import (SimpleStateMachine,
+                                                            WILDCARD)
 from robot_server.robot.calibration.tip_length.types import (
     TipCalibrationState as State,
     TipCalibrationError as Error
@@ -34,7 +35,7 @@ class TipCalibrationUserFlow():
                  hardware: ThreadManager,
                  mount: Mount = 'left',
                  has_calibration_block=True):
-        # TODO: don't default mount or has_calibration_block params
+        # TODO: require mount and has_calibration_block params
         self._has_calibration_block = has_calibration_block
         self._hardware = hardware
         self._current_state = State.sessionStarted
@@ -142,32 +143,3 @@ class TipCalibrationUserFlow():
     async def exit_session(self):
         # TODO: move to saved (jogged to) pick up tip location, return tip
         self._transition_to_state(State.sessionExited)
-
-
-class SimpleStateMachine:
-    def __init__(self,
-                 states: typing.Set[str],
-                 transitions: typing.Dict[str, typing.Set[str]]):
-        """
-        Construct a simple state machine
-
-        :param states: a collection of available states
-        :param transitions: the transitions to desired to_states
-                            keyed by from_state
-        """
-        self._states = states
-        self._transitions = transitions
-
-    def trigger_transition(self, from_state, to_state):
-        """
-        Trigger a state transition
-
-        :param from_state: The current state
-        :param to_state: The desired state
-        :return: desired state if successful, None if fails
-        """
-        if to_state in self._transitions.get(WILDCARD, {}) or \
-                to_state in self._transitions.get(from_state, {}):
-            return to_state
-        else:
-            return None
