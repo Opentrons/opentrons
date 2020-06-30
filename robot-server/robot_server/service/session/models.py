@@ -1,7 +1,7 @@
+from datetime import datetime
 from enum import Enum
 import typing
 from uuid import uuid4
-from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
 from robot_server.robot.calibration.check import models as calibration_models
@@ -92,6 +92,9 @@ class Session(BasicSession):
     details: SessionDetails =\
         Field(...,
               description="Detailed session specific status")
+    created_at: datetime = \
+        Field(...,
+              description="Date and time that this session was created")
 
 
 class BasicSessionCommand(BaseModel):

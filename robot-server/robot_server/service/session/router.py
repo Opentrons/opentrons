@@ -54,7 +54,7 @@ async def create_session_handler(
     """Create a session"""
     session_type = create_request.data.attributes.sessionType
     try:
-        new_session = await session_manager.add(session_type)
+        new_session = await session_manager.add(session_type=session_type)
     except SessionCreationException as e:
         log.exception("Failed to create session")
         raise RobotServerError(
