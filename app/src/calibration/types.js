@@ -43,6 +43,7 @@ export type CalibrationAction =
 
 export type PerRobotCalibrationState = $ReadOnly<{|
   calibrationStatus: CalibrationStatus,
+  // add stuff here
 |}>
 
 export type CalibrationState = $ReadOnly<{

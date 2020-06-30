@@ -2,13 +2,15 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-export type LabwareTableProps = {|
+export type ProtocolLabwareListProps = {|
   children: React.Node,
 |}
 
-export function LabwareTable(props: LabwareTableProps): React.Node {
+export function ProtocolLabwareList(
+  props: ProtocolLabwareListProps
+): React.Node {
   return (
-    <table className={styles.labware_table}>
+    <div className={styles.labware_table}>
       <tbody>
         <tr>
           <th>Type</th>
@@ -16,6 +18,6 @@ export function LabwareTable(props: LabwareTableProps): React.Node {
         </tr>
         {props.children}
       </tbody>
-    </table>
+    </div>
   )
 }

@@ -6,7 +6,7 @@ import countBy from 'lodash/countBy'
 
 import { selectors as robotSelectors } from '../../robot'
 import { InfoSection } from './InfoSection'
-import { LabwareTable } from './LabwareTable'
+import { ProtocolLabwareList } from './ProtocolLabwareList'
 
 import type { State, Dispatch } from '../../types'
 import type { Labware } from '../../robot'
@@ -41,7 +41,13 @@ function ProtocolLabwareCardComponent(props: Props) {
 
   return (
     <InfoSection title={TITLE}>
-      <LabwareTable>{labwareList}</LabwareTable>
+      {labwareCount.map(labware => (
+        <ProtocolLabwareList
+          labwareName={labware}
+        >
+          {itemProps.displayName}
+        </ProtocolLabwareList>
+      ))}
     </InfoSection>
   )
 }
