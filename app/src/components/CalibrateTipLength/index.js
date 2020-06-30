@@ -51,7 +51,7 @@ export function CalibrateTipLength(
   const currentStep = session?.details?.currentStep || ''
   const robotName = ''
   // TODO: get real block setting
-  const haveBlock = true
+  const haveBlock = null
   const title = `${mount} pipette tip length calibration`
   const Panel = PANEL_BY_STEP[currentStep]
 

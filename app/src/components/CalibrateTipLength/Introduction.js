@@ -154,7 +154,7 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
             </OutlineButton>
           </div>
           <div>
-            <CheckboxField className={styles.intro_checkbox} label={REMEMBER} />
+            <CheckboxField label={REMEMBER} />
             <p className={styles.intro_settings_note}>{CAN_CHANGE}</p>
           </div>
         </AlertModal>

@@ -43,11 +43,7 @@
 
 .intro_settings_note {
   font-size: var('--fs-body-1');
-  padding: 0rem 1.75rem;
-}
-
-.intro_checkbox {
-  margin-bottom: 0rem,
+  padding: 0 1.75rem;
 }
 
 .terminal_modal_contents,
