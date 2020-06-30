@@ -18,43 +18,33 @@ from opentrons.hardware_control.types import CriticalPoint
 
 
 async def test_transform_from_moves_v2(
-        async_server, async_client, monkeypatch):
+        hardware, monkeypatch):
     test_mount, test_model = (types.Mount.LEFT, 'p300_multi_v1')
-    hardware = async_server['com.opentrons.hardware']
 
     await hardware.reset()
     await hardware.cache_instruments({
         test_mount: test_model,
         types.Mount.RIGHT: None})
     await hardware.home()
-    # This is difficult to test without the `async_client` because it has to
-    # take an `aiohttp.web.Request` object as a parameter instead of a dict
-    resp = await async_client.post('/calibration/deck/start')
-    start_res = await resp.json()
-    token = start_res.get('token')
-    assert start_res.get('pipette', {}).get('mount') == 'left'
-    assert start_res.get('pipette', {}).get('model') == test_model
+    resp = await dc.endpoints.create_session(False, hardware=hardware)
+    token = resp.token
+    assert resp.pipette.get('mount') == 'left'
+    assert resp.pipette.get('model') == test_model
 
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'attach tip', 'tipLength': 51.7})
-    assert res.status == 200
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'move', 'point': 'safeZ'})
-    assert res.status == 200
-    jogres = await async_client.post('/calibration/deck', json={
+    await dc.endpoints.attach_tip({'tipLength': 51.7})
+
+    await dc.endpoints.move({'point': 'safeZ'})
+
+    await dc.endpoints.run_jog({
         'token': token,
         'command': 'jog',
         'axis': 'z',
         'direction': -1,
         'step': 4.5})
-    assert jogres.status == 200
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'save z'})
-    assert res.status == 200
 
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'move', 'point': '1'})
-    assert res.status == 200
+    await dc.endpoints.save_z({})
+
+    await dc.endpoints.move({'point': '1'})
 
     expected1 = endpoints.safe_points().get('1')
     coordinates = await hardware.gantry_position(
@@ -68,28 +58,21 @@ async def test_transform_from_moves_v2(
     # Jog to calculated position for transform
     x_delta1 = 13.16824337 - dc.endpoints.safe_points()['1'][0]
     y_delta1 = 8.30855312 - dc.endpoints.safe_points()['1'][1]
-    jogres = await async_client.post('/calibration/deck', json={
-        'token': token,
-        'command': 'jog',
+    await dc.endpoints.run_jog({
         'axis': 'x',
         'direction': 1,
         'step': x_delta1})
-    assert jogres.status == 200
-    jogres = await async_client.post('/calibration/deck', json={
-        'token': token,
-        'command': 'jog',
+
+    await dc.endpoints.run_jog({
         'axis': 'y',
         'direction': 1,
-        'step': y_delta1})
-    assert jogres.status == 200
+        'step': y_delta1
+    })
 
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'save xy', 'point': '1'})
-    assert res.status == 200
+    await dc.endpoints.save_xy({'point': '1'})
 
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'move', 'point': '2'})
-    assert res.status == 200
+    await dc.endpoints.move({'point': '2'})
+
     expected2 = endpoints.safe_points().get('2')
     coordinates = await hardware.gantry_position(
         test_mount, critical_point=CriticalPoint.FRONT_NOZZLE)
@@ -103,28 +86,21 @@ async def test_transform_from_moves_v2(
     # Jog to calculated position for transform
     x_delta2 = 380.50507635 - dc.endpoints.safe_points()['2'][0]
     y_delta2 = -23.82925545 - dc.endpoints.safe_points()['2'][1]
-    jogres = await async_client.post('/calibration/deck', json={
-        'token': token,
-        'command': 'jog',
+
+    await dc.endpoints.run_jog({
         'axis': 'x',
         'direction': 1,
         'step': x_delta2})
-    assert jogres.status == 200
-    jogres = await async_client.post('/calibration/deck', json={
-        'token': token,
-        'command': 'jog',
+
+    await dc.endpoints.run_jog({
         'axis': 'y',
         'direction': 1,
         'step': y_delta2})
-    assert jogres.status == 200
 
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'save xy', 'point': '2'})
-    assert res.status == 200
+    await dc.endpoints.save_xy({'point': '2'})
 
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'move', 'point': '3'})
-    assert res.status == 200
+    await dc.endpoints.move({'point': '3'})
+
     expected3 = endpoints.safe_points().get('3')
     coordinates = await hardware.gantry_position(
         test_mount, critical_point=CriticalPoint.FRONT_NOZZLE)
@@ -137,33 +113,22 @@ async def test_transform_from_moves_v2(
     # Jog to calculated position for transform
     x_delta3 = 34.87002331 - dc.endpoints.safe_points()['3'][0]
     y_delta3 = 256.36103295 - dc.endpoints.safe_points()['3'][1]
-    jogres = await async_client.post('/calibration/deck', json={
-        'token': token,
-        'command': 'jog',
+
+    await dc.endpoints.run_jog({
         'axis': 'x',
         'direction': 1,
         'step': x_delta3})
-    assert jogres.status == 200
 
-    jogres = await async_client.post('/calibration/deck', json={
-        'token': token,
-        'command': 'jog',
+    await dc.endpoints.run_jog({
         'axis': 'y',
         'direction': 1,
         'step': y_delta3})
-    assert jogres.status == 200
 
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'save xy', 'point': '3'})
+    await dc.endpoints.save_xy({'point': '3'})
 
-    assert res.status == 200
+    await dc.endpoints.save_transform({})
 
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'save transform'})
-    assert res.status == 200
-    res = await async_client.post('/calibration/deck', json={
-        'token': token, 'command': 'release'})
-    assert res.status == 200
+    await dc.endpoints.release({})
 
     # This transform represents a 5 degree rotation, with a shift in x, y, & z.
     # Values for the points and expected transform come from a hand-crafted
