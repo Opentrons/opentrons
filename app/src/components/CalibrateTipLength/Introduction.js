@@ -47,7 +47,7 @@ const CAN_CHANGE =
 const SUPPORT_URL = 'https://www.opentrons.com/contact-support'
 
 export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
-  const { haveBlock, mount, session } = props
+  const { hasBlock, mount, session } = props
   const tiprackID =
     session.details.instruments[mount.toLowerCase()]['tiprack_id']
   const tiprack = session.details.labware.find(l => l.id === tiprackID)
@@ -111,7 +111,7 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
           {CONTINUE}
         </PrimaryButton>
       </div>
-      {haveBlock ?? (
+      {hasBlock ?? (
         <AlertModal iconName={null} heading={ALERT_TIP_LENGTH_CAL_HEADER}>
           <div>
             <p className={styles.intro_content}>{ALERT_TIP_LENGTH_CAL_BODY}</p>
