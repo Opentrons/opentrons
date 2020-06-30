@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/components",
-  "version": "3.19.0-alpha.1",
+  "version": "3.19.0",
   "description": "React components library for Opentrons' projects",
   "main": "src/index.js",
   "style": "src/index.css",

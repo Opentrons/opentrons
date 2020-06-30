@@ -3,13 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.19.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-10)
-
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
 
 ### Bug Fixes
 
 * **protocol-designer:** Add scroll to top on export modal display ([#5744](https://github.com/Opentrons/opentrons/issues/5744)) ([f797cdc](https://github.com/Opentrons/opentrons/commit/f797cdc)), closes [#5422](https://github.com/Opentrons/opentrons/issues/5422)
+* **protocol-designer:** auto add TC module id to TC steps ([#5944](https://github.com/Opentrons/opentrons/issues/5944)) ([cf70c98](https://github.com/Opentrons/opentrons/commit/cf70c98)), closes [#5942](https://github.com/Opentrons/opentrons/issues/5942)
+* **protocol-designer:** Correct tc profile fields sizing ([#5870](https://github.com/Opentrons/opentrons/issues/5870)) ([2ac185b](https://github.com/Opentrons/opentrons/commit/2ac185b)), closes [#5851](https://github.com/Opentrons/opentrons/issues/5851)
+* **protocol-designer:** ensure all TC set temps + runProfile are awaited ([#5910](https://github.com/Opentrons/opentrons/issues/5910)) ([644375c](https://github.com/Opentrons/opentrons/commit/644375c))
+* **protocol-designer:** ensure lid is closed before calling TC runProfile ([#5918](https://github.com/Opentrons/opentrons/issues/5918)) ([19c2479](https://github.com/Opentrons/opentrons/commit/19c2479))
+* **protocol-designer:** Lighten TC hover overlay ([#5939](https://github.com/Opentrons/opentrons/issues/5939)) ([3204f6c](https://github.com/Opentrons/opentrons/commit/3204f6c)), closes [#5912](https://github.com/Opentrons/opentrons/issues/5912)
 * **protocol-designer:** Remove errant p tag ([#5786](https://github.com/Opentrons/opentrons/issues/5786)) ([6695bd3](https://github.com/Opentrons/opentrons/commit/6695bd3))
+* **protocol-designer:** Update profile step fields alignment ([#5937](https://github.com/Opentrons/opentrons/issues/5937)) ([5ab095d](https://github.com/Opentrons/opentrons/commit/5ab095d))
 
 
 ### Features
@@ -18,28 +23,30 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
 * **protocol-designer:** add atomic thermocyclerRunProfile command creator ([#5843](https://github.com/Opentrons/opentrons/issues/5843)) ([e20bbda](https://github.com/Opentrons/opentrons/commit/e20bbda)), closes [#5839](https://github.com/Opentrons/opentrons/issues/5839)
 * **protocol-designer:** Add ending hold state fields to TC profile ([#5750](https://github.com/Opentrons/opentrons/issues/5750)) ([d388237](https://github.com/Opentrons/opentrons/commit/d388237)), closes [#5519](https://github.com/Opentrons/opentrons/issues/5519)
+* **protocol-designer:** add ending hold to TC profile substeps ([#5884](https://github.com/Opentrons/opentrons/issues/5884)) ([edcfadc](https://github.com/Opentrons/opentrons/commit/edcfadc)), closes [#5522](https://github.com/Opentrons/opentrons/issues/5522)
+* **protocol-designer:** Add number maskers to tc duration fields ([#5848](https://github.com/Opentrons/opentrons/issues/5848)) ([e7523a8](https://github.com/Opentrons/opentrons/commit/e7523a8)), closes [#5737](https://github.com/Opentrons/opentrons/issues/5737)
 * **protocol-designer:** Add profile step numbers and tooltips ([#5819](https://github.com/Opentrons/opentrons/issues/5819)) ([4cfc25d](https://github.com/Opentrons/opentrons/commit/4cfc25d)), closes [#5515](https://github.com/Opentrons/opentrons/issues/5515)
 * **protocol-designer:** Add profiles settings to TC profile form ([#5771](https://github.com/Opentrons/opentrons/issues/5771)) ([ce484cb](https://github.com/Opentrons/opentrons/commit/ce484cb))
 * **protocol-designer:** Add step grouping and styles for tc cycles ([#5836](https://github.com/Opentrons/opentrons/issues/5836)) ([f335d77](https://github.com/Opentrons/opentrons/commit/f335d77)), closes [#5516](https://github.com/Opentrons/opentrons/issues/5516) [#5517](https://github.com/Opentrons/opentrons/issues/5517) [#5518](https://github.com/Opentrons/opentrons/issues/5518)
 * **protocol-designer:** add support for TC cycles ([#5809](https://github.com/Opentrons/opentrons/issues/5809)) ([5cb55bc](https://github.com/Opentrons/opentrons/commit/5cb55bc)), closes [#5516](https://github.com/Opentrons/opentrons/issues/5516) [#5517](https://github.com/Opentrons/opentrons/issues/5517) [#5518](https://github.com/Opentrons/opentrons/issues/5518)
+* **protocol-designer:** add TC announcement modal ([#5898](https://github.com/Opentrons/opentrons/issues/5898)) ([e5894c5](https://github.com/Opentrons/opentrons/commit/e5894c5)), closes [#5887](https://github.com/Opentrons/opentrons/issues/5887)
+* **protocol-designer:** add TC profile deck visualization ([#5896](https://github.com/Opentrons/opentrons/issues/5896)) ([47b4329](https://github.com/Opentrons/opentrons/commit/47b4329)), closes [#5523](https://github.com/Opentrons/opentrons/issues/5523)
+* **protocol-designer:** add TC profile state updater ([#5856](https://github.com/Opentrons/opentrons/issues/5856)) ([83eff59](https://github.com/Opentrons/opentrons/commit/83eff59)), closes [#5837](https://github.com/Opentrons/opentrons/issues/5837)
 * **protocol-designer:** Add validation to profile settings and end hold ([#5802](https://github.com/Opentrons/opentrons/issues/5802)) ([c303e38](https://github.com/Opentrons/opentrons/commit/c303e38)), closes [#5520](https://github.com/Opentrons/opentrons/issues/5520) [#5753](https://github.com/Opentrons/opentrons/issues/5753)
 * **protocol-designer:** create barebones setup for TC profile steps ([#5751](https://github.com/Opentrons/opentrons/issues/5751)) ([a2c6ca6](https://github.com/Opentrons/opentrons/commit/a2c6ca6))
+* **protocol-designer:** create barebones TC profile substeps ([#5865](https://github.com/Opentrons/opentrons/issues/5865)) ([ab29038](https://github.com/Opentrons/opentrons/commit/ab29038)), closes [#5522](https://github.com/Opentrons/opentrons/issues/5522)
 * **protocol-designer:** disable save for dynamic field errors ([#5769](https://github.com/Opentrons/opentrons/issues/5769)) ([9a36b87](https://github.com/Opentrons/opentrons/commit/9a36b87)), closes [#5737](https://github.com/Opentrons/opentrons/issues/5737)
 * **protocol-designer:** finish form-level errors for dynamic fields ([#5818](https://github.com/Opentrons/opentrons/issues/5818)) ([9ca9911](https://github.com/Opentrons/opentrons/commit/9ca9911)), closes [#5814](https://github.com/Opentrons/opentrons/issues/5814)
 * **protocol-designer:** implement form-level errors for dynamic profile fields ([#5784](https://github.com/Opentrons/opentrons/issues/5784)) ([56588f0](https://github.com/Opentrons/opentrons/commit/56588f0)), closes [#5737](https://github.com/Opentrons/opentrons/issues/5737)
 * **protocol-designer:** implement formToArgs for TC profile ([#5842](https://github.com/Opentrons/opentrons/issues/5842)) ([4b3e008](https://github.com/Opentrons/opentrons/commit/4b3e008)), closes [#5838](https://github.com/Opentrons/opentrons/issues/5838)
+* **protocol-designer:** implement thermocyclerProfileStep CC ([#5858](https://github.com/Opentrons/opentrons/issues/5858)) ([cc3be8e](https://github.com/Opentrons/opentrons/commit/cc3be8e)), closes [#5835](https://github.com/Opentrons/opentrons/issues/5835)
+* **protocol-designer:** replace v4 protocol export hint ([#5897](https://github.com/Opentrons/opentrons/issues/5897)) ([179f638](https://github.com/Opentrons/opentrons/commit/179f638)), closes [#5888](https://github.com/Opentrons/opentrons/issues/5888)
+* **protocol-designer:** Reset TC form on form type toggle ([#5871](https://github.com/Opentrons/opentrons/issues/5871)) ([8192afd](https://github.com/Opentrons/opentrons/commit/8192afd)), closes [#5754](https://github.com/Opentrons/opentrons/issues/5754)
+* **protocol-designer:** reverse multi channel substep arrows in sidebar ([#5931](https://github.com/Opentrons/opentrons/issues/5931)) ([ade4cca](https://github.com/Opentrons/opentrons/commit/ade4cca))
 * **protocol-designer:** Style dynamic step fields ([#5795](https://github.com/Opentrons/opentrons/issues/5795)) ([eb950b6](https://github.com/Opentrons/opentrons/commit/eb950b6)), closes [#5513](https://github.com/Opentrons/opentrons/issues/5513)
+* **protocol-designer:** style TC profile substeps ([#5876](https://github.com/Opentrons/opentrons/issues/5876)) ([615866c](https://github.com/Opentrons/opentrons/commit/615866c)), closes [#5522](https://github.com/Opentrons/opentrons/issues/5522)
 * **test:** add button names to edit pipette, swap pipette, and continue to liquids ([#5826](https://github.com/Opentrons/opentrons/issues/5826)) ([cc3ba61](https://github.com/Opentrons/opentrons/commit/cc3ba61)), closes [#5724](https://github.com/Opentrons/opentrons/issues/5724)
 * **test:** add test id to Pipette Select component ([#5791](https://github.com/Opentrons/opentrons/issues/5791)) ([845b508](https://github.com/Opentrons/opentrons/commit/845b508)), closes [#5724](https://github.com/Opentrons/opentrons/issues/5724)
-
-
-
-
-
-
-
-**Note:** Version bump only for package protocol-designer
-
 
 
 
