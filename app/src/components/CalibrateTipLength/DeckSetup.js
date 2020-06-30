@@ -7,6 +7,7 @@ import {
   LabwareRender,
   LabwareNameOverlay,
   RobotCoordsForeignDiv,
+  ModalPage,
 } from '@opentrons/components'
 import {
   type LabwareDefinition2,

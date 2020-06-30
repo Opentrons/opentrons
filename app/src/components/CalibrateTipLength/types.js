@@ -11,6 +11,7 @@ export type CalibrateTipLengthParentProps = {|
   mount: Mount,
   probed: boolean,
   robotName: string | null,
+  haveBlock: boolean | null,
   session: Session,
 |}
 

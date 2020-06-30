@@ -2,6 +2,8 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 
+import { ModalPage, TitleBarProps } from '@opentrons/components'
+
 import type {
   SessionCommandString,
   SessionCommandData,
@@ -18,11 +20,15 @@ import { TipPickUp } from './TipPickUp'
 import { InspectingTip } from './InspectingTip'
 import { MeasureTip } from './MeasureTip'
 import { CompleteConfirmation } from './CompleteConfirmation'
+import styles from './styles.css'
 
 import type {
   CalibrateTipLengthParentProps,
   CalibrateTipLengthChildProps,
 } from './types'
+
+const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
+const EXIT = 'exit'
 
 const PANEL_BY_STEP: {
   [string]: React.ComponentType<CalibrateTipLengthChildProps>,
@@ -44,11 +50,14 @@ export function CalibrateTipLength(
   // TODO: get real currentStep from session
   const currentStep = session?.details?.currentStep || ''
   const robotName = ''
-
-  const title = `${mount} pipette calibration`
+  // TODO: get real block setting
+  const haveBlock = true
+  const title = `${mount} pipette tip length calibration`
   const Panel = PANEL_BY_STEP[currentStep]
 
   const [dispatchRequest] = useDispatchApiRequest()
+
+  const shouldDisplayTitleBarExit = true
 
   function sendCommand(
     command: SessionCommandString,
@@ -64,13 +73,33 @@ export function CalibrateTipLength(
   }
   return (
     <>
-      <CalibrationInfoBox confirmed={probed} title={title}>
-        {Panel ? (
-          <Panel {...props} sendSessionCommand={sendCommand} />
-        ) : (
+      {Panel ? (
+        <ModalPage
+          titleBar={buildTitleBarProps(shouldDisplayTitleBarExit)}
+          contentsClassName={styles.terminal_modal_contents}
+        >
+          <Panel
+            {...props}
+            haveBlock={haveBlock}
+            sendSessionCommand={sendCommand}
+          />
+        </ModalPage>
+      ) : (
+        <CalibrationInfoBox confirmed={probed} title={title}>
           <UncalibratedInfo {...props} sendSessionCommand={sendCommand} />
-        )}
-      </CalibrationInfoBox>
+        </CalibrationInfoBox>
+      )}
     </>
   )
+}
+
+const buildTitleBarProps = (): TitleBarProps => {
+  return {
+    title: TIP_LENGTH_CALIBRATION_SUBTITLE,
+    back: {
+      onClick: () => console.log('TODO: handle confirm exit'),
+      title: EXIT,
+      children: EXIT,
+    },
+  }
 }

@@ -16,6 +16,40 @@
   align-items: center;
 }
 
+.tiplengthcal_intro_div {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.intro_content {
+  margin-bottom: 1rem;
+  font-size: var('--fs-body-2');
+}
+
+.intro_button {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+.button_spacer {
+  width: 0.875rem;
+  height: 1rem;
+}
+
+.intro_settings_note {
+  font-size: var('--fs-body-1');
+  padding: 0rem 1.75rem;
+}
+
+.intro_checkbox {
+  margin-bottom: 0rem,
+}
+
 .terminal_modal_contents,
 .modal_contents {
   display: flex;
@@ -95,6 +129,17 @@
   margin: 2rem 5rem;
 }
 
+.required_block {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.block_image {
+  max-height: 20rem;
+  max-width: 16rem;
+}
+
 .required_tipracks_wrapper {
   width: 100%;
   display: flex;
@@ -152,11 +197,25 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   }
 }
 
+.tipracks_note_div {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
 .tipracks_note_header {
   text-transform: uppercase;
 }
 
 .tipracks_note_body {
+  font-size: var('--fs-body-1');
+}
+
+.tipracks_note_emphasized_body {
+  text-decoration: underline;
   font-size: var('--fs-body-1');
 }
 
