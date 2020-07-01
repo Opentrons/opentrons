@@ -53,10 +53,12 @@ clean-py:
 	$(MAKE) -C $(ROBOT_SERVER_DIR) clean
 	$(MAKE) -C $(SHARED_DATA_DIR) clean
 
+.PHONY: setup-pipenv
+setup-pipenv:
+	$(OT_PYTHON) -m pip install pipenv==2018.10.9
 
 .PHONY: setup-py
-setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2018.10.9
+setup-py: setup-pipenv
 	$(MAKE) -C $(API_DIR) setup
 	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
 	$(MAKE) -C $(ROBOT_SERVER_DIR) setup

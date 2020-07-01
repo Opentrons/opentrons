@@ -16,13 +16,30 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
-      - run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
-      - run: yarn global add shx@0.2.2
+      # use npm rather than yarn so npx will pick it up
+      - run: npm install --global shx@0.2.2
       - run: make setup-py
       - run: make test-py
       - run: make lint-py
-      - run: make -C api docs
       - uses: codecov/codecov-action@v1
+
+  docs-python:
+    name: Build Python Protocol API docs
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
+      # use npm rather than yarn so npx will pick it up
+      - run: npm install --global shx@0.2.2
+      - run: make setup-pipenv
+      - run: make -C api setup
+      - run: make -C api docs
 
   test-js:
     name: Run JavaScript unit tests
@@ -75,13 +92,23 @@ jobs:
       - run: make -C components
       - run: make -C protocol-designer
       - run: make -C labware-library
-  # build-app:
-  #   name: Build desktop Opentrons App
-  #   needs: [test-js, e2e-js, check-js]
-  #   runs-on: ubuntu-latest
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #   matrix:
-  #     os: [ubuntu-20.04, macos-10.15, windows-2019]
-  #   steps:
-  #     - uses: actions/checkout@v2
+
+  build-app:
+    name: Build desktop Opentrons App on ${{ matrix.os }}
+    needs: [test-js, e2e-js, check-js]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-10.15, windows-2019]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - run: make setup-js
+      - if: runner.os == 'Linux'
+        run: make -C app-shell dist-linux
+      - if: runner.os == 'macOS'
+        run: make -C app-shell dist-osx
+      - if: runner.os == 'Windows'
+        run: make -C app-shell dist-win
