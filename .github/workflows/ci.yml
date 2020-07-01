@@ -1,0 +1,71 @@
+name: continuous integration
+on: [push, pull_request]
+
+env:
+  CI: true
+
+jobs:
+  # test-python:
+  #   name: Run Python unit tests and build API docs
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  test-js:
+    name: Run JavaScript unit tests
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - run: make setup-js
+      - run: make test-js
+
+  # e2e-js:
+  #   name: Run JavaScript end-to-end tests
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: '12'
+
+  check-js:
+    name: Run JavaScript lints and checks
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - run: make setup-js
+      - run: make lint-js
+      - run: make format
+      - run: make circular-dependencies-js
+      - run: make lint-css
+      - run: make check-js
+
+  build-js:
+    name: Build JavaScript browser apps
+    needs: [test-js, check-js]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - run: make setup-js
+      - run: make -C components
+      - run: make -C protocol-designer
+      - run: make -C labware-library
+  # build-app:
+  #   name: Build desktop Opentrons App
+  #   needs: [test-js, e2e-js, check-js]
+  #   runs-on: ubuntu-latest
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #   matrix:
+  #     os: [ubuntu-20.04, macos-10.15, windows-2019]
+  #   steps:
+  #     - uses: actions/checkout@v2
