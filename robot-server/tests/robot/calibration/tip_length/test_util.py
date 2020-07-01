@@ -66,6 +66,7 @@ invalid_transitions: List[Tuple[str, str]] = [
     ('millingLumber', 'imaginingTable'),
     ('gluingUp', 'millingLumber'),
     ('admiringWork', 'millingLumber'),
+    ('admiringWork', '*'),
 ]
 
 

@@ -1,9 +1,6 @@
-
 from enum import Enum
 
-
-class TipCalibrationError(Exception):
-    pass
+WILDCARD = '*'
 
 
 class TipCalibrationState(str, Enum):
@@ -15,3 +12,4 @@ class TipCalibrationState(str, Enum):
     measuringTipOffset = "measuringTipOffset"
     calibrationComplete = "calibrationComplete"
     sessionExited = "sessionExited"
+    WILDCARD = WILDCARD

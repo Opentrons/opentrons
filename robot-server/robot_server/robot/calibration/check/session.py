@@ -57,16 +57,16 @@ class CalibrationCheckState(str, Enum):
 
 
 class CalibrationCheckTrigger(str, Enum):
-    load_labware = "loadLabware"
-    prepare_pipette = "preparePipette"
+    load_labware = "load_labware"
+    prepare_pipette = "prepare_pipette"
     jog = "jog"
-    pick_up_tip = "pickUpTip"
-    confirm_tip_attached = "confirmTip"
-    invalidate_tip = "invalidateTip"
-    compare_point = "comparePoint"
-    go_to_next_check = "goToNextCheck"
-    exit = "exitSession"
-    reject_calibration = "rejectCalibration"
+    pick_up_tip = "pick_up_tip"
+    confirm_tip_attached = "confirm_tip"
+    invalidate_tip = "invalidate_tip"
+    compare_point = "compare_point"
+    go_to_next_check = "go_to_next_check"
+    exit = "exit_session"
+    reject_calibration = "reject_calibration"
 
 
 CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [

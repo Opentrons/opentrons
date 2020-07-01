@@ -1,6 +1,9 @@
 import typing
+from robot_server.robot.calibration.tip_length.constants import WILDCARD
 
-WILDCARD = '*'
+
+class TipCalibrationError(Exception):
+    pass
 
 
 class SimpleStateMachine:
@@ -25,8 +28,10 @@ class SimpleStateMachine:
         :param to_state: The desired state
         :return: desired state if successful, None if fails
         """
-        if to_state in self._transitions.get(WILDCARD, {}) or \
-                to_state in self._transitions.get(from_state, {}):
-            return to_state
-        else:
+        inaccessible = (
+                to_state not in self._transitions.get(WILDCARD, {}) and
+                to_state not in self._transitions.get(from_state, {}))
+        if to_state == WILDCARD or inaccessible:
             return None
+        else:
+            return to_state

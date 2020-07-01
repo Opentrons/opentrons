@@ -26,7 +26,8 @@ class TipLengthCalibration(BaseSession):
                      instance_meta: SessionMetaData) -> 'BaseSession':
         return cls(configuration=configuration,
                    instance_meta=instance_meta,
-                   tip_length_calibration=TipCalibrationUserFlow())
+                   tip_length_calibration=TipCalibrationUserFlow(
+                          hardware=configuration.hardware))
 
     @property
     def command_executor(self) -> CommandExecutor:
