@@ -5,11 +5,24 @@ env:
   CI: true
 
 jobs:
-  # test-python:
-  #   name: Run Python unit tests and build API docs
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - uses: actions/checkout@v2
+  test-python:
+    name: Run Python unit tests and build API docs
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
+      - run: yarn global add shx@0.2.2
+      - run: make setup-py
+      - run: make test-py
+      - run: make lint-py
+      - run: make -C api docs
+      - uses: codecov/codecov-action@v1
 
   test-js:
     name: Run JavaScript unit tests
@@ -21,15 +34,18 @@ jobs:
           node-version: '12'
       - run: make setup-js
       - run: make test-js
+      - uses: codecov/codecov-action@v1
 
-  # e2e-js:
-  #   name: Run JavaScript end-to-end tests
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: '12'
+  e2e-js:
+    name: Run JavaScript end-to-end tests
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - run: make setup-js
+      - run: make test-e2e
 
   check-js:
     name: Run JavaScript lints and checks
@@ -48,7 +64,7 @@ jobs:
 
   build-js:
     name: Build JavaScript browser apps
-    needs: [test-js, check-js]
+    needs: [test-js, e2e-js, check-js]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2

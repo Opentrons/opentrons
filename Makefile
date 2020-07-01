@@ -66,7 +66,7 @@ setup-py:
 # front-end dependecies handled by yarn
 .PHONY: setup-js
 setup-js:
-	yarn
+	yarn $(and $(CI),--frozen-lockfile)
 	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
 	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
 	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) setup
