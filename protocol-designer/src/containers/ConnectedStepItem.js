@@ -69,6 +69,9 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
+  const formHasChanges = useSelector(
+    stepFormSelectors.getCurrentFormHasUnsavedChanges
+  )
   const labwareDefDisplayNamesById = mapValues(
     labwareEntities,
     (l: LabwareEntity) => getLabwareDisplayName(l.def)
@@ -88,7 +91,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   // step selection is gated when showConfirmation is true
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     selectStep,
-    currentFormIsPresaved
+    currentFormIsPresaved || formHasChanges
   )
 
   const stepItemProps = {
@@ -129,6 +132,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     <>
       {showConfirmation && (
         <ConfirmDeleteStepModal
+          close
           onContinueClick={confirm}
           onCancelClick={cancel}
         />

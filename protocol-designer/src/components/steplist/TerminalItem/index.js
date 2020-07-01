@@ -7,7 +7,10 @@ import {
   getSelectedTerminalItemId,
   actions as stepsActions,
 } from '../../../ui/steps'
-import { getCurrentFormIsPresaved } from '../../../step-forms/selectors'
+import {
+  getCurrentFormIsPresaved,
+  getCurrentFormHasUnsavedChanges,
+} from '../../../step-forms/selectors'
 import { ConfirmDeleteStepModal } from '../../modals/ConfirmDeleteStepModal'
 import { PDTitledList } from '../../lists'
 import type { TerminalItemId } from '../../../steplist'
@@ -27,6 +30,7 @@ export const TerminalItem = (props: Props): React.Node => {
   const hovered = useSelector(getHoveredTerminalItemId) === id
   const selected = useSelector(getSelectedTerminalItemId) === id
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
+  const formHasChanges = useSelector(getCurrentFormHasUnsavedChanges)
 
   const dispatch = useDispatch()
 
@@ -37,13 +41,14 @@ export const TerminalItem = (props: Props): React.Node => {
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     selectItem,
-    currentFormIsPresaved
+    currentFormIsPresaved || formHasChanges
   )
 
   return (
     <>
       {showConfirmation && (
         <ConfirmDeleteStepModal
+          close
           onContinueClick={confirm}
           onCancelClick={cancel}
         />

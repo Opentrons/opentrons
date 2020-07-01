@@ -142,14 +142,22 @@ const getDirtyFields = (
 
 type StepEditFormManagerProps = {|
   // TODO(IL, 2020-04-22): use HydratedFormData type see #3161
-  formData: ?FormData,
-  isNewStep: boolean,
   canSave: boolean,
+  formData: ?FormData,
+  formHasChanges: boolean,
+  isNewStep: boolean,
   isPristineSetTempForm: boolean,
 |}
 
 const StepEditFormManager = (props: StepEditFormManagerProps) => {
-  const { canSave, formData, isNewStep, isPristineSetTempForm } = props
+  const {
+    canSave,
+    formData,
+    isNewStep,
+    formHasChanges,
+    isPristineSetTempForm,
+  } = props
+
   const [
     showMoreOptionsModal,
     setShowMoreOptionsModal,
@@ -202,7 +210,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     confirm: confirmClose,
     showConfirmation: showConfirmCancelModal,
     cancel: cancelClose,
-  } = useConditionalConfirm(handleClose, isNewStep)
+  } = useConditionalConfirm(handleClose, isNewStep || formHasChanges)
 
   const {
     confirm: confirmAddPauseUntilTempStep,
@@ -264,9 +272,10 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
 
 const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
   return {
-    formData: stepFormSelectors.getHydratedUnsavedForm(state),
-    isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
     canSave: stepFormSelectors.getCurrentFormCanBeSaved(state),
+    formData: stepFormSelectors.getHydratedUnsavedForm(state),
+    formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
+    isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
     isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
       state
     ),
