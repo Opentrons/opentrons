@@ -2,20 +2,20 @@
 import * as React from 'react'
 import { SidePanel, ListItem, Icon } from '@opentrons/components'
 
+import { MORE } from '../../nav'
 import styles from './styles.css'
 
 // TODO(mc, 2019-12-03): i18n
-const MENU = 'Menu'
 const ITEMS = [
-  { label: 'App', url: '/menu/app' },
-  { label: 'Custom Labware', url: '/menu/custom-labware' },
-  { label: 'Network & System', url: '/menu/network-and-system' },
-  { label: 'Resources', url: '/menu/resources' },
+  { label: 'App', url: '/more/app' },
+  { label: 'Custom Labware', url: '/more/custom-labware' },
+  { label: 'Network & System', url: '/more/network-and-system' },
+  { label: 'Resources', url: '/more/resources' },
 ]
 
-export function MenuPanel(): React.Node {
+export function MorePanel(): React.Node {
   return (
-    <SidePanel title={MENU}>
+    <SidePanel title={MORE}>
       <div className={styles.menu_panel}>
         <ol className={styles.menu_list}>
           {ITEMS.map(item => (

@@ -35,7 +35,7 @@ export function Robots(): React.Node {
 
   if (appUpdate.available && !appUpdate.seen) {
     log.warn('App update available on load, redirecting to app update.')
-    return <Redirect to={'/menu/app/update'} />
+    return <Redirect to={'/more/app/update'} />
   }
 
   if (!robot) {

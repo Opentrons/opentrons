@@ -7,6 +7,7 @@ export const C_MED_DARK_GRAY = '#6c6c6c'
 export const C_MED_GRAY = '#9b9b9b'
 export const C_MED_LIGHT_GRAY = '#d2d2d2'
 export const C_LIGHT_GRAY = '#e6e6e6'
+export const C_NEAR_WHITE = '#fafafa'
 export const C_WHITE = '#ffffff'
 export const C_TRANSPARENT = 'transparent'
 
