@@ -1,6 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ListItem Disabled Side Panel Group renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="panel_group disabled"
 >
@@ -9,10 +17,11 @@ exports[`ListItem Disabled Side Panel Group renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="title_bar_icon"
+      className="sc-AxmLO c0 title_bar_icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <path
         d="M2.44444444,20.4 C2.44444444,21.0627417 2.99165197,21.6 3.66666667,21.6 L18.3333333,21.6 C19.008348,21.6 19.5555556,21.0627417 19.5555556,20.4 C19.5555556,20.148 19.47,19.908 19.3355556,19.716 L12.2222222,7.62 L12.2222222,2.4 L9.77777778,2.4 L9.77777778,7.62 L2.66444444,19.716 C2.53,19.908 2.44444444,20.148 2.44444444,20.4 Z M3.66666667,24 C1.64162258,24 0,22.3882251 0,20.4 C0,19.68 0.22,19.008 0.611111111,18.444 L7.33333333,6.972 L7.33333333,4.8 C6.65831864,4.8 6.11111111,4.2627417 6.11111111,3.6 L6.11111111,2.4 C6.11111111,1.0745166 7.20552617,0 8.55555556,0 L13.4444444,0 C14.7944738,0 15.8888889,1.0745166 15.8888889,2.4 L15.8888889,3.6 C15.8888889,4.2627417 15.3416814,4.8 14.6666667,4.8 L14.6666667,6.972 L21.3888889,18.444 C21.78,19.008 22,19.68 22,20.4 C22,22.3882251 20.3583774,24 18.3333333,24 L3.66666667,24 Z M12.2222222,16.8 L13.86,15.192 L16.2188889,19.2 L5.78111111,19.2 L9.03222222,13.668 L12.2222222,16.8 Z M11.6111111,12 C11.9486185,12 12.2222222,12.2686292 12.2222222,12.6 C12.2222222,12.9313708 11.9486185,13.2 11.6111111,13.2 C11.2736038,13.2 11,12.9313708 11,12.6 C11,12.2686292 11.2736038,12 11.6111111,12 Z"
@@ -30,6 +39,14 @@ exports[`ListItem Disabled Side Panel Group renders correctly 1`] = `
 `;
 
 exports[`ListItem Side Panel Group renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="panel_group"
 >
@@ -38,10 +55,11 @@ exports[`ListItem Side Panel Group renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="title_bar_icon"
+      className="sc-AxmLO c0 title_bar_icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <path
         d="M2.44444444,20.4 C2.44444444,21.0627417 2.99165197,21.6 3.66666667,21.6 L18.3333333,21.6 C19.008348,21.6 19.5555556,21.0627417 19.5555556,20.4 C19.5555556,20.148 19.47,19.908 19.3355556,19.716 L12.2222222,7.62 L12.2222222,2.4 L9.77777778,2.4 L9.77777778,7.62 L2.66444444,19.716 C2.53,19.908 2.44444444,20.148 2.44444444,20.4 Z M3.66666667,24 C1.64162258,24 0,22.3882251 0,20.4 C0,19.68 0.22,19.008 0.611111111,18.444 L7.33333333,6.972 L7.33333333,4.8 C6.65831864,4.8 6.11111111,4.2627417 6.11111111,3.6 L6.11111111,2.4 C6.11111111,1.0745166 7.20552617,0 8.55555556,0 L13.4444444,0 C14.7944738,0 15.8888889,1.0745166 15.8888889,2.4 L15.8888889,3.6 C15.8888889,4.2627417 15.3416814,4.8 14.6666667,4.8 L14.6666667,6.972 L21.3888889,18.444 C21.78,19.008 22,19.68 22,20.4 C22,22.3882251 20.3583774,24 18.3333333,24 L3.66666667,24 Z M12.2222222,16.8 L13.86,15.192 L16.2188889,19.2 L5.78111111,19.2 L9.03222222,13.668 L12.2222222,16.8 Z M11.6111111,12 C11.9486185,12 12.2222222,12.2686292 12.2222222,12.6 C12.2222222,12.9313708 11.9486185,13.2 11.6111111,13.2 C11.2736038,13.2 11,12.9313708 11,12.6 C11,12.2686292 11.2736038,12 11.6111111,12 Z"
@@ -59,15 +77,24 @@ exports[`ListItem Side Panel Group renders correctly 1`] = `
 `;
 
 exports[`ListItem renders ListItem with icon correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <li
   className="list_item disabled"
 >
   <svg
     aria-hidden="true"
-    className="item_icon"
+    className="sc-AxmLO c0 item_icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M9.6,18 L3.6,12 L5.292,10.296 L9.6,14.604 L18.708,5.496 L20.4,7.2 L9.6,18 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z"
@@ -157,6 +184,14 @@ exports[`TitledList renders TitledList without icon correctly 1`] = `
 `;
 
 exports[`TitledList renders collapsed TitledList correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="titled_list"
 >
@@ -172,10 +207,11 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="title_bar_icon"
+        className="sc-AxmLO c0 title_bar_icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           d="M7.41 9L12 13.242 16.59 9 18 10.312l-6 5.545-6-5.545z"
@@ -188,6 +224,14 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
 `;
 
 exports[`TitledList renders expanded TitledList correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="titled_list"
 >
@@ -203,10 +247,11 @@ exports[`TitledList renders expanded TitledList correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="title_bar_icon"
+        className="sc-AxmLO c0 title_bar_icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           d="M7.41 15.857L12 11.615l4.59 4.242L18 14.545 12 9l-6 5.545z"

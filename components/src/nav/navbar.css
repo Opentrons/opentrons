@@ -68,10 +68,6 @@ revisit once we have a need for more than one icon aligned to bottom.
   color: var(--c-med-gray);
 }
 
-.notification {
-  color: var(--c-orange);
-}
-
 .no_link {
   text-decoration: none;
   color: inherit;

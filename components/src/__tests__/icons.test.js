@@ -27,7 +27,6 @@ describe('Notification Icon', () => {
         name="flask-outline"
         className="foo"
         childName="circle"
-        childClassName="bar"
       />
     ).toJSON()
 

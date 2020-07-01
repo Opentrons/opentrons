@@ -7,13 +7,14 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 
 import * as Styles from '../../styles'
-import { Box, Flex, Text, Link } from '..'
+import { Box, Flex, Text, Link, Svg } from '..'
 
 const COMPONENTS = [
   { Component: Box, name: 'Box' },
   { Component: Flex, name: 'Flex' },
   { Component: Text, name: 'Text' },
   { Component: Link, name: 'Link' },
+  { Component: Svg, name: 'Svg' },
 ]
 
 describe('primitive components with style props', () => {
@@ -72,7 +73,8 @@ describe('primitive components with style props', () => {
 
       it('should take layout props', () => {
         const [wrapper, domNode] = render({
-          size: Styles.SIZE_3,
+          width: Styles.SIZE_3,
+          height: Styles.SIZE_3,
         })
 
         expect(wrapper).toHaveStyleRule('width', Styles.SIZE_3)

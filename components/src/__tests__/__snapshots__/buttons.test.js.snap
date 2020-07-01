@@ -12,6 +12,14 @@ exports[`buttons Button renders correctly 1`] = `
 `;
 
 exports[`buttons Button with iconName renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <button
   className="c"
   onClick={[Function]}
@@ -20,10 +28,11 @@ exports[`buttons Button with iconName renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="icon"
+    className="sc-AxmLO c0 icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M2.44444444,20.4 C2.44444444,21.0627417 2.99165197,21.6 3.66666667,21.6 L18.3333333,21.6 C19.008348,21.6 19.5555556,21.0627417 19.5555556,20.4 C19.5555556,20.148 19.47,19.908 19.3355556,19.716 L12.2222222,7.62 L12.2222222,2.4 L9.77777778,2.4 L9.77777778,7.62 L2.66444444,19.716 C2.53,19.908 2.44444444,20.148 2.44444444,20.4 Z M3.66666667,24 C1.64162258,24 0,22.3882251 0,20.4 C0,19.68 0.22,19.008 0.611111111,18.444 L7.33333333,6.972 L7.33333333,4.8 C6.65831864,4.8 6.11111111,4.2627417 6.11111111,3.6 L6.11111111,2.4 C6.11111111,1.0745166 7.20552617,0 8.55555556,0 L13.4444444,0 C14.7944738,0 15.8888889,1.0745166 15.8888889,2.4 L15.8888889,3.6 C15.8888889,4.2627417 15.3416814,4.8 14.6666667,4.8 L14.6666667,6.972 L21.3888889,18.444 C21.78,19.008 22,19.68 22,20.4 C22,22.3882251 20.3583774,24 18.3333333,24 L3.66666667,24 Z M12.2222222,16.8 L13.86,15.192 L16.2188889,19.2 L5.78111111,19.2 L9.03222222,13.668 L12.2222222,16.8 Z M11.6111111,12 C11.9486185,12 12.2222222,12.2686292 12.2222222,12.6 C12.2222222,12.9313708 11.9486185,13.2 11.6111111,13.2 C11.2736038,13.2 11,12.9313708 11,12.6 C11,12.2686292 11.2736038,12 11.6111111,12 Z"
@@ -46,6 +55,14 @@ exports[`buttons FlatButton renders correctly 1`] = `
 `;
 
 exports[`buttons FlatButton with iconName renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <button
   className="button_flat c"
   onClick={[Function]}
@@ -54,10 +71,11 @@ exports[`buttons FlatButton with iconName renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="icon"
+    className="sc-AxmLO c0 icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M2.44444444,20.4 C2.44444444,21.0627417 2.99165197,21.6 3.66666667,21.6 L18.3333333,21.6 C19.008348,21.6 19.5555556,21.0627417 19.5555556,20.4 C19.5555556,20.148 19.47,19.908 19.3355556,19.716 L12.2222222,7.62 L12.2222222,2.4 L9.77777778,2.4 L9.77777778,7.62 L2.66444444,19.716 C2.53,19.908 2.44444444,20.148 2.44444444,20.4 Z M3.66666667,24 C1.64162258,24 0,22.3882251 0,20.4 C0,19.68 0.22,19.008 0.611111111,18.444 L7.33333333,6.972 L7.33333333,4.8 C6.65831864,4.8 6.11111111,4.2627417 6.11111111,3.6 L6.11111111,2.4 C6.11111111,1.0745166 7.20552617,0 8.55555556,0 L13.4444444,0 C14.7944738,0 15.8888889,1.0745166 15.8888889,2.4 L15.8888889,3.6 C15.8888889,4.2627417 15.3416814,4.8 14.6666667,4.8 L14.6666667,6.972 L21.3888889,18.444 C21.78,19.008 22,19.68 22,20.4 C22,22.3882251 20.3583774,24 18.3333333,24 L3.66666667,24 Z M12.2222222,16.8 L13.86,15.192 L16.2188889,19.2 L5.78111111,19.2 L9.03222222,13.668 L12.2222222,16.8 Z M11.6111111,12 C11.9486185,12 12.2222222,12.2686292 12.2222222,12.6 C12.2222222,12.9313708 11.9486185,13.2 11.6111111,13.2 C11.2736038,13.2 11,12.9313708 11,12.6 C11,12.2686292 11.2736038,12 11.6111111,12 Z"
@@ -69,6 +87,14 @@ exports[`buttons FlatButton with iconName renders correctly 1`] = `
 `;
 
 exports[`buttons IconButton renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <button
   className="button_flat button_icon c"
   disabled={true}
@@ -77,10 +103,11 @@ exports[`buttons IconButton renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="button_only_icon spin"
+    className="sc-AxmLO c0 button_only_icon spin"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M18 7.209L16.791 6 12 10.791 7.209 6 6 7.209 10.791 12 6 16.791 7.209 18 12 13.209 16.791 18 18 16.791 13.209 12z"
@@ -113,6 +140,14 @@ exports[`buttons OutlineButton renders correctly 1`] = `
 `;
 
 exports[`buttons OutlineButton with iconName renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <button
   className="button_outline c"
   onClick={[Function]}
@@ -121,10 +156,11 @@ exports[`buttons OutlineButton with iconName renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="icon"
+    className="sc-AxmLO c0 icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M2.44444444,20.4 C2.44444444,21.0627417 2.99165197,21.6 3.66666667,21.6 L18.3333333,21.6 C19.008348,21.6 19.5555556,21.0627417 19.5555556,20.4 C19.5555556,20.148 19.47,19.908 19.3355556,19.716 L12.2222222,7.62 L12.2222222,2.4 L9.77777778,2.4 L9.77777778,7.62 L2.66444444,19.716 C2.53,19.908 2.44444444,20.148 2.44444444,20.4 Z M3.66666667,24 C1.64162258,24 0,22.3882251 0,20.4 C0,19.68 0.22,19.008 0.611111111,18.444 L7.33333333,6.972 L7.33333333,4.8 C6.65831864,4.8 6.11111111,4.2627417 6.11111111,3.6 L6.11111111,2.4 C6.11111111,1.0745166 7.20552617,0 8.55555556,0 L13.4444444,0 C14.7944738,0 15.8888889,1.0745166 15.8888889,2.4 L15.8888889,3.6 C15.8888889,4.2627417 15.3416814,4.8 14.6666667,4.8 L14.6666667,6.972 L21.3888889,18.444 C21.78,19.008 22,19.68 22,20.4 C22,22.3882251 20.3583774,24 18.3333333,24 L3.66666667,24 Z M12.2222222,16.8 L13.86,15.192 L16.2188889,19.2 L5.78111111,19.2 L9.03222222,13.668 L12.2222222,16.8 Z M11.6111111,12 C11.9486185,12 12.2222222,12.2686292 12.2222222,12.6 C12.2222222,12.9313708 11.9486185,13.2 11.6111111,13.2 C11.2736038,13.2 11,12.9313708 11,12.6 C11,12.2686292 11.2736038,12 11.6111111,12 Z"
@@ -147,6 +183,14 @@ exports[`buttons PrimaryButton renders correctly 1`] = `
 `;
 
 exports[`buttons PrimaryButton with iconName renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <button
   className="button_primary c"
   onClick={[Function]}
@@ -155,10 +199,11 @@ exports[`buttons PrimaryButton with iconName renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="icon"
+    className="sc-AxmLO c0 icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M2.44444444,20.4 C2.44444444,21.0627417 2.99165197,21.6 3.66666667,21.6 L18.3333333,21.6 C19.008348,21.6 19.5555556,21.0627417 19.5555556,20.4 C19.5555556,20.148 19.47,19.908 19.3355556,19.716 L12.2222222,7.62 L12.2222222,2.4 L9.77777778,2.4 L9.77777778,7.62 L2.66444444,19.716 C2.53,19.908 2.44444444,20.148 2.44444444,20.4 Z M3.66666667,24 C1.64162258,24 0,22.3882251 0,20.4 C0,19.68 0.22,19.008 0.611111111,18.444 L7.33333333,6.972 L7.33333333,4.8 C6.65831864,4.8 6.11111111,4.2627417 6.11111111,3.6 L6.11111111,2.4 C6.11111111,1.0745166 7.20552617,0 8.55555556,0 L13.4444444,0 C14.7944738,0 15.8888889,1.0745166 15.8888889,2.4 L15.8888889,3.6 C15.8888889,4.2627417 15.3416814,4.8 14.6666667,4.8 L14.6666667,6.972 L21.3888889,18.444 C21.78,19.008 22,19.68 22,20.4 C22,22.3882251 20.3583774,24 18.3333333,24 L3.66666667,24 Z M12.2222222,16.8 L13.86,15.192 L16.2188889,19.2 L5.78111111,19.2 L9.03222222,13.668 L12.2222222,16.8 Z M11.6111111,12 C11.9486185,12 12.2222222,12.2686292 12.2222222,12.6 C12.2222222,12.9313708 11.9486185,13.2 11.6111111,13.2 C11.2736038,13.2 11,12.9313708 11,12.6 C11,12.2686292 11.2736038,12 11.6111111,12 Z"

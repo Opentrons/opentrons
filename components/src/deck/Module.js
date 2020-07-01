@@ -118,7 +118,7 @@ function ModuleItemContents(props: ModuleProps) {
         className={iconClassName}
         x="8"
         y="0"
-        width="16"
+        svgWidth="16"
         name={iconNameByMode[mode] || 'usb'}
       />
       <div className={styles.module_text_wrapper}>{message}</div>
