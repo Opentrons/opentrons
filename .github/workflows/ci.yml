@@ -16,6 +16,7 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
+      - run: sudo apt-get install -y --no-install-recommends libsystemd-dev
       # use npm rather than yarn so npx will pick it up
       - run: npm install --global shx@0.2.2
       - run: make setup-py
@@ -34,7 +35,7 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
-      - run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
+      - run: sudo apt-get install -y --no-install-recommends libsystemd-dev texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended latexmk texlive-lang-greek
       # use npm rather than yarn so npx will pick it up
       - run: npm install --global shx@0.2.2
       - run: make setup-pipenv
