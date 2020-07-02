@@ -57,7 +57,7 @@ class TipCalibrationUserFlow():
         self._hardware = hardware
         self._current_state = State.sessionStarted
         self._state_machine = SimpleStateMachine(
-            states=set([s for s in State]),
+            states=set(s for s in State),
             transitions=TIP_LENGTH_TRANSITIONS
         )
         self._mount = mount
