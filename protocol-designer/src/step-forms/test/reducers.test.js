@@ -1166,10 +1166,12 @@ describe('unsavedForm reducer', () => {
 
   const actionTypes = [
     'CANCEL_STEP_FORM',
-    'SELECT_TERMINAL_ITEM',
-    'SAVE_STEP_FORM',
+    'CREATE_MODULE',
+    'DELETE_MODULE',
     'DELETE_STEP',
     'EDIT_MODULE',
+    'SAVE_STEP_FORM',
+    'SELECT_TERMINAL_ITEM',
   ]
   actionTypes.forEach(actionType => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {

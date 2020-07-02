@@ -80,7 +80,7 @@
     "body": "Update your pipette and tiprack selection. Please note, this may affect your existing protocol steps."
   },
   "close_step": {
-    "body": "You have not saved this step form. If you continue without saving this step will be deleted."
+    "body": "You have unsaved changes in this step form. If you navigate away without saving you will lose these changes."
   },
   "delete_step": {
     "body": "You have not saved this step form. If you navigate away without saving, this step will be deleted."

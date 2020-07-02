@@ -99,12 +99,12 @@ import type {
   ModuleEntities,
 } from '../types'
 import type {
-  CreatePipettesAction,
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
   CreateModuleAction,
-  EditModuleAction,
+  CreatePipettesAction,
   DeleteModuleAction,
+  DeletePipettesAction,
+  EditModuleAction,
+  SubstituteStepFormPipettesAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -119,6 +119,8 @@ type UnsavedFormActions =
   | CancelStepFormAction
   | SaveStepFormAction
   | DeleteStepAction
+  | CreateModuleAction
+  | DeleteModuleAction
   | SelectTerminalItemAction
   | EditModuleAction
   | SubstituteStepFormPipettesAction
@@ -180,10 +182,12 @@ export const unsavedForm = (
     case 'POPULATE_FORM':
       return action.payload
     case 'CANCEL_STEP_FORM':
-    case 'SELECT_TERMINAL_ITEM':
-    case 'SAVE_STEP_FORM':
+    case 'CREATE_MODULE':
+    case 'DELETE_MODULE':
     case 'DELETE_STEP':
     case 'EDIT_MODULE':
+    case 'SAVE_STEP_FORM':
+    case 'SELECT_TERMINAL_ITEM':
       return unsavedFormInitialState
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       // only substitute unsaved step form if its ID is in the start-end range
