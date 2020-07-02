@@ -13,7 +13,7 @@ export type TitledListProps = {|
   iconName?: ?IconName,
   /** props passed down to icon (`className` and `name` are ignored) */
   iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: mixed }>,
-  /** optional ID for the container */
+  /** optional data test id for the container */
   'data-test'?: string,
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
