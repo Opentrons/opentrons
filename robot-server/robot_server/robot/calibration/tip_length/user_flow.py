@@ -9,7 +9,6 @@ from robot_server.robot.calibration.tip_length.util import (
 )
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState as State,
-    WILDCARD
 )
 
 
@@ -102,7 +101,6 @@ class TipCalibrationUserFlow():
             else:
                 checked_handler(self, **data)
 
-
     @_only_in_states(allowed_states={State.sessionStarted})
     async def load_labware(self):
         # TODO: load tip rack onto deck
@@ -165,6 +163,7 @@ class TipCalibrationUserFlow():
         # TODO: move to reference location (block || trash edge)
         self._transition_to_state(State.measuringTipOffset)
 
+    @_only_in_states(allowed_states={State.measuringTipOffset})
     def save_tip_position(self):
         self._transition_to_state(State.calibrationComplete)
 

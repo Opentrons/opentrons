@@ -1,4 +1,4 @@
-import typing
+from typing import Set, Dict, Any
 from robot_server.robot.calibration.tip_length.constants import WILDCARD
 
 
@@ -8,8 +8,8 @@ class TipCalibrationError(Exception):
 
 class SimpleStateMachine:
     def __init__(self,
-                 states: typing.Set[str],
-                 transitions: typing.Dict[str, typing.Set[str]]):
+                 states: Set[Any],
+                 transitions: Dict[Any, Set[Any]]):
         """
         Construct a simple state machine
 
