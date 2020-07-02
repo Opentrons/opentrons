@@ -38,7 +38,7 @@ def _only_in_states(allowed_states: typing.Set[State]):
         """ Decorator to throw if method called while not in
         allowed state."""
         @functools.wraps(func)
-        def decorated(*args, **kwargs):
+        async def decorated(*args, **kwargs):
             self = args[0]
             if self._current_state not in allowed_states:
                 raise Error(f'Cannot issue {func.__name__} command '
@@ -87,11 +87,21 @@ class TipCalibrationUserFlow():
         :param data: Data supplied in command
         :return: None
         """
-        handler = getattr(self, name)
-        if asyncio.iscoroutinefunction(handler):
-            await handler(**data)
+        checked_handler = getattr(self, name)
+        try:
+            # if decorated func check wrapped func
+            checked_handler = checked_handler.__wrapped__
+        except AttributeError:
+            if asyncio.iscoroutinefunction(checked_handler):
+                await checked_handler(**data)
+            else:
+                checked_handler(**data)
         else:
-            handler(**data)
+            if asyncio.iscoroutinefunction(checked_handler):
+                await checked_handler(self, **data)
+            else:
+                checked_handler(self, **data)
+
 
     @_only_in_states(allowed_states={State.sessionStarted})
     async def load_labware(self):
