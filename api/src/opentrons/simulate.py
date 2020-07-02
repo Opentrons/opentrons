@@ -105,6 +105,7 @@ class CommandScraper:
         """ The callback subscribed to the broker """
         payload = message['payload']
         if message['$'] == 'before':
+            print(payload)
             self._commands.append({'level': self._depth,
                                    'payload': payload,
                                    'logs': []})
@@ -341,7 +342,31 @@ def simulate(protocol_file: TextIO,
             extra_labware=gpa_extras)
         scraper = CommandScraper(stack_logger, log_level, context.broker)
         try:
-            execute.run_protocol(protocol, context)
+            fl = execute.FlowController.create(protocol, context)
+            import threading
+            thread = threading.Thread(target=execute.run_protocol,
+                                      args=(protocol, context, fl))
+            thread.start()
+            while True:
+                v = input("command: s=step, r=resume, q=end, p=pause - ")
+                try:
+                    lno = int(v)
+                    fl.add_break(lno)
+                    continue
+                except ValueError:
+                    pass
+                if v == "s":
+                    fl.step()
+                elif v == "r":
+                    fl.resume()
+                elif v == "p":
+                    fl.pause()
+                elif v == "q":
+                    fl.resume()
+                    break
+
+            thread.join()
+            # execute.run_protocol(protocol, context, fl)
             if isinstance(protocol, PythonProtocol)\
                and protocol.api_level >= APIVersion(2, 0)\
                and protocol.bundled_labware is None\

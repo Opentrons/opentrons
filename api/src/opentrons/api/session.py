@@ -3,7 +3,6 @@ import base64
 from copy import copy
 from functools import reduce
 import logging
-from threading import Lock, Event
 from time import time, sleep
 from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
 from uuid import uuid4
@@ -21,7 +20,7 @@ from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
                                     labware, module_geometry)
-from opentrons.protocol_api.execute import run_protocol
+from opentrons.protocol_api.execute import run_protocol, FlowController
 from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)
@@ -266,8 +265,7 @@ class Session(RobotBusy):
         self.door_state: Optional[str] = None
         self.blocked: Optional[bool] = None
 
-        self._run_lock: Lock = Lock()
-        self._is_running: Event = Event()
+        self._flow_controller = None
 
     @property
     def busy_lock(self) -> ThreadedAsyncLock:
@@ -491,6 +489,10 @@ class Session(RobotBusy):
             self.set_state('running')
             return self
 
+    def step(self):
+        if self._flow_controller:
+            self._flow_controller.step()
+
     def _start_hardware_event_watcher(self):
         if not callable(self._event_watcher):
             # initialize and update window switch state
@@ -557,7 +559,9 @@ class Session(RobotBusy):
                     extra_labware=getattr(self._protocol, 'extra_labware', {}))
                 ctx.connect(self._hardware)
                 ctx.home()
-                run_protocol(self._protocol, context=ctx)
+                self._flow_controller = None # FlowController.create(self._protocol, ctx)
+                run_protocol(self._protocol, context=ctx,
+                             flow_controller=self._flow_controller)
             else:
                 robot.broker = self._broker
                 assert isinstance(self._protocol, PythonProtocol),\

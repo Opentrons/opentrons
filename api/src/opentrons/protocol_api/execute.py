@@ -1,10 +1,13 @@
+import abc
 import asyncio
 import inspect
 import logging
 import traceback
 import sys
+from threading import Event
 from typing import Any, Dict
 
+import typing
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 
 from .contexts import ProtocolContext
@@ -67,8 +70,77 @@ def _find_protocol_error(tb, proto_name):
         raise KeyError
 
 
+class Tracer:
+    def __init__(self, proto_file, event: Event, ctx: ProtocolContext, bp: typing.Set[int]):
+        self._proto = proto_file
+        self._event = event
+        self._ctx = ctx
+        self._bp = bp
+
+    def __enter__(self):
+        sys.settrace(self)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.settrace(None)
+        pass
+
+    def __call__(self, frame, event, arg):
+        if self._proto == frame.f_code.co_filename:
+            self._ctx.comment(F"{frame}")
+            if frame.f_lineno in self._bp:
+                self._event.clear()
+            self._event.wait()
+            return None if event != 'call' else self
+        return self
+
+
+class FlowController(abc.ABC):
+    @classmethod
+    def create(cls, protocol: Protocol, ctx: ProtocolContext) -> "FlowController":
+        if isinstance(protocol, PythonProtocol):
+            return PythonFlowController(typing.cast(PythonProtocol, protocol), ctx)
+        return None
+
+    def pause(self):
+        ...
+
+    def resume(self):
+        ...
+
+    def step(self):
+        ...
+
+    def add_break(self, line):
+        ...
+
+
+class PythonFlowController(FlowController):
+    def __init__(self, protocol: PythonProtocol, ctx: ProtocolContext):
+        self._event = Event()
+        self._break_points = set()
+        self._ctx = ctx
+
+    def cm(self, f):
+        return Tracer(f, self._event, self._ctx, self._break_points)
+
+    def pause(self):
+        self._event.clear()
+
+    def resume(self):
+        self._event.set()
+
+    def step(self):
+        self._event.set()
+        self._event.clear()
+
+    def add_break(self, line):
+        self._break_points.add(line)
+
+
 def _run_python(
-        proto: PythonProtocol, context: ProtocolContext):
+        proto: PythonProtocol, context: ProtocolContext,
+        flow_controller: PythonFlowController):
     new_globs: Dict[Any, Any] = {}
     exec(proto.contents, new_globs)
     # If the protocol is written correctly, it will have defined a function
@@ -85,7 +157,11 @@ def _run_python(
 
     new_globs['__context'] = context
     try:
-        exec('run(__context)', new_globs)
+        if flow_controller:
+            with flow_controller.cm(filename):
+                exec('run(__context)', new_globs)
+        else:
+            exec('run(__context)', new_globs)
     except (SmoothieAlarm, asyncio.CancelledError, ExecutionCancelledError):
         # this is a protocol cancel and shouldn't have special logging
         raise
@@ -100,7 +176,8 @@ def _run_python(
 
 
 def run_protocol(protocol: Protocol,
-                 context: ProtocolContext):
+                 context: ProtocolContext,
+                 flow_controller = None):
     """ Run a protocol.
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
@@ -108,7 +185,7 @@ def run_protocol(protocol: Protocol,
     """
     if isinstance(protocol, PythonProtocol):
         if protocol.api_level >= APIVersion(2, 0):
-            _run_python(protocol, context)
+            _run_python(protocol, context, flow_controller)
         else:
             raise RuntimeError(
                 f'Unsupported python API version: {protocol.api_level}'
