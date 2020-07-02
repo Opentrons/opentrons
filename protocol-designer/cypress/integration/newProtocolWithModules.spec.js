@@ -44,7 +44,7 @@ describe('Protocols with Modules', () => {
         .next()
         .contains('None')
         .click()
-      cy.get('[data-id="PipetteNameItem_p300MultiChannelGen1"]').click()
+      cy.get('[data-test="PipetteNameItem_p300MultiChannelGen1"]').click()
       cy.selectTipRacks(tipRack, tipRack)
 
       // Add modules
