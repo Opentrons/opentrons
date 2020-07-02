@@ -25,6 +25,8 @@ const initialFlags: Flags = {
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
   OT_PD_ENABLE_THERMOCYCLER:
     process.env.OT_PD_ENABLE_THERMOCYCLER === '1' || false,
+  OT_PD_ENABLE_AIR_GAP_AND_DELAY:
+    process.env.OT_PD_ENABLE_AIR_GAP_AND_DELAY === '1' || false,
 }
 
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
