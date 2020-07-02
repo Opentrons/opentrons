@@ -99,12 +99,12 @@ import type {
   ModuleEntities,
 } from '../types'
 import type {
-  CreatePipettesAction,
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
   CreateModuleAction,
-  EditModuleAction,
+  CreatePipettesAction,
   DeleteModuleAction,
+  DeletePipettesAction,
+  EditModuleAction,
+  SubstituteStepFormPipettesAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -119,6 +119,7 @@ type UnsavedFormActions =
   | CancelStepFormAction
   | SaveStepFormAction
   | DeleteStepAction
+  | CreateModuleAction
   | DeleteModuleAction
   | SelectTerminalItemAction
   | EditModuleAction
@@ -181,6 +182,7 @@ export const unsavedForm = (
     case 'POPULATE_FORM':
       return action.payload
     case 'CANCEL_STEP_FORM':
+    case 'CREATE_MODULE':
     case 'DELETE_MODULE':
     case 'DELETE_STEP':
     case 'EDIT_MODULE':

@@ -1166,6 +1166,7 @@ describe('unsavedForm reducer', () => {
 
   const actionTypes = [
     'CANCEL_STEP_FORM',
+    'CREATE_MODULE',
     'DELETE_MODULE',
     'DELETE_STEP',
     'EDIT_MODULE',
