@@ -14,7 +14,7 @@ export type TitledListProps = {|
   /** props passed down to icon (`className` and `name` are ignored) */
   iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: mixed }>,
   /** optional ID for the container */
-  dataId?: string,
+  'data-test'?: string,
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
   children?: React.Node,
@@ -52,7 +52,7 @@ export function TitledList(props: TitledListProps): React.Node {
     iconName,
     disabled,
     inert,
-    dataId,
+    'data-test': dataTest,
     onCollapseToggle,
     iconProps,
     onMouseEnter,
@@ -95,7 +95,7 @@ export function TitledList(props: TitledListProps): React.Node {
   return (
     <div
       className={className}
-      data-id={dataId}
+      data-test={dataTest}
       {...{ onMouseEnter, onMouseLeave, onContextMenu }}
     >
       <div onClick={onClick} className={titleBarClass}>

@@ -267,7 +267,7 @@ describe('Protocols with Modules', () => {
 
       // Add Temperature Step w/out Pause
       cy.addStep('temperature')
-      cy.get('[data-id="StepItem_1"]')
+      cy.get('[data-test="StepItem_1"]')
         .contains('temperature')
         .should('exist')
       cy.get(designPageModal).within(() => {
@@ -320,14 +320,14 @@ describe('Protocols with Modules', () => {
           .contains('pause later')
           .click()
       })
-      cy.get('[data-id="StepItem_1"]').within(() => {
+      cy.get('[data-test="StepItem_1"]').within(() => {
         cy.contains('Temperature module').should('exist')
         cy.contains('Go To', { matchCase: false }).should('exist')
       })
 
       // Add Pause Step until Temp
       cy.addStep('pause')
-      cy.get('[data-id="StepItem_2"]')
+      cy.get('[data-test="StepItem_2"]')
         .contains('pause')
         .should('exist')
       cy.get(designPageModal).within(() => {
@@ -354,14 +354,14 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .click()
       })
-      cy.get('[data-id="StepItem_2"]').within(() => {
+      cy.get('[data-test="StepItem_2"]').within(() => {
         cy.contains('Pause Until', { matchCase: false }).should('exist')
         cy.contains('heating up').should('exist')
       })
 
       // Add First Transfer Step
       cy.addStep('transfer')
-      cy.get('[data-id="StepItem_3"]')
+      cy.get('[data-test="StepItem_3"]')
         .contains('transfer')
         .should('exist')
       cy.get(designPageModal).within(() => {
@@ -408,7 +408,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .click()
       })
-      cy.get('[data-id="StepItem_3"]').within(() => {
+      cy.get('[data-test="StepItem_3"]').within(() => {
         cy.contains('Aspirate', { matchCase: false }).should('exist')
         cy.contains('Dispense', { matchCase: false }).should('exist')
         cy.contains('Temp Deck Block', { matchCase: false }).should('exist')
@@ -418,7 +418,7 @@ describe('Protocols with Modules', () => {
 
       // Add Engage Magnet Step
       cy.addStep('magnet')
-      cy.get('[data-id="StepItem_4"]')
+      cy.get('[data-test="StepItem_4"]')
         .contains('magnet')
         .should('exist')
       cy.get(designPageModal).within(() => {
@@ -442,7 +442,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .click()
       })
-      cy.get('[data-id="StepItem_4"]').within(() => {
+      cy.get('[data-test="StepItem_4"]').within(() => {
         cy.contains('Magnet', { matchCase: false }).should('exist')
         cy.contains('Engage', { matchCase: false }).should('exist')
       })
@@ -465,7 +465,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .click()
       })
-      cy.get('[data-id="StepItem_5"]')
+      cy.get('[data-test="StepItem_5"]')
         .contains('pause')
         .should('exist')
       cy.get('[data-test="ModuleTag_magneticModuleType"]')
@@ -518,7 +518,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .click()
       })
-      cy.get('[data-id="StepItem_6"]').within(() => {
+      cy.get('[data-test="StepItem_6"]').within(() => {
         cy.contains('Aspirate', { matchCase: false }).should('exist')
         cy.contains('Dispense', { matchCase: false }).should('exist')
         cy.contains('Temp Deck Block', { matchCase: false }).should('exist')
@@ -535,7 +535,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .click()
       })
-      cy.get('[data-id="StepItem_7"]')
+      cy.get('[data-test="StepItem_7"]')
         .contains('magnet')
         .should('exist')
 
@@ -554,10 +554,10 @@ describe('Protocols with Modules', () => {
           .contains('Pause protocol now')
           .click()
       })
-      cy.get('[data-id="StepItem_8"]')
+      cy.get('[data-test="StepItem_8"]')
         .contains('Temperature')
         .should('exist')
-      cy.get('[data-id="StepItem_9"]')
+      cy.get('[data-test="StepItem_9"]')
         .contains('pause', { matchCase: false })
         .should('exist')
     })
@@ -568,7 +568,7 @@ describe('Protocols with Modules', () => {
       cy.get('button[name="removeMagneticModuleType"]').click()
       cy.get('button[name="addMagneticModuleType"]').should('exist')
       cy.openDesignPage()
-      cy.get('[data-id="StepItem_4"]')
+      cy.get('[data-test="StepItem_4"]')
         .children()
         .first()
         .click()
@@ -580,7 +580,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .should('exist')
       })
-      cy.get('[data-id="StepItem_7"]').click()
+      cy.get('[data-test="StepItem_7"]').click()
       cy.get(designPageModal).within(() => {
         cy.get(alertTitleContainer)
           .contains('error')
@@ -608,7 +608,7 @@ describe('Protocols with Modules', () => {
 
       // Verify timeline errors resolved
       cy.openDesignPage()
-      cy.get('[data-id="StepItem_4"]')
+      cy.get('[data-test="StepItem_4"]')
         .children()
         .first()
         .click()
@@ -616,7 +616,7 @@ describe('Protocols with Modules', () => {
         cy.get(alertTitleContainer).should('not.exist')
         cy.get('button[disabled]').should('not.exist')
       })
-      cy.get('[data-id="StepItem_7"]').click()
+      cy.get('[data-test="StepItem_7"]').click()
       cy.get(designPageModal).within(() => {
         cy.get(alertTitleContainer).should('not.exist')
         cy.get('button[disabled]').should('not.exist')
@@ -627,7 +627,7 @@ describe('Protocols with Modules', () => {
       cy.get('button[name="removeTemperatureModuleType"]').click()
       cy.get('button[name="addTemperatureModuleType"]').should('exist')
       cy.openDesignPage()
-      cy.get('[data-id="StepItem_1"]').click()
+      cy.get('[data-test="StepItem_1"]').click()
       cy.get(designPageModal).within(() => {
         cy.get(alertTitleContainer)
           .contains('error')
@@ -637,7 +637,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .should('exist')
       })
-      cy.get('[data-id="StepItem_2"]').click()
+      cy.get('[data-test="StepItem_2"]').click()
       cy.get(designPageModal).within(() => {
         cy.get(alertTitleContainer)
           .contains('error')
@@ -649,7 +649,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .should('exist')
       })
-      cy.get('[data-id="StepItem_8"]').click()
+      cy.get('[data-test="StepItem_8"]').click()
       cy.get(designPageModal).within(() => {
         cy.get(alertTitleContainer)
           .contains('error')
@@ -658,7 +658,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .should('exist')
       })
-      cy.get('[data-id="StepItem_9"]').click()
+      cy.get('[data-test="StepItem_9"]').click()
       cy.get(designPageModal).within(() => {
         cy.get(alertTitleContainer)
           .contains('error')
@@ -686,7 +686,7 @@ describe('Protocols with Modules', () => {
 
       // Resolve Timeline Errors
       cy.openDesignPage()
-      cy.get('[data-id="StepItem_1"]').click()
+      cy.get('[data-test="StepItem_1"]').click()
       cy.get(designPageModal).within(() => {
         cy.get('select').select('TEMP Temp Deck Block')
         cy.get(alertTitleContainer).should('not.exist')
@@ -696,7 +696,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .click()
       })
-      cy.get('[data-id="StepItem_2"]').click()
+      cy.get('[data-test="StepItem_2"]').click()
       cy.get(designPageModal).within(() => {
         cy.get('select').select('TEMP Temp Deck Block')
         cy.get(alertTitleContainer).should('not.exist')
@@ -706,7 +706,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .click()
       })
-      cy.get('[data-id="StepItem_8"]').click()
+      cy.get('[data-test="StepItem_8"]').click()
       cy.get(designPageModal).within(() => {
         cy.get('select').select('TEMP Temp Deck Block')
         cy.get(alertTitleContainer).should('not.exist')
@@ -716,7 +716,7 @@ describe('Protocols with Modules', () => {
           .contains('save', { matchCase: false })
           .click()
       })
-      cy.get('[data-id="StepItem_9"]').click()
+      cy.get('[data-test="StepItem_9"]').click()
       cy.get(designPageModal).within(() => {
         cy.get('select').select('TEMP Temp Deck Block')
         cy.get(alertTitleContainer).should('not.exist')

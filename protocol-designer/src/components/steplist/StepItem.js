@@ -88,7 +88,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
       description={Description}
       iconName={error || warning ? 'alert-circle' : iconName}
       iconProps={{ className: iconClassName }}
-      dataId={`StepItem_${stepNumber}`}
+      data-test={`StepItem_${stepNumber}`}
       title={`${stepNumber}. ${props.title ||
         i18n.t(`application.stepType.${stepType}`)}`}
       onClick={selectStep}
