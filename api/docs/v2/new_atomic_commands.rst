@@ -348,8 +348,7 @@ The ``mix`` command takes up to three arguments: ``mix(repetitions, volume, loca
 
 .. note::
 
-    Mixes consist of aspirates and then immediate dispenses. In between these actions, the pipette moves up and out of the target well. This is normal, and is done to avoid incorrect aspirate and dispense actions.
-
+    In API Versions 2.4 and earlier, mixes consist of aspirates and then immediate dispenses. In between these actions, the pipette moves up and out of the target well. In API Version 2.5 and later, the pipette will not move between actions. 
 
 .. versionadded:: 2.0
 
