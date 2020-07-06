@@ -11,10 +11,11 @@ import {
   type ComputeRobotStateTimelineSuccessAction,
 } from '../file-data/actions'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
-// import { getFeatureFlagData } from '../feature-flags/selectors' // TODO: break memoization w/ FF changes
+import { getFeatureFlagData } from '../feature-flags/selectors'
 import Worker from './worker'
 
 import type { Middleware } from 'redux'
+import type { Flags } from '../feature-flags/types'
 import type { BaseState } from '../types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import type { GenerateSubstepsArgs } from './generateSubsteps'
@@ -26,7 +27,10 @@ type SubstepsArgsNoTimeline = $Diff<
   { robotStateTimeline: any }
 >
 
-const hasChanged = (nextValues, memoizedValues): boolean =>
+const hasChanged = (
+  nextValues: { [any]: any, ... },
+  memoizedValues: { [any]: any, ... }
+): boolean =>
   Object.keys(nextValues).some(
     (selectorKey: string) =>
       nextValues[selectorKey] !== memoizedValues?.[selectorKey]
@@ -37,7 +41,6 @@ const getTimelineArgs = (state: BaseState): GenerateRobotStateTimelineArgs => ({
   orderedStepIds: getOrderedStepIds(state),
   invariantContext: getInvariantContext(state),
   initialRobotState: getInitialRobotState(state),
-  // featureFlagData: getFeatureFlagData(state), // TODO: break memoization when FF changes
 })
 
 const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
@@ -71,20 +74,28 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     worker.postMessage(message)
 
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
+  let prevFeatureFlags: Flags | null = null // force timeline recompute when feature flags change
   let prevSubstepsArgs: SubstepsArgsNoTimeline | null = null
   let prevSuccessAction: ComputeRobotStateTimelineSuccessAction | null = null
 
   const timelineNeedsRecompute = (state: BaseState): boolean => {
-    if (prevTimelineArgs === null) {
+    const nextSelectorResults = getTimelineArgs(state)
+    const nextFeatureFlags = getFeatureFlagData(state)
+
+    if (prevTimelineArgs === null || prevFeatureFlags === null) {
       // initial call, must populate memoized value
-      prevTimelineArgs = getTimelineArgs(state)
+      prevTimelineArgs = nextSelectorResults
+      prevFeatureFlags = nextFeatureFlags
       return true
     }
-    const nextSelectorResults = getTimelineArgs(state)
 
-    const needsRecompute = hasChanged(nextSelectorResults, prevTimelineArgs)
+    const needsRecompute =
+      hasChanged(nextSelectorResults, prevTimelineArgs) ||
+      hasChanged(nextFeatureFlags, prevFeatureFlags)
 
-    prevTimelineArgs = nextSelectorResults // update memoized value
+    // update memoized values
+    prevTimelineArgs = nextSelectorResults
+    prevFeatureFlags = nextFeatureFlags
     return needsRecompute
   }
 
