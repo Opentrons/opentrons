@@ -17,6 +17,7 @@ export type FlagTypes =
   | 'PRERELEASE_MODE'
   | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
   | 'OT_PD_ENABLE_THERMOCYCLER'
+  | 'OT_PD_ENABLE_AIR_GAP_AND_DELAY'
 
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: Array<FlagTypes> = [
