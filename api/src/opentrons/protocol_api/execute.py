@@ -17,7 +17,8 @@ from .json_dispatchers import pipette_command_map, \
 from . import execute_v3, execute_v4
 
 from opentrons.protocols.types import (PythonProtocol, Protocol,
-                                       APIVersion, MalformedProtocolError)
+                                       APIVersion, MalformedProtocolError,
+                                       JsonProtocol)
 from opentrons.hardware_control import ExecutionCancelledError
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -83,10 +84,33 @@ class Tracer:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.settrace(None)
-        pass
 
     def __call__(self, frame, event, arg):
         if self._proto == frame.f_code.co_filename:
+            self._ctx.comment(F"{frame}")
+            if frame.f_lineno in self._bp:
+                self._event.clear()
+            self._event.wait()
+            return None if event != 'call' else self
+        return self
+
+
+class Tracer2:
+    def __init__(self, proto_file, event: Event, ctx: ProtocolContext, bp: typing.Set[int]):
+        self._proto = proto_file
+        self._event = event
+        self._ctx = ctx
+        self._bp = bp
+
+    def __enter__(self):
+        sys.settrace(self)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.settrace(None)
+
+    def __call__(self, frame, event, arg):
+        if "execute_v3" in frame.f_code.co_filename:
             self._ctx.comment(F"{frame}")
             if frame.f_lineno in self._bp:
                 self._event.clear()
@@ -100,6 +124,8 @@ class FlowController(abc.ABC):
     def create(cls, protocol: Protocol, ctx: ProtocolContext) -> "FlowController":
         if isinstance(protocol, PythonProtocol):
             return PythonFlowController(typing.cast(PythonProtocol, protocol), ctx)
+        elif isinstance(protocol, JsonProtocol):
+            return JsFlowController(typing.cast(JsonProtocol, protocol), ctx)
         return None
 
     def pause(self):
@@ -113,6 +139,28 @@ class FlowController(abc.ABC):
 
     def add_break(self, line):
         ...
+
+
+class JsFlowController(FlowController):
+    def __init__(self, protocol: JsonProtocol, ctx: ProtocolContext):
+        self._event = Event()
+        self._ctx = ctx
+
+    def cm(self, f):
+        return Tracer2(f, self._event, self._ctx, set())
+
+    def pause(self):
+        self._event.clear()
+
+    def resume(self):
+        self._event.set()
+
+    def step(self):
+        self._event.set()
+        self._event.clear()
+
+    def add_break(self, line):
+        pass
 
 
 class PythonFlowController(FlowController):
@@ -196,10 +244,13 @@ def run_protocol(protocol: Protocol,
                 context, protocol.contents)
             lw = execute_v3.load_labware_from_json_defs(
                 context, protocol.contents)
-            execute_v3.dispatch_json(context, protocol.contents, ins, lw)
+
+            with flow_controller.cm("N"):
+                execute_v3.dispatch_json(context, protocol.contents, ins, lw)
         elif protocol.contents['schemaVersion'] == 4:
             # reuse the v3 fns for loading labware and pipettes
             # b/c the v4 protocol has no changes for these keys
+
             ins = execute_v3.load_pipettes_from_json(
                 context, protocol.contents)
 
@@ -208,6 +259,7 @@ def run_protocol(protocol: Protocol,
 
             lw = execute_v4.load_labware_from_json_defs(
                 context, protocol.contents, modules)
+
             execute_v4.dispatch_json(
                 context, protocol.contents, ins, lw, modules,
                 pipette_command_map, magnetic_module_command_map,
