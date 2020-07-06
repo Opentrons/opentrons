@@ -4,29 +4,32 @@ from typing import List, Tuple, Dict
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 
+from robot_server.service.session.models import CommandName
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
 
 valid_commands: List[Tuple[str, str, str, Dict]] = [
-  ('load_labware', 'sessionStarted', 'labwareLoaded', {}),
-  ('move_to_measure_nozzle_offset', 'labwareLoaded',
+  (CommandName.load_labware, 'sessionStarted', 'labwareLoaded', {}),
+  (CommandName.move_to_reference_point, 'labwareLoaded',
    'measuringNozzleOffset', {}),
-  ('jog', 'measuringNozzleOffset', 'measuringNozzleOffset', stub_jog_data),
-  ('save_nozzle_position', 'measuringNozzleOffset', 'preparingPipette', {}),
-  ('jog', 'preparingPipette', 'preparingPipette', stub_jog_data),
-  ('pick_up_tip', 'preparingPipette', 'preparingPipette', {}),
-  ('invalidate_tip', 'preparingPipette', 'preparingPipette', {}),
-  ('confirm_tip_attached', 'preparingPipette', 'measuringTipOffset', {}),
-  ('jog', 'measuringTipOffset', 'measuringTipOffset', stub_jog_data),
-  ('save_tip_position', 'measuringTipOffset', 'calibrationComplete', {}),
-  ('exit_session', 'calibrationComplete', 'sessionExited', {}),
-  ('exit_session', 'sessionStarted', 'sessionExited', {}),
-  ('exit_session', 'labwareLoaded', 'sessionExited', {}),
-  ('exit_session', 'measuringNozzleOffset', 'sessionExited', {}),
-  ('exit_session', 'preparingPipette', 'sessionExited', {}),
-  ('exit_session', 'measuringTipOffset', 'sessionExited', {}),
+  (CommandName.jog, 'measuringNozzleOffset',
+   'measuringNozzleOffset', stub_jog_data),
+  (CommandName.save_offset, 'measuringNozzleOffset', 'preparingPipette', {}),
+  (CommandName.jog, 'preparingPipette', 'preparingPipette', stub_jog_data),
+  (CommandName.pick_up_tip, 'preparingPipette', 'preparingPipette', {}),
+  (CommandName.invalidate_tip, 'preparingPipette', 'preparingPipette', {}),
+  (CommandName.move_to_reference_point, 'preparingPipette',
+   'measuringTipOffset', {}),
+  (CommandName.jog, 'measuringTipOffset', 'measuringTipOffset', stub_jog_data),
+  (CommandName.save_offset, 'measuringTipOffset', 'calibrationComplete', {}),
+  (CommandName.exit, 'calibrationComplete', 'sessionExited', {}),
+  (CommandName.exit, 'sessionStarted', 'sessionExited', {}),
+  (CommandName.exit, 'labwareLoaded', 'sessionExited', {}),
+  (CommandName.exit, 'measuringNozzleOffset', 'sessionExited', {}),
+  (CommandName.exit, 'preparingPipette', 'sessionExited', {}),
+  (CommandName.exit, 'measuringTipOffset', 'sessionExited', {}),
 ]
 
 

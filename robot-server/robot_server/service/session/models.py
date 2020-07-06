@@ -50,17 +50,25 @@ class CommandName(str, Enum):
     home_all_motors = "homeAllMotors"
     home_pipette = "homePipette"
     toggle_lights = "toggleLights"
-    load_labware = CalibrationCheckTrigger.load_labware.value
-    prepare_pipette = CalibrationCheckTrigger.prepare_pipette.value
-    jog = (CalibrationCheckTrigger.jog.value,
-           calibration_models.JogPosition)
-    pick_up_tip = CalibrationCheckTrigger.pick_up_tip.value
-    confirm_tip_attached = CalibrationCheckTrigger.confirm_tip_attached.value
-    invalidate_tip = CalibrationCheckTrigger.invalidate_tip.value
-    compare_point = CalibrationCheckTrigger.compare_point.value
-    confirm_step = CalibrationCheckTrigger.go_to_next_check.value
-    exit = CalibrationCheckTrigger.exit.value
-    reject_calibration = CalibrationCheckTrigger.reject_calibration.value
+
+    # Shared Between Calibration Flows
+    load_labware = "loadLabware"
+    prepare_pipette = "preparePipette"
+    jog = ("jog", calibration_models.JogPosition)
+    pick_up_tip = "pickUpTip"
+    confirm_tip_attached = "confirmTip"
+    invalidate_tip = "invalidateTip"
+    save_offset = "saveOffset"
+
+    # Cal Check Specific
+    compare_point = "comparePoint"
+    go_to_next_check = "goToNextCheck"
+    exit = "exit"
+    # TODO: remove unused command name and trigger
+    reject_calibration = "rejectCalibration"
+
+    # Tip Length Calibration Specific
+    move_to_reference_point = "moveToReferencePoint"
 
     def __new__(cls, value, model=EmptyModel):
         """Create a string enum with the expected model"""
