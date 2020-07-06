@@ -168,7 +168,7 @@ def _air_gap(instruments: Dict[str, InstrumentContext],
     # cache. The JSON atomic command should be stateless. We'll
     # explicitly move_to the specified well to ensure the location
     # cache is set to that well.
-    pipette.move_to(well.top().move(Point(0, 0, offset_from_top)))
+    pipette.move_to(well.top(offset_from_top))
     pipette.air_gap(volume, offset_from_top)
 
 
