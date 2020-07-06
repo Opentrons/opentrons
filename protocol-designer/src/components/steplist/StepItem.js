@@ -264,9 +264,6 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
   }
 
   if (substeps && substeps.substepType === THERMOCYCLER_PROFILE) {
-    const lidTemperature = makeTemperatureText(substeps.profileTargetLidTemp)
-    const lidLabelText = makeLidLabelText(substeps.lidOpenHold)
-
     return (
       <ModuleStepItems
         labwareDisplayName={substeps.labwareDisplayName}
@@ -276,7 +273,11 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
         actionText={i18n.t(`modules.actions.cycling`)}
         moduleType={THERMOCYCLER_MODULE_TYPE}
       >
-        <ModuleStepItemRow label={lidLabelText} value={lidTemperature} />
+        <ModuleStepItemRow
+          // NOTE: for TC Profile, lid label text always says "closed" bc Profile runs with lid closed.
+          label={makeLidLabelText(false)}
+          value={makeTemperatureText(substeps.profileTargetLidTemp)}
+        />
         <CollapsibleSubstep
           headerContent={
             <span
@@ -331,7 +332,7 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
             hideHeader
           />
           <ModuleStepItemRow
-            label={`Lid (${substeps.lidOpenHold ? 'open' : 'closed'})`}
+            label={makeLidLabelText(substeps.lidOpenHold)}
             value={makeTemperatureText(substeps.lidTargetTempHold)}
           />
         </CollapsibleSubstep>
