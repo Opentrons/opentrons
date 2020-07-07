@@ -1,11 +1,7 @@
 import typing
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import ThreadManager
-from robot_server.service.session.models import (
-    CommandName,
-    CommandDataType,
-    JogPosition
-)
+from robot_server.service.session.models import CommandName
 from robot_server.robot.calibration.tip_length.util import (
     SimpleStateMachine,
     TipCalibrationError as Error
@@ -30,12 +26,9 @@ TIP_LENGTH_TRANSITIONS: typing.Dict[State, typing.Set[State]] = {
     State.WILDCARD: {State.sessionExited},
 }
 
-# TODO: enumerate acceptable command names for this session type
-TipLengthCommandName = CommandName
+COMMAND_HANDLER = typing.Callable[..., typing.Awaitable]
 
-COMMAND_HANDLER = typing.Callable[[CommandDataType], typing.Awaitable]
-
-COMMAND_MAP = typing.Dict[TipLengthCommandName, typing.Tuple[COMMAND_HANDLER,
+COMMAND_MAP = typing.Dict[str, typing.Tuple[COMMAND_HANDLER,
                           typing.Set[State]]]
 
 
@@ -88,8 +81,8 @@ class TipCalibrationUserFlow():
                         f"from {self._current_state}.")
 
     async def handle_command(self,
-                             name: TipLengthCommandName,
-                             data: CommandDataType):
+                             name: str,
+                             data: typing.Dict[typing.Any, typing.Any]):
         """
         Handle a client command
 
@@ -106,8 +99,7 @@ class TipCalibrationUserFlow():
                     (self._current_state not in valid_states):
                 raise Error(f'Cannot issue {name} command '
                             f'from {self._current_state}')
-            args = dict(data)
-            return await handler(**args)
+            return await handler(**data)
 
     async def load_labware(self, *args):
         # TODO: load tip rack onto deck

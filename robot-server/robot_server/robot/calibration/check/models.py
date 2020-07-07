@@ -2,13 +2,12 @@ from uuid import UUID
 from typing import Dict, Optional, List, Any, Tuple
 from functools import partial
 from pydantic import BaseModel, Field
-from robot_server.service.session.models import OffsetVector
 
+OffsetVector = Tuple[float, float, float]
 
 OffsetVectorField = partial(Field, ...,
                             description="An offset vector in deck "
                                         "coordinates (x, y, z)")
-
 
 
 # TODO: BC: the mount and rank fields here are typed as strings
