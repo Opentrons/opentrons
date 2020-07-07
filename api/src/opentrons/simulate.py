@@ -348,7 +348,7 @@ def simulate(protocol_file: TextIO,
                                       args=(protocol, context, fl))
             thread.start()
             while True:
-                v = input("command: s=step, r=resume, q=end, p=pause - ")
+                v = input("command: s=step, r=resume, q=finish, p=pause, XX=a line number to set breakpoint - ")
                 try:
                     lno = int(v)
                     fl.add_break(lno)

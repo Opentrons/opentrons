@@ -87,7 +87,7 @@ class Tracer:
 
     def __call__(self, frame, event, arg):
         if self._proto == frame.f_code.co_filename:
-            self._ctx.comment(F"{frame}")
+            self._ctx.comment(F"function[{frame.f_code.co_name}]-line[{frame.f_lineno}]-file[{frame.f_code.co_filename}]")
             if frame.f_lineno in self._bp:
                 self._event.clear()
             self._event.wait()
