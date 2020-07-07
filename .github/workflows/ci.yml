@@ -139,7 +139,5 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          aws s3 sync --region us-east-2 --acl public-read \
-            app-shell/dist/publish
-            s3://sandbox.app-releases.opentrons.com/${OT_BRANCH}
+          AWS_DEFAULT_REGION: us-east-2
+        run: aws s3 sync --acl public-read app-shell/dist/publish s3://sandbox.app-releases.opentrons.com/${OT_BRANCH}
