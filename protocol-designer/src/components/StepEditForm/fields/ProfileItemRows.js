@@ -8,6 +8,8 @@ import {
   Icon,
   Tooltip,
   useHoverTooltip,
+  TOOLTIP_TOP,
+  TOOLTIP_TOP_END,
 } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { getUnsavedForm } from '../../../step-forms/selectors'
@@ -53,8 +55,14 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   const deleteProfileCycle = () =>
     dispatch(steplistActions.deleteProfileCycle({ id: cycleItem.id }))
 
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: 'top',
+  const [
+    addStepToCycleTargetProps,
+    addStepToCycleTooltipProps,
+  ] = useHoverTooltip({
+    placement: TOOLTIP_TOP_END,
+  })
+  const [deleteCycleTargetProps, deleteCycleTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
   })
 
   return (
@@ -93,13 +101,16 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
             />
           </div>
         )}
-        <div className={styles.add_cycle_step}>
+        <Tooltip {...addStepToCycleTooltipProps}>
+          {i18n.t('tooltip.profile.add_step_to_cycle')}
+        </Tooltip>
+        <div className={styles.add_cycle_step} {...addStepToCycleTargetProps}>
           <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
         </div>
       </div>
-      <div onClick={deleteProfileCycle} {...targetProps}>
-        <Tooltip {...tooltipProps}>
-          {i18n.t('tooltip.step_fields.profileCycle.deleteCycle')}
+      <div onClick={deleteProfileCycle} {...deleteCycleTargetProps}>
+        <Tooltip {...deleteCycleTooltipProps}>
+          {i18n.t('tooltip.profile.delete_cycle')}
         </Tooltip>
         <Icon name="close" className={styles.delete_step_icon} />
       </div>
@@ -115,6 +126,13 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
   const dispatch = useDispatch()
   const addProfileCycle = () => dispatch(steplistActions.addProfileCycle(null))
   const addProfileStep = () => dispatch(steplistActions.addProfileStep(null))
+
+  const [addCycleTargetProps, addCycleTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
+  })
+  const [addStepTargetProps, addStepTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
+  })
 
   const unsavedForm = useSelector(getUnsavedForm)
   if (!unsavedForm) {
@@ -163,9 +181,29 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
         </div>
       )}
       {rows}
+      <Tooltip {...addStepTooltipProps}>
+        {i18n.t('tooltip.profile.add_step')}
+      </Tooltip>
+      <Tooltip {...addCycleTooltipProps}>
+        {i18n.t('tooltip.profile.add_cycle')}
+      </Tooltip>
       <div className={styles.profile_button_group}>
-        <OutlineButton onClick={addProfileStep}>+ Step</OutlineButton>
-        <OutlineButton onClick={addProfileCycle}>+ Cycle</OutlineButton>
+        <OutlineButton
+          hoverTooltipHandlers={addStepTargetProps}
+          onClick={addProfileStep}
+        >
+          {i18n.t(
+            'form.step_edit_form.field.thermocyclerProfile.add_step_button'
+          )}
+        </OutlineButton>
+        <OutlineButton
+          hoverTooltipHandlers={addCycleTargetProps}
+          onClick={addProfileCycle}
+        >
+          {i18n.t(
+            'form.step_edit_form.field.thermocyclerProfile.add_cycle_button'
+          )}
+        </OutlineButton>
       </div>
     </>
   )
@@ -261,7 +299,7 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
     durationSeconds: i18n.t('application.units.seconds'),
   }
   const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: 'top',
+    placement: TOOLTIP_TOP,
   })
   const fields = names.map(name => {
     const className = name === 'title' ? styles.title : styles.profile_field
@@ -295,7 +333,7 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
         {...targetProps}
       >
         <Tooltip {...tooltipProps}>
-          {i18n.t('tooltip.step_fields.profileStepRow.deleteStep')}
+          {i18n.t('tooltip.profile.delete_step')}
         </Tooltip>
         <Icon name="close" className={styles.delete_step_icon} />
       </div>

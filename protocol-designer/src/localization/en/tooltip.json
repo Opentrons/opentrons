@@ -46,12 +46,6 @@
       "disabled": {
         "wait_until_temp": "There is no temperature module on the deck"
       }
-    },
-    "profileStepRow": {
-      "deleteStep": "Delete profile step"
-    },
-    "profileCycle": {
-      "deleteCycle": "Delete cycle and steps"
     }
   },
   "edit_module_card": {
@@ -60,5 +54,12 @@
   },
   "edit_module_modal": {
     "slot_selection": "To enable non-default/unrestricted positioning, go to Settings > App > Experimental settings."
+  },
+  "profile": {
+    "add_cycle": "Add a series of steps that cycle",
+    "add_step": "Add a single non-cycling step",
+    "add_step_to_cycle": "Add a step to the cycle",
+    "delete_step": "Delete profile step",
+    "delete_cycle": "Delete cycle and steps"
   }
 }
