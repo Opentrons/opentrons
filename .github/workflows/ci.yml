@@ -6,7 +6,7 @@ env:
 
 jobs:
   test-python:
-    name: Run Python unit tests and build API docs
+    name: Run Python unit tests
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -108,7 +108,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, macos-10.15, windows-2019]
     env:
-      OT_BUILD: ${{ github.run_id }}
+      OT_BUILD: ${{ github.run_number }}
       OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
       OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
     steps:
@@ -140,6 +140,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          aws sync --region us-east-2 --acl public-read \
+          aws s3 sync --region us-east-2 --acl public-read \
             app-shell/dist/publish
             s3://sandbox.app-releases.opentrons.com/${OT_BRANCH}
