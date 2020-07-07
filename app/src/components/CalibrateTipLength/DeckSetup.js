@@ -29,8 +29,8 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
   // TODO: get real hasBlock value and labware from tip length calibration session
-  const { hasBlock, session } = props
-  const labware = session.labware
+  const { hasBlock } = props
+  const labware = {}
 
   const proceed = () => {
     console.log('TODO: wire up command')

@@ -17,6 +17,7 @@ import {
 } from '@opentrons/components'
 
 import styles from './styles.css'
+import type { CalibrateTipLengthChildProps } from './types'
 import { calBlockImage } from './labwareImages'
 import { Portal } from '../portal'
 
@@ -39,7 +40,9 @@ const SUPPORT_URL = 'https://www.opentrons.com/contact-support'
 
 const NOTE_SPACING = '1.75rem'
 
-export function ToolSettingAlertModal(props): React.Node {
+export function ToolSettingAlertModal(
+  props: CalibrateTipLengthChildProps
+): React.Node {
   return (
     <Portal>
       <AlertModal
@@ -87,7 +90,10 @@ export function ToolSettingAlertModal(props): React.Node {
           </SecondaryBtn>
         </Flex>
         <div>
-          <CheckboxField label={REMEMBER} />
+          <CheckboxField
+            label={REMEMBER}
+            onChange={() => console.log('TODO: save block setting')}
+          />
           <Text fontSize={FONT_SIZE_BODY_1} paddingX={NOTE_SPACING}>
             {CAN_CHANGE}
           </Text>

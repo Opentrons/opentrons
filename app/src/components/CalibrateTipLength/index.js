@@ -91,7 +91,11 @@ export function CalibrateTipLength(
         </ModalPage>
       ) : (
         <CalibrationInfoBox confirmed={probed} title={title}>
-          <UncalibratedInfo {...props} sendSessionCommand={sendCommand} />
+          <UncalibratedInfo
+            {...props}
+            hasBlock={hasBlock}
+            sendSessionCommand={sendCommand}
+          />
         </CalibrationInfoBox>
       )}
     </>

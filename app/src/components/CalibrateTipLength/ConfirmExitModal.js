@@ -11,6 +11,7 @@ export type ConfirmExitModalProps = {|
 const HEADING = 'Are you sure you want to exit?'
 const GO_BACK = 'go back'
 const EXIT = 'continue'
+const WARNING = 'Doing so will exit the tip length calibration.'
 
 export function ConfirmExitModal(props: ConfirmExitModalProps): React.Node {
   const { back, exit } = props
@@ -23,6 +24,8 @@ export function ConfirmExitModal(props: ConfirmExitModalProps): React.Node {
         { children: EXIT, onClick: exit },
       ]}
       alertOverlay
-    />
+    >
+      {WARNING}
+    </AlertModal>
   )
 }

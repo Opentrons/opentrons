@@ -43,6 +43,8 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
   const tiprackID =
     session.details.instruments[mount.toLowerCase()]['tiprack_id']
   const tiprack = session.details.labware.find(l => l.id === tiprackID)
+  // TODO: get tiprack loadname based on session
+  const tiprackLoadName = tiprack?.loadName || 'opentrons_96_tiprack_300ul'
 
   // TODO: get target labware based on alert modal selection or robot block setting
   const targetLabwareName = 'Opentrons Calibration Block'
@@ -65,16 +67,16 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
             <div className={styles.tiprack_image_container}>
               <img
                 className={styles.tiprack_image}
-                src={tiprackImages[tiprack.loadName]}
+                src={tiprackImages[tiprackLoadName]}
               />
             </div>
             <p className={styles.tiprack_display_name}>
-              {getLatestLabwareDef(tiprack.loadName)?.metadata.displayName}
+              {getLatestLabwareDef(tiprackLoadName)?.metadata.displayName}
             </p>
             <Link
               external
               className={styles.tiprack_measurements_link}
-              href={`${LABWARE_LIBRARY_PAGE_PATH}/${tiprack.loadName}`}
+              href={`${LABWARE_LIBRARY_PAGE_PATH}/${tiprackLoadName}`}
             >
               {VIEW_TIPRACK_MEASUREMENTS}
             </Link>
