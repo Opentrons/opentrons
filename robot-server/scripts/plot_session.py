@@ -63,21 +63,17 @@ def build_tip_length_calibration_plot(
     flow = TipCalibrationUserFlow(hardware=StubHardware())
     for state in flow._state_machine._states:
         d.node(state.name,  state.value)
-        for name, command in flow._command_map.items():
-            valid_states = command[1]
-            if state in valid_states:
-                d.edge(state.name, state.name, label=name.name)
 
     for from_state, to_states in flow._state_machine._transitions.items():
-        fs = from_state
-        if fs == TipCalibrationState.WILDCARD and not wildcard_separate:
+        if from_state == TipCalibrationState.WILDCARD and \
+                not wildcard_separate:
             all_states = [s.name for s in TipCalibrationState]
             for s in all_states:
-                d.edge(fs.name, s.name)
+                d.edge(from_state.name, s.name)
         else:
             for ts in to_states:
-                d.edge(fs.name, ts.name)
-        return d
+                d.edge(from_state.name, ts.name)
+    return d
 
 
 def build_argparser(
@@ -111,6 +107,7 @@ def build_argparser(
         help='Select output format (one of https://www.graphviz.org/doc/info/output.html)')
     return parent
 
+
 if __name__ == '__main__':
     parser = build_argparser()
     args = parser.parse_args()
@@ -125,4 +122,3 @@ if __name__ == '__main__':
             args.actions)
         graph.format = args.format
         args.output.write(graph.pipe())
-
