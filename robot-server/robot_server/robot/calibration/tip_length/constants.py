@@ -8,7 +8,6 @@ class TipCalibrationState(str, Enum):
     labwareLoaded = "labwareLoaded"
     measuringNozzleOffset = "measuringNozzleOffset"
     preparingPipette = "preparingPipette"
-    inspectingTip = "inspectingTip"
     measuringTipOffset = "measuringTipOffset"
     calibrationComplete = "calibrationComplete"
     sessionExited = "sessionExited"

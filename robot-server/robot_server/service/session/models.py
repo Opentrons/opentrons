@@ -24,6 +24,13 @@ class EmptyModel(BaseModel):
     pass
 
 
+OffsetVector = typing.Tuple[float, float, float]
+
+
+class JogPosition(BaseModel):
+    vector: OffsetVector
+
+
 class SessionType(str, Enum):
     """The available session types"""
     null = 'null'
@@ -54,7 +61,7 @@ class CommandName(str, Enum):
     # Shared Between Calibration Flows
     load_labware = "loadLabware"
     prepare_pipette = "preparePipette"
-    jog = ("jog", calibration_models.JogPosition)
+    jog = ("jog", JogPosition)
     pick_up_tip = "pickUpTip"
     confirm_tip_attached = "confirmTip"
     invalidate_tip = "invalidateTip"
@@ -83,7 +90,7 @@ class CommandName(str, Enum):
 
 
 CommandDataType = typing.Union[
-    calibration_models.JogPosition,
+    JogPosition,
     EmptyModel
 ]
 

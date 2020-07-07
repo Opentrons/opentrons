@@ -2,7 +2,7 @@ import argparse
 from typing import Dict
 
 import graphviz as gv
-
+from opentrons.types import Mount
 from robot_server.robot.calibration.check.session import (
     CalibrationCheckState,
     CHECK_TRANSITIONS
@@ -10,6 +10,7 @@ from robot_server.robot.calibration.check.session import (
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState)
 from robot_server.robot.calibration.tip_length.user_flow import (
+    TipCalibrationUserFlow,
     TIP_LENGTH_TRANSITIONS)
 
 
@@ -51,18 +52,32 @@ def build_tip_length_calibration_plot(
         wildcard_separate: bool,
         plot_actions: bool) -> gv.Digraph:
     d = gv.Digraph('Tip Length Calibration Session')
-    for state in TipCalibrationState:
-        d.node(state.name, state.value)
-    all_states = [s.name for s in TipCalibrationState]
-    if wildcard_separate:
-        d.node('*', 'wildcard')
-    for from_state, to_states in TIP_LENGTH_TRANSITIONS:
+
+    class StubHardware():
+        def __init__(self):
+            self.attached_instruments = {
+                Mount.RIGHT: {},
+                Mount.LEFT: {'model': 'fakemodel'}
+            }
+
+    flow = TipCalibrationUserFlow(hardware=StubHardware())
+    for state in flow._state_machine._states:
+        d.node(state.name,  state.value)
+        for name, command in flow._command_map.items():
+            valid_states = command[1]
+            if state in valid_states:
+                d.edge(state.name, state.name, label=name.name)
+
+    for from_state, to_states in flow._state_machine._transitions.items():
         fs = from_state
-        if isinstance(fs, TipCalibrationState):
-            fs_s = [fs.name]
-        for ts in to_states:
-            d.edge(fs.name, ts.name)
-    return d
+        if fs == TipCalibrationState.WILDCARD and not wildcard_separate:
+            all_states = [s.name for s in TipCalibrationState]
+            for s in all_states:
+                d.edge(fs.name, s.name)
+        else:
+            for ts in to_states:
+                d.edge(fs.name, ts.name)
+        return d
 
 
 def build_argparser(

@@ -1,7 +1,11 @@
 import typing
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import ThreadManager
-from robot_server.service.session.models import (CommandName, CommandDataType)
+from robot_server.service.session.models import (
+    CommandName,
+    CommandDataType,
+    JogPosition
+)
 from robot_server.robot.calibration.tip_length.util import (
     SimpleStateMachine,
     TipCalibrationError as Error
@@ -20,21 +24,16 @@ unique (by serial number) physical pipette.
 TIP_LENGTH_TRANSITIONS: typing.Dict[State, typing.Set[State]] = {
     State.sessionStarted: {State.labwareLoaded},
     State.labwareLoaded: {State.measuringNozzleOffset},
-    State.measuringNozzleOffset: {State.measuringNozzleOffset,
-                                  State.preparingPipette},
-    State.preparingPipette: {State.preparingPipette,
-                             State.inspectingTip,
-                             State.measuringTipOffset},
-    State.measuringTipOffset: {State.measuringTipOffset,
-                               State.calibrationComplete},
+    State.measuringNozzleOffset: {State.preparingPipette},
+    State.preparingPipette: {State.measuringTipOffset},
+    State.measuringTipOffset: {State.calibrationComplete},
     State.WILDCARD: {State.sessionExited},
 }
 
 # TODO: enumerate acceptable command names for this session type
-TipLengthCommandName = str
+TipLengthCommandName = CommandName
 
-COMMAND_HANDLER = typing.Union[typing.Callable[[], typing.Any],
-                               typing.Callable[[Point], typing.Any]]
+COMMAND_HANDLER = typing.Callable[[CommandDataType], typing.Awaitable]
 
 COMMAND_MAP = typing.Dict[TipLengthCommandName, typing.Tuple[COMMAND_HANDLER,
                           typing.Set[State]]]
@@ -90,7 +89,7 @@ class TipCalibrationUserFlow():
 
     async def handle_command(self,
                              name: TipLengthCommandName,
-                             data: typing.Dict[typing.Any, typing.Any]):
+                             data: CommandDataType):
         """
         Handle a client command
 
@@ -107,7 +106,8 @@ class TipCalibrationUserFlow():
                     (self._current_state not in valid_states):
                 raise Error(f'Cannot issue {name} command '
                             f'from {self._current_state}')
-            return await handler(**data)
+            args = dict(data)
+            return await handler(**args)
 
     async def load_labware(self, *args):
         # TODO: load tip rack onto deck
@@ -129,7 +129,7 @@ class TipCalibrationUserFlow():
         elif self._current_state == State.measuringTipOffset:
             self._transition_to_state(State.calibrationComplete)
 
-    async def jog(self, vector: Point):
+    async def jog(self, vector, *args):
         await self._hardware.move_rel(self._mount, Point(*vector))
 
     async def pick_up_tip(self, *args):
