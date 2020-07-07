@@ -3,23 +3,28 @@ from typing import Dict
 
 import graphviz as gv
 
-from opentrons.calibration.check import session as check_session
-from opentrons.calibration.tip_length import (
-    state_machine as tip_length_state_machine)
+from robot_server.robot.calibration.check.session import (
+    CalibrationCheckState,
+    CHECK_TRANSITIONS
+)
+from robot_server.robot.calibration.tip_length.constants import (
+    TipCalibrationState)
+from robot_server.robot.calibration.tip_length.user_flow import (
+    TIP_LENGTH_TRANSITIONS)
 
 
 def build_calibration_check_plot(
         wildcard_separate: bool,
         plot_actions: bool) -> gv.Digraph:
     d = gv.Digraph('Calibration Check Session')
-    for state in check_session.CalibrationCheckState:
+    for state in CalibrationCheckState:
         d.node(state.name, state.value)
-    all_states = [s.name for s in check_session.CalibrationCheckState]
+    all_states = [s.name for s in CalibrationCheckState]
     if wildcard_separate:
         d.node('*', 'wildcard')
-    for edgespec in check_session.CHECK_TRANSITIONS:
+    for edgespec in CHECK_TRANSITIONS:
         fs = edgespec['from_state']
-        if isinstance(fs, check_session.CalibrationCheckState):
+        if isinstance(fs, CalibrationCheckState):
             fs_s = [fs.name]
         elif wildcard_separate:
             fs_s = [fs]
@@ -46,33 +51,17 @@ def build_tip_length_calibration_plot(
         wildcard_separate: bool,
         plot_actions: bool) -> gv.Digraph:
     d = gv.Digraph('Tip Length Calibration Session')
-    for state in tip_length_state_machine.TipCalibrationState:
+    for state in TipCalibrationState:
         d.node(state.name, state.value)
-    all_states = [s.name for s in tip_length_state_machine.TipCalibrationState]
+    all_states = [s.name for s in TipCalibrationState]
     if wildcard_separate:
         d.node('*', 'wildcard')
-    for edgespec in tip_length_state_machine.TIP_LENGTH_TRANSITIONS:
-        fs = edgespec['from_state']
-        if isinstance(fs, tip_length_state_machine.TipCalibrationState):
+    for from_state, to_states in TIP_LENGTH_TRANSITIONS:
+        fs = from_state
+        if isinstance(fs, TipCalibrationState):
             fs_s = [fs.name]
-        elif wildcard_separate:
-            fs_s = [fs]
-        else:
-            fs_s = all_states
-        ts = edgespec['to_state']
-
-        kws: Dict[str, str] = {}
-        if plot_actions:
-            if edgespec.get('before'):
-                kws['before'] = edgespec['before']
-            if edgespec.get('after'):
-                kws['after'] = edgespec['after']
-        label = r'\n'.join([edgespec['trigger'].name]
-                           + [rf'{k}: {v}' for k, v in kws.items()])
-        if edgespec.get('condition'):
-            label += rf'\ncondition: {edgespec["condition"]}'
-        for f in fs_s:
-            d.edge(f, ts, label=label)
+        for ts in to_states:
+            d.edge(fs.name, ts.name)
     return d
 
 
