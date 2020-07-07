@@ -75,7 +75,14 @@ export function CalibrateTipLength(
     <>
       {Panel ? (
         <ModalPage
-          titleBar={buildTitleBarProps(shouldDisplayTitleBarExit)}
+          titleBar={{
+            title: TIP_LENGTH_CALIBRATION_SUBTITLE,
+            back: {
+              onClick: () => console.log('TODO: handle confirm exit'),
+              title: EXIT,
+              children: EXIT,
+            },
+          }}
           contentsClassName={styles.terminal_modal_contents}
         >
           <Panel
@@ -91,15 +98,4 @@ export function CalibrateTipLength(
       )}
     </>
   )
-}
-
-const buildTitleBarProps = (): TitleBarProps => {
-  return {
-    title: TIP_LENGTH_CALIBRATION_SUBTITLE,
-    back: {
-      onClick: () => console.log('TODO: handle confirm exit'),
-      title: EXIT,
-      children: EXIT,
-    },
-  }
 }
