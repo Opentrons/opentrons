@@ -169,8 +169,8 @@ def get_protocol_api(
     elif not isinstance(version, APIVersion):
         raise TypeError('version must be either a string or an APIVersion')
     else:
-        print(f'Executing using API Version {checked_version}')
         checked_version = version
+    print(f'Executing using API Version {checked_version}')
     if extra_labware is None\
        and IS_ROBOT\
        and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir():  # type: ignore
