@@ -12,7 +12,10 @@ type RadioGroupFieldProps = {|
   className?: string,
 |}
 
-export const RadioGroupField = (props: RadioGroupFieldProps): React.Node => {
+const RadioGroupFieldComponent = (
+  props: RadioGroupFieldProps,
+  ref
+): React.Node => {
   const {
     name,
     onFieldFocus,
@@ -30,6 +33,7 @@ export const RadioGroupField = (props: RadioGroupFieldProps): React.Node => {
       render={({ value, updateValue, errorToShow }) => (
         <RadioGroup
           {...radioGroupProps}
+          ref={ref}
           className={className}
           value={value ? String(value) : ''}
           error={errorToShow}
@@ -42,3 +46,8 @@ export const RadioGroupField = (props: RadioGroupFieldProps): React.Node => {
     />
   )
 }
+
+export const RadioGroupField: React.AbstractComponent<
+  RadioGroupFieldProps,
+  typeof RadioGroupField
+> = React.forwardRef(RadioGroupFieldComponent)

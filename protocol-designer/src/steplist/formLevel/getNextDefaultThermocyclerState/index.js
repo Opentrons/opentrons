@@ -82,7 +82,14 @@ export function getNextDefaultLidOpen(
 ): ?boolean {
   const prevLidSteps = orderedStepIds
     .map(stepId => savedForms[stepId])
-    .filter(form => form && form.lidOpen !== null)
+    .filter(
+      form => form && form.stepType === 'thermocycler' && form.lidOpen !== null
+    )
+
+  console.log('lidOpen', {
+    pre: orderedStepIds.map(s => savedForms[s]?.lidOpen),
+    filtered: prevLidSteps,
+  })
 
   const lastLidStep = last(prevLidSteps)
 

@@ -31,7 +31,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
         </span>
       </div>
       <div className={styles.tc_step_group}>
-        <div className={styles.checkbox_row}>
+        <div className={styles.checkbox_row} id="foo-test-it">
           <RadioGroupField
             name="thermocyclerFormType"
             className={styles.tc_step_option}

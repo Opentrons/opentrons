@@ -164,6 +164,7 @@ export const unsavedForm = (
         savedStepForms: rootState.savedStepForms,
         orderedStepIds: rootState.orderedStepIds,
         initialDeckSetup: _getInitialDeckSetupRootState(rootState),
+        robotStateTimeline: action.meta.robotStateTimeline,
       })
     }
     case 'CHANGE_FORM_INPUT': {
