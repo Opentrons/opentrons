@@ -28,9 +28,9 @@ const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
-  // TODO: get real has_block value and labware from tip length calibration session
-  const has_block = true
-  const labware = {}
+  // TODO: get real hasBlock value and labware from tip length calibration session
+  const { hasBlock, session } = props
+  const labware = session.labware
 
   const proceed = () => {
     console.log('TODO: wire up command')
@@ -40,7 +40,7 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   return (
     <>
       <div className={styles.prompt}>
-        {has_block ? (
+        {hasBlock ? (
           <p className={styles.prompt_text}>{DECK_SETUP_WITH_BLOCK_PROMPT}</p>
         ) : (
           <p className={styles.prompt_text}>{DECK_SETUP_NO_BLOCK_PROMPT}</p>

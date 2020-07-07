@@ -22,23 +22,28 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  position: relative;
+}
+
+.intro_header {
+  @apply --font-header-dark;
+
+  margin-bottom: 1rem;
+  text-transform: uppercase;
 }
 
 .intro_content {
-  margin-bottom: 1rem;
-  font-size: var('--fs-body-2');
-}
+  @apply --font-body-2-dark;
 
-.intro_button {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  flex: 1;
+  margin-bottom: 1.5rem;
 }
 
 .button_spacer {
   width: 0.875rem;
   height: 1rem;
+}
+
+.alert_modal_padding {
+  padding: 4rem 1rem;
 }
 
 .intro_settings_note {
@@ -58,7 +63,7 @@
 }
 
 .terminal_modal_contents {
-  padding: 2rem 3.5rem;
+  padding: 1rem 1.5rem;
 }
 
 .complete_summary {
@@ -122,7 +127,7 @@
 }
 
 .continue_button {
-  margin: 2rem 5rem;
+  margin: 1.5rem 5rem 1rem;
 }
 
 .required_block {
@@ -136,19 +141,13 @@
   max-width: 16rem;
 }
 
-.required_tipracks_wrapper {
-  width: 100%;
-  display: flex;
-}
-
 .required_tiprack {
   width: 50%;
   border: 1px solid var('--c-med-gray');
-  padding: 0 1.5rem;
+  padding: 0 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 1rem 0;
 }
 
 .required_tiprack:not(:last-child) {
@@ -160,13 +159,13 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 15rem;
+  padding: 1rem 0;
+  height: 70%;
 }
 
 .tiprack_image {
   width: 100%;
-  max-height: 15rem;
-  max-width: 15.25rem;
+  max-height: 100%;
 }
 
 .tiprack_display_name {
@@ -193,26 +192,8 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   }
 }
 
-.tipracks_note_div {
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  position: relative;
-}
-
 .tipracks_note_header {
   text-transform: uppercase;
-}
-
-.tipracks_note_body {
-  font-size: var('--fs-body-1');
-}
-
-.tipracks_note_emphasized_body {
-  text-decoration: underline;
-  font-size: var('--fs-body-1');
 }
 
 /* end copped styles */
