@@ -2,7 +2,7 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 
-import { ModalPage, TitleBarProps } from '@opentrons/components'
+import { ModalPage } from '@opentrons/components'
 
 import type {
   SessionCommandString,
@@ -56,8 +56,6 @@ export function CalibrateTipLength(
   const Panel = PANEL_BY_STEP[currentStep]
 
   const [dispatchRequest] = useDispatchApiRequest()
-
-  const shouldDisplayTitleBarExit = true
 
   function sendCommand(
     command: SessionCommandString,
