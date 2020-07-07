@@ -62,7 +62,7 @@ describe('NavbarLink component', () => {
       disabledReason: 'ah!',
     })
 
-    // TODO(mc, 2020-07-01): figure out a good testing stratgey for
+    // TODO(mc, 2020-07-01): figure out a good testing strategy for
     // useHoverTooltip so we can test tooltip contents
     expect(wrapper.exists(Tooltip)).toBe(true)
   })
@@ -76,7 +76,7 @@ describe('NavbarLink component', () => {
       notificationReason: 'ah!',
     })
 
-    // TODO(mc, 2020-07-01): figure out a good testing stratgey for
+    // TODO(mc, 2020-07-01): figure out a good testing strategy for
     // useHoverTooltip so we can test tooltip contents
     expect(wrapper.exists(Tooltip)).toBe(true)
   })
