@@ -64,7 +64,7 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Send a home_all_motors command
+  - name: Send a homeAllMotors command
     request:
       url: "{host:s}:{port:d}/sessions/default/commands/execute"
       method: POST
@@ -72,11 +72,11 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: home_all_motors
+            command: homeAllMotors
             data: {}
     response:
       status_code: 200
-  - name: Send a toggle_lights command
+  - name: Send a toggleLights command
     request:
       url: "{host:s}:{port:d}/sessions/default/commands/execute"
       method: POST
@@ -84,7 +84,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: toggle_lights
+            command: toggleLights
             data: {}
     response:
       status_code: 200

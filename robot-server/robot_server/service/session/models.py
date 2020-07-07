@@ -47,9 +47,9 @@ class CommandStatus(str, Enum):
 
 class CommandName(str, Enum):
     """The available session commands"""
-    home_all_motors = "home_all_motors"
-    home_pipette = "home_pipette"
-    toggle_lights = "toggle_lights"
+    home_all_motors = "homeAllMotors"
+    home_pipette = "homePipette"
+    toggle_lights = "toggleLights"
     load_labware = CalibrationCheckTrigger.load_labware.value
     prepare_pipette = CalibrationCheckTrigger.prepare_pipette.value
     jog = (CalibrationCheckTrigger.jog.value,
