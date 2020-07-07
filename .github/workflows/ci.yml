@@ -90,9 +90,15 @@ jobs:
         with:
           node-version: '12'
       - run: make setup-js
-      - run: make -C components
-      - run: make -C protocol-designer
-      - run: make -C labware-library
+      - name: Build Components Library style guide
+        run: make -C components
+      - name: Build Protocol Designer
+        env:
+          OT_PD_COMMIT_HASH: ${{ github.SHA }}
+          OT_PD_FULLSTORY_ORG: ${{ secrets.OT_PD_FULLSTORY_ORG }}
+        run: make -C protocol-designer
+      - name: Build Labware Library
+        run: make -C labware-library
 
   build-app:
     name: Build desktop Opentrons App on ${{ matrix.os }}
@@ -101,15 +107,39 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04, macos-10.15, windows-2019]
+    env:
+      OT_BUILD: ${{ github.run_id }}
+      OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
+      OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
     steps:
+      - name: Set branch and tag name environment variables
+        uses: actions/github-script@v2
+        with:
+          script: |
+            const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
+            const tag = context.ref.startsWith('refs/tags/') ? branch : ''
+            core.exportVariable('OT_BRANCH', branch)
+            core.exportVariable('OT_TAG', tag)
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: '12'
       - run: make setup-js
-      - if: runner.os == 'Linux'
+      - name: Build app for Linux
+        if: ${{ runner.os == 'Linux' }}
         run: make -C app-shell dist-linux
-      - if: runner.os == 'macOS'
+      - name: Build app for macOS
+        if: ${{ runner.os == 'macOS' }}
         run: make -C app-shell dist-osx
-      - if: runner.os == 'Windows'
+      - name: Build app for Windows
+        if: ${{ runner.os == 'Windows' }}
         run: make -C app-shell dist-win
+      - name: Deploy app files to S3
+        if: ${{ github.event_name == 'push' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws sync --region us-east-2 --acl public-read \
+            app-shell/dist/publish
+            s3://sandbox.app-releases.opentrons.com/${OT_BRANCH}
