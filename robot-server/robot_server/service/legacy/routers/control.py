@@ -42,7 +42,7 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
     robot_positions = control.RobotPositions(
         change_pipette=control.ChangePipette(target=control.MotionTarget.mount,
                                              left=[300, 40, 30],
-                                             right=[95, 30, 30]),
+                                             right=[95, 40, 30]),
         attach_tip=control.AttachTip(target=control.MotionTarget.pipette,
                                      point=[200, 90, 150])
     )
