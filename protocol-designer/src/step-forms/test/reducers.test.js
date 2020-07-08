@@ -1213,7 +1213,12 @@ describe('unsavedForm reducer', () => {
     const action = { type: 'ADD_PROFILE_CYCLE', payload: null }
 
     const id = 'newCycleId'
-    mockUuid.mockReturnValue(id)
+    const profileStepId = 'newProfileStepId'
+    // NOTE: because we're using uuid() to create multiple different ids,
+    // this test is sensitive to the order that uuid is called in and
+    // assumes it's first for cycle id, then next for profile step id
+    mockUuid.mockReturnValueOnce(id)
+    mockUuid.mockReturnValueOnce(profileStepId)
 
     const state = {
       unsavedForm: {
@@ -1228,7 +1233,7 @@ describe('unsavedForm reducer', () => {
       stepType: 'thermocycler',
       orderedProfileItems: [id],
       profileItemsById: {
-        [id]: createInitialProfileCycle(id),
+        [id]: createInitialProfileCycle(id, profileStepId),
       },
     })
   })
