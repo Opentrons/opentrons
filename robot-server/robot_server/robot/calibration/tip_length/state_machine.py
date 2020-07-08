@@ -43,10 +43,8 @@ class TipCalibrationStateMachine():
             transitions=TIP_LENGTH_TRANSITIONS
         )
 
-    def get_next_state(self, command):
-        next_state = self._state_machine.get_next_state(
-                self._current_state,
-                command)
+    def get_next_state(self, from_state: State, command: CommandName):
+        next_state = self._state_machine.get_next_state(from_state, command)
         if next_state:
             return next_state
         else:

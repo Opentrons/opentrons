@@ -27,7 +27,7 @@ def machine(loop):
             'glueUp': 'gluingUp'
         },
         'assemblingTable': {
-            'glueUp':'gluingUp',
+            'glueUp': 'gluingUp',
             'sand': 'sandingDown'
         },
         'gluingUp': {

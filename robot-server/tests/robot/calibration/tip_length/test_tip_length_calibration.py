@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 
@@ -10,26 +10,13 @@ from robot_server.robot.calibration.tip_length.user_flow import \
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
 
-valid_commands: List[Tuple[str, str, str, Dict]] = [
-  (CommandName.load_labware, 'sessionStarted', 'labwareLoaded', {}),
-  (CommandName.move_to_reference_point, 'labwareLoaded',
-   'measuringNozzleOffset', {}),
-  (CommandName.jog, 'measuringNozzleOffset',
-   'measuringNozzleOffset', stub_jog_data),
-  (CommandName.save_offset, 'measuringNozzleOffset', 'preparingPipette', {}),
-  (CommandName.jog, 'preparingPipette', 'preparingPipette', stub_jog_data),
-  (CommandName.pick_up_tip, 'preparingPipette', 'preparingPipette', {}),
-  (CommandName.invalidate_tip, 'preparingPipette', 'preparingPipette', {}),
-  (CommandName.move_to_reference_point, 'preparingPipette',
-   'measuringTipOffset', {}),
-  (CommandName.jog, 'measuringTipOffset', 'measuringTipOffset', stub_jog_data),
-  (CommandName.save_offset, 'measuringTipOffset', 'calibrationComplete', {}),
-  (CommandName.exit, 'calibrationComplete', 'sessionExited', {}),
-  (CommandName.exit, 'sessionStarted', 'sessionExited', {}),
-  (CommandName.exit, 'labwareLoaded', 'sessionExited', {}),
-  (CommandName.exit, 'measuringNozzleOffset', 'sessionExited', {}),
-  (CommandName.exit, 'preparingPipette', 'sessionExited', {}),
-  (CommandName.exit, 'measuringTipOffset', 'sessionExited', {}),
+valid_commands: List[Tuple[str, str, Dict[Any, Any]]] = [
+  (CommandName.move_to_reference_point, 'labwareLoaded', {}),
+  (CommandName.jog, 'measuringNozzleOffset', stub_jog_data),
+  (CommandName.pick_up_tip, 'preparingPipette', {}),
+  (CommandName.invalidate_tip, 'preparingPipette', {}),
+  (CommandName.save_offset, 'measuringTipOffset', {}),
+  (CommandName.exit, 'calibrationComplete', {}),
 ]
 
 
@@ -55,9 +42,16 @@ def mock_user_flow(hardware):
     yield m
 
 
-@pytest.mark.parametrize('command,from_state,to_state,data', valid_commands)
-async def test_valid_commands(command, from_state, to_state, data,
-                              mock_user_flow):
-    mock_user_flow._current_state = from_state
+hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
+  (CommandName.jog, 'measuringNozzleOffset', stub_jog_data, 'move_rel'),
+  (CommandName.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
+  (CommandName.invalidate_tip, 'preparingPipette', {}, 'drop_tip'),
+]
+
+
+@pytest.mark.parametrize('command,current_state,data,hw_meth', hw_commands)
+async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
+    mock_user_flow._current_state = current_state
     await mock_user_flow.handle_command(command, data)
-    assert mock_user_flow._current_state == to_state
+
+    getattr(mock_user_flow._hardware, hw_meth).assert_called()

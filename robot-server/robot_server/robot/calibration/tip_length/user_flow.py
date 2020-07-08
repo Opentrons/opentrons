@@ -90,7 +90,8 @@ class TipCalibrationUserFlow():
         :param data: Data supplied in command
         :return: None
         """
-        next_state = self._state_machine.get_next_state(name)
+        next_state = self._state_machine.get_next_state(self._current_state,
+                                                        name)
         handler = self._command_map.get(name)
         if handler is not None:
             return await handler(**data)
