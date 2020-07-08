@@ -1,7 +1,10 @@
-import typing
+from typing import Dict, Set, Tuple, Awaitable, Callable, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import ThreadManager
 from robot_server.service.session.models import CommandName
+from robot_server.robot.calibration.tip_length.state_machine import (
+    TipCalibrationStateMachine
+)
 from robot_server.robot.calibration.tip_length.util import (
     SimpleStateMachine,
     TipCalibrationError as Error
@@ -17,19 +20,35 @@ calibration data associated with the combination of a pipette tip type and a
 unique (by serial number) physical pipette.
 """
 
-TIP_LENGTH_TRANSITIONS: typing.Dict[State, typing.Set[State]] = {
-    State.sessionStarted: {State.labwareLoaded},
-    State.labwareLoaded: {State.measuringNozzleOffset},
-    State.measuringNozzleOffset: {State.preparingPipette},
-    State.preparingPipette: {State.measuringTipOffset},
-    State.measuringTipOffset: {State.calibrationComplete},
-    State.WILDCARD: {State.sessionExited},
+TIP_LENGTH_TRANSITIONS: Dict[State, Set[Dict[CommandName, State]]] = {
+    State.sessionStarted: {
+        CommandName.load_labware: State.labwareLoaded
+    },
+    State.labwareLoaded: {
+        CommandName.move_to_reference_point: State.measuringNozzleOffset
+    },
+    State.measuringNozzleOffset: {
+        CommandName.save_offset: State.preparingPipette,
+        CommandName.jog: State.measuringNozzleOffset
+    },
+    State.preparingPipette: {
+        CommandName.jog: State.preparingPipette,
+        CommandName.pick_up_tip: State.preparingPipette,
+        CommandName.invalidate_tip: State.preparingPipette,
+        CommandName.move_to_reference_point: State.measuringTipOffset
+    },
+    State.measuringTipOffset: {
+        CommandName.save_offset: State.calibrationComplete,
+        CommandName.jog: State.measuringTipOffset
+    },
+    State.WILDCARD: {
+        CommandName.exit: State.sessionExited
+    }
 }
 
-COMMAND_HANDLER = typing.Callable[..., typing.Awaitable]
+COMMAND_HANDLER = Callable[..., Awaitable]
 
-COMMAND_MAP = typing.Dict[str, typing.Tuple[COMMAND_HANDLER,
-                          typing.Set[State]]]
+COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
 
 class TipCalibrationUserFlow():
@@ -41,10 +60,7 @@ class TipCalibrationUserFlow():
         self._has_calibration_block = has_calibration_block
         self._hardware = hardware
         self._current_state = State.sessionStarted
-        self._state_machine = SimpleStateMachine(
-            states=set(s for s in State),
-            transitions=TIP_LENGTH_TRANSITIONS
-        )
+        self._state_machine = TipCalibrationStateMachine()
         self._mount = mount
         self._hw_pipette = self._hardware.attached_instruments[mount]
         if not self._hw_pipette:
@@ -52,37 +68,21 @@ class TipCalibrationUserFlow():
                         'cannot run tip length calibration')
 
         self._command_map: COMMAND_MAP = {
-            CommandName.load_labware: (self.load_labware,
-                                       {State.sessionStarted}),
-            CommandName.jog: (self.jog, {State.measuringNozzleOffset,
-                                         State.measuringTipOffset,
-                                         State.preparingPipette}),
-            CommandName.pick_up_tip: (self.pick_up_tip,
-                                      {State.preparingPipette}),
-            CommandName.invalidate_tip: (self.invalidate_tip,
-                                         {State.preparingPipette}),
-            CommandName.save_offset: (self.save_offset,
-                                      {State.measuringNozzleOffset,
-                                       State.measuringTipOffset}),
-            CommandName.move_to_reference_point: (self.move_to_reference_point,
-                                                  {State.labwareLoaded,
-                                                   State.preparingPipette}),
-            CommandName.exit: (self.exit_session, {State.WILDCARD})
+            CommandName.load_labware: self.load_labware,
+            CommandName.jog: self.jog,
+            CommandName.pick_up_tip: self.pick_up_tip,
+            CommandName.invalidate_tip: self.invalidate_tip,
+            CommandName.save_offset: self.save_offset,
+            CommandName.move_to_reference_point: self.move_to_reference_point,
+            CommandName.exit: self.exit_session,
         }
 
-    def _transition_to_state(self, to_state):
-        next_state = self._state_machine.trigger_transition(
-                self._current_state,
-                to_state)
-        if next_state:
-            self._current_state = next_state
-        else:
-            raise Error(f"Cannot proceed to {to_state} step"
-                        f"from {self._current_state}.")
+    def _set_current_state(self, to_state):
+        self._current_state = to_state
 
     async def handle_command(self,
                              name: str,
-                             data: typing.Dict[typing.Any, typing.Any]):
+                             data: Dict[Any, Any]):
         """
         Handle a client command
 
@@ -90,36 +90,26 @@ class TipCalibrationUserFlow():
         :param data: Data supplied in command
         :return: None
         """
-
-        command_info = self._command_map.get(name)
-        if command_info is not None:
-            handler = command_info[0]
-            valid_states = command_info[1]
-            if (State.WILDCARD not in valid_states) and \
-                    (self._current_state not in valid_states):
-                raise Error(f'Cannot issue {name} command '
-                            f'from {self._current_state}')
+        next_state = self._state_machine.get_next_state(name)
+        handler = self._command_map.get(name)
+        if handler is not None:
             return await handler(**data)
+        self._set_current_state(next_state)
 
     async def load_labware(self, *args):
         # TODO: load tip rack onto deck
         # TODO: move to pick up tip pick up start location
-        self._transition_to_state(State.labwareLoaded)
+        pass
 
     async def move_to_reference_point(self, *args):
         # TODO: move nozzle/tip to reference location (block || trash edge)
-        if self._current_state == State.labwareLoaded:
-            self._transition_to_state(State.measuringNozzleOffset)
-        elif self._current_state == State.preparingPipette:
-            self._transition_to_state(State.measuringTipOffset)
+        pass
 
     async def save_offset(self, *args):
         # TODO: save the current nozzle/tip offset here
-        if self._current_state == State.measuringNozzleOffset:
+        # if self._current_state == State.measuringNozzleOffset:
             # TODO: move to pick up tip pick up start location
-            self._transition_to_state(State.preparingPipette)
-        elif self._current_state == State.measuringTipOffset:
-            self._transition_to_state(State.calibrationComplete)
+        pass
 
     async def jog(self, vector, *args):
         await self._hardware.move_rel(self._mount, Point(*vector))
@@ -137,7 +127,7 @@ class TipCalibrationUserFlow():
         # # mod geometry contexts. Ignore type checking error here.
         # tiprack = self._deck[lw_info.slot]
         # full_length = tiprack.tip_length  # type: ignore
-        # overlap_dict: typing.Dict =\
+        # overlap_dict: Dict =\
         #     self.pipettes[mount]['tip_overlap']  # type: ignore
         # default = overlap_dict['default']
         # overlap = overlap_dict.get(
@@ -159,4 +149,4 @@ class TipCalibrationUserFlow():
 
     async def exit_session(self, *args):
         # TODO: move to saved (jogged to) pick up tip location, return tip
-        self._transition_to_state(State.sessionExited)
+        pass
