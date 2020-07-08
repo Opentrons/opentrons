@@ -1,30 +1,30 @@
 import pytest
 from typing import List, Tuple
 
-from robot_server.service.session.models import CommandName
+from robot_server.service.session.models import CommonCommand
 from robot_server.robot.calibration.tip_length.state_machine import \
     TipCalibrationStateMachine
 
 valid_commands: List[Tuple[str, str, str]] = [
-  (CommandName.load_labware, 'sessionStarted', 'labwareLoaded'),
-  (CommandName.move_to_reference_point, 'labwareLoaded',
+  (CommonCommand.load_labware, 'sessionStarted', 'labwareLoaded'),
+  (CommonCommand.move_to_reference_point, 'labwareLoaded',
    'measuringNozzleOffset'),
-  (CommandName.jog, 'measuringNozzleOffset',
+  (CommonCommand.jog, 'measuringNozzleOffset',
    'measuringNozzleOffset'),
-  (CommandName.save_offset, 'measuringNozzleOffset', 'preparingPipette'),
-  (CommandName.jog, 'preparingPipette', 'preparingPipette'),
-  (CommandName.pick_up_tip, 'preparingPipette', 'preparingPipette'),
-  (CommandName.invalidate_tip, 'preparingPipette', 'preparingPipette'),
-  (CommandName.move_to_reference_point, 'preparingPipette',
+  (CommonCommand.save_offset, 'measuringNozzleOffset', 'preparingPipette'),
+  (CommonCommand.jog, 'preparingPipette', 'preparingPipette'),
+  (CommonCommand.pick_up_tip, 'preparingPipette', 'preparingPipette'),
+  (CommonCommand.invalidate_tip, 'preparingPipette', 'preparingPipette'),
+  (CommonCommand.move_to_reference_point, 'preparingPipette',
    'measuringTipOffset'),
-  (CommandName.jog, 'measuringTipOffset', 'measuringTipOffset'),
-  (CommandName.save_offset, 'measuringTipOffset', 'calibrationComplete'),
-  (CommandName.exit, 'calibrationComplete', 'sessionExited'),
-  (CommandName.exit, 'sessionStarted', 'sessionExited'),
-  (CommandName.exit, 'labwareLoaded', 'sessionExited'),
-  (CommandName.exit, 'measuringNozzleOffset', 'sessionExited'),
-  (CommandName.exit, 'preparingPipette', 'sessionExited'),
-  (CommandName.exit, 'measuringTipOffset', 'sessionExited'),
+  (CommonCommand.jog, 'measuringTipOffset', 'measuringTipOffset'),
+  (CommonCommand.save_offset, 'measuringTipOffset', 'calibrationComplete'),
+  (CommonCommand.exit, 'calibrationComplete', 'sessionExited'),
+  (CommonCommand.exit, 'sessionStarted', 'sessionExited'),
+  (CommonCommand.exit, 'labwareLoaded', 'sessionExited'),
+  (CommonCommand.exit, 'measuringNozzleOffset', 'sessionExited'),
+  (CommonCommand.exit, 'preparingPipette', 'sessionExited'),
+  (CommonCommand.exit, 'measuringTipOffset', 'sessionExited'),
 ]
 
 
