@@ -11,11 +11,6 @@ import {
   getNextDefaultPipetteId,
   getNextDefaultTemperatureModuleId,
   getNextDefaultThermocyclerModuleId,
-  // getNextDefaultBlockIsActive, // TODO IMMEDIATELY: delete
-  // getNextDefaultBlockTemperature,
-  // getNextDefaultLidIsActive,
-  // getNextDefaultLidTemperature,
-  // getNextDefaultLidOpen,
   handleFormChange,
 } from '../../steplist/formLevel'
 import {
@@ -154,47 +149,17 @@ const _patchTemperatureModuleId = (args: {|
 
 const _patchThermocyclerFields = (args: {|
   initialDeckSetup: InitialDeckSetup,
-  orderedStepIds: OrderedStepIdsState,
-  savedStepForms: SavedStepFormState,
   stepType: StepType,
   robotStateTimeline: Timeline,
 |}): FormUpdater => () => {
-  const {
-    initialDeckSetup,
-    orderedStepIds,
-    savedStepForms,
-    stepType,
-    robotStateTimeline,
-  } = args
+  const { initialDeckSetup, stepType, robotStateTimeline } = args
 
   if (stepType !== 'thermocycler') {
     return null
   }
 
-  const moduleId = getNextDefaultThermocyclerModuleId(
-    savedStepForms,
-    orderedStepIds,
-    initialDeckSetup.modules
-  )
+  const moduleId = getNextDefaultThermocyclerModuleId(initialDeckSetup.modules)
 
-  // const blockIsActive = getNextDefaultBlockIsActive(
-  //   savedStepForms,
-  //   orderedStepIds
-  // )
-
-  // const blockTargetTemp = getNextDefaultBlockTemperature(
-  //   savedStepForms,
-  //   orderedStepIds
-  // )
-
-  // const lidIsActive = getNextDefaultLidIsActive(savedStepForms, orderedStepIds)
-
-  // const lidTargetTemp = getNextDefaultLidTemperature(
-  //   savedStepForms,
-  //   orderedStepIds
-  // )
-
-  // const lidOpen = getNextDefaultLidOpen(savedStepForms, orderedStepIds)
   const lastRobotState: ?RobotState = last(robotStateTimeline.timeline)
     ?.robotState
   const moduleState = lastRobotState?.modules[moduleId]?.moduleState
@@ -251,8 +216,6 @@ export const createPresavedStepForm = ({
 
   const updateThermocyclerFields = _patchThermocyclerFields({
     initialDeckSetup,
-    orderedStepIds,
-    savedStepForms,
     stepType,
     robotStateTimeline,
   })
