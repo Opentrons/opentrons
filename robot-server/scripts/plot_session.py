@@ -2,16 +2,14 @@ import argparse
 from typing import Dict
 
 import graphviz as gv
-from opentrons.types import Mount
 from robot_server.robot.calibration.check.session import (
     CalibrationCheckState,
     CHECK_TRANSITIONS
 )
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState)
-from robot_server.robot.calibration.tip_length.user_flow import (
-    TipCalibrationUserFlow,
-    TIP_LENGTH_TRANSITIONS)
+from robot_server.robot.calibration.tip_length.state_machine import (
+    TipCalibrationStateMachine)
 
 
 def build_calibration_check_plot(
@@ -53,26 +51,33 @@ def build_tip_length_calibration_plot(
         plot_actions: bool) -> gv.Digraph:
     d = gv.Digraph('Tip Length Calibration Session')
 
-    class StubHardware():
-        def __init__(self):
-            self.attached_instruments = {
-                Mount.RIGHT: {},
-                Mount.LEFT: {'model': 'fakemodel'}
-            }
-
-    flow = TipCalibrationUserFlow(hardware=StubHardware())
-    for state in flow._state_machine._states:
+    tip_cal = TipCalibrationStateMachine()
+    for state in tip_cal._state_machine._states:
         d.node(state.name,  state.value)
 
-    for from_state, to_states in flow._state_machine._transitions.items():
+    uniq_edge_map = {}
+    for from_state, to_states_by_command in \
+            tip_cal._state_machine._transitions.items():
         if from_state == TipCalibrationState.WILDCARD and \
                 not wildcard_separate:
             all_states = [s.name for s in TipCalibrationState]
             for s in all_states:
                 d.edge(from_state.name, s.name)
         else:
-            for ts in to_states:
-                d.edge(from_state.name, ts.name)
+            for command, ts in to_states_by_command.items():
+                edge_key = f'{from_state.name}->{ts.name}'
+                existing_edge = uniq_edge_map.get(
+                        f'{from_state.name}->{ts.name}', None)
+                if existing_edge:
+                    uniq_edge_map[edge_key] = \
+                        (existing_edge[0], existing_edge[1],
+                         f'{existing_edge[2]} | {command.name}')
+                else:
+                    uniq_edge_map[edge_key] = (from_state.name, ts.name,
+                                               command.name)
+    for k, v in uniq_edge_map.items():
+        fs, ts, c = v
+        d.edge(fs, ts, label=c)
     return d
 
 
