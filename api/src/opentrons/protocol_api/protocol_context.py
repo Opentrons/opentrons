@@ -678,7 +678,11 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def fixed_trash(self) -> Labware:
-        """ The trash fixed to slot 12 of the robot deck. """
+        """ The trash fixed to slot 12 of the robot deck.
+        
+        It has one well and should be accessed like labware in your protocol
+        e.g. ``protocol.fixed_trash['A1']``
+        """
         trash = self._deck_layout['12']
         if not trash:
             raise RuntimeError("Robot must have a trash container in 12")
