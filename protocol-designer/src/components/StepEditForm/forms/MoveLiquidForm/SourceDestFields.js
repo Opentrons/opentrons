@@ -121,9 +121,12 @@ export const SourceDestFields = (props: Props): React.Node => {
             </CheckboxRowField>
           </React.Fragment>
         )}
-        {prefix === 'dispense' && getDelayFields()}
-        {prefix === 'dispense' && getMixFields()}
-
+        {prefix === 'dispense' && (
+          <React.Fragment>
+            {getDelayFields()}
+            {getMixFields()}
+          </React.Fragment>
+        )}
         <CheckboxRowField
           name={addFieldNamePrefix('touchTip_checkbox')}
           tooltipComponent={i18n.t(
