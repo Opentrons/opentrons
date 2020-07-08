@@ -34,7 +34,7 @@ export const SourceDestFields = (props: Props): React.Node => {
   const { className, focusHandlers, prefix } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
-  const mixFields = (
+  const getMixFields = () => (
     <CheckboxRowField
       name={addFieldNamePrefix('mix_checkbox')}
       label={i18n.t('form.step_edit_form.field.mix.label')}
@@ -100,7 +100,7 @@ export const SourceDestFields = (props: Props): React.Node => {
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
               className={styles.small_field}
             />
-            {mixFields}
+            {getMixFields()}
             {getDelayFields()}
             <CheckboxRowField
               disabled
@@ -119,7 +119,7 @@ export const SourceDestFields = (props: Props): React.Node => {
           </React.Fragment>
         )}
         {prefix === 'dispense' && getDelayFields()}
-        {prefix === 'dispense' && mixFields}
+        {prefix === 'dispense' && getMixFields()}
 
         <CheckboxRowField
           name={addFieldNamePrefix('touchTip_checkbox')}
