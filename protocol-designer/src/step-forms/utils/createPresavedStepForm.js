@@ -174,7 +174,8 @@ const _patchThermocyclerFields = (args: {|
       lidOpen: moduleState.lidOpen,
     }
   }
-  return null
+  // if there's no last robot state (eg upstream errors), still should return moduleId
+  return { moduleId }
 }
 
 export const createPresavedStepForm = ({
