@@ -13,7 +13,7 @@ export const LabwareTooltipContents = (
   return (
     <div className={styles.labware_tooltip_contents}>
       <p className={styles.labware_name}>{labwareNickname}</p>
-      {labwareNickname && (
+      {labwareDefDisplayName && (
         <React.Fragment>
           <div className={styles.labware_spacer} />
           <p>{labwareDefDisplayName}</p>
