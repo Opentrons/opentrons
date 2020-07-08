@@ -12,7 +12,7 @@ export function Resources(): React.Node {
         <ResourceCard
           title="Support Articles"
           description="Visit our walkthroughs and FAQs"
-          url={'https://support.opentrons.com/ot-2'}
+          url={'https://support.opentrons.com/'}
         />
       </CardRow>
       <CardRow>
