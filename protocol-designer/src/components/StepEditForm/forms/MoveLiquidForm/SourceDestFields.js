@@ -61,6 +61,9 @@ export const SourceDestFields = (props: Props): React.Node => {
         name={addFieldNamePrefix('delay_checkbox')}
         label={i18n.t('form.step_edit_form.field.delay.label')}
         className={styles.small_field}
+        tooltipComponent={i18n.t(
+          `tooltip.step_fields.defaults.${addFieldNamePrefix('delay_checkbox')}`
+        )}
       >
         <TextField
           name={addFieldNamePrefix('delay_seconds')}
