@@ -60,7 +60,7 @@ def build_tip_length_calibration_plot(
             tip_cal._state_machine._transitions.items():
         if from_state == TipCalibrationState.WILDCARD and \
                 not wildcard_separate:
-            all_states = [s.name for s in TipCalibrationState]
+            all_states = (s.name for s in TipCalibrationState)
             for s in all_states:
                 d.edge(from_state.name, s.name)
         else:

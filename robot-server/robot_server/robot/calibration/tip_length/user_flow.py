@@ -77,7 +77,7 @@ class TipCalibrationUserFlow():
             CommandName.exit: self.exit_session,
         }
 
-    def _set_current_state(self, to_state):
+    def _set_current_state(self, to_state: State):
         self._current_state = to_state
 
     async def handle_command(self,
