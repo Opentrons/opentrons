@@ -58,6 +58,9 @@
           "never": "Use same tip as the previous step."
         }
       },
+      "delay": {
+        "label": "delay"
+      },
       "tip_position": { "label": "tip position" },
       "volume": { "label": "volume per well" },
       "well_order": {
