@@ -1,6 +1,6 @@
 import pytest
 
-from robot_server.robot.calibration import util
+from robot_server.robot.calibration.check import util
 
 
 @pytest.fixture

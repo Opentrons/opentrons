@@ -4,7 +4,6 @@ from datetime import datetime
 
 import typing
 
-from robot_server.robot.calibration.check.models import JogPosition
 from pydantic.main import BaseModel
 
 from robot_server.service.dependencies import get_session_manager
@@ -15,7 +14,7 @@ from robot_server.service.session.command_execution.command import \
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
 from robot_server.service.session.models import CommandName, EmptyModel, \
-    SessionType
+    SessionType, JogPosition
 from robot_server.service.session.session_types import NullSession, \
     SessionMetaData
 

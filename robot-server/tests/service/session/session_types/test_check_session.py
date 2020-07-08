@@ -3,17 +3,17 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 from robot_server.robot.calibration.check.session import \
     CheckCalibrationSession, CalibrationCheckState, CalibrationCheckTrigger
-from robot_server.robot.calibration.check.models import JogPosition
 from robot_server.robot.calibration.helper_classes import PipetteInfo,\
     PipetteRank
 from opentrons import types
 from robot_server.robot.calibration.session import CalibrationException, \
     NoPipetteException
-from robot_server.robot.calibration.util import StateMachineError
+from robot_server.robot.calibration.check.util import StateMachineError
 
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import CommandName, EmptyModel
+from robot_server.service.session.models import (CommandName, EmptyModel,
+                                                 JogPosition)
 from robot_server.service.session.session_types import CheckSession, \
     SessionMetaData, BaseSession
 
