@@ -1,4 +1,4 @@
-from typing import Dict, Set
+from typing import Dict
 from robot_server.service.session.models import CommandName
 from robot_server.robot.calibration.tip_length.util import (
     SimpleStateMachine,
@@ -9,7 +9,7 @@ from robot_server.robot.calibration.tip_length.constants import (
 )
 
 
-TIP_LENGTH_TRANSITIONS: Dict[State, Set[Dict[CommandName, State]]] = {
+TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandName, State]] = {
     State.sessionStarted: {
         CommandName.load_labware: State.labwareLoaded
     },
@@ -48,5 +48,4 @@ class TipCalibrationStateMachine():
         if next_state:
             return next_state
         else:
-            raise Error(f"Cannot call {command} command"
-                        f"from {self._current_state}.")
+            raise Error(f"Cannot call {command} command from {from_state}.")

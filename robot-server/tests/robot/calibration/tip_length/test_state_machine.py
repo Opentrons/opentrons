@@ -1,6 +1,5 @@
 import pytest
 from typing import List, Tuple
-from opentrons.types import Point
 
 from robot_server.service.session.models import CommandName
 from robot_server.robot.calibration.tip_length.state_machine import \

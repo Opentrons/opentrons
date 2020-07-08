@@ -1,4 +1,4 @@
-from typing import Set, Dict, Any, Tuple
+from typing import Set, Dict, Any
 from robot_server.robot.calibration.tip_length.constants import WILDCARD
 
 

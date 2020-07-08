@@ -1,4 +1,4 @@
-from typing import Dict, Set, Tuple, Awaitable, Callable, Any
+from typing import Dict, Awaitable, Callable, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import ThreadManager
 from robot_server.service.session.models import CommandName
@@ -6,7 +6,6 @@ from robot_server.robot.calibration.tip_length.state_machine import (
     TipCalibrationStateMachine
 )
 from robot_server.robot.calibration.tip_length.util import (
-    SimpleStateMachine,
     TipCalibrationError as Error
 )
 from robot_server.robot.calibration.tip_length.constants import (
@@ -20,7 +19,7 @@ calibration data associated with the combination of a pipette tip type and a
 unique (by serial number) physical pipette.
 """
 
-TIP_LENGTH_TRANSITIONS: Dict[State, Set[Dict[CommandName, State]]] = {
+TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandName, State]] = {
     State.sessionStarted: {
         CommandName.load_labware: State.labwareLoaded
     },
@@ -46,6 +45,7 @@ TIP_LENGTH_TRANSITIONS: Dict[State, Set[Dict[CommandName, State]]] = {
     }
 }
 
+# TODO: BC 2020-07-08: type all command logic here with actual Model type
 COMMAND_HANDLER = Callable[..., Awaitable]
 
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
@@ -81,7 +81,7 @@ class TipCalibrationUserFlow():
         self._current_state = to_state
 
     async def handle_command(self,
-                             name: str,
+                             name: Any,
                              data: Dict[Any, Any]):
         """
         Handle a client command
@@ -99,8 +99,9 @@ class TipCalibrationUserFlow():
 
     async def load_labware(self, *args):
         # TODO: load tip rack onto deck
-        # TODO: move to pick up tip pick up start location
         pass
+
+    # TODO: make generic to move to tip in rack command?
 
     async def move_to_reference_point(self, *args):
         # TODO: move nozzle/tip to reference location (block || trash edge)
@@ -108,8 +109,6 @@ class TipCalibrationUserFlow():
 
     async def save_offset(self, *args):
         # TODO: save the current nozzle/tip offset here
-        # if self._current_state == State.measuringNozzleOffset:
-            # TODO: move to pick up tip pick up start location
         pass
 
     async def jog(self, vector, *args):
