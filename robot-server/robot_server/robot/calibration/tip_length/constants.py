@@ -1,4 +1,5 @@
 from enum import Enum
+from opentrons.types import Point
 
 WILDCARD = '*'
 
@@ -20,3 +21,5 @@ LEFT_MOUNT_CAL_BLOCK_SLOT = '3'
 LEFT_MOUNT_CAL_BLOCK_LOADNAME = 'opentrons_calibrationblock_short_side_right'
 RIGHT_MOUNT_CAL_BLOCK_SLOT = '1'
 RIGHT_MOUNT_CAL_BLOCK_LOADNAME = 'opentrons_calibrationblock_short_side_left'
+
+MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)

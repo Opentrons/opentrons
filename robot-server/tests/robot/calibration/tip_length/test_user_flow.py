@@ -52,9 +52,15 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     async def async_mock(*args, **kwargs):
         pass
 
+    async def gantry_pos_mock(*args, **kwargs):
+        return Point(0, 0, 0)
+
     hardware.move_rel = MagicMock(side_effect=async_mock)
     hardware.pick_up_tip = MagicMock(side_effect=async_mock)
     hardware.drop_tip = MagicMock(side_effect=async_mock)
+    hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
+    hardware.move_to = MagicMock(side_effect=async_mock)
+    hardware.get_instrument_max_height.return_value = 180
     return hardware
 
 
@@ -71,9 +77,15 @@ def mock_hw(hardware):
     async def async_mock(*args, **kwargs):
         pass
 
+    async def gantry_pos_mock(*args, **kwargs):
+        return Point(0, 0, 0)
+
     hardware.move_rel = MagicMock(side_effect=async_mock)
     hardware.pick_up_tip = MagicMock(side_effect=async_mock)
     hardware.drop_tip = MagicMock(side_effect=async_mock)
+    hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
+    hardware.move_to = MagicMock(side_effect=async_mock)
+    hardware.get_instrument_max_height.return_value = 180
     return hardware
 
 
@@ -105,9 +117,9 @@ def mock_user_flow_all_combos(mock_hw_all_combos, request):
 hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
   (CommandName.jog, 'measuringNozzleOffset', stub_jog_data, 'move_rel'),
   (CommandName.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
-  (CommandName.invalidate_tip, 'preparingPipette', {}, 'drop_tip'),
 ]
 
+# TODO: unit test each command
 
 @pytest.mark.parametrize('command,current_state,data,hw_meth', hw_commands)
 async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
