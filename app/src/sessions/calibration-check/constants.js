@@ -42,15 +42,18 @@ export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badCalibrationData' =
 export const CHECK_STEP_NO_PIPETTES_ATTACHED: 'noPipettesAttached' =
   'noPipettesAttached'
 
-const LOAD_LABWARE: 'loadLabware' = 'loadLabware'
-const PREPARE_PIPETTE: 'preparePipette' = 'preparePipette'
-const JOG: 'jog' = 'jog'
-const PICK_UP_TIP: 'pickUpTip' = 'pickUpTip'
-const CONFIRM_TIP: 'confirmTip' = 'confirmTip'
-const INVALIDATE_TIP: 'invalidateTip' = 'invalidateTip'
-const COMPARE_POINT: 'comparePoint' = 'comparePoint'
-const GO_TO_NEXT_CHECK: 'goToNextCheck' = 'goToNextCheck'
-const EXIT: 'exitSession' = 'exitSession'
+const LOAD_LABWARE: 'calibration.loadLabware' = 'calibration.loadLabware'
+const PREPARE_PIPETTE: 'calibration.preparePipette' =
+  'calibration.preparePipette'
+const JOG: 'calibration.jog' = 'calibration.jog'
+const PICK_UP_TIP: 'calibration.pickUpTip' = 'calibration.pickUpTip'
+const CONFIRM_TIP: 'calibration.confirmTip' = 'calibration.confirmTip'
+const INVALIDATE_TIP: 'calibration.invalidateTip' = 'calibration.invalidateTip'
+const COMPARE_POINT: 'calibration.check.comparePoint' =
+  'calibration.check.comparePoint'
+const GO_TO_NEXT_CHECK: 'calibration.check.goToNextCheck' =
+  'calibration.check.goToNextCheck'
+const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
 
 export const checkCommands = {
   LOAD_LABWARE,
