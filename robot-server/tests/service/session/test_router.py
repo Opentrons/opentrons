@@ -13,8 +13,8 @@ from robot_server.service.session.command_execution.command import \
     CommandResult, CompletedCommand, CommandContent, CommandMeta, CommandStatus
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
-from robot_server.service.session.models import CommonCommand, EmptyModel, \
-    SessionType, JogPosition
+from robot_server.service.session.models import CalibrationCommand, \
+    EmptyModel, SessionType, JogPosition
 from robot_server.service.session.session_types import NullSession, \
     SessionMetaData
 
@@ -297,7 +297,7 @@ def test_execute_command(api_client,
     mock_command_executor.execute.assert_called_once_with(
         Command(
             content=CommandContent(
-                name=CommonCommand.jog,
+                name=CalibrationCommand.jog,
                 data=JogPosition(vector=(1, 2, 3,))
             ),
             meta=CommandMeta(identifier=command_id,
@@ -349,7 +349,7 @@ def test_execute_command_no_body(api_client,
     mock_command_executor.execute.assert_called_once_with(
         Command(
             content=CommandContent(
-                name=CommonCommand.load_labware,
+                name=CalibrationCommand.load_labware,
                 data=EmptyModel()),
             meta=CommandMeta(command_id, command_created_at)
         )

@@ -1,7 +1,8 @@
 from typing import Dict, Awaitable, Callable, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import ThreadManager
-from robot_server.service.session.models import CommonCommand
+from robot_server.service.session.models import CalibrationCommand, \
+    TipLengthCalibrationCommand, CommandDefinition
 from robot_server.robot.calibration.tip_length.state_machine import (
     TipCalibrationStateMachine
 )
@@ -19,29 +20,29 @@ calibration data associated with the combination of a pipette tip type and a
 unique (by serial number) physical pipette.
 """
 
-TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommonCommand, State]] = {
+TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.sessionStarted: {
-        CommonCommand.load_labware: State.labwareLoaded
+        CalibrationCommand.load_labware: State.labwareLoaded
     },
     State.labwareLoaded: {
-        CommonCommand.move_to_reference_point: State.measuringNozzleOffset
+        TipLengthCalibrationCommand.move_to_reference_point: State.measuringNozzleOffset  # noqa: E501
     },
     State.measuringNozzleOffset: {
-        CommonCommand.save_offset: State.preparingPipette,
-        CommonCommand.jog: State.measuringNozzleOffset
+        CalibrationCommand.save_offset: State.preparingPipette,
+        CalibrationCommand.jog: State.measuringNozzleOffset
     },
     State.preparingPipette: {
-        CommonCommand.jog: State.preparingPipette,
-        CommonCommand.pick_up_tip: State.preparingPipette,
-        CommonCommand.invalidate_tip: State.preparingPipette,
-        CommonCommand.move_to_reference_point: State.measuringTipOffset
+        CalibrationCommand.jog: State.preparingPipette,
+        CalibrationCommand.pick_up_tip: State.preparingPipette,
+        CalibrationCommand.invalidate_tip: State.preparingPipette,
+        TipLengthCalibrationCommand.move_to_reference_point: State.measuringTipOffset  # noqa: E501
     },
     State.measuringTipOffset: {
-        CommonCommand.save_offset: State.calibrationComplete,
-        CommonCommand.jog: State.measuringTipOffset
+        CalibrationCommand.save_offset: State.calibrationComplete,
+        CalibrationCommand.jog: State.measuringTipOffset
     },
     State.WILDCARD: {
-        CommonCommand.exit: State.sessionExited
+        CalibrationCommand.exit: State.sessionExited
     }
 }
 
@@ -68,13 +69,13 @@ class TipCalibrationUserFlow():
                         'cannot run tip length calibration')
 
         self._command_map: COMMAND_MAP = {
-            CommonCommand.load_labware: self.load_labware,
-            CommonCommand.jog: self.jog,
-            CommonCommand.pick_up_tip: self.pick_up_tip,
-            CommonCommand.invalidate_tip: self.invalidate_tip,
-            CommonCommand.save_offset: self.save_offset,
-            CommonCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
-            CommonCommand.exit: self.exit_session,
+            CalibrationCommand.load_labware: self.load_labware,
+            CalibrationCommand.jog: self.jog,
+            CalibrationCommand.pick_up_tip: self.pick_up_tip,
+            CalibrationCommand.invalidate_tip: self.invalidate_tip,
+            CalibrationCommand.save_offset: self.save_offset,
+            TipLengthCalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
+            CalibrationCommand.exit: self.exit_session,
         }
 
     def _set_current_state(self, to_state: State):

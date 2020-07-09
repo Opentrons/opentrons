@@ -78,13 +78,27 @@ class CommandDefinition(str, Enum):
         return self._localname
 
 
+def cmd_def(name, model=EmptyModel, ns=None):
+    """
+    Convenience function for creating CommandDefinition tuple.
+
+    :param name: Name of command
+    :param model: Model of the command data payload
+    :param ns: namespace
+    :return: Tuple
+    """
+    return name, model, ns
+
+
 class CommonCommand(CommandDefinition):
     """The available session commands"""
     home_all_motors = "homeAllMotors"
     home_pipette = "homePipette"
     toggle_lights = "toggleLights"
 
-    # Shared Between Calibration Flows
+
+class CalibrationCommand(CommandDefinition):
+    """Shared Between Calibration Flows"""
     load_labware = "loadLabware"
     prepare_pipette = "preparePipette"
     jog = ("jog", JogPosition)
@@ -92,16 +106,21 @@ class CommonCommand(CommandDefinition):
     confirm_tip_attached = "confirmTip"
     invalidate_tip = "invalidateTip"
     save_offset = "saveOffset"
+    exit = "exit"
 
-    # Cal Check Specific
+
+class CalibrationCheckCommand(CommandDefinition):
+    """Cal Check Specific"""
     compare_point = "comparePoint"
     go_to_next_check = "goToNextCheck"
-    exit = "exit"
     # TODO: remove unused command name and trigger
     reject_calibration = "rejectCalibration"
 
-    # Tip Length Calibration Specific
-    move_to_reference_point = "moveToReferencePoint"
+
+class TipLengthCalibrationCommand(CommandDefinition):
+    """Tip Length Calibration Specific"""
+    move_to_reference_point = cmd_def("moveToReferencePoint",
+                                      ns=SessionType.tip_length_calibration)
 
 
 CommandDataType = typing.Union[
@@ -110,7 +129,12 @@ CommandDataType = typing.Union[
 ]
 
 
-CommandDefinitions = typing.Union[CommonCommand]
+CommandDefinitions = typing.Union[
+    CommonCommand,
+    CalibrationCommand,
+    CalibrationCheckCommand,
+    TipLengthCalibrationCommand
+]
 
 
 class BasicSession(BaseModel):

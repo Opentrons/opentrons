@@ -12,8 +12,8 @@ from robot_server.robot.calibration.check.util import StateMachineError
 
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import (CommonCommand, EmptyModel,
-                                                 JogPosition)
+from robot_server.service.session.models import (EmptyModel, JogPosition,
+                                                 CalibrationCommand)
 from robot_server.service.session.session_types import CheckSession, \
     SessionMetaData, BaseSession
 
@@ -170,7 +170,7 @@ async def test_session_command_execute(check_session_instance,
                                        mock_cal_session):
     await check_session_instance.command_executor.execute(
         create_command(
-            CommonCommand.jog,
+            CalibrationCommand.jog,
             JogPosition(vector=(1, 2, 3)))
     )
 
@@ -184,7 +184,7 @@ async def test_session_command_execute_no_body(check_session_instance,
                                                mock_cal_session):
     await check_session_instance.command_executor.execute(
         create_command(
-            CommonCommand.load_labware,
+            CalibrationCommand.load_labware,
             EmptyModel())
     )
 
@@ -209,5 +209,6 @@ async def test_session_command_execute_raise(check_session_instance,
 
     with pytest.raises(SessionCommandException):
         await check_session_instance.command_executor.execute(
-            create_command(CommonCommand.jog, JogPosition(vector=(1, 2, 3)))
+            create_command(CalibrationCommand.jog,
+                           JogPosition(vector=(1, 2, 3)))
         )

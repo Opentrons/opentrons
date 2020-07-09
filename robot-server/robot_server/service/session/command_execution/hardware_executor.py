@@ -4,7 +4,7 @@ from opentrons.hardware_control import ThreadManager
 from . import Command, CompletedCommand, CommandResult
 from . base_executor import CommandExecutor
 from ..errors import UnsupportedCommandException
-from ..models import CommandDataType, CommonCommand
+from ..models import CommandDataType, CommonCommand, CommandDefinition
 from robot_server.util import duration
 
 
@@ -24,7 +24,7 @@ async def toggle_lights(hardware: ThreadManager, *args):
 class HardwareExecutor(CommandExecutor):
     """A command executor that executes direct hardware commands"""
 
-    COMMAND_TO_FUNC: typing.Dict[CommonCommand, COMMAND_HANDLER] = {
+    COMMAND_TO_FUNC: typing.Dict[CommandDefinition, COMMAND_HANDLER] = {
         CommonCommand.home_all_motors: home_all_motors,
         CommonCommand.toggle_lights: toggle_lights
     }
@@ -58,7 +58,7 @@ class HardwareExecutor(CommandExecutor):
                                  completed_at=timed.end)
         )
 
-    def get_handler(self, command_name: CommonCommand) \
+    def get_handler(self, command_name: CommandDefinition) \
             -> typing.Optional[COMMAND_HANDLER]:
         """Get the handler for the command type"""
         if self._command_filter is not None:
