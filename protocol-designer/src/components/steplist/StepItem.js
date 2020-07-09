@@ -225,23 +225,37 @@ const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
 
 const renderSubstepInfo = (substeps: ThermocyclerProfileSubstepItem) => {
   let stepNumber = 1
-  return substeps.meta?.rawProfileItems.map(item => {
-    const prevStepNumber = stepNumber
-    if (item.type === PROFILE_CYCLE) {
-      stepNumber += item.steps.length
-      return (
-        <ProfileCycleSubstepGroup cycle={item} stepNumber={prevStepNumber} />
-      )
-    }
-    stepNumber++
-    return (
-      <ProfileStepSubstepRow
-        step={item}
-        stepNumber={prevStepNumber}
-        repetitionsDisplay="1"
-      />
-    )
-  })
+  const substepInfo: Array<
+    | React.Element<typeof ProfileCycleSubstepGroup>
+    | React.Element<typeof ProfileStepSubstepRow>
+  > = []
+
+  substeps.meta &&
+    substeps.meta.rawProfileItems.forEach(item => {
+      const prevStepNumber = stepNumber
+      if (item.type === PROFILE_CYCLE) {
+        stepNumber += item.steps.length
+        substepInfo.push(
+          <ProfileCycleSubstepGroup
+            cycle={item}
+            stepNumber={prevStepNumber}
+            key={prevStepNumber}
+          />
+        )
+      } else {
+        stepNumber++
+        substepInfo.push(
+          <ProfileStepSubstepRow
+            step={item}
+            stepNumber={prevStepNumber}
+            repetitionsDisplay="1"
+            key={prevStepNumber}
+          />
+        )
+      }
+    })
+
+  return substepInfo
 }
 
 export const StepItemContents = (props: StepItemContentsProps): React.Node => {
