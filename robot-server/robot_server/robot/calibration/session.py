@@ -1,7 +1,7 @@
 import typing
 from uuid import UUID, uuid4
 
-from robot_server.robot.calibration.constants import LOOKUP_LABWARE
+from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.robot.calibration.helper_classes import PipetteInfo, \
     PipetteRank, LabwareInfo, Moves, CheckMove
 from opentrons.config import feature_flags as ff
@@ -123,11 +123,11 @@ class CalibrationSession:
 
     def _alt_load_names_for_mount(self, mount: Mount) -> typing.List[str]:
         pip_vol = self.pipettes[mount]['max_volume']
-        return list(LOOKUP_LABWARE[str(pip_vol)].alternatives)
+        return list(TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].alternatives)
 
     def _load_name_for_mount(self, mount: Mount) -> str:
         pip_vol = self.pipettes[mount]['max_volume']
-        return LOOKUP_LABWARE[str(pip_vol)].load_name
+        return TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
 
     def _build_deck_moves(self) -> Moves:
         return Moves(

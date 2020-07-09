@@ -26,7 +26,7 @@ class LabwareLookUp:
     alternatives: Set[str]
 
 
-LOOKUP_LABWARE: Dict[str, LabwareLookUp] = {
+TIP_RACK_LOOKUP_BY_MAX_VOL: Dict[str, LabwareLookUp] = {
     '10': LabwareLookUp(
         load_name=TIPRACK_10,
         alternatives={

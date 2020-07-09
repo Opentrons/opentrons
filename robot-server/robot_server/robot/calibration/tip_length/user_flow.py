@@ -1,7 +1,10 @@
 from typing import Dict, Awaitable, Callable, Any
 from opentrons.types import Mount, Point
+from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager
+from opentrons.protocol_api import geometry, labware
 from robot_server.service.session.models import CommandName
+from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.robot.calibration.tip_length.state_machine import (
     TipCalibrationStateMachine
 )
@@ -10,6 +13,12 @@ from robot_server.robot.calibration.tip_length.util import (
 )
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState as State,
+    TRASH_SLOT,
+    TIP_RACK_SLOT,
+    RIGHT_MOUNT_CAL_BLOCK_SLOT,
+    LEFT_MOUNT_CAL_BLOCK_SLOT,
+    RIGHT_MOUNT_CAL_BLOCK_LOADNAME,
+    LEFT_MOUNT_CAL_BLOCK_LOADNAME,
 )
 
 
@@ -57,15 +66,20 @@ class TipCalibrationUserFlow():
                  mount: Mount = Mount.LEFT,
                  has_calibration_block=True):
         # TODO: require mount and has_calibration_block params
-        self._has_calibration_block = has_calibration_block
         self._hardware = hardware
-        self._current_state = State.sessionStarted
-        self._state_machine = TipCalibrationStateMachine()
         self._mount = mount
+        self._has_calibration_block = has_calibration_block
+
         self._hw_pipette = self._hardware.attached_instruments[mount]
         if not self._hw_pipette:
             raise Error(f'No pipette found on {mount} mount,'
                         'cannot run tip length calibration')
+
+        self._deck = geometry.Deck()
+        self._load_deck()
+
+        self._current_state = State.sessionStarted
+        self._state_machine = TipCalibrationStateMachine()
 
         self._command_map: COMMAND_MAP = {
             CommandName.load_labware: self.load_labware,
@@ -150,3 +164,38 @@ class TipCalibrationUserFlow():
     async def exit_session(self, *args):
         # TODO: move to saved (jogged to) pick up tip location, return tip
         pass
+
+    def _get_trash_lw(self) -> labware.Labware:
+        if ff.short_fixed_trash():
+            trash_lw = labware.load(
+                'opentrons_1_trash_850ml_fixed',
+                self._deck.position_for(TRASH_SLOT))
+        else:
+            trash_lw = labware.load(
+                'opentrons_1_trash_1100ml_fixed',
+                self._deck.position_for(TRASH_SLOT))
+        return trash_lw
+
+    def _get_tip_rack_lw(self) -> labware.Labware:
+        pip_vol = self._hw_pipette['max_volume']
+        load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
+        lw_def = labware.get_labware_definition(load_name)
+        return labware.load(lw_def, TIP_RACK_SLOT)
+
+    def _initialize_deck(self):
+        trash_lw = self._get_trash_lw()
+        self._deck[TRASH_SLOT] = trash_lw
+
+        tip_rack_lw = self._get_tip_rack_lw()
+        self._deck[TIP_RACK_SLOT] = tip_rack_lw
+
+        cal_block_slot = (RIGHT_MOUNT_CAL_BLOCK_SLOT
+                          if self._mount == Mount.RIGHT
+                          else LEFT_MOUNT_CAL_BLOCK_SLOT)
+        cal_block_loadname = (RIGHT_MOUNT_CAL_BLOCK_LOADNAME
+                              if self._mount == Mount.RIGHT
+                              else LEFT_MOUNT_CAL_BLOCK_LOADNAME)
+        cal_block_def = labware.get_labware_definition(cal_block_loadname)
+        self._deck[cal_block_slot] = labware.load(
+            cal_block_def,
+            self._deck.position_for(cal_block_slot))
