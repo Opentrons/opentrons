@@ -124,7 +124,7 @@
       "thermocyclerAction": {
         "options": {
           "state": "Change Thermocycler state",
-          "profile": "Program a Thermal cycling profile"
+          "profile": "Program a Thermocycler profile"
         }
       },
       "thermocyclerState": {
