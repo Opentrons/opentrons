@@ -11,7 +11,10 @@ import {
   getCurrentFormIsPresaved,
   getCurrentFormHasUnsavedChanges,
 } from '../../../step-forms/selectors'
-import { ConfirmDeleteStepModal } from '../../modals/ConfirmDeleteStepModal'
+import {
+  ConfirmDeleteModal,
+  UNSAVED_STEP_FORM_CLOSE,
+} from '../../modals/ConfirmDeleteModal'
 import { PDTitledList } from '../../lists'
 import type { TerminalItemId } from '../../../steplist'
 
@@ -47,8 +50,8 @@ export const TerminalItem = (props: Props): React.Node => {
   return (
     <>
       {showConfirmation && (
-        <ConfirmDeleteStepModal
-          close
+        <ConfirmDeleteModal
+          modalType={UNSAVED_STEP_FORM_CLOSE}
           onContinueClick={confirm}
           onCancelClick={cancel}
         />

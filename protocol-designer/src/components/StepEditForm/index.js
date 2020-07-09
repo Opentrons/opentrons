@@ -14,7 +14,11 @@ import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForS
 import formStyles from '../forms/forms.css'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
-import { ConfirmDeleteStepModal } from '../modals/ConfirmDeleteStepModal'
+import {
+  ConfirmDeleteModal,
+  UNSAVED_STEP_FORM_CLOSE,
+  UNSAVED_STEP_FORM_DELETE,
+} from '../modals/ConfirmDeleteModal'
 
 import {
   MixForm,
@@ -228,16 +232,15 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   return (
     <>
       {showConfirmDeleteModal && (
-        <ConfirmDeleteStepModal
+        <ConfirmDeleteModal
+          modalType={UNSAVED_STEP_FORM_DELETE}
           onCancelClick={cancelDelete}
           onContinueClick={confirmDelete}
         />
       )}
       {showConfirmCancelModal && (
-        <ConfirmDeleteStepModal
-          heading="Unsaved Step form"
-          alertOverlay
-          close
+        <ConfirmDeleteModal
+          modalType={UNSAVED_STEP_FORM_CLOSE}
           onCancelClick={cancelClose}
           onContinueClick={confirmClose}
         />
