@@ -148,7 +148,9 @@
         "volume": "volume",
         "lid_temp": "lid temp",
         "lid_position": "lid position",
-        "lid_closed": "Closed"
+        "lid_closed": "Closed",
+        "add_cycle_button": "+ Cycle",
+        "add_step_button": "+ Step"
       }
     }
   }
