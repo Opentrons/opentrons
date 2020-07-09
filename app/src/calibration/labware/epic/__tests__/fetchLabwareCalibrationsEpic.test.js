@@ -3,7 +3,7 @@ import {
   setupEpicTestMocks,
   runEpicTest,
 } from '../../../../robot-api/__utils__'
-import * as Fixtures from '../../../__fixtures__'
+import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { labwareCalibrationEpic } from '..'
 
@@ -12,15 +12,15 @@ const makeTriggerActionAllCalibrations = robotName =>
 const makeTriggerActionSingleCalibrations = robotName =>
   Actions.fetchSingleLabwareCalibration(robotName)
 
-describe('fetch calibration status epic', () => {
+describe('fetch labware calibration epics', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('calls GET /calibration/status', () => {
+  it('calls GET /labware/calibrations', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerActionAllCalibrations,
-      Fixtures.mockFetchCalibrationStatusSuccess
+      Fixtures.mockFetchLabwareCalibrationSuccess
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
@@ -33,15 +33,16 @@ describe('fetch calibration status epic', () => {
 
       expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
         method: 'GET',
-        path: '/calibration/status',
+        path: '/labware/calibrations',
+        query: {},
       })
     })
   })
 
-  it('maps successful response to FETCH_CALIBRATION_STATUS_SUCCESS', () => {
+  it('maps successful response to FETCH_LABWARE_CALAIBRATION_SUCCESS', () => {
     const mocks = setupEpicTestMocks(
-      makeTriggerAction,
-      Fixtures.mockFetchCalibrationStatusSuccess
+      makeTriggerActionAllCalibrations,
+      Fixtures.mockFetchLabwareCalibrationSuccess
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
@@ -50,22 +51,22 @@ describe('fetch calibration status epic', () => {
       const output$ = labwareCalibrationEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.fetchCalibrationStatusSuccess(
+        a: Actions.fetchLabwareCalibrationSuccess(
           mocks.robot.name,
-          Fixtures.mockFetchCalibrationStatusSuccess.body,
+          Fixtures.mockFetchLabwareCalibrationSuccess.body,
           {
             ...mocks.meta,
-            response: Fixtures.mockFetchCalibrationStatusSuccessMeta,
+            response: Fixtures.mockFetchLabwareCalibrationSuccessMeta,
           }
         ),
       })
     })
   })
 
-  it('maps failed response to FETCH_CALIBRATION_STATUS_FAILURE', () => {
+  it('maps failed response to FETCH_LABWARE_CALAIBRATION_FAILURE', () => {
     const mocks = setupEpicTestMocks(
-      makeTriggerAction,
-      Fixtures.mockFetchCalibrationStatusFailure
+      makeTriggerActionAllCalibrations,
+      Fixtures.mockFetchLabwareCalibrationFailure
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
@@ -74,12 +75,12 @@ describe('fetch calibration status epic', () => {
       const output$ = labwareCalibrationEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.fetchCalibrationStatusFailure(
+        a: Actions.fetchLabwareCalibrationFailure(
           mocks.robot.name,
-          Fixtures.mockFetchCalibrationStatusFailure.body,
+          Fixtures.mockFetchLabwareCalibrationFailure.body,
           {
             ...mocks.meta,
-            response: Fixtures.mockFetchCalibrationStatusFailureMeta,
+            response: Fixtures.mockFetchLabwareCalibrationFailureMeta,
           }
         ),
       })

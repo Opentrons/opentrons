@@ -2,6 +2,7 @@
 
 import * as Constants from './constants'
 import * as Types from './types'
+import * as APITypes from '../types'
 
 import type {
   RobotApiRequestMeta,
@@ -10,27 +11,38 @@ import type {
 
 export const fetchAllLabwareCalibrations = (
   robotName: string
-): Types.FetchCalibrationStatusAction => ({
+): Types.FetchLabwareCalibrationAction => ({
   type: Constants.FETCH_ALL_LABWARE_CALIBRATIONS,
   payload: { robotName },
   meta: {},
 })
 
 export const fetchSingleLabwareCalibration = (
-  robotName: string
-): Types.FetchCalibrationStatusAction => ({
+  robotName: string,
+  calibrationId: string
+): Types.FetchSingleLabwareCalibrationAction => ({
   type: Constants.FETCH_SINGLE_LABWARE_CALIBRATION,
-  payload: { robotName },
+  payload: { robotName, calibrationId },
   meta: {},
+})
+
+export const fetchSingleLabwareCalibrationSuccess = (
+  robotName: string,
+  labwareCalibration: APITypes.LabwareCalibrationObjects,
+  meta: RobotApiRequestMeta
+): Types.FetchSingleLabwareCalibrationSuccessAction => ({
+  type: Constants.FETCH_LABWARE_CALIBRATION_SUCCESS,
+  payload: { robotName, labwareCalibration },
+  meta,
 })
 
 export const fetchLabwareCalibrationSuccess = (
   robotName: string,
-  calibrationStatus: Types.CalibrationStatus,
+  labwareCalibration: APITypes.AllLabwareCalibrations,
   meta: RobotApiRequestMeta
-): Types.FetchCalibrationStatusSuccessAction => ({
+): Types.FetchAllLabwareCalibrationSuccessAction => ({
   type: Constants.FETCH_LABWARE_CALIBRATION_SUCCESS,
-  payload: { robotName, calibrationStatus },
+  payload: { robotName, labwareCalibration },
   meta,
 })
 
@@ -38,7 +50,7 @@ export const fetchLabwareCalibrationFailure = (
   robotName: string,
   error: RobotApiErrorResponse,
   meta: RobotApiRequestMeta
-): Types.FetchCalibrationStatusFailureAction => ({
+): Types.FetchLabwareCalibrationFailureAction => ({
   type: Constants.FETCH_LABWARE_CALIBRATION_FAILURE,
   payload: { robotName, error },
   meta,

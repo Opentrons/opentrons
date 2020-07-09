@@ -5,7 +5,9 @@ import type {
   RobotApiErrorResponse,
 } from '../robot-api/types'
 
-import type { CalibrationStatus } from './types'
+import type { CalibrationStatus, AllLabwareCalibrations } from './types'
+
+import type { LawareCalibrationAction } from './labware/types'
 
 import typeof {
   FETCH_CALIBRATION_STATUS,
@@ -40,10 +42,11 @@ export type CalibrationAction =
   | FetchCalibrationStatusAction
   | FetchCalibrationStatusSuccessAction
   | FetchCalibrationStatusFailureAction
+  | LawareCalibrationAction
 
 export type PerRobotCalibrationState = $ReadOnly<{|
   calibrationStatus: CalibrationStatus,
-  // add stuff here
+  labwareCalibration: ?AllLabwareCalibrations,
 |}>
 
 export type CalibrationState = $ReadOnly<{

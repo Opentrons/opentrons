@@ -24,7 +24,6 @@ const mapResponseToAction: ResponseToActionMapper<FetchCalibrationStatusAction> 
 ) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
-
   return response.ok
     ? Actions.fetchCalibrationStatusSuccess(host.name, body, meta)
     : Actions.fetchCalibrationStatusFailure(host.name, body, meta)

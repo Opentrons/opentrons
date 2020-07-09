@@ -1,6 +1,6 @@
 // @flow
 import * as Constants from './constants'
-import * as LabwareConstants from './labware/constants'
+import { constants as LabwareConstants } from './labware'
 
 import type { Action } from '../types'
 import type { CalibrationState } from './types'
@@ -23,17 +23,15 @@ export function calibrationReducer(
       }
     }
     case LabwareConstants.FETCH_LABWARE_CALIBRATION_SUCCESS: {
-      const { robotName, labwareCalibrations } = action.payload
+      const { robotName, labwareCalibration } = action.payload
       return {
         ...state,
         [robotName]: {
           ...(state[robotName] ?? {}),
-          labwareCalibrations,
+          labwareCalibration,
         },
       }
     }
-    // create new action type of labware calibration
-    // don't follow exactly above because it would delete cal status.
   }
   return state
 }
