@@ -45,13 +45,13 @@ export const {
   success: mockFetchLabwareCalibrationSuccess,
   failure: mockFetchLabwareCalibrationFailure,
 }: ResponseFixtures<
-  Array<?LabwareCalibrationObjects>,
+  AllLabwareCalibrations,
   {| message: string |}
 > = makeResponseFixtures({
   method: GET,
   path: LABWARE_CALIBRATION_PATH,
   successStatus: 200,
-  successBody: [mockLabwareCalibration],
+  successBody: mockAllLabwareCalibraton,
   failureStatus: 500,
   failureBody: mockFailureBody,
 })

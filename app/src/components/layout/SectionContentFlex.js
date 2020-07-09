@@ -1,7 +1,13 @@
 // @flow
 import * as React from 'react'
 
-import { SPACING_1, Flex, Box, ALIGN_CENTER } from '@opentrons/components'
+import {
+  SPACING_1,
+  Flex,
+  Box,
+  ALIGN_CENTER,
+  FLEX_AUTO,
+} from '@opentrons/components'
 import type {
   UseHoverTooltipTargetProps,
   StyleProps,
@@ -25,19 +31,17 @@ export function SectionContentFlex({
   ...styleProps
 }: SectionContentFlexProps): React.Node {
   return (
-    <Flex {...styleProps}>
-      <Box>
-        <Flex alignItems={ALIGN_CENTER} padding="0">
-          <Box>
-            <h4>{title}</h4>
-          </Box>
-          <Box paddingLeft={SPACING_1} {...toolTipProps}>
-            {icon}
-            {toolTipComponent}
-          </Box>
-        </Flex>
-        {children}
-      </Box>
-    </Flex>
+    <Box {...styleProps}>
+      <Flex alignItems={ALIGN_CENTER}>
+        <Box flex={FLEX_AUTO}>
+          <h4>{title}</h4>
+        </Box>
+        <Box paddingLeft={SPACING_1} flex={FLEX_AUTO} {...toolTipProps}>
+          {icon}
+          {toolTipComponent}
+        </Box>
+      </Flex>
+      {children}
+    </Box>
   )
 }

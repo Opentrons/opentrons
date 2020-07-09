@@ -17,25 +17,6 @@ export const fetchAllLabwareCalibrations = (
   meta: {},
 })
 
-export const fetchSingleLabwareCalibration = (
-  robotName: string,
-  calibrationId: string
-): Types.FetchSingleLabwareCalibrationAction => ({
-  type: Constants.FETCH_SINGLE_LABWARE_CALIBRATION,
-  payload: { robotName, calibrationId },
-  meta: {},
-})
-
-export const fetchSingleLabwareCalibrationSuccess = (
-  robotName: string,
-  labwareCalibration: APITypes.LabwareCalibrationObjects,
-  meta: RobotApiRequestMeta
-): Types.FetchSingleLabwareCalibrationSuccessAction => ({
-  type: Constants.FETCH_LABWARE_CALIBRATION_SUCCESS,
-  payload: { robotName, labwareCalibration },
-  meta,
-})
-
 export const fetchLabwareCalibrationSuccess = (
   robotName: string,
   labwareCalibration: APITypes.AllLabwareCalibrations,

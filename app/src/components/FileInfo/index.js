@@ -65,7 +65,7 @@ export function FileInfo(props: FileInfoProps): React.Node {
   const calibrationLoadNamesMap = keyBy(calibrations, function(labwareObject) {
     return labwareObject?.attributes.loadName
   })
-  console.log(calibrationLoadNamesMap)
+
   const allLabwareCalibrated = every(Object.keys(labwareCount), function(a) {
     return Object.keys(calibrationLoadNamesMap).includes(a)
   })

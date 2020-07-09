@@ -34,7 +34,7 @@ const SPECS: Array<ActionSpec> = [
       type: 'calibration:FETCH_LABWARE_CALIBRATION_SUCCESS',
       payload: {
         robotName: 'robot-name',
-        labwareCalibration: [Fixtures.mockLabwareCalibration],
+        labwareCalibration: Fixtures.mockAllLabwareCalibraton,
       },
       meta: { requestId: '123' },
     },

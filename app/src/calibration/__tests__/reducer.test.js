@@ -21,13 +21,13 @@ describe('calibration reducer', () => {
   it('should handle a FETCH_LABWARE_CALIBRATION_SUCCESS', () => {
     const action = LabwareActions.fetchLabwareCalibrationSuccess(
       'robot-name',
-      [LabwareFixtures.mockLabwareCalibration],
+      LabwareFixtures.mockAllLabwareCalibraton,
       {}
     )
 
     expect(calibrationReducer({}, action)).toEqual({
       'robot-name': {
-        labwareCalibration: [LabwareFixtures.mockLabwareCalibration],
+        labwareCalibration: LabwareFixtures.mockAllLabwareCalibraton,
       },
     })
   })

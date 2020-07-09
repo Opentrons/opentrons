@@ -33,12 +33,15 @@ export function ProtocolLabwareList({
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_AUTO,
   })
-  const iconComponent = <Icon name="information" className={styles.info_icon} />
+  const iconComponent = (
+    <Icon name="information" className={styles.calibration_data_info_icon} />
+  )
   const toolTipComponent = (
     <Tooltip {...tooltipProps}>
       {'calibrated offset from labware origin point'}
     </Tooltip>
   )
+
   return (
     <Flex
       textAlign={DIRECTION_COLUMN}
@@ -64,8 +67,8 @@ export function ProtocolLabwareList({
         toolTipComponent={toolTipComponent}
         toolTipProps={targetProps}
       >
-        <table>
-          <tbody borderSpacing={SPACING_1}>{calibration}</tbody>
+        <table style={{ borderSpacing: { SPACING_1 } }}>
+          <tbody>{calibration}</tbody>
         </table>
       </SectionContentFlex>
     </Flex>

@@ -9,8 +9,6 @@ import { labwareCalibrationEpic } from '..'
 
 const makeTriggerActionAllCalibrations = robotName =>
   Actions.fetchAllLabwareCalibrations(robotName)
-const makeTriggerActionSingleCalibrations = robotName =>
-  Actions.fetchSingleLabwareCalibration(robotName)
 
 describe('fetch labware calibration epics', () => {
   afterEach(() => {
