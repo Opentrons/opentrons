@@ -76,7 +76,7 @@ class TipCalibrationUserFlow():
                         'cannot run tip length calibration')
 
         self._deck = geometry.Deck()
-        self._load_deck()
+        self._initialize_deck()
 
         self._current_state = State.sessionStarted
         self._state_machine = TipCalibrationStateMachine()
@@ -177,10 +177,10 @@ class TipCalibrationUserFlow():
         return trash_lw
 
     def _get_tip_rack_lw(self) -> labware.Labware:
-        pip_vol = self._hw_pipette['max_volume']
+        pip_vol = self._hw_pipette.config.max_volume
         load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
-        lw_def = labware.get_labware_definition(load_name)
-        return labware.load(lw_def, TIP_RACK_SLOT)
+        return labware.load(load_name,
+                            self._deck.position_for(TIP_RACK_SLOT))
 
     def _initialize_deck(self):
         trash_lw = self._get_trash_lw()
@@ -195,7 +195,6 @@ class TipCalibrationUserFlow():
         cal_block_loadname = (RIGHT_MOUNT_CAL_BLOCK_LOADNAME
                               if self._mount == Mount.RIGHT
                               else LEFT_MOUNT_CAL_BLOCK_LOADNAME)
-        cal_block_def = labware.get_labware_definition(cal_block_loadname)
         self._deck[cal_block_slot] = labware.load(
-            cal_block_def,
+            cal_block_loadname,
             self._deck.position_for(cal_block_slot))
