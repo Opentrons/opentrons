@@ -3,12 +3,20 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { getCalibrateLocation } from '../../nav'
+import { getCalibrateLocation, getRunLocation } from '../../nav'
 import { PrimaryButton, HoverTooltip } from '@opentrons/components'
 import styles from './styles.css'
 
-export function Continue(): React.Node {
-  const { path, disabledReason } = useSelector(getCalibrateLocation)
+type ContinueProps = {|
+  labwareCalibrated: boolean,
+|}
+
+export function Continue({ labwareCalibrated }: ContinueProps): React.Node {
+  const buttonText = labwareCalibrated
+    ? 'Proceed to Run'
+    : 'Proceed to Calibrate'
+  const selector = labwareCalibrated ? getRunLocation : getCalibrateLocation
+  const { path, disabledReason } = useSelector(selector)
 
   // TODO(mc, 2019-11-26): tooltip positioning is all messed up with this component
   return (
@@ -24,7 +32,7 @@ export function Continue(): React.Node {
             disabled={Boolean(disabledReason)}
             className={styles.continue_button}
           >
-            Proceed to Calibrate
+            {buttonText}
           </PrimaryButton>
         </div>
       )}
