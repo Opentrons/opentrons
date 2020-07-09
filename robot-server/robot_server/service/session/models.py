@@ -72,7 +72,7 @@ class CommandDefinition(str, Enum):
         """
         This is primarily for allowing  definitions to define a
         namespace. The name space will be used to make the value of the
-        enum. It will be "{namespoce}.{value}"
+        enum. It will be "{namespace}.{value}"
         """
         return None
 
