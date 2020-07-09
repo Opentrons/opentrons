@@ -175,7 +175,7 @@ async def test_session_command_execute(check_session_instance,
     )
 
     mock_cal_session.trigger_transition.assert_called_once_with(
-        trigger="jog",
+        trigger="calibration.jog",
         vector=(1.0, 2.0, 3.0)
     )
 
@@ -189,7 +189,7 @@ async def test_session_command_execute_no_body(check_session_instance,
     )
 
     mock_cal_session.trigger_transition.assert_called_once_with(
-        trigger="loadLabware"
+        trigger="calibration.loadLabware"
     )
 
 

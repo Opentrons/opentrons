@@ -72,7 +72,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: homeAllMotors
+            command: robot.homeAllMotors
             data: {}
     response:
       status_code: 200
@@ -84,7 +84,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: toggleLights
+            command: robot.toggleLights
             data: {}
     response:
       status_code: 200
@@ -96,7 +96,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: loadLabware
+            command: calibration.loadLabware
             data: {}
     response:
       status_code: 400
