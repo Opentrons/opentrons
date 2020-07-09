@@ -22,7 +22,7 @@ import {
 } from '../step-forms'
 import {
   ConfirmDeleteModal,
-  UNSAVED_STEP_FORM_CLOSE,
+  CLOSE_UNSAVED_STEP_FORM,
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, type StepType } from '../form-types'
@@ -142,7 +142,7 @@ export const StepCreationButton = (): React.Node => {
       {enqueuedStepType !== null && (
         <Portal>
           <ConfirmDeleteModal
-            modalType={UNSAVED_STEP_FORM_CLOSE}
+            modalType={CLOSE_UNSAVED_STEP_FORM}
             onCancelClick={() => setEnqueuedStepType(null)}
             onContinueClick={() => {
               if (enqueuedStepType !== null) {

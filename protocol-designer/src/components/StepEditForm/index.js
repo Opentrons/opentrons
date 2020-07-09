@@ -16,8 +16,9 @@ import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import {
   ConfirmDeleteModal,
-  UNSAVED_STEP_FORM_CLOSE,
-  UNSAVED_STEP_FORM_DELETE,
+  DELETE_STEP_FORM,
+  CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_UNSAVED_STEP_FORM,
 } from '../modals/ConfirmDeleteModal'
 
 import {
@@ -233,14 +234,16 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     <>
       {showConfirmDeleteModal && (
         <ConfirmDeleteModal
-          modalType={UNSAVED_STEP_FORM_DELETE}
+          modalType={DELETE_STEP_FORM}
           onCancelClick={cancelDelete}
           onContinueClick={confirmDelete}
         />
       )}
       {showConfirmCancelModal && (
         <ConfirmDeleteModal
-          modalType={UNSAVED_STEP_FORM_CLOSE}
+          modalType={
+            isNewStep ? CLOSE_UNSAVED_STEP_FORM : CLOSE_STEP_FORM_WITH_CHANGES
+          }
           onCancelClick={cancelClose}
           onContinueClick={confirmClose}
         />

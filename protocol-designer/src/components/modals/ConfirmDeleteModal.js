@@ -6,15 +6,17 @@ import { Portal } from '../portals/MainPageModalPortal'
 import modalStyles from './modal.css'
 
 export const DELETE_PROFILE_CYCLE: 'deleteProfileCycle' = 'deleteProfileCycle'
-export const UNSAVED_STEP_FORM_CLOSE: 'unsavedStepFormClose' =
-  'unsavedStepFormClose'
-export const UNSAVED_STEP_FORM_DELETE: 'unsavedStepFormDelete' =
-  'unsavedStepFormDelete'
+export const CLOSE_STEP_FORM_WITH_CHANGES: 'closeStepFormWithChanges' =
+  'closeStepFormWithChanges'
+export const CLOSE_UNSAVED_STEP_FORM: 'closeUnsavedStepForm' =
+  'closeUnsavedStepForm'
+export const DELETE_STEP_FORM: 'deleteStepForm' = 'deleteStepForm'
 
 export type DeleteModalType =
   | typeof DELETE_PROFILE_CYCLE
-  | typeof UNSAVED_STEP_FORM_CLOSE
-  | typeof UNSAVED_STEP_FORM_DELETE
+  | typeof CLOSE_STEP_FORM_WITH_CHANGES
+  | typeof CLOSE_UNSAVED_STEP_FORM
+  | typeof DELETE_STEP_FORM
 
 type Props = {|
   modalType: DeleteModalType,
