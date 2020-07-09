@@ -2,7 +2,7 @@ from typing import Dict, Awaitable, Callable, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import ThreadManager
 from robot_server.service.session.models import CalibrationCommand, \
-    TipLengthCalibrationCommand, CommandDefinition
+    TipLengthCalibrationCommand
 from robot_server.robot.calibration.tip_length.state_machine import (
     TipCalibrationStateMachine
 )
@@ -19,32 +19,6 @@ A collection of functions that allow a consumer to prepare and update
 calibration data associated with the combination of a pipette tip type and a
 unique (by serial number) physical pipette.
 """
-
-TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
-    State.sessionStarted: {
-        CalibrationCommand.load_labware: State.labwareLoaded
-    },
-    State.labwareLoaded: {
-        TipLengthCalibrationCommand.move_to_reference_point: State.measuringNozzleOffset  # noqa: E501
-    },
-    State.measuringNozzleOffset: {
-        CalibrationCommand.save_offset: State.preparingPipette,
-        CalibrationCommand.jog: State.measuringNozzleOffset
-    },
-    State.preparingPipette: {
-        CalibrationCommand.jog: State.preparingPipette,
-        CalibrationCommand.pick_up_tip: State.preparingPipette,
-        CalibrationCommand.invalidate_tip: State.preparingPipette,
-        TipLengthCalibrationCommand.move_to_reference_point: State.measuringTipOffset  # noqa: E501
-    },
-    State.measuringTipOffset: {
-        CalibrationCommand.save_offset: State.calibrationComplete,
-        CalibrationCommand.jog: State.measuringTipOffset
-    },
-    State.WILDCARD: {
-        CalibrationCommand.exit: State.sessionExited
-    }
-}
 
 # TODO: BC 2020-07-08: type all command logic here with actual Model type
 COMMAND_HANDLER = Callable[..., Awaitable]
