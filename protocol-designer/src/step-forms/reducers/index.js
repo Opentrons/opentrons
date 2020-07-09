@@ -144,14 +144,15 @@ export const unsavedForm = (
         )
         return unsavedFormState
       }
-      const id = uuid()
+      const cycleId = uuid()
+      const profileStepId = uuid()
 
       return {
         ...unsavedFormState,
-        orderedProfileItems: [...unsavedFormState.orderedProfileItems, id],
+        orderedProfileItems: [...unsavedFormState.orderedProfileItems, cycleId],
         profileItemsById: {
           ...unsavedFormState.profileItemsById,
-          [id]: createInitialProfileCycle(id),
+          [cycleId]: createInitialProfileCycle(cycleId, profileStepId),
         },
       }
     }
