@@ -82,7 +82,7 @@ class CommandDefinition(str, Enum):
         return self._localname
 
 
-class CommonCommand(CommandDefinition):
+class RobotCommand(CommandDefinition):
     """Generic commands"""
     home_all_motors = "homeAllMotors"
     home_pipette = "homePipette"
@@ -136,8 +136,9 @@ CommandDataType = typing.Union[
 ]
 
 
-CommandDefinitions = typing.Union[
-    CommonCommand,
+# A Union of all CommandDefinition enumerations accepted
+CommandDefinitionType = typing.Union[
+    RobotCommand,
     CalibrationCommand,
     CalibrationCheckCommand,
     TipLengthCalibrationCommand
@@ -165,8 +166,9 @@ class BasicSessionCommand(BaseModel):
     """A session command"""
     data: CommandDataType
     # For validation, command MUST appear after data
-    command: CommandDefinitions = Field(...,
-                                        description="The command description")
+    command: CommandDefinitionType = Field(
+        ...,
+        description="The command description")
 
     @validator('command', always=True, allow_reuse=True)
     def check_data_type(cls, v, values):

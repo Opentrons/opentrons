@@ -4,7 +4,7 @@ from opentrons.hardware_control import ThreadManager
 from . import Command, CompletedCommand, CommandResult
 from . base_executor import CommandExecutor
 from ..errors import UnsupportedCommandException
-from ..models import CommandDataType, CommonCommand, CommandDefinition
+from ..models import CommandDataType, RobotCommand, CommandDefinition
 from robot_server.util import duration
 
 
@@ -25,13 +25,13 @@ class HardwareExecutor(CommandExecutor):
     """A command executor that executes direct hardware commands"""
 
     COMMAND_TO_FUNC: typing.Dict[CommandDefinition, COMMAND_HANDLER] = {
-        CommonCommand.home_all_motors: home_all_motors,
-        CommonCommand.toggle_lights: toggle_lights
+        RobotCommand.home_all_motors: home_all_motors,
+        RobotCommand.toggle_lights: toggle_lights
     }
 
     def __init__(self,
                  hardware: ThreadManager,
-                 command_filter: typing.Optional[typing.Set[CommonCommand]]):
+                 command_filter: typing.Optional[typing.Set[RobotCommand]]):
         """
         Constructor
 
@@ -70,6 +70,6 @@ class HardwareExecutor(CommandExecutor):
 class DefaultHardwareExecutor(HardwareExecutor):
     """The default command executor"""
     def __init__(self, hardware: ThreadManager):
-        super().__init__(hardware, {CommonCommand.home_all_motors,
-                                    CommonCommand.home_pipette,
-                                    CommonCommand.toggle_lights})
+        super().__init__(hardware, {RobotCommand.home_all_motors,
+                                    RobotCommand.home_pipette,
+                                    RobotCommand.toggle_lights})
