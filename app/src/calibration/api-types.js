@@ -47,7 +47,7 @@ export type TipLengthData = {|
 
 export type CalibrationData = {|
   offset: OffsetData,
-  tipLength: ?TipLengthData,
+  tipLength: TipLengthData | null,
 |}
 
 export type SingleLabwareCalibration = {|
@@ -65,7 +65,7 @@ export type LabwareCalibrationObjects = {|
 |}
 
 export type AllLabwareCalibrations = {|
-  data: Array<?LabwareCalibrationObjects>,
+  data: Array<LabwareCalibrationObjects | null>,
   type: string,
   meta: Object,
 |}

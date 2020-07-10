@@ -16,10 +16,7 @@ import type { Epic } from '../../../types'
 import type { FetchLabwareCalibrationAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchLabwareCalibrationAction> = action => {
-  // $FlowFixMe(lc, 2020-07-08): lodash flow types do not support keys with values of different types
-  const payloadWithoutRobot = omitBy(action.payload, function(value, key) {
-    return key === 'robotName'
-  })
+  const { robotName, ...payloadWithoutRobot } = action.payload
   // $FlowFixMe(lc, 2020-07-08): lodash flow types do not support keys with values of different types
   const queryDict = omitBy(payloadWithoutRobot, isEmpty)
 

@@ -1,7 +1,5 @@
 // @flow
 // labware calibration actions, selectors and constants
-import * as actions from './actions'
-import * as constants from './constants'
-import * as selectors from './selectors'
-
-export { constants, selectors, actions }
+export * from './actions'
+export * from './constants'
+export * from './selectors'

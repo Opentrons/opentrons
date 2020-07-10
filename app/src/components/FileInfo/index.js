@@ -20,11 +20,9 @@ import { selectors as robotSelectors } from '../../robot'
 import {
   selectors as labwareCalibrationSelectors,
   actions as labwareActions,
-} from '../../calibration/labware'
+} from '../../calibration'
 
 import type { State, Dispatch } from '../../types'
-// import type { Labware } from '../../robot'
-// import type { SingleLabwareCalibration } from '../../calibration/api-types'
 
 import type { Robot } from '../../discovery/types'
 

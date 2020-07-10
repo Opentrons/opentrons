@@ -9,7 +9,7 @@ import { Continue } from '../Continue'
 
 import type { State } from '../../../types'
 
-jest.mock('../../nav')
+jest.mock('../../../nav')
 
 const mockGetCalNavigation: JestMockFn<
   [State],

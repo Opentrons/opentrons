@@ -38,30 +38,32 @@ export function ProtocolLabwareList({
   )
   const toolTipComponent = (
     <Tooltip {...tooltipProps}>
-      {'calibrated offset from labware origin point'}
+      calibrated offset from labware origin point
     </Tooltip>
   )
-
+  const LABWARE_TYPE = "Type"
+  const LABWARE_QUANTITY = "Quantity"
+  const CALIBRATION_DATA = "Calibration Data"
   return (
     <Flex
-      textAlign={DIRECTION_COLUMN}
+      flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       fontSize={FONT_SIZE_BODY_1}
       fontWeight={FONT_WEIGHT_REGULAR}
       color={C_DARK_GRAY}
     >
-      <SectionContentFlex title="Type" width={FLEX_AUTO}>
+      <SectionContentFlex title={LABWARE_TYPE}>
         {labware.map(name => (
           <Text key={name}>{name}</Text>
         ))}
       </SectionContentFlex>
-      <SectionContentFlex title="Quantity" width={FLEX_AUTO}>
+      <SectionContentFlex title={LABWARE_QUANTITY}>
         {quantity.map((item, index) => (
           <Text key={`${index}`}>{item}</Text>
         ))}
       </SectionContentFlex>
       <SectionContentFlex
-        title="Calibration Data"
+        title={CALIBRATION_DATA}
         width={FLEX_AUTO}
         icon={iconComponent}
         toolTipComponent={toolTipComponent}

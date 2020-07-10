@@ -55,7 +55,7 @@ export function ProtocolLabwareCard({
         labware={Object.keys(labware)}
         quantity={labwareQuantity}
         calibration={labwareCalibration}
-      ></ProtocolLabwareList>
+      />
     </InfoSection>
   )
 }
