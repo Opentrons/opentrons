@@ -239,7 +239,6 @@ def test_ensures_config():
              'useOldAspirationFunctions': None,
              'disableLogAggregation': True,
              'useProtocolApi2': None,
-             'useV1HttpApi': None,
              'enableDoorSafetySwitch': None,
              'enableTipLengthCalibration': None
          }

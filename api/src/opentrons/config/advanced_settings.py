@@ -146,12 +146,6 @@ settings = [
                     ' affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.'
     ),
     SettingDefinition(
-        _id='useV1HttpApi',
-        title='Revert to legacy HTTP API v1',
-        description='Tells the OT-2 to run the legacy v1 http api.',
-        restart_required=True
-    ),
-    SettingDefinition(
         _id='enableDoorSafetySwitch',
         title='Enable robot door safety switch',
         description="Automatically pause protocols when robot door opens. "
