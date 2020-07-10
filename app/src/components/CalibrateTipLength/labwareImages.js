@@ -20,5 +20,5 @@ export const tiprackImages = {
 }
 
 export const calBlockImage = [
-  require('../../img/labware/opentrons_calibrationblock.png'),
+  require('../../img/labware/opentrons_calibration_block.png'),
 ]

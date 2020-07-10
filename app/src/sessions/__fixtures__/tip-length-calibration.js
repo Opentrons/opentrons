@@ -22,7 +22,7 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       serial: 'fake serial 2',
     },
   },
-  currentStep: 'sessionStarted',
+  currentStep: 'labwareLoaded',
   labware: [
     {
       alternatives: ['fake_tiprack_load_name'],
@@ -34,11 +34,29 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       version: 1,
     },
     {
+      alternatives: ['fake_block_load_name_short_right'],
+      slot: '3',
+      id: 'opentrons_calibrationblock_short_side_right',
+      forMounts: ['left'],
+      loadName: 'opentrons_calibrationblock_short_side_right',
+      namespace: 'opentrons',
+      version: 1,
+    },
+    {
       alternatives: ['fake_other_tiprack_load_name'],
       slot: '6',
       id: 'def456_labware_uuid',
       forMounts: ['right'],
       loadName: 'opentrons_96_tiprack_20ul',
+      namespace: 'opentrons',
+      version: 1,
+    },
+    {
+      alternatives: ['fake_block_load_name_short_left'],
+      slot: '1',
+      id: 'opentrons_calibrationblock_short_side_left',
+      forMounts: ['right'],
+      loadName: 'opentrons_calibrationblock_short_side_left',
       namespace: 'opentrons',
       version: 1,
     },

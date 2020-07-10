@@ -16,7 +16,9 @@ import {
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { getLatestLabwareDef } from '../../getLabware'
-import type { CalibrateTipLengthChildProps } from './types'
+import type {
+  CalibrateTipLengthChildProps,
+} from './types'
 import styles from './styles.css'
 
 const DECK_SETUP_WITH_BLOCK_PROMPT =
@@ -29,8 +31,12 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
   // TODO: get real hasBlock value and labware from tip length calibration session
-  const { hasBlock } = props
-  const labware = {}
+  const { hasBlock, session, mount } = props
+  // const tiprackID = session.details.instruments[mount.toLowerCase()]['tiprack_id']
+  // const labware = [session.details.labware.find(l => l.id === tiprackID)]
+  const labware = session.details.labware.filter(l => {
+    return l.forMounts.includes(mount.toLowerCase())
+  })
 
   const proceed = () => {
     console.log('TODO: wire up command')
@@ -75,11 +81,10 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
                 const labwareForSlot = labware.find(l => l.slot === slotId)
                 const labwareDef = getLatestLabwareDef(labwareForSlot?.loadName)
-
                 // TODO: also render calibration block if present
 
                 return labwareDef ? (
-                  <TiprackRender
+                  <CalibrationLabwareRender
                     key={slotId}
                     slotDef={slot}
                     labwareDef={labwareDef}
@@ -94,11 +99,11 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   )
 }
 
-type TiprackRenderProps = {|
+type CalibrationLabwareRenderProps = {|
   labwareDef: LabwareDefinition2,
   slotDef: DeckSlot,
 |}
-export function TiprackRender(props: TiprackRenderProps): React.Node {
+export function CalibrationLabwareRender(props: CalibrationLabwareRenderProps): React.Node {
   const { labwareDef, slotDef } = props
   const title = getLabwareDisplayName(labwareDef)
   return (

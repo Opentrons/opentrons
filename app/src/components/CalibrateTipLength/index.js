@@ -41,6 +41,17 @@ const PANEL_BY_STEP: {
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
+const PANEL_STYLE_BY_STEP: {
+  [string]: string,
+} = {
+  sessionStarted: styles.terminal_modal_contents,
+  labwareLoaded: styles.page_content_dark,
+  measuringNozzleOffset: styles.modal_contents,
+  preparingPipette: styles.modal_contents,
+  inspectingTip: styles.modal_contents,
+  measuringTipOffset: styles.modal_contents,
+  calibrationComplete: styles.modal_contents,
+}
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
@@ -81,7 +92,7 @@ export function CalibrateTipLength(
               children: EXIT,
             },
           }}
-          contentsClassName={styles.terminal_modal_contents}
+          contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
         >
           <Panel
             {...props}
