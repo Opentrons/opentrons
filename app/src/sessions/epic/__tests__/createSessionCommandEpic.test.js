@@ -33,7 +33,7 @@ describe('createSessionCommandEpic', () => {
       data: {
         type: 'Command',
         attributes: {
-          command: 'jog',
+          command: 'calibration.jog',
           data: {
             someData: 32,
           },

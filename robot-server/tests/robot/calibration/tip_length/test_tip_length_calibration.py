@@ -4,19 +4,20 @@ from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 
-from robot_server.service.session.models import CommandName
+from robot_server.service.session.models import TipLengthCalibrationCommand, \
+    CalibrationCommand
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
 
 valid_commands: List[Tuple[str, str, Dict[Any, Any]]] = [
-  (CommandName.move_to_reference_point, 'labwareLoaded', {}),
-  (CommandName.jog, 'measuringNozzleOffset', stub_jog_data),
-  (CommandName.pick_up_tip, 'preparingPipette', {}),
-  (CommandName.invalidate_tip, 'preparingPipette', {}),
-  (CommandName.save_offset, 'measuringTipOffset', {}),
-  (CommandName.exit, 'calibrationComplete', {}),
+  (TipLengthCalibrationCommand.move_to_reference_point, 'labwareLoaded', {}),
+  (CalibrationCommand.jog, 'measuringNozzleOffset', stub_jog_data),
+  (CalibrationCommand.pick_up_tip, 'preparingPipette', {}),
+  (CalibrationCommand.invalidate_tip, 'preparingPipette', {}),
+  (CalibrationCommand.save_offset, 'measuringTipOffset', {}),
+  (CalibrationCommand.exit, 'calibrationComplete', {}),
 ]
 
 
@@ -43,9 +44,9 @@ def mock_user_flow(hardware):
 
 
 hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
-  (CommandName.jog, 'measuringNozzleOffset', stub_jog_data, 'move_rel'),
-  (CommandName.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
-  (CommandName.invalidate_tip, 'preparingPipette', {}, 'drop_tip'),
+  (CalibrationCommand.jog, 'measuringNozzleOffset', stub_jog_data, 'move_rel'),
+  (CalibrationCommand.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
+  (CalibrationCommand.invalidate_tip, 'preparingPipette', {}, 'drop_tip'),
 ]
 
 

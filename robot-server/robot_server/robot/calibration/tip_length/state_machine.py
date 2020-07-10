@@ -1,5 +1,6 @@
 from typing import Dict
-from robot_server.service.session.models import CommandName
+from robot_server.service.session.models import CommandDefinition, \
+    TipLengthCalibrationCommand, CalibrationCommand
 from robot_server.robot.calibration.tip_length.util import (
     SimpleStateMachine,
     TipCalibrationError as Error
@@ -9,41 +10,41 @@ from robot_server.robot.calibration.tip_length.constants import (
 )
 
 
-TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandName, State]] = {
+TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.sessionStarted: {
-        CommandName.load_labware: State.labwareLoaded
+        CalibrationCommand.load_labware: State.labwareLoaded
     },
     State.labwareLoaded: {
-        CommandName.move_to_reference_point: State.measuringNozzleOffset
+        TipLengthCalibrationCommand.move_to_reference_point: State.measuringNozzleOffset  # noqa: e501
     },
     State.measuringNozzleOffset: {
-        CommandName.save_offset: State.preparingPipette,
-        CommandName.jog: State.measuringNozzleOffset
+        CalibrationCommand.save_offset: State.preparingPipette,
+        CalibrationCommand.jog: State.measuringNozzleOffset
     },
     State.preparingPipette: {
-        CommandName.jog: State.preparingPipette,
-        CommandName.pick_up_tip: State.preparingPipette,
-        CommandName.invalidate_tip: State.preparingPipette,
-        CommandName.move_to_reference_point: State.measuringTipOffset
+        CalibrationCommand.jog: State.preparingPipette,
+        CalibrationCommand.pick_up_tip: State.preparingPipette,
+        CalibrationCommand.invalidate_tip: State.preparingPipette,
+        TipLengthCalibrationCommand.move_to_reference_point: State.measuringTipOffset  # noqa: e501
     },
     State.measuringTipOffset: {
-        CommandName.save_offset: State.calibrationComplete,
-        CommandName.jog: State.measuringTipOffset
+        CalibrationCommand.save_offset: State.calibrationComplete,
+        CalibrationCommand.jog: State.measuringTipOffset
     },
     State.WILDCARD: {
-        CommandName.exit: State.sessionExited
+        CalibrationCommand.exit: State.sessionExited
     }
 }
 
 
-class TipCalibrationStateMachine():
+class TipCalibrationStateMachine:
     def __init__(self):
         self._state_machine = SimpleStateMachine(
             states=set(s for s in State),
             transitions=TIP_LENGTH_TRANSITIONS
         )
 
-    def get_next_state(self, from_state: State, command: CommandName):
+    def get_next_state(self, from_state: State, command: CommandDefinition):
         next_state = self._state_machine.get_next_state(from_state, command)
         if next_state:
             return next_state
