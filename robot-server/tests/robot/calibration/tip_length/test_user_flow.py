@@ -3,21 +3,11 @@ from unittest.mock import MagicMock
 from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
-from robot_server.service.session.models import TipLengthCalibrationCommand, \
-    CalibrationCommand
+from robot_server.service.session.models import CalibrationCommand
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
-
-valid_commands: List[Tuple[str, str, Dict[Any, Any]]] = [
-  (TipLengthCalibrationCommand.move_to_reference_point, 'labwareLoaded', {}),
-  (CalibrationCommand.jog, 'measuringNozzleOffset', stub_jog_data),
-  (CalibrationCommand.pick_up_tip, 'preparingPipette', {}),
-  (CalibrationCommand.invalidate_tip, 'preparingPipette', {}),
-  (CalibrationCommand.save_offset, 'measuringTipOffset', {}),
-  (CalibrationCommand.exit, 'calibrationComplete', {}),
-]
 
 pipette_map = {
     "p10_single_v1.5": "opentrons_96_tiprack_10ul",
@@ -34,6 +24,7 @@ pipette_map = {
     "p300_multi_v2.1": "opentrons_96_tiprack_300ul",
 }
 
+
 @pytest.fixture(params=pipette_map.keys())
 def mock_hw_pipette_all_combos(request):
     model = request.param
@@ -43,6 +34,7 @@ def mock_hw_pipette_all_combos(request):
                                'multi': [0, 0, 0]
                            },
                            'testId')
+
 
 @pytest.fixture(params=[Mount.RIGHT, Mount.LEFT])
 def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
@@ -115,11 +107,13 @@ def mock_user_flow_all_combos(mock_hw_all_combos, request):
 
 
 hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
-  (CommandName.jog, 'measuringNozzleOffset', stub_jog_data, 'move_rel'),
-  (CommandName.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
+    (CalibrationCommand.jog, 'measuringNozzleOffset',
+     stub_jog_data, 'move_rel'),
+    (CalibrationCommand.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
 ]
 
 # TODO: unit test each command
+
 
 @pytest.mark.parametrize('command,current_state,data,hw_meth', hw_commands)
 async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):

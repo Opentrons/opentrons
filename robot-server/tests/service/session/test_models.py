@@ -18,6 +18,6 @@ def test_command_type_empty():
     """Test that we create command correctly for
      commands that have no added data."""
     c = models.BasicSessionCommand(
-        **{'command': models.CalibrationCommand.prepare_pipette,
+        **{'command': models.CalibrationCommand.load_labware,
            'data': {}})
     assert c.data == models.EmptyModel()
