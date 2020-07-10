@@ -46,7 +46,7 @@ class TipCalibrationUserFlow():
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block = has_calibration_block
-        self._hw_pipette = self._hardware.attached_instruments[mount]
+        self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
             raise Error(f'No pipette found on {mount} mount,'
                         'cannot run tip length calibration')
@@ -159,8 +159,7 @@ class TipCalibrationUserFlow():
         pip_vol = self._hw_pipette.config.max_volume
         tr_lookup = TIP_RACK_LOOKUP_BY_MAX_VOL.get(str(pip_vol), None)
         if tr_lookup:
-            load_name = tr_lookup
-            return labware.load(load_name,
+            return labware.load(tr_lookup.load_name,
                                 self._deck.position_for(TIP_RACK_SLOT))
         else:
             raise Error(

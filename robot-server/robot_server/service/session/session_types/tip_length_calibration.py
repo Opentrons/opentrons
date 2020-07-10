@@ -1,5 +1,7 @@
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
+from robot_server.robot.calibration.session import CalibrationException
+from robot_server.service.session.errors import SessionCreationException
 
 from .base_session import BaseSession, SessionMetaData
 from ..command_execution import CommandQueue, CommandExecutor, \
@@ -7,6 +9,7 @@ from ..command_execution import CommandQueue, CommandExecutor, \
 from ..configuration import SessionConfiguration
 from ..models import EmptyModel, SessionType, SessionDetails
 from ..errors import UnsupportedFeature
+
 
 class TipLengthCalibration(BaseSession):
 
@@ -23,10 +26,15 @@ class TipLengthCalibration(BaseSession):
     @classmethod
     async def create(cls, configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> 'BaseSession':
+        try:
+            tip_length_cal = TipCalibrationUserFlow(
+                    hardware=configuration.hardware)
+        except (AssertionError, CalibrationException) as e:
+            raise SessionCreationException(str(e))
+
         return cls(configuration=configuration,
                    instance_meta=instance_meta,
-                   tip_length_calibration=TipCalibrationUserFlow(
-                          hardware=configuration.hardware))
+                   tip_length_calibration=tip_length_cal)
 
     @property
     def command_executor(self) -> CommandExecutor:

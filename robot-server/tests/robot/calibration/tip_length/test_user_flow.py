@@ -39,7 +39,7 @@ def mock_hw_pipette_all_combos(request):
 @pytest.fixture(params=[Mount.RIGHT, Mount.LEFT])
 def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     mount = request.param
-    hardware.attached_instruments = {mount: mock_hw_pipette_all_combos}
+    hardware._attached_instruments = {mount: mock_hw_pipette_all_combos}
 
     async def async_mock(*args, **kwargs):
         pass
@@ -64,7 +64,7 @@ def mock_hw(hardware):
                               'multi': [0, 0, 0]
                           },
                           'testId')
-    hardware.attached_instruments = {Mount.RIGHT: pip}
+    hardware._attached_instruments = {Mount.RIGHT: pip}
 
     async def async_mock(*args, **kwargs):
         pass
@@ -87,7 +87,7 @@ def mock_user_flow(mock_hw, request):
     m = TipCalibrationUserFlow(
         hardware=mock_hw,
         mount=next(k for k, v in
-                   mock_hw.attached_instruments.items() if v),
+                   mock_hw._attached_instruments.items() if v),
         has_calibration_block=has_calibration_block)
 
     yield m
@@ -100,7 +100,7 @@ def mock_user_flow_all_combos(mock_hw_all_combos, request):
     m = TipCalibrationUserFlow(
         hardware=hw,
         mount=next(k for k, v in
-                   hw.attached_instruments.items() if v),
+                   hw._attached_instruments.items() if v),
         has_calibration_block=has_calibration_block)
 
     yield m
