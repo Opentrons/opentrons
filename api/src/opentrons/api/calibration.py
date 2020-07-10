@@ -5,6 +5,7 @@ from typing import Optional
 
 from opentrons.util import calibration_functions
 from opentrons.config import feature_flags as ff
+from opentrons.calibration_storage import modify
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
@@ -295,7 +296,7 @@ class CalibrationManager(RobotBusy):
             else:
                 orig = _well0(container._container)._top().point
             delta = here - orig
-            labware.save_calibration(container._container, delta)
+            modify.save_calibration(container._container, delta)
         else:
             inst.robot.calibrate_container_with_instrument(
                 container=container._container,

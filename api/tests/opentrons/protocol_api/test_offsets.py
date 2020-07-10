@@ -6,6 +6,7 @@ import time
 import pytest
 import datetime
 from opentrons import config
+from opentrons import calibration_storage as storage
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 
@@ -59,7 +60,8 @@ minimalLabwareDef = {
 
 
 def path(calibration_name):
-    return labware.OFFSETS_PATH \
+    return config.get_opentrons_path(
+        'labware_calibration_offsets_dir_v2') \
         / '{}.json'.format(calibration_name)
 
 
@@ -119,7 +121,7 @@ def test_save_calibration(monkeypatch, clear_calibration):
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
 
-    labware.save_calibration(test_labware, Point(1, 1, 1))
+    storage.modify.save_calibration(test_labware, Point(1, 1, 1))
     assert os.path.exists(path(MOCK_HASH))
     assert calibration_point == Point(1, 1, 1)
 
@@ -188,7 +190,7 @@ def test_save_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
             'lastModified': 1
         }
     }
-    labware.save_tip_length_calibration(PIPETTE_ID, test_data)
+    storage.modify.save_tip_length_calibration(PIPETTE_ID, test_data)
     assert os.path.exists(tlc_path(PIPETTE_ID))
     # test an index file is also created
     assert os.path.exists(tlc_path('index'))
@@ -215,7 +217,7 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
     assert not os.path.exists(tlc_path(PIPETTE_ID))
 
     monkeypatch.setattr(
-        labware,
+        storage.helpers,
         '_hash_labware_def', mock_hash_labware)
 
     test_labware = labware.Labware(minimalLabwareDef,
@@ -253,11 +255,11 @@ def test_schema_shape(monkeypatch, clear_calibration):
                                    Location(Point(0, 0, 0), 'deck'))
 
     monkeypatch.setattr(
-       labware,
+       storage.helpers,
        '_hash_labware_def', mock_hash_labware
     )
 
-    labware.save_calibration(test_labware, Point(1, 1, 1))
+    storage.modify.save_calibration(test_labware, Point(1, 1, 1))
     expected = {"default": {"offset": [1, 1, 1], "lastModified": 1}}
     with open(path(MOCK_HASH)) as f:
         result = json.load(f)
@@ -277,7 +279,7 @@ def test_load_calibration(monkeypatch, clear_calibration):
         'set_calibration', mock_set_calibration)
 
     monkeypatch.setattr(
-        labware,
+        storage.helpers,
         '_hash_labware_def', mock_hash_labware
     )
 
@@ -287,8 +289,8 @@ def test_load_calibration(monkeypatch, clear_calibration):
     test_offset = Point(1, 1, 1)
     test_tip_length = 31.7
 
-    labware.save_calibration(test_labware, test_offset)
-    labware.save_tip_length(test_labware, test_tip_length)
+    storage.modify.save_calibration(test_labware, test_offset)
+    storage.modify.save_tip_length(test_labware, test_tip_length)
 
     # Set without saving to show that load will update with previously saved
     # data
@@ -306,7 +308,7 @@ def test_wells_rebuilt_with_offset():
     old_wells = test_labware._wells
     assert test_labware._offset == Point(10, 10, 5)
     assert test_labware._calibrated_offset == Point(10, 10, 5)
-    labware.save_calibration(test_labware, Point(2, 2, 2))
+    storage.modify.save_calibration(test_labware, Point(2, 2, 2))
     new_wells = test_labware._wells
     assert old_wells[0] != new_wells[0]
     assert test_labware._offset == Point(10, 10, 5)
@@ -337,13 +339,13 @@ def test_hash_labware_def():
     def2 = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.000033, 1/3]}
 
     # identity preserved across json serialization+deserialization
-    assert labware._hash_labware_def(def1a) == \
-        labware._hash_labware_def(
+    assert storage.helpers._hash_labware_def(def1a) == \
+        storage.helpers._hash_labware_def(
             json.loads(json.dumps(def1a, separators=(',', ':'))))
     # 2 instances of same def should match
-    assert labware._hash_labware_def(def1a) == \
-        labware._hash_labware_def(def1aa)
+    assert storage.helpers._hash_labware_def(def1a) == \
+        storage.helpers._hash_labware_def(def1aa)
     # metadata ignored
-    assert labware._hash_labware_def(def1a) == labware._hash_labware_def(def1b)
+    assert storage.helpers._hash_labware_def(def1a) == storage.helpers._hash_labware_def(def1b)
     # different data should not match
-    assert labware._hash_labware_def(def1a) != labware._hash_labware_def(def2)
+    assert storage.helpers._hash_labware_def(def1a) != storage.helpers._hash_labware_def(def2)

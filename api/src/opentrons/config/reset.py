@@ -8,7 +8,7 @@ from typing import NamedTuple, Dict, Set
 from opentrons.config import (robot_configs as rc,
                               IS_ROBOT, feature_flags as ff)
 from opentrons.data_storage import database as db
-from opentrons.protocol_api import labware
+from opentrons.calibration_storage import delete
 
 DATA_BOOT_D = Path('/data/boot.d')
 
@@ -80,7 +80,7 @@ def reset_boot_scripts():
 
 
 def reset_labware_calibration():
-    labware.clear_calibrations()
+    delete.clear_calibrations()
     db.reset()
 
 
@@ -89,7 +89,7 @@ def reset_tip_probe():
     config = config._replace(
         instrument_offset=rc.build_fallback_instrument_offset({}))
     if ff.enable_tip_length_calibration():
-        labware.clear_tip_length_calibration()
+        delete.clear_tip_length_calibration()
     else:
         config.tip_length.clear()
     rc.save_robot_settings(config)

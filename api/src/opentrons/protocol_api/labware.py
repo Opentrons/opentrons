@@ -7,149 +7,41 @@ and labware calibration offsets. It contains all the code necessary to
 transform from labware symbolic points (such as "well a1 of an opentrons
 tiprack") to points in deck coordinates.
 """
-import datetime
 import logging
 import json
 import re
-import time
 import os
 import shutil
 
 from pathlib import Path
-from dataclasses import dataclass
 from collections import defaultdict
-from hashlib import sha256
 from itertools import takewhile, dropwhile
 from typing import (
     Any, AnyStr, List, Dict,
     Optional, Union, Sequence, Tuple,
-    TYPE_CHECKING, NewType)
+    TYPE_CHECKING)
 
 import jsonschema  # type: ignore
 
-from .util import ModifiedList, requires_version, first_parent
-from opentrons.config import get_tip_length_cal_path
+from .util import ModifiedList, requires_version
+from opentrons.calibration_storage.get import load_calibration
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
 from .constants import (OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE,
-                        STANDARD_DEFS_PATH, OFFSETS_PATH, USER_DEFS_PATH)
+                        STANDARD_DEFS_PATH, USER_DEFS_PATH)
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)
-    from .dev_types import (
-        TipLengthCalibration, PipTipLengthCalibration,
-        CalibrationDict, CalibrationIndexDict)
     from opentrons_shared_data.labware.dev_types import (
         LabwareDefinition, LabwareParameters, WellDefinition)
 
 
 MODULE_LOG = logging.getLogger(__name__)
 
-CalibrationID = NewType('CalibrationID', str)
-
 
 class OutOfTipsError(Exception):
     pass
-
-
-# TODO: AA 2020-06-10 move out of protocol_api
-class TipLengthCalNotFound(Exception):
-    pass
-
-
-# TODO: AA 2020-06-10 move out of protocol_api
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
-
-
-# TODO: AA 2020-06-10 move out of protocol_api
-class DateTimeDecoder(json.JSONDecoder):
-    def __init__(self):
-        super().__init__(object_hook=self.dict_to_obj)
-
-    def dict_to_obj(self, d):
-        if isinstance(d, dict):
-            d = {k: self._decode_datetime(v) for k, v in d.items()}
-        return d
-
-    def _decode_datetime(self, obj):
-        try:
-            return datetime.datetime.fromisoformat(obj)
-        except ValueError:
-            return obj
-        except TypeError:
-            return self.dict_to_obj(obj)
-
-
-@dataclass
-class OffsetData:
-    """
-    Class to categorize the shape of a
-    given calibration data.
-    TODO(6/8): Move to a separate file
-    """
-    value: List[float]
-    last_modified: Optional[str]
-
-
-@dataclass
-class TipLengthData:
-    """
-    Class to categorize the shape of a
-    given calibration data.
-    TODO(6/8): Move to a separate file
-    """
-    value: Optional[float] = None
-    last_modified: Optional[str] = None
-
-
-@dataclass
-class ParentOptions:
-    """
-    Class to store whether a labware calibration has
-    a module, as well the original parent (slot).
-    As of now, the slot is not saved in association
-    with labware calibrations.
-    TODO(6/8): Move to a separate file
-    """
-    slot: str
-    module: str = ''
-
-
-@dataclass
-class CalibrationTypes:
-    """
-    Class to categorize what calibration
-    data might be stored for a labware.
-    TODO(6/8): Move to a separate file
-    """
-    offset: OffsetData
-    tip_length: TipLengthData
-
-
-@dataclass
-class CalibrationInformation:
-    """
-    Class to store important calibration
-    info for labware.
-    TODO(6/8): Move to a separate file
-    """
-    calibration: CalibrationTypes
-    definition: 'LabwareDefinition'
-    parent: ParentOptions
-    labware_id: str
-    uri: str
-
-
-@dataclass
-class UriDetails:
-    namespace: str
-    load_name: str
-    version: int
 
 
 class Well:
@@ -903,266 +795,6 @@ class Labware(DeckItem):
                 well.has_tip = True
 
 
-def _get_parent_identifier(
-        parent: Union[Well, str, DeckItem, None]) -> str:
-    if isinstance(parent, DeckItem) and parent.separate_calibration:
-        # treat a given labware on a given module type as same
-        return parent.load_name
-    else:
-        return ''  # treat all slots as same
-
-
-def _hash_labware_def(labware_def: 'LabwareDefinition') -> str:
-    # remove keys that do not affect run
-    blocklist = ['metadata', 'brand', 'groups']
-    def_no_metadata = {
-        k: v for k, v in labware_def.items() if k not in blocklist}
-    sorted_def_str = json.dumps(
-        def_no_metadata, sort_keys=True, separators=(',', ':'))
-    return sha256(sorted_def_str.encode('utf-8')).hexdigest()
-
-
-def _add_to_index_offset_file(labware: Labware, lw_hash: str):
-    """
-    A helper method to create or add to an index file so that calibration
-    files can be looked up by their hash to reveal the labware uri and
-    parent information of a given file.
-
-    :param labware: A labware object
-    :param lw_hash: The labware hash of the calibration
-    """
-    index_file = OFFSETS_PATH / 'index.json'
-    uri = labware.uri
-    if index_file.exists():
-        blob = _read_file(str(index_file))
-    else:
-        blob = {}
-
-    mod_parent = _get_parent_identifier(labware.parent)
-    slot = first_parent(labware)
-    if mod_parent:
-        mod_dict = {
-            'parent': mod_parent,
-            'fullParent': f'{slot}-{mod_parent}'}
-    else:
-        mod_dict = {}
-    full_id = f'{lw_hash}{mod_parent}'
-    blob[full_id] = {
-            "uri": f'{uri}',
-            "slot": full_id,
-            "module": mod_dict
-        }
-    with index_file.open('w') as f:
-        json.dump(blob, f)
-
-
-def _get_labware_offset_path(labware: Labware):
-    OFFSETS_PATH.mkdir(parents=True, exist_ok=True)
-
-    parent_id = _get_parent_identifier(labware.parent)
-    labware_hash = _hash_labware_def(labware._definition)
-    return OFFSETS_PATH/f'{labware_hash}{parent_id}.json'
-
-
-def save_calibration(labware: Labware, delta: Point):
-    """
-    Function to be used whenever an updated delta is found for the first well
-    of a given labware. If an offset file does not exist, create the file
-    using labware id as the filename. If the file does exist, load it and
-    modify the delta and the lastModified fields under the "default" key.
-    """
-    labware_offset_path = _get_labware_offset_path(labware)
-    labware_hash = _hash_labware_def(labware._definition)
-    _add_to_index_offset_file(labware, labware_hash)
-    calibration_data = _helper_offset_data_format(
-        str(labware_offset_path), delta)
-    with labware_offset_path.open('w') as f:
-        json.dump(calibration_data, f)
-    labware.set_calibration(delta)
-
-
-def save_tip_length(labware: Labware, length: float):
-    """
-    Function to be used whenever an updated tip length is found for
-    of a given tip rack. If an offset file does not exist, create the file
-    using labware id as the filename. If the file does exist, load it and
-    modify the length and the lastModified fields under the "tipLength" key.
-    """
-    labware_offset_path = _get_labware_offset_path(labware)
-    calibration_data = _helper_tip_length_data_format(
-        str(labware_offset_path), length)
-    with labware_offset_path.open('w') as f:
-        json.dump(calibration_data, f)
-    labware.tip_length = length
-
-
-# TODO: AA - move out of protocol_api
-def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
-    index_file = get_tip_length_cal_path()/'index.json'
-    try:
-        index_data = _read_file(str(index_file))
-    except FileNotFoundError:
-        index_data = {}
-
-    if lw_hash not in index_data:
-        index_data[lw_hash] = [pip_id]
-    elif pip_id not in index_data[lw_hash]:
-        index_data[lw_hash].append(pip_id)
-
-    with index_file.open('w') as f:
-        json.dump(index_data, f)
-
-
-# TODO: AA - move out of protocol_api
-def save_tip_length_calibration(
-        pip_id: str, tip_length_cal: 'PipTipLengthCalibration'):
-    tip_length_dir_path = get_tip_length_cal_path()
-    tip_length_dir_path.mkdir(parents=True, exist_ok=True)
-    pip_tip_length_path = tip_length_dir_path/f'{pip_id}.json'
-
-    for lw_hash in tip_length_cal.keys():
-        _append_to_index_tip_length_file(pip_id, lw_hash)
-
-    try:
-        tip_length_data = _read_cal_file(str(pip_tip_length_path))
-    except FileNotFoundError:
-        tip_length_data = {}
-
-    tip_length_data.update(tip_length_cal)
-
-    with pip_tip_length_path.open('w') as f:
-        json.dump(tip_length_data, f, cls=DateTimeEncoder)
-
-
-# TODO: AA - move out of protocol_api
-def create_tip_length_data(
-        labware: Labware, length: float) -> 'PipTipLengthCalibration':
-    assert labware._is_tiprack, \
-        'cannot save tip length for non-tiprack labware'
-    parent_id = _get_parent_identifier(labware.parent)
-    labware_hash = _hash_labware_def(labware._definition)
-
-    tip_length_data: 'TipLengthCalibration' = {
-        'tipLength': length,
-        'lastModified': datetime.datetime.utcnow()
-    }
-
-    data = {labware_hash + parent_id: tip_length_data}
-    return data
-
-
-# TODO: AA - move out of protocol_api
-def load_tip_length_calibration(
-        pip_id: str, labware: Labware) -> 'TipLengthCalibration':
-    assert labware._is_tiprack, \
-        'cannot load tip length for non-tiprack labware'
-    parent_id = _get_parent_identifier(labware.parent)
-    labware_hash = _hash_labware_def(labware._definition)
-    return get_tip_length_data(
-        pip_id=pip_id,
-        labware_hash=labware_hash + parent_id,
-        labware_load_name=labware.load_name)
-
-
-# TODO: AA - move out of protocol_api
-def get_tip_length_data(
-        pip_id: str, labware_hash: str, labware_load_name: str
-) -> 'TipLengthCalibration':
-    try:
-        pip_tip_length_path = get_tip_length_cal_path()/f'{pip_id}.json'
-        tip_length_data = _read_cal_file(str(pip_tip_length_path))
-        return tip_length_data[labware_hash]
-    except (FileNotFoundError, AttributeError):
-        raise TipLengthCalNotFound(
-            f'Tip length of {labware_load_name} has not been '
-            f'calibrated for this pipette: {pip_id} and cannot'
-            'be loaded')
-
-
-# TODO: AA - move out of protocol_api
-def clear_tip_length_calibration():
-    """
-    Delete all tip length calibration files.
-    """
-    tip_length_path = get_tip_length_cal_path()
-    try:
-        targets = (
-            f for f in tip_length_path.iterdir() if f.suffix == '.json')
-        for target in targets:
-            target.unlink()
-    except FileNotFoundError:
-        pass
-
-
-# TODO: AA - move out of protocol_api
-def _read_cal_file(filepath: str) -> dict:
-    with open(filepath, 'r') as f:
-        calibration_data = json.load(f, cls=DateTimeDecoder)
-    for value in calibration_data.values():
-        if value.get('lastModified'):
-            assert isinstance(value['lastModified'], datetime.datetime), \
-                "invalid decoded value type for lastModified: got " \
-                f"{type(value['lastModified']).__name__}, expected datetime"
-    return calibration_data
-
-
-def load_calibration(labware: Labware):
-    """
-    Look up a calibration if it exists and apply it to the given labware.
-    """
-    labware_offset_path = _get_labware_offset_path(labware)
-    if labware_offset_path.exists():
-        calibration_data = _read_file(str(labware_offset_path))
-        offset_array = calibration_data['default']['offset']
-        offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
-        labware.set_calibration(offset)
-        if 'tipLength' in calibration_data.keys():
-            tip_length = calibration_data['tipLength']['length']
-            labware.tip_length = tip_length
-
-
-def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
-    if not Path(filepath).is_file():
-        calibration_data = {
-            "default": {
-                "offset": [delta.x, delta.y, delta.z],
-                "lastModified": time.time()
-            }
-        }
-    else:
-        calibration_data = _read_file(filepath)
-        calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
-        calibration_data['default']['lastModified'] = time.time()
-    return calibration_data
-
-
-def _helper_tip_length_data_format(filepath: str, length: float) -> dict:
-    try:
-        calibration_data = _read_file(filepath)
-    except FileNotFoundError:
-        # This should generally not occur, as labware calibration has to happen
-        # prior to tip length calibration
-        calibration_data = {}
-
-    calibration_data['tipLength'] = {
-        'length': length,
-        'lastModified': time.time()}
-
-    return calibration_data
-
-
-def _read_file(filepath: str):
-    # TODO(6/16): We should use tagged unions for
-    # both the calibration and tip length dicts to better
-    # categorize the Typed Dicts used here.
-    # This can be done when the labware endpoints
-    # are refactored to grab tip length calibration
-    # from the correct locations.
-    with open(filepath, 'r') as f:
-        calibration_data = json.load(f)
-    return calibration_data
-
-
 def _get_path_to_labware(
         load_name: str, namespace: str, version: int, base_path: Path = None
         ) -> Path:
@@ -1399,107 +1031,6 @@ def get_all_labware_definitions() -> List[str]:
     return labware_list
 
 
-def _format_calibration_type(
-        data: 'CalibrationDict') -> 'CalibrationTypes':
-    offset = OffsetData(
-        value=data['default']['offset'],
-        last_modified=data['default']['lastModified']
-    )
-    # TODO(6/16): Tip calibration no longer exists in
-    # the labware calibraiton file. We should
-    # have a follow-up PR to grab tip lengths
-    # based on the loaded pips + labware
-    return CalibrationTypes(
-            offset=offset,
-            tip_length=TipLengthData()
-        )
-
-
-def _format_parent(data: 'CalibrationIndexDict') -> ParentOptions:
-    options = ParentOptions(slot=data['slot'])
-    if data['module']:
-        options.module = data['module']['parent']
-    return options
-
-
-def get_all_calibrations() -> List[CalibrationInformation]:
-    """
-    A helper function that will list all of the given calibrations
-    in a succinct way.
-
-    :return: A list of dictionary objects representing all of the
-    labware calibration files found on the robot.
-    TODO(6/8): Move to another location
-    """
-    all_calibrations: List[CalibrationInformation] = []
-    index_path = OFFSETS_PATH / 'index.json'
-    if not index_path.exists():
-        return all_calibrations
-    index_file = _read_file(str(index_path))
-    for key, data in index_file.items():
-        cal_path = OFFSETS_PATH / f'{key}.json'
-        if cal_path.exists():
-            cal_blob = _read_file(str(cal_path))
-            calibration = _format_calibration_type(cal_blob)
-            details = details_from_uri(data['uri'])
-            definition = get_labware_definition(
-                details.load_name, details.namespace, details.version)
-            all_calibrations.append(
-                CalibrationInformation(
-                    calibration=calibration,
-                    definition=definition,
-                    parent=_format_parent(data),
-                    labware_id=key,
-                    uri=data['uri']
-                ))
-    return all_calibrations
-
-
-def clear_calibrations():
-    """
-    Delete all calibration files for labware. This includes deleting tip-length
-    data for tipracks.
-    """
-    calibration_path = OFFSETS_PATH
-    try:
-        targets = [
-            f for f in calibration_path.iterdir() if f.suffix == '.json']
-        for target in targets:
-            target.unlink()
-    except FileNotFoundError:
-        pass
-
-
-def _remove_offset_from_index(calibration_id: CalibrationID):
-    """
-    Helper function to remove an individual offset file.
-
-    :param calibration_id: labware hash
-    :raises FileNotFoundError: If index file does not exist or
-    the specified id is not in the index file.
-    """
-    index_path = OFFSETS_PATH / 'index.json'
-    blob = _read_file(str(index_path))
-
-    del blob[calibration_id]
-    with index_path.open('w') as f:
-        json.dump(blob, f)
-
-
-def delete_offset_file(calibration_id: CalibrationID):
-    """
-    Given a labware's hash, delete the file and remove it from the index file.
-
-    :param calibration_id: labware hash
-    """
-    offset = OFFSETS_PATH / f'{calibration_id}.json'
-    try:
-        _remove_offset_from_index(calibration_id)
-        offset.unlink()
-    except FileNotFoundError:
-        pass
-
-
 def quirks_from_any_parent(
         loc: Union[Labware, Well, str, 'ModuleGeometry', None]) -> List[str]:
     """ Walk the tree of wells and labwares and extract quirks """
@@ -1559,15 +1090,6 @@ def uri_from_details(namespace: str, load_name: str, version: Union[str, int],
     :returns str: The URI.
     """
     return f'{namespace}{delimiter}{load_name}{delimiter}{version}'
-
-
-def details_from_uri(uri: str, delimiter='/') -> UriDetails:
-    """
-    Unpack a labware URI to get the namespace, loadname and version
-    """
-    info = uri.split(delimiter)
-    return UriDetails(
-        namespace=info[0], load_name=info[1], version=int(info[2]))
 
 
 def uri_from_definition(definition: 'LabwareDefinition', delimiter='/') -> str:

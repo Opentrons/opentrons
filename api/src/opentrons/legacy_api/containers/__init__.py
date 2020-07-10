@@ -20,9 +20,10 @@ from .placeable import (
 from opentrons.helpers import helpers
 
 from opentrons.protocol_api import labware as new_labware
+from opentrons.calibration_storage.get import get_tip_length_data
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.dev_types import TipLengthCalibration
+    from opentrons.calibration_storage.types import TipLengthCalibration
 
 
 __all__ = [
@@ -289,6 +290,6 @@ def load_tip_length_calibration(
         pip_id: str, location) -> 'TipLengthCalibration':
     placeable, _ = unpack_location(location)
     lw = placeable.get_parent()
-    return new_labware.get_tip_length_data(
+    return get_tip_length_data(
         pip_id=pip_id, labware_hash=lw.properties['labware_hash'],
         labware_load_name=lw.properties['type'])
