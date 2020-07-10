@@ -46,7 +46,6 @@ class TipCalibrationUserFlow():
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block = has_calibration_block
-
         self._hw_pipette = self._hardware.attached_instruments[mount]
         if not self._hw_pipette:
             raise Error(f'No pipette found on {mount} mount,'
@@ -91,7 +90,6 @@ class TipCalibrationUserFlow():
         self._set_current_state(next_state)
 
     async def load_labware(self, *args):
-        # TODO: load tip rack onto deck
         pass
 
     async def move_to_tip_rack(self, *args):
@@ -159,9 +157,14 @@ class TipCalibrationUserFlow():
 
     def _get_tip_rack_lw(self) -> labware.Labware:
         pip_vol = self._hw_pipette.config.max_volume
-        load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
-        return labware.load(load_name,
-                            self._deck.position_for(TIP_RACK_SLOT))
+        tr_lookup = TIP_RACK_LOOKUP_BY_MAX_VOL.get(str(pip_vol), None)
+        if tr_lookup:
+            load_name = tr_lookup
+            return labware.load(load_name,
+                                self._deck.position_for(TIP_RACK_SLOT))
+        else:
+            raise Error(
+                    f'No tiprack found for pipette {self._hw_pipette.model}')
 
     def _initialize_deck(self):
         trash_lw = self._get_trash_lw()

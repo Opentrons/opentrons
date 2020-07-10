@@ -8,7 +8,6 @@ from ..configuration import SessionConfiguration
 from ..models import EmptyModel, SessionType, SessionDetails
 from ..errors import UnsupportedFeature
 
-
 class TipLengthCalibration(BaseSession):
 
     def __init__(self, configuration: SessionConfiguration,
