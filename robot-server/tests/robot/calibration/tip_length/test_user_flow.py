@@ -3,20 +3,20 @@ from unittest.mock import MagicMock
 from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
-from opentrons.config import pipette_config
-from robot_server.service.session.models import CommandName
+from robot_server.service.session.models import TipLengthCalibrationCommand, \
+    CalibrationCommand
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
 
 valid_commands: List[Tuple[str, str, Dict[Any, Any]]] = [
-  (CommandName.move_to_reference_point, 'labwareLoaded', {}),
-  (CommandName.jog, 'measuringNozzleOffset', stub_jog_data),
-  (CommandName.pick_up_tip, 'preparingPipette', {}),
-  (CommandName.invalidate_tip, 'preparingPipette', {}),
-  (CommandName.save_offset, 'measuringTipOffset', {}),
-  (CommandName.exit, 'calibrationComplete', {}),
+  (TipLengthCalibrationCommand.move_to_reference_point, 'labwareLoaded', {}),
+  (CalibrationCommand.jog, 'measuringNozzleOffset', stub_jog_data),
+  (CalibrationCommand.pick_up_tip, 'preparingPipette', {}),
+  (CalibrationCommand.invalidate_tip, 'preparingPipette', {}),
+  (CalibrationCommand.save_offset, 'measuringTipOffset', {}),
+  (CalibrationCommand.exit, 'calibrationComplete', {}),
 ]
 
 pipette_map = {

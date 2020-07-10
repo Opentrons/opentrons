@@ -36,12 +36,12 @@ export const mockSession: Types.Session = {
 }
 
 export const mockSessionCommand: Types.SessionCommandAttributes = {
-  command: 'jog',
+  command: 'calibration.jog',
   data: { someData: 32 },
 }
 
 export const mockSessionCommandAttributes: Types.SessionCommandAttributes = {
-  command: 'preparePipette',
+  command: 'calibration.preparePipette',
   status: 'accepted',
   data: {},
 }

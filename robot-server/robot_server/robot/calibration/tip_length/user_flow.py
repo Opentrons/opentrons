@@ -4,7 +4,8 @@ from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import geometry, labware
-from robot_server.service.session.models import CommandName
+from robot_server.service.session.models import CalibrationCommand, \
+    TipLengthCalibrationCommand
 from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.robot.calibration.tip_length.state_machine import (
     TipCalibrationStateMachine
@@ -29,32 +30,6 @@ A collection of functions that allow a consumer to prepare and update
 calibration data associated with the combination of a pipette tip type and a
 unique (by serial number) physical pipette.
 """
-
-TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandName, State]] = {
-    State.sessionStarted: {
-        CommandName.load_labware: State.labwareLoaded
-    },
-    State.labwareLoaded: {
-        CommandName.move_to_reference_point: State.measuringNozzleOffset
-    },
-    State.measuringNozzleOffset: {
-        CommandName.save_offset: State.preparingPipette,
-        CommandName.jog: State.measuringNozzleOffset
-    },
-    State.preparingPipette: {
-        CommandName.jog: State.preparingPipette,
-        CommandName.pick_up_tip: State.preparingPipette,
-        CommandName.invalidate_tip: State.preparingPipette,
-        CommandName.move_to_reference_point: State.measuringTipOffset
-    },
-    State.measuringTipOffset: {
-        CommandName.save_offset: State.calibrationComplete,
-        CommandName.jog: State.measuringTipOffset
-    },
-    State.WILDCARD: {
-        CommandName.exit: State.sessionExited
-    }
-}
 
 # TODO: BC 2020-07-08: type all command logic here with actual Model type
 COMMAND_HANDLER = Callable[..., Awaitable]
@@ -85,13 +60,13 @@ class TipCalibrationUserFlow():
         self._state_machine = TipCalibrationStateMachine()
 
         self._command_map: COMMAND_MAP = {
-            CommandName.load_labware: self.load_labware,
-            CommandName.jog: self.jog,
-            CommandName.pick_up_tip: self.pick_up_tip,
-            CommandName.invalidate_tip: self.invalidate_tip,
-            CommandName.save_offset: self.save_offset,
-            CommandName.move_to_reference_point: self.move_to_reference_point,
-            CommandName.exit: self.exit_session,
+            CalibrationCommand.load_labware: self.load_labware,
+            CalibrationCommand.jog: self.jog,
+            CalibrationCommand.pick_up_tip: self.pick_up_tip,
+            CalibrationCommand.invalidate_tip: self.invalidate_tip,
+            CalibrationCommand.save_offset: self.save_offset,
+            TipLengthCalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
+            CalibrationCommand.exit: self.exit_session,
         }
 
     def _set_current_state(self, to_state: State):

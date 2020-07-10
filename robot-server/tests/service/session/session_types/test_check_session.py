@@ -12,8 +12,8 @@ from robot_server.robot.calibration.check.util import StateMachineError
 
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import (CommandName, EmptyModel,
-                                                 JogPosition)
+from robot_server.service.session.models import (EmptyModel, JogPosition,
+                                                 CalibrationCommand)
 from robot_server.service.session.session_types import CheckSession, \
     SessionMetaData, BaseSession
 
@@ -170,12 +170,12 @@ async def test_session_command_execute(check_session_instance,
                                        mock_cal_session):
     await check_session_instance.command_executor.execute(
         create_command(
-            CommandName.jog,
+            CalibrationCommand.jog,
             JogPosition(vector=(1, 2, 3)))
     )
 
     mock_cal_session.trigger_transition.assert_called_once_with(
-        trigger="jog",
+        trigger="calibration.jog",
         vector=(1.0, 2.0, 3.0)
     )
 
@@ -184,12 +184,12 @@ async def test_session_command_execute_no_body(check_session_instance,
                                                mock_cal_session):
     await check_session_instance.command_executor.execute(
         create_command(
-            CommandName.load_labware,
+            CalibrationCommand.load_labware,
             EmptyModel())
     )
 
     mock_cal_session.trigger_transition.assert_called_once_with(
-        trigger="loadLabware"
+        trigger="calibration.loadLabware"
     )
 
 
@@ -209,5 +209,6 @@ async def test_session_command_execute_raise(check_session_instance,
 
     with pytest.raises(SessionCommandException):
         await check_session_instance.command_executor.execute(
-            create_command(CommandName.jog, JogPosition(vector=(1, 2, 3)))
+            create_command(CalibrationCommand.jog,
+                           JogPosition(vector=(1, 2, 3)))
         )

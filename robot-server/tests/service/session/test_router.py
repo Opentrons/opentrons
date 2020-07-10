@@ -13,8 +13,8 @@ from robot_server.service.session.command_execution.command import \
     CommandResult, CompletedCommand, CommandContent, CommandMeta, CommandStatus
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
-from robot_server.service.session.models import CommandName, EmptyModel, \
-    SessionType, JogPosition
+from robot_server.service.session.models import CalibrationCommand, \
+    EmptyModel, SessionType, JogPosition
 from robot_server.service.session.session_types import NullSession, \
     SessionMetaData
 
@@ -291,13 +291,13 @@ def test_execute_command(api_client,
                          patch_create_command):
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("jog",
+        json=command("calibration.jog",
                      JogPosition(vector=(1, 2, 3,))))
 
     mock_command_executor.execute.assert_called_once_with(
         Command(
             content=CommandContent(
-                name=CommandName.jog,
+                name=CalibrationCommand.jog,
                 data=JogPosition(vector=(1, 2, 3,))
             ),
             meta=CommandMeta(identifier=command_id,
@@ -308,7 +308,7 @@ def test_execute_command(api_client,
     assert response.json() == {
         'data': {
             'attributes': {
-                'command': 'jog',
+                'command': 'calibration.jog',
                 'data': {'vector': [1.0, 2.0, 3.0]},
                 'status': 'executed',
                 'created_at': '2000-01-01T00:00:00',
@@ -343,13 +343,13 @@ def test_execute_command_no_body(api_client,
     """Test that a command with empty body can be accepted"""
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("loadLabware", None)
+        json=command("calibration.loadLabware", None)
     )
 
     mock_command_executor.execute.assert_called_once_with(
         Command(
             content=CommandContent(
-                name=CommandName.load_labware,
+                name=CalibrationCommand.load_labware,
                 data=EmptyModel()),
             meta=CommandMeta(command_id, command_created_at)
         )
@@ -358,7 +358,7 @@ def test_execute_command_no_body(api_client,
     assert response.json() == {
         'data': {
             'attributes': {
-                'command': 'loadLabware',
+                'command': 'calibration.loadLabware',
                 'data': {},
                 'status': 'executed',
                 'created_at': '2000-01-01T00:00:00',
