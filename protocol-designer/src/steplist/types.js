@@ -107,7 +107,6 @@ export type SourceDestSubstepItem =
 export type MagnetSubstepItem = {|
   substepType: 'magnet',
   engage: boolean,
-  labwareDisplayName: ?string,
   labwareNickname: ?string,
   message?: string,
 |}
@@ -115,7 +114,6 @@ export type MagnetSubstepItem = {|
 export type TemperatureSubstepItem = {|
   substepType: 'temperature',
   temperature: number | null,
-  labwareDisplayName: ?string,
   labwareNickname: ?string,
   message?: string,
 |}
@@ -128,7 +126,6 @@ export type PauseSubstepItem = {|
 export type AwaitTemperatureSubstepItem = {|
   substepType: 'awaitTemperature',
   temperature: number,
-  labwareDisplayName: ?string,
   labwareNickname: ?string,
   message?: string,
 |}
@@ -136,7 +133,6 @@ export type AwaitTemperatureSubstepItem = {|
 export type ThermocyclerProfileSubstepItem = {|
   substepType: THERMOCYCLER_PROFILE,
   blockTargetTempHold: number | null,
-  labwareDisplayName: ?string,
   labwareNickname: ?string,
   lidOpenHold: boolean,
   lidTargetTempHold: number | null,
@@ -149,7 +145,6 @@ export type ThermocyclerProfileSubstepItem = {|
 
 export type ThermocyclerStateSubstepItem = {|
   substepType: THERMOCYCLER_STATE,
-  labwareDisplayName: ?string,
   labwareNickname: ?string,
   blockTargetTemp: number | null,
   lidTargetTemp: number | null,

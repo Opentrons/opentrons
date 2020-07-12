@@ -32,15 +32,11 @@ describe('StepItemContents', () => {
         substeps: {
           substepType: stepType,
           engage: true,
-          labwareDisplayName: 'magnet display',
           labwareNickname: 'magnet nickname',
           message: 'message',
         },
         labwareNicknamesById: {
           magnetId: 'magnet nickname',
-        },
-        labwareDefDisplayNamesById: {
-          magnetId: 'magnet display',
         },
       }
     })
@@ -78,9 +74,6 @@ describe('StepItemContents', () => {
         labwareNicknamesById: {
           temperatureId: 'temperature nickname',
         },
-        labwareDefDisplayNamesById: {
-          temperatureId: 'temperature display',
-        },
       }
     })
 
@@ -88,7 +81,6 @@ describe('StepItemContents', () => {
       temperatureProps.substeps = {
         substepType: stepType,
         temperature: 45,
-        labwareDisplayName: 'temperature display',
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
@@ -102,7 +94,6 @@ describe('StepItemContents', () => {
       temperatureProps.substeps = {
         substepType: stepType,
         temperature: null,
-        labwareDisplayName: 'temperature display',
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
@@ -116,13 +107,11 @@ describe('StepItemContents', () => {
       temperatureProps.substeps = {
         substepType: stepType,
         temperature: null,
-        labwareDisplayName: 'temperature display',
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
       const wrapper = shallow(<StepItemContents {...temperatureProps} />)
       const component = wrapper.find(ModuleStepItems)
-      expect(component.prop('labwareDisplayName')).toEqual('')
       expect(component.prop('labwareNickname')).toEqual('temperature nickname')
     })
   })
@@ -144,9 +133,6 @@ describe('StepItemContents', () => {
         labwareNicknamesById: {
           temperatureId: 'temperature nickname',
         },
-        labwareDefDisplayNamesById: {
-          temperatureId: 'temperature display',
-        },
       }
     })
 
@@ -154,7 +140,6 @@ describe('StepItemContents', () => {
       awaitTemperatureProps.substeps = {
         substepType: stepType,
         temperature: 45,
-        labwareDisplayName: 'temperature display',
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
@@ -163,7 +148,6 @@ describe('StepItemContents', () => {
       expect(component).toHaveLength(1)
       expect(component.prop('action')).toEqual('pause until')
       expect(component.prop('actionText')).toEqual('45 °C')
-      expect(component.prop('labwareDisplayName')).toEqual('')
       expect(component.prop('labwareNickname')).toEqual('temperature nickname')
     })
   })
@@ -185,9 +169,6 @@ describe('StepItemContents', () => {
         labwareNicknamesById: {
           temperatureId: 'tc nickname',
         },
-        labwareDefDisplayNamesById: {
-          temperatureId: 'tc display',
-        },
       }
     })
 
@@ -197,7 +178,6 @@ describe('StepItemContents', () => {
         blockTargetTemp: 55,
         lidTargetTemp: 45,
         lidOpen: false,
-        labwareDisplayName: 'tc display',
         labwareNickname: 'tc nickname',
         message: 'message',
       }
@@ -205,7 +185,6 @@ describe('StepItemContents', () => {
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
 
-      expect(component.prop('labwareDisplayName')).toEqual('')
       expect(component.prop('labwareNickname')).toEqual('tc nickname')
       expect(component.prop('message')).toEqual('message')
       expect(component.prop('action')).toEqual('hold')

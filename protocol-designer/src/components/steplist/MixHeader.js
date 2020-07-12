@@ -6,15 +6,14 @@ import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
-type Props = {
+type Props = {|
   volume: ?string,
   times: ?string,
   labwareNickname: ?string,
-  labwareDisplayName: ?string,
-}
+|}
 
 export function MixHeader(props: Props): React.Node {
-  const { volume, times, labwareNickname, labwareDisplayName } = props
+  const { volume, times, labwareNickname } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
     strategy: TOOLTIP_FIXED,
@@ -22,9 +21,7 @@ export function MixHeader(props: Props): React.Node {
   return (
     <>
       <Tooltip {...tooltipProps}>
-        <LabwareTooltipContents
-          {...{ labwareNickname, labwareDefDisplayName: labwareDisplayName }}
-        />
+        <LabwareTooltipContents {...{ labwareNickname }} />
       </Tooltip>
 
       <PDListItem className={styles.step_subitem}>
