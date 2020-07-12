@@ -137,7 +137,7 @@ def config_tempdir(tmpdir, template_db):
 
 
 @pytest.fixture
-def offset_tempdir(tmpdir):
+def labware_offset_tempdir(tmpdir):
     os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
     config.reload()
 

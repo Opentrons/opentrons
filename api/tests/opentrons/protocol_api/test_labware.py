@@ -36,7 +36,7 @@ test_data = {
 
 
 @pytest.fixture
-def set_up_index_file(offset_tempdir):
+def set_up_index_file(labware_offset_tempdir):
     deck = Deck()
     labware_list = [
         'nest_96_wellplate_2ml_deep',
@@ -494,7 +494,7 @@ def test_uris():
         'corning_384_wellplate_112ul_flat',
         'geb_96_tiprack_1000ul',
         'nest_12_reservoir_15ml'])
-def test_add_index_file(labware_name, index_file_dir):
+def test_add_index_file(labware_name, labware_offset_tempdir):
     deck = Deck()
     parent = deck.position_for(1)
     definition = labware.get_labware_definition(labware_name)
@@ -517,7 +517,7 @@ def test_add_index_file(labware_name, index_file_dir):
             "module": mod_dict
         }
 
-    lw_path = index_file_dir / 'index.json'
+    lw_path = labware_offset_tempdir / 'index.json'
     info = file_operators._read_file(lw_path)
     assert info[full_id] == blob
 

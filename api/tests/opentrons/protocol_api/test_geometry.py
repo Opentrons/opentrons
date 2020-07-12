@@ -157,7 +157,7 @@ def test_force_direct():
     assert different_lw == [(lw2.wells()[0].bottom().point, None)]
 
 
-def test_no_labware_loc(offset_tempdir):
+def test_no_labware_loc(labware_offset_tempdir):
     labware_def = labware.get_labware_definition(labware_name)
 
     deck = Deck()
