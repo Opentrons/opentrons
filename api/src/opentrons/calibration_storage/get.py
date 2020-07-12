@@ -1,6 +1,6 @@
 import typing
 
-from opentrons.config import get_opentrons_path, get_tip_length_cal_path
+from opentrons import config
 from opentrons.types import Point
 
 from . import (
@@ -10,8 +10,6 @@ from . import (
 
 if typing.TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
-
-OFFSETS_PATH = get_opentrons_path('labware_calibration_offsets_dir_v2')
 
 
 def _format_calibration_type(
@@ -48,12 +46,14 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
     labware calibration files found on the robot.
     """
     all_calibrations: typing.List[local_types.CalibrationInformation] = []
-    index_path = OFFSETS_PATH / 'index.json'
+    offset_path =\
+        config.get_opentrons_path('labware_calibration_offsets_dir_v2')
+    index_path = offset_path / 'index.json'
     if not index_path.exists():
         return all_calibrations
     index_file = io._read_file(str(index_path))
     for key, data in index_file.items():
-        cal_path = OFFSETS_PATH / f'{key}.json'
+        cal_path = offset_path / f'{key}.json'
         if cal_path.exists():
             cal_blob = io._read_file(str(cal_path))
             calibration = _format_calibration_type(cal_blob)
@@ -71,7 +71,7 @@ def get_tip_length_data(
         pip_id: str, labware_hash: str, labware_load_name: str
 ) -> local_types.TipLengthCalibration:
     try:
-        pip_tip_length_path = get_tip_length_cal_path()/f'{pip_id}.json'
+        pip_tip_length_path = config.get_tip_length_cal_path()/f'{pip_id}.json'
         tip_length_data =\
             io._read_cal_file(str(pip_tip_length_path), ed.DateTimeDecoder)
         return tip_length_data[labware_hash]
@@ -86,8 +86,10 @@ def load_calibration(labware: 'Labware'):
     """
     Look up a calibration if it exists and apply it to the given labware.
     """
+    offset_path =\
+        config.get_opentrons_path('labware_calibration_offsets_dir_v2')
     labware_offset_path =\
-        helpers._get_labware_offset_path(labware, OFFSETS_PATH)
+        helpers._get_labware_offset_path(labware, offset_path)
     if labware_offset_path.exists():
         calibration_data = io._read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']

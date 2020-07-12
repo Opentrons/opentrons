@@ -30,7 +30,7 @@ def mock_db():
 
 @pytest.fixture()
 def mock_labware():
-    with patch("opentrons.config.reset.labware") as m:
+    with patch("opentrons.config.reset.delete") as m:
         yield m
 
 

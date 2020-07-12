@@ -136,6 +136,17 @@ def config_tempdir(tmpdir, template_db):
     yield tmpdir, template_db
 
 
+@pytest.fixture
+def offset_tempdir(tmpdir):
+    os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
+    config.reload()
+
+    yield config.get_opentrons_path('labware_calibration_offsets_dir_v2')
+
+    del os.environ['OT_API_CONFIG_DIR']
+    config.reload()
+
+
 @pytest.mark.apiv1
 @pytest.fixture(scope='function')
 def offsets_tempdir(tmpdir, template_db):
@@ -165,7 +176,6 @@ def wifi_keys_tempdir():
 
 @pytest.fixture
 def is_robot(monkeypatch):
-    print("in here")
     monkeypatch.setattr(config, 'IS_ROBOT', True)
     yield
     monkeypatch.setattr(config, 'IS_ROBOT', False)

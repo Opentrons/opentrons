@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 import pytest
 
@@ -7,7 +6,8 @@ from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION, module_geometry)
 
 from opentrons_shared_data import load_shared_data
-from opentrons import calibration_storage as storage
+from opentrons.calibration_storage import (
+    modify, helpers, get, delete, file_operators)
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api.geometry import Deck
@@ -36,13 +36,7 @@ test_data = {
 
 
 @pytest.fixture
-def index_file_dir(tmpdir, monkeypatch):
-    monkeypatch.setattr(labware, 'OFFSETS_PATH', Path(tmpdir))
-    yield tmpdir
-
-
-@pytest.fixture
-def set_up_index_file(index_file_dir):
+def set_up_index_file(offset_tempdir):
     deck = Deck()
     labware_list = [
         'nest_96_wellplate_2ml_deep',
@@ -53,7 +47,7 @@ def set_up_index_file(index_file_dir):
         parent = deck.position_for(idx+1)
         definition = labware.get_labware_definition(name)
         lw = labware.Labware(definition, parent)
-        storage.modify.save_calibration(lw, Point(0, 0, 0))
+        modify.save_calibration(lw, Point(0, 0, 0))
 
     return labware_list
 
@@ -505,12 +499,12 @@ def test_add_index_file(labware_name, index_file_dir):
     parent = deck.position_for(1)
     definition = labware.get_labware_definition(labware_name)
     lw = labware.Labware(definition, parent)
-    labware_hash = storage.helpers._hash_labware_def(lw._definition)
-    storage.modify._add_to_index_offset_file(lw, labware_hash)
+    labware_hash = helpers._hash_labware_def(lw._definition)
+    modify._add_to_index_offset_file(lw, labware_hash)
 
     lw_uri = labware.uri_from_definition(definition)
 
-    str_parent = storage.get._get_parent_identifier(lw.parent)
+    str_parent = helpers._get_parent_identifier(lw.parent)
     slot = '1'
     if str_parent:
         mod_dict = {str_parent: f'{slot}-{str_parent}'}
@@ -524,13 +518,13 @@ def test_add_index_file(labware_name, index_file_dir):
         }
 
     lw_path = index_file_dir / 'index.json'
-    info = storage.file_operators._read_file(lw_path)
+    info = file_operators._read_file(lw_path)
     assert info[full_id] == blob
 
 
 def test_delete_one_calibration(set_up_index_file):
     lw_to_delete = 'nest_96_wellplate_2ml_deep'
-    all_cals = storage.get.get_all_calibrations()
+    all_cals = get.get_all_calibrations()
     id_saved = ''
 
     def get_load_names(all_cals):
@@ -538,7 +532,7 @@ def test_delete_one_calibration(set_up_index_file):
         load_names = []
         for cal in all_cals:
             uri = cal.uri
-            dets = storage.helpers.details_from_uri(uri)
+            dets = helpers.details_from_uri(uri)
             if dets.load_name == lw_to_delete:
                 id_saved = cal.labware_id
             load_names.append(dets.load_name)
@@ -548,9 +542,9 @@ def test_delete_one_calibration(set_up_index_file):
 
     assert lw_to_delete in load_names
 
-    storage.delete.delete_offset_file(id_saved)
+    delete.delete_offset_file(id_saved)
 
-    all_cals = storage.get.get_all_calibrations()
+    all_cals = get.get_all_calibrations()
     load_names = get_load_names(all_cals)
 
     assert lw_to_delete not in load_names

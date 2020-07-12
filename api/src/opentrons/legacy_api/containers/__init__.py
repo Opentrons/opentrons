@@ -20,7 +20,11 @@ from .placeable import (
 from opentrons.helpers import helpers
 
 from opentrons.protocol_api import labware as new_labware
-from opentrons.calibration_storage.get import get_tip_length_data
+from opentrons.calibration_storage import (
+    get,
+    file_operators as io,
+    helpers as cal_helpers,
+    modify)
 
 if TYPE_CHECKING:
     from opentrons.calibration_storage.types import TipLengthCalibration
@@ -213,7 +217,7 @@ def _look_up_offsets(labware_hash):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     if labware_offset_path.exists():
-        calibration_data = new_labware._read_file(str(labware_offset_path))
+        calibration_data = io._read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']
         return Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
     else:
@@ -242,7 +246,7 @@ def save_new_offsets(labware_hash, delta):
     new_delta = old_delta + Point(x=delta[0], y=delta[1], z=delta[2])
 
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
-    calibration_data = new_labware._helper_offset_data_format(
+    calibration_data = modify._helper_offset_data_format(
         str(labware_offset_path), new_delta)
     with labware_offset_path.open('w') as f:
         json.dump(calibration_data, f)
@@ -264,7 +268,7 @@ def load_new_labware(container_name, version=None):
 def load_new_labware_def(definition):
     """ Load a labware definition in the new schema into a placeable
     """
-    labware_hash = new_labware._hash_labware_def(definition)
+    labware_hash = cal_helpers._hash_labware_def(definition)
     saved_offset = _look_up_offsets(labware_hash)
     container = Container()
     container_name = definition['parameters']['loadName']
@@ -290,6 +294,6 @@ def load_tip_length_calibration(
         pip_id: str, location) -> 'TipLengthCalibration':
     placeable, _ = unpack_location(location)
     lw = placeable.get_parent()
-    return get_tip_length_data(
+    return get.get_tip_length_data(
         pip_id=pip_id, labware_hash=lw.properties['labware_hash'],
         labware_load_name=lw.properties['type'])

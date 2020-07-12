@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 
 from opentrons.protocol_api.util import first_parent
-from opentrons.config import get_opentrons_path, get_tip_length_cal_path
+from opentrons import config
 
 from . import (
     file_operators as io,
@@ -16,8 +16,6 @@ if typing.TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
     from opentrons.types import Point
 
-OFFSETS_PATH = get_opentrons_path('labware_calibration_offsets_dir_v2')
-
 
 def _add_to_index_offset_file(labware: 'Labware', lw_hash: str):
     """
@@ -28,7 +26,9 @@ def _add_to_index_offset_file(labware: 'Labware', lw_hash: str):
     :param labware: A labware object
     :param lw_hash: The labware hash of the calibration
     """
-    index_file = OFFSETS_PATH / 'index.json'
+    offset =\
+        config.get_opentrons_path('labware_calibration_offsets_dir_v2')
+    index_file = offset / 'index.json'
     uri = labware.uri
     if index_file.exists():
         blob = io._read_file(str(index_file))
@@ -59,8 +59,10 @@ def save_calibration(labware: 'Labware', delta: 'Point'):
     using labware id as the filename. If the file does exist, load it and
     modify the delta and the lastModified fields under the "default" key.
     """
+    offset_path =\
+        config.get_opentrons_path('labware_calibration_offsets_dir_v2')
     labware_offset_path =\
-        helpers._get_labware_offset_path(labware, OFFSETS_PATH)
+        helpers._get_labware_offset_path(labware, offset_path)
     labware_hash = helpers._hash_labware_def(labware._definition)
     _add_to_index_offset_file(labware, labware_hash)
     calibration_data = _helper_offset_data_format(
@@ -102,7 +104,7 @@ def _helper_offset_data_format(filepath: str, delta: 'Point') -> dict:
 
 
 def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
-    index_file = get_tip_length_cal_path()/'index.json'
+    index_file = config.get_tip_length_cal_path()/'index.json'
     try:
         index_data = io._read_file(str(index_file))
     except FileNotFoundError:
@@ -118,7 +120,7 @@ def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
 
 def save_tip_length_calibration(
         pip_id: str, tip_length_cal: local_types.PipTipLengthCalibration):
-    tip_length_dir_path = get_tip_length_cal_path()
+    tip_length_dir_path = config.get_tip_length_cal_path()
     tip_length_dir_path.mkdir(parents=True, exist_ok=True)
     pip_tip_length_path = tip_length_dir_path/f'{pip_id}.json'
 

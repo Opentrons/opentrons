@@ -1,15 +1,17 @@
 import pytest
 
-from opentrons.protocol_api import labware
+from opentrons.calibration_storage import file_operators
+from opentrons import config
 
 
 @pytest.fixture
 def grab_id(set_up_index_file_temporary_directory):
     labware_to_access = 'opentrons_96_tiprack_10ul'
     uri_to_check = f'opentrons/{labware_to_access}/1'
-
-    index_path = labware.OFFSETS_PATH / 'index.json'
-    index_file = labware._read_file(str(index_path))
+    offset_path =\
+        config.get_opentrons_path('labware_calibration_offsets_dir_v2')
+    index_path = offset_path / 'index.json'
+    index_file = file_operators._read_file(str(index_path))
     calibration_id = ''
     for key, data in index_file.items():
         if data['uri'] == uri_to_check:
