@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { Provider } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { mount } from 'enzyme'
 
 import { getCalibrateLocation, getRunLocation } from '../../../nav'
@@ -27,6 +27,8 @@ const mockCalPath = '/path/to/cal'
 describe('Continue to run or calibration button component', () => {
   let mockStore
   let render
+  let props
+  let optional_link
 
   const CALIBRATE_SELECTOR = {
     id: 'calibrate',
@@ -47,17 +49,21 @@ describe('Continue to run or calibration button component', () => {
   beforeEach(() => {
     mockGetCalNavigation.mockReturnValue(CALIBRATE_SELECTOR)
     mockGetRunNavigation.mockReturnValue(RUN_SELECTOR)
+    props = {
+      labwareCalibrated: false,
+    }
+    optional_link = mockCalPath
 
     mockStore = {
       subscribe: () => {},
       getState: () => ({ state: true }),
       dispatch: jest.fn(),
     }
-    render = (labwareCalibrated: boolean = false) =>
+    render = props =>
       mount(
-        <Provider store={mockStore}>
-          <Continue labwareCalibrated={labwareCalibrated} />
-        </Provider>
+        <Link to={optional_link}>
+          <Continue {...props} />
+        </Link>
       )
   })
 

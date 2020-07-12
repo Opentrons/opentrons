@@ -2,7 +2,7 @@
 
 import * as Fixtures from '../__fixtures__'
 import * as LabwareFixtures from '../labware/__fixtures__'
-import { actions as LabwareActions } from '../labware'
+import { labware as LabwareFunctions } from '../'
 import * as Actions from '../actions'
 import { calibrationReducer } from '../reducer'
 
@@ -19,7 +19,7 @@ describe('calibration reducer', () => {
     })
   })
   it('should handle a FETCH_LABWARE_CALIBRATION_SUCCESS', () => {
-    const action = LabwareActions.fetchLabwareCalibrationSuccess(
+    const action = LabwareFunctions.fetchLabwareCalibrationSuccess(
       'robot-name',
       LabwareFixtures.mockAllLabwareCalibraton,
       {}

@@ -115,12 +115,6 @@
   margin: 0.5rem 0.5rem 0.5rem 0;
 }
 
-.calibration_data_info_icon {
-    height: 1rem;
-    width: 1rem;
-    fill: var(--c-med-gray);
-  }
-
 .warning_info_wrapper {
   display: flex;
   align-items: center;

@@ -1,6 +1,6 @@
 // @flow
 import * as Constants from './constants'
-import { constants as LabwareConstants } from './labware'
+import { labware } from '.'
 
 import type { Action } from '../types'
 import type { CalibrationState } from './types'
@@ -22,7 +22,7 @@ export function calibrationReducer(
         },
       }
     }
-    case LabwareConstants.FETCH_LABWARE_CALIBRATION_SUCCESS: {
+    case labware.FETCH_LABWARE_CALIBRATION_SUCCESS: {
       const { robotName, labwareCalibration } = action.payload
       return {
         ...state,

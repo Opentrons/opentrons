@@ -17,10 +17,7 @@ import { UploadError } from '../UploadError'
 import styles from './styles.css'
 
 import { selectors as robotSelectors } from '../../robot'
-import {
-  selectors as labwareCalibrationSelectors,
-  actions as labwareActions,
-} from '../../calibration'
+import { labware as labwareFunctions } from '../../calibration'
 
 import type { State, Dispatch } from '../../types'
 
@@ -40,7 +37,7 @@ export function FileInfo(props: FileInfoProps): React.Node {
   const { robot, sessionLoaded, sessionHasSteps } = props
   const { name: robotName } = robot
   React.useEffect(() => {
-    dispatch(labwareActions.fetchAllLabwareCalibrations(robotName))
+    dispatch(labwareFunctions.fetchAllLabwareCalibrations(robotName))
   }, [dispatch, robotName])
   let uploadError = props.uploadError
 
@@ -48,7 +45,7 @@ export function FileInfo(props: FileInfoProps): React.Node {
     robotSelectors.getLabware(state)
   )
   const labwareCalibrations = useSelector((state: State) =>
-    labwareCalibrationSelectors.getListOfLabwareCalibrations(state, robotName)
+    labwareFunctions.getListOfLabwareCalibrations(state, robotName)
   )
 
   if (sessionLoaded && !uploadError && !sessionHasSteps) {

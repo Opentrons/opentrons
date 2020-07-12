@@ -17,11 +17,11 @@ export const mockLabwareCalibration: LabwareCalibrationObjects = {
     calibrationData: {
       offset: {
         value: [0.0, 0.0, 0.0],
-        lastModified: '2020-03-27 19:43:24.642318',
+        lastModified: '2020-04-05T14:30',
       },
       tipLength: {
         value: 30,
-        lastModified: '2020-03-27 19:43:24.642318',
+        lastModified: '2007-05-05T0:30',
       },
     },
     loadName: 'opentrons_96_tiprack_10ul',
