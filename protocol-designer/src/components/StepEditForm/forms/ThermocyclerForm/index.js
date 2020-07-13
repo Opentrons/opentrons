@@ -73,24 +73,26 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
         name={'thermocyclerFormType'}
         condition={val => val === THERMOCYCLER_PROFILE}
       >
-        <div className={styles.section_header}>
-          <span className={styles.section_header_text}>
-            {i18n.t('application.stepType.profile_settings')}
-          </span>
+        <div className={styles.profile_form}>
+          <div className={styles.section_header}>
+            <span className={styles.section_header_text}>
+              {i18n.t('application.stepType.profile_settings')}
+            </span>
+          </div>
+          <ProfileSettings focusHandlers={focusHandlers} />
+          <div className={styles.section_header}>
+            <span className={styles.section_header_text}>
+              {i18n.t('application.stepType.profile_steps')}
+            </span>
+          </div>
+          <ProfileItemRows focusHandlers={focusHandlers} />
+          <div className={styles.section_header}>
+            <span className={styles.section_header_text}>
+              {i18n.t('application.stepType.ending_hold')}
+            </span>
+          </div>
+          <StateFields focusHandlers={focusHandlers} isEndingHold />
         </div>
-        <ProfileSettings focusHandlers={focusHandlers} />
-        <div className={styles.section_header}>
-          <span className={styles.section_header_text}>
-            {i18n.t('application.stepType.profile_steps')}
-          </span>
-        </div>
-        <ProfileItemRows focusHandlers={focusHandlers} />
-        <div className={styles.section_header}>
-          <span className={styles.section_header_text}>
-            {i18n.t('application.stepType.ending_hold')}
-          </span>
-        </div>
-        <StateFields focusHandlers={focusHandlers} isEndingHold />
       </ConditionalOnField>
     </div>
   )
