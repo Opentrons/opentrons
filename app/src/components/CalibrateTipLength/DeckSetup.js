@@ -1,24 +1,12 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
-import {
-  OutlineButton,
-  RobotWorkSpace,
-  LabwareRender,
-  LabwareNameOverlay,
-  RobotCoordsForeignDiv,
-} from '@opentrons/components'
-import {
-  type LabwareDefinition2,
-  type DeckSlot,
-  getLabwareDisplayName,
-} from '@opentrons/shared-data'
+import { OutlineButton, RobotWorkSpace } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { getLatestLabwareDef } from '../../getLabware'
-import type {
-  CalibrateTipLengthChildProps,
-} from './types'
+import type { CalibrateTipLengthChildProps } from './types'
+import { CalibrationLabwareRender } from './calibrationBlockRender'
 import styles from './styles.css'
 
 const DECK_SETUP_WITH_BLOCK_PROMPT =
@@ -81,7 +69,6 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
                 const labwareForSlot = labware.find(l => l.slot === slotId)
                 const labwareDef = getLatestLabwareDef(labwareForSlot?.loadName)
-                // TODO: also render calibration block if present
 
                 return labwareDef ? (
                   <CalibrationLabwareRender
@@ -96,30 +83,5 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
         </RobotWorkSpace>
       </div>
     </>
-  )
-}
-
-type CalibrationLabwareRenderProps = {|
-  labwareDef: LabwareDefinition2,
-  slotDef: DeckSlot,
-|}
-export function CalibrationLabwareRender(props: CalibrationLabwareRenderProps): React.Node {
-  const { labwareDef, slotDef } = props
-  const title = getLabwareDisplayName(labwareDef)
-  return (
-    <g transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}>
-      <LabwareRender definition={labwareDef} />
-      <RobotCoordsForeignDiv
-        width={labwareDef.dimensions.xDimension}
-        height={labwareDef.dimensions.yDimension}
-        x={0}
-        y={0 - labwareDef.dimensions.yDimension}
-        transformWithSVG
-        innerDivProps={{ className: styles.labware_ui_wrapper }}
-      >
-        {/* title is capitalized by CSS, and "µL" capitalized is "ML" */}
-        <LabwareNameOverlay title={title.replace('µL', 'uL')} />
-      </RobotCoordsForeignDiv>
-    </g>
   )
 }
