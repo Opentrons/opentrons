@@ -112,7 +112,7 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
       if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
         const timelineArgs: GenerateRobotStateTimelineArgs = prevTimelineArgs
         const substepsArgs: SubstepsArgsNoTimeline = prevSubstepsArgs
-        worker.postMessage({ timeline: null, timelineArgs, substepsArgs })
+        worker.postMessage({ needsTimeline: true, timelineArgs, substepsArgs })
       } else {
         console.error(
           'something weird happened, prevTimelineArgs and prevSubstepsArgs should never be null here'
@@ -122,8 +122,8 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
       // Timeline did not change, but a substeps-specific selector did
       if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
         worker.postMessage({
+          needsTimeline: false,
           timeline: prevSuccessAction.payload.standardTimeline,
-          timelineArgs: null,
           substepsArgs: prevSubstepsArgs,
         })
       } else {

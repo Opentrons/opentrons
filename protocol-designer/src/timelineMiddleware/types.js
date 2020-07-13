@@ -7,7 +7,7 @@ import type { Timeline } from '../step-generation'
 // worker itself will spread the robotStateTimeline in
 export type SubstepsArgsNoTimeline = $Diff<
   GenerateSubstepsArgs,
-  { robotStateTimeline: any }
+  {| robotStateTimeline: mixed |}
 >
 
 // Two types of message. Substep generation requires a timeline.
@@ -15,15 +15,17 @@ export type SubstepsArgsNoTimeline = $Diff<
 // - we have a timeline, so we only need to generate substeps
 export type WorkerCommandMessage =
   | {|
-      timeline: null,
+      needsTimeline: true,
       timelineArgs: GenerateRobotStateTimelineArgs,
       substepsArgs: SubstepsArgsNoTimeline,
     |}
   | {|
+      needsTimeline: false,
       timeline: Timeline,
-      timelineArgs: null,
       substepsArgs: SubstepsArgsNoTimeline,
     |}
+
+export type WorkerCommandEvent = {| data: WorkerCommandMessage |}
 
 export type WorkerResponse = {|
   standardTimeline: Timeline,
@@ -34,4 +36,9 @@ export type WorkerResponseEvent = {| data: WorkerResponse |}
 export type TimelineWorker = {|
   onmessage: WorkerResponseEvent => void,
   postMessage: WorkerCommandMessage => void,
+|}
+
+export type WorkerContext = {|
+  addEventListener: ('message', (WorkerCommandEvent) => void) => void,
+  postMessage: WorkerResponse => void,
 |}
