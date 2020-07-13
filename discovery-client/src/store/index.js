@@ -6,6 +6,8 @@ import { reducer } from './reducer'
 import type { Store } from 'redux'
 import type { State, Action } from './types'
 
+export * from './actions'
+
 export function createStore(): Store<State, Action> {
   return createReduxStore(reducer)
 }

@@ -36,9 +36,17 @@ export type HostState = $ReadOnly<{|
   port: number,
   /** Whether this IP has been seen via mDNS or HTTP while the client has been running */
   seen: boolean,
-  /** If last /health request to this IP returned 200 (null if request not yet made) */
+  /**
+   * If last /health request to this IP returned 200 (null if request not yet made)
+   * TODO(mc, 2020-07-13): replace with an enum to capture the difference between
+   * a fetch error due to networking and a 4xx or 5xx response
+   */
   ok: boolean | null,
-  /** If last /server/health request to this IP returned 200 (null if request not yet made) */
+  /**
+   * If last /server/health request to this IP returned 200 (null if request not yet made)
+   * TODO(mc, 2020-07-13): replace with an enum to capture the difference between
+   * a fetch error due to networking and a 4xx or 5xx response
+   */
   serverOk: boolean | null,
   /** Error status and response from /health if last request was not 200 */
   healthError: HealthErrorResponse | null,
