@@ -96,7 +96,7 @@ function AppSettingsComponent(props: Props) {
         />
         <Route
           render={() =>
-            available && !seen ? <Redirect to="/menu/app/update" /> : null
+            available && !seen ? <Redirect to="/more/app/update" /> : null
           }
         />
       </Switch>
@@ -120,7 +120,7 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
     applyUpdate: () => dispatch(applyShellUpdate()),
     closeModal: () => {
       dispatch(setShellUpdateSeen())
-      dispatch(push('/menu/app'))
+      dispatch(push('/more/app'))
     },
   }
 }

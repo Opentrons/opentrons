@@ -1,18 +1,13 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import mapValues from 'lodash/mapValues'
 import { useConditionalConfirm } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { selectors as uiLabwareSelectors } from '../ui/labware'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as dismissSelectors } from '../dismiss'
-import {
-  selectors as stepFormSelectors,
-  type LabwareEntity,
-} from '../step-forms'
+import { selectors as stepFormSelectors } from '../step-forms'
 import {
   getCollapsedSteps,
   getHoveredSubstep,
@@ -23,7 +18,11 @@ import {
 import { selectors as fileDataSelectors } from '../file-data'
 
 import { StepItem, StepItemContents } from '../components/steplist/StepItem'
-import { ConfirmDeleteStepModal } from '../components/modals/ConfirmDeleteStepModal'
+import {
+  ConfirmDeleteModal,
+  CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_UNSAVED_STEP_FORM,
+} from '../components/modals/ConfirmDeleteModal'
 
 import type { SubstepIdentifier } from '../steplist/types'
 import type { StepIdType } from '../form-types'
@@ -64,13 +63,11 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const labwareNicknamesById = useSelector(
     uiLabwareSelectors.getLabwareNicknamesById
   )
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
-  const labwareDefDisplayNamesById = mapValues(
-    labwareEntities,
-    (l: LabwareEntity) => getLabwareDisplayName(l.def)
+  const formHasChanges = useSelector(
+    stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
 
   // Actions
@@ -87,7 +84,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   // step selection is gated when showConfirmation is true
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     selectStep,
-    currentFormIsPresaved
+    currentFormIsPresaved || formHasChanges
   )
 
   const stepItemProps = {
@@ -117,7 +114,6 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     substeps,
 
     ingredNames,
-    labwareDefDisplayNamesById,
     labwareNicknamesById,
 
     highlightSubstep,
@@ -127,7 +123,12 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   return (
     <>
       {showConfirmation && (
-        <ConfirmDeleteStepModal
+        <ConfirmDeleteModal
+          modalType={
+            currentFormIsPresaved
+              ? CLOSE_UNSAVED_STEP_FORM
+              : CLOSE_STEP_FORM_WITH_CHANGES
+          }
           onContinueClick={confirm}
           onCancelClick={cancel}
         />

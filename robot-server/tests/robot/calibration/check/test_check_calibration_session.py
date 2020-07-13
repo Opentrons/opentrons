@@ -4,8 +4,7 @@ import pytest
 from opentrons import types
 from opentrons.hardware_control import API, ThreadManager
 
-from robot_server.robot.calibration import util
-from robot_server.robot.calibration.check import session
+from robot_server.robot.calibration.check import session, util
 from robot_server.robot.calibration.session import NoPipetteException
 
 

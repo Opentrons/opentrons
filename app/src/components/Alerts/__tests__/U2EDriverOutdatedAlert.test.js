@@ -51,7 +51,7 @@ describe('U2EDriverOutdatedAlert', () => {
 
   it('should have a link to /network-and-system that dismisses the alert', () => {
     const wrapper = render()
-    const link = wrapper.find('Link[to="/menu/network-and-system"]')
+    const link = wrapper.find('Link[to="/more/network-and-system"]')
 
     link.invoke('onClick')()
 
@@ -85,7 +85,7 @@ describe('U2EDriverOutdatedAlert', () => {
       checkbox.simulate('change')
     })
     wrapper.update()
-    wrapper.find('Link[to="/menu/network-and-system"]').invoke('onClick')()
+    wrapper.find('Link[to="/more/network-and-system"]').invoke('onClick')()
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
     expect(trackEvent).toHaveBeenCalledWith({

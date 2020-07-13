@@ -1,11 +1,10 @@
 import typing
 from opentrons.hardware_control import ThreadManager
 
-from . import Command, CompletedCommand
+from . import Command, CompletedCommand, CommandResult
 from . base_executor import CommandExecutor
-from .command import CommandResult
 from ..errors import UnsupportedCommandException
-from ..models import CommandDataType, CommandName
+from ..models import CommandDataType, RobotCommand, CommandDefinition
 from robot_server.util import duration
 
 
@@ -25,14 +24,14 @@ async def toggle_lights(hardware: ThreadManager, *args):
 class HardwareExecutor(CommandExecutor):
     """A command executor that executes direct hardware commands"""
 
-    COMMAND_TO_FUNC: typing.Dict[CommandName, COMMAND_HANDLER] = {
-        CommandName.home_all_motors: home_all_motors,
-        CommandName.toggle_lights: toggle_lights
+    COMMAND_TO_FUNC: typing.Dict[CommandDefinition, COMMAND_HANDLER] = {
+        RobotCommand.home_all_motors: home_all_motors,
+        RobotCommand.toggle_lights: toggle_lights
     }
 
     def __init__(self,
                  hardware: ThreadManager,
-                 command_filter: typing.Optional[typing.Set[CommandName]]):
+                 command_filter: typing.Optional[typing.Set[RobotCommand]]):
         """
         Constructor
 
@@ -59,7 +58,7 @@ class HardwareExecutor(CommandExecutor):
                                  completed_at=timed.end)
         )
 
-    def get_handler(self, command_name: CommandName) \
+    def get_handler(self, command_name: CommandDefinition) \
             -> typing.Optional[COMMAND_HANDLER]:
         """Get the handler for the command type"""
         if self._command_filter is not None:
@@ -71,6 +70,6 @@ class HardwareExecutor(CommandExecutor):
 class DefaultHardwareExecutor(HardwareExecutor):
     """The default command executor"""
     def __init__(self, hardware: ThreadManager):
-        super().__init__(hardware, {CommandName.home_all_motors,
-                                    CommandName.home_pipette,
-                                    CommandName.toggle_lights})
+        super().__init__(hardware, {RobotCommand.home_all_motors,
+                                    RobotCommand.home_pipette,
+                                    RobotCommand.toggle_lights})

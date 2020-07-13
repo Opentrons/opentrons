@@ -59,7 +59,6 @@ export function NavTab(props: NavTabProps): React.Node {
         name={props.iconName}
         childName={props.notification ? 'circle' : null}
         className={styles.icon}
-        childClassName={styles.notification}
       />
       {props.title && <span className={styles.title}>{props.title}</span>}
     </Button>

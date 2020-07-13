@@ -40,8 +40,8 @@ export function SlotOverlay(props: SlotOverlayProps): React.Node {
         <Icon
           x={leftRightPadding + 6 + '%'}
           y={topPadding + 6 + '%'}
-          height={iconSize}
-          width={iconSize}
+          svgHeight={iconSize}
+          svgWidth={iconSize}
           name={icon}
           className={styles.icon}
         />

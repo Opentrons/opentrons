@@ -1,6 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`modals AlertModal renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   onScrollCapture={[Function]}
   onTouchMoveCapture={[Function]}
@@ -21,10 +29,11 @@ exports[`modals AlertModal renders correctly 1`] = `
       >
         <svg
           aria-hidden="true"
-          className="alert_modal_icon"
+          className="sc-AxmLO c0 alert_modal_icon"
           fill="currentColor"
           version="1.1"
           viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
         >
           <path
             d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
@@ -151,6 +160,14 @@ exports[`modals Modal renders correctly with optional heading 1`] = `
 `;
 
 exports[`modals ModalPage renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="modal_page"
 >
@@ -168,10 +185,11 @@ exports[`modals ModalPage renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="icon"
+        className="sc-AxmLO c0 icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           d="M15.429 17.019l-4.242-4.59 4.242-4.59-1.312-1.41-5.545 6 5.545 6z"
@@ -212,6 +230,14 @@ exports[`modals Overlay renders correctly 1`] = `
 `;
 
 exports[`modals SpinnerModalPage renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="modal"
 >
@@ -226,10 +252,11 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="icon"
+        className="sc-AxmLO c0 icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           d="M15.429 17.019l-4.242-4.59 4.242-4.59-1.312-1.41-5.545 6 5.545 6z"
@@ -265,10 +292,11 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="spinner_modal_icon spin"
+        className="sc-AxmLO c0 spinner_modal_icon spin"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 512 512"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"

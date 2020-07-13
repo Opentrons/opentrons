@@ -88,16 +88,19 @@ stages:
           type: Session
           attributes:
             sessionType: "default"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: {}
         - id: "{session_id_1}"
           type: Session
           attributes:
             sessionType: "null"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: {}
         - id: "{session_id_2}"
           type: Session
           attributes:
             sessionType: "calibrationCheck"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: !anydict
 
   - name: Get just the calcheck sessions
@@ -112,6 +115,7 @@ stages:
           type: Session
           attributes:
             sessionType: "calibrationCheck"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: !anydict
 
   - name: Delete session 1
@@ -140,4 +144,5 @@ stages:
           type: Session
           attributes:
             sessionType: "default"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: {}

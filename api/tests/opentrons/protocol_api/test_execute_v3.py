@@ -8,7 +8,7 @@ from opentrons.protocol_api.geometry import Deck
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, \
     execute, labware, MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.execute_v3 import _aspirate, _dispense, _delay, \
-    _drop_tip, _blowout, dispatch_json, _pick_up_tip, _touch_tip, \
+    _drop_tip, _blowout, dispatch_json, _pick_up_tip, _touch_tip, _air_gap, \
     _move_to_slot, load_labware_from_json_defs, _get_well, _set_flow_rate, \
     _get_location_with_offset, load_pipettes_from_json
 
@@ -167,6 +167,41 @@ def test_drop_tip():
 
     assert pipette_mock.mock_calls == [
         mock.call.drop_tip(well)
+    ]
+
+
+def test_air_gap():
+    m = mock.MagicMock()
+    m.pipette_mock = mock.create_autospec(InstrumentContext)
+    m.mock_set_flow_rate = mock.MagicMock()
+
+    deck = Location(Point(0, 0, 0), 'deck')
+    well_name = 'A2'
+    some_labware = labware.Labware(minimalLabwareDef2, deck)
+    loaded_labware = {'someLabwareId': some_labware}
+    params = {'labware': 'someLabwareId', 'well': well_name}
+
+    params = {'pipette': 'somePipetteId', 'volume': 42,
+              'labware': 'someLabwareId', 'well': well_name,
+              'offsetFromBottomMm': 12}
+
+    instruments = {'somePipetteId': m.pipette_mock}
+
+    loaded_labware = {'someLabwareId': some_labware}
+
+    with mock.patch(
+            'opentrons.protocol_api.execute_v3._set_flow_rate',
+            new=m.mock_set_flow_rate):
+        _air_gap(instruments, loaded_labware, params)
+
+    # NOTE: air_gap `height` arg is mm from well top,
+    # so we expect it to equal offsetFromBottomMm - well depth.
+    assert m.mock_calls == [
+        mock.call.mock_set_flow_rate(m.pipette_mock, params),
+        mock.call.pipette_mock.move_to(
+            Location(point=Point(x=19, y=28, z=17.0),
+                     labware=some_labware[well_name])),
+        mock.call.pipette_mock.air_gap(42, 12 - 40)
     ]
 
 

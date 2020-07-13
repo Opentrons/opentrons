@@ -336,7 +336,7 @@ export function generateSubstepItem(
   robotState: ?RobotState,
   stepId: string,
   labwareNamesByModuleId: {
-    [moduleId: string]: ?{ nickname: ?string, displayName: string },
+    [moduleId: string]: ?{ nickname: string },
   }
 ): ?SubstepItemData {
   if (!robotState) {
@@ -391,7 +391,6 @@ export function generateSubstepItem(
     return {
       substepType: 'magnet',
       engage: stepArgs.commandCreatorFnName === 'engageMagnet',
-      labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,
     }
@@ -409,7 +408,6 @@ export function generateSubstepItem(
     return {
       substepType: 'temperature',
       temperature: temperature,
-      labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,
     }
@@ -419,7 +417,6 @@ export function generateSubstepItem(
     return {
       substepType: 'awaitTemperature',
       temperature: stepArgs.temperature,
-      labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,
     }
@@ -439,7 +436,6 @@ export function generateSubstepItem(
     return {
       substepType: THERMOCYCLER_PROFILE,
       blockTargetTempHold,
-      labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
       lidOpenHold,
       lidTargetTempHold,
@@ -454,7 +450,6 @@ export function generateSubstepItem(
   if (stepArgs.commandCreatorFnName === THERMOCYCLER_STATE) {
     return {
       substepType: THERMOCYCLER_STATE,
-      labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
       blockTargetTemp: stepArgs.blockTargetTemp,
       lidTargetTemp: stepArgs.lidTargetTemp,

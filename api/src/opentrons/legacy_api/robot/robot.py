@@ -14,6 +14,8 @@ from opentrons.commands import CommandPublisher
 
 from opentrons.data_storage import database, old_container_loading,\
     database_migration
+from opentrons.drivers.rpi_drivers import build_gpio_chardev
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.types import MoveSplit
 from opentrons.trackers import pose_tracker
@@ -530,7 +532,17 @@ class Robot(CommandPublisher):
         >>> from opentrons import robot # doctest: +SKIP
         >>> robot.connect() # doctest: +SKIP
         """
-
+        log.info(
+            'Setting up GPIOs for APIv1, expected to fail if opentrons-'
+            'robot-server is already running. This should not affect the '
+            'robot lights behavior in the protocol if it is running using '
+            'the Opentrons App.')
+        gpio_chardev = build_gpio_chardev('gpiochip0')
+        # setup gpio chardev if built successfully
+        if not isinstance(gpio_chardev, SimulatingGPIOCharDev):
+            gpio_chardev.config_by_board_rev()
+            gpio_chardev.setup_v1()
+            self._driver.gpio_chardev = gpio_chardev
         self._driver.connect(port=port)
         self.fw_version = self._driver.get_fw_version()
 

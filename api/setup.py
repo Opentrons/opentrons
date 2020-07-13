@@ -53,7 +53,6 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='src')
 INSTALL_REQUIRES = [
     'pyserial==3.4',
-    'aiohttp==3.4.4',
     'numpy>=1.15.1',
     'urwid==1.3.1',
     'jsonschema>=3.0.2,<4',

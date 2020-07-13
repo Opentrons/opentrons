@@ -1,5 +1,9 @@
 // @flow
-import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import last from 'lodash/last'
+import {
+  MAGNETIC_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import {
   createBlankForm,
   getNextDefaultEngageHeight,
@@ -7,11 +11,6 @@ import {
   getNextDefaultPipetteId,
   getNextDefaultTemperatureModuleId,
   getNextDefaultThermocyclerModuleId,
-  getNextDefaultBlockIsActive,
-  getNextDefaultBlockTemperature,
-  getNextDefaultLidIsActive,
-  getNextDefaultLidTemperature,
-  getNextDefaultLidOpen,
   handleFormChange,
 } from '../../steplist/formLevel'
 import {
@@ -26,6 +25,7 @@ import type {
   InitialDeckSetup,
 } from '../types'
 import type { FormPatch } from '../../steplist/actions/types'
+import type { RobotState, Timeline } from '../../step-generation'
 import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
 
 export type CreatePresavedStepFormArgs = {|
@@ -36,6 +36,7 @@ export type CreatePresavedStepFormArgs = {|
   savedStepForms: SavedStepFormState,
   orderedStepIds: OrderedStepIdsState,
   initialDeckSetup: InitialDeckSetup,
+  robotStateTimeline: Timeline,
 |}
 
 type FormUpdater = FormData => FormPatch | null
@@ -148,48 +149,33 @@ const _patchTemperatureModuleId = (args: {|
 
 const _patchThermocyclerFields = (args: {|
   initialDeckSetup: InitialDeckSetup,
-  orderedStepIds: OrderedStepIdsState,
-  savedStepForms: SavedStepFormState,
   stepType: StepType,
+  robotStateTimeline: Timeline,
 |}): FormUpdater => () => {
-  const { initialDeckSetup, orderedStepIds, savedStepForms, stepType } = args
+  const { initialDeckSetup, stepType, robotStateTimeline } = args
 
   if (stepType !== 'thermocycler') {
     return null
   }
 
-  const moduleId = getNextDefaultThermocyclerModuleId(
-    savedStepForms,
-    orderedStepIds,
-    initialDeckSetup.modules
-  )
+  const moduleId = getNextDefaultThermocyclerModuleId(initialDeckSetup.modules)
 
-  const blockIsActive = getNextDefaultBlockIsActive(
-    savedStepForms,
-    orderedStepIds
-  )
+  const lastRobotState: ?RobotState = last(robotStateTimeline.timeline)
+    ?.robotState
+  const moduleState = lastRobotState?.modules[moduleId]?.moduleState
 
-  const blockTargetTemp = getNextDefaultBlockTemperature(
-    savedStepForms,
-    orderedStepIds
-  )
-
-  const lidIsActive = getNextDefaultLidIsActive(savedStepForms, orderedStepIds)
-
-  const lidTargetTemp = getNextDefaultLidTemperature(
-    savedStepForms,
-    orderedStepIds
-  )
-
-  const lidOpen = getNextDefaultLidOpen(savedStepForms, orderedStepIds)
-  return {
-    moduleId,
-    blockIsActive,
-    blockTargetTemp,
-    lidIsActive,
-    lidTargetTemp,
-    lidOpen,
+  if (moduleState && moduleState.type === THERMOCYCLER_MODULE_TYPE) {
+    return {
+      moduleId,
+      blockIsActive: moduleState.blockTargetTemp !== null,
+      blockTargetTemp: moduleState.blockTargetTemp,
+      lidIsActive: moduleState.lidTargetTemp !== null,
+      lidTargetTemp: moduleState.lidTargetTemp,
+      lidOpen: moduleState.lidOpen,
+    }
   }
+  // if there's no last robot state (eg upstream errors), still should return moduleId
+  return { moduleId }
 }
 
 export const createPresavedStepForm = ({
@@ -200,6 +186,7 @@ export const createPresavedStepForm = ({
   savedStepForms,
   stepId,
   stepType,
+  robotStateTimeline,
 }: CreatePresavedStepFormArgs): FormData => {
   const formData = createBlankForm({
     stepId,
@@ -228,11 +215,10 @@ export const createPresavedStepForm = ({
     stepType,
   })
 
-  const updateThermocyclerModuleId = _patchThermocyclerFields({
+  const updateThermocyclerFields = _patchThermocyclerFields({
     initialDeckSetup,
-    orderedStepIds,
-    savedStepForms,
     stepType,
+    robotStateTimeline,
   })
 
   // finally, compose and apply all the updaters in order,
@@ -240,7 +226,7 @@ export const createPresavedStepForm = ({
   return [
     updateDefaultPipette,
     updateTemperatureModuleId,
-    updateThermocyclerModuleId,
+    updateThermocyclerFields,
     updateMagneticModuleId,
   ].reduce<FormData>(
     (acc, updater: FormUpdater) => {

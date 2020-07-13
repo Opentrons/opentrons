@@ -1,9 +1,12 @@
 // @flow
 import * as React from 'react'
-import classnames from 'classnames'
+import { css, keyframes } from 'styled-components'
+import cx from 'classnames'
 
+import { Svg } from '../primitives'
 import { ICON_DATA_BY_NAME } from './icon-data'
-import styles from './icons.css'
+
+import type { StyleProps } from '../primitives'
 
 export type IconName = $Keys<typeof ICON_DATA_BY_NAME>
 
@@ -19,14 +22,29 @@ export type IconProps = {|
   /** y attribute as a number or string (for nesting inside another SVG) */
   y?: number | string,
   /** width as a number or string (for nesting inside another SVG) */
-  height?: number | string,
+  svgHeight?: number | string,
   /** height as a number or string (for nesting inside another SVG) */
-  width?: number | string,
+  svgWidth?: number | string,
   /** inline style passed into the icon svg */
-  style?: { [string]: string },
+  style?: { [string]: string | number, ... },
   /** optional children */
   children?: React.Node,
+  /** primitive styling props */
+  ...StyleProps,
 |}
+
+const spinAnimation = keyframes`
+  100% {
+    transform: rotate(360deg);
+  }
+`
+
+const spinStyle = css`
+  &.spin {
+    animation: ${spinAnimation} 0.8s steps(8) infinite;
+    transform-origin: center;
+  }
+`
 
 /**
  * Inline SVG icon component
@@ -37,7 +55,7 @@ export type IconProps = {|
  * ```
  */
 export function Icon(props: IconProps): React.Node {
-  const { name, x, y, height, width, style } = props
+  const { name, children, className, spin, ...svgProps } = props
 
   if (!(name in ICON_DATA_BY_NAME)) {
     console.error(`"${name}" is not a valid Icon name`)
@@ -45,21 +63,18 @@ export function Icon(props: IconProps): React.Node {
   }
 
   const { viewBox, path } = ICON_DATA_BY_NAME[name]
-  const className = classnames(props.className, {
-    [styles.spin]: props.spin,
-  })
 
   return (
-    <svg
-      version="1.1"
+    <Svg
       aria-hidden="true"
-      viewBox={viewBox}
-      className={className}
       fill="currentColor"
-      {...{ x, y, height, width, style }}
+      viewBox={viewBox}
+      className={cx(className, { spin })}
+      css={spinStyle}
+      {...svgProps}
     >
       <path fillRule="evenodd" d={path} />
       {props.children}
-    </svg>
+    </Svg>
   )
 }

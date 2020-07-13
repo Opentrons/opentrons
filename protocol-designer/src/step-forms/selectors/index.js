@@ -1,6 +1,7 @@
 // @flow
 import type { ElementProps } from 'react'
 import assert from 'assert'
+import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
@@ -387,6 +388,20 @@ const getOrderedSavedForms: Selector<Array<FormData>> = createSelector(
     return orderedStepIds
       .map(stepId => savedStepForms[stepId])
       .filter(form => form && form.id != null) // NOTE: for old protocols where stepId could === 0, need to do != null here
+  }
+)
+
+export const getCurrentFormHasUnsavedChanges: Selector<boolean> = createSelector(
+  getUnsavedForm,
+  getSavedStepForms,
+  (unsavedForm, savedStepForms) => {
+    const id = unsavedForm?.id
+    const savedForm = id != null ? savedStepForms[id] : null
+    if (savedForm == null) {
+      // nonexistent = no unsaved changes
+      return false
+    }
+    return !isEqual(unsavedForm, savedForm)
   }
 )
 

@@ -92,7 +92,7 @@ def _ensure_trash():
     """
     load_all_containers_from_disk()
 
-    to_load = set(['fixed-trash', 'tall-fixed-trash'])
+    to_load = {'fixed-trash', 'tall-fixed-trash'}
     present = set(database.list_all_containers())
     to_update = to_load - present
     log.info(f"_ensure_trash: loading {to_update}")

@@ -52,7 +52,7 @@ export function VersionInfoModal(props: VersionInfoModalProps): React.Node {
     primaryButton = {
       ...primaryButton,
       Component: Link,
-      to: '/menu/app/update',
+      to: '/more/app/update',
       children: 'View App Update',
     }
   } else if (robotUpdateType === 'upgrade' || robotUpdateType === 'downgrade') {

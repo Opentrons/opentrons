@@ -11,5 +11,9 @@
   "OT_PD_ENABLE_THERMOCYCLER": {
     "title": "Enable thermocycler module",
     "description": "Allow adding thermocycler modules and steps to protocols."
+  },
+  "OT_PD_ENABLE_AIR_GAP_AND_DELAY": {
+    "title": "Enable Air Gap & Delay",
+    "description": "Allow using the Air Gap and the Delay advanced settings in steps."
   }
 }

@@ -132,6 +132,18 @@ class GPIOCharDev:
         self.set_reset_pin(True)
         await asyncio.sleep(0.25)
 
+    def setup_v1(self):
+        # TODO: AA 07-08-2020 remove when legacy API is deprecated
+        MODULE_LOG.info("Setting up GPIOs for APIv1")
+        self.set_audio_enable(True)
+        # smoothieware programming pins, must be in a known state (HIGH)
+        self.set_halt_pin(True)
+        self.set_isp_pin(True)
+        self.set_reset_pin(False)
+        time.sleep(0.25)
+        self.set_reset_pin(True)
+        time.sleep(0.25)
+
     def set_high(self, output_pin: GPIOPin):
         self.lines[output_pin.name].set_value(1)
 

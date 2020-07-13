@@ -10,7 +10,6 @@ beforeEach(() => {
     action: 'action',
     moduleType: MAGNETIC_MODULE_TYPE,
     actionText: 'engage',
-    labwareDisplayName: 'magnet module',
     labwareNickname: 'maggie',
     message: 'my magnet module',
   }

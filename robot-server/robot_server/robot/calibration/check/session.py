@@ -8,12 +8,13 @@ from robot_server.robot.calibration.session import CalibrationSession, \
     CalibrationException, HEIGHT_SAFETY_BUFFER
 from opentrons.types import Mount, Point, Location
 
-from robot_server.robot.calibration.util import StateMachine, WILDCARD
-from robot_server.robot.calibration.check.models import ComparisonStatus, \
-    OffsetVector
+from robot_server.robot.calibration.check.util import StateMachine, WILDCARD
+from robot_server.robot.calibration.check.models import ComparisonStatus
 from robot_server.robot.calibration.helper_classes import (
     CheckMove, DeckCalibrationError, PipetteRank, PipetteInfo, PipetteStatus
 )
+from robot_server.service.session.models import OffsetVector,\
+    CalibrationCommand, CalibrationCheckCommand
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware
 
@@ -57,16 +58,16 @@ class CalibrationCheckState(str, Enum):
 
 
 class CalibrationCheckTrigger(str, Enum):
-    load_labware = "loadLabware"
-    prepare_pipette = "preparePipette"
-    jog = "jog"
-    pick_up_tip = "pickUpTip"
-    confirm_tip_attached = "confirmTip"
-    invalidate_tip = "invalidateTip"
-    compare_point = "comparePoint"
-    go_to_next_check = "goToNextCheck"
-    exit = "exitSession"
-    reject_calibration = "rejectCalibration"
+    load_labware = CalibrationCommand.load_labware.value
+    prepare_pipette = CalibrationCommand.prepare_pipette.value
+    jog = CalibrationCommand.jog.value
+    pick_up_tip = CalibrationCommand.pick_up_tip.value
+    confirm_tip_attached = CalibrationCommand.confirm_tip_attached.value
+    invalidate_tip = CalibrationCommand.invalidate_tip.value
+    compare_point = CalibrationCheckCommand.compare_point.value
+    go_to_next_check = CalibrationCheckCommand.go_to_next_check.value
+    exit = CalibrationCommand.exit.value
+    reject_calibration = CalibrationCheckCommand.reject_calibration.value
 
 
 CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [

@@ -113,7 +113,7 @@ const EXPECTED_RUN = {
 
 const EXPECTED_MORE = {
   id: 'more',
-  path: '/menu',
+  path: '/more',
   title: 'More',
   iconName: 'dots-horizontal',
   notificationReason: null,

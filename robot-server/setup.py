@@ -50,7 +50,6 @@ DESCRIPTION = (
     "A server providing access to the Opentrons API")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    'aiohttp==3.4.4',
     'fastapi==0.54.1',
     'python-multipart==0.0.5',
     'opentrons',
