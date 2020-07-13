@@ -22,10 +22,10 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       serial: 'fake serial 2',
     },
   },
-  currentStep: 'labwareLoaded',
+  currentStep: 'sessionStarted',
   labware: [
     {
-      alternatives: ['fake_tiprack_load_name'],
+      alternatives: ['fake_tprack_load_name'],
       slot: '8',
       id: 'abc123_labware_uuid',
       forMounts: ['left'],

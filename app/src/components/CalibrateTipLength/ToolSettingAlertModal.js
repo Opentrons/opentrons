@@ -7,7 +7,6 @@ import {
   Link,
   FONT_SIZE_BODY_1,
   FONT_SIZE_BODY_2,
-  SPACING_2,
   SPACING_3,
   Flex,
   Text,
@@ -77,10 +76,7 @@ export function ToolSettingAlertModal(
           </Flex>
         </Box>
         <Flex marginY={SPACING_3} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <SecondaryBtn
-            marginRight={SPACING_2}
-            onClick={() => console.log('TODO: handle use block')}
-          >
+          <SecondaryBtn onClick={() => console.log('TODO: handle use block')}>
             {HAVE_BLOCK}
           </SecondaryBtn>
           <SecondaryBtn
