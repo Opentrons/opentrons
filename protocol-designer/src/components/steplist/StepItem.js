@@ -110,7 +110,6 @@ export type StepItemContentsProps = {|
   substeps: ?SubstepItemData,
 
   ingredNames: WellIngredientNames,
-  labwareDefDisplayNamesById: { [labwareId: string]: ?string },
   labwareNicknamesById: { [labwareId: string]: string },
 
   highlightSubstep: SubstepIdentifier => mixed,
@@ -264,7 +263,6 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
     stepType,
     substeps,
     ingredNames,
-    labwareDefDisplayNamesById,
     labwareNicknamesById,
     highlightSubstep,
     hoveredSubstep,
@@ -282,7 +280,6 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
   if (substeps && substeps.substepType === 'magnet') {
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
         labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t(`modules.actions.action`)}
@@ -299,12 +296,11 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
 
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
-        labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t(`modules.actions.go_to`)}
         actionText={temperature}
         moduleType={TEMPERATURE_MODULE_TYPE}
+        labwareNickname={substeps.labwareNickname}
       />
     )
   }
@@ -312,12 +308,11 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
   if (substeps && substeps.substepType === THERMOCYCLER_PROFILE) {
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
-        labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t(`modules.actions.profile`)}
         actionText={i18n.t(`modules.actions.cycling`)}
         moduleType={THERMOCYCLER_MODULE_TYPE}
+        labwareNickname={substeps.labwareNickname}
       >
         <ModuleStepItemRow
           // NOTE: for TC Profile, lid label text always says "closed" bc Profile runs with lid closed.
@@ -361,11 +356,10 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
           }
         >
           <ModuleStepItems
-            labwareDisplayName={substeps.labwareDisplayName}
-            labwareNickname={substeps.labwareNickname}
             actionText={makeTemperatureText(substeps.blockTargetTempHold)}
             moduleType={THERMOCYCLER_MODULE_TYPE}
             hideHeader
+            labwareNickname={substeps.labwareNickname}
           />
           <ModuleStepItemRow
             label={makeLidLabelText(substeps.lidOpenHold)}
@@ -383,12 +377,11 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
 
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
-        labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t(`modules.actions.hold`)}
         actionText={blockTemperature}
         moduleType={THERMOCYCLER_MODULE_TYPE}
+        labwareNickname={substeps.labwareNickname}
       >
         <ModuleStepItemRow label={lidLabelText} value={lidTemperature} />
       </ModuleStepItems>
@@ -400,12 +393,11 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
 
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
-        labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t('modules.actions.await_temperature')}
         actionText={temperature}
         moduleType={TEMPERATURE_MODULE_TYPE}
+        labwareNickname={substeps.labwareNickname}
       />
     )
   }
@@ -421,11 +413,7 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
       <AspirateDispenseHeader
         key="moveLiquid-header"
         sourceLabwareNickname={labwareNicknamesById[sourceLabwareId]}
-        sourceLabwareDefDisplayName={
-          labwareDefDisplayNamesById[sourceLabwareId]
-        }
         destLabwareNickname={labwareNicknamesById[destLabwareId]}
-        destLabwareDefDisplayName={labwareDefDisplayNamesById[destLabwareId]}
       />
     )
   }
@@ -438,7 +426,6 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
         volume={rawForm.volume}
         times={rawForm.times}
         labwareNickname={labwareNicknamesById[mixLabwareId]}
-        labwareDefDisplayName={labwareDefDisplayNamesById[mixLabwareId]}
       />
     )
   }

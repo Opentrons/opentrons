@@ -1,19 +1,14 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import mapValues from 'lodash/mapValues'
 import { useConditionalConfirm } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { selectors as uiLabwareSelectors } from '../ui/labware'
 import * as substepSelectors from '../top-selectors/substeps'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as dismissSelectors } from '../dismiss'
-import {
-  selectors as stepFormSelectors,
-  type LabwareEntity,
-} from '../step-forms'
+import { selectors as stepFormSelectors } from '../step-forms'
 import {
   getCollapsedSteps,
   getHoveredSubstep,
@@ -65,16 +60,11 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const labwareNicknamesById = useSelector(
     uiLabwareSelectors.getLabwareNicknamesById
   )
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
   const formHasChanges = useSelector(
     stepFormSelectors.getCurrentFormHasUnsavedChanges
-  )
-  const labwareDefDisplayNamesById = mapValues(
-    labwareEntities,
-    (l: LabwareEntity) => getLabwareDisplayName(l.def)
   )
 
   // Actions
@@ -121,7 +111,6 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     substeps,
 
     ingredNames,
-    labwareDefDisplayNamesById,
     labwareNicknamesById,
 
     highlightSubstep,
