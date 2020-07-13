@@ -1,7 +1,7 @@
 // Common Variables and Selectors
 const protocolTitle = 'Thermocrycelr Test Protocol'
-const leftPipette = '[data-id="PipetteNameItem_p300SingleChannelGen2"]'
-const rightPipette = '[data-id="PipetteNameItem_p300MultiChannelGen2"]'
+const leftPipette = '[data-test="PipetteNameItem_p300SingleChannelGen2"]'
+const rightPipette = '[data-test="PipetteNameItem_p300MultiChannelGen2"]'
 const tipRack = 'Opentrons 96 Tip Rack 300 µL'
 const editThermocycler = '[name="editThermocyclerModuleType"]'
 const removeThermocycler = '[name="removeThermocyclerModuleType"]'
@@ -329,11 +329,10 @@ describe('Protocols with Modules', () => {
         cy.get(profileStepRow + temperature).type('60')
         cy.get(profileStepRow + minutes).type('5')
         cy.get(profileStepRow + seconds).type('30')
-        // Add Cycle Steps
+        // Add Cycle (should have 1 step by default)
         cy.get('button')
           .contains('Cycle')
           .click()
-        cy.get(profileCycleAddStepButton).click()
         cy.get(profileCycleFields + title).type('cycle step 1')
         cy.get(profileCycleFields + temperature).type('30')
         cy.get(profileCycleFields + minutes).type('1')
@@ -356,6 +355,18 @@ describe('Protocols with Modules', () => {
         cy.get(thermocyclerToggleGroups + ':last-child').within(() => {
           cy.get('input[type="checkbox"][checked]').should('not.exist')
         })
+
+        // Add second step to the cycle, giving us one top-level step and 2 cycle steps
+        cy.get(profileCycleAddStepButton).click()
+        cy.get(profileCycleFields).should('have.length', 3)
+
+        // Delete that new cycle step
+        cy.get('[class*=cycle_step_delete]')
+          .last()
+          .click()
+        cy.get(profileCycleFields).should('have.length', 2)
+
+        // save form
         cy.get('button')
           .contains('save')
           .click()
