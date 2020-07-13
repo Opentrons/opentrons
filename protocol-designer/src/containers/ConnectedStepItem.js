@@ -19,7 +19,11 @@ import {
 import { selectors as fileDataSelectors } from '../file-data'
 
 import { StepItem, StepItemContents } from '../components/steplist/StepItem'
-import { ConfirmDeleteStepModal } from '../components/modals/ConfirmDeleteStepModal'
+import {
+  ConfirmDeleteModal,
+  CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_UNSAVED_STEP_FORM,
+} from '../components/modals/ConfirmDeleteModal'
 
 import type { SubstepIdentifier } from '../steplist/types'
 import type { StepIdType } from '../form-types'
@@ -120,8 +124,12 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   return (
     <>
       {showConfirmation && (
-        <ConfirmDeleteStepModal
-          close
+        <ConfirmDeleteModal
+          modalType={
+            currentFormIsPresaved
+              ? CLOSE_UNSAVED_STEP_FORM
+              : CLOSE_STEP_FORM_WITH_CHANGES
+          }
           onContinueClick={confirm}
           onCancelClick={cancel}
         />

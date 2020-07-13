@@ -20,7 +20,10 @@ import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
 } from '../step-forms'
-import { ConfirmDeleteStepModal } from './modals/ConfirmDeleteStepModal'
+import {
+  ConfirmDeleteModal,
+  CLOSE_UNSAVED_STEP_FORM,
+} from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, type StepType } from '../form-types'
 import styles from './listButtons.css'
@@ -138,8 +141,8 @@ export const StepCreationButton = (): React.Node => {
     <>
       {enqueuedStepType !== null && (
         <Portal>
-          <ConfirmDeleteStepModal
-            close
+          <ConfirmDeleteModal
+            modalType={CLOSE_UNSAVED_STEP_FORM}
             onCancelClick={() => setEnqueuedStepType(null)}
             onContinueClick={() => {
               if (enqueuedStepType !== null) {
@@ -147,7 +150,7 @@ export const StepCreationButton = (): React.Node => {
                 setEnqueuedStepType(null)
               }
             }}
-          ></ConfirmDeleteStepModal>
+          ></ConfirmDeleteModal>
         </Portal>
       )}
       <StepCreationButtonComponent
