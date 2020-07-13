@@ -17,7 +17,7 @@ const ROBOT = 'Robot'
 const PROTOCOL = 'Protocol'
 const CALIBRATE = 'Calibrate'
 const RUN = 'Run'
-const MORE = 'More'
+export const MORE = 'More'
 
 const PLEASE_CONNECT_TO_A_ROBOT = 'Please connect to a robot to proceed'
 const PLEASE_LOAD_A_PROTOCOL = 'Please load a protocol to proceed'
@@ -153,7 +153,7 @@ export const getMoreLocation: State => NavLocation = createSelector(
 
     return {
       id: 'more',
-      path: '/menu',
+      path: '/more',
       title: MORE,
       iconName: 'dots-horizontal',
       notificationReason,
