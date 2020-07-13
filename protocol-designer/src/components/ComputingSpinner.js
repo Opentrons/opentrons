@@ -27,11 +27,7 @@ export const ComputingSpinner = (): React.Node => {
         right={0}
         data-test="ComputingSpinner"
       >
-        <Icon
-          name="ot-spinner"
-          style={{ width: '7.5rem', marginBottom: '3rem' }}
-          spin
-        />
+        <Icon name="ot-spinner" width="7.5rem" marginBottom="3rem" spin />
       </Flex>
     )
   )
