@@ -73,14 +73,7 @@ describe('getNextDefaultThermocyclerModuleId', () => {
 
     testCases.forEach(({ testMsg, equippedModulesById, expected }) => {
       it(testMsg, () => {
-        const savedForms = {}
-        const orderedStepIds = []
-
-        const result = getNextDefaultThermocyclerModuleId(
-          savedForms,
-          orderedStepIds,
-          equippedModulesById
-        )
+        const result = getNextDefaultThermocyclerModuleId(equippedModulesById)
 
         expect(result).toBe(expected)
       })
@@ -95,21 +88,6 @@ describe('getNextDefaultThermocyclerModuleId', () => {
           tempId: getTemp(),
           tcId: getThermocycler(),
         },
-        savedForms: {
-          tempStepId: {
-            id: 'tempStepId',
-            stepType: 'temperature',
-            stepName: 'temperature',
-            moduleId: 'tempId',
-          },
-          tcStepId: {
-            id: 'tcStepId',
-            stepType: THERMOCYCLER_MODULE_TYPE,
-            stepName: THERMOCYCLER_MODULE_TYPE,
-            moduleId: 'tcId',
-          },
-        },
-        orderedStepIds: ['tempStepId', 'tcStepId'],
         expected: 'tcId',
       },
       {
@@ -134,43 +112,15 @@ describe('getNextDefaultThermocyclerModuleId', () => {
             },
           },
         },
-        savedForms: {
-          tempStepId: {
-            id: 'tempStepId',
-            stepType: 'temperature',
-            stepName: 'temperature',
-            moduleId: 'tempId',
-          },
-          magStepId: {
-            id: 'magStepId',
-            stepType: 'magnet',
-            stepName: 'magnet',
-            moduleId: 'magdeckId',
-          },
-        },
-        orderedStepIds: ['tempStepId', 'magStepId'],
         expected: null,
       },
     ]
 
-    testCases.forEach(
-      ({
-        testMsg,
-        savedForms = {},
-        equippedModulesById,
-        orderedStepIds = [],
-        expected,
-      }) => {
-        it(testMsg, () => {
-          const result = getNextDefaultThermocyclerModuleId(
-            savedForms,
-            orderedStepIds,
-            equippedModulesById
-          )
-
-          expect(result).toBe(expected)
-        })
-      }
-    )
+    testCases.forEach(({ testMsg, equippedModulesById, expected }) => {
+      it(testMsg, () => {
+        const result = getNextDefaultThermocyclerModuleId(equippedModulesById)
+        expect(result).toBe(expected)
+      })
+    })
   })
 })

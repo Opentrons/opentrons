@@ -1,9 +1,14 @@
 // @flow
 import type { StepIdType, StepType } from '../../../form-types'
 import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
+import type { Timeline } from '../../../step-generation'
 
 type AddStepPayload = {| id: string, stepType: StepType |}
-export type AddStepAction = {| type: 'ADD_STEP', payload: AddStepPayload |}
+export type AddStepAction = {|
+  type: 'ADD_STEP',
+  payload: AddStepPayload,
+  meta: { robotStateTimeline: Timeline },
+|}
 
 export type ClearWellSelectionLabwareKeyAction = {|
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',

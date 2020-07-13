@@ -1192,6 +1192,7 @@ describe('unsavedForm reducer', () => {
     const result = unsavedForm(stateMock, {
       type: 'ADD_STEP',
       payload: { id: 'stepId123', stepType: 'moveLiquid' },
+      meta: { robotStateTimeline: 'robotStateTimelineValue' },
     })
     expect(result).toEqual('createPresavedStepFormMockResult')
     expect(mockCreatePresavedStepForm.mock.calls).toEqual([
@@ -1204,6 +1205,7 @@ describe('unsavedForm reducer', () => {
           savedStepForms: 'savedStepFormsValue',
           orderedStepIds: 'orderedStepIdsValue',
           initialDeckSetup: 'initalDeckSetupValue',
+          robotStateTimeline: 'robotStateTimelineValue',
         },
       ],
     ])

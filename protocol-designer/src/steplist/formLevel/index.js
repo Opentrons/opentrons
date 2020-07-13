@@ -40,13 +40,6 @@ export {
 } from './getNextDefaultModuleId'
 export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
-export {
-  getNextDefaultBlockIsActive,
-  getNextDefaultBlockTemperature,
-  getNextDefaultLidIsActive,
-  getNextDefaultLidTemperature,
-  getNextDefaultLidOpen,
-} from './getNextDefaultThermocyclerState'
 export { stepFormToArgs } from './stepFormToArgs'
 export type { FormError, FormWarning, FormWarningType }
 
