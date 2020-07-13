@@ -1,17 +1,38 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Icon } from '@opentrons/components'
+import {
+  Flex,
+  Icon,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  POSITION_FIXED,
+} from '@opentrons/components'
 import * as fileDataSelectors from '../file-data/selectors'
-import styles from './ComputingSpinner.css'
 
 export const ComputingSpinner = (): React.Node => {
   const showSpinner = useSelector(fileDataSelectors.getTimelineIsBeingComputed)
+
   return (
     showSpinner && (
-      <div className={styles.overlay} data-test="ComputingSpinner">
-        <Icon name="ot-spinner" className={styles.spinner_icon} spin />
-      </div>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
+        backgroundColor="rgba(115, 115, 115, 0.9)"
+        zIndex={999}
+        position={POSITION_FIXED}
+        top={0}
+        bottom={0}
+        left={0}
+        right={0}
+        data-test="ComputingSpinner"
+      >
+        <Icon
+          name="ot-spinner"
+          style={{ width: '7.5rem', marginBottom: '3rem' }}
+          spin
+        />
+      </Flex>
     )
   )
 }
