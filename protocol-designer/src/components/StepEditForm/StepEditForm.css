@@ -14,6 +14,7 @@
 .form_row,
 .checkbox_column {
   margin: 1rem 0;
+  width: auto;
 }
 
 .form_row {
@@ -40,6 +41,7 @@
 
 .small_field {
   width: 5.75rem;
+  min-width: 5.75rem;
 }
 
 .full_width_field {
@@ -289,7 +291,7 @@ and when that is implemented.
 }
 
 .toggle_form_group {
-  width: 20%;
+  min-width: 20%;
   margin: 0 0 1rem 1.75rem;
 }
 
