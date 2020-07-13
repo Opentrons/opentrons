@@ -307,6 +307,10 @@ and when that is implemented.
   margin-top: 0.125rem;
 }
 
+.profile_form {
+  padding-left: 1.75rem;
+}
+
 .profile_settings_group {
   margin-right: 1rem;
 }
