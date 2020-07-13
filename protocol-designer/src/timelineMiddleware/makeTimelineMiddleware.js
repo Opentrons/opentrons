@@ -18,14 +18,7 @@ import type { Middleware } from 'redux'
 import type { Flags } from '../feature-flags/types'
 import type { BaseState } from '../types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
-import type { GenerateSubstepsArgs } from './generateSubsteps'
-import type { Timeline } from '../step-generation'
-
-// worker itself will spread the robotStateTimeline in
-type SubstepsArgsNoTimeline = $Diff<
-  GenerateSubstepsArgs,
-  { robotStateTimeline: any }
->
+import type { SubstepsArgsNoTimeline, TimelineWorker } from './types'
 
 const hasChanged = (
   nextValues: { [any]: any, ... },
@@ -51,27 +44,9 @@ const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
   labwareNamesByModuleId: getLabwareNamesByModuleId(state),
 })
 
-// Two types of message. Substep generation requires a timeline.
-// - we don't have a timeline and need to generate timeline + substeps
-// - we have a timeline, so we only need to generate substeps
-type WorkerMessage =
-  | {|
-      timeline: null,
-      timelineArgs: GenerateRobotStateTimelineArgs,
-      substepsArgs: SubstepsArgsNoTimeline,
-    |}
-  | {|
-      timeline: Timeline,
-      timelineArgs: null,
-      substepsArgs: SubstepsArgsNoTimeline,
-    |}
-
 // TODO(IL, 2020-06-15): once we create an Action union for PD, use that instead of `any` for Middleware<S, A>
 export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
-  const worker = new Worker()
-  // worker is any-typed, so this fn provides a type-safe interface
-  const postToWorker = (message: WorkerMessage): void =>
-    worker.postMessage(message)
+  const worker: TimelineWorker = new Worker()
 
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
   let prevFeatureFlags: Flags | null = null // force timeline recompute when feature flags change
@@ -137,7 +112,7 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
       if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
         const timelineArgs: GenerateRobotStateTimelineArgs = prevTimelineArgs
         const substepsArgs: SubstepsArgsNoTimeline = prevSubstepsArgs
-        postToWorker({ timeline: null, timelineArgs, substepsArgs })
+        worker.postMessage({ timeline: null, timelineArgs, substepsArgs })
       } else {
         console.error(
           'something weird happened, prevTimelineArgs and prevSubstepsArgs should never be null here'
@@ -146,7 +121,7 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     } else if (shouldRecomputeSubsteps && prevSuccessAction) {
       // Timeline did not change, but a substeps-specific selector did
       if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
-        postToWorker({
+        worker.postMessage({
           timeline: prevSuccessAction.payload.standardTimeline,
           timelineArgs: null,
           substepsArgs: prevSubstepsArgs,

@@ -1,7 +1,6 @@
 // @flow
-import type { Substeps } from '../steplist/types'
-import type { Timeline } from '../step-generation'
 import type { FileMetadataFields, SaveFileMetadataAction } from './types'
+import type { WorkerResponse } from '../timelineMiddleware/types'
 
 export const saveFileMetadata = (
   payload: FileMetadataFields
@@ -19,10 +18,10 @@ export const computeRobotStateTimelineRequest = (): ComputeRobotStateTimelineReq
 
 export type ComputeRobotStateTimelineSuccessAction = {|
   type: 'COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS',
-  payload: {| standardTimeline: Timeline, substeps: Substeps |},
+  payload: WorkerResponse,
 |}
 export const computeRobotStateTimelineSuccess = (
-  payload: $PropertyType<ComputeRobotStateTimelineSuccessAction, 'payload'>
+  payload: WorkerResponse
 ): ComputeRobotStateTimelineSuccessAction => ({
   type: 'COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS',
   payload,
