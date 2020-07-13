@@ -125,7 +125,7 @@ async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
 
 def test_load_trash(mock_user_flow):
     assert mock_user_flow._deck['12'].load_name == \
-            'opentrons_1_trash_1100ml_fixed'
+        'opentrons_1_trash_1100ml_fixed'
 
 
 def test_load_deck(mock_user_flow_all_combos):

@@ -6,7 +6,11 @@ from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import geometry, labware
 from robot_server.service.session.models import CalibrationCommand, \
     TipLengthCalibrationCommand
-from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
+from robot_server.robot.calibration.constants import (
+    TIP_RACK_LOOKUP_BY_MAX_VOL,
+    SHORT_TRASH_DECK,
+    STANDARD_DECK
+)
 from robot_server.robot.calibration.tip_length.state_machine import (
     TipCalibrationStateMachine
 )
@@ -15,12 +19,8 @@ from robot_server.robot.calibration.tip_length.util import (
 )
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState as State,
-    TRASH_SLOT,
     TIP_RACK_SLOT,
-    RIGHT_MOUNT_CAL_BLOCK_SLOT,
-    LEFT_MOUNT_CAL_BLOCK_SLOT,
-    RIGHT_MOUNT_CAL_BLOCK_LOADNAME,
-    LEFT_MOUNT_CAL_BLOCK_LOADNAME,
+    CAL_BLOCK_SETUP_BY_MOUNT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER
 )
 
@@ -52,7 +52,9 @@ class TipCalibrationUserFlow():
                         'cannot run tip length calibration')
         self._tip_origin_loc = None
 
-        self._deck = geometry.Deck()
+        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
+            else STANDARD_DECK
+        self._deck = geometry.Deck(load_name=deck_load_name)
         self._initialize_deck()
 
         self._current_state = State.sessionStarted
@@ -116,16 +118,12 @@ class TipCalibrationUserFlow():
             saved_default = self._hw_pipette.config.pick_up_current
             self._hw_pipette.update_config_item('pick_up_current', 0.1)
 
-        # Note: ABC DeckItem cannot have tiplength b/c of
-        # mod geometry contexts. Ignore type checking error here.
-        tiprack = self._deck[TIP_RACK_SLOT]
-        full_length = tiprack.tip_length  # type: ignore
+        tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]
+        full_length = tiprack.tip_length
         overlap_dict: Dict = \
-            self._hw_pipette.config.tip_overlap  # type: ignore
+            self._hw_pipette.config.tip_overlap
         default = overlap_dict['default']
-        overlap = overlap_dict.get(
-                                tiprack.uri,  # type: ignore
-                                default)
+        overlap = overlap_dict.get(tiprack.uri, default)
         tip_length = full_length - overlap
 
         cur_pt = await self._hardware.gantry_position(self._mount)
@@ -144,17 +142,6 @@ class TipCalibrationUserFlow():
     async def exit_session(self, *args):
         await self._return_tip()
 
-    def _get_trash_lw(self) -> labware.Labware:
-        if ff.short_fixed_trash():
-            trash_lw = labware.load(
-                'opentrons_1_trash_850ml_fixed',
-                self._deck.position_for(TRASH_SLOT))
-        else:
-            trash_lw = labware.load(
-                'opentrons_1_trash_1100ml_fixed',
-                self._deck.position_for(TRASH_SLOT))
-        return trash_lw
-
     def _get_tip_rack_lw(self) -> labware.Labware:
         pip_vol = self._hw_pipette.config.max_volume
         tr_lookup = TIP_RACK_LOOKUP_BY_MAX_VOL.get(str(pip_vol), None)
@@ -166,21 +153,14 @@ class TipCalibrationUserFlow():
                     f'No tiprack found for pipette {self._hw_pipette.model}')
 
     def _initialize_deck(self):
-        trash_lw = self._get_trash_lw()
-        self._deck[TRASH_SLOT] = trash_lw
-
         tip_rack_lw = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = tip_rack_lw
 
-        cal_block_slot = (RIGHT_MOUNT_CAL_BLOCK_SLOT
-                          if self._mount == Mount.RIGHT
-                          else LEFT_MOUNT_CAL_BLOCK_SLOT)
-        cal_block_loadname = (RIGHT_MOUNT_CAL_BLOCK_LOADNAME
-                              if self._mount == Mount.RIGHT
-                              else LEFT_MOUNT_CAL_BLOCK_LOADNAME)
-        self._deck[cal_block_slot] = labware.load(
-            cal_block_loadname,
-            self._deck.position_for(cal_block_slot))
+        cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
+
+        self._deck[cb_setup['slot']] = labware.load(
+            cb_setup['load_name'],
+            self._deck.position_for(cb_setup['slot']))
 
     async def _return_tip(self):
         if self._tip_origin_loc and self.hw_pipette.has_tip:

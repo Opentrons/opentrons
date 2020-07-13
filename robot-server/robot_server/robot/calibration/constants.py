@@ -55,3 +55,6 @@ TIP_RACK_LOOKUP_BY_MAX_VOL: Dict[str, LabwareLookUp] = {
               TIPRACK_1000,
               FILTERTIPRACK_1000})
 }
+
+SHORT_TRASH_DECK = 'ot2_short_trash'
+STANDARD_DECK = 'ot2_standard'

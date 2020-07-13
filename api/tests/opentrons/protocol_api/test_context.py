@@ -40,7 +40,8 @@ def set_version_added(attr, mp, version):
 
 @pytest.fixture
 def get_labware_def(monkeypatch):
-    def dummy_load(labware_name, namespace=None, version=None):
+    def dummy_load(labware_name, namespace=None, version=None,
+                   bundled_defs=None, extra_defs=None, api_level=None):
         # TODO: Ian 2019-05-30 use fixtures not real defs
         labware_def = json.loads(
             load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
@@ -829,21 +830,13 @@ def test_tip_length_for(loop, monkeypatch):
 
 
 def test_bundled_labware(loop, get_labware_fixture):
-    fake_fixed_trash = get_labware_fixture('fixture_trash')
-    fake_fixed_trash['namespace'] = 'opentrons'
-    fake_fixed_trash['parameters']['loadName'] = \
-        'opentrons_1_trash_1100ml_fixed'
-    fake_fixed_trash['version'] = 1
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
-        'opentrons/opentrons_1_trash_1100ml_fixed/1': fake_fixed_trash,
         'fixture/fixture_96_plate/1': fixture_96_plate
     }
 
     ctx = papi.ProtocolContext(loop, bundled_labware=bundled_labware)
     lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
-    assert ctx.loaded_labwares[12] == ctx.fixed_trash
-    assert ctx.loaded_labwares[12]._definition == fake_fixed_trash
     assert ctx.loaded_labwares[3] == lw1
     assert ctx.loaded_labwares[3]._definition == fixture_96_plate
 
@@ -852,24 +845,22 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
     bundled_labware = {}
     with pytest.raises(
         RuntimeError,
-        match='No labware found in bundle with load name opentrons_1_trash_'
+        match='No labware found in bundle with load name fixture_96_plate'
     ):
-        papi.ProtocolContext(loop, bundled_labware=bundled_labware)
+        ctx = papi.ProtocolContext(loop, bundled_labware=bundled_labware)
+        ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
 
-    fake_fixed_trash = get_labware_fixture('fixture_trash')
-    fake_fixed_trash['namespace'] = 'opentrons'
-    fake_fixed_trash['parameters']['loadName'] = \
-        'opentrons_1_trash_1100ml_fixed'
-    fake_fixed_trash['version'] = 1
+    fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
-        'opentrons/opentrons_1_trash_1100ml_fixed/1': fake_fixed_trash,
+        'fixture/fixture_96_plate/1': fixture_96_plate
     }
     with pytest.raises(
         RuntimeError,
-        match='No labware found in bundle with load name opentrons_1_trash_'
+        match='No labware found in bundle with load name fixture_96_plate'
     ):
-        papi.ProtocolContext(loop, bundled_labware={},
-                             extra_labware=bundled_labware)
+        ctx = papi.ProtocolContext(loop, bundled_labware={},
+                                   extra_labware=bundled_labware)
+        ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
 
 
 def test_bundled_data(loop):

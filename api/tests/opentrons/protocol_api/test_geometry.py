@@ -8,6 +8,7 @@ from opentrons.protocol_api import labware, module_geometry
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api.definitions import MAX_SUPPORTED_VERSION
 
+tall_lw_name = 'opentrons_96_tiprack_1000ul'
 labware_name = 'corning_96_wellplate_360ul_flat'
 trough_name = 'usascientific_12_reservoir_22ml'
 P300M_GEN2_MAX_HEIGHT = 155.75
@@ -63,12 +64,13 @@ def test_slot_collisions():
 
 def test_highest_z():
     deck = Deck()
-    assert deck.highest_z == 0
-    lw = labware.load(labware_name, deck.position_for(1))
-    deck[1] = lw
-    assert deck.highest_z == pytest.approx(lw.wells()[0].top().point.z)
+    fixed_trash = deck.get_fixed_trash()
+    assert deck.highest_z == fixed_trash.highest_z
+    tall_lw = labware.load(tall_lw_name, deck.position_for(1))
+    deck[1] = tall_lw
+    assert deck.highest_z == pytest.approx(tall_lw.wells()[0].top().point.z)
     del deck[1]
-    assert deck.highest_z == 0
+    assert deck.highest_z == fixed_trash.highest_z
     mod = module_geometry.load_module(
         module_geometry.TemperatureModuleModel.TEMPERATURE_V1,
         deck.position_for(8))
@@ -328,6 +330,7 @@ def test_gen2_module_transforms():
 
 def test_instr_max_height():
     deck = Deck()
+    fixed_trash = deck.get_fixed_trash()
     trough = labware.load(trough_name, deck.position_for(1))
     trough2 = labware.load(trough_name, deck.position_for(2))
     deck[1] = trough
@@ -336,28 +339,40 @@ def test_instr_max_height():
     # if the highest deck height is between 1 mm and 10 mm below
     # the max instrument achievable height, we use the max instrument
     # height as the safe height
-    instr_max_height = trough.wells()[0].top().point.z + 1
+    instr_max_height = fixed_trash.wells()[0].top().point.z + 1
     height = safe_height(
-        trough.wells()[0].top(), trough2.wells()[0].top(),
-        deck, round(instr_max_height, 2), 7.0, 15.0)
+        from_loc=trough.wells()[0].top(),
+        to_loc=trough2.wells()[0].top(),
+        deck=deck,
+        instr_max_height=round(instr_max_height, 2),
+        well_z_margin=7.0,
+        lw_z_margin=15.0)
     assert height == round(instr_max_height, 2)
 
     # if the highest deck height is > 10 mm below the max instrument
     # height, we use the lw_z_margin instead
-    instr_max_height = trough.wells()[0].top().point.z + 30
+    instr_max_height = fixed_trash.wells()[0].top().point.z + 30
     height2 = safe_height(
-        trough.wells()[0].top(), trough2.wells()[0].top(),
-        deck, round(instr_max_height, 2), 7.0, 15.0)
+        from_loc=trough.wells()[0].top(),
+        to_loc=trough2.wells()[0].top(),
+        deck=deck,
+        instr_max_height=round(instr_max_height, 2),
+        well_z_margin=7.0,
+        lw_z_margin=15.0)
     assert height2 ==\
-        round(trough.wells()[0].top().point.z, 2) + 15.0
+        round(fixed_trash.wells()[0].top().point.z, 2) + 15.0
 
     # it fails if the highest deck height is less than 1 mm below
     # the max instr achievable height
-    instr_max_height = trough.wells()[0].top().point.z
+    instr_max_height = fixed_trash.wells()[0].top().point.z
     with pytest.raises(Exception):
         safe_height(
-            trough.wells()[0].top(), trough2.wells()[0].top(),
-            deck, round(instr_max_height, 2), 7.0, 15.0)
+            from_loc=trough.wells()[0].top(),
+            to_loc=trough2.wells()[0].top(),
+            deck=deck,
+            instr_max_height=round(instr_max_height, 2),
+            well_z_margin=7.0,
+            lw_z_margin=15.0)
 
 
 def test_first_parent():
