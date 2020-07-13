@@ -3,22 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.19.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-10)
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
 
 
 ### Features
 
 * **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
-
-
-
-
-
-
-
-**Note:** Version bump only for package @opentrons/discovery-client
-
-
 
 
 

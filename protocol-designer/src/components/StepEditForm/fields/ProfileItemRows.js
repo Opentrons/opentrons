@@ -3,11 +3,14 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import cx from 'classnames'
 import {
+  Icon,
   InputField,
   OutlineButton,
-  Icon,
   Tooltip,
+  useConditionalConfirm,
   useHoverTooltip,
+  TOOLTIP_TOP,
+  TOOLTIP_TOP_END,
 } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { getUnsavedForm } from '../../../step-forms/selectors'
@@ -17,6 +20,10 @@ import {
   getProfileFieldErrors,
   maskProfileField,
 } from '../../../steplist/fieldLevel'
+import {
+  ConfirmDeleteModal,
+  DELETE_PROFILE_CYCLE,
+} from '../../modals/ConfirmDeleteModal'
 import { getDynamicFieldFocusHandlerId } from '../utils'
 import styles from '../StepEditForm.css'
 import type {
@@ -50,60 +57,86 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
     dispatch(steplistActions.addProfileStep({ cycleId: cycleItem.id }))
   }
 
+  // TODO IMMEDIATELY make conditional
   const deleteProfileCycle = () =>
     dispatch(steplistActions.deleteProfileCycle({ id: cycleItem.id }))
 
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: 'top',
+  const [
+    addStepToCycleTargetProps,
+    addStepToCycleTooltipProps,
+  ] = useHoverTooltip({
+    placement: TOOLTIP_TOP_END,
+  })
+  const {
+    confirm: confirmDeleteCycle,
+    showConfirmation: showConfirmDeleteCycle,
+    cancel: cancelConfirmDeleteCycle,
+  } = useConditionalConfirm(deleteProfileCycle, true)
+
+  const [deleteCycleTargetProps, deleteCycleTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
   })
 
   return (
-    <div className={styles.profile_cycle_wrapper}>
-      <div className={styles.profile_cycle_group}>
-        {cycleItem.steps.length > 0 && (
-          <div className={styles.cycle_steps}>
-            <div className={styles.cycle_row}>
-              {cycleItem.steps.map((stepItem, index) => {
-                return (
-                  <ProfileStepRow
-                    profileStepItem={stepItem}
-                    focusHandlers={focusHandlers}
-                    key={stepItem.id}
-                    stepNumber={stepOffset + index}
-                    isCycle
-                  />
-                )
-              })}
-            </div>
+    <>
+      {showConfirmDeleteCycle && (
+        <ConfirmDeleteModal
+          modalType={DELETE_PROFILE_CYCLE}
+          onContinueClick={confirmDeleteCycle}
+          onCancelClick={cancelConfirmDeleteCycle}
+        />
+      )}
 
-            <ProfileField
-              name="repetitions"
-              focusHandlers={focusHandlers}
-              profileItem={cycleItem}
-              units={i18n.t('application.units.cycles')}
-              className={cx(styles.small_field, styles.cycles_field)}
-              updateValue={(name, value) =>
-                dispatch(
-                  steplistActions.editProfileCycle({
-                    id: cycleItem.id,
-                    fields: { [name]: value },
-                  })
-                )
-              }
-            />
+      <div className={styles.profile_cycle_wrapper}>
+        <div className={styles.profile_cycle_group}>
+          {cycleItem.steps.length > 0 && (
+            <div className={styles.cycle_steps}>
+              <div className={styles.cycle_row}>
+                {cycleItem.steps.map((stepItem, index) => {
+                  return (
+                    <ProfileStepRow
+                      profileStepItem={stepItem}
+                      focusHandlers={focusHandlers}
+                      key={stepItem.id}
+                      stepNumber={stepOffset + index}
+                      isCycle
+                    />
+                  )
+                })}
+              </div>
+
+              <ProfileField
+                name="repetitions"
+                focusHandlers={focusHandlers}
+                profileItem={cycleItem}
+                units={i18n.t('application.units.cycles')}
+                className={cx(styles.small_field, styles.cycles_field)}
+                updateValue={(name, value) =>
+                  dispatch(
+                    steplistActions.editProfileCycle({
+                      id: cycleItem.id,
+                      fields: { [name]: value },
+                    })
+                  )
+                }
+              />
+            </div>
+          )}
+          <Tooltip {...addStepToCycleTooltipProps}>
+            {i18n.t('tooltip.profile.add_step_to_cycle')}
+          </Tooltip>
+          <div className={styles.add_cycle_step} {...addStepToCycleTargetProps}>
+            <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
           </div>
-        )}
-        <div className={styles.add_cycle_step}>
-          <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
+        </div>
+        <div onClick={confirmDeleteCycle} {...deleteCycleTargetProps}>
+          <Tooltip {...deleteCycleTooltipProps}>
+            {i18n.t('tooltip.profile.delete_cycle')}
+          </Tooltip>
+          <Icon name="close" className={styles.delete_step_icon} />
         </div>
       </div>
-      <div onClick={deleteProfileCycle} {...targetProps}>
-        <Tooltip {...tooltipProps}>
-          {i18n.t('tooltip.step_fields.profileCycle.deleteCycle')}
-        </Tooltip>
-        <Icon name="close" className={styles.delete_step_icon} />
-      </div>
-    </div>
+    </>
   )
 }
 
@@ -115,6 +148,13 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
   const dispatch = useDispatch()
   const addProfileCycle = () => dispatch(steplistActions.addProfileCycle(null))
   const addProfileStep = () => dispatch(steplistActions.addProfileStep(null))
+
+  const [addCycleTargetProps, addCycleTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
+  })
+  const [addStepTargetProps, addStepTooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
+  })
 
   const unsavedForm = useSelector(getUnsavedForm)
   if (!unsavedForm) {
@@ -163,9 +203,29 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
         </div>
       )}
       {rows}
+      <Tooltip {...addStepTooltipProps}>
+        {i18n.t('tooltip.profile.add_step')}
+      </Tooltip>
+      <Tooltip {...addCycleTooltipProps}>
+        {i18n.t('tooltip.profile.add_cycle')}
+      </Tooltip>
       <div className={styles.profile_button_group}>
-        <OutlineButton onClick={addProfileStep}>+ Step</OutlineButton>
-        <OutlineButton onClick={addProfileCycle}>+ Cycle</OutlineButton>
+        <OutlineButton
+          hoverTooltipHandlers={addStepTargetProps}
+          onClick={addProfileStep}
+        >
+          {i18n.t(
+            'form.step_edit_form.field.thermocyclerProfile.add_step_button'
+          )}
+        </OutlineButton>
+        <OutlineButton
+          hoverTooltipHandlers={addCycleTargetProps}
+          onClick={addProfileCycle}
+        >
+          {i18n.t(
+            'form.step_edit_form.field.thermocyclerProfile.add_cycle_button'
+          )}
+        </OutlineButton>
       </div>
     </>
   )
@@ -261,7 +321,7 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
     durationSeconds: i18n.t('application.units.seconds'),
   }
   const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: 'top',
+    placement: TOOLTIP_TOP,
   })
   const fields = names.map(name => {
     const className = name === 'title' ? styles.title : styles.profile_field
@@ -295,7 +355,7 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
         {...targetProps}
       >
         <Tooltip {...tooltipProps}>
-          {i18n.t('tooltip.step_fields.profileStepRow.deleteStep')}
+          {i18n.t('tooltip.profile.delete_step')}
         </Tooltip>
         <Icon name="close" className={styles.delete_step_icon} />
       </div>

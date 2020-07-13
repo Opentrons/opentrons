@@ -126,7 +126,7 @@ describe('analytics epics', () => {
       })
     })
 
-    it('noops on no change in status', () => {
+    it('noops on no change in status or if config not yet initialized', () => {
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('----')
         const state$ = hot('-a-b', { a: on, b: on })
@@ -150,6 +150,16 @@ describe('analytics epics', () => {
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('----')
         const state$ = hot('-a-b', { a: { config: null }, b: { config: null } })
+        const output$ = analyticsEpic(action$, state$)
+
+        expectObservable(output$).toBe('----')
+        flush()
+        expect(setMixpanelTracking).toHaveBeenCalledTimes(0)
+      })
+
+      testScheduler.run(({ hot, expectObservable, flush }) => {
+        const action$ = hot('----')
+        const state$ = hot('-a-b', { a: { config: null }, b: on })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('----')

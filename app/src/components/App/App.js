@@ -20,7 +20,7 @@ import { Upload } from '../../pages/Upload'
 import { Calibrate } from '../../pages/Calibrate'
 import { Run } from '../../pages/Run'
 import { SidePanel } from '../../pages/SidePanel'
-import { NavBar } from '../nav-bar'
+import { Navbar } from '../Navbar'
 import { Alerts } from '../Alerts'
 import { PortalRoot as ModalPortalRoot } from '../portal'
 
@@ -67,14 +67,14 @@ export function App(): React.Node {
         onDragOver={stopEvent}
         onDrop={stopEvent}
       >
-        <NavBar />
+        <Navbar />
         <SidePanel />
         <Box position={POSITION_RELATIVE} width="100%" height="100%">
           <Switch>
             <Route path="/robots/:name?">
               <Robots />
             </Route>
-            <Route path="/menu">
+            <Route path="/more">
               <More />
             </Route>
             <Route path="/upload">

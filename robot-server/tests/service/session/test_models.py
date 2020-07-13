@@ -3,21 +3,21 @@ from robot_server.service.session import models
 
 
 def test_command_type_validation_jog():
-    c = models.SessionCommand(**{'command': models.CommandName.jog,
-                                 'data': {'vector': [1, 2, 3]}})
-    assert c.data == models.calibration_models.JogPosition(vector=(1, 2, 3,))
+    c = models.BasicSessionCommand(**{'command': models.CalibrationCommand.jog,
+                                      'data': {'vector': [1, 2, 3]}})
+    assert c.data == models.JogPosition(vector=(1, 2, 3,))
 
 
 def test_command_type_validation_jog_fail():
     with pytest.raises(ValueError):
-        models.SessionCommand(**{'command': models.CommandName.jog,
-                                 'data': {}})
+        models.BasicSessionCommand(**{'command': models.CalibrationCommand.jog,
+                                      'data': {}})
 
 
 def test_command_type_empty():
     """Test that we create command correctly for
      commands that have no added data."""
-    c = models.SessionCommand(
-        **{'command': models.CommandName.prepare_pipette,
+    c = models.BasicSessionCommand(
+        **{'command': models.CalibrationCommand.prepare_pipette,
            'data': {}})
     assert c.data == models.EmptyModel()

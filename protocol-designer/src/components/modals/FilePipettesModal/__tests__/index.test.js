@@ -57,7 +57,6 @@ describe('FilePipettesModal', () => {
       hideModal: false,
       onCancel: jest.fn(),
       onSave: jest.fn(),
-      thermocyclerEnabled: true,
       moduleRestrictionsDisabled: false,
     }
   })
@@ -127,7 +126,6 @@ describe('FilePipettesModal', () => {
       const pipetteFields = wrapper.find(PipetteFields)
 
       expect(moduleFields.prop('values')).toEqual(props.initialModuleValues)
-      expect(moduleFields.prop('thermocyclerEnabled')).toBe(true)
       expect(pipetteFields.prop('values')).toEqual(props.initialPipetteValues)
     })
   })

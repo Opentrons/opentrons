@@ -17,6 +17,7 @@ import {
 } from '../../../../tutorial'
 
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
+import * as fileDataSelectors from '../../../../file-data/selectors'
 import type { DuplicateStepAction } from '../types'
 
 import type { StepType, StepIdType, FormData } from '../../../../form-types'
@@ -25,7 +26,9 @@ import type { ThunkAction } from '../../../../types'
 export const addAndSelectStepWithHints: ({
   stepType: StepType,
 }) => ThunkAction<any> = payload => (dispatch, getState) => {
-  dispatch(addStep({ stepType: payload.stepType }))
+  const robotStateTimeline = fileDataSelectors.getRobotStateTimeline(getState())
+  dispatch(addStep({ stepType: payload.stepType, robotStateTimeline }))
+
   const state = getState()
   const deckHasLiquid = labwareIngredsSelectors.getDeckHasLiquid(state)
   const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
@@ -175,7 +178,12 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
   dispatch(_saveStepForm(unsavedSetTemperatureForm))
 
   // add a new pause step form
-  dispatch(addStep({ stepType: 'pause' }))
+  dispatch(
+    addStep({
+      stepType: 'pause',
+      robotStateTimeline: fileDataSelectors.getRobotStateTimeline(getState()),
+    })
+  )
 
   // NOTE: fields should be set one at a time b/c dependentFieldsUpdate fns can filter out inputs
   // contingent on other inputs (eg changing the pauseAction radio button may clear the pauseTemperature).

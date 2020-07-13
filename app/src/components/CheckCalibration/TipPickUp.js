@@ -113,9 +113,7 @@ export function TipPickUp(props: TipPickUpProps): React.Node {
             <p className={styles.tip_pick_up_demo_body}>
               {jogUntilAbove}
               <b>&nbsp;{tipRackWellName}&nbsp;</b>
-              {POSITION}
-              <br />
-              {AND}
+              {`${POSITION} ${AND}`}
               <b>&nbsp;{FLUSH}&nbsp;</b>
               {WITH_TOP_OF_TIP}
             </p>

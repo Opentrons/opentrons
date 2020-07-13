@@ -1,7 +1,6 @@
 // @flow
 import assert from 'assert'
 import reduce from 'lodash/reduce'
-import omit from 'lodash/omit'
 import * as React from 'react'
 import cx from 'classnames'
 import { Formik } from 'formik'
@@ -72,7 +71,6 @@ export type Props = {|
     pipettes: Array<PipetteFieldsData>,
     modules: Array<ModuleCreationArgs>,
   |}) => mixed,
-  thermocyclerEnabled: ?boolean,
   moduleRestrictionsDisabled: ?boolean,
 |}
 
@@ -298,10 +296,6 @@ export class FilePipettesModal extends React.Component<Props, State> {
                     (hasCrashableMagnetModuleSelected ||
                       hasCrashableTemperatureModuleSelected)
 
-                  const visibleModules = this.props.thermocyclerEnabled
-                    ? values.modulesByType
-                    : omit(values.modulesByType, THERMOCYCLER_MODULE_TYPE)
-
                   return (
                     <>
                       <form onSubmit={handleSubmit}>
@@ -357,10 +351,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                             </h2>
                             <ModuleFields
                               errors={errors.modulesByType ?? null}
-                              values={visibleModules}
-                              thermocyclerEnabled={
-                                this.props.thermocyclerEnabled
-                              }
+                              values={values.modulesByType}
                               onFieldChange={handleChange}
                               onSetFieldValue={setFieldValue}
                               onBlur={handleBlur}

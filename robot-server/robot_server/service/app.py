@@ -19,6 +19,7 @@ from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
 from robot_server.service.access.router import router as access_router
 from robot_server.service.session.router import router as session_router
+from robot_server.service.labware.router import router as labware_router
 
 
 log = logging.getLogger(__name__)
@@ -49,6 +50,8 @@ routes.include_router(router=session_router,
                       tags=["Session Management"])
 routes.include_router(router=access_router,
                       tags=["Access Control"])
+routes.include_router(router=labware_router,
+                      tags=["Labware Calibration Management"])
 
 app.include_router(router=routes,
                    responses={

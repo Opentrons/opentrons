@@ -40,10 +40,6 @@
   padding: 0;
 }
 
-.notification {
-  color: var(--c-orange);
-}
-
 .link_text {
   flex: 1;
   margin: 0 0.5rem;

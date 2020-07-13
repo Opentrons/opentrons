@@ -230,6 +230,14 @@
   text-transform: uppercase;
 }
 
+.align_left {
+  text-align: left;
+}
+
+.align_right {
+  text-align: right;
+}
+
 /* TODO: similar to .substep_header .step_subitem_channel_row */
 .profile_substep_header {
   display: flex;
@@ -299,10 +307,14 @@
 
 .cycle_step_row {
   border-right: 2px solid var(--c-med-gray);
-  width: 12rem;
+  width: 13.4rem;
   display: flex;
   justify-content: space-between;
   padding: 1em 1.25rem 1rem 0;
+
+  & > * {
+    flex: 1;
+  }
 }
 
 .cycle_repetitions {

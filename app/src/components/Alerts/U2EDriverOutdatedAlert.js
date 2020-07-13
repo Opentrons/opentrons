@@ -26,7 +26,7 @@ const VIEW_ADAPTER_INFO = 'view adapter info'
 const GET_UPDATE = 'get update'
 const DONT_REMIND_ME_AGAIN = "Don't remind me again"
 
-const ADAPTER_INFO_URL = '/menu/network-and-system'
+const ADAPTER_INFO_URL = '/more/network-and-system'
 
 const LinkButton = styled(Link)`
   width: auto;

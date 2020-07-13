@@ -23,7 +23,6 @@ describe('File Page', () => {
       goToNextPage: () => null,
       saveFileMetadata: () => null,
       swapPipettes: () => null,
-      thermocyclerEnabled: false,
       modules: {},
     }
     mockStore = {

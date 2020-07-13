@@ -1,6 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`alerts success alert renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="alert success"
 >
@@ -9,10 +17,11 @@ exports[`alerts success alert renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="icon"
+      className="sc-AxmLO c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <path
         d="M9.6,18 L3.6,12 L5.292,10.296 L9.6,14.604 L18.708,5.496 L20.4,7.2 L9.6,18 Z M12,5.32907052e-16 C5.372583,-2.13162821e-15 5.32907052e-16,5.372583 0,12 C-1.59872116e-15,15.1825979 1.26428208,18.2348448 3.51471863,20.4852814 C5.76515517,22.7357179 8.81740212,24 12,24 C15.1825979,24 18.2348448,22.7357179 20.4852814,20.4852814 C22.7357179,18.2348448 24,15.1825979 24,12 C24,8.81740212 22.7357179,5.76515517 20.4852814,3.51471863 C18.2348448,1.26428208 15.1825979,2.66453526e-16 12,5.32907052e-16 Z"
@@ -29,6 +38,14 @@ exports[`alerts success alert renders correctly 1`] = `
 `;
 
 exports[`alerts warning alert onCloseClick renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="alert warning"
 >
@@ -37,10 +54,11 @@ exports[`alerts warning alert onCloseClick renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="icon"
+      className="sc-AxmLO c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <path
         d="M12 .33A11.67 11.67 0 1 0 23.67 12 11.67 11.67 0 0 0 12 .33zm1.17 17.5h-2.34V15.5h2.33zm0-4.67h-2.34v-7h2.33z"
@@ -59,10 +77,11 @@ exports[`alerts warning alert onCloseClick renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="button_only_icon"
+        className="sc-AxmLO c0 button_only_icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           d="M18 7.209L16.791 6 12 10.791 7.209 6 6 7.209 10.791 12 6 16.791 7.209 18 12 13.209 16.791 18 18 16.791 13.209 12z"
@@ -75,6 +94,14 @@ exports[`alerts warning alert onCloseClick renders correctly 1`] = `
 `;
 
 exports[`alerts warning alert renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="alert warning"
 >
@@ -83,10 +110,11 @@ exports[`alerts warning alert renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="icon"
+      className="sc-AxmLO c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <path
         d="M12 .33A11.67 11.67 0 1 0 23.67 12 11.67 11.67 0 0 0 12 .33zm1.17 17.5h-2.34V15.5h2.33zm0-4.67h-2.34v-7h2.33z"
@@ -103,6 +131,14 @@ exports[`alerts warning alert renders correctly 1`] = `
 `;
 
 exports[`alerts warning alert with message body renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="alert warning"
 >
@@ -111,10 +147,11 @@ exports[`alerts warning alert with message body renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="icon"
+      className="sc-AxmLO c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <path
         d="M12 .33A11.67 11.67 0 1 0 23.67 12 11.67 11.67 0 0 0 12 .33zm1.17 17.5h-2.34V15.5h2.33zm0-4.67h-2.34v-7h2.33z"
@@ -133,10 +170,11 @@ exports[`alerts warning alert with message body renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="button_only_icon"
+        className="sc-AxmLO c0 button_only_icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           d="M18 7.209L16.791 6 12 10.791 7.209 6 6 7.209 10.791 12 6 16.791 7.209 18 12 13.209 16.791 18 18 16.791 13.209 12z"

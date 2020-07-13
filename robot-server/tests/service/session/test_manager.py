@@ -2,10 +2,13 @@ import asyncio
 from unittest.mock import patch, MagicMock
 import pytest
 
-from robot_server.service.session.errors import SessionCreationException
+
+from robot_server.service.session.errors import SessionCreationException, \
+    SessionException
 from robot_server.service.session.manager import SessionManager, \
     SessionMetaData
 from robot_server.service.session.models import create_identifier, SessionType
+from robot_server.service.session.session_types import DefaultSession
 
 
 async def side_effect(*args, **kwargs):
@@ -51,7 +54,7 @@ async def test_add_stores_session(manager):
 async def test_add_activates_session(manager):
     """Test that adding a session also makes that new session active"""
     session = await manager.add(SessionType.null)
-    assert manager._active_session_id == session.meta.identifier
+    assert manager._active.active_id == session.meta.identifier
 
 
 async def test_remove_removes(manager):
@@ -69,16 +72,16 @@ async def test_remove_calls_cleanup(manager):
 
 async def test_remove_active_session(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.meta.identifier
+    manager._active.active_id = session.meta.identifier
     await manager.remove(session.meta.identifier)
-    assert manager._active_session_id is None
+    assert manager._active.active_id is manager._active.default_id
 
 
 async def test_remove_inactive_session(manager):
     session = await manager.add(SessionType.null)
     active_session = await manager.add(SessionType.null)
     await manager.remove(session.meta.identifier)
-    assert manager._active_session_id is active_session.meta.identifier
+    assert manager._active.active_id is active_session.meta.identifier
 
 
 async def test_remove_unknown_session(manager):
@@ -99,18 +102,18 @@ async def test_get_by_type(manager):
 
 async def test_get_active(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.meta.identifier
+    manager._active.active_id = session.meta.identifier
     assert manager.get_active() is session
 
 
-def test_get_active_no_active(manager):
-    manager._active_session_id = None
-    assert manager.get_active() is None
+def test_get_active_no_active_returns_default(manager):
+    manager._active.active_id = None
+    assert manager.get_active() is manager._sessions[DefaultSession.DEFAULT_ID]
 
 
 async def test_is_active(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.meta.identifier
+    manager._active.active_id = session.meta.identifier
     assert manager.is_active(session.meta.identifier) is True
 
 
@@ -121,28 +124,46 @@ def test_is_active_not_active(manager):
 async def test_activate(manager):
     session = await manager.add(SessionType.null)
     assert manager.activate(session.meta.identifier) is session
-    assert manager._active_session_id == session.meta.identifier
+    assert manager._active.active_id == session.meta.identifier
 
 
 def test_activate_unknown_session(manager):
     assert manager.activate(create_identifier()) is None
-    assert manager._active_session_id is None
+    assert manager._active.active_id is manager._active.default_id
 
 
 async def test_deactivate(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.meta.identifier
+    manager._active.active_id = session.meta.identifier
     assert manager.deactivate(session.meta.identifier) is session
-    assert manager._active_session_id is None
+    assert manager._active.active_id is manager._active.default_id
 
 
 async def test_deactivate_unknown_session(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.meta.identifier
+    manager._active.active_id = session.meta.identifier
     assert manager.deactivate(create_identifier()) is None
-    assert manager._active_session_id is session.meta.identifier
+    assert manager._active.active_id is session.meta.identifier
 
 
 def test_deactivate_non_active(manager):
-    manager._active_session_id = None
+    manager._active.active_id = None
     assert manager.deactivate(create_identifier()) is None
+
+
+class TestDefaultSession:
+
+    def test_always_present(self, manager):
+        assert manager.get_by_id(DefaultSession.DEFAULT_ID) is not None
+
+    def test_default_is_active(self, manager):
+        """Test that default is active if no other session is active"""
+        assert manager.is_active(DefaultSession.DEFAULT_ID) is True
+
+    async def test_add_fails(self, manager):
+        with pytest.raises(SessionCreationException):
+            await manager.add(session_type=SessionType.default)
+
+    async def test_remove_fails(self, manager):
+        with pytest.raises(SessionException):
+            await manager.remove(DefaultSession.DEFAULT_ID)

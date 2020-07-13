@@ -38,7 +38,7 @@ export function AppInfoCard(props: AppInfoCardProps): React.Node {
       <CardContentHalf>
         <OutlineButton
           Component={Link}
-          to="/menu/app/update"
+          to="/more/app/update"
           disabled={!availableVersion}
           className={styles.show_update_button}
         >

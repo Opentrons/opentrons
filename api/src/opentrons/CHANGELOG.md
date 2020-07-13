@@ -3,35 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.19.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-10)
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
 
 
 ### Bug Fixes
 
 * **api:** catch factory tests up to gpio changes ([#5747](https://github.com/Opentrons/opentrons/issues/5747)) ([751d9a4](https://github.com/Opentrons/opentrons/commit/751d9a4))
 * **api:** convert extra seconds to minutes in delay command ([#5755](https://github.com/Opentrons/opentrons/issues/5755)) ([df26e07](https://github.com/Opentrons/opentrons/commit/df26e07)), closes [#5414](https://github.com/Opentrons/opentrons/issues/5414)
+* **api:** disallow calling Session._run while protocol is running. ([#5831](https://github.com/Opentrons/opentrons/issues/5831)) ([fce1f79](https://github.com/Opentrons/opentrons/commit/fce1f79)), closes [#5239](https://github.com/Opentrons/opentrons/issues/5239)
 * **api:** do not allow v1 imports in v2 protocols ([#5859](https://github.com/Opentrons/opentrons/issues/5859)) ([7ed945d](https://github.com/Opentrons/opentrons/commit/7ed945d)), closes [#5852](https://github.com/Opentrons/opentrons/issues/5852)
 * **api:** Enable audio on GPIO startup ([#5787](https://github.com/Opentrons/opentrons/issues/5787)) ([907401c](https://github.com/Opentrons/opentrons/commit/907401c)), closes [/github.com/Opentrons/opentrons/blob/751d9a402fa5d1f936df43ed12fd7387be23237f/api/src/opentrons/tools/factory_test.py#L217](https://github.com//github.com/Opentrons/opentrons/blob/751d9a402fa5d1f936df43ed12fd7387be23237f/api/src/opentrons/tools/factory_test.py/issues/L217)
 * **api:** Fix return tip behavior in check session ([#5772](https://github.com/Opentrons/opentrons/issues/5772)) ([34ef09c](https://github.com/Opentrons/opentrons/commit/34ef09c))
+* **api:** fix transform type logic in calibration check session ([#5951](https://github.com/Opentrons/opentrons/issues/5951)) ([bcb566e](https://github.com/Opentrons/opentrons/commit/bcb566e))
 * **api:** prevent thermocycler wait_for_temp() from exiting prematurely ([#5807](https://github.com/Opentrons/opentrons/issues/5807)) ([7720b28](https://github.com/Opentrons/opentrons/commit/7720b28)), closes [#5602](https://github.com/Opentrons/opentrons/issues/5602)
 * **api:** return rail lights to original state post cal-check ([#5861](https://github.com/Opentrons/opentrons/issues/5861)) ([3a6cc41](https://github.com/Opentrons/opentrons/commit/3a6cc41))
+* **api:** Simulate protocols with a realistic deck transform ([#5908](https://github.com/Opentrons/opentrons/issues/5908)) ([03757d9](https://github.com/Opentrons/opentrons/commit/03757d9))
+* **robot-server, api:** reject commands while robot is moving ([#5878](https://github.com/Opentrons/opentrons/issues/5878)) ([d8c63d7](https://github.com/Opentrons/opentrons/commit/d8c63d7)), closes [#5810](https://github.com/Opentrons/opentrons/issues/5810)
 
 
 ### Features
 
 * **api:** add info to debug warning on how IS_ROBOT is determined ([#5783](https://github.com/Opentrons/opentrons/issues/5783)) ([fbbf1b6](https://github.com/Opentrons/opentrons/commit/fbbf1b6))
 * **api:** add skeleton state machine instance for tip length calibration ([#5805](https://github.com/Opentrons/opentrons/issues/5805)) ([dd36d53](https://github.com/Opentrons/opentrons/commit/dd36d53)), closes [#5605](https://github.com/Opentrons/opentrons/issues/5605)
+* **api:** define data architecture for tip length calibration in v2 ([#5820](https://github.com/Opentrons/opentrons/issues/5820)) ([f149cb6](https://github.com/Opentrons/opentrons/commit/f149cb6)), closes [#5606](https://github.com/Opentrons/opentrons/issues/5606)
+* **api, app:** Check Robot Deck Transform ([#5845](https://github.com/Opentrons/opentrons/issues/5845)) ([ed67383](https://github.com/Opentrons/opentrons/commit/ed67383))
 * **api, app:** implement automatic door safety stop feature ([#5706](https://github.com/Opentrons/opentrons/issues/5706)) ([ad94d07](https://github.com/Opentrons/opentrons/commit/ad94d07)), closes [#2820](https://github.com/Opentrons/opentrons/issues/2820) [#2752](https://github.com/Opentrons/opentrons/issues/2752)
+* **api, docs:** add GPIO rail lights and door control to ProtocolContext ([#5862](https://github.com/Opentrons/opentrons/issues/5862)) ([4d5d89f](https://github.com/Opentrons/opentrons/commit/4d5d89f)), closes [#5775](https://github.com/Opentrons/opentrons/issues/5775) [#5703](https://github.com/Opentrons/opentrons/issues/5703)
+* **robot-server:** Add skeleton of tip calibration session including integration test.' ([#5868](https://github.com/Opentrons/opentrons/issues/5868)) ([c66f8ae](https://github.com/Opentrons/opentrons/commit/c66f8ae))
 * **robot-server:** session manager ([#5796](https://github.com/Opentrons/opentrons/issues/5796)) ([c1fd7e8](https://github.com/Opentrons/opentrons/commit/c1fd7e8)), closes [#5763](https://github.com/Opentrons/opentrons/issues/5763) [#5765](https://github.com/Opentrons/opentrons/issues/5765)
-
-
-
-
-
-
-
-**Note:** Version bump only for package @opentrons/api-server
-
 
 
 

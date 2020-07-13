@@ -8,8 +8,8 @@
     "description_1": "Turn off all restrictions on module placement and related pipette crash guidance.",
     "description_2": "NOT recommended! Switching from default positions may cause crashes and the Protocol Designer cannot yet give guidance on what to expect. Use at your own discretion. "
   },
-  "OT_PD_ENABLE_THERMOCYCLER": {
-    "title": "Enable thermocycler module",
-    "description": "Allow adding thermocycler modules and steps to protocols."
+  "OT_PD_ENABLE_AIR_GAP_AND_DELAY": {
+    "title": "Enable Air Gap & Delay",
+    "description": "Allow using the Air Gap and the Delay advanced settings in steps."
   }
 }

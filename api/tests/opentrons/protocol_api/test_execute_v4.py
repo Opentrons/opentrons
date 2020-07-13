@@ -105,9 +105,9 @@ def thermocycler_module_command_map(mockObj):
 
 def test_load_modules_from_json():
     def fake_module(model, slot=None):
-        return (model, slot)
+        return 'mock_module_ctx_' + model
     ctx = mock.create_autospec(ProtocolContext)
-    ctx.load_module = fake_module
+    ctx.load_module.side_effect = fake_module
     protocol = {'modules': {
         'aID': {'slot': '1', 'model': 'magneticModuleV1'},
         'bID': {'slot': '4', 'model': 'temperatureModuleV2'},
@@ -117,9 +117,18 @@ def test_load_modules_from_json():
     }}
     result = load_modules_from_json(ctx, protocol)
 
-    assert result == {'aID': ('magneticModuleV1', '1'),
-                      'bID': ('temperatureModuleV2', '4'),
-                      'cID': ('thermocyclerModuleV1', None)}
+    # load_module should be called in a deterministic order
+    assert ctx.mock_calls == [
+        mock.call.load_module('magneticModuleV1', '1'),
+        mock.call.load_module('temperatureModuleV2', '4'),
+        mock.call.load_module('thermocyclerModuleV1')
+    ]
+
+    # resulting dict should have ModuleContext objects (from calling
+    # load_module) as its values
+    assert result == {'aID': 'mock_module_ctx_magneticModuleV1',
+                      'bID': 'mock_module_ctx_temperatureModuleV2',
+                      'cID': 'mock_module_ctx_thermocyclerModuleV1'}
 
 
 def test_engage_magnet():

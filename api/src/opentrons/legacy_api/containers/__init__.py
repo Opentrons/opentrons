@@ -2,6 +2,7 @@ from collections import OrderedDict
 import itertools
 import logging
 import json
+from typing import TYPE_CHECKING
 from opentrons.config import CONFIG
 from opentrons.data_storage import database
 from opentrons.util.vector import Vector
@@ -19,6 +20,10 @@ from .placeable import (
 from opentrons.helpers import helpers
 
 from opentrons.protocol_api import labware as new_labware
+
+if TYPE_CHECKING:
+    from opentrons.protocol_api.dev_types import TipLengthCalibration
+
 
 __all__ = [
     'Deck',
@@ -278,3 +283,12 @@ def load_new_labware_def(definition):
             definition['wells'][well_name], saved_offset, lw_quirks)
         container.add(well_obj, well_name, well_pos)
     return container
+
+
+def load_tip_length_calibration(
+        pip_id: str, location) -> 'TipLengthCalibration':
+    placeable, _ = unpack_location(location)
+    lw = placeable.get_parent()
+    return new_labware.get_tip_length_data(
+        pip_id=pip_id, labware_hash=lw.properties['labware_hash'],
+        labware_load_name=lw.properties['type'])

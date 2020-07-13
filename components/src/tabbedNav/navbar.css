@@ -73,10 +73,6 @@
   color: var(--c-charcoal);
 }
 
-.notification {
-  color: var(--c-orange);
-}
-
 .no_link {
   text-decoration: none;
   color: inherit;

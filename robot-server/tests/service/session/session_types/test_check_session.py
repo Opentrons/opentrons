@@ -1,18 +1,19 @@
 import pytest
 from unittest.mock import MagicMock, PropertyMock, patch
 
-from opentrons.calibration.check.session import CheckCalibrationSession, \
-    CalibrationCheckState, CalibrationCheckTrigger
-from opentrons.calibration.check.models import JogPosition
-from opentrons.calibration.helper_classes import PipetteInfo, PipetteRank
+from robot_server.robot.calibration.check.session import \
+    CheckCalibrationSession, CalibrationCheckState, CalibrationCheckTrigger
+from robot_server.robot.calibration.helper_classes import PipetteInfo,\
+    PipetteRank
 from opentrons import types
-from opentrons.calibration.session import CalibrationException, \
+from robot_server.robot.calibration.session import CalibrationException, \
     NoPipetteException
-from opentrons.calibration.util import StateMachineError
+from robot_server.robot.calibration.check.util import StateMachineError
 
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import CommandName, EmptyModel
+from robot_server.service.session.models import (EmptyModel, JogPosition,
+                                                 CalibrationCommand)
 from robot_server.service.session.session_types import CheckSession, \
     SessionMetaData, BaseSession
 
@@ -67,7 +68,7 @@ def mock_cal_session(hardware):
     m.trigger_transition = MagicMock(side_effect=async_mock)
     m.delete_session = MagicMock(side_effect=async_mock)
 
-    path = 'opentrons.calibration.check.session.' \
+    path = 'robot_server.robot.calibration.check.session.' \
            'CheckCalibrationSession.current_state_name'
     with patch(path, new_callable=PropertyMock) as p:
         p.return_value = CalibrationCheckState.preparingFirstPipette.value
@@ -169,12 +170,12 @@ async def test_session_command_execute(check_session_instance,
                                        mock_cal_session):
     await check_session_instance.command_executor.execute(
         create_command(
-            CommandName.jog,
+            CalibrationCommand.jog,
             JogPosition(vector=(1, 2, 3)))
     )
 
     mock_cal_session.trigger_transition.assert_called_once_with(
-        trigger="jog",
+        trigger="calibration.jog",
         vector=(1.0, 2.0, 3.0)
     )
 
@@ -183,12 +184,12 @@ async def test_session_command_execute_no_body(check_session_instance,
                                                mock_cal_session):
     await check_session_instance.command_executor.execute(
         create_command(
-            CommandName.load_labware,
+            CalibrationCommand.load_labware,
             EmptyModel())
     )
 
     mock_cal_session.trigger_transition.assert_called_once_with(
-        trigger="loadLabware"
+        trigger="calibration.loadLabware"
     )
 
 
@@ -208,5 +209,6 @@ async def test_session_command_execute_raise(check_session_instance,
 
     with pytest.raises(SessionCommandException):
         await check_session_instance.command_executor.execute(
-            create_command(CommandName.jog, JogPosition(vector=(1, 2, 3)))
+            create_command(CalibrationCommand.jog,
+                           JogPosition(vector=(1, 2, 3)))
         )

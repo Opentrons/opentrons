@@ -45,8 +45,6 @@ test_name: Multiple Session Lifecycle
 marks:
   - usefixtures:
       - run_server
-strict:
-  - json:off
 stages:
   - name: Create a null session
     request:
@@ -86,14 +84,24 @@ stages:
       status_code: 200
       json:
         data:
+        - id: "default"
+          type: Session
+          attributes:
+            sessionType: "default"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            details: {}
         - id: "{session_id_1}"
           type: Session
           attributes:
             sessionType: "null"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            details: {}
         - id: "{session_id_2}"
           type: Session
           attributes:
             sessionType: "calibrationCheck"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            details: !anydict
 
   - name: Get just the calcheck sessions
     request:
@@ -107,6 +115,8 @@ stages:
           type: Session
           attributes:
             sessionType: "calibrationCheck"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            details: !anydict
 
   - name: Delete session 1
     request:
@@ -129,4 +139,10 @@ stages:
     response:
       status_code: 200
       json:
-        data: []
+        data:
+        - id: "default"
+          type: Session
+          attributes:
+            sessionType: "default"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            details: {}

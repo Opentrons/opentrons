@@ -36,7 +36,6 @@ export function RobotListItem(props: RobotListItemProps): React.Node {
           name={isLocal ? 'usb' : 'wifi'}
           className={styles.robot_item_icon}
           childName={isUpgradable ? 'circle' : null}
-          childClassName={styles.notification}
         />
         <p className={styles.link_text}>{displayName}</p>
         {isConnectable ? (

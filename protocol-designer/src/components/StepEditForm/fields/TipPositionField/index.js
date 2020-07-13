@@ -38,8 +38,8 @@ type OP = {| fieldName: TipOffsetFields, className?: string |}
 
 type SP = {|
   disabled: boolean,
-  mmFromBottom: number,
-  wellDepthMm: number,
+  mmFromBottom: number | null,
+  wellDepthMm: number | null,
 |}
 
 type Props = { ...OP, ...SP }
@@ -60,10 +60,10 @@ function TipPositionInput(props: Props) {
   const isTouchTipField = getIsTouchTipField(props.fieldName)
 
   let value = ''
-  if (wellDepthMm != null) {
+  if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     value =
-      mmFromBottom != null
+      mmFromBottom !== null
         ? mmFromBottom
         : getDefaultMmFromBottom({ fieldName, wellDepthMm })
   }
@@ -141,10 +141,8 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
   return {
     disabled: rawForm ? getDisabledFields(rawForm).has(fieldName) : false,
-    // $FlowFixMe(mc, 2020-06-05): fix types here and in TipPositionModal
     wellDepthMm,
-    // $FlowFixMe(mc, 2020-06-05): fix types here and in TipPositionModal
-    mmFromBottom: rawForm && rawForm[fieldName],
+    mmFromBottom: rawForm?.[fieldName] ?? null,
   }
 }
 

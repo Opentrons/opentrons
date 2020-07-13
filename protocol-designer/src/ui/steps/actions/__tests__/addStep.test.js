@@ -15,9 +15,12 @@ beforeEach(() => {
 describe('addStep', () => {
   it('should dispatch an ADD_STEP action with given stepType and a UUID', () => {
     const stepType = 'transfer'
-    expect(addStep({ stepType })).toEqual({
-      type: 'ADD_STEP',
-      payload: { stepType, id },
-    })
+    expect(addStep({ stepType, robotStateTimeline: { timeline: [] } })).toEqual(
+      {
+        type: 'ADD_STEP',
+        payload: { stepType, id },
+        meta: { robotStateTimeline: { timeline: [] } },
+      }
+    )
   })
 })

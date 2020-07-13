@@ -17,7 +17,7 @@ export const getDisableModuleRestrictions: Selector<?boolean> = createSelector(
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
 
-export const getEnableThermocycler: Selector<?boolean> = createSelector(
+export const getEnableAirGapDelay: Selector<?boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_THERMOCYCLER
+  flags => flags.OT_PD_ENABLE_AIR_GAP_AND_DELAY
 )

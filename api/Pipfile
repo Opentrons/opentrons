@@ -16,7 +16,6 @@ mypy = "==0.770"
 numpydoc = "==0.9.1"
 pylama = "*"
 pytest = "==5.4.1"
-pytest-aiohttp = "*"
 pytest-cov = "*"
 pygments = "*"
 sphinx = "==2.2.0"
@@ -24,11 +23,10 @@ twine = "==2.0.0"
 typing-extensions = "*"
 wheel = "==0.30.0"
 "e1839a8" = {editable = true, path = "."}
-graphviz = "*"
 "c445fee" = {editable = true, path = "./../shared-data/python"}
+pytest-aiohttp = "*"
 
 [packages]
-aiohttp = "==3.4.4"
 aionotify = "==0.2.0"
 jsonrpcserver = "==4.0.3"
 jsonschema = "==3.0.2"
@@ -36,4 +34,3 @@ numpy = "==1.15.1"
 pyserial = "==3.4"
 systemd-python = {version="==234", sys_platform="== 'linux'"}
 urwid = "==1.3.1"
-pydantic = "==1.4.0"

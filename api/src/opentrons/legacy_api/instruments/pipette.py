@@ -5,14 +5,14 @@ import warnings
 import logging
 import time
 from opentrons import commands
-from ..containers import unpack_location
+from ..containers import unpack_location, load_tip_length_calibration
 from ..containers.placeable import (
     Container, Placeable, WellSeries
 )
 from opentrons.commands import CommandPublisher, do_publish
 from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
-from opentrons.config import pipette_config
+from opentrons.config import pipette_config, feature_flags as ff
 
 log = logging.getLogger(__name__)
 
@@ -148,7 +148,8 @@ class Pipette(CommandPublisher):
             quirks=[],
             fallback_tip_length=51.7,
             blow_out_flow_rate=None,
-            requested_as=None):
+            requested_as=None,
+            pipette_id=None):
 
         super().__init__(robot.broker)
         self.robot = robot
@@ -252,6 +253,7 @@ class Pipette(CommandPublisher):
 
         self.quirks = quirks if isinstance(quirks, list) else []
         self.requested_as = requested_as or self.name
+        self.pipette_id = pipette_id
 
     def reset(self):
         """
@@ -1048,9 +1050,11 @@ class Pipette(CommandPublisher):
                 self.move_to(
                     self.current_tip().top(0),
                     strategy='direct')
-            self._add_tip(
-                length=self._tip_length
-            )
+            if ff.enable_tip_length_calibration() and self.pipette_id:
+                tip_length_cal = load_tip_length_calibration(
+                    self.pipette_id, location)
+                self._tip_length = tip_length_cal['tipLength']
+            self._add_tip(length=self._tip_length)
             # neighboring tips tend to get stuck in the space between
             # the volume chamber and the drop-tip sleeve on p1000.
             # This extra shake ensures those tips are removed
@@ -1801,6 +1805,10 @@ class Pipette(CommandPublisher):
         # TODO (andy): tip length should be retrieved from tip-rack's labware
         # definition, unblocking ability to use multiple types of tips
         return self.robot.config.tip_length[self.model]
+
+    @_tip_length.setter
+    def _tip_length(self, tip_length: float):
+        self._tip_length = tip_length
 
     def set_speed(self, aspirate=None, dispense=None, blow_out=None):
         """

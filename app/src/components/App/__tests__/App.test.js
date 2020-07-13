@@ -10,7 +10,7 @@ import { More } from '../../../pages/More'
 import { Upload } from '../../../pages/Upload'
 import { Calibrate } from '../../../pages/Calibrate'
 import { Run } from '../../../pages/Run'
-import { NavBar } from '../../nav-bar'
+import { Navbar } from '../../Navbar'
 import { PortalRoot } from '../../portal'
 import { Alerts } from '../../Alerts'
 
@@ -21,7 +21,7 @@ jest.mock('../../../pages/More', () => ({ More: () => <></> }))
 jest.mock('../../../pages/Upload', () => ({ Upload: () => <></> }))
 jest.mock('../../../pages/Calibrate', () => ({ Calibrate: () => <></> }))
 jest.mock('../../../pages/Run', () => ({ Run: () => <></> }))
-jest.mock('../../nav-bar', () => ({ NavBar: () => <></> }))
+jest.mock('../../Navbar', () => ({ Navbar: () => <></> }))
 jest.mock('../../Alerts', () => ({ Alerts: () => <></> }))
 
 describe('top level App component', () => {
@@ -32,9 +32,9 @@ describe('top level App component', () => {
     })
   }
 
-  it('should render a NavBar', () => {
+  it('should render a Navbar', () => {
     const wrapper = render()
-    expect(wrapper.exists(NavBar)).toBe(true)
+    expect(wrapper.exists(Navbar)).toBe(true)
   })
 
   it('should render a SidePanel', () => {
@@ -52,8 +52,8 @@ describe('top level App component', () => {
     expect(wrapper.exists(Robots)).toBe(true)
   })
 
-  it('should render a More page on /menu', () => {
-    const wrapper = render('/menu')
+  it('should render a More page on /more', () => {
+    const wrapper = render('/more')
     expect(wrapper.exists(More)).toBe(true)
   })
 

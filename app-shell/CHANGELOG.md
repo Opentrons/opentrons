@@ -3,22 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.19.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-10)
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
+
+
+### Bug Fixes
+
+* **app:** restart MDNS browser when network interfaces change ([#5933](https://github.com/Opentrons/opentrons/issues/5933)) ([c9c6dc8](https://github.com/Opentrons/opentrons/commit/c9c6dc8)), closes [#5343](https://github.com/Opentrons/opentrons/issues/5343)
+* **app-shell:** clean up old robot update files ([#5892](https://github.com/Opentrons/opentrons/issues/5892)) ([1e2b815](https://github.com/Opentrons/opentrons/commit/1e2b815)), closes [#4667](https://github.com/Opentrons/opentrons/issues/4667)
 
 
 ### Features
 
 * **app:** add network interface collection to system-info ([#5764](https://github.com/Opentrons/opentrons/issues/5764)) ([7d64efa](https://github.com/Opentrons/opentrons/commit/7d64efa)), closes [#5397](https://github.com/Opentrons/opentrons/issues/5397)
 * **app, app-shell:** add ability to disable discovery cache ([#5759](https://github.com/Opentrons/opentrons/issues/5759)) ([5ad57d9](https://github.com/Opentrons/opentrons/commit/5ad57d9))
-
-
-
-
-
-
-
-**Note:** Version bump only for package @opentrons/app-shell
-
 
 
 

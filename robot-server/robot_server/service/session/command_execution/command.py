@@ -2,12 +2,12 @@ from datetime import datetime
 from dataclasses import dataclass, field
 
 from robot_server.service.session.models import IdentifierType, \
-    create_identifier, CommandName, CommandDataType
+    create_identifier, CommandDefinition, CommandDataType, CommandStatus
 
 
 @dataclass(frozen=True)
 class CommandContent:
-    name: CommandName
+    name: CommandDefinition
     data: CommandDataType
 
 
@@ -19,8 +19,9 @@ class CommandMeta:
 
 @dataclass(frozen=True)
 class CommandResult:
-    status: str
-    completed_at: datetime = field(default_factory=datetime.utcnow)
+    started_at: datetime
+    completed_at: datetime
+    status: CommandStatus = CommandStatus.executed
 
 
 @dataclass(frozen=True)
@@ -36,25 +37,11 @@ class CompletedCommand:
     result: CommandResult
 
 
-def create_command(name: CommandName, data: CommandDataType) -> Command:
+def create_command(name: CommandDefinition, data: CommandDataType) -> Command:
     """Create a command object"""
     return Command(
         content=CommandContent(
             name=name,
             data=data
         )
-    )
-
-
-def complete_command(command: Command, status: str) -> CompletedCommand:
-    """
-    Create a completed command
-
-    :param command: the originating command
-    :param status: description of the result
-    """
-    return CompletedCommand(
-        content=command.content,
-        meta=command.meta,
-        result=CommandResult(status=status)
     )

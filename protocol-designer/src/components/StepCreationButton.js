@@ -8,7 +8,6 @@ import {
   useHoverTooltip,
   TOOLTIP_RIGHT,
   TOOLTIP_FIXED,
-  AlertModal,
 } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -21,6 +20,10 @@ import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
 } from '../step-forms'
+import {
+  ConfirmDeleteModal,
+  CLOSE_UNSAVED_STEP_FORM,
+} from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, type StepType } from '../form-types'
 import styles from './listButtons.css'
@@ -94,6 +97,9 @@ export const StepCreationButton = (): React.Node => {
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
+  const formHasChanges = useSelector(
+    stepFormSelectors.getCurrentFormHasUnsavedChanges
+  )
   const modules = useSelector(stepFormSelectors.getInitialDeckSetup).modules
   const isStepTypeEnabled = {
     moveLiquid: true,
@@ -122,7 +128,7 @@ export const StepCreationButton = (): React.Node => {
       onClick={() => {
         setExpanded(false)
 
-        if (currentFormIsPresaved) {
+        if (currentFormIsPresaved || formHasChanges) {
           setEnqueuedStepType(stepType)
         } else {
           addStep(stepType)
@@ -135,29 +141,16 @@ export const StepCreationButton = (): React.Node => {
     <>
       {enqueuedStepType !== null && (
         <Portal>
-          <AlertModal
-            heading="Unsaved step form"
-            alertOverlay
-            buttons={[
-              {
-                children: 'Continue',
-                onClick: () => setEnqueuedStepType(null),
-              },
-              {
-                children: 'Delete Step',
-                onClick: () => {
-                  if (enqueuedStepType !== null) {
-                    addStep(enqueuedStepType)
-                    setEnqueuedStepType(null)
-                  }
-                },
-              },
-            ]}
-          >
-            <p style={{ lineHeight: 1.5 }}>
-              {i18n.t('modal.delete_step.body')}
-            </p>
-          </AlertModal>
+          <ConfirmDeleteModal
+            modalType={CLOSE_UNSAVED_STEP_FORM}
+            onCancelClick={() => setEnqueuedStepType(null)}
+            onContinueClick={() => {
+              if (enqueuedStepType !== null) {
+                addStep(enqueuedStepType)
+                setEnqueuedStepType(null)
+              }
+            }}
+          ></ConfirmDeleteModal>
         </Portal>
       )}
       <StepCreationButtonComponent

@@ -36,7 +36,6 @@ type Props = {|
   action?: string,
   moduleType: ModuleRealType,
   actionText: string,
-  labwareDisplayName: ?string,
   labwareNickname: ?string,
   message?: ?string,
   children?: React.Node,
@@ -57,10 +56,7 @@ export const ModuleStepItems = (props: Props): React.Node => {
         </li>
       )}
       <Tooltip {...tooltipProps}>
-        <LabwareTooltipContents
-          labwareNickname={props.labwareNickname}
-          labwareDefDisplayName={props.labwareDisplayName}
-        />
+        <LabwareTooltipContents labwareNickname={props.labwareNickname} />
       </Tooltip>
       <ModuleStepItemRow
         label={props.labwareNickname}

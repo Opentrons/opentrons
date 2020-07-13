@@ -1166,10 +1166,12 @@ describe('unsavedForm reducer', () => {
 
   const actionTypes = [
     'CANCEL_STEP_FORM',
-    'SELECT_TERMINAL_ITEM',
-    'SAVE_STEP_FORM',
+    'CREATE_MODULE',
+    'DELETE_MODULE',
     'DELETE_STEP',
     'EDIT_MODULE',
+    'SAVE_STEP_FORM',
+    'SELECT_TERMINAL_ITEM',
   ]
   actionTypes.forEach(actionType => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {
@@ -1190,6 +1192,7 @@ describe('unsavedForm reducer', () => {
     const result = unsavedForm(stateMock, {
       type: 'ADD_STEP',
       payload: { id: 'stepId123', stepType: 'moveLiquid' },
+      meta: { robotStateTimeline: 'robotStateTimelineValue' },
     })
     expect(result).toEqual('createPresavedStepFormMockResult')
     expect(mockCreatePresavedStepForm.mock.calls).toEqual([
@@ -1202,6 +1205,7 @@ describe('unsavedForm reducer', () => {
           savedStepForms: 'savedStepFormsValue',
           orderedStepIds: 'orderedStepIdsValue',
           initialDeckSetup: 'initalDeckSetupValue',
+          robotStateTimeline: 'robotStateTimelineValue',
         },
       ],
     ])
@@ -1211,7 +1215,12 @@ describe('unsavedForm reducer', () => {
     const action = { type: 'ADD_PROFILE_CYCLE', payload: null }
 
     const id = 'newCycleId'
-    mockUuid.mockReturnValue(id)
+    const profileStepId = 'newProfileStepId'
+    // NOTE: because we're using uuid() to create multiple different ids,
+    // this test is sensitive to the order that uuid is called in and
+    // assumes it's first for cycle id, then next for profile step id
+    mockUuid.mockReturnValueOnce(id)
+    mockUuid.mockReturnValueOnce(profileStepId)
 
     const state = {
       unsavedForm: {
@@ -1226,7 +1235,7 @@ describe('unsavedForm reducer', () => {
       stepType: 'thermocycler',
       orderedProfileItems: [id],
       profileItemsById: {
-        [id]: createInitialProfileCycle(id),
+        [id]: createInitialProfileCycle(id, profileStepId),
       },
     })
   })

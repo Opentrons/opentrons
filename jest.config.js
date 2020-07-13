@@ -35,4 +35,5 @@ module.exports = {
   testPathIgnorePatterns: ['cypress/', '/node_modules/'],
   coverageReporters: ['lcov', 'text-summary'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
+  watchPathIgnorePatterns: ['/node_modules/'],
 }

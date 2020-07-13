@@ -25,15 +25,7 @@ exports[`LabwareList component renders 1`] = `
         },
         "groups": Array [
           Object {
-            "brand": Object {
-              "brand": "USA Scientific",
-              "brandId": Array [
-                "1061-8150",
-              ],
-            },
             "metadata": Object {
-              "displayCategory": "reservoir",
-              "displayName": "12 Channel Trough",
               "wellBottomShape": "v",
             },
             "wells": Array [
@@ -255,15 +247,7 @@ exports[`LabwareList component renders 1`] = `
         },
         "groups": Array [
           Object {
-            "brand": Object {
-              "brand": "USA Scientific",
-              "brandId": Array [
-                "1061-8150",
-              ],
-            },
             "metadata": Object {
-              "displayCategory": "reservoir",
-              "displayName": "12 Channel Trough",
               "wellBottomShape": "v",
             },
             "wells": Array [
@@ -5148,13 +5132,7 @@ exports[`LabwareList component renders 1`] = `
         },
         "groups": Array [
           Object {
-            "brand": Object {
-              "brand": "generic",
-              "brandId": Array [],
-            },
             "metadata": Object {
-              "displayCategory": "wellPlate",
-              "displayName": "ANSI 96 Standard Microplate",
               "wellBottomShape": "flat",
             },
             "wells": Array [
@@ -6968,13 +6946,7 @@ exports[`LabwareList component renders 1`] = `
         },
         "groups": Array [
           Object {
-            "brand": Object {
-              "brand": "overlappy",
-              "brandId": Array [],
-            },
             "metadata": Object {
-              "displayCategory": "wellPlate",
-              "displayName": "Overlappy 96 Well Plate 200 µL",
               "wellBottomShape": "flat",
             },
             "wells": Array [
