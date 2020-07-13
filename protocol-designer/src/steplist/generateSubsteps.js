@@ -337,7 +337,7 @@ export function generateSubsteps(
   robotState: ?RobotState,
   stepId: string,
   labwareNamesByModuleId: {
-    [moduleId: string]: { nickname: string },
+    [moduleId: string]: ?{ nickname: string },
   }
 ): ?SubstepItemData {
   if (!robotState) {
