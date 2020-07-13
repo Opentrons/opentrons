@@ -171,3 +171,7 @@ export type StepArgsAndErrors = {
 }
 
 export type StepArgsAndErrorsById = { [stepId: string]: StepArgsAndErrors, ... }
+
+export type LabwareNamesByModuleId = {
+  [moduleId: string]: ?{ nickname: string },
+}

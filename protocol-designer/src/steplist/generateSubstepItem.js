@@ -35,6 +35,7 @@ import type {
   SourceDestSubstepItem,
   SubstepItemData,
   SubstepTimelineFrame,
+  LabwareNamesByModuleId,
 } from './types'
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
@@ -335,9 +336,7 @@ export function generateSubstepItem(
   invariantContext: InvariantContext,
   robotState: ?RobotState,
   stepId: string,
-  labwareNamesByModuleId: {
-    [moduleId: string]: ?{ nickname: string },
-  }
+  labwareNamesByModuleId: LabwareNamesByModuleId
 ): ?SubstepItemData {
   if (!robotState) {
     console.info(

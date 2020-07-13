@@ -5,8 +5,11 @@ import type {
   RobotState,
   InvariantContext,
 } from '../step-generation/types'
-import type { LabwareNameByModuleId } from '../ui/modules/selectors'
-import type { StepArgsAndErrorsById, Substeps } from '../steplist/types'
+import type {
+  LabwareNamesByModuleId,
+  StepArgsAndErrorsById,
+  Substeps,
+} from '../steplist/types'
 
 export type GenerateSubstepsArgs = {|
   allStepArgsAndErrors: StepArgsAndErrorsById,
@@ -14,7 +17,7 @@ export type GenerateSubstepsArgs = {|
   orderedStepIds: Array<string>,
   robotStateTimeline: Timeline,
   initialRobotState: RobotState,
-  labwareNamesByModuleId: LabwareNameByModuleId,
+  labwareNamesByModuleId: LabwareNamesByModuleId,
 |}
 
 export const generateSubsteps = (args: GenerateSubstepsArgs): Substeps => {
