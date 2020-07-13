@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
@@ -45,7 +44,6 @@ type Props = {|
         },
       },
   values: FormModulesByType,
-  thermocyclerEnabled: ?boolean,
   onFieldChange: (
     event: SyntheticInputEvent<HTMLSelectElement | HTMLInputElement>
   ) => mixed,
@@ -61,7 +59,6 @@ export function ModuleFields(props: Props): React.Node {
     onSetFieldTouched,
     onBlur,
     values,
-    thermocyclerEnabled,
     errors,
     touched,
   } = props
@@ -80,12 +77,8 @@ export function ModuleFields(props: Props): React.Node {
     onSetFieldTouched(targetToClear, false)
   }
 
-  const className = cx(styles.modules_row, {
-    [styles.hide_thermo]: !thermocyclerEnabled,
-  })
-
   return (
-    <div className={className}>
+    <div className={styles.modules_row}>
       {modules.map((moduleType, i) => {
         const moduleTypeAccessor = `modulesByType.${moduleType}`
         const label = i18n.t(`modules.module_display_names.${moduleType}`)

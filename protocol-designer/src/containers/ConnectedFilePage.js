@@ -11,7 +11,6 @@ import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import type { InitialDeckSetup } from '../step-forms'
 import type { FileMetadataFields } from '../file-data'
 import { actions as navActions } from '../navigation'
-import { selectors as featureFlagSelectors } from '../feature-flags'
 
 type Props = React.ElementProps<typeof FilePage>
 
@@ -19,7 +18,6 @@ type SP = {|
   instruments: $PropertyType<Props, 'instruments'>,
   formValues: $PropertyType<Props, 'formValues'>,
   _initialDeckSetup: InitialDeckSetup,
-  thermocyclerEnabled: ?boolean,
   modules: $PropertyType<Props, 'modules'>,
 |}
 
@@ -29,7 +27,6 @@ const mapStateToProps = (state: BaseState): SP => {
     instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
     modules: stepFormSelectors.getModulesForEditModulesCard(state),
     _initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
-    thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
   }
 }
 
