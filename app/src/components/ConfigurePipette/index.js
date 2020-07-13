@@ -15,7 +15,7 @@ import {
   getAttachedPipetteSettings,
   updatePipetteSettings,
 } from '../../pipettes'
-import { getConfig } from '../../config'
+import { useFeatureFlag } from '../../config'
 
 import { ScrollableAlertModal } from '../modals'
 import { ConfigMessage } from './ConfigMessage'
@@ -64,9 +64,7 @@ export function ConfigurePipette(props: Props): React.Node {
       : null
 
   // TODO(mc, 2019-12-09): remove this feature flag
-  const __showHiddenFields = useSelector((state: State) =>
-    Boolean(getConfig(state).devInternal?.allPipetteConfig)
-  )
+  const __showHiddenFields = useFeatureFlag('allPipetteConfig')
 
   // when an in-progress request completes, close modal if response was ok
   React.useEffect(() => {

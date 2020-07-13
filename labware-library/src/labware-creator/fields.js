@@ -122,7 +122,7 @@ export type ProcessedLabwareFields = {|
   labwareType: LabwareType,
   tubeRackInsertLoadName: string,
   aluminumBlockType: string,
-  aluminumBlockChildType: string,
+  aluminumBlockChildType: string | null,
 
   // tubeRackSides: Array<string>, // eg, []
   footprintXDimension: number,

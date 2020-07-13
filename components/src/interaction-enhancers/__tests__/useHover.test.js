@@ -36,7 +36,7 @@ describe('useHover hook', () => {
     const target = wrapper.find(TARGET_SELECTOR)
 
     act(() => {
-      target.simulate('mouseEnter')
+      target.simulate('pointerEnter')
     })
 
     expect(result[0]).toBe(true)
@@ -47,11 +47,11 @@ describe('useHover hook', () => {
     const target = wrapper.find(TARGET_SELECTOR)
 
     act(() => {
-      target.simulate('mouseEnter')
+      target.simulate('pointerEnter')
     })
 
     act(() => {
-      target.simulate('mouseLeave')
+      target.simulate('pointerLeave')
     })
 
     expect(result[0]).toBe(false)
@@ -64,7 +64,7 @@ describe('useHover hook', () => {
     const target = wrapper.find(TARGET_SELECTOR)
 
     act(() => {
-      target.simulate('mouseEnter')
+      target.simulate('pointerEnter')
     })
 
     expect(result[0]).toBe(false)
@@ -83,8 +83,8 @@ describe('useHover hook', () => {
     const target = wrapper.find(TARGET_SELECTOR)
 
     act(() => {
-      target.simulate('mouseEnter')
-      target.simulate('mouseLeave')
+      target.simulate('pointerEnter')
+      target.simulate('pointerLeave')
       jest.advanceTimersByTime(42)
     })
 
@@ -98,8 +98,8 @@ describe('useHover hook', () => {
     const target = wrapper.find(TARGET_SELECTOR)
 
     act(() => {
-      target.simulate('mouseEnter')
-      target.simulate('mouseLeave')
+      target.simulate('pointerEnter')
+      target.simulate('pointerLeave')
     })
 
     expect(result[0]).toBe(true)
@@ -118,9 +118,9 @@ describe('useHover hook', () => {
     const target = wrapper.find(TARGET_SELECTOR)
 
     act(() => {
-      target.simulate('mouseEnter')
-      target.simulate('mouseLeave')
-      target.simulate('mouseEnter')
+      target.simulate('pointerEnter')
+      target.simulate('pointerLeave')
+      target.simulate('pointerEnter')
       jest.advanceTimersByTime(42)
     })
 
@@ -138,7 +138,7 @@ describe('useHover hook', () => {
     const target = wrapper.find(TARGET_SELECTOR)
 
     act(() => {
-      target.simulate('mouseEnter')
+      target.simulate('pointerEnter')
       wrapper.unmount()
       jest.advanceTimersByTime(0)
     })

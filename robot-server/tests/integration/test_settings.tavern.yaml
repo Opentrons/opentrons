@@ -48,12 +48,6 @@ stages:
           description: !re_search "Aspirate with the less accurate volumetric calibrations"
           restart_required: false
           value: !anything
-        - id: useV1HttpApi
-          old_id: Null
-          title: Revert to legacy HTTP API v1
-          description: !re_match "Tells the OT-2 to run the legacy v1.*"
-          restart_required: true
-          value: !anything
         - id: enableDoorSafetySwitch
           old_id: Null
           title: Enable robot door safety switch
@@ -83,7 +77,6 @@ marks:
       - useProtocolApi2
       - disableHomeOnBoot
       - useOldAspirationFunctions
-      - useV1HttpApi
       - enableDoorSafetySwitch
   - parametrize:
       key: value
@@ -121,7 +114,6 @@ marks:
       - useProtocolApi2
       - disableHomeOnBoot
       - useOldAspirationFunctions
-      - useV1HttpApi
       - enableDoorSafetySwitch
 stages:
   - name: Set each setting to acceptable values 

@@ -5,6 +5,7 @@ import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../constants'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
+import type { Timeline } from '../../../step-generation'
 import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
 import type {
   AddStepAction,
@@ -22,13 +23,19 @@ import type {
 // adds an incremental integer ID for Step reducers.
 // NOTE: if this is an "add step" directly performed by the user,
 // addAndSelectStepWithHints is probably what you want
-export const addStep = (payload: { stepType: StepType }): AddStepAction => {
+export const addStep = (args: {
+  stepType: StepType,
+  robotStateTimeline: Timeline,
+}): AddStepAction => {
   const stepId = uuid()
   return {
     type: 'ADD_STEP',
     payload: {
-      stepType: payload.stepType,
+      stepType: args.stepType,
       id: stepId,
+    },
+    meta: {
+      robotStateTimeline: args.robotStateTimeline,
     },
   }
 }

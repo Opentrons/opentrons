@@ -6,13 +6,11 @@ import { act } from 'react-dom/test-utils'
 import { BadCalibration } from '../BadCalibration'
 
 describe('Introduction', () => {
-  const mockExit = jest.fn()
+  const mockDeleteSession = jest.fn()
 
   const getExitButton = wrapper =>
     wrapper
-      .find(
-        'PrimaryButton[children="Drop tip in trash and exit robot calibration check"]'
-      )
+      .find('PrimaryButton[children="Drop tip in trash and exit"]')
       .find('button')
 
   afterEach(() => {
@@ -20,9 +18,9 @@ describe('Introduction', () => {
   })
 
   it('clicking button exits calibration check', () => {
-    const wrapper = mount(<BadCalibration exit={mockExit} />)
+    const wrapper = mount(<BadCalibration deleteSession={mockDeleteSession} />)
     act(() => getExitButton(wrapper).invoke('onClick')())
     wrapper.update()
-    expect(mockExit).toHaveBeenCalled()
+    expect(mockDeleteSession).toHaveBeenCalled()
   })
 })

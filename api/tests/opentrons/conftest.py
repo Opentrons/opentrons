@@ -17,8 +17,6 @@ import shutil
 import tempfile
 from collections import namedtuple
 from functools import partial
-from uuid import uuid4 as uuid
-from unittest import mock
 import zipfile
 
 import pytest
@@ -28,12 +26,10 @@ from opentrons.legacy_api.instruments.pipette import Pipette
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
 from opentrons.data_storage import database_migration
-from opentrons.server import rpc
 from opentrons import config, types
-from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
-from opentrons.hardware_control import API, ThreadManager
+from opentrons.hardware_control import API, ThreadManager, ThreadedAsyncLock
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
 from opentrons import (robot as rb,
@@ -167,6 +163,14 @@ def wifi_keys_tempdir():
         config.CONFIG['wifi_keys_dir'] = old_wifi_keys
 
 
+@pytest.fixture
+def is_robot(monkeypatch):
+    print("in here")
+    monkeypatch.setattr(config, 'IS_ROBOT', True)
+    yield
+    monkeypatch.setattr(config, 'IS_ROBOT', False)
+
+
 # -------feature flag fixtures-------------
 @pytest.fixture
 async def calibrate_bottom_flag():
@@ -194,49 +198,15 @@ async def old_aspiration(monkeypatch):
 # -----end feature flag fixtures-----------
 
 
-@pytest.mark.skipif(aionotify is None,
-                    reason="requires inotify (linux only)")
 @pytest.fixture
-async def async_server(hardware, virtual_smoothie_env, loop, aiohttp_server):
-    testserver = await aiohttp_server(init(hardware, loop=loop))
-    yield testserver.app
-
-
-@pytest.fixture
-async def async_client(async_server, loop, aiohttp_client):
-    cli = await loop.create_task(aiohttp_client(async_server))
-    endpoints.session_wrapper.session = None
-    yield cli
-
-
-@pytest.fixture
-async def mocked_hw(async_server, monkeypatch):
-    original_hw = async_server['com.opentrons.hardware']
-    # TODO(seth,03/17/2020): this is an annoying hack caused by fixture
-    # ordering in pytest. the monkeypatch fixture gets finalized after
-    # the async_server fixture, which means the async_server or
-    # async_client finalizer calls shutdown(), and that calls clean_up
-    # on the mock. We need to add clean_up (a method of the threadmanager)
-    # to the spec of the mock, and we need to make sure that we clean up
-    # the original object.
-    hw_mock = mock.Mock(spec=dir(API) + ['clean_up'])
-    monkeypatch.setitem(async_server, 'com.opentrons.hardware', hw_mock)
-    try:
-        yield hw_mock
-    finally:
-        original_hw.clean_up()
-
-
-@pytest.fixture
-async def dc_session(request, async_server, monkeypatch, loop):
+async def dc_session(request, hardware, monkeypatch, loop):
     """
     Mock session manager for deck calibation
     """
-    hw = async_server['com.opentrons.hardware']
-    await hw.cache_instruments({
+    await hardware.cache_instruments({
         types.Mount.LEFT: None,
         types.Mount.RIGHT: 'p300_multi_v1'})
-    ses = endpoints.SessionManager(hw)
+    ses = endpoints.SessionManager(hardware)
     endpoints.session_wrapper.session = ses
     yield ses
     endpoints.session_wrapper.session = None
@@ -276,46 +246,6 @@ def session_manager(main_router):
     return main_router.session_manager
 
 
-@pytest.fixture
-def session(loop, aiohttp_client, request, main_router):
-    """
-    Create testing session. Tests using this fixture are expected
-    to have @pytest.mark.parametrize('root', [value]) decorator set.
-    If not set root will be defaulted to None
-    """
-    from aiohttp import web
-    from opentrons.server import error_middleware
-    root = None
-    try:
-        root = request.getfixturevalue('root')
-        if not root:
-            root = main_router
-        # Assume test fixture has init to attach test loop
-        root.init(loop=loop)
-    except Exception:
-        pass
-
-    app = web.Application(middlewares=[error_middleware])
-    server = rpc.RPCServer(app, root)
-    client = loop.run_until_complete(aiohttp_client(server.app))
-    socket = loop.run_until_complete(client.ws_connect('/'))
-    token = str(uuid())
-
-    async def call(**kwargs):
-        request = {
-            '$': {
-                'token': token
-            },
-        }
-        request.update(kwargs)
-        return await socket.send_json(request)
-
-    def finalizer():
-        server.shutdown()
-    request.addfinalizer(finalizer)
-    return Session(server, socket, token, call)
-
-
 def fuzzy_assert(result, expected):
     expected_re = ['.*'.join(['^'] + item + ['$']) for item in expected]
 
@@ -326,14 +256,6 @@ def fuzzy_assert(result, expected):
         assert re.compile(
             exp.lower()).match(res.lower()), "element {}: {} didn't match {}" \
             .format(idx, res, exp)
-
-
-@pytest.fixture
-def connect(session, aiohttp_client):
-    async def _connect():
-        client = await aiohttp_client(session.server.app)
-        return await client.ws_connect('/')
-    return _connect
 
 
 @pytest.fixture
@@ -361,7 +283,7 @@ async def hardware(request, loop, virtual_smoothie_env):
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.fixture
-def sync_hardware(request, loop, virtual_smoothie_env):
+def sync_hardware(request, loop, virtual_smoothie_env, is_robot):
     thread_manager = ThreadManager(API.build_hardware_controller)
     hardware = thread_manager.sync
     try:
@@ -374,7 +296,7 @@ def sync_hardware(request, loop, virtual_smoothie_env):
 
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
-    router = MainRouter(hardware, loop)
+    router = MainRouter(hardware=hardware, loop=loop, lock=ThreadedAsyncLock())
     router.wait_until = partial(
         wait_until,
         notifications=router.notifications,
@@ -522,7 +444,7 @@ def cntrlr_mock_connect(monkeypatch):
 
 
 @pytest.fixture
-async def hardware_api(loop):
+async def hardware_api(loop, is_robot):
     hw_api = await API.build_hardware_simulator(loop=loop)
     return hw_api
 

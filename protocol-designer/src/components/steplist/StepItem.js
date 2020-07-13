@@ -30,6 +30,7 @@ import type {
 import type {
   SubstepIdentifier,
   SubstepItemData,
+  ThermocyclerProfileSubstepItem,
   WellIngredientNames,
 } from '../../steplist/types'
 
@@ -88,6 +89,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
       description={Description}
       iconName={error || warning ? 'alert-circle' : iconName}
       iconProps={{ className: iconClassName }}
+      data-test={`StepItem_${stepNumber}`}
       title={`${stepNumber}. ${props.title ||
         i18n.t(`application.stepType.${stepType}`)}`}
       onClick={selectStep}
@@ -108,7 +110,6 @@ export type StepItemContentsProps = {|
   substeps: ?SubstepItemData,
 
   ingredNames: WellIngredientNames,
-  labwareDefDisplayNamesById: { [labwareId: string]: ?string },
   labwareNicknamesById: { [labwareId: string]: string },
 
   highlightSubstep: SubstepIdentifier => mixed,
@@ -125,12 +126,13 @@ const makeDurationText = (
 
 type ProfileStepSubstepRowProps = {|
   step: ProfileStepItem,
+  stepNumber: number,
   repetitionsDisplay: ?string,
 |}
 export const ProfileStepSubstepRow = (
   props: ProfileStepSubstepRowProps
 ): React.Node => {
-  const { repetitionsDisplay } = props
+  const { repetitionsDisplay, stepNumber } = props
   const { temperature, durationMinutes, durationSeconds } = props.step
   return (
     // TODO IMMEDIATELY: rename .step_subitem_channel_row class to more generic name
@@ -140,7 +142,8 @@ export const ProfileStepSubstepRow = (
         styles.profile_step_substep_row
       )}
     >
-      <span className={styles.profile_step_substep_column}>
+      <span className={styles.profile_step_substep_column}>{stepNumber}</span>
+      <span className={styles.align_left}>
         {makeTemperatureText(temperature)}
       </span>
       <span
@@ -159,20 +162,24 @@ export const ProfileStepSubstepRow = (
 }
 
 // this is a row under a cycle under a substep
-type ProfileCycleRowProps = {| step: ProfileStepItem |}
+type ProfileCycleRowProps = {| step: ProfileStepItem, stepNumber: number |}
 const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
-  const { step } = props
+  const { step, stepNumber } = props
   return (
     <div className={styles.cycle_step_row}>
+      <span>{stepNumber}</span>
       <span>{makeTemperatureText(step.temperature)}</span>
-      <span>
+      <span className={styles.align_right}>
         {makeDurationText(step.durationMinutes, step.durationSeconds)}
       </span>
     </div>
   )
 }
 
-type ProfileCycleSubstepGroupProps = {| cycle: ProfileCycleItem |}
+type ProfileCycleSubstepGroupProps = {|
+  cycle: ProfileCycleItem,
+  stepNumber: number,
+|}
 export const ProfileCycleSubstepGroup = (
   props: ProfileCycleSubstepGroupProps
 ): React.Node => {
@@ -181,7 +188,11 @@ export const ProfileCycleSubstepGroup = (
     <div className={styles.profile_substep_cycle}>
       <div className={styles.cycle_group}>
         {steps.map((step, index) => (
-          <ProfileCycleRow key={index} step={step} />
+          <ProfileCycleRow
+            key={index}
+            stepNumber={props.stepNumber + index}
+            step={step}
+          />
         ))}
       </div>
       <div className={styles.cycle_repetitions}>{`${repetitions}x`}</div>
@@ -203,12 +214,47 @@ const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
           className={styles.inner_carat}
           onClick={() => setContentCollapsed(!contentCollapsed)}
         >
-          <Icon name={contentCollapsed ? 'chevron-up' : 'chevron-down'} />
+          <Icon name={contentCollapsed ? 'chevron-down' : 'chevron-up'} />
         </span>
       </PDListItem>
       {!contentCollapsed && props.children}
     </>
   )
+}
+
+const renderSubstepInfo = (substeps: ThermocyclerProfileSubstepItem) => {
+  let stepNumber = 1
+  const substepInfo: Array<
+    | React.Element<typeof ProfileCycleSubstepGroup>
+    | React.Element<typeof ProfileStepSubstepRow>
+  > = []
+
+  substeps.meta &&
+    substeps.meta.rawProfileItems.forEach(item => {
+      const prevStepNumber = stepNumber
+      if (item.type === PROFILE_CYCLE) {
+        stepNumber += item.steps.length
+        substepInfo.push(
+          <ProfileCycleSubstepGroup
+            cycle={item}
+            stepNumber={prevStepNumber}
+            key={prevStepNumber}
+          />
+        )
+      } else {
+        stepNumber++
+        substepInfo.push(
+          <ProfileStepSubstepRow
+            step={item}
+            stepNumber={prevStepNumber}
+            repetitionsDisplay="1"
+            key={prevStepNumber}
+          />
+        )
+      }
+    })
+
+  return substepInfo
 }
 
 export const StepItemContents = (props: StepItemContentsProps): React.Node => {
@@ -217,7 +263,6 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
     stepType,
     substeps,
     ingredNames,
-    labwareDefDisplayNamesById,
     labwareNicknamesById,
     highlightSubstep,
     hoveredSubstep,
@@ -235,7 +280,6 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
   if (substeps && substeps.substepType === 'magnet') {
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
         labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t(`modules.actions.action`)}
@@ -252,30 +296,29 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
 
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
-        labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t(`modules.actions.go_to`)}
         actionText={temperature}
         moduleType={TEMPERATURE_MODULE_TYPE}
+        labwareNickname={substeps.labwareNickname}
       />
     )
   }
 
   if (substeps && substeps.substepType === THERMOCYCLER_PROFILE) {
-    const lidTemperature = makeTemperatureText(substeps.profileTargetLidTemp)
-    const lidLabelText = makeLidLabelText(substeps.lidOpenHold)
-
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
-        labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t(`modules.actions.profile`)}
         actionText={i18n.t(`modules.actions.cycling`)}
         moduleType={THERMOCYCLER_MODULE_TYPE}
+        labwareNickname={substeps.labwareNickname}
       >
-        <ModuleStepItemRow label={lidLabelText} value={lidTemperature} />
+        <ModuleStepItemRow
+          // NOTE: for TC Profile, lid label text always says "closed" bc Profile runs with lid closed.
+          label={makeLidLabelText(false)}
+          value={makeTemperatureText(substeps.profileTargetLidTemp)}
+        />
         <CollapsibleSubstep
           headerContent={
             <span
@@ -288,6 +331,7 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
           }
         >
           <li className={cx(styles.profile_substep_header, styles.uppercase)}>
+            <span className={styles.profile_step_substep_column} />
             <span className={styles.profile_step_substep_column}>
               block temp
             </span>
@@ -301,18 +345,7 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
             </span>
             <span className={styles.profile_step_substep_column}>cycles</span>
           </li>
-          {substeps.meta?.rawProfileItems.map((item, index) => {
-            if (item.type === PROFILE_CYCLE) {
-              return <ProfileCycleSubstepGroup cycle={item} key={index} />
-            }
-            return (
-              <ProfileStepSubstepRow
-                step={item}
-                key={index}
-                repetitionsDisplay="1"
-              />
-            )
-          })}
+          {renderSubstepInfo(substeps)}
         </CollapsibleSubstep>
 
         <CollapsibleSubstep
@@ -323,14 +356,13 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
           }
         >
           <ModuleStepItems
-            labwareDisplayName={substeps.labwareDisplayName}
-            labwareNickname={substeps.labwareNickname}
             actionText={makeTemperatureText(substeps.blockTargetTempHold)}
             moduleType={THERMOCYCLER_MODULE_TYPE}
             hideHeader
+            labwareNickname={substeps.labwareNickname}
           />
           <ModuleStepItemRow
-            label={`Lid (${substeps.lidOpenHold ? 'open' : 'closed'})`}
+            label={makeLidLabelText(substeps.lidOpenHold)}
             value={makeTemperatureText(substeps.lidTargetTempHold)}
           />
         </CollapsibleSubstep>
@@ -345,12 +377,11 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
 
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
-        labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t(`modules.actions.hold`)}
         actionText={blockTemperature}
         moduleType={THERMOCYCLER_MODULE_TYPE}
+        labwareNickname={substeps.labwareNickname}
       >
         <ModuleStepItemRow label={lidLabelText} value={lidTemperature} />
       </ModuleStepItems>
@@ -362,12 +393,11 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
 
     return (
       <ModuleStepItems
-        labwareDisplayName={substeps.labwareDisplayName}
-        labwareNickname={substeps.labwareNickname}
         message={substeps.message}
         action={i18n.t('modules.actions.await_temperature')}
         actionText={temperature}
         moduleType={TEMPERATURE_MODULE_TYPE}
+        labwareNickname={substeps.labwareNickname}
       />
     )
   }
@@ -383,11 +413,7 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
       <AspirateDispenseHeader
         key="moveLiquid-header"
         sourceLabwareNickname={labwareNicknamesById[sourceLabwareId]}
-        sourceLabwareDefDisplayName={
-          labwareDefDisplayNamesById[sourceLabwareId]
-        }
         destLabwareNickname={labwareNicknamesById[destLabwareId]}
-        destLabwareDefDisplayName={labwareDefDisplayNamesById[destLabwareId]}
       />
     )
   }
@@ -400,7 +426,6 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
         volume={rawForm.volume}
         times={rawForm.times}
         labwareNickname={labwareNicknamesById[mixLabwareId]}
-        labwareDefDisplayName={labwareDefDisplayNamesById[mixLabwareId]}
       />
     )
   }

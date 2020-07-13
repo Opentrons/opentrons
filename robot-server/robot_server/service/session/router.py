@@ -3,7 +3,6 @@ import typing
 
 from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
-from opentrons.calibration.check import models
 
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError
@@ -11,7 +10,7 @@ from robot_server.service.json_api import Error, ResourceLink,\
     ResponseDataModel
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import SessionCreationException, \
-    SessionCommandException
+    SessionCommandException, SessionException
 from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session import models as route_models
 
@@ -55,7 +54,7 @@ async def create_session_handler(
     """Create a session"""
     session_type = create_request.data.attributes.sessionType
     try:
-        new_session = await session_manager.add(session_type)
+        new_session = await session_manager.add(session_type=session_type)
     except SessionCreationException as e:
         log.exception("Failed to create session")
         raise RobotServerError(
@@ -87,7 +86,18 @@ async def delete_session_handler(
                               session_id=session_id,
                               api_router=router)
 
-    await session_manager.remove(session_obj.meta.identifier)
+    try:
+        await session_manager.remove(session_obj.meta.identifier)
+    except SessionException as e:
+        log.exception("Failed to remove a session session")
+        raise RobotServerError(
+            status_code=http_status_codes.HTTP_400_BAD_REQUEST,
+            error=Error(
+                title="Removal Failed",
+                detail=f"Failed to remove session "
+                       f"'{session_id}': {str(e)}.",
+            )
+        )
 
     return route_models.SessionResponse(
         data=ResponseDataModel.create(
@@ -125,13 +135,13 @@ async def get_session_handler(
             response_model_exclude_unset=True,
             response_model=route_models.MultiSessionResponse)
 async def get_sessions_handler(
-        type_filter: models.SessionType = Query(
+        session_type: route_models.SessionType = Query(
             None,
             description="Will limit the results to only this session type"),
         session_manager: SessionManager = Depends(get_session_manager)) \
         -> route_models.MultiSessionResponse:
     """Get multiple sessions"""
-    sessions = session_manager.get(session_type=type_filter)
+    sessions = session_manager.get(session_type=session_type)
     return route_models.MultiSessionResponse(
         data=[ResponseDataModel.create(
             attributes=session.get_response_model(),
@@ -184,7 +194,11 @@ async def session_command_execute_handler(
             attributes=route_models.SessionCommand(
                 data=command_result.content.data,
                 command=command_result.content.name,
-                status=command_result.result.status),
+                status=command_result.result.status,
+                created_at=command_result.meta.created_at,
+                started_at=command_result.result.started_at,
+                completed_at=command_result.result.completed_at
+            ),
             resource_id=command_result.meta.identifier
         ),
         links=get_valid_session_links(session_id, router)

@@ -1,21 +1,20 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
-import { PrimaryButton, Icon, Link, type Mount } from '@opentrons/components'
+import { PrimaryButton, Icon, type Mount } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import {
-  type RobotCalibrationCheckComparison,
-  CHECK_TRANSFORM_TYPE_DECK,
-} from '../../calibration'
-import { JogControls } from '../JogControls'
+import type { RobotCalibrationCheckComparison } from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import { JogControls } from '../JogControls'
 import styles from './styles.css'
-import { formatOffsetValue } from './utils'
+import { getBadOutcomeHeader } from './utils'
+import { EndOfStepComparison } from './EndOfStepComparisons'
+import { BadOutcomeBody } from './BadOutcomeBody'
 
-import slot5LeftMultiDemoAsset from './videos/SLOT_5_LEFT_MULTI_Z_(640X480)_REV3.webm'
-import slot5LeftSingleDemoAsset from './videos/SLOT_5_LEFT_SINGLE_Z_(640X480)_REV3.webm'
-import slot5RightMultiDemoAsset from './videos/SLOT_5_RIGHT_MULTI_Z_(640X480)_REV3.webm'
-import slot5RightSingleDemoAsset from './videos/SLOT_5_RIGHT_SINGLE_Z_(640X480)_REV3.webm'
+import slot5LeftMultiDemoAsset from './videos/SLOT_5_LEFT_MULTI_Z.webm'
+import slot5LeftSingleDemoAsset from './videos/SLOT_5_LEFT_SINGLE_Z.webm'
+import slot5RightMultiDemoAsset from './videos/SLOT_5_RIGHT_MULTI_Z.webm'
+import slot5RightSingleDemoAsset from './videos/SLOT_5_RIGHT_SINGLE_Z.webm'
 
 const assetMap = {
   left: {
@@ -28,40 +27,35 @@ const assetMap = {
   },
 }
 
-const CHECK_Z_HEADER = 'Check the Z-axis'
+const CHECK_Z_HEADER = 'check z-axis in slot 5'
 
-const JOG_UNTIL = 'Jog pipette until tip is'
-const JUST_BARELY = 'just barely'
-const TOUCHING = 'touching the deck in'
+const JOG_UNTIL = 'Jog the pipette until the tip is'
+const JUST_BARELY_TOUCHING = 'barely touching (less than 0.1mm)'
+const DECK_IN = 'the deck in'
 const SLOT_5 = 'slot 5'
-const THEN = 'Then'
+const THEN = 'Then press the'
 const CHECK_AXES = 'check z-axis'
 const TO_DETERMINE_MATCH =
-  'to see if the position matches the calibration co-ordinate.'
+  'button to determine how this position compares to the previously-saved z-axis calibration coordinate.'
 
 const EXIT_CALIBRATION_CHECK = 'exit robot calibration check'
 
-const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
 const GOOD_INSPECTING_HEADER = 'Good calibration'
-const BAD_INSPECTING_BODY =
-  "Your current pipette tip position does not match your robot's saved calibration data"
-const GOOD_INSPECTING_BODY =
-  "Your current pipette tip position matches your robot's saved calibration data"
-const DIFFERENCE = 'Difference'
-const DECK_CAL_BLURB =
-  'To resolve this, you will need to perform deck calibration. Read'
-const THIS_ARTICLE = 'this article'
-const TO_LEARN = 'to learn more'
-const DECK_CAL_ARTICLE_URL =
-  'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
-const CONTACT_SUPPORT = 'Please contact Opentrons support for next steps.'
+const BAD_INSPECTING_PREAMBLE =
+  'Your current pipette tip position falls outside the acceptable tolerance range for a'
+const GOOD_INSPECTING_PREAMBLE =
+  'Your current pipette tip position falls within the acceptable tolerance range for a '
+const INSPECTING_COMPARISON =
+  "pipette when compared to your robot's saved Z-axis calibration coordinates."
+const CONTINUE_BLURB = 'You may also continue forward to the next check.'
 
 type CheckHeightProps = {|
   isMulti: boolean,
   mount: Mount | null,
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
-  exit: () => void,
+  pipetteModel: string,
+  exit: () => mixed,
   nextButtonText: string,
   comparePoint: () => void,
   goToNextCheck: () => void,
@@ -73,6 +67,7 @@ export function CheckHeight(props: CheckHeightProps): React.Node {
     mount,
     isInspecting,
     comparison,
+    pipetteModel,
     exit,
     nextButtonText,
     comparePoint,
@@ -94,22 +89,26 @@ export function CheckHeight(props: CheckHeightProps): React.Node {
         <CompareZ
           comparison={comparison}
           goToNextCheck={goToNextCheck}
+          pipetteModel={pipetteModel}
           exit={exit}
           nextButtonText={nextButtonText}
         />
       ) : (
         <>
-          <div className={styles.tip_pick_up_demo_wrapper}>
-            <p className={styles.tip_pick_up_demo_body}>
-              {JOG_UNTIL}
-              <b>&nbsp;{JUST_BARELY}&nbsp;</b>
-              {TOUCHING}
-              <b>&nbsp;{SLOT_5}.&nbsp;</b>
-              <br />
-              {THEN}
-              <b>&nbsp;{CHECK_AXES}&nbsp;</b>
-              {TO_DETERMINE_MATCH}
-            </p>
+          <div className={styles.step_check_wrapper}>
+            <div className={styles.step_check_body_wrapper}>
+              <p className={styles.tip_pick_up_demo_body}>
+                {JOG_UNTIL}
+                <b>&nbsp;{JUST_BARELY_TOUCHING}&nbsp;</b>
+                {DECK_IN}
+                <b>&nbsp;{SLOT_5}.&nbsp;</b>
+                <br />
+                <br />
+                {THEN}
+                <b>&nbsp;{CHECK_AXES}&nbsp;</b>
+                {TO_DETERMINE_MATCH}
+              </p>
+            </div>
             <div className={styles.step_check_video_wrapper}>
               <video
                 key={demoAsset}
@@ -142,23 +141,28 @@ export function CheckHeight(props: CheckHeightProps): React.Node {
 type CompareZProps = {|
   comparison: RobotCalibrationCheckComparison,
   goToNextCheck: () => void,
-  exit: () => void,
+  pipetteModel: string,
+  exit: () => mixed,
   nextButtonText: string,
 |}
 function CompareZ(props: CompareZProps) {
-  const { comparison, goToNextCheck, exit, nextButtonText } = props
-  const { differenceVector, exceedsThreshold } = comparison
-
+  const {
+    comparison,
+    pipetteModel,
+    goToNextCheck,
+    exit,
+    nextButtonText,
+  } = props
+  const { exceedsThreshold, transformType } = comparison
+  const { displayName } = getPipetteModelSpecs(pipetteModel) || {}
   let header = GOOD_INSPECTING_HEADER
-  let body = GOOD_INSPECTING_BODY
+  let preamble = GOOD_INSPECTING_PREAMBLE
   let icon = <Icon name="check-circle" className={styles.success_status_icon} />
-  let differenceClass = styles.difference_good
 
   if (exceedsThreshold) {
-    header = BAD_INSPECTING_HEADER
-    body = BAD_INSPECTING_BODY
+    header = getBadOutcomeHeader(transformType)
+    preamble = BAD_INSPECTING_PREAMBLE
     icon = <Icon name="close-circle" className={styles.error_status_icon} />
-    differenceClass = styles.difference_bad
   }
 
   return (
@@ -167,32 +171,22 @@ function CompareZ(props: CompareZProps) {
         {icon}
         <h3>{header}</h3>
       </div>
-      <p className={styles.difference_body}>{body}</p>
-      <div className={cx(styles.difference_wrapper, differenceClass)}>
-        <h5>{DIFFERENCE}</h5>
-        <div className={styles.difference_values}>
-          <div className={styles.difference_value_wrapper}>
-            <h5>Z</h5>
-            <span className={cx(styles.difference_value, differenceClass)}>
-              {formatOffsetValue(differenceVector[2])}
-            </span>
-          </div>
-        </div>
-      </div>
-      {exceedsThreshold &&
-        (comparison.transformType === CHECK_TRANSFORM_TYPE_DECK ? (
+      <p className={styles.difference_body}>
+        {preamble}
+        &nbsp;
+        {displayName}
+        &nbsp;
+        {INSPECTING_COMPARISON}
+      </p>
+      <EndOfStepComparison comparison={comparison} forAxes={['z']} />
+      {exceedsThreshold && (
+        <>
           <p className={styles.difference_body}>
-            {DECK_CAL_BLURB}
-            &nbsp;
-            <Link href={DECK_CAL_ARTICLE_URL} external>
-              {THIS_ARTICLE}
-            </Link>
-            &nbsp;
-            {TO_LEARN}
+            <BadOutcomeBody transform={comparison.transformType} />
           </p>
-        ) : (
-          <p className={styles.difference_body}>{CONTACT_SUPPORT}</p>
-        ))}
+          <p className={styles.difference_body}>{CONTINUE_BLURB}</p>
+        </>
+      )}
       <div className={styles.button_stack}>
         {exceedsThreshold && (
           <PrimaryButton onClick={exit}>{EXIT_CALIBRATION_CHECK}</PrimaryButton>

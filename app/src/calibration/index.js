@@ -1,18 +1,5 @@
 // @flow
-// calibration  actions, selectors and constants
-import type {
-  RobotCalibrationCheckStep,
-  RobotCalibrationCheckComparison,
-  RobotCalibrationCheckSessionDetails,
-  TipLengthCalibrationStep,
-  TipLengthCalibrationSessionDetails,
-} from './api-types'
+// calibration data actions, selectors and constants
+export * from './actions'
 export * from './constants'
-
-export type {
-  RobotCalibrationCheckStep,
-  RobotCalibrationCheckComparison,
-  RobotCalibrationCheckSessionDetails,
-  TipLengthCalibrationStep,
-  TipLengthCalibrationSessionDetails,
-}
+export * from './selectors'

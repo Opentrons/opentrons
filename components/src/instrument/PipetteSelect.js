@@ -119,7 +119,7 @@ const PipetteNameItem = (props: PipetteNameSpecs) => {
 
   return (
     <Flex
-      data-id={dataIdFormat(
+      data-test={dataIdFormat(
         'PipetteNameItem',
         volumeClass,
         channels,

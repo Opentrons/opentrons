@@ -33,6 +33,8 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_1_trash_1100ml_fixed',
   'eppendorf_96_tiprack_1000ul_eptips',
   'eppendorf_96_tiprack_10ul_eptips',
+  'opentrons_calibrationblock_short_side_left',
+  'opentrons_calibrationblock_short_side_right',
 ]
 
 export function getLabwareV1Def(labwareName: string): ?LabwareDefinition1 {

@@ -13,6 +13,7 @@ import typeof {
   FETCH_ALL_SESSIONS,
   FETCH_ALL_SESSIONS_SUCCESS,
   FETCH_ALL_SESSIONS_FAILURE,
+  ENSURE_SESSION,
   CREATE_SESSION_COMMAND,
   CREATE_SESSION_COMMAND_SUCCESS,
   CREATE_SESSION_COMMAND_FAILURE,
@@ -25,14 +26,22 @@ import type {
   RobotApiV2ResponseBody,
   RobotApiV2ErrorResponseBody,
 } from '../robot-api/types'
-import * as Calibration from '../calibration'
+
+import * as CalCheckTypes from './calibration-check/types'
+import * as TipLengthCalTypes from './tip-length-calibration/types'
+import * as CalCheckConstants from './calibration-check/constants'
+
+export type * from './calibration-check/types'
+export type * from './tip-length-calibration/types'
 
 // The available session types
 export type SessionType =
   | SESSION_TYPE_CALIBRATION_CHECK
   | SESSION_TYPE_TIP_LENGTH_CALIBRATION
 
-export type SessionCommandString = $Values<typeof Calibration.checkCommands>
+export type SessionCommandString = $Values<
+  typeof CalCheckConstants.checkCommands
+>
 
 // TODO(al, 2020-05-11): data should be properly typed with all
 // known command types
@@ -40,12 +49,12 @@ export type SessionCommandData = { ... }
 
 export type CalibrationCheckSessionResponseAttributes = {|
   sessionType: SESSION_TYPE_CALIBRATION_CHECK,
-  details: Calibration.RobotCalibrationCheckSessionDetails,
+  details: CalCheckTypes.RobotCalibrationCheckSessionDetails,
 |}
 
 export type TipLengthCalibrationSessionResponseAttributes = {|
   sessionType: SESSION_TYPE_TIP_LENGTH_CALIBRATION,
-  details: Calibration.TipLengthCalibrationSessionDetails,
+  details: TipLengthCalTypes.TipLengthCalibrationSessionDetails,
 |}
 
 export type SessionResponseAttributes =
@@ -176,6 +185,12 @@ export type FetchAllSessionsFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type EnsureSessionAction = {|
+  type: ENSURE_SESSION,
+  payload: {| robotName: string, sessionType: SessionType |},
+  meta: RobotApiRequestMeta,
+|}
+
 export type CreateSessionCommandAction = {|
   type: CREATE_SESSION_COMMAND,
   payload: {|
@@ -191,7 +206,7 @@ export type CreateSessionCommandSuccessAction = {|
   payload: {|
     robotName: string,
     sessionId: string,
-    ...SessionCommandResponse,
+    ...SessionResponse,
   |},
   meta: RobotApiRequestMeta,
 |}
@@ -222,6 +237,7 @@ export type SessionsAction =
   | CreateSessionCommandAction
   | CreateSessionCommandSuccessAction
   | CreateSessionCommandFailureAction
+  | EnsureSessionAction
 
 export type SessionsById = $Shape<{|
   [id: string]: Session,

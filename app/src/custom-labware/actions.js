@@ -1,9 +1,9 @@
 // @flow
 
-import { resetConfig } from '../config'
+import { resetConfigValue } from '../config'
 import * as Types from './types'
 
-import type { ResetConfigAction } from '../config/types'
+import type { ResetConfigValueAction } from '../config/types'
 
 // action type literals
 
@@ -98,5 +98,6 @@ export const openCustomLabwareDirectory = (): Types.OpenCustomLabwareDirectoryAc
   meta: { shell: true },
 })
 
-export const resetCustomLabwareDirectory = (): ResetConfigAction =>
-  resetConfig(LABWARE_DIRECTORY_CONFIG_PATH)
+export const resetCustomLabwareDirectory = (): ResetConfigValueAction => {
+  return resetConfigValue(LABWARE_DIRECTORY_CONFIG_PATH)
+}

@@ -19,7 +19,8 @@ export function sessionReducer(
 ): SessionState {
   switch (action.type) {
     case Constants.CREATE_SESSION_SUCCESS:
-    case Constants.FETCH_SESSION_SUCCESS: {
+    case Constants.FETCH_SESSION_SUCCESS:
+    case Constants.CREATE_SESSION_COMMAND_SUCCESS: {
       const { robotName, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
       return {

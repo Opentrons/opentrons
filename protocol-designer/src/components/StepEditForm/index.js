@@ -14,7 +14,12 @@ import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForS
 import formStyles from '../forms/forms.css'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
-import { ConfirmDeleteStepModal } from '../modals/ConfirmDeleteStepModal'
+import {
+  ConfirmDeleteModal,
+  DELETE_STEP_FORM,
+  CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_UNSAVED_STEP_FORM,
+} from '../modals/ConfirmDeleteModal'
 
 import {
   MixForm,
@@ -142,14 +147,22 @@ const getDirtyFields = (
 
 type StepEditFormManagerProps = {|
   // TODO(IL, 2020-04-22): use HydratedFormData type see #3161
-  formData: ?FormData,
-  isNewStep: boolean,
   canSave: boolean,
+  formData: ?FormData,
+  formHasChanges: boolean,
+  isNewStep: boolean,
   isPristineSetTempForm: boolean,
 |}
 
 const StepEditFormManager = (props: StepEditFormManagerProps) => {
-  const { canSave, formData, isNewStep, isPristineSetTempForm } = props
+  const {
+    canSave,
+    formData,
+    isNewStep,
+    formHasChanges,
+    isPristineSetTempForm,
+  } = props
+
   const [
     showMoreOptionsModal,
     setShowMoreOptionsModal,
@@ -202,7 +215,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     confirm: confirmClose,
     showConfirmation: showConfirmCancelModal,
     cancel: cancelClose,
-  } = useConditionalConfirm(handleClose, isNewStep)
+  } = useConditionalConfirm(handleClose, isNewStep || formHasChanges)
 
   const {
     confirm: confirmAddPauseUntilTempStep,
@@ -220,16 +233,17 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   return (
     <>
       {showConfirmDeleteModal && (
-        <ConfirmDeleteStepModal
+        <ConfirmDeleteModal
+          modalType={DELETE_STEP_FORM}
           onCancelClick={cancelDelete}
           onContinueClick={confirmDelete}
         />
       )}
       {showConfirmCancelModal && (
-        <ConfirmDeleteStepModal
-          heading="Unsaved Step form"
-          alertOverlay
-          close
+        <ConfirmDeleteModal
+          modalType={
+            isNewStep ? CLOSE_UNSAVED_STEP_FORM : CLOSE_STEP_FORM_WITH_CHANGES
+          }
           onCancelClick={cancelClose}
           onContinueClick={confirmClose}
         />
@@ -264,9 +278,10 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
 
 const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
   return {
-    formData: stepFormSelectors.getHydratedUnsavedForm(state),
-    isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
     canSave: stepFormSelectors.getCurrentFormCanBeSaved(state),
+    formData: stepFormSelectors.getHydratedUnsavedForm(state),
+    formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
+    isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
     isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
       state
     ),

@@ -1,65 +1,88 @@
 // @flow
-import remove from 'lodash/remove'
+import * as Constants from './constants'
+import * as Types from './types'
 
-import { UPDATE, RESET } from './constants'
-import { getConfig } from './selectors'
-
-import type { ThunkAction } from '../types'
-import type {
-  UpdateConfigAction,
-  ResetConfigAction,
-  DevInternalFlag,
-} from './types'
-
-// trigger a config value update via the app-shell via shell middleware
-export const updateConfig = (path: string, value: any): UpdateConfigAction => ({
-  type: UPDATE,
+// request a config value update
+export const updateConfigValue = (
+  path: string,
+  value: mixed
+): Types.UpdateConfigValueAction => ({
+  type: Constants.UPDATE_VALUE,
   payload: { path, value },
   meta: { shell: true },
 })
 
-// trigger a config value reset via the app-shell via shell middleware
-export const resetConfig = (path: string): ResetConfigAction => ({
-  type: RESET,
+// request a config value reset to default
+export const resetConfigValue = (
+  path: string
+): Types.ResetConfigValueAction => ({
+  type: Constants.RESET_VALUE,
   payload: { path },
   meta: { shell: true },
 })
 
-// TODO(mc, 2020-02-05): move to `shell` module
-export function toggleDevTools(): ThunkAction {
-  return (dispatch, getState) => {
-    const devToolsOn = getConfig(getState()).devtools
-    return dispatch(updateConfig('devtools', !devToolsOn))
-  }
+// request a boolean config value toggle
+export const toggleConfigValue = (
+  path: string
+): Types.ToggleConfigValueAction => ({
+  type: Constants.TOGGLE_VALUE,
+  payload: { path },
+  meta: { shell: true },
+})
+
+// add a unique value into an array config if it's not already in there
+export const addUniqueConfigValue = (
+  path: string,
+  value: mixed
+): Types.AddUniqueConfigValueAction => ({
+  type: Constants.ADD_UNIQUE_VALUE,
+  payload: { path, value },
+  meta: { shell: true },
+})
+
+// remove a unique from an array config if it's in there
+export const subtractConfigValue = (
+  path: string,
+  value: mixed
+): Types.SubtractConfigValueAction => ({
+  type: Constants.SUBTRACT_VALUE,
+  payload: { path, value },
+  meta: { shell: true },
+})
+
+// config file has been initialized
+export const configInitialized = (
+  config: Types.Config
+): Types.ConfigInitializedAction => ({
+  type: Constants.INITIALIZED,
+  payload: { config },
+})
+
+// config value has been updated
+export const configValueUpdated = (
+  path: string,
+  value: mixed
+): Types.ConfigValueUpdatedAction => ({
+  type: Constants.VALUE_UPDATED,
+  payload: { path, value },
+})
+
+export function toggleDevtools(): Types.ToggleConfigValueAction {
+  return toggleConfigValue('devtools')
 }
 
-export function toggleDevInternalFlag(flag: DevInternalFlag): ThunkAction {
-  return (dispatch, getState) => {
-    const devInternal = getConfig(getState()).devInternal
-    const isFlagOn = devInternal ? devInternal[flag] : false
-    return dispatch(updateConfig(`devInternal.${flag}`, !isFlagOn))
-  }
+export function toggleDevInternalFlag(
+  flag: Types.DevInternalFlag
+): Types.ToggleConfigValueAction {
+  return toggleConfigValue(`devInternal.${flag}`)
 }
 
 // TODO(mc, 2020-02-05): move to `discovery` module
-export function addManualIp(ip: string): ThunkAction {
-  return (dispatch, getState) => {
-    const candidates = getConfig(getState()).discovery.candidates
-    const previous: ?string = [].concat(candidates).find(i => i === ip)
-    let nextCandidatesList = candidates
-    if (!previous) nextCandidatesList = nextCandidatesList.concat(ip)
-
-    return dispatch(updateConfig('discovery.candidates', nextCandidatesList))
-  }
+export function addManualIp(ip: string): Types.AddUniqueConfigValueAction {
+  return addUniqueConfigValue('discovery.candidates', ip)
 }
 
 // TODO(mc, 2020-02-05): move to `discovery` module
-export function removeManualIp(ip: string): ThunkAction {
-  return (dispatch, getState) => {
-    const candidates = [].concat(getConfig(getState()).discovery.candidates)
-
-    remove(candidates, c => c === ip)
-
-    return dispatch(updateConfig('discovery.candidates', candidates))
-  }
+export function removeManualIp(ip: string): Types.SubtractConfigValueAction {
+  return subtractConfigValue('discovery.candidates', ip)
 }

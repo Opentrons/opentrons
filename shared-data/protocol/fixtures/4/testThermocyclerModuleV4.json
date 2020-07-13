@@ -8,43 +8,6 @@
     "subcategory": null,
     "tags": []
   },
-  "designerApplication": {
-    "name": "opentrons/protocol-designer",
-    "version": "4.0.1",
-    "data": {
-      "_internalAppBuildDate": "Wed, 29 Apr 2020 15:30:24 GMT",
-      "defaultValues": {
-        "aspirate_mmFromBottom": 1,
-        "dispense_mmFromBottom": 0.5,
-        "touchTip_mmFromTop": -1,
-        "blowout_mmFromTop": 0
-      },
-      "pipetteTiprackAssignments": {
-        "de8061b0-8a4a-11ea-b2bb-0d8365e806c3": "opentrons/opentrons_96_tiprack_20ul/1"
-      },
-      "dismissedWarnings": { "form": {}, "timeline": {} },
-      "ingredients": {},
-      "ingredLocations": {},
-      "savedStepForms": {
-        "__INITIAL_DECK_SETUP_STEP__": {
-          "stepType": "manualIntervention",
-          "id": "__INITIAL_DECK_SETUP_STEP__",
-          "labwareLocationUpdate": {
-            "trashId": "12",
-            "de82f9c0-8a4a-11ea-b2bb-0d8365e806c3:opentrons/opentrons_96_tiprack_20ul/1": "1",
-            "e5860500-8a4a-11ea-b2bb-0d8365e806c3:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1": "someThermocyclerModuleId"
-          },
-          "pipetteLocationUpdate": {
-            "de8061b0-8a4a-11ea-b2bb-0d8365e806c3": "left"
-          },
-          "moduleLocationUpdate": {
-            "someThermocyclerModuleId": "span7_8_10_11"
-          }
-        }
-      },
-      "orderedStepIds": []
-    }
-  },
   "robot": { "model": "OT-2 Standard" },
   "pipettes": {
     "de8061b0-8a4a-11ea-b2bb-0d8365e806c3": {

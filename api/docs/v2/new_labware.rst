@@ -297,13 +297,11 @@ representing the combination of a point in space (another named tuple) and
 a reference to the associated :py:class:`.Well` (or :py:class:`.Labware`, or
 slot name, depending on context).
 
-To further change positions, you can use :py:meth:`.Location.move`, which
-lets you move the Location. This function takes a single argument, ``point``,
-which should be a :py:class:`opentrons.types.Point`. This is a named tuple
-with elements ``x``, ``y``, and ``z``, representing a 3 dimensional point.
+To adjust the position within a well, you can use :py:meth:`.Location.move`.
+Pass it a :py:class:`opentrons.types.Point` representing a 3-dimensional offset.
+It will return a new location, representing the original location with that offset applied.
 
-To move a location, you create a :py:class:`.types.Point` representing a
-3d offset and give it to :py:meth:`.Location.move`:
+For example:
 
 .. code-block:: python
 
@@ -314,8 +312,14 @@ To move a location, you create a :py:class:`.types.Point` representing a
    def run(protocol):
         plate = protocol.load_labware(
            'corning_24_wellplate_3.4ml_flat', slot='1')
-        plate['A1'].center().move(
-           types.Point(x=1, y=1, z=1)) # 1mm up, to the right, and towards the
-                                       # back of the robot
+
+        # Get the center of well A1.
+        center_location = plate['A1'].center()
+
+        # Get a location 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
+        adjusted_location = center_location.move(types.Point(x=1, y=1, z=1))
+
+        # Move to 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
+        pipette.move_to(adjusted_location)
 
 .. versionadded:: 2.0

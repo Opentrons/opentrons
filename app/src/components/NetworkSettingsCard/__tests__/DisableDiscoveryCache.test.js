@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
 
-import * as AllConfig from '../../../config'
+import * as Cfg from '../../../config'
 import { LabeledToggle } from '@opentrons/components'
 import { DisableDiscoveryCache } from '../DisableDiscoveryCache'
 
@@ -15,7 +15,7 @@ jest.mock('../../../config/selectors')
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 
-const getConfig: JestMockFn<[State], $Shape<Config>> = AllConfig.getConfig
+const getConfig: JestMockFn<[State], $Shape<Config> | null> = Cfg.getConfig
 
 function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
   mock.mockImplementation(state => {
@@ -80,12 +80,12 @@ describe('DisableDiscoveryCache', () => {
     expect(wrapper.find(LabeledToggle).prop('toggledOn')).toBe(false)
   })
 
-  it('dispatches config update on toggle', () => {
+  it('dispatches config toggle on toggle', () => {
     const wrapper = render()
     const theToggle = wrapper.find(LabeledToggle)
     theToggle.prop('onClick')()
     expect(dispatch).toHaveBeenCalledWith(
-      AllConfig.updateConfig('discovery.disableCache', true)
+      Cfg.toggleConfigValue('discovery.disableCache')
     )
   })
 })

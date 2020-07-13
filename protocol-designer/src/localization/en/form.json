@@ -58,6 +58,9 @@
           "never": "Use same tip as the previous step."
         }
       },
+      "delay": {
+        "label": "delay"
+      },
       "tip_position": { "label": "tip position" },
       "volume": { "label": "volume per well" },
       "well_order": {
@@ -124,7 +127,7 @@
       "thermocyclerAction": {
         "options": {
           "state": "Change Thermocycler state",
-          "profile": "Program a Thermal cycling profile"
+          "profile": "Program a Thermocycler profile"
         }
       },
       "thermocyclerState": {
@@ -148,7 +151,9 @@
         "volume": "volume",
         "lid_temp": "lid temp",
         "lid_position": "lid position",
-        "lid_closed": "Closed"
+        "lid_closed": "Closed",
+        "add_cycle_button": "+ Cycle",
+        "add_step_button": "+ Step"
       }
     }
   }

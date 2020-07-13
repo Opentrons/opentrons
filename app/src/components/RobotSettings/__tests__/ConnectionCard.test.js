@@ -13,13 +13,11 @@ import type { State } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
 
 jest.mock('../../../networking/selectors')
-jest.mock('../../../components/RobotSettings/SelectNetwork', () => {
-  return {
-    SelectNetwork: () => {
-      return <></>
-    },
-  }
-})
+jest.mock('../../../components/RobotSettings/SelectNetwork', () => ({
+  SelectNetwork: () => {
+    return <></>
+  },
+}))
 
 const mockRobot: ViewableRobot = ({
   name: 'robot-name',

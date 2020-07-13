@@ -25,10 +25,6 @@ def use_old_aspiration_functions():
     return advs.get_setting_with_env_overload('useOldAspirationFunctions')
 
 
-def use_fast_api() -> bool:
-    return not advs.get_setting_with_env_overload('useV1HttpApi')
-
-
 def enable_door_safety_switch():
     return advs.get_setting_with_env_overload('enableDoorSafetySwitch')
 

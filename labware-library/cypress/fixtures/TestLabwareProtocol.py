@@ -19,7 +19,7 @@ CALIBRATION_CROSS_COORDS = {
     }
 }
 CALIBRATION_CROSS_SLOTS = ['1', '3', '7']
-TEST_LABWARE_SLOT = '3'
+TEST_LABWARE_SLOT = '2'
 
 RATE = 0.25  # % of default speeds
 SLOWER_RATE = 0.1
@@ -30,7 +30,7 @@ PIPETTE_NAME = 'p10_single'
 TIPRACK_SLOT = '5'
 TIPRACK_LOADNAME = 'opentrons_96_tiprack_20ul'
 
-LABWARE_DEF_JSON = """{"ordering":[["A1","B1","C1"],["A2","B2","C2"],["A3","B3","C3"],["A4","B4","C4"],["A5","B5","C5"]],"brand":{"brand":"TestPro","brandId":["001"]},"metadata":{"displayName":"TestPro 15 Well Plate 5 µL","displayCategory":"wellPlate","displayVolumeUnits":"µL","tags":[]},"dimensions":{"xDimension":127,"yDimension":85,"zDimension":5},"wells":{"A1":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":10,"y":75,"z":0},"B1":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":10,"y":50,"z":0},"C1":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":10,"y":25,"z":0},"A2":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":35,"y":75,"z":0},"B2":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":35,"y":50,"z":0},"C2":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":35,"y":25,"z":0},"A3":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":60,"y":75,"z":0},"B3":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":60,"y":50,"z":0},"C3":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":60,"y":25,"z":0},"A4":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":85,"y":75,"z":0},"B4":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":85,"y":50,"z":0},"C4":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":85,"y":25,"z":0},"A5":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":110,"y":75,"z":0},"B5":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":110,"y":50,"z":0},"C5":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":110,"y":25,"z":0}},"groups":[{"metadata":{"displayName":"TestPro 15 Well Plate 5 µL","displayCategory":"wellPlate","wellBottomShape":"flat"},"brand":{"brand":"TestPro","brandId":["001"]},"wells":["A1","B1","C1","A2","B2","C2","A3","B3","C3","A4","B4","C4","A5","B5","C5"]}],"parameters":{"format":"irregular","quirks":[],"isTiprack":false,"isMagneticModuleCompatible":false,"loadName":"testpro_15_wellplate_5ul"},"namespace":"custom_beta","version":1,"schemaVersion":2,"cornerOffsetFromSlot":{"x":0,"y":0,"z":0}}"""
+LABWARE_DEF_JSON = """{"ordering":[["A1","B1","C1"],["A2","B2","C2"],["A3","B3","C3"],["A4","B4","C4"],["A5","B5","C5"]],"brand":{"brand":"TestPro","brandId":["001"]},"metadata":{"displayName":"TestPro 15 Well Plate 5 µL","displayCategory":"wellPlate","displayVolumeUnits":"µL","tags":[]},"dimensions":{"xDimension":127,"yDimension":85,"zDimension":5},"wells":{"A1":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":10,"y":75,"z":0},"B1":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":10,"y":50,"z":0},"C1":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":10,"y":25,"z":0},"A2":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":35,"y":75,"z":0},"B2":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":35,"y":50,"z":0},"C2":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":35,"y":25,"z":0},"A3":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":60,"y":75,"z":0},"B3":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":60,"y":50,"z":0},"C3":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":60,"y":25,"z":0},"A4":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":85,"y":75,"z":0},"B4":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":85,"y":50,"z":0},"C4":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":85,"y":25,"z":0},"A5":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":110,"y":75,"z":0},"B5":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":110,"y":50,"z":0},"C5":{"depth":5,"totalLiquidVolume":5,"shape":"circular","diameter":5,"x":110,"y":25,"z":0}},"groups":[{"metadata":{"wellBottomShape":"flat"},"wells":["A1","B1","C1","A2","B2","C2","A3","B3","C3","A4","B4","C4","A5","B5","C5"]}],"parameters":{"format":"irregular","quirks":[],"isTiprack":false,"isMagneticModuleCompatible":false,"loadName":"testpro_15_wellplate_5ul"},"namespace":"custom_beta","version":1,"schemaVersion":2,"cornerOffsetFromSlot":{"x":0,"y":0,"z":0}}"""
 LABWARE_DEF = json.loads(LABWARE_DEF_JSON)
 LABWARE_LABEL = LABWARE_DEF.get('metadata', {}).get(
     'displayName', 'test labware')
@@ -44,6 +44,7 @@ def uniq(l):
         if i not in res:
             res.append(i)
     return res
+
 
 def run(protocol: protocol_api.ProtocolContext):
     tiprack = protocol.load_labware(TIPRACK_LOADNAME, TIPRACK_SLOT)
@@ -109,6 +110,9 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.move_to(edge_location)
             protocol.pause(f'Moved to {edge_name} edge')
 
+    # go to bottom last. (If there is more than one well, use the last well first
+    # because the pipette is already at the last well at this point)
+    for well_loc in reversed(well_locs):
         set_speeds(RATE)
         pipette.move_to(well.bottom())
         protocol.pause("Moved to the bottom of the well")

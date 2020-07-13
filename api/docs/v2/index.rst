@@ -206,9 +206,9 @@ __ https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md
 
     writing
     versioning
-    new_pipette
     new_labware
     new_modules
+    new_pipette
     new_atomic_commands
     new_complex_commands
     new_protocol_api

@@ -34,6 +34,12 @@ describe('thermocyclerProfileStep', () => {
       },
       expected: [
         {
+          command: 'thermocycler/closeLid',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+        {
           command: 'thermocycler/setTargetLidTemperature',
           params: {
             module: 'thermocyclerId',
@@ -91,12 +97,142 @@ describe('thermocyclerProfileStep', () => {
     },
     {
       testName:
-        'should generate expected commands, omitting the setTargetLidTemperature when lid temp is already at desired temp',
+        'should omit the setTargetLidTemperature when lid temp is already at desired temp',
+      initialThermocyclerModuleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: 55,
+        lidOpen: false,
+      },
+      args: {
+        commandCreatorFnName: 'thermocyclerProfile',
+        blockTargetTempHold: 4,
+        lidTargetTempHold: null,
+        lidOpenHold: true,
+        module: thermocyclerId,
+        profileSteps: [{ temperature: 61, holdTime: 99 }],
+        profileTargetLidTemp: 55,
+        profileVolume: 42,
+      },
+      expected: [
+        {
+          command: 'thermocycler/runProfile',
+          params: {
+            module: 'thermocyclerId',
+            profile: [{ temperature: 61, holdTime: 99 }],
+            volume: 42,
+          },
+        },
+        {
+          command: 'thermocycler/awaitProfileComplete',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+        {
+          command: 'thermocycler/openLid',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+        {
+          command: 'thermocycler/setTargetBlockTemperature',
+          params: {
+            module: 'thermocyclerId',
+            temperature: 4,
+          },
+        },
+        {
+          command: 'thermocycler/awaitBlockTemperature',
+          params: {
+            module: 'thermocyclerId',
+            temperature: 4,
+          },
+        },
+        {
+          command: 'thermocycler/deactivateLid',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+      ],
+    },
+    {
+      testName:
+        'should close the lid before running the profile if the lid open state is null',
       initialThermocyclerModuleState: {
         type: THERMOCYCLER_MODULE_TYPE,
         blockTargetTemp: null,
         lidTargetTemp: 55,
         lidOpen: null,
+      },
+      args: {
+        commandCreatorFnName: 'thermocyclerProfile',
+        blockTargetTempHold: 4,
+        lidTargetTempHold: null,
+        lidOpenHold: true,
+        module: thermocyclerId,
+        profileSteps: [{ temperature: 61, holdTime: 99 }],
+        profileTargetLidTemp: 55,
+        profileVolume: 42,
+      },
+      expected: [
+        {
+          command: 'thermocycler/closeLid',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+        {
+          command: 'thermocycler/runProfile',
+          params: {
+            module: 'thermocyclerId',
+            profile: [{ temperature: 61, holdTime: 99 }],
+            volume: 42,
+          },
+        },
+        {
+          command: 'thermocycler/awaitProfileComplete',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+        {
+          command: 'thermocycler/openLid',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+        {
+          command: 'thermocycler/setTargetBlockTemperature',
+          params: {
+            module: 'thermocyclerId',
+            temperature: 4,
+          },
+        },
+        {
+          command: 'thermocycler/awaitBlockTemperature',
+          params: {
+            module: 'thermocyclerId',
+            temperature: 4,
+          },
+        },
+        {
+          command: 'thermocycler/deactivateLid',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+      ],
+    },
+    {
+      testName:
+        'should omit the closeLid when the lid open state is false before running a profile',
+      initialThermocyclerModuleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: 55,
+        lidOpen: false,
       },
       args: {
         commandCreatorFnName: 'thermocyclerProfile',

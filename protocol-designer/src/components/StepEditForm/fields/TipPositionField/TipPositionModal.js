@@ -33,8 +33,8 @@ const LARGE_STEP_MM = 10
 const DECIMALS_ALLOWED = 1
 
 type OP = {|
-  mmFromBottom: number,
-  wellDepthMm: number,
+  mmFromBottom: number | null,
+  wellDepthMm: number | null,
   isOpen: boolean,
   closeModal: () => mixed,
   fieldName: TipOffsetFields,
@@ -43,7 +43,7 @@ type OP = {|
 type DP = {| updateValue: (?number) => mixed |}
 
 type Props = { ...OP, ...DP }
-type State = { value: ?number }
+type State = { value: number | null }
 
 const roundValue = (value: number | string): number =>
   round(Number(value), DECIMALS_ALLOWED)
@@ -52,37 +52,48 @@ class TipPositionModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     const initialValue =
-      props.mmFromBottom != null
+      props.mmFromBottom !== null
         ? roundValue(props.mmFromBottom)
         : roundValue(this.getDefaultMmFromBottom())
     this.state = { value: initialValue }
   }
+
   componentDidUpdate(prevProps: Props) {
     if (prevProps.wellDepthMm !== this.props.wellDepthMm) {
-      this.setState({ value: roundValue(this.props.mmFromBottom) })
+      this.setState({ value: roundValue(this.getMmFromBottom()) })
     }
   }
+
   applyChanges = () => {
     const { value } = this.state
     this.props.updateValue(value == null ? null : roundValue(value))
     this.props.closeModal()
   }
+
   getDefaultMmFromBottom = (): number => {
-    const { fieldName, wellDepthMm } = this.props
+    const { fieldName } = this.props
+    const wellDepthMm = this.getWellDepthMm()
     return utils.getDefaultMmFromBottom({ fieldName, wellDepthMm })
   }
+
+  getMmFromBottom = () =>
+    this.props.mmFromBottom ?? this.getDefaultMmFromBottom()
+
+  getWellDepthMm = () => this.props.wellDepthMm ?? 0
+
   getMinMaxMmFromBottom = (): {
     maxMmFromBottom: number,
     minMmFromBottom: number,
   } => {
+    const wellDepthMm = this.getWellDepthMm()
     if (getIsTouchTipField(this.props.fieldName)) {
       return {
-        maxMmFromBottom: roundValue(this.props.wellDepthMm),
-        minMmFromBottom: roundValue(this.props.wellDepthMm / 2),
+        maxMmFromBottom: roundValue(wellDepthMm),
+        minMmFromBottom: roundValue(wellDepthMm / 2),
       }
     }
     return {
-      maxMmFromBottom: roundValue(this.props.wellDepthMm * 2),
+      maxMmFromBottom: roundValue(wellDepthMm * 2),
       minMmFromBottom: 0,
     }
   }
@@ -92,7 +103,7 @@ class TipPositionModalComponent extends React.Component<Props, State> {
   }
   handleCancel = () => {
     this.setState(
-      { value: roundValue(this.props.mmFromBottom) },
+      { value: roundValue(this.getMmFromBottom()) },
       this.props.closeModal
     )
   }
@@ -121,9 +132,11 @@ class TipPositionModalComponent extends React.Component<Props, State> {
       value: clamp(valueFloat, minMmFromBottom, maxMmFromBottom),
     })
   }
+
   handleInputFieldChange = (e: SyntheticEvent<HTMLInputElement>) => {
     this.handleChange(e.currentTarget.value)
   }
+
   handleIncrementDecrement = (delta: number) => {
     const { value } = this.state
     const prevValue =
@@ -131,16 +144,20 @@ class TipPositionModalComponent extends React.Component<Props, State> {
 
     this.handleChange(prevValue + delta)
   }
+
   makeHandleIncrement = (step: number) => () => {
     this.handleIncrementDecrement(step)
   }
+
   makeHandleDecrement = (step: number) => () => {
     this.handleIncrementDecrement(step * -1)
   }
+
   render() {
     if (!this.props.isOpen) return null
     const { value } = this.state
-    const { fieldName, wellDepthMm } = this.props
+    const { fieldName } = this.props
+    const wellDepthMm = this.getWellDepthMm()
     const { maxMmFromBottom, minMmFromBottom } = this.getMinMaxMmFromBottom()
 
     return (
@@ -186,21 +203,21 @@ class TipPositionModalComponent extends React.Component<Props, State> {
                     className={styles.position_from_bottom_input}
                     onChange={this.handleInputFieldChange}
                     units="mm"
-                    value={value != null ? String(value) : ''}
+                    value={value !== null ? String(value) : ''}
                   />
                 </FormGroup>
                 <div className={styles.viz_group}>
                   <div className={styles.adjustment_buttons}>
                     <OutlineButton
                       className={styles.adjustment_button}
-                      disabled={value != null && value >= maxMmFromBottom}
+                      disabled={value !== null && value >= maxMmFromBottom}
                       onClick={this.makeHandleIncrement(SMALL_STEP_MM)}
                     >
                       <Icon name="plus" />
                     </OutlineButton>
                     <OutlineButton
                       className={styles.adjustment_button}
-                      disabled={value != null && value <= minMmFromBottom}
+                      disabled={value !== null && value <= minMmFromBottom}
                       onClick={this.makeHandleDecrement(SMALL_STEP_MM)}
                     >
                       <Icon name="minus" />
@@ -208,7 +225,7 @@ class TipPositionModalComponent extends React.Component<Props, State> {
                   </div>
                   <TipPositionZAxisViz
                     mmFromBottom={
-                      value != null ? value : this.getDefaultMmFromBottom()
+                      value !== null ? value : this.getDefaultMmFromBottom()
                     }
                     wellDepthMm={wellDepthMm}
                   />

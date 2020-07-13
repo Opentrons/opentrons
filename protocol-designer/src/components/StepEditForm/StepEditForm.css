@@ -307,6 +307,10 @@ and when that is implemented.
   margin-top: 0.125rem;
 }
 
+.profile_form {
+  padding-left: 1.75rem;
+}
+
 .profile_settings_group {
   margin-right: 1rem;
 }
@@ -330,7 +334,7 @@ and when that is implemented.
 
   width: 1.5rem;
   text-align: right;
-  padding-right: 0.5rem;
+  padding: 0.5rem 0.5rem 0 0;
 }
 
 .profile_step_row {
@@ -345,7 +349,7 @@ and when that is implemented.
 
 .profile_step_fields {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   border: var(--bd-light);
   width: 100%;
   min-width: 36rem;

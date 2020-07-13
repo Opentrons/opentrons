@@ -125,7 +125,11 @@ export const SelectNetwork = ({
               type={changeState.type}
               ssid={changeState.ssid}
               isPending={requestState.status === RobotApi.PENDING}
-              error={requestState.error ? requestState.error : null}
+              error={
+                requestState.error && requestState.error.message
+                  ? requestState.error
+                  : null
+              }
               onClose={handleDone}
             />
           ) : changeState.type === DISCONNECT ? (

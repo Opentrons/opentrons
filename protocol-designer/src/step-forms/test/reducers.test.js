@@ -757,9 +757,9 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       )
     })
     describe('existing steps', () => {
-      let prevRootStateWithMagStep
+      let prevRootStateWithMagAndTCSteps
       beforeEach(() => {
-        prevRootStateWithMagStep = {
+        prevRootStateWithMagAndTCSteps = {
           savedStepForms: {
             ...makePrevRootState().savedStepForms,
             ...{
@@ -768,10 +768,16 @@ describe('savedStepForms reducer: initial deck setup step', () => {
                 moduleId: 'magdeckId',
               },
             },
+            ...{
+              TC_step_form_id: {
+                stepType: 'thermocycler',
+                moduleId: 'TCId',
+              },
+            },
           },
         }
       })
-      const testCases = [
+      const magneticStepCases = [
         {
           testName: 'create mag mod -> override mag step module id',
           action: {
@@ -813,10 +819,61 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
       ]
 
-      testCases.forEach(({ testName, action, expectedModuleId }) => {
+      const TCStepCases = [
+        {
+          testName: 'create TC -> override TC step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'NewTCId',
+              slot: SPAN7_8_10_11_SLOT,
+              type: THERMOCYCLER_MODULE_TYPE,
+              model: 'someTCModel',
+            },
+          },
+          expectedModuleId: 'NewTCId',
+        },
+        {
+          testName: 'create temp mod -> DO NOT override TC step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'tempdeckId',
+              slot: '1',
+              type: TEMPERATURE_MODULE_TYPE,
+              model: 'someTempModel',
+            },
+          },
+          expectedModuleId: 'TCId',
+        },
+        {
+          testName: 'create magnetic mod -> DO NOT override TC step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'newMagdeckId',
+              slot: '1',
+              type: MAGNETIC_MODULE_TYPE,
+              model: 'someMagModel',
+            },
+          },
+          expectedModuleId: 'TCId',
+        },
+      ]
+
+      magneticStepCases.forEach(({ testName, action, expectedModuleId }) => {
         it(testName, () => {
-          const result = savedStepForms(prevRootStateWithMagStep, action)
-          expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
+          const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
+          if (action.payload.type)
+            expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
+        })
+      })
+
+      TCStepCases.forEach(({ testName, action, expectedModuleId }) => {
+        it(testName, () => {
+          const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
+          if (action.payload.type)
+            expect(result.TC_step_form_id.moduleId).toBe(expectedModuleId)
         })
       })
     })
@@ -1109,10 +1166,12 @@ describe('unsavedForm reducer', () => {
 
   const actionTypes = [
     'CANCEL_STEP_FORM',
-    'SELECT_TERMINAL_ITEM',
-    'SAVE_STEP_FORM',
+    'CREATE_MODULE',
+    'DELETE_MODULE',
     'DELETE_STEP',
     'EDIT_MODULE',
+    'SAVE_STEP_FORM',
+    'SELECT_TERMINAL_ITEM',
   ]
   actionTypes.forEach(actionType => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {
@@ -1133,6 +1192,7 @@ describe('unsavedForm reducer', () => {
     const result = unsavedForm(stateMock, {
       type: 'ADD_STEP',
       payload: { id: 'stepId123', stepType: 'moveLiquid' },
+      meta: { robotStateTimeline: 'robotStateTimelineValue' },
     })
     expect(result).toEqual('createPresavedStepFormMockResult')
     expect(mockCreatePresavedStepForm.mock.calls).toEqual([
@@ -1145,6 +1205,7 @@ describe('unsavedForm reducer', () => {
           savedStepForms: 'savedStepFormsValue',
           orderedStepIds: 'orderedStepIdsValue',
           initialDeckSetup: 'initalDeckSetupValue',
+          robotStateTimeline: 'robotStateTimelineValue',
         },
       ],
     ])
@@ -1154,7 +1215,12 @@ describe('unsavedForm reducer', () => {
     const action = { type: 'ADD_PROFILE_CYCLE', payload: null }
 
     const id = 'newCycleId'
-    mockUuid.mockReturnValue(id)
+    const profileStepId = 'newProfileStepId'
+    // NOTE: because we're using uuid() to create multiple different ids,
+    // this test is sensitive to the order that uuid is called in and
+    // assumes it's first for cycle id, then next for profile step id
+    mockUuid.mockReturnValueOnce(id)
+    mockUuid.mockReturnValueOnce(profileStepId)
 
     const state = {
       unsavedForm: {
@@ -1169,7 +1235,7 @@ describe('unsavedForm reducer', () => {
       stepType: 'thermocycler',
       orderedProfileItems: [id],
       profileItemsById: {
-        [id]: createInitialProfileCycle(id),
+        [id]: createInitialProfileCycle(id, profileStepId),
       },
     })
   })

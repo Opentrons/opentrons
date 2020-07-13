@@ -30,7 +30,7 @@ type SP = {|
 |}
 
 type DP = {|
-  checkUpdate: () => mixed,
+  checkUpdate: () => void,
   downloadUpdate: () => mixed,
   applyUpdate: () => mixed,
   closeModal: () => mixed,
@@ -96,7 +96,7 @@ function AppSettingsComponent(props: Props) {
         />
         <Route
           render={() =>
-            available && !seen ? <Redirect to="/menu/app/update" /> : null
+            available && !seen ? <Redirect to="/more/app/update" /> : null
           }
         />
       </Switch>
@@ -113,12 +113,14 @@ function mapStateToProps(state: State): SP {
 
 function mapDispatchToProps(dispatch: Dispatch): DP {
   return {
-    checkUpdate: () => dispatch(checkShellUpdate()),
+    checkUpdate: () => {
+      dispatch(checkShellUpdate())
+    },
     downloadUpdate: () => dispatch(downloadShellUpdate()),
     applyUpdate: () => dispatch(applyShellUpdate()),
     closeModal: () => {
       dispatch(setShellUpdateSeen())
-      dispatch(push('/menu/app'))
+      dispatch(push('/more/app'))
     },
   }
 }

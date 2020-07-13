@@ -3,8 +3,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
-from opentrons.calibration.check.models import SessionType
-
 from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
@@ -54,7 +52,8 @@ class BaseSession(ABC):
     def get_response_model(self) -> models.Session:
         """Get the response model"""
         return models.Session(sessionType=self.session_type,
-                              details=self._get_response_details())
+                              details=self._get_response_details(),
+                              created_at=self.meta.created_at)
 
     @abstractmethod
     def _get_response_details(self) -> models.SessionDetails:
@@ -82,7 +81,7 @@ class BaseSession(ABC):
 
     @property
     @abstractmethod
-    def session_type(self) -> SessionType:
+    def session_type(self) -> models.SessionType:
         pass
 
     def __str__(self) -> str:

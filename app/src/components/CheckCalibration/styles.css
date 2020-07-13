@@ -1,5 +1,9 @@
 @import '@opentrons/components';
 
+.suppress_exit_button {
+  display: none;
+}
+
 .success_status_icon {
   width: 2.5rem;
   margin-right: 0.75rem;
@@ -10,6 +14,25 @@
   width: 2.5rem;
   margin-right: 0.75rem;
   color: var(--c-error);
+}
+
+.calcheck_intro_div {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.intro_header {
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-size: var('--fs-body-2');
+}
+
+.intro_content {
+  margin-bottom: 1rem;
+  font-size: var('--fs-body-2');
 }
 
 .modal_header {
@@ -34,15 +57,7 @@
 }
 
 .terminal_modal_contents {
-  padding: 2rem 3.5rem;
-}
-
-.complete_body_passed {
-  @apply --font-body-2-dark;
-}
-
-.complete_body_failed {
-  @apply --font-body-2-dark;
+  padding: 1rem 3.5rem;
 }
 
 .complete_summary {
@@ -53,22 +68,12 @@
   margin: 2rem 0;
 }
 
-.summary_section {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  height: 3rem;
-  width: 10.25rem;
-  padding: 0.75rem;
-  margin-right: 1rem;
-  border-radius: var(--bd-radius-default);
-  border-width: var(--bd-width-default);
-  border-style: solid;
+.summary_page_header {
+  margin-bottom: 1.75rem;
 }
 
-.summary_section:last-child {
-  margin-right: 0;
+.summary_section {
+  margin-bottom: 1.25rem;
 }
 
 .summary_icon {
@@ -76,13 +81,108 @@
   width: 1.25rem;
 }
 
-.raw_data_wrapper {
+.summary_page_contents {
+  width: 100%;
+}
+
+.download_summary_button {
+  align-self: flex-end;
+  width: 18rem;
+  margin-bottom: 1rem;
+}
+
+.summary_bad_outcome_header {
+  @apply --font-header-dark;
+
+  margin-bottom: 0.5rem;
+}
+
+.summary_bad_outcome_body {
+  @apply --font-body-2-dark;
+
+  margin-bottom: 0.25rem;
+}
+
+.summary_bad_outcome_body:last-child {
+  margin-bottom: 0.75rem;
+}
+
+.summary_exit_button {
+  margin-bottom: 0;
+}
+
+.pipette_data_wrapper {
   align-self: stretch;
 }
 
-.raw_data_table {
+.pipette_data_table {
+  @apply --font-body-1-dark;
+
   font-size: 0.75rem;
   width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.pipette_data_table > thead > tr > th {
+  text-transform: capitalize;
+  font-weight: var(--fw-semibold);
+}
+
+.pipette_data_table > tbody > tr > td {
+  height: 2rem;
+}
+
+.pipette_data_table:not(.individual_data) > tbody > tr:not(:last-child) {
+  border-bottom: 1px solid #d8d8d8;
+}
+
+.pipette_data_header {
+  @apply --font-body-2-dark;
+
+  font-weight: var(--fw-semibold);
+  display: flex;
+  text-transform: capitalize;
+  margin-bottom: 0.75rem;
+  align-items: baseline;
+}
+
+.pipette_serial {
+  font-size: var(--fs-body-1);
+  font-weight: var(--fw-regular);
+}
+
+.individual_step_comparison_wrapper {
+  max-width: 66%;
+}
+
+.inline_step_status {
+  display: flex;
+  align-items: center;
+  text-transform: capitalize;
+}
+
+.difference_value_data_cell {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.data_axis_label {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 1;
+  max-width: 4rem;
+}
+
+.compare_axis_label {
+  font-weight: var(--fw-semibold);
+  margin-right: 1rem;
+}
+
+.data_axis_label:not(:last-child) {
+  margin-right: 1rem;
 }
 
 .copy_icon {
@@ -91,26 +191,14 @@
   margin-bottom: 2rem;
 }
 
-.passed_row {
-  color: var(--c-success);
-}
-
-.failed_row {
-  color: var(--c-error);
-}
-
-.summary_section.passed {
-  border-color: var(--c-success);
-}
-
-.summary_section.failed {
-  border-color: var(--c-error);
-}
-
 .error_explanation {
   @apply --font-body-2-dark;
 
   margin: 0.75rem 0;
+}
+
+.error_explanation_list {
+  list-style-position: inside;
 }
 
 .padded_contents_wrapper {
@@ -162,11 +250,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 15rem;
+  height: 8rem;
 }
 
 .tiprack_image {
-  width: 100%;
+  height: 100%;
   max-height: 15rem;
   max-width: 15.25rem;
 }
@@ -293,10 +381,24 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   text-align: center;
 }
 
+.step_check_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid var(--c-lightest-gray);
+  padding: 1rem 0;
+  margin-top: 1rem;
+}
+
 .tip_pick_up_demo_body {
   @apply --font-body-2-dark;
 
   margin: 0 1rem;
+}
+
+.step_check_body_wrapper {
+  max-width: 49%;
 }
 
 .command_button {

@@ -145,11 +145,33 @@ async def test_on_change_called(loop,
         m.assert_called_once_with(True)
 
 
-async def test_restart_required(loop, restore_restart_required):
-    assert advanced_settings.is_restart_required() is False
-    _id = 'useV1HttpApi'
-    await advanced_settings.set_adv_setting(_id, True)
-    assert advanced_settings.is_restart_required() is True
+async def test_restart_required(loop, restore_restart_required,
+                                mock_read_settings_file,
+                                mock_write_settings_file,
+                                mock_settings_version):
+    _id = 'restart_required'
+    # Mock out the available settings
+    available_settings = [
+        advanced_settings.SettingDefinition(
+            _id=_id,
+            title='',
+            description='',
+            restart_required=True)
+    ]
+    with patch.object(advanced_settings, "settings", new=available_settings):
+        # Mock out the settings_by_id
+        available_settings_by_id = {s.id: s for s in available_settings}
+        with patch.object(advanced_settings, "settings_by_id",
+                          new=available_settings_by_id):
+            mock_read_settings_file.return_value = \
+                advanced_settings.SettingsData(
+                    settings_map={_id: None},
+                    version=mock_settings_version
+                )
+
+            assert advanced_settings.is_restart_required() is False
+            await advanced_settings.set_adv_setting(_id, True)
+            assert advanced_settings.is_restart_required() is True
 
 
 def test_get_setting_use_env_overload(mock_read_settings_file,

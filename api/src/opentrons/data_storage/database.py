@@ -45,8 +45,11 @@ def _create_container_obj_in_db(db, container: Container, container_name: str):
     db_queries.create_container(
         db, container_name, **_parse_container_obj(container)
     )
-    for well in iter(container):
-        _create_well_obj_in_db(db, container_name, well)
+
+    well_data = (_parse_well_obj(well) for well in iter(container))
+    well_rows = (db_queries.WellRow(container_name=container_name, **w)
+                 for w in well_data)
+    db_queries.insert_wells_into_db(db, well_rows)
 
 
 def _load_container_object_from_db(db, container_name: str):
@@ -97,7 +100,8 @@ def _delete_container_object_in_db(db, container_name: str):
 def _create_well_obj_in_db(db, container_name: str, well: Well):
     well_data = _parse_well_obj(well)
     db_queries.insert_well_into_db(
-        db_conn=db, container_name=container_name, **well_data
+        db_conn=db,
+        well=db_queries.WellRow(container_name=container_name, **well_data)
     )
 
 
@@ -116,7 +120,7 @@ def _load_well_object_from_db(db, well_data):
     x -= (well.x_size() / 2)
     y -= (well.y_size() / 2)
     well_coordinates = (x, y, z)
-    return (well, location, well_coordinates)
+    return well, location, well_coordinates
 
 
 def _list_all_containers_by_name(db):

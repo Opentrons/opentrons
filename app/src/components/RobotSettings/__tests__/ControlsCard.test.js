@@ -5,11 +5,14 @@ import { mount } from 'enzyme'
 
 import * as RobotControls from '../../../robot-controls'
 import * as RobotAdmin from '../../../robot-admin'
+import * as Calibration from '../../../calibration'
 import * as RobotSelectors from '../../../robot/selectors'
-import * as ConfigSelectors from '../../../config/selectors'
+
 import { ControlsCard } from '../ControlsCard'
+import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
+import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
 
 import type { State } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
@@ -17,6 +20,11 @@ import type { ViewableRobot } from '../../../discovery/types'
 jest.mock('../../../robot-controls/selectors')
 jest.mock('../../../robot/selectors')
 jest.mock('../../../config/selectors')
+jest.mock('../../../calibration/selectors')
+
+jest.mock('../CheckCalibrationControl', () => ({
+  CheckCalibrationControl: () => <></>,
+}))
 
 const mockRobot: ViewableRobot = ({
   name: 'robot-name',
@@ -40,26 +48,20 @@ const mockGetIsRunning: JestMockFn<
   $Call<typeof RobotSelectors.getIsRunning, State>
 > = RobotSelectors.getIsRunning
 
-const getFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof ConfigSelectors.getFeatureFlags, State>
-> = ConfigSelectors.getFeatureFlags
+const getDeckCalibrationStatus: JestMockFn<
+  [State, string],
+  $Call<typeof Calibration.getDeckCalibrationStatus, State, string>
+> = Calibration.getDeckCalibrationStatus
 
 describe('ControlsCard', () => {
   let mockStore
   let render
 
   const getDeckCalButton = wrapper =>
-    wrapper
-      .find({ label: 'Calibrate deck' })
-      .find(LabeledButton)
-      .find('button')
+    wrapper.find('TitledControl[title="Calibrate deck"]').find('button')
 
-  const getRobotCalibrationCheckButton = wrapper =>
-    wrapper
-      .find({ label: 'Check robot calibration' })
-      .find(LabeledButton)
-      .find('button')
+  const getCheckCalibrationControl = wrapper =>
+    wrapper.find(CheckCalibrationControl)
 
   const getHomeButton = wrapper =>
     wrapper
@@ -77,6 +79,7 @@ describe('ControlsCard', () => {
     wrapper.find({ label: 'Lights' }).find(LabeledToggle)
 
   beforeEach(() => {
+    jest.useFakeTimers()
     mockStore = {
       subscribe: () => {},
       getState: () => ({
@@ -85,9 +88,7 @@ describe('ControlsCard', () => {
       dispatch: jest.fn(),
     }
 
-    getFeatureFlags.mockReturnValue({
-      enableRobotCalCheck: true,
-    })
+    getDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
 
     render = (robot: ViewableRobot = mockRobot) => {
       return mount(
@@ -101,7 +102,9 @@ describe('ControlsCard', () => {
   })
 
   afterEach(() => {
+    jest.clearAllTimers()
     jest.resetAllMocks()
+    jest.useRealTimers()
   })
 
   it('calls fetchLights on mount', () => {
@@ -109,6 +112,25 @@ describe('ControlsCard', () => {
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       RobotControls.fetchLights(mockRobot.name)
+    )
+  })
+
+  it('calls fetchCalibrationStatus on mount and on a 10s interval', () => {
+    render()
+
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      Calibration.fetchCalibrationStatus(mockRobot.name)
+    )
+    mockStore.dispatch.mockReset()
+    jest.advanceTimersByTime(20000)
+    expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
+    expect(mockStore.dispatch).toHaveBeenNthCalledWith(
+      1,
+      Calibration.fetchCalibrationStatus(mockRobot.name)
+    )
+    expect(mockStore.dispatch).toHaveBeenNthCalledWith(
+      2,
+      Calibration.fetchCalibrationStatus(mockRobot.name)
     )
   })
 
@@ -150,7 +172,9 @@ describe('ControlsCard', () => {
     const wrapper = render()
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(false)
-    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(false)
+    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
+      null
+    )
     expect(getHomeButton(wrapper).prop('disabled')).toBe(false)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(false)
   })
@@ -159,7 +183,9 @@ describe('ControlsCard', () => {
     const wrapper = render(mockUnconnectableRobot)
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
+      'Connect to robot to control'
+    )
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -174,7 +200,9 @@ describe('ControlsCard', () => {
     const wrapper = render(mockRobotNotConnected)
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
+      'Connect to robot to control'
+    )
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -185,20 +213,60 @@ describe('ControlsCard', () => {
     const wrapper = render()
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
+      'Protocol is running'
+    )
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  it('Check cal button does not render if feature flag off', () => {
-    mockGetIsRunning.mockReturnValue(true)
+  it('does not render check cal button if GET /calibration/status has not responded', () => {
+    getDeckCalibrationStatus.mockReturnValue(null)
 
-    getFeatureFlags.mockReturnValue({
-      enableRobotCalCheck: false,
+    const wrapper = render()
+    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
+  })
+
+  it('disables check cal button if deck calibration is bad', () => {
+    getDeckCalibrationStatus.mockImplementation((state, rName) => {
+      expect(state).toEqual({ mockState: true })
+      expect(rName).toEqual(mockRobot.name)
+      return Calibration.DECK_CAL_STATUS_BAD_CALIBRATION
     })
 
     const wrapper = render()
 
-    expect(wrapper.exists({ label: 'Check deck calibration' })).toBe(false)
+    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
+      'Bad deck calibration detected. Please perform a full deck calibration.'
+    )
+
+    getDeckCalibrationStatus.mockReturnValue(
+      Calibration.DECK_CAL_STATUS_SINGULARITY
+    )
+    wrapper.setProps({})
+    wrapper.update()
+
+    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
+      'Bad deck calibration detected. Please perform a full deck calibration.'
+    )
+
+    getDeckCalibrationStatus.mockReturnValue(
+      Calibration.DECK_CAL_STATUS_IDENTITY
+    )
+    wrapper.setProps({})
+    wrapper.update()
+
+    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
+      'Please perform a full deck calibration.'
+    )
+  })
+
+  it('DeckCalibrationWarning component renders if deck calibration is bad', () => {
+    const wrapper = render()
+
+    // check that the deck calibration warning component is not null
+    // TODO(lc, 2020-06-18): Mock out the new transform status such that
+    // this should evaluate to true.
+    expect(wrapper.exists(DeckCalibrationWarning)).toBe(true)
   })
 })

@@ -8,6 +8,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import { getStateAndContextTempTCModules } from '../../step-generation/__fixtures__'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
@@ -17,6 +18,10 @@ const stepId = 'stepId123'
 const EXAMPLE_ENGAGE_HEIGHT = '18'
 let defaultArgs
 beforeEach(() => {
+  const { robotState } = getStateAndContextTempTCModules({
+    temperatureModuleId: 'someTemperatureModuleId',
+    thermocyclerId: 'someThermocyclerModuleId',
+  })
   const leftPipette = {
     name: 'p10_single',
     id: 'leftPipetteId',
@@ -66,6 +71,14 @@ beforeEach(() => {
         },
       },
       pipettes: { leftPipetteId: { ...leftPipette, mount: 'left' } },
+    },
+    robotStateTimeline: {
+      timeline: [
+        {
+          commands: [],
+          robotState,
+        },
+      ],
     },
   }
 })
@@ -265,89 +278,86 @@ describe('createPresavedStepForm', () => {
       stepDetails: '',
     })
   })
+  ;[true, false].forEach(timelineHasErrors => {
+    ;[true, false].forEach(isFirstThermocyclerStep => {
+      const testName = `should set a default thermocycler module and set TC state defaults when ${
+        isFirstThermocyclerStep
+          ? 'the first Thermocycler step is added'
+          : 'a following Thermocycler step is added'
+      }${timelineHasErrors ? ' and timeline has errors' : ''}`
+      it(testName, () => {
+        // mutate robot state in defaultArgs
+        if (timelineHasErrors) {
+          defaultArgs.robotStateTimeline = { errors: ['OH NO!'], timeline: [] }
+        } else {
+          const thermocyclerModuleState =
+            defaultArgs.robotStateTimeline.timeline[0].robotState.modules[
+              'someThermocyclerModuleId'
+            ]
+          thermocyclerModuleState.moduleState = {
+            ...thermocyclerModuleState.moduleState,
+            blockTargetTemp: 42,
+            lidTargetTemp: 43,
+            lidOpen: true,
+          }
+        }
 
-  it('should set a default thermocycler module when a Thermocycler step is added', () => {
-    const args = {
-      ...defaultArgs,
-      stepType: 'thermocycler',
-    }
+        const args = {
+          ...defaultArgs,
+          stepType: 'thermocycler',
+        }
 
-    expect(createPresavedStepForm(args)).toEqual({
-      id: stepId,
-      stepType: 'thermocycler',
-      moduleId: 'someThermocyclerModuleId',
-      // TC Default field
-      stepName: 'thermocycler',
-      stepDetails: '',
-      thermocyclerFormType: 'thermocyclerState',
-      blockIsActive: false,
-      blockTargetTemp: null,
-      lidIsActive: false,
-      lidTargetTemp: null,
-      lidOpen: null,
-      profileVolume: null,
-      profileTargetLidTemp: null,
-      orderedProfileItems: [],
-      profileItemsById: {},
-      blockIsActiveHold: false,
-      blockTargetTempHold: null,
-      lidIsActiveHold: false,
-      lidTargetTempHold: null,
-      lidOpenHold: null,
-    })
-  })
+        if (isFirstThermocyclerStep) {
+          args.savedStepForms = {
+            prevStepId: {
+              stepType: 'thermocycler',
+              // TC Default fields (should all be ignored, robotState is used to populate the form)
+              stepName: 'thermocycler',
+              stepDetails: '',
+              thermocyclerFormType: 'thermocyclerState',
+              blockIsActive: false,
+              blockTargetTemp: null,
+              lidIsActive: false,
+              lidTargetTemp: null,
+              lidOpen: null,
+              profileVolume: null,
+              profileTargetLidTemp: null,
+              orderedProfileItems: [],
+              profileItemsById: {},
+              blockIsActiveHold: false,
+              blockTargetTempHold: null,
+              lidIsActiveHold: false,
+              lidTargetTempHold: null,
+              lidOpenHold: null,
+            },
+          }
 
-  it('should populate TC state when previously saved TC state', () => {
-    const args = {
-      ...defaultArgs,
-      savedStepForms: {
-        prevStepId: {
-          id: 'prevStepId',
-          stepName: 'thermocycler',
-          stepDetails: '',
-          thermocyclerFormType: 'thermocyclerState',
-          blockIsActive: true,
-          blockTargetTemp: 45,
-          lidIsActive: true,
-          lidTargetTemp: 45,
-          lidOpen: true,
-          profileVolume: null,
-          profileTargetLidTemp: null,
+          args.orderedStepIds = ['prevStepId']
+        }
+
+        expect(createPresavedStepForm(args)).toEqual({
+          blockIsActive: !timelineHasErrors,
+          blockIsActiveHold: false,
+          blockTargetTemp: timelineHasErrors ? null : 42,
+          blockTargetTempHold: null,
+          id: stepId,
+          lidIsActive: !timelineHasErrors,
+          lidIsActiveHold: false,
+          lidOpen: timelineHasErrors ? null : true,
+          lidOpenHold: null,
+          lidTargetTemp: timelineHasErrors ? null : 43,
+          lidTargetTempHold: null,
+          moduleId: 'someThermocyclerModuleId',
           orderedProfileItems: [],
           profileItemsById: {},
-          blockIsActiveHold: false,
-          blockTargetTempHold: null,
-          lidIsActiveHold: false,
-          lidTargetTempHold: null,
-          lidOpenHold: null,
-        },
-      },
-      orderedStepIds: ['prevStepId'],
-      stepType: 'thermocycler',
-    }
-
-    expect(createPresavedStepForm(args)).toEqual({
-      id: stepId,
-      stepType: 'thermocycler',
-      moduleId: 'someThermocyclerModuleId',
-      // TC Default field
-      stepName: 'thermocycler',
-      stepDetails: '',
-      thermocyclerFormType: 'thermocyclerState',
-      blockIsActive: true,
-      blockTargetTemp: 45,
-      lidIsActive: true,
-      lidTargetTemp: 45,
-      lidOpen: true,
-      profileVolume: null,
-      profileTargetLidTemp: null,
-      orderedProfileItems: [],
-      profileItemsById: {},
-      blockIsActiveHold: false,
-      blockTargetTempHold: null,
-      lidIsActiveHold: false,
-      lidTargetTempHold: null,
-      lidOpenHold: null,
+          profileTargetLidTemp: null,
+          profileVolume: null,
+          stepDetails: '',
+          stepName: 'thermocycler',
+          stepType: 'thermocycler',
+          thermocyclerFormType: 'thermocyclerState',
+        })
+      })
     })
   })
 })

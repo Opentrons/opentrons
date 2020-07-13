@@ -33,18 +33,35 @@ stages:
           type: Session
           attributes:
             sessionType: tipLengthCalibration
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+.\\d+"
             details: {}
 
   - name: Load labware
-    request: &post_command
+    request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
           type: SessionCommand
           attributes:
-            command: loadLabware
+            command: calibration.loadLabware
             data: {}
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: !anystr
+          type: SessionCommand
+          attributes:
+            status: executed
+            command: calibration.loadLabware
+            created_at: &dt
+              !re_match "\\d+-\\d+-\\d+T"
+            started_at: *dt
+            completed_at: *dt
+            data: {}
+
 
   - name: Delete the session
     request:
@@ -53,12 +70,18 @@ stages:
     response:
       status_code: 200
 
-  - name: There are no sessions
+  - name: There are no sessions except default
     request:
       url: "{host:s}:{port:d}/sessions"
       method: GET
     response:
       status_code: 200
       json:
-        data: []
+        data:
+          - id: "default"
+            type: Session
+            attributes:
+              sessionType: default
+              created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+              details: {}
 

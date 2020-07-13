@@ -13,6 +13,6 @@ import type { AnalyticsEvent } from './types'
  * @returns {AnalyticsEvent => void} track event function
  */
 export function useTrackEvent(): AnalyticsEvent => void {
-  const config = useSelector((state: State) => getConfig(state).analytics)
-  return event => trackEvent(event, config)
+  const config = useSelector((state: State) => getConfig(state)?.analytics)
+  return event => config && trackEvent(event, config)
 }

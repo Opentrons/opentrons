@@ -1,5 +1,6 @@
 // @flow
 import * as Fixtures from '../__fixtures__'
+import * as Actions from '../actions'
 import { sessionReducer } from '../reducer'
 
 import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
@@ -109,6 +110,39 @@ const SPECS: Array<ReducerSpec> = [
       },
       meta: {},
     },
+    state: {
+      'eggplant-parm': {
+        robotSessions: {
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
+        },
+      },
+    },
+    expected: {
+      'eggplant-parm': {
+        robotSessions: {
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
+        },
+      },
+    },
+  },
+  {
+    name: 'handles sessions:CREATE_SESSION_COMMAND_SUCCESS with existing',
+    action: Actions.createSessionCommandSuccess(
+      'eggplant-parm',
+      Fixtures.mockSessionId,
+      Fixtures.mockSessionResponse,
+      {}
+    ),
     state: {
       'eggplant-parm': {
         robotSessions: {

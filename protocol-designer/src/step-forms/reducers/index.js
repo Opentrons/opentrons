@@ -13,6 +13,7 @@ import {
   getModuleType,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   rootReducer as labwareDefsRootReducer,
@@ -98,12 +99,12 @@ import type {
   ModuleEntities,
 } from '../types'
 import type {
-  CreatePipettesAction,
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
   CreateModuleAction,
-  EditModuleAction,
+  CreatePipettesAction,
   DeleteModuleAction,
+  DeletePipettesAction,
+  EditModuleAction,
+  SubstituteStepFormPipettesAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -118,6 +119,8 @@ type UnsavedFormActions =
   | CancelStepFormAction
   | SaveStepFormAction
   | DeleteStepAction
+  | CreateModuleAction
+  | DeleteModuleAction
   | SelectTerminalItemAction
   | EditModuleAction
   | SubstituteStepFormPipettesAction
@@ -141,14 +144,15 @@ export const unsavedForm = (
         )
         return unsavedFormState
       }
-      const id = uuid()
+      const cycleId = uuid()
+      const profileStepId = uuid()
 
       return {
         ...unsavedFormState,
-        orderedProfileItems: [...unsavedFormState.orderedProfileItems, id],
+        orderedProfileItems: [...unsavedFormState.orderedProfileItems, cycleId],
         profileItemsById: {
           ...unsavedFormState.profileItemsById,
-          [id]: createInitialProfileCycle(id),
+          [cycleId]: createInitialProfileCycle(cycleId, profileStepId),
         },
       }
     }
@@ -161,6 +165,7 @@ export const unsavedForm = (
         savedStepForms: rootState.savedStepForms,
         orderedStepIds: rootState.orderedStepIds,
         initialDeckSetup: _getInitialDeckSetupRootState(rootState),
+        robotStateTimeline: action.meta.robotStateTimeline,
       })
     }
     case 'CHANGE_FORM_INPUT': {
@@ -179,10 +184,12 @@ export const unsavedForm = (
     case 'POPULATE_FORM':
       return action.payload
     case 'CANCEL_STEP_FORM':
-    case 'SELECT_TERMINAL_ITEM':
-    case 'SAVE_STEP_FORM':
+    case 'CREATE_MODULE':
+    case 'DELETE_MODULE':
     case 'DELETE_STEP':
     case 'EDIT_MODULE':
+    case 'SAVE_STEP_FORM':
+    case 'SELECT_TERMINAL_ITEM':
       return unsavedFormInitialState
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       // only substitute unsaved step form if its ID is in the start-end range
@@ -623,6 +630,13 @@ export const savedStepForms = (
         if (
           savedForm.stepType === 'magnet' &&
           action.payload.type === MAGNETIC_MODULE_TYPE
+        ) {
+          return { ...savedForm, moduleId }
+        }
+        // same logic applies to Thermocycler
+        if (
+          savedForm.stepType === 'thermocycler' &&
+          action.payload.type === THERMOCYCLER_MODULE_TYPE
         ) {
           return { ...savedForm, moduleId }
         }

@@ -5,16 +5,17 @@ import {
   makeResponseFixtures,
   mockV2ErrorResponse,
 } from '../../robot-api/__fixtures__'
-import {
-  mockRobotCalibrationCheckSessionDetails,
-  mockTipLengthCalibrationSessionDetails,
-} from '../../calibration/__fixtures__'
+import { mockRobotCalibrationCheckSessionDetails } from './calibration-check'
+import { mockTipLengthCalibrationSessionDetails } from './tip-length-calibration'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 
 import * as Types from '../types'
 import * as Constants from '../constants'
+
+export * from './calibration-check'
+export * from './tip-length-calibration'
 
 export const mockSessionId: string = 'fake_session_id'
 export const mockOtherSessionId: string = 'other_fake_session_id'
@@ -35,12 +36,12 @@ export const mockSession: Types.Session = {
 }
 
 export const mockSessionCommand: Types.SessionCommandAttributes = {
-  command: 'jog',
+  command: 'calibration.jog',
   data: { someData: 32 },
 }
 
 export const mockSessionCommandAttributes: Types.SessionCommandAttributes = {
-  command: 'preparePipette',
+  command: 'calibration.preparePipette',
   status: 'accepted',
   data: {},
 }
