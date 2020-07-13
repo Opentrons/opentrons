@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import { i18n } from '../../../../localization'
+import { selectors as featureFlagSelectors } from '../../../../feature-flags'
 
 import type { FocusHandlers } from '../../types'
 
@@ -28,10 +30,11 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export const SourceDestFields = (props: Props): React.Node => {
+  const delayEnabled = useSelector(featureFlagSelectors.getEnableAirGapDelay)
   const { className, focusHandlers, prefix } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
-  const mixFields = (
+  const getMixFields = () => (
     <CheckboxRowField
       name={addFieldNamePrefix('mix_checkbox')}
       label={i18n.t('form.step_edit_form.field.mix.label')}
@@ -51,6 +54,31 @@ export const SourceDestFields = (props: Props): React.Node => {
       />
     </CheckboxRowField>
   )
+
+  const getDelayFields = () =>
+    delayEnabled ? (
+      <CheckboxRowField
+        name={addFieldNamePrefix('delay_checkbox')}
+        label={i18n.t('form.step_edit_form.field.delay.label')}
+        className={styles.small_field}
+        tooltipComponent={i18n.t(
+          `tooltip.step_fields.defaults.${addFieldNamePrefix('delay_checkbox')}`
+        )}
+      >
+        <TextField
+          name={addFieldNamePrefix('delay_seconds')}
+          units={i18n.t('application.units.seconds')}
+          className={styles.small_field}
+          {...focusHandlers}
+        />
+        <TextField
+          name={addFieldNamePrefix('delay_tip_position')}
+          units={i18n.t('application.units.millimeter')}
+          className={styles.small_field}
+          {...focusHandlers}
+        />
+      </CheckboxRowField>
+    ) : null
 
   return (
     <div className={className}>
@@ -75,7 +103,8 @@ export const SourceDestFields = (props: Props): React.Node => {
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
               className={styles.small_field}
             />
-            {mixFields}
+            {getMixFields()}
+            {getDelayFields()}
             <CheckboxRowField
               disabled
               tooltipComponent={i18n.t('tooltip.not_in_beta')}
@@ -92,9 +121,12 @@ export const SourceDestFields = (props: Props): React.Node => {
             </CheckboxRowField>
           </React.Fragment>
         )}
-
-        {prefix === 'dispense' && mixFields}
-
+        {prefix === 'dispense' && (
+          <React.Fragment>
+            {getDelayFields()}
+            {getMixFields()}
+          </React.Fragment>
+        )}
         <CheckboxRowField
           name={addFieldNamePrefix('touchTip_checkbox')}
           tooltipComponent={i18n.t(
