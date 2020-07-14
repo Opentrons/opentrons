@@ -75,3 +75,21 @@ export type LogLevel =
   | 'silly'
 
 export type Logger = { [level: LogLevel]: (message: string, meta?: {}) => void }
+
+/**
+ * Health poll data for a given IP address
+ */
+export type HealthPollerResult = $ReadOnly<{|
+  /** IP address used for poll */
+  ip: string,
+  /** Port used for poll */
+  port: number,
+  /** GET /health data if server responded with 2xx */
+  health: HealthResponse | null,
+  /** GET /server/health data if server responded with 2xx */
+  serverHealth: ServerHealthResponse | null,
+  /** GET /health status code and body if response was non-2xx */
+  healthError: HealthErrorResponse | null,
+  /** GET /server/health status code and body if response was non-2xx */
+  serverHealthError: HealthErrorResponse | null,
+|}>

@@ -4,6 +4,7 @@ import type {
   HealthResponse,
   ServerHealthResponse,
   HealthErrorResponse,
+  HealthPollerResult,
 } from '../types'
 
 import typeof {
@@ -84,14 +85,7 @@ export type ServiceFoundAction = {|
  */
 export type HealthPolledAction = {|
   type: HEALTH_POLLED,
-  payload: {|
-    ip: string,
-    port: number,
-    health: HealthResponse | null,
-    serverHealth: ServerHealthResponse | null,
-    healthError: HealthErrorResponse | null,
-    serverHealthError: HealthErrorResponse | null,
-  |},
+  payload: HealthPollerResult,
 |}
 
 /**

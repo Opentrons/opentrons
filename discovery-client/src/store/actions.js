@@ -1,10 +1,6 @@
 // @flow
 
-import type {
-  HealthResponse,
-  ServerHealthResponse,
-  HealthErrorResponse,
-} from '../types'
+import type { HealthPollerResult } from '../types'
 
 import * as Types from './types'
 
@@ -25,15 +21,10 @@ export const serviceFound = (
 })
 
 export const healthPolled = (
-  ip: string,
-  port: number,
-  health: HealthResponse | null,
-  serverHealth: ServerHealthResponse | null,
-  healthError: HealthErrorResponse | null = null,
-  serverHealthError: HealthErrorResponse | null = null
+  payload: HealthPollerResult
 ): Types.HealthPolledAction => ({
   type: HEALTH_POLLED,
-  payload: { ip, port, health, serverHealth, healthError, serverHealthError },
+  payload,
 })
 
 export const addIpAddress = (ip: string): Types.AddIpAddressAction => ({

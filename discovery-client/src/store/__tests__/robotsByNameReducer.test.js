@@ -45,12 +45,14 @@ describe('robotsByName reducer', () => {
   })
 
   it('should handle an "http:HEALTH_POLLED action for a new robot', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      mockHealthResponse,
-      mockServerHealthResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: mockServerHealthResponse,
+      healthError: null,
+      serverHealthError: null,
+    })
     const initialState = {}
     const nextState = robotsByNameReducer(initialState, action)
 
@@ -64,12 +66,14 @@ describe('robotsByName reducer', () => {
   })
 
   it('should handle a good "http:HEALTH_POLLED action for an existing robot', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      mockHealthResponse,
-      mockServerHealthResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: mockServerHealthResponse,
+      healthError: null,
+      serverHealthError: null,
+    })
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',
@@ -89,14 +93,14 @@ describe('robotsByName reducer', () => {
   })
 
   it('should do nothing with a bad health poll', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      null,
-      null,
-      mockHealthErrorJsonResponse,
-      mockHealthErrorJsonResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: null,
+      serverHealth: null,
+      healthError: mockHealthErrorJsonResponse,
+      serverHealthError: mockHealthErrorJsonResponse,
+    })
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',
@@ -112,14 +116,14 @@ describe('robotsByName reducer', () => {
   })
 
   it('should be able to do a partial update to health', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      mockHealthResponse,
-      null,
-      null,
-      mockHealthErrorJsonResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: null,
+      healthError: null,
+      serverHealthError: mockHealthErrorJsonResponse,
+    })
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',
@@ -139,14 +143,14 @@ describe('robotsByName reducer', () => {
   })
 
   it('should be able to do a partial update to serverHealth', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      null,
-      mockServerHealthResponse,
-      mockHealthErrorJsonResponse,
-      null
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: null,
+      serverHealth: mockServerHealthResponse,
+      healthError: mockHealthErrorJsonResponse,
+      serverHealthError: null,
+    })
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',
@@ -166,14 +170,14 @@ describe('robotsByName reducer', () => {
   })
 
   it('should not update state if new poll results are deep equal', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      mockHealthResponse,
-      mockServerHealthResponse,
-      null,
-      null
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: mockServerHealthResponse,
+      healthError: null,
+      serverHealthError: null,
+    })
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',

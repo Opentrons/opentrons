@@ -114,12 +114,14 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should handle an "http:HEALTH_POLLED" action for a new ip', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      mockHealthResponse,
-      mockServerHealthResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: mockServerHealthResponse,
+      healthError: null,
+      serverHealthError: null,
+    })
     const initialState = {}
     const nextState = hostsByIpReducer(initialState, action)
 
@@ -138,12 +140,14 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should handle a good "http:HEALTH_POLLED" action for an existing ip', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      mockHealthResponse,
-      mockServerHealthResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: mockServerHealthResponse,
+      healthError: null,
+      serverHealthError: null,
+    })
     const initialState = {
       '127.0.0.1': {
         ip: '127.0.0.1',
@@ -173,12 +177,14 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should handle a good "http:HEALTH_POLLED" action for an existing ip with the wrong robot name', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      mockHealthResponse,
-      mockServerHealthResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: mockServerHealthResponse,
+      healthError: null,
+      serverHealthError: null,
+    })
     const initialState = {
       '127.0.0.1': {
         ip: '127.0.0.1',
@@ -208,12 +214,14 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should handle a good "http:HEALTH_POLLED" action that does not change the state', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      mockHealthResponse,
-      mockServerHealthResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: mockServerHealthResponse,
+      healthError: null,
+      serverHealthError: null,
+    })
     const initialState = {
       '127.0.0.1': {
         ip: '127.0.0.1',
@@ -232,14 +240,14 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should not reset seen nor robotName with a bad health poll', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      null,
-      null,
-      mockHealthErrorJsonResponse,
-      mockHealthErrorJsonResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: null,
+      serverHealth: null,
+      healthError: mockHealthErrorJsonResponse,
+      serverHealthError: mockHealthErrorJsonResponse,
+    })
     const initialState = {
       '127.0.0.1': {
         ip: '127.0.0.1',
@@ -269,12 +277,14 @@ describe('hostsByIp reducer', () => {
   })
 
   it('a good health poll will remove any un-seen un-health IPs for the same robot', () => {
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      mockHealthResponse,
-      mockServerHealthResponse
-    )
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: mockServerHealthResponse,
+      healthError: null,
+      serverHealthError: null,
+    })
     const initialState = {
       '127.0.0.2': {
         ip: '127.0.0.2',

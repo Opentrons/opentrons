@@ -27,12 +27,14 @@ describe('discovery client action creators', () => {
       systemVersion: '7.8.9',
     }
 
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
       health,
-      serverHealth
-    )
+      serverHealth,
+      healthError: null,
+      serverHealthError: null,
+    })
 
     expect(action).toEqual({
       type: 'http:HEALTH_POLLED',
@@ -57,14 +59,14 @@ describe('discovery client action creators', () => {
       body: 'this is some NGNIX error',
     }
 
-    const action = Actions.healthPolled(
-      '127.0.0.1',
-      31950,
-      null,
-      null,
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: null,
+      serverHealth: null,
       healthError,
-      serverHealthError
-    )
+      serverHealthError,
+    })
 
     expect(action).toEqual({
       type: 'http:HEALTH_POLLED',
