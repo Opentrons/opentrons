@@ -1,11 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SlotMap renders correctly with collision warning 1`] = `
-.c0 {
-  width: 20px;
-  height: 20px;
-}
-
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;
@@ -74,8 +69,10 @@ exports[`SlotMap renders correctly with collision warning 1`] = `
       aria-hidden="true"
       className="sc-AxmLO c0 collision_icon"
       fill="currentColor"
+      height={20}
       version="1.1"
       viewBox="0 0 24 24"
+      width={20}
       x={6.5}
       xmlns="http://www.w3.org/2000/svg"
       y={1.5}
@@ -241,11 +238,6 @@ exports[`SlotMap renders correctly with error 1`] = `
 `;
 
 exports[`SlotMap renders correctly with error and collision warning 1`] = `
-.c0 {
-  width: 20px;
-  height: 20px;
-}
-
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;
@@ -314,8 +306,10 @@ exports[`SlotMap renders correctly with error and collision warning 1`] = `
       aria-hidden="true"
       className="sc-AxmLO c0 collision_icon"
       fill="currentColor"
+      height={20}
       version="1.1"
       viewBox="0 0 24 24"
+      width={20}
       x={6.5}
       xmlns="http://www.w3.org/2000/svg"
       y={1.5}
