@@ -8,6 +8,7 @@ export type HealthResponse = {
   system_version?: string,
   logs?: Array<string>,
   protocol_api_version?: [number, number],
+  ...
 }
 
 export type Capability =
@@ -28,7 +29,13 @@ export type ServerHealthResponse = {
   smoothieVersion: string,
   systemVersion: string,
   capabilities?: CapabilityMap,
+  ...
 }
+
+export type HealthErrorResponse = {|
+  status: number,
+  body: string | { [string]: mixed, ... },
+|}
 
 export type Candidate = {
   ip: string,
@@ -68,3 +75,21 @@ export type LogLevel =
   | 'silly'
 
 export type Logger = { [level: LogLevel]: (message: string, meta?: {}) => void }
+
+/**
+ * Health poll data for a given IP address
+ */
+export type HealthPollerResult = $ReadOnly<{|
+  /** IP address used for poll */
+  ip: string,
+  /** Port used for poll */
+  port: number,
+  /** GET /health data if server responded with 2xx */
+  health: HealthResponse | null,
+  /** GET /server/health data if server responded with 2xx */
+  serverHealth: ServerHealthResponse | null,
+  /** GET /health status code and body if response was non-2xx */
+  healthError: HealthErrorResponse | null,
+  /** GET /server/health status code and body if response was non-2xx */
+  serverHealthError: HealthErrorResponse | null,
+|}>
