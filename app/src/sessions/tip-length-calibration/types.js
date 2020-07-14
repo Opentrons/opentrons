@@ -38,6 +38,7 @@ export type TipLengthCalibrationLabware = {|
   loadName: string,
   namespace: string,
   version: number,
+  isTiprack: boolean,
 |}
 
 export type TipLengthCalibrationSessionDetails = {|

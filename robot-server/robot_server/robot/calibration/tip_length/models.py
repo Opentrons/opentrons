@@ -32,6 +32,7 @@ class RequiredLabware(BaseModel):
     loadName: str
     namespace: str
     version: str
+    isTiprack: bool
 
 
 class TipCalibrationSessionStatus(BaseModel):
@@ -68,6 +69,15 @@ class TipCalibrationSessionStatus(BaseModel):
                           "loadName": "tiprack_loadname",
                           "namespace": "opentrons",
                           "version": "1",
+                          "isTiprack": "true"
+                      },
+                      {
+                          "alternatives": [],
+                          "slot": "3",
+                          "loadName": "cal_block_loadname",
+                          "namespace": "opentrons",
+                          "version": "1",
+                          "isTiprack": "false"
                       }
                     ]
                 }

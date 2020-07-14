@@ -17,7 +17,7 @@ import {
 
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
-import { tiprackImages, calBlockImage } from './labwareImages'
+import { labwareImages } from './labwareImages'
 import { getLatestLabwareDef } from '../../getLabware'
 import { ToolSettingAlertModal } from './ToolSettingAlertModal'
 
@@ -36,18 +36,13 @@ const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 
 const CONTINUE = 'Continue to tip length calibration'
 
-const TIP_LEGNTH_CALIBRATION_INITRO_HEADER = 'tip length calibration'
+const TIP_LENGTH_CALIBRATION_INTRO_HEADER = 'tip length calibration'
 
 export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
   const { hasBlock, mount, session } = props
-  const tiprackID =
-    session.details.instruments[mount.toLowerCase()]['tiprack_id']
-  const tiprack = session.details.labware.find(l => l.id === tiprackID)
-  // TODO: get tiprack loadname based on session
-  const tiprackLoadName = tiprack?.loadName || 'opentrons_96_tiprack_300ul'
-
-  // TODO: get target labware based on alert modal selection or robot block setting
-  const targetLabwareName = 'Opentrons Calibration Block'
+  const tipRacksFirst = session.details.labware.sort((a, b) =>
+    a.isTiprack ? (b.isTiprack ? 0 : 1) : -1
+  )
 
   return (
     <>
@@ -58,35 +53,17 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
         position={POSITION_RELATIVE}
       >
         <h3 className={styles.intro_header}>
-          {TIP_LEGNTH_CALIBRATION_INITRO_HEADER}
+          {TIP_LENGTH_CALIBRATION_INTRO_HEADER}
         </h3>
         <p className={styles.intro_content}>{TIP_LENGTH_CAL_INTRO_BODY}</p>
         <h5>{LABWARE_REQS}</h5>
         <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING_3}>
-          <div className={styles.required_tiprack}>
-            <div className={styles.tiprack_image_container}>
-              <img
-                className={styles.tiprack_image}
-                src={tiprackImages[tiprackLoadName]}
-              />
-            </div>
-            <p className={styles.tiprack_display_name}>
-              {getLatestLabwareDef(tiprackLoadName)?.metadata.displayName}
-            </p>
-            <Link
-              external
-              className={styles.tiprack_measurements_link}
-              href={`${LABWARE_LIBRARY_PAGE_PATH}/${tiprackLoadName}`}
-            >
-              {VIEW_TIPRACK_MEASUREMENTS}
-            </Link>
-          </div>
-          <div className={styles.required_tiprack}>
-            <div className={styles.tiprack_image_container}>
-              <img className={styles.tiprack_image} src={calBlockImage} />
-            </div>
-            <p className={styles.tiprack_display_name}>{targetLabwareName}</p>
-          </div>
+          {tipRacksFirst.map(l => (
+            <RequiredLabwareCard
+              loadName={l.loadName}
+              isTiprack={l.isTiprack}
+            />
+          ))}
         </Flex>
         <Box fontSize={FONT_SIZE_BODY_1} marginY={SPACING_3}>
           <Text>
@@ -107,5 +84,30 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
       </div>
       {hasBlock ?? <ToolSettingAlertModal {...props} />}
     </>
+  )
+}
+
+type RequiredLabwareCardProps = {| loadName: string, isTiprack: boolean |}
+
+function RequiredLabwareCard(props: RequiredLabwareCardProps) {
+  const { loadName, isTiprack } = props
+  return (
+    <div className={styles.required_tiprack}>
+      <div className={styles.tiprack_image_container}>
+        <img className={styles.tiprack_image} src={labwareImages[loadName]} />
+      </div>
+      <p className={styles.tiprack_display_name}>
+        {getLatestLabwareDef(loadName)?.metadata.displayName}
+      </p>
+      {isTiprack && (
+        <Link
+          external
+          className={styles.tiprack_measurements_link}
+          href={`${LABWARE_LIBRARY_PAGE_PATH}/${loadName}`}
+        >
+          {VIEW_TIPRACK_MEASUREMENTS}
+        </Link>
+      )}
+    </div>
   )
 }

@@ -4,6 +4,7 @@ import type {
   SessionCommandString,
   SessionCommandData,
   Session,
+  TipLengthCalibrationSession,
 } from '../../sessions/types'
 
 export type CalibrateTipLengthParentProps = {|
@@ -11,7 +12,7 @@ export type CalibrateTipLengthParentProps = {|
   mount: Mount,
   probed: boolean,
   robotName: string | null,
-  session: Session,
+  session: TipLengthCalibrationSession,
 |}
 
 export type CalibrateTipLengthChildProps = {|

@@ -101,7 +101,8 @@ class TipCalibrationUserFlow():
                 slot=s,
                 loadName=lw.load_name,
                 namespace=lw._definition['namespace'],
-                version=str(lw._definition['version'])
+                version=str(lw._definition['version'],
+                isTiprack=lw.is_tiprack)
             ) for s, lw in lw_by_slot.items()
         ]
 
