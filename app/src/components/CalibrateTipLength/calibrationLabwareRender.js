@@ -35,6 +35,8 @@ export function CalibrationLabwareRender(
   const { labwareDef, slotDef } = props
   const title = getLabwareDisplayName(labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
+
+  // TODO: we can change this boolean to check to isCalibrationBlock instead of isTiprack to render any labware
   return isTiprack ? (
     <g transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}>
       <LabwareRender definition={labwareDef} />
