@@ -2,7 +2,6 @@ import json
 import datetime
 
 
-# TODO: AA 2020-06-10 move out of protocol_api
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
@@ -10,7 +9,6 @@ class DateTimeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-# TODO: AA 2020-06-10 move out of protocol_api
 class DateTimeDecoder(json.JSONDecoder):
     def __init__(self):
         super().__init__(object_hook=self.dict_to_obj)

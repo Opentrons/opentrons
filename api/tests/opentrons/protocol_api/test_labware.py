@@ -518,7 +518,7 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
         }
 
     lw_path = labware_offset_tempdir / 'index.json'
-    info = file_operators._read_file(lw_path)
+    info = file_operators._read_cal_filelw_path)
     assert info[full_id] == blob
 
 

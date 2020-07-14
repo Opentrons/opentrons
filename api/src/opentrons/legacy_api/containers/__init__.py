@@ -217,9 +217,7 @@ def _look_up_offsets(labware_hash):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     if labware_offset_path.exists():
-        calibration_data = io._read_file(str(labware_offset_path))
-        offset_array = calibration_data['default']['offset']
-        return Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
+        return get.get_calibration(labware_offset_path)
     else:
         return Point(x=0, y=0, z=0)
 

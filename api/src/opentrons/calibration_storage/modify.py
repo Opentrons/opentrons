@@ -16,6 +16,12 @@ if typing.TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
     from opentrons.types import Point
 
+""" opentrons.calibration_storage.modify: functions for modifying calibration storage
+
+This module has functions that you can import to save robot or labware calibration
+to its designated file location.
+"""
+
 
 def _add_to_index_offset_file(labware: 'Labware', lw_hash: str):
     """
@@ -31,7 +37,7 @@ def _add_to_index_offset_file(labware: 'Labware', lw_hash: str):
     index_file = offset / 'index.json'
     uri = labware.uri
     if index_file.exists():
-        blob = io._read_file(str(index_file))
+        blob = io._read_cal_file(str(index_file))
     else:
         blob = {}
 
@@ -97,7 +103,7 @@ def _helper_offset_data_format(filepath: str, delta: 'Point') -> dict:
             }
         }
     else:
-        calibration_data = io._read_file(filepath)
+        calibration_data = io._read_cal_file(filepath)
         calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
         calibration_data['default']['lastModified'] = time.time()
     return calibration_data
@@ -106,7 +112,7 @@ def _helper_offset_data_format(filepath: str, delta: 'Point') -> dict:
 def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
     index_file = config.get_tip_length_cal_path()/'index.json'
     try:
-        index_data = io._read_file(str(index_file))
+        index_data = io._read_cal_file(str(index_file))
     except FileNotFoundError:
         index_data = {}
 

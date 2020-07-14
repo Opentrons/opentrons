@@ -1,10 +1,13 @@
 import typing
+
 from typing_extensions import TypedDict
 from dataclasses import dataclass
 from datetime import datetime
+from os import PathLike
 
 
 CalibrationID = typing.NewType('CalibrationID', str)
+StrPath = typing.Union[str, PathLike[str]]
 
 
 class TipLengthCalNotFound(Exception):

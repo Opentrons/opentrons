@@ -12,6 +12,13 @@ if typing.TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
 
 
+""" opentrons.calibration_storage.get: functions for grabing calibration
+
+This module has functions that you can import to load robot or labware calibration
+from its designated file location.
+"""
+
+
 def _format_calibration_type(
         data: local_types.CalibrationDict) -> local_types.CalibrationTypes:
     offset = local_types.OffsetData(
@@ -51,11 +58,11 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
     index_path = offset_path / 'index.json'
     if not index_path.exists():
         return all_calibrations
-    index_file = io._read_file(str(index_path))
+    index_file = io._read_cal_file(str(index_path))
     for key, data in index_file.items():
         cal_path = offset_path / f'{key}.json'
         if cal_path.exists():
-            cal_blob = io._read_file(str(cal_path))
+            cal_blob = io._read_cal_file(str(cal_path)) # type: ignore
             calibration = _format_calibration_type(cal_blob)
             all_calibrations.append(
                 local_types.CalibrationInformation(
@@ -82,22 +89,19 @@ def get_tip_length_data(
             'be loaded')
 
 
-def load_calibration(labware: 'Labware'):
+def get_calibration(lookup_path: local_types.StrPath) -> Point:
     """
     Look up a calibration if it exists and apply it to the given labware.
     """
     offset_path =\
         config.get_opentrons_path('labware_calibration_offsets_dir_v2')
-    labware_offset_path =\
-        helpers._get_labware_offset_path(labware, offset_path)
-    if labware_offset_path.exists():
-        calibration_data = io._read_file(str(labware_offset_path))
+    offset = Point(0, 0, 0)
+    labware_path = offset_path / lookup_path
+    if labware_path.exists():
+        calibration_data = io._read_cal_file(str(labware_path))
         offset_array = calibration_data['default']['offset']
         offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
-        labware.set_calibration(offset)
-        if 'tipLength' in calibration_data.keys():
-            tip_length = calibration_data['tipLength']['length']
-            labware.tip_length = tip_length
+    return offset
 
 
 def load_tip_length_calibration(

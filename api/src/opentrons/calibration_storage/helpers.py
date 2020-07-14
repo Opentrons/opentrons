@@ -21,14 +21,6 @@ def _get_parent_identifier(
         return ''  # treat all slots as same
 
 
-def _get_labware_offset_path(labware: 'Labware', offset_path: Path):
-    offset_path.mkdir(parents=True, exist_ok=True)
-
-    parent_id = _get_parent_identifier(labware.parent)
-    labware_hash = _hash_labware_def(labware._definition)
-    return offset_path/f'{labware_hash}{parent_id}.json'
-
-
 def _hash_labware_def(labware_def: 'LabwareDefinition') -> str:
     # remove keys that do not affect run
     blocklist = ['metadata', 'brand', 'groups']

@@ -24,7 +24,7 @@ from typing import (
 import jsonschema  # type: ignore
 
 from .util import ModifiedList, requires_version
-from opentrons.calibration_storage.get import load_calibration
+from opentrons.calibration_storage import get, helpers
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
@@ -1104,6 +1104,12 @@ def uri_from_definition(definition: 'LabwareDefinition', delimiter='/') -> str:
                             definition['version'])
 
 
+def _get_labware_path(labware: 'Labware'):
+    parent_id = helpers._get_parent_identifier(labware.parent)
+    labware_hash = helpers._hash_labware_def(labware._definition)
+    return f'{labware_hash}{parent_id}.json'
+
+
 def load_from_definition(
         definition: 'LabwareDefinition',
         parent: Location,
@@ -1129,7 +1135,9 @@ def load_from_definition(
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
     labware = Labware(definition, parent, label, api_level)
-    load_calibration(labware)
+    lookup_path = _get_labware_path(labware)
+    offset = get.get_calibration(lookup_path)
+    labware.set_calibration(offset)
     return labware
 
 

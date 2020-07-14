@@ -255,16 +255,6 @@ def test_schema_shape(monkeypatch, clear_calibration):
 
 def test_load_calibration(monkeypatch, clear_calibration):
 
-    calibration_point = None
-
-    def mock_set_calibration(self, delta):
-        nonlocal calibration_point
-        calibration_point = delta
-
-    monkeypatch.setattr(
-        labware.Labware,
-        'set_calibration', mock_set_calibration)
-
     monkeypatch.setattr(
         helpers,
         '_hash_labware_def', mock_hash_labware
@@ -281,8 +271,8 @@ def test_load_calibration(monkeypatch, clear_calibration):
     # data
     test_labware.set_calibration(Point(0, 0, 0))
     test_labware.tip_length = 46.8
-
-    get.load_calibration(test_labware)
+    lookup_path = labware._get_labware_offset_path(test_load_calibration)
+    calibration_point = get.get_calibration(test_labware)
     assert calibration_point == test_offset
 
 
