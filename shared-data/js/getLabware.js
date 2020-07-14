@@ -36,6 +36,13 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
 ]
+// NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
+// but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST
+// because of legacy protocols that might use them
+export const PD_DO_NOT_LIST = [
+  'opentrons_calibrationblock_short_side_left',
+  'opentrons_calibrationblock_short_side_right',
+]
 
 export function getLabwareV1Def(labwareName: string): ?LabwareDefinition1 {
   const labware: ?LabwareDefinition1 = definitions[labwareName]
