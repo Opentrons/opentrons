@@ -20,6 +20,7 @@ export type Capability =
 
 export type CapabilityMap = {
   [capabilityName: Capability]: ?string,
+  ...,
 }
 
 export type ServerHealthResponse = {
@@ -40,6 +41,7 @@ export type HealthErrorResponse = {|
 export type Candidate = {
   ip: string,
   port: number,
+  ...
 }
 
 export type Service = {
@@ -58,6 +60,7 @@ export type Service = {
   health: ?HealthResponse,
   // last good /server/health response
   serverHealth: ?ServerHealthResponse,
+  ...
 }
 
 export type ServiceUpdate = $Shape<Service>
@@ -92,4 +95,47 @@ export type HealthPollerResult = $ReadOnly<{|
   healthError: HealthErrorResponse | null,
   /** GET /server/health status code and body if response was non-2xx */
   serverHealthError: HealthErrorResponse | null,
+|}>
+
+/**
+ * Object describing something than can be polled for health. Inexact to avoid
+ * coupling what the HealthPoller expects with what the DiscoveryClient needs
+ * for its own state
+ */
+export type HealthPollerTarget = $ReadOnly<{
+  ip: string,
+  port: number,
+  ...
+}>
+
+/**
+ * Base configuration options of a HealthPoller
+ */
+export type HealthPollerConfig = $ReadOnly<{|
+  /** List of addresses to poll */
+  list: $ReadOnlyArray<HealthPollerTarget>,
+  /** Call the health endpoints for a given IP once every `interval` ms */
+  interval: number,
+|}>
+
+/**
+ * Options used to construct a health poller
+ */
+export type HealthPollerOptions = $ReadOnly<{|
+  ...HealthPollerConfig,
+  /** Function to call whenever the requests for an IP settle */
+  onPollResult: (pollResult: HealthPollerResult) => mixed,
+  /** Optional logger */
+  logger?: Logger,
+|}>
+
+/**
+ * A HealthPoller manages polling the HTTP health endpoints of a set of IP
+ * addresses
+ */
+export type HealthPoller = $ReadOnly<{|
+  /** (Re)start the poller, optionally passing in a new configuration */
+  start: (startOpts?: $Partial<HealthPollerConfig>) => void,
+  /** Stop the poller (will not cancel any in-flight HTTP requests) */
+  stop: () => void,
 |}>

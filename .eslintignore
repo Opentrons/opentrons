@@ -9,7 +9,7 @@ shared-data/python/**
 **/venv/**
 
 # flow
-**/flow-typed/**
+flow-typed/npm/**
 
 # compiled
 app-shell/lib/**
