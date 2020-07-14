@@ -36,10 +36,13 @@ def _format_calibrations(
         tip_length = lw_models.TipData(
             value=tip_cal.value,
             lastModified=tip_cal.last_modified)
+        # TODO (lc, 07-13-2020) Once we categorize calibrations
+        # per slot, we should ensure that the parent displayed
+        # is the slot number.
         if calInfo.parent.module:
             parent_info = calInfo.parent.module
         else:
-            parent_info = calInfo.parent.slot
+            parent_info = ''
         cal_data = lw_models.CalibrationData(
             offset=offset, tipLength=tip_length)
         formatted_cal = lw_models.LabwareCalibration(

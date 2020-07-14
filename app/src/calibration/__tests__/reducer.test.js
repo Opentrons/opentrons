@@ -19,7 +19,7 @@ describe('calibration reducer', () => {
     })
   })
   it('should handle a FETCH_LABWARE_CALIBRATION_SUCCESS', () => {
-    const action = LabwareFunctions.fetchLabwareCalibrationSuccess(
+    const action = LabwareFunctions.fetchLabwareCalibrationsSuccess(
       'robot-name',
       LabwareFixtures.mockAllLabwareCalibraton,
       {}

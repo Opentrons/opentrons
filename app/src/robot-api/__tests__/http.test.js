@@ -80,6 +80,15 @@ describe('robot-api http client', () => {
     )
   })
 
+  it('removes any empty query params', () => {
+    const url = robotApiUrl(robot, {
+      method: GET,
+      path: '/health',
+      query: { fakeParam: '' },
+    })
+    expect(url).toEqual(`http://127.0.0.1:${testPort}/health?`)
+  })
+
   it('can make a get request', () => {
     testApp.get('/health', (req, res) => {
       res.status(200).send('{ "hello": "world" }')

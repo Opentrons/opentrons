@@ -10,6 +10,19 @@ import { labwareCalibrationEpic } from '..'
 const makeTriggerActionAllCalibrations = robotName =>
   Actions.fetchAllLabwareCalibrations(robotName)
 
+const makeTriggerActionFilterCalibrations = (
+  robotName,
+  loadName,
+  namespace,
+  version
+) =>
+  Actions.fetchAllLabwareCalibrations(
+    robotName,
+    (loadName = 'my_cute_labware'),
+    (namespace = 'cutelabwares'),
+    (version = 2)
+  )
+
 describe('fetch labware calibration epics', () => {
   afterEach(() => {
     jest.resetAllMocks()
@@ -37,6 +50,32 @@ describe('fetch labware calibration epics', () => {
     })
   })
 
+  it('calls GET /labware/calibrations with query string', () => {
+    const mocks = setupEpicTestMocks(
+      makeTriggerActionFilterCalibrations,
+      Fixtures.mockFetchLabwareCalibrationSuccess
+    )
+
+    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
+      const output$ = labwareCalibrationEpic(action$, state$)
+
+      expectObservable(output$)
+      flush()
+
+      expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
+        method: 'GET',
+        path: '/labware/calibrations',
+        query: {
+          loadName: 'my_cute_labware',
+          namespace: 'cutelabwares',
+          version: 2,
+        },
+      })
+    })
+  })
+
   it('maps successful response to FETCH_LABWARE_CALAIBRATION_SUCCESS', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerActionAllCalibrations,
@@ -49,7 +88,7 @@ describe('fetch labware calibration epics', () => {
       const output$ = labwareCalibrationEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.fetchLabwareCalibrationSuccess(
+        a: Actions.fetchLabwareCalibrationsSuccess(
           mocks.robot.name,
           Fixtures.mockFetchLabwareCalibrationSuccess.body,
           {
@@ -73,7 +112,7 @@ describe('fetch labware calibration epics', () => {
       const output$ = labwareCalibrationEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.fetchLabwareCalibrationFailure(
+        a: Actions.fetchLabwareCalibrationsFailure(
           mocks.robot.name,
           Fixtures.mockFetchLabwareCalibrationFailure.body,
           {

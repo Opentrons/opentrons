@@ -10,14 +10,17 @@ import type {
 } from '../../robot-api/types'
 
 export const fetchAllLabwareCalibrations = (
-  robotName: string
+  robotName: string,
+  loadName?: string,
+  namespace?: string,
+  version?: number
 ): Types.FetchLabwareCalibrationAction => ({
   type: Constants.FETCH_ALL_LABWARE_CALIBRATIONS,
-  payload: { robotName },
+  payload: { robotName, loadName, namespace, version },
   meta: {},
 })
 
-export const fetchLabwareCalibrationSuccess = (
+export const fetchLabwareCalibrationsSuccess = (
   robotName: string,
   labwareCalibration: APITypes.AllLabwareCalibrations,
   meta: RobotApiRequestMeta
@@ -27,7 +30,7 @@ export const fetchLabwareCalibrationSuccess = (
   meta,
 })
 
-export const fetchLabwareCalibrationFailure = (
+export const fetchLabwareCalibrationsFailure = (
   robotName: string,
   error: RobotApiErrorResponse,
   meta: RobotApiRequestMeta

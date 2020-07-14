@@ -24,7 +24,7 @@ const SPECS: Array<ActionSpec> = [
   },
   {
     should: 'create a fetchCalibrationStatusSuccess action',
-    creator: Actions.fetchLabwareCalibrationSuccess,
+    creator: Actions.fetchLabwareCalibrationsSuccess,
     args: [
       'robot-name',
       Fixtures.mockFetchLabwareCalibrationSuccess.body,
@@ -41,7 +41,7 @@ const SPECS: Array<ActionSpec> = [
   },
   {
     should: 'create a fetchCalibrationStatusFailure action',
-    creator: Actions.fetchLabwareCalibrationFailure,
+    creator: Actions.fetchLabwareCalibrationsFailure,
     args: [
       'robot-name',
       Fixtures.mockFetchLabwareCalibrationFailure.body,

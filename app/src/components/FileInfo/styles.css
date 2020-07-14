@@ -91,14 +91,11 @@
   }
 }
 
-.continue {
-  text-align: right;
-}
 
 .continue_button {
   display: inline-block;
   width: 16.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.25rem;
 }
 
 .soft_warning {

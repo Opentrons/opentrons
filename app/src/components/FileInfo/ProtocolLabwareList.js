@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { css } from 'styled-components'
 
 import {
   DIRECTION_ROW,
@@ -13,26 +12,28 @@ import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_REGULAR,
   C_DARK_GRAY,
-  TOOLTIP_AUTO,
-  SPACING_1,
+  TOOLTIP_TOP,
   SIZE_1,
   C_MED_GRAY,
+  SPACING_1,
 } from '@opentrons/components'
 import { SectionContentFlex } from '../layout'
 
 export type ProtocolLabwareListProps = {|
-  labware: Array<?string>,
-  quantity: Array<?string>,
-  calibration: Array<?React.Node>,
+  labware: Array<string>,
+  quantity: Array<string>,
+  calibration: React.Node,
+  labwareToParent: Object,
 |}
 
 export function ProtocolLabwareList({
   labware,
   quantity,
   calibration,
+  labwareToParent,
 }: ProtocolLabwareListProps): React.Node {
   const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_AUTO,
+    placement: TOOLTIP_TOP,
   })
   const iconComponent = (
     <Icon name="information" size={SIZE_1} color={C_MED_GRAY} />
@@ -52,10 +53,14 @@ export function ProtocolLabwareList({
       fontSize={FONT_SIZE_BODY_1}
       fontWeight={FONT_WEIGHT_REGULAR}
       color={C_DARK_GRAY}
+      border={SPACING_1}
     >
       <SectionContentFlex title={LABWARE_TYPE}>
         {labware.map(name => (
-          <Text key={name}>{name}</Text>
+          <div key={name}>
+            <Text>{labwareToParent[name]}</Text>
+            <Text>{name}</Text>
+          </div>
         ))}
       </SectionContentFlex>
       <SectionContentFlex title={LABWARE_QUANTITY}>
@@ -69,13 +74,7 @@ export function ProtocolLabwareList({
         toolTipComponent={toolTipComponent}
         toolTipProps={targetProps}
       >
-        <table
-          css={css`
-            border-spacing: ${SPACING_1};
-          `}
-        >
-          <tbody>{calibration}</tbody>
-        </table>
+        {calibration}
       </SectionContentFlex>
     </Flex>
   )

@@ -44,6 +44,7 @@ export function FileInfo(props: FileInfoProps): React.Node {
   const labware = useSelector((state: State) =>
     robotSelectors.getLabware(state)
   )
+
   const labwareCalibrations = useSelector((state: State) =>
     labwareFunctions.getListOfLabwareCalibrations(state, robotName)
   )

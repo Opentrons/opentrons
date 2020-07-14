@@ -3,6 +3,7 @@ import * as React from 'react'
 
 import {
   SPACING_1,
+  SIZE_1,
   Flex,
   Box,
   ALIGN_CENTER,
@@ -31,7 +32,7 @@ export function SectionContentFlex({
   ...styleProps
 }: SectionContentFlexProps): React.Node {
   return (
-    <Box {...styleProps}>
+    <Box {...styleProps} paddingTop={SIZE_1} paddingBottom={SIZE_1}>
       <Flex alignItems={ALIGN_CENTER}>
         <Box flex={FLEX_AUTO}>
           <h4>{title}</h4>

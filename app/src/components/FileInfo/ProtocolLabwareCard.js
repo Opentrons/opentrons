@@ -2,8 +2,14 @@
 // setup labware component
 import * as React from 'react'
 import round from 'lodash/round'
+import { css } from 'styled-components'
+import map from 'lodash/map'
 
-import { ALIGN_CENTER, FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  FONT_WEIGHT_SEMIBOLD,
+  SPACING_1,
+} from '@opentrons/components'
 
 import { InfoSection } from './InfoSection'
 import { ProtocolLabwareList } from './ProtocolLabwareList'
@@ -47,14 +53,34 @@ export function ProtocolLabwareCard({
     }
   })
 
+  const labwareCalibrationTable = (
+    <table
+      css={css`
+        border-spacing: ${SPACING_1};
+      `}
+    >
+      <tbody>{labwareCalibration}</tbody>
+    </table>
+  )
   const labwareQuantity = Object.keys(labware).map(type => `x${labware[type]}`)
+
+  const labwareToParentMap = {}
+  Object.keys(labware).forEach(type => {
+    const parent = labwareCalibrations[type]?.attributes.parent ?? ''
+    const spacedParent = parent
+      .split(/(?=[A-Z])/)
+      .map(s => s.toUpperCase())
+      .join(' ')
+    return (labwareToParentMap[type] = spacedParent)
+  })
 
   return (
     <InfoSection title={TITLE}>
       <ProtocolLabwareList
         labware={Object.keys(labware)}
         quantity={labwareQuantity}
-        calibration={labwareCalibration}
+        calibration={labwareCalibrationTable}
+        labwareToParent={labwareToParentMap}
       />
     </InfoSection>
   )

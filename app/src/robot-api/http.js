@@ -4,6 +4,7 @@ import { of, from } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import mapValues from 'lodash/mapValues'
 import toString from 'lodash/toString'
+import omitBy from 'lodash/omitBy'
 
 import type { Observable } from 'rxjs'
 import type {
@@ -11,6 +12,10 @@ import type {
   RobotApiRequestOptions,
   RobotApiResponse,
 } from './types'
+
+function checkEmpty(value) {
+  return value == null || value === ''
+}
 
 export function robotApiUrl(
   host: RobotHost,
@@ -20,7 +25,8 @@ export function robotApiUrl(
   let url = `http://${host.ip}:${host.port}${path}`
 
   if (query && Object.keys(query).length > 0) {
-    const stringParamsMap = mapValues(query, toString)
+    const queryNoEmptyParams = omitBy(query, checkEmpty)
+    const stringParamsMap = mapValues(queryNoEmptyParams, toString)
     const queryParams = new URLSearchParams(stringParamsMap)
     url += `?${queryParams.toString()}`
   }
