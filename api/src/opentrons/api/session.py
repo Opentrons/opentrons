@@ -19,6 +19,7 @@ from opentrons.commands.commands import is_new_loc, listify
 from opentrons.protocols.types import PythonProtocol, APIVersion
 from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
+from opentrons.calibration_storage import helpers
 from opentrons.protocol_api import (ProtocolContext,
                                     labware, module_geometry)
 from opentrons.protocol_api.execute import run_protocol
@@ -215,7 +216,7 @@ class Session(RobotBusy):
         cls, name, contents, hardware, loop, broker, motion_lock, extra_labware
     ):
         protocol = parse(contents, filename=name,
-                         extra_labware={labware.uri_from_definition(defn): defn
+                         extra_labware={helpers.uri_from_definition(defn): defn
                                         for defn in extra_labware})
         sess = cls(name, protocol, hardware, loop, broker, motion_lock)
         sess.prepare()

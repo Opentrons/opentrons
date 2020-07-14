@@ -5,17 +5,15 @@ from opentrons.types import Point
 
 from . import (
     types as local_types,
-    file_operators as io, helpers,
-    encoder_decoder as ed)
-
+    file_operators as io, helpers)
 if typing.TYPE_CHECKING:
-    from opentrons.protocol_api.labware import Labware
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 """ opentrons.calibration_storage.get: functions for grabing calibration
 
-This module has functions that you can import to load robot or labware calibration
-from its designated file location.
+This module has functions that you can import to load robot or
+labware calibration from its designated file location.
 """
 
 
@@ -62,8 +60,8 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
     for key, data in index_file.items():
         cal_path = offset_path / f'{key}.json'
         if cal_path.exists():
-            cal_blob = io._read_cal_file(str(cal_path)) # type: ignore
-            calibration = _format_calibration_type(cal_blob)
+            cal_blob = io._read_cal_file(str(cal_path))
+            calibration = _format_calibration_type(cal_blob)  # type: ignore
             all_calibrations.append(
                 local_types.CalibrationInformation(
                     calibration=calibration,
@@ -80,7 +78,7 @@ def get_tip_length_data(
     try:
         pip_tip_length_path = config.get_tip_length_cal_path()/f'{pip_id}.json'
         tip_length_data =\
-            io._read_cal_file(str(pip_tip_length_path), ed.DateTimeDecoder)
+            io._read_cal_file(str(pip_tip_length_path))
         return tip_length_data[labware_hash]
     except (FileNotFoundError, AttributeError):
         raise local_types.TipLengthCalNotFound(
@@ -89,7 +87,7 @@ def get_tip_length_data(
             'be loaded')
 
 
-def get_calibration(lookup_path: local_types.StrPath) -> Point:
+def get_labware_calibration(lookup_path: local_types.StrPath) -> Point:
     """
     Look up a calibration if it exists and apply it to the given labware.
     """
@@ -105,12 +103,17 @@ def get_calibration(lookup_path: local_types.StrPath) -> Point:
 
 
 def load_tip_length_calibration(
-        pip_id: str, labware: 'Labware') -> local_types.TipLengthCalibration:
-    assert labware._is_tiprack, \
-        'cannot load tip length for non-tiprack labware'
-    parent_id = helpers._get_parent_identifier(labware.parent)
-    labware_hash = helpers._hash_labware_def(labware._definition)
+        pip_id: str,
+        definition: 'LabwareDefinition',
+        parent: str) -> local_types.TipLengthCalibration:
+    # TODO(lc, 07-14-2020) since we're trying not to utilize
+    # a labware object for these functions, the is tiprack
+    # check should happen outside of this function.
+    # assert labware._is_tiprack, \
+    #     'cannot save tip length for non-tiprack labware'
+    labware_hash = helpers._hash_labware_def(definition)
+    load_name = definition['parameters']['loadName']
     return get_tip_length_data(
         pip_id=pip_id,
-        labware_hash=labware_hash + parent_id,
-        labware_load_name=labware.load_name)
+        labware_hash=labware_hash + parent,
+        labware_load_name=load_name)

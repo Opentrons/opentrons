@@ -3,7 +3,6 @@ import datetime
 import time
 from pathlib import Path
 
-from opentrons.protocol_api.util import first_parent
 from opentrons import config
 
 from . import (
@@ -13,43 +12,42 @@ from . import (
     helpers)
 
 if typing.TYPE_CHECKING:
-    from opentrons.protocol_api.labware import Labware
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons.types import Point
 
-""" opentrons.calibration_storage.modify: functions for modifying calibration storage
+""" opentrons.calibration_storage.modify: functions for modifying
+calibration storage
 
-This module has functions that you can import to save robot or labware calibration
-to its designated file location.
+This module has functions that you can import to save robot or
+labware calibration to its designated file location.
 """
 
 
-def _add_to_index_offset_file(labware: 'Labware', lw_hash: str):
+def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
     """
     A helper method to create or add to an index file so that calibration
     files can be looked up by their hash to reveal the labware uri and
     parent information of a given file.
 
-    :param labware: A labware object
+    :param parent: A labware object
+    :param slot
     :param lw_hash: The labware hash of the calibration
     """
     offset =\
         config.get_opentrons_path('labware_calibration_offsets_dir_v2')
     index_file = offset / 'index.json'
-    uri = labware.uri
     if index_file.exists():
         blob = io._read_cal_file(str(index_file))
     else:
         blob = {}
 
-    mod_parent = helpers._get_parent_identifier(labware.parent)
-    slot = first_parent(labware)
-    if mod_parent:
+    if parent:
         mod_dict = {
-            'parent': mod_parent,
-            'fullParent': f'{slot}-{mod_parent}'}
+            'parent': parent,
+            'fullParent': f'{slot}-{parent}'}
     else:
         mod_dict = {}
-    full_id = f'{lw_hash}{mod_parent}'
+    full_id = f'{lw_hash}{parent}'
     blob[full_id] = {
             "uri": f'{uri}',
             "slot": full_id,
@@ -58,7 +56,12 @@ def _add_to_index_offset_file(labware: 'Labware', lw_hash: str):
     io.save_to_file(index_file, blob)
 
 
-def save_calibration(labware: 'Labware', delta: 'Point'):
+def save_labware_calibration(
+        labware_path: local_types.StrPath,
+        definition: 'LabwareDefinition',
+        delta: 'Point',
+        slot: str = '',
+        parent: str = ''):
     """
     Function to be used whenever an updated delta is found for the first well
     of a given labware. If an offset file does not exist, create the file
@@ -67,30 +70,32 @@ def save_calibration(labware: 'Labware', delta: 'Point'):
     """
     offset_path =\
         config.get_opentrons_path('labware_calibration_offsets_dir_v2')
-    labware_offset_path =\
-        helpers._get_labware_offset_path(labware, offset_path)
-    labware_hash = helpers._hash_labware_def(labware._definition)
-    _add_to_index_offset_file(labware, labware_hash)
+    labware_offset_path = offset_path / labware_path
+    labware_hash = helpers._hash_labware_def(definition)
+    uri = helpers.uri_from_definition(definition)
+    _add_to_index_offset_file(parent, slot, uri, labware_hash)
     calibration_data = _helper_offset_data_format(
         str(labware_offset_path), delta)
     io.save_to_file(labware_offset_path, calibration_data)
-    labware.set_calibration(delta)
 
 
 def create_tip_length_data(
-        labware: 'Labware',
+        definition: 'LabwareDefinition',
+        parent: str,
         length: float) -> local_types.PipTipLengthCalibration:
-    assert labware._is_tiprack, \
-        'cannot save tip length for non-tiprack labware'
-    parent_id = helpers._get_parent_identifier(labware.parent)
-    labware_hash = helpers._hash_labware_def(labware._definition)
+    # TODO(lc, 07-14-2020) since we're trying not to utilize
+    # a labware object for these functions, the is tiprack
+    # check should happen outside of this function.
+    # assert labware._is_tiprack, \
+    #     'cannot save tip length for non-tiprack labware'
+    labware_hash = helpers._hash_labware_def(definition)
 
     tip_length_data: local_types.TipLengthCalibration = {
         'tipLength': length,
         'lastModified': datetime.datetime.utcnow()
     }
 
-    data = {labware_hash + parent_id: tip_length_data}
+    data = {labware_hash + parent: tip_length_data}
     return data
 
 
@@ -99,13 +104,13 @@ def _helper_offset_data_format(filepath: str, delta: 'Point') -> dict:
         calibration_data = {
             "default": {
                 "offset": [delta.x, delta.y, delta.z],
-                "lastModified": time.time()
+                "lastModified": datetime.datetime.utcnow()
             }
         }
     else:
         calibration_data = io._read_cal_file(filepath)
         calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
-        calibration_data['default']['lastModified'] = time.time()
+        calibration_data['default']['lastModified'] = datetime.datetime.utcnow()
     return calibration_data
 
 

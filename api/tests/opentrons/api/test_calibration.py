@@ -318,8 +318,7 @@ async def test_jog_api1(main_router, model):
 
 @pytest.mark.api2_only
 async def test_update_container_offset_v2(main_router, model):
-    with mock.patch(
-            'opentrons.calibration_storage.modify.save_calibration') as call,\
+    with mock.patch('opentrons.labware.save_calibration') as call,\
             mock.patch.object(API,
                               'gantry_position') as gp:
         gp.return_value = Point(0, 0, 0)

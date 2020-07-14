@@ -2,24 +2,18 @@ import typing
 import json
 
 from hashlib import sha256
-from pathlib import Path
 
-from opentrons.protocol_api.definitions import DeckItem
 from . import types as local_types
 
 if typing.TYPE_CHECKING:
-    from opentrons.protocol_api.labware import Well, Labware
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+""" opentrons.calibration_storage.helpers: various miscellaneous
+functions 
 
-def _get_parent_identifier(
-        parent: typing.Union['Well', str, DeckItem, None]) -> str:
-    if isinstance(parent, DeckItem) and parent.separate_calibration:
-        # treat a given labware on a given module type as same
-        return parent.load_name
-    else:
-        return ''  # treat all slots as same
-
+This module has functions that you can import to save robot or
+labware calibration to its designated file location.
+"""
 
 def _hash_labware_def(labware_def: 'LabwareDefinition') -> str:
     # remove keys that do not affect run
@@ -38,3 +32,27 @@ def details_from_uri(uri: str, delimiter='/') -> local_types.UriDetails:
     info = uri.split(delimiter)
     return local_types.UriDetails(
         namespace=info[0], load_name=info[1], version=int(info[2]))
+
+
+def uri_from_details(namespace: str, load_name: str,
+                     version: typing.Union[str, int],
+                     delimiter='/') -> str:
+    """ Build a labware URI from its details.
+
+    A labware URI is a string that uniquely specifies a labware definition.
+
+    :returns str: The URI.
+    """
+    return f'{namespace}{delimiter}{load_name}{delimiter}{version}'
+
+
+def uri_from_definition(definition: 'LabwareDefinition', delimiter='/') -> str:
+    """ Build a labware URI from its definition.
+
+    A labware URI is a string that uniquely specifies a labware definition.
+
+    :returns str: The URI.
+    """
+    return uri_from_details(definition['namespace'],
+                            definition['parameters']['loadName'],
+                            definition['version'])

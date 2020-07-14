@@ -22,7 +22,6 @@ from opentrons.helpers import helpers
 from opentrons.protocol_api import labware as new_labware
 from opentrons.calibration_storage import (
     get,
-    file_operators as io,
     helpers as cal_helpers,
     modify)
 
@@ -217,7 +216,7 @@ def _look_up_offsets(labware_hash):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     if labware_offset_path.exists():
-        return get.get_calibration(labware_offset_path)
+        return get.get_labware_calibration(labware_offset_path)
     else:
         return Point(x=0, y=0, z=0)
 

@@ -7,7 +7,7 @@ from os import PathLike
 
 
 CalibrationID = typing.NewType('CalibrationID', str)
-StrPath = typing.Union[str, PathLike[str]]
+StrPath = typing.Union[str, PathLike]
 
 
 class TipLengthCalNotFound(Exception):
@@ -28,7 +28,7 @@ class OffsetData:
     given calibration data.
     """
     value: typing.List[float]
-    last_modified: typing.Optional[str]
+    last_modified: typing.Optional[datetime]
 
 
 @dataclass
@@ -38,7 +38,7 @@ class TipLengthData:
     given calibration data.
     """
     value: typing.Optional[float] = None
-    last_modified: typing.Optional[str] = None
+    last_modified: typing.Optional[datetime] = None
 
 
 @dataclass
@@ -97,12 +97,12 @@ class CalibrationIndexDict(TypedDict):
 
 class OffsetDict(TypedDict):
     offset: typing.List[float]
-    lastModified: str
+    lastModified: datetime
 
 
 class TipLengthDict(TypedDict):
     length: float
-    lastModified: str
+    lastModified: datetime
 
 
 class CalibrationDict(TypedDict):

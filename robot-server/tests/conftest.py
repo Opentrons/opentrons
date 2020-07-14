@@ -13,7 +13,7 @@ from robot_server.service.dependencies import get_hardware
 from opentrons.hardware_control import API, HardwareAPILike
 from opentrons import config
 
-from opentrons.calibration_storage import delete, modify
+from opentrons.calibration_storage import delete
 from opentrons.protocol_api import labware
 from opentrons.types import Point
 from opentrons.protocol_api.geometry import Deck
@@ -105,4 +105,4 @@ def set_up_index_file_temporary_directory(server_temp_directory):
         parent = deck.position_for(idx+1)
         definition = labware.get_labware_definition(name)
         lw = labware.Labware(definition, parent)
-        modify.save_calibration(lw, Point(0, 0, 0))
+        lw.save_calibration(lw, Point(0, 0, 0))

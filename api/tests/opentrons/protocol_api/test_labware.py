@@ -47,7 +47,7 @@ def set_up_index_file(labware_offset_tempdir):
         parent = deck.position_for(idx+1)
         definition = labware.get_labware_definition(name)
         lw = labware.Labware(definition, parent)
-        modify.save_calibration(lw, Point(0, 0, 0))
+        labware.save_calibration(lw, Point(0, 0, 0))
 
     return labware_list
 
@@ -481,9 +481,9 @@ def test_tiprack_list():
 def test_uris():
     details = ('opentrons', 'opentrons_96_tiprack_300ul', '1')
     uri = 'opentrons/opentrons_96_tiprack_300ul/1'
-    assert labware.uri_from_details(*details) == uri
+    assert helpers.uri_from_details(*details) == uri
     defn = labware.get_labware_definition(details[1], details[0], details[2])
-    assert labware.uri_from_definition(defn) == uri
+    assert helpers.uri_from_definition(defn) == uri
     lw = labware.Labware(defn, Location(Point(0, 0, 0), 'Test Slot'))
     assert lw.uri == uri
 
@@ -499,12 +499,11 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
     parent = deck.position_for(1)
     definition = labware.get_labware_definition(labware_name)
     lw = labware.Labware(definition, parent)
-    labware_hash = helpers._hash_labware_def(lw._definition)
-    modify._add_to_index_offset_file(lw, labware_hash)
+    lw.save_calibration(lw, Point(0, 0, 0))
 
-    lw_uri = labware.uri_from_definition(definition)
+    lw_uri = helpers.uri_from_definition(definition)
 
-    str_parent = helpers._get_parent_identifier(lw.parent)
+    str_parent = labware._get_parent_identifier(lw.parent)
     slot = '1'
     if str_parent:
         mod_dict = {str_parent: f'{slot}-{str_parent}'}
@@ -518,7 +517,7 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
         }
 
     lw_path = labware_offset_tempdir / 'index.json'
-    info = file_operators._read_cal_filelw_path)
+    info = file_operators._read_cal_file(lw_path)
     assert info[full_id] == blob
 
 

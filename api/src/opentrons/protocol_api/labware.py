@@ -24,7 +24,7 @@ from typing import (
 import jsonschema  # type: ignore
 
 from .util import ModifiedList, requires_version
-from opentrons.calibration_storage import get, helpers
+from opentrons.calibration_storage import get, helpers, modify
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
@@ -330,7 +330,7 @@ class Labware(DeckItem):
 
         :returns: The uri, ``"namespace/loadname/version"``
         """
-        return uri_from_definition(self._definition)
+        return helpers.uri_from_definition(self._definition)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1081,31 +1081,20 @@ def filter_tipracks_to_start(
         lambda tr: starting_point.parent is not tr, tipracks))
 
 
-def uri_from_details(namespace: str, load_name: str, version: Union[str, int],
-                     delimiter='/') -> str:
-    """ Build a labware URI from its details.
-
-    A labware URI is a string that uniquely specifies a labware definition.
-
-    :returns str: The URI.
-    """
-    return f'{namespace}{delimiter}{load_name}{delimiter}{version}'
-
-
-def uri_from_definition(definition: 'LabwareDefinition', delimiter='/') -> str:
-    """ Build a labware URI from its definition.
-
-    A labware URI is a string that uniquely specifies a labware definition.
-
-    :returns str: The URI.
-    """
-    return uri_from_details(definition['namespace'],
-                            definition['parameters']['loadName'],
-                            definition['version'])
+def _get_parent_identifier(
+        parent: Union['Well', str, DeckItem, None]) -> str:
+    # TODO (lc, 07-14-2020): Once we implement calibrations per slot,
+    # this function should either return a slot using `first_parent` or
+    # the module it is attached to.
+    if isinstance(parent, DeckItem) and parent.separate_calibration:
+        # treat a given labware on a given module type as same
+        return parent.load_name
+    else:
+        return ''  # treat all slots as same
 
 
 def _get_labware_path(labware: 'Labware'):
-    parent_id = helpers._get_parent_identifier(labware.parent)
+    parent_id = _get_parent_identifier(labware.parent)
     labware_hash = helpers._hash_labware_def(labware._definition)
     return f'{labware_hash}{parent_id}.json'
 
@@ -1136,9 +1125,18 @@ def load_from_definition(
     """
     labware = Labware(definition, parent, label, api_level)
     lookup_path = _get_labware_path(labware)
-    offset = get.get_calibration(lookup_path)
+    offset = get.get_labware_calibration(lookup_path)
     labware.set_calibration(offset)
     return labware
+
+
+def save_calibration(labware: 'Labware', delta: Point):
+    definition = labware._definition
+    labware_path = _get_labware_path(labware)
+    parent = _get_parent_identifier(labware)
+    modify.save_labware_calibration(
+        labware_path, definition, delta, parent=parent)
+    labware.set_calibration(delta)
 
 
 def load(

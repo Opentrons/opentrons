@@ -105,7 +105,7 @@ def clear_tlc_calibration(monkeypatch):
         pass
 
 
-def test_save_calibration(monkeypatch, clear_calibration):
+def test_save_labware_calibration(monkeypatch, clear_calibration):
     # Test the save calibration file
     assert not os.path.exists(path(MOCK_HASH))
     calibration_point = None
@@ -126,7 +126,7 @@ def test_save_calibration(monkeypatch, clear_calibration):
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
 
-    modify.save_calibration(test_labware, Point(1, 1, 1))
+    test_labware.save_calibration(test_labware, Point(1, 1, 1))
     assert os.path.exists(path(MOCK_HASH))
     assert calibration_point == Point(1, 1, 1)
 
@@ -246,7 +246,7 @@ def test_schema_shape(monkeypatch, clear_calibration):
        '_hash_labware_def', mock_hash_labware
     )
 
-    modify.save_calibration(test_labware, Point(1, 1, 1))
+    test_labware.save_calibration(test_labware, Point(1, 1, 1))
     expected = {"default": {"offset": [1, 1, 1], "lastModified": 1}}
     with open(path(MOCK_HASH)) as f:
         result = json.load(f)
@@ -265,14 +265,14 @@ def test_load_calibration(monkeypatch, clear_calibration):
 
     test_offset = Point(1, 1, 1)
 
-    modify.save_calibration(test_labware, test_offset)
+    test_labware.save_calibration(test_labware, test_offset)
 
     # Set without saving to show that load will update with previously saved
     # data
     test_labware.set_calibration(Point(0, 0, 0))
     test_labware.tip_length = 46.8
     lookup_path = labware._get_labware_offset_path(test_load_calibration)
-    calibration_point = get.get_calibration(test_labware)
+    calibration_point = get.get_labware_calibration(test_labware)
     assert calibration_point == test_offset
 
 
@@ -282,7 +282,7 @@ def test_wells_rebuilt_with_offset():
     old_wells = test_labware._wells
     assert test_labware._offset == Point(10, 10, 5)
     assert test_labware._calibrated_offset == Point(10, 10, 5)
-    modify.save_calibration(test_labware, Point(2, 2, 2))
+    test_labware.save_calibration(test_labware, Point(2, 2, 2))
     new_wells = test_labware._wells
     assert old_wells[0] != new_wells[0]
     assert test_labware._offset == Point(10, 10, 5)
