@@ -487,6 +487,12 @@ class Deck(UserDict):
             if ft else None
         )
 
+    def get_non_fixture_slots(self) -> List[types.DeckLocation]:
+        fixtures = self._definition['locations']['fixtures']
+        fixture_slots = {self._check_name(f['slot'])
+                         for f in fixtures if f['slot']}
+        return [s for s in self.data.keys() if s not in fixture_slots]
+
     def get_collisions_for_item(self,
                                 slot_key: types.DeckLocation,
                                 item: DeckItem) -> Dict[types.DeckLocation,

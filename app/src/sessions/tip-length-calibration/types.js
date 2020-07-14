@@ -24,9 +24,24 @@ export type TipLengthCalibrationStep =
   | TIP_LENGTH_STEP_MEASURING_TIP_OFFSET
   | TIP_LENGTH_STEP_CALIBRATION_COMPLETE
 
-// TODO: update this type once the session details settle
+export type TipLengthCalibrationInstrument = {|
+  model: string,
+  name: string,
+  tip_length: number,
+  mount: string,
+  serial: string,
+|}
+
+export type TipLengthCalibrationLabware = {|
+  alternatives: Array<string>,
+  slot: string,
+  loadName: string,
+  namespace: string,
+  version: number,
+|}
+
 export type TipLengthCalibrationSessionDetails = {|
-  instruments: { [mount: string]: RobotCalibrationCheckInstrument, ... },
+  instrument: TipLengthCalibrationInstrument,
   currentStep: TipLengthCalibrationStep,
-  labware: Array<RobotCalibrationCheckLabware>,
+  labware: Array<TipLengthCalibrationLabware>,
 |}

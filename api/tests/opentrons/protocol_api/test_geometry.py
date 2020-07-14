@@ -420,7 +420,7 @@ def test_should_dodge():
     )
 
 
-def test_labware_in_next_slow():
+def test_labware_in_next_slot():
     deck = Deck()
     trough = labware.load(trough_name, deck.position_for(4))
     trough2 = labware.load(trough_name, deck.position_for(1))
@@ -433,3 +433,12 @@ def test_labware_in_next_slow():
     assert deck.right_of('2') is trough3
 
     assert deck.right_of('9') is None
+
+
+def test_get_non_fixture_slots():
+    deck = Deck()
+    trough = labware.load(trough_name, deck.position_for(4))
+    deck[4] = trough
+
+    assert deck.get_non_fixture_slots() == [1, 2, 3, 4, 5, 6,
+                                            7, 8, 9, 10, 11]
