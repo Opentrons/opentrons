@@ -82,11 +82,11 @@ describe('discovery client action creators', () => {
   })
 
   it('should allow the user to manually add an IP address to the client', () => {
-    const action = Actions.addIpAddress('localhost')
+    const action = Actions.addIpAddress('localhost', 31950)
 
     expect(action).toEqual({
       type: 'client:ADD_IP_ADDRESS',
-      payload: { ip: 'localhost' },
+      payload: { ip: 'localhost', port: 31950 },
     })
   })
 

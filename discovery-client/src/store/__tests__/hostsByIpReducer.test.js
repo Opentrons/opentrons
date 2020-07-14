@@ -376,7 +376,7 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should handle "client:ADD_IP_ADDRESS" for new address', () => {
-    const action = Actions.addIpAddress('127.0.0.1')
+    const action = Actions.addIpAddress('127.0.0.1', 31950)
     const initialState = {}
     const nextState = hostsByIpReducer(initialState, action)
 
@@ -395,7 +395,7 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should noop "client:ADD_IP_ADDRESS" for existing address', () => {
-    const action = Actions.addIpAddress('127.0.0.1')
+    const action = Actions.addIpAddress('127.0.0.1', 31950)
     const initialState = {
       '127.0.0.1': {
         ip: '127.0.0.1',

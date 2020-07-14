@@ -102,7 +102,7 @@ export type HealthPolledAction = {|
  */
 export type AddIpAddressAction = {|
   type: ADD_IP_ADDRESS,
-  payload: {| ip: string |},
+  payload: {| ip: string, port: number |},
 |}
 
 /**

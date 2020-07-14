@@ -27,9 +27,12 @@ export const healthPolled = (
   payload,
 })
 
-export const addIpAddress = (ip: string): Types.AddIpAddressAction => ({
+export const addIpAddress = (
+  ip: string,
+  port: number
+): Types.AddIpAddressAction => ({
   type: ADD_IP_ADDRESS,
-  payload: { ip },
+  payload: { ip, port },
 })
 
 export const removeIpAddress = (ip: string): Types.RemoveIpAddressAction => ({

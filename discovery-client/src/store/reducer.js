@@ -26,9 +26,9 @@ const INITIAL_STATE = {
   hostsByIp: {},
 }
 
-const makeInitialHostState = ip => ({
+const makeInitialHostState = (ip, port) => ({
   ip,
-  port: 31950,
+  port,
   seen: false,
   healthStatus: null,
   serverHealthStatus: null,
@@ -92,8 +92,8 @@ export const hostsByIpReducer = (
 ): HostsByIpMap => {
   switch (action.type) {
     case Actions.ADD_IP_ADDRESS: {
-      const { ip } = action.payload
-      return ip in state ? state : { [ip]: makeInitialHostState(ip) }
+      const { ip, port } = action.payload
+      return ip in state ? state : { [ip]: makeInitialHostState(ip, port) }
     }
 
     case Actions.REMOVE_IP_ADDRESS: {
