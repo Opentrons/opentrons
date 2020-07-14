@@ -24,3 +24,8 @@ export const mockHealthErrorStringResponse = {
   status: 504,
   body: 'NGINX gateway timeout',
 }
+
+export const mockHealthFetchErrorResponse = {
+  status: -1,
+  body: 'Failed to fetch',
+}

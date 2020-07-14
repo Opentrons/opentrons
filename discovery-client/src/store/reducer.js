@@ -4,6 +4,11 @@ import isEqual from 'lodash/isEqual'
 import omit from 'lodash/omit'
 
 import * as Actions from './actions'
+import {
+  HEALTH_STATUS_OK,
+  HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_UNREACHABLE,
+} from './constants'
 
 import type { Reducer } from 'redux'
 
@@ -25,12 +30,18 @@ const makeInitialHostState = ip => ({
   ip,
   port: 31950,
   seen: false,
-  ok: null,
-  serverOk: null,
+  healthStatus: null,
+  serverHealthStatus: null,
   healthError: null,
   serverHealthError: null,
   robotName: null,
 })
+
+const getHealthStatus = (responseData, error) => {
+  if (responseData) return HEALTH_STATUS_OK
+  if (error && error.status >= 400) return HEALTH_STATUS_NOT_OK
+  return HEALTH_STATUS_UNREACHABLE
+}
 
 export const robotsByNameReducer = (
   state: RobotsByNameMap = INITIAL_STATE.robotsByName,
@@ -110,8 +121,8 @@ export const hostsByIpReducer = (
         port,
         robotName,
         seen: true,
-        ok: newHost ? null : host?.ok ?? null,
-        serverOk: newHost ? null : host?.serverOk ?? null,
+        healthStatus: newHost ? null : host?.healthStatus ?? null,
+        serverHealthStatus: newHost ? null : host?.serverHealthStatus ?? null,
         healthError: newHost ? null : host?.healthError ?? null,
         serverHealthError: newHost ? null : host?.serverHealthError ?? null,
       }
@@ -133,16 +144,22 @@ export const hostsByIpReducer = (
       const host: HostState | void = state[ip]
       const robotName =
         serverHealth?.name ?? health?.name ?? host?.robotName ?? null
+      const healthStatus = getHealthStatus(health, healthError)
+      const serverHealthStatus = getHealthStatus(
+        serverHealth,
+        serverHealthError
+      )
       const seen =
-        host?.seen === true || health !== null || serverHealth !== null
-      const ok = health !== null
-      const serverOk = serverHealth !== null
+        host?.seen === true ||
+        healthStatus !== HEALTH_STATUS_UNREACHABLE ||
+        serverHealthStatus !== HEALTH_STATUS_UNREACHABLE
+
       const nextHostState = {
         ip,
         port,
         seen,
-        ok,
-        serverOk,
+        healthStatus,
+        serverHealthStatus,
         healthError,
         serverHealthError,
         robotName,
@@ -150,25 +167,28 @@ export const hostsByIpReducer = (
 
       // if we get a healthy poll on a given IP, remove any unhealthy, unseen
       // ips for the same robot from the list to avoid polling them forever
-      const removals: Array<string> =
-        ok && serverOk
-          ? Object.keys(state).filter((targetIp: string) => {
-              const {
-                seen: targetSeen,
-                ok: targetOk,
-                serverOk: targetServerOk,
-                robotName: targetRobotName,
-              } = state[targetIp]
+      const ipIsGood =
+        healthStatus === HEALTH_STATUS_OK &&
+        serverHealthStatus === HEALTH_STATUS_OK
 
-              return (
-                targetRobotName === robotName &&
-                targetIp !== ip &&
-                targetSeen === false &&
-                targetOk === false &&
-                targetServerOk === false
-              )
-            })
-          : []
+      const removals: Array<string> = ipIsGood
+        ? Object.keys(state).filter((targetIp: string) => {
+            const {
+              seen: targetSeen,
+              healthStatus: targetHealthStatus,
+              serverHealthStatus: targetServerHealthStatus,
+              robotName: targetRobotName,
+            } = state[targetIp]
+
+            return (
+              targetIp !== ip &&
+              targetRobotName === robotName &&
+              targetSeen === false &&
+              targetHealthStatus === HEALTH_STATUS_UNREACHABLE &&
+              targetServerHealthStatus === HEALTH_STATUS_UNREACHABLE
+            )
+          })
+        : []
 
       return isEqual(state[ip], nextHostState) && removals.length === 0
         ? state

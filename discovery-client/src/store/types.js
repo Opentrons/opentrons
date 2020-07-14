@@ -15,6 +15,12 @@ import typeof {
   REMOVE_ROBOT,
 } from './actions'
 
+import typeof {
+  HEALTH_STATUS_UNREACHABLE,
+  HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
+} from './constants'
+
 /**
  * Health state of a given robot
  */
@@ -28,6 +34,17 @@ export type RobotState = $ReadOnly<{|
 |}>
 
 /**
+ * Health endpoint status, where a given endpoint is one of:
+ * - Unreachable: fetch failed completely
+ * - Not ok: Fetch was successful, but the status code was not 2xx
+ * - Ok: Fetch was successful and status code was 2xx
+ */
+export type HealthStatus =
+  | HEALTH_STATUS_UNREACHABLE
+  | HEALTH_STATUS_NOT_OK
+  | HEALTH_STATUS_OK
+
+/**
  * State for a given IP address, which should point to a robot
  */
 export type HostState = $ReadOnly<{|
@@ -37,18 +54,10 @@ export type HostState = $ReadOnly<{|
   port: number,
   /** Whether this IP has been seen via mDNS or HTTP while the client has been running */
   seen: boolean,
-  /**
-   * If last /health request to this IP returned 200 (null if request not yet made)
-   * TODO(mc, 2020-07-13): replace with an enum to capture the difference between
-   * a fetch error due to networking and a 4xx or 5xx response
-   */
-  ok: boolean | null,
-  /**
-   * If last /server/health request to this IP returned 200 (null if request not yet made)
-   * TODO(mc, 2020-07-13): replace with an enum to capture the difference between
-   * a fetch error due to networking and a 4xx or 5xx response
-   */
-  serverOk: boolean | null,
+  /** How the last GET /health responded (null if no response yet) */
+  healthStatus: HealthStatus | null,
+  /** How the last GET /server/health responded (null if no response yet) */
+  serverHealthStatus: HealthStatus | null,
   /** Error status and response from /health if last request was not 200 */
   healthError: HealthErrorResponse | null,
   /** Error status and response from /server/health if last request was not 200 */
