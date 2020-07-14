@@ -2,7 +2,7 @@ import logging
 import traceback
 
 from opentrons import __version__
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Depends
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, JSONResponse
 from starlette.requests import Request
@@ -16,7 +16,8 @@ from .errors import V1HandlerError, \
     transform_validation_error_to_json_api_errors, \
     consolidate_fastapi_response, RobotServerError, ErrorResponse, \
     build_unhandled_exception_response
-from .dependencies import get_rpc_server, get_protocol_manager, api_wrapper
+from .dependencies import get_rpc_server, get_protocol_manager, api_wrapper, \
+    verify_hardware
 from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
 from robot_server.service.access.router import router as access_router
@@ -50,7 +51,8 @@ app.include_router(router=legacy_routes,
 # New v2 routes
 routes = APIRouter()
 routes.include_router(router=session_router,
-                      tags=["Session Management"])
+                      tags=["Session Management"],
+                      dependencies=[Depends(verify_hardware)])
 routes.include_router(router=access_router,
                       tags=["Access Control"])
 routes.include_router(router=labware_router,
