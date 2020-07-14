@@ -3,7 +3,6 @@
 import * as React from 'react'
 import round from 'lodash/round'
 import { css } from 'styled-components'
-import map from 'lodash/map'
 
 import {
   ALIGN_CENTER,
