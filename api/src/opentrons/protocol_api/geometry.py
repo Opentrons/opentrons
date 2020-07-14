@@ -7,8 +7,8 @@ from typing import List, Optional, Tuple, Dict, TYPE_CHECKING
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
-from opentrons_shared_data.deck import load
-from .labware import (Labware, Well,
+from opentrons_shared_data.deck import load as load_deck
+from .labware import (Labware, Well, load as load_lw,
                       quirks_from_any_parent)
 from .definitions import DeckItem
 from .module_geometry import ThermocyclerGeometry, ModuleGeometry, ModuleType
@@ -16,7 +16,7 @@ from .util import first_parent
 
 if TYPE_CHECKING:
     from opentrons_shared_data.deck.dev_types import (
-        SlotDefV2
+        SlotDefV2,
     )
 
 
@@ -24,6 +24,7 @@ MODULE_LOG = logging.getLogger(__name__)
 
 # Amount of slots in a single deck row
 ROW_LENGTH = 3
+FIXED_TRASH_ID = 'fixedTrash'
 
 
 @dataclass
@@ -274,7 +275,7 @@ def plan_moves(
 
 
 class Deck(UserDict):
-    def __init__(self):
+    def __init__(self, load_name='ot2_standard'):
         super().__init__()
         row_offset = 90.5
         col_offset = 132.5
@@ -285,8 +286,15 @@ class Deck(UserDict):
                                                 0)
                            for idx in range(12)}
         self._highest_z = 0.0
-        # TODO: support deck loadName as a param
-        self._definition = load('ot2_standard', 2)
+        self._definition = load_deck(load_name, 2)
+        self._load_fixtures()
+
+    def _load_fixtures(self):
+        for f in self._definition['locations']['fixtures']:
+            slot_name = self._check_name(f['slot'])  # type: ignore
+            loaded_f = load_lw(f['labware'],  # type: ignore
+                               self.position_for(slot_name))
+            self.__setitem__(slot_name, loaded_f)
 
     @staticmethod
     def _assure_int(key: object) -> int:
@@ -470,6 +478,14 @@ class Deck(UserDict):
                              'could not be found, '
                              f'valid calibration position ids are: {pos_ids}')
         return calibration_position
+
+    def get_fixed_trash(self) -> Optional[Labware]:
+        fixtures = self._definition['locations']['fixtures']
+        ft = next((f for f in fixtures if f['id'] == FIXED_TRASH_ID), None)
+        return (
+            self.data[self._check_name(ft.get('slot'))]  # type: ignore
+            if ft else None
+        )
 
     def get_collisions_for_item(self,
                                 slot_key: types.DeckLocation,

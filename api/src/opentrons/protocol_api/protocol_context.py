@@ -36,6 +36,9 @@ ModuleTypes = Union[
     'ThermocyclerContext'
 ]
 
+SHORT_TRASH_DECK = 'ot2_short_trash'
+STANDARD_DECK = 'ot2_standard'
+
 
 class ProtocolContext(CommandPublisher):
     """ The Context class is a container for the state of a protocol.
@@ -98,7 +101,9 @@ class ProtocolContext(CommandPublisher):
                 f'robot software. Please either reduce your requested API '
                 f'version or update your robot.')
         self._loop = loop or asyncio.get_event_loop()
-        self._deck_layout = geometry.Deck()
+        deck_load_name = SHORT_TRASH_DECK if fflags.short_fixed_trash() \
+            else STANDARD_DECK
+        self._deck_layout = geometry.Deck(load_name=deck_load_name)
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
         self._modules: Set[ModuleContext] = set()
@@ -116,13 +121,6 @@ class ProtocolContext(CommandPublisher):
 
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
-        if fflags.short_fixed_trash():
-            trash_name = 'opentrons_1_trash_850ml_fixed'
-        else:
-            trash_name = 'opentrons_1_trash_1100ml_fixed'
-        if self._deck_layout['12']:
-            del self._deck_layout['12']
-        self.load_labware(trash_name, '12')
 
     @classmethod
     def build_using(cls,
