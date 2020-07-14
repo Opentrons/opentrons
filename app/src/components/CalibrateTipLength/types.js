@@ -16,6 +16,7 @@ export type CalibrateTipLengthParentProps = {|
 
 export type CalibrateTipLengthChildProps = {|
   ...CalibrateTipLengthParentProps,
+  hasBlock: boolean | null,
   sendSessionCommand: (
     command: SessionCommandString,
     data: SessionCommandData

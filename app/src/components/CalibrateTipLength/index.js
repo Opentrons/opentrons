@@ -2,6 +2,8 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 
+import { ModalPage } from '@opentrons/components'
+
 import type {
   SessionCommandString,
   SessionCommandData,
@@ -18,11 +20,15 @@ import { TipPickUp } from './TipPickUp'
 import { InspectingTip } from './InspectingTip'
 import { MeasureTip } from './MeasureTip'
 import { CompleteConfirmation } from './CompleteConfirmation'
+import styles from './styles.css'
 
 import type {
   CalibrateTipLengthParentProps,
   CalibrateTipLengthChildProps,
 } from './types'
+
+const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
+const EXIT = 'exit'
 
 const PANEL_BY_STEP: {
   [string]: React.ComponentType<CalibrateTipLengthChildProps>,
@@ -35,6 +41,17 @@ const PANEL_BY_STEP: {
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
+const PANEL_STYLE_BY_STEP: {
+  [string]: string,
+} = {
+  sessionStarted: styles.terminal_modal_contents,
+  labwareLoaded: styles.page_content_dark,
+  measuringNozzleOffset: styles.modal_contents,
+  preparingPipette: styles.modal_contents,
+  inspectingTip: styles.modal_contents,
+  measuringTipOffset: styles.modal_contents,
+  calibrationComplete: styles.modal_contents,
+}
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
@@ -44,8 +61,9 @@ export function CalibrateTipLength(
   // TODO: get real currentStep from session
   const currentStep = session?.details?.currentStep || ''
   const robotName = ''
-
-  const title = `${mount} pipette calibration`
+  // TODO: get real block setting
+  const hasBlock = false
+  const title = `${mount} pipette tip length calibration`
   const Panel = PANEL_BY_STEP[currentStep]
 
   const [dispatchRequest] = useDispatchApiRequest()
@@ -64,13 +82,33 @@ export function CalibrateTipLength(
   }
   return (
     <>
-      <CalibrationInfoBox confirmed={probed} title={title}>
-        {Panel ? (
-          <Panel {...props} sendSessionCommand={sendCommand} />
-        ) : (
-          <UncalibratedInfo {...props} sendSessionCommand={sendCommand} />
-        )}
-      </CalibrationInfoBox>
+      {Panel ? (
+        <ModalPage
+          titleBar={{
+            title: TIP_LENGTH_CALIBRATION_SUBTITLE,
+            back: {
+              onClick: () => console.log('TODO: handle confirm exit'),
+              title: EXIT,
+              children: EXIT,
+            },
+          }}
+          contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
+        >
+          <Panel
+            {...props}
+            hasBlock={hasBlock}
+            sendSessionCommand={sendCommand}
+          />
+        </ModalPage>
+      ) : (
+        <CalibrationInfoBox confirmed={probed} title={title}>
+          <UncalibratedInfo
+            {...props}
+            hasBlock={hasBlock}
+            sendSessionCommand={sendCommand}
+          />
+        </CalibrationInfoBox>
+      )}
     </>
   )
 }
