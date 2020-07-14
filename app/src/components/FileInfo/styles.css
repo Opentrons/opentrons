@@ -15,7 +15,6 @@
   & > p {
     @apply --font-body-2-dark;
   }
-
 }
 
 .title {
@@ -90,7 +89,6 @@
     width: 80%;
   }
 }
-
 
 .continue_button {
   display: inline-block;
