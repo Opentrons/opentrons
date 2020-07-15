@@ -45,9 +45,9 @@ The OT-2 has a set of labware well-supported by Opentrons defined internally. Th
 Custom Labware
 ^^^^^^^^^^^^^^
 
-If you have a piece of labware that is not in the Labware Library, you can create your own definition using the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. Before using the Labware Creator, you should read the introduction article `here <https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions>`_.
+If you have a piece of labware that is not in the Labware Library, you can create your own definition using the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. Before using the Labware Creator, you should read the introduction article `here <https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions>`__.
 
-Once you have created your labware and saved it as a ``.json`` file, you can add it to the Opentrons App by clicking "More" and then "Labware". Once you have added your labware to the Opentrons App, it will be available to all Python Protocol API version 2 protocols uploaded to your robot through that Opentrons App. If other people will be using this custom labware definition, they must also add it to their Opentrons App. You can find a support article about this custom labware process `here <https://support.opentrons.com/en/articles/3136506-using-labware-in-your-protocols>`_.
+Once you have created your labware and saved it as a ``.json`` file, you can add it to the Opentrons App by clicking "More" and then "Labware". Once you have added your labware to the Opentrons App, it will be available to all Python Protocol API version 2 protocols uploaded to your robot through that Opentrons App. If other people will be using this custom labware definition, they must also add it to their Opentrons App. You can find a support article about this custom labware process `here <https://support.opentrons.com/en/articles/3136506-using-labware-in-your-protocols>`__.
 
 
 .. _new-well-access:

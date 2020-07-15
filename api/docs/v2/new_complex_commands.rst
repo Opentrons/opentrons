@@ -144,7 +144,7 @@ When you are using a multi-channel pipette, you can transfer the entire column (
 
         Multichannel pipettes can only access a limited number of rows in a plate during `transfer`, `distribute` and `consolidate`: the first row (wells A1 - A12) of a 96-well plate, and (since API Version 2.2) the first two rows (wells A1 - B24) for a 384-well plate. Wells specified outside of the limit will be ignored. 
 
-Transfer commands will automatically create entire series of :py:meth:`.InstrumentContext.aspirate`, :py:meth:`.InstrumentContext.dispense`, and other :py:meth:`.InstrumentContext` commands.
+Transfer commands will automatically create entire series of :py:meth:`.InstrumentContext.aspirate`, :py:meth:`.InstrumentContext.dispense`, and other :py:obj:`.InstrumentContext` commands.
 
 
 Large Volumes

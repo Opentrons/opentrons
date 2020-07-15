@@ -123,7 +123,7 @@ def get_protocol_api(
         hardware_simulator: HardwareToManage = None)\
         -> protocol_api.ProtocolContext:
     """
-    Build and return a :py:class:`ProtocolContext`connected to
+    Build and return a :py:class:`ProtocolContext` connected to
     Virtual Smoothie.
 
     This can be used to run protocols from interactive Python sessions

@@ -29,7 +29,7 @@ The robot module can be thought of as the parent for all aspects of the Opentron
 
 
 User-Specified Pause
-==========
+====================
 
 This will pause your protocol at a specific step. You can resume by pressing 'resume' in your OT App.
 
