@@ -4,8 +4,7 @@ import typing
 from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
 
-from robot_server.service.dependencies import get_session_manager, \
-    verify_hardware
+from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError
 from robot_server.service.json_api import Error, ResourceLink,\
     ResponseDataModel
@@ -47,7 +46,6 @@ def get_session(manager: SessionManager,
              description="Create a session",
              response_model_exclude_unset=True,
              response_model=route_models.SessionResponse,
-             dependencies=[Depends(verify_hardware)],
              status_code=http_status_codes.HTTP_201_CREATED,
              )
 async def create_session_handler(
