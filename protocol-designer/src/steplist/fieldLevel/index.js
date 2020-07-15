@@ -123,6 +123,20 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     getErrors: composeErrors(requiredField),
     hydrate: getLabwareEntity,
   },
+  aspirate_delay_seconds: {
+    getErrors: composeErrors(minFieldValue(1)),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
+  },
+  aspirate_delay_tip_position: {
+    castValue: Number,
+  },
+  dispense_delay_seconds: {
+    getErrors: composeErrors(minFieldValue(1)),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
+  },
+  dispense_delay_tip_position: {
+    castValue: Number,
+  },
   pauseHour: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
   },
