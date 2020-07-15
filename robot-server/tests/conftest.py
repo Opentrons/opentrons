@@ -105,4 +105,4 @@ def set_up_index_file_temporary_directory(server_temp_directory):
         parent = deck.position_for(idx+1)
         definition = labware.get_labware_definition(name)
         lw = labware.Labware(definition, parent)
-        lw.save_calibration(lw, Point(0, 0, 0))
+        labware.save_calibration(lw, Point(0, 0, 0))

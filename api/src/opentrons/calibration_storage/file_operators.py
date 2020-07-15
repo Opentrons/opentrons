@@ -9,11 +9,12 @@ from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
 manipulate the file system.
 
 These methods should only be imported inside the calibration_storage
-module.
+module, except in the special case of v2 labware support in
+the v1 API.
 """
 
-DecoderType = typing.Optional[typing.Type[json.JSONDecoder]]
-EncoderType = typing.Optional[typing.Type[json.JSONEncoder]]
+DecoderType = typing.Type[json.JSONDecoder]
+EncoderType = typing.Type[json.JSONEncoder]
 
 
 def _read_cal_file(
@@ -27,11 +28,14 @@ def _read_cal_file(
     # from the correct locations.
     with open(filepath, 'r') as f:
         calibration_data = json.load(f, cls=decoder)
-    for value in calibration_data.values():
-        if value.get('lastModified'):
-            assert isinstance(value['lastModified'], datetime.datetime), \
-                "invalid decoded value type for lastModified: got " \
-                f"{type(value['lastModified']).__name__}, expected datetime"
+    if isinstance(calibration_data.values(), dict):
+        for value in calibration_data.values():
+            if value.get('lastModified'):
+                assert isinstance(
+                    value['lastModified'], datetime.datetime), \
+                    "invalid decoded value type for lastModified: got " \
+                    f"{type(value['lastModified']).__name__}," \
+                    "expected datetime"
     return calibration_data
 
 

@@ -9,11 +9,12 @@ if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 """ opentrons.calibration_storage.helpers: various miscellaneous
-functions 
+functions
 
 This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
+
 
 def _hash_labware_def(labware_def: 'LabwareDefinition') -> str:
     # remove keys that do not affect run

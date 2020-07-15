@@ -1,13 +1,11 @@
 import typing
 import datetime
-import time
 from pathlib import Path
 
 from opentrons import config
 
 from . import (
     file_operators as io,
-    encoder_decoder as ed,
     types as local_types,
     helpers)
 
@@ -110,7 +108,8 @@ def _helper_offset_data_format(filepath: str, delta: 'Point') -> dict:
     else:
         calibration_data = io._read_cal_file(filepath)
         calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
-        calibration_data['default']['lastModified'] = datetime.datetime.utcnow()
+        calibration_data['default']['lastModified'] =\
+            datetime.datetime.utcnow()
     return calibration_data
 
 
@@ -145,4 +144,4 @@ def save_tip_length_calibration(
 
     tip_length_data.update(tip_length_cal)
 
-    io.save_to_file(pip_tip_length_path, tip_length_data, ed.DateTimeEncoder)
+    io.save_to_file(pip_tip_length_path, tip_length_data)

@@ -7,7 +7,7 @@ from opentrons.protocol_api import (
 
 from opentrons_shared_data import load_shared_data
 from opentrons.calibration_storage import (
-    modify, helpers, get, delete, file_operators)
+    helpers, get, delete, file_operators)
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api.geometry import Deck
@@ -499,7 +499,8 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
     parent = deck.position_for(1)
     definition = labware.get_labware_definition(labware_name)
     lw = labware.Labware(definition, parent)
-    lw.save_calibration(lw, Point(0, 0, 0))
+    labware_hash = helpers._hash_labware_def(definition)
+    labware.save_calibration(lw, Point(0, 0, 0))
 
     lw_uri = helpers.uri_from_definition(definition)
 

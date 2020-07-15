@@ -1,11 +1,11 @@
 # pylama:ignore=W0612
 import json
 import os
-import time
 
 import pytest
 import datetime
 from opentrons import config
+from unittest.mock import Mock
 from opentrons.calibration_storage import (
     modify,
     get,
@@ -126,7 +126,7 @@ def test_save_labware_calibration(monkeypatch, clear_calibration):
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
 
-    test_labware.save_calibration(test_labware, Point(1, 1, 1))
+    labware.save_calibration(test_labware, Point(1, 1, 1))
     assert os.path.exists(path(MOCK_HASH))
     assert calibration_point == Point(1, 1, 1)
 
@@ -155,16 +155,16 @@ def test_create_tip_length_calibration_data(monkeypatch):
         helpers,
         '_hash_labware_def', mock_hash_labware)
 
-    test_labware = labware.Labware(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck'))
     tip_length = 22.0
+    parent = ''
     expected_data = {
         MOCK_HASH: {
             'tipLength': tip_length,
             'lastModified': fake_time
         }
     }
-    result = modify.create_tip_length_data(test_labware, tip_length)
+    result = modify.create_tip_length_data(
+        minimalLabwareDef, parent, tip_length)
     assert result == expected_data
 
 
@@ -207,12 +207,13 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
         helpers,
         '_hash_labware_def', mock_hash_labware)
 
-    test_labware = labware.Labware(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck'))
     tip_length = 22.0
-    test_data = modify.create_tip_length_data(test_labware, tip_length)
+    parent = ''
+    test_data = modify.create_tip_length_data(
+        minimalLabwareDef, parent, tip_length)
     modify.save_tip_length_calibration(PIPETTE_ID, test_data)
-    result = get.load_tip_length_calibration(PIPETTE_ID, test_labware)
+    result = get.load_tip_length_calibration(
+        PIPETTE_ID, minimalLabwareDef, parent)
 
     assert result == test_data[MOCK_HASH]
 
@@ -234,9 +235,25 @@ def test_clear_tip_length_calibration_data(monkeypatch):
 
 
 def test_schema_shape(monkeypatch, clear_calibration):
-    def fake_time():
-        return 1
-    monkeypatch.setattr(time, 'time', fake_time)
+    fake_time = datetime.datetime.utcnow()
+    time_string = fake_time.isoformat()
+    from_iso = datetime.datetime.fromisoformat(time_string)
+
+    class fake_datetime:
+        @classmethod
+        def fromisoformat(cls, obj):
+            return from_iso
+
+        @classmethod
+        def utcnow(cls):
+            return fake_time
+
+        @classmethod
+        def isoformat(cls):
+            return time_string
+
+    mock = Mock(spec=fake_datetime)
+    mock.__class__ = datetime.datetime
 
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
@@ -246,10 +263,20 @@ def test_schema_shape(monkeypatch, clear_calibration):
        '_hash_labware_def', mock_hash_labware
     )
 
-    test_labware.save_calibration(test_labware, Point(1, 1, 1))
-    expected = {"default": {"offset": [1, 1, 1], "lastModified": 1}}
+    expected = {"default": {"offset": [1, 1, 1], "lastModified": fake_time}}
+
+    def fake_helper_data(path, delta):
+        return expected
+
+    monkeypatch.setattr(
+        modify,
+        '_helper_offset_data_format',
+        fake_helper_data
+    )
+
+    labware.save_calibration(test_labware, Point(1, 1, 1))
     with open(path(MOCK_HASH)) as f:
-        result = json.load(f)
+        result = json.load(f, cls=ed.DateTimeDecoder)
     assert result == expected
 
 
@@ -265,14 +292,14 @@ def test_load_calibration(monkeypatch, clear_calibration):
 
     test_offset = Point(1, 1, 1)
 
-    test_labware.save_calibration(test_labware, test_offset)
+    labware.save_calibration(test_labware, test_offset)
 
     # Set without saving to show that load will update with previously saved
     # data
     test_labware.set_calibration(Point(0, 0, 0))
     test_labware.tip_length = 46.8
-    lookup_path = labware._get_labware_offset_path(test_load_calibration)
-    calibration_point = get.get_labware_calibration(test_labware)
+    lookup_path = labware._get_labware_path(test_labware)
+    calibration_point = get.get_labware_calibration(lookup_path)
     assert calibration_point == test_offset
 
 
@@ -282,7 +309,7 @@ def test_wells_rebuilt_with_offset():
     old_wells = test_labware._wells
     assert test_labware._offset == Point(10, 10, 5)
     assert test_labware._calibrated_offset == Point(10, 10, 5)
-    test_labware.save_calibration(test_labware, Point(2, 2, 2))
+    labware.save_calibration(test_labware, Point(2, 2, 2))
     new_wells = test_labware._wells
     assert old_wells[0] != new_wells[0]
     assert test_labware._offset == Point(10, 10, 5)

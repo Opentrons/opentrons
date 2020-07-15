@@ -1,7 +1,6 @@
 from collections import OrderedDict
 import itertools
 import logging
-import json
 from typing import TYPE_CHECKING
 from opentrons.config import CONFIG
 from opentrons.data_storage import database
@@ -23,6 +22,7 @@ from opentrons.protocol_api import labware as new_labware
 from opentrons.calibration_storage import (
     get,
     helpers as cal_helpers,
+    file_operators as io,
     modify)
 
 if TYPE_CHECKING:
@@ -245,8 +245,7 @@ def save_new_offsets(labware_hash, delta):
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     calibration_data = modify._helper_offset_data_format(
         str(labware_offset_path), new_delta)
-    with labware_offset_path.open('w') as f:
-        json.dump(calibration_data, f)
+    io.save_to_file(labware_offset_path, calibration_data)
 
 
 def load_new_labware(container_name, version=None):
