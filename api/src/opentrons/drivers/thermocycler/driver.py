@@ -423,18 +423,23 @@ class Thermocycler:
 
     async def set_lid_temperature(self, temp: float) -> None:
         if temp is None:
-            self._lid_target = LID_TARGET_DEFAULT
+            _lid_target = LID_TARGET_DEFAULT
         else:
             if temp < LID_TARGET_MIN:
-                self._lid_target = LID_TARGET_MIN
+                _lid_target = LID_TARGET_MIN
             elif temp > LID_TARGET_MAX:
-                self._lid_target = LID_TARGET_MAX
+                _lid_target = LID_TARGET_MAX
             else:
-                self._lid_target = temp
+                _lid_target = temp
 
-        lid_temp_cmd = '{} S{}'.format(GCODES['SET_LID_TEMP'],
-                                       self._lid_target)
+        lid_temp_cmd = '{} S{}'.format(GCODES['SET_LID_TEMP'], _lid_target)
         await self._write_and_wait(lid_temp_cmd)
+        retries = 0
+        while self._lid_target != _lid_target:
+            await asyncio.sleep(0.1)    # Wait for the poller to update
+            retries += 1
+            if retries > TEMP_UPDATE_RETRIES:
+                break
 
     def _lid_status_update_callback(self, lid_response):
         if lid_response:
