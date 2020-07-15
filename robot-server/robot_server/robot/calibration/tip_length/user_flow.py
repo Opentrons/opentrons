@@ -1,7 +1,7 @@
-from typing import Dict, Awaitable, Callable, Any, Set
+from typing import Dict, Awaitable, Callable, Any, Set, List
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
-from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
+from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import geometry, labware
 from robot_server.service.session.models import CalibrationCommand, \
@@ -91,7 +91,7 @@ class TipCalibrationUserFlow():
                                serial=self._hw_pipette.pipette_id)
 
     @property
-    def required_labware(self) -> RequiredLabware:
+    def required_labware(self) -> List[RequiredLabware]:
         slots = self._deck.get_non_fixture_slots()
         lw_by_slot = {s: self._deck[s] for s in slots if self._deck[s]}
         alt_trs = self._get_alt_tip_racks(),
@@ -100,9 +100,9 @@ class TipCalibrationUserFlow():
                 alternatives=alt_trs if s == TIP_RACK_SLOT else [],
                 slot=s,
                 loadName=lw.load_name,
-                namespace=lw._definition['namespace'],
-                version=str(lw._definition['version']),
-                isTiprack=lw.is_tiprack
+                namespace=lw._definition['namespace'],  # type: ignore
+                version=str(lw._definition['version']),  # type: ignore
+                isTiprack=lw.is_tiprack  # type: ignore
             ) for s, lw in lw_by_slot.items()
         ]
 

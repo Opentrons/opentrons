@@ -489,8 +489,8 @@ class Deck(UserDict):
 
     def get_non_fixture_slots(self) -> List[types.DeckLocation]:
         fixtures = self._definition['locations']['fixtures']
-        fixture_slots = {self._check_name(f['slot'])
-                         for f in fixtures if f['slot']}
+        fixture_slots = {self._check_name(f.get('slot'))  # type: ignore
+                         for f in fixtures if f.get('slot')}  # type: ignore
         return [s for s in self.data.keys() if s not in fixture_slots]
 
     def get_collisions_for_item(self,
