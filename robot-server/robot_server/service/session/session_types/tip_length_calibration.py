@@ -17,26 +17,26 @@ from ..errors import UnsupportedFeature
 class TipLengthCalibration(BaseSession):
     def __init__(self, configuration: SessionConfiguration,
                  instance_meta: SessionMetaData,
-                 tip_length_calibration: TipCalibrationUserFlow
+                 tip_cal_user_flow: TipCalibrationUserFlow
                  ):
         super().__init__(configuration, instance_meta)
-        self._tip_length_calibration = tip_length_calibration
+        self._tip_cal_user_flow = tip_cal_user_flow
         self._command_executor = CallableExecutor(
-            self._tip_length_calibration.handle_command
+            self._tip_cal_user_flow.handle_command
         )
 
     @classmethod
     async def create(cls, configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> 'BaseSession':
         try:
-            tip_length_cal = TipCalibrationUserFlow(
+            tip_cal_user_flow = TipCalibrationUserFlow(
                     hardware=configuration.hardware)
         except (AssertionError, CalibrationException) as e:
             raise SessionCreationException(str(e))
 
         return cls(configuration=configuration,
                    instance_meta=instance_meta,
-                   tip_length_calibration=tip_length_cal)
+                   tip_cal_user_flow=tip_cal_user_flow)
 
     @property
     def command_executor(self) -> CommandExecutor:
@@ -52,7 +52,7 @@ class TipLengthCalibration(BaseSession):
 
     def _get_response_details(self) -> SessionDetails:
         return TipCalibrationSessionStatus(
-            instrument=self._tip_length_calibration.pipette,
-            currentStep=self._tip_length_calibration.current_state,
-            labware=self._tip_length_calibration.required_labware,
+            instrument=self._tip_cal_user_flow.get_pipette(),
+            currentStep=self._tip_cal_user_flow.current_state,
+            labware=self._tip_cal_user_flow.get_required_labware(),
         )

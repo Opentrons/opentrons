@@ -82,16 +82,14 @@ class TipCalibrationUserFlow():
     def current_state(self) -> State:
         return self._current_state
 
-    @property
-    def pipette(self) -> AttachedPipette:
+    def get_pipette(self) -> AttachedPipette:
         return AttachedPipette(model=self._hw_pipette.model,
                                name=self._hw_pipette.name,
                                tip_length=self._hw_pipette.config.tip_length,
                                mount=str(self._mount),
                                serial=self._hw_pipette.pipette_id)
 
-    @property
-    def required_labware(self) -> List[RequiredLabware]:
+    def get_required_labware(self) -> List[RequiredLabware]:
         slots = self._deck.get_non_fixture_slots()
         lw_by_slot = {s: self._deck[s] for s in slots if self._deck[s]}
         alt_trs = self._get_alt_tip_racks(),

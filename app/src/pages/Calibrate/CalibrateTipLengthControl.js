@@ -81,12 +81,6 @@ export function CalibrateTipLengthControl({
     }
   }, [dispatch, hasCalBlock])
 
-  // // TODO: get real session
-  // const tipLengthCalibrationSession: Sessions.TipLengthCalibrationSession = {
-  //   ...mockTipLengthCalibrationSessionAttributes,
-  //   id: 'fake_session_id',
-  // }
-
   return (
     <>
       <CalibrationInfoBox
