@@ -4,6 +4,11 @@ import intersectionBy from 'lodash/intersectionBy'
 import unionBy from 'lodash/unionBy'
 import xorBy from 'lodash/xorBy'
 
+import {
+  ROBOT_SERVER_HEALTH_PATH,
+  UPDATE_SERVER_HEALTH_PATH,
+} from './constants'
+
 import type {
   HealthPoller,
   HealthPollerTarget,
@@ -140,13 +145,15 @@ function fetchAndParse<SuccessBody>(
 }
 
 /**
- * Poll both /heath and /server/health of an IP address and combine the
+ * Poll both /heath and /server/update/health of an IP address and combine the
  * responses into a single result object
  */
 function pollHealth(ip: string, port: number): Promise<HealthPollerResult> {
-  const healthReq = fetchAndParse<HealthResponse>(`http://${ip}:${port}/health`)
+  const healthReq = fetchAndParse<HealthResponse>(
+    `http://${ip}:${port}${ROBOT_SERVER_HEALTH_PATH}`
+  )
   const serverHealthReq = fetchAndParse<ServerHealthResponse>(
-    `http://${ip}:${port}/server/health`
+    `http://${ip}:${port}${UPDATE_SERVER_HEALTH_PATH}`
   )
 
   return Promise.all([healthReq, serverHealthReq]).then(

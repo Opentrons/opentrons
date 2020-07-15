@@ -63,7 +63,7 @@ describe('health poller', () => {
     jest.resetAllMocks()
   })
 
-  it('should call GET /health and GET /server/health', () => {
+  it('should call GET /health and GET /server/update/health', () => {
     const poller = createHealthPoller({
       list: [HOST_1, HOST_2, HOST_3],
       interval: 1000,
@@ -72,17 +72,17 @@ describe('health poller', () => {
 
     const expectedFetches = [
       'http://127.0.0.1:31950/health',
-      'http://127.0.0.1:31950/server/health',
+      'http://127.0.0.1:31950/server/update/health',
       'http://127.0.0.2:31950/health',
-      'http://127.0.0.2:31950/server/health',
+      'http://127.0.0.2:31950/server/update/health',
       'http://127.0.0.3:31950/health',
-      'http://127.0.0.3:31950/server/health',
+      'http://127.0.0.3:31950/server/update/health',
       'http://127.0.0.1:31950/health',
-      'http://127.0.0.1:31950/server/health',
+      'http://127.0.0.1:31950/server/update/health',
       'http://127.0.0.2:31950/health',
-      'http://127.0.0.2:31950/server/health',
+      'http://127.0.0.2:31950/server/update/health',
       'http://127.0.0.3:31950/health',
-      'http://127.0.0.3:31950/server/health',
+      'http://127.0.0.3:31950/server/update/health',
     ]
 
     poller.start()
@@ -132,14 +132,14 @@ describe('health poller', () => {
     const expectedFetches = [
       // round 1: poll HOST_1 and HOST_2
       'http://127.0.0.1:31950/health',
-      'http://127.0.0.1:31950/server/health',
+      'http://127.0.0.1:31950/server/update/health',
       'http://127.0.0.2:31950/health',
-      'http://127.0.0.2:31950/server/health',
+      'http://127.0.0.2:31950/server/update/health',
       // round 2: HOST_1 still in list, HOST_2 removed, HOST_3 added
       'http://127.0.0.1:31950/health',
-      'http://127.0.0.1:31950/server/health',
+      'http://127.0.0.1:31950/server/update/health',
       'http://127.0.0.3:31950/health',
-      'http://127.0.0.3:31950/server/health',
+      'http://127.0.0.3:31950/server/update/health',
     ]
 
     expect(fetch).toHaveBeenCalledTimes(expectedFetches.length)
@@ -163,14 +163,14 @@ describe('health poller', () => {
     const expectedFetches = [
       // round 1: poll HOST_1 and HOST_2
       'http://127.0.0.1:31950/health',
-      'http://127.0.0.1:31950/server/health',
+      'http://127.0.0.1:31950/server/update/health',
       'http://127.0.0.2:31950/health',
-      'http://127.0.0.2:31950/server/health',
+      'http://127.0.0.2:31950/server/update/health',
       // round 2: HOST_1 still in list, HOST_2 removed, HOST_3 added
       'http://127.0.0.1:31950/health',
-      'http://127.0.0.1:31950/server/health',
+      'http://127.0.0.1:31950/server/update/health',
       'http://127.0.0.3:31950/health',
-      'http://127.0.0.3:31950/server/health',
+      'http://127.0.0.3:31950/server/update/health',
     ]
 
     expect(fetch).toHaveBeenCalledTimes(expectedFetches.length)
@@ -194,10 +194,10 @@ describe('health poller', () => {
     const expectedFetches = [
       // round 1: poll HOST_1
       'http://127.0.0.1:31950/health',
-      'http://127.0.0.1:31950/server/health',
+      'http://127.0.0.1:31950/server/update/health',
       // round 2: poll HOST_2 after list "refreshed"
       'http://127.0.0.2:31950/health',
-      'http://127.0.0.2:31950/server/health',
+      'http://127.0.0.2:31950/server/update/health',
     ]
 
     expect(fetch).toHaveBeenCalledTimes(expectedFetches.length)
@@ -212,7 +212,7 @@ describe('health poller', () => {
     stubFetchOnce('http://127.0.0.1:31950/health')(
       makeMockJsonResponse(Fixtures.mockHealthResponse)
     )
-    stubFetchOnce('http://127.0.0.1:31950/server/health')(
+    stubFetchOnce('http://127.0.0.1:31950/server/update/health')(
       makeMockJsonResponse(Fixtures.mockServerHealthResponse)
     )
 
@@ -243,7 +243,7 @@ describe('health poller', () => {
     stubFetchOnce('http://127.0.0.1:31950/health')(
       makeMockJsonResponse({ message: 'some error' }, false, 400)
     )
-    stubFetchOnce('http://127.0.0.1:31950/server/health')(
+    stubFetchOnce('http://127.0.0.1:31950/server/update/health')(
       makeMockJsonResponse(Fixtures.mockServerHealthResponse)
     )
 
@@ -276,7 +276,7 @@ describe('health poller', () => {
       status: 504,
       text: () => Promise.resolve('Gateway timeout'),
     })
-    stubFetchOnce('http://127.0.0.1:31950/server/health')({
+    stubFetchOnce('http://127.0.0.1:31950/server/update/health')({
       ok: false,
       status: 504,
       text: () => Promise.resolve('Gateway timeout'),
@@ -307,7 +307,7 @@ describe('health poller', () => {
     const onPollResult = jest.fn()
 
     stubFetchOnce('http://127.0.0.1:31950/health')(new Error('Failed to fetch'))
-    stubFetchOnce('http://127.0.0.1:31950/server/health')(
+    stubFetchOnce('http://127.0.0.1:31950/server/update/health')(
       new Error('Failed to fetch')
     )
 
@@ -341,13 +341,13 @@ describe('health poller', () => {
 
     const expectedFetches = [
       'http://127.0.0.1:31950/health',
-      'http://127.0.0.1:31950/server/health',
+      'http://127.0.0.1:31950/server/update/health',
       'http://127.0.0.2:31950/health',
-      'http://127.0.0.2:31950/server/health',
+      'http://127.0.0.2:31950/server/update/health',
       'http://127.0.0.3:31950/health',
-      'http://127.0.0.3:31950/server/health',
+      'http://127.0.0.3:31950/server/update/health',
       'http://127.0.0.1:31950/health',
-      'http://127.0.0.1:31950/server/health',
+      'http://127.0.0.1:31950/server/update/health',
     ]
 
     poller.start()
@@ -394,7 +394,7 @@ describe('health poller', () => {
       onPollResult,
     })
 
-    // the first two calls the fetch (/health and /server/health) will error
+    // the first two calls the fetch (/health and /server/update/health) will error
     // out _after_ the second two calls are made and completed
     const mockErrorImpl = () => {
       return new Promise((resolve, reject) => {
@@ -409,7 +409,7 @@ describe('health poller', () => {
     stubFetchOnce('http://127.0.0.1:31950/health')(
       makeMockJsonResponse(Fixtures.mockHealthResponse)
     )
-    stubFetchOnce('http://127.0.0.1:31950/server/health')(
+    stubFetchOnce('http://127.0.0.1:31950/server/update/health')(
       makeMockJsonResponse(Fixtures.mockServerHealthResponse)
     )
 

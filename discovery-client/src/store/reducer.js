@@ -3,12 +3,13 @@ import { combineReducers } from 'redux'
 import isEqual from 'lodash/isEqual'
 import omit from 'lodash/omit'
 
-import * as Actions from './actions'
 import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
   HEALTH_STATUS_UNREACHABLE,
-} from './constants'
+} from '../constants'
+
+import * as Actions from './actions'
 
 import type { Reducer } from 'redux'
 

@@ -52,13 +52,13 @@ export type Service = {
   local: ?boolean,
   // GET /health response.ok === true
   ok: ?boolean,
-  // GET /server/health response.ok === true
+  // GET /server/update/health response.ok === true
   serverOk: ?boolean,
   // is advertising on MDNS
   advertising: ?boolean,
   // last good /health response
   health: ?HealthResponse,
-  // last good /server/health response
+  // last good /server/update/health response
   serverHealth: ?ServerHealthResponse,
   ...
 }
@@ -89,11 +89,11 @@ export type HealthPollerResult = $ReadOnly<{|
   port: number,
   /** GET /health data if server responded with 2xx */
   health: HealthResponse | null,
-  /** GET /server/health data if server responded with 2xx */
+  /** GET /server/update/health data if server responded with 2xx */
   serverHealth: ServerHealthResponse | null,
   /** GET /health status code and body if response was non-2xx */
   healthError: HealthErrorResponse | null,
-  /** GET /server/health status code and body if response was non-2xx */
+  /** GET /server/update/health status code and body if response was non-2xx */
   serverHealthError: HealthErrorResponse | null,
 |}>
 
