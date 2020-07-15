@@ -43,12 +43,12 @@ export const CHECK_STEP_NO_PIPETTES_ATTACHED: 'noPipettesAttached' =
   'noPipettesAttached'
 
 const LOAD_LABWARE: 'calibration.loadLabware' = 'calibration.loadLabware'
-const PREPARE_PIPETTE: 'calibration.preparePipette' =
-  'calibration.preparePipette'
 const JOG: 'calibration.jog' = 'calibration.jog'
 const PICK_UP_TIP: 'calibration.pickUpTip' = 'calibration.pickUpTip'
 const CONFIRM_TIP: 'calibration.confirmTip' = 'calibration.confirmTip'
 const INVALIDATE_TIP: 'calibration.invalidateTip' = 'calibration.invalidateTip'
+const PREPARE_PIPETTE: 'calibration.check.preparePipette' =
+  'calibration.check.preparePipette'
 const COMPARE_POINT: 'calibration.check.comparePoint' =
   'calibration.check.comparePoint'
 const GO_TO_NEXT_CHECK: 'calibration.check.goToNextCheck' =
