@@ -419,7 +419,8 @@ class Thermocycler:
             await asyncio.sleep(0.1)    # Wait for the poller to update
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
-                break
+                raise ThermocyclerError("Thermocycler driver could not verify "
+                                        "if block temperature has been set")
 
     async def set_lid_temperature(self, temp: float) -> None:
         if temp is None:
@@ -439,7 +440,8 @@ class Thermocycler:
             await asyncio.sleep(0.1)    # Wait for the poller to update
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
-                break
+                raise ThermocyclerError("Thermocycler driver could not verify "
+                                        "if lid temperature has been set")
 
     def _lid_status_update_callback(self, lid_response):
         if lid_response:
