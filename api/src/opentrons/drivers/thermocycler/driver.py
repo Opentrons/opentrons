@@ -39,11 +39,11 @@ GCODES = {
     'DEACTIVATE_BLOCK': 'M14',
     'DEVICE_INFO': 'M115'
 }
-LID_TARGET_DEFAULT = 105    # Degree celsius
-LID_TARGET_MIN = 37
-LID_TARGET_MAX = 110
-BLOCK_TARGET_MIN = 0
-BLOCK_TARGET_MAX = 99
+LID_TARGET_DEFAULT = 105.0    # Degree celsius (floats)
+LID_TARGET_MIN = 37.0
+LID_TARGET_MAX = 110.0
+BLOCK_TARGET_MIN = 0.0
+BLOCK_TARGET_MAX = 99.0
 TEMP_UPDATE_RETRIES = 15
 TEMP_BUFFER_MAX_LEN = 10
 
@@ -419,8 +419,11 @@ class Thermocycler:
             await asyncio.sleep(0.1)    # Wait for the poller to update
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
-                raise ThermocyclerError("Thermocycler driver could not verify "
-                                        "if block temperature has been set")
+                raise ThermocyclerError(f'Thermocycler driver set the block '
+                                        f'temp to T={temp} & H={hold_time} '
+                                        f'but status reads '
+                                        f'T={self._target_temp} & '
+                                        f'H={self._hold_time}')
 
     async def set_lid_temperature(self, temp: float) -> None:
         if temp is None:
@@ -440,8 +443,9 @@ class Thermocycler:
             await asyncio.sleep(0.1)    # Wait for the poller to update
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
-                raise ThermocyclerError("Thermocycler driver could not verify "
-                                        "if lid temperature has been set")
+                raise ThermocyclerError(f'Thermocycler driver set lid temp to'
+                                        f' {_lid_target} but self._lid_target'
+                                        f' reads {self._lid_target}')
 
     def _lid_status_update_callback(self, lid_response):
         if lid_response:
