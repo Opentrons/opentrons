@@ -101,8 +101,8 @@ class TipCalibrationUserFlow():
                 slot=s,
                 loadName=lw.load_name,
                 namespace=lw._definition['namespace'],
-                version=str(lw._definition['version'],
-                isTiprack=lw.is_tiprack)
+                version=str(lw._definition['version']),
+                isTiprack=lw.is_tiprack
             ) for s, lw in lw_by_slot.items()
         ]
 
@@ -120,7 +120,7 @@ class TipCalibrationUserFlow():
                                                         name)
         handler = self._command_map.get(name)
         if handler is not None:
-            return await handler(**data)
+            await handler(**data)
         self._set_current_state(next_state)
 
     async def load_labware(self, *args):

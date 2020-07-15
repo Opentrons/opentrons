@@ -22,6 +22,7 @@ import { SessionHeader } from '../../components/SessionHeader'
 import type { ContextRouter } from 'react-router-dom'
 import type { Dispatch } from '../../types'
 import type { Mount } from '../../pipettes/types'
+import { CalibrateTipLengthControl } from './CalibrateTipLengthControl'
 
 type Props = ContextRouter
 
@@ -63,14 +64,13 @@ export function Pipettes(props: Props): React.Node {
           changePipetteUrl,
         }}
       />
-      {!!currentPipette &&
+      {robotName &&
+        !!currentPipette &&
         (ff.enableTipLengthCal ? (
-          <CalibrateTipLength
+          <CalibrateTipLengthControl
             mount={currentPipette.mount}
-            isMulti={currentPipette.channels > 1}
-            probed={currentPipette.probed}
             robotName={robotName}
-            session={tipLengthCalibrationSession}
+            hasCalibrated={currentPipette.probed}
           />
         ) : (
           <TipProbe {...currentPipette} />

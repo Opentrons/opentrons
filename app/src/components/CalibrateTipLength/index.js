@@ -55,15 +55,8 @@ const PANEL_STYLE_BY_STEP: {
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
-  const { mount, probed, session } = props
-  // TODO: get real session
-  const tipLengthCalSession = session || {}
-  // TODO: get real currentStep from session
-  const currentStep = session?.details?.currentStep || ''
-  const robotName = ''
-  // TODO: get real block setting
-  const hasBlock = false
-  const title = `${mount} pipette tip length calibration`
+  const { session, robotName, hasBlock } = props
+  const currentStep = session?.details?.currentStep
   const Panel = PANEL_BY_STEP[currentStep]
 
   const [dispatchRequest] = useDispatchApiRequest()
@@ -72,43 +65,28 @@ export function CalibrateTipLength(
     command: SessionCommandString,
     data: SessionCommandData = {}
   ) {
-    tipLengthCalSession.id &&
+    session &&
+      session.id &&
       dispatchRequest(
-        Sessions.createSessionCommand(robotName, tipLengthCalSession.id, {
+        Sessions.createSessionCommand(robotName, session.id, {
           command,
           data,
         })
       )
   }
-  return (
-    <>
-      {Panel ? (
-        <ModalPage
-          titleBar={{
-            title: TIP_LENGTH_CALIBRATION_SUBTITLE,
-            back: {
-              onClick: () => console.log('TODO: handle confirm exit'),
-              title: EXIT,
-              children: EXIT,
-            },
-          }}
-          contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
-        >
-          <Panel
-            {...props}
-            hasBlock={hasBlock}
-            sendSessionCommand={sendCommand}
-          />
-        </ModalPage>
-      ) : (
-        <CalibrationInfoBox confirmed={probed} title={title}>
-          <UncalibratedInfo
-            {...props}
-            hasBlock={hasBlock}
-            sendSessionCommand={sendCommand}
-          />
-        </CalibrationInfoBox>
-      )}
-    </>
-  )
+  return Panel ? (
+    <ModalPage
+      titleBar={{
+        title: TIP_LENGTH_CALIBRATION_SUBTITLE,
+        back: {
+          onClick: () => console.log('TODO: handle confirm exit'),
+          title: EXIT,
+          children: EXIT,
+        },
+      }}
+      contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
+    >
+      <Panel {...props} hasBlock={hasBlock} sendSessionCommand={sendCommand} />
+    </ModalPage>
+  ) : null
 }

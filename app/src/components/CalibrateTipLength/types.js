@@ -8,16 +8,14 @@ import type {
 } from '../../sessions/types'
 
 export type CalibrateTipLengthParentProps = {|
-  isMulti: boolean,
-  mount: Mount,
-  probed: boolean,
-  robotName: string | null,
+  robotName: string,
   session: TipLengthCalibrationSession,
+  closeWizard: () => void,
+  hasBlock: boolean,
 |}
 
 export type CalibrateTipLengthChildProps = {|
   ...CalibrateTipLengthParentProps,
-  hasBlock: boolean | null,
   sendSessionCommand: (
     command: SessionCommandString,
     data: SessionCommandData

@@ -13,3 +13,19 @@ export const TIP_LENGTH_STEP_MEASURING_TIP_OFFSET: 'measuringTipOffset' =
   'measuringTipOffset'
 export const TIP_LENGTH_STEP_CALIBRATION_COMPLETE: 'calibrationComplete' =
   'calibrationComplete'
+
+const LOAD_LABWARE: 'calibration.loadLabware' = 'calibration.loadLabware'
+const JOG: 'calibration.jog' = 'calibration.jog'
+const PICK_UP_TIP: 'calibration.pickUpTip' = 'calibration.pickUpTip'
+const CONFIRM_TIP: 'calibration.confirmTip' = 'calibration.confirmTip'
+const INVALIDATE_TIP: 'calibration.invalidateTip' = 'calibration.invalidateTip'
+const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
+
+export const tipCalCommands = {
+  LOAD_LABWARE,
+  JOG,
+  PICK_UP_TIP,
+  CONFIRM_TIP,
+  INVALIDATE_TIP,
+  EXIT,
+}

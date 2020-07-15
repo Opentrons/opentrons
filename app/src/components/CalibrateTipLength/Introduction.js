@@ -15,6 +15,7 @@ import {
   Text,
 } from '@opentrons/components'
 
+import * as Sessions from '../../sessions'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
 import { labwareImages } from './labwareImages'
@@ -39,10 +40,9 @@ const CONTINUE = 'Continue to tip length calibration'
 const TIP_LENGTH_CALIBRATION_INTRO_HEADER = 'tip length calibration'
 
 export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
-  const { hasBlock, mount, session } = props
-  const tipRacksFirst = session.details.labware.sort((a, b) =>
-    a.isTiprack ? (b.isTiprack ? 0 : 1) : -1
-  )
+  const { session, sendSessionCommand } = props
+  const { labware } = session.details
+  const tipRacksFirst = labware.sort((a, b) => (a.isTiprack ? -1 : 1))
 
   return (
     <>
@@ -58,8 +58,9 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
         <p className={styles.intro_content}>{TIP_LENGTH_CAL_INTRO_BODY}</p>
         <h5>{LABWARE_REQS}</h5>
         <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING_3}>
-          {tipRacksFirst.map(l => (
+          {tipRacksFirst.map((l, i) => (
             <RequiredLabwareCard
+              key={`${l.loadName}${i}`}
               loadName={l.loadName}
               isTiprack={l.isTiprack}
             />
@@ -78,11 +79,15 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
         </Box>
       </Flex>
       <div className={styles.button_row}>
-        <PrimaryButton className={styles.continue_button}>
+        <PrimaryButton
+          onClick={() =>
+            sendSessionCommand(Sessions.tipCalCommands.LOAD_LABWARE)
+          }
+          className={styles.continue_button}
+        >
           {CONTINUE}
         </PrimaryButton>
       </div>
-      {hasBlock ?? <ToolSettingAlertModal {...props} />}
     </>
   )
 }
