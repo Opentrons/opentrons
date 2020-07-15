@@ -452,19 +452,28 @@ class InstrumentContext(CommandPublisher):
 
         def _build_edges(where: Well, offset: float) -> List[types.Point]:
             # Determine the touch_tip edges/points
-            offset_pt = types.Point(0, 0, offset)
-            return [
-                # right edge
-                where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
-                # left edge
-                where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
-                # back edge
-                where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
-                # front edge
-                where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
-            ]
+            if 'reservoir' in location._parent.parameters['loadName'] and 'multi' in self.hw_pipette['name']:
+                offset_pt = types.Point(0, 31.5, offset)
+                return [
+                    # right edge
+                    where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
+                    # left edge
+                    where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
+                ]
+            else:
+                offset_pt = types.Point(0, 0, offset)
+                return [
+                    # right edge
+                    where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
+                    # left edge
+                    where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
+                    # back edge
+                    where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
+                    # front edge
+                    where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
+                ]
 
-        checked_speed = clamp_value(speed, 80, 20, 'touch_tip:')
+        checked_speed = clamp_value(speed, 80, 1, 'touch_tip:')
 
         # If location is a valid well, move to the well first
         if location is None:
@@ -475,9 +484,6 @@ class InstrumentContext(CommandPublisher):
                 # type checked below
 
         if isinstance(location, Well):
-            if 'touchTipDisabled' in quirks_from_any_parent(location):
-                self._log.info(f"Ignoring touch tip on labware {location}")
-                return self
             if location.parent.is_tiprack:
                 self._log.warning('Touch_tip being performed on a tiprack. '
                                   'Please re-check your code')
