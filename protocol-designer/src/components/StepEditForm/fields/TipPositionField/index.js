@@ -106,13 +106,13 @@ function TipPositionInput(props: Props) {
   )
 }
 
-type WrapperProps = {
+type WrapperProps = {|
   isTouchTipField: boolean,
   isDelayPositionField: boolean,
   children: React.Node,
   disabled: boolean,
   targetProps: $ElementType<UseHoverTooltipResult, 0>,
-}
+|}
 
 const Wrapper = (props: WrapperProps) =>
   props.isTouchTipField || props.isDelayPositionField ? (
