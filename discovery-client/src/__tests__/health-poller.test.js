@@ -387,4 +387,21 @@ describe('health poller', () => {
       expect(onPollResult).toHaveBeenCalledTimes(0)
     })
   })
+
+  it('should work with IPv6 addresses', () => {
+    const expectedFetches = [
+      'http://[fd00:0:cafe:fefe::1]:31950/health',
+      'http://[fd00:0:cafe:fefe::1]:31950/server/update/health',
+    ]
+
+    poller.start({
+      list: [{ ip: 'fd00:0:cafe:fefe::1', port: 31950 }],
+      interval: 1000,
+    })
+
+    jest.advanceTimersByTime(1000)
+    expectedFetches.forEach((url, idx) => {
+      expect(fetch).toHaveBeenNthCalledWith(idx + 1, url, EXPECTED_FETCH_OPTS)
+    })
+  })
 })
