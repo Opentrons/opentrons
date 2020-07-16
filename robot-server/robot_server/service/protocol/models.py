@@ -7,17 +7,18 @@ from robot_server.service.json_api import ResponseModel, ResponseDataModel
 
 
 class ProtocolResponseAttributes(BaseModel):
-    name: str
     protocolFile: str
     userFiles: typing.List[str]
     lastModifiedAt: datetime
     createdAt: datetime
 
 
+ProtocolResponseDataModel = ResponseDataModel[ProtocolResponseAttributes]
+
 ProtocolResponse = ResponseModel[
-    ResponseDataModel[ProtocolResponseAttributes], dict
+    ProtocolResponseDataModel, dict
 ]
 
 MultiProtocolResponse = ResponseModel[
-    typing.List[ResponseDataModel[ProtocolResponseAttributes]], dict
+    typing.List[ProtocolResponseDataModel], dict
 ]
