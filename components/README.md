@@ -41,7 +41,7 @@ If you use the base webpack config in `@opentrons/webpack-config`, the project s
 
 ## contributing
 
-Make sure you have read the top-level [Contributing Guide][../contributing.md].
+Make sure you have read the top-level [Contributing Guide][contributing].
 
 ### unit tests
 
@@ -67,3 +67,4 @@ Unit tests live in a `__tests__` directory in the same directory as the module u
   ```
 
 [jest-snapshots]: https://facebook.github.io/jest/docs/en/snapshot-testing.html
+[contributing]: ./CONTRIBUTING.md
