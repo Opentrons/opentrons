@@ -3,11 +3,13 @@ import * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
+import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
 import type { CalibrateTipLengthChildProps } from './types'
 import styles from './styles.css'
+import { formatJogVector } from './utils'
 
 // TODO: put these assets in a shared location?
 import multiDemoAsset from '../CheckCalibration/videos/A1_Multi_Channel_REV1.webm'
@@ -31,6 +33,7 @@ const ASSET_MAP = {
   single: singleDemoAsset,
 }
 export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
+  const { sendSessionCommand } = props
   // TODO: get real isMulti and tiprack from the session
   const tiprack = {}
   const isMulti = true
@@ -53,15 +56,13 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
   )
 
   const pickUpTip = () => {
-    console.log('TODO: wire up command')
-    // props.sendSessionCommand('pickUpTip')
+    sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP)
   }
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    console.log('TODO: wire up jog with params', axis, dir, step)
-    // props.sendSessionCommand('jog',{
-    //   vector: formatJogVector(axis, direction, step),
-    // }, {})
+    sendSessionCommand(Sessions.tipCalCommands.JOG, {
+      vector: formatJogVector(axis, dir, step),
+    })
   }
 
   return (

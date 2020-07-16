@@ -26,4 +26,5 @@ export type CalibrateTipLengthChildProps = {|
     data?: SessionCommandData
   ) => void,
   hasBlock: boolean,
+  deleteSession: () => void,
 |}

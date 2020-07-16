@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
+
+import * as Sessions from '../../sessions'
 import type { CalibrateTipLengthChildProps } from './types'
 import styles from './styles.css'
 
@@ -9,13 +11,12 @@ const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, continue'
 const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
 
 export function InspectingTip(props: CalibrateTipLengthChildProps): React.Node {
+  const { sendSessionCommand } = props
   const invalidateTip = () => {
-    console.log('TODO: wire up command')
-    // props.sendSessionCommand('invalidateTip')
+    sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP)
   }
   const confirmTip = () => {
-    console.log('TODO: wire up command')
-    // props.sendSessionCommand('confirmTip')
+    sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT)
   }
   return (
     <div className={styles.tip_pick_up_confirmation_wrapper}>

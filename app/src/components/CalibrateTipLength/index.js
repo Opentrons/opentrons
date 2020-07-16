@@ -66,12 +66,6 @@ export function CalibrateTipLength(
     closeWizard()
   }
 
-  const {
-    showConfirmation: showConfirmExit,
-    confirm: confirmExit,
-    cancel: cancelExit,
-  } = useConditionalConfirm(deleteSession, true)
-
   function sendCommand(
     command: SessionCommandString,
     data: SessionCommandData = {}
@@ -85,6 +79,16 @@ export function CalibrateTipLength(
         })
       )
   }
+
+  const {
+    showConfirmation: showConfirmExit,
+    confirm: confirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(() => {
+    sendCommand(Sessions.tipCalCommands.EXIT)
+    deleteSession()
+  }, true)
+
   return Panel ? (
     <>
       <ModalPage
@@ -99,6 +103,7 @@ export function CalibrateTipLength(
           labware={labware}
           hasBlock={hasBlock}
           sendSessionCommand={sendCommand}
+          deleteSession={deleteSession}
         />
       </ModalPage>
       {showConfirmExit && (
