@@ -1,8 +1,13 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 import { Box, POSITION_FIXED } from '@opentrons/components'
 import * as fileDataSelectors from '../file-data/selectors'
+
+const waitCursorStyle = css`
+  cursor: wait;
+`
 
 export const ComputingSpinner = (): React.Node => {
   const showSpinner = useSelector(fileDataSelectors.getTimelineIsBeingComputed)
@@ -10,7 +15,7 @@ export const ComputingSpinner = (): React.Node => {
   return (
     showSpinner && (
       <Box
-        cursor="wait" // TODO(IL, 2020-07-16): make a const CURSOR_WAIT to import here
+        css={waitCursorStyle}
         opacity={0}
         zIndex={999}
         position={POSITION_FIXED}
