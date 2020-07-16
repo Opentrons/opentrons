@@ -13,7 +13,7 @@ import * as fileDataSelectors from '../file-data/selectors'
 
 const appearWithDelayAnimation = keyframes`
   100% {
-    opacity: 1.0;
+    opacity: 1;
   }
 `
 
