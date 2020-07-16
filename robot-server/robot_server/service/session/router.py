@@ -13,6 +13,7 @@ from robot_server.service.session.errors import SessionCreationException, \
     SessionCommandException, SessionException
 from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session import models as route_models
+from robot_server.service.session.session_types import SessionMetaData
 
 router = APIRouter()
 
@@ -53,8 +54,11 @@ async def create_session_handler(
         -> route_models.SessionResponse:
     """Create a session"""
     session_type = create_request.data.attributes.sessionType
+    create_params = create_request.data.attributes.createParams
     try:
-        new_session = await session_manager.add(session_type=session_type)
+        new_session = await session_manager.add(
+            session_type=session_type,
+            session_meta_data=SessionMetaData(create_params=create_params))
     except SessionCreationException as e:
         log.exception("Failed to create session")
         raise RobotServerError(

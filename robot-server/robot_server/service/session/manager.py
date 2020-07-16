@@ -38,10 +38,13 @@ class SessionManager:
         )
         # Create the default session.
         asyncio.new_event_loop().run_until_complete(
-            self.add(SessionType.default)
+            self.add(SessionType.default, SessionMetaData())
         )
 
-    async def add(self, session_type: SessionType) -> BaseSession:
+    async def add(self,
+                  session_type: SessionType,
+                  session_meta_data: SessionMetaData,
+                  ) -> BaseSession:
         """Add a new session"""
         cls = SessionTypeToClass.get(session_type)
         if not cls:
@@ -49,7 +52,7 @@ class SessionManager:
                 "Session type is not supported"
             )
         session = await cls.create(configuration=self._session_common,
-                                   instance_meta=SessionMetaData())
+                                   instance_meta=session_meta_data)
         if session.meta.identifier in self._sessions:
             raise SessionCreationException(
                 f"Session with id {session.meta.identifier} already exists"

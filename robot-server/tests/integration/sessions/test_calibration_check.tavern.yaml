@@ -34,6 +34,7 @@ stages:
           attributes: &session_data_attributes
             sessionType: calibrationCheck
             created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createParams: null
             details: &session_data_attribute_details
               currentStep: sessionStarted
               instruments: !anydict
@@ -660,6 +661,7 @@ stages:
               sessionType: default
               created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
               details: {}
+              createParams: null
 ---
 test_name: Calibration check session errors
 strict:

@@ -32,11 +32,27 @@ class JogPosition(BaseModel):
 
 class SessionType(str, Enum):
     """The available session types"""
+    def __new__(cls, value, create_param_model=type(None)):
+        """Create a session type enum with the optional create param model"""
+        obj = str.__new__(cls, value)
+        obj._value_ = value
+        obj._model = create_param_model
+        return obj
+
     null = 'null'
     default = 'default'
     calibration_check = 'calibrationCheck'
     tip_length_calibration = 'tipLengthCalibration'
 
+    @property
+    def model(self):
+        """Get the data model of the create param model"""
+        return self._model
+
+
+SessionCreateParamType = typing.Union[
+    None, EmptyModel
+]
 
 SessionDetails = typing.Union[
     calibration_models.CalibrationSessionStatus,
@@ -147,14 +163,25 @@ CommandDefinitionType = typing.Union[
 
 
 class BasicSession(BaseModel):
-    """Minimal session description"""
+    """Attributes required for creating a session"""
+    createParams: SessionCreateParamType
+    # For validation, command MUST appear after createParams
     sessionType: SessionType =\
         Field(...,
               description="The type of the session")
 
+    @validator('sessionType', always=True, allow_reuse=True)
+    def check_data_type(cls, v, values):
+        """Validate that the session type and create params model match"""
+        create_params = values.get('createParams')
+        if not isinstance(create_params, v.model):
+            raise ValueError(f"Invalid create param for session type {v}. "
+                             f"Expecting {v.model}")
+        return v
+
 
 class Session(BasicSession):
-    """Full description of session"""
+    """The attributes of a created session"""
     details: SessionDetails =\
         Field(...,
               description="Detailed session specific status")

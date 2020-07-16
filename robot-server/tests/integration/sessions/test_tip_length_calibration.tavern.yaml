@@ -35,6 +35,7 @@ stages:
             sessionType: tipLengthCalibration
             created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+.\\d+"
             details: {}
+            createParams: null
 
   - name: Load labware
     request:
@@ -84,4 +85,5 @@ stages:
               sessionType: default
               created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
               details: {}
+              createParams: null
 

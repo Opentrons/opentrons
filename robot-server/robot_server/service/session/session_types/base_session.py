@@ -13,6 +13,7 @@ from robot_server.service.session import models
 class SessionMetaData:
     name: Optional[str] = None
     description: Optional[str] = None
+    create_params: Optional[models.SessionCreateParamType] = None
     identifier: models.IdentifierType = field(
         default_factory=models.create_identifier
     )
@@ -53,7 +54,8 @@ class BaseSession(ABC):
         """Get the response model"""
         return models.Session(sessionType=self.session_type,
                               details=self._get_response_details(),
-                              created_at=self.meta.created_at)
+                              created_at=self.meta.created_at,
+                              createParams=self.meta.create_params)
 
     @abstractmethod
     def _get_response_details(self) -> models.SessionDetails:

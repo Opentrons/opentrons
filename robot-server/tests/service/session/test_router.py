@@ -33,6 +33,7 @@ def session_response(mock_session_meta):
             },
             'sessionType': 'null',
             'created_at': mock_session_meta.created_at.isoformat(),
+            'createParams': None,
         },
         'type': 'Session',
         'id': mock_session_meta.identifier
@@ -103,7 +104,7 @@ def patch_create_session(mock_session):
 @pytest.mark.asyncio
 async def session_manager_with_session(loop, patch_create_session):
     manager = get_session_manager()
-    session = await manager.add(SessionType.null)
+    session = await manager.add(SessionType.null, SessionMetaData())
 
     yield manager
 
