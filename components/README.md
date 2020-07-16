@@ -67,4 +67,4 @@ Unit tests live in a `__tests__` directory in the same directory as the module u
   ```
 
 [jest-snapshots]: https://facebook.github.io/jest/docs/en/snapshot-testing.html
-[contributing]: ./CONTRIBUTING.md
+[contributing]: ../CONTRIBUTING.md
