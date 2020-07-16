@@ -40,8 +40,7 @@ const CONTINUE = 'Continue to tip length calibration'
 const TIP_LENGTH_CALIBRATION_INTRO_HEADER = 'tip length calibration'
 
 export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
-  const { session, sendSessionCommand } = props
-  const { labware } = session.details
+  const { labware, sendSessionCommand } = props
   const tipRacksFirst = labware.sort((a, b) => (a.isTiprack ? -1 : 1))
 
   return (

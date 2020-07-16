@@ -97,9 +97,8 @@ describe('CalibrateTipLength', () => {
         <CalibrateTipLength
           robotName="robot-name"
           session={mockTipLengthSession}
-          mount="left"
-          isMulti
-          probed
+          closeWizard={() => {}}
+          hasBlock={true}
         />,
         {
           wrappingComponent: Provider,

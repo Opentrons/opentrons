@@ -6,6 +6,10 @@ import type {
   Session,
   TipLengthCalibrationSession,
 } from '../../sessions/types'
+import type {
+  TipLengthCalibrationInstrument,
+  TipLengthCalibrationLabware,
+} from '../../sessions/tip-length-calibration/types'
 
 export type CalibrateTipLengthParentProps = {|
   robotName: string,
@@ -15,9 +19,11 @@ export type CalibrateTipLengthParentProps = {|
 |}
 
 export type CalibrateTipLengthChildProps = {|
-  ...CalibrateTipLengthParentProps,
+  instrument: TipLengthCalibrationInstrument,
+  labware: Array<TipLengthCalibrationLabware>,
   sendSessionCommand: (
     command: SessionCommandString,
-    data: SessionCommandData
+    data?: SessionCommandData
   ) => void,
+  hasBlock: boolean,
 |}
