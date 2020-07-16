@@ -4,10 +4,12 @@ import {
   Box,
   Flex,
   PrimaryButton,
+  Text,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDER_SOLID_LIGHT,
   DIRECTION_COLUMN,
+  FONT_SIZE_BODY_2,
   JUSTIFY_CENTER,
   POSITION_RELATIVE,
   SPACING_2,
@@ -120,15 +122,19 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
             alignItems={ALIGN_CENTER}
             textAlign={TEXT_ALIGN_CENTER}
           >
-            <p className={styles.tip_pick_up_demo_body}>
+            <Text
+              fontSize={FONT_SIZE_BODY_2}
+              marginBottom={SPACING_3}
+              paddingX={SPACING_2}
+            >
               {jogUntilAbove}
-              <b>{` ${TIP_WELL_NAME} `}</b>
+              <b>&nbsp;{TIP_WELL_NAME}&nbsp;</b>
               {POSITION}
-              <br />
+              &nbsp;
               {AND}
-              <b>{` ${FLUSH} `}</b>
+              <b>&nbsp;{FLUSH}&nbsp;</b>
               {WITH_TOP_OF_TIP}
-            </p>
+            </Text>
             <div className={styles.step_check_video_wrapper}>
               <video
                 key={demoAsset}

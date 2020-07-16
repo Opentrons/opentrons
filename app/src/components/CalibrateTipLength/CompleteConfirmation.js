@@ -16,6 +16,7 @@ import type { CalibrateTipLengthChildProps } from './types'
 import * as Sessions from '../../sessions'
 
 const COMPLETE_HEADER = 'Tip length calibration complete'
+const COMPLETE_BODY = 'Remove Calibration Block from the deck.'
 const RETURN_TIP = 'Return tip to tip rack'
 
 export function CompleteConfirmation(

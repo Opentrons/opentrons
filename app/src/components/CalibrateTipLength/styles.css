@@ -173,12 +173,6 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   text-transform: uppercase;
 }
 
-.tip_pick_up_demo_body {
-  @apply --font-body-2-dark;
-
-  margin: 0 1rem;
-}
-
 .command_button {
   margin: 0 5rem;
 }
@@ -189,7 +183,7 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 }
 
 .step_check_video_wrapper {
-  margin-top: 1rem;
+  margin-left: 1rem;
 }
 
 .step_check_video {

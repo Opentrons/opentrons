@@ -4,15 +4,16 @@ import {
   Box,
   Flex,
   PrimaryButton,
+  Text,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDER_SOLID_LIGHT,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
+  FONT_SIZE_BODY_2,
   POSITION_RELATIVE,
   SPACING_2,
   SPACING_3,
-  TEXT_ALIGN_CENTER,
+  SPACING_4,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -51,9 +52,8 @@ const assetMap = {
 }
 
 const HEADER = 'Save the tip length'
-const JOG_UNTIL = 'Jog the robot until tip is'
-const JUST_BARELY = 'just barely'
-const TOUCHING = 'touching the deck in'
+const JOG_UNTIL = 'Jog the robot until the tip is'
+const BARELY_TOUCHING = 'barely touching (less than 0.1 mm)'
 const THE = 'the'
 const BLOCK = 'block in'
 const FLAT_SURFACE = 'flat surface'
@@ -100,29 +100,23 @@ export function MeasureTip(props: CalibrateTipLengthChildProps): React.Node {
       >
         <h3 className={styles.intro_header}>{HEADER}</h3>
         <Box
-          padding={SPACING_3}
+          paddingX={SPACING_3}
+          paddingY={SPACING_4}
           border={BORDER_SOLID_LIGHT}
           borderWidth="2px"
           width="100%"
         >
-          <Flex
-            justifyContent={JUSTIFY_CENTER}
-            flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_CENTER}
-            textAlign={TEXT_ALIGN_CENTER}
-          >
-            <p className={styles.tip_pick_up_demo_body}>
+          <Flex alignItems={ALIGN_CENTER} width="100%">
+            <Text width="49%" fontSize={FONT_SIZE_BODY_2}>
               {JOG_UNTIL}
-              <b>&nbsp;{JUST_BARELY}&nbsp;</b>
-              {TOUCHING}
-              &nbsp;
+              <b>&nbsp;{BARELY_TOUCHING}&nbsp;</b>
               {THE}
               &nbsp;
               {hasBlock ? BLOCK : <b>{FLAT_SURFACE}</b>}
               &nbsp;
               {hasBlock ? <b>{`${slotName}`}</b> : OF_THE_TRASH_BIN}
               &#46;
-            </p>
+            </Text>
             <div className={styles.step_check_video_wrapper}>
               <video
                 key={demoAsset}
