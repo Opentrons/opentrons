@@ -3,11 +3,21 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from robot_server.service.json_api import ResponseModel, ResponseDataModel
 
-class ProtocolResponse(BaseModel):
+
+class ProtocolResponseAttributes(BaseModel):
     name: str
-    protocol_file: str
-    labware_files: typing.List[str]
-    user_files: typing.List[str]
-    last_modified_at: datetime
-    created_at: datetime
+    protocolFile: str
+    userFiles: typing.List[str]
+    lastModifiedAt: datetime
+    createdAt: datetime
+
+
+ProtocolResponse = ResponseModel[
+    ResponseDataModel[ProtocolResponseAttributes], dict
+]
+
+MultiProtocolResponse = ResponseModel[
+    typing.List[ResponseDataModel[ProtocolResponseAttributes]], dict
+]
