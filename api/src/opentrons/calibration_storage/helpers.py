@@ -1,3 +1,9 @@
+""" opentrons.calibration_storage.helpers: various miscellaneous
+functions
+
+This module has functions that you can import to save robot or
+labware calibration to its designated file location.
+"""
 import typing
 import json
 
@@ -8,15 +14,16 @@ from . import types as local_types
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-""" opentrons.calibration_storage.helpers: various miscellaneous
-functions
 
-This module has functions that you can import to save robot or
-labware calibration to its designated file location.
-"""
+def hash_labware_def(labware_def: 'LabwareDefinition') -> str:
+    """
+    Helper function to take in a labware definition and return
+    a hashed string of key elemenets from the labware definition
+    to make it a unique identifier.
 
-
-def _hash_labware_def(labware_def: 'LabwareDefinition') -> str:
+    :param labware_def: Full labware definitino
+    :returns: sha256 string
+    """
     # remove keys that do not affect run
     blocklist = ['metadata', 'brand', 'groups']
     def_no_metadata = {

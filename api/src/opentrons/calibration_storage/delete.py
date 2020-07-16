@@ -1,3 +1,7 @@
+""" opentrons.calibration_storage.delete: functions that
+remove single or multiple calibration files from the
+file system.
+"""
 from . import types as local_types, file_operators as io
 
 from opentrons import config
@@ -30,7 +34,7 @@ def _remove_offset_from_index(calibration_id: local_types.CalibrationID):
     offset_path =\
         config.get_opentrons_path('labware_calibration_offsets_dir_v2')
     index_path = offset_path / 'index.json'
-    blob = io._read_cal_file(str(index_path))
+    blob = io.read_cal_file(str(index_path))
 
     del blob[calibration_id]
     io.save_to_file(index_path, blob)

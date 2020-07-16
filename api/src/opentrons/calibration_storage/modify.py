@@ -1,3 +1,9 @@
+""" opentrons.calibration_storage.modify: functions for modifying
+calibration storage
+
+This module has functions that you can import to save robot or
+labware calibration to its designated file location.
+"""
 import typing
 import datetime
 from pathlib import Path
@@ -12,13 +18,6 @@ from . import (
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons.types import Point
-
-""" opentrons.calibration_storage.modify: functions for modifying
-calibration storage
-
-This module has functions that you can import to save robot or
-labware calibration to its designated file location.
-"""
 
 
 def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
@@ -35,7 +34,7 @@ def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
         config.get_opentrons_path('labware_calibration_offsets_dir_v2')
     index_file = offset / 'index.json'
     if index_file.exists():
-        blob = io._read_cal_file(str(index_file))
+        blob = io.read_cal_file(str(index_file))
     else:
         blob = {}
 
@@ -65,11 +64,18 @@ def save_labware_calibration(
     of a given labware. If an offset file does not exist, create the file
     using labware id as the filename. If the file does exist, load it and
     modify the delta and the lastModified fields under the "default" key.
+
+    :param labware_path: name of labware offset path
+    :param definition: full definition of the labware
+    :param delta: point you are saving
+    :param slot: slot the labware calibration is associated with
+    [not yet implemented so it will currently only be an empty string]
+    :param parent: parent of the labware, either a slot or a module.
     """
     offset_path =\
         config.get_opentrons_path('labware_calibration_offsets_dir_v2')
     labware_offset_path = offset_path / labware_path
-    labware_hash = helpers._hash_labware_def(definition)
+    labware_hash = helpers.hash_labware_def(definition)
     uri = helpers.uri_from_definition(definition)
     _add_to_index_offset_file(parent, slot, uri, labware_hash)
     calibration_data = _helper_offset_data_format(
@@ -81,12 +87,20 @@ def create_tip_length_data(
         definition: 'LabwareDefinition',
         parent: str,
         length: float) -> local_types.PipTipLengthCalibration:
+    """
+    Function to correctly format tip length data.
+
+    :param definition: full labware definition
+    :param parent: the slot associated with the tiprack
+    [not yet implemented, so it is always an empty string]
+    :param length: the tip length to save
+    """
     # TODO(lc, 07-14-2020) since we're trying not to utilize
     # a labware object for these functions, the is tiprack
     # check should happen outside of this function.
     # assert labware._is_tiprack, \
     #     'cannot save tip length for non-tiprack labware'
-    labware_hash = helpers._hash_labware_def(definition)
+    labware_hash = helpers.hash_labware_def(definition)
 
     tip_length_data: local_types.TipLengthCalibration = {
         'tipLength': length,
@@ -106,7 +120,7 @@ def _helper_offset_data_format(filepath: str, delta: 'Point') -> dict:
             }
         }
     else:
-        calibration_data = io._read_cal_file(filepath)
+        calibration_data = io.read_cal_file(filepath)
         calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
         calibration_data['default']['lastModified'] =\
             datetime.datetime.utcnow()
@@ -116,7 +130,7 @@ def _helper_offset_data_format(filepath: str, delta: 'Point') -> dict:
 def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
     index_file = config.get_tip_length_cal_path()/'index.json'
     try:
-        index_data = io._read_cal_file(str(index_file))
+        index_data = io.read_cal_file(str(index_file))
     except FileNotFoundError:
         index_data = {}
 
@@ -130,6 +144,13 @@ def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
 
 def save_tip_length_calibration(
         pip_id: str, tip_length_cal: local_types.PipTipLengthCalibration):
+    """
+    Function used to save tip length calibration to file.
+
+    :param pip_id: pipette id to associate with this tip length
+    :param tip_length_cal: results of the data created using
+           :meth:`create_tip_length_data`
+    """
     tip_length_dir_path = config.get_tip_length_cal_path()
     tip_length_dir_path.mkdir(parents=True, exist_ok=True)
     pip_tip_length_path = tip_length_dir_path/f'{pip_id}.json'
@@ -138,7 +159,7 @@ def save_tip_length_calibration(
         _append_to_index_tip_length_file(pip_id, lw_hash)
 
     try:
-        tip_length_data = io._read_cal_file(str(pip_tip_length_path))
+        tip_length_data = io.read_cal_file(str(pip_tip_length_path))
     except FileNotFoundError:
         tip_length_data = {}
 

@@ -120,7 +120,7 @@ def test_save_labware_calibration(monkeypatch, clear_calibration):
 
     monkeypatch.setattr(
         helpers,
-        '_hash_labware_def', mock_hash_labware
+        'hash_labware_def', mock_hash_labware
     )
 
     test_labware = labware.Labware(minimalLabwareDef,
@@ -153,7 +153,7 @@ def test_create_tip_length_calibration_data(monkeypatch):
 
     monkeypatch.setattr(
         helpers,
-        '_hash_labware_def', mock_hash_labware)
+        'hash_labware_def', mock_hash_labware)
 
     tip_length = 22.0
     parent = ''
@@ -205,7 +205,7 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
 
     monkeypatch.setattr(
         helpers,
-        '_hash_labware_def', mock_hash_labware)
+        'hash_labware_def', mock_hash_labware)
 
     tip_length = 22.0
     parent = ''
@@ -260,7 +260,7 @@ def test_schema_shape(monkeypatch, clear_calibration):
 
     monkeypatch.setattr(
        helpers,
-       '_hash_labware_def', mock_hash_labware
+       'hash_labware_def', mock_hash_labware
     )
 
     expected = {"default": {"offset": [1, 1, 1], "lastModified": fake_time}}
@@ -284,7 +284,7 @@ def test_load_calibration(monkeypatch, clear_calibration):
 
     monkeypatch.setattr(
         helpers,
-        '_hash_labware_def', mock_hash_labware
+        'hash_labware_def', mock_hash_labware
     )
 
     test_labware = labware.Labware(minimalLabwareDef,
@@ -333,20 +333,20 @@ def test_clear_calibrations():
     assert len(os.listdir(calpath)) == 0
 
 
-def test_hash_labware_def():
+def testhash_labware_def():
     def1a = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
     def1aa = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
     def1b = {"metadata": {"a": "blah"}, "importantStuff": [1.1, 0.00003, 1/3]}
     def2 = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.000033, 1/3]}
 
     # identity preserved across json serialization+deserialization
-    assert helpers._hash_labware_def(def1a) == \
-        helpers._hash_labware_def(
+    assert helpers.hash_labware_def(def1a) == \
+        helpers.hash_labware_def(
             json.loads(json.dumps(def1a, separators=(',', ':'))))
     # 2 instances of same def should match
-    assert helpers._hash_labware_def(def1a) == \
-        helpers._hash_labware_def(def1aa)
+    assert helpers.hash_labware_def(def1a) == \
+        helpers.hash_labware_def(def1aa)
     # metadata ignored
-    assert helpers._hash_labware_def(def1a) == helpers._hash_labware_def(def1b)
+    assert helpers.hash_labware_def(def1a) == helpers.hash_labware_def(def1b)
     # different data should not match
-    assert helpers._hash_labware_def(def1a) != helpers._hash_labware_def(def2)
+    assert helpers.hash_labware_def(def1a) != helpers.hash_labware_def(def2)

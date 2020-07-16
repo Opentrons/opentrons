@@ -1,3 +1,8 @@
+""" opentrons.calibration_storage.get: functions for grabing calibration
+
+This module has functions that you can import to load robot or
+labware calibration from its designated file location.
+"""
 import typing
 
 from opentrons import config
@@ -8,13 +13,6 @@ from . import (
     file_operators as io, helpers)
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
-
-""" opentrons.calibration_storage.get: functions for grabing calibration
-
-This module has functions that you can import to load robot or
-labware calibration from its designated file location.
-"""
 
 
 def _format_calibration_type(
@@ -56,11 +54,11 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
     index_path = offset_path / 'index.json'
     if not index_path.exists():
         return all_calibrations
-    index_file = io._read_cal_file(str(index_path))
+    index_file = io.read_cal_file(str(index_path))
     for key, data in index_file.items():
         cal_path = offset_path / f'{key}.json'
         if cal_path.exists():
-            cal_blob = io._read_cal_file(str(cal_path))
+            cal_blob = io.read_cal_file(str(cal_path))
             calibration = _format_calibration_type(cal_blob)  # type: ignore
             all_calibrations.append(
                 local_types.CalibrationInformation(
@@ -72,13 +70,13 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
     return all_calibrations
 
 
-def get_tip_length_data(
+def _get_tip_length_data(
         pip_id: str, labware_hash: str, labware_load_name: str
 ) -> local_types.TipLengthCalibration:
     try:
         pip_tip_length_path = config.get_tip_length_cal_path()/f'{pip_id}.json'
         tip_length_data =\
-            io._read_cal_file(str(pip_tip_length_path))
+            io.read_cal_file(str(pip_tip_length_path))
         return tip_length_data[labware_hash]
     except (FileNotFoundError, AttributeError):
         raise local_types.TipLengthCalNotFound(
@@ -89,14 +87,18 @@ def get_tip_length_data(
 
 def get_labware_calibration(lookup_path: local_types.StrPath) -> Point:
     """
-    Look up a calibration if it exists and apply it to the given labware.
+    Find the delta of a given labware, if it exists.
+
+    :param lookup_path: short path to the labware calibration
+    :return: A point which represents the delta from well A1 origin of
+    a labware
     """
     offset_path =\
         config.get_opentrons_path('labware_calibration_offsets_dir_v2')
     offset = Point(0, 0, 0)
     labware_path = offset_path / lookup_path
     if labware_path.exists():
-        calibration_data = io._read_cal_file(str(labware_path))
+        calibration_data = io.read_cal_file(str(labware_path))
         offset_array = calibration_data['default']['offset']
         offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
     return offset
@@ -106,14 +108,22 @@ def load_tip_length_calibration(
         pip_id: str,
         definition: 'LabwareDefinition',
         parent: str) -> local_types.TipLengthCalibration:
+    """
+    Function used to grab the current tip length associated
+    with a particular tiprack.
+
+    :param pip_id: pipette you are using
+    :param definition: full definition of the tiprack
+    :param parent: parent of the tiprack
+    """
     # TODO(lc, 07-14-2020) since we're trying not to utilize
     # a labware object for these functions, the is tiprack
     # check should happen outside of this function.
     # assert labware._is_tiprack, \
     #     'cannot save tip length for non-tiprack labware'
-    labware_hash = helpers._hash_labware_def(definition)
+    labware_hash = helpers.hash_labware_def(definition)
     load_name = definition['parameters']['loadName']
-    return get_tip_length_data(
+    return _get_tip_length_data(
         pip_id=pip_id,
         labware_hash=labware_hash + parent,
         labware_load_name=load_name)

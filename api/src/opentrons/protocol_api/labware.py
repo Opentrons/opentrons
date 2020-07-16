@@ -1099,7 +1099,7 @@ def _get_parent_identifier(
 
 def _get_labware_path(labware: 'Labware'):
     parent_id = _get_parent_identifier(labware.parent)
-    labware_hash = helpers._hash_labware_def(labware._definition)
+    labware_hash = helpers.hash_labware_def(labware._definition)
     return f'{labware_hash}{parent_id}.json'
 
 

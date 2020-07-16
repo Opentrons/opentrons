@@ -499,7 +499,7 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
     parent = deck.position_for(1)
     definition = labware.get_labware_definition(labware_name)
     lw = labware.Labware(definition, parent)
-    labware_hash = helpers._hash_labware_def(definition)
+    labware_hash = helpers.hash_labware_def(definition)
     labware.save_calibration(lw, Point(0, 0, 0))
 
     lw_uri = helpers.uri_from_definition(definition)
@@ -518,7 +518,7 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
         }
 
     lw_path = labware_offset_tempdir / 'index.json'
-    info = file_operators._read_cal_file(lw_path)
+    info = file_operators.read_cal_file(lw_path)
     assert info[full_id] == blob
 
 

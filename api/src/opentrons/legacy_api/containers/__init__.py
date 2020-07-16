@@ -264,7 +264,7 @@ def load_new_labware(container_name, version=None):
 def load_new_labware_def(definition):
     """ Load a labware definition in the new schema into a placeable
     """
-    labware_hash = cal_helpers._hash_labware_def(definition)
+    labware_hash = cal_helpers.hash_labware_def(definition)
     saved_offset = _look_up_offsets(labware_hash)
     container = Container()
     container_name = definition['parameters']['loadName']
@@ -290,6 +290,6 @@ def load_tip_length_calibration(
         pip_id: str, location) -> 'TipLengthCalibration':
     placeable, _ = unpack_location(location)
     lw = placeable.get_parent()
-    return get.get_tip_length_data(
+    return get._get_tip_length_data(
         pip_id=pip_id, labware_hash=lw.properties['labware_hash'],
         labware_load_name=lw.properties['type'])
