@@ -355,7 +355,6 @@ describe('createPresavedStepForm', () => {
           stepDetails: '',
           stepName: 'thermocycler',
           stepType: 'thermocycler',
-          thermocyclerFormType: 'thermocyclerState',
         })
       })
     })
