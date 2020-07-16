@@ -1,10 +1,8 @@
 // flow-typed signature: 41a424ad7c0d0083d9498f60975cb2db
 // flow-typed version: <<STUB>>/mdns-js_v1.0.1/flow_v0.76.0
 
-import EventEmitter from 'events'
-
 declare module 'mdns-js' {
-  declare class mdns$Browser extends EventEmitter {
+  declare class mdns$Browser extends events$EventEmitter {
     discover(): void;
     stop(): void;
     networking: {
