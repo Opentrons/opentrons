@@ -7,7 +7,7 @@ from pathlib import PurePosixPath, PurePath
 from typing import Dict, BinaryIO, TYPE_CHECKING
 from zipfile import ZipFile
 
-from opentrons.protocol_api.labware import uri_from_definition
+from opentrons.calibration_storage.helpers import uri_from_definition
 
 from .types import BundleContents
 
