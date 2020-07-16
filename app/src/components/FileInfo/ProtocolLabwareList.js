@@ -5,7 +5,6 @@ import {
   DIRECTION_ROW,
   Flex,
   Text,
-  Icon,
   Tooltip,
   useHoverTooltip,
   JUSTIFY_SPACE_BETWEEN,
@@ -35,9 +34,6 @@ export function ProtocolLabwareList({
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
   })
-  const iconComponent = (
-    <Icon name="information" size={SIZE_1} color={C_MED_GRAY} />
-  )
   const TOOL_TIP_MESSAGE = 'calibrated offset from labware origin point'
   const toolTipComponent = (
     <Tooltip {...tooltipProps}>{TOOL_TIP_MESSAGE}</Tooltip>
@@ -70,7 +66,6 @@ export function ProtocolLabwareList({
       </SectionContentFlex>
       <SectionContentFlex
         title={CALIBRATION_DATA}
-        icon={iconComponent}
         toolTipComponent={toolTipComponent}
         toolTipProps={targetProps}
       >

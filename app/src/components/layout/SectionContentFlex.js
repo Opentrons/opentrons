@@ -17,7 +17,6 @@ import type {
 export type SectionContentFlexProps = {|
   title: string,
   children: React.Node,
-  icon?: React.Node,
   toolTipComponent?: React.Node,
   toolTipProps?: UseHoverTooltipTargetProps,
   ...StyleProps,
@@ -26,7 +25,6 @@ export type SectionContentFlexProps = {|
 export function SectionContentFlex({
   title,
   children,
-  icon,
   toolTipComponent,
   toolTipProps,
   ...styleProps
@@ -34,11 +32,8 @@ export function SectionContentFlex({
   return (
     <Box {...styleProps} paddingTop={SIZE_1} paddingBottom={SIZE_1}>
       <Flex alignItems={ALIGN_CENTER}>
-        <Box flex={FLEX_AUTO}>
+        <Box flex={FLEX_AUTO} {...toolTipProps}>
           <h4>{title}</h4>
-        </Box>
-        <Box paddingLeft={SPACING_1} flex={FLEX_AUTO} {...toolTipProps}>
-          {icon}
           {toolTipComponent}
         </Box>
       </Flex>
