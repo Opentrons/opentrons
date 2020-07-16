@@ -103,26 +103,28 @@ export type HealthPollerResult = $ReadOnly<{|
  * for its own state
  */
 export type HealthPollerTarget = $ReadOnly<{
+  /** IP address used to contruct health URLs */
   ip: string,
+  /** Port address used to construct health URLs */
   port: number,
   ...
 }>
 
 /**
- * Base configuration options of a HealthPoller
+ * HealthPoller runtime configuration that can be changed by multiple calls
+ * to start; previous config state will be preserved if left unspecified
  */
 export type HealthPollerConfig = $ReadOnly<{|
   /** List of addresses to poll */
-  list: $ReadOnlyArray<HealthPollerTarget>,
+  list?: $ReadOnlyArray<HealthPollerTarget>,
   /** Call the health endpoints for a given IP once every `interval` ms */
-  interval: number,
+  interval?: number,
 |}>
 
 /**
  * Options used to construct a health poller
  */
 export type HealthPollerOptions = $ReadOnly<{|
-  ...HealthPollerConfig,
   /** Function to call whenever the requests for an IP settle */
   onPollResult: (pollResult: HealthPollerResult) => mixed,
   /** Optional logger */
@@ -134,8 +136,13 @@ export type HealthPollerOptions = $ReadOnly<{|
  * addresses
  */
 export type HealthPoller = $ReadOnly<{|
-  /** (Re)start the poller, optionally passing in a new configuration */
-  start: (startOpts?: $Partial<HealthPollerConfig>) => void,
+  /**
+   * (Re)start the poller, optionally passing in new configuration values.
+   * Any unspecified config values will be preserved from the last time
+   * they were set. `start` must be called with an interval and list at least
+   * once to actually poll anything.
+   */
+  start: (startOpts?: HealthPollerConfig) => void,
   /** Stop the poller (will not cancel any in-flight HTTP requests) */
   stop: () => void,
 |}>

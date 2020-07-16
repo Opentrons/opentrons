@@ -31,8 +31,8 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
     typeof logger?.[level] === 'function' && logger[level](msg, meta)
   }
 
-  let { interval } = options
-  let pollQueue: Array<HealthPollerTarget> = [...options.list]
+  let interval = 0
+  let pollQueue: Array<HealthPollerTarget> = []
   let pollIntervalId: IntervalID | null = null
   let lastCompletedPollTimeByIp: { [ip: string]: number | void, ... } = {}
 
@@ -60,8 +60,8 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
       })
   }
 
-  const start = (nextOpts: $Partial<HealthPollerConfig> = {}) => {
-    const { interval: nextInterval, list: nextList } = nextOpts
+  const start = (config?: HealthPollerConfig) => {
+    const { interval: nextInterval, list: nextList } = config ?? {}
     let needsNewInterval = pollIntervalId === null
 
     if (nextInterval != null && nextInterval !== interval) {
@@ -82,7 +82,7 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
       needsNewInterval = true
     }
 
-    if (needsNewInterval && pollQueue.length > 0) {
+    if (needsNewInterval && pollQueue.length > 0 && interval > 0) {
       const handlePoll = () => {
         // since we're using a mutable array as a queue, guard against unsafe
         // array access before we start shifting and pushing
@@ -139,8 +139,16 @@ function fetchAndParse<SuccessBody>(
         })
         .then(body => ({ ok, status, body }: any))
     })
-    .catch((error: Error) => {
-      return { ok: false, status: -1, body: error.message }
+    .catch((error: { type?: string, code?: string, message: string, ... }) => {
+      // error.type === 'system' means error came from Node.js (e.g. EHOSTDOWN).
+      // if it was a system error, skip error.message and attach the error code.
+      // error.message may have timestamps or other frequently changing info
+      const body =
+        error.type === 'system' && typeof error.code === 'string'
+          ? `Request failed, reason: ${error.code}`
+          : error.message
+
+      return { ok: false, status: -1, body }
     })
 }
 

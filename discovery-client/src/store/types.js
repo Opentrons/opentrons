@@ -44,14 +44,18 @@ export type HealthStatus =
   | HEALTH_STATUS_NOT_OK
   | HEALTH_STATUS_OK
 
-/**
- * State for a given IP address, which should point to a robot
- */
-export type HostState = $ReadOnly<{|
+export type Address = $ReadOnly<{|
   /** IP address */
   ip: string,
   /** Port */
   port: number,
+|}>
+
+/**
+ * State for a given IP address, which should point to a robot
+ */
+export type HostState = $ReadOnly<{|
+  ...Address,
   /** Whether this IP has been seen via mDNS or HTTP while the client has been running */
   seen: boolean,
   /** How the last GET /health responded (null if no response yet) */
