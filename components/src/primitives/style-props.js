@@ -11,6 +11,7 @@ import type { Styles } from 'styled-components'
 const COLOR_PROPS = ['color', 'backgroundColor', 'opacity']
 
 const TYPOGRAPHY_PROPS = [
+  'cursor',
   'fontSize',
   'fontWeight',
   'fontStyle',
