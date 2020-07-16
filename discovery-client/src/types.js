@@ -1,5 +1,7 @@
 // @flow
 
+import type { RobotState, HostState } from './store/types'
+
 // TODO(mc, 2018-10-03): figure out what to do with duplicate type in app
 export type HealthResponse = {
   name: string,
@@ -141,10 +143,32 @@ export type HealthPoller = $ReadOnly<{|
    * Any unspecified config will be preserved from the last time `start` was
    * called. `start` must be called with an interval and list at least once.
    */
-  start: (startOpts?: HealthPollerConfig) => void,
+  start: (config?: HealthPollerConfig) => void,
   /**
    * Stop the poller. In-flight HTTP requests may not be cancelled, but
    * `onPollResult` will no longer be called.
    */
   stop: () => void,
+|}>
+
+/**
+ * Relavent data from an mDNS advertisement
+ */
+export type MdnsBrowserService = $ReadOnly<{|
+  /** The service's name from the advertisement */
+  name: string,
+  /** The IP address that the service is using */
+  ip: string,
+  /** The port the service is using */
+  port: number,
+|}>
+
+/**
+ * Robot object that the DiscoveryClient returns that combines latest known
+ * health data from the robot along with possible IP addressess
+ */
+export type DiscoveryClientRobot = $ReadOnly<{|
+  ...RobotState,
+  /** IP addresses and health state, ranked by connectability (descending) */
+  addresses: $ReadOnlyArray<$Rest<HostState, {| robotName: mixed |}>>,
 |}>
