@@ -10,13 +10,11 @@ import type {
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest } from '../../robot-api'
-import { CalibrationInfoBox } from '../CalibrationInfoBox'
 
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { MeasureNozzle } from './MeasureNozzle'
 import { TipPickUp } from './TipPickUp'
-import { InspectingTip } from './InspectingTip'
 import { MeasureTip } from './MeasureTip'
 import { CompleteConfirmation } from './CompleteConfirmation'
 import { ConfirmExitModal } from './ConfirmExitModal'
@@ -37,7 +35,6 @@ const PANEL_BY_STEP: {
   labwareLoaded: DeckSetup,
   measuringNozzleOffset: MeasureNozzle,
   preparingPipette: TipPickUp,
-  inspectingTip: InspectingTip,
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
@@ -56,28 +53,25 @@ export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
   const { session, robotName, hasBlock, closeWizard } = props
-  const { currentStep, instrument, labware } = session?.details
-  const Panel = PANEL_BY_STEP[currentStep]
-
   const [dispatchRequest] = useDispatchApiRequest()
-
-  function deleteSession() {
-    session.id && dispatchRequest(Sessions.deleteSession(robotName, session.id))
-    closeWizard()
-  }
 
   function sendCommand(
     command: SessionCommandString,
     data: SessionCommandData = {}
   ) {
-    session &&
-      session.id &&
+    session?.id &&
       dispatchRequest(
         Sessions.createSessionCommand(robotName, session.id, {
           command,
           data,
         })
       )
+  }
+
+  function deleteSession() {
+    session?.id &&
+      dispatchRequest(Sessions.deleteSession(robotName, session.id))
+    closeWizard()
   }
 
   const {
@@ -88,6 +82,12 @@ export function CalibrateTipLength(
     sendCommand(Sessions.tipCalCommands.EXIT)
     deleteSession()
   }, true)
+
+  if (!session) {
+    return null
+  }
+  const { currentStep, instrument, labware } = session?.details
+  const Panel = PANEL_BY_STEP[currentStep]
 
   return Panel ? (
     <>

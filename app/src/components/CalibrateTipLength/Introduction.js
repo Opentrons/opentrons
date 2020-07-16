@@ -20,7 +20,6 @@ import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
 import { labwareImages } from './labwareImages'
 import { getLatestLabwareDef } from '../../getLabware'
-import { ToolSettingAlertModal } from './ToolSettingAlertModal'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 

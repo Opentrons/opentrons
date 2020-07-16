@@ -1,9 +1,7 @@
 // @flow
-import type { Mount } from '@opentrons/components'
 import type {
   SessionCommandString,
   SessionCommandData,
-  Session,
   TipLengthCalibrationSession,
 } from '../../sessions/types'
 import type {
@@ -13,7 +11,7 @@ import type {
 
 export type CalibrateTipLengthParentProps = {|
   robotName: string,
-  session: TipLengthCalibrationSession,
+  session: TipLengthCalibrationSession | null,
   closeWizard: () => void,
   hasBlock: boolean,
 |}

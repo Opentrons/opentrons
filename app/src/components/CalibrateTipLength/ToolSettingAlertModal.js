@@ -16,7 +16,6 @@ import {
 } from '@opentrons/components'
 
 import styles from './styles.css'
-import type { CalibrateTipLengthChildProps } from './types'
 import { labwareImages } from './labwareImages'
 import { Portal } from '../portal'
 

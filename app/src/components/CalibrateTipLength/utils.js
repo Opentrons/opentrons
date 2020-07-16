@@ -1,3 +1,4 @@
+// @flow
 import type { JogAxis } from '../../http-api-client'
 
 const ORDERED_AXES: [JogAxis, JogAxis, JogAxis] = ['x', 'y', 'z']

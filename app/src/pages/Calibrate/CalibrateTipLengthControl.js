@@ -6,13 +6,11 @@ import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
-import { TipProbe } from '../../components/TipProbe'
 import { CalibrateTipLength } from '../../components/CalibrateTipLength'
 import { ToolSettingAlertModal } from '../../components/CalibrateTipLength/ToolSettingAlertModal'
 import { CalibrationInfoBox } from '../../components/CalibrationInfoBox'
 import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
 import { Portal } from '../../components/portal'
-import { mockTipLengthCalibrationSessionAttributes } from '../../sessions/__fixtures__'
 
 import type { State } from '../../types'
 
@@ -61,17 +59,17 @@ export function CalibrateTipLengthControl({
     ) {
       return session
     }
-    return {}
+    return null
   })
 
-  const ensureSession = () => {
+  const ensureSession = React.useCallback(() => {
     dispatch(
       Sessions.ensureSession(
         robotName,
         Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
       )
     )
-  }
+  }, [dispatch, robotName])
 
   const handleStart = React.useCallback(() => {
     if (hasCalBlock !== null) {
@@ -79,7 +77,7 @@ export function CalibrateTipLengthControl({
     } else {
       setShowCalBlockPrompt(true)
     }
-  }, [dispatch, hasCalBlock])
+  }, [hasCalBlock, ensureSession])
 
   return (
     <>

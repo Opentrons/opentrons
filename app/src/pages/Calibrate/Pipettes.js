@@ -3,16 +3,13 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import * as Sessions from '../../sessions'
 import { selectors as robotSelectors } from '../../robot'
 import { PIPETTE_MOUNTS, fetchPipettes } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 import { getFeatureFlags } from '../../config'
-import { mockTipLengthCalibrationSessionAttributes } from '../../sessions/__fixtures__'
 
 import { Page } from '../../components/Page'
 import { TipProbe } from '../../components/TipProbe'
-import { CalibrateTipLength } from '../../components/CalibrateTipLength'
 import {
   PipetteTabs,
   Pipettes as PipettesContents,
@@ -46,12 +43,6 @@ export function Pipettes(props: Props): React.Node {
     PIPETTE_MOUNTS.find(m => m === mount) || null
 
   const currentPipette = pipettes.find(p => p.mount === currentMount) || null
-
-  // TODO: get real session
-  const tipLengthCalibrationSession: Sessions.TipLengthCalibrationSession = {
-    ...mockTipLengthCalibrationSessionAttributes,
-    id: 'fake_session_id',
-  }
 
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>

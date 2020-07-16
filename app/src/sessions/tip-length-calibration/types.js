@@ -10,11 +10,6 @@ import typeof {
   TIP_LENGTH_STEP_CALIBRATION_COMPLETE,
 } from '../constants'
 
-import type {
-  RobotCalibrationCheckInstrument,
-  RobotCalibrationCheckLabware,
-} from '../calibration-check/types'
-
 export type TipLengthCalibrationStep =
   | TIP_LENGTH_STEP_SESSION_STARTED
   | TIP_LENGTH_STEP_LABWARE_LOADED
