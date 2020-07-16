@@ -47,7 +47,7 @@ const PANEL_STYLE_BY_STEP: {
   preparingPipette: styles.modal_contents,
   inspectingTip: styles.modal_contents,
   measuringTipOffset: styles.modal_contents,
-  calibrationComplete: styles.modal_contents,
+  calibrationComplete: styles.terminal_modal_contents,
 }
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
