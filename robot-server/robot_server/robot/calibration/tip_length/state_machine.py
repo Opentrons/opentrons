@@ -25,7 +25,8 @@ TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
         CalibrationCommand.jog: State.preparingPipette,
         CalibrationCommand.pick_up_tip: State.preparingPipette,
         CalibrationCommand.invalidate_tip: State.preparingPipette,
-        TipLengthCalibrationCommand.move_to_reference_point: State.measuringTipOffset  # noqa: e501
+        TipLengthCalibrationCommand.move_to_reference_point: State.measuringTipOffset,  # noqa: e501
+        TipLengthCalibrationCommand.move_to_tip_rack: State.preparingPipette # noqa: e501
     },
     State.measuringTipOffset: {
         CalibrationCommand.save_offset: State.calibrationComplete,
