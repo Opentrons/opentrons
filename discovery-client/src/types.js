@@ -138,11 +138,13 @@ export type HealthPollerOptions = $ReadOnly<{|
 export type HealthPoller = $ReadOnly<{|
   /**
    * (Re)start the poller, optionally passing in new configuration values.
-   * Any unspecified config values will be preserved from the last time
-   * they were set. `start` must be called with an interval and list at least
-   * once to actually poll anything.
+   * Any unspecified config will be preserved from the last time `start` was
+   * called. `start` must be called with an interval and list at least once.
    */
   start: (startOpts?: HealthPollerConfig) => void,
-  /** Stop the poller (will not cancel any in-flight HTTP requests) */
+  /**
+   * Stop the poller. In-flight HTTP requests may not be cancelled, but
+   * `onPollResult` will no longer be called.
+   */
   stop: () => void,
 |}>
