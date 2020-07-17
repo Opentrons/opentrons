@@ -783,10 +783,10 @@ class TransferPlan:
     def _check_valid_well_list(self, well_list, id, old_well_list):
         if self._api_version >= APIVersion(2, 2) and len(well_list) < 1:
             raise RuntimeError(
-                f"Invalid {id} for multichannel transfer: {old_well_list}. 
-                The multichannel can only access rows 1 and 2 of 384-well
-                plates. If this is a valid 384-well plate, try using API 
-                Version 2.2 or greater.")
+                f'''Invalid {id} for multichannel transfer: {old_well_list}.
+                 The multichannel can only access rows 1 and 2 of 384-well
+                 plates. If this is a valid 384-well plate, try using API
+                 Version 2.2 or greater.''')
 
     def _multichannel_transfer(self, s, d):
         # TODO: add a check for container being multi-channel compatible?
@@ -846,3 +846,12 @@ class TransferPlan:
                 return test_well in valid_wells
             else:
                 return test_well in test_well.parent.rows()[0]
+
+def testing_string():
+    id = 'hey'
+    old_well_list = 'heyy'
+    raise RuntimeError(
+        (f'Invalid {id} for multichannel transfer: {old_well_list}.'
+         'The multichannel can only access rows 1 and 2 of 384-well'
+         'plates. If this is a valid 384-well plate, try using API'
+         'Version 2.2 or greater.'))
