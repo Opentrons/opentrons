@@ -33,8 +33,9 @@ stages:
           type: Session
           attributes:
             sessionType: tipLengthCalibration
-            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+.\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+.\\d+"
             details: {}
+            createParams: null
 
   - name: Load labware
     request:
@@ -56,10 +57,10 @@ stages:
           attributes:
             status: executed
             command: calibration.loadLabware
-            created_at: &dt
+            createdAt: &dt
               !re_match "\\d+-\\d+-\\d+T"
-            started_at: *dt
-            completed_at: *dt
+            startedAt: *dt
+            completedAt: *dt
             data: {}
 
 
@@ -82,6 +83,7 @@ stages:
             type: Session
             attributes:
               sessionType: default
-              created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+              createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
               details: {}
+              createParams: null
 
