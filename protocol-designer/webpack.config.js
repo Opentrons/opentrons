@@ -16,7 +16,7 @@ const PROTOCOL_DESIGNER_ENV_VAR_PREFIX = 'OT_PD_'
 // Also remove all OT_PD_VERSION env vars, the version should always
 // be gleaned from the package.json
 
-const OT_PD_VERSION = '4.0.4'
+const OT_PD_VERSION = '4.0.5'
 const OT_PD_BUILD_DATE = new Date().toUTCString()
 
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
