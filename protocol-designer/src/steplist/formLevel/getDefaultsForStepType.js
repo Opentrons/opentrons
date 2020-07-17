@@ -94,6 +94,7 @@ export function getDefaultsForStepType(
       }
     case 'thermocycler':
       return {
+        thermocyclerFormType: null,
         moduleId: null,
         blockIsActive: false,
         blockTargetTemp: null,
