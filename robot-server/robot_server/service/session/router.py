@@ -199,9 +199,9 @@ async def session_command_execute_handler(
                 data=command_result.content.data,
                 command=command_result.content.name,
                 status=command_result.result.status,
-                created_at=command_result.meta.created_at,
-                started_at=command_result.result.started_at,
-                completed_at=command_result.result.completed_at
+                createdAt=command_result.meta.created_at,
+                startedAt=command_result.result.started_at,
+                completedAt=command_result.result.completed_at
             ),
             resource_id=command_result.meta.identifier
         ),

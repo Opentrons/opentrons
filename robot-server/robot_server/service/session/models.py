@@ -185,7 +185,7 @@ class Session(BasicSession):
     details: SessionDetails =\
         Field(...,
               description="Detailed session specific status")
-    created_at: datetime = \
+    createdAt: datetime = \
         Field(...,
               description="Date and time that this session was created")
 
@@ -229,9 +229,9 @@ class BasicSessionCommand(BaseModel):
 class SessionCommand(BasicSessionCommand):
     """A session command response"""
     status: CommandStatus
-    created_at: datetime = Field(..., default_factory=datetime.utcnow)
-    started_at: typing.Optional[datetime]
-    completed_at: typing.Optional[datetime]
+    createdAt: datetime = Field(..., default_factory=datetime.utcnow)
+    startedAt: typing.Optional[datetime]
+    completedAt: typing.Optional[datetime]
 
 
 # Session create and query requests/responses

@@ -88,21 +88,21 @@ stages:
           type: Session
           attributes:
             sessionType: "default"
-            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: {}
             createParams: null
         - id: "{session_id_1}"
           type: Session
           attributes:
             sessionType: "null"
-            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: {}
             createParams: null
         - id: "{session_id_2}"
           type: Session
           attributes:
             sessionType: "calibrationCheck"
-            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: !anydict
             createParams: null
 
@@ -118,7 +118,7 @@ stages:
           type: Session
           attributes:
             sessionType: "calibrationCheck"
-            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: !anydict
             createParams: null
 
@@ -148,6 +148,6 @@ stages:
           type: Session
           attributes:
             sessionType: "default"
-            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: {}
             createParams: null

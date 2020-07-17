@@ -54,7 +54,7 @@ class BaseSession(ABC):
         """Get the response model"""
         return models.Session(sessionType=self.session_type,
                               details=self._get_response_details(),
-                              created_at=self.meta.created_at,
+                              createdAt=self.meta.created_at,
                               createParams=self.meta.create_params)
 
     @abstractmethod
