@@ -1,6 +1,5 @@
 // @flow
 import mapValues from 'lodash/mapValues'
-import * as componentLib from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -20,18 +19,6 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
-// TODO Ian 2018-11-27: import these from components lib, not from this constants file
-export const {
-  // OT2 DECK CONSTANTS
-  SLOTNAME_MATRIX,
-  sortedSlotnames,
-  TRASH_SLOTNAME,
-  SLOT_SPACING_MM,
-  // STYLE CONSTANTS
-  swatchColors,
-  // SPECIAL SELECTORS
-  SELECTABLE_WELL_CLASS,
-} = componentLib
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)

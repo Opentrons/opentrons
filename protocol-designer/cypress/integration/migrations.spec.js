@@ -73,6 +73,11 @@ describe('Protocol fixtures migrate and match snapshots', () => {
             mimeType: 'application/json',
             encoding: 'utf8',
           })
+          cy.get('[data-test="ComputingSpinner"]').should('exist')
+          // wait until computation is done before proceeding, with generous timeout
+          cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
+            'not.exist'
+          )
         })
 
         if (genericMigrationModal) {

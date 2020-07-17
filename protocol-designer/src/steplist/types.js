@@ -161,11 +161,17 @@ export type SubstepItemData =
   | ThermocyclerProfileSubstepItem
   | ThermocyclerStateSubstepItem
 
-export type SubSteps = { [StepIdType]: ?SubstepItemData }
+export type Substeps = { [StepIdType]: ?SubstepItemData }
 
 export type StepFormErrors = Array<FormError>
 
 export type StepArgsAndErrors = {
   errors: boolean,
   stepArgs: CommandCreatorArgs | null, // TODO: incompleteData field when this is null?
+}
+
+export type StepArgsAndErrorsById = { [stepId: string]: StepArgsAndErrors, ... }
+
+export type LabwareNamesByModuleId = {
+  [moduleId: string]: ?{ nickname: string },
 }

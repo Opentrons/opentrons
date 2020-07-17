@@ -18,10 +18,9 @@ import {
 } from './utils'
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
+import type { LabwareNamesByModuleId } from '../../steplist/types'
 
-export const getLabwareNamesByModuleId: Selector<{|
-  [moduleId: string]: ?{ nickname: string },
-|}> = createSelector(
+export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = createSelector(
   getInitialDeckSetup,
   getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) =>

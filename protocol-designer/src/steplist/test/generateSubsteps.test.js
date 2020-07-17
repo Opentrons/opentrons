@@ -1,10 +1,10 @@
 // @flow
-import { generateSubsteps } from '../generateSubsteps'
+import { generateSubstepItem } from '../generateSubstepItem'
 import { makeInitialRobotState } from '../../step-generation/utils'
 import { makeContext } from '../../step-generation/__fixtures__'
 import { THERMOCYCLER_STATE } from '../../constants'
 
-describe('generateSubsteps', () => {
+describe('generateSubstepItem', () => {
   const stepId = 'step123'
   const tiprackId = 'tiprack1Id'
   const pipetteId = 'p300SingleId'
@@ -49,7 +49,7 @@ describe('generateSubsteps', () => {
       errors: {},
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -84,7 +84,7 @@ describe('generateSubsteps', () => {
     },
   ].forEach(({ testName, args }) => {
     it(testName, () => {
-      const result = generateSubsteps(
+      const result = generateSubstepItem(
         args,
         invariantContext,
         robotState,
@@ -107,7 +107,7 @@ describe('generateSubsteps', () => {
     }
     const robotState = makeInitialRobotState({ invariantContext })
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -318,7 +318,7 @@ describe('generateSubsteps', () => {
           stepArgs: { ...sharedArgs, ...stepArgs },
         }
 
-        const result = generateSubsteps(
+        const result = generateSubstepItem(
           stepArgsAndErrors,
           invariantContext,
           robotState,
@@ -355,7 +355,7 @@ describe('generateSubsteps', () => {
       errors: {},
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -496,7 +496,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -522,7 +522,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -549,7 +549,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -576,7 +576,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -602,7 +602,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -630,7 +630,7 @@ describe('generateSubsteps', () => {
         lidOpen: false,
       },
     }
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -655,7 +655,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,

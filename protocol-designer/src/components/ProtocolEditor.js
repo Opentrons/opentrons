@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { DragDropContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
+import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
 import { ConnectedSidebar } from '../containers/ConnectedSidebar'
 import { ConnectedTitleBar } from '../containers/ConnectedTitleBar'
@@ -24,6 +25,7 @@ const showGateModal =
 function ProtocolEditorComponent() {
   return (
     <div>
+      <ComputingSpinner />
       <TopPortalRoot />
       {showGateModal ? <GateModal /> : null}
       <PrereleaseModeIndicator />

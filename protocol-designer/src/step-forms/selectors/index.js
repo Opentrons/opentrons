@@ -43,7 +43,10 @@ import type {
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
 import type { FormData, StepIdType } from '../../form-types'
-import type { StepArgsAndErrors, StepFormErrors } from '../../steplist/types'
+import type {
+  StepArgsAndErrorsById,
+  StepFormErrors,
+} from '../../steplist/types'
 import type {
   InitialDeckSetup,
   NormalizedLabwareById,
@@ -534,9 +537,7 @@ export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
   }
 )
 
-export const getArgsAndErrorsByStepId: Selector<{
-  [StepIdType]: StepArgsAndErrors,
-}> = createSelector(
+export const getArgsAndErrorsByStepId: Selector<StepArgsAndErrorsById> = createSelector(
   getOrderedSavedForms,
   getInvariantContext,
   (stepForms, contextualState) => {
