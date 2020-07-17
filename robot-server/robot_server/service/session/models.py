@@ -165,7 +165,7 @@ CommandDefinitionType = typing.Union[
 class BasicSession(BaseModel):
     """Attributes required for creating a session"""
     createParams: SessionCreateParamType
-    # For validation, command MUST appear after createParams
+    # For validation, sessionType MUST appear after createParams
     sessionType: SessionType =\
         Field(...,
               description="The type of the session")
