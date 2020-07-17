@@ -7,7 +7,7 @@ from robot_server.service.json_api.errors import Error
 class ProtocolException(RobotServerError):
     """Base of all protocol exceptions"""
     def __init__(self, status_code, **kwargs):
-        super().__init__(status_code=HTTP_404_NOT_FOUND,
+        super().__init__(status_code=status_code,
                          error=Error(**kwargs))
 
 

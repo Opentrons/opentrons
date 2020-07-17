@@ -47,6 +47,17 @@ class ProtocolManager:
     def remove(self, name: str) -> UploadedProtocol:
         """Remove a protocol"""
         try:
-            return self._protocols.pop(name)
+            proto = self._protocols.pop(name)
+            proto.clean_up()
+            return proto
         except KeyError:
             raise errors.ProtocolNotFoundException(name)
+
+    def remove_all(self):
+        """Remove all protocols"""
+        for p in self._protocols.values():
+            try:
+                p.clean_up()
+            except IOError:
+                log.exception(f"Failed to remove protocol {p.meta.name}")
+        self._protocols = {}

@@ -23,10 +23,18 @@ class UploadedProtocol:
     DIR_PREFIX = 'opentrons_'
     DIR_SUFFIX = '._proto_dir'
 
-    def __init__(self, protocol_file: UploadFile):
-        """Constructor"""
+    def __init__(self,
+                 protocol_file: UploadFile,
+                 directory: str = None):
+        """
+        Constructor
+
+        :param protocol_file: The uploaded protocol file
+        :param directory: Optional parent directory
+        """
         temp_dir = TemporaryDirectory(suffix=UploadedProtocol.DIR_SUFFIX,
-                                      prefix=UploadedProtocol.DIR_PREFIX)
+                                      prefix=UploadedProtocol.DIR_PREFIX,
+                                      dir=directory)
 
         protocol_file_name = Path(protocol_file.filename)
         with open(Path(temp_dir.name) / protocol_file_name, 'wb') as p:
