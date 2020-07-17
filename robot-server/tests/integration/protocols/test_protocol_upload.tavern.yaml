@@ -1,0 +1,78 @@
+---
+test_name: Protocol lifecycle
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload a protocol
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocol_file: "tests/integration/protocols/phony_proto.py"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: phony_proto
+          type: ProtocolResponseAttributes
+          attributes:
+            protocolFile: phony_proto.py
+            userFiles: []
+            lastModifiedAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+  - name: Get the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/phony_proto"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          id: phony_proto
+          type: ProtocolResponseAttributes
+          attributes:
+            protocolFile: phony_proto.py
+            userFiles: []
+            lastModifiedAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+  - name: Upload a data file
+    request:
+      url: "{host:s}:{port:d}/protocols/phony_proto"
+      method: POST
+      files:
+        file: "tests/integration/protocols/data.csv"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: phony_proto
+          type: ProtocolResponseAttributes
+          attributes:
+            protocolFile: phony_proto.py
+            userFiles: ['data.csv']
+            lastModifiedAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/phony_proto"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data:
+          id: phony_proto
+          type: ProtocolResponseAttributes
+          attributes:
+            protocolFile: phony_proto.py
+            userFiles: ['data.csv']
+            lastModifiedAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+  - name: Get all protocols to see that there are none
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data: []
