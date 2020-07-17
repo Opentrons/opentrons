@@ -343,7 +343,7 @@ describe('createPresavedStepForm', () => {
           id: stepId,
           lidIsActive: !timelineHasErrors,
           lidIsActiveHold: false,
-          lidOpen: timelineHasErrors ? null : true,
+          lidOpen: !timelineHasErrors,
           lidOpenHold: null,
           lidTargetTemp: timelineHasErrors ? null : 43,
           lidTargetTempHold: null,

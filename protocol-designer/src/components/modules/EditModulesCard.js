@@ -5,7 +5,6 @@ import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -22,16 +21,11 @@ import type { ModulesForEditModulesCard } from '../../step-forms'
 
 type Props = {
   modules: ModulesForEditModulesCard,
-  thermocyclerEnabled: ?boolean,
   openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
 }
 
 export function EditModulesCard(props: Props): React.Node {
-  const { modules, thermocyclerEnabled, openEditModuleModal } = props
-
-  const visibleModules = thermocyclerEnabled
-    ? SUPPORTED_MODULE_TYPES
-    : SUPPORTED_MODULE_TYPES.filter(m => m !== THERMOCYCLER_MODULE_TYPE)
+  const { modules, openEditModuleModal } = props
 
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
@@ -68,7 +62,7 @@ export function EditModulesCard(props: Props): React.Node {
             temperatureOnDeck={hasCrashableTempModule}
           />
         )}
-        {visibleModules.map((moduleType, i) => {
+        {SUPPORTED_MODULE_TYPES.map((moduleType, i) => {
           const moduleData = modules[moduleType]
           if (moduleData) {
             return (

@@ -55,8 +55,8 @@ export function SlotMap(props: SlotMapProps): React.Node {
                 <Icon
                   className={styles.collision_icon}
                   name="information"
-                  width={iconSize}
-                  height={iconSize}
+                  svgWidth={iconSize}
+                  svgHeight={iconSize}
                   x={slotWidth / 2 - iconSize / 2}
                   y={slotHeight / 2 - iconSize / 2}
                 />

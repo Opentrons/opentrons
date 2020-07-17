@@ -41,7 +41,6 @@ describe('ModuleFields', () => {
         [TEMPERATURE_MODULE_TYPE]: temperatureModuleNotOnDeck,
         [THERMOCYCLER_MODULE_TYPE]: thermocyclerModuleNotOnDeck,
       },
-      thermocyclerEnabled: false,
       onFieldChange: jest.fn(),
       onSetFieldValue: jest.fn(),
       onSetFieldTouched: jest.fn(),

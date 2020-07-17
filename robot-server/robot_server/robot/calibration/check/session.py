@@ -59,7 +59,7 @@ class CalibrationCheckState(str, Enum):
 
 class CalibrationCheckTrigger(str, Enum):
     load_labware = CalibrationCommand.load_labware.value
-    prepare_pipette = CalibrationCommand.prepare_pipette.value
+    prepare_pipette = CalibrationCheckCommand.prepare_pipette.value
     jog = CalibrationCommand.jog.value
     pick_up_tip = CalibrationCommand.pick_up_tip.value
     confirm_tip_attached = CalibrationCommand.confirm_tip_attached.value

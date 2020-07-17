@@ -233,6 +233,7 @@ def execute(protocol_file: TextIO,
                               non-recursive contents of specified directories
                               are presented by the protocol context in
                               :py:attr:`.ProtocolContext.bundled_data`.
+
     The format of the runlog entries is as follows:
 
     .. code-block:: python

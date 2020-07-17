@@ -66,9 +66,9 @@ Both modules have the ability to check what state they are currently in. To do t
 For the temperature module this will return a string stating whether it's `heating`, `cooling`, `holding at target` or `idle`.
 For the magnetic module this will return a string stating whether it's `engaged` or `disengaged`.
 
-**********
+******************
 Temperature Module
-**********
+******************
 
 Our temperature module acts as both a cooling and heating device. The range
 of temperatures this module can reach goes from 4 to 95 degrees celsius with a resolution of 1 degree celcius.
@@ -92,7 +92,7 @@ To set the temperature module to a given temperature in degrees celsius do the f
 This will set your Temperature module to 4 degrees celsius.
 
 Wait Until Setpoint Reached
-==========================
+===========================
 This function will pause your protocol until your target temperature is reached.
 
 .. code-block:: python
@@ -139,6 +139,7 @@ We can read the target temperature of the module by the following:
     plate = labware.load('96-flat', slot, share=True)
 
     temperature = module.target
+
 This will return a float of the temperature that the module is trying to reach.
 
 Deactivate
@@ -168,9 +169,9 @@ clicking on the `Pipettes & Modules` tab. Your temperature module will automatic
 deactivate if another protocol is uploaded to the app. Your temperature module will
 not deactivate automatically upon protocol end, cancel or re-setting a protocol.
 
-**********
+***************
 Magnetic Module
-**********
+***************
 
 The magnetic module has two actions:
 

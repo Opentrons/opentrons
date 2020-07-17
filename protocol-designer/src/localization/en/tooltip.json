@@ -8,7 +8,7 @@
     "moveLiquid": "Move liquid to and from wells/tubes.",
     "magnet": "Engage or disengage the Magnetic module.",
     "temperature": "Set temperature command for Temperature module.",
-    "thermocycler": "Program a profile for the Thermocycler module."
+    "thermocycler": "Change Thermocycler state or program a profile."
   },
 
   "disabled_module_step": "Add a relevant module to use this step",

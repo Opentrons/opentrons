@@ -1,7 +1,11 @@
 import typing
 from uuid import UUID, uuid4
 
-from robot_server.robot.calibration.constants import LOOKUP_LABWARE
+from robot_server.robot.calibration.constants import (
+    TIP_RACK_LOOKUP_BY_MAX_VOL,
+    SHORT_TRASH_DECK,
+    STANDARD_DECK
+)
 from robot_server.robot.calibration.helper_classes import PipetteInfo, \
     PipetteRank, LabwareInfo, Moves, CheckMove
 from opentrons.config import feature_flags as ff
@@ -39,19 +43,12 @@ class CalibrationSession:
                  lights_on_before: bool = False):
         self._hardware = hardware
         self._lights_on_before = lights_on_before
-        self._deck = geometry.Deck()
+
+        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
+            else STANDARD_DECK
+        self._deck = geometry.Deck(load_name=deck_load_name)
         self._pip_info_by_mount = self._get_pip_info_by_mount(
                 hardware.get_attached_instruments())
-        if ff.short_fixed_trash():
-            trash_lw = labware.load(
-                'opentrons_1_trash_850ml_fixed',
-                self._deck.position_for('12'))
-        else:
-            trash_lw = labware.load(
-                'opentrons_1_trash_1100ml_fixed',
-                self._deck.position_for('12'))
-        self._deck['12'] = trash_lw
-        self._trash_lw = trash_lw
         self._labware_info = self._determine_required_labware()
         self._moves = self._build_deck_moves()
 
@@ -123,11 +120,11 @@ class CalibrationSession:
 
     def _alt_load_names_for_mount(self, mount: Mount) -> typing.List[str]:
         pip_vol = self.pipettes[mount]['max_volume']
-        return list(LOOKUP_LABWARE[str(pip_vol)].alternatives)
+        return list(TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].alternatives)
 
     def _load_name_for_mount(self, mount: Mount) -> str:
         pip_vol = self.pipettes[mount]['max_volume']
-        return LOOKUP_LABWARE[str(pip_vol)].load_name
+        return TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
 
     def _build_deck_moves(self) -> Moves:
         return Moves(
@@ -199,7 +196,9 @@ class CalibrationSession:
             instr.update_config_item('pick_up_current', saved_default)
 
     async def _trash_tip(self, mount: Mount):
-        to_loc = self._trash_lw.wells()[0].top()
+        trash_lw = self._deck.get_fixed_trash()
+        assert trash_lw
+        to_loc = trash_lw.wells()[0].top()
         await self._move(mount, to_loc, CriticalPoint.XY_CENTER)
         await self._drop_tip(mount)
 

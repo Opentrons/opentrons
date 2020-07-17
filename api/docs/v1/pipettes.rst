@@ -20,8 +20,6 @@ Pipette Model(s)
 ===================
 Currently in our API there are 10 pipette models to correspond with the offered pipette models on our website.
 
-.. note::
-
 They are as follows:
 
 - ``P10_Single`` (1 - 10 ul)
@@ -81,7 +79,7 @@ The speeds at which the pipette will aspirate and dispense can be set through ``
 
 
 Minimum and Maximum Volume
-==================
+==========================
 
 The minimum and maximum volume of the pipette may be set using
 ``min_volume`` and ``max_volume``. The values are in microliters and have

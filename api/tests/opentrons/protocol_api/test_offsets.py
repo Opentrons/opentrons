@@ -1,11 +1,17 @@
 # pylama:ignore=W0612
 import json
 import os
-import time
 
 import pytest
 import datetime
 from opentrons import config
+from unittest.mock import Mock
+from opentrons.calibration_storage import (
+    modify,
+    get,
+    helpers,
+    delete,
+    encoder_decoder as ed)
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 
@@ -59,7 +65,8 @@ minimalLabwareDef = {
 
 
 def path(calibration_name):
-    return labware.OFFSETS_PATH \
+    return config.get_opentrons_path(
+        'labware_calibration_offsets_dir_v2') \
         / '{}.json'.format(calibration_name)
 
 
@@ -98,7 +105,7 @@ def clear_tlc_calibration(monkeypatch):
         pass
 
 
-def test_save_calibration(monkeypatch, clear_calibration):
+def test_save_labware_calibration(monkeypatch, clear_calibration):
     # Test the save calibration file
     assert not os.path.exists(path(MOCK_HASH))
     calibration_point = None
@@ -112,8 +119,8 @@ def test_save_calibration(monkeypatch, clear_calibration):
         'set_calibration', mock_set_calibration)
 
     monkeypatch.setattr(
-        labware,
-        '_hash_labware_def', mock_hash_labware
+        helpers,
+        'hash_labware_def', mock_hash_labware
     )
 
     test_labware = labware.Labware(minimalLabwareDef,
@@ -128,27 +135,9 @@ def test_json_datetime_encoder():
     fake_time = datetime.datetime.utcnow()
     original = {'mock_hash': {'tipLength': 25.0, 'lastModified': fake_time}}
 
-    encoded = json.dumps(original, cls=labware.DateTimeEncoder)
-    decoded = json.loads(encoded, cls=labware.DateTimeDecoder)
+    encoded = json.dumps(original, cls=ed.DateTimeEncoder)
+    decoded = json.loads(encoded, cls=ed.DateTimeDecoder)
     assert decoded == original
-
-
-def test_save_tip_length(monkeypatch, clear_calibration):
-    assert not os.path.exists(path(MOCK_HASH))
-
-    monkeypatch.setattr(
-        labware,
-        '_hash_labware_def', mock_hash_labware
-    )
-
-    test_labware = labware.Labware(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck'))
-    calibrated_length = 22.0
-    labware.save_tip_length(test_labware, calibrated_length)
-    assert os.path.exists(path(MOCK_HASH))
-    with open(path(MOCK_HASH)) as calibration_file:
-        data = json.load(calibration_file)
-        assert data['tipLength']['length'] == calibrated_length
 
 
 def test_create_tip_length_calibration_data(monkeypatch):
@@ -163,19 +152,19 @@ def test_create_tip_length_calibration_data(monkeypatch):
     monkeypatch.setattr(datetime, 'datetime', fake_datetime)
 
     monkeypatch.setattr(
-        labware,
-        '_hash_labware_def', mock_hash_labware)
+        helpers,
+        'hash_labware_def', mock_hash_labware)
 
-    test_labware = labware.Labware(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck'))
     tip_length = 22.0
+    parent = ''
     expected_data = {
         MOCK_HASH: {
             'tipLength': tip_length,
             'lastModified': fake_time
         }
     }
-    result = labware.create_tip_length_data(test_labware, tip_length)
+    result = modify.create_tip_length_data(
+        minimalLabwareDef, parent, tip_length)
     assert result == expected_data
 
 
@@ -188,7 +177,7 @@ def test_save_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
             'lastModified': 1
         }
     }
-    labware.save_tip_length_calibration(PIPETTE_ID, test_data)
+    modify.save_tip_length_calibration(PIPETTE_ID, test_data)
     assert os.path.exists(tlc_path(PIPETTE_ID))
     # test an index file is also created
     assert os.path.exists(tlc_path('index'))
@@ -201,13 +190,13 @@ def test_add_index_file(monkeypatch, clear_tlc_calibration):
             result = json.load(f)
         return result
 
-    labware._append_to_index_tip_length_file('pip_1', 'lw_1')
+    modify._append_to_index_tip_length_file('pip_1', 'lw_1')
     assert get_result() == {'lw_1': ['pip_1']}
 
-    labware._append_to_index_tip_length_file('pip_2', 'lw_1')
+    modify._append_to_index_tip_length_file('pip_2', 'lw_1')
     assert get_result() == {'lw_1': ['pip_1', 'pip_2']}
 
-    labware._append_to_index_tip_length_file('pip_2', 'lw_2')
+    modify._append_to_index_tip_length_file('pip_2', 'lw_2')
     assert get_result() == {'lw_1': ['pip_1', 'pip_2'], 'lw_2': ['pip_2']}
 
 
@@ -215,15 +204,16 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
     assert not os.path.exists(tlc_path(PIPETTE_ID))
 
     monkeypatch.setattr(
-        labware,
-        '_hash_labware_def', mock_hash_labware)
+        helpers,
+        'hash_labware_def', mock_hash_labware)
 
-    test_labware = labware.Labware(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck'))
     tip_length = 22.0
-    test_data = labware.create_tip_length_data(test_labware, tip_length)
-    labware.save_tip_length_calibration(PIPETTE_ID, test_data)
-    result = labware.load_tip_length_calibration(PIPETTE_ID, test_labware)
+    parent = ''
+    test_data = modify.create_tip_length_data(
+        minimalLabwareDef, parent, tip_length)
+    modify.save_tip_length_calibration(PIPETTE_ID, test_data)
+    result = get.load_tip_length_calibration(
+        PIPETTE_ID, minimalLabwareDef, parent)
 
     assert result == test_data[MOCK_HASH]
 
@@ -240,64 +230,77 @@ def test_clear_tip_length_calibration_data(monkeypatch):
         json.dump(test_offset, offset_file)
 
     assert len(os.listdir(calpath)) > 0
-    labware.clear_tip_length_calibration()
+    delete.clear_tip_length_calibration()
     assert len(os.listdir(calpath)) == 0
 
 
 def test_schema_shape(monkeypatch, clear_calibration):
-    def fake_time():
-        return 1
-    monkeypatch.setattr(time, 'time', fake_time)
+    fake_time = datetime.datetime.utcnow()
+    time_string = fake_time.isoformat()
+    from_iso = datetime.datetime.fromisoformat(time_string)
+
+    class fake_datetime:
+        @classmethod
+        def fromisoformat(cls, obj):
+            return from_iso
+
+        @classmethod
+        def utcnow(cls):
+            return fake_time
+
+        @classmethod
+        def isoformat(cls):
+            return time_string
+
+    mock = Mock(spec=fake_datetime)
+    mock.__class__ = datetime.datetime
 
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
 
     monkeypatch.setattr(
-       labware,
-       '_hash_labware_def', mock_hash_labware
+       helpers,
+       'hash_labware_def', mock_hash_labware
+    )
+
+    expected = {"default": {"offset": [1, 1, 1], "lastModified": fake_time}}
+
+    def fake_helper_data(path, delta):
+        return expected
+
+    monkeypatch.setattr(
+        modify,
+        '_helper_offset_data_format',
+        fake_helper_data
     )
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
-    expected = {"default": {"offset": [1, 1, 1], "lastModified": 1}}
     with open(path(MOCK_HASH)) as f:
-        result = json.load(f)
+        result = json.load(f, cls=ed.DateTimeDecoder)
     assert result == expected
 
 
 def test_load_calibration(monkeypatch, clear_calibration):
 
-    calibration_point = None
-
-    def mock_set_calibration(self, delta):
-        nonlocal calibration_point
-        calibration_point = delta
-
     monkeypatch.setattr(
-        labware.Labware,
-        'set_calibration', mock_set_calibration)
-
-    monkeypatch.setattr(
-        labware,
-        '_hash_labware_def', mock_hash_labware
+        helpers,
+        'hash_labware_def', mock_hash_labware
     )
 
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
 
     test_offset = Point(1, 1, 1)
-    test_tip_length = 31.7
 
     labware.save_calibration(test_labware, test_offset)
-    labware.save_tip_length(test_labware, test_tip_length)
 
     # Set without saving to show that load will update with previously saved
     # data
     test_labware.set_calibration(Point(0, 0, 0))
     test_labware.tip_length = 46.8
-
-    labware.load_calibration(test_labware)
+    lookup_path = labware._get_labware_path(test_labware)
+    calibration_point = get.get_labware_calibration(lookup_path)
     assert calibration_point == test_offset
-    assert test_labware.tip_length == test_tip_length
 
 
 def test_wells_rebuilt_with_offset():
@@ -314,7 +317,7 @@ def test_wells_rebuilt_with_offset():
 
 
 def test_clear_calibrations():
-    calpath = labware.OFFSETS_PATH
+    calpath = config.get_opentrons_path('labware_calibration_offsets_dir_v2')
     with open(calpath/'1.json', 'w') as offset_file:
         test_offset = {
             "default": {
@@ -326,24 +329,24 @@ def test_clear_calibrations():
         json.dump(test_offset, offset_file)
 
     assert len(os.listdir(calpath)) > 0
-    labware.clear_calibrations()
+    delete.clear_calibrations()
     assert len(os.listdir(calpath)) == 0
 
 
-def test_hash_labware_def():
+def testhash_labware_def():
     def1a = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
     def1aa = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
     def1b = {"metadata": {"a": "blah"}, "importantStuff": [1.1, 0.00003, 1/3]}
     def2 = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.000033, 1/3]}
 
     # identity preserved across json serialization+deserialization
-    assert labware._hash_labware_def(def1a) == \
-        labware._hash_labware_def(
+    assert helpers.hash_labware_def(def1a) == \
+        helpers.hash_labware_def(
             json.loads(json.dumps(def1a, separators=(',', ':'))))
     # 2 instances of same def should match
-    assert labware._hash_labware_def(def1a) == \
-        labware._hash_labware_def(def1aa)
+    assert helpers.hash_labware_def(def1a) == \
+        helpers.hash_labware_def(def1aa)
     # metadata ignored
-    assert labware._hash_labware_def(def1a) == labware._hash_labware_def(def1b)
+    assert helpers.hash_labware_def(def1a) == helpers.hash_labware_def(def1b)
     # different data should not match
-    assert labware._hash_labware_def(def1a) != labware._hash_labware_def(def2)
+    assert helpers.hash_labware_def(def1a) != helpers.hash_labware_def(def2)

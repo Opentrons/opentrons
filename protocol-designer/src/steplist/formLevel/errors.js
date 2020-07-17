@@ -108,6 +108,14 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
     title: 'Temperature is required',
     dependentFields: ['thermocyclerFormType', 'profileTargetLidTemp'],
   },
+  LID_TEMPERATURE_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['lidIsActive', 'lidTargetTemp'],
+  },
+  BLOCK_TEMPERATURE_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['blockIsActive', 'blockTargetTemp'],
+  },
   BLOCK_TEMPERATURE_HOLD_REQUIRED: {
     title: 'Temperature is required',
     dependentFields: ['blockIsActiveHold', 'blockTargetTempHold'],

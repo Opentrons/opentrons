@@ -1,8 +1,16 @@
 from typing import Dict, Awaitable, Callable, Any
-from opentrons.types import Mount, Point
-from opentrons.hardware_control import ThreadManager
+from opentrons.types import Mount, Point, Location
+from opentrons.config import feature_flags as ff
+from opentrons.hardware_control import ThreadManager, CriticalPoint
+from opentrons.hardware_control.util import plan_arc
+from opentrons.protocol_api import geometry, labware
 from robot_server.service.session.models import CalibrationCommand, \
     TipLengthCalibrationCommand
+from robot_server.robot.calibration.constants import (
+    TIP_RACK_LOOKUP_BY_MAX_VOL,
+    SHORT_TRASH_DECK,
+    STANDARD_DECK
+)
 from robot_server.robot.calibration.tip_length.state_machine import (
     TipCalibrationStateMachine
 )
@@ -11,6 +19,9 @@ from robot_server.robot.calibration.tip_length.util import (
 )
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState as State,
+    TIP_RACK_SLOT,
+    CAL_BLOCK_SETUP_BY_MOUNT,
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER
 )
 
 
@@ -32,15 +43,22 @@ class TipCalibrationUserFlow():
                  mount: Mount = Mount.LEFT,
                  has_calibration_block=True):
         # TODO: require mount and has_calibration_block params
-        self._has_calibration_block = has_calibration_block
         self._hardware = hardware
-        self._current_state = State.sessionStarted
-        self._state_machine = TipCalibrationStateMachine()
         self._mount = mount
-        self._hw_pipette = self._hardware.attached_instruments[mount]
+        self._has_calibration_block = has_calibration_block
+        self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
             raise Error(f'No pipette found on {mount} mount,'
                         'cannot run tip length calibration')
+        self._tip_origin_loc = None
+
+        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
+            else STANDARD_DECK
+        self._deck = geometry.Deck(load_name=deck_load_name)
+        self._initialize_deck()
+
+        self._current_state = State.sessionStarted
+        self._state_machine = TipCalibrationStateMachine()
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
@@ -49,6 +67,7 @@ class TipCalibrationUserFlow():
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CalibrationCommand.save_offset: self.save_offset,
             TipLengthCalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
+            TipLengthCalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
         }
 
@@ -73,10 +92,13 @@ class TipCalibrationUserFlow():
         self._set_current_state(next_state)
 
     async def load_labware(self, *args):
-        # TODO: load tip rack onto deck
         pass
 
-    # TODO: make generic to move to tip in rack command?
+    async def move_to_tip_rack(self, *args):
+        point = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
+                MOVE_TO_TIP_RACK_SAFETY_BUFFER
+        to_loc = Location(point, None)
+        await self._move(to_loc)
 
     async def move_to_reference_point(self, *args):
         # TODO: move nozzle/tip to reference location (block || trash edge)
@@ -95,33 +117,70 @@ class TipCalibrationUserFlow():
             # reduce pick up current for multichannel pipette picking up 1 tip
             saved_default = self._hw_pipette.config.pick_up_current
             self._hw_pipette.update_config_item('pick_up_current', 0.1)
-        tip_length = self._hw_pipette.config.tip_length
 
-        # TODO: get proper tip length from loaded tip rack
-        # # Note: ABC DeckItem cannot have tiplength b/c of
-        # # mod geometry contexts. Ignore type checking error here.
-        # tiprack = self._deck[lw_info.slot]
-        # full_length = tiprack.tip_length  # type: ignore
-        # overlap_dict: Dict =\
-        #     self.pipettes[mount]['tip_overlap']  # type: ignore
-        # default = overlap_dict['default']
-        # overlap = overlap_dict.get(
-        #                         tiprack.uri,  # type: ignore
-        #                         default)
-        # tip_length = full_length - overlap
-        # Do we need a fallback tip length here anymore?
-        # tip_length = self.pipettes[mount]['fallback_tip_length']
+        tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]
+        full_length = tiprack.tip_length
+        overlap_dict: Dict = \
+            self._hw_pipette.config.tip_overlap
+        default = overlap_dict['default']
+        overlap = overlap_dict.get(tiprack.uri, default)
+        tip_length = full_length - overlap
+
+        cur_pt = await self._hardware.gantry_position(self._mount)
+        self._tip_origin_loc = Location(cur_pt, None)
 
         await self._hardware.pick_up_tip(self._mount, tip_length)
+
         if saved_default:
             self._hw_pipette.update_config_item('pick_up_current',
                                                 saved_default)
-        # TODO: save current location locally for returning tip later
 
     async def invalidate_tip(self, *args):
-        # TODO: move back to pick up tip start location
-        await self._hardware.drop_tip(self._mount)
+        await self._return_tip()
+        await self.move_to_tip_rack()
 
     async def exit_session(self, *args):
-        # TODO: move to saved (jogged to) pick up tip location, return tip
-        pass
+        await self._return_tip()
+
+    def _get_tip_rack_lw(self) -> labware.Labware:
+        pip_vol = self._hw_pipette.config.max_volume
+        tr_lookup = TIP_RACK_LOOKUP_BY_MAX_VOL.get(str(pip_vol), None)
+        if tr_lookup:
+            return labware.load(tr_lookup.load_name,
+                                self._deck.position_for(TIP_RACK_SLOT))
+        else:
+            raise Error(
+                    f'No tiprack found for pipette {self._hw_pipette.model}')
+
+    def _initialize_deck(self):
+        tip_rack_lw = self._get_tip_rack_lw()
+        self._deck[TIP_RACK_SLOT] = tip_rack_lw
+
+        cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
+
+        self._deck[cb_setup['slot']] = labware.load(
+            cb_setup['load_name'],
+            self._deck.position_for(cb_setup['slot']))
+
+    async def _return_tip(self):
+        if self._tip_origin_loc and self.hw_pipette.has_tip:
+            await self._move(self._tip_origin_loc)
+            await self._hardware.drop_tip(self._mount)
+            self._tip_origin_loc = None
+
+    async def _move(self, to_loc: Location):
+        from_pt = await self._hardware.gantry_position(self._mount)
+        from_loc = Location(from_pt, None)
+        cp = (CriticalPoint.FRONT_NOZZLE if
+              self._hw_pipette.config.channels == 8 else
+              self._hw_pipette.critical_point)
+        max_height = self._hardware.get_instrument_max_height(self._mount)
+
+        safe = geometry.safe_height(
+            from_loc, to_loc, self._deck, max_height)
+        moves = plan_arc(from_pt, to_loc.point, safe,
+                         origin_cp=None,
+                         dest_cp=cp)
+        for move in moves:
+            await self._hardware.move_to(
+                self._mount, move[0], critical_point=move[1])

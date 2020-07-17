@@ -2,7 +2,7 @@ import 'cypress-file-upload'
 
 // Common Variables and Selectors
 const protocolTitle = 'Custom Tip Rack Test Protocol'
-const pipette = 'P300'
+const pipette = '[data-test="PipetteNameItem_p300SingleChannelGen2"]'
 const customTipRackTitle = 'Custom 200µL Tiprack'
 const customTipRackTitleWithotMicro = 'Custom 200uL Tiprack'
 // Deck Map Slots

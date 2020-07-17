@@ -55,7 +55,7 @@ export function Introduction(props: IntroductionProps): React.Node {
       <div className={styles.required_tipracks_wrapper}>
         {labwareLoadNames.map(loadName => (
           <div key={loadName} className={styles.required_tiprack}>
-            <div key={loadName} className={styles.tiprack_image_container}>
+            <div className={styles.tiprack_image_container}>
               <img
                 className={styles.tiprack_image}
                 src={tiprackImages[loadName]}

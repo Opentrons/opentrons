@@ -39,7 +39,6 @@ type SP = {|
   _customLabware: LabwareDefByDefURI,
   _hasUnsavedChanges: ?boolean,
   hideModal: $PropertyType<Props, 'hideModal'>,
-  thermocyclerEnabled: ?boolean,
   moduleRestrictionsDisabled: ?boolean,
 |}
 
@@ -72,7 +71,6 @@ function mapStateToProps(state: BaseState): SP {
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
     _customLabware: labwareDefSelectors.getCustomLabwareDefsByURI(state),
     hideModal: !selectors.getNewProtocolModal(state),
-    thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
     moduleRestrictionsDisabled: featureFlagSelectors.getDisableModuleRestrictions(
       state
     ),
@@ -145,7 +143,6 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
 function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   return {
     ...ownProps,
-    thermocyclerEnabled: stateProps.thermocyclerEnabled,
     moduleRestrictionsDisabled: stateProps.moduleRestrictionsDisabled,
     showModulesFields: true,
     hideModal: stateProps.hideModal,

@@ -1,22 +1,12 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
-import {
-  OutlineButton,
-  RobotWorkSpace,
-  LabwareRender,
-  LabwareNameOverlay,
-  RobotCoordsForeignDiv,
-} from '@opentrons/components'
-import {
-  type LabwareDefinition2,
-  type DeckSlot,
-  getLabwareDisplayName,
-} from '@opentrons/shared-data'
+import { OutlineButton, RobotWorkSpace } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { getLatestLabwareDef } from '../../getLabware'
 import type { CalibrateTipLengthChildProps } from './types'
+import { CalibrationLabwareRender } from './calibrationLabwareRender'
 import styles from './styles.css'
 
 const DECK_SETUP_WITH_BLOCK_PROMPT =
@@ -28,9 +18,13 @@ const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
-  // TODO: get real has_block value and labware from tip length calibration session
-  const has_block = true
-  const labware = {}
+  // TODO: get real hasBlock value and labware from tip length calibration session
+  const { hasBlock, session, mount } = props
+  // const tiprackID = session.details.instruments[mount.toLowerCase()]['tiprack_id']
+  // const labware = [session.details.labware.find(l => l.id === tiprackID)]
+  const labware = session.details.labware.filter(l => {
+    return l.forMounts.includes(mount.toLowerCase())
+  })
 
   const proceed = () => {
     console.log('TODO: wire up command')
@@ -40,7 +34,7 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   return (
     <>
       <div className={styles.prompt}>
-        {has_block ? (
+        {hasBlock ? (
           <p className={styles.prompt_text}>{DECK_SETUP_WITH_BLOCK_PROMPT}</p>
         ) : (
           <p className={styles.prompt_text}>{DECK_SETUP_NO_BLOCK_PROMPT}</p>
@@ -76,10 +70,8 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
                 const labwareForSlot = labware.find(l => l.slot === slotId)
                 const labwareDef = getLatestLabwareDef(labwareForSlot?.loadName)
 
-                // TODO: also render calibration block if present
-
                 return labwareDef ? (
-                  <TiprackRender
+                  <CalibrationLabwareRender
                     key={slotId}
                     slotDef={slot}
                     labwareDef={labwareDef}
@@ -91,30 +83,5 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
         </RobotWorkSpace>
       </div>
     </>
-  )
-}
-
-type TiprackRenderProps = {|
-  labwareDef: LabwareDefinition2,
-  slotDef: DeckSlot,
-|}
-export function TiprackRender(props: TiprackRenderProps): React.Node {
-  const { labwareDef, slotDef } = props
-  const title = getLabwareDisplayName(labwareDef)
-  return (
-    <g transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}>
-      <LabwareRender definition={labwareDef} />
-      <RobotCoordsForeignDiv
-        width={labwareDef.dimensions.xDimension}
-        height={labwareDef.dimensions.yDimension}
-        x={0}
-        y={0 - labwareDef.dimensions.yDimension}
-        transformWithSVG
-        innerDivProps={{ className: styles.labware_ui_wrapper }}
-      >
-        {/* title is capitalized by CSS, and "µL" capitalized is "ML" */}
-        <LabwareNameOverlay title={title.replace('µL', 'uL')} />
-      </RobotCoordsForeignDiv>
-    </g>
   )
 }

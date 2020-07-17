@@ -41,7 +41,7 @@ export const mockSessionCommand: Types.SessionCommandAttributes = {
 }
 
 export const mockSessionCommandAttributes: Types.SessionCommandAttributes = {
-  command: 'calibration.preparePipette',
+  command: 'calibration.check.preparePipette',
   status: 'accepted',
   data: {},
 }

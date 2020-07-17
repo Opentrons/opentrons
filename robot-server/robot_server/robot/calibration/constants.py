@@ -26,7 +26,7 @@ class LabwareLookUp:
     alternatives: Set[str]
 
 
-LOOKUP_LABWARE: Dict[str, LabwareLookUp] = {
+TIP_RACK_LOOKUP_BY_MAX_VOL: Dict[str, LabwareLookUp] = {
     '10': LabwareLookUp(
         load_name=TIPRACK_10,
         alternatives={
@@ -55,3 +55,6 @@ LOOKUP_LABWARE: Dict[str, LabwareLookUp] = {
               TIPRACK_1000,
               FILTERTIPRACK_1000})
 }
+
+SHORT_TRASH_DECK = 'ot2_short_trash'
+STANDARD_DECK = 'ot2_standard'

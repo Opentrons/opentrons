@@ -96,7 +96,6 @@ class RobotCommand(CommandDefinition):
 class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
     load_labware = "loadLabware"
-    prepare_pipette = "preparePipette"
     jog = ("jog", JogPosition)
     pick_up_tip = "pickUpTip"
     confirm_tip_attached = "confirmTip"
@@ -111,6 +110,7 @@ class CalibrationCommand(CommandDefinition):
 
 class CalibrationCheckCommand(CommandDefinition):
     """Cal Check Specific"""
+    prepare_pipette = "preparePipette"
     compare_point = "comparePoint"
     go_to_next_check = "goToNextCheck"
     # TODO: remove unused command name and trigger
@@ -124,6 +124,7 @@ class CalibrationCheckCommand(CommandDefinition):
 class TipLengthCalibrationCommand(CommandDefinition):
     """Tip Length Calibration Specific"""
     move_to_reference_point = "moveToReferencePoint"
+    move_to_tip_rack = "moveToTipRack"
 
     @staticmethod
     def namespace():
