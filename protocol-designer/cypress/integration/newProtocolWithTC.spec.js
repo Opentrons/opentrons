@@ -10,6 +10,7 @@ const tipRackWithoutUnit = 'Opentrons 96 Tip Rack 300'
 const sidePanel = '[class*="SidePanel__panel_contents"]'
 const deckMap = '[class*="DeckSetup"]'
 const designPageModal = '#main-page-modal-portal-root'
+const thermocyclerFormOption = '[class*="StepEditForm__tc_step_option"]'
 const thermocyclerToggleGroups = '[class*="toggle_form_group"]'
 const temperatureFieldInput = '[class*="toggle_temperature_field"] input'
 const thermocyclerWellBlock = 'TC Well'
@@ -180,6 +181,11 @@ describe('Protocols with Modules', () => {
           .contains('thermocycler')
           .should('exist')
         // Verify acceptable block temperature range
+        cy.get(thermocyclerFormOption)
+          .first()
+          .within(() => {
+            cy.get('input[type="radio"]').check({ force: true })
+          })
         cy.get(thermocyclerToggleGroups + ':first-child').within(() => {
           cy.get('input[type="checkbox"]').click({ force: true })
           cy.get(temperatureFieldInput)
@@ -232,19 +238,37 @@ describe('Protocols with Modules', () => {
         cy.contains('deactivated').should('exist')
       })
 
-      // Add another Thermocycler State Step
-      cy.addStep('thermocycler')
+      // Verify thermocycler block settings
+      cy.get('[data-test="StepItem_1"]')
+        .children()
+        .first()
+        .click()
       cy.get(designPageModal).within(() => {
-        // Verify thermocycler block settings
+        cy.get(thermocyclerFormOption)
+          .first()
+          .within(() => {
+            cy.get('input[type="radio"]').check({ force: true })
+          })
         cy.get(thermocyclerToggleGroups + ':first-child').within(() => {
           cy.get('input[type="checkbox"][checked]').should('exist')
           cy.get(temperatureFieldInput + '[value="50"]').should('exist')
         })
+
         // Verify acceptable lid temperature range
         cy.get(thermocyclerToggleGroups + ':nth-child(2)').within(() => {
           cy.get('input[type="checkbox"][checked]').should('exist')
           cy.get(temperatureFieldInput + '[value="50"]').should('exist')
         })
+      })
+
+      // Add another Thermocycler State Step
+      cy.addStep('thermocycler')
+      cy.get(designPageModal).within(() => {
+        cy.get(thermocyclerFormOption)
+          .first()
+          .within(() => {
+            cy.get('input[type="radio"]').check({ force: true })
+          })
         // Close Lid
         cy.get(thermocyclerToggleGroups + ':last-child').within(() => {
           cy.get('input[type="checkbox"]').click({ force: true })
