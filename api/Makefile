@@ -16,7 +16,7 @@ SHX := npx shx
 firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
-sphinx_build := $(pipenv) pipenv sphinx-build
+sphinx_build := $(pipenv) run sphinx-build
 
 
 # Find the version of the wheel from package.json using a helper script. We
