@@ -475,7 +475,9 @@ class InstrumentContext(CommandPublisher):
                     # back edge
                     where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
                     # front edge
-                    where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
+                    where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt,
+                    # center
+                    where._from_center_cartesian(x=0, y=0, z=1) + offset_pt
                 ]
 
         checked_speed = clamp_value(speed, 80, 1, 'touch_tip:')
