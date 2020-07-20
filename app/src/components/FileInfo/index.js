@@ -1,15 +1,5 @@
 // @flow
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import {
-  getLabwareDisplayName,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
-
-import filter from 'lodash/filter'
-import countBy from 'lodash/countBy'
-import keyBy from 'lodash/keyBy'
-import forEach from 'lodash/forEach'
 
 // TODO(mc, 2018-09-13): these aren't cards; rename
 import { InformationCard } from './InformationCard'
@@ -19,11 +9,6 @@ import { ProtocolLabwareCard } from './ProtocolLabwareCard'
 import { Continue } from './Continue'
 import { UploadError } from '../UploadError'
 import styles from './styles.css'
-
-import { selectors as robotSelectors } from '../../robot'
-import { labware as labwareFunctions } from '../../calibration'
-
-import type { State, Dispatch } from '../../types'
 
 import type { Robot } from '../../discovery/types'
 
@@ -37,69 +22,20 @@ export type FileInfoProps = {|
 |}
 
 export function FileInfo(props: FileInfoProps): React.Node {
-  const dispatch = useDispatch<Dispatch>()
   const { robot, sessionLoaded, sessionHasSteps } = props
-  const { name: robotName } = robot
-  React.useEffect(() => {
-    dispatch(labwareFunctions.fetchAllLabwareCalibrations(robotName))
-  }, [dispatch, robotName])
-  let uploadError = props.uploadError
 
-  const labware = useSelector((state: State) =>
-    robotSelectors.getLabware(state)
-  )
-  const modulesBySlot = useSelector((state: State) =>
-    robotSelectors.getModulesBySlot(state)
-  )
-  console.log(modulesBySlot)
-  const labwareCalibrations = useSelector((state: State) =>
-    labwareFunctions.getListOfLabwareCalibrations(state, robotName)
-  )
+  let uploadError = props.uploadError
 
   if (sessionLoaded && !uploadError && !sessionHasSteps) {
     uploadError = { message: NO_STEPS_MESSAGE }
   }
-
-  const labwareCount = countBy(labware, 'type')
-
-  const calibrations = filter(labwareCalibrations, function(l) {
-    return Object.keys(labwareCount).includes(l?.attributes.loadName)
-  })
-
-  const calibrationLoadNamesMap = keyBy(calibrations, function(labwareObject) {
-    const loadName = labwareObject?.attributes.loadName ?? ''
-    const parent = labwareObject?.attributes.parent ?? ''
-    return loadName + parent
-  })
-
-  const labwareDisplayNames = {}
-  forEach(labware, function(lw) {
-    const moduleName = modulesBySlot[lw.slot]?.model ?? ''
-    const keyValue = lw.type + moduleName
-    const existing = labwareDisplayNames[keyValue]
-    const parentName = (moduleName && getModuleDisplayName(moduleName)) || ''
-    if (!existing) {
-      const displayName = lw.definition && getLabwareDisplayName(lw.definition)
-      return (labwareDisplayNames[keyValue] = {
-        display: displayName,
-        count: 1,
-        parent: parentName,
-      })
-    } else {
-      existing.count += 1
-      return existing
-    }
-  })
 
   return (
     <div className={styles.file_info_container}>
       <InformationCard />
       <ProtocolPipettesCard robotName={robot.name} />
       <ProtocolModulesCard robot={robot} />
-      <ProtocolLabwareCard
-        labware={labwareDisplayNames}
-        labwareCalibrations={calibrationLoadNamesMap}
-      />
+      <ProtocolLabwareCard robotName={robot.name} />
       {uploadError && <UploadError uploadError={uploadError} />}
       {sessionLoaded && !uploadError && <Continue />}
     </div>

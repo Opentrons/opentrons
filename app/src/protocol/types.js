@@ -50,3 +50,12 @@ export type ProtocolState = $ReadOnly<{|
   contents: string | null,
   data: ProtocolData | null,
 |}>
+
+// selector types
+
+export type LabwareWithCalibration = {|
+  parent: string,
+  quantity: number,
+  display: string,
+  calibration: {| x: number, y: number, z: number |} | null,
+|}

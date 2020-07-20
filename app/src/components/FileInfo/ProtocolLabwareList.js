@@ -8,21 +8,25 @@ import {
   useHoverTooltip,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_REGULAR,
+  FONT_WEIGHT_SEMIBOLD,
   C_DARK_GRAY,
   TOOLTIP_TOP,
-  SIZE_2,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
+  SIZE_1,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 
 export type LoadNameMapProps = {|
   parent: string,
-  quantity: string,
+  quantity: number,
   display: string,
-  calibration: React.Node,
+  calibration: {| x: string, y: string, z: string |} | null,
 |}
 
 export type ProtocolLabwareListProps = {|
-  loadNameMap: { [key: string]: LoadNameMapProps },
+  loadNameMap: Array<LoadNameMapProps>,
 |}
 
 export function ProtocolLabwareList({
@@ -35,6 +39,7 @@ export function ProtocolLabwareList({
   const LABWARE_TYPE = 'Type'
   const LABWARE_QUANTITY = 'Quantity'
   const CALIBRATION_DATA = 'Calibration Data'
+  const NOT_CALIBRATED = 'Not yet calibrated'
 
   return (
     <Flex
@@ -45,7 +50,9 @@ export function ProtocolLabwareList({
       <table
         css={css`
           border-collapse: separate;
-          border-spacing: ${SIZE_2} 0;
+          border-spacing: ${SIZE_1} ${SIZE_1};
+          width: 100%;
+          text-align: left;
         `}
       >
         <tbody>
@@ -59,23 +66,39 @@ export function ProtocolLabwareList({
               </div>
             </th>
           </tr>
-          {Object.keys(loadNameMap).map(type => {
-            const loadNameObject = loadNameMap[type]
+          {loadNameMap.map((labwareObj, index) => {
             return (
-              <tr key={type}>
+              <tr key={index}>
                 <td>
                   <div>
-                    <Text>{loadNameObject.parent}</Text>
-                    <Text>{loadNameObject.display}</Text>
+                    <Text>{labwareObj.parent}</Text>
+                    <Text>{labwareObj.display}</Text>
                   </div>
                 </td>
-                <td>{loadNameObject.quantity}</td>
+                <td>{`x${labwareObj.quantity}`}</td>
                 <td
                   css={css`
                     border-spacing: 0;
                   `}
                 >
-                  {loadNameObject.calibration}
+                  {labwareObj.calibration ? (
+                    <Flex
+                      flexDirection={DIRECTION_ROW}
+                      justifyContent={JUSTIFY_SPACE_BETWEEN}
+                      key={index}
+                    >
+                      <div style={{ fontWeight: FONT_WEIGHT_SEMIBOLD }}>X</div>
+                      <div>{labwareObj.calibration.x}</div>
+                      <div style={{ fontWeight: FONT_WEIGHT_SEMIBOLD }}>Y</div>
+                      <div>{labwareObj.calibration.y}</div>
+                      <div style={{ fontWeight: FONT_WEIGHT_SEMIBOLD }}>Z</div>
+                      <div>{labwareObj.calibration.z}</div>
+                    </Flex>
+                  ) : (
+                    <Flex align={ALIGN_CENTER} key={index}>
+                      {NOT_CALIBRATED}
+                    </Flex>
+                  )}
                 </td>
               </tr>
             )
