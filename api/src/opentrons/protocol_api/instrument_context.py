@@ -452,13 +452,16 @@ class InstrumentContext(CommandPublisher):
 
         def _build_edges(where: Well, offset: float) -> List[types.Point]:
             # Determine the touch_tip edges/points
-            if 'reservoir' in location._parent.parameters['loadName'] and 'multi' in self.hw_pipette['name']:
+            if 'reservoir' in location._parent.parameters['loadName'] \
+            and 'multi' in self.hw_pipette['name']:
                 offset_pt = types.Point(0, 31.5, offset)
                 return [
                     # right edge
                     where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
                     # left edge
                     where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
+                    #center
+                    where._from_center_cartesian(x=0, y=0, z=1) + offset_pt
                 ]
             else:
                 offset_pt = types.Point(0, 0, offset)
@@ -467,6 +470,8 @@ class InstrumentContext(CommandPublisher):
                     where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
                     # left edge
                     where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
+                    # center
+                    where._from_center_cartesian(x=0, y=0, z=1) + offset_pt,
                     # back edge
                     where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
                     # front edge
@@ -487,7 +492,10 @@ class InstrumentContext(CommandPublisher):
             if location.parent.is_tiprack:
                 self._log.warning('Touch_tip being performed on a tiprack. '
                                   'Please re-check your code')
-            self.move_to(location.top())
+            move_with_z_offset =\
+                location.top().point + types.Point(0, 0, v_offset)
+            to_loc = types.Location(move_with_z_offset, location)
+            self.move_to(to_loc)
         else:
             raise TypeError(
                 'location should be a Well, but it is {}'.format(location))
