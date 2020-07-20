@@ -37,6 +37,85 @@ Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext
 
     When you load a pipette in a protocol, you inform the OT-2 that you want the specified pipette to be present. Even if you do not use the pipette anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all pipettes loaded with ``load_instrument`` are attached to the OT-2.
 
+.. _new-multichannel-pipettes:
+Multi-Channel Pipettes
+======================
+
+All atomic commands work with both single-channel (like ``'p20_single_gen2'``)
+and multi-channel (like ``'p20_multi_gen2'``) pipettes. To keep the interface
+to the Opentrons API consistent between single and multi-channel
+pipettes, commands treat the *backmost channel* of a multi-channel pipette as
+the location of the pipette. Location arguments to building block and advanced
+commands are specified for the backmost channel. This also means that offset
+changes (such as :py:meth:`Well.top` or :py:meth:`Well.bottom`) can be applied
+to the single specified well.
+
+For instance, to aspirate from the first column of a 96-well plate you would write:
+
+.. code-block:: python
+
+    from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.5'}
+
+    def run(protocol: protocol_api.ProtocolContext):
+        # Load a tiprack for 300uL tips
+        tiprack1 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+        # Load a wellplate
+        plate = protocol.load_labware('corning_96_wellplate_360ul_flat')
+
+        # Load a P300 Multi GEN2 on the right mount
+        right = protocol.load_instrument(
+            'p300_multi_gen2', 'right', tip_rack=tiprack1)
+
+        # Specify well A1 for pick_up_tip. The backmost channel of the
+        # pipette moves to A1, which means the rest of the wells are above the
+        # rest of the wells in column 1.
+        right.pick_up_tip(tiprack1['A1'])
+
+        # Similarly, specifying well A2 for aspirate means the pipette will
+        # position its backmost channel over well A2, and the rest of the
+        # pipette channels are over the rest of the wells of column 1
+        right.aspirate(300, plate['A2'])
+
+        # Dispense into column 3 of the plate with all 8 channels of the
+        # pipette at the top of their respective wells
+        right.dispense(300, plate['A3'].top())
+
+In general, you should specify wells in the first row of a labware when you are
+using multi-channel pipettes. One common exception to this rule is when using
+384-well plates. The space between the wells in a 384-well plate and the space
+between the nozzles of a multi-channel pipette means that a multi-channel
+pipette accesses every other well in a column. Specifying well A1 acesses odd
+rows; specifying well A2 accesses even rows:
+
+.. code-block:: python
+
+    from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.5'}
+
+    def run(protocol: protocol_api.ProtocolContext):
+        # Load a tiprack for 300uL tips
+        tiprack1 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+        # Load a wellplate
+        plate = protocol.load_labware('corning_384_wellplate_112ul_flat')
+
+        # Load a P300 Multi GEN2 on the right mount
+        right = protocol.load_instrument(
+            'p300_multi_gen2', 'right', tip_rack=tiprack1)
+
+        # pick up a tip in preparation for aspiration
+        right.pick_up_tip()
+
+        # Aspirate from wells A1, A3, A5, A7, A9, A11, A13, and A15
+        right.aspirate(300, plate['A1'])
+        # Dispense in wells A2, A4, A6, A8, A10, A12, A14, A16
+        right.dispense(300, plate['A2'])
+
+
+This pattern of access applies to both building block commands and advanced
+commands.
 
 .. _new-pipette-models:
 
