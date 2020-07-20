@@ -20,6 +20,7 @@ export type Capability =
 
 export type CapabilityMap = {
   [capabilityName: Capability]: ?string,
+  ...,
 }
 
 export type ServerHealthResponse = {
@@ -40,6 +41,7 @@ export type HealthErrorResponse = {|
 export type Candidate = {
   ip: string,
   port: number,
+  ...
 }
 
 export type Service = {
@@ -50,14 +52,15 @@ export type Service = {
   local: ?boolean,
   // GET /health response.ok === true
   ok: ?boolean,
-  // GET /server/health response.ok === true
+  // GET /server/update/health response.ok === true
   serverOk: ?boolean,
   // is advertising on MDNS
   advertising: ?boolean,
   // last good /health response
   health: ?HealthResponse,
-  // last good /server/health response
+  // last good /server/update/health response
   serverHealth: ?ServerHealthResponse,
+  ...
 }
 
 export type ServiceUpdate = $Shape<Service>
@@ -86,10 +89,62 @@ export type HealthPollerResult = $ReadOnly<{|
   port: number,
   /** GET /health data if server responded with 2xx */
   health: HealthResponse | null,
-  /** GET /server/health data if server responded with 2xx */
+  /** GET /server/update/health data if server responded with 2xx */
   serverHealth: ServerHealthResponse | null,
   /** GET /health status code and body if response was non-2xx */
   healthError: HealthErrorResponse | null,
-  /** GET /server/health status code and body if response was non-2xx */
+  /** GET /server/update/health status code and body if response was non-2xx */
   serverHealthError: HealthErrorResponse | null,
+|}>
+
+/**
+ * Object describing something than can be polled for health. Inexact to avoid
+ * coupling what the HealthPoller expects with what the DiscoveryClient needs
+ * for its own state
+ */
+export type HealthPollerTarget = $ReadOnly<{
+  /** IP address used to contruct health URLs */
+  ip: string,
+  /** Port address used to construct health URLs */
+  port: number,
+  ...
+}>
+
+/**
+ * HealthPoller runtime configuration that can be changed by multiple calls
+ * to start; previous config state will be preserved if left unspecified
+ */
+export type HealthPollerConfig = $ReadOnly<{|
+  /** List of addresses to poll */
+  list?: $ReadOnlyArray<HealthPollerTarget>,
+  /** Call the health endpoints for a given IP once every `interval` ms */
+  interval?: number,
+|}>
+
+/**
+ * Options used to construct a health poller
+ */
+export type HealthPollerOptions = $ReadOnly<{|
+  /** Function to call whenever the requests for an IP settle */
+  onPollResult: (pollResult: HealthPollerResult) => mixed,
+  /** Optional logger */
+  logger?: Logger,
+|}>
+
+/**
+ * A HealthPoller manages polling the HTTP health endpoints of a set of IP
+ * addresses
+ */
+export type HealthPoller = $ReadOnly<{|
+  /**
+   * (Re)start the poller, optionally passing in new configuration values.
+   * Any unspecified config will be preserved from the last time `start` was
+   * called. `start` must be called with an interval and list at least once.
+   */
+  start: (startOpts?: HealthPollerConfig) => void,
+  /**
+   * Stop the poller. In-flight HTTP requests may not be cancelled, but
+   * `onPollResult` will no longer be called.
+   */
+  stop: () => void,
 |}>
