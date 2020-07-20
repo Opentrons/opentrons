@@ -1,11 +1,15 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import {
+  getLabwareDisplayName,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
 import filter from 'lodash/filter'
-import every from 'lodash/every'
 import countBy from 'lodash/countBy'
 import keyBy from 'lodash/keyBy'
+import forEach from 'lodash/forEach'
 
 // TODO(mc, 2018-09-13): these aren't cards; rename
 import { InformationCard } from './InformationCard'
@@ -44,8 +48,10 @@ export function FileInfo(props: FileInfoProps): React.Node {
   const labware = useSelector((state: State) =>
     robotSelectors.getLabware(state)
   )
-  console.log("RESULTS FROM LW SELECTOR")
-  console.log(labware)
+  const modulesBySlot = useSelector((state: State) =>
+    robotSelectors.getModulesBySlot(state)
+  )
+  console.log(modulesBySlot)
   const labwareCalibrations = useSelector((state: State) =>
     labwareFunctions.getListOfLabwareCalibrations(state, robotName)
   )
@@ -53,6 +59,7 @@ export function FileInfo(props: FileInfoProps): React.Node {
   if (sessionLoaded && !uploadError && !sessionHasSteps) {
     uploadError = { message: NO_STEPS_MESSAGE }
   }
+
   const labwareCount = countBy(labware, 'type')
 
   const calibrations = filter(labwareCalibrations, function(l) {
@@ -60,11 +67,28 @@ export function FileInfo(props: FileInfoProps): React.Node {
   })
 
   const calibrationLoadNamesMap = keyBy(calibrations, function(labwareObject) {
-    return labwareObject?.attributes.loadName
+    const loadName = labwareObject?.attributes.loadName ?? ''
+    const parent = labwareObject?.attributes.parent ?? ''
+    return loadName + parent
   })
 
-  const allLabwareCalibrated = every(Object.keys(labwareCount), function(a) {
-    return Object.keys(calibrationLoadNamesMap).includes(a)
+  const labwareDisplayNames = {}
+  forEach(labware, function(lw) {
+    const moduleName = modulesBySlot[lw.slot]?.model ?? ''
+    const keyValue = lw.type + moduleName
+    const existing = labwareDisplayNames[keyValue]
+    const parentName = (moduleName && getModuleDisplayName(moduleName)) || ''
+    if (!existing) {
+      const displayName = lw.definition && getLabwareDisplayName(lw.definition)
+      return (labwareDisplayNames[keyValue] = {
+        display: displayName,
+        count: 1,
+        parent: parentName,
+      })
+    } else {
+      existing.count += 1
+      return existing
+    }
   })
 
   return (
@@ -73,13 +97,11 @@ export function FileInfo(props: FileInfoProps): React.Node {
       <ProtocolPipettesCard robotName={robot.name} />
       <ProtocolModulesCard robot={robot} />
       <ProtocolLabwareCard
-        labware={labwareCount}
+        labware={labwareDisplayNames}
         labwareCalibrations={calibrationLoadNamesMap}
       />
       {uploadError && <UploadError uploadError={uploadError} />}
-      {sessionLoaded && !uploadError && (
-        <Continue labwareCalibrated={allLabwareCalibrated} />
-      )}
+      {sessionLoaded && !uploadError && <Continue />}
     </div>
   )
 }

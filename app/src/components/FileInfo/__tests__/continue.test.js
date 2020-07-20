@@ -25,11 +25,6 @@ const getCalibrateLocation: JestMockFn<
   $Call<typeof navigation.getCalibrateLocation, State>
 > = navigation.getCalibrateLocation
 
-const getRunLocation: JestMockFn<
-  [State],
-  $Call<typeof navigation.getRunLocation, State>
-> = navigation.getRunLocation
-
 function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
   mock.mockImplementation(state => {
     expect(state).toBe(MOCK_STATE)
@@ -37,7 +32,6 @@ function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
   })
 }
 
-const mockRunPath = '/path/to/run'
 const mockCalPath = '/path/to/cal'
 
 describe('Continue to run or calibration button component', () => {
@@ -45,7 +39,7 @@ describe('Continue to run or calibration button component', () => {
     return mount(
       <Provider store={MOCK_STORE}>
         <MemoryRouter>
-          <Continue labwareCalibrated={labwareCalibrated} />
+          <Continue />
         </MemoryRouter>
       </Provider>
     )
@@ -58,25 +52,16 @@ describe('Continue to run or calibration button component', () => {
     disabledReason: null,
   }
 
-  const RUN_SELECTOR = {
-    id: 'run',
-    path: mockRunPath,
-    title: 'RUN',
-    iconName: 'ot-run',
-    disabledReason: null,
-  }
-
   const CALIBRATE_SELECTOR_DISABLED = {
-    id: 'run',
-    path: mockRunPath,
-    title: 'RUN',
-    iconName: 'ot-run',
+    id: 'calibrate',
+    path: mockCalPath,
+    title: 'CALIBRATE',
+    iconName: 'ot-calibrate',
     disabledReason: 'check your toolbox!',
   }
 
   beforeEach(() => {
     stubSelector(getCalibrateLocation, CALIBRATE_SELECTOR)
-    stubSelector(getRunLocation, RUN_SELECTOR)
   })
 
   afterEach(() => {
@@ -93,18 +78,6 @@ describe('Continue to run or calibration button component', () => {
     expect(button.children().text()).toEqual('Proceed to Calibrate')
     expect(secondarybutton.exists()).toEqual(false)
     expect(button.props().to).toEqual(mockCalPath)
-  })
-
-  it('Run button renders when all labware is calibrated as well as secondary button', () => {
-    const wrapper = render(true)
-    const button = wrapper.find(PrimaryButton)
-    const secondarybutton = wrapper.find(OutlineButton)
-    const tooltip = wrapper.find(Tooltip)
-
-    expect(tooltip.exists()).toEqual(false)
-    expect(button.children().text()).toEqual('Proceed to Run')
-    expect(secondarybutton.exists()).toEqual(true)
-    expect(button.props().to).toEqual(mockRunPath)
   })
 
   it('Test tool tip when disabled reason given', () => {

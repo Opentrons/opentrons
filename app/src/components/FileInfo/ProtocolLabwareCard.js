@@ -2,20 +2,24 @@
 // setup labware component
 import * as React from 'react'
 import round from 'lodash/round'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
   FONT_WEIGHT_SEMIBOLD,
-  SPACING_1,
+  Flex,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import { InfoSection } from './InfoSection'
 import { ProtocolLabwareList } from './ProtocolLabwareList'
+import type { LabwareCalibrationObjects } from '../../calibration'
 
-type ProtocolLabwareProps = {|
-  labware: { string: number },
-  labwareCalibrations: Object, // Note this should be { string: LabwareCalibrationObjects }, but flow was not passing
+export type ProtocolLabwareProps = {|
+  labware: {
+    [key: string]: { count: number, display: string, parent: string },
+  },
+  labwareCalibrations: { [key: string]: LabwareCalibrationObjects },
 |}
 
 const TITLE = 'Required Labware'
@@ -26,61 +30,49 @@ export function ProtocolLabwareCard({
 }: ProtocolLabwareProps): React.Node {
   if (Object.keys(labware).length === 0) return null
 
-  const labwareCalibration = Object.keys(labware).map(function(type, index) {
+  const labwareToParentMap = {}
+  Object.keys(labware).forEach((type, index) => {
     const currentLabware = labwareCalibrations[type]?.attributes
+    let calibrationData
     if (currentLabware) {
       const offset = currentLabware?.calibrationData?.offset.value
-      const X = round(offset[0], 2)
-      const Y = round(offset[1], 2)
-      const Z = round(offset[2], 2)
-      return (
-        <tr key={`${index}`}>
-          <td style={{ fontWeight: FONT_WEIGHT_SEMIBOLD }}>X</td>
-          <td>{X}</td>
-          <td style={{ fontWeight: FONT_WEIGHT_SEMIBOLD }}>Y</td>
-          <td>{Y}</td>
-          <td style={{ fontWeight: FONT_WEIGHT_SEMIBOLD }}>Z</td>
-          <td>{Z}</td>
-        </tr>
+      const X = parseFloat(round(offset[0], 1)).toFixed(1)
+      const Y = parseFloat(round(offset[1], 1)).toFixed(1)
+      const Z = parseFloat(round(offset[2], 1)).toFixed(1)
+      calibrationData = (
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          key={`${index}`}
+        >
+          <div style={{ fontWeight: FONT_WEIGHT_SEMIBOLD }}>X</div>
+          <div>{X}</div>
+          <div style={{ fontWeight: FONT_WEIGHT_SEMIBOLD }}>Y</div>
+          <div>{Y}</div>
+          <div style={{ fontWeight: FONT_WEIGHT_SEMIBOLD }}>Z</div>
+          <div>{Z}</div>
+        </Flex>
       )
     } else {
-      return (
-        <tr align={ALIGN_CENTER} key={`${index}`}>
-          <td colSpan="6">Not yet calibrated</td>
-        </tr>
+      calibrationData = (
+        <Flex align={ALIGN_CENTER} key={`${index}`}>
+          Not yet calibrated
+        </Flex>
       )
     }
-  })
 
-  const labwareCalibrationTable = (
-    <table
-      css={css`
-        border-spacing: ${SPACING_1};
-      `}
-    >
-      <tbody>{labwareCalibration}</tbody>
-    </table>
-  )
-  const labwareQuantity = Object.keys(labware).map(type => `x${labware[type]}`)
-
-  const labwareToParentMap = {}
-  Object.keys(labware).forEach(type => {
-    const parent = labwareCalibrations[type]?.attributes.parent ?? ''
-    const spacedParent = parent
-      .split(/(?=[A-Z])/)
-      .map(s => s.toUpperCase())
-      .join(' ')
-    return (labwareToParentMap[type] = spacedParent)
+    return (labwareToParentMap[type] = {
+      parent: labware[type].parent,
+      quantity: `x${labware[type].count}`,
+      display: labware[type].display,
+      calibration: calibrationData,
+    })
   })
+  console.log(labwareToParentMap)
 
   return (
     <InfoSection title={TITLE}>
-      <ProtocolLabwareList
-        labware={Object.keys(labware)}
-        quantity={labwareQuantity}
-        calibration={labwareCalibrationTable}
-        labwareToParent={labwareToParentMap}
-      />
+      <ProtocolLabwareList loadNameMap={labwareToParentMap} />
     </InfoSection>
   )
 }

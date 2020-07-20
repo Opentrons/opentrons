@@ -90,6 +90,10 @@
   }
 }
 
+.continue {
+    text-align: right;
+}
+
 .continue_button {
   display: inline-block;
   width: 16.5rem;

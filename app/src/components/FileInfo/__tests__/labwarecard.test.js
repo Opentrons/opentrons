@@ -2,11 +2,14 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 
-import { ProtocolLabwareCard } from '../ProtocolLabwareCard'
+import {
+  ProtocolLabwareCard,
+  ProtocolLabwareProps,
+} from '../ProtocolLabwareCard'
 import { ProtocolLabwareList } from '../ProtocolLabwareList'
 
 describe('Protocol Labware Card Component', () => {
-  const render = (labware: Object, labwareCalibrations: Object) => {
+  const render = ({ labware, labwareCalibrations }: ProtocolLabwareProps) => {
     return mount(
       <ProtocolLabwareCard
         labware={labware}
@@ -21,8 +24,14 @@ describe('Protocol Labware Card Component', () => {
   })
 
   it('passes in corectly formatted quantity and calibration to labware list', () => {
-    const wrapper = render(
-      { opentrons_labware: 2 },
+    const labwareParams = {
+        opentrons_labware: {
+          count: 2,
+          parent: '',
+          display: 'Opentrons Labware',
+        },
+      }
+    const calibrationParams=
       {
         opentrons_labware: {
           attributes: {
@@ -31,7 +40,7 @@ describe('Protocol Labware Card Component', () => {
           },
         },
       }
-    )
+    const wrapper = render(labware={labwareParams} labwareCalibrations={calibrationParams})
     const labwareList = wrapper.find(ProtocolLabwareList)
     const props = labwareList.props()
 
