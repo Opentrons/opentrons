@@ -230,20 +230,23 @@ node_modules/.bin/discovery [command] [options]
 
 ### global options
 
-The CLI's global options are almost completely the same as the API's options, with the addition of `logLevel`:
+The CLI's global options are almost completely the same as the API's options, with the addition of `logLevel`. You may print the options with:
 
-| flag                 | description               | default  | example          |
-| -------------------- | ------------------------- | -------- | ---------------- |
-| `-p, --pollInterval` | see `pollInterval` option | `1000`   | `-p 500`         |
-| `-c, --candidates`   | see `candidates` option   | `[]`     | `-c localhost`   |
-| `-n, --nameFilter`   | see `nameFilter` option   | `[]`     | `-n opentrons`   |
-| `-i, --ipFilter`     | see `ipFilter` option     | `[]`     | `-i 169.254`     |
-| `-a, --portFilter`   | see `portFilter` option   | `[]`     | `-a 31951 31952` |
-| `-l, --logLevel`     | log level for printout    | `'info'` | `-l debug`       |
+```shell
+yarn discovery --help
+```
+
+| flag                 | description                                       | default  | example        |
+| -------------------- | ------------------------------------------------- | -------- | -------------- |
+| `-p, --pollInterval` | How often the health poller hits every IP address | `1000`   | `-p 500`       |
+| `-n, --nameFilter`   | Filter found robots by name substring             | `[]`     | `-n opentrons` |
+| `-i, --ipFilter`     | Filter found robots by IP address substring       | `[]`     | `-i 169.254`   |
+| `-c, --candidates`   | Extra IP addresses to poll outside of mDNS        | `[]`     | `-c localhost` |
+| `-l, --logLevel`     | Log level for printout                            | `'info'` | `-l debug`     |
 
 ### `discovery (browse) [options]`
 
-Print out robots as it discovers them.
+Print out robots as it discovers them and as they are updated
 
 ```shell
 # example: browse for robots, including at localhost
@@ -258,7 +261,7 @@ discovery --nameFilter moon
 Find the first robot you can, optionally specifying name or any other global options, and print out the IP address to `stdout` (bypassing any log level settings).
 
 ```shell
-# example: find a specific robot
+# example: find a specific robot by exact name
 discovery find opentrons-moon-moon
 
 # example: find the IP address of a link-local wired robot
@@ -266,7 +269,7 @@ discovery find --ipFilter 169.254
 
 # example: find the IP address of a wired robot that may be IPv4 or IPv6
 # (IPv6 means legacy non-mDNS wired configuration)
-discovery find -i "169.254" "fd00" -c "[fd00:0:cafe:fefe::1]"
+discovery find -i 169.254 fd00 -c fd00:0:cafe:fefe::1
 ```
 
 #### command specific options

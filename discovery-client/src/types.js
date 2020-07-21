@@ -1,6 +1,6 @@
 // @flow
 
-import type { RobotState, HostState } from './store/types'
+import type { RobotState, HostState, Address } from './store/types'
 
 // TODO(mc, 2018-10-03): figure out what to do with duplicate type in app
 export type HealthResponse = {
@@ -185,6 +185,13 @@ export type MdnsBrowser = $ReadOnly<{|
   stop: () => void,
 |}>
 
+/**
+ * IP address and instantaneous health information for a given robot
+ */
+export type DiscoveryClientRobotAddress = $Rest<
+  HostState,
+  {| robotName: mixed |}
+>
 /*
  * Robot object that the DiscoveryClient returns that combines latest known
  * health data from the robot along with possible IP addressess
@@ -192,5 +199,35 @@ export type MdnsBrowser = $ReadOnly<{|
 export type DiscoveryClientRobot = $ReadOnly<{|
   ...RobotState,
   /** IP addresses and health state, ranked by connectability (descending) */
-  addresses: $ReadOnlyArray<$Rest<HostState, {| robotName: mixed |}>>,
+  addresses: $ReadOnlyArray<DiscoveryClientRobotAddress>,
+|}>
+
+/**
+ * Discovery Client runtime configuration that can be changed by multiple calls
+ * to start; previous config state will be preserved if left unspecified
+ */
+export type DiscoveryClientConfig = $ReadOnly<{|
+  /** Health poll interval used by the HealthPoller */
+  healthPollInterval?: number,
+  /** Robots list to (re)initialize the tracking state */
+  initialRobots?: $ReadOnlyArray<DiscoveryClientRobot>,
+  /** Extra IP addresses to manially track */
+  manualAddresses?: $ReadOnlyArray<Address>,
+|}>
+
+/**
+ * Permanent options used when constructing a Discovery Client
+ */
+export type DiscoveryClientOptions = $ReadOnly<{|
+  /** Function to call when the robots list is updated */
+  onListChange: (robots: $ReadOnlyArray<DiscoveryClientRobot>) => mixed,
+  /** Optional logger */
+  logger?: Logger,
+|}>
+
+export type DiscoveryClientNext = $ReadOnly<{|
+  getRobots: () => $ReadOnlyArray<DiscoveryClientRobot>,
+  removeRobot: (robotName: string) => void,
+  start: (config: DiscoveryClientConfig) => void,
+  stop: () => void,
 |}>

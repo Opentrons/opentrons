@@ -1,4 +1,5 @@
 // @flow
+import net from 'net'
 import fetch from 'node-fetch'
 import intersectionBy from 'lodash/intersectionBy'
 import unionBy from 'lodash/unionBy'
@@ -157,11 +158,14 @@ function fetchAndParse<SuccessBody>(
  * responses into a single result object
  */
 function pollHealth(ip: string, port: number): Promise<HealthPollerResult> {
+  // IPv6 addresses require brackets
+  const urlIp = net.isIPv6(ip) ? `[${ip}]` : ip
+
   const healthReq = fetchAndParse<HealthResponse>(
-    `http://${ip}:${port}${ROBOT_SERVER_HEALTH_PATH}`
+    `http://${urlIp}:${port}${ROBOT_SERVER_HEALTH_PATH}`
   )
   const serverHealthReq = fetchAndParse<ServerHealthResponse>(
-    `http://${ip}:${port}${UPDATE_SERVER_HEALTH_PATH}`
+    `http://${urlIp}:${port}${UPDATE_SERVER_HEALTH_PATH}`
   )
 
   return Promise.all([healthReq, serverHealthReq]).then(
