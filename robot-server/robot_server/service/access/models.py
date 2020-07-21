@@ -13,7 +13,7 @@ TokenType = str
 class AccessTokenInfo(BaseModel):
     token: TokenType =\
         Field(..., description="An access token")
-    createdOn: typing.Optional[datetime] =\
+    createdAt: typing.Optional[datetime] =\
         Field(..., description="When this token was created")
 
 

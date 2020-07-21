@@ -6,7 +6,6 @@ import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4
 
 import mapValues from 'lodash/mapValues'
 
-import { allSubsteps } from './substeps'
 import * as StepGeneration from '../step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
@@ -206,7 +205,7 @@ export const wellHighlightsByLabwareId: Selector<{
   stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
   getHoveredSubstep,
-  allSubsteps,
+  fileDataSelectors.getSubsteps,
   stepFormSelectors.getOrderedStepIds,
   (
     robotStateTimeline,
@@ -214,7 +213,7 @@ export const wellHighlightsByLabwareId: Selector<{
     allStepArgsAndErrors,
     hoveredStepId,
     hoveredSubstep,
-    allSubsteps,
+    substepsById,
     orderedStepIds
   ) => {
     const timeline = robotStateTimeline.timeline
@@ -245,7 +244,7 @@ export const wellHighlightsByLabwareId: Selector<{
           selectedWells = _getSelectedWellsForSubstep(
             stepArgs,
             labwareId,
-            allSubsteps[stepId],
+            substepsById[stepId],
             hoveredSubstep.substepIndex,
             invariantContext
           )

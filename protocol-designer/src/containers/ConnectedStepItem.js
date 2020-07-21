@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 
 import { selectors as uiLabwareSelectors } from '../ui/labware'
-import * as substepSelectors from '../top-selectors/substeps'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as dismissSelectors } from '../dismiss'
@@ -58,7 +57,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const hoveredStep = useSelector(getHoveredStepId)
   const selected = useSelector(getSelectedStepId) === stepId
 
-  const substeps = useSelector(substepSelectors.allSubsteps)[stepId]
+  const substeps = useSelector(fileDataSelectors.getSubsteps)[stepId]
 
   const ingredNames = useSelector(labwareIngredSelectors.getLiquidNamesById)
   const labwareNicknamesById = useSelector(

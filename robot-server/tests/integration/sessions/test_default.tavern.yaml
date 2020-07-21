@@ -56,8 +56,9 @@ stages:
           type: Session
           attributes:
             sessionType: default
-            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: {}
+            createParams: null
 ---
 test_name: Default Commands
 marks:

@@ -7,8 +7,8 @@ import {
   mockHealthFetchErrorResponse,
 } from '../../__fixtures__/health'
 
+import * as Constants from '../../constants'
 import * as Actions from '../actions'
-import * as Constants from '../constants'
 import { reducer, hostsByIpReducer } from '../reducer'
 
 describe('hostsByIp reducer', () => {

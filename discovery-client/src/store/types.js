@@ -8,18 +8,18 @@ import type {
 } from '../types'
 
 import typeof {
+  HEALTH_STATUS_UNREACHABLE,
+  HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
+} from '../constants'
+
+import typeof {
   SERVICE_FOUND,
   HEALTH_POLLED,
   ADD_IP_ADDRESS,
   REMOVE_IP_ADDRESS,
   REMOVE_ROBOT,
 } from './actions'
-
-import typeof {
-  HEALTH_STATUS_UNREACHABLE,
-  HEALTH_STATUS_NOT_OK,
-  HEALTH_STATUS_OK,
-} from './constants'
 
 /**
  * Health state of a given robot
@@ -29,7 +29,7 @@ export type RobotState = $ReadOnly<{|
   name: string,
   /** latest /health response data from the robot */
   health: HealthResponse | null,
-  /** latest /server/health response data from the robot */
+  /** latest /server/update/health response data from the robot */
   serverHealth: ServerHealthResponse | null,
 |}>
 
@@ -44,23 +44,27 @@ export type HealthStatus =
   | HEALTH_STATUS_NOT_OK
   | HEALTH_STATUS_OK
 
-/**
- * State for a given IP address, which should point to a robot
- */
-export type HostState = $ReadOnly<{|
+export type Address = $ReadOnly<{|
   /** IP address */
   ip: string,
   /** Port */
   port: number,
+|}>
+
+/**
+ * State for a given IP address, which should point to a robot
+ */
+export type HostState = $ReadOnly<{|
+  ...Address,
   /** Whether this IP has been seen via mDNS or HTTP while the client has been running */
   seen: boolean,
   /** How the last GET /health responded (null if no response yet) */
   healthStatus: HealthStatus | null,
-  /** How the last GET /server/health responded (null if no response yet) */
+  /** How the last GET /server/update/health responded (null if no response yet) */
   serverHealthStatus: HealthStatus | null,
   /** Error status and response from /health if last request was not 200 */
   healthError: HealthErrorResponse | null,
-  /** Error status and response from /server/health if last request was not 200 */
+  /** Error status and response from /server/update/health if last request was not 200 */
   serverHealthError: HealthErrorResponse | null,
   /** Robot that this IP points to, if known */
   robotName: string | null,

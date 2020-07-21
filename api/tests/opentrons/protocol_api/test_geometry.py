@@ -1,5 +1,4 @@
 import pytest
-from pathlib import Path
 
 from opentrons.types import Location, Point
 from opentrons.protocol_api.geometry import (
@@ -160,8 +159,7 @@ def test_force_direct():
     assert different_lw == [(lw2.wells()[0].bottom().point, None)]
 
 
-def test_no_labware_loc(monkeypatch, tmpdir):
-    monkeypatch.setattr(labware, 'OFFSETS_PATH', Path(tmpdir))
+def test_no_labware_loc(labware_offset_tempdir):
     labware_def = labware.get_labware_definition(labware_name)
 
     deck = Deck()

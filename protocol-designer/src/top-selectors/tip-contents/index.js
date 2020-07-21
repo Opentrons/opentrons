@@ -5,7 +5,6 @@ import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import { getWellSetForMultichannel } from '../../utils'
 import * as StepGeneration from '../../step-generation'
-import { allSubsteps as getAllSubsteps } from '../substeps'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
@@ -174,7 +173,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
   getLastValidTips,
   getLabwareIdProp,
   getHoveredSubstep,
-  getAllSubsteps,
+  fileDataSelectors.getSubsteps,
   (
     orderedStepIds,
     invariantContext,
@@ -185,7 +184,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
     lastValidTips,
     labwareId,
     hoveredSubstepIdentifier,
-    allSubsteps
+    substepsById
   ) => {
     const labwareDef = invariantContext.labwareEntities[labwareId].def
     if (!activeItem.isStep) {
@@ -230,7 +229,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
       let highlighted = false
       if (hoveredSubstepIdentifier && currentFrame) {
         const { substepIndex } = hoveredSubstepIdentifier
-        const substepsForStep = allSubsteps[hoveredSubstepIdentifier.stepId]
+        const substepsForStep = substepsById[hoveredSubstepIdentifier.stepId]
 
         if (substepsForStep && substepsForStep.substepType === 'sourceDest') {
           if (substepsForStep.multichannel) {

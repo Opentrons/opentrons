@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 import pytest
 
@@ -7,6 +6,8 @@ from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION, module_geometry)
 
 from opentrons_shared_data import load_shared_data
+from opentrons.calibration_storage import (
+    helpers, get, delete, file_operators)
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api.geometry import Deck
@@ -35,13 +36,7 @@ test_data = {
 
 
 @pytest.fixture
-def index_file_dir(tmpdir, monkeypatch):
-    monkeypatch.setattr(labware, 'OFFSETS_PATH', Path(tmpdir))
-    yield tmpdir
-
-
-@pytest.fixture
-def set_up_index_file(index_file_dir):
+def set_up_index_file(labware_offset_tempdir):
     deck = Deck()
     labware_list = [
         'nest_96_wellplate_2ml_deep',
@@ -486,9 +481,9 @@ def test_tiprack_list():
 def test_uris():
     details = ('opentrons', 'opentrons_96_tiprack_300ul', '1')
     uri = 'opentrons/opentrons_96_tiprack_300ul/1'
-    assert labware.uri_from_details(*details) == uri
+    assert helpers.uri_from_details(*details) == uri
     defn = labware.get_labware_definition(details[1], details[0], details[2])
-    assert labware.uri_from_definition(defn) == uri
+    assert helpers.uri_from_definition(defn) == uri
     lw = labware.Labware(defn, Location(Point(0, 0, 0), 'Test Slot'))
     assert lw.uri == uri
 
@@ -499,15 +494,15 @@ def test_uris():
         'corning_384_wellplate_112ul_flat',
         'geb_96_tiprack_1000ul',
         'nest_12_reservoir_15ml'])
-def test_add_index_file(labware_name, index_file_dir):
+def test_add_index_file(labware_name, labware_offset_tempdir):
     deck = Deck()
     parent = deck.position_for(1)
     definition = labware.get_labware_definition(labware_name)
     lw = labware.Labware(definition, parent)
-    labware_hash = labware._hash_labware_def(lw._definition)
-    labware._add_to_index_offset_file(lw, labware_hash)
+    labware_hash = helpers.hash_labware_def(definition)
+    labware.save_calibration(lw, Point(0, 0, 0))
 
-    lw_uri = labware.uri_from_definition(definition)
+    lw_uri = helpers.uri_from_definition(definition)
 
     str_parent = labware._get_parent_identifier(lw.parent)
     slot = '1'
@@ -522,14 +517,14 @@ def test_add_index_file(labware_name, index_file_dir):
             "module": mod_dict
         }
 
-    lw_path = index_file_dir / 'index.json'
-    info = labware._read_file(lw_path)
+    lw_path = labware_offset_tempdir / 'index.json'
+    info = file_operators.read_cal_file(lw_path)
     assert info[full_id] == blob
 
 
 def test_delete_one_calibration(set_up_index_file):
     lw_to_delete = 'nest_96_wellplate_2ml_deep'
-    all_cals = labware.get_all_calibrations()
+    all_cals = get.get_all_calibrations()
     id_saved = ''
 
     def get_load_names(all_cals):
@@ -537,7 +532,7 @@ def test_delete_one_calibration(set_up_index_file):
         load_names = []
         for cal in all_cals:
             uri = cal.uri
-            dets = labware.details_from_uri(uri)
+            dets = helpers.details_from_uri(uri)
             if dets.load_name == lw_to_delete:
                 id_saved = cal.labware_id
             load_names.append(dets.load_name)
@@ -547,9 +542,9 @@ def test_delete_one_calibration(set_up_index_file):
 
     assert lw_to_delete in load_names
 
-    labware.delete_offset_file(id_saved)
+    delete.delete_offset_file(id_saved)
 
-    all_cals = labware.get_all_calibrations()
+    all_cals = get.get_all_calibrations()
     load_names = get_load_names(all_cals)
 
     assert lw_to_delete not in load_names

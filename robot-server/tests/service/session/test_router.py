@@ -32,7 +32,8 @@ def session_response(mock_session_meta):
             'details': {
             },
             'sessionType': 'null',
-            'created_at': mock_session_meta.created_at.isoformat(),
+            'createdAt': mock_session_meta.created_at.isoformat(),
+            'createParams': None,
         },
         'type': 'Session',
         'id': mock_session_meta.identifier
@@ -103,7 +104,7 @@ def patch_create_session(mock_session):
 @pytest.mark.asyncio
 async def session_manager_with_session(loop, patch_create_session):
     manager = get_session_manager()
-    session = await manager.add(SessionType.null)
+    session = await manager.add(SessionType.null, SessionMetaData())
 
     yield manager
 
@@ -311,9 +312,9 @@ def test_execute_command(api_client,
                 'command': 'calibration.jog',
                 'data': {'vector': [1.0, 2.0, 3.0]},
                 'status': 'executed',
-                'created_at': '2000-01-01T00:00:00',
-                'started_at': '2019-01-01T00:00:00',
-                'completed_at': '2020-01-01T00:00:00',
+                'createdAt': '2000-01-01T00:00:00',
+                'startedAt': '2019-01-01T00:00:00',
+                'completedAt': '2020-01-01T00:00:00',
             },
             'type': 'SessionCommand',
             'id': command_id,
@@ -361,9 +362,9 @@ def test_execute_command_no_body(api_client,
                 'command': 'calibration.loadLabware',
                 'data': {},
                 'status': 'executed',
-                'created_at': '2000-01-01T00:00:00',
-                'started_at': '2019-01-01T00:00:00',
-                'completed_at': '2020-01-01T00:00:00',
+                'createdAt': '2000-01-01T00:00:00',
+                'startedAt': '2019-01-01T00:00:00',
+                'completedAt': '2020-01-01T00:00:00',
             },
             'type': 'SessionCommand',
             'id': command_id

@@ -4,7 +4,12 @@ from starlette import status
 from fastapi import APIRouter
 from functools import partial
 
-from opentrons.protocol_api import labware as lw_funcs
+
+from opentrons.calibration_storage import (
+    helpers,
+    types as cal_types,
+    get as get_cal,
+    delete)
 
 from robot_server.service.labware import models as lw_models
 from robot_server.service.errors import RobotServerError
@@ -19,11 +24,11 @@ These routes serve the current labware offsets on the robot to a client.
 
 
 def _format_calibrations(
-        calibrations: List[lw_funcs.CalibrationInformation])\
+        calibrations: List[cal_types.CalibrationInformation])\
         -> List[lw_models.LabwareCalibration]:
     formatted_calibrations = []
     for calInfo in calibrations:
-        details = lw_funcs.details_from_uri(calInfo.uri)
+        details = helpers.details_from_uri(calInfo.uri)
         lw_offset = calInfo.calibration.offset
         # TODO: Integrate datetime methods
         # to ensure that last_modified is the expected
@@ -56,7 +61,7 @@ def _format_calibrations(
 
 
 def _grab_value(
-        calibration: lw_funcs.CalibrationInformation,
+        calibration: cal_types.CalibrationInformation,
         filtering: str,
         comparison: Union[str, int]) -> bool:
     """
@@ -70,7 +75,7 @@ def _grab_value(
     - Version of the calibration matches the version
     provided by the client.
     """
-    details = lw_funcs.details_from_uri(calibration.uri)
+    details = helpers.details_from_uri(calibration.uri)
     if filtering == 'namespace':
         return details.namespace == comparison
     if filtering == 'loadname':
@@ -81,7 +86,7 @@ def _grab_value(
 
 
 def _check_parent(
-        parentOpts: lw_funcs.ParentOptions,
+        parentOpts: cal_types.ParentOptions,
         parent: str) -> bool:
     """
     A filtering function to check whether the parent provided
@@ -105,7 +110,7 @@ async def get_all_labware_calibrations(
         namespace: str = None,
         version: int = None,
         parent: str = None) -> lw_models.MultipleCalibrationsResponse:
-    all_calibrations = lw_funcs.get_all_calibrations()
+    all_calibrations = get_cal.get_all_calibrations()
 
     if not all_calibrations:
         lw_models.MultipleCalibrationsResponse(data=all_calibrations)
@@ -137,8 +142,8 @@ async def get_all_labware_calibrations(
             responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}})
 async def get_specific_labware_calibration(
         calibrationId: str) -> lw_models.SingleCalibrationResponse:
-    calibration: Optional[lw_funcs.CalibrationInformation] = None
-    for cal in lw_funcs.get_all_calibrations():
+    calibration: Optional[cal_types.CalibrationInformation] = None
+    for cal in get_cal.get_all_calibrations():
         if calibrationId == cal.labware_id:
             calibration = cal
             break
@@ -157,9 +162,9 @@ async def get_specific_labware_calibration(
                responses={
                    status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}})
 async def delete_specific_labware_calibration(
-        calibrationId: lw_funcs.CalibrationID):
+        calibrationId: cal_types.CalibrationID):
     try:
-        lw_funcs.delete_offset_file(calibrationId)
+        delete.delete_offset_file(calibrationId)
     except (FileNotFoundError, KeyError):
         error = Error(title='{calibrationId} does not exist.')
         raise RobotServerError(status_code=status.HTTP_404_NOT_FOUND,

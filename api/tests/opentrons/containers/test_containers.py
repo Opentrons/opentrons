@@ -12,6 +12,7 @@ from opentrons.legacy_api.containers import (
     load_new_labware as new_load,
     load_tip_length_calibration
 )
+from opentrons.calibration_storage import delete, modify
 from opentrons.legacy_api.containers.placeable import (
     Container,
     Well,
@@ -250,11 +251,11 @@ def test_load_tip_length_calibration_v1(robot):
             'lastModified': datetime.datetime.utcnow()}
     tip_length_cal = {hash: tip_length_data}
     pip_id = 'fake_id'
-    new_labware.save_tip_length_calibration(
+    modify.save_tip_length_calibration(
         pip_id=pip_id, tip_length_cal=tip_length_cal)
 
     result = load_tip_length_calibration(pip_id, lw.wells('A1'))
 
     assert result == tip_length_data
 
-    new_labware.clear_tip_length_calibration()  # clean up
+    delete.clear_tip_length_calibration()  # clean up

@@ -1,7 +1,8 @@
 pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
-python := $(pipenv_envvars) pipenv run python
-pip := $(pipenv_envvars) pipenv run pip
-pytest := $(pipenv_envvars) pipenv run py.test
+pipenv := $(pipenv_envvars) python -m pipenv
+python := $(pipenv) run python
+pip := $(pipenv) run pip
+pytest := $(pipenv) run py.test
 
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated --clear)

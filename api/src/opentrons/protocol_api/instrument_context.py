@@ -165,7 +165,7 @@ class InstrumentContext(CommandPublisher):
         :type volume: int or float
         :param location: Where to aspirate from. If `location` is a
                          :py:class:`.Well`, the robot will aspirate from
-                         :py:attr:`well_bottom_clearance```.aspirate`` mm
+                         :py:obj:`well_bottom_clearance```.aspirate`` mm
                          above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
@@ -266,7 +266,7 @@ class InstrumentContext(CommandPublisher):
 
         :param location: Where to dispense into. If `location` is a
                          :py:class:`.Well`, the robot will dispense into
-                         :py:attr:`well_bottom_clearance```.dispense`` mm
+                         :py:obj:`well_bottom_clearance```.dispense`` mm
                          above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the

@@ -35,6 +35,7 @@ import type {
   SourceDestSubstepItem,
   SubstepItemData,
   SubstepTimelineFrame,
+  LabwareNamesByModuleId,
 } from './types'
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
@@ -330,15 +331,12 @@ function transferLikeSubsteps(args: {|
   }
 }
 
-// NOTE: This is the fn used by the `allSubsteps` selector
-export function generateSubsteps(
+export function generateSubstepItem(
   stepArgsAndErrors: ?StepArgsAndErrors,
   invariantContext: InvariantContext,
   robotState: ?RobotState,
   stepId: string,
-  labwareNamesByModuleId: {
-    [moduleId: string]: ?{ nickname: string },
-  }
+  labwareNamesByModuleId: LabwareNamesByModuleId
 ): ?SubstepItemData {
   if (!robotState) {
     console.info(
@@ -460,7 +458,7 @@ export function generateSubsteps(
   }
 
   console.warn(
-    "allSubsteps doesn't support commandCreatorFnName: ",
+    "generateSubsteps doesn't support commandCreatorFnName: ",
     stepArgs.commandCreatorFnName,
     stepId
   )

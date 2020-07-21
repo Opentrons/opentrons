@@ -2,12 +2,12 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
+import { SELECTABLE_WELL_CLASS } from '@opentrons/components'
 import {
   arrayToWellGroup,
   getCollidingWells,
   getWellSetForMultichannel,
 } from '../../utils'
-import { SELECTABLE_WELL_CLASS } from '../../constants'
 import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
 import { WellTooltip } from './WellTooltip'

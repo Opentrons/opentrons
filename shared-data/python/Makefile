@@ -38,8 +38,8 @@ twine_repository_url ?= $(pypi_test_upload_url)
 
 .PHONY: setup-py
 setup-py:
-	$(pipenv_envvars) pipenv sync $(pipenv_opts)
-	$(pipenv_envvars) pipenv run pip freeze
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 
 .PHONY: clean

@@ -3,13 +3,12 @@ import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
-import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
 import { getAllWellsForLabware } from '../../constants'
 import * as StepGeneration from '../../step-generation'
-import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import type { Substeps } from '../../steplist/types'
 import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
 import type {
@@ -20,17 +19,6 @@ import type {
   PipetteOnDeck,
   PipetteTemporalProperties,
 } from '../../step-forms'
-
-const getInvariantContext: Selector<StepGeneration.InvariantContext> = createSelector(
-  stepFormSelectors.getLabwareEntities,
-  stepFormSelectors.getModuleEntities,
-  stepFormSelectors.getPipetteEntities,
-  (labwareEntities, moduleEntities, pipetteEntities) => ({
-    labwareEntities,
-    moduleEntities,
-    pipetteEntities,
-  })
-)
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
@@ -108,7 +96,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-const commandCreatorFromStepArgs = (
+export const commandCreatorFromStepArgs = (
   args: StepGeneration.CommandCreatorArgs
 ): StepGeneration.CurriedCommandCreator | null => {
   switch (args.commandCreatorFnName) {
@@ -167,100 +155,15 @@ const commandCreatorFromStepArgs = (
   return null
 }
 
+export const getTimelineIsBeingComputed: Selector<boolean> = state =>
+  state.fileData.timelineIsBeingComputed
+
 // exposes errors and last valid robotState
-export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
-  stepFormSelectors.getArgsAndErrorsByStepId,
-  stepFormSelectors.getOrderedStepIds,
-  getInitialRobotState,
-  getInvariantContext,
-  featureFlagSelectors.getFeatureFlagData,
-  (
-    allStepArgsAndErrors,
-    orderedStepIds,
-    initialRobotState,
-    invariantContext,
-    featureFlagMemoizationBust // HACK Ian 2019-11-12: this isn't used directly,
-    // it's only included to bust this selector's memoization. Required b/c step-generation's `getFeatureFlag` util
-    // must read directly from localStorage. Once getDisableModuleRestrictions aka "rogue mode"
-    // is removed, we can remove this arg to this selector.
-  ) => {
-    const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(
-      stepId => {
-        return (
-          (allStepArgsAndErrors[stepId] &&
-            allStepArgsAndErrors[stepId].stepArgs) ||
-          null
-        )
-      }
-    )
+export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = state =>
+  state.fileData.computedRobotStateTimeline
 
-    // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
-    // $FlowFixMe
-    const continuousStepArgs: Array<StepGeneration.CommandCreatorArgs> = takeWhile(
-      allStepArgs,
-      stepArgs => stepArgs
-    )
-
-    const curriedCommandCreators = continuousStepArgs.reduce(
-      (
-        acc: Array<StepGeneration.CurriedCommandCreator>,
-        args: StepGeneration.CommandCreatorArgs,
-        stepIndex
-      ): Array<StepGeneration.CurriedCommandCreator> => {
-        const curriedCommandCreator = commandCreatorFromStepArgs(args)
-
-        if (curriedCommandCreator === null) {
-          // unsupported command creator in args.commandCreatorFnName
-          return acc
-        }
-
-        // Drop tips eagerly, per pipette
-        //
-        // - If we don't have a 'changeTip: never' step for this pipette in the future,
-        // we know the current tip(s) aren't going to be reused, so we can drop them
-        // immediately after the current step is done.
-        const pipetteId = StepGeneration.getPipetteIdFromCCArgs(args)
-        if (pipetteId) {
-          const nextStepArgsForPipette = continuousStepArgs
-            .slice(stepIndex + 1)
-            .find(
-              stepArgs => stepArgs.pipette && stepArgs.pipette === pipetteId
-            )
-
-          const willReuseTip =
-            nextStepArgsForPipette?.changeTip &&
-            nextStepArgsForPipette.changeTip === 'never'
-          if (!willReuseTip) {
-            return [
-              ...acc,
-              (_invariantContext, _prevRobotState) =>
-                StepGeneration.reduceCommandCreators(
-                  [
-                    curriedCommandCreator,
-                    StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
-                      pipette: pipetteId,
-                    }),
-                  ],
-                  _invariantContext,
-                  _prevRobotState
-                ),
-            ]
-          }
-        }
-        return [...acc, curriedCommandCreator]
-      },
-      []
-    )
-
-    const timeline = StepGeneration.commandCreatorsTimeline(
-      curriedCommandCreators,
-      invariantContext,
-      initialRobotState
-    )
-
-    return timeline
-  }
-)
+export const getSubsteps: Selector<Substeps> = state =>
+  state.fileData.computedSubsteps
 
 type WarningsPerStep = {
   [stepId: number | string]: ?Array<StepGeneration.CommandCreatorWarning>,

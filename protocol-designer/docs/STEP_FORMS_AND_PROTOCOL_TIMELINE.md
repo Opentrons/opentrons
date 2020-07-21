@@ -40,6 +40,16 @@ Timeline warnings/errors are generated in command creators. As mentioned above, 
 
 Side note: in an effort to treat `step-generation/` as an independent library, it has its own error/warning messages, and PD UI overwrites these messages with custom text to support things like linking out to support articles or rich-text formatting.
 
+### Offloaded computation of timeline + substeps
+
+Generating the timeline, and generating the substeps (which are derived from a `Timeline`), can require significant computation. This can bog down the render thread, so this work is offloaded to a webworker.
+
+- `timelineMiddleware/` is hooked into Redux. Like the old `getRobotStateTimeline` selector (via reselect), it memoizes the arguments that the worker will use to call `generateRobotStateTimeline` and `generateSubsteps`. When and only when any of those arguments have changed, it must recompute the timeline/substeps.
+- Timeline middleware has a simple web worker that just calls `generateRobotStateTimeline` and/or `generateSubsteps` with the data that was passed to it, and returns the message as a result
+- Timeline middleware triggers a timeline recomputation by posting to its worker. To make the loading spinner UI appear, it also dispatches `COMPUTE_ROBOT_STATE_TIMELINE_REQUEST` action (no payload)
+- When the worker is complete, timeline middleware relays its message by dispatching a `COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS` action (payload contains timeline and substeps)
+- The `getRobotStateTimeline` selector, formerly responsible for doing that computation itself, now is dumb and just reads from a reducer which is also dumb, that reducer at `state.fileData.computedRobotStateTimeline` simply stores the last computed timeline (payload of `COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS`)
+
 # PD Step Form Data Flow & Error/Warning Reporting
 
 The rest of this doc will describe the PD-specific side of things: how Step Forms work and the data transformations they undergo on their way to `step-generation/` utilities.
