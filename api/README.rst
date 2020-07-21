@@ -94,10 +94,10 @@ You can run this tool from the command line of the robot by using ``ssh`` to acc
 To run the tool either type ``calibrate`` or ``python -m opentrons.deck_calibration.dc_main``
 
 Instructions:
-    - Robot must be set up with two 300ul or 50ul single-channel pipettes
+    - Robot must be set up with two ``300ul`` or ``50ul`` single-channel pipettes
       installed on the right-hand and left-hand mount.
-    - Put a GEB 300ul tip onto the pipette.
-    - Use the arrow keys to jog the robot over slot 5 in an open space that
+    - Put a GEB ``300ul`` tip onto the pipette.
+    - Use the arrow keys to jog the robot over slot ``5`` in an open space that
       is not an engraving or a hole.
     - Use the ``q`` and ``a`` keys to jog the pipette up and down respectively
       until the tip is just touching the deck surface, then press ``z``. This
@@ -108,7 +108,7 @@ Instructions:
     - Repeat with ``2`` and ``3``.
     - After calibrating all three points, press the space bar to save the
       configuration.
-    - Optionally, press 4,5,6 or 7 to validate the new configuration.
+    - Optionally, press ``4``, ``5``, ``6`` or ``7`` to validate the new configuration.
     - Press ``p`` to perform tip probe. Press the space bar to save again.
     - Press ``m`` to perform mount calibration. Press the space bar to save again.
     - Press ``esc`` to exit the program.
