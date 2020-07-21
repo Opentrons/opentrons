@@ -179,14 +179,14 @@ async def test_get_reference_location(mock_user_flow_all_combos):
 
 async def test_save_offsets(mock_user_flow):
     uf = mock_user_flow
-    uf._current_state = 'labwareLoaded'
+    uf._current_state = 'measuringNozzleOffset'
     assert uf._nozzle_z_offset is None
 
     await uf._hardware.move_to(x=10, y=10, z=10)
     await uf.save_offset()
     assert uf._nozzle_z_offset == 10
 
-    uf._current_state = 'preparingPipette'
+    uf._current_state = 'measuringTipOffset'
     uf._hw_pipette._has_tip = True
     await uf._hardware.move_to(x=10, y=10, z=40)
     result = await uf._calculate_tip_length()

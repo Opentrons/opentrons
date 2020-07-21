@@ -124,10 +124,10 @@ class TipCalibrationUserFlow():
         return Location(point, None)
 
     async def save_offset(self, *args):
-        if self._current_state == State.labwareLoaded:
+        if self._current_state == State.measuringNozzleOffset:
             cur_pt = await self._hardware.gantry_position(self._mount)
             self._nozzle_z_offset = cur_pt.z
-        elif self._current_state == State.preparingPipette:
+        elif self._current_state == State.measuringTipOffset:
             assert self._hw_pipette.has_tip
             tip_length_offset = await self._calculate_tip_length()
             tip_length_data = modify.create_tip_length_data(
