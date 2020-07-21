@@ -283,6 +283,8 @@ export type TipOffsetFields =
   | 'mix_mmFromBottom'
   | 'aspirate_touchTip_mmFromBottom'
   | 'dispense_touchTip_mmFromBottom'
+  | 'aspirate_delay_tip_position'
+  | 'dispense_delay_tip_position'
   | 'mix_touchTip_mmFromBottom'
 
 export function getIsTouchTipField(fieldName: string): boolean {
@@ -292,4 +294,12 @@ export function getIsTouchTipField(fieldName: string): boolean {
     'mix_touchTip_mmFromBottom',
   ]
   return touchTipFields.includes(fieldName)
+}
+
+export function getIsDelayPositionField(fieldName: string): boolean {
+  const delayPositionFields = [
+    'aspirate_delay_tip_position',
+    'dispense_delay_tip_position',
+  ]
+  return delayPositionFields.includes(fieldName)
 }

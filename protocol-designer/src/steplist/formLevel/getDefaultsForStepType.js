@@ -1,4 +1,5 @@
 // @flow
+import { getPrereleaseFeatureFlag } from '../../persist'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -9,7 +10,11 @@ import {
 } from '../../constants'
 import type { StepType, StepFieldName } from '../../form-types'
 
+const isAirGapDelayEnabled = getPrereleaseFeatureFlag(
+  'OT_PD_ENABLE_AIR_GAP_AND_DELAY'
+)
 // TODO: Ian 2019-01-17 move this somewhere more central - see #2926
+
 export function getDefaultsForStepType(
   stepType: StepType
 ): { [StepFieldName]: any } {
@@ -63,6 +68,10 @@ export function getDefaultsForStepType(
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
         preWetTip: false,
+
+        ...(isAirGapDelayEnabled
+          ? { aspirate_delay_seconds: '1', dispense_delay_seconds: '1' }
+          : {}),
       }
     case 'pause':
       return {
