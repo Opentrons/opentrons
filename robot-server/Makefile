@@ -49,8 +49,8 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	$(pipenv_envvars) pipenv sync $(pipenv_opts)
-	$(pipenv_envvars) pipenv run pip freeze
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean:
@@ -58,7 +58,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(pipenv_envvars)	pipenv --rm
+	$(pipenv) --rm
 
 dist/robotserver-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(clean_cmd)
@@ -84,7 +84,7 @@ dev:
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv_envvars) pipenv shell
+	$(pipenv) shell
 
 .PHONY: push
 push: wheel

@@ -16,7 +16,7 @@ SHX := npx shx
 firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
-sphinx_build := $(pipenv_envvars) pipenv run sphinx-build
+sphinx_build := $(pipenv) run sphinx-build
 
 
 # Find the version of the wheel from package.json using a helper script. We
@@ -68,8 +68,8 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	$(pipenv_envvars) pipenv sync $(pipenv_opts)
-	$(pipenv_envvars) pipenv run pip freeze
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean: docs-clean
@@ -77,7 +77,7 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	$(pipenv_envvars)	pipenv --rm
+	$(pipenv) --rm
 
 dist/opentrons-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(clean_cmd)
@@ -131,7 +131,7 @@ dev:
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv_envvars) pipenv shell
+	$(pipenv) shell
 
 .PHONY: push-no-restart
 push-no-restart: wheel
