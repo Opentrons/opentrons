@@ -39,7 +39,7 @@ ifeq ($(watch), true)
 endif
 
 # run at usage (=), not on makefile parse (:=)
-usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
+usb_host=$(shell yarn run -s discovery find -i 169.254")
 
 
 # install all project dependencies

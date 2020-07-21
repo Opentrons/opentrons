@@ -74,17 +74,18 @@ const createClient = (
   argv: Argv,
   onListChange: (robots: $ReadOnlyArray<DiscoveryClientRobot>) => mixed
 ): DiscoveryClientNext => {
-  const log = createLogger(argv)
+  const logger = createLogger(argv)
   const { pollInterval, candidates } = argv
   const client = createDiscoveryClient({
     onListChange: robots => onListChange(robots.filter(passesFilters(argv))),
+    logger,
   })
   const config = {
     healthPollInterval: pollInterval,
     manualAddresses: candidates.map(ip => ({ ip, port: DEFAULT_PORT })),
   }
 
-  log.debug('Starting client with config: %o', config)
+  logger.debug('Starting client with config: %o', config)
   client.start(config)
 
   return client
