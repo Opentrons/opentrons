@@ -34,7 +34,10 @@ stages:
           attributes:
             sessionType: tipLengthCalibration
             created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+.\\d+"
-            details: {}
+            details: &session_data_attribute_details
+              currentStep: sessionStarted
+              instrument: !anydict
+              labware: !anylist
 
   - name: Load labware
     request:

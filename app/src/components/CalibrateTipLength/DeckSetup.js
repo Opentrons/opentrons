@@ -7,7 +7,7 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import * as Sessions from '../../sessions'
 import { getLatestLabwareDef } from '../../getLabware'
 import type { CalibrateTipLengthChildProps } from './types'
-import { CalibrationLabwareRender } from './calibrationLabwareRender'
+import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import styles from './styles.css'
 
 const DECK_SETUP_WITH_BLOCK_PROMPT =
