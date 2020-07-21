@@ -79,7 +79,7 @@ def _to_response(uploaded_protocol: UploadedProtocol) \
     return route_models.ProtocolResponseDataModel.create(
         attributes=route_models.ProtocolResponseAttributes(
             protocolFile=meta.protocol_file_name.name,
-            userFiles=meta.user_files,
+            userFiles=[str(s) for s in meta.user_files],
             lastModifiedAt=meta.last_modified_at,
             createdAt=meta.created_at
         ),

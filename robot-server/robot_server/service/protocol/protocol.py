@@ -14,7 +14,7 @@ class UploadedProtocolMeta:
     name: str
     protocol_file_name: Path
     directory: TemporaryDirectory
-    user_files: typing.List[str] = field(default_factory=list)
+    user_files: typing.List[Path] = field(default_factory=list)
     last_modified_at: datetime = field(default_factory=datetime.utcnow)
     created_at: datetime = field(default_factory=datetime.utcnow)
 
@@ -59,7 +59,7 @@ class UploadedProtocol:
 
         self._meta = replace(
             self._meta,
-            user_files=self._meta.user_files + [support_file.filename],
+            user_files=self._meta.user_files + [Path(support_file.filename)],
             last_modified_at=datetime.utcnow()
         )
 

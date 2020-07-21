@@ -40,9 +40,9 @@ class ProtocolManager:
         except KeyError:
             raise errors.ProtocolNotFoundException(name)
 
-    def get_all(self) -> typing.Iterable[UploadedProtocol]:
+    def get_all(self) -> typing.Tuple[UploadedProtocol, ...]:
         """Get all the protocols"""
-        return self._protocols.values()
+        return tuple(self._protocols.values())
 
     def remove(self, name: str) -> UploadedProtocol:
         """Remove a protocol"""
@@ -53,11 +53,13 @@ class ProtocolManager:
         except KeyError:
             raise errors.ProtocolNotFoundException(name)
 
-    def remove_all(self):
+    def remove_all(self) -> typing.Tuple[UploadedProtocol, ...]:
         """Remove all protocols"""
         for p in self._protocols.values():
             try:
                 p.clean_up()
             except IOError:
                 log.exception(f"Failed to remove protocol {p.meta.name}")
+        ret_val = tuple(self._protocols.values())
         self._protocols = {}
+        return ret_val
