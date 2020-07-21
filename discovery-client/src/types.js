@@ -164,6 +164,28 @@ export type MdnsBrowserService = $ReadOnly<{|
 |}>
 
 /**
+ * Options used to construct an mDNS browser
+ */
+export type MdnsBrowserOptions = $ReadOnly<{|
+  /** list of allowed ports; if empty, no services will be emitted */
+  ports: $ReadOnlyArray<number>,
+  /** Function to call whenever a service is discovered on mDNS */
+  onService: (service: MdnsBrowserService) => mixed,
+  /** Optional logger */
+  logger?: Logger,
+|}>
+
+/**
+ * An mDNS browser that can be started and stopped as needed
+ */
+export type MdnsBrowser = $ReadOnly<{|
+  /** Start discovering services */
+  start: () => void,
+  /** Stop discovering services and tear down the underlying browser */
+  stop: () => void,
+|}>
+
+/*
  * Robot object that the DiscoveryClient returns that combines latest known
  * health data from the robot along with possible IP addressess
  */
