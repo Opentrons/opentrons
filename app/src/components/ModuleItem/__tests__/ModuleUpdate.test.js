@@ -65,4 +65,9 @@ describe('ModuleUpdate', () => {
       }
     )
   })
+
+  it.todo('is available and can control')
+  it.todo('is available and cannot control')
+  it.todo('is not available and can control')
+  it.todo('is not available and cannot control')
 })
