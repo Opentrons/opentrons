@@ -113,10 +113,7 @@ describe('airGap', () => {
       well: 'A1',
     }
     const result = airGap({ ...params }, invariantContext, robotStateNoTip)
-    expect(getErrorResult(result).errors).toHaveLength(1)
-    expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'NO_TIP_ON_PIPETTE',
-    })
+    expectTimelineError(getErrorResult(result).errors, 'NO_TIP_ON_PIPETTE')
   })
 
   it('should return a volume exceeded error when the air gap volume is above the tip max', () => {
@@ -140,10 +137,7 @@ describe('airGap', () => {
       robotStateWithTip
     )
 
-    expect(getErrorResult(result).errors).toHaveLength(1)
-    expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'TIP_VOLUME_EXCEEDED',
-    })
+    expectTimelineError(getErrorResult(result).errors, 'TIP_VOLUME_EXCEEDED')
   })
 
   it('should return a TC lid closed error when there is a pipette collision with a TC', () => {
@@ -170,10 +164,10 @@ describe('airGap', () => {
       invariantContext,
       robotStateWithTip
     )
-    expect(getErrorResult(result).errors).toHaveLength(1)
-    expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'THERMOCYCLER_LID_CLOSED',
-    })
+    expectTimelineError(
+      getErrorResult(result).errors,
+      'THERMOCYCLER_LID_CLOSED'
+    )
   })
 
   it('should return a module collision error when there a module collision', () => {
@@ -203,10 +197,11 @@ describe('airGap', () => {
       invariantContext,
       robotStateWithTip
     )
-    expect(getErrorResult(result).errors).toHaveLength(1)
-    expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'MODULE_PIPETTE_COLLISION_DANGER',
-    })
+
+    expectTimelineError(
+      getErrorResult(result).errors,
+      'MODULE_PIPETTE_COLLISION_DANGER'
+    )
   })
 
   it('should return a pipette volume exceeded error when the pipette volume is less than the air gap volume', () => {
@@ -229,9 +224,10 @@ describe('airGap', () => {
       invariantContext,
       robotStateWithTip
     )
-    expect(getErrorResult(result).errors).toHaveLength(1)
-    expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'PIPETTE_VOLUME_EXCEEDED',
-    })
+
+    expectTimelineError(
+      getErrorResult(result).errors,
+      'PIPETTE_VOLUME_EXCEEDED'
+    )
   })
 })
