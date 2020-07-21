@@ -9,19 +9,19 @@ from pydantic import BaseModel, Field
 # the middle ware before they are returned to the client
 class AttachedPipette(BaseModel):
     """Pipette (if any) attached to the mount"""
-    model: Optional[str] =\
+    model: str =\
         Field(None,
               description="The model of the attached pipette. These are snake "
                           "case as in the Protocol API. This includes the full"
                           " version string")
-    name: Optional[str] =\
+    name: str =\
         Field(None, description="Short name of pipette model without"
                                 "generation version")
-    tip_length: Optional[float] =\
+    tipLength: float =\
         Field(None, description="The default tip length for this pipette")
-    mount: Optional[str] =\
+    mount: str =\
         Field(None, description="The mount this pipette attached to")
-    serial: Optional[str] =\
+    serial: str =\
         Field(None, description="The serial number of the attached pipette")
 
 
