@@ -44,11 +44,14 @@ Multi-Channel Pipettes
 All building block and advanced commands work with both single-channel (like
 ``'p20_single_gen2'``) and multi-channel (like ``'p20_multi_gen2'``) pipettes.
 To keep the interface to the Opentrons API consistent between single and
-multi-channel pipettes, commands treat the *backmost channel* of a
+multi-channel pipettes, commands treat the *backmost channel* (furthest from the
+door) of a
 multi-channel pipette as the location of the pipette. Location arguments to
 building block and advanced commands are specified for the backmost channel.
-This also means that offset changes (such as :py:meth:`Well.top` or
-:py:meth:`Well.bottom`) can be applied to the single specified well.
+This also means that offset changes (such as :py:meth:`.Well.top` or
+:py:meth:`.Well.bottom`) can be applied to the single specified well, and each
+channels of the pipette will be at the same position relative to the well
+that it is over.
 
 For instance, to aspirate from the first column of a 96-well plate you would write:
 
@@ -84,7 +87,7 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
 
 In general, you should specify wells in the first row of a labware when you are
 using multi-channel pipettes. One common exception to this rule is when using
-384-well plates. The space between the wells in a 384-well plate and the space
+384-well plates. The spacing between the wells in a 384-well plate and the space
 between the nozzles of a multi-channel pipette means that a multi-channel
 pipette accesses every other well in a column. Specifying well A1 acesses every
 other well starting with the first (rows A, C, E, G, I, K, M, and O); specifying well
@@ -113,7 +116,7 @@ F, H, J, L, N, and P).
         # Aspirate from wells A1, C1, E1, G1, I1, K1, M1, and O1
         right.aspirate(300, plate['A1'])
         # Dispense in wells B1, D1, F1, H1, J1, L1, N1, and P1
-        right.dispense(300, plate['A2'])
+        right.dispense(300, plate['B1'])
 
 
 This pattern of access applies to both building block commands and advanced
