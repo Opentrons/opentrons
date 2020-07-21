@@ -16,7 +16,7 @@ export const airGap: CommandCreator<AirGapParams> = (
 ) => {
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
 
-  const actionName = 'aspirate'
+  const actionName = 'airGap'
   const errors: Array<CommandCreatorError> = []
 
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
