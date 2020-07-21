@@ -2,7 +2,7 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 
-import { ModalPage } from '@opentrons/components'
+import { ModalPage, useConditionalConfirm } from '@opentrons/components'
 
 import type {
   SessionCommandString,
@@ -10,16 +10,14 @@ import type {
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest } from '../../robot-api'
-import { CalibrationInfoBox } from '../CalibrationInfoBox'
 
-import { UncalibratedInfo } from './UncalibratedInfo'
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { MeasureNozzle } from './MeasureNozzle'
 import { TipPickUp } from './TipPickUp'
-import { InspectingTip } from './InspectingTip'
 import { MeasureTip } from './MeasureTip'
 import { CompleteConfirmation } from './CompleteConfirmation'
+import { ConfirmExitModal } from './ConfirmExitModal'
 import styles from './styles.css'
 
 import type {
@@ -37,7 +35,6 @@ const PANEL_BY_STEP: {
   labwareLoaded: DeckSetup,
   measuringNozzleOffset: MeasureNozzle,
   preparingPipette: TipPickUp,
-  inspectingTip: InspectingTip,
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
@@ -55,60 +52,63 @@ const PANEL_STYLE_BY_STEP: {
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
-  const { mount, probed, session } = props
-  // TODO: get real session
-  const tipLengthCalSession = session || {}
-  // TODO: get real currentStep from session
-  const currentStep = session?.details?.currentStep || ''
-  const robotName = ''
-  // TODO: get real block setting
-  const hasBlock = false
-  const title = `${mount} pipette tip length calibration`
-  const Panel = PANEL_BY_STEP[currentStep]
-
+  const { session, robotName, hasBlock, closeWizard } = props
   const [dispatchRequest] = useDispatchApiRequest()
 
   function sendCommand(
     command: SessionCommandString,
     data: SessionCommandData = {}
   ) {
-    tipLengthCalSession.id &&
+    session?.id &&
       dispatchRequest(
-        Sessions.createSessionCommand(robotName, tipLengthCalSession.id, {
+        Sessions.createSessionCommand(robotName, session.id, {
           command,
           data,
         })
       )
   }
-  return (
+
+  function deleteSession() {
+    session?.id &&
+      dispatchRequest(Sessions.deleteSession(robotName, session.id))
+    closeWizard()
+  }
+
+  const {
+    showConfirmation: showConfirmExit,
+    confirm: confirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(() => {
+    sendCommand(Sessions.tipCalCommands.EXIT)
+    deleteSession()
+  }, true)
+
+  if (!session) {
+    return null
+  }
+  const { currentStep, instrument, labware } = session?.details
+  const Panel = PANEL_BY_STEP[currentStep]
+
+  return Panel ? (
     <>
-      {Panel ? (
-        <ModalPage
-          titleBar={{
-            title: TIP_LENGTH_CALIBRATION_SUBTITLE,
-            back: {
-              onClick: () => console.log('TODO: handle confirm exit'),
-              title: EXIT,
-              children: EXIT,
-            },
-          }}
-          contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
-        >
-          <Panel
-            {...props}
-            hasBlock={hasBlock}
-            sendSessionCommand={sendCommand}
-          />
-        </ModalPage>
-      ) : (
-        <CalibrationInfoBox confirmed={probed} title={title}>
-          <UncalibratedInfo
-            {...props}
-            hasBlock={hasBlock}
-            sendSessionCommand={sendCommand}
-          />
-        </CalibrationInfoBox>
+      <ModalPage
+        titleBar={{
+          title: TIP_LENGTH_CALIBRATION_SUBTITLE,
+          back: { onClick: confirmExit, title: EXIT, children: EXIT },
+        }}
+        contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
+      >
+        <Panel
+          instrument={instrument}
+          labware={labware}
+          hasBlock={hasBlock}
+          sendSessionCommand={sendCommand}
+          deleteSession={deleteSession}
+        />
+      </ModalPage>
+      {showConfirmExit && (
+        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
       )}
     </>
-  )
+  ) : null
 }

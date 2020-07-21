@@ -1,4 +1,4 @@
-from typing import Dict, Awaitable, Callable, Any
+from typing import Dict, Awaitable, Callable, Any, Set, List
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
@@ -22,6 +22,10 @@ from robot_server.robot.calibration.tip_length.constants import (
     TIP_RACK_SLOT,
     CAL_BLOCK_SETUP_BY_MOUNT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER
+)
+from robot_server.robot.calibration.tip_length.models import (
+    RequiredLabware,
+    AttachedPipette
 )
 
 
@@ -74,6 +78,32 @@ class TipCalibrationUserFlow():
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
 
+    @property
+    def current_state(self) -> State:
+        return self._current_state
+
+    def get_pipette(self) -> AttachedPipette:
+        return AttachedPipette(model=self._hw_pipette.model,
+                               name=self._hw_pipette.name,
+                               tip_length=self._hw_pipette.config.tip_length,
+                               mount=str(self._mount),
+                               serial=self._hw_pipette.pipette_id)
+
+    def get_required_labware(self) -> List[RequiredLabware]:
+        slots = self._deck.get_non_fixture_slots()
+        lw_by_slot = {s: self._deck[s] for s in slots if self._deck[s]}
+        alt_trs = self._get_alt_tip_racks(),
+        return [
+            RequiredLabware(
+                alternatives=alt_trs if s == TIP_RACK_SLOT else [],
+                slot=s,
+                loadName=lw.load_name,
+                namespace=lw._definition['namespace'],  # type: ignore
+                version=str(lw._definition['version']),  # type: ignore
+                isTiprack=lw.is_tiprack  # type: ignore
+            ) for s, lw in lw_by_slot.items()
+        ]
+
     async def handle_command(self,
                              name: Any,
                              data: Dict[Any, Any]):
@@ -88,7 +118,7 @@ class TipCalibrationUserFlow():
                                                         name)
         handler = self._command_map.get(name)
         if handler is not None:
-            return await handler(**data)
+            await handler(**data)
         self._set_current_state(next_state)
 
     async def load_labware(self, *args):
@@ -151,6 +181,10 @@ class TipCalibrationUserFlow():
         else:
             raise Error(
                     f'No tiprack found for pipette {self._hw_pipette.model}')
+
+    def _get_alt_tip_racks(self) -> Set[str]:
+        pip_vol = self._hw_pipette.config.max_volume
+        return set(TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].alternatives)
 
     def _initialize_deck(self):
         tip_rack_lw = self._get_tip_rack_lw()

@@ -13,7 +13,6 @@ import { Introduction } from '../Introduction'
 import { DeckSetup } from '../DeckSetup'
 import { MeasureNozzle } from '../MeasureNozzle'
 import { TipPickUp } from '../TipPickUp'
-import { InspectingTip } from '../InspectingTip'
 import { MeasureTip } from '../MeasureTip'
 import { CompleteConfirmation } from '../CompleteConfirmation'
 
@@ -61,7 +60,6 @@ describe('CalibrateTipLength', () => {
     DeckSetup,
     MeasureNozzle,
     TipPickUp,
-    InspectingTip,
     MeasureTip,
     CompleteConfirmation,
   ]
@@ -70,7 +68,6 @@ describe('CalibrateTipLength', () => {
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: MeasureNozzle, currentStep: 'measuringNozzleOffset' },
-    { component: InspectingTip, currentStep: 'inspectingTip' },
     { component: TipPickUp, currentStep: 'preparingPipette' },
     { component: MeasureTip, currentStep: 'measuringTipOffset' },
     { component: CompleteConfirmation, currentStep: 'calibrationComplete' },
@@ -97,9 +94,8 @@ describe('CalibrateTipLength', () => {
         <CalibrateTipLength
           robotName="robot-name"
           session={mockTipLengthSession}
-          mount="left"
-          isMulti
-          probed
+          closeWizard={() => {}}
+          hasBlock={true}
         />,
         {
           wrappingComponent: Provider,

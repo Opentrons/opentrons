@@ -5,7 +5,10 @@ from functools import lru_cache
 from uuid import uuid4
 
 from pydantic import BaseModel, Field, validator
-from robot_server.robot.calibration.check import models as calibration_models
+from robot_server.robot.calibration.check import (
+    models as calibration_check_models)
+from robot_server.robot.calibration.tip_length import (
+    models as tip_length_calibration_models)
 
 from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
@@ -55,7 +58,8 @@ SessionCreateParamType = typing.Union[
 ]
 
 SessionDetails = typing.Union[
-    calibration_models.CalibrationSessionStatus,
+    calibration_check_models.CalibrationSessionStatus,
+    tip_length_calibration_models.TipCalibrationSessionStatus,
     EmptyModel
 ]
 

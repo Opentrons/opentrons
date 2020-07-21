@@ -3,9 +3,11 @@ import * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
 
 import { JogControls } from '../JogControls'
+import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
+import { formatJogVector } from './utils'
 
 // TODO: fill with real video assets keyed by mount and then channels
 const assetMap = {
@@ -22,6 +24,7 @@ const TOUCHING = 'touching the deck in'
 const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis'
 
 export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
+  const { sendSessionCommand } = props
   // TODO: get real isMulti and mount and slotName from the session
   const isMulti = false
   const mount = 'left'
@@ -33,10 +36,14 @@ export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    console.log('TODO: wire up jog with params', axis, dir, step)
-    // props.sendSessionCommand('jog',{
-    //   vector: formatJogVector(axis, direction, step),
-    // }, {})
+    sendSessionCommand(Sessions.tipCalCommands.JOG, {
+      vector: formatJogVector(axis, dir, step),
+    })
+  }
+
+  const proceed = () => {
+    sendSessionCommand(Sessions.tipCalCommands.SAVE_OFFSET)
+    sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_TIP_RACK)
   }
 
   return (
@@ -67,12 +74,7 @@ export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
         <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
       </div>
       <div className={styles.button_row}>
-        <PrimaryButton
-          onClick={() => {
-            console.log('TODO: save nozzle offset')
-          }}
-          className={styles.command_button}
-        >
+        <PrimaryButton onClick={proceed} className={styles.command_button}>
           {SAVE_NOZZLE_Z_AXIS}
         </PrimaryButton>
       </div>
