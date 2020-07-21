@@ -65,6 +65,17 @@ export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
   const isMulti = false
   const slotName = 'slot 3'
 
+  const referencePointStr = hasBlock ? (
+    BLOCK
+  ) : (
+    <Text as="strong">{FLAT_SURFACE}</Text>
+  )
+  const referenceSlotStr = hasBlock ? (
+    <Text as="strong">{`${slotName}`}</Text>
+  ) : (
+    OF_THE_TRASH_BIN
+  )
+
   const demoAsset = React.useMemo(
     () =>
       mount &&
@@ -105,12 +116,14 @@ export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
           <Flex alignItems={ALIGN_CENTER} width="100%">
             <Text width="49%" fontSize={FONT_SIZE_BODY_2}>
               {JOG_UNTIL}
-              <b>&nbsp;{BARELY_TOUCHING}&nbsp;</b>
+              &nbsp;
+              <Text as="strong">{BARELY_TOUCHING}</Text>
+              &nbsp;
               {THE}
               &nbsp;
-              {hasBlock ? BLOCK : <b>{FLAT_SURFACE}</b>}
+              {referencePointStr}
               &nbsp;
-              {hasBlock ? <b>{`${slotName}`}</b> : OF_THE_TRASH_BIN}
+              {referenceSlotStr}
               &#46;
             </Text>
             <div className={styles.step_check_video_wrapper}>
