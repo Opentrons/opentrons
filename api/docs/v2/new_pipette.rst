@@ -53,6 +53,9 @@ This also means that offset changes (such as :py:meth:`.Well.top` or
 channels of the pipette will be at the same position relative to the well
 that it is over.
 
+Because there is only one motor in a multi-channel pipette, multi-channel
+pipettes will always aspirate and dispense on all channels simultaneously.
+
 For instance, to aspirate from the first column of a 96-well plate you would write:
 
 .. code-block:: python
