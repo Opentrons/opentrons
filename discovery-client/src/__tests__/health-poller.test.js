@@ -63,9 +63,11 @@ describe('health poller', () => {
   })
 
   afterEach(() => {
-    jest.clearAllTimers()
-    jest.useRealTimers()
-    jest.resetAllMocks()
+    return flush().then(() => {
+      jest.clearAllTimers()
+      jest.useRealTimers()
+      jest.resetAllMocks()
+    })
   })
 
   it('should call GET /health and GET /server/update/health', () => {
@@ -319,55 +321,49 @@ describe('health poller', () => {
     })
   })
 
-  it('should ignore late responses', () => {
-    // TODO(mc, 2020-07-13): Jest v25 fake timers do not mock Date.now,
-    // so this test needs real timers. Move back to fake timers after upgrade
-    jest.useRealTimers()
-    // these need to be created after real timers are back on for tests to pass
-    const onPollResult = jest.fn()
-    const poller = createHealthPoller({ onPollResult })
+  // TODO(mc, 2020-07-13): Jest v25 fake timers do not mock Date.now, and using
+  // real times makes this test flakey. Revisit after upgrade to Jest v26
+  it.todo('should ignore late responses')
+  // // the first two calls the fetch (/health and /server/update/health) will error
+  // // out _after_ the second two calls are made and completed
+  // const mockErrorImpl = () => {
+  //   return new Promise((resolve, reject) => {
+  //     setTimeout(() => reject(new Error('Oh no eventual error!')), 75)
+  //   })
+  // }
+  // fetch.mockImplementationOnce(mockErrorImpl)
+  // fetch.mockImplementationOnce(mockErrorImpl)
 
-    // the first two calls the fetch (/health and /server/update/health) will error
-    // out _after_ the second two calls are made and completed
-    const mockErrorImpl = () => {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => reject(new Error('Oh no eventual error!')), 75)
-      })
-    }
-    fetch.mockImplementationOnce(mockErrorImpl)
-    fetch.mockImplementationOnce(mockErrorImpl)
+  // // the second two calls with successfully resolve quickly before the first
+  // // two calls return their eventual errors
+  // stubFetchOnce('http://127.0.0.1:31950/health')(
+  //   makeMockJsonResponse(Fixtures.mockHealthResponse)
+  // )
+  // stubFetchOnce('http://127.0.0.1:31950/server/update/health')(
+  //   makeMockJsonResponse(Fixtures.mockServerHealthResponse)
+  // )
 
-    // the second two calls with successfully resolve quickly before the first
-    // two calls return their eventual errors
-    stubFetchOnce('http://127.0.0.1:31950/health')(
-      makeMockJsonResponse(Fixtures.mockHealthResponse)
-    )
-    stubFetchOnce('http://127.0.0.1:31950/server/update/health')(
-      makeMockJsonResponse(Fixtures.mockServerHealthResponse)
-    )
+  // poller.start({
+  //   list: [HOST_1],
+  //   // NOTE(mc, 2020-07-13): see TODO above. This value chosen to work well
+  //   // with real time but runs the risk of being flakey because setTimeout
+  //   // is not exact in real life
+  //   interval: 50,
+  // })
 
-    poller.start({
-      list: [HOST_1],
-      // NOTE(mc, 2020-07-13): see TODO above. This value chosen to work well
-      // with real time but runs the risk of being flakey because setTimeout
-      // is not exact in real life
-      interval: 50,
-    })
-
-    return new Promise(resolve => setTimeout(resolve, 150)).then(() => {
-      // ensure that the fact that the second poll returned means the eventual
-      // errors for the first poll are thrown away
-      expect(onPollResult).toHaveBeenCalledTimes(1)
-      expect(onPollResult).toHaveBeenCalledWith({
-        ip: '127.0.0.1',
-        port: 31950,
-        health: Fixtures.mockHealthResponse,
-        serverHealth: Fixtures.mockServerHealthResponse,
-        healthError: null,
-        serverHealthError: null,
-      })
-    })
-  })
+  // return new Promise(resolve => setTimeout(resolve, 150)).then(() => {
+  //   // ensure that the fact that the second poll returned means the eventual
+  //   // errors for the first poll are thrown away
+  //   expect(onPollResult).toHaveBeenCalledTimes(1)
+  //   expect(onPollResult).toHaveBeenCalledWith({
+  //     ip: '127.0.0.1',
+  //     port: 31950,
+  //     health: Fixtures.mockHealthResponse,
+  //     serverHealth: Fixtures.mockServerHealthResponse,
+  //     healthError: null,
+  //     serverHealthError: null,
+  //   })
+  // })
 
   it('should ignore responses after stop()', () => {
     const mockErrorImpl = () => {
@@ -375,6 +371,7 @@ describe('health poller', () => {
         setTimeout(() => reject(new Error('Oh no eventual error!')), 25)
       })
     }
+
     fetch.mockImplementationOnce(mockErrorImpl)
     fetch.mockImplementationOnce(mockErrorImpl)
 
