@@ -11,7 +11,6 @@ import {
 } from '../../constants'
 import type { StepType, StepFieldName } from '../../form-types'
 
-// OT_PD_ENABLE_AIR_GAP_AND_DELAY
 const isAirGapDelayEnabled = getPrereleaseFeatureFlag(
   'OT_PD_ENABLE_AIR_GAP_AND_DELAY'
 )
