@@ -24,7 +24,7 @@ A third optional argument can be used to give the labware a nickname to be displ
 .. code-block:: python
 
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat',
-                                  slot='2',
+                                  location='2',
                                   label='any-name-you-want')
 
 Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns
