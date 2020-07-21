@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 // @flow
 import * as React from 'react'
 import {
@@ -21,12 +22,9 @@ import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
-<<<<<<< HEAD
 import { formatJogVector } from './utils'
-=======
 import leftMultiBlockNozzleAsset from './videos/Left_Multi_CalBlock_Nozzle_REV1.webm'
 import leftMultiTrashNozzleAsset from './videos/Left_Multi_Trash_Nozzle_REV1.webm'
->>>>>>> refactor(app): tip length calibration: jog + complete screens
 
 const assetMap = {
   block: {
@@ -61,12 +59,9 @@ const OF_THE_TRASH_BIN = 'of the trash bin'
 const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis'
 
 export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
-<<<<<<< HEAD
-  const { sendSessionCommand } = props
-=======
-  const { mount, hasBlock } = props
->>>>>>> refactor(app): tip length calibration: jog + complete screens
+  const { sendSessionCommand, hasBlock } = props
   // TODO: get real isMulti and mount and slotName from the session
+  const mount = 'left'
   const isMulti = false
   const slotName = 'slot 3'
 
@@ -135,7 +130,7 @@ export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
           <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
         </div>
         <Flex width="100%">
-          <PrimaryButton onClick={onClick={proceed}} className={styles.command_button}>
+          <PrimaryButton onClick={proceed} className={styles.command_button}>
             {SAVE_NOZZLE_Z_AXIS}
           </PrimaryButton>
         </Flex>

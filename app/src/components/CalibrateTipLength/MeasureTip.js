@@ -21,12 +21,9 @@ import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
-<<<<<<< HEAD
 import { formatJogVector } from './utils'
-=======
 import leftMultiBlockTipAsset from './videos/Left_Multi_CalBlock_Tip_REV1.webm'
 import leftMultiTrashTipAsset from './videos/Left_Multi_Trash_Tip_REV1.webm'
->>>>>>> refactor(app): tip length calibration: jog + complete screens
 
 const assetMap = {
   block: {
@@ -61,12 +58,9 @@ const OF_THE_TRASH_BIN = 'of the trash bin'
 const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
 
 export function MeasureTip(props: CalibrateTipLengthChildProps): React.Node {
-<<<<<<< HEAD
-  const { sendSessionCommand } = props
-=======
-  const { mount, hasBlock } = props
->>>>>>> refactor(app): tip length calibration: jog + complete screens
+  const { sendSessionCommand, hasBlock } = props
   // TODO: get real isMulti and mount and slotName from the session
+  const mount = 'left'
   const isMulti = false
   const slotName = 'slot 3'
 

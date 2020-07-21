@@ -50,10 +50,7 @@ const ASSET_MAP = {
 export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
   const { sendSessionCommand } = props
   // TODO: get real isMulti and tiprack from the session
-  const { mount, session } = props
-  const tiprackID =
-    session.details.instruments[mount.toLowerCase()]['tiprack_id']
-  const tiprack = session.details.labware.find(l => l.id === tiprackID)
+  const tiprack = {}
   const isMulti = true
 
   const [showTipInspection, setShowTipInspection] = React.useState(false)
@@ -172,8 +169,14 @@ type InspectingTipProps = {|
 
 export function InspectingTip(props: InspectingTipProps): React.Node {
   return (
-    <div className={styles.tip_pick_up_confirmation_wrapper}>
-      <p className={styles.pick_up_tip_confirmation_body}>{CONFIRM_TIP_BODY}</p>
+    <Flex
+      width="100%"
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_CENTER}
+      marginY={SPACING_3}
+    >
+      <Text marginBottom={SPACING_3}>{CONFIRM_TIP_BODY}</Text>
       <PrimaryButton
         className={styles.pick_up_tip_confirmation_button}
         onClick={props.invalidateTip}
@@ -186,6 +189,6 @@ export function InspectingTip(props: InspectingTipProps): React.Node {
       >
         {CONFIRM_TIP_YES_BUTTON_TEXT}
       </PrimaryButton>
-    </div>
+    </Flex>
   )
 }
