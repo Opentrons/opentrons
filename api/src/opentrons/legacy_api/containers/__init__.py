@@ -26,7 +26,7 @@ from opentrons.calibration_storage import (
     modify)
 
 if TYPE_CHECKING:
-    from opentrons.calibration_storage.types import TipLengthCalibration
+    from opentrons.calibration_storage.dev_types import TipLengthCalibration
 
 
 __all__ = [

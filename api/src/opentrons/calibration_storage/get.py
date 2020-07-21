@@ -13,10 +13,12 @@ from . import (
     file_operators as io, helpers)
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from .dev_types import (
+        TipLengthCalibration, CalibrationIndexDict, CalibrationDict)
 
 
 def _format_calibration_type(
-        data: local_types.CalibrationDict) -> local_types.CalibrationTypes:
+        data: 'CalibrationDict') -> local_types.CalibrationTypes:
     offset = local_types.OffsetData(
         value=data['default']['offset'],
         last_modified=data['default']['lastModified']
@@ -32,7 +34,7 @@ def _format_calibration_type(
 
 
 def _format_parent(
-        data: local_types.CalibrationIndexDict)\
+        data: 'CalibrationIndexDict')\
             -> local_types.ParentOptions:
     options = local_types.ParentOptions(slot=data['slot'])
     if data['module']:
@@ -72,7 +74,7 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
 
 def _get_tip_length_data(
         pip_id: str, labware_hash: str, labware_load_name: str
-) -> local_types.TipLengthCalibration:
+) -> 'TipLengthCalibration':
     try:
         pip_tip_length_path = config.get_tip_length_cal_path()/f'{pip_id}.json'
         tip_length_data =\
@@ -107,7 +109,7 @@ def get_labware_calibration(lookup_path: local_types.StrPath) -> Point:
 def load_tip_length_calibration(
         pip_id: str,
         definition: 'LabwareDefinition',
-        parent: str) -> local_types.TipLengthCalibration:
+        parent: str) -> 'TipLengthCalibration':
     """
     Function used to grab the current tip length associated
     with a particular tiprack.
