@@ -21,6 +21,14 @@ export const airGap: CommandCreator<AirGapParams> = (
 
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
 
+  if (!pipetteSpec) {
+    errors.push(errorCreators.pipetteDoesNotExist({ actionName, pipette }))
+  }
+
+  if (!labware || !prevRobotState.labware[labware]) {
+    errors.push(errorCreators.labwareDoesNotExist({ actionName, labware }))
+  }
+
   if (!prevRobotState.tipState.pipettes[pipette]) {
     errors.push(
       errorCreators.noTipOnPipette({

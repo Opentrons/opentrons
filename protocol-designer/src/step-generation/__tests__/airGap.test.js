@@ -11,6 +11,7 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../__fixtures__'
+import { expectTimelineError } from '../__utils__/testMatchers'
 import { airGap } from '../commandCreators/atomic/airGap'
 import { thermocyclerPipetteCollision, modulePipetteCollision } from '../utils'
 
@@ -71,6 +72,36 @@ describe('airGap', () => {
         params,
       },
     ])
+  })
+
+  it('should return pipette error when using an invalid pipette', () => {
+    const result = airGap(
+      {
+        ...flowRateAndOffsets,
+        pipette: 'badPipette',
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expectTimelineError(getErrorResult(result).errors, 'PIPETTE_DOES_NOT_EXIST')
+  })
+
+  it('should return a labware error when using invalid labware', () => {
+    const result = airGap(
+      {
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: 'problematicLabwareId',
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expectTimelineError(getErrorResult(result).errors, 'LABWARE_DOES_NOT_EXIST')
   })
 
   it('should return a no tip error when there is no tip', () => {
