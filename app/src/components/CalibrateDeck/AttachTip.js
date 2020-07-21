@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import type { CalibrateDeckStartedProps, CalibrationStep } from './types'
-import { PrimaryButton } from '@opentrons/components'
+import { PrimaryButton, Link } from '@opentrons/components'
 
 import styles from './styles.css'
 
@@ -22,6 +22,9 @@ const DIAGRAMS: { [step: CalibrationStep]: { [Channels]: string } } = {
     multi: require('./images/detach-tip-multi@3x.png'),
   },
 }
+
+const PIPETTE_CALIBRATION_URL =
+  'https://support.opentrons.com/en/articles/2687641-get-started-calibrate-pipettes-and-labware'
 
 export function AttachTip(props: AttachTipProps): React.Node {
   const multi = props.pipette.channels === 8
@@ -45,13 +48,23 @@ export function AttachTip(props: AttachTipProps): React.Node {
       <span>
         <p>Remove the Opentrons tip from the pipette.</p>
         <p>
-          You must restart your robot to finish the initial robot calibration
-          process and have the new settings take effect. It may take several
-          minutes for your robot to restart.
+          Please note that as a result of the new deck calibration data, your
+          prior pipette calibration data is no longer valid.
+        </p>
+        <p>
+          In order to effectively use this new deck calibration, please
+          calibrate your pipette prior to running your next protocol.
+        </p>
+        <p>
+          Learn more about pipette calibration &nbsp;
+          <Link href={PIPETTE_CALIBRATION_URL} external>
+            here
+          </Link>
+          &nbsp;
         </p>
       </span>
     )
-    buttonText = 'finish and restart robot'
+    buttonText = 'save deck calibration and exit'
   }
 
   return (
