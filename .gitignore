@@ -91,6 +91,7 @@ labware-library/cypress/screenshots/
 labware-library/cypress/videos/
 protocol-designer/cypress/screenshots/
 protocol-designer/cypress/videos/
+protocol-designer/benchmarks/output
 
 # Local Calibration Data
 calibrations/

@@ -2,7 +2,7 @@
 
 Note: this tooling around benchmark testing is very minimal and subject to change!
 
-To run all PD benchmarks, navigate to the monorepo root dir and do `NODE_ENV=test node ./scripts/runBenchmarks.js protocol-designer/benchmarks/*.js`
+To run all PD benchmarks, `make -C protocol-designer benchmarks`. This will output to a file `protocol-designer/benchmarks/output/$(date_time)`. To set the name of the file, specify `benchmark_output`
 
 These benchmarks use [Nanobench](https://github.com/mafintosh/nanobench), so you can pipe the output to a file and compare benchmark runs with `yarn nanobench-compare fileA fileB`
 
