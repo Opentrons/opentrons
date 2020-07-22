@@ -64,9 +64,7 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
   const jogUntilAbove = isMulti ? (
     <>
       {MULTI_JOG_UNTIL_AT}
-      &nbsp;
-      <Text as="strong">{CLOSEST}</Text>
-      &nbsp;
+      <Text as="strong">{` ${CLOSEST} `}</Text>
       {TO_YOU_IS_CENTERED}
     </>
   ) : (
@@ -121,21 +119,17 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
             alignItems={ALIGN_CENTER}
             textAlign={TEXT_ALIGN_CENTER}
           >
+            <Text fontSize={FONT_SIZE_BODY_2} paddingX={SPACING_2}>
+              {jogUntilAbove}
+            </Text>
             <Text
               fontSize={FONT_SIZE_BODY_2}
               marginBottom={SPACING_3}
               paddingX={SPACING_2}
             >
-              {jogUntilAbove}
-              &nbsp;
-              <Text as="strong">{TIP_WELL_NAME}</Text>
-              &nbsp;
-              {POSITION}
-              &nbsp;
-              {AND}
-              &nbsp;
-              <Text as="strong">{FLUSH}</Text>
-              &nbsp;
+              <Text as="strong">{` ${TIP_WELL_NAME} `}</Text>
+              {`${POSITION} ${AND}`}
+              <Text as="strong">{` ${FLUSH} `}</Text>
               {WITH_TOP_OF_TIP}
             </Text>
             <div className={styles.step_check_video_wrapper}>

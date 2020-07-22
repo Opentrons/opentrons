@@ -67,10 +67,10 @@ export function MeasureTip(props: CalibrateTipLengthChildProps): React.Node {
   const referencePointStr = hasBlock ? (
     BLOCK
   ) : (
-    <Text as="strong">{FLAT_SURFACE}</Text>
+    <Text as="strong">{`${FLAT_SURFACE} `}</Text>
   )
   const referenceSlotStr = hasBlock ? (
-    <Text as="strong">{`${slotName}`}</Text>
+    <Text as="strong">{` ${slotName}`}</Text>
   ) : (
     OF_THE_TRASH_BIN
   )
@@ -114,15 +114,11 @@ export function MeasureTip(props: CalibrateTipLengthChildProps): React.Node {
           <Flex alignItems={ALIGN_CENTER} width="100%">
             <Text width="49%" fontSize={FONT_SIZE_BODY_2}>
               {JOG_UNTIL}
-              &nbsp;
-              <Text as="strong">{BARELY_TOUCHING}</Text>
-              &nbsp;
-              {THE}
-              &nbsp;
+              <Text as="strong">{` ${BARELY_TOUCHING} `}</Text>
+              {`${THE} `}
               {referencePointStr}
-              &nbsp;
               {referenceSlotStr}
-              &#46;
+              {`.`}
             </Text>
             <div className={styles.step_check_video_wrapper}>
               <video
