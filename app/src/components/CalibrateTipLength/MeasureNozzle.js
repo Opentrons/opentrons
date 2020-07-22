@@ -1,6 +1,21 @@
+/* eslint-disable no-return-assign */
 // @flow
 import * as React from 'react'
-import { PrimaryButton } from '@opentrons/components'
+import {
+  Box,
+  Flex,
+  PrimaryButton,
+  Text,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  BORDER_SOLID_LIGHT,
+  DIRECTION_COLUMN,
+  FONT_SIZE_BODY_2,
+  POSITION_RELATIVE,
+  SPACING_2,
+  SPACING_3,
+  SPACING_4,
+} from '@opentrons/components'
 
 import { JogControls } from '../JogControls'
 import * as Sessions from '../../sessions'
@@ -8,31 +23,66 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
 import { formatJogVector } from './utils'
+import leftMultiBlockNozzleAsset from './videos/Left_Multi_CalBlock_Nozzle_REV1.webm'
+import leftMultiTrashNozzleAsset from './videos/Left_Multi_Trash_Nozzle_REV1.webm'
 
-// TODO: fill with real video assets keyed by mount and then channels
 const assetMap = {
-  left: {},
-  right: {},
+  block: {
+    left: {
+      multi: leftMultiBlockNozzleAsset,
+      single: leftMultiBlockNozzleAsset, // TODO: get asset for single pipettes
+    },
+    right: {
+      multi: leftMultiBlockNozzleAsset,
+      single: leftMultiBlockNozzleAsset, // TODO: get asset for single pipettes
+    },
+  },
+  trash: {
+    left: {
+      multi: leftMultiTrashNozzleAsset,
+      single: leftMultiTrashNozzleAsset, // TODO: get asset for single pipettes
+    },
+    right: {
+      multi: leftMultiTrashNozzleAsset,
+      single: leftMultiTrashNozzleAsset, // TODO: get asset for single pipettes
+    },
+  },
 }
 
 const HEADER = 'Save the nozzle z-axis'
-const JOG_UNTIL = 'Jog the robot until nozzle is'
-const JUST_BARELY = 'just barely'
-// TODO: check copy here, should be touching the calibration block if present
-// and the top of the trash if not
-const TOUCHING = 'touching the deck in'
+const JOG_UNTIL = 'Jog the robot until the nozzle is'
+const BARELY_TOUCHING = 'barely touching (less than 0.1 mm)'
+const THE = 'the'
+const BLOCK = 'block in'
+const FLAT_SURFACE = 'flat surface'
+const OF_THE_TRASH_BIN = 'of the trash bin'
 const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis'
 
 export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
-  const { sendSessionCommand } = props
+  const { sendSessionCommand, hasBlock } = props
   // TODO: get real isMulti and mount and slotName from the session
-  const isMulti = false
   const mount = 'left'
+  const isMulti = false
   const slotName = 'slot 3'
 
+  const referencePointStr = hasBlock ? (
+    BLOCK
+  ) : (
+    <Text as="strong">{`${FLAT_SURFACE} `}</Text>
+  )
+  const referenceSlotStr = hasBlock ? (
+    <Text as="strong">{` ${slotName}`}</Text>
+  ) : (
+    OF_THE_TRASH_BIN
+  )
+
   const demoAsset = React.useMemo(
-    () => mount && assetMap[mount][isMulti ? 'multi' : 'single'],
-    [mount, isMulti]
+    () =>
+      mount &&
+      assetMap[hasBlock ? 'block' : 'trash'][mount][
+        isMulti ? 'multi' : 'single'
+      ],
+    [mount, isMulti, hasBlock]
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
@@ -48,36 +98,52 @@ export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
 
   return (
     <>
-      <div className={styles.modal_header}>
-        <h3>{HEADER}</h3>
-      </div>
-      <div className={styles.tip_pick_up_demo_wrapper}>
-        <p className={styles.tip_pick_up_demo_body}>
-          {JOG_UNTIL}
-          <b>&nbsp;{JUST_BARELY}&nbsp;</b>
-          {TOUCHING}
-          <b>&nbsp;{slotName}.&nbsp;</b>
-        </p>
-        <div className={styles.step_check_video_wrapper}>
-          <video
-            key={demoAsset}
-            className={styles.step_check_video}
-            autoPlay={true}
-            loop={true}
-            controls={false}
-          >
-            {/* TODO: insert assets <source src={demoAsset} /> */}
-          </video>
+      <Flex
+        marginY={SPACING_2}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_FLEX_START}
+        position={POSITION_RELATIVE}
+        width="100%"
+      >
+        <h3 className={styles.intro_header}>{HEADER}</h3>
+        <Box
+          paddingX={SPACING_3}
+          paddingY={SPACING_4}
+          border={BORDER_SOLID_LIGHT}
+          borderWidth="2px"
+          width="100%"
+        >
+          <Flex alignItems={ALIGN_CENTER} width="100%">
+            <Text width="49%" fontSize={FONT_SIZE_BODY_2}>
+              {JOG_UNTIL}
+              <Text as="strong">{` ${BARELY_TOUCHING} `}</Text>
+              {`${THE} `}
+              {referencePointStr}
+              {referenceSlotStr}
+              {`.`}
+            </Text>
+            <div className={styles.step_check_video_wrapper}>
+              <video
+                key={demoAsset}
+                className={styles.step_check_video}
+                autoPlay={true}
+                loop={true}
+                controls={false}
+              >
+                <source src={demoAsset} />
+              </video>
+            </div>
+          </Flex>
+        </Box>
+        <div>
+          <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
         </div>
-      </div>
-      <div className={styles.tip_pick_up_controls_wrapper}>
-        <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
-      </div>
-      <div className={styles.button_row}>
-        <PrimaryButton onClick={proceed} className={styles.command_button}>
-          {SAVE_NOZZLE_Z_AXIS}
-        </PrimaryButton>
-      </div>
+        <Flex width="100%">
+          <PrimaryButton onClick={proceed} className={styles.command_button}>
+            {SAVE_NOZZLE_Z_AXIS}
+          </PrimaryButton>
+        </Flex>
+      </Flex>
     </>
   )
 }

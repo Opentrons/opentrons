@@ -1,6 +1,21 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton } from '@opentrons/components'
+import {
+  Box,
+  Flex,
+  PrimaryButton,
+  Text,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  BORDER_SOLID_LIGHT,
+  DIRECTION_COLUMN,
+  FONT_SIZE_BODY_2,
+  JUSTIFY_CENTER,
+  POSITION_RELATIVE,
+  SPACING_2,
+  SPACING_3,
+  TEXT_ALIGN_CENTER,
+} from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../sessions'
@@ -49,7 +64,7 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
   const jogUntilAbove = isMulti ? (
     <>
       {MULTI_JOG_UNTIL_AT}
-      <b>&nbsp;{CLOSEST}&nbsp;</b>
+      <Text as="strong">{` ${CLOSEST} `}</Text>
       {TO_YOU_IS_CENTERED}
     </>
   ) : (
@@ -79,44 +94,66 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
     <InspectingTip invalidateTip={invalidateTip} confirmTip={confirmTip} />
   ) : (
     <>
-      <div className={styles.modal_header}>
-        <h3>
+      <Flex
+        marginY={SPACING_2}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_FLEX_START}
+        position={POSITION_RELATIVE}
+        width="100%"
+      >
+        <h3 className={styles.intro_header}>
           {TIP_PICK_UP_HEADER}
           {tiprackDef
             ? getLabwareDisplayName(tiprackDef).replace('µL', 'uL')
             : null}
         </h3>
-      </div>
-      <div className={styles.tip_pick_up_demo_wrapper}>
-        <p className={styles.tip_pick_up_demo_body}>
-          {jogUntilAbove}
-          <b>{` ${TIP_WELL_NAME} `}</b>
-          {POSITION}
-          <br />
-          {AND}
-          <b>{` ${FLUSH} `}</b>
-          {WITH_TOP_OF_TIP}
-        </p>
-        <div className={styles.step_check_video_wrapper}>
-          <video
-            key={demoAsset}
-            className={styles.step_check_video}
-            autoPlay={true}
-            loop={true}
-            controls={false}
+        <Box
+          padding={SPACING_3}
+          border={BORDER_SOLID_LIGHT}
+          borderWidth="2px"
+          width="100%"
+        >
+          <Flex
+            justifyContent={JUSTIFY_CENTER}
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            textAlign={TEXT_ALIGN_CENTER}
           >
-            <source src={demoAsset} />
-          </video>
+            <Text fontSize={FONT_SIZE_BODY_2} paddingX={SPACING_2}>
+              {jogUntilAbove}
+            </Text>
+            <Text
+              fontSize={FONT_SIZE_BODY_2}
+              marginBottom={SPACING_3}
+              paddingX={SPACING_2}
+            >
+              <Text as="strong">{` ${TIP_WELL_NAME} `}</Text>
+              {`${POSITION} ${AND}`}
+              <Text as="strong">{` ${FLUSH} `}</Text>
+              {WITH_TOP_OF_TIP}
+            </Text>
+            <div className={styles.step_check_video_wrapper}>
+              <video
+                key={demoAsset}
+                className={styles.step_check_video}
+                autoPlay={true}
+                loop={true}
+                controls={false}
+              >
+                <source src={demoAsset} />
+              </video>
+            </div>
+          </Flex>
+        </Box>
+        <div>
+          <JogControls jog={jog} />
         </div>
-      </div>
-      <div className={styles.tip_pick_up_controls_wrapper}>
-        <JogControls jog={jog} />
-      </div>
-      <div className={styles.button_row}>
-        <PrimaryButton onClick={pickUpTip} className={styles.command_button}>
-          {TIP_PICK_UP_BUTTON_TEXT}
-        </PrimaryButton>
-      </div>
+        <Flex width="100%">
+          <PrimaryButton onClick={pickUpTip} className={styles.command_button}>
+            {TIP_PICK_UP_BUTTON_TEXT}
+          </PrimaryButton>
+        </Flex>
+      </Flex>
     </>
   )
 }
@@ -132,8 +169,14 @@ type InspectingTipProps = {|
 
 export function InspectingTip(props: InspectingTipProps): React.Node {
   return (
-    <div className={styles.tip_pick_up_confirmation_wrapper}>
-      <p className={styles.pick_up_tip_confirmation_body}>{CONFIRM_TIP_BODY}</p>
+    <Flex
+      width="100%"
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_CENTER}
+      marginY={SPACING_3}
+    >
+      <Text marginBottom={SPACING_3}>{CONFIRM_TIP_BODY}</Text>
       <PrimaryButton
         className={styles.pick_up_tip_confirmation_button}
         onClick={props.invalidateTip}
@@ -146,6 +189,6 @@ export function InspectingTip(props: InspectingTipProps): React.Node {
       >
         {CONFIRM_TIP_YES_BUTTON_TEXT}
       </PrimaryButton>
-    </div>
+    </Flex>
   )
 }
