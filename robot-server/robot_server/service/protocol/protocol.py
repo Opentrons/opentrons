@@ -7,14 +7,15 @@ from pathlib import Path
 from fastapi import UploadFile
 
 from robot_server.service.protocol.errors import ProtocolAlreadyExistsException
+from robot_server.util import FileMeta, save_upload
 
 
 @dataclass(frozen=True)
 class UploadedProtocolMeta:
     name: str
-    protocol_file_name: Path
+    protocol_file: FileMeta
     directory: TemporaryDirectory
-    user_files: typing.List[Path] = field(default_factory=list)
+    support_files: typing.List[FileMeta] = field(default_factory=list)
     last_modified_at: datetime = field(default_factory=datetime.utcnow)
     created_at: datetime = field(default_factory=datetime.utcnow)
 
@@ -25,41 +26,44 @@ class UploadedProtocol:
 
     def __init__(self,
                  protocol_file: UploadFile,
-                 directory: str = None):
+                 support_files: typing.List[UploadFile]
+                 ):
         """
         Constructor
 
         :param protocol_file: The uploaded protocol file
-        :param directory: Optional parent directory
+        :param support_files: Optional support files
         """
         temp_dir = TemporaryDirectory(suffix=UploadedProtocol.DIR_SUFFIX,
-                                      prefix=UploadedProtocol.DIR_PREFIX,
-                                      dir=directory)
+                                      prefix=UploadedProtocol.DIR_PREFIX)
 
-        protocol_file_name = Path(protocol_file.filename)
-        with open(Path(temp_dir.name) / protocol_file_name, 'wb') as p:
-            p.write(protocol_file.file.read())
+        temp_dir_path = Path(temp_dir.name)
+        protocol_file_meta = save_upload(temp_dir_path, protocol_file)
+        support_files_meta = [save_upload(temp_dir_path, s)
+                              for s in support_files]
 
         self._meta = UploadedProtocolMeta(
-            name=protocol_file_name.stem,
-            protocol_file_name=protocol_file_name,
+            name=protocol_file_meta.path.stem,
+            protocol_file=protocol_file_meta,
+            support_files=support_files_meta,
             directory=temp_dir
         )
 
     def add(self, support_file: UploadFile):
         """Add a support file to protocol temp directory"""
-        path = Path(self._meta.directory.name) / support_file.filename
+        temp_dir = Path(self._meta.directory.name)
+
+        path = temp_dir / support_file.filename
         if path.exists():
             raise ProtocolAlreadyExistsException(
                 f"File {support_file.filename} already exists"
             )
 
-        with open(path, 'wb') as p:
-            p.write(support_file.file.read())
+        file_meta = save_upload(directory=temp_dir, upload_file=support_file)
 
         self._meta = replace(
             self._meta,
-            user_files=self._meta.user_files + [Path(support_file.filename)],
+            support_files=self._meta.support_files + [file_meta],
             last_modified_at=datetime.utcnow()
         )
 

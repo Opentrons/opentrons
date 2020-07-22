@@ -18,7 +18,7 @@ def mock_upload_file():
 def mock_uploaded_protocol(mock_upload_file):
     m = MagicMock(spec=UploadedProtocol)
     m.meta = UploadedProtocolMeta(name="some_file_name",
-                                  protocol_file_name=None,
+                                  protocol_file=None,
                                   directory=None)
     return m
 
@@ -36,7 +36,8 @@ class TestCreate:
     def test_create(self, mock, mock_upload_file, mock_uploaded_protocol):
         mock.return_value = mock_uploaded_protocol
         manager = ProtocolManager()
-        p = manager.create(mock_upload_file)
+        p = manager.create(mock_upload_file, [])
+        mock.assert_called_once_with(mock_upload_file, [])
         assert p == mock_uploaded_protocol
         assert manager._protocols[mock_uploaded_protocol.meta.name] == p
 
@@ -44,7 +45,7 @@ class TestCreate:
                                    mock_upload_file,
                                    manager_with_mock_protocol):
         with pytest.raises(errors.ProtocolAlreadyExistsException):
-            manager_with_mock_protocol.create(mock_upload_file)
+            manager_with_mock_protocol.create(mock_upload_file, [])
 
     @pytest.mark.parametrize(argnames="exception", argvalues=[
         TypeError, IOError
@@ -62,7 +63,7 @@ class TestCreate:
 
             with pytest.raises(errors.ProtocolIOException):
                 manager = ProtocolManager()
-                manager.create(mock_upload_file)
+                manager.create(mock_upload_file, [])
 
 
 class TestGet:

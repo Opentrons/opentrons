@@ -15,7 +15,10 @@ class ProtocolManager:
     def __init__(self):
         self._protocols: typing.Dict[str, UploadedProtocol] = {}
 
-    def create(self, protocol_file: UploadFile) -> UploadedProtocol:
+    def create(self,
+               protocol_file: UploadFile,
+               support_files: typing.List[UploadFile]
+               ) -> UploadedProtocol:
         """Create a protocol object from upload"""
         name = Path(protocol_file.filename).stem
         if name in self._protocols:
@@ -24,7 +27,7 @@ class ProtocolManager:
             )
 
         try:
-            new_protocol = UploadedProtocol(protocol_file)
+            new_protocol = UploadedProtocol(protocol_file, support_files)
             log.debug(f"Created new protocol: {new_protocol.meta}")
         except (TypeError, IOError) as e:
             log.exception("Failed to create protocol")

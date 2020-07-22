@@ -1,7 +1,8 @@
 import logging
+import typing
 
 from starlette import status as http_status_codes
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import APIRouter, UploadFile, File, Depends, Body
 
 from robot_server.service.protocol import models as route_models
 from robot_server.service.dependencies import get_protocol_manager
@@ -19,9 +20,16 @@ router = APIRouter()
              response_model_exclude_unset=True,
              response_model=route_models.ProtocolResponse,
              status_code=http_status_codes.HTTP_201_CREATED)
-async def create_protocol(protocol_file: UploadFile = File(...),
-                          protocol_manager=Depends(get_protocol_manager)):
-    new_proto = protocol_manager.create(protocol_file=protocol_file)
+async def create_protocol(
+        protocol_file: UploadFile = File(..., description="The protocol file"),
+        support_files: typing.List[UploadFile] = Body(
+            default=list(),
+            description="Any support files needed by the protocol (ie data "
+                        "files, additional python files)"),
+        protocol_manager=Depends(get_protocol_manager)):
+    """Create protocol from proto file plus optional support files"""
+    new_proto = protocol_manager.create(protocol_file=protocol_file,
+                                        support_files=support_files,)
     return route_models.ProtocolResponse(data=_to_response(new_proto))
 
 
@@ -78,8 +86,12 @@ def _to_response(uploaded_protocol: UploadedProtocol) \
     meta = uploaded_protocol.meta
     return route_models.ProtocolResponseDataModel.create(
         attributes=route_models.ProtocolResponseAttributes(
-            protocolFile=meta.protocol_file_name.name,
-            userFiles=[str(s) for s in meta.user_files],
+            protocolFile=route_models.FileAttributes(
+                basename=meta.protocol_file.path.name
+            ),
+            supportFiles=[route_models.FileAttributes(
+                basename=xx.path.name
+            ) for xx in meta.support_files],
             lastModifiedAt=meta.last_modified_at,
             createdAt=meta.created_at
         ),
