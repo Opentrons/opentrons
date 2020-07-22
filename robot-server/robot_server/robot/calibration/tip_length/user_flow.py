@@ -54,7 +54,7 @@ class TipCalibrationUserFlow():
             raise Error(f'No pipette found on {mount} mount,'
                         'cannot run tip length calibration')
         self._tip_origin_loc = None
-        self._nozzle_z_offset = None
+        self._nozzle_height_at_reference = None
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
@@ -104,7 +104,7 @@ class TipCalibrationUserFlow():
         to_loc = Location(point, None)
         await self._move(to_loc)
 
-    async def move_to_reference_point(self, *args):
+    async def move_to_reference_point(self):
         to_loc = self._get_reference_point()
         await self._move(to_loc)
 
@@ -113,20 +113,22 @@ class TipCalibrationUserFlow():
             slot = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['slot']
             well = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['well']
             calblock: labware.Labware = self._deck[slot]  # type: ignore
-            point = calblock.wells_by_name()[well].top().point + \
-                MOVE_TO_REF_POINT_SAFETY_BUFFER
+            calblock_loc = calblock.wells_by_name()[well].top()
+            return calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)
         else:
             trash = self._deck.get_fixed_trash()
             assert trash
             trash_height = trash.highest_z
-            point = trash._offset._replace(z=trash_height) + \
-                TRASH_REF_POINT_OFFSET + MOVE_TO_REF_POINT_SAFETY_BUFFER
-        return Location(point, None)
+            trash_loc = self._deck.position_for(trash.parent)
+            return trash_loc.move(
+                Point(0, 0, trash_height) + TRASH_REF_POINT_OFFSET +
+                MOVE_TO_REF_POINT_SAFETY_BUFFER)
 
-    async def save_offset(self, *args):
+    async def save_offset(self):
         if self._current_state == State.measuringNozzleOffset:
-            cur_pt = await self._hardware.gantry_position(self._mount)
-            self._nozzle_z_offset = cur_pt.z
+            cur_pt = await self._hardware.gantry_position(
+                self._mount, critical_point=CriticalPoint.FRONT_NOZZLE)
+            self._nozzle_height_at_reference = cur_pt.z
         elif self._current_state == State.measuringTipOffset:
             assert self._hw_pipette.has_tip
             tip_length_offset = await self._calculate_tip_length()
@@ -136,10 +138,10 @@ class TipCalibrationUserFlow():
             modify.save_tip_length_calibration(self._hw_pipette.pipette_id,
                                                tip_length_data)
 
-    async def _calculate_tip_length(self):
+    async def _calculate_tip_length(self) -> float:
         cur_pt = await self._hardware.gantry_position(
             self._mount, critical_point=CriticalPoint.NOZZLE)
-        return cur_pt.z - self._nozzle_z_offset
+        return cur_pt.z - self._nozzle_height_at_reference
 
     async def jog(self, vector, *args):
         await self._hardware.move_rel(self._mount, Point(*vector))

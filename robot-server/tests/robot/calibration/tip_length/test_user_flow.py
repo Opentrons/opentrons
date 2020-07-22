@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 from typing import List, Tuple, Dict, Any
-from opentrons.types import Location, Mount, Point
+from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from robot_server.service.session.models import (
     CalibrationCommand, TipLengthCalibrationCommand)
@@ -168,23 +168,23 @@ async def test_get_reference_location(mock_user_flow_all_combos):
     result = uf._get_reference_point()
     if uf._has_calibration_block:
         if uf._mount == Mount.LEFT:
-            exp = uf._deck['3'].wells()[0].top().point + Point(0, 0, 5)
+            exp = uf._deck['3'].wells()[0].top().move(Point(0, 0, 5))
         else:
-            exp = uf._deck['1'].wells()[1].top().point + Point(0, 0, 5)
+            exp = uf._deck['1'].wells()[1].top().move(Point(0, 0, 5))
     else:
         height = uf._deck['12'].highest_z + 5
-        exp = uf._deck['12']._offset + Point(25, 25, height)
-    assert result == Location(exp, None)
+        exp = uf._deck.position_for('12').move(Point(26, 33, height))
+    assert result == exp
 
 
 async def test_save_offsets(mock_user_flow):
     uf = mock_user_flow
     uf._current_state = 'measuringNozzleOffset'
-    assert uf._nozzle_z_offset is None
+    assert uf._nozzle_height_at_reference is None
 
     await uf._hardware.move_to(x=10, y=10, z=10)
     await uf.save_offset()
-    assert uf._nozzle_z_offset == 10
+    assert uf._nozzle_height_at_reference == 10
 
     uf._current_state = 'measuringTipOffset'
     uf._hw_pipette._has_tip = True

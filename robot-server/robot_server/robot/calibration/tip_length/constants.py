@@ -24,7 +24,7 @@ RIGHT_MOUNT_CAL_BLOCK_SLOT = '1'
 RIGHT_MOUNT_CAL_BLOCK_LOADNAME = 'opentrons_calibrationblock_short_side_left'
 RIGHT_MOUNT_CAL_BLOCK_WELL = 'A2'
 
-TRASH_REF_POINT_OFFSET = Point(25, 25, 0)  # offset from the corner of slot 12
+TRASH_REF_POINT_OFFSET = Point(26, 33, 0)  # offset from corner of slot 12
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 MOVE_TO_REF_POINT_SAFETY_BUFFER = Point(0, 0, 5)
 
