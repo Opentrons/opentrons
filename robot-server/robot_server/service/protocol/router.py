@@ -90,8 +90,8 @@ def _to_response(uploaded_protocol: UploadedProtocol) \
                 basename=meta.protocol_file.path.name
             ),
             supportFiles=[route_models.FileAttributes(
-                basename=xx.path.name
-            ) for xx in meta.support_files],
+                basename=s.path.name
+            ) for s in meta.support_files],
             lastModifiedAt=meta.last_modified_at,
             createdAt=meta.created_at
         ),
