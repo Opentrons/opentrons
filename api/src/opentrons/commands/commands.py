@@ -12,6 +12,7 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api.module_geometry import ModuleGeometry
+from opentrons.protocol_api.util import FlowRates
 from opentrons.types import Location
 from opentrons.drivers import utils
 
@@ -120,8 +121,9 @@ def home(mount):
 
 def aspirate(instrument, volume, location, rate):
     location_text = stringify_location(location)
-    text = 'Aspirating {volume} uL from {location} at {rate} speed'.format(
-        volume=float(volume), location=location_text, rate=rate
+    flow_rate = rate * FlowRates(instrument).aspirate
+    text = 'Aspirating {volume} uL from {location} at {flow_rate} uL/sec'.format(
+        volume=float(volume), location=location_text, flow_rate=flow_rate
     )
     return make_command(
         name=command_types.ASPIRATE,
@@ -137,8 +139,9 @@ def aspirate(instrument, volume, location, rate):
 
 def dispense(instrument, volume, location, rate):
     location_text = stringify_location(location)
-    text = 'Dispensing {volume} uL into {location} at {rate} speed'.format(
-        volume=float(volume), location=location_text, rate=rate)
+    flow_rate = rate * FlowRates(instrument).dispense
+    text = 'Dispensing {volume} uL into {location} at {flow_rate} uL/sec'.format(
+        volume=float(volume), location=location_text, flow_rate=flow_rate)
 
     return make_command(
         name=command_types.DISPENSE,
