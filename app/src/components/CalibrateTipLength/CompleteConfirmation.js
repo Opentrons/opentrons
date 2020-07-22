@@ -1,11 +1,22 @@
 // @flow
 import * as React from 'react'
-import { Icon, PrimaryButton } from '@opentrons/components'
+import {
+  Flex,
+  Icon,
+  PrimaryButton,
+  Text,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  DIRECTION_COLUMN,
+  SPACING_3,
+  SPACING_4,
+} from '@opentrons/components'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
 import * as Sessions from '../../sessions'
 
 const COMPLETE_HEADER = 'Tip length calibration complete'
+const COMPLETE_BODY = 'Remove Calibration Block from the deck.'
 const RETURN_TIP = 'Return tip to tip rack'
 
 export function CompleteConfirmation(
@@ -17,11 +28,26 @@ export function CompleteConfirmation(
   }
   return (
     <>
-      <div className={styles.modal_icon_wrapper}>
-        <Icon name="check-circle" className={styles.success_status_icon} />
-        <h3>{COMPLETE_HEADER}</h3>
-      </div>
-      <PrimaryButton onClick={exitSession}>{RETURN_TIP}</PrimaryButton>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={SPACING_3}
+        alignItems={ALIGN_FLEX_START}
+        width="100%"
+      >
+        <Flex alignItems={ALIGN_CENTER}>
+          <Icon name="check-circle" className={styles.success_status_icon} />
+          <h3>{COMPLETE_HEADER}</h3>
+        </Flex>
+        <Text marginY={SPACING_4} className={styles.complete_summary}>
+          {props.hasBlock ? COMPLETE_BODY : null}
+        </Text>
+
+        {/* TODO: add block removal demo asset */}
+
+        <PrimaryButton marginY={SPACING_3} onClick={exitSession}>
+          {RETURN_TIP}
+        </PrimaryButton>
+      </Flex>
     </>
   )
 }

@@ -94,7 +94,7 @@ export function CalibrateTipLengthControl({
     <>
       <CalibrationInfoBox
         confirmed={hasCalibrated}
-        title={`${mount} pipette calibration`}
+        title={`${mount} pipette tip length calibration`}
       >
         <UncalibratedInfo
           requestStatus={requestStatus}
