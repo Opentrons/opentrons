@@ -19,7 +19,7 @@ const fetchRobotApi: JestMockFn<
 > = RobotApiHttp.fetchRobotApi
 
 const makeTriggerAction = robotName =>
-  Actions.ensureSession(robotName, 'calibrationCheck')
+  Actions.ensureSession(robotName, 'calibrationCheck', {})
 
 const expectedFetchRequest = {
   method: 'GET',
@@ -34,6 +34,7 @@ const expectedCreateRequest = {
       type: 'Session',
       attributes: {
         sessionType: 'calibrationCheck',
+        createParams: {},
       },
     },
   },

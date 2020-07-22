@@ -55,11 +55,13 @@ export type SessionCommandData = { ... }
 export type CalibrationCheckSessionResponseAttributes = {|
   sessionType: SESSION_TYPE_CALIBRATION_CHECK,
   details: CalCheckTypes.RobotCalibrationCheckSessionDetails,
+  createParams: {},
 |}
 
 export type TipLengthCalibrationSessionResponseAttributes = {|
   sessionType: SESSION_TYPE_TIP_LENGTH_CALIBRATION,
   details: TipLengthCalTypes.TipLengthCalibrationSessionDetails,
+  createParams: TipLengthCalTypes.TipLengthCalibrationSessionParams,
 |}
 
 export type SessionResponseAttributes =
