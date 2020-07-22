@@ -20,6 +20,7 @@ from robot_server.robot.calibration.tip_length.util import (
 )
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState as State,
+    TRASH_WELL,
     TIP_RACK_SLOT,
     CAL_BLOCK_SETUP_BY_MOUNT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
@@ -118,11 +119,9 @@ class TipCalibrationUserFlow():
         else:
             trash = self._deck.get_fixed_trash()
             assert trash
-            trash_height = trash.highest_z
-            trash_loc = self._deck.position_for(trash.parent)
-            return trash_loc.move(
-                Point(0, 0, trash_height) + TRASH_REF_POINT_OFFSET +
-                MOVE_TO_REF_POINT_SAFETY_BUFFER)
+            trash_loc = trash.wells_by_name()[TRASH_WELL].top()
+            return trash_loc.move(TRASH_REF_POINT_OFFSET +
+                                  MOVE_TO_REF_POINT_SAFETY_BUFFER)
 
     async def save_offset(self):
         if self._current_state == State.measuringNozzleOffset:
@@ -132,8 +131,12 @@ class TipCalibrationUserFlow():
         elif self._current_state == State.measuringTipOffset:
             assert self._hw_pipette.has_tip
             tip_length_offset = await self._calculate_tip_length()
+
+            # TODO: 07-22-2020 parent slot is not important when tracking
+            # tip length data, hence the empty string, we should remove it
+            # from create_tip_length_data in a refactor
             tip_length_data = modify.create_tip_length_data(
-                self._deck[TIP_RACK_SLOT]._definition, TIP_RACK_SLOT,
+                self._deck[TIP_RACK_SLOT]._definition, '',
                 tip_length_offset)
             modify.save_tip_length_calibration(self._hw_pipette.pipette_id,
                                                tip_length_data)

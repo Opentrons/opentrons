@@ -172,8 +172,8 @@ async def test_get_reference_location(mock_user_flow_all_combos):
         else:
             exp = uf._deck['1'].wells()[1].top().move(Point(0, 0, 5))
     else:
-        height = uf._deck['12'].highest_z + 5
-        exp = uf._deck.position_for('12').move(Point(26, 33, height))
+        exp = uf._deck.get_fixed_trash().wells()[0].top().move(
+            Point(-57.84, -55, 5))
     assert result == exp
 
 

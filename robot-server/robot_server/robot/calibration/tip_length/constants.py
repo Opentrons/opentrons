@@ -16,6 +16,7 @@ class TipCalibrationState(str, Enum):
     WILDCARD = WILDCARD
 
 
+TRASH_WELL = 'A1'
 TIP_RACK_SLOT = '8'
 LEFT_MOUNT_CAL_BLOCK_SLOT = '3'
 LEFT_MOUNT_CAL_BLOCK_LOADNAME = 'opentrons_calibrationblock_short_side_right'
@@ -24,7 +25,7 @@ RIGHT_MOUNT_CAL_BLOCK_SLOT = '1'
 RIGHT_MOUNT_CAL_BLOCK_LOADNAME = 'opentrons_calibrationblock_short_side_left'
 RIGHT_MOUNT_CAL_BLOCK_WELL = 'A2'
 
-TRASH_REF_POINT_OFFSET = Point(26, 33, 0)  # offset from corner of slot 12
+TRASH_REF_POINT_OFFSET = Point(-57.84, -55, 0)  # offset from center of trash
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 MOVE_TO_REF_POINT_SAFETY_BUFFER = Point(0, 0, 5)
 
