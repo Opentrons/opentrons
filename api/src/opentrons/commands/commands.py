@@ -122,9 +122,9 @@ def home(mount):
 def aspirate(instrument, volume, location, rate):
     location_text = stringify_location(location)
     flow_rate = rate * FlowRates(instrument).aspirate
-    text = 'Aspirating {volume} uL from {location} at {flow_rate} uL/sec'.format(
-        volume=float(volume), location=location_text, flow_rate=flow_rate
-    )
+    text = 'Aspirating {volume} uL from {location} at {flow} uL/sec'.format(
+            volume=float(volume), location=location_text, flow=flow_rate)
+
     return make_command(
         name=command_types.ASPIRATE,
         payload={
@@ -140,8 +140,8 @@ def aspirate(instrument, volume, location, rate):
 def dispense(instrument, volume, location, rate):
     location_text = stringify_location(location)
     flow_rate = rate * FlowRates(instrument).dispense
-    text = 'Dispensing {volume} uL into {location} at {flow_rate} uL/sec'.format(
-        volume=float(volume), location=location_text, flow_rate=flow_rate)
+    text = 'Dispensing {volume} uL into {location} at {flow} uL/sec'.format(
+            volume=float(volume), location=location_text, flow=flow_rate)
 
     return make_command(
         name=command_types.DISPENSE,
