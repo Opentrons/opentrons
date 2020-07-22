@@ -2,12 +2,12 @@
 // app shell discovery module
 import { app } from 'electron'
 import Store from 'electron-store'
+import groupBy from 'lodash/groupBy'
 import throttle from 'lodash/throttle'
 
 import {
   createDiscoveryClient,
-  SERVICE_EVENT,
-  SERVICE_REMOVED_EVENT,
+  DEFAULT_PORT,
 } from '@opentrons/discovery-client'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
@@ -18,12 +18,14 @@ import {
   CLEAR_CACHE,
 } from '@opentrons/app/src/discovery/actions'
 
-import { getConfig, getOverrides, handleConfigChange } from './config'
+import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
 import { createNetworkInterfaceMonitor } from './system-info'
 
-import type { Service } from '@opentrons/discovery-client'
-
+import type {
+  DiscoveryClientRobot,
+  LegacyService,
+} from '@opentrons/discovery-client'
 import type { Action, Dispatch } from './types'
 
 const log = createLogger('discovery')
@@ -39,35 +41,87 @@ let config
 let store
 let client
 
-export function registerDiscovery(dispatch: Dispatch): Action => mixed {
-  const onServiceUpdate = throttle(handleServices, UPDATE_THROTTLE_MS)
+const makeManualAddresses = (addrs: string | Array<string>) => {
+  return ['fd00:0:cafe:fefe::1']
+    .concat(addrs)
+    .map(ip => ({ ip, port: DEFAULT_PORT }))
+}
 
-  config = getConfig('discovery')
-  store = new Store({ name: 'discovery', defaults: { services: [] } })
+const migrateLegacyServices = (
+  legacyServices: Array<LegacyService>
+): Array<DiscoveryClientRobot> => {
+  const servicesByName = groupBy<string, LegacyService>(legacyServices, 'name')
+
+  return Object.keys(servicesByName).map((name: string) => {
+    const services = servicesByName[name]
+    const addresses = services.flatMap((service: LegacyService) => {
+      const { ip, port } = service
+      return ip != null
+        ? [
+            {
+              ip,
+              port,
+              seen: false,
+              healthStatus: null,
+              serverHealthStatus: null,
+              healthError: null,
+              serverHealthError: null,
+            },
+          ]
+        : []
+    })
+
+    return { name, health: null, serverHealth: null, addresses }
+  })
+}
+
+export function registerDiscovery(dispatch: Dispatch): Action => mixed {
+  const handleRobotListChange = throttle(handleRobots, UPDATE_THROTTLE_MS)
+
+  config = getFullConfig().discovery
+  store = new Store({ name: 'discovery', defaults: { robots: [] } })
+
   let disableCache = config.disableCache
+  let initialRobots: Array<DiscoveryClientRobot> = []
+
+  if (!disableCache) {
+    const legacyCachedServices: Array<LegacyService> | null = store.get(
+      'services',
+      null
+    )
+
+    if (legacyCachedServices) {
+      initialRobots = migrateLegacyServices(legacyCachedServices)
+      store.delete('services')
+    } else {
+      initialRobots = store.get('robots', [])
+    }
+  }
 
   client = createDiscoveryClient({
-    pollInterval: SLOW_POLL_INTERVAL_MS,
+    onListChange: handleRobotListChange,
     logger: log,
-    candidates: ['[fd00:0:cafe:fefe::1]'].concat(config.candidates),
-    services: disableCache ? [] : store.get('services'),
   })
 
-  client
-    .on(SERVICE_EVENT, onServiceUpdate)
-    .on(SERVICE_REMOVED_EVENT, onServiceUpdate)
-    .on('error', error => log.error('discovery error', { error }))
-    .start()
+  client.start({
+    initialRobots,
+    healthPollInterval: SLOW_POLL_INTERVAL_MS,
+    manualAddresses: makeManualAddresses(config.candidates),
+  })
 
-  handleConfigChange('discovery.candidates', value =>
-    client.setCandidates(['[fd00:0:cafe:fefe::1]'].concat(value))
+  handleConfigChange(
+    'discovery.candidates',
+    (value: string | Array<string>) => {
+      client.start({ manualAddresses: makeManualAddresses(value) })
+    }
   )
 
-  handleConfigChange('discovery.disableCache', value => {
+  handleConfigChange('discovery.disableCache', (value: boolean) => {
     if (value === true) {
+      disableCache = value
+      store.set('robots', [])
       clearCache()
     }
-    disableCache = value
   })
 
   let ifaceMonitor
@@ -75,7 +129,7 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
     ifaceMonitor && ifaceMonitor.stop()
     ifaceMonitor = createNetworkInterfaceMonitor({
       pollInterval,
-      onInterfaceChange: () => client.start(),
+      onInterfaceChange: () => client.start({}),
     })
   }
 
@@ -92,44 +146,34 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
     switch (action.type) {
       case UI_INITIALIZED:
       case DISCOVERY_START:
-        handleServices()
+        handleRobots()
         startIfaceMonitor(IFACE_MONITOR_FAST_INTERVAL_MS)
-        return client.setPollInterval(FAST_POLL_INTERVAL_MS)
+        return client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
 
       case DISCOVERY_FINISH:
         startIfaceMonitor(IFACE_MONITOR_SLOW_INTERVAL_MS)
-        return client.setPollInterval(SLOW_POLL_INTERVAL_MS)
+        return client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
 
       case DISCOVERY_REMOVE:
-        return client.remove(action.payload.robotName)
+        return client.removeRobot(action.payload.robotName)
 
       case CLEAR_CACHE:
         return clearCache()
     }
   }
 
-  function handleServices() {
-    if (!disableCache) {
-      store.set('services', filterServicesToPersist(client.services))
-    }
+  function handleRobots() {
+    const robots = client.getRobots()
+
+    if (!disableCache) store.set('robots', robots)
+
     dispatch({
       type: 'discovery:UPDATE_LIST',
-      payload: { robots: client.services },
+      payload: { robots },
     })
   }
 
   function clearCache() {
-    client.stop()
-    client.services = []
-    handleServices()
-    client.start()
+    client.start({ initialRobots: [] })
   }
-}
-
-function filterServicesToPersist(services: Array<Service>) {
-  const candidateOverrides = getOverrides('discovery.candidates')
-  if (!candidateOverrides) return client.services
-
-  const blocklist = [].concat(candidateOverrides)
-  return client.services.filter(s => blocklist.every(ip => ip !== s.ip))
 }

@@ -3,11 +3,8 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
-import {
-  actions as robotActions,
-  selectors as robotSelectors,
-} from '../../robot'
-import { getAllRobots } from '../../discovery'
+import { actions as robotActions } from '../../robot'
+import { getAllRobots, CONNECTABLE } from '../../discovery'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 import { ModalCopy } from './ModalCopy'
@@ -22,11 +19,11 @@ export function LostConnectionAlert(): React.Node {
   const showAlert = useSelector((state: State) => {
     // search _all_ robots, not just connectable ones, in case we were connected
     // and then robot became not connectable
-    const connectedName = robotSelectors.getConnectedRobotName(state)
-    const robot = getAllRobots(state).find(r => r.name === connectedName)
+    const robot = getAllRobots(state).find(r => r.connected)
+    const robotDown = robot?.status !== CONNECTABLE
     const unexpectedDisconnect = state.robot.connection.unexpectedDisconnect
 
-    return Boolean(robot && !robot.ok && unexpectedDisconnect)
+    return Boolean(robot && robotDown && unexpectedDisconnect)
   })
 
   const disconnect = () => {

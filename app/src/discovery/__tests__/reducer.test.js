@@ -40,16 +40,16 @@ describe('discoveryReducer', () => {
         type: 'discovery:UPDATE_LIST',
         payload: {
           robots: [
-            { name: 'foo', ip: '192.168.1.1', port: 31950 },
-            { name: 'bar', ip: '192.168.1.2', port: 31950 },
+            { name: 'foo', health: null, serverHealth: null, addresses: [] },
+            { name: 'bar', health: null, serverHealth: null, addresses: [] },
           ],
         },
       },
       initialState: { robotsByName: {} },
       expectedState: {
         robotsByName: {
-          foo: [{ name: 'foo', ip: '192.168.1.1', port: 31950 }],
-          bar: [{ name: 'bar', ip: '192.168.1.2', port: 31950 }],
+          foo: { name: 'foo', health: null, serverHealth: null, addresses: [] },
+          bar: { name: 'bar', health: null, serverHealth: null, addresses: [] },
         },
       },
     },

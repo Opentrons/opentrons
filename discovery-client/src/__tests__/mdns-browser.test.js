@@ -2,7 +2,7 @@
 import EventEmitter from 'events'
 import Mdns from 'mdns-js'
 
-import { MOCK_BROWSER_SERVICE } from '../__fixtures__/mdns-browser-service'
+import { mockBrowserService } from '../__fixtures__'
 import { createMdnsBrowser } from '../mdns-browser'
 
 import type { MdnsServiceType, Browser } from 'mdns-js'
@@ -96,7 +96,7 @@ describe('mdns browser', () => {
 
     browser.start()
     baseBrowser.emit('ready')
-    baseBrowser.emit('update', MOCK_BROWSER_SERVICE)
+    baseBrowser.emit('update', mockBrowserService)
 
     expect(onService).toHaveBeenCalledWith({
       name: 'opentrons-dev',
@@ -110,7 +110,7 @@ describe('mdns browser', () => {
 
     browser.start()
     baseBrowser.emit('ready')
-    baseBrowser.emit('update', { ...MOCK_BROWSER_SERVICE, fullname: undefined })
+    baseBrowser.emit('update', { ...mockBrowserService, fullname: undefined })
 
     expect(onService).toHaveBeenCalledTimes(0)
   })
@@ -120,7 +120,7 @@ describe('mdns browser', () => {
 
     browser.start()
     baseBrowser.emit('ready')
-    baseBrowser.emit('update', { ...MOCK_BROWSER_SERVICE, port: undefined })
+    baseBrowser.emit('update', { ...mockBrowserService, port: undefined })
 
     expect(onService).toHaveBeenCalledTimes(0)
   })
@@ -130,7 +130,7 @@ describe('mdns browser', () => {
 
     browser.start()
     baseBrowser.emit('ready')
-    baseBrowser.emit('update', { ...MOCK_BROWSER_SERVICE, addresses: [] })
+    baseBrowser.emit('update', { ...mockBrowserService, addresses: [] })
 
     expect(onService).toHaveBeenCalledTimes(0)
   })
@@ -141,7 +141,7 @@ describe('mdns browser', () => {
 
     browser.start()
     baseBrowser.emit('ready')
-    baseBrowser.emit('update', { ...MOCK_BROWSER_SERVICE, addresses })
+    baseBrowser.emit('update', { ...mockBrowserService, addresses })
 
     expect(onService).toHaveBeenCalledWith({
       name: 'opentrons-dev',
@@ -155,8 +155,8 @@ describe('mdns browser', () => {
 
     browser.start()
     baseBrowser.emit('ready')
-    baseBrowser.emit('update', { ...MOCK_BROWSER_SERVICE })
-    baseBrowser.emit('update', { ...MOCK_BROWSER_SERVICE, port: 12345 })
+    baseBrowser.emit('update', { ...mockBrowserService })
+    baseBrowser.emit('update', { ...mockBrowserService, port: 12345 })
 
     expect(onService).toHaveBeenCalledTimes(1)
     expect(onService).toHaveBeenCalledWith({

@@ -11,8 +11,6 @@ import type {
   DiscoveryClientOptions,
 } from './types'
 
-export { DEFAULT_PORT }
-
 export function createDiscoveryClient(
   options: DiscoveryClientOptions
 ): DiscoveryClientNext {

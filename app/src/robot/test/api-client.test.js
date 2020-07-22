@@ -14,11 +14,14 @@ import {
   MockSessionNoDoorInfo,
 } from './__fixtures__/session'
 import { MockCalibrationManager } from './__fixtures__/calibration-manager'
+import { mockConnectableRobot } from '../../discovery/__fixtures__'
 
+import { getConnectableRobots } from '../../discovery/selectors'
 import { getLabwareDefBySlot } from '../../protocol/selectors'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 
 jest.mock('../../rpc/client')
+jest.mock('../../discovery/selectors')
 jest.mock('../../protocol/selectors')
 jest.mock('../../custom-labware/selectors')
 
@@ -58,9 +61,6 @@ describe('api client', () => {
       create_from_bundle: jest.fn(),
     }
     rpcClient = {
-      // TODO(mc, 2017-09-22): these jest promise mocks are causing promise
-      // rejection warnings. These warnings are Jest's fault for nextTick stuff
-      // http://clarkdave.net/2016/09/node-v6-6-and-asynchronously-handled-promise-rejections/
       on: jest.fn(() => rpcClient),
       removeAllListeners: jest.fn(() => rpcClient),
       close: jest.fn(),
@@ -75,6 +75,7 @@ describe('api client', () => {
 
     getLabwareDefBySlot.mockReturnValue({})
     getCustomLabwareDefinitions.mockReturnValue([])
+    getConnectableRobots.mockReturnValue([mockConnectableRobot])
 
     const _receive = client(dispatch)
 
@@ -89,29 +90,13 @@ describe('api client', () => {
     jest.resetAllMocks()
   })
 
-  const ROBOT_NAME = 'ot'
-  const ROBOT_IP = '127.0.0.1'
+  const ROBOT_NAME = mockConnectableRobot.name
+  const ROBOT_IP = mockConnectableRobot.ip
   const STATE = {
     robot: {
       connection: {
         connectedTo: '',
         connectRequest: { inProgress: false },
-      },
-    },
-    discovery: {
-      robotsByName: {
-        [ROBOT_NAME]: [
-          {
-            name: ROBOT_NAME,
-            ip: ROBOT_IP,
-            local: true,
-            port: 31950,
-            ok: true,
-            serverOk: true,
-            health: {},
-            serverHealth: {},
-          },
-        ],
       },
     },
   }

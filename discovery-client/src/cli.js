@@ -1,7 +1,7 @@
 // @flow
 import Yargs from 'yargs'
 import noop from 'lodash/noop'
-import { createDiscoveryClient, DEFAULT_PORT } from './discovery-client'
+import { createDiscoveryClient, DEFAULT_PORT } from '.'
 import { version } from '../package.json'
 
 import type { Argv as YargsArgv } from 'yargs'

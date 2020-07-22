@@ -8,6 +8,7 @@ import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
+  HEALTH_STATUS_OK,
 } from '../../discovery'
 
 import { getBuildrootRobot, getBuildrootUpdateAvailable } from '../../buildroot'
@@ -59,14 +60,14 @@ export function InformationCard(props: InformationCardProps): React.Node {
     dispatch,
   ])
 
-  const { displayName, serverOk } = robot
+  const { displayName, serverHealthStatus } = robot
   const buildrootRobot = useSelector(getBuildrootRobot)
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
   const maxApiVersion = getRobotProtocolApiVersion(robot)
 
   const updateFilesUnavailable = updateType === null
-  const updateServerUnavailable = !serverOk
+  const updateServerUnavailable = serverHealthStatus !== HEALTH_STATUS_OK
   const otherRobotUpdating = Boolean(buildrootRobot && buildrootRobot !== robot)
   const updateDisabled =
     updateFilesUnavailable || updateServerUnavailable || otherRobotUpdating

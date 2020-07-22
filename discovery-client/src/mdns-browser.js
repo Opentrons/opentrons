@@ -54,7 +54,7 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
           const name = fullname.replace(/\._http\._tcp.local$/, '')
           onService({ name, ip, port })
         } else {
-          log('debug', 'Ignoring mDNS service', { service })
+          log('silly', 'Ignoring mDNS service', { service })
         }
       })
       .on('error', (e: Error) => {

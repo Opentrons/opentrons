@@ -248,7 +248,7 @@ describe('discovery client state selectors', () => {
       expect(result).toEqual([ok, notOk, unreachable, unknown])
     })
 
-    it('prefer more local "ip" addresses', () => {
+    it('should prefer more local "ip" addresses', () => {
       const home: $Shape<HostState> = {
         ip: '127.0.0.1',
         healthStatus: HEALTH_STATUS_OK,
@@ -275,6 +275,25 @@ describe('discovery client state selectors', () => {
 
       const result = sort([regular, linkLocal, localhost, home])
       expect(result).toEqual([home, localhost, linkLocal, regular])
+    })
+
+    it('should prefer more seen "ip" addresses', () => {
+      const unseen: $Shape<HostState> = {
+        ip: '192.168.1.1',
+        healthStatus: HEALTH_STATUS_OK,
+        serverHealthStatus: HEALTH_STATUS_OK,
+        seen: false,
+      }
+
+      const seen: $Shape<HostState> = {
+        ip: '192.168.1.2',
+        healthStatus: HEALTH_STATUS_OK,
+        serverHealthStatus: HEALTH_STATUS_OK,
+        seen: true,
+      }
+
+      const result = sort([unseen, seen])
+      expect(result).toEqual([seen, unseen])
     })
   })
 })

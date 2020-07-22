@@ -1,6 +1,13 @@
 // @flow
 
-import type { RobotState, HostState, Address } from './store/types'
+import type {
+  RobotState,
+  HostState,
+  HealthStatus,
+  Address,
+} from './store/types'
+
+export type { RobotState, HostState, HealthStatus }
 
 // TODO(mc, 2018-10-03): figure out what to do with duplicate type in app
 export type HealthResponse = {
@@ -39,35 +46,6 @@ export type HealthErrorResponse = {|
   status: number,
   body: string | { [string]: mixed, ... },
 |}
-
-export type Candidate = {
-  ip: string,
-  port: number,
-  ...
-}
-
-export type Service = {
-  name: string,
-  ip: ?string,
-  port: number,
-  // IP address (if known) is a link-local address
-  local: ?boolean,
-  // GET /health response.ok === true
-  ok: ?boolean,
-  // GET /server/update/health response.ok === true
-  serverOk: ?boolean,
-  // is advertising on MDNS
-  advertising: ?boolean,
-  // last good /health response
-  health: ?HealthResponse,
-  // last good /server/update/health response
-  serverHealth: ?ServerHealthResponse,
-  ...
-}
-
-export type ServiceUpdate = $Shape<Service>
-
-export type ServiceList = Array<Service>
 
 // TODO(mc, 2018-07-26): grab common logger type from app and app-shell
 export type LogLevel =
@@ -231,3 +209,25 @@ export type DiscoveryClientNext = $ReadOnly<{|
   start: (config: DiscoveryClientConfig) => void,
   stop: () => void,
 |}>
+
+/**
+ * Legacy type used in previous version of Discovery Client for robot state
+ */
+export type LegacyService = {
+  name: string,
+  ip: ?string,
+  port: number,
+  // IP address (if known) is a link-local address
+  local: ?boolean,
+  // GET /health response.ok === true
+  ok: ?boolean,
+  // GET /server/update/health response.ok === true
+  serverOk: ?boolean,
+  // is advertising on MDNS
+  advertising: ?boolean,
+  // last good /health response
+  health: ?HealthResponse,
+  // last good /server/update/health response
+  serverHealth: ?ServerHealthResponse,
+  ...
+}
