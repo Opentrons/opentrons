@@ -40,6 +40,10 @@ export type SessionType =
   | SESSION_TYPE_CALIBRATION_CHECK
   | SESSION_TYPE_TIP_LENGTH_CALIBRATION
 
+export type SessionParams =
+  | {||}
+  | TipLengthCalTypes.TipLengthCalibrationSessionParams
+
 export type SessionCommandString =
   | $Values<typeof CalCheckConstants.checkCommands>
   | $Values<typeof TipCalConstants.tipCalCommands>
@@ -105,7 +109,11 @@ export type SessionCommandResponse = RobotApiV2ResponseBody<
 
 export type CreateSessionAction = {|
   type: CREATE_SESSION,
-  payload: {| robotName: string, sessionType: SessionType |},
+  payload: {|
+    robotName: string,
+    sessionType: SessionType,
+    params: SessionParams,
+  |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -188,7 +196,11 @@ export type FetchAllSessionsFailureAction = {|
 
 export type EnsureSessionAction = {|
   type: ENSURE_SESSION,
-  payload: {| robotName: string, sessionType: SessionType |},
+  payload: {|
+    robotName: string,
+    sessionType: SessionType,
+    params: SessionParams,
+  |},
   meta: RobotApiRequestMeta,
 |}
 

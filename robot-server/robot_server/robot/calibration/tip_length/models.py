@@ -35,6 +35,12 @@ class RequiredLabware(BaseModel):
     isTiprack: bool
 
 
+class SessionCreateParams(BaseModel):
+    """The parameters required to start a tip length calibration session."""
+    mount: str
+    hasCalibrationBlock: bool
+
+
 class TipCalibrationSessionStatus(BaseModel):
     """The current status of a tip length calibration session."""
     instrument: AttachedPipette

@@ -1,10 +1,13 @@
 from robot_server.robot.calibration.tip_length.user_flow import (
     TipCalibrationUserFlow,
 )
-from robot_server.robot.calibration.tip_length.models import \
-    TipCalibrationSessionStatus
+from robot_server.robot.calibration.tip_length.models import (
+    TipCalibrationSessionStatus,
+    SessionCreateParams
+)
 from robot_server.robot.calibration.session import CalibrationException
 from robot_server.service.session.errors import SessionCreationException
+from opentrons.types import Mount
 
 from .base_session import BaseSession, SessionMetaData
 from ..command_execution import CommandQueue, CommandExecutor, \
@@ -28,9 +31,14 @@ class TipLengthCalibration(BaseSession):
     @classmethod
     async def create(cls, configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> 'BaseSession':
+        assert isinstance(instance_meta.create_params, SessionCreateParams)
+        has_calibration_block = instance_meta.create_params.hasCalibrationBlock
+        mount = instance_meta.create_params.mount
         try:
             tip_cal_user_flow = TipCalibrationUserFlow(
-                    hardware=configuration.hardware)
+                    hardware=configuration.hardware,
+                    mount=Mount[mount.upper()],
+                    has_calibration_block=has_calibration_block)
         except (AssertionError, CalibrationException) as e:
             raise SessionCreationException(str(e))
 

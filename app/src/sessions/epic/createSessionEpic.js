@@ -25,6 +25,7 @@ export const mapActionToRequest = (
       type: 'Session',
       attributes: {
         sessionType: action.payload.sessionType,
+        createParams: action.payload.params,
       },
     },
   },

@@ -36,6 +36,11 @@ export type TipLengthCalibrationLabware = {|
   isTiprack: boolean,
 |}
 
+export type TipLengthCalibrationSessionParams = {|
+  mount: string,
+  hasCalibrationBlock: boolean,
+|}
+
 export type TipLengthCalibrationSessionDetails = {|
   instrument: TipLengthCalibrationInstrument,
   currentStep: TipLengthCalibrationStep,

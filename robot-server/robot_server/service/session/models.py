@@ -45,7 +45,10 @@ class SessionType(str, Enum):
     null = 'null'
     default = 'default'
     calibration_check = 'calibrationCheck'
-    tip_length_calibration = 'tipLengthCalibration'
+    tip_length_calibration = (
+        'tipLengthCalibration',
+        tip_length_calibration_models.SessionCreateParams
+    )
 
     @property
     def model(self):
@@ -54,6 +57,7 @@ class SessionType(str, Enum):
 
 
 SessionCreateParamType = typing.Union[
+    tip_length_calibration_models.SessionCreateParams,
     None, EmptyModel
 ]
 

@@ -40,8 +40,7 @@ const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 const NOTE_SPACING = '1.75rem'
 
 type Props = {|
-  setHasCalBlock: boolean => void,
-  close: () => void,
+  setHasBlock: boolean => void,
 |}
 export function ToolSettingAlertModal(props: Props): React.Node {
   return (
@@ -83,16 +82,14 @@ export function ToolSettingAlertModal(props: Props): React.Node {
         <Flex marginY={SPACING_3} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <SecondaryBtn
             onClick={() => {
-              props.setHasCalBlock(true)
-              props.close()
+              props.setHasBlock(true)
             }}
           >
             {HAVE_BLOCK}
           </SecondaryBtn>
           <SecondaryBtn
             onClick={() => {
-              props.setHasCalBlock(false)
-              props.close()
+              props.setHasBlock(false)
             }}
           >
             {USE_TRASH}
