@@ -47,6 +47,15 @@ class TestCreate:
         with pytest.raises(errors.ProtocolAlreadyExistsException):
             manager_with_mock_protocol.create(mock_upload_file, [])
 
+    def test_create_upload_limit_reached(self,
+                                         mock_upload_file,
+                                         manager_with_mock_protocol):
+        ProtocolManager.MAX_COUNT = 1
+        m = MagicMock(spec=UploadFile)
+        m.filename = "123_" + mock_upload_file.filename
+        with pytest.raises(errors.ProtocolUploadCountLimitReached):
+            manager_with_mock_protocol.create(m, [])
+
     @pytest.mark.parametrize(argnames="exception", argvalues=[
         TypeError, IOError
     ])

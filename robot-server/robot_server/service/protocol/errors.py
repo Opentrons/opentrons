@@ -33,3 +33,11 @@ class ProtocolIOException(ProtocolException):
         super().__init__(status_code=HTTP_500_INTERNAL_SERVER_ERROR,
                          error=Error(title="IO Error",
                                      detail=msg))
+
+
+class ProtocolUploadCountLimitReached(RobotServerError):
+    """Maximum protocol upload count reached"""
+    def __init__(self, msg: str):
+        super().__init__(status_code=HTTP_403_FORBIDDEN,
+                         error=Error(title="",
+                                     detail=msg))

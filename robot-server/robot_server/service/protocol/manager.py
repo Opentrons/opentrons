@@ -6,18 +6,20 @@ from fastapi import UploadFile
 
 from robot_server.service.protocol.protocol import UploadedProtocol
 from robot_server.service.protocol import errors
-
+from robot_server.settings import get_settings
 
 log = logging.getLogger(__name__)
 
 
 class ProtocolManager:
+    MAX_COUNT = get_settings().protocol_manager_max_protocols
+
     def __init__(self):
         self._protocols: typing.Dict[str, UploadedProtocol] = {}
 
     def create(self,
                protocol_file: UploadFile,
-               support_files: typing.List[UploadFile]
+               support_files: typing.List[UploadFile],
                ) -> UploadedProtocol:
         """Create a protocol object from upload"""
         name = Path(protocol_file.filename).stem
@@ -25,6 +27,11 @@ class ProtocolManager:
             raise errors.ProtocolAlreadyExistsException(
                 f"A protocol named {name} already exists"
             )
+
+        if len(self._protocols) >= ProtocolManager.MAX_COUNT:
+            raise errors.ProtocolUploadCountLimitReached(
+                f"Upload limit of {ProtocolManager.MAX_COUNT} has "
+                f"been reached.")
 
         try:
             new_protocol = UploadedProtocol(protocol_file, support_files)
