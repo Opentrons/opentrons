@@ -205,6 +205,13 @@ async def old_aspiration(monkeypatch):
         'useOldAspirationFunctions', False)
 
 
+@pytest.fixture
+async def use_tip_length_cal(monkeypatch):
+    await config.advanced_settings.set_adv_setting(
+        'enableTipLengthCalibration', True)
+    yield
+    await config.advanced_settings.set_adv_setting(
+        'enableTipLengthCalibration', False)
 # -----end feature flag fixtures-----------
 
 
