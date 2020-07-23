@@ -141,7 +141,8 @@ def test_execute_function_bundle_apiv2(get_bundle_fixture,
         'Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
         'Picking up tip from C1 of Opentrons 96 Tip Rack 10 µL on 3',
         'Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec',
-        'Dispensing 3.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec',
+        "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at" \
+        " 10.0 uL/sec",
         'Dropping tip into A1 of Opentrons Fixed Trash on 12'
         ]
 
