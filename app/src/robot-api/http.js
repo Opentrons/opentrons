@@ -13,9 +13,7 @@ import type {
   RobotApiResponse,
 } from './types'
 
-function checkEmpty(value) {
-  return value == null || value === ''
-}
+const checkEmpty = (val: mixed): boolean => val == null || val === ''
 
 export function robotApiUrl(
   host: RobotHost,

@@ -13,17 +13,37 @@ type ActionSpec = {|
 
 const SPECS: Array<ActionSpec> = [
   {
-    should: 'create a fetchCalibrationStatus action',
+    should: 'create a fetchLabwareCalibration action',
     creator: Actions.fetchAllLabwareCalibrations,
     args: ['robot-name'],
     expected: {
       type: 'calibration:FETCH_ALL_LABWARE_CALIBRATIONS',
-      payload: { robotName: 'robot-name' },
+      payload: {
+        robotName: 'robot-name',
+        loadName: null,
+        namespace: null,
+        version: null,
+      },
       meta: {},
     },
   },
   {
-    should: 'create a fetchCalibrationStatusSuccess action',
+    should: 'create a fetchLabwareCalibration action with params',
+    creator: Actions.fetchAllLabwareCalibrations,
+    args: ['robot-name'],
+    expected: {
+      type: 'calibration:FETCH_ALL_LABWARE_CALIBRATIONS',
+      payload: {
+        robotName: 'robot-name',
+        loadName: 'fake_labware',
+        namespace: 'weird',
+        version: 1,
+      },
+      meta: {},
+    },
+  },
+  {
+    should: 'create a fetchLabwareCalibrationSuccess action',
     creator: Actions.fetchLabwareCalibrationsSuccess,
     args: [
       'robot-name',
@@ -40,7 +60,7 @@ const SPECS: Array<ActionSpec> = [
     },
   },
   {
-    should: 'create a fetchCalibrationStatusFailure action',
+    should: 'create a fetchLabwareCalibrationFailure action',
     creator: Actions.fetchLabwareCalibrationsFailure,
     args: [
       'robot-name',

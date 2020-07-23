@@ -11,9 +11,9 @@ import type {
 
 export const fetchAllLabwareCalibrations = (
   robotName: string,
-  loadName?: string,
-  namespace?: string,
-  version?: number
+  loadName: string | null = null,
+  namespace: string | null = null,
+  version: number | null = null
 ): Types.FetchLabwareCalibrationAction => ({
   type: Constants.FETCH_ALL_LABWARE_CALIBRATIONS,
   payload: { robotName, loadName, namespace, version },

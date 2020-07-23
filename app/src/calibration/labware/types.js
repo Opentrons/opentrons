@@ -17,9 +17,9 @@ export type FetchLabwareCalibrationAction = {|
   type: FETCH_ALL_LABWARE_CALIBRATIONS,
   payload: {|
     robotName: string,
-    loadName?: string,
-    version?: number,
-    namespace?: string,
+    loadName: string | null,
+    version: number | null,
+    namespace: string | null,
   |},
   meta: RobotApiRequestMeta,
 |}

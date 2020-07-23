@@ -1,6 +1,6 @@
 // @flow
 import * as Constants from './constants'
-import { labware } from '.'
+import * as labware from './labware'
 
 import type { Action } from '../types'
 import type { CalibrationState } from './types'

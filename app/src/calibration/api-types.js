@@ -66,6 +66,5 @@ export type LabwareCalibrationObjects = {|
 
 export type AllLabwareCalibrations = {|
   data: Array<LabwareCalibrationObjects | null>,
-  type: string,
   meta: Object,
 |}

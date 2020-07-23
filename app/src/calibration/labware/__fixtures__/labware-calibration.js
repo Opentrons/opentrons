@@ -36,7 +36,6 @@ export const mockLabwareCalibration: LabwareCalibrationObjects = {
 export const mockAllLabwareCalibraton: AllLabwareCalibrations = {
   data: [mockLabwareCalibration],
   meta: {},
-  type: 'Labware Calibration',
 }
 
 export const {
