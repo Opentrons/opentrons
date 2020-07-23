@@ -16,7 +16,6 @@
   "step_fields": {
     "defaults": {
       "aspirate_airGap_checkbox": "Aspirate air before moving to destination well",
-      "dispense_airGap_checkbox": "Aspirate air after dispense, before moving to next destination",
       "aspirate_flowRate": "The speed at which the pipette aspirates",
       "dispense_flowRate": "The speed at which the pipette dispenses",
       "aspirate_mix_checkbox": "Pipette up and down before aspirating",

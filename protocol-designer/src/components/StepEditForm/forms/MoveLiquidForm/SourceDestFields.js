@@ -158,7 +158,7 @@ export const SourceDestFields = (props: Props): React.Node => {
           </CheckboxRowField>
         )}
 
-        {delayEnabled && (
+        {prefix === 'aspirate' && delayEnabled && (
           <CheckboxRowField
             tooltipComponent={i18n.t(
               `tooltip.step_fields.defaults.${addFieldNamePrefix(
