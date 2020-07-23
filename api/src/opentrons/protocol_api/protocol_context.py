@@ -140,7 +140,7 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
-        """ Return the API version supported by this protoocl context.
+        """ Return the API version supported by this protocol context.
 
         The supported API version was specified when the protocol context
         was initialized. It may be lower than the highest version supported
