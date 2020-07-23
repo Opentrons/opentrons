@@ -3,8 +3,50 @@
 import * as Actions from '../actions'
 
 describe('discovery client action creators', () => {
+  it('should create a client:INITIALIZE_STATE action with robots in the payload', () => {
+    const action = Actions.initializeState({
+      initialRobots: [
+        {
+          name: 'opentrons-dev',
+          health: null,
+          serverHealth: null,
+          addresses: [],
+        },
+      ],
+    })
+
+    expect(action).toEqual({
+      type: 'client:INITIALIZE_STATE',
+      payload: {
+        initialRobots: [
+          {
+            name: 'opentrons-dev',
+            health: null,
+            serverHealth: null,
+            addresses: [],
+          },
+        ],
+      },
+    })
+  })
+
+  it('should create a client:INITIALIZE_STATE action with manualAddresses in the payload', () => {
+    const action = Actions.initializeState({
+      manualAddresses: [{ ip: '127.0.0.1', port: 31950 }],
+    })
+
+    expect(action).toEqual({
+      type: 'client:INITIALIZE_STATE',
+      payload: { manualAddresses: [{ ip: '127.0.0.1', port: 31950 }] },
+    })
+  })
+
   it('should create an mdns:SERVICE_FOUND action', () => {
-    const action = Actions.serviceFound('opentrons-dev', '127.0.0.1', 31950)
+    const action = Actions.serviceFound({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+    })
 
     expect(action).toEqual({
       type: 'mdns:SERVICE_FOUND',
@@ -78,24 +120,6 @@ describe('discovery client action creators', () => {
         healthError,
         serverHealthError,
       },
-    })
-  })
-
-  it('should allow the user to manually add an IP address to the client', () => {
-    const action = Actions.addIpAddress('localhost', 31950)
-
-    expect(action).toEqual({
-      type: 'client:ADD_IP_ADDRESS',
-      payload: { ip: 'localhost', port: 31950 },
-    })
-  })
-
-  it('should allow the user to manually remove an IP address from the client', () => {
-    const action = Actions.removeIpAddress('localhost')
-
-    expect(action).toEqual({
-      type: 'client:REMOVE_IP_ADDRESS',
-      payload: { ip: 'localhost' },
     })
   })
 

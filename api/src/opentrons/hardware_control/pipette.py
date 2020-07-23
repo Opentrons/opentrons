@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional, Tuple, Union, TYPE_CHECKING
 
 from opentrons.types import Point
 from opentrons.config import pipette_config
+from opentrons.config.feature_flags import enable_tip_length_calibration
 from .types import CriticalPoint
 from opentrons_shared_data.pipette import name_for_model
 
@@ -110,21 +111,25 @@ class Pipette:
         mod_and_tip = Point(mod_offset_xy[0],
                             mod_offset_xy[1],
                             mod_offset_xy[2] - tip_length)
-        cp = mod_and_tip + self._instrument_offset._replace(z=0)
+
+        if enable_tip_length_calibration():
+            instr = self._instrument_offset
+        else:
+            instr = self._instrument_offset._replace(z=0)
+
+        cp = mod_and_tip + instr
+
         if self._log.isEnabledFor(logging.DEBUG):
-            mo = 'model offset: {} + '.format(self.model_offset)\
-                if cp_type != CriticalPoint.XY_CENTER else ''
-            info_str = 'cp: {}{}: {}=({}instr offset xy: {}'\
-                .format(cp_type, '(from override)' if cp_override else '',
-                        cp, mo,
-                        self._instrument_offset._replace(z=0))
-            if cp_type == CriticalPoint.TIP:
-                info_str += '- current_tip_length: {}=(true tip length: {}'\
-                    ' - inst z: {}) (z only)'.format(
-                        self.current_tip_length, self._current_tip_length,
-                        self._instrument_offset.z)
+            info_str = 'cp: {}{}: {} (from: '\
+                .format(cp_type,
+                        ' (from override)' if cp_override else '',
+                        cp)
+            info_str += 'model offset: {} + instrument offset: {}'\
+                .format(mod_offset_xy, instr)
+            info_str += ' - tip_length: {}'.format(tip_length)
             info_str += ')'
             self._log.debug(info_str)
+
         return cp
 
     @property
@@ -135,8 +140,11 @@ class Pipette:
     @property
     def current_tip_length(self) -> float:
         """ The length of the current tip attached (0.0 if no tip) """
-        return (self._current_tip_length
-                - self._instrument_offset.z)
+        if enable_tip_length_calibration():
+            return self._current_tip_length
+        else:
+            return (self._current_tip_length
+                    - self._instrument_offset.z)
 
     @property
     def current_tiprack_diameter(self) -> float:

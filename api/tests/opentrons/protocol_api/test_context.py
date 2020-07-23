@@ -13,6 +13,7 @@ from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import config_models
 from opentrons.protocol_api import transfers as tf
 from opentrons.protocols.types import APIVersion
+from opentrons.calibration_storage import get, types as cs_types
 
 import pytest
 
@@ -823,10 +824,28 @@ def test_tip_length_for(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     instr = ctx.load_instrument('p20_single_gen2', 'left')
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
+    instr._tip_length_for.cache_clear()
     assert instr._tip_length_for(tiprack)\
         == (tiprack._definition['parameters']['tipLength']
             - instr.hw_pipette['tip_overlap']
             ['opentrons/geb_96_tiprack_10ul/1'])
+
+
+def test_tip_length_for_caldata(loop, monkeypatch, use_tip_length_cal):
+    ctx = papi.ProtocolContext(loop)
+    instr = ctx.load_instrument('p20_single_gen2', 'left')
+    tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
+    mock_tip_length = mock.Mock()
+    mock_tip_length.return_value = {'tipLength': 2}
+    monkeypatch.setattr(get, 'load_tip_length_calibration', mock_tip_length)
+    instr._tip_length_for.cache_clear()
+    assert instr._tip_length_for(tiprack) == 2
+    instr._tip_length_for.cache_clear()
+    mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
+    assert instr._tip_length_for(tiprack) == (
+        tiprack._definition['parameters']['tipLength']
+        - instr.hw_pipette['tip_overlap']
+        ['opentrons/geb_96_tiprack_10ul/1'])
 
 
 def test_bundled_labware(loop, get_labware_fixture):

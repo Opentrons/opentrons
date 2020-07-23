@@ -109,7 +109,7 @@ export function fromResponse(
 
   if (!name) return null
 
-  // in case of name mismatch, prefer /server/health name and flag not ok
+  // in case of name mismatch, prefer /server/update/health name and flag not ok
   if (apiName != null && serverName != null && apiName !== serverName) {
     apiOk = false
   }

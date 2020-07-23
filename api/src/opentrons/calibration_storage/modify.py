@@ -16,6 +16,7 @@ from . import (
     helpers)
 
 if typing.TYPE_CHECKING:
+    from .dev_types import (TipLengthCalibration, PipTipLengthCalibration)
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons.types import Point
 
@@ -86,7 +87,7 @@ def save_labware_calibration(
 def create_tip_length_data(
         definition: 'LabwareDefinition',
         parent: str,
-        length: float) -> local_types.PipTipLengthCalibration:
+        length: float) -> 'PipTipLengthCalibration':
     """
     Function to correctly format tip length data.
 
@@ -102,7 +103,7 @@ def create_tip_length_data(
     #     'cannot save tip length for non-tiprack labware'
     labware_hash = helpers.hash_labware_def(definition)
 
-    tip_length_data: local_types.TipLengthCalibration = {
+    tip_length_data: 'TipLengthCalibration' = {
         'tipLength': length,
         'lastModified': datetime.datetime.utcnow()
     }
@@ -143,7 +144,7 @@ def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
 
 
 def save_tip_length_calibration(
-        pip_id: str, tip_length_cal: local_types.PipTipLengthCalibration):
+        pip_id: str, tip_length_cal: 'PipTipLengthCalibration'):
     """
     Function used to save tip length calibration to file.
 

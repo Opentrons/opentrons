@@ -3,16 +3,13 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import * as Sessions from '../../sessions'
 import { selectors as robotSelectors } from '../../robot'
 import { PIPETTE_MOUNTS, fetchPipettes } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 import { getFeatureFlags } from '../../config'
-import { mockTipLengthCalibrationSessionAttributes } from '../../sessions/__fixtures__'
 
 import { Page } from '../../components/Page'
 import { TipProbe } from '../../components/TipProbe'
-import { CalibrateTipLength } from '../../components/CalibrateTipLength'
 import {
   PipetteTabs,
   Pipettes as PipettesContents,
@@ -22,6 +19,7 @@ import { SessionHeader } from '../../components/SessionHeader'
 import type { ContextRouter } from 'react-router-dom'
 import type { Dispatch } from '../../types'
 import type { Mount } from '../../pipettes/types'
+import { CalibrateTipLengthControl } from './CalibrateTipLengthControl'
 
 type Props = ContextRouter
 
@@ -46,12 +44,6 @@ export function Pipettes(props: Props): React.Node {
 
   const currentPipette = pipettes.find(p => p.mount === currentMount) || null
 
-  // TODO: get real session
-  const tipLengthCalibrationSession: Sessions.TipLengthCalibrationSession = {
-    ...mockTipLengthCalibrationSessionAttributes,
-    id: 'fake_session_id',
-  }
-
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>
       <PipetteTabs currentMount={currentMount} />
@@ -63,14 +55,13 @@ export function Pipettes(props: Props): React.Node {
           changePipetteUrl,
         }}
       />
-      {!!currentPipette &&
+      {robotName &&
+        !!currentPipette &&
         (ff.enableTipLengthCal ? (
-          <CalibrateTipLength
+          <CalibrateTipLengthControl
             mount={currentPipette.mount}
-            isMulti={currentPipette.channels > 1}
-            probed={currentPipette.probed}
             robotName={robotName}
-            session={tipLengthCalibrationSession}
+            hasCalibrated={currentPipette.probed}
           />
         ) : (
           <TipProbe {...currentPipette} />

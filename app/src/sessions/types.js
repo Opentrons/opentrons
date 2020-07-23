@@ -30,6 +30,7 @@ import type {
 import * as CalCheckTypes from './calibration-check/types'
 import * as TipLengthCalTypes from './tip-length-calibration/types'
 import * as CalCheckConstants from './calibration-check/constants'
+import * as TipCalConstants from './tip-length-calibration/constants'
 
 export type * from './calibration-check/types'
 export type * from './tip-length-calibration/types'
@@ -39,9 +40,13 @@ export type SessionType =
   | SESSION_TYPE_CALIBRATION_CHECK
   | SESSION_TYPE_TIP_LENGTH_CALIBRATION
 
-export type SessionCommandString = $Values<
-  typeof CalCheckConstants.checkCommands
->
+export type SessionParams =
+  | {||}
+  | TipLengthCalTypes.TipLengthCalibrationSessionParams
+
+export type SessionCommandString =
+  | $Values<typeof CalCheckConstants.checkCommands>
+  | $Values<typeof TipCalConstants.tipCalCommands>
 
 // TODO(al, 2020-05-11): data should be properly typed with all
 // known command types
@@ -50,11 +55,13 @@ export type SessionCommandData = { ... }
 export type CalibrationCheckSessionResponseAttributes = {|
   sessionType: SESSION_TYPE_CALIBRATION_CHECK,
   details: CalCheckTypes.RobotCalibrationCheckSessionDetails,
+  createParams: {},
 |}
 
 export type TipLengthCalibrationSessionResponseAttributes = {|
   sessionType: SESSION_TYPE_TIP_LENGTH_CALIBRATION,
   details: TipLengthCalTypes.TipLengthCalibrationSessionDetails,
+  createParams: TipLengthCalTypes.TipLengthCalibrationSessionParams,
 |}
 
 export type SessionResponseAttributes =
@@ -104,7 +111,11 @@ export type SessionCommandResponse = RobotApiV2ResponseBody<
 
 export type CreateSessionAction = {|
   type: CREATE_SESSION,
-  payload: {| robotName: string, sessionType: SessionType |},
+  payload: {|
+    robotName: string,
+    sessionType: SessionType,
+    params: SessionParams,
+  |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -187,7 +198,11 @@ export type FetchAllSessionsFailureAction = {|
 
 export type EnsureSessionAction = {|
   type: ENSURE_SESSION,
-  payload: {| robotName: string, sessionType: SessionType |},
+  payload: {|
+    robotName: string,
+    sessionType: SessionType,
+    params: SessionParams,
+  |},
   meta: RobotApiRequestMeta,
 |}
 

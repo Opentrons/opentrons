@@ -71,11 +71,8 @@ export const SourceDestFields = (props: Props): React.Node => {
           className={styles.small_field}
           {...focusHandlers}
         />
-        <TextField
-          name={addFieldNamePrefix('delay_tip_position')}
-          units={i18n.t('application.units.millimeter')}
-          className={styles.small_field}
-          {...focusHandlers}
+        <TipPositionField
+          fieldName={addFieldNamePrefix('delay_tip_position')}
         />
       </CheckboxRowField>
     ) : null

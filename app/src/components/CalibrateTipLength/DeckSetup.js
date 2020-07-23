@@ -4,9 +4,10 @@ import map from 'lodash/map'
 import { OutlineButton, RobotWorkSpace } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
+import * as Sessions from '../../sessions'
 import { getLatestLabwareDef } from '../../getLabware'
 import type { CalibrateTipLengthChildProps } from './types'
-import { CalibrationLabwareRender } from './calibrationLabwareRender'
+import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import styles from './styles.css'
 
 const DECK_SETUP_WITH_BLOCK_PROMPT =
@@ -18,17 +19,10 @@ const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
-  // TODO: get real hasBlock value and labware from tip length calibration session
-  const { hasBlock, session, mount } = props
-  // const tiprackID = session.details.instruments[mount.toLowerCase()]['tiprack_id']
-  // const labware = [session.details.labware.find(l => l.id === tiprackID)]
-  const labware = session.details.labware.filter(l => {
-    return l.forMounts.includes(mount.toLowerCase())
-  })
+  const { hasBlock, labware, sendSessionCommand } = props
 
   const proceed = () => {
-    console.log('TODO: wire up command')
-    // props.sendSessionCommand('loadLabware')
+    sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT)
   }
 
   return (

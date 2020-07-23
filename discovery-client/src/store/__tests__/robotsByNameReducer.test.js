@@ -10,13 +10,83 @@ import * as Actions from '../actions'
 import { reducer, robotsByNameReducer } from '../reducer'
 
 describe('robotsByName reducer', () => {
-  it('should return an empty initial state', () => {
+  it('should return an empty initial state under robotsByName in the root reducer', () => {
     const state = reducer(undefined, ({}: any))
     expect(state.robotsByName).toEqual({})
   })
 
+  it('should not overwrite state if "client:INITIALIZE_STATE" action has no robots', () => {
+    const initialState = {
+      'opentrons-dev': {
+        name: 'opentrons-dev',
+        health: null,
+        serverHealth: null,
+      },
+    }
+    const action = Actions.initializeState({})
+    const state = robotsByNameReducer(initialState, action)
+
+    expect(state).toBe(initialState)
+  })
+
+  it('should overwrite state with robots from "client:INITIALIZE_STATE"', () => {
+    const initialState = {
+      'opentrons-dev': {
+        name: 'opentrons-dev',
+        health: null,
+        serverHealth: null,
+      },
+    }
+
+    const action = Actions.initializeState({
+      initialRobots: [
+        {
+          name: 'opentrons-1',
+          health: mockHealthResponse,
+          serverHealth: mockServerHealthResponse,
+          addresses: [],
+        },
+        {
+          name: 'opentrons-2',
+          health: null,
+          serverHealth: mockServerHealthResponse,
+          addresses: [],
+        },
+        {
+          name: 'opentrons-3',
+          health: mockHealthResponse,
+          serverHealth: null,
+          addresses: [],
+        },
+      ],
+    })
+    const state = robotsByNameReducer(initialState, action)
+
+    expect(state).toEqual({
+      'opentrons-1': {
+        name: 'opentrons-1',
+        health: mockHealthResponse,
+        serverHealth: mockServerHealthResponse,
+      },
+      'opentrons-2': {
+        name: 'opentrons-2',
+        health: null,
+        serverHealth: mockServerHealthResponse,
+      },
+      'opentrons-3': {
+        name: 'opentrons-3',
+        health: mockHealthResponse,
+        serverHealth: null,
+      },
+    })
+  })
+
   it('should handle an "mdns:SERVICE_FOUND action for a new robot', () => {
-    const action = Actions.serviceFound('opentrons-dev', '127.0.0.1', 31950)
+    const action = Actions.serviceFound({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+    })
     const initialState = {}
 
     expect(robotsByNameReducer(initialState, action)).toEqual({
@@ -29,7 +99,11 @@ describe('robotsByName reducer', () => {
   })
 
   it('should handle an "mdns:SERVICE_FOUND action for an existing robot', () => {
-    const action = Actions.serviceFound('opentrons-dev', '127.0.0.1', 31950)
+    const action = Actions.serviceFound({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+    })
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',

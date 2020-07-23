@@ -21,6 +21,7 @@ describe('createSessionEpic', () => {
         type: 'Session',
         attributes: {
           sessionType: 'calibrationCheck',
+          createParams: {},
         },
       },
     },

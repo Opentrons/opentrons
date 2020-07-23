@@ -15,6 +15,9 @@ stages:
           type: Session
           attributes:
             sessionType: tipLengthCalibration
+            createParams:
+              mount: left
+              hasCalibrationBlock: true
     response:
       status_code: 201
       save:
@@ -34,8 +37,13 @@ stages:
           attributes:
             sessionType: tipLengthCalibration
             createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+.\\d+"
-            details: {}
-            createParams: null
+            details: &session_data_attribute_details
+              currentStep: sessionStarted
+              instrument: !anydict
+              labware: !anylist
+            createParams:
+              mount: left
+              hasCalibrationBlock: true
 
   - name: Load labware
     request:

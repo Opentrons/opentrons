@@ -1,40 +1,50 @@
-from robot_server.robot.calibration.tip_length.user_flow import \
-    TipCalibrationUserFlow
+from robot_server.robot.calibration.tip_length.user_flow import (
+    TipCalibrationUserFlow,
+)
+from robot_server.robot.calibration.tip_length.models import (
+    TipCalibrationSessionStatus,
+    SessionCreateParams
+)
 from robot_server.robot.calibration.session import CalibrationException
 from robot_server.service.session.errors import SessionCreationException
+from opentrons.types import Mount
 
 from .base_session import BaseSession, SessionMetaData
 from ..command_execution import CommandQueue, CommandExecutor, \
     CallableExecutor
 from ..configuration import SessionConfiguration
-from ..models import EmptyModel, SessionType, SessionDetails
+from ..models import SessionType, SessionDetails
 from ..errors import UnsupportedFeature
 
 
 class TipLengthCalibration(BaseSession):
-
     def __init__(self, configuration: SessionConfiguration,
                  instance_meta: SessionMetaData,
-                 tip_length_calibration: TipCalibrationUserFlow
+                 tip_cal_user_flow: TipCalibrationUserFlow
                  ):
         super().__init__(configuration, instance_meta)
-        self._tip_length_calibration = tip_length_calibration
+        self._tip_cal_user_flow = tip_cal_user_flow
         self._command_executor = CallableExecutor(
-            self._tip_length_calibration.handle_command
+            self._tip_cal_user_flow.handle_command
         )
 
     @classmethod
     async def create(cls, configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> 'BaseSession':
+        assert isinstance(instance_meta.create_params, SessionCreateParams)
+        has_calibration_block = instance_meta.create_params.hasCalibrationBlock
+        mount = instance_meta.create_params.mount
         try:
-            tip_length_cal = TipCalibrationUserFlow(
-                    hardware=configuration.hardware)
+            tip_cal_user_flow = TipCalibrationUserFlow(
+                    hardware=configuration.hardware,
+                    mount=Mount[mount.upper()],
+                    has_calibration_block=has_calibration_block)
         except (AssertionError, CalibrationException) as e:
             raise SessionCreationException(str(e))
 
         return cls(configuration=configuration,
                    instance_meta=instance_meta,
-                   tip_length_calibration=tip_length_cal)
+                   tip_cal_user_flow=tip_cal_user_flow)
 
     @property
     def command_executor(self) -> CommandExecutor:
@@ -49,6 +59,8 @@ class TipLengthCalibration(BaseSession):
         return SessionType.tip_length_calibration
 
     def _get_response_details(self) -> SessionDetails:
-        # TODO: Create a proper model for the session details. Add it to
-        #   SessionDetails Union
-        return EmptyModel()
+        return TipCalibrationSessionStatus(
+            instrument=self._tip_cal_user_flow.get_pipette(),
+            currentStep=self._tip_cal_user_flow.current_state,
+            labware=self._tip_cal_user_flow.get_required_labware(),
+        )

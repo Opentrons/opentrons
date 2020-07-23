@@ -21,7 +21,11 @@ export function getDefaultMmFromBottom(args: {
   switch (fieldName) {
     case 'aspirate_mmFromBottom':
       return DEFAULT_MM_FROM_BOTTOM_ASPIRATE
+    case 'aspirate_delay_tip_position':
+      return DEFAULT_MM_FROM_BOTTOM_ASPIRATE
     case 'dispense_mmFromBottom':
+      return DEFAULT_MM_FROM_BOTTOM_DISPENSE
+    case 'dispense_delay_tip_position':
       return DEFAULT_MM_FROM_BOTTOM_DISPENSE
     case 'mix_mmFromBottom':
       // TODO: Ian 2018-11-131 figure out what offset makes most sense for mix

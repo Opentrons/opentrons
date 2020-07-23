@@ -1,14 +1,16 @@
 // @flow
 import { combineReducers } from 'redux'
 import isEqual from 'lodash/isEqual'
+import keyBy from 'lodash/keyBy'
 import omit from 'lodash/omit'
 
-import * as Actions from './actions'
 import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
   HEALTH_STATUS_UNREACHABLE,
-} from './constants'
+} from '../constants'
+
+import * as Actions from './actions'
 
 import type { Reducer } from 'redux'
 
@@ -19,22 +21,24 @@ import type {
   HostState,
   RobotsByNameMap,
   HostsByIpMap,
+  Address,
 } from './types'
 
-const INITIAL_STATE = {
+const INITIAL_STATE: State = {
   robotsByName: {},
   hostsByIp: {},
+  manualAddresses: [],
 }
 
-const makeInitialHostState = (ip, port) => ({
+const makeHostState = (ip, port, robotName) => ({
   ip,
   port,
+  robotName,
   seen: false,
   healthStatus: null,
   serverHealthStatus: null,
   healthError: null,
   serverHealthError: null,
-  robotName: null,
 })
 
 const getHealthStatus = (responseData, error) => {
@@ -48,6 +52,16 @@ export const robotsByNameReducer = (
   action: Action
 ): RobotsByNameMap => {
   switch (action.type) {
+    case Actions.INITIALIZE_STATE: {
+      const { initialRobots } = action.payload
+      if (!initialRobots) return state
+
+      const states = initialRobots.map(
+        ({ addresses, ...robotState }) => robotState
+      )
+      return keyBy(states, 'name')
+    }
+
     case Actions.REMOVE_ROBOT: {
       const { name } = action.payload
       return name in state ? omit(state, name) : state
@@ -91,15 +105,15 @@ export const hostsByIpReducer = (
   action: Action
 ): HostsByIpMap => {
   switch (action.type) {
-    case Actions.ADD_IP_ADDRESS: {
-      const { ip, port } = action.payload
-      return ip in state ? state : { [ip]: makeInitialHostState(ip, port) }
-    }
+    case Actions.INITIALIZE_STATE: {
+      const { initialRobots } = action.payload
+      if (!initialRobots) return state
 
-    case Actions.REMOVE_IP_ADDRESS: {
-      const { ip } = action.payload
-      const host: HostState | void = state[ip]
-      return host && host.seen === false ? omit(state, ip) : state
+      const states = initialRobots.flatMap<HostState>(({ name, addresses }) => {
+        return addresses.map(({ ip, port }) => makeHostState(ip, port, name))
+      })
+
+      return keyBy(states, 'ip')
     }
 
     case Actions.REMOVE_ROBOT: {
@@ -199,7 +213,21 @@ export const hostsByIpReducer = (
   return state
 }
 
+export const manualAddressesReducer = (
+  state: $ReadOnlyArray<Address> = INITIAL_STATE.manualAddresses,
+  action: Action
+): $ReadOnlyArray<Address> => {
+  switch (action.type) {
+    case Actions.INITIALIZE_STATE: {
+      return action.payload.manualAddresses ?? state
+    }
+  }
+
+  return state
+}
+
 export const reducer: Reducer<State, Action> = combineReducers({
   robotsByName: robotsByNameReducer,
   hostsByIp: hostsByIpReducer,
+  manualAddresses: manualAddressesReducer,
 })

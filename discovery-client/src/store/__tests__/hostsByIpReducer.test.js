@@ -7,18 +7,142 @@ import {
   mockHealthFetchErrorResponse,
 } from '../../__fixtures__/health'
 
+import * as Constants from '../../constants'
 import * as Actions from '../actions'
-import * as Constants from '../constants'
 import { reducer, hostsByIpReducer } from '../reducer'
 
 describe('hostsByIp reducer', () => {
-  it('should return an empty initial state', () => {
+  it('should return an empty initial state under hostsByIp in the root reducer', () => {
     const state = reducer(undefined, ({}: any))
     expect(state.hostsByIp).toEqual({})
   })
 
+  it('should not overwrite state if a "client:INITIALIZE_STATE" action has no robots', () => {
+    const initialState = {
+      '127.0.0.1': {
+        ip: '127.0.0.1',
+        port: 31950,
+        seen: false,
+        healthStatus: null,
+        serverHealthStatus: null,
+        healthError: null,
+        serverHealthError: null,
+        robotName: 'opentrons-dev',
+      },
+    }
+    const action = Actions.initializeState({})
+    const state = hostsByIpReducer(initialState, action)
+
+    expect(state).toBe(initialState)
+  })
+
+  it('should overwrite state with robots from "client:INITIALIZE_STATE"', () => {
+    const initialState = {
+      '127.0.0.1': {
+        ip: '127.0.0.1',
+        port: 31950,
+        seen: false,
+        healthStatus: null,
+        serverHealthStatus: null,
+        healthError: null,
+        serverHealthError: null,
+        robotName: 'opentrons-dev',
+      },
+    }
+
+    const action = Actions.initializeState({
+      initialRobots: [
+        {
+          name: 'opentrons-1',
+          health: mockHealthResponse,
+          serverHealth: mockServerHealthResponse,
+          addresses: [
+            {
+              ip: '127.0.0.2',
+              port: 31950,
+              seen: false,
+              healthStatus: null,
+              serverHealthStatus: null,
+              healthError: null,
+              serverHealthError: null,
+            },
+          ],
+        },
+        {
+          name: 'opentrons-2',
+          health: null,
+          serverHealth: mockServerHealthResponse,
+          addresses: [
+            {
+              ip: '127.0.0.3',
+              port: 31950,
+              seen: true,
+              healthStatus: Constants.HEALTH_STATUS_NOT_OK,
+              serverHealthStatus: Constants.HEALTH_STATUS_NOT_OK,
+              healthError: mockHealthErrorJsonResponse,
+              serverHealthError: mockHealthErrorJsonResponse,
+            },
+            {
+              ip: '127.0.0.4',
+              port: 31950,
+              seen: false,
+              healthStatus: Constants.HEALTH_STATUS_UNREACHABLE,
+              serverHealthStatus: Constants.HEALTH_STATUS_UNREACHABLE,
+              healthError: mockHealthFetchErrorResponse,
+              serverHealthError: mockHealthFetchErrorResponse,
+            },
+          ],
+        },
+        {
+          name: 'opentrons-3',
+          health: mockHealthResponse,
+          serverHealth: null,
+          addresses: [],
+        },
+      ],
+    })
+    const state = hostsByIpReducer(initialState, action)
+
+    expect(state).toEqual({
+      '127.0.0.2': {
+        ip: '127.0.0.2',
+        port: 31950,
+        seen: false,
+        healthStatus: null,
+        serverHealthStatus: null,
+        healthError: null,
+        serverHealthError: null,
+        robotName: 'opentrons-1',
+      },
+      '127.0.0.3': {
+        ip: '127.0.0.3',
+        port: 31950,
+        seen: false,
+        healthStatus: null,
+        serverHealthStatus: null,
+        healthError: null,
+        serverHealthError: null,
+        robotName: 'opentrons-2',
+      },
+      '127.0.0.4': {
+        ip: '127.0.0.4',
+        port: 31950,
+        seen: false,
+        healthStatus: null,
+        serverHealthStatus: null,
+        healthError: null,
+        serverHealthError: null,
+        robotName: 'opentrons-2',
+      },
+    })
+  })
+
   it('should handle an "mdns:SERVICE_FOUND" action for a new ip', () => {
-    const action = Actions.serviceFound('opentrons-dev', '127.0.0.1', 31950)
+    const action = Actions.serviceFound({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+    })
     const initialState = {}
 
     expect(hostsByIpReducer(initialState, action)).toEqual({
@@ -36,7 +160,11 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should handle an "mdns:SERVICE_FOUND" action for an existing, un-polled ip', () => {
-    const action = Actions.serviceFound('opentrons-dev', '127.0.0.1', 31950)
+    const action = Actions.serviceFound({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+    })
     const initialState = {
       '127.0.0.1': {
         ip: '127.0.0.1',
@@ -66,7 +194,11 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should handle an "mdns:SERVICE_FOUND" action for an existing, polled ip', () => {
-    const action = Actions.serviceFound('opentrons-dev', '127.0.0.1', 31950)
+    const action = Actions.serviceFound({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+    })
     const initialState = {
       '127.0.0.1': {
         ip: '127.0.0.1',
@@ -86,7 +218,11 @@ describe('hostsByIp reducer', () => {
   })
 
   it('should handle an "mdns:SERVICE_FOUND" action for an existing ip with an old robot name', () => {
-    const action = Actions.serviceFound('opentrons-dev', '127.0.0.1', 31950)
+    const action = Actions.serviceFound({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+    })
     const initialState = {
       '127.0.0.1': {
         ip: '127.0.0.1',
@@ -373,101 +509,6 @@ describe('hostsByIp reducer', () => {
         robotName: 'opentrons-other',
       },
     })
-  })
-
-  it('should handle "client:ADD_IP_ADDRESS" for new address', () => {
-    const action = Actions.addIpAddress('127.0.0.1', 31950)
-    const initialState = {}
-    const nextState = hostsByIpReducer(initialState, action)
-
-    expect(nextState).toEqual({
-      '127.0.0.1': {
-        ip: '127.0.0.1',
-        port: 31950,
-        seen: false,
-        healthStatus: null,
-        serverHealthStatus: null,
-        healthError: null,
-        serverHealthError: null,
-        robotName: null,
-      },
-    })
-  })
-
-  it('should noop "client:ADD_IP_ADDRESS" for existing address', () => {
-    const action = Actions.addIpAddress('127.0.0.1', 31950)
-    const initialState = {
-      '127.0.0.1': {
-        ip: '127.0.0.1',
-        port: 31950,
-        seen: true,
-        healthStatus: Constants.HEALTH_STATUS_OK,
-        serverHealthStatus: Constants.HEALTH_STATUS_OK,
-        healthError: null,
-        serverHealthError: null,
-        robotName: 'opentrons-dev',
-      },
-    }
-    const nextState = hostsByIpReducer(initialState, action)
-
-    expect(nextState).toBe(initialState)
-  })
-
-  it('should handle "client:REMOVE_IP_ADDRESS" for unseen address', () => {
-    const action = Actions.removeIpAddress('127.0.0.1')
-    const initialState = {
-      '127.0.0.1': {
-        ip: '127.0.0.1',
-        port: 31950,
-        seen: false,
-        healthStatus: null,
-        serverHealthStatus: null,
-        healthError: null,
-        serverHealthError: null,
-        robotName: null,
-      },
-    }
-    const nextState = hostsByIpReducer(initialState, action)
-
-    expect(nextState).toEqual({})
-  })
-
-  it('should noop "client:REMOVE_IP_ADDRESS" for seen address', () => {
-    const action = Actions.removeIpAddress('127.0.0.1')
-    const initialState = {
-      '127.0.0.1': {
-        ip: '127.0.0.1',
-        port: 31950,
-        seen: true,
-        healthStatus: Constants.HEALTH_STATUS_OK,
-        serverHealthStatus: Constants.HEALTH_STATUS_OK,
-        healthError: null,
-        serverHealthError: null,
-        robotName: 'opentrons-dev',
-      },
-    }
-    const nextState = hostsByIpReducer(initialState, action)
-
-    expect(nextState).toBe(initialState)
-  })
-
-  it('should noop "client:REMOVE_IP_ADDRESS" for non-existent address', () => {
-    const action = Actions.removeIpAddress('127.0.0.1')
-    const initialState = {
-      '127.0.0.2': {
-        ip: '127.0.0.2',
-        port: 31950,
-        seen: true,
-        healthStatus: Constants.HEALTH_STATUS_OK,
-        serverHealthStatus: Constants.HEALTH_STATUS_OK,
-        healthError: null,
-        serverHealthError: null,
-        robotName: 'opentrons-dev',
-      },
-    }
-    const nextState = hostsByIpReducer(initialState, action)
-
-    expect(nextState).toBe(initialState)
   })
 
   it('should handle "client:REMOVE_ROBOT"', () => {

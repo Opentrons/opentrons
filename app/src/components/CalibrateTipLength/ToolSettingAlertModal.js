@@ -16,8 +16,7 @@ import {
 } from '@opentrons/components'
 
 import styles from './styles.css'
-import type { CalibrateTipLengthChildProps } from './types'
-import { calBlockImage } from './labwareImages'
+import { labwareImages } from './labwareImages'
 import { Portal } from '../portal'
 
 const ALERT_TIP_LENGTH_CAL_HEADER = 'Pipette calibration has been updated!'
@@ -36,12 +35,14 @@ const REMEMBER = "Remember my selection and don't ask again"
 const CAN_CHANGE =
   '(You can change this selection under More > Robots > Advanced Settings)'
 const SUPPORT_URL = 'https://www.opentrons.com/contact-support'
+const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 
 const NOTE_SPACING = '1.75rem'
 
-export function ToolSettingAlertModal(
-  props: CalibrateTipLengthChildProps
-): React.Node {
+type Props = {|
+  setHasBlock: boolean => void,
+|}
+export function ToolSettingAlertModal(props: Props): React.Node {
   return (
     <Portal>
       <AlertModal
@@ -71,16 +72,25 @@ export function ToolSettingAlertModal(
               <Text marginBottom={SPACING_3}>{ALTERNATIVE}</Text>
             </div>
             <div>
-              <img className={styles.block_image} src={calBlockImage} />
+              <img
+                className={styles.block_image}
+                src={labwareImages[CAL_BLOCK_LOAD_NAME]}
+              />
             </div>
           </Flex>
         </Box>
         <Flex marginY={SPACING_3} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <SecondaryBtn onClick={() => console.log('TODO: handle use block')}>
+          <SecondaryBtn
+            onClick={() => {
+              props.setHasBlock(true)
+            }}
+          >
             {HAVE_BLOCK}
           </SecondaryBtn>
           <SecondaryBtn
-            onClick={() => console.log('TODO: handle use trash edge')}
+            onClick={() => {
+              props.setHasBlock(false)
+            }}
           >
             {USE_TRASH}
           </SecondaryBtn>
