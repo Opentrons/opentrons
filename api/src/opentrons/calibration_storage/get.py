@@ -80,7 +80,7 @@ def _get_tip_length_data(
         tip_length_data =\
             io.read_cal_file(str(pip_tip_length_path))
         return tip_length_data[labware_hash]
-    except (FileNotFoundError, AttributeError):
+    except (FileNotFoundError, KeyError):
         raise local_types.TipLengthCalNotFound(
             f'Tip length of {labware_load_name} has not been '
             f'calibrated for this pipette: {pip_id} and cannot'
