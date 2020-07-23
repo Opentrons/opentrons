@@ -1055,7 +1055,7 @@ class Pipette(CommandPublisher):
             if ff.enable_tip_length_calibration() and self.pipette_id:
                 tip_length_cal = load_tip_length_calibration(
                     self.pipette_id, location)
-                self._tip_length(tip_length_cal['tipLength'])
+                self._tip_length = tip_length_cal['tipLength']
             self._add_tip(length=self._tip_length)
             # neighboring tips tend to get stuck in the space between
             # the volume chamber and the drop-tip sleeve on p1000.
