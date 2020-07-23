@@ -142,14 +142,22 @@ export const ProfileStepSubstepRow = (
         styles.profile_step_substep_row
       )}
     >
-      <span className={styles.profile_step_substep_column}>{stepNumber}</span>
-      <span className={styles.align_left}>
+      <span
+        className={cx(
+          styles.profile_step_substep_column,
+          styles.profile_step_number
+        )}
+      >
+        {stepNumber}
+      </span>
+      <span className={styles.profile_block_temp}>
         {makeTemperatureText(temperature)}
       </span>
       <span
         className={cx(
           styles.profile_step_substep_column,
-          styles.profile_center_column
+          styles.profile_center_column,
+          styles.profile_step_time
         )}
       >
         {makeDurationText(durationMinutes, durationSeconds)}
@@ -167,8 +175,10 @@ const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   const { step, stepNumber } = props
   return (
     <div className={styles.cycle_step_row}>
-      <span>{stepNumber}</span>
-      <span>{makeTemperatureText(step.temperature)}</span>
+      <span className={styles.profile_step_number}>{stepNumber}</span>
+      <span className={styles.profile_block_temp}>
+        {makeTemperatureText(step.temperature)}
+      </span>
       <span className={styles.align_right}>
         {makeDurationText(step.durationMinutes, step.durationSeconds)}
       </span>
