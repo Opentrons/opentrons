@@ -158,7 +158,7 @@ def dispense(instrument, volume, location, rate):
                                                       'dispense')
         flow_rate = rate * flow_ulsec
         flow_rate = round(flow_rate, 1)
-        text = 'Dispensing {volume} uL from {location} at {flow} uL/sec'.format(
+        text = 'Dispensing {volume} uL into {location} at {flow} uL/sec'.format(
                 volume=float(volume), location=location_text, flow=flow_rate)
 
     return make_command(
