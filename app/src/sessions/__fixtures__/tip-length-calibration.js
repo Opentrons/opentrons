@@ -1,5 +1,6 @@
 // @flow
 import type { TipLengthCalibrationSessionDetails } from '../types'
+import type { TipLengthCalibrationSessionParams } from '../tip-length-calibration/types'
 
 export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSessionDetails = {
   instrument: {
@@ -28,4 +29,9 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       isTiprack: false,
     },
   ],
+}
+
+export const mockTipLengthCalibrationSessionParams: TipLengthCalibrationSessionParams = {
+  mount: 'left',
+  hasCalibrationBlock: true,
 }

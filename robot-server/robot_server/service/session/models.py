@@ -49,7 +49,10 @@ class SessionType(str, Enum):
     null = 'null'
     default = 'default'
     calibration_check = 'calibrationCheck'
-    tip_length_calibration = 'tipLengthCalibration'
+    tip_length_calibration = (
+        'tipLengthCalibration',
+        tip_length_calibration_models.SessionCreateParams
+    )
 
     @property
     def model(self):
@@ -68,6 +71,7 @@ When we move to Python 3.8 we can use Literal type as described here
 https://pydantic-docs.helpmanual.io/usage/types/#literal-type
 """
 SessionCreateParamType = typing.Union[
+    tip_length_calibration_models.SessionCreateParams,
     None, EmptyModel
 ]
 

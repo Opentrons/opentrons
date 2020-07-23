@@ -2,6 +2,7 @@
 import { ofType } from 'redux-observable'
 import { of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
+import isEqual from 'lodash/isEqual'
 
 import { fetchRobotApi } from '../../robot-api'
 import { withRobotHost } from '../../robot-api/operators'
@@ -33,18 +34,22 @@ export const ensureSessionEpic: Epic = (action$, state$) => {
     withRobotHost<EnsureSessionAction>(state$, a => a.payload.robotName),
     switchMap<[EnsureSessionAction, State, RobotHost], _, _>(
       ([originalAction, state, host]) => {
-        const { sessionType } = originalAction.payload
+        const { sessionType, params } = originalAction.payload
         const fetchAllRequest = mapActionToFetchAllRequest()
         const createRequest = mapActionToCreateRequest(originalAction)
 
         return fetchRobotApi(host, fetchAllRequest).pipe(
           switchMap(fetchResponse => {
             const { ok, body } = fetchResponse
-            // if fetch all failed or body included the correct sessionType,
+            // if fetch all failed or body included the correct sessionType and params,
             // we're done
             if (
               !ok ||
-              body.data.some(s => s.attributes.sessionType === sessionType)
+              body.data.some(
+                s =>
+                  s.attributes.sessionType === sessionType &&
+                  isEqual(s.attributes.createParams, params)
+              )
             ) {
               return of(
                 mapFetchAllResponseToAction(fetchResponse, originalAction)

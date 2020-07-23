@@ -22,7 +22,11 @@ describe('robot session check actions', () => {
       args: ['robot-name', 'calibrationCheck'],
       expected: {
         type: 'sessions:CREATE_SESSION',
-        payload: { robotName: 'robot-name', sessionType: 'calibrationCheck' },
+        payload: {
+          robotName: 'robot-name',
+          sessionType: 'calibrationCheck',
+          params: {},
+        },
         meta: {},
       },
     },
@@ -176,7 +180,11 @@ describe('robot session check actions', () => {
       args: ['robot-name', 'calibrationCheck'],
       expected: {
         type: 'sessions:ENSURE_SESSION',
-        payload: { robotName: 'robot-name', sessionType: 'calibrationCheck' },
+        payload: {
+          robotName: 'robot-name',
+          sessionType: 'calibrationCheck',
+          params: {},
+        },
         meta: {},
       },
     },

@@ -6,7 +6,10 @@ import {
   mockV2ErrorResponse,
 } from '../../robot-api/__fixtures__'
 import { mockRobotCalibrationCheckSessionDetails } from './calibration-check'
-import { mockTipLengthCalibrationSessionDetails } from './tip-length-calibration'
+import {
+  mockTipLengthCalibrationSessionDetails,
+  mockTipLengthCalibrationSessionParams,
+} from './tip-length-calibration'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
@@ -22,11 +25,13 @@ export const mockOtherSessionId: string = 'other_fake_session_id'
 
 export const mockCalibrationCheckSessionAttributes: Types.CalibrationCheckSessionResponseAttributes = {
   sessionType: Constants.SESSION_TYPE_CALIBRATION_CHECK,
+  createParams: {},
   details: mockRobotCalibrationCheckSessionDetails,
 }
 
 export const mockTipLengthCalibrationSessionAttributes: Types.TipLengthCalibrationSessionResponseAttributes = {
   sessionType: Constants.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+  createParams: mockTipLengthCalibrationSessionParams,
   details: mockTipLengthCalibrationSessionDetails,
 }
 

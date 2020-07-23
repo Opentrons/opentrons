@@ -48,8 +48,8 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 class TipCalibrationUserFlow():
     def __init__(self,
                  hardware: ThreadManager,
-                 mount: Mount = Mount.LEFT,
-                 has_calibration_block=True):
+                 mount: Mount,
+                 has_calibration_block: bool):
         # TODO: require mount and has_calibration_block params
         self._hardware = hardware
         self._mount = mount
@@ -126,10 +126,10 @@ class TipCalibrationUserFlow():
             await handler(**data)
         self._set_current_state(next_state)
 
-    async def load_labware(self, *args):
+    async def load_labware(self):
         pass
 
-    async def move_to_tip_rack(self, *args):
+    async def move_to_tip_rack(self):
         point = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
                 MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
@@ -176,10 +176,10 @@ class TipCalibrationUserFlow():
             self._mount, critical_point=CriticalPoint.NOZZLE)
         return cur_pt.z - self._nozzle_height_at_reference
 
-    async def jog(self, vector, *args):
+    async def jog(self, vector):
         await self._hardware.move_rel(self._mount, Point(*vector))
 
-    async def pick_up_tip(self, *args):
+    async def pick_up_tip(self):
         saved_default = None
         if self._hw_pipette.config.channels > 1:
             # reduce pick up current for multichannel pipette picking up 1 tip
@@ -203,11 +203,11 @@ class TipCalibrationUserFlow():
             self._hw_pipette.update_config_item('pick_up_current',
                                                 saved_default)
 
-    async def invalidate_tip(self, *args):
+    async def invalidate_tip(self):
         await self._return_tip()
         await self.move_to_tip_rack()
 
-    async def exit_session(self, *args):
+    async def exit_session(self):
         await self._return_tip()
 
     def _get_tip_rack_lw(self) -> labware.Labware:
