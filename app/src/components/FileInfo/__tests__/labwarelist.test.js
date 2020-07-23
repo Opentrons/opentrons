@@ -21,7 +21,7 @@ describe('Protocol Labware List Component', () => {
       },
       {
         parent: 'MODULE GEN1',
-        quantity: 2,
+        quantity: 1,
         display: 'Other Opentrons Labware',
         calibration: { x: '1', y: '1', z: '1' },
       },
@@ -30,32 +30,47 @@ describe('Protocol Labware List Component', () => {
     const table = wrapper.find('tbody')
     const headers = table.find('th')
     const rows = table.find('tr')
-    const calibrationTitle = headers.find('Calibration Data')
-    const tooltip = calibrationTitle.find(Tooltip)
+    const tooltip = table.find(Tooltip)
     const titleList = ['Type', 'Quantity', 'Calibration Data']
 
     expect(tooltip.exists()).toEqual(true)
-    expect(table.length).toEqual(3)
-    headers.forEach(section =>
-      expect(titleList).toContain(section.props().children)
-    )
+    expect(rows.length).toEqual(3)
+    headers.forEach(section => expect(titleList).toContain(section.text()))
     expect(
       rows
         .find('td')
         .at(0)
         .text()
-    ).toEqual()
+    ).toEqual('Opentrons Labware')
     expect(
       rows
         .find('td')
         .at(1)
         .text()
-    ).toEqual()
+    ).toEqual('x2')
     expect(
       rows
         .find('td')
         .at(2)
         .text()
-    ).toEqual()
+    ).toEqual('Not yet calibrated')
+    expect(
+      rows
+        .find('td')
+        .at(3)
+        .text()
+    ).toEqual('MODULE GEN1Other Opentrons Labware')
+    expect(
+      rows
+        .find('td')
+        .at(4)
+        .text()
+    ).toEqual('x1')
+    expect(
+      rows
+        .find('td')
+        .at(5)
+        .text()
+    ).toEqual('X1Y1Z1')
   })
 })

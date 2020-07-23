@@ -88,6 +88,7 @@ describe('fetch labware calibration epics', () => {
         method: 'GET',
         path: '/labware/calibrations',
         query: {
+          loadName: null,
           namespace: 'cutelabwares',
           version: 2,
         },

@@ -30,7 +30,7 @@ const SPECS: Array<ActionSpec> = [
   {
     should: 'create a fetchLabwareCalibration action with params',
     creator: Actions.fetchAllLabwareCalibrations,
-    args: ['robot-name'],
+    args: ['robot-name', 'fake_labware', 'weird', 1],
     expected: {
       type: 'calibration:FETCH_ALL_LABWARE_CALIBRATIONS',
       payload: {

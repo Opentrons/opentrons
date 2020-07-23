@@ -7,7 +7,6 @@ import round from 'lodash/round'
 import { InfoSection } from './InfoSection'
 import { ProtocolLabwareList } from './ProtocolLabwareList'
 import * as labwareFunctions from '../../calibration'
-import { associateLabwareWithCalibration } from '../../protocol'
 
 import type { State, Dispatch } from '../../types'
 
@@ -25,7 +24,7 @@ export function ProtocolLabwareCard({
     dispatch(labwareFunctions.fetchAllLabwareCalibrations(robotName))
   }, [dispatch, robotName])
   const labwareWithCalibration = useSelector((state: State) =>
-    associateLabwareWithCalibration(state, robotName)
+    labwareFunctions.associateLabwareWithCalibration(state, robotName)
   )
   if (labwareWithCalibration.length === 0) return null
 

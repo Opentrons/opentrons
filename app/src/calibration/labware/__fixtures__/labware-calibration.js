@@ -12,7 +12,7 @@ import type {
   AllLabwareCalibrations,
 } from '../../api-types'
 
-export const mockLabwareCalibration: LabwareCalibrationObjects = {
+export const mockLabwareCalibration1: LabwareCalibrationObjects = {
   attributes: {
     calibrationData: {
       offset: {
@@ -33,8 +33,29 @@ export const mockLabwareCalibration: LabwareCalibrationObjects = {
   type: 'Labware Calibration',
 }
 
+export const mockLabwareCalibration2: LabwareCalibrationObjects = {
+  attributes: {
+    calibrationData: {
+      offset: {
+        value: [1.0, 1.0, 1.0],
+        lastModified: '2020-04-05T14:30',
+      },
+      tipLength: {
+        value: 30,
+        lastModified: '2007-05-05T0:30',
+      },
+    },
+    loadName: 'opentrons_96_tiprack_1000ul',
+    namespace: 'opentrons',
+    version: 1,
+    parent: '',
+  },
+  id: 'some id',
+  type: 'Labware Calibration',
+}
+
 export const mockAllLabwareCalibraton: AllLabwareCalibrations = {
-  data: [mockLabwareCalibration],
+  data: [mockLabwareCalibration1, mockLabwareCalibration2],
   meta: {},
 }
 

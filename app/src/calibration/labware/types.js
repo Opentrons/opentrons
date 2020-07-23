@@ -39,6 +39,15 @@ export type FetchLabwareCalibrationFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+// selector types
+
+export type LabwareWithCalibration = {|
+  parent: string,
+  quantity: number,
+  display: string,
+  calibration: {| x: number, y: number, z: number |} | null,
+|}
+
 export type LawareCalibrationAction =
   | FetchLabwareCalibrationAction
   | FetchAllLabwareCalibrationSuccessAction

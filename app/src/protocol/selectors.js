@@ -1,32 +1,17 @@
 // @flow
+import { createSelector } from 'reselect'
+
 import path from 'path'
 import startCase from 'lodash/startCase'
-import { createSelector } from 'reselect'
 import { getter } from '@thi.ng/paths'
-import {
-  getProtocolSchemaVersion,
-  getLabwareDisplayName,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
+import { getProtocolSchemaVersion } from '@opentrons/shared-data'
 import { fileIsJson } from './protocol-data'
 import { createLogger } from '../logger'
-
-import filter from 'lodash/filter'
-import countBy from 'lodash/countBy'
-import keyBy from 'lodash/keyBy'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ProtocolFile as SchemaV3ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { State } from '../types'
-import type {
-  ProtocolData,
-  ProtocolType,
-  ProtocolFile,
-  LabwareWithCalibration,
-} from './types'
-
-import { getLabware, getModulesBySlot } from '../robot/selectors'
-import { getListOfLabwareCalibrations } from '../calibration'
+import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
 
 type StringGetter = (?ProtocolData) => ?string
 type NumberGetter = (?ProtocolData) => ?number
@@ -227,64 +212,5 @@ export const getProtocolMethod: StringSelector = createSelector(
     if (!file || !contents) return null
     if (readableJsonName) return readableJsonName
     return `${METHOD_OT_API}${apiVersion !== null ? ` v${apiVersion}` : ''}`
-  }
-)
-
-export const associateLabwareWithCalibration: (
-  state: State,
-  robotName: string
-) => Array<LabwareWithCalibration> = createSelector<
-  State,
-  string,
-  Array<LabwareWithCalibration>,
-  _,
-  _,
-  _
->(
-  (state: State) => getLabware(state),
-  getModulesBySlot,
-  getListOfLabwareCalibrations,
-  (labware, modulesBySlot, labwareCalibrations) => {
-    const updatedLabwareType = []
-    labware.map(lw => {
-      const moduleName = modulesBySlot[lw.slot]?.model ?? ''
-      const newDataModel = { ...lw }
-      newDataModel.type = lw.type + moduleName
-      updatedLabwareType.push(newDataModel)
-    })
-
-    const labwareCount = countBy(updatedLabwareType, 'type')
-    const calibrations = filter(labwareCalibrations, function(l) {
-      return Object.keys(labwareCount).includes(l?.attributes.loadName)
-    })
-
-    const calibrationLoadNamesMap = keyBy(calibrations, function(
-      labwareObject
-    ) {
-      const loadName = labwareObject?.attributes.loadName ?? ''
-      const parent = labwareObject?.attributes.parent ?? ''
-      return loadName + parent
-    })
-
-    const labwareDisplayNames = []
-    updatedLabwareType.map(lw => {
-      const moduleName = modulesBySlot[lw.slot]?.model ?? ''
-      const parentName = (moduleName && getModuleDisplayName(moduleName)) || ''
-      const data =
-        calibrationLoadNamesMap[lw.type]?.attributes.calibrationData.offset
-          .value
-      const calibrationData = data
-        ? { x: data[0], y: data[1], z: data[2] }
-        : null
-      const displayName =
-        (lw.definition && getLabwareDisplayName(lw.definition)) || ''
-      return labwareDisplayNames.push({
-        display: displayName,
-        quantity: labwareCount[lw.type],
-        parent: parentName,
-        calibration: calibrationData,
-      })
-    })
-    return labwareDisplayNames
   }
 )
