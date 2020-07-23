@@ -126,8 +126,7 @@ class Pipette:
                         cp)
             info_str += 'model offset: {} + instrument offset: {}'\
                 .format(mod_offset_xy, instr)
-            if tip_length:
-                info_str += ' - tip_length: {}'.format(tip_length)
+            info_str += ' - tip_length: {}'.format(tip_length)
             info_str += ')'
             self._log.debug(info_str)
 
