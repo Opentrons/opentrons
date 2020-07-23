@@ -266,10 +266,6 @@
 
 .profile_step_substep_column {
   text-align: right;
-
-  &:first-child {
-    text-align: left;
-  }
 }
 
 .profile_center_column {
@@ -315,6 +311,21 @@
   & > * {
     flex: 1;
   }
+}
+
+.profile_step_number {
+  padding-right: 2rem;
+  max-width: 3rem;
+  text-align: right;
+}
+
+.profile_step_time {
+  padding-right: 2.125rem;
+}
+
+.profile_block_temp {
+  padding-right: 3rem;
+  text-align: right;
 }
 
 .cycle_repetitions {
