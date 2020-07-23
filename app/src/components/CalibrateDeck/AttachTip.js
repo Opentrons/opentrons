@@ -48,10 +48,6 @@ export function AttachTip(props: AttachTipProps): React.Node {
       <span>
         <p>Remove the Opentrons tip from the pipette.</p>
         <p>
-          Please note that as a result of the new deck calibration data, your
-          prior pipette calibration data is no longer valid.
-        </p>
-        <p>
           In order to effectively use this new deck calibration, please
           calibrate your pipette prior to running your next protocol.
         </p>
