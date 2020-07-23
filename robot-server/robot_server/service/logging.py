@@ -47,6 +47,16 @@ def _robot_log_config(log_level: int):
                 'level': log_level,
                 'propagate': False
             },
+            'fastapi': {
+                'handlers': ['robot_server'],
+                'level': log_level,
+                'propagate': False
+            },
+            'starlette':  {
+                'handlers': ['robot_server'],
+                'level': log_level,
+                'propagate': False,
+            }
         }
     }
 

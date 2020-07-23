@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import List, Dict, Any
 
 from pydantic import ValidationError
@@ -18,6 +19,16 @@ class RobotServerError(Exception):
     def __init__(self, status_code: int, error: Error):
         self.status_code = status_code
         self.error = error
+
+
+def build_unhandled_exception_response(exception: Exception) \
+    -> ErrorResponse:
+    error = Error(
+        status=str(HTTPStatus.INTERNAL_SERVER_ERROR.value),
+        detail=f'Unhandled exception: {type(exception)}',
+        title='Internal Server Error'
+    )
+    return ErrorResponse(errors=[error])
 
 
 def transform_http_exception_to_json_api_errors(exception: HTTPException) \

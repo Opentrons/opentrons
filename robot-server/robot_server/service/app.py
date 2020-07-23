@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from opentrons import __version__
 from fastapi import FastAPI, APIRouter
@@ -13,7 +14,8 @@ from robot_server.service.legacy.models import V1BasicResponse
 from .errors import V1HandlerError, \
     transform_http_exception_to_json_api_errors, \
     transform_validation_error_to_json_api_errors, \
-    consolidate_fastapi_response, RobotServerError, ErrorResponse
+    consolidate_fastapi_response, RobotServerError, ErrorResponse, \
+    build_unhandled_exception_response
 from .dependencies import get_rpc_server
 from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
@@ -102,6 +104,7 @@ async def robot_server_exception_handler(request: Request,
     """Catch robot server exceptions"""
     if not exc.error.status:
         exc.error.status = str(exc.status_code)
+    log.error(f"RobotServerError: {exc.error}")
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(errors=[exc.error]).dict(exclude_unset=True)
@@ -112,6 +115,7 @@ async def robot_server_exception_handler(request: Request,
 async def v1_exception_handler(request: Request, exc: V1HandlerError) \
         -> JSONResponse:
     """Catch legacy errors"""
+    log.error(f"V!HandlerError: {exc.status_code}: {exc.message}")
     return JSONResponse(
         status_code=exc.status_code,
         content=V1BasicResponse(message=exc.message).dict()
@@ -160,6 +164,18 @@ async def custom_http_exception_handler(
     return JSONResponse(
         status_code=exception.status_code,
         content=response,
+    )
+
+
+@app.exception_handler(Exception)
+async def unexpected_exception_handler(request: Request, exc: Exception) \
+          -> JSONResponse:
+    """ Log unhandled errors (reraise always)"""
+    log.error(f'Unhandled exception: {traceback.format_exc()}')
+    return JSONResponse(
+        status_code=500,
+        content=build_unhandled_exception_response(exc).dict(
+            exclude_unset=True),
     )
 
 
