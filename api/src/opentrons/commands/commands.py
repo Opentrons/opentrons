@@ -12,6 +12,7 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api.module_geometry import ModuleGeometry
+from opentrons.protocol_api.util import FlowRates
 from opentrons.types import Location
 from opentrons.drivers import utils
 
@@ -120,9 +121,20 @@ def home(mount):
 
 def aspirate(instrument, volume, location, rate):
     location_text = stringify_location(location)
-    text = 'Aspirating {volume} uL from {location} at {rate} speed'.format(
-        volume=float(volume), location=location_text, rate=rate
-    )
+    template = 'Aspirating {volume} uL from {location} at {flow} uL/sec'
+    try:
+        flow_rate = rate * FlowRates(instrument).aspirate
+        text = template.format(
+                volume=float(volume), location=location_text, flow=flow_rate)
+    except AttributeError:
+        flow_mms = instrument.speeds['aspirate']
+        flow_ulsec = flow_mms * instrument._ul_per_mm(instrument.max_volume,
+                                                      'aspirate')
+        flow_rate = rate * flow_ulsec
+        flow_rate = round(flow_rate, 1)
+        text = template.format(
+                volume=float(volume), location=location_text, flow=flow_rate)
+
     return make_command(
         name=command_types.ASPIRATE,
         payload={
@@ -137,8 +149,19 @@ def aspirate(instrument, volume, location, rate):
 
 def dispense(instrument, volume, location, rate):
     location_text = stringify_location(location)
-    text = 'Dispensing {volume} uL into {location} at {rate} speed'.format(
-        volume=float(volume), location=location_text, rate=rate)
+    template = 'Dispensing {volume} uL into {location} at {flow} uL/sec'
+    try:
+        flow_rate = rate * FlowRates(instrument).dispense
+        text = template.format(
+                volume=float(volume), location=location_text, flow=flow_rate)
+    except AttributeError:
+        flow_mms = instrument.speeds['dispense']
+        flow_ulsec = flow_mms * instrument._ul_per_mm(instrument.max_volume,
+                                                      'dispense')
+        flow_rate = rate * flow_ulsec
+        flow_rate = round(flow_rate, 1)
+        text = template.format(
+                volume=float(volume), location=location_text, flow=flow_rate)
 
     return make_command(
         name=command_types.DISPENSE,
