@@ -102,20 +102,22 @@ export const SourceDestFields = (props: Props): React.Node => {
             />
             {getMixFields()}
             {getDelayFields()}
-            <CheckboxRowField
-              disabled
-              tooltipComponent={i18n.t('tooltip.not_in_beta')}
-              name="aspirate_airGap_checkbox"
-              label={i18n.t('form.step_edit_form.field.airGap.label')}
-              className={styles.small_field}
-            >
-              <TextField
+            {!delayEnabled && (
+              <CheckboxRowField
                 disabled
-                name="aspirate_airGap_volume"
-                units={i18n.t('application.units.microliter')}
-                {...focusHandlers}
-              />
-            </CheckboxRowField>
+                tooltipComponent={i18n.t('tooltip.not_in_beta')}
+                name="aspirate_airGap_checkbox"
+                label={i18n.t('form.step_edit_form.field.airGap.label')}
+                className={styles.small_field}
+              >
+                <TextField
+                  disabled
+                  name="aspirate_airGap_volume"
+                  units={i18n.t('application.units.microliter')}
+                  {...focusHandlers}
+                />
+              </CheckboxRowField>
+            )}
           </React.Fragment>
         )}
         {prefix === 'dispense' && (
@@ -148,6 +150,26 @@ export const SourceDestFields = (props: Props): React.Node => {
             <BlowoutLocationField
               name="blowout_location"
               className={styles.full_width}
+              {...focusHandlers}
+            />
+          </CheckboxRowField>
+        )}
+
+        {prefix === 'aspirate' && delayEnabled && (
+          <CheckboxRowField
+            tooltipComponent={i18n.t(
+              `tooltip.step_fields.defaults.${addFieldNamePrefix(
+                'airGap_checkbox'
+              )}`
+            )}
+            name={addFieldNamePrefix('airGap_checkbox')}
+            label={i18n.t('form.step_edit_form.field.airGap.label')}
+            className={styles.small_field}
+          >
+            <TextField
+              className={styles.small_field}
+              name={addFieldNamePrefix('airGap_volume')}
+              units={i18n.t('application.units.microliter')}
               {...focusHandlers}
             />
           </CheckboxRowField>
