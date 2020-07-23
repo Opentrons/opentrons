@@ -742,16 +742,15 @@ class InstrumentContext(CommandPublisher):
               can be a :py:class:`.types.Location`; for instance, you can call
               `instr.drop_tip(tiprack.wells()[0].top())`.
 
-        .. note::
-
-            OT1 required homing the plunger after dropping tips, so the prior
-            version of `drop_tip` automatically homed the plunger. This is no
-            longer needed in OT2. If you need to home the plunger, use
-            :py:meth:`home_plunger`.
-
         :param location: The location to drop the tip
         :type location: :py:class:`.types.Location` or :py:class:`.Well` or
                         None
+        :param home_after: Whether to home the plunger after dropping the tip
+                           (defaults to ``True``). The plungeer must home after
+                           dropping tips because the ejector shroud that pops
+                           the tip off the end of the pipette is driven by the
+                           plunger motor, and may skip steps when dropping the
+                           tip.
 
         :returns: This instance
         """
