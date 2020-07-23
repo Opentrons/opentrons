@@ -203,7 +203,7 @@ export type DiscoveryClientOptions = $ReadOnly<{|
   logger?: Logger,
 |}>
 
-export type DiscoveryClientNext = $ReadOnly<{|
+export type DiscoveryClient = $ReadOnly<{|
   getRobots: () => $ReadOnlyArray<DiscoveryClientRobot>,
   removeRobot: (robotName: string) => void,
   start: (config: DiscoveryClientConfig) => void,

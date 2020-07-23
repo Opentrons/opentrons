@@ -6,14 +6,14 @@ import { createMdnsBrowser } from './mdns-browser'
 import * as Store from './store'
 
 import type {
-  DiscoveryClientNext,
+  DiscoveryClient,
   DiscoveryClientConfig,
   DiscoveryClientOptions,
 } from './types'
 
 export function createDiscoveryClient(
   options: DiscoveryClientOptions
-): DiscoveryClientNext {
+): DiscoveryClient {
   const { onListChange, logger } = options
   const { getState, dispatch, subscribe } = Store.createStore()
   const getAddresses = () => Store.getAddresses(getState())

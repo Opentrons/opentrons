@@ -7,7 +7,7 @@ import { version } from '../package.json'
 import type { Argv as YargsArgv } from 'yargs'
 
 import type {
-  DiscoveryClientNext,
+  DiscoveryClient,
   DiscoveryClientRobot,
   DiscoveryClientRobotAddress,
   LogLevel,
@@ -73,7 +73,7 @@ const passesFilters = (argv: Argv) => (robot: DiscoveryClientRobot) => {
 const createClient = (
   argv: Argv,
   onListChange: (robots: $ReadOnlyArray<DiscoveryClientRobot>) => mixed
-): DiscoveryClientNext => {
+): DiscoveryClient => {
   const logger = createLogger(argv)
   const { pollInterval, candidates } = argv
   const client = createDiscoveryClient({
