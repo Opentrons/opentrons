@@ -127,13 +127,10 @@ def aspirate(instrument, volume, location, rate):
                 volume=float(volume), location=location_text, flow=flow_rate)
     except:
         flow_mms = instrument.speeds['aspirate']
-        print('my flow_mms:{}'.format(flow_mms))
         flow_ulsec = flow_mms * instrument._ul_per_mm(instrument.max_volume,
                                                       'aspirate')
-        print('my flow_ulsec:{}'.format(flow_ulsec))
         flow_rate = rate * flow_ulsec
         flow_rate = round(flow_rate, 1)
-        print('my flow_rate:{}'.format(flow_rate))
         text = 'Aspirating {volume} uL from {location} at {flow} uL/sec'.format(
                 volume=float(volume), location=location_text, flow=flow_rate)
 
@@ -157,13 +154,10 @@ def dispense(instrument, volume, location, rate):
                 volume=float(volume), location=location_text, flow=flow_rate)
     except:
         flow_mms = instrument.speeds['dispense']
-        print('my flow_mms:{}'.format(flow_mms))
         flow_ulsec = flow_mms * instrument._ul_per_mm(instrument.max_volume,
                                                       'dispense')
-        print('my flow_ulsec:{}'.format(flow_ulsec))
         flow_rate = rate * flow_ulsec
         flow_rate = round(flow_rate, 1)
-        print('my flow_rate:{}'.format(flow_rate))
         text = 'Dispensing {volume} uL from {location} at {flow} uL/sec'.format(
                 volume=float(volume), location=location_text, flow=flow_rate)
 
