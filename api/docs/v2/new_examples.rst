@@ -43,7 +43,7 @@ This accomplishes the same thing as the following basic commands:
 
         p300.pick_up_tip()
         p300.aspirate(100, plate.wells('A1'))
-        p300.dispense(100, plate.wells('A1'))
+        p300.dispense(100, plate.wells('B1'))
         p300.return_tip()
 
 ******************************
@@ -52,7 +52,7 @@ This accomplishes the same thing as the following basic commands:
 Loops
 *****
 
-Loops in Python allow your protocol to perform many actions, or act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``11``, and uses that loop's current value to transfer from all wells in a reservoir to each row of a plate:
+Loops in Python allow your protocol to perform many actions, or act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``7``, and uses that loop's current value to transfer from all wells in a reservoir to each row of a plate:
 
 .. code-block:: python
 
@@ -79,7 +79,7 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
 Multiple Air Gaps
 *****************
 
-The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from five wells in the reservoir, while creating an air gap between each sample.
+The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from the first five wells in the reservoir, while creating an air gap between each sample.
 
 .. code-block:: python
 
@@ -92,12 +92,14 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
         tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
         reservoir = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
         p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
+
         p300.pick_up_tip()
 
-        for well in reservoir.wells():
+        for well in reservoir.wells()[:4]:
             p300.aspirate(35, well)
             p300.air_gap(10)
-            p300.dispense(45, plate['A1'])
+        
+        p300.dispense(225, plate['A1'])
 
         p300.return_tip()
 
