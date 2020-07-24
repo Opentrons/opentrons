@@ -12,7 +12,7 @@ from robot_server.util import FileMeta, save_upload
 
 @dataclass(frozen=True)
 class UploadedProtocolMeta:
-    name: str
+    identifier: str
     protocol_file: FileMeta
     directory: TemporaryDirectory
     support_files: typing.List[FileMeta] = field(default_factory=list)
@@ -25,12 +25,14 @@ class UploadedProtocol:
     DIR_SUFFIX = '._proto_dir'
 
     def __init__(self,
+                 protocol_id: str,
                  protocol_file: UploadFile,
                  support_files: typing.List[UploadFile]
                  ):
         """
         Constructor
 
+        :param protocol_id: The id assigned to this protocol
         :param protocol_file: The uploaded protocol file
         :param support_files: Optional support files
         """
@@ -43,7 +45,7 @@ class UploadedProtocol:
                               for s in support_files]
 
         self._meta = UploadedProtocolMeta(
-            name=protocol_file_meta.path.stem,
+            identifier=protocol_id,
             protocol_file=protocol_file_meta,
             support_files=support_files_meta,
             directory=temp_dir

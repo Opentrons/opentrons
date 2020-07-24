@@ -22,10 +22,10 @@ class ProtocolManager:
                support_files: typing.List[UploadFile],
                ) -> UploadedProtocol:
         """Create a protocol object from upload"""
-        name = Path(protocol_file.filename).stem
-        if name in self._protocols:
+        protocol_id = Path(protocol_file.filename).stem
+        if protocol_id in self._protocols:
             raise errors.ProtocolAlreadyExistsException(
-                f"A protocol named {name} already exists"
+                f"A protocol with id '{protocol_id}' already exists"
             )
 
         if len(self._protocols) >= ProtocolManager.MAX_COUNT:
@@ -34,34 +34,36 @@ class ProtocolManager:
                 f"been reached.")
 
         try:
-            new_protocol = UploadedProtocol(protocol_file, support_files)
+            new_protocol = UploadedProtocol(protocol_id,
+                                            protocol_file,
+                                            support_files)
             log.debug(f"Created new protocol: {new_protocol.meta}")
         except (TypeError, IOError) as e:
             log.exception("Failed to create protocol")
             raise errors.ProtocolIOException(str(e))
 
-        self._protocols[new_protocol.meta.name] = new_protocol
+        self._protocols[new_protocol.meta.identifier] = new_protocol
         return new_protocol
 
-    def get(self, name: str) -> UploadedProtocol:
+    def get(self, protocol_id: str) -> UploadedProtocol:
         """Get a protocol"""
         try:
-            return self._protocols[name]
+            return self._protocols[protocol_id]
         except KeyError:
-            raise errors.ProtocolNotFoundException(name)
+            raise errors.ProtocolNotFoundException(protocol_id)
 
     def get_all(self) -> typing.Tuple[UploadedProtocol, ...]:
         """Get all the protocols"""
         return tuple(self._protocols.values())
 
-    def remove(self, name: str) -> UploadedProtocol:
+    def remove(self, protocol_id: str) -> UploadedProtocol:
         """Remove a protocol"""
         try:
-            proto = self._protocols.pop(name)
+            proto = self._protocols.pop(protocol_id)
             proto.clean_up()
             return proto
         except KeyError:
-            raise errors.ProtocolNotFoundException(name)
+            raise errors.ProtocolNotFoundException(protocol_id)
 
     def remove_all(self) -> typing.Tuple[UploadedProtocol, ...]:
         """Remove all protocols"""
@@ -69,7 +71,7 @@ class ProtocolManager:
             try:
                 p.clean_up()
             except IOError:
-                log.exception(f"Failed to remove protocol {p.meta.name}")
+                log.exception(f"Failed to remove protocol {p.meta.identifier}")
         ret_val = tuple(self._protocols.values())
         self._protocols = {}
         return ret_val

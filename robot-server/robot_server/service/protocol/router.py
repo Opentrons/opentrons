@@ -49,7 +49,7 @@ async def get_protocols(
             response_model_exclude_unset=True,
             response_model=route_models.ProtocolResponse)
 async def get_protocol(
-        protocol_id,
+        protocol_id: str,
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
     proto = protocol_manager.get(protocol_id)
     return route_models.ProtocolResponse(data=_to_response(proto))
@@ -60,7 +60,7 @@ async def get_protocol(
                response_model_exclude_unset=True,
                response_model=route_models.ProtocolResponse)
 async def delete_protocol(
-        protocol_id,
+        protocol_id: str,
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
     proto = protocol_manager.remove(protocol_id)
     return route_models.ProtocolResponse(data=_to_response(proto))
@@ -72,7 +72,7 @@ async def delete_protocol(
              response_model=route_models.ProtocolResponse,
              status_code=http_status_codes.HTTP_201_CREATED)
 async def create_protocol_file(
-        protocol_id,
+        protocol_id: str,
         file: UploadFile = File(...),
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
     proto = protocol_manager.get(protocol_id)
@@ -95,5 +95,5 @@ def _to_response(uploaded_protocol: UploadedProtocol) \
             lastModifiedAt=meta.last_modified_at,
             createdAt=meta.created_at
         ),
-        resource_id=meta.name
+        resource_id=meta.identifier
     )
