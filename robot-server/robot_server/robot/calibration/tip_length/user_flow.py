@@ -125,12 +125,12 @@ class TipCalibrationUserFlow():
         next_state = self._state_machine.get_next_state(self._current_state,
                                                         name)
 
-        MODULE_LOG.info(f'TipCalUF HandleCommand ns: {next_state}, cs: {self._current_state}, command: {name}')
         handler = self._command_map.get(name)
         if handler is not None:
             await handler(**data)
         self._set_current_state(next_state)
-        MODULE_LOG.info(f'TipCalUF HandleCommand after cs: {self._current_state}')
+        MODULE_LOG.debug(f'TipCalUserFlow handled command {name}, transitioned'
+                         f'from {self._current_state} to {next_state}')
 
     async def load_labware(self):
         pass
