@@ -22,6 +22,7 @@ from opentrons.protocol_api.geometry import Deck
 
 test_router = routing.APIRouter()
 
+
 @test_router.get('/alwaysRaise')
 async def always_raise():
     raise RuntimeError
@@ -50,7 +51,7 @@ def api_client(override_hardware) -> TestClient:
 
 
 @pytest.fixture
-def api_client_no_errors(hardware) -> TestClient:
+def api_client_no_errors(override_hardware) -> TestClient:
     """ An API client that won't raise server exceptions.
     Use only to test 500 pages; never use this for other tests. """
     return TestClient(app, raise_server_exceptions=False)

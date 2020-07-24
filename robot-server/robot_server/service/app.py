@@ -115,7 +115,7 @@ async def robot_server_exception_handler(request: Request,
 async def v1_exception_handler(request: Request, exc: V1HandlerError) \
         -> JSONResponse:
     """Catch legacy errors"""
-    log.error(f"V!HandlerError: {exc.status_code}: {exc.message}")
+    log.error(f"V1HandlerError: {exc.status_code}: {exc.message}")
     return JSONResponse(
         status_code=exc.status_code,
         content=V1BasicResponse(message=exc.message).dict()

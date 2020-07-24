@@ -22,7 +22,7 @@ class RobotServerError(Exception):
 
 
 def build_unhandled_exception_response(exception: Exception) \
-    -> ErrorResponse:
+        -> ErrorResponse:
     error = Error(
         status=str(HTTPStatus.INTERNAL_SERVER_ERROR.value),
         detail=f'Unhandled exception: {type(exception)}',
