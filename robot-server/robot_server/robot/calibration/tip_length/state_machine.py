@@ -3,7 +3,7 @@ from robot_server.service.session.models import CommandDefinition, \
     TipLengthCalibrationCommand as TipCalCommand, CalibrationCommand
 from robot_server.robot.calibration.tip_length.util import (
     SimpleStateMachine,
-    TipCalibrationError as Error
+    StateTransitionError
 )
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState as State,
@@ -52,4 +52,5 @@ class TipCalibrationStateMachine:
         if next_state:
             return next_state
         else:
-            raise Error(f"Cannot call {command} command from {from_state}.")
+            raise StateTransitionError(f"Cannot call {command} command "
+                                       f"from {from_state}.")

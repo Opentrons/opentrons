@@ -71,6 +71,18 @@ stages:
             completedAt: *dt
             data: {}
 
+  - name: Attempt conflicting command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.pickUpTip
+            data: {}
+    response:
+      status_code: 409
 
   - name: Delete the session
     request:
