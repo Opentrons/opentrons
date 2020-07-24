@@ -113,7 +113,7 @@ async def get_all_labware_calibrations(
     all_calibrations = get_cal.get_all_calibrations()
 
     if not all_calibrations:
-        lw_models.MultipleCalibrationsResponse(data=all_calibrations)
+        return lw_models.MultipleCalibrationsResponse(data=all_calibrations)
 
     if namespace:
         all_calibrations = list(filter(

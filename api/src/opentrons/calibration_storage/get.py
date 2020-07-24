@@ -36,7 +36,9 @@ def _format_calibration_type(
 def _format_parent(
         data: 'CalibrationIndexDict')\
             -> local_types.ParentOptions:
-    options = local_types.ParentOptions(slot=data['slot'])
+    # Since the slot is not saved and the data in the index is actually
+    # the labware hash to aid lookup, we erase it here.
+    options = local_types.ParentOptions(slot='')
     if data['module']:
         options.module = data['module']['parent']
     return options
