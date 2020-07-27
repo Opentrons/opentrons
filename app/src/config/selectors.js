@@ -17,6 +17,10 @@ export const getUpdateChannel = (state: State): UpdateChannel => {
   return state.config?.update.channel ?? 'latest'
 }
 
+export const getUseTrashSurfaceForTipCal = (state: State): boolean | null => {
+  return state.config?.useTrashSurfaceForTipCal ?? null
+}
+
 const UPDATE_CHANNEL_OPTS = [
   { name: 'Stable', value: (('latest': UpdateChannel): string) },
   { name: 'Beta', value: (('beta': UpdateChannel): string) },

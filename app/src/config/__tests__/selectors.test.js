@@ -89,4 +89,21 @@ describe('shell selectors', () => {
       ])
     })
   })
+
+  describe('getUseTrashSurfaceForTipCal', () => {
+    it('should return null if no saved value in config', () => {
+      const state: MockState = { config: {} }
+      expect(Selectors.getUseTrashSurfaceForTipCal(state)).toEqual(null)
+    })
+
+    it('should return true if saved value in config is true', () => {
+      const state: MockState = { config: { useTrashSurfaceForTipCal: true } }
+      expect(Selectors.getUseTrashSurfaceForTipCal(state)).toEqual(true)
+    })
+
+    it('should return false if saved value in config is false', () => {
+      const state: MockState = { config: { useTrashSurfaceForTipCal: false } }
+      expect(Selectors.getUseTrashSurfaceForTipCal(state)).toEqual(false)
+    })
+  })
 })

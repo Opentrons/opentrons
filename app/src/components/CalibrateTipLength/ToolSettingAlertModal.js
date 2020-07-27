@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
 import {
   AlertModal,
   Box,
@@ -15,6 +16,7 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 
+import { setUseTrashSurfaceForTipCal } from '../../config'
 import styles from './styles.css'
 import { labwareImages } from './labwareImages'
 import { Portal } from '../portal'
@@ -43,6 +45,25 @@ type Props = {|
   setHasBlock: boolean => void,
 |}
 export function ToolSettingAlertModal(props: Props): React.Node {
+  const { setHasBlock } = props
+  const [rememberPreference, setRememberPreference] = React.useState<boolean>(
+    false
+  )
+  const dispatch = useDispatch()
+
+  const handleUseTrashSurface = React.useCallback(() => {
+    if (rememberPreference) {
+      dispatch(setUseTrashSurfaceForTipCal(true))
+    }
+    setHasBlock(false)
+  }, [rememberPreference, setHasBlock, dispatch])
+  const handleUseBlock = React.useCallback(() => {
+    if (rememberPreference) {
+      dispatch(setUseTrashSurfaceForTipCal(false))
+    }
+    setHasBlock(true)
+  }, [rememberPreference, setHasBlock, dispatch])
+
   return (
     <Portal>
       <AlertModal
@@ -80,25 +101,16 @@ export function ToolSettingAlertModal(props: Props): React.Node {
           </Flex>
         </Box>
         <Flex marginY={SPACING_3} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <SecondaryBtn
-            onClick={() => {
-              props.setHasBlock(true)
-            }}
-          >
-            {HAVE_BLOCK}
-          </SecondaryBtn>
-          <SecondaryBtn
-            onClick={() => {
-              props.setHasBlock(false)
-            }}
-          >
+          <SecondaryBtn onClick={handleUseBlock}>{HAVE_BLOCK}</SecondaryBtn>
+          <SecondaryBtn onClick={handleUseTrashSurface}>
             {USE_TRASH}
           </SecondaryBtn>
         </Flex>
         <div>
           <CheckboxField
             label={REMEMBER}
-            onChange={() => console.log('TODO: save block setting')}
+            onChange={e => setRememberPreference(e.currentTarget.checked)}
+            value={rememberPreference}
           />
           <Text fontSize={FONT_SIZE_BODY_1} paddingX={NOTE_SPACING}>
             {CAN_CHANGE}

@@ -94,6 +94,7 @@ export type ConfigV1 = $ReadOnly<{|
     candidates: DiscoveryCandidates,
     disableCache: boolean,
   |}>,
+  useTrashSurfaceForTipCal?: boolean,
 |}>
 
 export type Config = ConfigV1
