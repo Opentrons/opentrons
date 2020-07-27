@@ -22,28 +22,34 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
 import { formatJogVector } from './utils'
-import leftMultiBlockTipAsset from './videos/Left_Multi_CalBlock_Tip_REV1.webm'
-import leftMultiTrashTipAsset from './videos/Left_Multi_Trash_Tip_REV1.webm'
+import leftMultiBlockAsset from './videos/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import leftMultiTrashAsset from './videos/Left_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
+import leftSingleBlockAsset from './videos/Left_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import leftSingleTrashAsset from './videos/Left_Single_Trash_WITH_TIP_(330x260)REV1.webm'
+import rightMultiBlockAsset from './videos/Right_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import rightMultiTrashAsset from './videos/Right_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
+import rightSingleBlockAsset from './videos/Right_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import rightSingleTrashAsset from './videos/Right_Single_Trash_WITH_TIP_(330x260)REV1.webm'
 
 const assetMap = {
   block: {
     left: {
-      multi: leftMultiBlockTipAsset,
-      single: leftMultiBlockTipAsset, // TODO: get asset for single pipettes
+      multi: leftMultiBlockAsset,
+      single: leftSingleBlockAsset,
     },
     right: {
-      multi: leftMultiBlockTipAsset,
-      single: leftMultiBlockTipAsset, // TODO: get asset for single pipettes
+      multi: rightMultiBlockAsset,
+      single: rightSingleBlockAsset,
     },
   },
   trash: {
     left: {
-      multi: leftMultiTrashTipAsset,
-      single: leftMultiTrashTipAsset, // TODO: get asset for single pipettes
+      multi: leftMultiTrashAsset,
+      single: leftSingleTrashAsset,
     },
     right: {
-      multi: leftMultiTrashTipAsset,
-      single: leftMultiTrashTipAsset, // TODO: get asset for single pipettes
+      multi: rightMultiTrashAsset,
+      single: rightSingleTrashAsset,
     },
   },
 }
