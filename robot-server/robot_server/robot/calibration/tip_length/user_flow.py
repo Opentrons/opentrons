@@ -53,7 +53,6 @@ class TipCalibrationUserFlow():
                  hardware: ThreadManager,
                  mount: Mount,
                  has_calibration_block: bool):
-        # TODO: require mount and has_calibration_block params
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block = has_calibration_block
@@ -182,6 +181,20 @@ class TipCalibrationUserFlow():
             self._mount, critical_point=CriticalPoint.NOZZLE)
         return cur_pt.z - self._nozzle_height_at_reference
 
+    def _get_default_tip_length(self) -> float:
+        tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]  # type: ignore
+        full_length = tiprack.tip_length
+        overlap_dict: Dict = \
+            self._hw_pipette.config.tip_overlap
+        default = overlap_dict['default']
+        overlap = overlap_dict.get(tiprack.uri, default)
+        return full_length - overlap
+
+    def _get_critical_point(self):
+        return (CriticalPoint.FRONT_NOZZLE if
+                self._hw_pipette.config.channels == 8 else
+                self._hw_pipette.critical_point)
+
     async def jog(self, vector):
         await self._hardware.move_rel(self._mount, Point(*vector))
 
@@ -192,14 +205,7 @@ class TipCalibrationUserFlow():
             saved_default = self._hw_pipette.config.pick_up_current
             self._hw_pipette.update_config_item('pick_up_current', 0.1)
 
-        tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]
-        full_length = tiprack.tip_length
-        overlap_dict: Dict = \
-            self._hw_pipette.config.tip_overlap
-        default = overlap_dict['default']
-        overlap = overlap_dict.get(tiprack.uri, default)
-        tip_length = full_length - overlap
-
+        tip_length = self._get_default_tip_length()
         cur_pt = await self._hardware.gantry_position(self._mount)
         self._tip_origin_loc = Location(cur_pt, None)
 
@@ -234,24 +240,29 @@ class TipCalibrationUserFlow():
         tip_rack_lw = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = tip_rack_lw
 
-        cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
-
-        self._deck[cb_setup['slot']] = labware.load(
-            cb_setup['load_name'],
-            self._deck.position_for(cb_setup['slot']))
+        if self._has_calibration_block:
+            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
+            self._deck[cb_setup['slot']] = labware.load(
+                cb_setup['load_name'],
+                self._deck.position_for(cb_setup['slot']))
 
     async def _return_tip(self):
         if self._tip_origin_loc and self._hw_pipette.has_tip:
-            await self._move(self._tip_origin_loc)
+            tip_length = self._get_default_tip_length()
+            tip_return_ratio = self._hw_pipette.config.return_tip_height
+            return_z = tip_length * tip_return_ratio
+            to_pt = self._tip_origin_loc.point - Point(0, 0, return_z)
+            cp = self._get_critical_point()
+            await self._hardware.move_to(self._mount, to_pt,
+                                         critical_point=cp)
             await self._hardware.drop_tip(self._mount)
             self._tip_origin_loc = None
 
     async def _move(self, to_loc: Location):
         from_pt = await self._hardware.gantry_position(self._mount)
         from_loc = Location(from_pt, None)
-        cp = (CriticalPoint.FRONT_NOZZLE if
-              self._hw_pipette.config.channels == 8 else
-              self._hw_pipette.critical_point)
+        cp = self._get_critical_point()
+
         max_height = self._hardware.get_instrument_max_height(self._mount)
 
         safe = geometry.safe_height(
