@@ -80,7 +80,7 @@ lint: $(ot_py_sources)
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH := dev.env
 dev:
-	$(pipenv_run) uvicorn "robot_server.service.app:app" --host localhost --port 31950 --reload
+	$(pipenv) run uvicorn "robot_server.service.app:app" --host localhost --port 31950 --reload
 
 .PHONY: local-shell
 local-shell:
