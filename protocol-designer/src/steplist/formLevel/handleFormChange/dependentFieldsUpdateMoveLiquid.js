@@ -443,6 +443,27 @@ function updatePatchMixFields(patch: FormPatch, rawForm: FormData): FormPatch {
   return patch
 }
 
+export function updateAirGapFields(
+  patch: FormPatch,
+  rawForm: FormData,
+  pipetteEntities: PipetteEntities
+): FormPatch {
+  console.log({ patch, pipetteEntities })
+  if (
+    patch.aspirate_airGap_checkbox === true &&
+    typeof rawForm.pipette === 'string' &&
+    rawForm.pipette in pipetteEntities
+  ) {
+    const pipetteSpec = pipetteEntities[rawForm.pipette].spec
+    const airGapVolume = pipetteSpec.minVolume
+    return {
+      ...patch,
+      aspirate_airGap_volume: `${airGapVolume}`,
+    }
+  }
+  return patch
+}
+
 export function updatePatchBlowoutFields(
   patch: FormPatch,
   rawForm: FormData
@@ -500,5 +521,6 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchMixFields(chainPatch, rawForm),
     chainPatch => updatePatchBlowoutFields(chainPatch, rawForm),
+    chainPatch => updateAirGapFields(chainPatch, rawForm, pipetteEntities),
   ])
 }
