@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Awaitable, Callable, Any, Set, List
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
@@ -32,6 +33,8 @@ from robot_server.robot.calibration.tip_length.models import (
     AttachedPipette
 )
 
+
+MODULE_LOG = logging.getLogger(__name__)
 
 """
 A collection of functions that allow a consumer to prepare and update
@@ -121,10 +124,13 @@ class TipCalibrationUserFlow():
         """
         next_state = self._state_machine.get_next_state(self._current_state,
                                                         name)
+
         handler = self._command_map.get(name)
         if handler is not None:
             await handler(**data)
         self._set_current_state(next_state)
+        MODULE_LOG.debug(f'TipCalUserFlow handled command {name}, transitioned'
+                         f'from {self._current_state} to {next_state}')
 
     async def load_labware(self):
         pass

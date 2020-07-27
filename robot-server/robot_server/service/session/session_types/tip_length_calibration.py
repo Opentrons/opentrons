@@ -1,20 +1,32 @@
-from robot_server.robot.calibration.tip_length.user_flow import (
-    TipCalibrationUserFlow,
-)
-from robot_server.robot.calibration.tip_length.models import (
-    TipCalibrationSessionStatus,
-    SessionCreateParams
-)
-from robot_server.robot.calibration.session import CalibrationException
-from robot_server.service.session.errors import SessionCreationException
+
 from opentrons.types import Mount
+from robot_server.robot.calibration.tip_length.user_flow import \
+    TipCalibrationUserFlow
+from robot_server.robot.calibration.tip_length.models import \
+    TipCalibrationSessionStatus, SessionCreateParams
+from robot_server.robot.calibration.session import CalibrationException
+from robot_server.robot.calibration.tip_length.util import StateTransitionError
+from robot_server.service.session.errors import (SessionCreationException,
+                                                 CommandExecutionException,
+                                                 CommandExecutionConflict)
+from robot_server.service.session.command_execution import \
+     CallableExecutor, Command, CompletedCommand, CommandQueue, CommandExecutor
 
 from .base_session import BaseSession, SessionMetaData
-from ..command_execution import CommandQueue, CommandExecutor, \
-    CallableExecutor
 from ..configuration import SessionConfiguration
 from ..models import SessionType, SessionDetails
 from ..errors import UnsupportedFeature
+
+
+class TipLengthCalibrationCommandExecutor(CallableExecutor):
+
+    async def execute(self, command: Command) -> CompletedCommand:
+        try:
+            return await super().execute(command)
+        except StateTransitionError as e:
+            raise CommandExecutionConflict(e)
+        except (CalibrationException, AssertionError) as e:
+            raise CommandExecutionException(e)
 
 
 class TipLengthCalibration(BaseSession):
@@ -24,7 +36,7 @@ class TipLengthCalibration(BaseSession):
                  ):
         super().__init__(configuration, instance_meta)
         self._tip_cal_user_flow = tip_cal_user_flow
-        self._command_executor = CallableExecutor(
+        self._command_executor = TipLengthCalibrationCommandExecutor(
             self._tip_cal_user_flow.handle_command
         )
 

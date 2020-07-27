@@ -92,6 +92,7 @@ export function MeasureTip(props: CalibrateTipLengthChildProps): React.Node {
 
   const proceed = () => {
     sendSessionCommand(Sessions.tipCalCommands.SAVE_OFFSET)
+    sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_TIP_RACK)
   }
 
   return (
