@@ -56,7 +56,8 @@ class LabwareCalibration(BaseModel):
     version: int = Field(..., description="The labware definition version")
     parent: str =\
         Field(...,
-              description="The slot or module associated with this labware.")
+              description="The module associated with this offset or an empty"
+                          " string if the offset is associated with a slot")
 
     class Config:
         schema_extra = {
@@ -64,18 +65,34 @@ class LabwareCalibration(BaseModel):
                 {
                     "calibrationData": {
                         "tipLength": {
-                                "value"
-                                "lastModified"
+                            "value": 10,
+                            "lastModified": "2020-07-10T12:50:47.156321"
                             },
                         "offset": {
-                                "value"
-                                "lastModified"
+                            "value": [1, -2, 10],
+                            "lastModified": "2020-07-10T12:40:17.05"
                         }
                     },
                     "version": "1",
-                    "parent": "3",
-                    "namespace": "opentrons"
-
+                    "parent": "",
+                    "namespace": "opentrons",
+                    "loadName": "opentrons_96_tiprack_300ul",
+                },
+                {
+                    "calibrationData": {
+                        "tipLength": {
+                            "value": 10,
+                            "lastModified": "2020-07-10T12:50:47.156321"
+                            },
+                        "offset": {
+                            "value": [1, -2, 10],
+                            "lastModified": "2020-07-10T12:40:17.05"
+                        }
+                    },
+                    "version": "1",
+                    "parent": "temperatureModuleV2",
+                    "namespace": "opentrons",
+                    "loadName": "corning_96_wellPlate_384ul",
                 }
             ]
         }
