@@ -10,6 +10,8 @@ from . import HARDWARE_APP_KEY
 
 
 # The single instance of the RPCServer
+from .protocol.manager import ProtocolManager
+
 _rpc_server_instance = None
 
 # The single instance of the SessionManager
@@ -51,3 +53,9 @@ def get_session_manager(hardware: ThreadManager = Depends(get_hardware)) \
     if not _session_manager_inst:
         _session_manager_inst = SessionManager(hardware=hardware)
     return _session_manager_inst
+
+
+@lru_cache(maxsize=1)
+def get_protocol_manager() -> ProtocolManager:
+    """The single protocol manager instance"""
+    return ProtocolManager()

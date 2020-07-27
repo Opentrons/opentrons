@@ -69,5 +69,10 @@ class RobotServerSettings(BaseSettings):
                     " simulator."
     )
 
+    protocol_manager_max_protocols: int = Field(
+        1,
+        description="The maximum number of protocols allowed for upload"
+    )
+
     class Config:
         env_prefix = "OT_ROBOT_SERVER_"
