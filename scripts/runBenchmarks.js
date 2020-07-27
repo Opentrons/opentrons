@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 
-// NOTE: adapted from nanobench/run.js
-require('@babel/register')
+require('@babel/register')({
+  plugins: ['@babel/plugin-transform-modules-commonjs'],
+})
 
-if (process.env.NODE_ENV !== 'test') {
-  throw new Error(
-    'To run benchmarks, NODE_ENV must be "test" (for CommonJS transforms etc)'
-  )
-}
+// NOTE: the following was adapted from nanobench/run.js
 // eslint-disable-next-line no-unused-vars
 const bench = require('nanobench')
 const path = require('path')
