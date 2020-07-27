@@ -2,14 +2,14 @@
 'use strict'
 
 const assert = require('assert')
-require('@babel/register')({
-  plugins: ['@babel/plugin-transform-modules-commonjs'],
-})
-
+const path = require('path')
 const globby = require('globby')
 // eslint-disable-next-line no-unused-vars
 const bench = require('nanobench')
-const path = require('path')
+require('@babel/register')({
+  cwd: path.join(__dirname, '..'),
+  plugins: ['@babel/plugin-transform-modules-commonjs'],
+})
 
 const USAGE =
   "\nUsage:\n  node ./scripts/runBenchmarks 'path/to/benchmarks/*.js'"

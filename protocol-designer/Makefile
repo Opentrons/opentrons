@@ -38,8 +38,8 @@ build:
 benchmarks: export NODE_ENV := test
 benchmarks:
 	shx mkdir -p benchmarks/output
-	cd .. && node ./scripts/runBenchmarks "protocol-designer/benchmarks/*.js" | \
-	ntee "protocol-designer/benchmarks/output/$(benchmark_output)"
+	node ../scripts/runBenchmarks "./benchmarks/*.js" | \
+	ntee "./benchmarks/output/$(benchmark_output)"
 
 .PHONY: dev
 dev: export NODE_ENV := development
