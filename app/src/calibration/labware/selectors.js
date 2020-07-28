@@ -35,7 +35,9 @@ type BaseProtocolLabware = {|
 
 // TODO(mc, 2020-07-27): this selector should move to a protocol-focused module
 // when we don't have to rely on RPC-state selectors for protocol equipment info
-// NOTE(mc, 2020-07-27): due to how these endpo
+// NOTE(mc, 2020-07-27): due to how these endpoints work, v1 labware will always
+// come back as having "no calibration data". The `legacy` field is here so the
+// UI can adjust its messaging accordingly
 export const getProtocolLabwareList: (
   state: State,
   robotName: string
@@ -72,7 +74,7 @@ export const getProtocolLabwareList: (
         target.loadName === loadName &&
         target.namespace === namespace &&
         target.version === version &&
-        (!parent || target.parent === parent)
+        (parent === null || target.parent === parent)
 
       const quantity = baseLabwareList.filter(matchesLabwareIdentity).length
 
