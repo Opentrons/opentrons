@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Awaitable, Callable, Any, Set, List
+from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
 from opentrons.calibration_storage import modify
@@ -60,8 +60,8 @@ class TipCalibrationUserFlow():
         if not self._hw_pipette:
             raise Error(f'No pipette found on {mount} mount,'
                         'cannot run tip length calibration')
-        self._tip_origin_pt: Point = None
-        self._nozzle_height_at_reference: float = None
+        self._tip_origin_pt: Optional[Point] = None
+        self._nozzle_height_at_reference: Optional[float] = None
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
@@ -195,7 +195,8 @@ class TipCalibrationUserFlow():
                                                     critical_point=cp)
 
     async def jog(self, vector):
-        await self._hardware.move_rel(self._mount, Point(*vector))
+        await self._hardware.move_rel(mount=self._mount,
+                                      delta=Point(*vector))
 
     async def pick_up_tip(self):
         saved_default = None
@@ -205,7 +206,7 @@ class TipCalibrationUserFlow():
             self._hw_pipette.update_config_item('pick_up_current', 0.1)
 
         # grab position of active nozzle for ref when returning tip later
-        self._tip_origin_pt = self._get_current_point()
+        self._tip_origin_pt = await self._get_current_point()
 
         tip_length = self._get_default_tip_length()
         await self._hardware.pick_up_tip(self._mount, tip_length)
@@ -259,7 +260,8 @@ class TipCalibrationUserFlow():
             to_pt = self._tip_origin_pt - Point(0, 0, tip_length * coeff)
 
             cp = self._get_critical_point()
-            await self._hardware.move_to(self._mount, to_pt,
+            await self._hardware.move_to(mount=self._mount,
+                                         abs_position=to_pt,
                                          critical_point=cp)
             await self._hardware.drop_tip(self._mount)
             self._tip_origin_pt = None
@@ -277,5 +279,6 @@ class TipCalibrationUserFlow():
                          origin_cp=None,
                          dest_cp=cp)
         for move in moves:
-            await self._hardware.move_to(
-                self._mount, move[0], critical_point=move[1])
+            await self._hardware.move_to(mount=self._mount,
+                                         abs_position=move[0],
+                                         critical_point=move[1])
