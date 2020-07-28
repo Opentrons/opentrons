@@ -28,6 +28,10 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
+import {
+  getMinPipetteVolume,
+  getPipetteCapacity,
+} from '../../../pipettes/pipetteData'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
@@ -223,6 +227,36 @@ const clearedDisposalVolumeFields = getDefaultFields(
   'disposalVolume_volume',
   'disposalVolume_checkbox'
 )
+
+const clampAirGapVolume = (
+  patch: FormPatch,
+  rawForm: FormData,
+  pipetteEntities: PipetteEntities
+): FormPatch => {
+  const patchedAspirateAirgapVolume = patch.aspirate_airGap_volume
+  const pipetteId = patch.pipette || rawForm.pipette
+
+  if (
+    patchedAspirateAirgapVolume &&
+    typeof pipetteId === 'string' &&
+    pipetteId in pipetteEntities
+  ) {
+    const pipetteEntity = pipetteEntities[pipetteId]
+    const minPipetteVolume = getMinPipetteVolume(pipetteEntity)
+    const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
+    const maxAirGapVolume = getPipetteCapacity(pipetteEntity) - minPipetteVolume
+    const clampedAirGapVolume = clamp(
+      Number(patchedAspirateAirgapVolume),
+      minAirGapVolume,
+      maxAirGapVolume
+    )
+    return {
+      ...patch,
+      aspirate_airGap_volume: String(clampedAirGapVolume),
+    }
+  }
+  return patch
+}
 
 const updatePatchDisposalVolumeFields = (
   patch: FormPatch,
@@ -513,6 +547,7 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch =>
       updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
     chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
+    chainPatch => clampAirGapVolume(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchMixFields(chainPatch, rawForm),
     chainPatch => updatePatchBlowoutFields(chainPatch, rawForm),
   ])
