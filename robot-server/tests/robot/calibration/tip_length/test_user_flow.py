@@ -155,12 +155,18 @@ def test_load_deck(mock_user_flow_all_combos):
 
 def test_load_cal_block(mock_user_flow_all_combos):
     uf = mock_user_flow_all_combos
-    if uf._mount == Mount.RIGHT:
-        assert uf._deck['1'].load_name == \
-                'opentrons_calibrationblock_short_side_left'
+    if uf._has_calibration_block:
+        if uf._mount == Mount.RIGHT:
+            assert uf._deck['1'].load_name == \
+                    'opentrons_calibrationblock_short_side_left'
+            assert uf._deck['3'].load_name == None
+        else:
+            assert uf._deck['3'].load_name == \
+                    'opentrons_calibrationblock_short_side_right'
+            assert uf._deck['1'].load_name == None
     else:
-        assert uf._deck['3'].load_name == \
-                'opentrons_calibrationblock_short_side_right'
+        assert uf._deck['1'].load_name == None
+        assert uf._deck['3'].load_name == None
 
 
 async def test_get_reference_location(mock_user_flow_all_combos):
