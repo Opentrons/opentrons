@@ -95,7 +95,7 @@ describe('labware calibration selectors', () => {
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([])
     })
 
-    it('maps RPC labware to loadName and displayName', () => {
+    it('maps RPC labware to object with displayName', () => {
       getModulesBySlot.mockReturnValue({})
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
@@ -250,7 +250,7 @@ describe('labware calibration selectors', () => {
       ])
     })
 
-    it('flattens out duplicate labware using quantity', () => {
+    it('flattens out duplicate labware using quantity field', () => {
       getLabware.mockReturnValue([
         ({
           type: wellPlate96Def.parameters.loadName,

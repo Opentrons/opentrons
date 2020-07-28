@@ -23,7 +23,6 @@ export type FileInfoProps = {|
 
 export function FileInfo(props: FileInfoProps): React.Node {
   const { robot, sessionLoaded, sessionHasSteps } = props
-
   let uploadError = props.uploadError
 
   if (sessionLoaded && !uploadError && !sessionHasSteps) {

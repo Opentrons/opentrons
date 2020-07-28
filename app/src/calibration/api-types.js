@@ -36,7 +36,7 @@ export type CalibrationStatus = {|
 |}
 
 export type OffsetData = {|
-  value: Array<number>,
+  value: [number, number, number],
   lastModified: string,
 |}
 
