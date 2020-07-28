@@ -107,7 +107,7 @@ async def post_home_robot(
 
 @router.get("/robot/lights",
             description="Get the current status of the OT-2's rail lights",
-            response_model=control.RobotLightState)
+            response_model=control.RobotLightState,)
 async def get_robot_light_state(
         hardware: ThreadManager = Depends(get_hardware)) \
         -> control.RobotLightState:

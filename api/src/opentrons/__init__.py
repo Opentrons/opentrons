@@ -2,6 +2,7 @@ import importlib
 import json
 import os
 import sys
+from functools import partial
 from pathlib import Path
 import logging
 import asyncio
@@ -72,8 +73,11 @@ log = logging.getLogger(__name__)
 
 try:
     import systemd.daemon  # type: ignore
+    systemdd_notify = partial(systemd.daemon.notify, "READY=1")
 except ImportError:
     log.info("Systemd couldn't be imported, not notifying")
+    systemdd_notify = partial(lambda: None)
+
 
 SMOOTHIE_HEX_RE = re.compile('smoothie-(.*).hex')
 
@@ -100,9 +104,11 @@ def _find_smoothie_file() -> Tuple[Path, str]:
 async def initialize_robot() -> ThreadManager:
     if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         log.info("Initialized robot using virtual Smoothie")
+        systemdd_notify()
         return ThreadManager(API.build_hardware_simulator)
+
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
-    systemd.daemon.notify("READY=1")
+    systemdd_notify()
     hardware = ThreadManager(API.build_hardware_controller,
                              threadmanager_nonblocking=True,
                              firmware=(packed_smoothie_fw_file,
@@ -135,7 +141,7 @@ async def initialize_robot() -> ThreadManager:
     return hardware
 
 
-def initialize(
+async def initialize(
         hardware_server: bool = False,
         hardware_server_socket: str = None) \
         -> ThreadManager:
@@ -155,13 +161,11 @@ def initialize(
     log.info(f"API server version:  {__version__}")
     log.info(f"Robot Name: {name()}")
 
-    loop = asyncio.get_event_loop()
-    hardware = loop.run_until_complete(initialize_robot())
+    hardware = await initialize_robot()
 
     if hardware_server:
         #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
-        loop.run_until_complete(
-                install_hardware_server(checked_socket,
-                                        hardware))  # type: ignore
+        await install_hardware_server(checked_socket,
+                                      hardware)  # type: ignore
 
     return hardware

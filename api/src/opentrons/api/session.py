@@ -3,7 +3,6 @@ import base64
 from copy import copy
 from functools import reduce
 import logging
-from threading import Lock, Event
 from time import time, sleep
 from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
 from uuid import uuid4
@@ -266,9 +265,6 @@ class Session(RobotBusy):
         self._event_watcher = None
         self.door_state: Optional[str] = None
         self.blocked: Optional[bool] = None
-
-        self._run_lock: Lock = Lock()
-        self._is_running: Event = Event()
 
     @property
     def busy_lock(self) -> ThreadedAsyncLock:
