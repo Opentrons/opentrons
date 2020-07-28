@@ -39,7 +39,7 @@ export function CalibrateTipLengthControl({
     getUseTrashSurfaceForTipCal
   )
   const useTrashSurface = React.useRef<boolean | null>(
-    !useTrashSurfaceForTipCalSetting
+    useTrashSurfaceForTipCalSetting
   )
 
   const requestState = useSelector((state: State) => {

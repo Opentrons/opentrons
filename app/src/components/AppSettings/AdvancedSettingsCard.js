@@ -69,16 +69,17 @@ function AdvancedSettingsCardComponent(props: Props) {
 
   return (
     <Card title={TITLE}>
-      {useTrashSurfaceForTipCal != null && (
-        <LabeledToggle
-          data-test="useTrashSurfaceForTipCalToggle"
-          label={USE_TRASH_SURFACE_TIP_CAL_LABEL}
-          toggledOn={useTrashSurfaceForTipCal}
-          onClick={toggleUseTrashForTipCal}
-        >
-          <p>{USE_TRASH_SURFACE_TIP_CAL_BODY}</p>
-        </LabeledToggle>
-      )}
+      {devInternalFlags?.enableTipLengthCal &&
+        useTrashSurfaceForTipCal != null && (
+          <LabeledToggle
+            data-test="useTrashSurfaceForTipCalToggle"
+            label={USE_TRASH_SURFACE_TIP_CAL_LABEL}
+            toggledOn={useTrashSurfaceForTipCal}
+            onClick={toggleUseTrashForTipCal}
+          >
+            <p>{USE_TRASH_SURFACE_TIP_CAL_BODY}</p>
+          </LabeledToggle>
+        )}
       <LabeledSelect
         data-test="updateChannelSetting"
         label={UPDATE_CHANNEL_LABEL}
