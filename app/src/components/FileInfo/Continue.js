@@ -1,39 +1,48 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { getCalibrateLocation } from '../../nav'
+
 import {
-  PrimaryButton,
   useHoverTooltip,
-  Tooltip,
-  TOOLTIP_AUTO,
-  FONT_SIZE_CAPTION,
+  Box,
+  PrimaryBtn,
   Text,
+  Tooltip,
+  FONT_SIZE_CAPTION,
+  SPACING_1,
+  SIZE_5,
+  TEXT_ALIGN_RIGHT,
+  TOOLTIP_LEFT,
 } from '@opentrons/components'
-import styles from './styles.css'
+
+// TODO(mc, 2020-07-27): i18n
+const PROCEED_TO_CALIBRATE = 'Proceed to Calibrate'
+const VERIFY_CALIBRATIONS = 'Verify pipette and labware calibrations'
 
 export function Continue(): React.Node {
-  const buttonText = 'Proceed to Calibrate'
-  const primarySublabelText = 'Verify pipette and labware calibrations'
   const { path, disabledReason } = useSelector(getCalibrateLocation)
   const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_AUTO,
+    placement: TOOLTIP_LEFT,
   })
 
   return (
-    <div className={styles.continue} {...targetProps}>
-      <PrimaryButton
-        Component={Link}
-        to={path}
-        disabled={Boolean(disabledReason)}
-        className={styles.continue_button}
+    <Box textAlign={TEXT_ALIGN_RIGHT}>
+      <PrimaryBtn
+        as={Link}
+        to={disabledReason ? '#' : path}
+        className={cx({ disabled: disabledReason })}
+        width={SIZE_5}
+        marginBottom={SPACING_1}
+        {...targetProps}
       >
-        {buttonText}
-      </PrimaryButton>
+        {PROCEED_TO_CALIBRATE}
+      </PrimaryBtn>
       {disabledReason && <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>}
-      <Text fontSize={FONT_SIZE_CAPTION}>{primarySublabelText}</Text>
-    </div>
+      <Text fontSize={FONT_SIZE_CAPTION}>{VERIFY_CALIBRATIONS}</Text>
+    </Box>
   )
 }

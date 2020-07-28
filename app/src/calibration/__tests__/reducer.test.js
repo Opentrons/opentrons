@@ -2,7 +2,7 @@
 
 import * as Fixtures from '../__fixtures__'
 import * as LabwareFixtures from '../labware/__fixtures__'
-import * as LabwareFunctions from '../labware'
+import * as Labware from '../labware'
 import * as Actions from '../actions'
 import { calibrationReducer } from '../reducer'
 
@@ -15,11 +15,15 @@ describe('calibration reducer', () => {
     )
 
     expect(calibrationReducer({}, action)).toEqual({
-      'robot-name': { calibrationStatus: Fixtures.mockCalibrationStatus },
+      'robot-name': {
+        calibrationStatus: Fixtures.mockCalibrationStatus,
+        labwareCalibrations: null,
+      },
     })
   })
-  it('should handle a FETCH_LABWARE_CALIBRATION_SUCCESS', () => {
-    const action = LabwareFunctions.fetchLabwareCalibrationsSuccess(
+
+  it('should handle a FETCH_LABWARE_CALIBRATIONS_SUCCESS', () => {
+    const action = Labware.fetchLabwareCalibrationsSuccess(
       'robot-name',
       LabwareFixtures.mockAllLabwareCalibraton,
       {}
@@ -27,7 +31,8 @@ describe('calibration reducer', () => {
 
     expect(calibrationReducer({}, action)).toEqual({
       'robot-name': {
-        labwareCalibration: LabwareFixtures.mockAllLabwareCalibraton,
+        calibrationStatus: null,
+        labwareCalibrations: LabwareFixtures.mockAllLabwareCalibraton,
       },
     })
   })

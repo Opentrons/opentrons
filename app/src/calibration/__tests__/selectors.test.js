@@ -12,12 +12,21 @@ describe('calibration selectors', () => {
       expect(Selectors.getCalibrationStatus(state, 'robotName')).toBe(null)
     })
 
+    it('should return null if robot in state but no status', () => {
+      const state: $Shape<State> = {
+        calibration: {
+          robotName: { calibrationStatus: null, labwareCalibrations: null },
+        },
+      }
+      expect(Selectors.getCalibrationStatus(state, 'robotName')).toBe(null)
+    })
+
     it('should return status if in state', () => {
       const state: $Shape<State> = {
         calibration: {
           robotName: {
             calibrationStatus: Fixtures.mockCalibrationStatus,
-            labwareCalibration: null,
+            labwareCalibrations: null,
           },
         },
       }
@@ -38,7 +47,7 @@ describe('calibration selectors', () => {
         calibration: {
           robotName: {
             calibrationStatus: Fixtures.mockCalibrationStatus,
-            labwareCalibration: null,
+            labwareCalibrations: null,
           },
         },
       }

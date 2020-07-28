@@ -30,7 +30,7 @@ describe('File info Component', () => {
     expect(wrapper.find(ProtocolPipettesCard).exists()).toEqual(true)
     expect(wrapper.find(ProtocolModulesCard).exists()).toEqual(true)
     expect(wrapper.find(Continue).exists()).toEqual(true)
-    expect(labwareCard.props().robotName).toEqual('robot-name')
+    expect(labwareCard.prop('robotName')).toEqual('robot-name')
   })
 
   it('An error renders when an upload error is given', () => {
@@ -46,6 +46,6 @@ describe('File info Component', () => {
     // button should not render when upload error occurs
     expect(button.exists()).toEqual(false)
     expect(wrapper.exists(UploadError)).toEqual(true)
-    expect(uploadError.props().uploadError.message).toEqual('Oh No!')
+    expect(uploadError.prop('uploadError')).toEqual({ message: 'Oh No!' })
   })
 })

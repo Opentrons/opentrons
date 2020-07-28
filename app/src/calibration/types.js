@@ -15,7 +15,8 @@ import typeof {
   FETCH_CALIBRATION_STATUS_FAILURE,
 } from './constants'
 
-export * from './api-types'
+export type * from './api-types'
+export type * from './labware/types'
 
 export type FetchCalibrationStatusAction = {|
   type: FETCH_CALIBRATION_STATUS,
@@ -45,8 +46,8 @@ export type CalibrationAction =
   | LawareCalibrationAction
 
 export type PerRobotCalibrationState = $ReadOnly<{|
-  calibrationStatus: CalibrationStatus,
-  labwareCalibration: ?AllLabwareCalibrations,
+  calibrationStatus: CalibrationStatus | null,
+  labwareCalibrations: AllLabwareCalibrations | null,
 |}>
 
 export type CalibrationState = $ReadOnly<{

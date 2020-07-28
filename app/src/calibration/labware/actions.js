@@ -9,24 +9,21 @@ import type {
   RobotApiErrorResponse,
 } from '../../robot-api/types'
 
-export const fetchAllLabwareCalibrations = (
-  robotName: string,
-  loadName: string | null = null,
-  namespace: string | null = null,
-  version: number | null = null
-): Types.FetchLabwareCalibrationAction => ({
-  type: Constants.FETCH_ALL_LABWARE_CALIBRATIONS,
-  payload: { robotName, loadName, namespace, version },
+export const fetchLabwareCalibrations = (
+  robotName: string
+): Types.FetchLabwareCalibrationsAction => ({
+  type: Constants.FETCH_LABWARE_CALIBRATIONS,
+  payload: { robotName },
   meta: {},
 })
 
 export const fetchLabwareCalibrationsSuccess = (
   robotName: string,
-  labwareCalibration: APITypes.AllLabwareCalibrations,
+  labwareCalibrations: APITypes.AllLabwareCalibrations,
   meta: RobotApiRequestMeta
-): Types.FetchAllLabwareCalibrationSuccessAction => ({
-  type: Constants.FETCH_LABWARE_CALIBRATION_SUCCESS,
-  payload: { robotName, labwareCalibration },
+): Types.FetchLabwareCalibrationsSuccessAction => ({
+  type: Constants.FETCH_LABWARE_CALIBRATIONS_SUCCESS,
+  payload: { robotName, labwareCalibrations },
   meta,
 })
 
@@ -34,8 +31,8 @@ export const fetchLabwareCalibrationsFailure = (
   robotName: string,
   error: RobotApiErrorResponse,
   meta: RobotApiRequestMeta
-): Types.FetchLabwareCalibrationFailureAction => ({
-  type: Constants.FETCH_LABWARE_CALIBRATION_FAILURE,
+): Types.FetchLabwareCalibrationsFailureAction => ({
+  type: Constants.FETCH_LABWARE_CALIBRATIONS_FAILURE,
   payload: { robotName, error },
   meta,
 })

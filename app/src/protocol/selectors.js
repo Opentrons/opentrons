@@ -1,8 +1,7 @@
 // @flow
-import { createSelector } from 'reselect'
-
 import path from 'path'
 import startCase from 'lodash/startCase'
+import { createSelector } from 'reselect'
 import { getter } from '@thi.ng/paths'
 import { getProtocolSchemaVersion } from '@opentrons/shared-data'
 import { fileIsJson } from './protocol-data'

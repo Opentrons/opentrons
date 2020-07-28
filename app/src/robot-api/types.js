@@ -14,7 +14,7 @@ export type RobotApiRequestOptions = {|
   method: Method,
   path: string,
   body?: { ... },
-  query?: { [param: string]: string | boolean | number | null },
+  query?: { [param: string]: string | boolean | number | null | void, ... },
   form?: FormData,
 |}
 

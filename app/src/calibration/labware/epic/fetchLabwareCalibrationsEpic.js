@@ -11,19 +11,14 @@ import type {
   ResponseToActionMapper,
 } from '../../../robot-api/operators'
 import type { Epic } from '../../../types'
-import type { FetchLabwareCalibrationAction } from '../types'
+import type { FetchLabwareCalibrationsAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchLabwareCalibrationAction> = action => {
-  const { robotName, ...payloadWithoutRobot } = action.payload
+const mapActionToRequest: ActionToRequestMapper<FetchLabwareCalibrationsAction> = action => ({
+  method: GET,
+  path: Constants.LABWARE_CALIBRATION_PATH,
+})
 
-  return {
-    method: GET,
-    path: Constants.LABWARE_CALIBRATION_PATH,
-    query: payloadWithoutRobot,
-  }
-}
-
-const mapResponseToAction: ResponseToActionMapper<FetchLabwareCalibrationAction> = (
+const mapResponseToAction: ResponseToActionMapper<FetchLabwareCalibrationsAction> = (
   response,
   originalAction
 ) => {
@@ -34,9 +29,9 @@ const mapResponseToAction: ResponseToActionMapper<FetchLabwareCalibrationAction>
     : Actions.fetchLabwareCalibrationsFailure(host.name, body, meta)
 }
 
-export const fetchAllLabwareCalibrationEpic: Epic = (action$, state$) => {
+export const fetchLabwareCalibrationsEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_ALL_LABWARE_CALIBRATIONS),
+    ofType(Constants.FETCH_LABWARE_CALIBRATIONS),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

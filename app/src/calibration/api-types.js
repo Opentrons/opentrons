@@ -50,7 +50,7 @@ export type CalibrationData = {|
   tipLength: TipLengthData | null,
 |}
 
-export type SingleLabwareCalibration = {|
+export type LabwareCalibration = {|
   calibrationData: CalibrationData,
   loadName: string,
   namespace: string,
@@ -58,13 +58,13 @@ export type SingleLabwareCalibration = {|
   parent: string,
 |}
 
-export type LabwareCalibrationObjects = {|
-  attributes: SingleLabwareCalibration,
+export type LabwareCalibrationModel = {|
+  attributes: LabwareCalibration,
   type: string,
   id: string,
 |}
 
 export type AllLabwareCalibrations = {|
-  data: Array<LabwareCalibrationObjects | null>,
-  meta: Object,
+  data: Array<LabwareCalibrationModel>,
+  meta: { ... },
 |}

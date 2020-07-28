@@ -1,85 +1,107 @@
 // @flow
 import { createSelector } from 'reselect'
+import head from 'lodash/head'
+import isEqual from 'lodash/isEqual'
+import round from 'lodash/round'
+import uniqWith from 'lodash/uniqWith'
 
-import type { State } from '../../types'
-import type { LabwareCalibrationObjects } from './../types'
-import type { LabwareWithCalibration } from './types'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-import filter from 'lodash/filter'
-import countBy from 'lodash/countBy'
-import keyBy from 'lodash/keyBy'
-
 import { selectors as robotSelectors } from '../../robot'
 
-export const getListOfLabwareCalibrations = (
+import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
+import type { State } from '../../types'
+import type { LabwareCalibrationModel } from './../types'
+import type { LabwareSummary } from './types'
+
+export const getLabwareCalibrations = (
   state: State,
   robotName: string
-): Array<LabwareCalibrationObjects | null> | null => {
-  return state.calibration[robotName]?.labwareCalibration?.data ?? null
+): Array<LabwareCalibrationModel> => {
+  return state.calibration[robotName]?.labwareCalibrations?.data ?? []
 }
 
-// Note: due to some circular dependencies, this selector needs
-// to live in calibration/labware though it should actually be
-// a part of the protocol/ selectors
-export const associateLabwareWithCalibration: (
+type BaseProtocolLabware = {|
+  definition: LabwareDefinition2 | null,
+  loadName: string,
+  namespace: string | null,
+  version: number | null,
+  parent: ModuleModel | null,
+  legacy: boolean,
+|}
+
+// TODO(mc, 2020-07-27): this selector should move to a protocol-focused module
+// when we don't have to rely on RPC-state selectors for protocol equipment info
+// NOTE(mc, 2020-07-27): due to how these endpo
+export const getProtocolLabwareList: (
   state: State,
   robotName: string
-) => Array<LabwareWithCalibration> = createSelector<
-  State,
-  string,
-  Array<LabwareWithCalibration>,
-  _,
-  _,
-  _
->(
-  (state: State) => robotSelectors.getLabware(state),
-  robotSelectors.getModulesBySlot,
-  getListOfLabwareCalibrations,
-  (labware, modulesBySlot, labwareCalibrations) => {
-    const updatedLabwareType = []
-    labware.map(lw => {
-      const moduleName = modulesBySlot[lw.slot]?.model ?? ''
-      const newDataModel = { ...lw }
-      newDataModel.type = lw.type + moduleName
-      updatedLabwareType.push(newDataModel)
-    })
-
-    const labwareCount = countBy(updatedLabwareType, 'type')
-    const calibrations = filter(labwareCalibrations, function(l) {
-      return Object.keys(labwareCount).includes(l?.attributes.loadName)
-    })
-
-    const calibrationLoadNamesMap = keyBy(calibrations, function(
-      labwareObject
-    ) {
-      const loadName = labwareObject?.attributes.loadName ?? ''
-      const parent = labwareObject?.attributes.parent ?? ''
-      return loadName + parent
-    })
-
-    const labwareDisplayNames = []
-    updatedLabwareType.map(lw => {
-      const moduleName = modulesBySlot[lw.slot]?.model ?? ''
-      const parentName = (moduleName && getModuleDisplayName(moduleName)) || ''
-      const data =
-        calibrationLoadNamesMap[lw.type]?.attributes.calibrationData.offset
-          .value
-      const calibrationData = data
-        ? { x: data[0], y: data[1], z: data[2] }
-        : null
-      const displayName =
-        (lw.definition && getLabwareDisplayName(lw.definition)) || ''
-      return labwareDisplayNames.push({
-        display: displayName,
-        quantity: labwareCount[lw.type],
-        parent: parentName,
-        calibration: calibrationData,
+) => Array<LabwareSummary> = createSelector(
+  (state, robotName) => robotSelectors.getLabware(state),
+  (state, robotName) => robotSelectors.getModulesBySlot(state),
+  getLabwareCalibrations,
+  (protocolLabware, modulesBySlot, calibrations) => {
+    const baseLabwareList: $ReadOnlyArray<BaseProtocolLabware> = protocolLabware.map(
+      lw => ({
+        definition: lw.definition,
+        loadName: lw.definition?.parameters.loadName ?? lw.type,
+        namespace: lw.definition?.namespace ?? null,
+        version: lw.definition?.version ?? null,
+        parent: modulesBySlot[lw.slot]?.model ?? null,
+        legacy: lw.isLegacy,
       })
+    )
+
+    const uniqueLabware = uniqWith<BaseProtocolLabware>(
+      baseLabwareList,
+      (labwareA, labwareB) => {
+        const { definition: _defA, ...labwareIdentityA } = labwareA
+        const { definition: _defB, ...labwareIdentityB } = labwareB
+        return isEqual(labwareIdentityA, labwareIdentityB)
+      }
+    )
+
+    return uniqueLabware.map(lw => {
+      const { definition: def, loadName, namespace, version, parent } = lw
+      const displayName = def ? getLabwareDisplayName(def) : loadName
+      const parentDisplayName = parent ? getModuleDisplayName(parent) : null
+
+      const quantity = baseLabwareList.filter(baseLw => {
+        return (
+          baseLw.loadName === loadName &&
+          baseLw.namespace === namespace &&
+          baseLw.version === version
+        )
+      }).length
+
+      const calData = calibrations
+        .filter(({ attributes }) => {
+          return (
+            attributes.loadName === loadName &&
+            attributes.namespace === namespace &&
+            attributes.version === version &&
+            (!parent || attributes.parent === parent)
+          )
+        })
+        .map(({ attributes }) => {
+          const calVector = attributes.calibrationData.offset.value
+          return {
+            x: round(calVector[0], 1),
+            y: round(calVector[1], 1),
+            z: round(calVector[2], 1),
+          }
+        })
+
+      return {
+        displayName,
+        parentDisplayName,
+        quantity,
+        calibration: head(calData) ?? null,
+        legacy: lw.legacy,
+      }
     })
-    return labwareDisplayNames
   }
 )

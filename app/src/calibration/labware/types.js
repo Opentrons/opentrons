@@ -6,49 +6,45 @@ import type {
 } from '../../robot-api/types'
 
 import typeof {
-  FETCH_ALL_LABWARE_CALIBRATIONS,
-  FETCH_LABWARE_CALIBRATION_SUCCESS,
-  FETCH_LABWARE_CALIBRATION_FAILURE,
+  FETCH_LABWARE_CALIBRATIONS,
+  FETCH_LABWARE_CALIBRATIONS_SUCCESS,
+  FETCH_LABWARE_CALIBRATIONS_FAILURE,
 } from './constants'
 
 import type { AllLabwareCalibrations } from './../api-types'
 
-export type FetchLabwareCalibrationAction = {|
-  type: FETCH_ALL_LABWARE_CALIBRATIONS,
+export type FetchLabwareCalibrationsAction = {|
+  type: FETCH_LABWARE_CALIBRATIONS,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchLabwareCalibrationsSuccessAction = {|
+  type: FETCH_LABWARE_CALIBRATIONS_SUCCESS,
   payload: {|
     robotName: string,
-    loadName: string | null,
-    version: number | null,
-    namespace: string | null,
+    labwareCalibrations: AllLabwareCalibrations,
   |},
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchAllLabwareCalibrationSuccessAction = {|
-  type: FETCH_LABWARE_CALIBRATION_SUCCESS,
-  payload: {|
-    robotName: string,
-    labwareCalibration: AllLabwareCalibrations,
-  |},
-  meta: RobotApiRequestMeta,
-|}
-
-export type FetchLabwareCalibrationFailureAction = {|
-  type: FETCH_LABWARE_CALIBRATION_FAILURE,
+export type FetchLabwareCalibrationsFailureAction = {|
+  type: FETCH_LABWARE_CALIBRATIONS_FAILURE,
   payload: {| robotName: string, error: RobotApiErrorResponse |},
   meta: RobotApiRequestMeta,
 |}
 
 // selector types
 
-export type LabwareWithCalibration = {|
-  parent: string,
+export type LabwareSummary = {|
+  displayName: string,
+  parentDisplayName: string | null,
   quantity: number,
-  display: string,
   calibration: {| x: number, y: number, z: number |} | null,
+  legacy: boolean,
 |}
 
 export type LawareCalibrationAction =
-  | FetchLabwareCalibrationAction
-  | FetchAllLabwareCalibrationSuccessAction
-  | FetchLabwareCalibrationFailureAction
+  | FetchLabwareCalibrationsAction
+  | FetchLabwareCalibrationsSuccessAction
+  | FetchLabwareCalibrationsFailureAction

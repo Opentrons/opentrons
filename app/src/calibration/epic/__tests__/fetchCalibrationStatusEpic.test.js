@@ -2,7 +2,7 @@
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { calibrationEpic } from '../../'
+import { calibrationEpic } from '../../epic'
 
 const makeTriggerAction = robotName => Actions.fetchCalibrationStatus(robotName)
 

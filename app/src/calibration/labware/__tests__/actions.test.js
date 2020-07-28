@@ -13,37 +13,17 @@ type ActionSpec = {|
 
 const SPECS: Array<ActionSpec> = [
   {
-    should: 'create a fetchLabwareCalibration action',
-    creator: Actions.fetchAllLabwareCalibrations,
+    should: 'create a fetchLabwareCalibrations action',
+    creator: Actions.fetchLabwareCalibrations,
     args: ['robot-name'],
     expected: {
-      type: 'calibration:FETCH_ALL_LABWARE_CALIBRATIONS',
-      payload: {
-        robotName: 'robot-name',
-        loadName: null,
-        namespace: null,
-        version: null,
-      },
+      type: 'calibration:FETCH_LABWARE_CALIBRATIONS',
+      payload: { robotName: 'robot-name' },
       meta: {},
     },
   },
   {
-    should: 'create a fetchLabwareCalibration action with params',
-    creator: Actions.fetchAllLabwareCalibrations,
-    args: ['robot-name', 'fake_labware', 'weird', 1],
-    expected: {
-      type: 'calibration:FETCH_ALL_LABWARE_CALIBRATIONS',
-      payload: {
-        robotName: 'robot-name',
-        loadName: 'fake_labware',
-        namespace: 'weird',
-        version: 1,
-      },
-      meta: {},
-    },
-  },
-  {
-    should: 'create a fetchLabwareCalibrationSuccess action',
+    should: 'create a fetchLabwareCalibrationsSuccess action',
     creator: Actions.fetchLabwareCalibrationsSuccess,
     args: [
       'robot-name',
@@ -51,16 +31,16 @@ const SPECS: Array<ActionSpec> = [
       { requestId: '123' },
     ],
     expected: {
-      type: 'calibration:FETCH_LABWARE_CALIBRATION_SUCCESS',
+      type: 'calibration:FETCH_LABWARE_CALIBRATIONS_SUCCESS',
       payload: {
         robotName: 'robot-name',
-        labwareCalibration: Fixtures.mockAllLabwareCalibraton,
+        labwareCalibrations: Fixtures.mockAllLabwareCalibraton,
       },
       meta: { requestId: '123' },
     },
   },
   {
-    should: 'create a fetchLabwareCalibrationFailure action',
+    should: 'create a fetchLabwareCalibrationsFailure action',
     creator: Actions.fetchLabwareCalibrationsFailure,
     args: [
       'robot-name',
@@ -68,7 +48,7 @@ const SPECS: Array<ActionSpec> = [
       { requestId: '123' },
     ],
     expected: {
-      type: 'calibration:FETCH_LABWARE_CALIBRATION_FAILURE',
+      type: 'calibration:FETCH_LABWARE_CALIBRATIONS_FAILURE',
       payload: {
         robotName: 'robot-name',
         error: Fixtures.mockFetchLabwareCalibrationFailure.body,

@@ -8,11 +8,11 @@ import { LABWARE_CALIBRATION_PATH } from '../constants'
 
 import type { ResponseFixtures } from '../../../robot-api/__fixtures__'
 import type {
-  LabwareCalibrationObjects,
+  LabwareCalibrationModel,
   AllLabwareCalibrations,
 } from '../../api-types'
 
-export const mockLabwareCalibration1: LabwareCalibrationObjects = {
+export const mockLabwareCalibration1: LabwareCalibrationModel = {
   attributes: {
     calibrationData: {
       offset: {
@@ -33,7 +33,7 @@ export const mockLabwareCalibration1: LabwareCalibrationObjects = {
   type: 'Labware Calibration',
 }
 
-export const mockLabwareCalibration2: LabwareCalibrationObjects = {
+export const mockLabwareCalibration2: LabwareCalibrationModel = {
   attributes: {
     calibrationData: {
       offset: {

@@ -2,11 +2,13 @@
 // setup labware component
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import round from 'lodash/round'
 
 import { InfoSection } from './InfoSection'
 import { ProtocolLabwareList } from './ProtocolLabwareList'
-import * as labwareFunctions from '../../calibration'
+import {
+  fetchLabwareCalibrations,
+  getProtocolLabwareList,
+} from '../../calibration'
 
 import type { State, Dispatch } from '../../types'
 
@@ -14,42 +16,25 @@ export type ProtocolLabwareProps = {|
   robotName: string,
 |}
 
-const TITLE = 'Required Labware'
+// TODO(mc, 2020-07-27): i18n
+const REQUIRED_LABWARE = 'Required Labware'
 
-export function ProtocolLabwareCard({
-  robotName,
-}: ProtocolLabwareProps): React.Node {
+export function ProtocolLabwareCard(props: ProtocolLabwareProps): React.Node {
+  const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
-  React.useEffect(() => {
-    dispatch(labwareFunctions.fetchAllLabwareCalibrations(robotName))
-  }, [dispatch, robotName])
-  const labwareWithCalibration = useSelector((state: State) =>
-    labwareFunctions.associateLabwareWithCalibration(state, robotName)
-  )
-  if (labwareWithCalibration.length === 0) return null
-
-  const labwareToParentMap = []
-  labwareWithCalibration.map(labwareInfo => {
-    const offset = labwareInfo.calibration
-    let calibrationData = null
-    if (offset) {
-      const X = parseFloat(round(offset.x, 1)).toFixed(1)
-      const Y = parseFloat(round(offset.y, 1)).toFixed(1)
-      const Z = parseFloat(round(offset.z, 1)).toFixed(1)
-      calibrationData = { x: X, y: Y, z: Z }
-    }
-
-    labwareToParentMap.push({
-      parent: labwareInfo.parent,
-      quantity: labwareInfo.quantity,
-      display: labwareInfo.display,
-      calibration: calibrationData,
-    })
+  const labwareList = useSelector((state: State) => {
+    return getProtocolLabwareList(state, robotName)
   })
 
+  React.useEffect(() => {
+    dispatch(fetchLabwareCalibrations(robotName))
+  }, [dispatch, robotName])
+
+  if (labwareList.length === 0) return null
+
   return (
-    <InfoSection title={TITLE}>
-      <ProtocolLabwareList loadNameMap={labwareToParentMap} />
+    <InfoSection title={REQUIRED_LABWARE}>
+      <ProtocolLabwareList labware={labwareList} />
     </InfoSection>
   )
 }
