@@ -247,11 +247,19 @@ class TipCalibrationUserFlow():
                 self._deck.position_for(cb_setup['slot']))
 
     async def _return_tip(self):
+        """
+        Move pipette with tip to tip rack well, such that
+        the tip is inside the well, but not so deep that
+        the tip rack will block the sheath from ejecting fully.
+        Each pipette config contains a coefficient to apply to an
+        attached tip's length to determine proper return tip z offset
+        """
         if self._tip_origin_loc and self._hw_pipette.has_tip:
             tip_length = self._get_default_tip_length()
             tip_return_ratio = self._hw_pipette.config.return_tip_height
             return_z = tip_length * tip_return_ratio
             to_pt = self._tip_origin_loc.point - Point(0, 0, return_z)
+
             cp = self._get_critical_point()
             await self._hardware.move_to(self._mount, to_pt,
                                          critical_point=cp)
