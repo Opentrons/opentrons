@@ -206,7 +206,10 @@ class TipCalibrationUserFlow():
             self._hw_pipette.update_config_item('pick_up_current', 0.1)
 
         tip_length = self._get_default_tip_length()
-        cur_pt = await self._hardware.gantry_position(self._mount)
+        cp = self._get_critical_point()
+        cur_pt = await self._hardware.gantry_position(self._mount,
+                                                      critical_point=cp)
+        # grab position of active nozzle for ref when returning tip later
         self._tip_origin_loc = Location(cur_pt, None)
 
         await self._hardware.pick_up_tip(self._mount, tip_length)
