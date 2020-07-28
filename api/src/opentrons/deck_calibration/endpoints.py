@@ -3,11 +3,7 @@ from typing import Dict, Tuple, Optional, NamedTuple
 import logging
 from enum import Enum
 
-try:
-    from opentrons import instruments
-except ImportError:
-    pass
-from opentrons.config import pipette_config, robot_configs, feature_flags
+from opentrons.config import robot_configs, reset
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.deck_calibration import jog, position, dots_set, z_pos
@@ -126,17 +122,18 @@ def init_pipette(session):
 
     :return: The pipette type and mount chosen for deck calibration
     """
+    reset.reset_tip_probe()
     pipette_info = set_current_mount(session)
     pipette = pipette_info['pipette']
     res = {}
     if pipette:
         session.current_model = pipette_info['model']
-        if not feature_flags.use_protocol_api_v2():
-            mount = pipette.mount
-            session.current_mount = mount
-        else:
-            mount = pipette.get('mount')
-            session.current_mount = mount_by_name[mount]
+        mount = pipette.get('mount')
+        # ensure the current pipettes loaded have their instrument
+        # offsets zeroed out.
+        session.current_mount = mount_by_name[mount]
+        session.adapter.update_instrument_offset(
+            session.current_mount, new_offset=Point(0, 0, 0))
         session.pipettes[mount] = pipette
         res = {'mount': mount, 'model': pipette_info['model']}
 
@@ -146,22 +143,10 @@ def init_pipette(session):
 
 
 def get_pipettes(sess: SessionManager):
-    if not feature_flags.use_protocol_api_v2():
-        attached_pipettes = sess.adapter.get_attached_pipettes()
-        left_pipette = None
-        right_pipette = None
-        left = attached_pipettes.get('left')
-        right = attached_pipettes.get('right')
-        if left['model'] in pipette_config.config_models:
-            left_pipette = instruments.pipette_by_name(
-                'left', left['name'])
-        if right['model'] in pipette_config.config_models:
-            right_pipette = instruments.pipette_by_name(
-                'right', right['name'])
-    else:
-        attached_pipettes = sess.adapter.attached_instruments
-        left_pipette = attached_pipettes.get(Mount.LEFT)
-        right_pipette = attached_pipettes.get(Mount.RIGHT)
+    attached_pipettes = sess.adapter.attached_instruments
+    left_pipette = attached_pipettes.get(Mount.LEFT)
+    right_pipette = attached_pipettes.get(Mount.RIGHT)
+    log.info(f"Type of pipette {right_pipette}")
     return right_pipette, left_pipette
 
 
@@ -182,18 +167,12 @@ def set_current_mount(session: SessionManager):
     left_channel = None
     right_pipette, left_pipette = get_pipettes(session)
     if right_pipette:
-        if not feature_flags.use_protocol_api_v2():
-            right_channel = right_pipette.channels
-        else:
-            right_channel = right_pipette.get('channels')
-            right_pipette['mount'] = 'right'
+        right_channel = right_pipette.get('channels')
+        right_pipette['mount'] = 'right'
 
     if left_pipette:
-        if not feature_flags.use_protocol_api_v2():
-            left_channel = left_pipette.channels
-        else:
-            left_channel = left_pipette.get('channels')
-            left_pipette['mount'] = 'left'
+        left_channel = left_pipette.get('channels')
+        left_pipette['mount'] = 'left'
 
     if right_channel == 1:
         pipette = right_pipette
@@ -217,15 +196,10 @@ def _get_model_name(pipette, adapter):
     model = None
     pip_id = None
     if pipette:
-        if not feature_flags.use_protocol_api_v2():
-            model = pipette.model
-            pip_info = adapter.get_attached_pipettes()[pipette.mount]
-            pip_id = pip_info['id']
-        else:
-            model = pipette.get('model')
-            mount = Mount.LEFT if pipette['mount'] == 'left' else Mount.RIGHT
-            pip_info = adapter.attached_instruments[mount]
-            pip_id = pip_info['pipette_id']
+        model = pipette.get('model')
+        mount = Mount.LEFT if pipette['mount'] == 'left' else Mount.RIGHT
+        pip_info = adapter.attached_instruments[mount]
+        pip_id = pip_info['pipette_id']
 
     return model, pip_id
 
@@ -260,18 +234,10 @@ async def attach_tip(data) -> CommandResult:
         message = 'Error: "tipLength" must be specified in request'
         status = False
     else:
-        if not feature_flags.use_protocol_api_v2():
-            pipette = session_wrapper.session.pipettes[
-                session_wrapper.session.current_mount]
-            if pipette.tip_attached:
-                log.warning('attach tip called while tip already attached')
-                pipette._remove_tip(pipette._tip_length)
-            pipette._add_tip(tip_length)
-        else:
-            session_wrapper.session.adapter.add_tip(
-                session_wrapper.session.current_mount, tip_length)
-            if session_wrapper.session.cp == CriticalPoint.NOZZLE:
-                session_wrapper.session.cp = CriticalPoint.TIP
+        session_wrapper.session.adapter.add_tip(
+            session_wrapper.session.current_mount, tip_length)
+        if session_wrapper.session.cp == CriticalPoint.NOZZLE:
+            session_wrapper.session.cp = CriticalPoint.TIP
         session_wrapper.session.tip_length = tip_length
 
         message = "Tip length set: {}".format(tip_length)
@@ -289,17 +255,10 @@ async def detach_tip(data) -> CommandResult:
     if not session_wrapper.session:
         raise NoSessionInProgress()
 
-    if not feature_flags.use_protocol_api_v2():
-        pipette = session_wrapper.session.pipettes[
-            session_wrapper.session.current_mount]
-        if not pipette.tip_attached:
-            log.warning('detach tip called with no tip')
-        pipette._remove_tip(session_wrapper.session.tip_length)
-    else:
-        session_wrapper.session.adapter.remove_tip(
-            session_wrapper.session.current_mount)
-        if session_wrapper.session.cp == CriticalPoint.TIP:
-            session_wrapper.session.cp = CriticalPoint.NOZZLE
+    session_wrapper.session.adapter.remove_tip(
+        session_wrapper.session.current_mount)
+    if session_wrapper.session.cp == CriticalPoint.TIP:
+        session_wrapper.session.cp = CriticalPoint.NOZZLE
     session_wrapper.session.tip_length = None
 
     return CommandResult(success=True, message="Tip removed")
@@ -365,10 +324,6 @@ async def move(data) -> CommandResult:
     point_name = data.get('point')
     point = safe_points().get(point_name)
     if point and len(point) == 3:
-        if not feature_flags.use_protocol_api_v2():
-            pipette = session_wrapper.session.pipettes[
-                session_wrapper.session.current_mount]
-            channels = pipette.channels
         # For multichannel pipettes in the V1 session, we use the tip closest
         # to the front of the robot rather than the back (this is the tip that
         # would go into well H1 of a plate when pipetting from the first row of
@@ -380,52 +335,39 @@ async def move(data) -> CommandResult:
         # out of xy positions saved in the `save_xy` handler
         # (not 2 * Y_OFFSET_MULTI, because the axial center of the pipette
         # will only be off by 1* Y_OFFSET_MULTI).
-            if not channels == 1:
-                x = point[0]
-                y = point[1] + pipette_config.Y_OFFSET_MULTI * 2
-                z = point[2]
-                point = (x, y, z)
+        if not point_name == 'attachTip':
+            intermediate_pos = position(
+                session_wrapper.session.current_mount,
+                session_wrapper.session.adapter,
+                session_wrapper.session.cp)
+            session_wrapper.session.adapter.move_to(
+                session_wrapper.session.current_mount,
+                Point(
+                    x=intermediate_pos[0],
+                    y=intermediate_pos[1],
+                    z=session_wrapper.session.tip_length),
+                critical_point=session_wrapper.session.cp)
+            session_wrapper.session.adapter.move_to(
+                session_wrapper.session.current_mount,
+                Point(x=point[0],
+                      y=point[1],
+                      z=session_wrapper.session.tip_length),
+                critical_point=session_wrapper.session.cp)
+            session_wrapper.session.adapter.move_to(
+                session_wrapper.session.current_mount,
+                Point(x=point[0], y=point[1], z=point[2]),
+                critical_point=session_wrapper.session.cp)
+        else:
             # hack: z=150mm is not a safe point for a gen2 pipette with a tip
             # attached, since their home location is z=+172mm and both 300ul
             # and 1000ul tips are more than 22mm long. This isn't an issue for
             # apiv2 because it can select the NOZZLE critical point.
-            if pipette.tip_attached and point_name == 'attachTip':
-                point = (point[0],
-                         point[1],
-                         point[2]-pipette._tip_length)
-
-            pipette.move_to((session_wrapper.session.adapter.deck, point),
-                            strategy='arc')
-        else:
-            if not point_name == 'attachTip':
-                intermediate_pos = position(
-                    session_wrapper.session.current_mount,
-                    session_wrapper.session.adapter,
-                    session_wrapper.session.cp)
-                session_wrapper.session.adapter.move_to(
-                    session_wrapper.session.current_mount,
-                    Point(
-                        x=intermediate_pos[0],
-                        y=intermediate_pos[1],
-                        z=session_wrapper.session.tip_length),
-                    critical_point=session_wrapper.session.cp)
-                session_wrapper.session.adapter.move_to(
-                    session_wrapper.session.current_mount,
-                    Point(x=point[0],
-                          y=point[1],
-                          z=session_wrapper.session.tip_length),
-                    critical_point=session_wrapper.session.cp)
-                session_wrapper.session.adapter.move_to(
-                    session_wrapper.session.current_mount,
-                    Point(x=point[0], y=point[1], z=point[2]),
-                    critical_point=session_wrapper.session.cp)
-            else:
-                if session_wrapper.session.cp == CriticalPoint.TIP:
-                    session_wrapper.session.cp = CriticalPoint.NOZZLE
-                session_wrapper.session.adapter.move_to(
-                    session_wrapper.session.current_mount,
-                    Point(x=point[0], y=point[1], z=point[2]),
-                    critical_point=session_wrapper.session.cp)
+            if session_wrapper.session.cp == CriticalPoint.TIP:
+                session_wrapper.session.cp = CriticalPoint.NOZZLE
+            session_wrapper.session.adapter.move_to(
+                session_wrapper.session.current_mount,
+                Point(x=point[0], y=point[1], z=point[2]),
+                critical_point=session_wrapper.session.cp)
         message = 'Moved to {}'.format(point)
         status = True
     else:
@@ -456,23 +398,10 @@ async def save_xy(data) -> CommandResult:
         message = "Mount must be set before calibrating"
         status = False
     else:
-        if not feature_flags.use_protocol_api_v2():
-            mount = 'Z' if session_wrapper.session.current_mount == 'left'\
-                else 'A'
-            x, y, _ = position(mount, session_wrapper.session.adapter)
-            if session_wrapper.session.pipettes[
-                    session_wrapper.session.current_mount].channels != 1:
-                # See note in `move`
-                y = y - pipette_config.Y_OFFSET_MULTI
-            if session_wrapper.session.current_mount == 'left':
-                dx, dy, _ = session_wrapper.session.adapter.config.mount_offset
-                x = x + dx
-                y = y + dy
-        else:
-            x, y, _ = position(
-                session_wrapper.session.current_mount,
-                session_wrapper.session.adapter,
-                session_wrapper.session.cp)
+        x, y, _ = position(
+            session_wrapper.session.current_mount,
+            session_wrapper.session.adapter,
+            session_wrapper.session.cp)
 
         session_wrapper.session.points[point] = (x, y)
         message = "Saved point {} value: {}".format(
@@ -495,21 +424,10 @@ async def save_z(data) -> CommandResult:
         message = "Tip length must be set before calibrating"
         status = False
     else:
-        if not feature_flags.use_protocol_api_v2():
-            mount = 'Z' if session_wrapper.session.current_mount == 'left' \
-                else 'A'
-            actual_z = position(
-                mount, session_wrapper.session.adapter)[-1]
-            length_offset = pipette_config.load(
-                session_wrapper.session.current_model,
-                session_wrapper.session.pipette_id).model_offset[-1]
-            session_wrapper.session.z_value =\
-                actual_z - session_wrapper.session.tip_length + length_offset
-        else:
-            session_wrapper.session.z_value = position(
-                session_wrapper.session.current_mount,
-                session_wrapper.session.adapter,
-                session_wrapper.session.cp)[-1]
+        session_wrapper.session.z_value = position(
+            session_wrapper.session.current_mount,
+            session_wrapper.session.adapter,
+            session_wrapper.session.cp)[-1]
 
         session_wrapper.session.current_transform[2][3] =\
             session_wrapper.session.z_value
@@ -583,14 +501,10 @@ async def release(data) -> CommandResult:
     if not session_wrapper.session:
         raise NoSessionInProgress()
 
-    if not feature_flags.use_protocol_api_v2():
-        session_wrapper.session.adapter.remove_instrument('left')
-        session_wrapper.session.adapter.remove_instrument('right')
-    else:
-        session_wrapper.session.adapter.cache_instruments()
-        full_gantry_cal = session_wrapper.session.backup_gantry_cal
-        session_wrapper.session.adapter.update_config(
-            gantry_calibration=full_gantry_cal)
+    session_wrapper.session.adapter.cache_instruments()
+    full_gantry_cal = session_wrapper.session.backup_gantry_cal
+    session_wrapper.session.adapter.update_config(
+        gantry_calibration=full_gantry_cal)
     session_wrapper.session = None
 
     return CommandResult(success=True, message="calibration session released")
