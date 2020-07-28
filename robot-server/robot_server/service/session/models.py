@@ -158,6 +158,7 @@ class ProtocolCommand(CommandDefinition):
     cancel = "cancel"
     pause = "pause"
     resume = "resume"
+    single_step = "singleStep"
 
     @staticmethod
     def namespace():
