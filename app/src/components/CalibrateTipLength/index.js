@@ -1,16 +1,23 @@
 // @flow
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
+import { useSelector } from 'react-redux'
+import last from 'lodash/last'
 
-import { ModalPage, useConditionalConfirm } from '@opentrons/components'
+import {
+  ModalPage,
+  SpinnerModalPage,
+  useConditionalConfirm,
+} from '@opentrons/components'
 
+import type { State } from '../../types'
 import type {
   SessionCommandString,
   SessionCommandData,
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
-import { useDispatchApiRequest } from '../../robot-api'
-
+import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
+import type { RequestState } from '../../robot-api/types'
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { MeasureNozzle } from './MeasureNozzle'
@@ -53,7 +60,11 @@ export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
   const { session, robotName, hasBlock, closeWizard } = props
-  const [dispatchRequest] = useDispatchApiRequest()
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+
+  const requestStatus = useSelector<State, RequestState | null>(state =>
+    getRequestById(state, last(requestIds))
+  )?.status
 
   function sendCommand(
     command: SessionCommandString,
@@ -86,16 +97,23 @@ export function CalibrateTipLength(
   if (!session) {
     return null
   }
+
+  const titleBarProps = {
+    title: TIP_LENGTH_CALIBRATION_SUBTITLE,
+    back: { onClick: confirmExit, title: EXIT, children: EXIT },
+  }
+
+  if (requestStatus === PENDING) {
+    return <SpinnerModalPage titleBar={titleBarProps} />
+  }
+
   const { currentStep, instrument, labware } = session?.details
   const Panel = PANEL_BY_STEP[currentStep]
 
   return Panel ? (
     <>
       <ModalPage
-        titleBar={{
-          title: TIP_LENGTH_CALIBRATION_SUBTITLE,
-          back: { onClick: confirmExit, title: EXIT, children: EXIT },
-        }}
+        titleBar={titleBarProps}
         contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
       >
         <Panel
