@@ -29,5 +29,5 @@ def enable_door_safety_switch():
     return advs.get_setting_with_env_overload('enableDoorSafetySwitch')
 
 
-def enable_tip_length_calibration():
+def enable_calibration_overhaul():
     return advs.get_setting_with_env_overload('enableTipLengthCalibration')

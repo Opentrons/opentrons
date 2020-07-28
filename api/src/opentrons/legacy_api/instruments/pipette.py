@@ -1052,7 +1052,7 @@ class Pipette(CommandPublisher):
                 self.move_to(
                     self.current_tip().top(0),
                     strategy='direct')
-            if ff.enable_tip_length_calibration() and self.pipette_id:
+            if ff.enable_calibration_overhaul() and self.pipette_id:
                 tip_length_cal = load_tip_length_calibration(
                     self.pipette_id, location)
                 self._tip_length = tip_length_cal['tipLength']

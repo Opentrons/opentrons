@@ -56,8 +56,8 @@ stages:
           value: !anything
         - id: enableTipLengthCalibration
           old_id: Null
-          title: Enable Tip Length Calibration
-          description: !re_search "Measure the tip length based on each unique pipette"
+          title: Enable Under-Development Calibration Flows
+          description: !re_search "Enables the in-progress robot calibration flows"
           restart_required: false
           value: !anything
         links: !anydict 
