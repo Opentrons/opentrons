@@ -34,3 +34,37 @@ export type CalibrationStatus = {|
     |},
   |},
 |}
+
+export type OffsetData = {|
+  value: [number, number, number],
+  lastModified: string,
+|}
+
+export type TipLengthData = {|
+  value: number,
+  lastModified: string,
+|}
+
+export type CalibrationData = {|
+  offset: OffsetData,
+  tipLength: TipLengthData | null,
+|}
+
+export type LabwareCalibration = {|
+  calibrationData: CalibrationData,
+  loadName: string,
+  namespace: string,
+  version: number,
+  parent: string,
+|}
+
+export type LabwareCalibrationModel = {|
+  attributes: LabwareCalibration,
+  type: string,
+  id: string,
+|}
+
+export type AllLabwareCalibrations = {|
+  data: Array<LabwareCalibrationModel>,
+  meta: { ... },
+|}

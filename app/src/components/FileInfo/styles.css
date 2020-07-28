@@ -1,21 +1,14 @@
 @import '@opentrons/components';
 
-.file_info_container {
-  overflow-y: auto;
-  padding: 0 1.5rem;
-}
-
 .info_section {
   width: 100%;
   padding-top: 1.25rem;
   padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--c-light-gray);
+  margin-bottom: 1rem;
 
   & > p {
     @apply --font-body-2-dark;
-  }
-
-  &:not(:last-of-type) {
-    border-bottom: 1px solid var(--c-light-gray);
   }
 }
 
@@ -90,16 +83,6 @@
   &:first-child {
     width: 80%;
   }
-}
-
-.continue {
-  text-align: right;
-}
-
-.continue_button {
-  display: inline-block;
-  width: 16.5rem;
-  margin-bottom: 1rem;
 }
 
 .soft_warning {

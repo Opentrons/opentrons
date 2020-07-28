@@ -1,52 +1,40 @@
 // @flow
 // setup labware component
 import * as React from 'react'
-import { connect } from 'react-redux'
-import countBy from 'lodash/countBy'
+import { useSelector, useDispatch } from 'react-redux'
 
-import { selectors as robotSelectors } from '../../robot'
 import { InfoSection } from './InfoSection'
-import { LabwareTable } from './LabwareTable'
+import { ProtocolLabwareList } from './ProtocolLabwareList'
+import {
+  fetchLabwareCalibrations,
+  getProtocolLabwareList,
+} from '../../calibration'
 
 import type { State, Dispatch } from '../../types'
-import type { Labware } from '../../robot'
 
-type SP = {| labware: Array<Labware> |}
+export type ProtocolLabwareProps = {|
+  robotName: string,
+|}
 
-type Props = {| ...SP, dispatch: Dispatch |}
+// TODO(mc, 2020-07-27): i18n
+const REQUIRED_LABWARE = 'Required Labware'
 
-const TITLE = 'Required Labware'
+export function ProtocolLabwareCard(props: ProtocolLabwareProps): React.Node {
+  const { robotName } = props
+  const dispatch = useDispatch<Dispatch>()
+  const labwareList = useSelector((state: State) => {
+    return getProtocolLabwareList(state, robotName)
+  })
 
-export const ProtocolLabwareCard: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  _,
-  _,
-  _,
-  _
->(mapStateToProps)(ProtocolLabwareCardComponent)
+  React.useEffect(() => {
+    dispatch(fetchLabwareCalibrations(robotName))
+  }, [dispatch, robotName])
 
-function ProtocolLabwareCardComponent(props: Props) {
-  const { labware } = props
-
-  if (labware.length === 0) return null
-
-  const labwareCount = countBy(labware, 'type')
-  const labwareList = Object.keys(labwareCount).map(type => (
-    <tr key={type}>
-      <td>{type}</td>
-      <td>{`x${labwareCount[type]}`}</td>
-    </tr>
-  ))
+  if (labwareList.length === 0) return null
 
   return (
-    <InfoSection title={TITLE}>
-      <LabwareTable>{labwareList}</LabwareTable>
+    <InfoSection title={REQUIRED_LABWARE}>
+      <ProtocolLabwareList labware={labwareList} />
     </InfoSection>
   )
-}
-function mapStateToProps(state: State): SP {
-  return {
-    labware: robotSelectors.getLabware(state),
-  }
 }

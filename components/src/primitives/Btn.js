@@ -18,7 +18,8 @@ const BUTTON_BASE_STYLE = css`
   background-color: transparent;
   cursor: pointer;
 
-  &:disabled {
+  &:disabled,
+  &.disabled {
     cursor: default;
   }
 `
@@ -26,6 +27,7 @@ const BUTTON_BASE_STYLE = css`
 const BUTTON_VARIANT_STYLE = css`
   border-color: inherit;
   border-radius: ${Styles.BORDER_RADIUS_DEFAULT};
+  display: ${Styles.DISPLAY_INLINE_BLOCK};
   font-size: ${Styles.FONT_SIZE_BODY_2};
   font-weight: ${Styles.FONT_WEIGHT_SEMIBOLD};
   line-height: 1.4;
@@ -33,6 +35,7 @@ const BUTTON_VARIANT_STYLE = css`
   padding-right: ${Styles.SPACING_4};
   padding-top: ${Styles.SPACING_2};
   padding-bottom: ${Styles.SPACING_2};
+  text-align: ${Styles.TEXT_ALIGN_CENTER};
   text-transform: ${Styles.TEXT_TRANSFORM_UPPERCASE};
 `
 
@@ -75,7 +78,8 @@ export const PrimaryBtn: BtnComponent = styled(Btn)`
     background-color: ${Styles.C_MED_DARK_GRAY};
   }
 
-  &:disabled {
+  &:disabled,
+  &.disabled {
     background-color: ${Styles.C_LIGHT_GRAY};
     color: ${Styles.C_MED_GRAY};
     box-shadow: none;
@@ -103,7 +107,8 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
     background-color: ${Styles.C_MED_LIGHT_GRAY};
   }
 
-  &:disabled {
+  &:disabled,
+  &.disabled {
     background-color: ${Styles.C_WHITE};
     color: ${Styles.C_MED_GRAY};
   }
@@ -128,7 +133,8 @@ export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
     background-color: ${Styles.OVERLAY_WHITE_20};
   }
 
-  &:disabled {
+  &:disabled,
+  &.disabled {
     background-color: ${Styles.C_TRANSPARENT};
     color: ${Styles.C_MED_GRAY};
   }

@@ -14,8 +14,5 @@ export const getDeckCalibrationStatus = (
   state: State,
   robotName: string
 ): DeckCalibrationStatus | null => {
-  return (
-    state.calibration[robotName]?.calibrationStatus.deckCalibration.status ??
-    null
-  )
+  return getCalibrationStatus(state, robotName)?.deckCalibration.status ?? null
 }
