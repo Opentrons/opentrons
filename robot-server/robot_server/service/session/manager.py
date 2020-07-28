@@ -13,7 +13,7 @@ from robot_server.service.session.models import IdentifierType, SessionType
 from robot_server.service.session.session_types import (
     NullSession, CheckSession, SessionMetaData, TipLengthCalibration,
     DeckCalibrationSession, DefaultSession)
-from robot_server.service.session.session_types.protocol_session import \
+from robot_server.service.session.session_types.protcol.session import \
     ProtocolSession
 
 log = logging.getLogger(__name__)
