@@ -13,13 +13,13 @@ from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK,
     STANDARD_DECK
 )
-from robot_server.robot.calibration.tip_length.state_machine import (
+from .state_machine import (
     TipCalibrationStateMachine
 )
-from robot_server.robot.calibration.tip_length.util import (
-    TipCalibrationError as Error
+from .util import (
+    TipCalibrationException as Error, TipCalibrationErrors as Errors
 )
-from robot_server.robot.calibration.tip_length.constants import (
+from .constants import (
     TipCalibrationState as State,
     TRASH_WELL,
     TIP_RACK_SLOT,
@@ -28,7 +28,7 @@ from robot_server.robot.calibration.tip_length.constants import (
     MOVE_TO_REF_POINT_SAFETY_BUFFER,
     TRASH_REF_POINT_OFFSET
 )
-from robot_server.robot.calibration.tip_length.models import (
+from .models import (
     RequiredLabware,
     AttachedPipette
 )
@@ -58,10 +58,10 @@ class TipCalibrationUserFlow():
         self._has_calibration_block = has_calibration_block
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
-            raise Error(f'No pipette found on {mount} mount,'
-                        'cannot run tip length calibration')
+            raise Error(Errors.NO_PIPETTE, mount)
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
+
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
@@ -230,7 +230,8 @@ class TipCalibrationUserFlow():
                                 self._deck.position_for(TIP_RACK_SLOT))
         else:
             raise Error(
-                    f'No tiprack found for pipette {self._hw_pipette.model}')
+                Errors.NO_KNOWN_TIPRACK,
+                self._hw_pipette.model)
 
     def _get_alt_tip_racks(self) -> Set[str]:
         pip_vol = self._hw_pipette.config.max_volume
