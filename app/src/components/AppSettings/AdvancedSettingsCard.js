@@ -25,6 +25,8 @@ const ENABLE_DEV_TOOLS_LABEL = 'Enable Developer Tools'
 const ENABLE_DEV_TOOLS_BODY =
   "Requires restart. Turns on the app's developer tools, which provide access to the inner workings of the app and additional logging."
 
+const DEV_TITLE = 'Developer Only (unstable)'
+
 type Props = {|
   checkUpdate: () => void,
 |}
@@ -52,45 +54,50 @@ export function AdvancedSettingsCard(props: Props): React.Node {
   React.useEffect(props.checkUpdate, [channel])
 
   return (
-    <Card title={TITLE}>
-      {devInternalFlags?.enableCalibrationOverhaul &&
-        useTrashSurfaceForTipCal != null && (
-          <LabeledToggle
-            data-test="useTrashSurfaceForTipCalToggle"
-            label={USE_TRASH_SURFACE_TIP_CAL_LABEL}
-            toggledOn={useTrashSurfaceForTipCal}
-            onClick={toggleUseTrashForTipCal}
-          >
-            <p>{USE_TRASH_SURFACE_TIP_CAL_BODY}</p>
-          </LabeledToggle>
-        )}
-      <LabeledSelect
-        data-test="updateChannelSetting"
-        label={UPDATE_CHANNEL_LABEL}
-        value={channel}
-        options={channelOptions}
-        onChange={handleChannel}
-      >
-        <p>{UPDATE_CHANNEL_BODY}</p>
-      </LabeledSelect>
-      <LabeledToggle
-        data-test="enableDevToolsToggle"
-        label={ENABLE_DEV_TOOLS_LABEL}
-        toggledOn={devToolsOn}
-        onClick={toggleDevtools}
-      >
-        <p>{ENABLE_DEV_TOOLS_BODY}</p>
-      </LabeledToggle>
-      {devToolsOn &&
-        Config.DEV_INTERNAL_FLAGS.map(flag => (
-          <LabeledToggle
-            key={flag}
-            data-test={`devInternalToggle${flag}`}
-            label={`__DEV__ ${startCase(flag)}`}
-            toggledOn={Boolean(devInternalFlags?.[flag])}
-            onClick={() => toggleDevInternalFlag(flag)}
-          />
-        ))}
-    </Card>
+    <>
+      <Card title={TITLE}>
+        {devInternalFlags?.enableCalibrationOverhaul &&
+          useTrashSurfaceForTipCal != null && (
+            <LabeledToggle
+              data-test="useTrashSurfaceForTipCalToggle"
+              label={USE_TRASH_SURFACE_TIP_CAL_LABEL}
+              toggledOn={useTrashSurfaceForTipCal}
+              onClick={toggleUseTrashForTipCal}
+            >
+              <p>{USE_TRASH_SURFACE_TIP_CAL_BODY}</p>
+            </LabeledToggle>
+          )}
+        <LabeledSelect
+          data-test="updateChannelSetting"
+          label={UPDATE_CHANNEL_LABEL}
+          value={channel}
+          options={channelOptions}
+          onChange={handleChannel}
+        >
+          <p>{UPDATE_CHANNEL_BODY}</p>
+        </LabeledSelect>
+        <LabeledToggle
+          data-test="enableDevToolsToggle"
+          label={ENABLE_DEV_TOOLS_LABEL}
+          toggledOn={devToolsOn}
+          onClick={toggleDevtools}
+        >
+          <p>{ENABLE_DEV_TOOLS_BODY}</p>
+        </LabeledToggle>
+      </Card>
+      {devToolsOn && (
+        <Card title={DEV_TITLE}>
+          {Config.DEV_INTERNAL_FLAGS.map(flag => (
+            <LabeledToggle
+              key={flag}
+              data-test={`devInternalToggle${flag}`}
+              label={`__DEV__ ${startCase(flag)}`}
+              toggledOn={Boolean(devInternalFlags?.[flag])}
+              onClick={() => toggleDevInternalFlag(flag)}
+            />
+          ))}
+        </Card>
+      )}
+    </>
   )
 }
