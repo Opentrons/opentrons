@@ -2,8 +2,6 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { StaticRouter } from 'react-router-dom'
-import { act } from 'react-dom/test-utils'
 
 import type { State } from '../../../types'
 import * as Config from '../../../config'
@@ -120,30 +118,24 @@ describe('AdvancedSettingsCard', () => {
   it('switching toggles dispatches toggle action', () => {
     getUseTrashSurfaceForTipCal.mockReturnValue(false)
     const wrapper = render()
-    act(() => {
-      getDevtoolsToggle(wrapper).invoke('onClick')()
-    })
+    getDevtoolsToggle(wrapper).invoke('onClick')()
     wrapper.update()
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining(Config.toggleConfigValue('devtools'))
     )
 
-    act(() => {
-      getUpdateChannelSelect(wrapper).invoke('onChange')({
-        target: { value: 'alpha' },
-      })
+    getUpdateChannelSelect(wrapper).invoke('onChange')({
+      target: { value: 'alpha' },
     })
     wrapper.update()
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       Config.updateConfigValue('update.channel', 'alpha')
     )
 
-    act(() => {
-      getUseTrashForTipCalToggle(wrapper).invoke('onClick')()
-    })
+    getUseTrashForTipCalToggle(wrapper).invoke('onClick')()
     wrapper.update()
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Config.toggleConfigValue('useTrashSurfaceForTipCal')
+      Config.toggleConfigValue('calibration.useTrashSurfaceForTipCal')
     )
   })
 

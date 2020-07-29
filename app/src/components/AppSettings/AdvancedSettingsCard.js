@@ -2,13 +2,13 @@
 // app info card with version and updated
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import type { ContextRouter } from 'react-router-dom'
 import startCase from 'lodash/startCase'
 import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
 import type { DropdownOption } from '@opentrons/components'
 import type { DevInternalFlag } from '../../config/types'
 import type { Dispatch } from '../../types'
 import * as Config from '../../config'
+import * as Calibration from '../../calibration'
 
 const TITLE = 'Advanced Settings'
 
@@ -42,7 +42,7 @@ export function AdvancedSettingsCard(props: Props): React.Node {
   const dispatch = useDispatch<Dispatch>()
 
   const toggleUseTrashForTipCal = () =>
-    dispatch(Config.toggleUseTrashSurfaceForTipCal())
+    dispatch(Calibration.toggleUseTrashSurfaceForTipCal())
   const toggleDevtools = () => dispatch(Config.toggleDevtools())
   const toggleDevInternalFlag = (flag: DevInternalFlag) =>
     dispatch(Config.toggleDevInternalFlag(flag))

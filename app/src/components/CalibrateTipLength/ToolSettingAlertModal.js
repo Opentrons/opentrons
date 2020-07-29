@@ -16,7 +16,7 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 
-import { setUseTrashSurfaceForTipCal } from '../../config'
+import { setUseTrashSurfaceForTipCal } from '../../calibration'
 import styles from './styles.css'
 import { labwareImages } from './labwareImages'
 import { Portal } from '../portal'
@@ -51,18 +51,18 @@ export function ToolSettingAlertModal(props: Props): React.Node {
   )
   const dispatch = useDispatch()
 
-  const handleUseTrashSurface = React.useCallback(() => {
+  const handleUseTrashSurface = () => {
     if (rememberPreference) {
       dispatch(setUseTrashSurfaceForTipCal(true))
     }
     setHasBlock(false)
-  }, [rememberPreference, setHasBlock, dispatch])
-  const handleUseBlock = React.useCallback(() => {
+  }
+  const handleUseBlock = () => {
     if (rememberPreference) {
       dispatch(setUseTrashSurfaceForTipCal(false))
     }
     setHasBlock(true)
-  }, [rememberPreference, setHasBlock, dispatch])
+  }
 
   return (
     <Portal>

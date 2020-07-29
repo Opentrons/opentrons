@@ -67,16 +67,6 @@ export const configValueUpdated = (
   payload: { path, value },
 })
 
-export function toggleUseTrashSurfaceForTipCal(): Types.ToggleConfigValueAction {
-  return toggleConfigValue('useTrashSurfaceForTipCal')
-}
-
-export function setUseTrashSurfaceForTipCal(
-  shouldUseTrashSurface: boolean
-): Types.UpdateConfigValueAction {
-  return updateConfigValue('useTrashSurfaceForTipCal', shouldUseTrashSurface)
-}
-
 export function toggleDevtools(): Types.ToggleConfigValueAction {
   return toggleConfigValue('devtools')
 }

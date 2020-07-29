@@ -18,7 +18,7 @@ export const getUpdateChannel = (state: State): UpdateChannel => {
 }
 
 export const getUseTrashSurfaceForTipCal = (state: State): boolean | null => {
-  return state.config?.useTrashSurfaceForTipCal ?? null
+  return state.config?.calibration.useTrashSurfaceForTipCal ?? null
 }
 
 const UPDATE_CHANNEL_OPTS = [
