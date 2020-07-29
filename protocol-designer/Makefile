@@ -6,6 +6,8 @@ SHELL := bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
+benchmark_output := $(shell node -e 'console.log(new Date());')
+
 # standard targets
 #####################################################################
 
@@ -31,6 +33,13 @@ build:
 
 # development
 #####################################################################
+
+.PHONY: benchmarks
+benchmarks: export NODE_ENV := test
+benchmarks:
+	shx mkdir -p benchmarks/output
+	node ../scripts/runBenchmarks "./benchmarks/*.js" | \
+	ntee "./benchmarks/output/$(benchmark_output)"
 
 .PHONY: dev
 dev: export NODE_ENV := development

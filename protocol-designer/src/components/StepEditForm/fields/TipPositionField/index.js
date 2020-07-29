@@ -9,13 +9,17 @@ import {
   type UseHoverTooltipResult,
 } from '@opentrons/components'
 import { getWellsDepth } from '@opentrons/shared-data'
+import {
+  getIsTouchTipField,
+  getIsDelayPositionField,
+} from '../../../../form-types'
 import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledFields } from '../../../../steplist/formLevel'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './TipPositionInput.css'
 import { TipPositionModal } from './TipPositionModal'
-import { getIsTouchTipField } from '../../../../form-types'
+
 import { getDefaultMmFromBottom } from './utils'
 import type { BaseState } from '../../../../types'
 import type { StepFieldName, TipOffsetFields } from '../../../../form-types'
@@ -26,8 +30,10 @@ function getLabwareFieldForPositioningField(
   const fieldMap: { [TipOffsetFields]: StepFieldName } = {
     aspirate_mmFromBottom: 'aspirate_labware',
     aspirate_touchTip_mmFromBottom: 'aspirate_labware',
+    aspirate_delay_tip_position: 'aspirate_labware',
     dispense_mmFromBottom: 'dispense_labware',
     dispense_touchTip_mmFromBottom: 'dispense_labware',
+    dispense_delay_tip_position: 'dispense_labware',
     mix_mmFromBottom: 'labware',
     mix_touchTip_mmFromBottom: 'labware',
   }
@@ -58,7 +64,7 @@ function TipPositionInput(props: Props) {
 
   const { disabled, fieldName, mmFromBottom, wellDepthMm } = props
   const isTouchTipField = getIsTouchTipField(props.fieldName)
-
+  const isDelayPositionField = getIsDelayPositionField(props.fieldName)
   let value = ''
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
@@ -86,6 +92,7 @@ function TipPositionInput(props: Props) {
         targetProps={targetProps}
         disabled={disabled}
         isTouchTipField={isTouchTipField}
+        isDelayPositionField={isDelayPositionField}
       >
         <InputField
           className={props.className || stepFormStyles.small_field}
@@ -99,15 +106,16 @@ function TipPositionInput(props: Props) {
   )
 }
 
-type WrapperProps = {
+type WrapperProps = {|
   isTouchTipField: boolean,
+  isDelayPositionField: boolean,
   children: React.Node,
   disabled: boolean,
   targetProps: $ElementType<UseHoverTooltipResult, 0>,
-}
+|}
 
 const Wrapper = (props: WrapperProps) =>
-  props.isTouchTipField ? (
+  props.isTouchTipField || props.isDelayPositionField ? (
     <div {...props.targetProps}>{props.children}</div>
   ) : (
     <span {...props.targetProps}>

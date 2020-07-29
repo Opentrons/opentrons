@@ -15,6 +15,9 @@ stages:
           type: Session
           attributes:
             sessionType: tipLengthCalibration
+            createParams:
+              mount: left
+              hasCalibrationBlock: true
     response:
       status_code: 201
       save:
@@ -38,7 +41,9 @@ stages:
               currentStep: sessionStarted
               instrument: !anydict
               labware: !anylist
-            createParams: null
+            createParams:
+              mount: left
+              hasCalibrationBlock: true
 
   - name: Load labware
     request:
@@ -66,6 +71,18 @@ stages:
             completedAt: *dt
             data: {}
 
+  - name: Attempt conflicting command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.pickUpTip
+            data: {}
+    response:
+      status_code: 409
 
   - name: Delete the session
     request:

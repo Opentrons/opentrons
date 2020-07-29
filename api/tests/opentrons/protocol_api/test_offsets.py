@@ -11,7 +11,8 @@ from opentrons.calibration_storage import (
     get,
     helpers,
     delete,
-    encoder_decoder as ed)
+    encoder_decoder as ed,
+    types as cs_types)
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 
@@ -198,6 +199,30 @@ def test_add_index_file(monkeypatch, clear_tlc_calibration):
 
     modify._append_to_index_tip_length_file('pip_2', 'lw_2')
     assert get_result() == {'lw_1': ['pip_1', 'pip_2'], 'lw_2': ['pip_2']}
+
+
+def test_load_nonexistent_tip_length_calibration_data(
+        monkeypatch, clear_tlc_calibration):
+    assert not os.path.exists(tlc_path(PIPETTE_ID))
+
+    # file does not exist (FileNotFoundError)
+    with pytest.raises(cs_types.TipLengthCalNotFound):
+        result = get.load_tip_length_calibration(
+            PIPETTE_ID, minimalLabwareDef, '')
+
+    # labware hash not in calibration file (KeyError)
+    calpath = config.get_tip_length_cal_path()
+    with open(calpath/f'{PIPETTE_ID}.json', 'w') as offset_file:
+        test_offset = {
+            'FAKE_HASH': {
+                'tipLength': 22.0,
+                'lastModified': 1
+            }
+        }
+        json.dump(test_offset, offset_file)
+    with pytest.raises(cs_types.TipLengthCalNotFound):
+        result = get.load_tip_length_calibration(
+            PIPETTE_ID, minimalLabwareDef, '')
 
 
 def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):

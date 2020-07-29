@@ -2,13 +2,13 @@
 import * as React from 'react'
 
 // TODO(mc, 2018-09-13): these aren't cards; rename
+import { Box, OVERFLOW_AUTO, SPACING_4, SPACING_2 } from '@opentrons/components'
 import { InformationCard } from './InformationCard'
 import { ProtocolPipettesCard } from './ProtocolPipettesCard'
 import { ProtocolModulesCard } from './ProtocolModulesCard'
 import { ProtocolLabwareCard } from './ProtocolLabwareCard'
 import { Continue } from './Continue'
 import { UploadError } from '../UploadError'
-import styles from './styles.css'
 
 import type { Robot } from '../../discovery/types'
 
@@ -30,13 +30,17 @@ export function FileInfo(props: FileInfoProps): React.Node {
   }
 
   return (
-    <div className={styles.file_info_container}>
+    <Box
+      overflowY={OVERFLOW_AUTO}
+      paddingX={`calc(${SPACING_4} - ${SPACING_2})`}
+      paddingBottom={SPACING_2}
+    >
       <InformationCard />
       <ProtocolPipettesCard robotName={robot.name} />
       <ProtocolModulesCard robot={robot} />
-      <ProtocolLabwareCard />
+      <ProtocolLabwareCard robotName={robot.name} />
       {uploadError && <UploadError uploadError={uploadError} />}
       {sessionLoaded && !uploadError && <Continue />}
-    </div>
+    </Box>
   )
 }

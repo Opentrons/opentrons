@@ -76,7 +76,7 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
           </Text>
         </Box>
       </Flex>
-      <div className={styles.button_row}>
+      <Flex width="100%">
         <PrimaryButton
           onClick={() =>
             sendSessionCommand(Sessions.tipCalCommands.LOAD_LABWARE)
@@ -85,7 +85,7 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
         >
           {CONTINUE}
         </PrimaryButton>
-      </div>
+      </Flex>
     </>
   )
 }

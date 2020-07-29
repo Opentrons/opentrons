@@ -58,8 +58,8 @@ describe('SourceDestFields', () => {
         expect(checkboxes.at(0).prop('name')).toBe('preWetTip')
         expect(checkboxes.at(1).prop('name')).toBe('aspirate_mix_checkbox')
         expect(checkboxes.at(2).prop('name')).toBe('aspirate_delay_checkbox')
-        expect(checkboxes.at(3).prop('name')).toBe('aspirate_airGap_checkbox')
-        expect(checkboxes.at(4).prop('name')).toBe('aspirate_touchTip_checkbox')
+        expect(checkboxes.at(3).prop('name')).toBe('aspirate_touchTip_checkbox')
+        expect(checkboxes.at(4).prop('name')).toBe('aspirate_airGap_checkbox')
       })
     })
     describe('When air gap/delay FF is off', () => {

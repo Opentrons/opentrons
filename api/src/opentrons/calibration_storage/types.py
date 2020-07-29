@@ -47,6 +47,8 @@ class ParentOptions:
     a module, as well the original parent (slot).
     As of now, the slot is not saved in association
     with labware calibrations.
+
+    The slot value will be the empty string.
     """
     slot: str
     module: str = ''

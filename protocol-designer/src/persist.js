@@ -82,6 +82,11 @@ export const setLocalStorageItem = (path: string, value: any) => {
   }
 }
 
+export const getPrereleaseFeatureFlag = (value: string): boolean => {
+  const ffData: any = getLocalStorageItem('featureFlags.flags')
+  return Boolean(ffData?.[value])
+}
+
 /** Subscribe this fn to the Redux store to persist selected substates */
 type PersistSubscriber = () => void
 export const makePersistSubscriber = (

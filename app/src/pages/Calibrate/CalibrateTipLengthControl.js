@@ -35,7 +35,7 @@ export function CalibrateTipLengthControl({
   const [dispatch, requestIds] = RobotApi.useDispatchApiRequest()
 
   //  TODO: store saved cal block preference in app config and grab value
-  const [hasCalBlock, setHasCalBlock] = React.useState(null)
+  const hasCalBlock = React.useRef<boolean | null>(null)
 
   const requestState = useSelector((state: State) => {
     const reqId = last(requestIds) ?? null
@@ -63,27 +63,38 @@ export function CalibrateTipLengthControl({
   })
 
   const ensureSession = React.useCallback(() => {
+    if (hasCalBlock.current === null) return
     dispatch(
       Sessions.ensureSession(
         robotName,
-        Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+        Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+        { mount, hasCalibrationBlock: hasCalBlock.current }
       )
     )
-  }, [dispatch, robotName])
+  }, [dispatch, robotName, hasCalBlock, mount])
 
   const handleStart = React.useCallback(() => {
-    if (hasCalBlock !== null) {
+    if (hasCalBlock.current !== null) {
       ensureSession()
     } else {
       setShowCalBlockPrompt(true)
     }
   }, [hasCalBlock, ensureSession])
 
+  const setHasBlock = React.useCallback(
+    (hasCalibrationBlock: boolean) => {
+      hasCalBlock.current = hasCalibrationBlock
+      handleStart()
+      setShowCalBlockPrompt(false)
+    },
+    [hasCalBlock, handleStart]
+  )
+
   return (
     <>
       <CalibrationInfoBox
         confirmed={hasCalibrated}
-        title={`${mount} pipette calibration`}
+        title={`${mount} pipette tip length calibration`}
       >
         <UncalibratedInfo
           requestStatus={requestStatus}
@@ -93,22 +104,16 @@ export function CalibrateTipLengthControl({
       </CalibrationInfoBox>
       {showCalBlockPrompt && (
         <Portal>
-          <ToolSettingAlertModal
-            setHasCalBlock={setHasCalBlock}
-            close={() => {
-              ensureSession()
-              setShowCalBlockPrompt(false)
-            }}
-          />
+          <ToolSettingAlertModal setHasBlock={setHasBlock} />
         </Portal>
       )}
-      {showWizard && hasCalBlock !== null && (
+      {showWizard && hasCalBlock.current !== null && (
         <Portal>
           <CalibrateTipLength
             robotName={robotName}
             session={tipLengthCalibrationSession}
             closeWizard={() => setShowWizard(false)}
-            hasBlock={hasCalBlock}
+            hasBlock={hasCalBlock.current}
           />
         </Portal>
       )}

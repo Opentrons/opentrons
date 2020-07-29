@@ -3,8 +3,8 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
-import { actions as robotActions } from '../../robot'
-import { getAllRobots, CONNECTABLE } from '../../discovery'
+import { actions as robotActions, selectors as robotSel } from '../../robot'
+import { getConnectedRobot, CONNECTABLE } from '../../discovery'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 import { ModalCopy } from './ModalCopy'
@@ -17,13 +17,14 @@ export function LostConnectionAlert(): React.Node {
 
   // TODO(mc, 2020-05-07): move LostConnectionAlert into `state.alerts`
   const showAlert = useSelector((state: State) => {
-    // search _all_ robots, not just connectable ones, in case we were connected
-    // and then robot became not connectable
-    const robot = getAllRobots(state).find(r => r.connected)
-    const robotDown = robot?.status !== CONNECTABLE
+    const connectedName = robotSel.getConnectedRobotName(state)
+    const connectedRobot = getConnectedRobot(state)
+    const robotDown = connectedRobot?.status !== CONNECTABLE
     const unexpectedDisconnect = state.robot.connection.unexpectedDisconnect
 
-    return Boolean(robot && robotDown && unexpectedDisconnect)
+    // trigger an alert if we're supposed to be connected but the robot is down
+    // or if the WebSocket closed unexpectedly
+    return Boolean((connectedName && robotDown) || unexpectedDisconnect)
   })
 
   const disconnect = () => {

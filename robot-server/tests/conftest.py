@@ -6,10 +6,11 @@ import os
 import shutil
 from unittest.mock import MagicMock
 
+from fastapi import routing
 import pytest
 from starlette.testclient import TestClient
 from robot_server.service.app import app
-from robot_server.service.dependencies import get_hardware
+from robot_server.service.dependencies import get_hardware, verify_hardware
 from opentrons.hardware_control import API, HardwareAPILike
 from opentrons import config
 
@@ -19,20 +20,45 @@ from opentrons.types import Point
 from opentrons.protocol_api.geometry import Deck
 
 
+test_router = routing.APIRouter()
+
+
+@test_router.get('/alwaysRaise')
+async def always_raise():
+    raise RuntimeError
+
+app.include_router(test_router)
+
+
 @pytest.fixture
 def hardware():
     return MagicMock(spec=API)
 
 
 @pytest.fixture
-def api_client(hardware) -> TestClient:
+def override_hardware(hardware):
 
     async def get_hardware_override() -> HardwareAPILike:
         """Override for get_hardware dependency"""
         return hardware
 
+    async def verify_hardware_override():
+        pass
+
+    app.dependency_overrides[verify_hardware] = verify_hardware_override
     app.dependency_overrides[get_hardware] = get_hardware_override
+
+
+@pytest.fixture
+def api_client(override_hardware) -> TestClient:
     return TestClient(app)
+
+
+@pytest.fixture
+def api_client_no_errors(override_hardware) -> TestClient:
+    """ An API client that won't raise server exceptions.
+    Use only to test 500 pages; never use this for other tests. """
+    return TestClient(app, raise_server_exceptions=False)
 
 
 @pytest.fixture(scope="session")

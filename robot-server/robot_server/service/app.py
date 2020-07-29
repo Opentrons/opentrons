@@ -1,7 +1,8 @@
 import logging
+import traceback
 
 from opentrons import __version__
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Depends
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, JSONResponse
 from starlette.requests import Request
@@ -13,13 +14,16 @@ from robot_server.service.legacy.models import V1BasicResponse
 from .errors import V1HandlerError, \
     transform_http_exception_to_json_api_errors, \
     transform_validation_error_to_json_api_errors, \
-    consolidate_fastapi_response, RobotServerError, ErrorResponse
-from .dependencies import get_rpc_server
+    consolidate_fastapi_response, RobotServerError, ErrorResponse, \
+    build_unhandled_exception_response
+from .dependencies import get_rpc_server, get_protocol_manager, api_wrapper, \
+    verify_hardware
 from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
 from robot_server.service.access.router import router as access_router
 from robot_server.service.session.router import router as session_router
 from robot_server.service.labware.router import router as labware_router
+from robot_server.service.protocol.router import router as protocol_router
 
 
 log = logging.getLogger(__name__)
@@ -47,11 +51,14 @@ app.include_router(router=legacy_routes,
 # New v2 routes
 routes = APIRouter()
 routes.include_router(router=session_router,
-                      tags=["Session Management"])
+                      tags=["Session Management"],
+                      dependencies=[Depends(verify_hardware)])
 routes.include_router(router=access_router,
                       tags=["Access Control"])
 routes.include_router(router=labware_router,
                       tags=["Labware Calibration Management"])
+routes.include_router(router=protocol_router,
+                      tags=["Protocol Management"])
 
 app.include_router(router=routes,
                    responses={
@@ -65,6 +72,8 @@ app.include_router(router=routes,
 async def on_startup():
     """App startup handler"""
     initialize_logging()
+    # Initialize api
+    api_wrapper.async_initialize()
 
 
 @app.on_event("shutdown")
@@ -72,6 +81,8 @@ async def on_shutdown():
     """App shutdown handler"""
     s = await get_rpc_server()
     await s.on_shutdown()
+    # Remove all uploaded protocols
+    get_protocol_manager().remove_all()
 
 
 @app.middleware("http")
@@ -102,6 +113,7 @@ async def robot_server_exception_handler(request: Request,
     """Catch robot server exceptions"""
     if not exc.error.status:
         exc.error.status = str(exc.status_code)
+    log.error(f"RobotServerError: {exc.error}")
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(errors=[exc.error]).dict(exclude_unset=True)
@@ -112,6 +124,7 @@ async def robot_server_exception_handler(request: Request,
 async def v1_exception_handler(request: Request, exc: V1HandlerError) \
         -> JSONResponse:
     """Catch legacy errors"""
+    log.error(f"V1HandlerError: {exc.status_code}: {exc.message}")
     return JSONResponse(
         status_code=exc.status_code,
         content=V1BasicResponse(message=exc.message).dict()
@@ -160,6 +173,18 @@ async def custom_http_exception_handler(
     return JSONResponse(
         status_code=exception.status_code,
         content=response,
+    )
+
+
+@app.exception_handler(Exception)
+async def unexpected_exception_handler(request: Request, exc: Exception) \
+          -> JSONResponse:
+    """ Log unhandled errors (reraise always)"""
+    log.error(f'Unhandled exception: {traceback.format_exc()}')
+    return JSONResponse(
+        status_code=500,
+        content=build_unhandled_exception_response(exc).dict(
+            exclude_unset=True),
     )
 
 

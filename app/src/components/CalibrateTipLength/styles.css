@@ -6,24 +6,6 @@
   color: var(--c-success);
 }
 
-.modal_header {
-  display: flex;
-  text-transform: uppercase;
-}
-
-.modal_icon_wrapper {
-  display: flex;
-  align-items: center;
-}
-
-.tiplengthcal_intro_div {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
 .intro_header {
   @apply --font-header-dark;
 
@@ -37,18 +19,8 @@
   margin-bottom: 1.5rem;
 }
 
-.button_spacer {
-  width: 0.875rem;
-  height: 1rem;
-}
-
 .alert_modal_padding {
   padding: 4rem 1rem;
-}
-
-.intro_settings_note {
-  font-size: var('--fs-body-1');
-  padding: 0 1.75rem;
 }
 
 .terminal_modal_contents,
@@ -74,66 +46,8 @@
   margin: 2rem 0;
 }
 
-.summary_section {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  height: 3rem;
-  width: 10.25rem;
-  padding: 0.75rem;
-  margin-right: 1rem;
-  border-radius: var(--bd-radius-default);
-  border-width: var(--bd-width-default);
-  border-style: solid;
-}
-
-.summary_section:last-child {
-  margin-right: 0;
-}
-
-.summary_icon {
-  height: 1.25rem;
-  width: 1.25rem;
-}
-
-.copy_icon {
-  height: 2rem;
-  width: 2rem;
-  margin-bottom: 2rem;
-}
-
-.error_explanation {
-  @apply --font-body-2-dark;
-
-  margin: 0.75rem 0;
-}
-
-.padded_contents_wrapper {
-  margin: 1rem 3rem;
-}
-
-.button_row {
-  width: 100%;
-  display: flex;
-}
-
-.button_stack {
-  margin: 1rem 0;
-}
-
-.button_stack > button {
-  margin: 0.5rem 0;
-}
-
 .continue_button {
   margin: 1.5rem 5rem 1rem;
-}
-
-.required_block {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
 }
 
 .block_image {
@@ -251,22 +165,6 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   justify-content: flex-end;
 }
 
-.labware_ui_content {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-
-.name_overlay {
-  font-size: 0.5rem;
-  color: var(--c-font-light);
-  background-color: color-mod(var(--c-black) alpha(0.75));
-  padding: 0.25rem;
-  border-radius: 0 0 3px 3px;
-}
-
 .display_name {
   @apply --truncate;
 
@@ -275,39 +173,8 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   text-transform: uppercase;
 }
 
-.tip_pick_up_demo_wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid var(--c-lightest-gray);
-  padding: 1rem 0;
-  margin-top: 1rem;
-  text-align: center;
-}
-
-.tip_pick_up_demo_body {
-  @apply --font-body-2-dark;
-
-  margin: 0 1rem;
-}
-
 .command_button {
   margin: 0 5rem;
-}
-
-.tip_pick_up_confirmation_wrapper {
-  align-self: stretch;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 1rem;
-}
-
-.pick_up_tip_confirmation_body {
-  margin: 1rem 0;
 }
 
 .pick_up_tip_confirmation_button {
@@ -316,7 +183,7 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 }
 
 .step_check_video_wrapper {
-  margin-top: 1rem;
+  margin-left: 1rem;
 }
 
 .step_check_video {

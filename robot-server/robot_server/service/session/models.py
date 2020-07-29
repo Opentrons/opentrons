@@ -36,7 +36,11 @@ class JogPosition(BaseModel):
 class SessionType(str, Enum):
     """The available session types"""
     def __new__(cls, value, create_param_model=type(None)):
-        """Create a session type enum with the optional create param model"""
+        """Create a session type enum with the optional create param model
+
+        IMPORTANT: Model definition must appear in SessionCreateParamType
+        Union below.
+        """
         obj = str.__new__(cls, value)
         obj._value_ = value
         obj._model = create_param_model
@@ -45,7 +49,10 @@ class SessionType(str, Enum):
     null = 'null'
     default = 'default'
     calibration_check = 'calibrationCheck'
-    tip_length_calibration = 'tipLengthCalibration'
+    tip_length_calibration = (
+        'tipLengthCalibration',
+        tip_length_calibration_models.SessionCreateParams
+    )
 
     @property
     def model(self):
@@ -53,10 +60,26 @@ class SessionType(str, Enum):
         return self._model
 
 
+"""
+IMPORTANT: Models in this Union should be sorted by specificity. If model A
+has `name`, `type` attributes and model B has just `name`, then model A must
+come first.
+
+Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
+
+When we move to Python 3.8 we can use Literal type as described here
+https://pydantic-docs.helpmanual.io/usage/types/#literal-type
+"""
 SessionCreateParamType = typing.Union[
+    tip_length_calibration_models.SessionCreateParams,
     None, EmptyModel
 ]
 
+"""
+IMPORTANT: See note for SessionCreateParamType
+
+Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
+"""
 SessionDetails = typing.Union[
     calibration_check_models.CalibrationSessionStatus,
     tip_length_calibration_models.TipCalibrationSessionStatus,
@@ -73,7 +96,11 @@ class CommandStatus(str, Enum):
 
 class CommandDefinition(str, Enum):
     def __new__(cls, value, model=EmptyModel):
-        """Create a string enum with the expected model"""
+        """Create a string enum with the expected model
+
+        IMPORTANT: Model definition must appear in CommandDataType
+        Union below.
+        """
         namespace = cls.namespace()
         full_name = f"{namespace}.{value}" if namespace else value
         obj = str.__new__(cls, full_name)
@@ -151,6 +178,11 @@ class TipLengthCalibrationCommand(CommandDefinition):
         return "calibration.tipLength"
 
 
+"""
+IMPORTANT: See note for SessionCreateParamType
+
+Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
+"""
 CommandDataType = typing.Union[
     JogPosition,
     EmptyModel

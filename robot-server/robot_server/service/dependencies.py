@@ -1,27 +1,39 @@
 from functools import lru_cache
 
-from fastapi import Depends
+from starlette import status
+from fastapi import Depends, HTTPException
 from opentrons.api import MainRouter
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
+from robot_server.hardware_wrapper import HardwareWrapper
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.legacy.rpc import RPCServer
-from . import HARDWARE_APP_KEY
 
 
 # The single instance of the RPCServer
+from .protocol.manager import ProtocolManager
+
 _rpc_server_instance = None
 
 # The single instance of the SessionManager
 _session_manager_inst = None
 
+api_wrapper = HardwareWrapper()
+
+
+async def verify_hardware():
+    """
+    A dependency that raises an http exception if hardware is not ready. Must
+    only be used in PATH operation.
+    """
+    if not api_wrapper.get_hardware():
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                            detail="Robot is not ready for request")
+
 
 async def get_hardware() -> ThreadManager:
     """Hardware dependency"""
-    from .app import app
-    # todo Amit 2/11/2020. This function should create and return a singleton
-    #  hardware interface.
-    return app.extra[HARDWARE_APP_KEY]  # type: ignore
+    return api_wrapper.get_hardware()
 
 
 @lru_cache(maxsize=1)
@@ -51,3 +63,9 @@ def get_session_manager(hardware: ThreadManager = Depends(get_hardware)) \
     if not _session_manager_inst:
         _session_manager_inst = SessionManager(hardware=hardware)
     return _session_manager_inst
+
+
+@lru_cache(maxsize=1)
+def get_protocol_manager() -> ProtocolManager:
+    """The single protocol manager instance"""
+    return ProtocolManager()

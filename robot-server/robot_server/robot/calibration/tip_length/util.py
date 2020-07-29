@@ -6,6 +6,10 @@ class TipCalibrationError(Exception):
     pass
 
 
+class StateTransitionError(Exception):
+    pass
+
+
 TransitionMap = Dict[Any, Set[Dict[Any, Any]]]
 
 

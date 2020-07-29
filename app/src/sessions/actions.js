@@ -9,10 +9,11 @@ import type {
 
 export const createSession = (
   robotName: string,
-  sessionType: Types.SessionType
+  sessionType: Types.SessionType,
+  params: Types.SessionParams = {}
 ): Types.CreateSessionAction => ({
   type: Constants.CREATE_SESSION,
-  payload: { robotName, sessionType },
+  payload: { robotName, sessionType, params },
   meta: {},
 })
 
@@ -158,9 +159,10 @@ export const createSessionCommandFailure = (
 
 export const ensureSession = (
   robotName: string,
-  sessionType: Types.SessionType
+  sessionType: Types.SessionType,
+  params: Types.SessionParams = {}
 ): Types.EnsureSessionAction => ({
   type: Constants.ENSURE_SESSION,
-  payload: { robotName, sessionType },
+  payload: { robotName, sessionType, params },
   meta: {},
 })

@@ -36,7 +36,9 @@ def _format_calibration_type(
 def _format_parent(
         data: 'CalibrationIndexDict')\
             -> local_types.ParentOptions:
-    options = local_types.ParentOptions(slot=data['slot'])
+    # Since the slot is not saved and the data in the index is actually
+    # the labware hash to aid lookup, we erase it here.
+    options = local_types.ParentOptions(slot='')
     if data['module']:
         options.module = data['module']['parent']
     return options
@@ -80,7 +82,7 @@ def _get_tip_length_data(
         tip_length_data =\
             io.read_cal_file(str(pip_tip_length_path))
         return tip_length_data[labware_hash]
-    except (FileNotFoundError, AttributeError):
+    except (FileNotFoundError, KeyError):
         raise local_types.TipLengthCalNotFound(
             f'Tip length of {labware_load_name} has not been '
             f'calibrated for this pipette: {pip_id} and cannot'

@@ -10,7 +10,7 @@ from robot_server.service.json_api import Error, ResourceLink,\
     ResponseDataModel
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import SessionCreationException, \
-    SessionCommandException, SessionException
+    SessionCommandException, SessionException, CommandExecutionConflict
 from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session import models as route_models
 from robot_server.service.session.session_types import SessionMetaData
@@ -183,6 +183,15 @@ async def session_command_execute_handler(
                                  command_request.data.attributes.data)
         command_result = await session_obj.command_executor.execute(command)
         log.debug(f"Command completed {command}")
+    except CommandExecutionConflict as e:
+        log.exception("Failed to execute command due to conflict")
+        raise RobotServerError(
+            status_code=http_status_codes.HTTP_409_CONFLICT,
+            error=Error(
+                title="Command execution conflict",
+                detail=str(e),
+            )
+        )
     except SessionCommandException as e:
         log.exception("Failed to execute command")
         raise RobotServerError(

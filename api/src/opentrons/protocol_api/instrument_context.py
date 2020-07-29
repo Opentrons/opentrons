@@ -1,3 +1,4 @@
+from functools import lru_cache
 import logging
 from typing import (Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union)
 
@@ -5,9 +6,12 @@ from typing import (Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union)
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.config.feature_flags import enable_tip_length_calibration
+from opentrons.calibration_storage import get
+from opentrons.calibration_storage.types import TipLengthCalNotFound
 from .util import (
     FlowRates, PlungerSpeeds, Clearances,
-    clamp_value, requires_version, build_edges)
+    clamp_value, requires_version, build_edges, first_parent)
 from opentrons.protocols.types import APIVersion
 from .labware import (
     filter_tipracks_to_start, Labware, OutOfTipsError, quirks_from_any_parent,
@@ -738,16 +742,15 @@ class InstrumentContext(CommandPublisher):
               can be a :py:class:`.types.Location`; for instance, you can call
               `instr.drop_tip(tiprack.wells()[0].top())`.
 
-        .. note::
-
-            OT1 required homing the plunger after dropping tips, so the prior
-            version of `drop_tip` automatically homed the plunger. This is no
-            longer needed in OT2. If you need to home the plunger, use
-            :py:meth:`home_plunger`.
-
         :param location: The location to drop the tip
         :type location: :py:class:`.types.Location` or :py:class:`.Well` or
                         None
+        :param home_after: Whether to home the plunger after dropping the tip
+                           (defaults to ``True``). The plungeer must home after
+                           dropping tips because the ejector shroud that pops
+                           the tip off the end of the pipette is driven by the
+                           plunger motor, and may skip steps when dropping the
+                           tip.
 
         :returns: This instance
         """
@@ -1341,10 +1344,25 @@ class InstrumentContext(CommandPublisher):
         return '{} on {} mount'.format(self.hw_pipette['display_name'],
                                        self._mount.name.lower())
 
+    @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:
         """ Get the tip length, including overlap, for a tip from this rack """
-        tip_overlap = self.hw_pipette['tip_overlap'].get(
-            tiprack.uri,
-            self.hw_pipette['tip_overlap']['default'])
-        tip_length = tiprack.tip_length
-        return tip_length - tip_overlap
+
+        def _build_length_from_overlap() -> float:
+            tip_overlap = self.hw_pipette['tip_overlap'].get(
+                tiprack.uri,
+                self.hw_pipette['tip_overlap']['default'])
+            tip_length = tiprack.tip_length
+            return tip_length - tip_overlap
+
+        if not enable_tip_length_calibration():
+            return _build_length_from_overlap()
+        else:
+            try:
+                parent = first_parent(tiprack) or ''
+                return get.load_tip_length_calibration(
+                    self.hw_pipette['pipette_id'],
+                    tiprack._definition,
+                    parent)['tipLength']
+            except TipLengthCalNotFound:
+                return _build_length_from_overlap()

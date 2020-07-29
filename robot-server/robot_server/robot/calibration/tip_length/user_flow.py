@@ -1,6 +1,8 @@
+import logging
 from typing import Dict, Awaitable, Callable, Any, Set, List
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
+from opentrons.calibration_storage import modify
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import geometry, labware
@@ -19,15 +21,20 @@ from robot_server.robot.calibration.tip_length.util import (
 )
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState as State,
+    TRASH_WELL,
     TIP_RACK_SLOT,
     CAL_BLOCK_SETUP_BY_MOUNT,
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER,
+    MOVE_TO_REF_POINT_SAFETY_BUFFER,
+    TRASH_REF_POINT_OFFSET
 )
 from robot_server.robot.calibration.tip_length.models import (
     RequiredLabware,
     AttachedPipette
 )
 
+
+MODULE_LOG = logging.getLogger(__name__)
 
 """
 A collection of functions that allow a consumer to prepare and update
@@ -44,8 +51,8 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 class TipCalibrationUserFlow():
     def __init__(self,
                  hardware: ThreadManager,
-                 mount: Mount = Mount.LEFT,
-                 has_calibration_block=True):
+                 mount: Mount,
+                 has_calibration_block: bool):
         # TODO: require mount and has_calibration_block params
         self._hardware = hardware
         self._mount = mount
@@ -55,6 +62,7 @@ class TipCalibrationUserFlow():
             raise Error(f'No pipette found on {mount} mount,'
                         'cannot run tip length calibration')
         self._tip_origin_loc = None
+        self._nozzle_height_at_reference = None
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
@@ -116,32 +124,68 @@ class TipCalibrationUserFlow():
         """
         next_state = self._state_machine.get_next_state(self._current_state,
                                                         name)
+
         handler = self._command_map.get(name)
         if handler is not None:
             await handler(**data)
         self._set_current_state(next_state)
+        MODULE_LOG.debug(f'TipCalUserFlow handled command {name}, transitioned'
+                         f'from {self._current_state} to {next_state}')
 
-    async def load_labware(self, *args):
+    async def load_labware(self):
         pass
 
-    async def move_to_tip_rack(self, *args):
+    async def move_to_tip_rack(self):
         point = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
                 MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
         await self._move(to_loc)
 
-    async def move_to_reference_point(self, *args):
-        # TODO: move nozzle/tip to reference location (block || trash edge)
-        pass
+    async def move_to_reference_point(self):
+        to_loc = self._get_reference_point()
+        await self._move(to_loc)
 
-    async def save_offset(self, *args):
-        # TODO: save the current nozzle/tip offset here
-        pass
+    def _get_reference_point(self) -> Location:
+        if self._has_calibration_block:
+            slot = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['slot']
+            well = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['well']
+            calblock: labware.Labware = self._deck[slot]  # type: ignore
+            calblock_loc = calblock.wells_by_name()[well].top()
+            return calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)
+        else:
+            trash = self._deck.get_fixed_trash()
+            assert trash
+            trash_loc = trash.wells_by_name()[TRASH_WELL].top()
+            return trash_loc.move(TRASH_REF_POINT_OFFSET +
+                                  MOVE_TO_REF_POINT_SAFETY_BUFFER)
 
-    async def jog(self, vector, *args):
+    async def save_offset(self):
+        if self._current_state == State.measuringNozzleOffset:
+            cur_pt = await self._hardware.gantry_position(
+                self._mount, critical_point=CriticalPoint.FRONT_NOZZLE)
+            self._nozzle_height_at_reference = cur_pt.z
+        elif self._current_state == State.measuringTipOffset:
+            assert self._hw_pipette.has_tip
+            tip_length_offset = await self._calculate_tip_length()
+
+            # TODO: 07-22-2020 parent slot is not important when tracking
+            # tip length data, hence the empty string, we should remove it
+            # from create_tip_length_data in a refactor
+            tip_length_data = modify.create_tip_length_data(
+                self._deck[TIP_RACK_SLOT]._definition, '',
+                tip_length_offset)
+            modify.save_tip_length_calibration(self._hw_pipette.pipette_id,
+                                               tip_length_data)
+
+    async def _calculate_tip_length(self) -> float:
+        cur_pt = await self._hardware.gantry_position(
+            self._mount, critical_point=CriticalPoint.NOZZLE)
+        return cur_pt.z - self._nozzle_height_at_reference
+
+    async def jog(self, vector):
         await self._hardware.move_rel(self._mount, Point(*vector))
 
-    async def pick_up_tip(self, *args):
+    async def pick_up_tip(self):
         saved_default = None
         if self._hw_pipette.config.channels > 1:
             # reduce pick up current for multichannel pipette picking up 1 tip
@@ -165,11 +209,11 @@ class TipCalibrationUserFlow():
             self._hw_pipette.update_config_item('pick_up_current',
                                                 saved_default)
 
-    async def invalidate_tip(self, *args):
+    async def invalidate_tip(self):
         await self._return_tip()
         await self.move_to_tip_rack()
 
-    async def exit_session(self, *args):
+    async def exit_session(self):
         await self._return_tip()
 
     def _get_tip_rack_lw(self) -> labware.Labware:
@@ -197,7 +241,7 @@ class TipCalibrationUserFlow():
             self._deck.position_for(cb_setup['slot']))
 
     async def _return_tip(self):
-        if self._tip_origin_loc and self.hw_pipette.has_tip:
+        if self._tip_origin_loc and self._hw_pipette.has_tip:
             await self._move(self._tip_origin_loc)
             await self._hardware.drop_tip(self._mount)
             self._tip_origin_loc = None

@@ -46,3 +46,17 @@ def test_transform_http_exception_to_json_api_errors():
             'title': 'Bad Request',
         }]
     }
+
+
+def test_build_unhandled_exception_response():
+    exc = RuntimeError()
+    err = errors.build_unhandled_exception_response(
+        exc
+    ).dict(
+        exclude_unset=True
+    )
+    assert err == {
+        'errors': [{'status': '500',
+                    'detail': "Unhandled exception: <class 'RuntimeError'>",
+                    'title': 'Internal Server Error'}]
+    }
