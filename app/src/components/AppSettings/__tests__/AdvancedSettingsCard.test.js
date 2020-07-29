@@ -73,15 +73,9 @@ describe('AdvancedSettingsCard', () => {
     })
 
     render = () => {
-      const Wrapper = ({ children }: {| children: React.Node |}) => (
-        <Provider store={mockStore}>
-          <StaticRouter location="/" context={{}}>
-            {children}
-          </StaticRouter>
-        </Provider>
-      )
       return mount(<AdvancedSettingsCard checkUpdate={checkUpdate} />, {
-        wrappingComponent: Wrapper,
+        wrappingComponent: Provider,
+        wrappingComponentProps: { store: mockStore },
       })
     }
   })

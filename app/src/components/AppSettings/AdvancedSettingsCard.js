@@ -6,9 +6,9 @@ import type { ContextRouter } from 'react-router-dom'
 import startCase from 'lodash/startCase'
 import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
 import type { DropdownOption } from '@opentrons/components'
-import * as Config from '../../config'
 import type { DevInternalFlag } from '../../config/types'
 import type { Dispatch } from '../../types'
+import * as Config from '../../config'
 
 const TITLE = 'Advanced Settings'
 
@@ -41,23 +41,13 @@ export function AdvancedSettingsCard(props: Props): React.Node {
   )
   const dispatch = useDispatch<Dispatch>()
 
-  const toggleUseTrashForTipCal = React.useCallback(
-    () => dispatch(Config.toggleUseTrashSurfaceForTipCal()),
-    [dispatch]
-  )
-  const toggleDevtools = React.useCallback(
-    () => dispatch(Config.toggleDevtools()),
-    [dispatch]
-  )
-  const toggleDevInternalFlag = React.useCallback(
-    (flag: DevInternalFlag) => dispatch(Config.toggleDevInternalFlag(flag)),
-    [dispatch]
-  )
-  const handleChannel = React.useCallback(
-    event =>
-      dispatch(Config.updateConfigValue('update.channel', event.target.value)),
-    [dispatch]
-  )
+  const toggleUseTrashForTipCal = () =>
+    dispatch(Config.toggleUseTrashSurfaceForTipCal())
+  const toggleDevtools = () => dispatch(Config.toggleDevtools())
+  const toggleDevInternalFlag = (flag: DevInternalFlag) =>
+    dispatch(Config.toggleDevInternalFlag(flag))
+  const handleChannel = event =>
+    dispatch(Config.updateConfigValue('update.channel', event.target.value))
 
   React.useEffect(props.checkUpdate, [channel])
 
