@@ -91,8 +91,10 @@ describe('shell selectors', () => {
   })
 
   describe('getUseTrashSurfaceForTipCal', () => {
-    it('should return null if no saved value in config', () => {
-      const state: MockState = { config: {} }
+    it('should return null if saved value in config is null', () => {
+      const state: MockState = {
+        config: { calibration: { useTrashSurfaceForTipCal: null } },
+      }
       expect(Selectors.getUseTrashSurfaceForTipCal(state)).toEqual(null)
     })
 
@@ -105,7 +107,7 @@ describe('shell selectors', () => {
 
     it('should return false if saved value in config is false', () => {
       const state: MockState = {
-        config: { calibration: { useTrashSurfaceForTipCal: true } },
+        config: { calibration: { useTrashSurfaceForTipCal: false } },
       }
       expect(Selectors.getUseTrashSurfaceForTipCal(state)).toEqual(false)
     })
