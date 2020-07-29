@@ -2,7 +2,6 @@
 // app info card with version and updated
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import type { ContextRouter } from 'react-router-dom'
 import startCase from 'lodash/startCase'
 import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
@@ -27,15 +26,10 @@ const ENABLE_DEV_TOOLS_BODY =
   "Requires restart. Turns on the app's developer tools, which provide access to the inner workings of the app and additional logging."
 
 type Props = {|
-  ...ContextRouter,
   checkUpdate: () => void,
 |}
 
-export const AdvancedSettingsCard: React.AbstractComponent<
-  $Diff<Props, ContextRouter>
-> = withRouter(AdvancedSettingsCardComponent)
-
-function AdvancedSettingsCardComponent(props: Props) {
+export function AdvancedSettingsCard(props: Props): React.Node {
   const useTrashSurfaceForTipCal = useSelector(
     Config.getUseTrashSurfaceForTipCal
   )
