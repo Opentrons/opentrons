@@ -26,7 +26,7 @@ export function LostConnectionAlert(): React.Node {
     const robot = getAllRobots(state).find(r => r.name === connectedName)
     const unexpectedDisconnect = state.robot.connection.unexpectedDisconnect
 
-    return Boolean(robot && !robot.ok && unexpectedDisconnect)
+    return Boolean((connectedName && !robot?.ok) || unexpectedDisconnect)
   })
 
   const disconnect = () => {
