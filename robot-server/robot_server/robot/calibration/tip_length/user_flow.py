@@ -17,7 +17,7 @@ from .state_machine import (
     TipCalibrationStateMachine
 )
 from .util import (
-    TipCalibrationException as Error, TipCalibrationErrors as Errors
+    TipCalibrationException as ErrorExc, TipCalibrationError as Error
 )
 from .constants import (
     TipCalibrationState as State,
@@ -58,7 +58,7 @@ class TipCalibrationUserFlow():
         self._has_calibration_block = has_calibration_block
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
-            raise Error(Errors.NO_PIPETTE, mount)
+            raise ErrorExc(Error.NO_PIPETTE, mount)
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
@@ -229,8 +229,8 @@ class TipCalibrationUserFlow():
             return labware.load(tr_lookup.load_name,
                                 self._deck.position_for(TIP_RACK_SLOT))
         else:
-            raise Error(
-                Errors.NO_KNOWN_TIPRACK,
+            raise ErrorExc(
+                Error.NO_KNOWN_TIPRACK,
                 self._hw_pipette.model)
 
     def _get_alt_tip_racks(self) -> Set[str]:

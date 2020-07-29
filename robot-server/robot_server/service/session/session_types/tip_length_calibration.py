@@ -5,10 +5,8 @@ from robot_server.robot.calibration.tip_length.user_flow import \
 from robot_server.robot.calibration.tip_length.models import \
     TipCalibrationSessionStatus, SessionCreateParams
 from robot_server.robot.calibration.session import CalibrationException
-from robot_server.robot.calibration.tip_length.util import StateTransitionError
 from robot_server.service.session.errors import (SessionCreationException,
-                                                 CommandExecutionException,
-                                                 CommandExecutionConflict)
+                                                 CommandExecutionException)
 from robot_server.service.session.command_execution import \
      CallableExecutor, Command, CompletedCommand, CommandQueue, CommandExecutor
 
@@ -23,8 +21,6 @@ class TipLengthCalibrationCommandExecutor(CallableExecutor):
     async def execute(self, command: Command) -> CompletedCommand:
         try:
             return await super().execute(command)
-        except StateTransitionError as e:
-            raise CommandExecutionConflict(e)
         except (CalibrationException, AssertionError) as e:
             raise CommandExecutionException(e)
 

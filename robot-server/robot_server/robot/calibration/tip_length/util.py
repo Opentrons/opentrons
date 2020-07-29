@@ -7,7 +7,7 @@ from robot_server.service.errors import RobotServerError
 from robot_server.service.json_api.errors import Error
 
 
-class TipCalibrationErrors(Enum):
+class TipCalibrationError(Enum):
     NO_PIPETTE = (
         HTTPStatus.FORBIDDEN,
         'No Pipette Attached',
@@ -20,7 +20,7 @@ class TipCalibrationErrors(Enum):
 
 
 class TipCalibrationException(RobotServerError):
-    def __init__(self, whicherror: TipCalibrationErrors, *fmt_args):
+    def __init__(self, whicherror: TipCalibrationError, *fmt_args):
         super().__init__(
             whicherror.value[0],
             Error(
@@ -38,7 +38,7 @@ class StateTransitionError(RobotServerError):
             HTTPStatus.CONFLICT,
             Error(
                 id='TipLengthCalibration.StateTransitionError',
-                status=str(HTTPStatus.Conflict),
+                status=str(HTTPStatus.CONFLICT),
                 title='Illegal State Transition',
                 detail=f'The action {action} may not occur in the state '
                        f'{state}')
