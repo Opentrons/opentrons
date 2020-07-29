@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, ANY, patch, call
 from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
@@ -41,18 +41,27 @@ def mock_hw_pipette_all_combos(request):
 def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     mount = request.param
     hardware._attached_instruments = {mount: mock_hw_pipette_all_combos}
+    hardware._current_pos = Point(0, 0, 0)
 
     async def async_mock(*args, **kwargs):
         pass
 
+    async def async_mock_move_rel(*args, **kwargs):
+        delta = kwargs.get('delta', Point(0, 0, 0))
+        hardware._current_pos += delta
+
+    async def async_mock_move_to(*args, **kwargs):
+        to_pt = kwargs.get('abs_position', Point(0, 0, 0))
+        hardware._current_pos = to_pt
+
     async def gantry_pos_mock(*args, **kwargs):
-        return Point(0, 0, 0)
+        return hardware._current_pos
 
     hardware.move_rel = MagicMock(side_effect=async_mock)
     hardware.pick_up_tip = MagicMock(side_effect=async_mock)
     hardware.drop_tip = MagicMock(side_effect=async_mock)
     hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
-    hardware.move_to = MagicMock(side_effect=async_mock)
+    hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
     return hardware
 
@@ -72,16 +81,12 @@ def mock_hw(hardware):
         pass
 
     async def async_mock_move_rel(*args, **kwargs):
-        x = kwargs.get('x', 0)
-        y = kwargs.get('y', 0)
-        z = kwargs.get('z', 0)
-        hardware._current_pos += Point(x, y, z)
+        delta = kwargs.get('delta', Point(0, 0, 0))
+        hardware._current_pos += delta
 
     async def async_mock_move_to(*args, **kwargs):
-        x = kwargs.get('x', 0)
-        y = kwargs.get('y', 0)
-        z = kwargs.get('z', 0)
-        hardware._current_pos = Point(x, y, z)
+        to_pt = kwargs.get('abs_position', Point(0, 0, 0))
+        hardware._current_pos = to_pt
 
     async def gantry_pos_mock(*args, **kwargs):
         return hardware._current_pos
@@ -130,7 +135,85 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
      {}, 'gantry_position'),
 ]
 
-# TODO: unit test each command
+
+async def test_move_to_tip_rack(mock_user_flow):
+    uf = mock_user_flow
+    await uf.move_to_tip_rack()
+    cur_pt = await uf._get_current_point()
+    assert cur_pt == uf._deck['8'].wells()[0].top().point + Point(0, 0, 10)
+
+
+async def test_move_to_reference_point(mock_user_flow_all_combos):
+    uf = mock_user_flow_all_combos
+    await uf.move_to_reference_point()
+    buff = Point(0, 0, 5)
+    trash_offset = Point(-57.84, -55, 0)  # offset from center of trash
+    cur_pt = await uf._get_current_point()
+    if uf._has_calibration_block:
+        if uf._mount == Mount.LEFT:
+            assert cur_pt == \
+                uf._deck['3'].wells_by_name()['A1'].top().point + buff
+        else:
+            assert cur_pt == \
+                uf._deck['1'].wells_by_name()['A2'].top().point + buff
+    else:
+        assert cur_pt == \
+            uf._deck.get_fixed_trash().wells_by_name()['A1'].top().point + \
+            trash_offset + buff
+
+
+async def test_jog(mock_user_flow):
+    uf = mock_user_flow
+    await uf.jog(vector=(0, 0, 0.1))
+    assert await uf._get_current_point() == Point(0, 0, 0.1)
+    await uf.jog(vector=(1, 0, 0))
+    assert await uf._get_current_point() == Point(1, 0, 0.1)
+
+
+async def test_pick_up_tip(mock_user_flow):
+    uf = mock_user_flow
+    assert uf._tip_origin_pt is None
+    await uf.pick_up_tip()
+    # check that it saves the tip pick up location locally
+    assert uf._tip_origin_pt == Point(0, 0, 0)
+
+
+async def test_invalidate_tip(mock_user_flow):
+    uf = mock_user_flow
+    uf._tip_origin_pt = Point(1, 1, 1)
+    uf._hw_pipette._has_tip = True
+    z_offset = uf._hw_pipette.config.return_tip_height * \
+        uf._get_default_tip_length()
+    await uf.invalidate_tip()
+    # should move to return tip
+    move_calls = [
+        call(
+            mount=Mount.RIGHT,
+            abs_position=Point(1, 1, 1 - z_offset),
+            critical_point=uf._hw_pipette.critical_point
+        ),
+    ]
+    uf._hardware.move_to.assert_has_calls(move_calls)
+    uf._hardware.drop_tip.assert_called()
+
+
+async def test_exit(mock_user_flow):
+    uf = mock_user_flow
+    uf._tip_origin_pt = Point(1, 1, 1)
+    uf._hw_pipette._has_tip = True
+    z_offset = uf._hw_pipette.config.return_tip_height * \
+        uf._get_default_tip_length()
+    await uf.invalidate_tip()
+    # should move to return tip
+    move_calls = [
+        call(
+            mount=Mount.RIGHT,
+            abs_position=Point(1, 1, 1 - z_offset),
+            critical_point=uf._hw_pipette.critical_point
+        ),
+    ]
+    uf._hardware.move_to.assert_has_calls(move_calls)
+    uf._hardware.drop_tip.assert_called()
 
 
 @pytest.mark.parametrize('command,current_state,data,hw_meth', hw_commands)
@@ -155,12 +238,18 @@ def test_load_deck(mock_user_flow_all_combos):
 
 def test_load_cal_block(mock_user_flow_all_combos):
     uf = mock_user_flow_all_combos
-    if uf._mount == Mount.RIGHT:
-        assert uf._deck['1'].load_name == \
-                'opentrons_calibrationblock_short_side_left'
+    if uf._has_calibration_block:
+        if uf._mount == Mount.RIGHT:
+            assert uf._deck['1'].load_name == \
+                    'opentrons_calibrationblock_short_side_left'
+            assert uf._deck['3'] is None
+        else:
+            assert uf._deck['3'].load_name == \
+                    'opentrons_calibrationblock_short_side_right'
+            assert uf._deck['1'] is None
     else:
-        assert uf._deck['3'].load_name == \
-                'opentrons_calibrationblock_short_side_right'
+        assert uf._deck['1'] is None
+        assert uf._deck['3'] is None
 
 
 async def test_get_reference_location(mock_user_flow_all_combos):
@@ -178,16 +267,26 @@ async def test_get_reference_location(mock_user_flow_all_combos):
 
 
 async def test_save_offsets(mock_user_flow):
-    uf = mock_user_flow
-    uf._current_state = 'measuringNozzleOffset'
-    assert uf._nozzle_height_at_reference is None
+    with patch(
+            'opentrons.calibration_storage.modify.create_tip_length_data'
+    ) as create_tip_length_data_patch:
+        uf = mock_user_flow
+        uf._current_state = 'measuringNozzleOffset'
+        assert uf._nozzle_height_at_reference is None
+        await uf._hardware.move_to(
+            mount=uf._mount,
+            abs_position=Point(x=10, y=10, z=10),
+            critical_point=uf._hw_pipette.critical_point
+        )
+        await uf.save_offset()
+        assert uf._nozzle_height_at_reference == 10
 
-    await uf._hardware.move_to(x=10, y=10, z=10)
-    await uf.save_offset()
-    assert uf._nozzle_height_at_reference == 10
-
-    uf._current_state = 'measuringTipOffset'
-    uf._hw_pipette._has_tip = True
-    await uf._hardware.move_to(x=10, y=10, z=40)
-    result = await uf._calculate_tip_length()
-    assert result == 30
+        uf._current_state = 'measuringTipOffset'
+        uf._hw_pipette._has_tip = True
+        await uf._hardware.move_to(
+            mount=uf._mount,
+            abs_position=Point(x=10, y=10, z=40),
+            critical_point=uf._hw_pipette.critical_point
+        )
+        await uf.save_offset()
+        create_tip_length_data_patch.assert_called_with(ANY, '', 30)
