@@ -1,4 +1,3 @@
-
 from opentrons.types import Mount
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
@@ -42,11 +41,13 @@ class TipLengthCalibration(BaseSession):
         assert isinstance(instance_meta.create_params, SessionCreateParams)
         has_calibration_block = instance_meta.create_params.hasCalibrationBlock
         mount = instance_meta.create_params.mount
+        tiprack_def = instance_meta.create_params.tipRackDefinition
         try:
             tip_cal_user_flow = TipCalibrationUserFlow(
                     hardware=configuration.hardware,
                     mount=Mount[mount.upper()],
-                    has_calibration_block=has_calibration_block)
+                    has_calibration_block=has_calibration_block,
+                    tiprack=tiprack_def)
         except (AssertionError, CalibrationException) as e:
             raise SessionCreationException(str(e))
 

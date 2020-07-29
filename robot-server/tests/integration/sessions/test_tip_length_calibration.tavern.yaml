@@ -18,6 +18,7 @@ stages:
             createParams:
               mount: left
               hasCalibrationBlock: true
+              tipRackDefinition: !include fixture_tiprack_300_ul.json
     response:
       status_code: 201
       save:
@@ -44,6 +45,7 @@ stages:
             createParams:
               mount: left
               hasCalibrationBlock: true
+              tipRackDefinition: !include fixture_tiprack_300_ul.json
 
   - name: Load labware
     request:

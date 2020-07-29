@@ -12,11 +12,10 @@ class TipCalibrationError(Enum):
         HTTPStatus.FORBIDDEN,
         'No Pipette Attached',
         'No pipette present on {} mount')
-    NO_KNOWN_TIPRACK = (
-        HTTPStatus.NOT_IMPLEMENTED,
-        'No Tiprack For Pipette',
-        'No known tipracks for pipette model {}'
-    )
+    BAD_DEF = (
+        HTTPStatus.UNPROCESSABLE_ENTITY,
+        'Bad Labware Definition',
+        'Bad definition for tiprack under calibration')
 
 
 class TipCalibrationException(RobotServerError):
