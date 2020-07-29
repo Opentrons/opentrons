@@ -279,6 +279,41 @@ describe('discovery selectors', () => {
       ],
     },
     {
+      name:
+        'handles legacy IPv6 robots by wrapping IP in [] and setting as local',
+      selector: discovery.getDiscoveredRobots,
+      state: {
+        discovery: {
+          robotsByName: {
+            'opentrons-foo': {
+              name: 'opentrons-foo',
+              health: mockHealthResponse,
+              serverHealth: mockServerHealthResponse,
+              addresses: [
+                {
+                  ip: 'fd00:0:cafe:fefe::1',
+                  port: 31950,
+                  seen: true,
+                  healthStatus: HEALTH_STATUS_OK,
+                  serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+                  healthError: null,
+                  serverHealthError: mockHealthFetchErrorResponse,
+                },
+              ],
+            },
+          },
+        },
+        robot: { connection: { connectedTo: '' } },
+      },
+      expected: [
+        expect.objectContaining({
+          name: 'opentrons-foo',
+          ip: '[fd00:0:cafe:fefe::1]',
+          local: true,
+        }),
+      ],
+    },
+    {
       name: 'getViewableRobots returns connectable and reachable robots',
       selector: discovery.getViewableRobots,
       state: MOCK_STATE,

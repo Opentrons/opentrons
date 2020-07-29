@@ -261,8 +261,14 @@ describe('discovery client state selectors', () => {
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const linkLocal: $Shape<HostState> = {
+      const linkLocalV4: $Shape<HostState> = {
         ip: '169.254.24.42',
+        healthStatus: HEALTH_STATUS_OK,
+        serverHealthStatus: HEALTH_STATUS_OK,
+      }
+
+      const linkLocalV6: $Shape<HostState> = {
+        ip: 'fd00:0:cafe:fefe::1',
         healthStatus: HEALTH_STATUS_OK,
         serverHealthStatus: HEALTH_STATUS_OK,
       }
@@ -273,8 +279,14 @@ describe('discovery client state selectors', () => {
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const result = sort([regular, linkLocal, localhost, home])
-      expect(result).toEqual([home, localhost, linkLocal, regular])
+      const result = sort([regular, linkLocalV6, linkLocalV4, localhost, home])
+      expect(result).toEqual([
+        home,
+        localhost,
+        linkLocalV4,
+        linkLocalV6,
+        regular,
+      ])
     })
 
     it('should prefer more seen "ip" addresses', () => {

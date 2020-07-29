@@ -1,4 +1,5 @@
 // @flow
+import isIp from 'is-ip'
 import concat from 'lodash/concat'
 import find from 'lodash/find'
 import head from 'lodash/head'
@@ -8,6 +9,10 @@ import semver from 'semver'
 import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_UNREACHABLE,
+  RE_HOSTNAME_IPV6_LL,
+  RE_HOSTNAME_IPV4_LL,
+  RE_HOSTNAME_LOCALHOST,
+  RE_HOSTNAME_LOOPBACK,
   CONNECTABLE,
   REACHABLE,
   UNREACHABLE,
@@ -37,12 +42,14 @@ const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
 const isLocal = (ip: string) => {
   return (
-    ip.startsWith('169.254') ||
-    /^\[?(?:fd00|fe80)/.test(ip) ||
-    ip === 'localhost' ||
-    ip === '127.0.0.1'
+    RE_HOSTNAME_IPV6_LL.test(ip) ||
+    RE_HOSTNAME_IPV4_LL.test(ip) ||
+    RE_HOSTNAME_LOCALHOST.test(ip) ||
+    RE_HOSTNAME_LOOPBACK.test(ip)
   )
 }
+
+const ipToHostname = (ip: string) => (isIp.v6(ip) ? `[${ip}]` : ip)
 
 export function getScanning(state: State): boolean {
   return state.discovery.scanning
@@ -57,7 +64,7 @@ export const getDiscoveredRobots: State => Array<DiscoveredRobot> = createSelect
       const { addresses, ...robotState } = robot
       const { health } = robotState
       const addr = head(addresses)
-      const ip = addr?.ip ?? null
+      const ip = addr?.ip ? ipToHostname(addr.ip) : null
       const port = addr?.port ?? null
       const healthStatus = addr?.healthStatus ?? null
       const serverHealthStatus = addr?.serverHealthStatus ?? null

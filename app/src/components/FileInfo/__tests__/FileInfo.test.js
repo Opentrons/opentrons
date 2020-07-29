@@ -30,7 +30,9 @@ describe('File info Component', () => {
     expect(wrapper.find(ProtocolPipettesCard).exists()).toEqual(true)
     expect(wrapper.find(ProtocolModulesCard).exists()).toEqual(true)
     expect(wrapper.find(Continue).exists()).toEqual(true)
-    expect(labwareCard.prop('robotName')).toEqual('robot-name')
+    expect(labwareCard.prop('robotName')).toEqual(
+      Fixtures.mockConnectedRobot.name
+    )
   })
 
   it('An error renders when an upload error is given', () => {
