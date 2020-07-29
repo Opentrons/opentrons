@@ -224,10 +224,14 @@ def assert_tc_commands_do_not_use_unimplemented_params(
 
 def dispatch_json(
         context: ProtocolContext,
+        # TODO IMMEDIATELY: this can be 'JsonProtocolV5' too...
         protocol_data: 'JsonProtocolV4',
         instruments: Instruments,
         loaded_labware: LoadedLabware,
         modules: Dict[str, ModuleContext],
+        # TODO IMMEDIATELY: this can be JsonV5PipetteDispatch too
+        # (if we make that v5 type)
+        # Or, should we just NOT version the pipette dispatch map?
         pipette_command_map: 'JsonV4PipetteDispatch',
         magnetic_module_command_map: 'JsonV4MagneticModuleDispatch',
         temperature_module_command_map: 'JsonV4TemperatureModuleDispatch',

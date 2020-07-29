@@ -43,6 +43,7 @@ TouchTipCommandId = Literal['touchTip']
 PickUpTipCommandId = Literal['pickUpTip']
 DropTipCommandId = Literal['dropTip']
 MoveToSlotCommandId = Literal['moveToSlot']
+MoveToWellCommandId = Literal['moveToWell']
 DelayCommandId = Literal['delay']
 MagneticModuleEngageCommandId = Literal['magneticModule/engageMagnet']
 MagneticModuleDisengageCommandId = Literal['magneticModule/disengageMagnet']
@@ -160,6 +161,17 @@ class MoveToSlotParams(TypedDict, total=False):
 class MoveToSlotCommand(TypedDict):
     command: MoveToSlotCommandId
     params: MoveToSlotParams
+
+
+class MoveToWellParams(PipetteAccessParams, total=False):
+    offset: NamedOffset
+    minimumZHeight: float
+    forceDirect: bool
+
+
+class MoveToWellCommand(TypedDict):
+    command: MoveToWellCommandId
+    params: MoveToWellParams
 
 
 class DelayParams(TypedDict, total=False):
@@ -322,7 +334,7 @@ PipetteCommand = Union[AspirateCommand, DispenseCommand, AirGapCommand,
 PipetteCommandId = Union[AspirateCommandId, DispenseCommandId, AirGapCommandId,
                          BlowoutCommandId, TouchTipCommandId,
                          PickUpTipCommandId, DropTipCommandId,
-                         MoveToSlotCommandId]
+                         MoveToSlotCommandId, MoveToWellCommandId]
 
 RobotCommand = Union[DelayCommand]
 RobotCommandId = Union[DelayCommandId]

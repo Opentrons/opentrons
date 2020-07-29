@@ -12,6 +12,7 @@ from opentrons.protocol_api.execute_v4 import _engage_magnet, \
     _thermocycler_set_block_temperature, \
     _thermocycler_set_lid_temperature, \
     _thermocycler_run_profile
+from opentrons.protocol_api.execute_v5 import _move_to_well
 
 from .module_contexts import ThermocyclerContext
 
@@ -37,6 +38,7 @@ pipette_command_map: 'JsonV4PipetteDispatch' = {
     JsonPipetteCommand.dispense.value: _dispense,
     JsonPipetteCommand.touchTip.value: _touch_tip,
     JsonPipetteCommand.airGap.value: _air_gap,
+    JsonPipetteCommand.moveToWell.value: _move_to_well
 }
 
 magnetic_module_command_map: 'JsonV4MagneticModuleDispatch' = {

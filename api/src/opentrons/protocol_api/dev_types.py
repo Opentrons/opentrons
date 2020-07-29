@@ -6,7 +6,8 @@ from opentrons_shared_data.protocol.dev_types import (
     BlowoutParams, DelayParams, PipetteAccessParams,
     StandardLiquidHandlingParams, TouchTipParams, MoveToSlotParams,
     TemperatureParams, ModuleIDParams, MagneticModuleEngageParams,
-    ThermocyclerRunProfileParams, ThermocyclerSetTargetBlockParams
+    ThermocyclerRunProfileParams, ThermocyclerSetTargetBlockParams,
+    MoveToWellParams
 )
 
 if TYPE_CHECKING:
@@ -71,6 +72,11 @@ JsonV3Dispatch = TypedDict(
             ['ProtocolContext',
              Dict[str, 'InstrumentContext'],
              'MoveToSlotParams'], None],
+        # TODO: maybe this should be JSONV5Dispatch
+        'moveToWell': Callable[
+            [Dict[str, 'InstrumentContext'],
+             Dict[str, 'Labware'],
+             'MoveToWellParams'], None],
         'airGap': Callable[
             [Dict[str, 'InstrumentContext'],
              Dict[str, 'Labware'],

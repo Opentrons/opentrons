@@ -120,7 +120,7 @@ def run_protocol(protocol: Protocol,
             lw = execute_v3.load_labware_from_json_defs(
                 context, protocol.contents)
             execute_v3.dispatch_json(context, protocol.contents, ins, lw)
-        elif protocol.contents['schemaVersion'] == 4:
+        elif protocol.contents['schemaVersion'] in [4, 5]:
             # reuse the v3 fns for loading labware and pipettes
             # b/c the v4 protocol has no changes for these keys
             ins = execute_v3.load_pipettes_from_json(

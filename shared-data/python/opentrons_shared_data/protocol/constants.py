@@ -19,7 +19,7 @@ if TYPE_CHECKING:
         ThermocyclerDeactivateLidCommandId,
         ThermocyclerDeactivateBlockCommandId,
         ThermocyclerRunProfileCommandId,
-        ThermocyclerAwaitProfileCommandId
+        ThermocyclerAwaitProfileCommandId, MoveToWellCommandId
     )
 
 
@@ -32,6 +32,7 @@ class JsonPipetteCommand(Enum):
     dispense: 'DispenseCommandId' = "dispense"
     touchTip: 'TouchTipCommandId' = "touchTip"
     moveToSlot: 'MoveToSlotCommandId' = "moveToSlot"
+    moveToWell: 'MoveToWellCommandId' = "moveToWell"
 
 
 class JsonRobotCommand(Enum):
