@@ -53,7 +53,7 @@ export function AdvancedSettingsCard(props: Props): React.Node {
 
   return (
     <Card title={TITLE}>
-      {devInternalFlags?.enableTipLengthCal &&
+      {devInternalFlags?.enableCalibrationOverhaul &&
         useTrashSurfaceForTipCal != null && (
           <LabeledToggle
             data-test="useTrashSurfaceForTipCalToggle"

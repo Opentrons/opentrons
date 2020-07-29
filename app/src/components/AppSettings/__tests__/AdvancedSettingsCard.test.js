@@ -67,7 +67,7 @@ describe('AdvancedSettingsCard', () => {
     ])
     getFeatureFlags.mockReturnValue({
       enableBundleUpload: false,
-      enableTipLengthCal: true,
+      enableCalibrationOverhaul: true,
     })
 
     render = () => {
