@@ -86,9 +86,13 @@ export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(Sessions.tipCalCommands.JOG, {
-      vector: formatJogVector(axis, dir, step),
-    })
+    sendSessionCommand(
+      Sessions.tipCalCommands.JOG,
+      {
+        vector: formatJogVector(axis, dir, step),
+      },
+      false
+    )
   }
 
   const proceed = () => {

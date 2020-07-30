@@ -1,7 +1,7 @@
 // @flow
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
 
 import {
@@ -61,6 +61,7 @@ export function CalibrateTipLength(
 ): React.Node {
   const { session, robotName, hasBlock, closeWizard } = props
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const dispatch = useDispatch()
 
   const requestStatus = useSelector<State, RequestState | null>(state =>
     getRequestById(state, last(requestIds))
@@ -68,15 +69,20 @@ export function CalibrateTipLength(
 
   function sendCommand(
     command: SessionCommandString,
-    data: SessionCommandData = {}
+    data: SessionCommandData = {},
+    trackRequest: boolean = true
   ) {
-    session?.id &&
-      dispatchRequest(
-        Sessions.createSessionCommand(robotName, session.id, {
-          command,
-          data,
-        })
-      )
+    if (session === null) return
+    const sessionCommand = Sessions.createSessionCommand(
+      robotName,
+      session.id,
+      { command, data }
+    )
+    if (trackRequest) {
+      dispatchRequest(sessionCommand)
+    } else {
+      dispatch(sessionCommand)
+    }
   }
 
   function deleteSession() {
