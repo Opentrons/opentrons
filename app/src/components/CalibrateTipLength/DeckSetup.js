@@ -5,7 +5,6 @@ import { OutlineButton, RobotWorkSpace } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../sessions'
-import { getLatestLabwareDef } from '../../getLabware'
 import type { CalibrateTipLengthChildProps } from './types'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import styles from './styles.css'
