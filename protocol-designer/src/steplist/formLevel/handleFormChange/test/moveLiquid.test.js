@@ -1,30 +1,48 @@
 // @flow
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import {
+  fixtureP10Single,
+  fixtureP300Single,
+} from '@opentrons/shared-data/pipette/fixtures/name'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { getPrereleaseFeatureFlag } from '../../../../persist'
 import {
   dependentFieldsUpdateMoveLiquid,
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
-
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../../../step-generation'
 
-const fixture_tiprack_10_ul = {
-  parameters: { isTiprack: true },
-  wells: { A1: { totalLiquidVolume: 1000 } },
-}
 let pipetteEntities
 let labwareEntities
 let handleFormHelper
 
+jest.mock('../../../../persist')
+
+const mockGetPrereleaseFeatureFlag: JestMockFn<
+  string,
+  boolean
+> = getPrereleaseFeatureFlag
+
 beforeEach(() => {
+  mockGetPrereleaseFeatureFlag.mockImplementation(
+    ff => ff === 'OT_PD_ENABLE_AIR_GAP_AND_DELAY'
+  )
+
   pipetteEntities = {
     pipetteId: {
       name: 'p10_single',
       spec: fixtureP10Single,
       tiprackModel: 'tiprack-10ul',
       tiprackLabwareDef: fixture_tiprack_10_ul,
+    },
+    otherPipetteId: {
+      name: 'p300_single_gen2',
+      spec: fixtureP300Single,
+      tiprackModel: 'tiprack-300ul',
+      tiprackLabwareDef: fixture_tiprack_300_ul,
     },
   }
   labwareEntities = {}
@@ -35,6 +53,10 @@ beforeEach(() => {
       pipetteEntities,
       labwareEntities
     )
+})
+
+afterEach(() => {
+  jest.resetAllMocks()
 })
 
 describe('no-op cases should pass through the patch unchanged', () => {
@@ -242,5 +264,23 @@ describe('disposal volume should update...', () => {
         expect(result).toEqual({ ...patch, ...resetBlowoutLocation })
       })
     })
+  })
+})
+
+describe('air gap volume', () => {
+  const form = {
+    path: 'multiDispense',
+    aspirate_wells: ['A1'],
+    dispense_wells: ['B2', 'B3'],
+    volume: '2',
+    pipette: 'pipetteId',
+    disposalVolume_checkbox: true,
+    disposalVolume_volume: '1.1',
+    aspirate_airGap_checkbox: false,
+    aspirate_airGap_volume: null,
+  }
+  it('should reset to pipette min when pipette is changed', () => {
+    const result = handleFormHelper({ pipette: 'otherPipetteId' }, form)
+    expect(result).toMatchObject({ aspirate_airGap_volume: '30' })
   })
 })

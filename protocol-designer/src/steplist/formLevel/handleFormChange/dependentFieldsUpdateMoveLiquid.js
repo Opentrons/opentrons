@@ -4,6 +4,13 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPrereleaseFeatureFlag } from '../../../persist'
+import {
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '../../../step-generation/utils'
+import { getWellRatio } from '../../utils'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
@@ -15,12 +22,6 @@ import {
   volumeInCapacityForMulti,
   DISPOSAL_VOL_DIGITS,
 } from './utils'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
-import { getWellRatio } from '../../utils'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../../step-generation/utils'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
@@ -185,8 +186,21 @@ const updatePatchOnPipetteChange = (
   pipetteEntities: PipetteEntities
 ) => {
   // when pipette ID is changed (to another ID, or to null),
-  // set any flow rates, mix volumes, air gaps, or disposal volumes to null
+  // set any flow rates, mix volumes, or disposal volumes to null
+  // and set air gap volume to default (= pipette minimum)
   if (fieldHasChanged(rawForm, patch, 'pipette')) {
+    const newPipette = patch.pipette
+    let airGapVolume: string | null = null
+    if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
+      const pipetteSpec = pipetteEntities[newPipette].spec
+      airGapVolume = `${pipetteSpec.minVolume}`
+    }
+
+    // TODO: remove this when FF is removed
+    const airGapEnabled = getPrereleaseFeatureFlag(
+      'OT_PD_ENABLE_AIR_GAP_AND_DELAY'
+    )
+
     return {
       ...patch,
       ...getDefaultFields(
@@ -198,6 +212,7 @@ const updatePatchOnPipetteChange = (
         'aspirate_mmFromBottom',
         'dispense_mmFromBottom'
       ),
+      ...(airGapEnabled ? { aspirate_airGap_volume: airGapVolume } : {}),
     }
   }
 

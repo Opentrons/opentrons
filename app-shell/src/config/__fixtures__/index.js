@@ -1,6 +1,10 @@
 // @flow
 
-import type { ConfigV0, ConfigV1 } from '@opentrons/app/src/config/types'
+import type {
+  ConfigV0,
+  ConfigV1,
+  ConfigV2,
+} from '@opentrons/app/src/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
   version: 0, // Default key added on boot if missing in configs
@@ -65,5 +69,13 @@ export const MOCK_CONFIG_V1: ConfigV1 = {
   discovery: {
     ...MOCK_CONFIG_V0.discovery,
     disableCache: false,
+  },
+}
+
+export const MOCK_CONFIG_V2: ConfigV2 = {
+  ...MOCK_CONFIG_V1,
+  version: 2,
+  calibration: {
+    useTrashSurfaceForTipCal: null,
   },
 }

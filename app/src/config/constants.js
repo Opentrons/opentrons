@@ -7,7 +7,7 @@ export const CONFIG_VERSION_LATEST: 1 = 1
 export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'allPipetteConfig',
   'enableBundleUpload',
-  'enableTipLengthCal',
+  'enableCalibrationOverhaul',
 ]
 
 // action type constants

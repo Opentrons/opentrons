@@ -1,16 +1,23 @@
 // @flow
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import last from 'lodash/last'
 
-import { ModalPage, useConditionalConfirm } from '@opentrons/components'
+import {
+  ModalPage,
+  SpinnerModalPage,
+  useConditionalConfirm,
+} from '@opentrons/components'
 
+import type { State } from '../../types'
 import type {
   SessionCommandString,
   SessionCommandData,
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
-import { useDispatchApiRequest } from '../../robot-api'
-
+import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
+import type { RequestState } from '../../robot-api/types'
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { MeasureNozzle } from './MeasureNozzle'
@@ -24,6 +31,8 @@ import type {
   CalibrateTipLengthParentProps,
   CalibrateTipLengthChildProps,
 } from './types'
+
+export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
 
 const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
 const EXIT = 'exit'
@@ -53,19 +62,29 @@ export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
   const { session, robotName, hasBlock, closeWizard } = props
-  const [dispatchRequest] = useDispatchApiRequest()
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const dispatch = useDispatch()
+
+  const requestStatus = useSelector<State, RequestState | null>(state =>
+    getRequestById(state, last(requestIds))
+  )?.status
 
   function sendCommand(
     command: SessionCommandString,
-    data: SessionCommandData = {}
+    data: SessionCommandData = {},
+    trackRequest: boolean = true
   ) {
-    session?.id &&
-      dispatchRequest(
-        Sessions.createSessionCommand(robotName, session.id, {
-          command,
-          data,
-        })
-      )
+    if (session === null) return
+    const sessionCommand = Sessions.createSessionCommand(
+      robotName,
+      session.id,
+      { command, data }
+    )
+    if (trackRequest) {
+      dispatchRequest(sessionCommand)
+    } else {
+      dispatch(sessionCommand)
+    }
   }
 
   function deleteSession() {
@@ -86,16 +105,23 @@ export function CalibrateTipLength(
   if (!session) {
     return null
   }
+
+  const titleBarProps = {
+    title: TIP_LENGTH_CALIBRATION_SUBTITLE,
+    back: { onClick: confirmExit, title: EXIT, children: EXIT },
+  }
+
+  if (requestStatus === PENDING) {
+    return <SpinnerModalPage titleBar={titleBarProps} />
+  }
+
   const { currentStep, instrument, labware } = session?.details
   const Panel = PANEL_BY_STEP[currentStep]
 
   return Panel ? (
     <>
       <ModalPage
-        titleBar={{
-          title: TIP_LENGTH_CALIBRATION_SUBTITLE,
-          back: { onClick: confirmExit, title: EXIT, children: EXIT },
-        }}
+        titleBar={titleBarProps}
         contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
       >
         <Panel

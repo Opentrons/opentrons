@@ -21,7 +21,8 @@ export type CalibrateTipLengthChildProps = {|
   labware: Array<TipLengthCalibrationLabware>,
   sendSessionCommand: (
     command: SessionCommandString,
-    data?: SessionCommandData
+    data?: SessionCommandData,
+    trackRequest?: boolean
   ) => void,
   hasBlock: boolean,
   deleteSession: () => void,
