@@ -112,7 +112,7 @@ def mock_user_flow(mock_hw, request):
         hardware=mock_hw,
         mount=mount,
         has_calibration_block=has_calibration_block,
-        tiprack=tip_rack)
+        tip_rack=tip_rack)
 
     yield m
 
@@ -129,7 +129,7 @@ def mock_user_flow_all_combos(mock_hw_all_combos, request):
         hardware=hw,
         mount=mount,
         has_calibration_block=has_calibration_block,
-        tiprack=tip_rack)
+        tip_rack=tip_rack)
 
     yield m
 

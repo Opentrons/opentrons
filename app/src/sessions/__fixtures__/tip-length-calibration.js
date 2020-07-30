@@ -20,7 +20,6 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       namespace: 'opentrons',
       version: 1,
       isTiprack: true,
-      // $FlowFixMe: this is a fixture and i know i'm right
       definition: fixture_tiprack_300_ul,
     },
     {
@@ -29,7 +28,6 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       namespace: 'opentrons',
       version: 1,
       isTiprack: false,
-      // $FlowFixMe: this is a fixture and i know i'm right
       definition: opentrons_calibrationblock_short_side_left,
     },
   ],
@@ -38,6 +36,5 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
 export const mockTipLengthCalibrationSessionParams: TipLengthCalibrationSessionParams = {
   mount: 'left',
   hasCalibrationBlock: true,
-  // $FlowFixMe: this is a fixture and i know i'm right
   tipRackDefinition: fixture_tiprack_300_ul,
 }

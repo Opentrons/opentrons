@@ -60,7 +60,7 @@ class TipCalibrationUserFlow():
                  has_calibration_block: bool,
                  tiprack: Dict):
         # TODO: require mount and has_calibration_block params
-        self._tiprack_definition = tiprack
+        self._tip_rack_definition = tip_rack
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block = has_calibration_block
@@ -231,7 +231,7 @@ class TipCalibrationUserFlow():
     def _get_tip_rack_lw(self) -> labware.Labware:
         try:
             return labware.load_from_definition(
-                cast('LabwareDefinition', self._tiprack_definition),
+                cast('LabwareDefinition', self._tip_rack_definition),
                 self._deck.position_for(TIP_RACK_SLOT))
         except Exception:
             raise ErrorExc(Error.BAD_DEF)

@@ -15,7 +15,7 @@ class TipCalibrationError(Enum):
     BAD_DEF = (
         HTTPStatus.UNPROCESSABLE_ENTITY,
         'Bad Labware Definition',
-        'Bad definition for tiprack under calibration')
+        'Bad definition for tip rack under calibration')
 
 
 class TipCalibrationException(RobotServerError):

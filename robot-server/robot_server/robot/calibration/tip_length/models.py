@@ -48,7 +48,7 @@ class SessionCreateParams(BaseModel):
     )
     tipRackDefinition: dict = Field(
         ...,
-        description='The full labware definition of the tiprack to calibrate.'
+        description='The full labware definition of the tip rack to calibrate.'
     )
 
 
