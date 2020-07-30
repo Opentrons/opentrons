@@ -1,5 +1,10 @@
 // @flow
 
+import { toggleConfigValue, updateConfigValue } from '../config'
+import type {
+  ToggleConfigValueAction,
+  UpdateConfigValueAction,
+} from '../config/types'
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -35,3 +40,16 @@ export const fetchCalibrationStatusFailure = (
   payload: { robotName, error },
   meta,
 })
+
+export function toggleUseTrashSurfaceForTipCal(): ToggleConfigValueAction {
+  return toggleConfigValue('calibration.useTrashSurfaceForTipCal')
+}
+
+export function setUseTrashSurfaceForTipCal(
+  shouldUseTrashSurface: boolean
+): UpdateConfigValueAction {
+  return updateConfigValue(
+    'calibration.useTrashSurfaceForTipCal',
+    shouldUseTrashSurface
+  )
+}

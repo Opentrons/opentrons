@@ -10,7 +10,7 @@ export type DiscoveryCandidates = string | Array<string>
 export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
-  | 'enableTipLengthCal'
+  | 'enableCalibrationOverhaul'
 
 export type FeatureFlags = $Shape<{|
   [DevInternalFlag]: boolean | void,
@@ -96,4 +96,12 @@ export type ConfigV1 = $ReadOnly<{|
   |}>,
 |}>
 
-export type Config = ConfigV1
+export type ConfigV2 = $ReadOnly<{|
+  ...ConfigV1,
+  version: 2,
+  calibration: $ReadOnly<{|
+    useTrashSurfaceForTipCal: boolean | null,
+  |}>,
+|}>
+
+export type Config = ConfigV2

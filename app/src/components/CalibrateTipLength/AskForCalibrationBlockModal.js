@@ -40,9 +40,17 @@ const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 const NOTE_SPACING = '1.75rem'
 
 type Props = {|
-  setHasBlock: boolean => void,
+  setHasBlock: (hasBlock: boolean, rememberPreference: boolean) => void,
 |}
-export function ToolSettingAlertModal(props: Props): React.Node {
+export function AskForCalibrationBlockModal(props: Props): React.Node {
+  const [rememberPreference, setRememberPreference] = React.useState<boolean>(
+    false
+  )
+
+  const makeSetHasBlock = hasBlock => () => {
+    props.setHasBlock(hasBlock, rememberPreference)
+  }
+
   return (
     <Portal>
       <AlertModal
@@ -80,25 +88,18 @@ export function ToolSettingAlertModal(props: Props): React.Node {
           </Flex>
         </Box>
         <Flex marginY={SPACING_3} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <SecondaryBtn
-            onClick={() => {
-              props.setHasBlock(true)
-            }}
-          >
+          <SecondaryBtn onClick={makeSetHasBlock(true)}>
             {HAVE_BLOCK}
           </SecondaryBtn>
-          <SecondaryBtn
-            onClick={() => {
-              props.setHasBlock(false)
-            }}
-          >
+          <SecondaryBtn onClick={makeSetHasBlock(false)}>
             {USE_TRASH}
           </SecondaryBtn>
         </Flex>
         <div>
           <CheckboxField
             label={REMEMBER}
-            onChange={() => console.log('TODO: save block setting')}
+            onChange={e => setRememberPreference(e.currentTarget.checked)}
+            value={rememberPreference}
           />
           <Text fontSize={FONT_SIZE_BODY_1} paddingX={NOTE_SPACING}>
             {CAN_CHANGE}
