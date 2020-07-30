@@ -1,7 +1,7 @@
 import logging
 from typing import (
     Dict, Awaitable, Callable, Any, Set, List, Optional,
-    cast, TYPE_CHECKING)
+    TYPE_CHECKING)
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
 from opentrons.calibration_storage import modify
@@ -58,7 +58,7 @@ class TipCalibrationUserFlow():
                  hardware: ThreadManager,
                  mount: Mount,
                  has_calibration_block: bool,
-                 tip_rack: Dict):
+                 tip_rack: 'LabwareDefinition'):
         # TODO: require mount and has_calibration_block params
         self._tip_rack_definition = tip_rack
         self._hardware = hardware
@@ -231,7 +231,7 @@ class TipCalibrationUserFlow():
     def _get_tip_rack_lw(self) -> labware.Labware:
         try:
             return labware.load_from_definition(
-                cast('LabwareDefinition', self._tip_rack_definition),
+                self._tip_rack_definition,
                 self._deck.position_for(TIP_RACK_SLOT))
         except Exception:
             raise ErrorExc(Error.BAD_DEF)
