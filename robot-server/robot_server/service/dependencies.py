@@ -7,12 +7,11 @@ from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.hardware_wrapper import HardwareWrapper
 from robot_server.service.session.manager import SessionManager
+from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
 
 
 # The single instance of the RPCServer
-from .protocol.manager import ProtocolManager
-
 _rpc_server_instance = None
 
 # The single instance of the SessionManager
@@ -56,16 +55,20 @@ async def get_rpc_server() -> RPCServer:
     return _rpc_server_instance
 
 
-def get_session_manager(hardware: ThreadManager = Depends(get_hardware)) \
-        -> SessionManager:
-    """The single session manager instance"""
-    global _session_manager_inst
-    if not _session_manager_inst:
-        _session_manager_inst = SessionManager(hardware=hardware)
-    return _session_manager_inst
-
-
 @lru_cache(maxsize=1)
 def get_protocol_manager() -> ProtocolManager:
     """The single protocol manager instance"""
     return ProtocolManager()
+
+
+def get_session_manager(
+        hardware: ThreadManager = Depends(get_hardware),
+        protocol_manager: ProtocolManager = Depends(get_protocol_manager)) \
+        -> SessionManager:
+    """The single session manager instance"""
+    global _session_manager_inst
+    if not _session_manager_inst:
+        _session_manager_inst = SessionManager(
+            hardware=hardware,
+            protocol_manager=protocol_manager)
+    return _session_manager_inst

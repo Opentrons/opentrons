@@ -4,6 +4,7 @@ from typing import Optional, Tuple, Dict, Type
 
 from opentrons.hardware_control import ThreadManager
 
+from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedFeature
 from robot_server.service.session.session_types.base_session import BaseSession
@@ -11,7 +12,8 @@ from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType, SessionType
 from robot_server.service.session.session_types import NullSession, \
     CheckSession, SessionMetaData, TipLengthCalibration, DefaultSession
-
+from robot_server.service.session.session_types.protocol_session import \
+    ProtocolSession
 
 log = logging.getLogger(__name__)
 
@@ -19,14 +21,23 @@ SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
     SessionType.null: NullSession,
     SessionType.calibration_check: CheckSession,
     SessionType.tip_length_calibration: TipLengthCalibration,
-    SessionType.default: DefaultSession
+    SessionType.default: DefaultSession,
+    SessionType.protocol: ProtocolSession,
 }
 
 
 class SessionManager:
     """Manager of session instances"""
 
-    def __init__(self, hardware: ThreadManager):
+    def __init__(self,
+                 hardware: ThreadManager,
+                 protocol_manager: ProtocolManager):
+        """
+        Construct the session manager
+
+        :param hardware: ThreadManager to interact with hardware
+        :param protocol_manager: ProtocolManager for protocol related sessions
+        """
         self._sessions: Dict[IdentifierType, BaseSession] = {}
         self._active = ActiveSessionId(
             default_id=DefaultSession.DEFAULT_ID
@@ -34,7 +45,8 @@ class SessionManager:
         # Create object supplied to all sessions
         self._session_common = SessionConfiguration(
             hardware=hardware,
-            is_active=self.is_active
+            is_active=self.is_active,
+            protocol_manager=protocol_manager
         )
         # Create the default session.
         asyncio.new_event_loop().run_until_complete(

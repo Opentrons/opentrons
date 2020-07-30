@@ -1,0 +1,104 @@
+---
+test_name: Protocol session unknown protocol
+strict:
+  - json:on
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create the session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: protocol
+            createParams:
+              protocolId: "my_protocol"
+    response:
+      status_code: 404
+---
+test_name: Protocol session life cycle
+strict:
+  - json:on
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload a protocol to use with the session
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocol_file: "tests/integration/protocols/phony_proto.py"
+    response:
+      save:
+        json:
+          protocol_id: data.id
+      status_code: 201
+  - name: Create the session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: protocol
+            createParams:
+              protocolId: "{protocol_id}"
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id: data.id
+      json: &proto_session
+        data:
+          id: !anystr
+          type: Session
+          attributes:
+            sessionType: protocol
+            createParams:
+              protocolId: "{protocol_id}"
+            createdAt: !anystr
+            details: {}
+        links: !anydict
+  - name: Get the session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json: *proto_session
+  - name: Try to simulate
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: protocol.startSimulate
+            data: {}
+    response:
+      # Fails due to command execution not implemented yet
+      status_code: 400
+  - name: Delete the session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: DELETE
+    response:
+      status_code: 200
+      json: *proto_session
+  - name: Get the session will fail
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 404
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      method: DELETE

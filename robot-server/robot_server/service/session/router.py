@@ -59,6 +59,9 @@ async def create_session_handler(
         new_session = await session_manager.add(
             session_type=session_type,
             session_meta_data=SessionMetaData(create_params=create_params))
+    # TODO: Amit 07/30/2020 - SessionCreationException should be a
+    #  RobotServerError. Customized by raiser with status code and rest of
+    #  Error attributes. The job here would be to log and re-raise.
     except SessionCreationException as e:
         log.exception("Failed to create session")
         raise RobotServerError(
@@ -92,6 +95,9 @@ async def delete_session_handler(
 
     try:
         await session_manager.remove(session_obj.meta.identifier)
+    # TODO: Amit 07/30/2020 - SessionException should be a RobotServerError.
+    #  Customized by raiser with status code and rest of
+    #  Error attributes. The job here would be to log and re-raise.
     except SessionException as e:
         log.exception("Failed to remove a session session")
         raise RobotServerError(
@@ -183,6 +189,9 @@ async def session_command_execute_handler(
                                  command_request.data.attributes.data)
         command_result = await session_obj.command_executor.execute(command)
         log.debug(f"Command completed {command}")
+    # TODO: Amit 07/30/2020 - SessionCommandException should be a
+    #  RobotServerError. Customized by raiser with status code and rest of
+    #  Error attributes. The job here would be to log and re-raise.
     except CommandExecutionConflict as e:
         log.exception("Failed to execute command due to conflict")
         raise RobotServerError(
