@@ -1,6 +1,6 @@
 // @flow
-import { fixture_tiprack_300_ul } from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
-import { opentrons_calibrationblock_short_side_left } from '@opentrons/shared-data/labware/definitions/2/opentrons_calibrationblock_short_side_left/1'
+import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
+import calBlockFixture from '@opentrons/shared-data/labware/definitions/2/opentrons_calibrationblock_short_side_left/1'
 import type { TipLengthCalibrationSessionDetails } from '../types'
 import type { TipLengthCalibrationSessionParams } from '../tip-length-calibration/types'
 
@@ -20,7 +20,7 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       namespace: 'opentrons',
       version: 1,
       isTiprack: true,
-      definition: fixture_tiprack_300_ul,
+      definition: tipRackFixture,
     },
     {
       slot: '1',
@@ -28,7 +28,7 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       namespace: 'opentrons',
       version: 1,
       isTiprack: false,
-      definition: opentrons_calibrationblock_short_side_left,
+      definition: calBlockFixture,
     },
   ],
 }
@@ -36,5 +36,5 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
 export const mockTipLengthCalibrationSessionParams: TipLengthCalibrationSessionParams = {
   mount: 'left',
   hasCalibrationBlock: true,
-  tipRackDefinition: fixture_tiprack_300_ul,
+  tipRackDefinition: tipRackFixture,
 }
