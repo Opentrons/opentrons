@@ -58,7 +58,8 @@ describe('MeasureTip', () => {
 
       expect(mockSendCommand).toHaveBeenCalledWith(
         Sessions.tipCalCommands.JOG,
-        { vector: jogParamsByDirection[direction] }
+        { vector: jogParamsByDirection[direction] },
+        false
       )
     })
 
