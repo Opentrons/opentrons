@@ -62,7 +62,6 @@ class TipCalibrationUserFlow():
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
-
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
         self._deck = geometry.Deck(load_name=deck_load_name)
