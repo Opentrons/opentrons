@@ -1,10 +1,10 @@
 // @flow
 import type {
   AtomicProfileStep,
-  Command,
   EngageMagnetParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
 import typeof { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../constants'
 import type { ProfileItem } from '../form-types'
 import type {

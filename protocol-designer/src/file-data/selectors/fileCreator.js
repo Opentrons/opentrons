@@ -21,8 +21,8 @@ import type {
   FilePipette,
   FileLabware,
   FileModule,
-  Command,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
 import type { ModuleEntity } from '../../step-forms'
 import type { Selector } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
