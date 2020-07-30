@@ -88,7 +88,7 @@ def reset_tip_probe():
     config = rc.load()
     config = config._replace(
         instrument_offset=rc.build_fallback_instrument_offset({}))
-    if ff.enable_tip_length_calibration():
+    if ff.enable_calibration_overhaul():
         delete.clear_tip_length_calibration()
     else:
         config.tip_length.clear()

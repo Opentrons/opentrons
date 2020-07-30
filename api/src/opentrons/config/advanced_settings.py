@@ -155,11 +155,10 @@ settings = [
     ),
     SettingDefinition(
         _id='enableTipLengthCalibration',
-        title='Enable Tip Length Calibration',
-        description='Measure the tip length based on each unique pipette, '
-                    'by comparing the heights of the tip and the pipette '
-                    'nozzle. This should not be activated except by '
-                    'developers.'
+        title='Enable Under-Development Calibration Flows',
+        description='Do not activate this unless you are a developer. '
+                    'Enables the in-progress robot calibration flows '
+                    'for tip length, deck, and instrument calibration.'
     )
 ]
 

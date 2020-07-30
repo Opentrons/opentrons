@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional, Tuple, Union, TYPE_CHECKING
 
 from opentrons.types import Point
 from opentrons.config import pipette_config
-from opentrons.config.feature_flags import enable_tip_length_calibration
+from opentrons.config.feature_flags import enable_calibration_overhaul
 from .types import CriticalPoint
 from opentrons_shared_data.pipette import name_for_model
 
@@ -112,7 +112,7 @@ class Pipette:
                             mod_offset_xy[1],
                             mod_offset_xy[2] - tip_length)
 
-        if enable_tip_length_calibration():
+        if enable_calibration_overhaul():
             instr = self._instrument_offset
         else:
             instr = self._instrument_offset._replace(z=0)
@@ -140,7 +140,7 @@ class Pipette:
     @property
     def current_tip_length(self) -> float:
         """ The length of the current tip attached (0.0 if no tip) """
-        if enable_tip_length_calibration():
+        if enable_calibration_overhaul():
             return self._current_tip_length
         else:
             return (self._current_tip_length

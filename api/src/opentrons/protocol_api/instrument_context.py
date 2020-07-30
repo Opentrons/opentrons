@@ -6,7 +6,7 @@ from typing import (Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union)
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.config.feature_flags import enable_tip_length_calibration
+from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from .util import (
@@ -1355,7 +1355,7 @@ class InstrumentContext(CommandPublisher):
             tip_length = tiprack.tip_length
             return tip_length - tip_overlap
 
-        if not enable_tip_length_calibration():
+        if not enable_calibration_overhaul():
             return _build_length_from_overlap()
         else:
             try:
