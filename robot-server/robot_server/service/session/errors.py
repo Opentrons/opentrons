@@ -1,3 +1,8 @@
+# TODO: Amit 07/30/2020 - SessionException should derive from RobotServerError
+#   and provide an easy way to customize the HTTP status code along with
+#   other Error attributes
+
+
 class SessionException(Exception):
     """Base of all session exceptions"""
     pass
