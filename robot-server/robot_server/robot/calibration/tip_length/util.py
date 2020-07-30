@@ -1,13 +1,48 @@
+from enum import Enum
+
+from http import HTTPStatus
 from typing import Set, Dict, Any
 from robot_server.robot.calibration.tip_length.constants import WILDCARD
+from robot_server.service.errors import RobotServerError
+from robot_server.service.json_api.errors import Error
 
 
-class TipCalibrationError(Exception):
-    pass
+class TipCalibrationError(Enum):
+    NO_PIPETTE = (
+        HTTPStatus.FORBIDDEN,
+        'No Pipette Attached',
+        'No pipette present on {} mount')
+    NO_KNOWN_TIPRACK = (
+        HTTPStatus.NOT_IMPLEMENTED,
+        'No Tiprack For Pipette',
+        'No known tipracks for pipette model {}'
+    )
 
 
-class StateTransitionError(Exception):
-    pass
+class TipCalibrationException(RobotServerError):
+    def __init__(self, whicherror: TipCalibrationError, *fmt_args):
+        super().__init__(
+            whicherror.value[0],
+            Error(
+                id=str(whicherror),
+                status=str(whicherror.value[0]),
+                title=whicherror.value[1],
+                detail=whicherror.value[2].format(*fmt_args)
+            )
+        )
+
+
+class StateTransitionError(RobotServerError):
+    def __init__(self, action, state):
+        super().__init__(
+            HTTPStatus.CONFLICT,
+            Error(
+                id='TipLengthCalibration.StateTransitionError',
+                status=str(HTTPStatus.CONFLICT),
+                title='Illegal State Transition',
+                detail=f'The action {action} may not occur in the state '
+                       f'{state}')
+            )
 
 
 TransitionMap = Dict[Any, Set[Dict[Any, Any]]]

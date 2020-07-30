@@ -52,5 +52,4 @@ class TipCalibrationStateMachine:
         if next_state:
             return next_state
         else:
-            raise StateTransitionError(f"Cannot call {command} command "
-                                       f"from {from_state}.")
+            raise StateTransitionError(command, from_state)
