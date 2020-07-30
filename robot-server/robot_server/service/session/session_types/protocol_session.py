@@ -37,7 +37,7 @@ class ProtocolSession(BaseSession):
         """Try to create the protocol session"""
         protocol = configuration.protocol_manager.get(
             cast(models.ProtocolCreateParams,
-                 instance_meta.create_params).protocol_id
+                 instance_meta.create_params).protocolId
         )
         return cls(configuration, instance_meta, protocol)
 

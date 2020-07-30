@@ -16,7 +16,7 @@ stages:
           attributes:
             sessionType: protocol
             createParams:
-              protocol_id: "my_protocol"
+              protocolId: "my_protocol"
     response:
       status_code: 404
 ---
@@ -27,7 +27,7 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Upload a protocol with support file
+  - name: Upload a protocol to use with the session
     request:
       url: "{host:s}:{port:d}/protocols"
       method: POST
@@ -48,7 +48,7 @@ stages:
           attributes:
             sessionType: protocol
             createParams:
-              protocol_id: "{protocol_id}"
+              protocolId: "{protocol_id}"
     response:
       status_code: 201
       save:
@@ -61,7 +61,7 @@ stages:
           attributes:
             sessionType: protocol
             createParams:
-              protocol_id: "{protocol_id}"
+              protocolId: "{protocol_id}"
             createdAt: !anystr
             details: {}
         links: !anydict

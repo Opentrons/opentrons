@@ -34,7 +34,7 @@ class JogPosition(BaseModel):
 
 
 class ProtocolCreateParams(BaseModel):
-    protocol_id: str
+    protocolId: str
 
 
 class SessionType(str, Enum):
