@@ -59,7 +59,6 @@ class TipCalibrationUserFlow():
                  mount: Mount,
                  has_calibration_block: bool,
                  tip_rack: 'LabwareDefinition'):
-        # TODO: require mount and has_calibration_block params
         self._tip_rack_definition = tip_rack
         self._hardware = hardware
         self._mount = mount
