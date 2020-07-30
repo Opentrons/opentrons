@@ -23,28 +23,34 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
 import { formatJogVector } from './utils'
-import leftMultiBlockNozzleAsset from './videos/Left_Multi_CalBlock_Nozzle_REV1.webm'
-import leftMultiTrashNozzleAsset from './videos/Left_Multi_Trash_Nozzle_REV1.webm'
+import leftMultiBlockAsset from './videos/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
+import leftMultiTrashAsset from './videos/Left_Multi_Trash_NO_TIP_(330x260)REV1.webm'
+import leftSingleBlockAsset from './videos/Left_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
+import leftSingleTrashAsset from './videos/Left_Single_Trash_NO_TIP_(330x260)REV1.webm'
+import rightMultiBlockAsset from './videos/Right_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
+import rightMultiTrashAsset from './videos/Right_Multi_Trash_NO_TIP_(330x260)REV1.webm'
+import rightSingleBlockAsset from './videos/Right_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
+import rightSingleTrashAsset from './videos/Right_Single_Trash_NO_TIP_(330x260)REV1.webm'
 
 const assetMap = {
   block: {
     left: {
-      multi: leftMultiBlockNozzleAsset,
-      single: leftMultiBlockNozzleAsset, // TODO: get asset for single pipettes
+      multi: leftMultiBlockAsset,
+      single: leftSingleBlockAsset,
     },
     right: {
-      multi: leftMultiBlockNozzleAsset,
-      single: leftMultiBlockNozzleAsset, // TODO: get asset for single pipettes
+      multi: rightMultiBlockAsset,
+      single: rightSingleBlockAsset,
     },
   },
   trash: {
     left: {
-      multi: leftMultiTrashNozzleAsset,
-      single: leftMultiTrashNozzleAsset, // TODO: get asset for single pipettes
+      multi: leftMultiTrashAsset,
+      single: leftSingleTrashAsset,
     },
     right: {
-      multi: leftMultiTrashNozzleAsset,
-      single: leftMultiTrashNozzleAsset, // TODO: get asset for single pipettes
+      multi: rightMultiTrashAsset,
+      single: rightSingleTrashAsset,
     },
   },
 }
