@@ -58,7 +58,7 @@ class TipCalibrationUserFlow():
                  hardware: ThreadManager,
                  mount: Mount,
                  has_calibration_block: bool,
-                 tiprack: Dict):
+                 tip_rack: Dict):
         # TODO: require mount and has_calibration_block params
         self._tip_rack_definition = tip_rack
         self._hardware = hardware
