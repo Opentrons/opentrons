@@ -25,6 +25,8 @@ import type {
   CalibrateTipLengthChildProps,
 } from './types'
 
+export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
+
 const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
 const EXIT = 'exit'
 

@@ -1,21 +1,24 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
 import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 import { getUseTrashSurfaceForTipCal } from '../../config'
+import { setUseTrashSurfaceForTipCal } from '../../calibration'
 
-import { CalibrateTipLength } from '../../components/CalibrateTipLength'
-import { ToolSettingAlertModal } from '../../components/CalibrateTipLength/ToolSettingAlertModal'
+import {
+  CalibrateTipLength,
+  AskForCalibrationBlockModal,
+} from '../../components/CalibrateTipLength'
 import { CalibrationInfoBox } from '../../components/CalibrationInfoBox'
 import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
 import { Portal } from '../../components/portal'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 
-export type TipLengthCalibrationControlProps = {|
+export type CalibrateTipLengthControlProps = {|
   robotName: string,
   hasCalibrated: boolean,
   mount: Mount,
@@ -30,10 +33,11 @@ export function CalibrateTipLengthControl({
   robotName,
   hasCalibrated,
   mount,
-}: TipLengthCalibrationControlProps): React.Node {
+}: CalibrateTipLengthControlProps): React.Node {
   const [showWizard, setShowWizard] = React.useState(false)
   const [showCalBlockPrompt, setShowCalBlockPrompt] = React.useState(false)
-  const [dispatch, requestIds] = RobotApi.useDispatchApiRequest()
+  const dispatch = useDispatch<Dispatch>()
+  const [dispatchRequest, requestIds] = RobotApi.useDispatchApiRequest()
 
   const useTrashSurfaceForTipCalSetting = useSelector(
     getUseTrashSurfaceForTipCal
@@ -67,38 +71,33 @@ export function CalibrateTipLengthControl({
     return null
   })
 
-  const ensureSession = React.useCallback(() => {
-    if (useTrashSurface.current === null) return
-    dispatch(
-      Sessions.ensureSession(
-        robotName,
-        Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
-        { mount, hasCalibrationBlock: !useTrashSurface.current }
-      )
-    )
-  }, [dispatch, robotName, useTrashSurface, mount])
-
-  const handleStart = React.useCallback(() => {
+  const handleStart = () => {
     if (useTrashSurface.current !== null) {
-      ensureSession()
+      dispatchRequest(
+        Sessions.ensureSession(
+          robotName,
+          Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+          { mount, hasCalibrationBlock: !useTrashSurface.current }
+        )
+      )
     } else {
       setShowCalBlockPrompt(true)
     }
-  }, [useTrashSurface, ensureSession])
+  }
 
-  const setHasBlock = React.useCallback(
-    (hasCalibrationBlock: boolean) => {
-      useTrashSurface.current = !hasCalibrationBlock
-      handleStart()
-      setShowCalBlockPrompt(false)
-    },
-    [useTrashSurface, handleStart]
-  )
+  const setHasBlock = (hasBlock: boolean, rememberPreference: boolean) => {
+    useTrashSurface.current = !hasBlock
+    if (rememberPreference) {
+      dispatch(setUseTrashSurfaceForTipCal(!hasBlock))
+    }
+    handleStart()
+    setShowCalBlockPrompt(false)
+  }
 
-  const handleCloseWizard = React.useCallback(() => {
+  const handleCloseWizard = () => {
     setShowWizard(false)
     useTrashSurface.current = useTrashSurfaceForTipCalSetting
-  }, [useTrashSurface, setShowWizard, useTrashSurfaceForTipCalSetting])
+  }
 
   return (
     <>
@@ -114,7 +113,7 @@ export function CalibrateTipLengthControl({
       </CalibrationInfoBox>
       {showCalBlockPrompt && (
         <Portal>
-          <ToolSettingAlertModal setHasBlock={setHasBlock} />
+          <AskForCalibrationBlockModal setHasBlock={setHasBlock} />
         </Portal>
       )}
       {showWizard && useTrashSurface.current !== null && (

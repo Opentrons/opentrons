@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 import {
   AlertModal,
   Box,
@@ -16,7 +15,6 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 
-import { setUseTrashSurfaceForTipCal } from '../../calibration'
 import styles from './styles.css'
 import { labwareImages } from './labwareImages'
 import { Portal } from '../portal'
@@ -42,26 +40,15 @@ const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 const NOTE_SPACING = '1.75rem'
 
 type Props = {|
-  setHasBlock: boolean => void,
+  setHasBlock: (hasBlock: boolean, rememberPreference: boolean) => void,
 |}
-export function ToolSettingAlertModal(props: Props): React.Node {
-  const { setHasBlock } = props
+export function AskForCalibrationBlockModal(props: Props): React.Node {
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
     false
   )
-  const dispatch = useDispatch()
 
-  const handleUseTrashSurface = () => {
-    if (rememberPreference) {
-      dispatch(setUseTrashSurfaceForTipCal(true))
-    }
-    setHasBlock(false)
-  }
-  const handleUseBlock = () => {
-    if (rememberPreference) {
-      dispatch(setUseTrashSurfaceForTipCal(false))
-    }
-    setHasBlock(true)
+  const makeSetHasBlock = hasBlock => () => {
+    props.setHasBlock(hasBlock, rememberPreference)
   }
 
   return (
@@ -101,8 +88,10 @@ export function ToolSettingAlertModal(props: Props): React.Node {
           </Flex>
         </Box>
         <Flex marginY={SPACING_3} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <SecondaryBtn onClick={handleUseBlock}>{HAVE_BLOCK}</SecondaryBtn>
-          <SecondaryBtn onClick={handleUseTrashSurface}>
+          <SecondaryBtn onClick={makeSetHasBlock(true)}>
+            {HAVE_BLOCK}
+          </SecondaryBtn>
+          <SecondaryBtn onClick={makeSetHasBlock(false)}>
             {USE_TRASH}
           </SecondaryBtn>
         </Flex>
