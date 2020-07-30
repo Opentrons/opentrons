@@ -24,13 +24,13 @@ from opentrons_shared_data.protocol.constants import (
 
 if TYPE_CHECKING:
     from .dev_types import (
-        JsonV4PipetteDispatch, JsonV4MagneticModuleDispatch,
+        PipetteDispatch, JsonV4MagneticModuleDispatch,
         JsonV4TemperatureModuleDispatch,
         JsonV4ThermocyclerDispatch
     )
 
 
-pipette_command_map: 'JsonV4PipetteDispatch' = {
+pipette_command_map: 'PipetteDispatch' = {
     JsonPipetteCommand.blowout.value: _blowout,
     JsonPipetteCommand.pickUpTip.value: _pick_up_tip,
     JsonPipetteCommand.dropTip.value: _drop_tip,

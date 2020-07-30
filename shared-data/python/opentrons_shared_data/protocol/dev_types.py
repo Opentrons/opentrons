@@ -368,6 +368,22 @@ JsonProtocolV4 = TypedDict(
         "designerApplication": DesignerApplication
     }, total=False)
 
+JsonProtocolV5 = TypedDict(
+    'JsonProtocolV5',
+    {
+        "$otSharedSchema": Literal["#/protocol/schemas/5"],
+        "schemaVersion": Literal[5],
+        "metadata": Metadata,
+        "robot": RobotRequirement,
+        "pipettes": Dict[str, PipetteRequirement],
+        "labware": Dict[str, LabwareRequirement],
+        "labwareDefinitions": Dict[str, LabwareDefinition],
+        "modules": Dict[str, ModuleRequirement],
+        "commands": List[Command],
+        "commandAnnotations": Dict[str, Any],
+        "designerApplication": DesignerApplication
+    }, total=False)
+
 
 class JsonProtocolV3(TypedDict, total=False):
     schemaVersion: Literal[3]
