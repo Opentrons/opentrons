@@ -5,7 +5,6 @@ import { OutlineButton, RobotWorkSpace } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../sessions'
-import { getLatestLabwareDef } from '../../getLabware'
 import type { CalibrateTipLengthChildProps } from './types'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import styles from './styles.css'
@@ -62,7 +61,7 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
               (slot: $Values<typeof deckSlotsById>, slotId) => {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
                 const labwareForSlot = labware.find(l => l.slot === slotId)
-                const labwareDef = getLatestLabwareDef(labwareForSlot?.loadName)
+                const labwareDef = labwareForSlot?.definition
 
                 return labwareDef ? (
                   <CalibrationLabwareRender

@@ -43,6 +43,10 @@ export function Pipettes(props: Props): React.Node {
     PIPETTE_MOUNTS.find(m => m === mount) || null
 
   const currentPipette = pipettes.find(p => p.mount === currentMount) || null
+  const tipRackDef = (currentPipette
+    ? tipracksByMount[currentPipette.mount]
+    : null
+  )?.definition
 
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>
@@ -57,11 +61,13 @@ export function Pipettes(props: Props): React.Node {
       />
       {robotName &&
         !!currentPipette &&
+        !!tipRackDef &&
         (ff.enableCalibrationOverhaul ? (
           <CalibrateTipLengthControl
             mount={currentPipette.mount}
             robotName={robotName}
             hasCalibrated={currentPipette.probed}
+            tipRackDefinition={tipRackDef}
           />
         ) : (
           <TipProbe {...currentPipette} />

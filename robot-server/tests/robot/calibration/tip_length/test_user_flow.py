@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, ANY, patch, call
 from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
+from opentrons.protocol_api.labware import get_labware_definition
 from robot_server.service.session.models import (
     CalibrationCommand, TipLengthCalibrationCommand)
 from robot_server.robot.calibration.tip_length.user_flow import \
@@ -103,11 +104,15 @@ def mock_hw(hardware):
 @pytest.fixture(params=[True, False])
 def mock_user_flow(mock_hw, request):
     has_calibration_block = request.param
+    mount = next(k for k, v in
+                 mock_hw._attached_instruments.items() if v)
+    pip_model = mock_hw._attached_instruments[mount].model
+    tip_rack = get_labware_definition(pipette_map[pip_model], 'opentrons', '1')
     m = TipCalibrationUserFlow(
         hardware=mock_hw,
-        mount=next(k for k, v in
-                   mock_hw._attached_instruments.items() if v),
-        has_calibration_block=has_calibration_block)
+        mount=mount,
+        has_calibration_block=has_calibration_block,
+        tip_rack=tip_rack)
 
     yield m
 
@@ -116,11 +121,15 @@ def mock_user_flow(mock_hw, request):
 def mock_user_flow_all_combos(mock_hw_all_combos, request):
     has_calibration_block = request.param
     hw = mock_hw_all_combos
+    mount = next(k for k, v in
+                 hw._attached_instruments.items() if v)
+    pip_model = hw._attached_instruments[mount].model
+    tip_rack = get_labware_definition(pipette_map[pip_model], 'opentrons', '1')
     m = TipCalibrationUserFlow(
         hardware=hw,
-        mount=next(k for k, v in
-                   hw._attached_instruments.items() if v),
-        has_calibration_block=has_calibration_block)
+        mount=mount,
+        has_calibration_block=has_calibration_block,
+        tip_rack=tip_rack)
 
     yield m
 

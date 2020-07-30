@@ -27,18 +27,29 @@ class AttachedPipette(BaseModel):
 
 class RequiredLabware(BaseModel):
     """A model describing all tipracks required, based on pipettes attached."""
-    alternatives: List[str]
-    slot: Optional[str]
+    slot: str
     loadName: str
     namespace: str
     version: str
     isTiprack: bool
+    definition: dict
 
 
 class SessionCreateParams(BaseModel):
     """The parameters required to start a tip length calibration session."""
-    mount: str
-    hasCalibrationBlock: bool
+    mount: str = Field(
+        ...,
+        description='The mount on which the pipette is attached, left or right'
+    )
+    hasCalibrationBlock: bool = Field(
+        ...,
+        description='True if the user wants to use a calibration block; '
+                    'False otherwise'
+    )
+    tipRackDefinition: dict = Field(
+        ...,
+        description='The full labware definition of the tip rack to calibrate.'
+    )
 
 
 class TipCalibrationSessionStatus(BaseModel):
@@ -70,20 +81,20 @@ class TipCalibrationSessionStatus(BaseModel):
                     },
                     "labware": [
                       {
-                          "alternatives": ["filter_tip_rack_loadname"],
                           "slot": "8",
                           "loadName": "tiprack_loadname",
                           "namespace": "opentrons",
                           "version": "1",
-                          "isTiprack": "true"
+                          "isTiprack": "true",
+                          "definition": {"ordering": "the ordering section..."}
                       },
                       {
-                          "alternatives": [],
                           "slot": "3",
                           "loadName": "cal_block_loadname",
                           "namespace": "opentrons",
                           "version": "1",
-                          "isTiprack": "false"
+                          "isTiprack": "false",
+                          "definition": {"ordering": "the ordering section..."}
                       }
                     ]
                 }

@@ -1,5 +1,7 @@
 import logging
-from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
+from typing import (
+    Dict, Awaitable, Callable, Any, Set, List, Optional,
+    TYPE_CHECKING)
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
 from opentrons.calibration_storage import modify
@@ -33,6 +35,9 @@ from .models import (
     AttachedPipette
 )
 
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware import LabwareDefinition
+
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -52,7 +57,9 @@ class TipCalibrationUserFlow():
     def __init__(self,
                  hardware: ThreadManager,
                  mount: Mount,
-                 has_calibration_block: bool):
+                 has_calibration_block: bool,
+                 tip_rack: 'LabwareDefinition'):
+        self._tip_rack_definition = tip_rack
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block = has_calibration_block
@@ -98,15 +105,14 @@ class TipCalibrationUserFlow():
     def get_required_labware(self) -> List[RequiredLabware]:
         slots = self._deck.get_non_fixture_slots()
         lw_by_slot = {s: self._deck[s] for s in slots if self._deck[s]}
-        alt_trs = self._get_alt_tip_racks(),
         return [
             RequiredLabware(
-                alternatives=alt_trs if s == TIP_RACK_SLOT else [],
                 slot=s,
                 loadName=lw.load_name,
                 namespace=lw._definition['namespace'],  # type: ignore
                 version=str(lw._definition['version']),  # type: ignore
-                isTiprack=lw.is_tiprack  # type: ignore
+                isTiprack=lw.is_tiprack,  # type: ignore
+                definition=lw._definition,  # type: ignore
             ) for s, lw in lw_by_slot.items()
         ]
 
@@ -222,15 +228,12 @@ class TipCalibrationUserFlow():
         await self._return_tip()
 
     def _get_tip_rack_lw(self) -> labware.Labware:
-        pip_vol = self._hw_pipette.config.max_volume
-        tr_lookup = TIP_RACK_LOOKUP_BY_MAX_VOL.get(str(pip_vol), None)
-        if tr_lookup:
-            return labware.load(tr_lookup.load_name,
-                                self._deck.position_for(TIP_RACK_SLOT))
-        else:
-            raise ErrorExc(
-                Error.NO_KNOWN_TIPRACK,
-                self._hw_pipette.model)
+        try:
+            return labware.load_from_definition(
+                self._tip_rack_definition,
+                self._deck.position_for(TIP_RACK_SLOT))
+        except Exception:
+            raise ErrorExc(Error.BAD_DEF)
 
     def _get_alt_tip_racks(self) -> Set[str]:
         pip_vol = self._hw_pipette.config.max_volume

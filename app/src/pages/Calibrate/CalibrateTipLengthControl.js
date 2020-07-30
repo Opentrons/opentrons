@@ -8,10 +8,12 @@ import * as Sessions from '../../sessions'
 import { getUseTrashSurfaceForTipCal } from '../../config'
 import { setUseTrashSurfaceForTipCal } from '../../calibration'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   CalibrateTipLength,
   AskForCalibrationBlockModal,
 } from '../../components/CalibrateTipLength'
+
 import { CalibrationInfoBox } from '../../components/CalibrationInfoBox'
 import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
 import { Portal } from '../../components/portal'
@@ -22,6 +24,7 @@ export type CalibrateTipLengthControlProps = {|
   robotName: string,
   hasCalibrated: boolean,
   mount: Mount,
+  tipRackDefinition: LabwareDefinition2,
 |}
 
 const IS_CALIBRATED = 'Pipette tip height is calibrated'
@@ -33,6 +36,7 @@ export function CalibrateTipLengthControl({
   robotName,
   hasCalibrated,
   mount,
+  tipRackDefinition,
 }: CalibrateTipLengthControlProps): React.Node {
   const [showWizard, setShowWizard] = React.useState(false)
   const [showCalBlockPrompt, setShowCalBlockPrompt] = React.useState(false)
@@ -77,7 +81,11 @@ export function CalibrateTipLengthControl({
         Sessions.ensureSession(
           robotName,
           Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
-          { mount, hasCalibrationBlock: !useTrashSurface.current }
+          {
+            mount,
+            hasCalibrationBlock: !useTrashSurface.current,
+            tipRackDefinition,
+          }
         )
       )
     } else {
