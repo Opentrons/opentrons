@@ -26,8 +26,8 @@ The robot has 6 axes of motion, each controlled by a stepper motor:
 
  - X: left-right
  - Y: forward-back
-  - Z: left pipette up-down
-  - A: right pipette up-down
+ - Z: left pipette up-down
+ - A: right pipette up-down
  - B: left pipette plunger up-down
  - C: right pipette plunger up-down
 
