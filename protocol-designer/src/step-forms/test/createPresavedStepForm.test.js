@@ -143,7 +143,13 @@ describe('createPresavedStepForm', () => {
         pipette: 'leftPipetteId',
         stepType: 'moveLiquid',
         // default fields
-        ...(airGapEnabled ? { aspirate_airGap_volume: '1' } : {}),
+        ...(airGapEnabled
+          ? {
+              aspirate_airGap_volume: '1',
+              aspirate_delay_seconds: '1',
+              dispense_delay_seconds: '1',
+            }
+          : {}),
         aspirate_flowRate: null,
         aspirate_labware: null,
         aspirate_mix_checkbox: false,

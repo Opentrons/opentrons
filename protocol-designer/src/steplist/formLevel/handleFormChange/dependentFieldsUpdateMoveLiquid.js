@@ -219,10 +219,8 @@ const updatePatchOnPipetteChange = (
   return patch
 }
 
-const clearedDisposalVolumeFields = getDefaultFields(
-  'disposalVolume_volume',
-  'disposalVolume_checkbox'
-)
+const getClearedDisposalVolumeFields = () =>
+  getDefaultFields('disposalVolume_volume', 'disposalVolume_checkbox')
 
 const updatePatchDisposalVolumeFields = (
   patch: FormPatch,
@@ -241,7 +239,7 @@ const updatePatchDisposalVolumeFields = (
     // or whenever disposalVolume_checkbox is cleared
     return {
       ...patch,
-      ...clearedDisposalVolumeFields,
+      ...getClearedDisposalVolumeFields(),
     }
   }
 
@@ -321,7 +319,7 @@ const clampDisposalVolume = (
       }
     : {
         ...patch,
-        ...clearedDisposalVolumeFields,
+        ...getClearedDisposalVolumeFields(),
       }
 }
 
