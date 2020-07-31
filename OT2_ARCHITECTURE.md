@@ -1,9 +1,9 @@
 
 # OT2 Architecture
 
-  ## Hardware
+## Hardware
 
-  ### Raspberry Pi
+### Raspberry Pi
   
 Inside the OT2 is a small computer (a [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)), running Linux.
 
