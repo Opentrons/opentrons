@@ -5,7 +5,7 @@
 
   ### Raspberry Pi
   
-Inside the OT2 is a small computer (a Raspberry Pi 3), running Linux.
+Inside the OT2 is a small computer (a [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)), running Linux.
 
 #### Data storage
 
@@ -13,7 +13,7 @@ Data on the Raspberry Pi is stored in two physical pieces of hardware. The main 
 
 #### Networking
 
-  Other computers, like your laptop, communicate with the Raspberry Pi that controls the OT2 via a network. When you connect your robot via USB, you are in fact connecting to the Raspberry Pi's ethernet port. The USB port is connected to an internal USB-to-ethernet adapter, which is in turn connected to the Pi's ethernet port. When you plug into the USB connection your computer recognises a new network interface establishing a local network with the OT2. You can also connect the Pi to a wireless network with WiFi.
+  Other computers, like your laptop, communicate with the Raspberry Pi that controls the OT2 via a network. When you connect your robot via USB, you are in fact connecting to the Raspberry Pi's ethernet port. The USB port is connected to an internal USB-to-ethernet adapter, which is in turn connected to the Pi's ethernet port. When you connect a cable to the robot's USB port, your computer recognises the device as a new network interface, which establishes a local network with the OT2. (You can also connect the OT2 to a wireless network with WiFi, or connect to a wired network by placing a USB-ethernet adapter in one of the Pi's USB ports).
 
 ### Lights, switches
 
@@ -40,7 +40,7 @@ The SmoothieBoard is connected to the Raspberry Pi via a UART connection, with t
 
 The main operating system of the robot is a minimal version of Linux built using [a custom fork of buildroot](https://github.com/Opentrons/buildroot).
 
- The buildroot [configuration](https://github.com/Opentrons/buildroot/blob/opentrons-develop/configs/ot2_defconfig) includes a number of standard packages, and also some specific to the OT2. Those specific to the OT2 are: the API, the robot server, the 'shared data' and the update server.
+ The buildroot [configuration](https://github.com/Opentrons/buildroot/blob/opentrons-develop/configs/ot2_defconfig) includes a number of standard packages, and also some specific to the OT2. Those specific to the OT2 are: the API, the robot server, the 'shared data', and the update server.
 
 ## API
 The [OpenTrons API](https://github.com/Opentrons/opentrons/tree/edge/api) is a Python package which provides an interface to control the OT robot. Protocols are written in the protocol API, which is a part of the API package.
