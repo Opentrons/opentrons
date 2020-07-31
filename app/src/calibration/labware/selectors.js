@@ -14,7 +14,7 @@ import { selectors as robotSelectors } from '../../robot'
 
 import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { State } from '../../types'
-import type { LabwareCalibration, LabwareCalibrationModel } from './../types'
+import type { LabwareCalibration, LabwareCalibrationModel } from '../types'
 import type { LabwareSummary } from './types'
 
 export const getLabwareCalibrations = (
