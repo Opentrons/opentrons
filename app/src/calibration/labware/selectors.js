@@ -70,16 +70,25 @@ export const getProtocolLabwareList: (
       const { definition: def, loadName, namespace, version, parent } = lw
       const displayName = def ? getLabwareDisplayName(def) : loadName
       const parentDisplayName = parent ? getModuleDisplayName(parent) : null
-      const matchesLabwareIdentity = target =>
+      const matchesLabwareIdentityForQuantity = target =>
+        target.loadName === loadName &&
+        target.namespace === namespace &&
+        target.version === version &&
+        target.parent === parent
+
+      const quantity = baseLabwareList.filter(matchesLabwareIdentityForQuantity)
+        .length
+
+      const matchesLabwareIdentityForCalibration = target =>
         target.loadName === loadName &&
         target.namespace === namespace &&
         target.version === version &&
         (parent === null || target.parent === parent)
 
-      const quantity = baseLabwareList.filter(matchesLabwareIdentity).length
-
       const calData = calibrations
-        .filter(({ attributes }) => matchesLabwareIdentity(attributes))
+        .filter(({ attributes }) =>
+          matchesLabwareIdentityForCalibration(attributes)
+        )
         .map(({ attributes }) => {
           const calVector = attributes.calibrationData.offset.value.map(n =>
             round(n, 1)
