@@ -43,17 +43,17 @@ The main operating system of the robot is a minimal version of Linux built using
  The buildroot [configuration](https://github.com/Opentrons/buildroot/blob/opentrons-develop/configs/ot2_defconfig) includes a number of standard packages, and also some specific to the OT2. Those specific to the OT2 are: the API, the robot server, the 'shared data', and the update server.
 
 ## API
-The [OpenTrons API](https://github.com/Opentrons/opentrons/tree/edge/api) is a Python package which provides an interface to control the OT robot. Protocols are written in the protocol API, which is a part of the API package.
+The [Opentrons API](https://github.com/Opentrons/opentrons/tree/edge/api) is a Python package which provides an interface to control the OT robot. Protocols are written in the protocol API, which is a part of the API package.
 
 With the API alone, a Python script or Jupyter notebook running on the OT2 is able to control the robot to perform liquid-handling operations.
 
 ## Robot server
-The main such Python programme is the [robot server](https://github.com/Opentrons/opentrons/tree/edge/robot-server), which provides the interface to the robot that the OpenTrons app on a user's computer can access to do routine robot work. It provides endpoints that allow performing calibration and running protocols uploaded from the app.
+The main such Python programme is the [robot server](https://github.com/Opentrons/opentrons/tree/edge/robot-server), which provides the interface to the robot that the Opentrons app on a user's computer can access to do routine robot work. It provides endpoints that allow performing calibration and running protocols uploaded from the app.
 
-Note that only one process can have access to the robot's GPIO ports at a time. By default the robot server connects to these ports on start-up, which prevents a copy of the API running in Jupyter or imported from a Python script from using GPIO functionality. To gain access to the GPIO's in these custom scripts, one can disable the robot server with `systemctl stop opentrons-robot-server`, before importing the OpenTrons API into the other Python script. However this will prevent the OpenTrons app from connecting to the robot until the robot server is restarted with `systemctl start opentrons-robot-server`, or the robot is rebooted.
+Note that only one process can have access to the robot's GPIO ports at a time. By default the robot server connects to these ports on start-up, which prevents a copy of the API running in Jupyter or imported from a Python script from using GPIO functionality. To gain access to the GPIO's in these custom scripts, one can disable the robot server with `systemctl stop opentrons-robot-server`, before importing the Opentrons API into the other Python script. However this will prevent the Opentrons app from connecting to the robot until the robot server is restarted with `systemctl start opentrons-robot-server`, or the robot is rebooted.
 
 ## Shared data
-Some information, such as labware geometry data, needs to be used in multiple locations in the OpenTrons codebase (e.g. in the protocol designer as well as on the robot itself). This data is kept in a special [shared data](https://github.com/Opentrons/opentrons/tree/edge/shared-data) repository so that it can be easily included in all these locations.
+Some information, such as labware geometry data, needs to be used in multiple locations in the Opentrons codebase (e.g. in the protocol designer as well as on the robot itself). This data is kept in a special [shared data](https://github.com/Opentrons/opentrons/tree/edge/shared-data) repository so that it can be easily included in all these locations.
   
 
 ## Update server
