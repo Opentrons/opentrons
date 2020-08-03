@@ -14,6 +14,8 @@ from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.protocol.protocol import UploadedProtocol
 from robot_server.service.session.session_types.protocol.executor import \
     ProtocolCommandExecutor
+from robot_server.service.session.session_types.protocol.models import \
+    ProtocolSessionDetails
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +55,11 @@ class ProtocolSession(BaseSession):
         return cls(configuration, instance_meta, protocol)
 
     def _get_response_details(self) -> models.SessionDetails:
-        return models.EmptyModel()
+        return ProtocolSessionDetails(
+            protocolId=self._uploaded_protocol.meta.identifier,
+            currentState=self._command_executor.current_state,
+            executedCommands=self._command_executor.commands
+        )
 
     @property
     def command_executor(self) -> CommandExecutor:

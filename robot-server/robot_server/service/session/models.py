@@ -11,7 +11,8 @@ from robot_server.robot.calibration.tip_length import (
     models as tip_length_calibration_models)
 from robot_server.robot.calibration.deck import (
     models as deck_calibration_models)
-
+from robot_server.service.session.session_types.protocol import \
+    models as protocol_session_models
 from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
 
@@ -94,6 +95,7 @@ SessionDetails = typing.Union[
     calibration_check_models.CalibrationSessionStatus,
     tip_length_calibration_models.TipCalibrationSessionStatus,
     deck_calibration_models.DeckCalibrationSessionStatus,
+    protocol_session_models.ProtocolSessionDetails,
     EmptyModel
 ]
 

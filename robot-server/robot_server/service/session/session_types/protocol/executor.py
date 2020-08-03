@@ -4,6 +4,7 @@ import sys
 import threading
 import logging
 import typing
+from dataclasses import asdict
 from enum import Enum, auto
 
 from opentrons.api import Session as ApiProtocolSession
@@ -61,11 +62,12 @@ class ProtocolCommandExecutor(CommandExecutor):
         :param protocol: The protocol resource to use
         :param configuration: The session configuration
         """
+        self._loop = asyncio.get_event_loop()
         self._protocol = protocol
         # Create the protocol runner
         self._protocol_runner = ProtocolRunner(
             protocol=protocol,
-            loop=asyncio.get_event_loop(),
+            loop=self._loop,
             hardware=configuration.hardware,
             motion_lock=configuration.motion_lock)
         self._protocol_runner.add_listener(self._on_command)
@@ -82,6 +84,7 @@ class ProtocolCommandExecutor(CommandExecutor):
             ProtocolCommand.pause: self._worker.handle_pause,
             ProtocolCommand.single_step: self._worker.handle_single_step,
         }
+        self._commands = []
 
     async def execute(self, command: Command) -> CompletedCommand:
         """Command processing"""
@@ -89,6 +92,9 @@ class ProtocolCommandExecutor(CommandExecutor):
         if command_def not in self.STATE_COMMAND_MAP.get(self.current_state, {}):
             raise UnsupportedCommandException(
                 f"Can't do '{command_def}' during self.{self.current_state}")
+
+        # TODO: Amit 8/3/2020 - proper schema for command list
+        self._commands.append(asdict(command))
 
         handler = self._handlers.get(command_def)
         if not handler:
@@ -107,12 +113,19 @@ class ProtocolCommandExecutor(CommandExecutor):
         )
 
     @property
+    def commands(self):
+        # TODO: Amit 8/3/2020 - proper schema for command list
+        return self._commands
+
+    @property
     def current_state(self) -> ProtocolSessionState:
         return self._worker.current_state
 
     def _on_command(self, msg):
         """Handler for commands executed by protocol runner"""
         log.debug(msg)
+        # TODO: Amit 8/3/2020 - proper schema for command entries
+        self._loop.call_soon_threadsafe(self._commands.append, msg)
 
     async def clean_up(self):
         await self._worker.handle_finish()
@@ -151,6 +164,7 @@ class Worker:
         # Worker thread command (modified on main thread only)
         self._worker_command = WorkerCommand.none
         self._pause_event = threading.Event()
+        self._pause_event.set()
 
     async def handle_run(self):
         await self.set_command(AsyncCommand.start_run)
@@ -199,9 +213,9 @@ class Worker:
         self.set_current_state(ProtocolSessionState.simulating)
 
         await self._loop.run_in_executor(None, self._protocol_runner.load)
-        self.set_current_state(ProtocolSessionState.ready)
 
         while True:
+            self.set_current_state(ProtocolSessionState.ready)
             log.debug(f"Waiting for command: {self._state}")
             async_command = await self._async_command_queue.get()
             log.debug(f"Got run command: {async_command}")
