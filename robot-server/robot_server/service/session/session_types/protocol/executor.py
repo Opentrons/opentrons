@@ -288,22 +288,24 @@ class ProtocolRunner:
             listener(msg)
 
     def load(self):
+        """Create and simulate the api protocol session"""
         with ProtocolRunnerContext(self._protocol):
             self._session = ApiProtocolSession.build_and_prep(
-                name=self._protocol.meta.identifier,
+                name=self._protocol.meta.protocol_file.path.name,
                 contents=self._protocol.get_contents(),
                 hardware=self._hardware,
                 loop=self._loop,
                 broker=self._broker,
                 motion_lock=self._motion_lock,
-                extra_labware={}
-            )
+                extra_labware={})
 
     def run(self):
+        """Run the protocol"""
         with ProtocolRunnerContext(self._protocol):
             self._session.run()
 
     def simulate(self):
+        """Simulate the protocol"""
         with ProtocolRunnerContext(self._protocol):
             self._session.refresh()
 

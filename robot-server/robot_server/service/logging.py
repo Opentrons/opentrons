@@ -10,7 +10,7 @@ def initialize_logging():
     robot_conf = robot_configs.load()
     level = logging._nameToLevel.get(robot_conf.log_level.upper(),
                                      logging.INFO)
-
+    level = logging.DEBUG
     if IS_ROBOT:
         c = _robot_log_config(level)
     else:
