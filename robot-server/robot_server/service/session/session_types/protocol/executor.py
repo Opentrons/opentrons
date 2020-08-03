@@ -76,7 +76,7 @@ class ProtocolCommandExecutor(CommandExecutor):
             protocol_runner=self._protocol_runner,
             loop=asyncio.get_event_loop()
         )
-        self._handlers = {
+        self._handlers: typing.Dict[CommandDefinitionType, typing.Any] = {
             ProtocolCommand.start_run: self._worker.handle_run,
             ProtocolCommand.start_simulate: self._worker.handle_simulate,
             ProtocolCommand.cancel: self._worker.handle_cancel,
@@ -84,7 +84,8 @@ class ProtocolCommandExecutor(CommandExecutor):
             ProtocolCommand.pause: self._worker.handle_pause,
             ProtocolCommand.single_step: self._worker.handle_single_step,
         }
-        self._commands = []
+        # TODO: Amit 8/3/2020 - proper schema for command list
+        self._commands: typing.List[typing.Any] = []
 
     async def execute(self, command: Command) -> CompletedCommand:
         """Command processing"""
@@ -206,6 +207,7 @@ class Worker:
         self._state = state
 
     async def set_command(self, comm: AsyncCommand):
+        """Enqueue a command for the worker"""
         await self._async_command_queue.put(comm)
 
     async def _runner_task(self):
@@ -216,34 +218,41 @@ class Worker:
 
         while True:
             self.set_current_state(ProtocolSessionState.ready)
+
             log.debug(f"Waiting for command: {self._state}")
             async_command = await self._async_command_queue.get()
-            log.debug(f"Got run command: {async_command}")
 
+            log.info(f"Got run command: {async_command}")
             if async_command == AsyncCommand.terminate:
                 break
             if async_command == AsyncCommand.start_run:
                 self.set_current_state(ProtocolSessionState.running)
-                await self._loop.run_in_executor(None,
-                                                 self._protocol_runner.run)
+                await self._loop.run_in_executor(
+                    None,
+                    self._protocol_runner.run)
             if async_command == AsyncCommand.start_simulate:
                 self.set_current_state(ProtocolSessionState.simulating)
-                await self._loop.run_in_executor(None,
-                                                 self._protocol_runner.simulate)
+                await self._loop.run_in_executor(
+                    None,
+                    self._protocol_runner.simulate)
 
         # Done.
         self.set_current_state(ProtocolSessionState.exited)
 
     def _on_command(self, msg):
+        """Command listener"""
         self._check_state()
 
     def _check_state(self):
-        """Called from worker thread"""
+        """Called from worker thread to check for changes in run flow"""
         if not self._pause_event.is_set():
+            # Need to pause. Collect prior state for after the pause.
             previous_state = self.current_state
             self._loop.call_soon_threadsafe(self.set_current_state,
                                             ProtocolSessionState.paused)
+            # Wait on pause event
             self._pause_event.wait()
+            # Resume to previous state
             self._loop.call_soon_threadsafe(self.set_current_state,
                                             previous_state)
 
@@ -278,12 +287,15 @@ class ProtocolRunner:
         self._listeners: typing.List[ListenerType] = []
 
     def add_listener(self, listener: ListenerType):
+        """Add a command listener"""
         self._listeners.append(listener)
 
     def remove_listener(self, listener: ListenerType):
+        """Remove a command listener"""
         self._listeners.remove(listener)
 
     def _on_command(self, msg):
+        """Dispatch the commands"""
         for listener in self._listeners:
             listener(msg)
 
@@ -297,6 +309,7 @@ class ProtocolRunner:
                 loop=self._loop,
                 broker=self._broker,
                 motion_lock=self._motion_lock,
+                # TODO Amit 8/3/2020 - need an answer for custom labware
                 extra_labware={})
 
     def run(self):
