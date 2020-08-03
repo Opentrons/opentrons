@@ -274,5 +274,45 @@ describe('labware calibration selectors', () => {
         },
       ])
     })
+
+    it('does not aggregate labware across differing parents', () => {
+      getLabware.mockReturnValue([
+        ({
+          type: wellPlate96Def.parameters.loadName,
+          definition: wellPlate96Def,
+          slot: '2',
+        }: $Shape<ProtocolLabware>),
+        ({
+          type: wellPlate96Def.parameters.loadName,
+          definition: wellPlate96Def,
+          slot: '3',
+        }: $Shape<ProtocolLabware>),
+      ])
+
+      getModulesBySlot.mockImplementation(calledState => {
+        return {
+          '3': {
+            model: 'magneticModuleV1',
+            slot: '3',
+            _id: 1945365648,
+          },
+        }
+      })
+
+      expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
+        {
+          displayName: wellPlate96Def.metadata.displayName,
+          parentDisplayName: null,
+          quantity: 1,
+          calibration: null,
+        },
+        {
+          displayName: wellPlate96Def.metadata.displayName,
+          parentDisplayName: 'Magnetic Module GEN1',
+          quantity: 1,
+          calibration: null,
+        },
+      ])
+    })
   })
 })
