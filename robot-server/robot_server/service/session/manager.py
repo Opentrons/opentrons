@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Optional, Tuple, Dict, Type
 
-from opentrons.hardware_control import ThreadManager
+from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.errors import SessionCreationException, \
@@ -13,7 +13,7 @@ from robot_server.service.session.models import IdentifierType, SessionType
 from robot_server.service.session.session_types import (
     NullSession, CheckSession, SessionMetaData, TipLengthCalibration,
     DeckCalibrationSession, DefaultSession)
-from robot_server.service.session.session_types.protcol.session import \
+from robot_server.service.session.session_types.protocol.session import \
     ProtocolSession
 
 log = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ class SessionManager:
 
     def __init__(self,
                  hardware: ThreadManager,
+                 motion_lock: ThreadedAsyncLock,
                  protocol_manager: ProtocolManager):
         """
         Construct the session manager
@@ -48,6 +49,7 @@ class SessionManager:
         self._session_common = SessionConfiguration(
             hardware=hardware,
             is_active=self.is_active,
+            motion_lock=motion_lock,
             protocol_manager=protocol_manager
         )
         # Create the default session.

@@ -1,19 +1,24 @@
 import asyncio
+import os
+import sys
 import threading
 import logging
 import typing
 from enum import Enum, auto
 
-from opentrons import ThreadManager
-from opentrons.hardware_control import ThreadedAsyncLock
+from opentrons.api import Session as ApiProtocolSession
+from opentrons.broker import Broker
+from opentrons.commands import command_types
+from opentrons.hardware_control import ThreadedAsyncLock, ThreadManager
 
 from robot_server.service.protocol.protocol import UploadedProtocol
 from robot_server.service.session.command_execution import CommandExecutor, \
     Command, CompletedCommand, CommandResult
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.errors import UnsupportedCommandException
-from robot_server.service.session.models import ProtocolCommand, CommandDefinitionType
-from robot_server.service.session.session_types.protcol.models import \
+from robot_server.service.session.models import ProtocolCommand, \
+    CommandDefinitionType
+from robot_server.service.session.session_types.protocol.models import \
     ProtocolSessionState
 from robot_server.util import duration
 
@@ -30,8 +35,7 @@ class ProtocolCommandExecutor(CommandExecutor):
         ProtocolSessionState.idle: set(),
         ProtocolSessionState.ready: {
             ProtocolCommand.start_run,
-            ProtocolCommand.start_simulate,
-            ProtocolCommand.single_step
+            ProtocolCommand.start_simulate
         },
         ProtocolSessionState.running: {
             ProtocolCommand.cancel,
@@ -58,11 +62,18 @@ class ProtocolCommandExecutor(CommandExecutor):
         :param configuration: The session configuration
         """
         self._protocol = protocol
-        self._worker = Worker(protocol,
-                              asyncio.get_event_loop(),
-                              configuration.hardware,
-                              configuration.motion_lock,
-                              )
+        # Create the protocol runner
+        self._protocol_runner = ProtocolRunner(
+            protocol=protocol,
+            loop=asyncio.get_event_loop(),
+            hardware=configuration.hardware,
+            motion_lock=configuration.motion_lock)
+        self._protocol_runner.add_listener(self._on_command)
+        # The async worker
+        self._worker = Worker(
+            protocol_runner=self._protocol_runner,
+            loop=asyncio.get_event_loop()
+        )
         self._handlers = {
             ProtocolCommand.start_run: self._worker.handle_run,
             ProtocolCommand.start_simulate: self._worker.handle_simulate,
@@ -73,7 +84,7 @@ class ProtocolCommandExecutor(CommandExecutor):
         }
 
     async def execute(self, command: Command) -> CompletedCommand:
-        """Command"""
+        """Command processing"""
         if command not in self.STATE_COMMAND_MAP.get(self.current_state, {}):
             raise UnsupportedCommandException(
                 f"Can't do {command} during self.{self.current_state}")
@@ -98,6 +109,10 @@ class ProtocolCommandExecutor(CommandExecutor):
     def current_state(self) -> ProtocolSessionState:
         return self._worker.current_state
 
+    def _on_command(self, msg):
+        """Handler for commands executed by protocol runner"""
+        log.debug(msg)
+
 
 class AsyncCommand(int, Enum):
     """A command for the worker task"""
@@ -117,32 +132,20 @@ class WorkerCommand(int, Enum):
 
 class Worker:
     def __init__(self,
-                 protocol: UploadedProtocol,
+                 protocol_runner: 'ProtocolRunner',
                  loop: asyncio.AbstractEventLoop,
-                 hardware: ThreadManager,
-                 motion_lock: ThreadedAsyncLock,
                  ):
-        self._protocol = protocol
+        self._protocol_runner = protocol_runner
+        self._protocol_runner.add_listener(self._on_command)
         self._loop = loop
-        self._hardware = hardware
-        self._motion_lock = motion_lock
-
-        # Log of all commands executed
-        self._commands = []
-
-        # For passing AsyncCommand from main to worker task
-        self._run_queue = asyncio.Queue(maxsize=1)
-
         # State of the worker. Only modified on main thread
         self._state = ProtocolSessionState.idle
-
+        # For passing AsyncCommand from main to worker task
+        self._async_command_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
         # Protocol running AsyncCommand handling task
-        self._run_t = self._loop.create_task(self._runner_task())
-
+        self._async_command_task = self._loop.create_task(self._runner_task())
         # Worker thread command (modified on main thread only)
         self._worker_command = WorkerCommand.none
-
-        # Pause event
         self._pause_event = threading.Event()
 
     async def handle_run(self):
@@ -174,7 +177,7 @@ class Worker:
         # Maker sure to resume
         self._pause_event.set()
         # Wait for run task to finish
-        await self._run_t
+        await self._async_command_task
 
     @property
     def current_state(self) -> ProtocolSessionState:
@@ -185,43 +188,120 @@ class Worker:
         self._state = state
 
     async def set_command(self, comm: AsyncCommand):
-        await self._run_queue.put(comm)
-
-    def _check_state(self):
-        if not self._pause_event.is_set():
-            fstate = self.current_state
-            self._loop.call_soon_threadsafe(self.set_current_state, ProtocolSessionState.paused)
-            self._pause_event.wait()
-            self._loop.call_soon_threadsafe(self.set_current_state, fstate)
-
-        if self._worker_command == WorkerCommand.single_step:
-            self._pause_event.clear()
-        elif self._worker_command == WorkerCommand.stop:
-            raise RuntimeError("Stopping")
+        await self._async_command_queue.put(comm)
 
     async def _runner_task(self):
         """Entry point for protocol running task"""
-        self.set_current_state(ProtocolSessionState.preparing)
-
-        await self._loop.run_in_executor(None, self.load_things, 4)
         self.set_current_state(ProtocolSessionState.simulating)
 
-        # await loop.run_in_executor(None, self.do_something, 3)
+        await self._loop.run_in_executor(None, self._protocol_runner.load())
         self.set_current_state(ProtocolSessionState.ready)
 
         while True:
             log.debug(f"Waiting for command: {self._state}")
-            async_command = await self._run_queue.get()
+            async_command = await self._async_command_queue.get()
             log.debug(f"Got run command: {async_command}")
 
             if async_command == AsyncCommand.terminate:
                 break
             if async_command == AsyncCommand.start_run:
                 self.set_current_state(ProtocolSessionState.running)
-                await self._loop.run_in_executor(None, self.do_something, 20)
+                await self._loop.run_in_executor(None, self._protocol_runner.run())
             if async_command == AsyncCommand.start_simulate:
                 self.set_current_state(ProtocolSessionState.simulating)
-                await self._loop.run_in_executor(None, self.do_something, 5)
+                await self._loop.run_in_executor(None, self._protocol_runner.simulate())
 
         # Done.
         self.set_current_state(ProtocolSessionState.exited)
+
+    def _on_command(self, msg):
+        self._check_state()
+
+    def _check_state(self):
+        """Called from worker thread"""
+        if not self._pause_event.is_set():
+            previous_state = self.current_state
+            self._loop.call_soon_threadsafe(self.set_current_state,
+                                            ProtocolSessionState.paused)
+            self._pause_event.wait()
+            self._loop.call_soon_threadsafe(self.set_current_state,
+                                            previous_state)
+
+        if self._worker_command == WorkerCommand.single_step:
+            self._pause_event.clear()
+        elif self._worker_command == WorkerCommand.stop:
+            raise CancelledException()
+
+
+class CancelledException(Exception):
+    pass
+
+
+ListenerType = typing.Callable[[typing.Dict], None]
+
+
+class ProtocolRunner:
+    def __init__(self,
+                 protocol: UploadedProtocol,
+                 loop: asyncio.AbstractEventLoop,
+                 hardware: ThreadManager,
+                 motion_lock: ThreadedAsyncLock,
+                 ):
+        """Constructor"""
+        self._protocol = protocol
+        self._loop = loop
+        self._hardware = hardware
+        self._motion_lock = motion_lock
+        self._session: typing.Optional[ApiProtocolSession] = None
+        self._broker = Broker()
+        self._broker.subscribe(command_types.COMMAND, self._on_command)
+        self._listeners: typing.List[ListenerType] = []
+
+    def add_listener(self, listener: ListenerType):
+        self._listeners.append(listener)
+
+    def remove_listener(self, listener: ListenerType):
+        self._listeners.remove(listener)
+
+    def _on_command(self, msg):
+        for l in self._listeners:
+            l(msg)
+
+    def load(self):
+        with ProtocolRunnerContext(self._protocol):
+            self._session = ApiProtocolSession.build_and_prep(
+                name=self._protocol.meta.identifier,
+                contents=self._protocol.get_contents(),
+                hardware=self._hardware,
+                loop=self._loop,
+                broker=self._broker,
+                motion_lock=self._motion_lock,
+                extra_labware={}
+            )
+
+    def run(self):
+        with ProtocolRunnerContext(self._protocol):
+            self._session.run()
+
+    def simulate(self):
+        with ProtocolRunnerContext(self._protocol):
+            self._session.refresh()
+
+
+class ProtocolRunnerContext:
+    def __init__(self, protocol: UploadedProtocol):
+        self._protocol = protocol
+        self._cwd = None
+
+    def __enter__(self):
+        self._cwd = os.getcwd()
+        # Change working directory to temp dir
+        os.chdir(self._protocol.meta.directory.name)
+        # Add temp dir to path
+        sys.path.append(self._protocol.meta.directory.name)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # Undo working directory and path modifications
+        os.chdir(self._cwd)
+        sys.path.remove(self._protocol.meta.directory.name)

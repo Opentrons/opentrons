@@ -63,6 +63,7 @@ def get_protocol_manager() -> ProtocolManager:
 
 def get_session_manager(
         hardware: ThreadManager = Depends(get_hardware),
+        motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)) \
         -> SessionManager:
     """The single session manager instance"""
@@ -70,5 +71,6 @@ def get_session_manager(
     if not _session_manager_inst:
         _session_manager_inst = SessionManager(
             hardware=hardware,
+            motion_lock=motion_lock,
             protocol_manager=protocol_manager)
     return _session_manager_inst
