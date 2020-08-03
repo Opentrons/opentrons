@@ -6,7 +6,7 @@ from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.errors import SessionCreationException, \
-    UnsupportedFeature
+    UnsupportedFeature, SessionException
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType, SessionType
@@ -90,6 +90,14 @@ class SessionManager:
             await session.clean_up()
             log.debug(f"Removed session: {session}")
         return session
+
+    async def remove_all(self):
+        """Remove all sessions"""
+        for session in self._sessions.keys():
+            try:
+                await self.remove(session)
+            except SessionException:
+                log.exception(f"Failed to remove '{session}'")
 
     def get_by_id(self, identifier: IdentifierType) \
             -> Optional[BaseSession]:

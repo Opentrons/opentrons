@@ -17,7 +17,7 @@ from .errors import V1HandlerError, \
     consolidate_fastapi_response, RobotServerError, ErrorResponse, \
     build_unhandled_exception_response
 from .dependencies import get_rpc_server, get_protocol_manager, api_wrapper, \
-    verify_hardware
+        verify_hardware, get_session_manager
 from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
 from robot_server.service.access.router import router as access_router
@@ -81,6 +81,8 @@ async def on_shutdown():
     """App shutdown handler"""
     s = await get_rpc_server()
     await s.on_shutdown()
+    # Remove all sessions
+    await get_session_manager().remove_all()
     # Remove all uploaded protocols
     get_protocol_manager().remove_all()
 

@@ -66,3 +66,6 @@ class ProtocolSession(BaseSession):
     @property
     def session_type(self) -> models.SessionType:
         return models.SessionType.protocol
+
+    async def clean_up(self):
+        return await self._command_executor.clean_up()

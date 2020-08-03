@@ -114,6 +114,9 @@ class ProtocolCommandExecutor(CommandExecutor):
         """Handler for commands executed by protocol runner"""
         log.debug(msg)
 
+    async def clean_up(self):
+        await self._worker.handle_finish()
+
 
 class AsyncCommand(int, Enum):
     """A command for the worker task"""

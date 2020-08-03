@@ -32,6 +32,6 @@ def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
 
     # write contents to file
     with path.open('wb') as p:
-        p.write(upload_file.file.read())
+        p.write(contents)
 
     return FileMeta(path=path, content_hash=content_hash)
