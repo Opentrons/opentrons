@@ -39,3 +39,15 @@ export function getPipetteCapacity(pipetteEntity: PipetteEntity): number {
   )
   return NaN
 }
+
+export function getMinPipetteVolume(pipetteEntity: PipetteEntity): number {
+  const spec = pipetteEntity.spec
+  if (spec) {
+    return spec.minVolume
+  }
+  assert(
+    false,
+    `Expected spec for pipette ${pipetteEntity ? pipetteEntity.id : '???'}`
+  )
+  return NaN
+}

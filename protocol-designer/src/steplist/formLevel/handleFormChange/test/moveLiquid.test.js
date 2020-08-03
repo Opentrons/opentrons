@@ -268,19 +268,84 @@ describe('disposal volume should update...', () => {
 })
 
 describe('air gap volume', () => {
-  const form = {
-    path: 'multiDispense',
-    aspirate_wells: ['A1'],
-    dispense_wells: ['B2', 'B3'],
-    volume: '2',
-    pipette: 'pipetteId',
-    disposalVolume_checkbox: true,
-    disposalVolume_volume: '1.1',
-    aspirate_airGap_checkbox: false,
-    aspirate_airGap_volume: null,
-  }
-  it('should reset to pipette min when pipette is changed', () => {
-    const result = handleFormHelper({ pipette: 'otherPipetteId' }, form)
-    expect(result).toMatchObject({ aspirate_airGap_volume: '30' })
+  describe('when the path is single', () => {
+    let form
+    beforeEach(() => {
+      form = {
+        path: 'single',
+        aspirate_wells: ['A1'],
+        dispense_wells: ['B2'],
+        volume: '2',
+        pipette: 'pipetteId',
+        disposalVolume_checkbox: true,
+        disposalVolume_volume: '1.1',
+      }
+    })
+
+    it('should update the air gap volume to 0 when the patch volume is less than 0', () => {
+      const result = handleFormHelper({ aspirate_airGap_volume: '-1' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('0')
+    })
+    it('should update the air gap volume to the pipette capacity - min pipette volume when the air gap volume is too big', () => {
+      const result = handleFormHelper({ aspirate_airGap_volume: '100' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('9')
+    })
+    it('should NOT update when the patch volume is greater than the min pipette volume', () => {
+      const result = handleFormHelper({ aspirate_airGap_volume: '2' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('2')
+    })
+    it('should NOT update when the patch volume is equal to the min pipette volume', () => {
+      const result = handleFormHelper({ aspirate_airGap_volume: '1' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('1')
+    })
+  })
+
+  describe('when the path is multi aspirate', () => {
+    let form
+    beforeEach(() => {
+      form = {
+        path: 'multiAspirate',
+        aspirate_wells: ['A1', 'B1'],
+        dispense_wells: ['B2'],
+        volume: '2',
+        pipette: 'pipetteId',
+        disposalVolume_checkbox: true,
+        disposalVolume_volume: '1.1',
+      }
+    })
+
+    it('should update the air gap volume to 0 when the patch volume is less than 0', () => {
+      const result = handleFormHelper({ aspirate_airGap_volume: '-1' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('0')
+    })
+    it('should update the air gap volume to the pipette capacity - min pipette volume when the air gap volume is too big', () => {
+      const result = handleFormHelper({ aspirate_airGap_volume: '100' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('9')
+    })
+    it('should NOT update when the patch volume is greater than the min pipette volume', () => {
+      const result = handleFormHelper({ aspirate_airGap_volume: '2' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('2')
+    })
+    it('should NOT update when the patch volume is equal to the min pipette volume', () => {
+      const result = handleFormHelper({ aspirate_airGap_volume: '1' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('1')
+    })
+  })
+  describe('when the path is multi dispense', () => {
+    const form = {
+      path: 'multiDispense',
+      aspirate_wells: ['A1'],
+      dispense_wells: ['B2', 'B3'],
+      volume: '2',
+      pipette: 'pipetteId',
+      disposalVolume_checkbox: true,
+      disposalVolume_volume: '1.1',
+      aspirate_airGap_checkbox: false,
+      aspirate_airGap_volume: null,
+    }
+    it('should reset to pipette min when pipette is changed', () => {
+      const result = handleFormHelper({ pipette: 'otherPipetteId' }, form)
+      expect(result).toMatchObject({ aspirate_airGap_volume: '30' })
+    })
   })
 })

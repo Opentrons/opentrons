@@ -11,6 +11,7 @@ export type FormWarningType =
   | 'BELOW_PIPETTE_MINIMUM_VOLUME'
   | 'OVER_MAX_WELL_VOLUME'
   | 'BELOW_MIN_DISPOSAL_VOLUME'
+  | 'BELOW_MIN_AIR_GAP_VOLUME'
 
 export type FormWarning = {
   ...$Exact<FormError>,
@@ -18,6 +19,17 @@ export type FormWarning = {
 }
 // TODO: Ian 2018-12-06 use i18n for title/body text
 const FORM_WARNINGS: { [FormWarningType]: FormWarning } = {
+  BELOW_MIN_AIR_GAP_VOLUME: {
+    type: 'BELOW_MIN_AIR_GAP_VOLUME',
+    title: 'Below recommended air gap',
+    body: (
+      <React.Fragment>
+        For accuracy while using air gap we recommend you use a volume of at
+        least the pipette&apos;s minimum.
+      </React.Fragment>
+    ),
+    dependentFields: ['disposalVolume_volume', 'pipette'],
+  },
   BELOW_PIPETTE_MINIMUM_VOLUME: {
     type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
     title: 'Specified volume is below pipette minimum',
@@ -85,6 +97,20 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   if (isUnselected) return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME
   const isBelowMin = disposalVolume_volume < pipette.spec.minVolume
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
+}
+
+export const minAirGapVolume = (fields: HydratedFormData): ?FormWarning => {
+  const { aspirate_airGap_checkbox, aspirate_airGap_volume, pipette } = fields
+  if (
+    !aspirate_airGap_checkbox ||
+    !aspirate_airGap_volume ||
+    !pipette ||
+    !pipette.spec
+  )
+    return null
+
+  const isBelowMin = Number(aspirate_airGap_volume) < pipette.spec.minVolume
+  return isBelowMin ? FORM_WARNINGS.BELOW_MIN_AIR_GAP_VOLUME : null
 }
 
 /*******************

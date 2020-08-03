@@ -8,13 +8,13 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
 import { getPrereleaseFeatureFlag } from '../../persist'
 import { getStateAndContextTempTCModules } from '../../step-generation/__fixtures__'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
 } from '../utils/createPresavedStepForm'
-
 jest.mock('../../persist')
 
 const mockGetPrereleaseFeatureFlag: JestMockFn<
@@ -34,6 +34,7 @@ beforeEach(() => {
     name: 'p10_single',
     id: 'leftPipetteId',
     spec: fixtureP10Single,
+    tiprackLabwareDef: fixture_tiprack_10_ul,
   }
   const labwareOnMagModule = {
     id: 'labwareOnMagModule',
