@@ -12,7 +12,8 @@ from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.protocol.protocol import UploadedProtocol
-
+from robot_server.service.session.session_types.protocol.executor import \
+    ProtocolCommandExecutor
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +33,10 @@ class ProtocolSession(BaseSession):
         """
         super().__init__(configuration, instance_meta)
         self._uploaded_protocol = protocol
-        self._command_executor = CommandExecutor()
+        self._command_executor = ProtocolCommandExecutor(
+            protocol=self._uploaded_protocol,
+            configuration=configuration
+        )
 
     @classmethod
     async def create(cls, configuration: SessionConfiguration,

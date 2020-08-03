@@ -85,14 +85,15 @@ class ProtocolCommandExecutor(CommandExecutor):
 
     async def execute(self, command: Command) -> CompletedCommand:
         """Command processing"""
-        if command not in self.STATE_COMMAND_MAP.get(self.current_state, {}):
+        command_def = command.content.name
+        if command_def not in self.STATE_COMMAND_MAP.get(self.current_state, {}):
             raise UnsupportedCommandException(
-                f"Can't do {command} during self.{self.current_state}")
+                f"Can't do '{command_def}' during self.{self.current_state}")
 
-        handler = self._handlers.get(command.content.name)
+        handler = self._handlers.get(command_def)
         if not handler:
             raise UnsupportedCommandException(
-                f"Command '{command.content.name}' is not supported."
+                f"Command '{command_def}' is not supported."
             )
 
         with duration() as timed:
@@ -194,7 +195,7 @@ class Worker:
         """Entry point for protocol running task"""
         self.set_current_state(ProtocolSessionState.simulating)
 
-        await self._loop.run_in_executor(None, self._protocol_runner.load())
+        await self._loop.run_in_executor(None, self._protocol_runner.load)
         self.set_current_state(ProtocolSessionState.ready)
 
         while True:
@@ -206,10 +207,12 @@ class Worker:
                 break
             if async_command == AsyncCommand.start_run:
                 self.set_current_state(ProtocolSessionState.running)
-                await self._loop.run_in_executor(None, self._protocol_runner.run())
+                await self._loop.run_in_executor(None,
+                                                 self._protocol_runner.run)
             if async_command == AsyncCommand.start_simulate:
                 self.set_current_state(ProtocolSessionState.simulating)
-                await self._loop.run_in_executor(None, self._protocol_runner.simulate())
+                await self._loop.run_in_executor(None,
+                                                 self._protocol_runner.simulate)
 
         # Done.
         self.set_current_state(ProtocolSessionState.exited)
@@ -264,8 +267,8 @@ class ProtocolRunner:
         self._listeners.remove(listener)
 
     def _on_command(self, msg):
-        for l in self._listeners:
-            l(msg)
+        for listener in self._listeners:
+            listener(msg)
 
     def load(self):
         with ProtocolRunnerContext(self._protocol):
