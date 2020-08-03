@@ -652,7 +652,7 @@
           },
 
           {
-            "description": "Move to well command. Move pipette to specified well in a labware, with an optional offset.",
+            "description": "Move to well command. Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
