@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 
 import { SidePanel } from '@opentrons/components'
 import { PipetteList } from './PipetteList'

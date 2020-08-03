@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import isEqual from 'lodash/isEqual'
 
 import {
   getLabwareDisplayName,
@@ -48,6 +49,9 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
     moduleModel,
     calibrationData,
   } = props
+  const existingCalData = React.useRef<LabwareCalibrationData | null>(
+    calibrationData
+  )
 
   const url = `/calibrate/labware/${slot}`
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
@@ -101,7 +105,7 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
               </span>
               <CalibrationData
                 calibrationData={calibrationData}
-                hadExistingValues={confirmed}
+                existingCalData={existingCalData.current}
               />
             </div>
           </div>
@@ -123,14 +127,10 @@ function LabwareNameTooltip(props: {| name: string, displayName: string |}) {
 }
 
 function CalibrationData(props: {|
-  calibrationData: {|
-    x: number,
-    y: number,
-    z: number,
-  |} | null,
-  hadExistingValues: boolean,
+  calibrationData: LabwareCalibrationData | null,
+  existingCalData: LabwareCalibrationData | null,
 |}) {
-  const { calibrationData, hadExistingValues } = props
+  const { calibrationData, existingCalData } = props
   if (calibrationData === null) {
     return (
       <Text as="i" marginTop={SPACING_2}>
@@ -140,7 +140,10 @@ function CalibrationData(props: {|
   } else {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING_2}>
-        {hadExistingValues ? EXISTING_DATA : UPDATED_DATA}:
+        {isEqual(calibrationData, existingCalData)
+          ? EXISTING_DATA
+          : UPDATED_DATA}
+        :
         <CalibrationValues {...calibrationData} />
       </Flex>
     )

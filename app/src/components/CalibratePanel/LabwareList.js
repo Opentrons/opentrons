@@ -15,7 +15,7 @@ const TITLE = 'labware'
 type Props = {|
   labware: Array<Labware>,
   modulesBySlot: { [Slot]: SessionModule },
-  disabled: boolean,
+  tipracksConfirmed: boolean,
   setLabwareToCalibrate: (labware: Labware) => mixed,
   labwareCalibrations: Array<LabwareCalibrationModel>,
 |}
@@ -23,7 +23,7 @@ type Props = {|
 export function LabwareList(props: Props): React.Node {
   const {
     labware,
-    disabled,
+    tipracksConfirmed,
     setLabwareToCalibrate,
     modulesBySlot,
     labwareCalibrations,
@@ -48,7 +48,7 @@ export function LabwareList(props: Props): React.Node {
               )
             ) ?? null
           }
-          isDisabled={disabled}
+          isDisabled={!tipracksConfirmed}
           onClick={() => setLabwareToCalibrate(lw)}
         />
       ))}

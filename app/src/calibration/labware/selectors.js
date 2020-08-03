@@ -13,7 +13,6 @@ import {
 import { selectors as robotSelectors } from '../../robot'
 
 import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
-import { Labware } from '../../robot/types'
 import type { State } from '../../types'
 import type { LabwareCalibration, LabwareCalibrationModel } from '../types'
 import type { LabwareSummary } from './types'

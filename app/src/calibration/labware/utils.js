@@ -4,7 +4,6 @@ import round from 'lodash/round'
 import type { Labware, Slot, SessionModule } from '../../robot/types'
 import type { LabwareCalibrationModel } from '../types'
 import type { LabwareCalibrationData } from './types'
-import { getLabwareCalibrations } from './selectors'
 
 type LabwareIdentity = {|
   loadName: string,
