@@ -3,11 +3,13 @@ import json
 
 import pytest
 
-from opentrons.protocols.parse import (extract_metadata,
-                                       _get_protocol_schema_version,
-                                       validate_json,
-                                       parse,
-                                       version_from_metadata)
+from opentrons.protocols.parse import (
+    extract_metadata,
+    _get_protocol_schema_version,
+    validate_json,
+    parse,
+    MAX_SUPPORTED_JSON_SCHEMA_VERSION,
+    version_from_metadata)
 from opentrons.protocols.types import (JsonProtocol,
                                        PythonProtocol,
                                        APIVersion,
@@ -178,7 +180,8 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
     with pytest.raises(RuntimeError, match='Please update your OT-2 App' +
                        ' ' +
                        'and robot server to the latest version and try again'):
-        validate_json({'schemaVersion': '5'})
+        validate_json({'schemaVersion': str(
+            MAX_SUPPORTED_JSON_SCHEMA_VERSION + 1)})
     labware = get_labware_fixture('fixture_12_trough_v2')
     with pytest.raises(RuntimeError, match='labware'):
         validate_json(labware)

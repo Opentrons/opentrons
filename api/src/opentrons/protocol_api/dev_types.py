@@ -6,7 +6,8 @@ from opentrons_shared_data.protocol.dev_types import (
     BlowoutParams, DelayParams, PipetteAccessParams,
     StandardLiquidHandlingParams, TouchTipParams, MoveToSlotParams,
     TemperatureParams, ModuleIDParams, MagneticModuleEngageParams,
-    ThermocyclerRunProfileParams, ThermocyclerSetTargetBlockParams
+    ThermocyclerRunProfileParams, ThermocyclerSetTargetBlockParams,
+    MoveToWellParams
 )
 
 if TYPE_CHECKING:
@@ -39,8 +40,8 @@ if Protocol is not None:
 # using a lot of string literals here instead of the enum values from
 # opentrons_shared_data.protocol.constants because of
 # https://github.com/python/mypy/issues/4128
-JsonV3Dispatch = TypedDict(
-    'JsonV3Dispatch',
+PipetteDispatch = TypedDict(
+    'PipetteDispatch',
     {
         'delay': Callable[['ProtocolContext', 'DelayParams'], None],
         'blowout': Callable[
@@ -71,15 +72,16 @@ JsonV3Dispatch = TypedDict(
             ['ProtocolContext',
              Dict[str, 'InstrumentContext'],
              'MoveToSlotParams'], None],
+        'moveToWell': Callable[
+            [Dict[str, 'InstrumentContext'],
+             Dict[str, 'Labware'],
+             'MoveToWellParams'], None],
         'airGap': Callable[
             [Dict[str, 'InstrumentContext'],
              Dict[str, 'Labware'],
              'StandardLiquidHandlingParams'], None],
     },
     total=False)
-
-
-JsonV4PipetteDispatch = JsonV3Dispatch
 
 
 JsonV4MagneticModuleDispatch = TypedDict(

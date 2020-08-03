@@ -43,6 +43,7 @@ TouchTipCommandId = Literal['touchTip']
 PickUpTipCommandId = Literal['pickUpTip']
 DropTipCommandId = Literal['dropTip']
 MoveToSlotCommandId = Literal['moveToSlot']
+MoveToWellCommandId = Literal['moveToWell']
 DelayCommandId = Literal['delay']
 MagneticModuleEngageCommandId = Literal['magneticModule/engageMagnet']
 MagneticModuleDisengageCommandId = Literal['magneticModule/disengageMagnet']
@@ -160,6 +161,17 @@ class MoveToSlotParams(TypedDict, total=False):
 class MoveToSlotCommand(TypedDict):
     command: MoveToSlotCommandId
     params: MoveToSlotParams
+
+
+class MoveToWellParams(PipetteAccessParams, total=False):
+    offset: NamedOffset
+    minimumZHeight: float
+    forceDirect: bool
+
+
+class MoveToWellCommand(TypedDict):
+    command: MoveToWellCommandId
+    params: MoveToWellParams
 
 
 class DelayParams(TypedDict, total=False):
@@ -322,7 +334,7 @@ PipetteCommand = Union[AspirateCommand, DispenseCommand, AirGapCommand,
 PipetteCommandId = Union[AspirateCommandId, DispenseCommandId, AirGapCommandId,
                          BlowoutCommandId, TouchTipCommandId,
                          PickUpTipCommandId, DropTipCommandId,
-                         MoveToSlotCommandId]
+                         MoveToSlotCommandId, MoveToWellCommandId]
 
 RobotCommand = Union[DelayCommand]
 RobotCommandId = Union[DelayCommandId]
@@ -345,6 +357,22 @@ JsonProtocolV4 = TypedDict(
     {
         "$otSharedSchema": Literal["#/protocol/schemas/4"],
         "schemaVersion": Literal[4],
+        "metadata": Metadata,
+        "robot": RobotRequirement,
+        "pipettes": Dict[str, PipetteRequirement],
+        "labware": Dict[str, LabwareRequirement],
+        "labwareDefinitions": Dict[str, LabwareDefinition],
+        "modules": Dict[str, ModuleRequirement],
+        "commands": List[Command],
+        "commandAnnotations": Dict[str, Any],
+        "designerApplication": DesignerApplication
+    }, total=False)
+
+JsonProtocolV5 = TypedDict(
+    'JsonProtocolV5',
+    {
+        "$otSharedSchema": Literal["#/protocol/schemas/5"],
+        "schemaVersion": Literal[5],
         "metadata": Metadata,
         "robot": RobotRequirement,
         "pipettes": Dict[str, PipetteRequirement],

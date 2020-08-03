@@ -12,6 +12,7 @@ from opentrons_shared_data.protocol.constants import (
 if TYPE_CHECKING:
     from opentrons_shared_data.protocol.dev_types import (
         JsonProtocolV4,
+        JsonProtocolV5,
         MagneticModuleEngageParams,
         ModuleIDParams, TemperatureParams,
         ThermocyclerSetTargetBlockParams,
@@ -20,7 +21,7 @@ if TYPE_CHECKING:
         ThermocyclerCommandId
     )
     from .dev_types import (
-        JsonV4PipetteDispatch, JsonV4MagneticModuleDispatch,
+        PipetteDispatch, JsonV4MagneticModuleDispatch,
         JsonV4TemperatureModuleDispatch,
         JsonV4ThermocyclerDispatch)
 
@@ -224,11 +225,11 @@ def assert_tc_commands_do_not_use_unimplemented_params(
 
 def dispatch_json(
         context: ProtocolContext,
-        protocol_data: 'JsonProtocolV4',
+        protocol_data: Union['JsonProtocolV4', 'JsonProtocolV5'],
         instruments: Instruments,
         loaded_labware: LoadedLabware,
         modules: Dict[str, ModuleContext],
-        pipette_command_map: 'JsonV4PipetteDispatch',
+        pipette_command_map: 'PipetteDispatch',
         magnetic_module_command_map: 'JsonV4MagneticModuleDispatch',
         temperature_module_command_map: 'JsonV4TemperatureModuleDispatch',
         thermocycler_module_command_map: 'JsonV4ThermocyclerDispatch'

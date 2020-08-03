@@ -14,7 +14,7 @@ if TYPE_CHECKING:
         PipetteAccessParams, StandardLiquidHandlingParams,
         DelayParams, FlowRateParams, TouchTipParams,
         PipetteAccessWithOffsetParams, BlowoutParams, MoveToSlotParams)
-    from .dev_types import JsonV3Dispatch
+    from .dev_types import PipetteDispatch
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -207,7 +207,7 @@ def _move_to_slot(context: ProtocolContext,
         minimum_z_height=params.get('minimumZHeight'))
 
 
-dispatcher_map: 'JsonV3Dispatch' = {
+dispatcher_map: 'PipetteDispatch' = {
     JsonRobotCommand.delay.value: _delay,
     JsonPipetteCommand.blowout.value: _blowout,
     JsonPipetteCommand.pickUpTip.value: _pick_up_tip,
