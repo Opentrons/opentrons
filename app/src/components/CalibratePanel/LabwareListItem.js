@@ -27,6 +27,7 @@ import styles from './styles.css'
 const NOT_CALIBRATED = 'Not yet calibrated'
 const UPDATED_DATA = 'Updated data'
 const EXISTING_DATA = 'Existing data'
+
 export type LabwareListItemProps = {|
   ...Labware,
   moduleModel?: ModuleModel,

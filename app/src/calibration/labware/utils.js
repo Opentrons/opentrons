@@ -50,7 +50,6 @@ export function getCalibrationDataForLabware(
       doesLabwareIdentityMatch(compareCalbration, targetLabware, modulesBySlot)
     )
     .map(({ attributes }) => {
-      console.log('through filter: ', attributes)
       const calVector = attributes.calibrationData.offset.value.map(n =>
         round(n, 1)
       )
