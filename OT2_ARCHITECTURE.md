@@ -7,7 +7,7 @@
   
 Inside the OT2 is a small computer (a [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)), running Linux.
 
-Data is stored on the Raspberry Pi's SD card. The majority of the filesystem is read-only but certain directories such as `/data/` and `/var/lib/jupyter/notebooks` allow read-write access. The OT2 camera (a webcam) is connected to a USB port of the Raspberry Pi (this port, and a 4th port which may have an unused thumbdrive, are normally covered by the Pi's case).
+Data is stored on the Raspberry Pi's SD card. The majority of the filesystem is read-only but certain directories such as `/data/` and `/var/lib/jupyter/notebooks` allow read-write access. The OT2 camera (a webcam) is connected to a USB port on the Raspberry Pi (this port, and a 4th port which may have an unused thumbdrive, are normally covered by the Pi's case).
 
 #### Networking
 
