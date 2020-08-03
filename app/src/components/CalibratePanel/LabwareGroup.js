@@ -14,6 +14,7 @@ import { LabwareList } from './LabwareList'
 import { useSetLabwareToCalibrate } from './hooks'
 import type { State, Dispatch } from '../../types'
 
+// TODO(bc, 2019-08-03): i18n
 const TITLE = 'Labware Calibration'
 
 export function LabwareGroup(): React.Node {

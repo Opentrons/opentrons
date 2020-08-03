@@ -127,18 +127,18 @@ function LabwareNameTooltip(props: {| name: string, displayName: string |}) {
   )
 }
 
-function CalibrationData(props: {|
+export function CalibrationData(props: {|
   calibrationData: LabwareCalibrationData | null,
   existingCalData: LabwareCalibrationData | null,
-|}) {
+|}): React.Node {
   const { calibrationData, existingCalData } = props
-  if (calibrationData === null) {
+  if (calibrationData === null && existingCalData === null) {
     return (
       <Text as="i" marginTop={SPACING_2}>
         {NOT_CALIBRATED}
       </Text>
     )
-  } else {
+  } else if (calibrationData) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING_2}>
         {isEqual(calibrationData, existingCalData)
@@ -148,5 +148,9 @@ function CalibrationData(props: {|
         <CalibrationValues {...calibrationData} />
       </Flex>
     )
+  } else {
+    // NOTE: this case should never be reached as calibrationData will never be null
+    // at the same time that existingCalData is truthy
+    return null
   }
 }

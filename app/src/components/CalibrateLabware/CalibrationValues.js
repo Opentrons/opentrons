@@ -10,14 +10,14 @@ type Props = {|
 export const CalibrationValues = (props: Props): React.Node => (
   <span>
     {['x', 'y', 'z'].map(key => (
-      <>
+      <React.Fragment key={key}>
         <Text as="span" fontWeight={FONT_WEIGHT_SEMIBOLD}>
           {key.toUpperCase()}
         </Text>{' '}
         <Text as="span" marginRight={SPACING_3}>
           {props[key] != null ? props[key].toFixed(1) : null}
         </Text>
-      </>
+      </React.Fragment>
     ))}
   </span>
 )
