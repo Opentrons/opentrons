@@ -25,7 +25,7 @@ import {
   forSetTemperature,
   forDeactivateTemperature,
 } from './temperatureUpdates'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
 import type {
   InvariantContext,
   RobotState,
@@ -71,6 +71,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'touchTip':
     case 'delay':
+    case 'moveToWell':
       // these commands don't have any effects on the state
       break
     case 'temperatureModule/setTargetTemperature':
