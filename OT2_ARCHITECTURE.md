@@ -11,7 +11,7 @@ Data is stored on the Raspberry Pi's SD card. The majority of the filesystem is 
 
 #### Networking
 
-Other computers, like your laptop, communicate with the Raspberry Pi that controls the OT2 via a network. When you connect your robot via USB, you are in fact connecting to the Raspberry Pi's ethernet port. The USB port is connected to an internal USB-to-ethernet adapter, which is in turn connected to the Pi's ethernet port. When you connect a cable to the robot's USB port, your computer recognises the device as a new network interface, which establishes a local network with the OT2. (You can also connect the OT2 to a wireless network with WiFi, or connect to a wired network by placing a USB-ethernet adapter in one of the Pi's USB ports).
+Other computers, like your laptop, communicate with the Raspberry Pi that controls the OT2 via a network. When you connect your robot via USB, you are in fact connecting to the Raspberry Pi's ethernet port. The USB socket on the robot is connected to an internal USB-to-ethernet adapter, which is in turn connected to the Pi's ethernet port. When you connect a cable to the robot's USB port, your computer recognises the device as a new network interface, which establishes a local network with the OT2. (You can also connect the OT2 to a wireless network with WiFi, or connect to a wired network by placing a USB-ethernet adapter in one of the Pi's USB ports).
 
 ### Lights, switches
 
