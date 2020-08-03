@@ -1,6 +1,6 @@
 import pytest
 from typing import List, Tuple
-from robot_server.robot.calibration.tip_length import util
+from robot_server.robot.calibration import util
 
 
 @pytest.fixture

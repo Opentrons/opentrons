@@ -1,8 +1,7 @@
 from enum import Enum
 from typing import Dict
 from opentrons.types import Point, Mount
-
-WILDCARD = '*'
+from robot_server.robot.calibration.constants import WILDCARD
 
 
 class TipCalibrationState(str, Enum):

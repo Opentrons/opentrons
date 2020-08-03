@@ -1,6 +1,7 @@
 from typing import Dict, Set
 from dataclasses import dataclass
 
+WILDCARD = '*'
 
 _lw_fmt = "opentrons_96_{}_{}ul"
 _filtertiprack = "filtertiprack"

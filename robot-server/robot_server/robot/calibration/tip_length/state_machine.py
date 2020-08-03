@@ -1,7 +1,7 @@
 from typing import Dict
 from robot_server.service.session.models import CommandDefinition, \
     TipLengthCalibrationCommand as TipCalCommand, CalibrationCommand
-from robot_server.robot.calibration.tip_length.util import (
+from robot_server.robot.calibration.util import (
     SimpleStateMachine,
     StateTransitionError
 )
@@ -52,4 +52,6 @@ class TipCalibrationStateMachine:
         if next_state:
             return next_state
         else:
-            raise StateTransitionError(command, from_state)
+            raise StateTransitionError(command,
+                                       from_state,
+                                       'TipLengthCalibration')
