@@ -8,6 +8,7 @@ export type RobotHost = {
   name: string,
   ip: string,
   port: number,
+  ...
 }
 
 export type RobotApiRequestOptions = {|

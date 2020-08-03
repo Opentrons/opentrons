@@ -1,15 +1,11 @@
 // @flow
 import { last } from 'lodash'
 
-import {
-  mockHealthResponse,
-  mockServerHealthResponse,
-} from '../__fixtures__/health'
-
+import { mockHealthResponse, mockServerHealthResponse } from '../__fixtures__'
 import { HEALTH_STATUS_OK } from '../constants'
 import * as HealthPollerModule from '../health-poller'
 import * as MdnsBrowserModule from '../mdns-browser'
-import { createDiscoveryClient } from '../discovery-client'
+import { createDiscoveryClient } from '..'
 
 import type {
   HealthPoller,

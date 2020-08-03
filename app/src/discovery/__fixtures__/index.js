@@ -1,8 +1,13 @@
 // @flow
 
-import { CONNECTABLE, REACHABLE } from '../selectors'
+import {
+  CONNECTABLE,
+  REACHABLE,
+  HEALTH_STATUS_OK,
+  HEALTH_STATUS_NOT_OK,
+} from '../constants'
 
-import type { Service, ResolvedRobot, Robot, ReachableRobot } from '../types'
+import type { BaseRobot, Robot, ReachableRobot } from '../types'
 
 export const mockHealthResponse = {
   name: 'robot-name',
@@ -10,7 +15,7 @@ export const mockHealthResponse = {
   fw_version: '0.0.0-mock',
   system_version: '0.0.0-mock',
   logs: ([]: Array<string>),
-  protocol_api_version: [2, 0],
+  protocol_api_version: ([2, 0]: [number, number]),
 }
 
 export const mockUpdateServerHealthResponse = {
@@ -22,34 +27,43 @@ export const mockUpdateServerHealthResponse = {
   capabilities: ({}: { ... }),
 }
 
-export const mockService: $Exact<Service> = {
+export const mockDiscoveryClientRobot = {
   name: 'robot-name',
-  ip: null,
-  port: 31950,
-  local: true,
-  ok: null,
-  serverOk: null,
-  advertising: null,
+  health: mockHealthResponse,
+  serverHealth: mockUpdateServerHealthResponse,
+  addresses: [
+    {
+      ip: '127.0.0.1',
+      port: 31950,
+      seen: true,
+      healthStatus: HEALTH_STATUS_OK,
+      serverHealthStatus: HEALTH_STATUS_OK,
+      healthError: null,
+      serverHealthError: null,
+    },
+  ],
+}
+
+export const mockBaseRobot: BaseRobot = {
+  name: 'opentrons-robot-name',
+  displayName: 'robot-name',
+  connected: false,
+  seen: false,
+  local: null,
   health: null,
   serverHealth: null,
 }
 
-export const mockResolvedRobot: ResolvedRobot = {
-  ...mockService,
-  ip: '127.0.0.1',
-  local: true,
-  ok: true,
-  serverOk: true,
-  displayName: 'robot-name',
-}
-
 export const mockConnectableRobot: Robot = {
-  ...mockResolvedRobot,
-  ok: true,
+  ...mockBaseRobot,
+  status: CONNECTABLE,
   health: mockHealthResponse,
   serverHealth: mockUpdateServerHealthResponse,
-  status: CONNECTABLE,
-  connected: false,
+  healthStatus: HEALTH_STATUS_OK,
+  serverHealthStatus: HEALTH_STATUS_OK,
+  ip: '127.0.0.1',
+  port: 31950,
+  seen: true,
 }
 
 export const mockConnectedRobot: Robot = {
@@ -58,7 +72,13 @@ export const mockConnectedRobot: Robot = {
 }
 
 export const mockReachableRobot: ReachableRobot = {
-  ...mockResolvedRobot,
-  ok: false,
+  ...mockBaseRobot,
   status: REACHABLE,
+  health: mockHealthResponse,
+  serverHealth: mockUpdateServerHealthResponse,
+  healthStatus: HEALTH_STATUS_NOT_OK,
+  serverHealthStatus: HEALTH_STATUS_OK,
+  ip: '127.0.0.1',
+  port: 31950,
+  seen: true,
 }

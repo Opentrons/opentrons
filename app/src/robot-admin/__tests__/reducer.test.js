@@ -1,5 +1,7 @@
 // @flow
 
+import { mockDiscoveryClientRobot } from '../../discovery/__fixtures__'
+import { HEALTH_STATUS_NOT_OK } from '../../discovery'
 import { robotAdminReducer } from '../reducer'
 
 import type { Action } from '../../types'
@@ -35,13 +37,11 @@ describe('robotAdminReducer', () => {
       expected: { robotName: { status: 'restart-failed' } },
     },
     {
-      name: 'discovery:UPDATE_LIST sets status to up if ok: true',
+      name: 'discovery:UPDATE_LIST sets status to up if health status is ok',
       action: {
         type: 'discovery:UPDATE_LIST',
         payload: {
-          robots: [
-            ({ name: 'a', ip: '192.168.1.1', port: 31950, ok: true }: any),
-          ],
+          robots: [{ ...mockDiscoveryClientRobot, name: 'a' }],
         },
       },
       state: {
@@ -50,13 +50,12 @@ describe('robotAdminReducer', () => {
       expected: { a: { status: 'up' } },
     },
     {
-      name: 'discovery:UPDATE_LIST leaves restart pending alone if ok: true',
+      name:
+        'discovery:UPDATE_LIST leaves restart pending alone if health status is ok',
       action: {
         type: 'discovery:UPDATE_LIST',
         payload: {
-          robots: [
-            ({ name: 'a', ip: '192.168.1.1', port: 31950, ok: true }: any),
-          ],
+          robots: [{ ...mockDiscoveryClientRobot, name: 'a' }],
         },
       },
       state: {
@@ -66,12 +65,21 @@ describe('robotAdminReducer', () => {
     },
     {
       name:
-        'discovery:UPDATE_LIST sets restarting if restart pending and ok: false',
+        'discovery:UPDATE_LIST sets restarting if restart pending health status not ok',
       action: {
         type: 'discovery:UPDATE_LIST',
         payload: {
           robots: [
-            ({ name: 'a', ip: '192.168.1.1', port: 31950, ok: false }: any),
+            {
+              ...mockDiscoveryClientRobot,
+              name: 'a',
+              addresses: [
+                {
+                  ...mockDiscoveryClientRobot.addresses[0],
+                  healthStatus: HEALTH_STATUS_NOT_OK,
+                },
+              ],
+            },
           ],
         },
       },
@@ -87,7 +95,16 @@ describe('robotAdminReducer', () => {
         type: 'discovery:UPDATE_LIST',
         payload: {
           robots: [
-            ({ name: 'a', ip: '192.168.1.1', port: 31950, ok: false }: any),
+            {
+              ...mockDiscoveryClientRobot,
+              name: 'a',
+              addresses: [
+                {
+                  ...mockDiscoveryClientRobot.addresses[0],
+                  healthStatus: HEALTH_STATUS_NOT_OK,
+                },
+              ],
+            },
           ],
         },
       },

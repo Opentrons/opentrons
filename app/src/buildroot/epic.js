@@ -14,7 +14,7 @@ import {
 } from 'rxjs/operators'
 
 // imported directly to avoid circular dependencies between discovery and shell
-import { getAllRobots, getRobotApiVersion } from '../discovery/selectors'
+import { getAllRobots, getRobotApiVersion, CONNECTABLE } from '../discovery'
 import {
   startDiscovery,
   finishDiscovery,
@@ -324,7 +324,11 @@ export const watchForOfflineAfterRestartEpic: Epic = (_, state$) => {
       const session = getBuildrootSession(state)
       const robot = getBuildrootRobot(state)
 
-      return !robot?.ok && !session?.error && session?.step === RESTART
+      return (
+        robot?.status !== CONNECTABLE &&
+        !session?.error &&
+        session?.step === RESTART
+      )
     }),
     mapTo(setBuildrootSessionStep(RESTARTING))
   )
@@ -337,7 +341,9 @@ export const watchForOnlineAfterRestartEpic: Epic = (_, state$) => {
       const robot = getBuildrootRobot(state)
 
       return (
-        Boolean(robot?.ok) && !session?.error && session?.step === RESTARTING
+        robot?.status === CONNECTABLE &&
+        !session?.error &&
+        session?.step === RESTARTING
       )
     }),
     switchMap<State, _, _>(stateWithRobot => {

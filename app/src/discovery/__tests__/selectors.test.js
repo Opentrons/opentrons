@@ -1,83 +1,216 @@
 // discovery selectors tests
+import {
+  mockHealthResponse,
+  mockServerHealthResponse,
+  mockHealthErrorStringResponse,
+  mockHealthFetchErrorResponse,
+} from '@opentrons/discovery-client/src/__fixtures__'
+
+import {
+  HEALTH_STATUS_OK,
+  HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_UNREACHABLE,
+  CONNECTABLE,
+  REACHABLE,
+  UNREACHABLE,
+} from '../constants'
+
 import * as discovery from '../selectors'
 
-const makeFullyUp = (
-  name,
-  ip,
-  status = null,
-  connected = null,
-  displayName = null
-) => ({
-  name,
-  ip,
-  local: false,
-  ok: true,
-  serverOk: true,
-  advertising: true,
-  health: {},
-  serverHealth: {},
-  status,
-  connected,
-  displayName,
-})
+const MOCK_STATE = {
+  robot: { connection: { connectedTo: 'bar' } },
+  discovery: {
+    robotsByName: {
+      foo: {
+        name: 'foo',
+        health: mockHealthResponse,
+        serverHealth: null,
+        addresses: [
+          {
+            ip: '10.0.0.1',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_NOT_OK,
+            healthError: null,
+            serverHealthError: mockHealthErrorStringResponse,
+          },
+        ],
+      },
+      bar: {
+        name: 'bar',
+        health: mockHealthResponse,
+        serverHealth: mockServerHealthResponse,
+        addresses: [
+          {
+            ip: '10.0.0.2',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: null,
+            serverHealthError: null,
+          },
+        ],
+      },
+      baz: {
+        name: 'baz',
+        health: mockHealthResponse,
+        serverHealth: mockServerHealthResponse,
+        addresses: [
+          {
+            ip: '10.0.0.3',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_NOT_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: mockHealthErrorStringResponse,
+            serverHealthError: null,
+          },
+        ],
+      },
+      qux: {
+        name: 'qux',
+        health: mockHealthResponse,
+        serverHealth: mockServerHealthResponse,
+        addresses: [
+          {
+            ip: '10.0.0.4',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_UNREACHABLE,
+            serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+            healthError: mockHealthFetchErrorResponse,
+            serverHealthError: mockHealthFetchErrorResponse,
+          },
+        ],
+      },
+      fizz: {
+        name: 'fizz',
+        health: mockHealthResponse,
+        serverHealth: mockServerHealthResponse,
+        addresses: [
+          {
+            ip: '10.0.0.5',
+            port: 31950,
+            seen: false,
+            healthStatus: HEALTH_STATUS_UNREACHABLE,
+            serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+            healthError: mockHealthFetchErrorResponse,
+            serverHealthError: mockHealthFetchErrorResponse,
+          },
+        ],
+      },
+      buzz: {
+        name: 'buzz',
+        health: mockHealthResponse,
+        serverHealth: mockServerHealthResponse,
+        addresses: [],
+      },
+    },
+  },
+}
 
-const makeConnectable = (
-  name,
-  ip,
-  status = null,
-  connected = null,
-  displayName = null
-) => ({
-  name,
-  ip,
+// foo is connectable because health is defined and healthStatus of primary
+// address is "ok"
+const EXPECTED_FOO = {
+  name: 'foo',
+  displayName: 'foo',
+  status: CONNECTABLE,
+  connected: false,
   local: false,
-  ok: true,
-  serverOk: false,
-  health: {},
-  status,
-  connected,
-  displayName,
-})
+  seen: true,
+  health: mockHealthResponse,
+  serverHealth: null,
+  healthStatus: HEALTH_STATUS_OK,
+  serverHealthStatus: HEALTH_STATUS_NOT_OK,
+  ip: '10.0.0.1',
+  port: 31950,
+}
 
-const makeAdvertising = (name, ip, status = null, displayName = null) => ({
-  name,
-  ip,
+// bar is connectable because health is defined and healthStatus of primary
+// address is "ok", and bar is connected because of connectedTo state
+const EXPECTED_BAR = {
+  name: 'bar',
+  displayName: 'bar',
+  status: CONNECTABLE,
+  connected: true,
   local: false,
-  ok: false,
-  serverOk: false,
-  advertising: true,
-  status,
-  displayName,
-})
+  seen: true,
+  health: mockHealthResponse,
+  serverHealth: mockServerHealthResponse,
+  healthStatus: HEALTH_STATUS_OK,
+  serverHealthStatus: HEALTH_STATUS_OK,
+  ip: '10.0.0.2',
+  port: 31950,
+}
 
-const makeServerUp = (
-  name,
-  ip,
-  advertising,
-  status = null,
-  displayName = null
-) => ({
-  name,
-  ip,
-  advertising,
+// baz is reachable because healthStatus is "notOk", which means it responded
+// with an error code
+const EXPECTED_BAZ = {
+  name: 'baz',
+  displayName: 'baz',
+  status: REACHABLE,
+  connected: false,
   local: false,
-  ok: false,
-  serverOk: true,
-  serverHealth: {},
-  status,
-  displayName,
-})
+  seen: true,
+  health: mockHealthResponse,
+  serverHealth: mockServerHealthResponse,
+  healthStatus: HEALTH_STATUS_NOT_OK,
+  serverHealthStatus: HEALTH_STATUS_OK,
+  ip: '10.0.0.3',
+  port: 31950,
+}
 
-const makeUnreachable = (name, ip, status = null, displayName = null) => ({
-  name,
-  ip,
+// qux is reachable because it was recently seen, even though primary IP is
+// not currently responding in any way
+const EXPECTED_QUX = {
+  name: 'qux',
+  displayName: 'qux',
+  status: REACHABLE,
+  connected: false,
   local: false,
-  ok: false,
-  serverOk: false,
-  advertising: false,
-  status,
-  displayName,
-})
+  seen: true,
+  health: mockHealthResponse,
+  serverHealth: mockServerHealthResponse,
+  healthStatus: HEALTH_STATUS_UNREACHABLE,
+  serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+  ip: '10.0.0.4',
+  port: 31950,
+}
+
+// fizz is unreachable because IP is unreachable and we haven't seen any of
+// this robot's IP addresses recently
+const EXPECTED_FIZZ = {
+  name: 'fizz',
+  displayName: 'fizz',
+  status: UNREACHABLE,
+  connected: false,
+  local: false,
+  seen: false,
+  health: mockHealthResponse,
+  serverHealth: mockServerHealthResponse,
+  healthStatus: HEALTH_STATUS_UNREACHABLE,
+  serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+  ip: '10.0.0.5',
+  port: 31950,
+}
+
+// buzz is unreachable because we don't have any IP addresses for it
+const EXPECTED_BUZZ = {
+  name: 'buzz',
+  displayName: 'buzz',
+  status: UNREACHABLE,
+  connected: false,
+  local: null,
+  seen: false,
+  health: mockHealthResponse,
+  serverHealth: mockServerHealthResponse,
+  healthStatus: null,
+  serverHealthStatus: null,
+  ip: null,
+  port: null,
+}
 
 describe('discovery selectors', () => {
   const SPECS = [
@@ -94,269 +227,109 @@ describe('discovery selectors', () => {
       expected: false,
     },
     {
-      name: 'getConnectableRobots grabs robots with ok: true and health',
+      name:
+        'getDiscoveredRobots assigns status based on healthStatus and serverHealthStatus',
+      selector: discovery.getDiscoveredRobots,
+      state: MOCK_STATE,
+      expected: [
+        EXPECTED_FOO,
+        EXPECTED_BAR,
+        EXPECTED_BAZ,
+        EXPECTED_QUX,
+        EXPECTED_FIZZ,
+        EXPECTED_BUZZ,
+      ],
+    },
+    {
+      name: 'getConnectableRobots grabs robots with connectable status',
       selector: discovery.getConnectableRobots,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [makeConnectable('foo', '10.0.0.1')],
-            bar: [makeFullyUp('bar', '10.0.0.2')],
-          },
-        },
-        robot: { connection: { connectedTo: 'bar' } },
-      },
-      expected: [
-        makeConnectable('foo', '10.0.0.1', 'connectable', false, 'foo'),
-        makeFullyUp('bar', '10.0.0.2', 'connectable', true, 'bar'),
-      ],
+      state: MOCK_STATE,
+      expected: [EXPECTED_FOO, EXPECTED_BAR],
     },
     {
-      name: 'getConnectableRobots grabs correct service',
-      selector: discovery.getConnectableRobots,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [
-              makeConnectable('foo', '10.0.0.1'),
-              makeConnectable('foo', '10.0.0.2'),
-              makeServerUp('foo', '10.0.0.3', false),
-              makeAdvertising('foo', '10.0.0.4', false),
-            ],
-          },
-        },
-        robot: { connection: { connectedTo: 'foo' } },
-      },
-      expected: [
-        makeConnectable('foo', '10.0.0.1', 'connectable', true, 'foo'),
-      ],
-    },
-    {
-      name: 'getReachableRobots grabs robots with serverUp or advertising',
+      name: 'getReachableRobots grabs robots with reachable status',
       selector: discovery.getReachableRobots,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [makeServerUp('foo', '10.0.0.1', false)],
-            bar: [makeAdvertising('bar', '10.0.0.2')],
-          },
-        },
-      },
-      expected: [
-        makeServerUp('foo', '10.0.0.1', false, 'reachable', 'foo'),
-        makeAdvertising('bar', '10.0.0.2', 'reachable', 'bar'),
-      ],
+      state: MOCK_STATE,
+      expected: [EXPECTED_BAZ, EXPECTED_QUX],
     },
     {
-      name: 'getReachableRobots grabs correct service',
-      selector: discovery.getReachableRobots,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [
-              makeServerUp('foo', '10.0.0.1', true),
-              makeServerUp('foo', '10.0.0.1', false),
-              makeAdvertising('foo', '10.0.0.2'),
-            ],
-          },
-        },
-      },
-      expected: [makeServerUp('foo', '10.0.0.1', true, 'reachable', 'foo')],
-    },
-    {
-      name: 'getReachableRobots does not grab connectable robots',
-      selector: discovery.getReachableRobots,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [
-              makeConnectable('foo', '10.0.0.1'),
-              makeServerUp('foo', '10.0.0.2', true),
-            ],
-            bar: [
-              makeConnectable('bar', '10.0.0.3'),
-              makeServerUp('bar', '10.0.0.4', false),
-            ],
-            baz: [
-              makeConnectable('baz', '10.0.0.5'),
-              makeAdvertising('baz', '10.0.0.6'),
-            ],
-            qux: [makeFullyUp('qux', '10.0.0.7')],
-          },
-        },
-      },
-      expected: [],
-    },
-    {
-      name: 'getUnreachableRobots grabs robots with no ip',
+      name: 'getUnreachableRobots grabs robots with unreachable status',
       selector: discovery.getUnreachableRobots,
-      state: {
-        discovery: {
-          robotsByName: { foo: [{ name: 'foo', ip: null }] },
-        },
-      },
-      expected: [
-        {
-          name: 'foo',
-          ip: null,
-          status: 'unreachable',
-          displayName: 'foo',
-        },
-      ],
-    },
-    {
-      name: 'getUnreachableRobots grabs robots with IP but no responses',
-      selector: discovery.getUnreachableRobots,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [
-              makeUnreachable('foo', '10.0.0.1'),
-              makeUnreachable('foo', '10.0.0.2'),
-            ],
-          },
-        },
-      },
-      expected: [makeUnreachable('foo', '10.0.0.1', 'unreachable', 'foo')],
-    },
-    {
-      name: "getUnreachableRobots won't grab connectable/reachable robots",
-      selector: discovery.getUnreachableRobots,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [
-              makeServerUp('foo', '10.0.0.1', true),
-              makeUnreachable('foo', '10.0.0.2'),
-            ],
-            bar: [
-              makeServerUp('bar', '10.0.0.3', false),
-              makeUnreachable('bar', '10.0.0.4'),
-            ],
-            baz: [
-              makeAdvertising('bar', '10.0.0.5'),
-              makeUnreachable('baz', '10.0.0.6'),
-            ],
-            qux: [makeConnectable('qux', '10.0.0.7')],
-          },
-        },
-      },
-      expected: [],
+      state: MOCK_STATE,
+      expected: [EXPECTED_FIZZ, EXPECTED_BUZZ],
     },
     {
       name: 'display name removes opentrons- from connectable robot names',
-      selector: discovery.getConnectableRobots,
+      selector: discovery.getDiscoveredRobots,
       state: {
         discovery: {
           robotsByName: {
-            'opentrons-foo': [makeConnectable('opentrons-foo', '10.0.0.1')],
-            'opentrons-bar': [makeFullyUp('opentrons-bar', '10.0.0.2')],
+            'opentrons-foo': {
+              name: 'opentrons-foo',
+              health: mockHealthResponse,
+              serverHealth: mockServerHealthResponse,
+              addresses: [],
+            },
           },
         },
-        robot: { connection: { connectedTo: 'opentrons-bar' } },
+        robot: { connection: { connectedTo: '' } },
       },
       expected: [
-        makeConnectable(
-          'opentrons-foo',
-          '10.0.0.1',
-          'connectable',
-          false,
-          'foo'
-        ),
-        makeFullyUp('opentrons-bar', '10.0.0.2', 'connectable', true, 'bar'),
+        expect.objectContaining({ name: 'opentrons-foo', displayName: 'foo' }),
       ],
     },
     {
-      name: 'display name removes opentrons- from reachable robot names',
-      selector: discovery.getReachableRobots,
+      name:
+        'handles legacy IPv6 robots by wrapping IP in [] and setting as local',
+      selector: discovery.getDiscoveredRobots,
       state: {
         discovery: {
           robotsByName: {
-            'opentrons-foo': [makeServerUp('opentrons-foo', '10.0.0.1', false)],
-            'opentrons-bar': [makeAdvertising('opentrons-bar', '10.0.0.2')],
+            'opentrons-foo': {
+              name: 'opentrons-foo',
+              health: mockHealthResponse,
+              serverHealth: mockServerHealthResponse,
+              addresses: [
+                {
+                  ip: 'fd00:0:cafe:fefe::1',
+                  port: 31950,
+                  seen: true,
+                  healthStatus: HEALTH_STATUS_OK,
+                  serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+                  healthError: null,
+                  serverHealthError: mockHealthFetchErrorResponse,
+                },
+              ],
+            },
           },
         },
+        robot: { connection: { connectedTo: '' } },
       },
       expected: [
-        makeServerUp('opentrons-foo', '10.0.0.1', false, 'reachable', 'foo'),
-        makeAdvertising('opentrons-bar', '10.0.0.2', 'reachable', 'bar'),
-      ],
-    },
-    {
-      name: 'display name removes opentrons- from unreachable robot names',
-      selector: discovery.getUnreachableRobots,
-      state: {
-        discovery: {
-          robotsByName: {
-            'opentrons-foo': [makeUnreachable('opentrons-foo', null)],
-          },
-        },
-      },
-      expected: [makeUnreachable('opentrons-foo', null, 'unreachable', 'foo')],
-    },
-    {
-      name: 'getAllRobots returns all robots',
-      selector: discovery.getAllRobots,
-      state: {
-        robot: { connection: { connectedTo: 'qux' } },
-        discovery: {
-          robotsByName: {
-            foo: [
-              makeConnectable('foo', '10.0.0.1'),
-              makeUnreachable('foo', '10.0.0.2'),
-            ],
-            bar: [
-              makeServerUp('bar', '10.0.0.3', false),
-              makeUnreachable('bar', '10.0.0.4'),
-            ],
-            baz: [
-              makeAdvertising('baz', '10.0.0.5'),
-              makeUnreachable('baz', '10.0.0.6'),
-            ],
-            qux: [makeFullyUp('qux', '10.0.0.7')],
-          },
-        },
-      },
-      expected: [
-        makeConnectable('foo', '10.0.0.1', 'connectable', false, 'foo'),
-        makeFullyUp('qux', '10.0.0.7', 'connectable', true, 'qux'),
-        makeServerUp('bar', '10.0.0.3', false, 'reachable', 'bar'),
-        makeAdvertising('baz', '10.0.0.5', 'reachable', 'baz'),
+        expect.objectContaining({
+          name: 'opentrons-foo',
+          ip: '[fd00:0:cafe:fefe::1]',
+          local: true,
+        }),
       ],
     },
     {
       name: 'getViewableRobots returns connectable and reachable robots',
       selector: discovery.getViewableRobots,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [makeConnectable('foo', '10.0.0.1')],
-            bar: [makeFullyUp('bar', '10.0.0.2')],
-            baz: [makeServerUp('baz', '10.0.0.3', false)],
-            qux: [makeAdvertising('qux', '10.0.0.4')],
-          },
-        },
-        robot: { connection: { connectedTo: 'bar' } },
-      },
-      expected: [
-        makeConnectable('foo', '10.0.0.1', 'connectable', false, 'foo'),
-        makeFullyUp('bar', '10.0.0.2', 'connectable', true, 'bar'),
-        makeServerUp('baz', '10.0.0.3', false, 'reachable', 'baz'),
-        makeAdvertising('qux', '10.0.0.4', 'reachable', 'qux'),
-      ],
+      state: MOCK_STATE,
+      expected: [EXPECTED_FOO, EXPECTED_BAR, EXPECTED_BAZ, EXPECTED_QUX],
     },
     {
-      name: 'getConnectedRobot returns connected robot',
+      name: 'getConnectedRobot returns connected robot if connectable',
       selector: discovery.getConnectedRobot,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [makeConnectable('foo', '10.0.0.1')],
-            bar: [makeFullyUp('bar', '10.0.0.2')],
-          },
-        },
-        robot: { connection: { connectedTo: 'bar' } },
-      },
-      expected: makeFullyUp('bar', '10.0.0.2', 'connectable', true, 'bar'),
+      state: MOCK_STATE,
+      expected: EXPECTED_BAR,
+    },
+    {
+      name: 'getConnectedRobot returns null if not connectable',
+      selector: discovery.getConnectedRobot,
+      state: { ...MOCK_STATE, robot: { connection: { connectedTo: 'fizz' } } },
+      expected: null,
     },
     {
       name: 'getRobotApiVersion returns health.apiServerVersion',
@@ -451,74 +424,37 @@ describe('discovery selectors', () => {
     {
       name: 'getRobotByName returns connectable robot by name',
       selector: discovery.getRobotByName,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [makeConnectable('foo', '10.0.0.1')],
-            bar: [makeFullyUp('bar', '10.0.0.2')],
-            baz: [makeServerUp('baz', '10.0.0.3', false)],
-            qux: [makeAdvertising('qux', '10.0.0.4')],
-          },
-        },
-        robot: { connection: { connectedTo: null } },
-      },
+      state: MOCK_STATE,
       args: ['foo'],
-      expected: makeConnectable('foo', '10.0.0.1', 'connectable', false, 'foo'),
+      expected: EXPECTED_FOO,
     },
     {
       name: 'getRobotByName returns reachable robot by name',
       selector: discovery.getRobotByName,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [makeConnectable('foo', '10.0.0.1')],
-            bar: [makeFullyUp('bar', '10.0.0.2')],
-            baz: [makeServerUp('baz', '10.0.0.3', false)],
-            qux: [makeAdvertising('qux', '10.0.0.4')],
-          },
-        },
-        robot: { connection: { connectedTo: null } },
-      },
+      state: MOCK_STATE,
       args: ['baz'],
-      expected: makeServerUp('baz', '10.0.0.3', false, 'reachable', 'baz'),
+      expected: EXPECTED_BAZ,
+    },
+    {
+      name: 'getRobotByName returns null if robot is not connectable',
+      selector: discovery.getRobotByName,
+      state: MOCK_STATE,
+      args: ['fizz'],
+      expected: null,
     },
     {
       name: 'getRobotApiVersionByName returns API version of connectable robot',
       selector: discovery.getRobotApiVersionByName,
-      state: {
-        discovery: {
-          robotsByName: {
-            foo: [
-              {
-                ...makeConnectable('foo', '10.0.0.1'),
-                health: { api_version: '4.5.6' },
-              },
-            ],
-          },
-        },
-        robot: { connection: { connectedTo: null } },
-      },
+      state: MOCK_STATE,
       args: ['foo'],
-      expected: '4.5.6',
+      expected: EXPECTED_FOO.health.api_version,
     },
     {
       name: 'getRobotApiVersionByName returns API version of reachable robot',
       selector: discovery.getRobotApiVersionByName,
-      state: {
-        discovery: {
-          robotsByName: {
-            baz: [
-              {
-                ...makeServerUp('baz', '10.0.0.3', false),
-                serverHealth: { apiServerVersion: '1.2.3' },
-              },
-            ],
-          },
-        },
-        robot: { connection: { connectedTo: null } },
-      },
+      state: MOCK_STATE,
       args: ['baz'],
-      expected: '1.2.3',
+      expected: EXPECTED_BAZ.health.api_version,
     },
   ]
 

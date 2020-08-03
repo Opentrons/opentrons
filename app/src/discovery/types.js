@@ -1,56 +1,69 @@
 // @flow
 
-import type { Service } from '@opentrons/discovery-client'
+import type {
+  DiscoveryClientRobot,
+  HealthResponse,
+  HealthStatus,
+} from '@opentrons/discovery-client'
 
-export type { Service }
+import typeof {
+  HEALTH_STATUS_OK,
+  CONNECTABLE,
+  REACHABLE,
+  UNREACHABLE,
+} from './constants'
 
-export type RobotsMap = $Shape<{| [name: string]: Array<Service> |}>
+export type { DiscoveryClientRobot, HealthStatus }
+
+export type RobotsMap = $Shape<{| [name: string]: DiscoveryClientRobot |}>
 
 export type DiscoveryState = {|
   scanning: boolean,
   robotsByName: RobotsMap,
 |}
 
-export type ConnectableStatus = 'connectable'
-export type ReachableStatus = 'reachable'
-export type UnreachableStatus = 'unreachable'
-
-// service with a known IP address
-export type ResolvedRobot = {|
-  ...$Exact<Service>,
-  ip: $NonMaybeType<$PropertyType<Service, 'ip'>>,
-  local: $NonMaybeType<$PropertyType<Service, 'local'>>,
-  ok: $NonMaybeType<$PropertyType<Service, 'ok'>>,
-  serverOk: $NonMaybeType<$PropertyType<Service, 'serverOk'>>,
+export type BaseRobot = {|
+  ...$Rest<DiscoveryClientRobot, {| addresses: mixed |}>,
   displayName: string,
+  connected: boolean,
+  local: boolean | null,
+  seen: boolean,
 |}
 
 // fully connectable robot
 export type Robot = {|
-  ...ResolvedRobot,
-  ok: true,
-  health: $NonMaybeType<$PropertyType<Service, 'health'>>,
-  status: ConnectableStatus,
-  connected: boolean,
+  ...BaseRobot,
+  status: CONNECTABLE,
+  health: HealthResponse,
+  ip: string,
+  port: number,
+  healthStatus: HEALTH_STATUS_OK,
+  serverHealthStatus: HealthStatus,
 |}
 
-// robot with a known IP (i.e. advertising over mDNS) but unconnectable
+// robot with a seen, but not connecteable IP
 export type ReachableRobot = {|
-  ...ResolvedRobot,
-  ok: false,
-  status: ReachableStatus,
+  ...BaseRobot,
+  status: REACHABLE,
+  ip: string,
+  port: number,
+  healthStatus: HealthStatus,
+  serverHealthStatus: HealthStatus,
 |}
 
-// robot with an unknown IP
+// robot with no reachable IP
 export type UnreachableRobot = {|
-  ...$Exact<Service>,
-  displayName: string,
-  status: UnreachableStatus,
+  ...BaseRobot,
+  status: UNREACHABLE,
+  ip: string | null,
+  port: number | null,
+  healthStatus: HealthStatus | null,
+  serverHealthStatus: HealthStatus | null,
 |}
 
 export type ViewableRobot = Robot | ReachableRobot
 
-export type AnyRobot = Robot | ReachableRobot | UnreachableRobot
+export type DiscoveredRobot = Robot | ReachableRobot | UnreachableRobot
 
 export type StartDiscoveryAction = {|
   type: 'discovery:START',
@@ -65,7 +78,7 @@ export type FinishDiscoveryAction = {|
 
 export type UpdateListAction = {|
   type: 'discovery:UPDATE_LIST',
-  payload: {| robots: Array<Service> |},
+  payload: {| robots: Array<DiscoveryClientRobot> |},
 |}
 
 export type RemoveRobotAction = {|

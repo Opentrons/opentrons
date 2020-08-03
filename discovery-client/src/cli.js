@@ -1,13 +1,13 @@
 // @flow
 import Yargs from 'yargs'
 import noop from 'lodash/noop'
-import { createDiscoveryClient, DEFAULT_PORT } from './discovery-client'
+import { createDiscoveryClient, DEFAULT_PORT } from '.'
 import { version } from '../package.json'
 
 import type { Argv as YargsArgv } from 'yargs'
 
 import type {
-  DiscoveryClientNext,
+  DiscoveryClient,
   DiscoveryClientRobot,
   DiscoveryClientRobotAddress,
   LogLevel,
@@ -73,7 +73,7 @@ const passesFilters = (argv: Argv) => (robot: DiscoveryClientRobot) => {
 const createClient = (
   argv: Argv,
   onListChange: (robots: $ReadOnlyArray<DiscoveryClientRobot>) => mixed
-): DiscoveryClientNext => {
+): DiscoveryClient => {
   const logger = createLogger(argv)
   const { pollInterval, candidates } = argv
   const client = createDiscoveryClient({

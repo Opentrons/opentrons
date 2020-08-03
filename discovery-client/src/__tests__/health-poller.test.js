@@ -2,7 +2,7 @@
 import nodeFetch from 'node-fetch'
 import { isError } from 'lodash'
 
-import * as Fixtures from '../__fixtures__/health'
+import * as Fixtures from '../__fixtures__'
 import { createHealthPoller } from '../health-poller'
 
 import type { Request, RequestInit, Response } from 'node-fetch'

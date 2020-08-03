@@ -57,7 +57,7 @@ export function RobotItemComponent(props: RobotItemProps): React.Node {
         isConnectable,
         isUpgradable,
         isSelected,
-        isLocal,
+        isLocal: Boolean(isLocal),
         isConnected,
         onToggleConnect: handleToggleConnect,
       }}

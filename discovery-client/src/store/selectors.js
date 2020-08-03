@@ -5,6 +5,10 @@ import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
   HEALTH_STATUS_UNREACHABLE,
+  RE_HOSTNAME_IPV6_LL,
+  RE_HOSTNAME_IPV4_LL,
+  RE_HOSTNAME_LOCALHOST,
+  RE_HOSTNAME_LOOPBACK,
 } from '../constants'
 
 import type { DiscoveryClientRobot } from '../types'
@@ -50,13 +54,17 @@ const HEALTH_PRIORITY = [
   HEALTH_STATUS_OK,
 ]
 
+const SEEN_PRIORITY = [false, true]
+
 // accending priority order, where no match is lowest priority
 const IP_PRIORITY_MATCH = [
-  /^169\.254\.\d+\.\d+$/,
-  /^localhost$/,
-  /^127\.0\.0\.1$/,
+  RE_HOSTNAME_IPV6_LL,
+  RE_HOSTNAME_IPV4_LL,
+  RE_HOSTNAME_LOCALHOST,
+  RE_HOSTNAME_LOOPBACK,
 ]
 
+// compare hosts in decending priority order
 export const compareHostsByConnectability = (
   a: HostState,
   b: HostState
@@ -72,6 +80,10 @@ export const compareHostsByConnectability = (
     HEALTH_PRIORITY.indexOf(a.serverHealthStatus)
 
   if (serverHealthSort !== 0) return serverHealthSort
+
+  const seenSort = SEEN_PRIORITY.indexOf(b.seen) - SEEN_PRIORITY.indexOf(a.seen)
+
+  if (seenSort !== 0) return seenSort
 
   const aIpPriority = IP_PRIORITY_MATCH.findIndex(re => re.test(a.ip))
   const bIpPriority = IP_PRIORITY_MATCH.findIndex(re => re.test(b.ip))

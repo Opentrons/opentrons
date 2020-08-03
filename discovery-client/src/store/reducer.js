@@ -83,12 +83,10 @@ export const robotsByNameReducer = (
       const name = serverHealth?.name ?? health?.name ?? null
       if (!name) return state
 
-      const nextHealth = state[name]?.health ?? health
-      const nextServerHealth = state[name]?.serverHealth ?? serverHealth
       const nextRobotState = {
         name,
-        health: nextHealth,
-        serverHealth: nextServerHealth,
+        health: health ?? state[name]?.health ?? null,
+        serverHealth: serverHealth ?? state[name]?.serverHealth ?? null,
       }
 
       return isEqual(state[name], nextRobotState)

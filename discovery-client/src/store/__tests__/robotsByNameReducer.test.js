@@ -139,7 +139,7 @@ describe('robotsByName reducer', () => {
     })
   })
 
-  it('should handle a good "http:HEALTH_POLLED action for an existing robot', () => {
+  it('should handle a good "http:HEALTH_POLLED action for an existing robot with unknown health', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
@@ -230,6 +230,36 @@ describe('robotsByName reducer', () => {
         name: 'opentrons-dev',
         health: mockHealthResponse,
         serverHealth: null,
+      },
+    }
+    const nextState = robotsByNameReducer(initialState, action)
+
+    expect(nextState).toEqual({
+      'opentrons-dev': {
+        name: 'opentrons-dev',
+        health: mockHealthResponse,
+        serverHealth: mockServerHealthResponse,
+      },
+    })
+  })
+
+  it('should update health with a good health poll', () => {
+    const action = Actions.healthPolled({
+      ip: '127.0.0.1',
+      port: 31950,
+      health: mockHealthResponse,
+      serverHealth: mockServerHealthResponse,
+      healthError: null,
+      serverHealthError: null,
+    })
+    const initialState = {
+      'opentrons-dev': {
+        name: 'opentrons-dev',
+        health: { ...mockHealthResponse, api_version: '0.0.0' },
+        serverHealth: {
+          ...mockServerHealthResponse,
+          apiServerVersion: '0.0.0',
+        },
       },
     }
     const nextState = robotsByNameReducer(initialState, action)
