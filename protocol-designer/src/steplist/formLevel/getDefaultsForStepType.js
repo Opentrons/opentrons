@@ -10,9 +10,8 @@ import {
 } from '../../constants'
 import type { StepType, StepFieldName } from '../../form-types'
 
-const isAirGapDelayEnabled = getPrereleaseFeatureFlag(
-  'OT_PD_ENABLE_AIR_GAP_AND_DELAY'
-)
+const isAirGapDelayEnabled = () =>
+  getPrereleaseFeatureFlag('OT_PD_ENABLE_AIR_GAP_AND_DELAY')
 // TODO: Ian 2019-01-17 move this somewhere more central - see #2926
 
 export function getDefaultsForStepType(
@@ -69,7 +68,7 @@ export function getDefaultsForStepType(
         blowout_location: FIXED_TRASH_ID,
         preWetTip: false,
 
-        ...(isAirGapDelayEnabled
+        ...(isAirGapDelayEnabled()
           ? { aspirate_delay_seconds: '1', dispense_delay_seconds: '1' }
           : {}),
       }
