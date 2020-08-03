@@ -35,7 +35,7 @@ export function LabwareGroup(props: LabwareGroupProps): React.Node {
   React.useEffect(() => {
     robot && dispatch(fetchLabwareCalibrations(robot.name))
   }, [dispatch, robot])
-
+  console.log('ALLCAL', labwareCalibrations)
   return (
     <SidePanelGroup title={TITLE} disabled={isRunning}>
       <TipRackList

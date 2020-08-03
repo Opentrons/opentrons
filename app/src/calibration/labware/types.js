@@ -36,11 +36,12 @@ export type FetchLabwareCalibrationsFailureAction = {|
 
 // selector types
 
+export type LabwareCalibrationData = {| x: number, y: number, z: number |}
 export type LabwareSummary = {|
   displayName: string,
   parentDisplayName: string | null,
   quantity: number,
-  calibration: {| x: number, y: number, z: number |} | null,
+  calibration: LabwareCalibrationData | null,
   legacy: boolean,
 |}
 

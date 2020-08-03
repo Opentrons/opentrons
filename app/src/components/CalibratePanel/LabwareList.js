@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react'
+import head from 'lodash/head'
 
 import { TitledList } from '@opentrons/components'
 import { LabwareListItem } from './LabwareListItem'
+import { getCalibrationDataForLabware } from '../../calibration/labware/utils'
 
 import type { Labware, Slot, SessionModule } from '../../robot'
 import type { LabwareCalibrationModel } from '../../calibration/types'
@@ -19,8 +21,13 @@ type Props = {|
 |}
 
 export function LabwareList(props: Props): React.Node {
-  const { labware, disabled, setLabwareToCalibrate, modulesBySlot } = props
-
+  const {
+    labware,
+    disabled,
+    setLabwareToCalibrate,
+    modulesBySlot,
+    labwareCalibrations,
+  } = props
   return (
     <TitledList title={TITLE}>
       {labware.map(lw => (
@@ -31,6 +38,15 @@ export function LabwareList(props: Props): React.Node {
             modulesBySlot &&
             modulesBySlot[lw.slot] &&
             modulesBySlot[lw.slot].model
+          }
+          calibrationData={
+            head(
+              getCalibrationDataForLabware(
+                labwareCalibrations,
+                lw,
+                modulesBySlot
+              )
+            ) ?? null
           }
           isDisabled={disabled}
           onClick={() => setLabwareToCalibrate(lw)}
