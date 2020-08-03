@@ -12,8 +12,8 @@ from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.protocol.protocol import UploadedProtocol
-from robot_server.service.session.session_types.protocol.executor import \
-    ProtocolCommandExecutor
+from robot_server.service.session.session_types.protocol.execution.\
+    command_executor import ProtocolCommandExecutor
 from robot_server.service.session.session_types.protocol.models import \
     ProtocolSessionDetails
 
@@ -26,13 +26,7 @@ class ProtocolSession(BaseSession):
                  configuration: SessionConfiguration,
                  instance_meta: SessionMetaData,
                  protocol: UploadedProtocol):
-        """
-        Constructor
-
-        :param configuration:
-        :param instance_meta:
-        :param protocol:
-        """
+        """Constructor"""
         super().__init__(configuration, instance_meta)
         self._uploaded_protocol = protocol
         self._command_executor = ProtocolCommandExecutor(
