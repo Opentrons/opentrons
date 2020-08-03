@@ -7,13 +7,11 @@
   
 Inside the OT2 is a small computer (a [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)), running Linux.
 
-#### Data storage
-
-Data on the Raspberry Pi is stored in two physical pieces of hardware. The main operating system of the robot is stored on an SD card in the Raspberry Pi. This SD card is read-only apart from when the robot is being updated. Customized user data is stored on a thumb-drive in one of the USB ports of the Raspberry Pi (normally the case covers this USB port so it is not visible). The OT2 camera (a webcam) is connected to another normally hidden USB port of the Raspberry Pi.
+Data is stored on the Raspberry Pi's SD card. The majority of the filesystem is read-only but certain directories such as `/data/` and `/var/lib/jupyter/notebooks` allow read-write access. The OT2 camera (a webcam) is connected to a USB port of the Raspberry Pi (this port, and a 4th port which may have an unused thumbdrive, are normally covered by the Pi's case).
 
 #### Networking
 
-  Other computers, like your laptop, communicate with the Raspberry Pi that controls the OT2 via a network. When you connect your robot via USB, you are in fact connecting to the Raspberry Pi's ethernet port. The USB port is connected to an internal USB-to-ethernet adapter, which is in turn connected to the Pi's ethernet port. When you connect a cable to the robot's USB port, your computer recognises the device as a new network interface, which establishes a local network with the OT2. (You can also connect the OT2 to a wireless network with WiFi, or connect to a wired network by placing a USB-ethernet adapter in one of the Pi's USB ports).
+Other computers, like your laptop, communicate with the Raspberry Pi that controls the OT2 via a network. When you connect your robot via USB, you are in fact connecting to the Raspberry Pi's ethernet port. The USB port is connected to an internal USB-to-ethernet adapter, which is in turn connected to the Pi's ethernet port. When you connect a cable to the robot's USB port, your computer recognises the device as a new network interface, which establishes a local network with the OT2. (You can also connect the OT2 to a wireless network with WiFi, or connect to a wired network by placing a USB-ethernet adapter in one of the Pi's USB ports).
 
 ### Lights, switches
 
@@ -24,12 +22,12 @@ The Raspberry Pi controls the lights of the robot, and detects presses on the sw
 The robot has 6 axes of motion, each controlled by a stepper motor:
   
 
- - X: left-right
- - Y: forward-back
- - Z: left pipette up-down
- - A: right pipette up-down
- - B: left pipette plunger up-down
- - C: right pipette plunger up-down
+ - X: left/right
+ - Y: forward/back
+ - Z: left pipette up/down
+ - A: right pipette up/down
+ - B: left pipette plunger
+ - C: right pipette plunger
 
   
 The motors of the robot, and the endstops and probing switches that help position them, are connected to the motor controller board, housed in the gantry, which is a [SmoothieBoard](http://smoothieware.org/smoothieboard) running  [a custom fork of Smoothieware](https://github.com/Opentrons/SmoothiewareOT).
@@ -57,4 +55,4 @@ Some information, such as labware geometry data, needs to be used in multiple lo
   
 
 ## Update server
-The [update server](https://github.com/Opentrons/opentrons/tree/edge/update-server) is a separate server designed simply to allow updating the robot's software with a new system image built using buildroot.
+The [update server](https://github.com/Opentrons/opentrons/tree/edge/update-server) is a separate server designed primarily to allow updating the robot's software with a new system image built using buildroot. The update server also controls some system-specific tasks such as handling SSH keys and setting the robot's name.
