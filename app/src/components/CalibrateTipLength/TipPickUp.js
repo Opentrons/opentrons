@@ -48,15 +48,12 @@ const ASSET_MAP = {
   single: singleDemoAsset,
 }
 export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
-  const { sendSessionCommand } = props
-  // TODO: get real isMulti and tiprack from the session
-  const tiprack = {}
-  const isMulti = true
+  const { sendSessionCommand, isMulti, tipRack } = props
 
   const [showTipInspection, setShowTipInspection] = React.useState(false)
-  const tiprackDef = React.useMemo(
-    () => getLatestLabwareDef(tiprack?.loadName),
-    [tiprack]
+  const tipRackDef = React.useMemo(
+    () => getLatestLabwareDef(tipRack?.loadName),
+    [tipRack]
   )
 
   const demoAsset = ASSET_MAP[isMulti ? 'multi' : 'single']
@@ -72,14 +69,18 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
   )
 
   const pickUpTip = () => {
-    sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP)
+    sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP, {}, false)
     setShowTipInspection(true)
   }
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(Sessions.tipCalCommands.JOG, {
-      vector: formatJogVector(axis, dir, step),
-    })
+    sendSessionCommand(
+      Sessions.tipCalCommands.JOG,
+      {
+        vector: formatJogVector(axis, dir, step),
+      },
+      false
+    )
   }
 
   const invalidateTip = () => {

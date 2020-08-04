@@ -1,4 +1,6 @@
 // @flow
+
+import type { RequestState } from '../../robot-api/types'
 import type {
   SessionCommandString,
   SessionCommandData,
@@ -17,13 +19,15 @@ export type CalibrateTipLengthParentProps = {|
 |}
 
 export type CalibrateTipLengthChildProps = {|
-  instrument: TipLengthCalibrationInstrument,
-  labware: Array<TipLengthCalibrationLabware>,
+  isMulti: boolean,
+  mount: string,
+  tipRack: TipLengthCalibrationLabware | null,
+  calBlock: TipLengthCalibrationLabware | null,
   sendSessionCommand: (
     command: SessionCommandString,
     data?: SessionCommandData,
     trackRequest?: boolean
   ) => void,
-  hasBlock: boolean,
   deleteSession: () => void,
+  requestStatus: RequestState,
 |}

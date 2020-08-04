@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
 
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ModalPage,
   SpinnerModalPage,
@@ -14,6 +15,7 @@ import type { State } from '../../types'
 import type {
   SessionCommandString,
   SessionCommandData,
+  TipLengthCalibrationLabware,
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
@@ -62,12 +64,24 @@ export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
   const { session, robotName, hasBlock, closeWizard } = props
+  const { currentStep, instrument, labware } = session?.details || {}
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const dispatch = useDispatch()
 
   const requestStatus = useSelector<State, RequestState | null>(state =>
     getRequestById(state, last(requestIds))
   )?.status
+
+  const isMulti = React.useMemo(() => {
+    const spec = instrument && getPipetteModelSpecs(instrument.model)
+    return spec ? spec.channels > 1 : false
+  }, [instrument])
+
+  const tipRack: TipLengthCalibrationInstrument | null =
+    labware.find(l => l.isTiprack) ?? null
+  const calBlock: TipLengthCalibrationInstrument | null = hasBlock
+    ? labware.find(l => !l.isTiprack)
+    : null
 
   function sendCommand(
     command: SessionCommandString,
@@ -102,7 +116,7 @@ export function CalibrateTipLength(
     deleteSession()
   }, true)
 
-  if (!session) {
+  if (!session || !tipRack) {
     return null
   }
 
@@ -115,7 +129,6 @@ export function CalibrateTipLength(
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
-  const { currentStep, instrument, labware } = session?.details
   const Panel = PANEL_BY_STEP[currentStep]
 
   return Panel ? (
@@ -125,9 +138,10 @@ export function CalibrateTipLength(
         contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
       >
         <Panel
-          instrument={instrument}
-          labware={labware}
-          hasBlock={hasBlock}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase()}
+          tipRack={tipRack}
+          calBlock={calBlock}
           sendSessionCommand={sendCommand}
           deleteSession={deleteSession}
         />

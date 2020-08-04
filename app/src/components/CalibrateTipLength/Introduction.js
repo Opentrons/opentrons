@@ -39,8 +39,7 @@ const CONTINUE = 'Continue to tip length calibration'
 const TIP_LENGTH_CALIBRATION_INTRO_HEADER = 'tip length calibration'
 
 export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
-  const { labware, sendSessionCommand } = props
-  const tipRacksFirst = labware.sort((a, b) => (a.isTiprack ? -1 : 1))
+  const { tipRack, calBlock, sendSessionCommand } = props
 
   return (
     <>
@@ -56,13 +55,18 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
         <p className={styles.intro_content}>{TIP_LENGTH_CAL_INTRO_BODY}</p>
         <h5>{LABWARE_REQS}</h5>
         <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING_3}>
-          {tipRacksFirst.map((l, i) => (
+          {tipRack && (
             <RequiredLabwareCard
-              key={`${l.loadName}${i}`}
-              loadName={l.loadName}
-              isTiprack={l.isTiprack}
+              loadName={tipRack.loadName}
+              isTiprack={tipRack.isTiprack}
             />
-          ))}
+          )}
+          {calBlock && (
+            <RequiredLabwareCard
+              loadName={calBlock.loadName}
+              isTiprack={calBlock.isTiprack}
+            />
+          )}
         </Flex>
         <Box fontSize={FONT_SIZE_BODY_1} marginY={SPACING_3}>
           <Text>
