@@ -14,7 +14,8 @@ from . import (
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from .dev_types import (
-        TipLengthCalibration, CalibrationIndexDict, CalibrationDict)
+        TipLengthCalibration, CalibrationIndexDict,
+        CalibrationDict, RobotTransform)
 
 
 def _format_calibration_type(
@@ -131,3 +132,10 @@ def load_tip_length_calibration(
         pip_id=pip_id,
         labware_hash=labware_hash + parent,
         labware_load_name=load_name)
+
+
+def get_robot_deck_attitude() -> 'RobotTransform':
+    gantry_path =\
+        config.get_opentrons_path('robot_calibration_dir') / 'transform.json'
+    gantry_data = io.read_cal_file(gantry_path)
+    return gantry_data  # type: ignore

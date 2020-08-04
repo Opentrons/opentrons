@@ -47,7 +47,7 @@ def test_critical_points(model):
 
 
 @pytest.mark.parametrize('model', pipette_config.config_models)
-def test_critical_point_tiplength(use_tip_length_cal, model):
+def test_critical_point_tiplength(use_new_calibration, model):
     loaded = pipette_config.load(model)
     instr_z = 25
     pip = pipette.Pipette(

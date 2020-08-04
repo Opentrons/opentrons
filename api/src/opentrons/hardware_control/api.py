@@ -11,7 +11,8 @@ from opentrons_shared_data.pipette import name_for_model
 from opentrons import types as top_types
 from opentrons.util import linal
 from functools import lru_cache
-from opentrons.config import robot_configs, pipette_config
+from opentrons.config import (
+    robot_configs, pipette_config, feature_flags as ff)
 from opentrons.drivers.types import MoveSplit
 
 from .util import use_or_initialize_loop, DeckTransformState
@@ -25,7 +26,7 @@ from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
                     DoorStateNotification)
-from . import modules
+from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
@@ -85,6 +86,16 @@ class API(HardwareAPILike):
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
         self._door_state = DoorState.CLOSED
+        self._robot_calibration = rb_cal.load()
+
+    @property
+    def robot_calibration(self) -> rb_cal.RobotCalibration:
+        return self._robot_calibration
+
+    @robot_calibration.setter
+    def robot_calibration(
+            self, robot_calibration: rb_cal.RobotCalibration):
+        self._robot_calibration = robot_calibration
 
     @property
     def door_state(self) -> DoorState:
@@ -238,7 +249,11 @@ class API(HardwareAPILike):
         calibration is valid or not based on the following use-cases:
 
         """
-        curr_cal = np.array(self._config.gantry_calibration)
+        if ff.enable_calibration_overhaul():
+            curr_cal = np.array(
+                self.robot_calibration.deck_calibration.attitude)
+        else:
+            curr_cal = np.array(self._config.gantry_calibration)
         row, col = curr_cal.shape
         rank = np.linalg.matrix_rank(curr_cal)
 
@@ -698,15 +713,20 @@ class API(HardwareAPILike):
                         if k not in Axis.gantry_axes()}
         right = (with_enum[Axis.X], with_enum[Axis.Y],
                  with_enum[Axis.by_mount(top_types.Mount.RIGHT)])
+        if ff.enable_calibration_overhaul():
+            gantry_calibration =\
+                self.robot_calibration.deck_calibration.attitude
+        else:
+            gantry_calibration = self._config.gantry_calibration
         # Tell apply_transform to just do the change of base part of the
         # transform rather than the full affine transform, because this is
         # an offset
         left = (with_enum[Axis.X],
                 with_enum[Axis.Y],
                 with_enum[Axis.by_mount(top_types.Mount.LEFT)])
-        right_deck = linal.apply_reverse(self._config.gantry_calibration,
+        right_deck = linal.apply_reverse(gantry_calibration,
                                          right)
-        left_deck = linal.apply_reverse(self._config.gantry_calibration,
+        left_deck = linal.apply_reverse(gantry_calibration,
                                         left)
         deck_pos = {Axis.X: right_deck[0],
                     Axis.Y: right_deck[1],
@@ -927,8 +947,13 @@ class API(HardwareAPILike):
         # target_position.items() is (rightly) Tuple[float, ...] with unbounded
         # size; unfortunately, mypy can’t quite figure out the length check
         # above that makes this OK
+        if ff.enable_calibration_overhaul():
+            matrix_to_transform =\
+                self.robot_calibration.deck_calibration.attitude
+        else:
+            matrix_to_transform = self._config.gantry_calibration
         transformed = linal.apply_transform(
-            self._config.gantry_calibration, to_transform)  # type: ignore
+            matrix_to_transform, to_transform)  # type: ignore
 
         # Since target_position is an OrderedDict with the axes ordered by
         # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
