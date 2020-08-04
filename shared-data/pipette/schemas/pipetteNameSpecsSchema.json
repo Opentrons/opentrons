@@ -18,7 +18,7 @@
       "required": ["2.0"],
       "additionalProperties": false,
       "patternProperties": {
-        "^\\d\\.\\d$": {
+        "^\\d\\.\\d+$": {
           "$ref": "#/definitions/positiveNumber"
         }
       }
