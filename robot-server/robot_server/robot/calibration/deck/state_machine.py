@@ -45,7 +45,7 @@ DECK_CALIBRATION_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
 class DeckCalibrationStateMachine:
     def __init__(self):
         self._state_machine = SimpleStateMachine(
-            state=set(s for s in State),
+            states=set(s for s in State),
             transitions=DECK_CALIBRATION_TRANSITIONS
         )
 
