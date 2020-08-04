@@ -138,7 +138,6 @@ def get_robot_deck_attitude() -> typing.Optional['RobotTransform']:
     gantry_path =\
         config.get_opentrons_path('robot_calibration_dir') / 'transform.json'
     if gantry_path.exists():
-        gantry_data = io.read_cal_file(gantry_path)
+        return io.read_cal_file(gantry_path)  # type: ignore
     else:
-        gantry_data = None
-    return gantry_data
+        return None
