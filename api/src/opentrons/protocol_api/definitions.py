@@ -2,7 +2,7 @@ import abc
 
 from ..protocols import types
 
-MAX_SUPPORTED_VERSION = types.APIVersion(2, 5)
+MAX_SUPPORTED_VERSION = types.APIVersion(2, 6)
 #: The maximum supported protocol API version in this release
 
 V2_MODULE_DEF_VERSION = types.APIVersion(2, 3)

@@ -129,6 +129,14 @@ class FlowRates:
                  instr: 'InstrumentContext') -> None:
         self._instr = instr
 
+    def set_defaults(self, api_level: APIVersion):
+        self.aspirate = _find_value_for_api_version(
+            api_level, self._instr.hw_pipette['default_aspirate_flow_rates'])
+        self.dispense = _find_value_for_api_version(
+            api_level, self._instr.hw_pipette['default_dispense_flow_rates'])
+        self.blow_out = _find_value_for_api_version(
+            api_level, self._instr.hw_pipette['default_blow_out_flow_rates'])
+
     @property
     def aspirate(self) -> float:
         return self._instr.hw_pipette['aspirate_flow_rate']

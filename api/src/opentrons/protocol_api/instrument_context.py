@@ -96,6 +96,7 @@ class InstrumentContext(CommandPublisher):
         self._speeds = PlungerSpeeds(self)
         self._starting_tip: Union[Well, None] = None
         self.requested_as = requested_as
+        self._flow_rates.set_defaults(self._api_version)
 
     @property  # type: ignore
     @requires_version(2, 0)
