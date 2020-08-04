@@ -8,22 +8,26 @@
     "defaultAspirateFlowRate": {
       "value": 5,
       "min": 0.001,
-      "max": 50
+      "max": 50,
+      "valuesByApiLevel": {"2.0": 5}
     },
     "defaultDispenseFlowRate": {
       "value": 10,
       "min": 0.001,
-      "max": 50
+      "max": 50,
+      "valuesByApiLevel": {"2.0": 10}
     },
     "defaultBlowOutFlowRate": {
       "value": 1000,
       "min": 5,
-      "max": 1000
+      "max": 1000,
+      "valuesByApiLevel": {"2.0": 1000}
     },
     "smoothieConfigs": {
       "stepsPerMM": 768,
       "homePosition": 220,
-      "travelDistance": 30
+      "travelDistance": 30,
+      "valuesByApiLevel": {"2.0": 5}
     }
   },
   "p10_multi": {
@@ -34,17 +38,20 @@
     "defaultAspirateFlowRate": {
       "value": 5,
       "min": 0.001,
-      "max": 50
+      "max": 50,
+      "valuesByApiLevel": {"2.0": 5}
     },
     "defaultDispenseFlowRate": {
       "value": 10,
       "min": 0.001,
-      "max": 50
+      "max": 50,
+      "valuesByApiLevel":  {"2.0": 10}
     },
     "defaultBlowOutFlowRate": {
       "value": 1000,
       "min": 5,
-      "max": 1000
+      "max": 1000,
+      "valuesByApiLevel": {"2.0": 1000}
     },
     "channels": 8,
     "smoothieConfigs": {
@@ -59,17 +66,26 @@
     "defaultAspirateFlowRate": {
       "value": 3.78,
       "min": 0.08,
-      "max": 24
+      "max": 24,
+      "valuesByApiLevel": {
+        "2.0": 3.78,
+        "2.6": 7.56}
     },
     "defaultDispenseFlowRate": {
       "value": 3.78,
       "min": 0.08,
-      "max": 24
+      "max": 24,
+      "valuesByApiLevel": {
+        "2.0": 3.78,
+        "2.6": 7.56}
     },
     "defaultBlowOutFlowRate": {
       "value": 3.78,
       "min": 0.08,
-      "max": 24
+      "max": 24,
+      "valuesByApiLevel": {
+        "2.0": 3.78,
+        "2.6": 7.56}
     },
     "minVolume": 1,
     "maxVolume": 20,
@@ -86,17 +102,26 @@
     "defaultAspirateFlowRate": {
       "value": 7.6,
       "min": 0.08,
-      "max": 24
+      "max": 24,
+      "valuesByApiLevel": {
+        "2.0": 7.6
+      }
     },
     "defaultDispenseFlowRate": {
       "value": 7.6,
       "min": 0.08,
-      "max": 24
+      "max": 24,
+      "valuesByApiLevel": {
+        "2.0": 7.6
+      }
     },
     "defaultBlowOutFlowRate": {
       "value": 7.6,
       "min": 0.08,
-      "max": 24
+      "max": 24,
+      "valuesByApiLevel": {
+        "2.0": 7.6
+      }
     },
     "minVolume": 1,
     "maxVolume": 20,
@@ -113,17 +138,20 @@
     "defaultAspirateFlowRate": {
       "value": 25,
       "min": 0.001,
-      "max": 100
+      "max": 100,
+      "valuesByApiLevel": {"2.0":  25}
     },
     "defaultDispenseFlowRate": {
       "value": 50,
       "min": 0.001,
-      "max": 100
+      "max": 100,
+      "valuesByApiLevel": {"2.0": 50}
     },
     "defaultBlowOutFlowRate": {
       "value": 1000,
       "min": 5,
-      "max": 1000
+      "max": 1000,
+      "valuesByApiLevel": {"2.0": 1000}
     },
     "channels": 1,
     "minVolume": 5,
@@ -140,17 +168,20 @@
     "defaultAspirateFlowRate": {
       "value": 25,
       "min": 0.001,
-      "max": 100
+      "max": 100,
+      "valuesByApiLevel": {"2.0": 25}
     },
     "defaultDispenseFlowRate": {
       "value": 50,
       "min": 0.001,
-      "max": 100
+      "max": 100,
+      "valuesByApiLevel":  {"2.0": 50}
     },
     "defaultBlowOutFlowRate": {
       "value": 1000,
       "min": 5,
-      "max": 1000
+      "max": 1000,
+      "valuesByApiLevel": {"2.0": 1000}
     },
     "channels": 8,
     "minVolume": 5,
@@ -167,17 +198,20 @@
     "defaultAspirateFlowRate": {
       "value": 150,
       "min": 0.001,
-      "max": 600
+      "max": 600,
+      "valuesByApiLevel": {"2.0": 150}
     },
     "defaultDispenseFlowRate": {
       "value": 300,
       "min": 0.001,
-      "max": 600
+      "max": 600,
+      "valuesByApiLevel": {"2.0": 300}
     },
     "defaultBlowOutFlowRate": {
       "value": 1000,
       "min": 5,
-      "max": 1000
+      "max": 1000,
+      "valuesByApiLevel": {"2.0": 1000}
     },
     "channels": 1,
     "minVolume": 30,
@@ -194,17 +228,29 @@
     "defaultAspirateFlowRate": {
       "value": 46.43,
       "min": 1,
-      "max": 275
+      "max": 275,
+      "valuesByApiLevel": {
+        "2.0": 46.43,
+        "2.6": 92.86
+      }
     },
     "defaultDispenseFlowRate": {
       "value": 46.43,
       "min": 1,
-      "max": 275.31
+      "max": 275.31,
+      "valuesByApiLevel": {
+        "2.0": 46.43,
+        "2.6": 92.86
+      }
     },
     "defaultBlowOutFlowRate": {
       "value": 46.43,
       "min": 1,
-      "max": 275
+      "max": 275,
+      "valuesByApiLevel": {
+        "2.0": 46.43,
+        "2.6": 92.86
+      }
     },
     "channels": 1,
     "minVolume": 20,
@@ -221,17 +267,26 @@
     "defaultAspirateFlowRate": {
       "value": 94,
       "min": 1,
-      "max": 275
+      "max": 275,
+      "valuesByApiLevel": {
+        "2.0": 94
+      }
     },
     "defaultDispenseFlowRate": {
       "value": 94,
       "min": 1,
-      "max": 275
+      "max": 275,
+      "valuesByApiLevel": {
+        "2.0": 94
+      }
     },
     "defaultBlowOutFlowRate": {
       "value": 94,
       "min": 1,
-      "max": 275
+      "max": 275,
+      "valuesByApiLevel": {
+        "2.0": 94
+      }
     },
     "channels": 8,
     "minVolume": 20,
@@ -248,17 +303,20 @@
     "defaultAspirateFlowRate": {
       "value": 150,
       "min": 0.001,
-      "max": 600
+      "max": 600,
+      "valuesByApiLevel": {"2.0": 150}
     },
     "defaultDispenseFlowRate": {
       "value": 300,
       "min": 0.001,
-      "max": 600
+      "max": 600,
+      "valuesByApiLevel": {"2.0": 300}
     },
     "defaultBlowOutFlowRate": {
       "value": 1000,
       "min": 5,
-      "max": 1000
+      "max": 1000,
+      "valuesByApiLevel": {"2.0": 1000}
     },
     "channels": 8,
     "minVolume": 30,
@@ -275,17 +333,20 @@
     "defaultAspirateFlowRate": {
       "value": 500,
       "min": 50,
-      "max": 2000
+      "max": 2000,
+      "valuesByApiLevel": {"2.0": 500}
     },
     "defaultDispenseFlowRate": {
       "value": 1000,
       "min": 50,
-      "max": 2000
+      "max": 2000,
+      "valuesByApiLevel": {"2.0": 1000}
     },
     "defaultBlowOutFlowRate": {
       "value": 1000,
       "min": 5,
-      "max": 1000
+      "max": 1000,
+      "valuesByApiLevel": {"2.0": 1000}
     },
     "channels": 1,
     "minVolume": 100,
@@ -302,17 +363,29 @@
     "defaultAspirateFlowRate": {
       "value": 137.35,
       "min": 3,
-      "max": 812
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 137.35,
+        "2.6": 274.7
+      }
     },
     "defaultDispenseFlowRate": {
       "value": 137.35,
       "min": 3,
-      "max": 812
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 137.35,
+        "2.6": 274.7
+      }
     },
     "defaultBlowOutFlowRate": {
       "value": 137.35,
       "min": 3,
-      "max": 812
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 137.35,
+        "2.6": 274.7
+      }
     },
     "channels": 1,
     "minVolume": 100,

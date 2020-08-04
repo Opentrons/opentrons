@@ -12,6 +12,15 @@
     "displayCategory": {
       "type": "string",
       "enum": ["GEN1", "GEN2"]
+    },
+    "perApiLevelValues": {
+      "type": "object",
+      "required": ["2.0"],
+      "patternProperties": {
+        "\\d+\\.\\d+": {
+          "$ref": "#/definitions/positiveNumber"
+        }
+      }
     }
   },
 
@@ -34,19 +43,31 @@
       "properties": {
         "channels": { "$ref": "#/definitions/channels" },
         "defaultAspirateFlowRate": {
-          "value": { "$ref": "#/definitions/positiveNumber" },
+          "value": {
+            "$ref": "#/definitions/positiveNumber",
+            "$comment": "This key is deprecated in favor of valuesByApiLevel"
+          },
           "min": { "$ref": "#/definitions/positiveNumber" },
-          "max": { "$ref": "#/definitions/positiveNumber" }
+          "max": { "$ref": "#/definitions/positiveNumber" },
+          "valuesByApiLevel": { "$ref": "#/definitions/perApiLevelValues" }
         },
         "defaultDispenseFlowRate": {
-          "value": { "$ref": "#/definitions/positiveNumber" },
+          "value": {
+            "$ref": "#/definitions/positiveNumber",
+            "$comment": "This key is deprecated in favor of valuesByApiLevel"
+          },
           "min": { "$ref": "#/definitions/positiveNumber" },
-          "max": { "$ref": "#/definitions/positiveNumber" }
+          "max": { "$ref": "#/definitions/positiveNumber" },
+          "valuesByApiLevel": { "$ref": "#/definitions/perApiLevelValues" }
         },
         "defaultBlowOutFlowRate": {
-          "value": { "$ref": "#/definitions/positiveNumber" },
+          "value": {
+            "$ref": "#/definitions/positiveNumber",
+            "$comment": "This key is deprecated in favor of valuesByApiLevel"
+          },
           "min": { "$ref": "#/definitions/positiveNumber" },
-          "max": { "$ref": "#/definitions/positiveNumber" }
+          "max": { "$ref": "#/definitions/positiveNumber" },
+          "valuesByApiLevel": { "$ref": "#/definitions/perApiLevelValues" }
         },
         "displayName": { "type": "string" },
         "displayCategory": { "$ref": "#/definitions/displayCategory" },
