@@ -133,6 +133,7 @@ describe('labware calibration selectors', () => {
 
     it('grabs calibration data for labware if present, rounding to 1 decimal', () => {
       getModulesBySlot.mockReturnValue({})
+
       const lwCalibration = Fixtures.mockLabwareCalibration1
       const { attributes } = lwCalibration
       const { calibrationData } = attributes
@@ -151,6 +152,7 @@ describe('labware calibration selectors', () => {
                     loadName: wellPlate96Def.parameters.loadName,
                     namespace: wellPlate96Def.namespace,
                     version: wellPlate96Def.version,
+                    parent: '',
                     calibrationData: {
                       ...calibrationData,
                       offset: {
@@ -191,6 +193,7 @@ describe('labware calibration selectors', () => {
         ...lwCalibration,
         attributes: {
           ...attributes,
+          parent: '',
           loadName: wellPlate96Def.parameters.loadName,
           namespace: wellPlate96Def.namespace,
           version: wellPlate96Def.version,
@@ -238,6 +241,77 @@ describe('labware calibration selectors', () => {
         {
           displayName: wellPlate96Def.metadata.displayName,
           parentDisplayName: 'Magnetic Module GEN1',
+          quantity: 1,
+          calibration: { x: 1.2, y: 4.6, z: 7.9 },
+        },
+        {
+          displayName: 'some_v1_labware',
+          parentDisplayName: null,
+          quantity: 1,
+          calibration: null,
+        },
+      ])
+    })
+
+    it('grabs calibration data for labware not on module if on-module cal data is present', () => {
+      const lwCalibration = Fixtures.mockLabwareCalibration1
+      const { attributes } = lwCalibration
+      const { calibrationData } = attributes
+
+      const calNotOnModule = {
+        ...lwCalibration,
+        attributes: {
+          ...attributes,
+          parent: '',
+          loadName: wellPlate96Def.parameters.loadName,
+          namespace: wellPlate96Def.namespace,
+          version: wellPlate96Def.version,
+          calibrationData: {
+            ...calibrationData,
+            offset: {
+              ...calibrationData.offset,
+              value: [1.23, 4.56, 7.89],
+            },
+          },
+        },
+      }
+
+      const calOnModule = {
+        ...lwCalibration,
+        attributes: {
+          ...attributes,
+          parent: 'magneticModuleV1',
+          loadName: wellPlate96Def.parameters.loadName,
+          namespace: wellPlate96Def.namespace,
+          version: wellPlate96Def.version,
+          calibrationData: {
+            ...calibrationData,
+            offset: {
+              ...calibrationData.offset,
+              value: [0, 0, 0],
+            },
+          },
+        },
+      }
+
+      getModulesBySlot.mockReturnValue({})
+
+      state = ({
+        calibration: {
+          robotName: {
+            calibrationStatus: null,
+            labwareCalibrations: {
+              meta: {},
+              data: [calOnModule, calNotOnModule],
+            },
+          },
+        },
+      }: $Shape<State>)
+
+      expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
+        {
+          displayName: wellPlate96Def.metadata.displayName,
+          parentDisplayName: null,
           quantity: 1,
           calibration: { x: 1.2, y: 4.6, z: 7.9 },
         },

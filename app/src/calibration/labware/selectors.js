@@ -14,7 +14,7 @@ import { selectors as robotSelectors } from '../../robot'
 
 import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { State } from '../../types'
-import type { LabwareCalibrationModel } from './../types'
+import type { LabwareCalibration, LabwareCalibrationModel } from './../types'
 import type { LabwareSummary } from './types'
 
 export const getLabwareCalibrations = (
@@ -70,25 +70,30 @@ export const getProtocolLabwareList: (
       const { definition: def, loadName, namespace, version, parent } = lw
       const displayName = def ? getLabwareDisplayName(def) : loadName
       const parentDisplayName = parent ? getModuleDisplayName(parent) : null
-      const matchesLabwareIdentityForQuantity = target =>
-        target.loadName === loadName &&
-        target.namespace === namespace &&
-        target.version === version &&
-        target.parent === parent
+      const matchesLabwareIdentity = (
+        compare: LabwareCalibration | BaseProtocolLabware
+      ) => {
+        // target may be an internal protocol labware or API calibration data
+        // internal protocol labware model uses null for no parent
+        // API calibration model uses empty string for no parent
+        // normalize to null to do the comparison
+        const compareParent =
+          compare.parent === '' || compare.parent === null
+            ? null
+            : compare.parent
 
-      const quantity = baseLabwareList.filter(matchesLabwareIdentityForQuantity)
-        .length
+        return (
+          loadName === compare.loadName &&
+          namespace === compare.namespace &&
+          version === compare.version &&
+          parent === compareParent
+        )
+      }
 
-      const matchesLabwareIdentityForCalibration = target =>
-        target.loadName === loadName &&
-        target.namespace === namespace &&
-        target.version === version &&
-        (parent === null || target.parent === parent)
+      const quantity = baseLabwareList.filter(matchesLabwareIdentity).length
 
       const calData = calibrations
-        .filter(({ attributes }) =>
-          matchesLabwareIdentityForCalibration(attributes)
-        )
+        .filter(({ attributes }) => matchesLabwareIdentity(attributes))
         .map(({ attributes }) => {
           const calVector = attributes.calibrationData.offset.value.map(n =>
             round(n, 1)
