@@ -33,10 +33,10 @@ class ProtocolFlowDirective(int, Enum):
     single_step = auto()
 
 
-class Worker:
+class _Worker:
     """
-    A class that processes protocol session commands. It manages a
-    ProtocolRunner's behavior in an asyncio task.
+    A private class used by ProtocolCommandExecutor to handle protocol session
+     commands. It manages a ProtocolRunner's behavior in an asyncio task.
     """
     def __init__(self,
                  protocol_runner: ProtocolRunner,

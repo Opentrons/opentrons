@@ -13,7 +13,7 @@ from robot_server.service.session.models import ProtocolCommand, \
 from robot_server.service.session.session_types.protocol.execution.\
     protocol_runner import ProtocolRunner
 from robot_server.service.session.session_types.protocol.execution.worker \
-    import Worker
+    import _Worker
 from robot_server.service.session.session_types.protocol.models import \
     ProtocolSessionState
 from robot_server.util import duration
@@ -68,7 +68,7 @@ class ProtocolCommandExecutor(CommandExecutor):
             motion_lock=configuration.motion_lock)
         self._protocol_runner.add_listener(self._on_command)
         # The async worker with all commands are delegated.
-        self._worker = Worker(
+        self._worker = _Worker(
             protocol_runner=self._protocol_runner,
             loop=asyncio.get_event_loop()
         )
