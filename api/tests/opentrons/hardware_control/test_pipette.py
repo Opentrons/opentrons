@@ -120,3 +120,37 @@ def test_tip_overlap(config_model):
                           'testId')
     assert pip.config.tip_overlap\
         == pipette_config.configs[config_model]['tipOverlap']
+
+
+def test_flow_rate_setting():
+    pip = pipette.Pipette('p300_single_v2.0',
+                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          'testId')
+    # pipettes should load settings from config at init time
+    assert pip.aspirate_flow_rate\
+        == pip.config.default_aspirate_flow_rates['2.0']
+    assert pip.dispense_flow_rate\
+        == pip.config.default_dispense_flow_rates['2.0']
+    assert pip.blow_out_flow_rate\
+        == pip.config.default_blow_out_flow_rates['2.0']
+    # changing flow rates with normal property access shouldn't touch
+    # config or other flow rates
+    config = pip.config
+    pip.aspirate_flow_rate = 2
+    assert pip.aspirate_flow_rate == 2
+    assert pip.dispense_flow_rate\
+        == pip.config.default_dispense_flow_rates['2.0']
+    assert pip.blow_out_flow_rate\
+        == pip.config.default_blow_out_flow_rates['2.0']
+    assert pip.config is config
+    pip.dispense_flow_rate = 3
+    assert pip.aspirate_flow_rate == 2
+    assert pip.dispense_flow_rate == 3
+    assert pip.blow_out_flow_rate\
+        == pip.config.default_blow_out_flow_rates['2.0']
+    assert pip.config is config
+    pip.blow_out_flow_rate = 4
+    assert pip.aspirate_flow_rate == 2
+    assert pip.dispense_flow_rate == 3
+    assert pip.blow_out_flow_rate == 4
+    assert pip.config is config

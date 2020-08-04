@@ -52,6 +52,12 @@ class Pipette:
                        .format(model, self._instrument_offset))
         self.ready_to_aspirate = False
         #: True if ready to aspirate
+        self._aspirate_flow_rate\
+            = self._config.default_aspirate_flow_rates['2.0']
+        self._dispense_flow_rate\
+            = self._config.default_dispense_flow_rates['2.0']
+        self._blow_out_flow_rate\
+            = self._config.default_blow_out_flow_rates['2.0']
 
     def update_instrument_offset(self, new_offset: Point):
         self._log.info("updated instrument offset to {}".format(new_offset))
@@ -156,6 +162,36 @@ class Pipette:
         self._current_tiprack_diameter = diameter
 
     @property
+    def aspirate_flow_rate(self) -> float:
+        """ Current active flow rate (not config value)"""
+        return self._aspirate_flow_rate
+
+    @aspirate_flow_rate.setter
+    def aspirate_flow_rate(self, new_flow_rate: float):
+        assert new_flow_rate > 0
+        self._aspirate_flow_rate = new_flow_rate
+
+    @property
+    def dispense_flow_rate(self) -> float:
+        """ Current active flow rate (not config value)"""
+        return self._dispense_flow_rate
+
+    @dispense_flow_rate.setter
+    def dispense_flow_rate(self, new_flow_rate: float):
+        assert new_flow_rate > 0
+        self._dispense_flow_rate = new_flow_rate
+
+    @property
+    def blow_out_flow_rate(self) -> float:
+        """ Current active flow rate (not config value)"""
+        return self._blow_out_flow_rate
+
+    @blow_out_flow_rate.setter
+    def blow_out_flow_rate(self, new_flow_rate: float):
+        assert new_flow_rate > 0
+        self._blow_out_flow_rate = new_flow_rate
+
+    @property
     def working_volume(self) -> float:
         """ The working volume of the pipette """
         return self._working_volume
@@ -238,5 +274,8 @@ class Pipette:
                             'model': self.model,
                             'pipette_id': self.pipette_id,
                             'has_tip': self.has_tip,
-                            'working_volume': self.working_volume})
+                            'working_volume': self.working_volume,
+                            'aspirate_flow_rate':  self.aspirate_flow_rate,
+                            'dispense_flow_rate': self.dispense_flow_rate,
+                            'blow_out_flow_rate': self.blow_out_flow_rate})
         return config_dict

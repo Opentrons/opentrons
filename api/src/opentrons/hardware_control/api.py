@@ -4,7 +4,8 @@ import logging
 import pathlib
 import numpy as np  # type: ignore
 from collections import OrderedDict
-from typing import Dict, Union, List, Optional, Tuple, TYPE_CHECKING
+from typing import (Any, Dict, Union, List, Optional, Tuple,
+                    TYPE_CHECKING, cast)
 
 from opentrons_shared_data.pipette import name_for_model
 
@@ -31,6 +32,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
         UlPerMmAction, PipetteModel, PipetteName
     )
+    from .dev_types import PipetteDict
 
 
 mod_log = logging.getLogger(__name__)
@@ -428,7 +430,7 @@ class API(HardwareAPILike):
             self._attached_instruments))
 
     def get_attached_instruments(self) -> Dict[top_types.Mount,
-                                               Pipette.DictType]:
+                                               'PipetteDict']:
         """ Get the status dicts of the cached attached instruments.
 
         Also available as :py:meth:`get_attached_instruments`.
@@ -448,8 +450,10 @@ class API(HardwareAPILike):
                    'pipette_id', 'current_volume', 'display_name',
                    'tip_length', 'model', 'blow_out_flow_rate',
                    'working_volume', 'tip_overlap', 'available_volume',
-                   'return_tip_height']
-        instruments: Dict[top_types.Mount, Pipette.DictType] = {
+                   'return_tip_height',  'default_aspirate_flow_rates',
+                   'default_blow_out_flow_rates',
+                   'default_dispense_flow_rates']
+        instruments: Dict[top_types.Mount, Dict[str, Any]] = {
             top_types.Mount.LEFT: {},
             top_types.Mount.RIGHT: {}
         }
@@ -462,16 +466,32 @@ class API(HardwareAPILike):
                 instruments[mount][key] = instr_dict[key]
             instruments[mount]['has_tip'] = instr.has_tip
             instruments[mount]['aspirate_speed'] = self._plunger_speed(
-                instr, instr.config.aspirate_flow_rate, 'aspirate')
+                instr, instr.aspirate_flow_rate, 'aspirate')
             instruments[mount]['dispense_speed'] = self._plunger_speed(
-                instr, instr.config.dispense_flow_rate, 'dispense')
+                instr, instr.dispense_flow_rate, 'dispense')
             instruments[mount]['blow_out_speed'] = self._plunger_speed(
-                instr, instr.config.blow_out_flow_rate, 'dispense')
+                instr, instr.blow_out_flow_rate, 'dispense')
             instruments[mount]['ready_to_aspirate'] = instr.ready_to_aspirate
-        return instruments
+            instruments[mount]['default_blow_out_speeds'] = {
+                alvl: self._plunger_speed(instr, fr, 'dispense')
+                for alvl, fr
+                in instr.config.default_aspirate_flow_rates.items()
+            }
+            instruments[mount]['default_dispense_speeds'] = {
+                alvl: self._plunger_speed(instr, fr, 'dispense')
+                for alvl, fr
+                in instr.config.default_dispense_flow_rates.items()
+            }
+            instruments[mount]['default_aspirate_speeds'] = {
+                alvl: self._plunger_speed(instr, fr, 'aspirate')
+                for alvl, fr
+                in instr.config.default_aspirate_flow_rates.items()
+            }
+        return cast(Dict[top_types.Mount, 'PipetteDict'],
+                    instruments)
 
     @property
-    def attached_instruments(self):
+    def attached_instruments(self) -> Dict[top_types.Mount, 'PipetteDict']:
         return self.get_attached_instruments()
 
     @property
@@ -1075,7 +1095,7 @@ class API(HardwareAPILike):
         if this_pipette.current_volume == 0:
             speed = self._plunger_speed(
                 this_pipette,
-                this_pipette.config.blow_out_flow_rate,
+                this_pipette.blow_out_flow_rate,
                 'aspirate')
             await self._move_plunger(
                 mount, this_pipette.config.bottom,
@@ -1138,7 +1158,7 @@ class API(HardwareAPILike):
                 this_pipette,
                 this_pipette.current_volume + asp_vol,
                 'aspirate')
-        flow_rate = this_pipette.config.aspirate_flow_rate * rate
+        flow_rate = this_pipette.aspirate_flow_rate * rate
         speed = self._plunger_speed(this_pipette, flow_rate, 'aspirate')
         try:
             await self._move_plunger(mount, dist, speed=speed)
@@ -1192,7 +1212,7 @@ class API(HardwareAPILike):
                 this_pipette,
                 this_pipette.current_volume - disp_vol,
                 'dispense')
-        flow_rate = this_pipette.config.dispense_flow_rate * rate
+        flow_rate = this_pipette.dispense_flow_rate * rate
         speed = self._plunger_speed(this_pipette, flow_rate, 'dispense')
         try:
             await self._move_plunger(mount, dist, speed=speed)
@@ -1234,7 +1254,7 @@ class API(HardwareAPILike):
         self._backend.set_active_current(Axis.of_plunger(mount),
                                          this_pipette.config.plunger_current)
         speed = self._plunger_speed(
-            this_pipette, this_pipette.config.blow_out_flow_rate, 'dispense')
+            this_pipette, this_pipette.blow_out_flow_rate, 'dispense')
         try:
             await self._move_plunger(
                 mount, this_pipette.config.blow_out,
@@ -1469,11 +1489,11 @@ class API(HardwareAPILike):
             raise top_types.PipetteNotAttachedError(
                 "No pipette attached to {} mount".format(mount))
         if aspirate:
-            this_pipette.update_config_item('aspirate_flow_rate', aspirate)
+            this_pipette.aspirate_flow_rate = aspirate
         if dispense:
-            this_pipette.update_config_item('dispense_flow_rate', dispense)
+            this_pipette.dispense_flow_rate = dispense
         if blow_out:
-            this_pipette.update_config_item('blow_out_flow_rate', blow_out)
+            this_pipette.blow_out_flow_rate = blow_out
 
     def set_pipette_speed(self, mount,
                           aspirate=None, dispense=None, blow_out=None):
@@ -1482,17 +1502,14 @@ class API(HardwareAPILike):
             raise top_types.PipetteNotAttachedError(
                 "No pipette attached to {} mount".format(mount))
         if aspirate:
-            this_pipette.update_config_item(
-                'aspirate_flow_rate',
-                self._plunger_flowrate(this_pipette, aspirate, 'aspirate'))
+            this_pipette.aspirate_flow_rate = self._plunger_flowrate(
+                this_pipette, aspirate, 'aspirate')
         if dispense:
-            this_pipette.update_config_item(
-                'dispense_flow_rate',
-                self._plunger_flowrate(this_pipette, dispense, 'dispense'))
+            this_pipette.dispense_flow_rate = self._plunger_flowrate(
+                this_pipette, dispense, 'dispense')
         if blow_out:
-            this_pipette.update_config_item(
-                'blow_out_flow_rate',
-                self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
+            this_pipette.blow_out_flow_rate = self._plunger_flowrate(
+                this_pipette, blow_out, 'dispense')
 
     def _unregister_modules(self,
                             mods_at_ports: List[modules.ModuleAtPort]) -> None:

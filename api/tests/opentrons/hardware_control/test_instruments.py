@@ -5,9 +5,11 @@ try:
 except OSError:
     aionotify = None  # type: ignore
 import pytest
+import typeguard
 from opentrons import types
 from opentrons import hardware_control as hc
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.dev_types import PipetteDict
 
 
 LEFT_PIPETTE_PREFIX = 'p10_single'
@@ -49,23 +51,15 @@ def dummy_backwards_compatibility():
     return dummy_instruments_attached
 
 
-instrument_keys = sorted([
-    'name', 'min_volume', 'max_volume', 'aspirate_flow_rate', 'channels',
-    'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name',
-    'tip_length', 'has_tip', 'model', 'blow_out_flow_rate',
-    'blow_out_speed', 'aspirate_speed', 'dispense_speed', 'working_volume',
-    'tip_overlap', 'ready_to_aspirate', 'available_volume',
-    'return_tip_height'])
-
-
 async def test_cache_instruments(dummy_instruments, loop):
     hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments,
         loop=loop)
     await hw_api.cache_instruments()
     attached = hw_api.attached_instruments
-    assert sorted(attached[types.Mount.LEFT].keys()) == \
-        instrument_keys
+    typeguard.check_type(
+        'left mount dict', attached[types.Mount.LEFT],
+        PipetteDict)
 
 
 async def test_mismatch_fails(dummy_instruments, loop):
@@ -121,9 +115,9 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
 
     await hw_api_cntrlr.cache_instruments()
     attached = hw_api_cntrlr.attached_instruments
-    assert sorted(
-        attached[types.Mount.LEFT].keys()) == \
-        instrument_keys
+    typeguard.check_type('left mount dict default',
+                         attached[types.Mount.LEFT],
+                         PipetteDict)
 
     # If we pass a conflicting expectation we should get an error
     with pytest.raises(RuntimeError):
@@ -133,9 +127,9 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
     await hw_api_cntrlr.cache_instruments(
         {types.Mount.LEFT: LEFT_PIPETTE_PREFIX})
     attached = hw_api_cntrlr.attached_instruments
-    assert sorted(
-        attached[types.Mount.LEFT].keys()) == \
-        instrument_keys
+    typeguard.check_type('left mount dict after expects',
+                         attached[types.Mount.LEFT],
+                         PipetteDict)
 
 
 async def test_cache_instruments_sim(loop, dummy_instruments):
@@ -214,9 +208,11 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
         attached_instruments=dummy_instruments)
     await sim.cache_instruments()
     attached = sim.attached_instruments
-    assert sorted(
-        attached[types.Mount.LEFT].keys()) == \
-        instrument_keys
+    typeguard.check_type(
+        'after config',
+        attached[types.Mount.LEFT],
+        PipetteDict
+    )
 
     # If we specify conflicting expectations and init arguments we should
     # get a RuntimeError
