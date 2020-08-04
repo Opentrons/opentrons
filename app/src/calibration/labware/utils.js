@@ -2,8 +2,8 @@
 
 import round from 'lodash/round'
 import type { Labware, Slot, SessionModule } from '../../robot/types'
-import type { LabwareCalibrationModel } from '../types'
-import type { LabwareCalibrationData } from './types'
+import type { LabwareCalibrationModel, LabwareCalibration } from '../types'
+import type { LabwareCalibrationData, BaseProtocolLabware } from './types'
 
 type LabwareIdentity = {|
   loadName: string,
@@ -19,25 +19,47 @@ export function getLabwareIdentityParams(labware: Labware): LabwareIdentity {
   return { loadName, namespace, version }
 }
 
-export function doesLabwareIdentityMatch(
-  compareCalbration: LabwareCalibrationModel,
+export function makeBaseProtocolLabware(
   targetLabware: Labware,
   modulesBySlot: { [Slot]: SessionModule }
-): boolean {
-  const { loadName, namespace, version, parent } = compareCalbration.attributes
-  const {
-    loadName: targetLoadName,
-    namespace: targetNamespace,
-    version: targetVersion,
-  } = getLabwareIdentityParams(targetLabware)
-  const targetParent = modulesBySlot[targetLabware.slot]?.model ?? null
+): BaseProtocolLabware {
+  return {
+    definition: targetLabware.definition,
+    loadName:
+      targetLabware.definition?.parameters.loadName ?? targetLabware.type,
+    namespace: targetLabware.definition?.namespace ?? null,
+    version: targetLabware.definition?.version ?? null,
+    parent: modulesBySlot[targetLabware.slot]?.model ?? null,
+    legacy: targetLabware.isLegacy,
+  }
+}
 
+const normalizeParent = parent =>
+  // target and compare may be an internal protocol labware or API calibration data
+  // internal protocol labware model uses null for no parent
+  // API calibration model uses empty string for no parent
+  // normalize to null to do the comparison
+  parent === '' || parent === null ? null : parent
+
+export const matchesLabwareIdentity = (
+  target: LabwareCalibration | BaseProtocolLabware,
+  compare: LabwareCalibration | BaseProtocolLabware
+): boolean => {
   return (
-    loadName === targetLoadName &&
-    namespace === targetNamespace &&
-    version === targetVersion &&
-    (targetParent === null || parent === targetParent)
+    target.loadName === compare.loadName &&
+    target.namespace === compare.namespace &&
+    target.version === compare.version &&
+    normalizeParent(target.parent) === normalizeParent(compare.parent)
   )
+}
+
+export function formatCalibrationData(
+  model: LabwareCalibrationModel
+): LabwareCalibrationData {
+  const calVector = model.attributes.calibrationData.offset.value.map(n =>
+    round(n, 1)
+  )
+  return { x: calVector[0], y: calVector[1], z: calVector[2] }
 }
 
 export function getCalibrationDataForLabware(
@@ -46,13 +68,11 @@ export function getCalibrationDataForLabware(
   modulesBySlot: { [Slot]: SessionModule } = {}
 ): Array<LabwareCalibrationData> {
   return calibrations
-    .filter((compareCalbration: LabwareCalibrationModel) =>
-      doesLabwareIdentityMatch(compareCalbration, targetLabware, modulesBySlot)
-    )
-    .map(({ attributes }) => {
-      const calVector = attributes.calibrationData.offset.value.map(n =>
-        round(n, 1)
+    .filter((compareCalbration: LabwareCalibrationModel) => {
+      return matchesLabwareIdentity(
+        compareCalbration.attributes,
+        makeBaseProtocolLabware(targetLabware, modulesBySlot)
       )
-      return { x: calVector[0], y: calVector[1], z: calVector[2] }
     })
+    .map(formatCalibrationData)
 }
