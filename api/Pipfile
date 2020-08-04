@@ -25,6 +25,7 @@ wheel = "==0.30.0"
 "e1839a8" = {editable = true, path = "."}
 "c445fee" = {editable = true, path = "./../shared-data/python"}
 pytest-aiohttp = "*"
+typeguard = "*"
 
 [packages]
 aionotify = "==0.2.0"
