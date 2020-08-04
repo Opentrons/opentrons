@@ -956,9 +956,6 @@ Object {
     "homePosition": 220,
     "stepsPerMM": 768,
     "travelDistance": 30,
-    "valuesByApiLevel": Object {
-      "2.0": 5,
-    },
   },
   "tipLength": Object {
     "max": 100,
@@ -1180,9 +1177,6 @@ Object {
     "homePosition": 220,
     "stepsPerMM": 768,
     "travelDistance": 30,
-    "valuesByApiLevel": Object {
-      "2.0": 5,
-    },
   },
   "tipLength": Object {
     "max": 100,
@@ -1404,9 +1398,6 @@ Object {
     "homePosition": 220,
     "stepsPerMM": 768,
     "travelDistance": 30,
-    "valuesByApiLevel": Object {
-      "2.0": 5,
-    },
   },
   "tipLength": Object {
     "max": 100,
@@ -1628,9 +1619,6 @@ Object {
     "homePosition": 220,
     "stepsPerMM": 768,
     "travelDistance": 30,
-    "valuesByApiLevel": Object {
-      "2.0": 5,
-    },
   },
   "tipLength": Object {
     "max": 100,
@@ -5490,9 +5478,6 @@ Object {
     "homePosition": 220,
     "stepsPerMM": 768,
     "travelDistance": 30,
-    "valuesByApiLevel": Object {
-      "2.0": 5,
-    },
   },
 }
 `;
