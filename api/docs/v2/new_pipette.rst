@@ -435,25 +435,43 @@ Defaults
 
 **p20_single_gen2**
 
-- Aspirate Default: 3.78 µL/s
-- Dispense Default: 3.78 µL/s
-- Blow Out Default: 3.78 µL/s
+- Aspirate Default:
+    - On API Version 2.5 and previous: 3.78 µL/s
+    - On API Version 2.6 and subsequent: 7.56 µL/s
+- Dispense Default:
+    - On API Version 2.5 and previous: 3.78 µL/s
+    - On API Version 2.6 and subsequent: 7.56 µL/s
+- Blow Out Default:
+    - On API Version 2.5 and previous: 3.78 µL/s
+    - On API Version 2.6 and subsequent: 7.56 µL/s
 - Minimum Volume: 1 µL
 - Maximum Volume: 20 µL
 
 **p300_single_gen2**
 
-- Aspirate Default: 46.43 µL/s
-- Dispense Default: 46.43 µL/s
-- Blow Out Default: 46.43 µL/s
+- Aspirate Default:
+    - On API Version 2.5 and previous: 46.43 µL/s
+    - On API Version 2.6 and subsequent: 92.86 µL/s
+- Dispense Default:
+    - On API Version 2.5 and previous: 46.43 µL/s
+    - On API Version 2.6 and subsequent: 92.86 µL/s
+- Blow Out Default:
+    - On API Version 2.5 and previous: 46.43 µL/s
+    - On API Version 2.6 and subsequent: 92.86 µL/s
 - Minimum Volume: 20 µL
 - Maximum Volume: 300 µL
 
 **p1000_single_gen2**
 
-- Aspirate Default: 137.35 µL/s
-- Dispense Default: 137.35 µL/s
-- Blow Out Default: 137.35 µL/s
+- Aspirate Default:
+    - On API Version 2.5 and previous: 137.35 µL/s
+    - On API Version 2.6 and subsequent: 274.7 µL/s
+- Dispense Default:
+    - On API Version 2.5 and previous: 137.35 µL/s
+    - On API Version 2.6 and subsequent: 274.7 µL/s
+- Blow Out Default:
+    - On API Version 2.5 and previous: 137.35 µL/s
+    - On API Version 2.6 and subsequent: 274.7 µL/s
 - Minimum Volume: 100 µL
 - Maximum Volume: 1000 µL
 
