@@ -6,7 +6,7 @@ from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api.labware import Labware, get_labware_definition
 from opentrons.protocol_api.geometry import Deck
 from opentrons.protocol_api.util import (
-    HardwareManager, AxisMaxSpeeds, build_edges)
+    HardwareManager, AxisMaxSpeeds, build_edges, _find_value_for_api_version)
 from opentrons.hardware_control import API, adapters, types, ThreadManager
 
 
@@ -166,3 +166,15 @@ def test_build_edges_right_pipette(loop):
     res2 = build_edges(
         test_lw2['A12'], 1.0, APIVersion(2, 4), Mount.RIGHT, ctx._deck_layout)
     assert res2 == right_pip_edges
+
+
+@pytest.mark.parametrize('data,level,desired', [
+    ({'2.0': 5}, APIVersion(2, 0), 5),
+    ({'2.0': 5}, APIVersion(2, 5), 5),
+    ({'2.6': 4, '2.0': 5}, APIVersion(2, 1), 5),
+    ({'2.6': 4, '2.0': 5}, APIVersion(2, 6), 4),
+    ({'2.0': 5, '2.6': 4}, APIVersion(2, 3), 5),
+    ({'2.0': 5, '2.6': 4}, APIVersion(2, 6), 4)
+])
+def test_find_value_for_api_version(data, level, desired):
+    assert _find_value_for_api_version(level, data) == desired
