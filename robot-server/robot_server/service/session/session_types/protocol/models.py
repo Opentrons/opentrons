@@ -19,4 +19,4 @@ class ProtocolSessionDetails(BaseModel):
     protocolId: str
     currentState: ProtocolSessionState
     # TODO: Amit 8/3/2020 - proper schema for command types
-    executedCommands: typing.List[typing.Dict[typing.Any, typing.Any]]
+    executedCommands: typing.List[typing.Any]

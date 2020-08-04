@@ -122,9 +122,15 @@ class ProtocolCommandExecutor(CommandExecutor):
 
     def _on_command(self, msg):
         """Handler for commands executed by protocol runner"""
-        log.debug(msg)
         # TODO: Amit 8/3/2020 - proper schema for command entries
-        self._loop.call_soon_threadsafe(self._commands.append, msg)
+        self._loop.call_soon_threadsafe(
+            self._commands.append,
+            {
+                'name': msg.get('name'),
+                'desc': msg['payload']['text'],
+                'when': msg.get('$'),
+            }
+        )
 
     async def clean_up(self):
         await self._worker.handle_finish()

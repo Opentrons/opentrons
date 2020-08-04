@@ -76,7 +76,7 @@ class ProtocolRunner:
             self._session.refresh()
 
     def _on_command(self, msg):
-        """Dispatch the commands"""
+        """Dispatch the events"""
         for listener in self._listeners:
             listener(msg)
 
