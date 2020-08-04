@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Tuple, List, Optional
 
-from opentrons.config import feature_flags as ff
+from opentrons.config import robot_configs, feature_flags as ff
 from opentrons.calibration_storage import modify, types, get
 from opentrons.util import linal
 
@@ -31,10 +31,16 @@ def save_attitude_matrix(
 
 
 def load_attitude_matrix() -> DeckCalibration:
-    deck_cal_obj = DeckCalibration(**get.get_robot_deck_attitude())
-    # Add in an extra row + column to the attitude matrix to utilize
-    # current functions for transformation calculations.
-    deck_cal_obj.attitude = linal.add_z(np.array(deck_cal_obj.attitude), 0)
+    calibration_data = get.get_robot_deck_attitude()
+    if calibration_data:
+        deck_cal_obj = DeckCalibration(**calibration_data)
+        # Add in an extra row + column to the attitude matrix to utilize
+        # current functions for transformation calculations.
+        deck_cal_obj.attitude =\
+            linal.add_z(np.array(deck_cal_obj.attitude), 0)
+    else:
+        deck_cal_obj = DeckCalibration(
+            attitude=robot_configs.DEFAULT_DECK_CALIBRATION)
     return deck_cal_obj
 
 

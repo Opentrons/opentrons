@@ -134,8 +134,11 @@ def load_tip_length_calibration(
         labware_load_name=load_name)
 
 
-def get_robot_deck_attitude() -> 'RobotTransform':
+def get_robot_deck_attitude() -> typing.Optional['RobotTransform']:
     gantry_path =\
         config.get_opentrons_path('robot_calibration_dir') / 'transform.json'
-    gantry_data = io.read_cal_file(gantry_path)
-    return gantry_data  # type: ignore
+    if gantry_path.exists():
+        gantry_data = io.read_cal_file(gantry_path)
+    else:
+        gantry_data = None
+    return gantry_data
