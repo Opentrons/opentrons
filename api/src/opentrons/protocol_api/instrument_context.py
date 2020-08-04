@@ -411,8 +411,8 @@ class InstrumentContext(CommandPublisher):
     def touch_tip(self,
                   location: Well = None,
                   radius: float = 1.0,
-                  v_offset: float = -1.0,
-                  speed: float = 60.0) -> 'InstrumentContext':
+                  v_offset: float = -3.0,
+                  speed: float = 30.0) -> 'InstrumentContext':
         """
         Touch the pipette tip to the sides of a well, with the intent of
         removing left-over droplets
