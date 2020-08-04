@@ -5,20 +5,6 @@ import type { Labware, Slot, SessionModule } from '../../robot/types'
 import type { LabwareCalibrationModel, LabwareCalibration } from '../types'
 import type { LabwareCalibrationData, BaseProtocolLabware } from './types'
 
-type LabwareIdentity = {|
-  loadName: string,
-  namespace: string | null,
-  version: number | null,
-|}
-
-export function getLabwareIdentityParams(labware: Labware): LabwareIdentity {
-  const { definition } = labware
-  const loadName = definition?.parameters.loadName ?? labware.type
-  const namespace = definition?.namespace ?? null
-  const version = definition?.version ?? null
-  return { loadName, namespace, version }
-}
-
 export function makeBaseProtocolLabware(
   targetLabware: Labware,
   modulesBySlot: { [Slot]: SessionModule }
