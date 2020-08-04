@@ -13,13 +13,27 @@
       "type": "string",
       "enum": ["GEN1", "GEN2"]
     },
-    "perApiLevelValues": {
+    "valuesByApiLevel": {
       "type": "object",
       "required": ["2.0"],
+      "additionalProperties": false,
       "patternProperties": {
-        "\\d+\\.\\d+": {
+        "^\\d\\.\\d$": {
           "$ref": "#/definitions/positiveNumber"
         }
+      }
+    },
+    "configValue": {
+      "type": "object",
+      "required": ["value", "min", "max", "valuesByApiLevel"],
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/positiveNumber",
+          "$comment": "This key is deprecated in favor of valuesByApiLevel"
+        },
+        "min": { "$ref": "#/definitions/positiveNumber" },
+        "max": { "$ref": "#/definitions/positiveNumber" },
+        "valuesByApiLevel": { "$ref": "#/definitions/valuesByApiLevel" }
       }
     }
   },
@@ -43,31 +57,13 @@
       "properties": {
         "channels": { "$ref": "#/definitions/channels" },
         "defaultAspirateFlowRate": {
-          "value": {
-            "$ref": "#/definitions/positiveNumber",
-            "$comment": "This key is deprecated in favor of valuesByApiLevel"
-          },
-          "min": { "$ref": "#/definitions/positiveNumber" },
-          "max": { "$ref": "#/definitions/positiveNumber" },
-          "valuesByApiLevel": { "$ref": "#/definitions/perApiLevelValues" }
+          "$ref": "#/definitions/configValue"
         },
         "defaultDispenseFlowRate": {
-          "value": {
-            "$ref": "#/definitions/positiveNumber",
-            "$comment": "This key is deprecated in favor of valuesByApiLevel"
-          },
-          "min": { "$ref": "#/definitions/positiveNumber" },
-          "max": { "$ref": "#/definitions/positiveNumber" },
-          "valuesByApiLevel": { "$ref": "#/definitions/perApiLevelValues" }
+          "$ref": "#/definitions/configValue"
         },
         "defaultBlowOutFlowRate": {
-          "value": {
-            "$ref": "#/definitions/positiveNumber",
-            "$comment": "This key is deprecated in favor of valuesByApiLevel"
-          },
-          "min": { "$ref": "#/definitions/positiveNumber" },
-          "max": { "$ref": "#/definitions/positiveNumber" },
-          "valuesByApiLevel": { "$ref": "#/definitions/perApiLevelValues" }
+          "$ref": "#/definitions/configValue"
         },
         "displayName": { "type": "string" },
         "displayCategory": { "$ref": "#/definitions/displayCategory" },
