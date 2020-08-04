@@ -1,16 +1,23 @@
 // @flow
 // protocol type defs
-import type { ProtocolFile as SchemaV1ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV1'
-import type { ProtocolFile as SchemaV3ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type {
+  JsonProtocolFile,
+  ProtocolFileV1,
+} from '@opentrons/shared-data/protocol'
 
 import typeof { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
 
+export type PythonProtocolMetadata = {
+  ...$Exact<$PropertyType<ProtocolFileV1<{ ... }>, 'metadata'>>,
+  source?: string,
+  ...
+}
+
 // data may be a full JSON protocol or just a metadata dict from Python
-export type ProtocolData =
-  | SchemaV1ProtocolFile<{}>
-  | SchemaV3ProtocolFile<{}>
-  | { metadata: $PropertyType<SchemaV1ProtocolFile<{}>, 'metadata'> }
 // NOTE: add union of additional versions after schema is bumped
+export type ProtocolData =
+  | JsonProtocolFile
+  | {| metadata: PythonProtocolMetadata |}
 
 export type ProtocolType = TYPE_JSON | TYPE_PYTHON | TYPE_ZIP
 

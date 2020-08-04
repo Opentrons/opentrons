@@ -1,11 +1,11 @@
 {
   "schemaVersion": 3,
   "metadata": {
-    "protocol-name": "Simple test protocol v1",
+    "protocolName": "Simple test protocol v3",
     "author": "engineering <engineering@opentrons.com>",
     "description": "A short test protocol",
     "created": 1223131231,
-    "last-modified": null,
+    "lastModified": null,
     "category": null,
     "subcategory": null,
     "tags": ["unitTest"]
