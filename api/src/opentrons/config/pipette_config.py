@@ -132,6 +132,12 @@ def load(
                 override['quirks'] = [
                     qname for qname, qval in override['quirks'].items()
                     if qval]
+            for legacy_key in (
+                    'defaultAspirateFlowRate',
+                    'defaultDispenseFlowRate',
+                    'defaultBlowOutFlowRate'):
+                override.pop(legacy_key, None)
+
         except FileNotFoundError:
             save_overrides(pipette_id, {}, pipette_model)
             log.info(
@@ -169,10 +175,8 @@ def load(
             cfg, 'pickUpIncrement', MUTABLE_CONFIGS),
         pick_up_presses=ensure_value(cfg, 'pickUpPresses', MUTABLE_CONFIGS),
         pick_up_speed=ensure_value(cfg, 'pickUpSpeed', MUTABLE_CONFIGS),
-        aspirate_flow_rate=ensure_value(
-            cfg, 'defaultAspirateFlowRate', MUTABLE_CONFIGS),
-        dispense_flow_rate=ensure_value(
-            cfg, 'defaultDispenseFlowRate', MUTABLE_CONFIGS),
+        aspirate_flow_rate=cfg['defaultAspirateFlowRate']['value'],
+        dispense_flow_rate=cfg['defaultDispenseFlowRate']['value'],
         channels=ensure_value(cfg, 'channels', MUTABLE_CONFIGS),
         model_offset=ensure_value(cfg, 'modelOffset', MUTABLE_CONFIGS),
         plunger_current=ensure_value(cfg, 'plungerCurrent', MUTABLE_CONFIGS),
@@ -188,8 +192,7 @@ def load(
         name=cfg['name'],
         back_compat_names=cfg.get('backCompatNames', []),
         return_tip_height=cfg.get('returnTipHeight', 0.5),
-        blow_out_flow_rate=ensure_value(
-            cfg, 'defaultBlowOutFlowRate', MUTABLE_CONFIGS),
+        blow_out_flow_rate=cfg['defaultBlowOutFlowRate']['value'],
         max_travel=smoothie_configs['travelDistance'],
         home_position=smoothie_configs['homePosition'],
         steps_per_mm=smoothie_configs['stepsPerMM'],

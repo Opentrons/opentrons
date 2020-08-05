@@ -38,6 +38,13 @@ class PipetteConfigElement(TypedDict):
     max: float
 
 
+class PipetteConfigElementWithPerApiLevelValue(TypedDict):
+    value: float
+    min: float
+    max: float
+    valuesByApiLevel: Dict[str, float]
+
+
 # TypedDicts can't be generic sadly
 class PipetteCustomizableConfigElementFloat(TypedDict):
     value: float
@@ -71,9 +78,9 @@ class PipetteNameSpec(TypedDict):
     minVolume: Union[float, int]
     maxVolume: Union[float, int]
     channels: ChannelCount
-    defaultAspirateFlowRate: PipetteConfigElement
-    defaultDispenseFlowRate: PipetteConfigElement
-    defaultBlowOutFlowRate: PipetteConfigElement
+    defaultAspirateFlowRate: PipetteConfigElementWithPerApiLevelValue
+    defaultDispenseFlowRate: PipetteConfigElementWithPerApiLevelValue
+    defaultBlowOutFlowRate: PipetteConfigElementWithPerApiLevelValue
     smoothieConfigs: SmoothieConfigs
 
 
