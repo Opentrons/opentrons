@@ -8,7 +8,14 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
 } from '../../utils'
-import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
+import {
+  aspirate,
+  delay,
+  dispense,
+  replaceTip,
+  touchTip,
+  moveToWell,
+} from '../atomic'
 import { mixUtil } from './mix'
 import type {
   TransferArgs,
@@ -71,12 +78,13 @@ export const transfer: CommandCreator<TransferArgs> = (
   // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
   // when we decide to rename these fields/args... probably all the way up to the UI level.
   const {
+    aspirateDelay,
     aspirateFlowRateUlSec,
-    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
-    dispenseOffsetFromBottomMm,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
+    dispenseFlowRateUlSec,
+    dispenseOffsetFromBottomMm,
   } = args
 
   const effectiveTransferVol = getPipetteWithTipMaxVol(
@@ -166,6 +174,29 @@ export const transfer: CommandCreator<TransferArgs> = (
               })
             : []
 
+          const delayAfterAspirateCommands =
+            aspirateDelay != null
+              ? [
+                  curryCommandCreator(moveToWell, {
+                    pipette: args.pipette,
+                    labware: args.sourceLabware,
+                    well: sourceWell,
+                    offset: {
+                      x: 0,
+                      y: 0,
+                      z: aspirateDelay.mmFromBottom,
+                    },
+                  }),
+                  curryCommandCreator(delay, {
+                    commandCreatorFnName: 'delay',
+                    description: null,
+                    name: null,
+                    meta: null,
+                    wait: aspirateDelay.seconds,
+                  }),
+                ]
+              : []
+
           const touchTipAfterAspirateCommands = args.touchTipAfterAspirate
             ? [
                 curryCommandCreator(touchTip, {
@@ -228,6 +259,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
+            ...delayAfterAspirateCommands,
             ...touchTipAfterAspirateCommands,
             curryCommandCreator(dispense, {
               pipette: args.pipette,

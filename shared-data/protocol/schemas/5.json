@@ -667,7 +667,7 @@
                   "labware": { "type": "string" },
                   "well": { "type": "string" },
                   "offset": {
-                    "description": "Optional offset from slot bottom left corner, in mm",
+                    "description": "Optional offset from well bottom center, in mm",
                     "type": "object",
                     "required": ["x", "y", "z"],
                     "properties": {

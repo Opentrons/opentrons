@@ -1,24 +1,25 @@
 // @flow
 import { consolidate } from '../commandCreators/compound/consolidate'
 import {
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  blowoutHelper,
+  DEFAULT_PIPETTE,
+  delayWithOffset,
+  DEST_LABWARE,
+  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  dropTipHelper,
+  FIXED_TRASH_ID,
+  getErrorResult,
+  getFlowRateAndOffsetParams,
   getInitialRobotStateStandard,
   getRobotStatePickedUpTipStandard,
-  makeContext,
   getSuccessResult,
-  getErrorResult,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  FIXED_TRASH_ID,
-  getFlowRateAndOffsetParams,
   makeAspirateHelper,
+  makeContext,
   makeDispenseHelper,
   makeTouchTipHelper,
-  blowoutHelper,
   pickUpTipHelper,
-  dropTipHelper,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  SOURCE_LABWARE,
 } from '../__fixtures__'
 import type {
   AspirateParams,
@@ -74,7 +75,7 @@ beforeEach(() => {
     preWetTip: false,
     touchTipAfterAspirate: false,
     mixFirstAspirate: null,
-
+    aspirateDelay: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
@@ -393,6 +394,36 @@ describe('consolidate single-channel', () => {
     ])
   })
 
+  it('delay after aspirate', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'never',
+      aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+    }
+
+    const result = consolidate(data, invariantContext, robotStatePickedUpOneTip)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 150),
+      ...delayWithOffset('A1'),
+
+      aspirateHelper('A2', 150),
+      ...delayWithOffset('A2'),
+
+      dispenseHelper('B1', 300),
+
+      aspirateHelper('A3', 150),
+      ...delayWithOffset('A3'),
+
+      aspirateHelper('A4', 150),
+      ...delayWithOffset('A4'),
+
+      dispenseHelper('B1', 300),
+    ])
+  })
+
   it('touchTip after aspirate should touch tip after every aspirate command', () => {
     const data = {
       ...mixinArgs,
@@ -504,6 +535,7 @@ describe('consolidate multi-channel', () => {
     preWetTip: false,
     touchTipAfterAspirate: false,
     mixFirstAspirate: null,
+    aspirateDelay: null,
 
     touchTipAfterDispense: false,
     mixInDestination: null,
