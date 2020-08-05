@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 
-import { Icon, Tooltip, Text } from '@opentrons/components'
+import { Tooltip, Text } from '@opentrons/components'
 import { ProtocolLabwareList } from '../ProtocolLabwareList'
 
 const LABWARE = [
@@ -52,7 +52,6 @@ describe('ProtocolLabwareList Component', () => {
         <Text>Type</Text>,
         <Text>Quantity</Text>,
         <Text>Calibration Data</Text>,
-        <Icon name="information" />,
         <Tt>Calibrated offset from labware origin point</Tt>,
       ])
     ).toBe(true)

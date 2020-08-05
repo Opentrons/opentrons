@@ -5,14 +5,12 @@ import {
   useHoverTooltip,
   Box,
   Flex,
-  Icon,
   Text,
   Tooltip,
   ALIGN_FLEX_END,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   LINE_HEIGHT_COPY,
-  SIZE_1,
   SPACING_2,
   SPACING_3,
   SPACING_AUTO,
@@ -63,7 +61,6 @@ export function ProtocolLabwareList(
         <Text {...QUANTITY_COL_STYLE}>{QUANTITY}</Text>
         <Flex {...CAL_DATA_COL_STYLE} {...calDescTooltipTargetProps}>
           <Text>{CALIBRATION_DATA}</Text>
-          <Icon size={SIZE_1} name="information" marginLeft={SPACING_2} />
           <Tooltip {...calDescTooltipProps}>{CALIBRATION_DESCRIPTION}</Tooltip>
         </Flex>
       </Flex>
