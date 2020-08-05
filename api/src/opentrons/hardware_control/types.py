@@ -172,6 +172,18 @@ class ExecutionState(enum.Enum):
         return self.name
 
 
+class PipettePair(enum.Enum):
+    PRIMARY_LEFT = top_types.Mount.LEFT
+    PRIMARY_RIGHT = top_types.Mount.RIGHT
+
+    @property
+    def secondary(self):
+        if self.name == 'PRIMARY_RIGHT':
+            return top_types.Mount.LEFT
+        else:
+            return top_types.Mount.RIGHT
+
+
 class ExecutionCancelledError(RuntimeError):
     pass
 
