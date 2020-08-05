@@ -78,6 +78,18 @@ const SPECS = [
     expected: 'A Protocol',
   },
   {
+    name: 'getProtocolName from empty JSON',
+    selector: protocol.getProtocolName,
+    state: {
+      protocol: {
+        file: { name: 'proto.json' },
+        contents: 'fizzbuzz',
+        data: {},
+      },
+    },
+    expected: 'proto',
+  },
+  {
     name: 'getProtocolName from JSON Protocol >=v3 metadata',
     selector: protocol.getProtocolName,
     state: {
@@ -96,6 +108,12 @@ const SPECS = [
     expected: null,
   },
   {
+    name: 'getProtocolAuthor if no metadata',
+    selector: protocol.getProtocolAuthor,
+    state: { protocol: { data: {} } },
+    expected: null,
+  },
+  {
     name: 'getProtocolAuthor if author not in metadata',
     selector: protocol.getProtocolAuthor,
     state: { protocol: { data: { metadata: {} } } },
@@ -111,6 +129,12 @@ const SPECS = [
     name: 'getProtocolDescription if no data',
     selector: protocol.getProtocolDescription,
     state: { protocol: { data: null } },
+    expected: null,
+  },
+  {
+    name: 'getProtocolDescription if no metaddata',
+    selector: protocol.getProtocolDescription,
+    state: { protocol: { data: {} } },
     expected: null,
   },
   {
@@ -151,6 +175,17 @@ const SPECS = [
     name: 'getProtocolLastUpdated from file.lastModified',
     selector: protocol.getProtocolLastUpdated,
     state: { protocol: { file: { lastModified: 1 } } },
+    expected: 1,
+  },
+  {
+    name: 'getProtocolLastUpdated with data but no metadata',
+    selector: protocol.getProtocolLastUpdated,
+    state: {
+      protocol: {
+        file: { lastModified: 1 },
+        data: {},
+      },
+    },
     expected: 1,
   },
   {
@@ -315,6 +350,32 @@ const SPECS = [
       },
     },
     expected: 'Protocol Designer v4.5.6',
+  },
+  {
+    name: 'getLabwareDefBySlot returns empty object by default',
+    selector: protocol.getLabwareDefBySlot,
+    state: {
+      robot: { session: { apiLevel: [1, 0] } },
+      protocol: {
+        file: { name: 'proto.json', type: 'json' },
+        contents: 'fizzbuzz',
+        data: null,
+      },
+    },
+    expected: {},
+  },
+  {
+    name: 'getLabwareDefBySlot returns empty object with invalid data',
+    selector: protocol.getLabwareDefBySlot,
+    state: {
+      robot: { session: { apiLevel: [1, 0] } },
+      protocol: {
+        file: { name: 'proto.json', type: 'json' },
+        contents: 'fizzbuzz',
+        data: { labwareDefinitions: {} },
+      },
+    },
+    expected: {},
   },
   {
     name: 'getLabwareDefBySlot with JSON protocol without modules (v3)',

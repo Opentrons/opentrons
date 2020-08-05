@@ -25,6 +25,10 @@ export const getProtocolFile = (state: State): ProtocolFile | null =>
   state.protocol.file
 export const getProtocolContents = (state: State): string | null =>
   state.protocol.contents
+
+// TODO(mc, 2020-08-05): this data needs to be runtime schema checked
+// to truly prevent invalid data bringing down the app. For now we're
+// relying on overuse of ?. accessors
 export const getProtocolData = (state: State): ProtocolData | null =>
   state.protocol.data
 
@@ -47,7 +51,7 @@ type LabwareDefinitionBySlotMap = {
 export const getLabwareDefBySlot: State => LabwareDefinitionBySlotMap = createSelector(
   getProtocolData,
   data => {
-    if (data !== null && data.labwareDefinitions) {
+    if (data?.labwareDefinitions && data.labware) {
       const labwareById = data.labware
       const labwareDefinitions = data.labwareDefinitions
 
@@ -98,14 +102,15 @@ export const getProtocolDisplayData: ProtocolInfoSelector = createSelector(
     // TODO(mc, 2020-08-04): this typing doesn't behave; put data access behind
     // a unit tested utility that migrates all data patterns up to latest schema
     const data: any = _data
+    const metadata: any | void = _data.metadata
 
     const protocolName =
-      data.metadata.protocolName ?? data.metadata['protocol-name'] ?? basename
+      metadata?.protocolName ?? metadata?.['protocol-name'] ?? basename
 
     const lastModified =
-      data.metadata.lastModified ??
-      data.metadata['last-modified'] ??
-      data.metadata.created ??
+      metadata?.lastModified ??
+      metadata?.['last-modified'] ??
+      metadata?.created ??
       null
 
     const appName =
@@ -134,18 +139,18 @@ export const getProtocolName: State => string | null = createSelector(
 
 export const getProtocolAuthor: State => string | null = createSelector(
   getProtocolData,
-  data => data?.metadata.author ?? null
+  data => data?.metadata?.author ?? null
 )
 
 export const getProtocolDescription: State => string | null = createSelector(
   getProtocolData,
-  data => data?.metadata.description ?? null
+  data => data?.metadata?.description ?? null
 )
 
 export const getProtocolSource: State => string | null = createSelector(
   getProtocolData,
   data => {
-    return typeof data?.metadata.source === 'string'
+    return typeof data?.metadata?.source === 'string'
       ? data.metadata.source
       : null
   }

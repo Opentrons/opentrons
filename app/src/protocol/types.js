@@ -25,6 +25,7 @@ export type ProtocolFile = {
   name: string,
   type: ?ProtocolType,
   lastModified: ?number,
+  ...
 }
 
 // action types
