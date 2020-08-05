@@ -57,13 +57,15 @@ clean-py:
 setup-pipenv:
 	$(OT_PYTHON) -m pip install pipenv==2018.10.9
 
-.PHONY: setup-py
-setup-py: setup-pipenv
+.PHONY: setup-py-libs
+setup-py-apps: setup-pipenv
 	$(MAKE) -C $(API_DIR) setup
-	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
-	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
+.PHONY: setup-py
+setup-py: setup-py-libs
+	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
+	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
@@ -135,22 +137,25 @@ test: test-py test-js
 
 # tests that may be run on windows
 .PHONY: test-windows
-test-windows: test-js test-py-windows
+test-windows: test-js test-py-libs
 
 .PHONY: test-e2e
 test-e2e:
 	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
 
-.PHONY: test-py-windows
-test-py-windows:
+.PHONY: test-py-libs
+test-py-libs:
 	$(MAKE) -C $(API_DIR) test
 	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
-.PHONY: test-py
-test-py: test-py-windows
+.PHONY: test-py-apps
+test-py-apps:
 	$(MAKE) -C $(UPDATE_SERVER_DIR) test
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
+
+.PHONY: test-py
+test-py: test-py-libs test-py-apps
 
 .PHONY: test-js
 test-js:
@@ -172,12 +177,18 @@ else
 	prettier --ignore-path .eslintignore $(if $(CI),--check,--write) $(FORMAT_FILE_GLOB)
 endif
 
-.PHONY: lint-py
-lint-py:
+.PHONY: lint-py-libs
+lint-py-libs:
 	$(MAKE) -C $(API_DIR) lint
+	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
+
+.PHONY: lint-py-apps
+lint-py-apps:
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 	$(MAKE) -C $(ROBOT_SERVER_DIR) lint
-	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
+
+.PHONY: lint-py
+lint-py: lint-py-libs lint-py-apps
 
 .PHONY: lint-js
 lint-js:

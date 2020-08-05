@@ -5,8 +5,29 @@ env:
   CI: true
 
 jobs:
-  test-python:
-    name: Run Python unit tests
+  test-py-libs:
+    name: Run Python library tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-10.15, windows-2019]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      # use npm rather than yarn so npx will pick it up
+      - run: npm install --global shx@0.2.2
+      - run: make setup-py-libs
+      - run: make test-py-libs
+      - uses: codecov/codecov-action@v1
+
+  test-py-apps:
+    name: Run Python application tests and Python checks
+    needs: [test-py-libs]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -20,11 +41,11 @@ jobs:
       # use npm rather than yarn so npx will pick it up
       - run: npm install --global shx@0.2.2
       - run: make setup-py
-      - run: make test-py
+      - run: make test-py-apps
       - run: make lint-py
       - uses: codecov/codecov-action@v1
 
-  docs-python:
+  docs-py:
     name: Build Python Protocol API docs
     runs-on: ubuntu-20.04
     steps:
@@ -38,8 +59,7 @@ jobs:
       - run: sudo apt-get install -y --no-install-recommends libsystemd-dev texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended latexmk texlive-lang-greek
       # use npm rather than yarn so npx will pick it up
       - run: npm install --global shx@0.2.2
-      - run: make setup-pipenv
-      - run: make -C api setup
+      - run: make setup-py-libs
       - run: make -C api docs
 
   test-js:
