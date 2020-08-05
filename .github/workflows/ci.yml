@@ -10,7 +10,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-10.15, windows-2019]
+        # TODO(mc, 2020-08-05): pipenv sync fails in macOS due to bug in dep
+        # of the version of pipenv that we use. Enable macOS when we can
+        # https://github.com/sarugaku/shellingham/issues/15
+        # https://github.com/pypa/pipenv/pull/3096
+        os: [ubuntu-20.04, windows-2019]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
