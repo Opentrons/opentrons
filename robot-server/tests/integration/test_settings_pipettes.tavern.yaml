@@ -16,9 +16,6 @@ stages:
           fields: 
             blowout: !anydict
             bottom: !anydict
-            defaultAspirateFlowRate: !anydict
-            defaultBlowOutFlowRate: !anydict
-            defaultDispenseFlowRate: !anydict
             dropTip: !anydict
             dropTipCurrent: !anydict
             dropTipSpeed: !anydict
@@ -52,9 +49,6 @@ stages:
         fields: 
           blowout: !anydict
           bottom: !anydict
-          defaultAspirateFlowRate: !anydict
-          defaultBlowOutFlowRate: !anydict
-          defaultDispenseFlowRate: !anydict
           dropTip: !anydict
           dropTipCurrent: !anydict
           dropTipSpeed: !anydict
@@ -92,10 +86,7 @@ stages:
         fields: 
           blowout: !anydict
           bottom: !anydict
-          defaultAspirateFlowRate: !anydict
-          defaultBlowOutFlowRate: !anydict
-          defaultDispenseFlowRate: !anydict
-          dropTip: 
+          dropTip:
             units: mm
             type: float
             min: -6.0
@@ -154,10 +145,7 @@ stages:
             max: 19.0
             default: 3.5
             value: 3.0
-          defaultAspirateFlowRate: !anydict
-          defaultBlowOutFlowRate: !anydict
-          defaultDispenseFlowRate: !anydict
-          dropTip: !anydict 
+          dropTip: !anydict
           dropTipCurrent: !anydict
           dropTipSpeed: !anydict
           pickUpCurrent: !anydict
@@ -240,10 +228,7 @@ stages:
         fields: 
           blowout: !anydict
           bottom: !anydict
-          defaultAspirateFlowRate: !anydict
-          defaultBlowOutFlowRate: !anydict
-          defaultDispenseFlowRate: !anydict
-          dropTip: 
+          dropTip:
             units: mm
             type: float
             min: -6.0
