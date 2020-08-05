@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Dict
 from opentrons.types import Point, Mount
-from robot_server.robot.calibration.constants import WILDCARD
+from robot_server.robot.calibration.constants import STATE_WILDCARD
 
 
 class TipCalibrationState(str, Enum):
@@ -12,7 +12,7 @@ class TipCalibrationState(str, Enum):
     measuringTipOffset = "measuringTipOffset"
     calibrationComplete = "calibrationComplete"
     sessionExited = "sessionExited"
-    WILDCARD = WILDCARD
+    WILDCARD = STATE_WILDCARD
 
 
 TRASH_WELL = 'A1'

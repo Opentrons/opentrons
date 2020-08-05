@@ -3,7 +3,7 @@ from typing import Set, Dict, Any, Union
 from robot_server.service.errors import RobotServerError
 from robot_server.service.json_api.errors import Error
 from robot_server.service.session.models import CommandDefinition
-from .constants import WILDCARD
+from .constants import STATE_WILDCARD
 from .tip_length.constants import TipCalibrationState
 from .deck.constants import DeckCalibrationState
 
@@ -53,7 +53,7 @@ class SimpleStateMachine:
         :return: desired state if successful, None if fails
         """
 
-        wc_transitions = self._transitions.get(WILDCARD, {})
+        wc_transitions = self._transitions.get(STATE_WILDCARD, {})
         wc_to_state = wc_transitions.get(command, {})
 
         fs_transitions = self._transitions.get(from_state, {})

@@ -43,7 +43,7 @@ def machine(loop):
         'rethinkingDesign': {
             'saw': 'sawingToDimensions'
         },
-        util.WILDCARD: {
+        util.STATE_WILDCARD: {
             'rethink': 'rethinkingDesign'
         }
     }

@@ -201,6 +201,7 @@ class TipLengthCalibrationCommand(CommandDefinition):
 class DeckCalibrationCommand(CommandDefinition):
     """Deck Calibration Specific"""
     move_to_tip_rack = "moveToTipRack"
+    move_to_deck = "moveToDeck"
     move_to_point_one = "moveToPointOne"
     move_to_point_two = "moveToPointTwo"
     move_to_point_three = "moveToPointThree"

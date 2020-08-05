@@ -53,7 +53,7 @@ COMMAND_HANDLER = Callable[..., Awaitable]
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
 
-class TipCalibrationUserFlow():
+class TipCalibrationUserFlow:
     def __init__(self,
                  hardware: ThreadManager,
                  mount: Mount,

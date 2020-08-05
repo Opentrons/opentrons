@@ -1,10 +1,11 @@
 import logging
-from typing import Any, Awaitable, Callable, Dict
+from typing import Any, Awaitable, Callable, Dict, Tuple
 
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
-from opentrons.protocol_api import geometry
-from opentrons.types import Point, Location
+from opentrons.hardware_control.pipette import Pipette
+from opentrons.protocol_api import geometry, labware
+from opentrons.types import Mount, Point, Location
 from robot_server.service.session.models import (
     CalibrationCommand, DeckCalibrationCommand)
 from robot_server.robot.calibration.constants import (
@@ -30,7 +31,7 @@ COMMAND_HANDLER = Callable[..., Awaitable]
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
 
-class DeckCalibrationUserFlow():
+class DeckCalibrationUserFlow:
     def __init__(self,
                  hardware: ThreadManager):
         self._hardware = hardware
@@ -51,6 +52,7 @@ class DeckCalibrationUserFlow():
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CalibrationCommand.save_offset: self.save_offset,
             DeckCalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
+            DeckCalibrationCommand.move_to_deck: self.move_to_deck,
             DeckCalibrationCommand.move_to_point_one: self.move_to_point_one,
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
             DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
@@ -68,18 +70,20 @@ class DeckCalibrationUserFlow():
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
 
-    def _select_target_pipette(self):
+    def _select_target_pipette(self) -> Tuple[Pipette, Mount]:
         # TODO: select pipette for deck calibration
         # return pipette and mount
-        pass
+        return self._hardware._attached_instruments[Mount.RIGHT], Mount.RIGHT
 
-    def _get_tip_rack_lw(self):
+    def _get_tip_rack_lw(self) -> labware.Labware:
         # TODO: select tiprack based on chosen pipette model
-        pass
+        return labware.load(
+            "opentrons_96_tiprack_10ul",
+            self._deck.position_for(TIP_RACK_SLOT))
 
     def _initialize_deck(self):
-        # TODO: load tip rack to deck using get_tip_rack_lw
-        pass
+        tip_rack_lw = self._get_tip_rack_lw()
+        self._deck[TIP_RACK_SLOT] = tip_rack_lw
 
     async def handle_command(self,
                              name: Any,
@@ -102,12 +106,15 @@ class DeckCalibrationUserFlow():
             f'DeckCalUserFlow handled command {name}, transitioned'
             f'from {self._current_state} to {next_state}')
 
-    def _get_critical_point(self):
-        return (CriticalPoint.FRONT_NOZZLE if
-                self._hw_pipette.config.channels == 8 else
-                self._hw_pipette.critical_point)
+    def _get_critical_point(self) -> CriticalPoint:
+        return CriticalPoint.FRONT_NOZZLE
+        # TODO: uncomment the following after _select_target_pipette
+        # is complette:
+        # return (CriticalPoint.FRONT_NOZZLE if
+        #         self._hw_pipette.config.channels == 8 else
+        #         self._hw_pipette.critical_point)
 
-    async def _get_current_point(self):
+    async def _get_current_point(self) -> Point:
         cp = self._get_critical_point()
         return await self._hardware.gantry_position(self._mount,
                                                     critical_point=cp)
@@ -124,6 +131,9 @@ class DeckCalibrationUserFlow():
                 MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
         await self._move(to_loc)
+
+    async def move_to_deck(self):
+        pass
 
     async def move_to_point_one(self):
         pass

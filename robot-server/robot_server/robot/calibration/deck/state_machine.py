@@ -18,8 +18,13 @@ DECK_CALIBRATION_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
         CalibrationCommand.jog: State.preparingPipette,
         CalibrationCommand.pick_up_tip: State.preparingPipette,
         CalibrationCommand.invalidate_tip: State.preparingPipette,
+        DeckCalCommand.move_to_tip_rack: State.preparingPipette,
+        DeckCalCommand.move_to_deck: State.joggingToDeck,
+    },
+    State.joggingToDeck: {
+        CalibrationCommand.jog: State.joggingToDeck,
+        CalibrationCommand.save_offset: State.joggingToDeck,
         DeckCalCommand.move_to_point_one: State.savingPointOne,
-        DeckCalCommand.move_to_tip_rack: State.preparingPipette
     },
     State.savingPointOne: {
         CalibrationCommand.jog: State.savingPointOne,

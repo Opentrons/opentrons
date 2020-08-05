@@ -1,18 +1,19 @@
 from enum import Enum
 from opentrons.types import Point
-from robot_server.robot.calibration.constants import WILDCARD
+from robot_server.robot.calibration.constants import STATE_WILDCARD
 
 
 class DeckCalibrationState(str, Enum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     preparingPipette = "preparingPipette"
+    joggingToDeck = "joggingToDeck"
     savingPointOne = "savingPointOne"
     savingPointTwo = "savingPointTwo"
     savingPointThree = "savingPointThree"
     calibrationComplete = "calibrationComplete"
     sessionExited = "sessionExited"
-    WILDCARD = WILDCARD
+    WILDCARD = STATE_WILDCARD
 
 
 TIP_RACK_SLOT = '8'
