@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
+      - if: ${{ runner.os == 'Linux' }}
+        run: sudo apt-get install -y --no-install-recommends libsystemd-dev
       # use npm rather than yarn so npx will pick it up
       - run: npm install --global shx@0.2.2
       - run: make setup-py-libs
