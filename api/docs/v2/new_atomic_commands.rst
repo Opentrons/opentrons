@@ -13,7 +13,7 @@ The examples in this section would be added to the following:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.4'}
+    metadata = {'apiLevel': '2.6'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -515,7 +515,7 @@ You can turn the robot rail lights on or off in the protocol using :py:meth:`.Pr
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.5'}
+    metadata = {'apiLevel': '2.6'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # turn on robot rail lights

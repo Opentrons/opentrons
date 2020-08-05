@@ -53,6 +53,9 @@ class PipetteConfig:
     home_position: float
     steps_per_mm: float
     idle_current: float
+    default_blow_out_flow_rates: Dict[str, float]
+    default_aspirate_flow_rates: Dict[str, float]
+    default_dispense_flow_rates: Dict[str, float]
 
 
 # Notes:
@@ -196,7 +199,16 @@ def load(
         max_travel=smoothie_configs['travelDistance'],
         home_position=smoothie_configs['homePosition'],
         steps_per_mm=smoothie_configs['stepsPerMM'],
-        idle_current=cfg.get('idleCurrent', LOW_CURRENT_DEFAULT)
+        idle_current=cfg.get('idleCurrent', LOW_CURRENT_DEFAULT),
+        default_blow_out_flow_rates=cfg['defaultBlowOutFlowRate'].get(
+            'valuesByApiLevel',
+            {'2.0': cfg['defaultBlowOutFlowRate']['value']}),
+        default_dispense_flow_rates=cfg['defaultDispenseFlowRate'].get(
+            'valuesByApiLevel',
+            {'2.0': cfg['defaultDispenseFlowRate']['value']}),
+        default_aspirate_flow_rates=cfg['defaultAspirateFlowRate'].get(
+            'valuesByApiLevel',
+            {'2.0': cfg['defaultAspirateFlowRate']['value']}),
     )
 
     return res

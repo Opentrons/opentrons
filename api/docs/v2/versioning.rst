@@ -103,6 +103,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.5     |          3.19.0             |
 +-------------+-----------------------------+
+|     2.6     |          3.20.0             |
++-------------+-----------------------------+
 
 Changes in API Versions
 -----------------------
@@ -153,3 +155,12 @@ Version 2.5
     - :py:meth:`.ProtocolContext.set_rail_lights`: turns robot rail lights on or off
     - :py:obj:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
     - :py:obj:`.ProtocolContext.door_closed`: describes whether the robot door is closed
+
+
+Version 2.6
++++++++++++
+
+- GEN2 Single pipettes now default to flow rates equivalent to 10 mm/s plunger
+  speeds
+    - Protocols that manually configure pipette flow rates will be unaffected
+    - For a comparison between API Versions, see :ref:`defaults`

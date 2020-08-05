@@ -3,7 +3,8 @@ from collections import UserDict
 import functools
 import logging
 from dataclasses import dataclass, field, astuple
-from typing import Any, Callable, Optional, TYPE_CHECKING, Union, List, Set
+from typing import (Any, Callable, Dict, Optional,
+                    TYPE_CHECKING, Union, List, Set)
 
 from opentrons import types as top_types
 from opentrons.protocols.types import APIVersion
@@ -128,6 +129,14 @@ class FlowRates:
                  instr: 'InstrumentContext') -> None:
         self._instr = instr
 
+    def set_defaults(self, api_level: APIVersion):
+        self.aspirate = _find_value_for_api_version(
+            api_level, self._instr.hw_pipette['default_aspirate_flow_rates'])
+        self.dispense = _find_value_for_api_version(
+            api_level, self._instr.hw_pipette['default_dispense_flow_rates'])
+        self.blow_out = _find_value_for_api_version(
+            api_level, self._instr.hw_pipette['default_blow_out_flow_rates'])
+
     @property
     def aspirate(self) -> float:
         return self._instr.hw_pipette['aspirate_flow_rate']
@@ -160,6 +169,25 @@ class FlowRates:
             mount=self._instr._mount,
             blow_out=_assert_gzero(
                 new_val, 'flow rate should be a numerical value in ul/s'))
+
+
+def _find_value_for_api_version(for_version: APIVersion,
+                                values: Dict[str, float]) -> float:
+    """
+    Parse a dict that looks like
+    {"2.0": 5,
+    "2.5": 4}
+    (aka the flow rate values from pipette config) and return the value for
+    the highest api level that is at or underneath ``for_version``
+    """
+    sorted_versions = sorted({APIVersion.from_string(k): v
+                              for k, v in values.items()})
+    last = values[str(sorted_versions[0])]
+    for version in sorted_versions:
+        if version > for_version:
+            break
+        last = values[str(version)]
+    return last
 
 
 class PlungerSpeeds:
