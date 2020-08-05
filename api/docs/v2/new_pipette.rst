@@ -62,7 +62,7 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.5'}
+    metadata = {'apiLevel': '2.6'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 300uL tips
@@ -101,7 +101,7 @@ F, H, J, L, N, and P).
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.5'}
+    metadata = {'apiLevel': '2.6'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 300uL tips
