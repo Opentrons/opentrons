@@ -10,6 +10,7 @@ import {
   mockTipLengthCalibrationSessionDetails,
   mockTipLengthCalibrationSessionParams,
 } from './tip-length-calibration'
+import { mockDeckCalibrationSessionDetails } from './deck-calibration'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
@@ -19,6 +20,7 @@ import * as Constants from '../constants'
 
 export * from './calibration-check'
 export * from './tip-length-calibration'
+export * from './deck-calibration'
 
 export const mockSessionId: string = 'fake_session_id'
 export const mockOtherSessionId: string = 'other_fake_session_id'
@@ -33,6 +35,12 @@ export const mockTipLengthCalibrationSessionAttributes: Types.TipLengthCalibrati
   sessionType: Constants.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
   createParams: mockTipLengthCalibrationSessionParams,
   details: mockTipLengthCalibrationSessionDetails,
+}
+
+export const mockDeckCalibrationSessionAttributes: Types.DeckCalibrationSessionResponseAttributes = {
+  sessionType: Constants.SESSION_TYPE_DECK_CALIBRATION,
+  createParams: {},
+  details: mockDeckCalibrationSessionDetails,
 }
 
 export const mockSession: Types.Session = {

@@ -2,6 +2,7 @@
 
 export * from './calibration-check/constants'
 export * from './tip-length-calibration/constants'
+export * from './deck-calibration/constants'
 
 export const SESSIONS_PATH: '/sessions' = '/sessions'
 
@@ -61,3 +62,5 @@ export const SESSION_TYPE_CALIBRATION_CHECK: 'calibrationCheck' =
   'calibrationCheck'
 export const SESSION_TYPE_TIP_LENGTH_CALIBRATION: 'tipLengthCalibration' =
   'tipLengthCalibration'
+export const SESSION_TYPE_DECK_CALIBRATION: 'deckCalibration' =
+  'deckCalibration'
