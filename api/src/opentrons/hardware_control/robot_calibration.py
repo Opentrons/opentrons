@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Tuple, List, Optional
 
-from opentrons.config import robot_configs, feature_flags as ff
+from opentrons.config import robot_configs
 from opentrons.calibration_storage import modify, types, get
 from opentrons.util import linal
 
@@ -12,7 +12,7 @@ SolvedPoints = List[Tuple[float, float]]
 
 @dataclass
 class DeckCalibration:
-    attitude: Optional[types.AttitudeMatrix] = None
+    attitude: types.AttitudeMatrix
     last_modified: Optional[datetime] = None
     pipette_calibrated_with: Optional[str] = None
     tiprack: Optional[str] = None
@@ -45,7 +45,4 @@ def load_attitude_matrix() -> DeckCalibration:
 
 
 def load() -> RobotCalibration:
-    if ff.enable_calibration_overhaul():
-        return RobotCalibration(deck_calibration=load_attitude_matrix())
-    else:
-        return RobotCalibration(deck_calibration=DeckCalibration())
+    return RobotCalibration(deck_calibration=load_attitude_matrix())

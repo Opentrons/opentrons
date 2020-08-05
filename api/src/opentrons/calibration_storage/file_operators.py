@@ -12,9 +12,6 @@ import typing
 from .types import StrPath
 from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
 
-if typing.TYPE_CHECKING:
-    from .dev_types import RobotTransform
-
 
 DecoderType = typing.Type[json.JSONDecoder]
 EncoderType = typing.Type[json.JSONEncoder]
@@ -52,7 +49,7 @@ def read_cal_file(
 
 def save_to_file(
         filepath: StrPath,
-        data: typing.Union[typing.Dict, 'RobotTransform'],
+        data: typing.Mapping,
         encoder: EncoderType = DateTimeEncoder):
     """
     Function used to save data to a file

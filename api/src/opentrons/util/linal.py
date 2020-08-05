@@ -1,12 +1,20 @@
+import logging
 import numpy as np  # type: ignore
 from numpy import insert, dot  # type: ignore
 from numpy.linalg import inv  # type: ignore
 from typing import List, Tuple, Union
 
+mod_log = logging.getLogger(__name__)
 
-def identity_deck_transform():
+# (TODO(lc, 8/11/2020): temporary type until
+# old calibration data is removed.
+AxisPosition = Union[
+    Tuple[float, float, float], Tuple[float, float]]
+
+
+def identity_deck_transform(size: int = 4):
     """ The default deck transform """
-    return np.identity(4)
+    return np.identity(size)
 
 
 def solve(expected: List[Tuple[float, float]],
@@ -119,9 +127,18 @@ def add_z(xy: np.ndarray, z: float) -> np.ndarray:
     return xyz.round(11)
 
 
+def add_matrices(
+        t1: Tuple[float, float, float],
+        t2: Tuple[float, float, float]) -> Tuple[float, float, float]:
+    """
+    Simple method to convert tuples to numpy arrays and add them.
+    """
+    return tuple(np.asarray(t1) + np.asarray(t2))  # type: ignore
+
+
 def apply_transform(
         t: Union[List[List[float]], np.ndarray],
-        pos: Tuple[float, float, float],
+        pos: AxisPosition,
         with_offsets=True) -> Tuple[float, float, float]:
     """
     Change of base using a transform matrix. Primarily used to render a point
@@ -135,13 +152,15 @@ def apply_transform(
     :return: corresponding XYZ point in space B
     """
     extended = 1 if with_offsets else 0
+    test_stuff = list(pos) + [extended]
+    mod_log.info(test_stuff)
     return tuple(dot(t, list(pos) + [extended])[:3])  # type: ignore
 
 
 def apply_reverse(
         t: Union[List[List[float]], np.ndarray],
-        pos: Tuple[float, float, float],
+        pos: AxisPosition,
         with_offsets=True) -> Tuple[float, float, float]:
     """ Like apply_transform but inverts the transform first
     """
-    return apply_transform(inv(t), pos)
+    return apply_transform(inv(t), pos, with_offsets)

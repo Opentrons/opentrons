@@ -15,7 +15,7 @@ if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from .dev_types import (
         TipLengthCalibration, CalibrationIndexDict,
-        CalibrationDict, RobotTransform)
+        CalibrationDict, DeckCalibrationData)
 
 
 def _format_calibration_type(
@@ -134,9 +134,9 @@ def load_tip_length_calibration(
         labware_load_name=load_name)
 
 
-def get_robot_deck_attitude() -> typing.Optional['RobotTransform']:
-    gantry_path =\
-        config.get_opentrons_path('robot_calibration_dir') / 'transform.json'
+def get_robot_deck_attitude() -> typing.Optional['DeckCalibrationData']:
+    robot_dir = config.get_opentrons_path('robot_calibration_dir')
+    gantry_path = robot_dir / 'deck_calibration.json'
     if gantry_path.exists():
         return io.read_cal_file(gantry_path)  # type: ignore
     else:

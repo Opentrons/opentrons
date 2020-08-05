@@ -8,7 +8,7 @@ from opentrons.hardware_control import robot_calibration
 
 def test_save_calibration(ot_config_tempdir):
     pathway = config.get_opentrons_path(
-        'robot_calibration_dir') / 'transform.json'
+        'robot_calibration_dir') / 'deck_calibration.json'
     pip_id = 'fakePip'
     lw_hash = 'fakeHash'
     e = [(1, 1), (2, 2), (1, 2)]
@@ -28,7 +28,7 @@ def test_save_calibration(ot_config_tempdir):
 
 def test_load_calibration(ot_config_tempdir):
     pathway = config.get_opentrons_path(
-        'robot_calibration_dir') / 'transform.json'
+        'robot_calibration_dir') / 'deck_calibration.json'
     data = {
         'attitude': [[1, 0, 1], [0, 1, -.5], [0, 0, 1]],
         'pipette_calibrated_with': 'fake',

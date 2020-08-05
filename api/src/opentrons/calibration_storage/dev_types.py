@@ -44,7 +44,7 @@ class CalibrationDict(TypedDict):
     tipLength: TipLengthDict
 
 
-class RobotTransform(TypedDict):
+class DeckCalibrationData(TypedDict):
     attitude: AttitudeMatrix
     last_modified: datetime
     pipette_calibrated_with: str
