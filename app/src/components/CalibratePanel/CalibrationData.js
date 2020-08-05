@@ -14,13 +14,13 @@ export function CalibrationData(props: {|
   calibratedThisSession: boolean,
 |}): React.Node {
   const { calibrationData, calibratedThisSession } = props
-  if (calibrationData === null && !calibratedThisSession) {
+  if (calibrationData === null) {
     return (
       <Text as="i" marginTop={SPACING_2}>
         {NOT_CALIBRATED}
       </Text>
     )
-  } else if (calibrationData) {
+  } else {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING_2}>
         {calibratedThisSession ? UPDATED_DATA : EXISTING_DATA}
@@ -28,9 +28,5 @@ export function CalibrationData(props: {|
         <CalibrationValues {...calibrationData} />
       </Flex>
     )
-  } else {
-    // NOTE: this case should never be reached as calibrationData will never be null
-    // at the same time that calibratedThisSession is truthy
-    return null
   }
 }
