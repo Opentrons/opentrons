@@ -136,9 +136,9 @@ class _Worker:
 
     def _on_command(self, msg):
         """ProtocolRunner command listener"""
-        self._check_state()
+        self._check_flow()
 
-    def _check_state(self):
+    def _check_flow(self):
         """Called from ProtocolRunner to check for changes in run flow"""
         if not self._pause_event.is_set():
             # Need to pause. Collect prior state for after the pause.

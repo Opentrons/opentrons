@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 
 class CancelledException(Exception):
+    """Exception raised when a simulation or run is cancelled"""
     pass
 
 
