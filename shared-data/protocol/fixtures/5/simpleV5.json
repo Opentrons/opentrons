@@ -2,11 +2,11 @@
   "$otSharedSchema": "#/protocol/schemas/5",
   "schemaVersion": 5,
   "metadata": {
-    "protocol-name": "Simple test protocol",
+    "protocolName": "Simple test protocol",
     "author": "engineering <engineering@opentrons.com>",
     "description": "A short test protocol",
     "created": 1223131231,
-    "last-modified": null,
+    "lastModified": null,
     "category": null,
     "subcategory": null,
     "tags": ["unitTest"]
