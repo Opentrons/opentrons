@@ -22,10 +22,10 @@ const MOCK_STORE = {
 }
 const ROBOT_NAME = 'robotName'
 
-const getProtocolLabwareList: JestMockFn<
+const getUniqueProtocolLabwareSummaries: JestMockFn<
   [State, string],
-  $Call<typeof Calibration.getProtocolLabwareList, State, string>
-> = Calibration.getProtocolLabwareList
+  $Call<typeof Calibration.getUniqueProtocolLabwareSummaries, State, string>
+> = Calibration.getUniqueProtocolLabwareSummaries
 
 function stubSelector<R>(mock: JestMockFn<[State, string], R>, rVal: R) {
   mock.mockImplementation((state, robotName) => {
@@ -55,7 +55,7 @@ describe('ProtocolLabwareCard', () => {
   ]
 
   beforeEach(() => {
-    stubSelector(getProtocolLabwareList, FULL_LABWARE)
+    stubSelector(getUniqueProtocolLabwareSummaries, FULL_LABWARE)
   })
 
   afterEach(() => {
@@ -63,7 +63,7 @@ describe('ProtocolLabwareCard', () => {
   })
 
   it('renders nothing when no labware exists in the protocol', () => {
-    stubSelector(getProtocolLabwareList, EMPTY_LABWARE)
+    stubSelector(getUniqueProtocolLabwareSummaries, EMPTY_LABWARE)
     const wrapper = render()
     expect(wrapper).toEqual({})
   })

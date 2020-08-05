@@ -10,11 +10,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { selectors as robotSelectors } from '../../robot'
-import {
-  matchesLabwareIdentity,
-  makeBaseProtocolLabware,
-  formatCalibrationData,
-} from './utils'
+import { matchesLabwareIdentity, formatCalibrationData } from './utils'
 
 import type { State } from '../../types'
 import type { LabwareCalibrationModel } from '../types'
@@ -27,14 +23,36 @@ export const getLabwareCalibrations = (
   return state.calibration[robotName]?.labwareCalibrations?.data ?? []
 }
 
-const getBaseLabwareList: (
+// TODO(bc, 2020-08-05): this selector should move to a protocol-focused module
+// when we don't have to rely on RPC-state selectors for protocol equipment info
+export const getProtocolLabwareList: (
   state: State,
   robotName: string
 ) => Array<BaseProtocolLabware> = createSelector(
   (state, robotName) => robotSelectors.getLabware(state),
+  getLabwareCalibrations,
   (state, robotName) => robotSelectors.getModulesBySlot(state),
-  (protocolLabware, modulesBySlot) => {
-    return protocolLabware.map(lw => makeBaseProtocolLabware(lw, modulesBySlot))
+  (protocolLabware, calibrations, modulesBySlot) => {
+    return protocolLabware.map(lw => {
+      let baseLabware = {
+        ...lw,
+        loadName: lw.definition?.parameters.loadName ?? lw.type,
+        namespace: lw.definition?.namespace ?? null,
+        version: lw.definition?.version ?? null,
+        parent: modulesBySlot[lw.slot]?.model ?? null,
+        calibration: null,
+      }
+      const calData = calibrations
+        .filter(({ attributes }) =>
+          matchesLabwareIdentity(attributes, baseLabware)
+        )
+        .map(formatCalibrationData)
+
+      return {
+        ...baseLabware,
+        calibration: head(calData) ?? null,
+      }
+    })
   }
 )
 
@@ -43,11 +61,11 @@ const getBaseLabwareList: (
 // NOTE(mc, 2020-07-27): due to how these endpoints work, v1 labware will always
 // come back as having "no calibration data". The `legacy` field is here so the
 // UI can adjust its messaging accordingly
-export const getProtocolLabwareList: (
+export const getUniqueProtocolLabwareSummaries: (
   state: State,
   robotName: string
 ) => Array<LabwareSummary> = createSelector(
-  getBaseLabwareList,
+  getProtocolLabwareList,
   getLabwareCalibrations,
   (baseLabwareList, calibrations) => {
     const uniqueLabware = uniqWith<BaseProtocolLabware>(
@@ -60,7 +78,7 @@ export const getProtocolLabwareList: (
     )
 
     return uniqueLabware.map(lw => {
-      const { definition: def, loadName, parent } = lw
+      const { definition: def, loadName, parent, calibration } = lw
       const displayName = def ? getLabwareDisplayName(def) : loadName
       const parentDisplayName = parent ? getModuleDisplayName(parent) : null
 
@@ -68,16 +86,12 @@ export const getProtocolLabwareList: (
         matchesLabwareIdentity(t, lw)
       ).length
 
-      const calData = calibrations
-        .filter(({ attributes }) => matchesLabwareIdentity(attributes, lw))
-        .map(formatCalibrationData)
-
       return {
         displayName,
         parentDisplayName,
         quantity,
-        calibration: head(calData) ?? null,
-        legacy: lw.legacy,
+        calibration,
+        legacy: lw.isLegacy,
       }
     })
   }

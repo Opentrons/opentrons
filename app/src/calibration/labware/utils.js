@@ -1,27 +1,12 @@
 // @flow
 
+import head from 'lodash/head'
 import round from 'lodash/round'
 import type { Labware, Slot, SessionModule } from '../../robot/types'
 import type { LabwareCalibrationModel, LabwareCalibration } from '../types'
 import type { LabwareCalibrationData, BaseProtocolLabware } from './types'
 
-export function makeBaseProtocolLabware(
-  targetLabware: Labware,
-  modulesBySlot: { [Slot]: SessionModule }
-): BaseProtocolLabware {
-  return {
-    definition: targetLabware.definition,
-    loadName:
-      targetLabware.definition?.parameters.loadName ?? targetLabware.type,
-    namespace: targetLabware.definition?.namespace ?? null,
-    version: targetLabware.definition?.version ?? null,
-    parent: modulesBySlot[targetLabware.slot]?.model ?? null,
-    legacy: targetLabware.isLegacy,
-  }
-}
-
 const normalizeParent = parent =>
-  // target and compare may be an internal protocol labware or API calibration data
   // internal protocol labware model uses null for no parent
   // API calibration model uses empty string for no parent
   // normalize to null to do the comparison
@@ -52,13 +37,17 @@ export function getCalibrationDataForLabware(
   calibrations: Array<LabwareCalibrationModel>,
   targetLabware: Labware,
   modulesBySlot: { [Slot]: SessionModule } = {}
-): Array<LabwareCalibrationData> {
-  return calibrations
-    .filter((compareCalbration: LabwareCalibrationModel) => {
-      return matchesLabwareIdentity(
-        compareCalbration.attributes,
-        makeBaseProtocolLabware(targetLabware, modulesBySlot)
-      )
-    })
-    .map(formatCalibrationData)
+): LabwareCalibrationData | null {
+  return (
+    head(
+      calibrations
+        .filter((compareCalbration: LabwareCalibrationModel) => {
+          return matchesLabwareIdentity(
+            compareCalbration.attributes,
+            makeBaseProtocolLabware(targetLabware, modulesBySlot)
+          )
+        })
+        .map(formatCalibrationData)
+    ) ?? null
+  )
 }

@@ -7,7 +7,7 @@ import { InfoSection } from './InfoSection'
 import { ProtocolLabwareList } from './ProtocolLabwareList'
 import {
   fetchLabwareCalibrations,
-  getProtocolLabwareList,
+  getUniqueProtocolLabwareSummaries,
 } from '../../calibration'
 
 import type { State, Dispatch } from '../../types'
@@ -23,7 +23,7 @@ export function ProtocolLabwareCard(props: ProtocolLabwareProps): React.Node {
   const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const labwareList = useSelector((state: State) => {
-    return getProtocolLabwareList(state, robotName)
+    return getUniqueProtocolLabwareSummaries(state, robotName)
   })
 
   React.useEffect(() => {

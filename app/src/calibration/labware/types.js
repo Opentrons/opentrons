@@ -5,6 +5,7 @@ import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
 } from '../../robot-api/types'
+import type { Labware } from '../../robot/types'
 
 import typeof {
   FETCH_LABWARE_CALIBRATIONS,
@@ -52,10 +53,10 @@ export type LawareCalibrationAction =
   | FetchLabwareCalibrationsFailureAction
 
 export type BaseProtocolLabware = {|
-  definition: LabwareDefinition2 | null,
+  ...Labware,
+  calibration: LabwareCalibrationData | null,
   loadName: string,
   namespace: string | null,
   version: number | null,
   parent: ModuleModel | null,
-  legacy: boolean,
 |}

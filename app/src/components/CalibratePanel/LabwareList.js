@@ -1,23 +1,21 @@
 // @flow
 import * as React from 'react'
-import head from 'lodash/head'
 
 import { TitledList } from '@opentrons/components'
 import { LabwareListItem } from './LabwareListItem'
 import { getCalibrationDataForLabware } from '../../calibration/labware/utils'
 
 import type { Labware, Slot, SessionModule } from '../../robot'
-import type { LabwareCalibrationModel } from '../../calibration/types'
+import type { BaseProtocolLabware } from '../../calibration/types'
 
 // TODO(bc, 2019-07-31): i18n
 const TITLE = 'labware'
 
 type Props = {|
-  labware: Array<Labware>,
+  labware: Array<BaseProtocolLabware>,
   modulesBySlot: { [Slot]: SessionModule },
   tipracksConfirmed: boolean,
-  setLabwareToCalibrate: (labware: Labware) => mixed,
-  labwareCalibrations: Array<LabwareCalibrationModel>,
+  setLabwareToCalibrate: (labware: BaseProtocolLabware) => mixed,
 |}
 
 export function LabwareList(props: Props): React.Node {
@@ -26,7 +24,6 @@ export function LabwareList(props: Props): React.Node {
     tipracksConfirmed,
     setLabwareToCalibrate,
     modulesBySlot,
-    labwareCalibrations,
   } = props
   return (
     <TitledList title={TITLE}>
@@ -39,15 +36,7 @@ export function LabwareList(props: Props): React.Node {
             modulesBySlot[lw.slot] &&
             modulesBySlot[lw.slot].model
           }
-          calibrationData={
-            head(
-              getCalibrationDataForLabware(
-                labwareCalibrations,
-                lw,
-                modulesBySlot
-              )
-            ) ?? null
-          }
+          calibrationData={lw.calibration}
           isDisabled={!tipracksConfirmed}
           onClick={() => setLabwareToCalibrate(lw)}
         />

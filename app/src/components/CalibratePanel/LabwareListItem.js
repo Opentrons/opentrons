@@ -19,8 +19,10 @@ import {
   SPACING_2,
 } from '@opentrons/components'
 import { CalibrationValues } from '../CalibrateLabware/CalibrationValues'
-import type { LabwareCalibrationData } from '../../calibration/labware/types'
-import type { Labware } from '../../robot'
+import type {
+  BaseProtocolLabware,
+  LabwareCalibrationData,
+} from '../../calibration/labware/types'
 import styles from './styles.css'
 
 // TODO(bc, 2020-08-03): i18n
@@ -29,7 +31,7 @@ const UPDATED_DATA = 'Updated data'
 const EXISTING_DATA = 'Existing data'
 
 export type LabwareListItemProps = {|
-  ...Labware,
+  ...BaseProtocolLabware,
   moduleModel?: ModuleModel,
   calibrationData: LabwareCalibrationData | null,
   isDisabled: boolean,
