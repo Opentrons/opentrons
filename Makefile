@@ -58,7 +58,7 @@ setup-pipenv:
 	$(OT_PYTHON) -m pip install pipenv==2018.10.9
 
 .PHONY: setup-py-libs
-setup-py-apps: setup-pipenv
+setup-py-libs: setup-pipenv
 	$(MAKE) -C $(API_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
