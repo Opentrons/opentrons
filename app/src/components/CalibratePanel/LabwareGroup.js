@@ -4,11 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import partition from 'lodash/partition'
 
 import { SidePanelGroup, TitledList } from '@opentrons/components'
-import { getConnectedRobot } from '../../discovery'
-import {
-  fetchLabwareCalibrations,
-  getLabwareCalibrations,
-} from '../../calibration'
+import { fetchLabwareCalibrations } from '../../calibration'
 import {
   selectors as robotSelectors,
   actions as robotActions,
@@ -36,7 +32,6 @@ export function LabwareGroup(): React.Node {
   const allLabware = useSelector((state: State) => {
     return robotName ? getProtocolLabwareList(state, robotName) : []
   })
-  const modulesBySlot = useSelector(robotSelectors.getModulesBySlot)
 
   React.useEffect(() => {
     robotName && dispatch(fetchLabwareCalibrations(robotName))

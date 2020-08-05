@@ -1,8 +1,6 @@
 // @flow
 
-import head from 'lodash/head'
 import round from 'lodash/round'
-import type { Labware, Slot, SessionModule } from '../../robot/types'
 import type { LabwareCalibrationModel, LabwareCalibration } from '../types'
 import type { LabwareCalibrationData, BaseProtocolLabware } from './types'
 
@@ -31,23 +29,4 @@ export function formatCalibrationData(
     round(n, 1)
   )
   return { x: calVector[0], y: calVector[1], z: calVector[2] }
-}
-
-export function getCalibrationDataForLabware(
-  calibrations: Array<LabwareCalibrationModel>,
-  targetLabware: Labware,
-  modulesBySlot: { [Slot]: SessionModule } = {}
-): LabwareCalibrationData | null {
-  return (
-    head(
-      calibrations
-        .filter((compareCalbration: LabwareCalibrationModel) => {
-          return matchesLabwareIdentity(
-            compareCalbration.attributes,
-            makeBaseProtocolLabware(targetLabware, modulesBySlot)
-          )
-        })
-        .map(formatCalibrationData)
-    ) ?? null
-  )
 }

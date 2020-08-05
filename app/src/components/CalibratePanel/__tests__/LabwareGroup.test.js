@@ -58,11 +58,9 @@ const stubTipRacks = [
     definition: tiprack300Def,
     slot: '3',
     name: 'some tiprack',
-    calibratorMount: '',
+    calibratorMount: 'left',
     isTiprack: true,
     confirmed: true,
-    isDisabled: false,
-    onClick: jest.fn(),
     parent: null,
     calibrationData: null,
   }: $Shape<BaseProtocolLabware>),
@@ -71,11 +69,9 @@ const stubTipRacks = [
     definition: null,
     slot: '1',
     name: 'some other tiprack',
-    calibratorMount: '',
+    calibratorMount: 'left',
     isTiprack: true,
     confirmed: true,
-    isDisabled: false,
-    onClick: jest.fn(),
     parent: null,
     calibrationData: null,
   }: $Shape<BaseProtocolLabware>),
@@ -87,11 +83,9 @@ const stubOtherLabware = [
     definition: wellPlate96Def,
     slot: '4',
     name: 'some wellplate',
-    calibratorMount: '',
+    calibratorMount: 'left',
     isTiprack: false,
     confirmed: true,
-    isDisabled: false,
-    onClick: jest.fn(),
     parent: null,
     calibrationData: null,
   }: $Shape<BaseProtocolLabware>),
@@ -100,11 +94,9 @@ const stubOtherLabware = [
     definition: wellPlate96Def,
     slot: '7',
     name: 'some other wellplate',
-    calibratorMount: '',
+    calibratorMount: 'left',
     isTiprack: false,
     confirmed: true,
-    isDisabled: false,
-    onClick: jest.fn(),
     parent: null,
     calibrationData: null,
   }: $Shape<BaseProtocolLabware>),
@@ -125,6 +117,10 @@ describe('LabwareGroup', () => {
       dispatch,
     }
     mockGetConnectedRobotName.mockReturnValue('robotName')
+    mockGetCalibratorMount.mockReturnValue('left')
+    mockGetDeckPopulated.mockReturnValue(true)
+    mockGetTipracksConfirmed.mockReturnValue(false)
+    mockGetModulesBySlot.mockReturnValue({})
     mockGetProtocolLabwareList.mockReturnValue([
       ...stubTipRacks,
       ...stubOtherLabware,
@@ -142,7 +138,7 @@ describe('LabwareGroup', () => {
   })
 
   it('dispatches fetch labware calibration action on render', () => {
-    const wrapper = render()
+    render()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       fetchLabwareCalibrations('robotName')
@@ -167,10 +163,14 @@ describe('LabwareGroup', () => {
     const wrapper = render()
 
     stubTipRacks.forEach(lw => {
-      expect(wrapper.find(`LabwareListItem[name="${lw.name}"]`).exists()).toBe(true)
+      expect(wrapper.find(`LabwareListItem[name="${lw.name}"]`).exists()).toBe(
+        true
+      )
     })
     stubOtherLabware.forEach(lw => {
-      expect(wrapper.find(`LabwareListItem[name="${lw.name}"]`).exists()).toBe(true)
+      expect(wrapper.find(`LabwareListItem[name="${lw.name}"]`).exists()).toBe(
+        true
+      )
     })
   })
 })

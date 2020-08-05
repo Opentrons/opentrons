@@ -2,18 +2,18 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 
-import { CalibrationData } from '../LabwareListItem'
+import { CalibrationData } from '../CalibrationData'
 
 describe('CalibrationData', () => {
   let render
 
   beforeEach(() => {
     render = (props = {}) => {
-      const { calibrationData = null, existingCalData = null } = props
+      const { calibrationData = null, calibratedThisSession = false } = props
       return mount(
         <CalibrationData
           calibrationData={calibrationData}
-          existingCalData={existingCalData}
+          calibratedThisSession={calibratedThisSession}
         />
       )
     }
@@ -27,15 +27,15 @@ describe('CalibrationData', () => {
   it('displays existing data if present and not calibrated in this session', () => {
     const wrapper = render({
       calibrationData: { x: 1, y: 0, z: 0 },
-      existingCalData: null,
+      calibratedThisSession: false,
     })
-    expect(wrapper.text().includes('Updated data')).toBe(true)
+    expect(wrapper.text().includes('Existing data')).toBe(true)
   })
 
   it('displays updated data if calibrated in this session', () => {
     const wrapper = render({
       calibrationData: { x: 1, y: 2, z: 0 },
-      existingCalData: { x: 1, y: 0, z: 0 },
+      calibratedThisSession: true,
     })
     expect(wrapper.text().includes('Updated data')).toBe(true)
   })
@@ -43,8 +43,8 @@ describe('CalibrationData', () => {
   it('displays updated data if calibrated in this session with same data', () => {
     const wrapper = render({
       calibrationData: { x: 1, y: 0, z: 0 },
-      existingCalData: { x: 1, y: 0, z: 0 },
+      calibratedThisSession: true,
     })
-    expect(wrapper.text().includes('Existing data')).toBe(true)
+    expect(wrapper.text().includes('Updated data')).toBe(true)
   })
 })

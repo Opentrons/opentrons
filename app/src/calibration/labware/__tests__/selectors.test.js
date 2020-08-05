@@ -214,7 +214,7 @@ describe('labware calibration selectors', () => {
           namespace: wellPlate96Def.namespace,
           version: wellPlate96Def.version,
           parent: 'magneticModuleV1',
-          calibration: { x: 1.2, y: 4.6, z: 7.9 },
+          calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
         },
         {
           type: 'some_v1_labware',
@@ -224,7 +224,7 @@ describe('labware calibration selectors', () => {
           namespace: null,
           version: null,
           parent: null,
-          calibration: null,
+          calibrationData: null,
         },
       ])
     })
@@ -293,7 +293,7 @@ describe('labware calibration selectors', () => {
           namespace: wellPlate96Def.namespace,
           version: wellPlate96Def.version,
           parent: null,
-          calibration: { x: 1.2, y: 4.6, z: 7.9 },
+          calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
         },
         {
           type: 'some_v1_labware',
@@ -303,7 +303,7 @@ describe('labware calibration selectors', () => {
           namespace: null,
           version: null,
           parent: null,
-          calibration: null,
+          calibrationData: null,
         },
       ])
     })

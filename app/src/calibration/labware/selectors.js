@@ -34,12 +34,13 @@ export const getProtocolLabwareList: (
   (state, robotName) => robotSelectors.getModulesBySlot(state),
   (protocolLabware, calibrations, modulesBySlot) => {
     return protocolLabware.map(lw => {
-      let baseLabware = {
+      const baseLabware = {
         ...lw,
         loadName: lw.definition?.parameters.loadName ?? lw.type,
         namespace: lw.definition?.namespace ?? null,
         version: lw.definition?.version ?? null,
         parent: modulesBySlot[lw.slot]?.model ?? null,
+        calibrationData: null,
       }
       const calData = calibrations
         .filter(({ attributes }) =>
@@ -66,7 +67,10 @@ export const getUniqueProtocolLabwareSummaries: (
 ) => Array<LabwareSummary> = createSelector(
   getProtocolLabwareList,
   getLabwareCalibrations,
-  (baseLabwareList, calibrations) => {
+  (
+    baseLabwareList: Array<BaseProtocolLabware>,
+    calibrations: Array<LabwareCalibrationModel>
+  ) => {
     const uniqueLabware = uniqWith<BaseProtocolLabware>(
       baseLabwareList,
       (labwareA, labwareB) => {
@@ -77,21 +81,22 @@ export const getUniqueProtocolLabwareSummaries: (
     )
 
     return uniqueLabware.map(lw => {
-      const { definition: def, loadName, parent, calibration } = lw
+      const { definition: def, loadName, parent, calibrationData } = lw
       const displayName = def ? getLabwareDisplayName(def) : loadName
       const parentDisplayName = parent ? getModuleDisplayName(parent) : null
 
       const quantity = baseLabwareList.filter(t =>
         matchesLabwareIdentity(t, lw)
       ).length
-
-      return {
+      const summary: LabwareSummary = {
         displayName,
         parentDisplayName,
         quantity,
-        calibration,
+        calibration: calibrationData,
         legacy: lw.isLegacy,
       }
+
+      return summary
     })
   }
 )

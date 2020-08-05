@@ -1,6 +1,6 @@
 // @flow
 
-import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
+import type { ModuleModel } from '@opentrons/shared-data'
 import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
@@ -54,7 +54,7 @@ export type LawareCalibrationAction =
 
 export type BaseProtocolLabware = {|
   ...Labware,
-  calibration: LabwareCalibrationData | null,
+  calibrationData: LabwareCalibrationData | null,
   loadName: string,
   namespace: string | null,
   version: number | null,
