@@ -84,7 +84,7 @@ const SPECS = [
       protocol: {
         file: { name: 'proto.json' },
         contents: 'fizzbuzz',
-        data: { schemaVersion: 3, metadata: { protocolName: 'A Protocol' } },
+        data: { metadata: { protocolName: 'A Protocol' } },
       },
     },
     expected: 'A Protocol',
@@ -317,7 +317,7 @@ const SPECS = [
     expected: 'Protocol Designer v4.5.6',
   },
   {
-    name: 'getLabwareDefBySlot with v3 JSON protocol',
+    name: 'getLabwareDefBySlot with JSON protocol without modules (v3)',
     selector: protocol.getLabwareDefBySlot,
     state: {
       robot: { session: { apiLevel: [1, 0] } },
@@ -326,7 +326,6 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: {
           metadata: {},
-          schemaVersion: 3,
           labware: {
             'labware-id-1': { slot: '1', definitionId: 'labware-def-1' },
             'labware-id-2': { slot: '2', definitionId: 'labware-def-2' },
@@ -344,7 +343,7 @@ const SPECS = [
     },
   },
   {
-    name: 'getLabwareDefBySlot with v4 JSON protocol',
+    name: 'getLabwareDefBySlot with JSON protocol that includes modules (>=v4)',
     selector: protocol.getLabwareDefBySlot,
     state: {
       robot: { session: { apiLevel: [1, 0] } },
@@ -353,7 +352,6 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: {
           metadata: {},
-          schemaVersion: 4,
           labware: {
             'labware-id-1': { slot: '1', definitionId: 'labware-def-1' },
             'labware-id-2': {
@@ -377,7 +375,7 @@ const SPECS = [
     },
   },
   {
-    name: 'getLabwareDefBySlot with v4 JSON protocol with thermocycler',
+    name: 'getLabwareDefBySlot with JSON protocol that includes thermocycler',
     selector: protocol.getLabwareDefBySlot,
     state: {
       robot: { session: { apiLevel: [1, 0] } },
@@ -386,7 +384,6 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: {
           metadata: {},
-          schemaVersion: 4,
           labware: {
             'labware-id-1': { slot: '1', definitionId: 'labware-def-1' },
             'labware-id-2': {
