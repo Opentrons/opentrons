@@ -103,7 +103,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.5     |          3.19.0             |
 +-------------+-----------------------------+
-|     2.5     |          3.20.0             |
+|     2.6     |          3.20.0             |
 +-------------+-----------------------------+
 
 Changes in API Versions
