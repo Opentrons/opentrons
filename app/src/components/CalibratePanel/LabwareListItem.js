@@ -32,8 +32,6 @@ const EXISTING_DATA = 'Existing data'
 
 export type LabwareListItemProps = {|
   ...BaseProtocolLabware,
-  moduleModel?: ModuleModel,
-  calibrationData: LabwareCalibrationData | null,
   isDisabled: boolean,
   onClick: () => mixed,
 |}
@@ -49,21 +47,18 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
     isDisabled,
     onClick,
     definition,
-    moduleModel,
+    parent,
     calibrationData,
   } = props
-  const existingCalData = React.useRef<LabwareCalibrationData | null>(
-    calibrationData
-  )
 
   const url = `/calibrate/labware/${slot}`
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
   const displayName = definition ? getLabwareDisplayName(definition) : type
   let displaySlot = `Slot ${slot}`
-  if (moduleModel && getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE) {
+  if (parent && getModuleType(parent) === THERMOCYCLER_MODULE_TYPE) {
     displaySlot = 'Slots 7, 8, 10, & 11'
   }
-  const moduleDisplayName = moduleModel && getModuleDisplayName(moduleModel)
+  const moduleDisplayName = parent && getModuleDisplayName(parent)
 
   return (
     <ListItem
@@ -89,7 +84,7 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
           <div {...handlers} className={styles.item_info}>
             <span className={styles.item_info_location}>{displaySlot}</span>
             <div className={styles.slot_contents_names}>
-              {moduleModel && (
+              {parent && (
                 <span className={styles.module_name}>{moduleDisplayName}</span>
               )}
               <span className={styles.labware_item_name}>
@@ -108,7 +103,7 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
               </span>
               <CalibrationData
                 calibrationData={calibrationData}
-                existingCalData={existingCalData.current}
+                calibratedThisSession={confirmed}
               />
             </div>
           </div>
@@ -131,10 +126,10 @@ function LabwareNameTooltip(props: {| name: string, displayName: string |}) {
 
 export function CalibrationData(props: {|
   calibrationData: LabwareCalibrationData | null,
-  existingCalData: LabwareCalibrationData | null,
+  calibratedThisSession: boolean,
 |}): React.Node {
-  const { calibrationData, existingCalData } = props
-  if (calibrationData === null && existingCalData === null) {
+  const { calibrationData, calibratedThisSession } = props
+  if (calibrationData === null && !calibratedThisSession) {
     return (
       <Text as="i" marginTop={SPACING_2}>
         {NOT_CALIBRATED}
@@ -143,16 +138,14 @@ export function CalibrationData(props: {|
   } else if (calibrationData) {
     return (
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING_2}>
-        {isEqual(calibrationData, existingCalData)
-          ? EXISTING_DATA
-          : UPDATED_DATA}
+        {calibratedThisSession ? UPDATED_DATA : EXISTING_DATA}
         :
         <CalibrationValues {...calibrationData} />
       </Flex>
     )
   } else {
     // NOTE: this case should never be reached as calibrationData will never be null
-    // at the same time that existingCalData is truthy
+    // at the same time that calibratedThisSession is truthy
     return null
   }
 }

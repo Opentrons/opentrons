@@ -40,7 +40,6 @@ export const getProtocolLabwareList: (
         namespace: lw.definition?.namespace ?? null,
         version: lw.definition?.version ?? null,
         parent: modulesBySlot[lw.slot]?.model ?? null,
-        calibration: null,
       }
       const calData = calibrations
         .filter(({ attributes }) =>
@@ -50,7 +49,7 @@ export const getProtocolLabwareList: (
 
       return {
         ...baseLabware,
-        calibration: head(calData) ?? null,
+        calibrationData: head(calData) ?? null,
       }
     })
   }

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import partition from 'lodash/partition'
 
-import { SidePanelGroup } from '@opentrons/components'
+import { SidePanelGroup, TitledList } from '@opentrons/components'
 import { getConnectedRobot } from '../../discovery'
 import {
   fetchLabwareCalibrations,
@@ -14,13 +14,14 @@ import {
   actions as robotActions,
 } from '../../robot'
 import { getProtocolLabwareList } from '../../calibration/labware'
-import { TipRackList } from './TipRackList'
-import { LabwareList } from './LabwareList'
+import { LabwareListItem } from './LabwareListItem'
 import type { BaseProtocolLabware } from '../../calibration/types'
 import type { State, Dispatch } from '../../types'
 
 // TODO(bc, 2019-08-03): i18n
 const TITLE = 'Labware Calibration'
+const TIPRACKS_TITLE = 'tipracks'
+const LABWARE_TITLE = 'labware'
 
 export function LabwareGroup(): React.Node {
   const dispatch = useDispatch<Dispatch>()
@@ -29,17 +30,17 @@ export function LabwareGroup(): React.Node {
   const deckPopulated = useSelector(robotSelectors.getDeckPopulated)
   const tipracksConfirmed = useSelector(robotSelectors.getTipracksConfirmed)
 
-  const robot = useSelector(getConnectedRobot)
+  const robotName = useSelector(robotSelectors.getConnectedRobotName)
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
   const allLabware = useSelector((state: State) => {
-    return robot ? getProtocolLabwareList(state, robot.name) : []
+    return robotName ? getProtocolLabwareList(state, robotName) : []
   })
   const modulesBySlot = useSelector(robotSelectors.getModulesBySlot)
 
   React.useEffect(() => {
-    robot && dispatch(fetchLabwareCalibrations(robot.name))
-  }, [dispatch, robot])
+    robotName && dispatch(fetchLabwareCalibrations(robotName))
+  }, [dispatch, robotName])
 
   const [tipracks, otherLabware] = partition(
     allLabware,
@@ -54,17 +55,26 @@ export function LabwareGroup(): React.Node {
 
   return (
     <SidePanelGroup title={TITLE} disabled={isRunning}>
-      <TipRackList
-        tipracks={tipracks}
-        setLabwareToCalibrate={setLabwareToCalibrate}
-        tipracksConfirmed={tipracksConfirmed}
-      />
-      <LabwareList
-        labware={otherLabware}
-        modulesBySlot={modulesBySlot}
-        setLabwareToCalibrate={setLabwareToCalibrate}
-        tipracksConfirmed={tipracksConfirmed}
-      />
+      <TitledList title={TIPRACKS_TITLE} disabled={tipracksConfirmed}>
+        {tipracks.map(tr => (
+          <LabwareListItem
+            {...tr}
+            key={tr.slot}
+            isDisabled={tr.confirmed}
+            onClick={() => setLabwareToCalibrate(tr)}
+          />
+        ))}
+      </TitledList>
+      <TitledList title={LABWARE_TITLE}>
+        {otherLabware.map(lw => (
+          <LabwareListItem
+            {...lw}
+            key={lw.slot}
+            isDisabled={!tipracksConfirmed}
+            onClick={() => setLabwareToCalibrate(lw)}
+          />
+        ))}
+      </TitledList>
     </SidePanelGroup>
   )
 }

@@ -27,8 +27,6 @@ export function TipRackList(props: Props): React.Node {
           {...tr}
           key={tr.slot}
           isDisabled={tr.confirmed}
-          confirmed={tr.confirmed}
-          calibrationData={tr.calibration}
           onClick={() => setLabwareToCalibrate(tr)}
         />
       ))}

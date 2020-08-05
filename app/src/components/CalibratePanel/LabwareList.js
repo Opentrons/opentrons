@@ -31,12 +31,6 @@ export function LabwareList(props: Props): React.Node {
         <LabwareListItem
           {...lw}
           key={lw.slot}
-          moduleModel={
-            modulesBySlot &&
-            modulesBySlot[lw.slot] &&
-            modulesBySlot[lw.slot].model
-          }
-          calibrationData={lw.calibration}
           isDisabled={!tipracksConfirmed}
           onClick={() => setLabwareToCalibrate(lw)}
         />
