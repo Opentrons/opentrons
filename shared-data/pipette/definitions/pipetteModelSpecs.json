@@ -5169,9 +5169,6 @@
     "dropTipCurrent",
     "dropTipSpeed",
     "tipLength",
-    "defaultAspirateFlowRate",
-    "defaultDispenseFlowRate",
-    "defaultBlowOutFlowRate",
     "quirks"
   ],
   "validQuirks": [
