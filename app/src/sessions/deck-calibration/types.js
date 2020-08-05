@@ -39,7 +39,7 @@ export type DeckCalibrationLabware = {|
   namespace: string,
   version: number,
   isTiprack: boolean,
-  definition: LabwareDefinition2
+  definition: LabwareDefinition2,
 |}
 
 export type DeckCalibrationSessionDetails = {|
