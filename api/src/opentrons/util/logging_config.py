@@ -11,6 +11,7 @@ def _balena_config(level_value: int) -> Dict[str, Any]:
     api_log_filename = CONFIG['api_log_file']
     return {
         'version': 1,
+        'disable_existing_loggers': False,
         'formatters': {
             'basic': {
                 'format':
@@ -68,6 +69,7 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
     # either
     return {
         'version': 1,
+        'disable_existing_loggers': False,
         'formatters': {
             'message_only': {
                 'format': '%(message)s'
