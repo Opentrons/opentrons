@@ -52,7 +52,7 @@ def delete_offset_file(calibration_id: local_types.CalibrationID):
     try:
         _remove_offset_from_index(calibration_id)
         offset.unlink()
-    except (FileNotFoundError, KeyError):
+    except FileNotFoundError:
         pass
 
 

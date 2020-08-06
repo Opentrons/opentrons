@@ -13,7 +13,7 @@ def grab_id(set_up_index_file_temporary_directory):
     index_path = offset_path / 'index.json'
     index_file = file_operators.read_cal_file(str(index_path))
     calibration_id = ''
-    for key, data in index_file.items():
+    for key, data in index_file['data'].items():
         if data['uri'] == uri_to_check:
             calibration_id = key
     return calibration_id
