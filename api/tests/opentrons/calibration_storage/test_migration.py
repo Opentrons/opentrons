@@ -1,6 +1,10 @@
 import pytest
 from unittest.mock import MagicMock
-from opentrons.calibration_storage import get, file_operators as io
+
+from opentrons.protocol_api import labware
+from opentrons.calibration_storage import (
+    get, file_operators as io, migration)
+from opentrons.types import Point, Location
 
 OLD_FORMAT = {
     'opentrons/opentrons_96_tiprack_10ul/1': {
@@ -18,6 +22,7 @@ OLD_FORMAT = {
         }
 
 NEW_FORMAT = {
+    'version': 1,
     '030b6589be708e8d9edd1dafc32a48c6558d6a14475f11cb97775504b52184d0': {
         'uri': 'opentrons/opentrons_96_tiprack_10ul/1',
         'slot': 'fakeid1',
@@ -39,17 +44,24 @@ def setup(labware_offset_tempdir):
     offset_dir = labware_offset_tempdir
     index_path = offset_dir / 'index.json'
     io.save_to_file(index_path, OLD_FORMAT)
-    return index_path
+    parent = Location(Point(0, 0, 0), None)
+    test_labware = labware.load('opentrons_96_tiprack_300ul', parent)
+    labware.save_calibration(test_labware, Point(0, 0, 0))
+    return index_path, test_labware
 
 
 def test_migrate_index_file(setup):
-    index_path = setup
-    get._migrate_index_entries(index_path)
+    index_path, _ = setup
+    migration.migrate_index_0_to_1(index_path)
     data = io.read_cal_file(index_path)
     data == NEW_FORMAT
 
 
 def test_migration_called(setup):
-    get._migrate_index_entries = MagicMock()
-    get.get_all_calibrations()
-    assert get._migrate_index_entries.called
+    _, lw = setup
+    migration.migrate_index_0_to_1 = MagicMock()
+    path = labware._get_labware_path(lw)
+    get.get_labware_calibration(path)
+    assert migration.migrate_index_0_to_1.called
+    migration.migrate_index_0_to_1.reset_mock()
+    assert not migration.migrate_index_0_to_1.called

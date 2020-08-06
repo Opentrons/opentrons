@@ -9,7 +9,7 @@ from opentrons.types import Point
 
 from . import (
     types as local_types,
-    file_operators as io, helpers)
+    file_operators as io, helpers, migration)
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from .dev_types import (
@@ -43,49 +43,6 @@ def _format_parent(
     return options
 
 
-def _migrate_index_entries(index_path):
-    """
-    Previously, the index file was keyed as
-    ```
-    uri: {id: hash,
-          slot: hash+parent,
-          module: {{moduletype}: '{slot}-{moduletype}'}
-    ```
-    Now, the format is saved as
-    ```
-    labware_hash : {
-        uri: uri,
-        slot: hash+parent,
-        module: {
-            parent: {moduletype},
-            fullParent: {slot}-{moduletype}}
-    ```
-    This function ensures any index files are migrated over to
-    the correct format so users do not lose their calibrations
-    """
-    index_file = io.read_cal_file(str(index_path))
-    migrated_file = {}
-    for key, data in index_file.items():
-        if helpers.is_uri(key):
-            uri = key
-            full_hash = data['slot']
-            if data['module']:
-                parent, full_parent = list(data['module'].items())[0]
-                module = {
-                    'parent': parent,
-                    'fullParent': full_parent}
-            else:
-                module = {}
-            migrated_file[full_hash] = {
-                "uri": f'{uri}',
-                "slot": full_hash,
-                "module": module
-                }
-        else:
-            migrated_file[key] = data
-    io.save_to_file(index_path, migrated_file)
-
-
 def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
     """
     A helper function that will list all of the given calibrations
@@ -101,7 +58,6 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
     if not index_path.exists():
         return all_calibrations
 
-    _migrate_index_entries(index_path)
     index_file = io.read_cal_file(str(index_path))
 
     for key, data in index_file.items():
@@ -147,6 +103,7 @@ def get_labware_calibration(lookup_path: local_types.StrPath) -> Point:
     offset = Point(0, 0, 0)
     labware_path = offset_path / lookup_path
     if labware_path.exists():
+        migration.check_index_version(offset_path / 'index.json')
         calibration_data = io.read_cal_file(str(labware_path))
         offset_array = calibration_data['default']['offset']
         offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
