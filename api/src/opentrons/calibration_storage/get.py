@@ -58,6 +58,7 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
     if not index_path.exists():
         return all_calibrations
 
+    migration.check_index_version(index_path)
     index_file = io.read_cal_file(str(index_path))
 
     for key, data in index_file.items():

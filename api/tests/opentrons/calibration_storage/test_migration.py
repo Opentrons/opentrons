@@ -23,7 +23,7 @@ OLD_FORMAT = {
 
 NEW_FORMAT = {
     'version': 1,
-    '030b6589be708e8d9edd1dafc32a48c6558d6a14475f11cb97775504b52184d0': {
+    'fakeid1': {
         'uri': 'opentrons/opentrons_96_tiprack_10ul/1',
         'slot': 'fakeid1',
         'module': {}},
@@ -44,21 +44,24 @@ def setup(labware_offset_tempdir):
     offset_dir = labware_offset_tempdir
     index_path = offset_dir / 'index.json'
     io.save_to_file(index_path, OLD_FORMAT)
+    return index_path
+
+@pytest.fixture
+def migration_called(labware_offset_tempdir):
     parent = Location(Point(0, 0, 0), None)
     test_labware = labware.load('opentrons_96_tiprack_300ul', parent)
     labware.save_calibration(test_labware, Point(0, 0, 0))
-    return index_path, test_labware
-
+    return test_labware
 
 def test_migrate_index_file(setup):
-    index_path, _ = setup
+    index_path = setup
     migration.migrate_index_0_to_1(index_path)
     data = io.read_cal_file(index_path)
-    data == NEW_FORMAT
+    assert data == NEW_FORMAT
 
 
-def test_migration_called(setup):
-    _, lw = setup
+def test_migration_called(migration_called):
+    lw = migration_called
     migration.migrate_index_0_to_1 = MagicMock()
     path = labware._get_labware_path(lw)
     get.get_labware_calibration(path)
