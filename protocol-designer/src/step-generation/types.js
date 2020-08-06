@@ -316,6 +316,7 @@ export type ErrorType =
   | 'TIP_VOLUME_EXCEEDED'
   | 'MISSING_TEMPERATURE_STEP'
   | 'THERMOCYCLER_LID_CLOSED'
+  | 'INVALID_SLOT'
 
 export type CommandCreatorError = {|
   message: string,

@@ -37,6 +37,17 @@ export function pipetteDoesNotExist(args: {|
   }
 }
 
+export function invalidSlot(args: {|
+  actionName: string,
+  slot: string,
+|}): CommandCreatorError {
+  const { actionName, slot } = args
+  return {
+    message: `Attempted to ${actionName} with slot "${slot}", this is not a valid slot"`,
+    type: 'INVALID_SLOT',
+  }
+}
+
 export function labwareDoesNotExist(args: {|
   actionName: string,
   labware: string,
