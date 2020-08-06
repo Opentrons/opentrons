@@ -27,8 +27,13 @@ export function getDelayData(
   checkboxField: 'aspirate_delay_checkbox' | 'dispense_delay_checkbox',
   secondsField: 'aspirate_delay_seconds' | 'dispense_delay_seconds',
   mmFromBottomField:
+<<<<<<< HEAD
     | 'aspirate_delay_mmFromBottom'
     | 'dispense_delay_mmFromBottom'
+=======
+    | 'aspirate_delay_tip_position'
+    | 'dispense_delay_tip_position'
+>>>>>>> feat(protocol-designer): implement formToArgs for delays
 ): ?InnerDelayArgs {
   const checkbox = hydratedFormData[checkboxField]
   const seconds = hydratedFormData[secondsField]
@@ -166,14 +171,22 @@ export const moveLiquidFormToArgs = (
     fields,
     'aspirate_delay_checkbox',
     'aspirate_delay_seconds',
+<<<<<<< HEAD
     'aspirate_delay_mmFromBottom'
+=======
+    'aspirate_delay_tip_position'
+>>>>>>> feat(protocol-designer): implement formToArgs for delays
   )
 
   const dispenseDelay = getDelayData(
     fields,
     'dispense_delay_checkbox',
     'dispense_delay_seconds',
+<<<<<<< HEAD
     'dispense_delay_mmFromBottom'
+=======
+    'dispense_delay_tip_position'
+>>>>>>> feat(protocol-designer): implement formToArgs for delays
   )
 
   const blowoutLocation =
