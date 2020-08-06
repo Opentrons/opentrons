@@ -255,8 +255,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),
-        ...mixAfterCommands,
         ...delayAfterDispenseCommands,
+        ...mixAfterCommands,
         ...touchTipAfterDispenseCommands,
         ...blowoutCommand,
       ]

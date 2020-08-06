@@ -293,8 +293,8 @@ export const transfer: CommandCreator<TransferArgs> = (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
-            ...mixInDestinationCommands,
             ...delayAfterDispenseCommands,
+            ...mixInDestinationCommands,
             ...touchTipAfterDispenseCommands,
             ...blowoutCommand,
           ]
