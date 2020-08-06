@@ -25,7 +25,7 @@ To take advantage of Jupyter's ability to run only parts of your protocol, you h
 .. substitution-code-block:: python
 
     import opentrons.execute
-    protocol = opentrons.execute.get_protocol_api('2.0')
+    protocol = opentrons.execute.get_protocol_api('|apiLevel|')
     protocol.home()
 
 
@@ -57,7 +57,7 @@ If you have a protocol that you have already written you can run it directly in 
    def run(protocol: protocol_api.ProtocolContext):
        # the contents of your protocol are here...
 
-   protocol = opentrons.execute.get_protocol_api('2.0')
+   protocol = opentrons.execute.get_protocol_api('|apiLevel|')
    run(protocol)  # your protocol will now run
 
 
