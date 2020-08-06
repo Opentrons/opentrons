@@ -68,6 +68,8 @@ export type SharedTransferLikeArgs = {
   aspirateOffsetFromBottomMm: number,
 
   // ===== DISPENSE SETTINGS =====
+  /** Delay after every dispense */
+  dispenseDelay: ?InnerDelayArgs,
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean,
   /** Optional offset for touch tip after dispense (if null, use PD default) */

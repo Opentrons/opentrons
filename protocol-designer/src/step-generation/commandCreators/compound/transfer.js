@@ -79,6 +79,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   // when we decide to rename these fields/args... probably all the way up to the UI level.
   const {
     aspirateDelay,
+    dispenseDelay,
     aspirateFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     blowoutFlowRateUlSec,
@@ -235,6 +236,29 @@ export const transfer: CommandCreator<TransferArgs> = (
               })
             : []
 
+          const delayAfterDispenseCommands =
+            dispenseDelay != null
+              ? [
+                  curryCommandCreator(moveToWell, {
+                    pipette: args.pipette,
+                    labware: args.destLabware,
+                    well: destWell,
+                    offset: {
+                      x: 0,
+                      y: 0,
+                      z: dispenseDelay.mmFromBottom,
+                    },
+                  }),
+                  curryCommandCreator(delay, {
+                    commandCreatorFnName: 'delay',
+                    description: null,
+                    name: null,
+                    meta: null,
+                    wait: dispenseDelay.seconds,
+                  }),
+                ]
+              : []
+
           const blowoutCommand = blowoutUtil({
             pipette: args.pipette,
             sourceLabwareId: args.sourceLabware,
@@ -269,6 +293,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
+            ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,
             ...touchTipAfterDispenseCommands,
             ...blowoutCommand,

@@ -70,6 +70,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     aspirateOffsetFromBottomMm,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
+    dispenseDelay,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
   } = args
@@ -206,6 +207,29 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           })
         : []
 
+      const delayAfterDispenseCommands =
+        dispenseDelay != null
+          ? [
+              curryCommandCreator(moveToWell, {
+                pipette: args.pipette,
+                labware: args.destLabware,
+                well: args.destWell,
+                offset: {
+                  x: 0,
+                  y: 0,
+                  z: dispenseDelay.mmFromBottom,
+                },
+              }),
+              curryCommandCreator(delay, {
+                commandCreatorFnName: 'delay',
+                description: null,
+                name: null,
+                meta: null,
+                wait: dispenseDelay.seconds,
+              }),
+            ]
+          : []
+
       const blowoutCommand = blowoutUtil({
         pipette: args.pipette,
         sourceLabwareId: args.sourceLabware,
@@ -231,6 +255,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),
+        ...delayAfterDispenseCommands,
         ...mixAfterCommands,
         ...touchTipAfterDispenseCommands,
         ...blowoutCommand,

@@ -172,12 +172,15 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
   },
 })
 
-export const delayWithOffset = (well: string): Array<Command> => [
+export const delayWithOffset = (
+  well: string,
+  labware: string
+): Array<Command> => [
   {
     command: 'moveToWell',
     params: {
       pipette: DEFAULT_PIPETTE,
-      labware: SOURCE_LABWARE,
+      labware,
       well,
       offset: {
         x: 0,

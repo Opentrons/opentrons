@@ -76,6 +76,7 @@ beforeEach(() => {
     touchTipAfterAspirate: false,
     mixFirstAspirate: null,
     aspirateDelay: null,
+    dispenseDelay: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
@@ -222,7 +223,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  it('mix on aspirate', () => {
+  it('should mix on aspirate', () => {
     const data = {
       ...mixinArgs,
       volume: 125,
@@ -280,7 +281,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  it('mix after dispense', () => {
+  it('should mix after dispense', () => {
     const data = {
       ...mixinArgs,
       volume: 100,
@@ -313,7 +314,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  it('mix after dispense with blowout to trash: first mix, then blowout', () => {
+  it('should mix after dispense with blowout to trash: first mix, then blowout', () => {
     const data = {
       ...mixinArgs,
       volume: 100,
@@ -394,7 +395,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  it('delay after aspirate', () => {
+  it('should delay after aspirate', () => {
     const data = {
       ...mixinArgs,
       volume: 150,
@@ -407,20 +408,44 @@ describe('consolidate single-channel', () => {
 
     expect(res.commands).toEqual([
       aspirateHelper('A1', 150),
-      ...delayWithOffset('A1'),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
 
       aspirateHelper('A2', 150),
-      ...delayWithOffset('A2'),
+      ...delayWithOffset('A2', SOURCE_LABWARE),
 
       dispenseHelper('B1', 300),
 
       aspirateHelper('A3', 150),
-      ...delayWithOffset('A3'),
+      ...delayWithOffset('A3', SOURCE_LABWARE),
 
       aspirateHelper('A4', 150),
-      ...delayWithOffset('A4'),
+      ...delayWithOffset('A4', SOURCE_LABWARE),
 
       dispenseHelper('B1', 300),
+    ])
+  })
+
+  it('should delay after dispense', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'never',
+      dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+    }
+
+    const result = consolidate(data, invariantContext, robotStatePickedUpOneTip)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 150),
+      aspirateHelper('A2', 150),
+      dispenseHelper('B1', 300),
+      ...delayWithOffset('B1', DEST_LABWARE),
+
+      aspirateHelper('A3', 150),
+      aspirateHelper('A4', 150),
+      dispenseHelper('B1', 300),
+      ...delayWithOffset('B1', DEST_LABWARE),
     ])
   })
 
@@ -536,7 +561,7 @@ describe('consolidate multi-channel', () => {
     touchTipAfterAspirate: false,
     mixFirstAspirate: null,
     aspirateDelay: null,
-
+    dispenseDelay: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
