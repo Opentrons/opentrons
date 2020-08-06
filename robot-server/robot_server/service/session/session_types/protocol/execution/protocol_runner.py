@@ -4,6 +4,7 @@ import os
 import sys
 import typing
 
+from opentrons.api.dev_types import State
 from opentrons.broker import Broker
 from opentrons.commands import command_types
 from opentrons.hardware_control import ThreadedAsyncLock, ThreadManager
@@ -21,6 +22,10 @@ class CancelledException(Exception):
 
 
 ListenerType = typing.Callable[[typing.Dict], None]
+
+
+class ProtocolRunnerException(Exception):
+    pass
 
 
 class ProtocolRunner:
@@ -42,8 +47,20 @@ class ProtocolRunner:
         self._motion_lock = motion_lock
         self._session: typing.Optional[ApiProtocolSession] = None
         self._broker = Broker()
-        self._broker.subscribe(command_types.COMMAND, self._on_command)
+        self._broker.subscribe(command_types.COMMAND, self._on_message)
+        self._broker.subscribe(ApiProtocolSession.TOPIC, self._on_message)
         self._listeners: typing.List[ListenerType] = []
+
+    @property
+    def protocol_state(self) -> typing.Optional['State']:
+        return self._session.state if self._session else None
+
+    @property
+    def session(self) -> ApiProtocolSession:
+        """Access the session"""
+        if not self._session:
+            raise ProtocolRunnerException("Session is not loaded yet")
+        return self._session
 
     def add_listener(self, listener: ListenerType):
         """Add a command listener"""
@@ -69,14 +86,26 @@ class ProtocolRunner:
     def run(self):
         """Run the protocol"""
         with ProtocolRunnerContext(self._protocol):
-            self._session.run()
+            self.session.run()
 
     def simulate(self):
         """Simulate the protocol"""
         with ProtocolRunnerContext(self._protocol):
-            self._session.refresh()
+            self.session.refresh()
 
-    def _on_command(self, msg):
+    def cancel(self):
+        """Cancel running"""
+        self.session.stop()
+
+    def pause(self):
+        """Pause running"""
+        self.session.pause()
+
+    def resume(self):
+        """Resume running"""
+        self.session.resume()
+
+    def _on_message(self, msg):
         """Dispatch the events"""
         for listener in self._listeners:
             listener(msg)

@@ -1,12 +1,10 @@
 import asyncio
 import logging
-import threading
+import typing
 from enum import Enum, auto
 
 from robot_server.service.session.session_types.protocol.\
-    execution.protocol_runner import CancelledException, ProtocolRunner
-from robot_server.service.session.session_types.protocol.models import \
-    ProtocolSessionState
+    execution.protocol_runner import ProtocolRunner
 
 log = logging.getLogger(__name__)
 
@@ -22,17 +20,6 @@ class WorkerDirective(int, Enum):
     start_run = auto()
 
 
-class ProtocolFlowDirective(int, Enum):
-    """A directive checked during protocol execution steps."""
-    none = auto()
-    # Continue running (not currently in use)
-    run = auto()
-    # Stop the execution (ie cancel)
-    stop = auto()
-    # Resume running for one step
-    single_step = auto()
-
-
 class _Worker:
     """
     A private class used by ProtocolCommandExecutor to handle protocol session
@@ -40,118 +27,107 @@ class _Worker:
     """
     def __init__(self,
                  protocol_runner: ProtocolRunner,
+                 listener: 'WorkerListener',
                  loop: asyncio.AbstractEventLoop):
         """Constructor the command handling worker"""
         self._protocol_runner = protocol_runner
         self._protocol_runner.add_listener(self._on_command)
         self._loop = loop
-        # State of the worker. Only modified on main thread
-        self._state = ProtocolSessionState.idle
+        self._listener = listener
         # For passing AsyncCommand from main to worker task
         self._async_command_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
         # Protocol running AsyncCommand handling task
         self._async_command_task = self._loop.create_task(self._runner_task())
-        # Worker thread command (modified on main thread only)
-        self._worker_command = ProtocolFlowDirective.none
-        self._pause_event = threading.Event()
-        self._pause_event.set()
 
     async def handle_run(self):
         """Begin running the protocol"""
-        await self.set_command(WorkerDirective.start_run)
+        await self._set_command(WorkerDirective.start_run)
 
     async def handle_simulate(self):
         """Begin a simulation"""
-        await self.set_command(WorkerDirective.start_simulate)
+        await self._set_command(WorkerDirective.start_simulate)
 
     async def handle_cancel(self):
         """Cancel a running protocol"""
-        self._worker_command = ProtocolFlowDirective.stop
-        self._pause_event.set()
+        self._protocol_runner.cancel()
 
     async def handle_resume(self):
-        """Resume running or simulation"""
-        self._pause_event.set()
+        """Resume running"""
+        self._protocol_runner.resume()
 
     async def handle_pause(self):
-        """Pause the currently running or simulating protocol"""
-        self._pause_event.clear()
+        """Pause the currently running protocol"""
+        self._protocol_runner.pause()
 
-    async def handle_single_step(self):
-        """Take a single step in a running or simulating protocol"""
-        self._worker_command = ProtocolFlowDirective.single_step
-        self._pause_event.set()
-
-    async def handle_finish(self):
-        """Cancel current run and terminate worker task"""
+    async def close(self):
+        """Shutdown the worker. Cancel run and terminate worker task"""
         # Kill the command task
-        await self.set_command(WorkerDirective.terminate)
-        # And the worker thread
-        self._worker_command = ProtocolFlowDirective.stop
-        # Maker sure to resume
-        self._pause_event.set()
+        await self._set_command(WorkerDirective.terminate)
+        # Kill the protocl
+        self._protocol_runner.cancel()
         # Wait for run task to finish
         await self._async_command_task
 
-    @property
-    def current_state(self) -> ProtocolSessionState:
-        return self._state
-
-    def set_current_state(self, state: ProtocolSessionState):
-        log.debug(f"Set state to '{state}'")
-        self._state = state
-
-    async def set_command(self, comm: WorkerDirective):
+    async def _set_command(self, comm: WorkerDirective):
         """Enqueue a command for the worker"""
         await self._async_command_queue.put(comm)
 
     async def _runner_task(self):
         """Entry point for protocol running task"""
-        self.set_current_state(ProtocolSessionState.simulating)
 
-        await self._loop.run_in_executor(None, self._protocol_runner.load)
+        await self._load()
 
         while True:
-            self.set_current_state(ProtocolSessionState.ready)
+            # Notify that we are ready for a command
+            await self._listener.on_ready()
 
-            log.debug(f"Waiting for command: {self._state}")
+            log.debug("Waiting...")
             async_command = await self._async_command_queue.get()
 
-            log.info(f"Got run command: {async_command.name}")
+            await self._listener.on_directive(async_command)
+
+            log.info(f"Got directive: {async_command.name}")
             if async_command == WorkerDirective.terminate:
                 break
-            if async_command == WorkerDirective.start_run:
-                self.set_current_state(ProtocolSessionState.running)
-                await self._loop.run_in_executor(
-                    None,
-                    self._protocol_runner.run)
-            if async_command == WorkerDirective.start_simulate:
-                self.set_current_state(ProtocolSessionState.simulating)
-                await self._loop.run_in_executor(
-                    None,
-                    self._protocol_runner.simulate)
+            elif async_command == WorkerDirective.start_run:
+                await self._run()
+            elif async_command == WorkerDirective.start_simulate:
+                await self._simulate()
 
-        # Done.
-        self.set_current_state(ProtocolSessionState.exited)
+    async def _load(self):
+        """Load the protocol"""
+        await self._loop.run_in_executor(None, self._protocol_runner.load)
+
+    async def _simulate(self):
+        """Simulate the protocol"""
+        await self._loop.run_in_executor(None, self._protocol_runner.simulate)
+
+    async def _run(self):
+        """Run the protocol"""
+        await self._loop.run_in_executor(None, self._protocol_runner.run)
 
     def _on_command(self, msg):
         """ProtocolRunner command listener"""
-        self._check_flow()
+        # Notify command on main thread
+        asyncio.run_coroutine_threadsafe(
+            self._listener.on_protocol_event(msg),
+            self._loop
+        )
 
-    def _check_flow(self):
-        """Called from ProtocolRunner to check for changes in run flow"""
-        if not self._pause_event.is_set():
-            # Need to pause. Collect prior state for after the pause.
-            previous_state = self.current_state
-            self._loop.call_soon_threadsafe(self.set_current_state,
-                                            ProtocolSessionState.paused)
-            # Wait on pause event
-            self._pause_event.wait()
-            # Resume to previous state
-            self._loop.call_soon_threadsafe(self.set_current_state,
-                                            previous_state)
 
-        if self._worker_command == ProtocolFlowDirective.single_step:
-            self._pause_event.clear()
-        elif self._worker_command == ProtocolFlowDirective.stop:
-            raise CancelledException()
+class WorkerListener:
+    async def on_directive(self, directive: 'WorkerDirective'):
+        """Called when worker has a new directive"""
+        pass
+
+    async def on_ready(self):
+        """Called when worker task is ready for a directive"""
+        pass
+
+    async def on_error(self, err):
+        """Called on an unrecoverable error"""
+        pass
+
+    async def on_protocol_event(self, cmd: typing.Any):
+        """Called on protocol command"""
+        pass
