@@ -1,11 +1,6 @@
 // @flow
 import { TestScheduler } from 'rxjs/testing'
 import {
-  setupEpicTestMocks,
-  runEpicTest,
-} from '../../../../robot-api/__utils__'
-import * as Fixtures from '../../__fixtures__'
-import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../../../robot'
@@ -16,11 +11,6 @@ import type { State } from '../../../../types'
 
 jest.mock('../../actions')
 jest.mock('../../../../robot/selectors')
-
-const mockFetchLabwareCalibrations: JestMockFn<
-  [State, string],
-  void
-> = (Actions.fetchLabwareCalibrations: any)
 
 const mockGetConnectedRobotName: JestMockFn<
   [State],
@@ -44,7 +34,7 @@ describe('fetch labware calibration on rpc cal session update epic', () => {
     })
 
     testScheduler.run(schedulerArgs => {
-      const { hot, cold, expectObservable, flush } = schedulerArgs
+      const { hot, expectObservable, flush } = schedulerArgs
 
       const action$ = hot('--a', { a: robotActions.updateOffsetResponse() })
       const state$ = hot('s-s', { s: mockState })
@@ -65,7 +55,7 @@ describe('fetch labware calibration on rpc cal session update epic', () => {
     })
 
     testScheduler.run(schedulerArgs => {
-      const { hot, cold, expectObservable, flush } = schedulerArgs
+      const { hot, expectObservable, flush } = schedulerArgs
 
       const action$ = hot('--a', { a: robotActions.confirmTiprackResponse() })
       const state$ = hot('s-s', { s: mockState })
