@@ -1,6 +1,6 @@
 // @flow
 
-import type { RequestState } from '../../robot-api/types'
+import type { RequestStatus } from '../../robot-api/types'
 import type {
   SessionCommandString,
   SessionCommandData,
@@ -29,5 +29,5 @@ export type CalibrateTipLengthChildProps = {|
     trackRequest?: boolean
   ) => void,
   deleteSession: () => void,
-  requestStatus: RequestState,
+  lastRequestStatus: RequestStatus | null,
 |}

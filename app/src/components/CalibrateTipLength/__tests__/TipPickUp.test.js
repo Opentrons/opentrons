@@ -2,7 +2,10 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import { mockTipLengthCalibrationSessionDetails } from '../../../sessions/__fixtures__'
+import {
+  mockTipLengthCalBlock,
+  mockTipLengthTipRack,
+} from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
 
 import { TipPickUp } from '../TipPickUp'
@@ -28,17 +31,19 @@ describe('TipPickUp', () => {
   beforeEach(() => {
     render = (props: $Shape<React.ElementProps<typeof TipPickUp>> = {}) => {
       const {
-        hasBlock = true,
-        instrument = mockTipLengthCalibrationSessionDetails.instrument,
-        labware = mockTipLengthCalibrationSessionDetails.labware,
+        pipMount = 'left',
+        isMulti = false,
+        tipRack = mockTipLengthTipRack,
+        calBlock = mockTipLengthCalBlock,
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
       } = props
       return mount(
         <TipPickUp
-          hasBlock={hasBlock}
-          labware={labware}
-          instrument={instrument}
+          isMulti={isMulti}
+          mount={pipMount}
+          tipRack={tipRack}
+          calBlock={calBlock}
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
         />
@@ -68,7 +73,8 @@ describe('TipPickUp', () => {
 
       expect(mockSendCommand).toHaveBeenCalledWith(
         Sessions.tipCalCommands.JOG,
-        { vector: jogParamsByDirection[direction] }
+        { vector: jogParamsByDirection[direction] },
+        false
       )
     })
   })

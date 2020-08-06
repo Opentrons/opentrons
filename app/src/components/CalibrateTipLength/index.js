@@ -19,7 +19,7 @@ import type {
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
-import type { RequestState } from '../../robot-api/types'
+import type { RequestState, RequestStatus } from '../../robot-api/types'
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { MeasureNozzle } from './MeasureNozzle'
@@ -68,25 +68,37 @@ export function CalibrateTipLength(
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const dispatch = useDispatch()
 
-  const requestStatus = useSelector<State, RequestState | null>(state =>
-    getRequestById(state, last(requestIds))
-  )?.status
+  const lastRequestStatus: RequestStatus | null =
+    useSelector<State, RequestState | null>(state =>
+      getRequestById(state, last(requestIds))
+    )?.status ?? null
+
+  const longOngoingCommandId = React.useRef<string | null>(null)
+  const longOngoingCommandIsPending: boolean = React.useMemo(
+    () =>
+      useSelector<State, RequestState | null>(state =>
+        longOngoingCommandId.current !== null
+          ? getRequestById(state, longOngoingCommandId.current)
+          : null
+      )?.status === PENDING,
+    [longOngoingCommandId.current]
+  )
 
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)
     return spec ? spec.channels > 1 : false
   }, [instrument])
 
-  const tipRack: TipLengthCalibrationInstrument | null =
+  const tipRack: TipLengthCalibrationLabware | null =
     labware.find(l => l.isTiprack) ?? null
-  const calBlock: TipLengthCalibrationInstrument | null = hasBlock
-    ? labware.find(l => !l.isTiprack)
+  const calBlock: TipLengthCalibrationLabware | null = hasBlock
+    ? labware.find(l => !l.isTiprack) ?? null
     : null
 
   function sendCommand(
     command: SessionCommandString,
     data: SessionCommandData = {},
-    trackRequest: boolean = true
+    loadingSpinner: boolean = true
   ) {
     if (session === null) return
     const sessionCommand = Sessions.createSessionCommand(
@@ -94,10 +106,9 @@ export function CalibrateTipLength(
       session.id,
       { command, data }
     )
-    if (trackRequest) {
-      dispatchRequest(sessionCommand)
-    } else {
-      dispatch(sessionCommand)
+    dispatchRequest(sessionCommand)
+    if (loadingSpinner) {
+      longOngoingCommandId.current = last(requestIds)
     }
   }
 
@@ -125,7 +136,10 @@ export function CalibrateTipLength(
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
-  if (requestStatus === PENDING) {
+  console.log('rendered', longOngoingCommandIsPending)
+  console.log('lrs', lastRequestStatus)
+  console.log('logid', longOngoingCommandId.current)
+  if (longOngoingCommandIsPending) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
@@ -144,6 +158,7 @@ export function CalibrateTipLength(
           calBlock={calBlock}
           sendSessionCommand={sendCommand}
           deleteSession={deleteSession}
+          lastRequestStatus={lastRequestStatus}
         />
       </ModalPage>
       {showConfirmExit && (

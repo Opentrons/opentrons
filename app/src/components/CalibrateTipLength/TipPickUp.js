@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {
+  Icon,
   Box,
   Flex,
   PrimaryButton,
@@ -15,9 +16,11 @@ import {
   SPACING_2,
   SPACING_3,
   TEXT_ALIGN_CENTER,
+  SPACING_1,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
+import { PENDING } from '../../robot-api'
 import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import { getLatestLabwareDef } from '../../getLabware'
@@ -48,13 +51,9 @@ const ASSET_MAP = {
   single: singleDemoAsset,
 }
 export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
-  const { sendSessionCommand, isMulti, tipRack } = props
+  const { sendSessionCommand, isMulti, tipRack, lastRequestStatus } = props
 
   const [showTipInspection, setShowTipInspection] = React.useState(false)
-  const tipRackDef = React.useMemo(
-    () => getLatestLabwareDef(tipRack?.loadName),
-    [tipRack]
-  )
 
   const demoAsset = ASSET_MAP[isMulti ? 'multi' : 'single']
 
@@ -91,7 +90,7 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
     sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT)
   }
 
-  return showTipInspection ? (
+  return lastRequestStatus !== PENDING && showTipInspection ? (
     <InspectingTip invalidateTip={invalidateTip} confirmTip={confirmTip} />
   ) : (
     <>
@@ -104,8 +103,8 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
       >
         <h3 className={styles.intro_header}>
           {TIP_PICK_UP_HEADER}
-          {tiprackDef
-            ? getLabwareDisplayName(tiprackDef).replace('µL', 'uL')
+          {tipRack?.definition
+            ? getLabwareDisplayName(tipRack.definition).replace('µL', 'uL')
             : null}
         </h3>
         <Box
@@ -151,7 +150,11 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
         </div>
         <Flex width="100%">
           <PrimaryButton onClick={pickUpTip} className={styles.command_button}>
-            {TIP_PICK_UP_BUTTON_TEXT}
+            {lastRequestStatus === PENDING ? (
+              <Icon name="ot-spinner" height={SPACING_3} spin />
+            ) : (
+              TIP_PICK_UP_BUTTON_TEXT
+            )}
           </PrimaryButton>
         </Flex>
       </Flex>
