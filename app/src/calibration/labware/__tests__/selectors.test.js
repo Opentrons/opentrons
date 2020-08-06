@@ -92,43 +92,9 @@ describe('labware calibration selectors', () => {
 
     it('returns empty array if no labware in protocol', () => {
       getLabware.mockReturnValue([])
-      expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([])
-    })
-
-    it('maps RPC labware to object with displayName', () => {
-      getModulesBySlot.mockReturnValue({})
-
-      expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
-        {
-          displayName: wellPlate96Def.metadata.displayName,
-          parentDisplayName: null,
-          quantity: 1,
-          calibration: null,
-        },
-        {
-          displayName: 'some_v1_labware',
-          parentDisplayName: null,
-          quantity: 1,
-          calibration: null,
-        },
-      ])
-    })
-
-    it('sets parentDisplayName if labware has module parent', () => {
-      expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
-        {
-          displayName: wellPlate96Def.metadata.displayName,
-          parentDisplayName: 'Magnetic Module GEN1',
-          quantity: 1,
-          calibration: null,
-        },
-        {
-          displayName: 'some_v1_labware',
-          parentDisplayName: null,
-          quantity: 1,
-          calibration: null,
-        },
-      ])
+      expect(
+        Selectors.getUniqueProtocolLabwareSummaries(state, robotName)
+      ).toEqual([])
     })
 
     it('grabs calibration data for labware if present, rounding to 1 decimal', () => {
@@ -168,7 +134,9 @@ describe('labware calibration selectors', () => {
         },
       }: $Shape<State>)
 
-      expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
+      expect(
+        Selectors.getUniqueProtocolLabwareSummaries(state, robotName)
+      ).toEqual([
         {
           displayName: wellPlate96Def.metadata.displayName,
           parentDisplayName: null,
@@ -239,16 +207,24 @@ describe('labware calibration selectors', () => {
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
         {
-          displayName: wellPlate96Def.metadata.displayName,
-          parentDisplayName: 'Magnetic Module GEN1',
-          quantity: 1,
-          calibration: { x: 1.2, y: 4.6, z: 7.9 },
+          type: wellPlate96Def.parameters.loadName,
+          definition: wellPlate96Def,
+          slot: '3',
+          loadName: wellPlate96Def.parameters.loadName,
+          namespace: wellPlate96Def.namespace,
+          version: wellPlate96Def.version,
+          parent: 'magneticModuleV1',
+          calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
         },
         {
-          displayName: 'some_v1_labware',
-          parentDisplayName: null,
-          quantity: 1,
-          calibration: null,
+          type: 'some_v1_labware',
+          definition: null,
+          slot: '1',
+          loadName: 'some_v1_labware',
+          namespace: null,
+          version: null,
+          parent: null,
+          calibrationData: null,
         },
       ])
     })
@@ -310,10 +286,102 @@ describe('labware calibration selectors', () => {
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
         {
+          type: wellPlate96Def.parameters.loadName,
+          definition: wellPlate96Def,
+          slot: '3',
+          loadName: wellPlate96Def.parameters.loadName,
+          namespace: wellPlate96Def.namespace,
+          version: wellPlate96Def.version,
+          parent: null,
+          calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
+        },
+        {
+          type: 'some_v1_labware',
+          definition: null,
+          slot: '1',
+          loadName: 'some_v1_labware',
+          namespace: null,
+          version: null,
+          parent: null,
+          calibrationData: null,
+        },
+      ])
+    })
+  })
+
+  describe('getUniqueProtocolLabwareSummaries', () => {
+    let state: $Shape<State>
+
+    beforeEach(() => {
+      state = { calibration: {} }
+
+      getLabware.mockImplementation(calledState => {
+        expect(calledState).toBe(state)
+
+        return [
+          ({
+            type: wellPlate96Def.parameters.loadName,
+            definition: wellPlate96Def,
+            slot: '3',
+          }: $Shape<ProtocolLabware>),
+          ({
+            type: 'some_v1_labware',
+            definition: null,
+            slot: '1',
+          }: $Shape<ProtocolLabware>),
+        ]
+      })
+
+      getModulesBySlot.mockImplementation(calledState => {
+        expect(calledState).toBe(state)
+
+        return {
+          '3': {
+            model: 'magneticModuleV1',
+            slot: '3',
+            _id: 1945365648,
+          },
+        }
+      })
+    })
+
+    it('returns empty array if no labware in protocol', () => {
+      getLabware.mockReturnValue([])
+      expect(
+        Selectors.getUniqueProtocolLabwareSummaries(state, robotName)
+      ).toEqual([])
+    })
+
+    it('maps RPC labware to object with displayName', () => {
+      getModulesBySlot.mockReturnValue({})
+
+      expect(
+        Selectors.getUniqueProtocolLabwareSummaries(state, robotName)
+      ).toEqual([
+        {
           displayName: wellPlate96Def.metadata.displayName,
           parentDisplayName: null,
           quantity: 1,
-          calibration: { x: 1.2, y: 4.6, z: 7.9 },
+          calibration: null,
+        },
+        {
+          displayName: 'some_v1_labware',
+          parentDisplayName: null,
+          quantity: 1,
+          calibration: null,
+        },
+      ])
+    })
+
+    it('sets parentDisplayName if labware has module parent', () => {
+      expect(
+        Selectors.getUniqueProtocolLabwareSummaries(state, robotName)
+      ).toEqual([
+        {
+          displayName: wellPlate96Def.metadata.displayName,
+          parentDisplayName: 'Magnetic Module GEN1',
+          quantity: 1,
+          calibration: null,
         },
         {
           displayName: 'some_v1_labware',
@@ -339,7 +407,9 @@ describe('labware calibration selectors', () => {
       ])
       getModulesBySlot.mockReturnValue({})
 
-      expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
+      expect(
+        Selectors.getUniqueProtocolLabwareSummaries(state, robotName)
+      ).toEqual([
         {
           displayName: wellPlate96Def.metadata.displayName,
           parentDisplayName: null,
@@ -373,7 +443,9 @@ describe('labware calibration selectors', () => {
         }
       })
 
-      expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
+      expect(
+        Selectors.getUniqueProtocolLabwareSummaries(state, robotName)
+      ).toEqual([
         {
           displayName: wellPlate96Def.metadata.displayName,
           parentDisplayName: null,

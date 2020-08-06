@@ -7,16 +7,14 @@ import {
   getModuleDisplayName,
   getModuleType,
   THERMOCYCLER_MODULE_TYPE,
-  type ModuleModel,
 } from '@opentrons/shared-data'
 import { ListItem, HoverTooltip } from '@opentrons/components'
+import { CalibrationData } from './CalibrationData'
+import type { BaseProtocolLabware } from '../../calibration/labware/types'
 import styles from './styles.css'
 
-import type { Labware } from '../../robot'
-
 export type LabwareListItemProps = {|
-  ...Labware,
-  moduleModel?: ModuleModel,
+  ...BaseProtocolLabware,
   isDisabled: boolean,
   onClick: () => mixed,
 |}
@@ -32,24 +30,25 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
     isDisabled,
     onClick,
     definition,
-    moduleModel,
+    parent,
+    calibrationData,
   } = props
 
   const url = `/calibrate/labware/${slot}`
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
   const displayName = definition ? getLabwareDisplayName(definition) : type
   let displaySlot = `Slot ${slot}`
-  if (moduleModel && getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE) {
+  if (parent && getModuleType(parent) === THERMOCYCLER_MODULE_TYPE) {
     displaySlot = 'Slots 7, 8, 10, & 11'
   }
-  const moduleDisplayName = moduleModel && getModuleDisplayName(moduleModel)
+  const moduleDisplayName = parent && getModuleDisplayName(parent)
 
   return (
     <ListItem
       url={!isDisabled ? url : undefined}
       onClick={!isDisabled ? onClick : undefined}
       iconName={iconName}
-      className={cx({ [styles.disabled]: isDisabled })}
+      className={cx(styles.labware_item, { [styles.disabled]: isDisabled })}
       activeClassName={styles.active}
     >
       <HoverTooltip
@@ -67,16 +66,28 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
         {handlers => (
           <div {...handlers} className={styles.item_info}>
             <span className={styles.item_info_location}>{displaySlot}</span>
-            {isTiprack && (
-              <span className={styles.tiprack_item_mount}>
-                {calibratorMount && calibratorMount.charAt(0).toUpperCase()}
-              </span>
-            )}
             <div className={styles.slot_contents_names}>
-              {moduleModel && (
+              {parent && (
                 <span className={styles.module_name}>{moduleDisplayName}</span>
               )}
-              <span className={styles.labware_item_name}>{displayName}</span>
+              <span className={styles.labware_item_name}>
+                {isTiprack ? (
+                  <span className={styles.tiprack_item_mount}>
+                    <span className={styles.tiprack_item_mount}>
+                      {calibratorMount
+                        ? calibratorMount.charAt(0).toUpperCase()
+                        : ''}
+                    </span>
+                    {displayName}
+                  </span>
+                ) : (
+                  displayName
+                )}
+              </span>
+              <CalibrationData
+                calibrationData={calibrationData}
+                calibratedThisSession={confirmed}
+              />
             </div>
           </div>
         )}
