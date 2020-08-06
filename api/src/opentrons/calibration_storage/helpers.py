@@ -33,23 +33,11 @@ def hash_labware_def(labware_def: 'LabwareDefinition') -> str:
     return sha256(sorted_def_str.encode('utf-8')).hexdigest()
 
 
-def is_uri(key: str) -> bool:
-    uri_split = split_string(key, '/')
-    if len(uri_split) > 1:
-        return True
-    else:
-        return False
-
-
-def split_string(to_split: str, delimiter: str) -> typing.List[str]:
-    return to_split.split(delimiter)
-
-
 def details_from_uri(uri: str, delimiter='/') -> local_types.UriDetails:
     """
     Unpack a labware URI to get the namespace, loadname and version
     """
-    info = split_string(uri, delimiter)
+    info = uri.split(delimiter)
     return local_types.UriDetails(
         namespace=info[0], load_name=info[1], version=int(info[2]))
 

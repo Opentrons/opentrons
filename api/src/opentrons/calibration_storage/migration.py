@@ -1,5 +1,5 @@
 import typing
-from . import file_operators as io, helpers, types as local_types
+from . import file_operators as io, types as local_types
 
 
 def check_index_version(index_path: local_types.StrPath):
@@ -32,22 +32,19 @@ def migrate_index_0_to_1(index_path: local_types.StrPath):
     index_file = io.read_cal_file(str(index_path))
     migrated_file: typing.Dict = {}
     for key, data in index_file.items():
-        if helpers.is_uri(key):
-            uri = key
-            full_hash = data['slot']
-            if data['module']:
-                parent, full_parent = list(data['module'].items())[0]
-                module = {
-                    'parent': parent,
-                    'fullParent': full_parent}
-            else:
-                module = {}
-            migrated_file[full_hash] = {
-                "uri": f'{uri}',
-                "slot": full_hash,
-                "module": module
-                }
+        uri = key
+        full_hash = data['slot']
+        if data['module']:
+            parent, full_parent = list(data['module'].items())[0]
+            module = {
+                'parent': parent,
+                'fullParent': full_parent}
         else:
-            migrated_file[key] = data
+            module = {}
+        migrated_file[full_hash] = {
+            "uri": f'{uri}',
+            "slot": full_hash,
+            "module": module
+            }
     migrated_file['version'] = 1
     io.save_to_file(index_path, migrated_file)
