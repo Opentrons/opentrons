@@ -5,8 +5,8 @@ import type {
   BlowoutParams,
   DispenseParams,
   TouchTipParams,
-  Command,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results
@@ -171,6 +171,26 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
     ...params,
   },
 })
+
+export const delayWithOffset = (well: string): Array<Command> => [
+  {
+    command: 'moveToWell',
+    params: {
+      pipette: DEFAULT_PIPETTE,
+      labware: SOURCE_LABWARE,
+      well,
+      offset: {
+        x: 0,
+        y: 0,
+        z: 14,
+      },
+    },
+  },
+  {
+    command: 'delay',
+    params: { wait: 12 },
+  },
+]
 
 // =================
 

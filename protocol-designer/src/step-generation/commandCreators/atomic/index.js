@@ -12,6 +12,7 @@ import { engageMagnet } from './engageMagnet'
 import { replaceTip } from './replaceTip'
 import { setTemperature } from './setTemperature'
 import { touchTip } from './touchTip'
+import { moveToWell } from './moveToWell'
 
 export {
   aspirate,
@@ -27,4 +28,5 @@ export {
   replaceTip,
   setTemperature,
   touchTip,
+  moveToWell,
 }

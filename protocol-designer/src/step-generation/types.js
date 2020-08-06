@@ -30,6 +30,8 @@ export type InnerMixArgs = {|
   times: number,
 |}
 
+export type InnerDelayArgs = {| seconds: number, mmFromBottom: number |}
+
 type CommonArgs = {|
   /** Optional user-readable name for this step */
   name: ?string,
@@ -58,6 +60,8 @@ export type SharedTransferLikeArgs = {
   touchTipAfterAspirateOffsetMmFromBottom: number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
+  /** Delay after every aspirate */
+  aspirateDelay: ?InnerDelayArgs,
   /** Flow rate in uL/sec for all aspirates */
   aspirateFlowRateUlSec: number,
   /** offset from bottom of well in mm */

@@ -1,22 +1,23 @@
 // @flow
 import {
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  blowoutHelper,
+  DEFAULT_PIPETTE,
+  delayWithOffset,
+  DEST_LABWARE,
+  dropTipHelper,
+  FIXED_TRASH_ID,
+  getErrorResult,
+  getFlowRateAndOffsetParams,
   getRobotInitialStateNoTipsRemain,
   getRobotStateWithTipStandard,
-  makeContext,
   getSuccessResult,
-  getErrorResult,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  FIXED_TRASH_ID,
-  getFlowRateAndOffsetParams,
   makeAspirateHelper,
+  makeContext,
   makeDispenseHelper,
-  blowoutHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
-  dropTipHelper,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  SOURCE_LABWARE,
 } from '../__fixtures__'
 import { distribute } from '../commandCreators/compound/distribute'
 import type { DistributeArgs } from '../types'
@@ -51,6 +52,7 @@ beforeEach(() => {
     disposalLabware: FIXED_TRASH_ID,
     disposalWell: 'A1',
     mixBeforeAspirate: null,
+    aspirateDelay: null,
 
     touchTipAfterDispense: false,
   }
@@ -305,6 +307,37 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
   //     blowoutSingleToTrash,
   //   ])
   // })
+
+  it('delay after aspirate', () => {
+    const distributeArgs: DistributeArgs = {
+      ...mixinArgs,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3', 'A4', 'A5'],
+      changeTip: 'never',
+      volume: 100,
+      aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      // no blowout
+      disposalVolume: 0,
+    }
+
+    const result = distribute(
+      distributeArgs,
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 300),
+      ...delayWithOffset('A1'),
+      dispenseHelper('A2', 100),
+      dispenseHelper('A3', 100),
+      dispenseHelper('A4', 100),
+
+      aspirateHelper('A1', 100),
+      ...delayWithOffset('A1'),
+      dispenseHelper('A5', 100),
+    ])
+  })
 
   it('touch tip after aspirate', () => {
     const distributeArgs: DistributeArgs = {

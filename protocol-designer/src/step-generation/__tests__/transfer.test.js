@@ -1,20 +1,21 @@
 // @flow
 import {
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  DEFAULT_PIPETTE,
+  delayWithOffset,
+  DEST_LABWARE,
+  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  dropTipHelper,
   getErrorResult,
   getFlowRateAndOffsetParams,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
   makeAspirateHelper,
+  makeContext,
   makeDispenseHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
-  dropTipHelper,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  SOURCE_LABWARE,
 } from '../__fixtures__'
 import { transfer } from '../commandCreators/compound/transfer'
 
@@ -40,6 +41,7 @@ beforeEach(() => {
     preWetTip: false,
     touchTipAfterAspirate: false,
     mixBeforeAspirate: null,
+    aspirateDelay: null,
 
     touchTipAfterDispense: false,
     mixInDestination: null,
@@ -506,6 +508,42 @@ describe('advanced options', () => {
 
         ...mixCommands,
         aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
+      ])
+    })
+
+    it('delays after aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        ...delayWithOffset('A1'),
+        dispenseHelper('B1', 300),
+
+        aspirateHelper('A1', 50),
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: DEFAULT_PIPETTE,
+            labware: SOURCE_LABWARE,
+            well: 'A1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 14,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: { wait: 12 },
+        },
         dispenseHelper('B1', 50),
       ])
     })

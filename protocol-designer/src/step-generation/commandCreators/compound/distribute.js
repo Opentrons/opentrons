@@ -4,7 +4,15 @@ import flatMap from 'lodash/flatMap'
 import { getWellsDepth } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { aspirate, dispense, blowout, replaceTip, touchTip } from '../atomic'
+import {
+  aspirate,
+  blowout,
+  delay,
+  dispense,
+  moveToWell,
+  replaceTip,
+  touchTip,
+} from '../atomic'
 import { mixUtil } from './mix'
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import type {
@@ -59,9 +67,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
   // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
   // when we decide to rename these fields/args... probably all the way up to the UI level.
   const {
+    aspirateDelay,
     aspirateFlowRateUlSec,
-    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
+    dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
   } = args
 
@@ -157,6 +166,29 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ]
       }
 
+      const delayAfterAspirateCommands =
+        aspirateDelay != null
+          ? [
+              curryCommandCreator(moveToWell, {
+                pipette: args.pipette,
+                labware: args.sourceLabware,
+                well: args.sourceWell,
+                offset: {
+                  x: 0,
+                  y: 0,
+                  z: aspirateDelay.mmFromBottom,
+                },
+              }),
+              curryCommandCreator(delay, {
+                commandCreatorFnName: 'delay',
+                description: null,
+                name: null,
+                meta: null,
+                wait: aspirateDelay.seconds,
+              }),
+            ]
+          : []
+
       const touchTipAfterAspirateCommand = args.touchTipAfterAspirate
         ? [
             curryCommandCreator(touchTip, {
@@ -193,6 +225,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           flowRate: aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
         }),
+        ...delayAfterAspirateCommands,
         ...touchTipAfterAspirateCommand,
 
         ...dispenseCommands,
