@@ -29,6 +29,7 @@ export type DeckCalibrationStep =
 export type DeckCalibrationInstrument = {|
   model: string,
   name: string,
+  tip_length: number,
   mount: string,
   serial: string,
 |}
@@ -45,4 +46,5 @@ export type DeckCalibrationLabware = {|
 export type DeckCalibrationSessionDetails = {|
   instrument: DeckCalibrationInstrument,
   currentStep: DeckCalibrationStep,
+  labware: Array<DeckCalibrationLabware>,
 |}
