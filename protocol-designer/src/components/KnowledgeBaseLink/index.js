@@ -2,16 +2,16 @@
 import * as React from 'react'
 
 export const KNOWLEDGEBASE_ROOT_URL =
-  'https://intercom.help/opentrons-protocol-designer'
+  'https://support.opentrons.com/en/collections/493886-protocol-designer'
 
 export const links = {
-  multiDispense: `${KNOWLEDGEBASE_ROOT_URL}/building-a-protocol/steps/paths`,
-  protocolSteps: `${KNOWLEDGEBASE_ROOT_URL}/en/collections/1606688-building-a-protocol#steps`,
+  multiDispense: `https://support.opentrons.com/en/articles/4170341-paths`,
+  protocolSteps: `https://support.opentrons.com/en/collections/493886-protocol-designer#building-a-protocol-steps`,
   customLabware: `https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions`,
   recommendedLabware:
-    'https://intercom.help/opentrons-protocol-designer/en/articles/3846942-labware-and-module-compatibility',
+    'https://support.opentrons.com/en/articles/4168748-labware-and-module-compatibility',
   pipetteGen1MultiModuleCollision:
-    'https://intercom.help/opentrons-protocol-designer/en/articles/3846910-module-placement',
+    'https://support.opentrons.com/en/articles/4168741-module-placement',
   betaReleases: `https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases`,
   magneticModuleGenerations:
     'http://support.opentrons.com/en/articles/1820112-magnetic-module',

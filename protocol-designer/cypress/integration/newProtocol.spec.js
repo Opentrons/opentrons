@@ -180,7 +180,7 @@ describe('Desktop Navigation', () => {
           .should('have.prop', 'href')
           .and(
             'equal',
-            'https://intercom.help/opentrons-protocol-designer/en/collections/1606688-building-a-protocol#steps'
+            'https://support.opentrons.com/en/collections/493886-protocol-designer#building-a-protocol-steps'
           )
         // And buttons to get out
         cy.get('button')

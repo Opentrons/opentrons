@@ -1,104 +1,118 @@
-{%- extends "basic/layout.html" %}
-{% set css_files = css_files +  ['_static/new-nav.css'] + ['_static/nav.css'] + ['_static/override_sphinx.css'] + ['_static/banners.css'] %}
-{%- block extrahead %}
-{{ super() }}
-<link rel="stylesheet" href="{{ pathto('_static/custom.css', 1) }}" type="text/css" /> {% if theme_touch_icon %}
-<link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" /> {% endif %} {% if theme_canonical_url %}
-<link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html" /> {% endif %}
-<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+{%- extends "basic/layout.html" %} {% set css_files = css_files +
+['_static/new-nav.css'] + ['_static/nav.css'] + ['_static/override_sphinx.css']
++ ['_static/banners.css'] %} {%- block extrahead %} {{ super() }}
+<link
+  rel="stylesheet"
+  href="{{ pathto('_static/custom.css', 1) }}"
+  type="text/css"
+/>
+{% if theme_touch_icon %}
+<link
+  rel="apple-touch-icon"
+  href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}"
+/>
+{% endif %} {% if theme_canonical_url %}
+<link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html" /> {%
+endif %}
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=0.9, maximum-scale=0.9"
+/>
 <script src="{{ pathto('_static/Akko-Pro-All.js', 1) }}"></script>
 <!-- INTERCOM -->
 <script>
-window.intercomSettings = {
-  app_id: 'ukpodv2l'
-};
+  window.intercomSettings = {
+    app_id: 'ukpodv2l',
+  }
 </script>
 <script>
-(function () {
-  var w = window;
-  var ic = w.Intercom;
-  if (typeof ic === "function") {
-    ic('reattach_activator');
-    ic('update', intercomSettings);
-  } else {
-    var d = document;
-    var i = function() {
-      i.c(arguments)
-    };
-    i.q = [];
-    i.c = function(args) {
-      i.q.push(args)
-    };
-    w.Intercom = i;
-
-    function l () {
-      var s = d.createElement('script');
-      s.type = 'text/javascript';
-      s.async = true;
-      s.src = 'https://widget.intercom.io/widget/ukpodv2l';
-      var x = d.getElementsByTagName('script')[0];
-      x.parentNode.insertBefore(s, x);
-    }
-    if (w.attachEvent) {
-        w.attachEvent('onload', l);
+  ;(function() {
+    var w = window
+    var ic = w.Intercom
+    if (typeof ic === 'function') {
+      ic('reattach_activator')
+      ic('update', intercomSettings)
     } else {
-        w.addEventListener('load', l, false);
+      var d = document
+      var i = function() {
+        i.c(arguments)
+      }
+      i.q = []
+      i.c = function(args) {
+        i.q.push(args)
+      }
+      w.Intercom = i
+
+      function l() {
+        var s = d.createElement('script')
+        s.type = 'text/javascript'
+        s.async = true
+        s.src = 'https://widget.intercom.io/widget/ukpodv2l'
+        var x = d.getElementsByTagName('script')[0]
+        x.parentNode.insertBefore(s, x)
+      }
+      if (w.attachEvent) {
+        w.attachEvent('onload', l)
+      } else {
+        w.addEventListener('load', l, false)
+      }
     }
-  }
-})()
+  })()
 </script>
-{% endblock %} {# Disable base theme's top+bottom related navs; we have our own in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock %} {# Nav should appear before content, not after #} {%- block content %}
+{% endblock %} {# Disable base theme's top+bottom related navs; we have our own
+in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
+%} {# Nav should appear before content, not after #} {%- block content %}
 
 <header id="nav">
   <nav class="docs-navbar">
     <div class="container">
       <div class="container-div"></div>
-    <ul>
-      <li>
-        <a
-          href="https://docs.opentrons.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-gtm-category="g-toolbar"
-          data-gtm-label="opentrons-api"
-          data-gtm-action="click"
-          >Python API</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://labware.opentrons.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-gtm-category="g-toolbar"
-          data-gtm-label="labware-library"
-          data-gtm-action="click"
-          >Labware Library</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://protocols.opentrons.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-gtm-category="g-toolbar"
-          data-gtm-label="protocol-library"
-          data-gtm-action="click"
-          >Protocol Library</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://designer.opentrons.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-gtm-category="g-toolbar"
-          data-gtm-label="protocol-designer"
-          data-gtm-action="click"
-          >Protocol Designer</a
-        >
-      </li>
-    </ul>
+      <ul>
+        <li>
+          <a
+            href="https://docs.opentrons.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="opentrons-api"
+            data-gtm-action="click"
+            >Python API</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://labware.opentrons.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="labware-library"
+            data-gtm-action="click"
+            >Labware Library</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://protocols.opentrons.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="protocol-library"
+            data-gtm-action="click"
+            >Protocol Library</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://designer.opentrons.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="protocol-designer"
+            data-gtm-action="click"
+            >Protocol Designer</a
+          >
+        </li>
+      </ul>
     </div>
   </nav>
   <nav class="navbar">
@@ -119,7 +133,7 @@ window.intercomSettings = {
               class="img-logo"
               src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png"
               alt="Opentrons Home"
-            >
+            />
           </a>
         </div>
         <div class="schedule-menu mobile-schedule-menu">
@@ -132,7 +146,8 @@ window.intercomSettings = {
               data-gtm-category="d-header"
               data-gtm-label="contact-sales"
               data-gtm-action="click"
-            >Contact sales</a>
+              >Contact sales</a
+            >
           </div>
           <div class="mobile-hamburger">
             <div id="nav-collapse" onclick="toggleOpen()">
@@ -156,7 +171,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="about"
                   data-gtm-action="click"
-                >Mission</a>
+                  >Mission</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -166,7 +182,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="team"
                   data-gtm-action="click"
-                >Our Team</a>
+                  >Our Team</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -174,7 +191,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="blog"
                   data-gtm-action="click"
-                >Blog</a>
+                  >Blog</a
+                >
               </li>
             </ul>
           </li>
@@ -189,7 +207,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="ot-2"
                   data-gtm-action="click"
-                >OT-2 Robot</a>
+                  >OT-2 Robot</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -199,7 +218,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="modules"
                   data-gtm-action="click"
-                >OT-2 Add-ons</a>
+                  >OT-2 Add-ons</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -209,7 +229,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="ot-2-pipettes"
                   data-gtm-action="click"
-                >OT-2 Pipettes</a>
+                  >OT-2 Pipettes</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -219,7 +240,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="tips"
                   data-gtm-action="click"
-                >Pipette Tips</a>
+                  >Pipette Tips</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -229,7 +251,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="tube-racks"
                   data-gtm-action="click"
-                >Racks &amp; Adapters</a>
+                  >Racks &amp; Adapters</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -239,7 +262,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="reagents"
                   data-gtm-action="click"
-                >Reagents</a>
+                  >Reagents</a
+                >
               </li>
               <a
                 onclick="closeMenu()"
@@ -250,7 +274,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="all-products"
                 data-gtm-action="click"
-              >Shop all products ›</a>
+                >Shop all products ›</a
+              >
             </ul>
           </li>
           <li class="main-menu-li" onclick="toggleMenu(`applications`)">
@@ -264,7 +289,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="prep"
                   data-gtm-action="click"
-                >PCR Sample Prep</a>
+                  >PCR Sample Prep</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -274,7 +300,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="nap"
                   data-gtm-action="click"
-                >Nucelic Acid Purification</a>
+                  >Nucelic Acid Purification</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -284,7 +311,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="qpcr"
                   data-gtm-action="click"
-                >qPCR/RT-PCR</a>
+                  >qPCR/RT-PCR</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -294,7 +322,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="elisa"
                   data-gtm-action="click"
-                >ELISA</a>
+                  >ELISA</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -304,7 +333,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="ngs-prep"
                   data-gtm-action="click"
-                >NGS Library Prep</a>
+                  >NGS Library Prep</a
+                >
               </li>
               <li onclick="closeMenu()">
                 <a
@@ -314,7 +344,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="basic"
                   data-gtm-action="click"
-                >Basic Pipetting</a>
+                  >Basic Pipetting</a
+                >
               </li>
             </ul>
           </li>
@@ -331,8 +362,11 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="protocol-tools"
                       data-gtm-action="click"
-                    >Protocol Options</a>
-                    <span>Gain an overview of our protocol creation options</span>
+                      >Protocol Options</a
+                    >
+                    <span
+                      >Gain an overview of our protocol creation options</span
+                    >
                   </li>
                   <li onclick="closeMenu()">
                     <a
@@ -342,10 +376,10 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="protocol-designer"
                       data-gtm-action="click"
-                    >Protocol Designer</a>
+                      >Protocol Designer</a
+                    >
                     <span>
-                      Use our graphical user interface to design
-                      protocols
+                      Use our graphical user interface to design protocols
                     </span>
                   </li>
                   <li class="protocol-bottom" onclick="closeMenu()">
@@ -356,7 +390,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="protocol-library"
                       data-gtm-action="click"
-                    >Protocol Library</a>
+                      >Protocol Library</a
+                    >
                     <span>Explore our open source database of protocols</span>
                   </li>
                 </div>
@@ -369,7 +404,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="opentrons-api"
                       data-gtm-action="click"
-                    >Python API</a>
+                      >Python API</a
+                    >
                     <span class="protocol-items-span">
                       Maximum customization for anyone with python and basic
                       wetlab skills
@@ -383,8 +419,11 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="github-protocols"
                       data-gtm-action="click"
-                    >Github</a>
-                    <span class="protocol-items-span">Contribute to open source protocol repository</span>
+                      >Github</a
+                    >
+                    <span class="protocol-items-span"
+                      >Contribute to open source protocol repository</span
+                    >
                   </li>
                 </div>
               </div>
@@ -397,7 +436,8 @@ window.intercomSettings = {
                   data-gtm-category="d-header"
                   data-gtm-label="request-protocol-protocols"
                   data-gtm-action="click"
-                >Request a free custom protocol ›</a>
+                  >Request a free custom protocol ›</a
+                >
               </div>
             </ul>
           </li>
@@ -416,7 +456,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="start-guide"
                       data-gtm-action="click"
-                    >OT-2 Start Guide</a>
+                      >OT-2 Start Guide</a
+                    >
                     <span>You recieved your robot, here's what's next</span>
                   </li>
                   <li onclick="closeMenu()">
@@ -427,7 +468,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="product-help"
                       data-gtm-action="click"
-                    >Product Help</a>
+                      >Product Help</a
+                    >
                     <span>Answer common technical questions</span>
                   </li>
                   <li onclick="closeMenu()" class="github">
@@ -438,7 +480,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="github-support"
                       data-gtm-action="click"
-                    >Github</a>
+                      >Github</a
+                    >
                     <span>Contribute to open source protocol repository</span>
                   </li>
                 </div>
@@ -450,12 +493,15 @@ window.intercomSettings = {
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
-                      href="https://intercom.help/opentrons-protocol-designer/intro/opentrons-standard-labware"
+                      href="https://support.opentrons.com/en/articles/4168651-opentrons-standard-labware"
                       data-gtm-category="d-header"
                       data-gtm-label="labware-library"
                       data-gtm-action="click"
-                    >Labware Library</a>
-                    <span>Understand what labware is compatible with the OT-2</span>
+                      >Labware Library</a
+                    >
+                    <span
+                      >Understand what labware is compatible with the OT-2</span
+                    >
                   </li>
                   <li onclick="closeMenu()">
                     <a
@@ -465,7 +511,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="ot-app"
                       data-gtm-action="click"
-                    >Install the app</a>
+                      >Install the app</a
+                    >
                   </li>
                   <a
                     target="_blank"
@@ -475,7 +522,8 @@ window.intercomSettings = {
                     data-gtm-category="d-header"
                     data-gtm-label="contact-support"
                     data-gtm-action="click"
-                  >Contact support ›</a>
+                    >Contact support ›</a
+                  >
                 </div>
                 <!-- <div class="number">718-999-9999</div> -->
               </div>
@@ -490,7 +538,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="shop"
                       data-gtm-action="click"
-                    >Order online</a>
+                      >Order online</a
+                    >
                   </li>
                   <a
                     target="_blank"
@@ -500,7 +549,8 @@ window.intercomSettings = {
                     data-gtm-category="d-header"
                     data-gtm-label="contact-sales"
                     data-gtm-action="click"
-                  >Contact sales ›</a>
+                    >Contact sales ›</a
+                  >
                 </div>
                 <a
                   target="_blank"
@@ -510,7 +560,8 @@ window.intercomSettings = {
                   data-gtm-action="click"
                   class="btn schedule-demo"
                   href="https://opentrons.com/demo"
-                >Schedule a demo ›</a>
+                  >Schedule a demo ›</a
+                >
                 <!-- <div class="number">718-999-9999</div> -->
               </div>
             </ul>
@@ -526,7 +577,8 @@ window.intercomSettings = {
               data-gtm-category="d-header"
               data-gtm-label="contact-sales-primary"
               data-gtm-action="click"
-            >Contact Sales</a>
+              >Contact Sales</a
+            >
           </div>
         </div>
       </div>
@@ -548,12 +600,16 @@ window.intercomSettings = {
               data-gtm-category="d-header"
               data-gtm-label="contact-sales-primary"
               data-gtm-action="click"
-            >Contact Sales</a>
+              >Contact Sales</a
+            >
           </div>
         </div>
         <div class="sub-menu about sub-menu-about">
           <div class="sub-menu-div" onclick="closeMenu()">
-            <img src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg" alt>
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
             <span>About</span>
           </div>
           <ul>
@@ -565,7 +621,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="about"
                 data-gtm-action="click"
-              >Mission ›</a>
+                >Mission ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -575,7 +632,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="team"
                 data-gtm-action="click"
-              >Our Team ›</a>
+                >Our Team ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -583,13 +641,17 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="blog"
                 data-gtm-action="click"
-              >Blog ›</a>
+                >Blog ›</a
+              >
             </li>
           </ul>
         </div>
         <div class="sub-menu products sub-menu-products">
           <div class="sub-menu-div" onclick="closeMenu()">
-            <img src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg" alt>
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
             <span>Products</span>
           </div>
           <ul>
@@ -601,7 +663,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="ot-2"
                 data-gtm-action="click"
-              >OT-2 Robot ›</a>
+                >OT-2 Robot ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -611,7 +674,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="modules"
                 data-gtm-action="click"
-              >OT-2 Add-ons ›</a>
+                >OT-2 Add-ons ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -621,7 +685,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="ot-2-pipettes"
                 data-gtm-action="click"
-              >OT-2 Pipettes ›</a>
+                >OT-2 Pipettes ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -631,7 +696,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="tips"
                 data-gtm-action="click"
-              >Pipette Tips ›</a>
+                >Pipette Tips ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -641,7 +707,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="tube-racks"
                 data-gtm-action="click"
-              >Racks &amp; Adapters ›</a>
+                >Racks &amp; Adapters ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -651,7 +718,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="reagents"
                 data-gtm-action="click"
-              >Reagents ›</a>
+                >Reagents ›</a
+              >
             </li>
             <li class="blue" onclick="close()">
               <a
@@ -663,15 +731,17 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="all-products"
                 data-gtm-action="click"
-              >Shop all products ›</a>
+                >Shop all products ›</a
+              >
             </li>
           </ul>
         </div>
-        <div
-          class="sub-menu applications sub-menu-applications"
-        >
+        <div class="sub-menu applications sub-menu-applications">
           <div class="sub-menu-div" onclick="closeMenu()">
-            <img src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg" alt>
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
             <span>Applications</span>
           </div>
           <ul>
@@ -683,7 +753,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="prep"
                 data-gtm-action="click"
-              >PCR Sample Prep ›</a>
+                >PCR Sample Prep ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -693,7 +764,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="nap"
                 data-gtm-action="click"
-              >Nucelic Acid Purification ›</a>
+                >Nucelic Acid Purification ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -703,7 +775,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="qpcr"
                 data-gtm-action="click"
-              >qPCR/RT-PCR ›</a>
+                >qPCR/RT-PCR ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -713,7 +786,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="elisa"
                 data-gtm-action="click"
-              >ELISA ›</a>
+                >ELISA ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -723,7 +797,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="ngs-prep"
                 data-gtm-action="click"
-              >NGS Library Prep ›</a>
+                >NGS Library Prep ›</a
+              >
             </li>
             <li onclick="close()">
               <a
@@ -733,13 +808,17 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="basic"
                 data-gtm-action="click"
-              >Basic Pipetting ›</a>
+                >Basic Pipetting ›</a
+              >
             </li>
           </ul>
         </div>
         <div class="sub-menu protocols sub-menu-protocols">
           <div class="sub-menu-div" onclick="closeMenu()">
-            <img src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg" alt>
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
             <span>Protocols</span>
           </div>
           <ul>
@@ -751,7 +830,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="protocol-tools"
                 data-gtm-action="click"
-              >Protocol Options ›</a>
+                >Protocol Options ›</a
+              >
               <span>Gain an overview of our protocol creation options</span>
             </li>
             <li onclick="close()">
@@ -762,7 +842,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="protocol-designer"
                 data-gtm-action="click"
-              >Protocol Designer ›</a>
+                >Protocol Designer ›</a
+              >
               <span>Use our graphical user interface to design protocols</span>
             </li>
             <li onclick="close()">
@@ -773,7 +854,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="protocol-library"
                 data-gtm-action="click"
-              >Protocol Library ›</a>
+                >Protocol Library ›</a
+              >
               <span>Explore our open source database of protocols</span>
             </li>
             <li onclick="close()">
@@ -784,7 +866,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="opentrons-api"
                 data-gtm-action="click"
-              >Python API ›</a>
+                >Python API ›</a
+              >
               <span>
                 Maximum customization for anyone with python and basic weblab
                 skills
@@ -798,7 +881,8 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="github-protocols"
                 data-gtm-action="click"
-              >Github ›</a>
+                >Github ›</a
+              >
               <span>Contribute to open source protocol repository</span>
             </li>
             <li onclick="close()">
@@ -810,13 +894,17 @@ window.intercomSettings = {
                 data-gtm-category="d-header"
                 data-gtm-label="request-protocol-protocols"
                 data-gtm-action="click"
-              >Request a free custom protocol ›</a>
+                >Request a free custom protocol ›</a
+              >
             </li>
           </ul>
         </div>
         <div class="sub-menu sns sub-menu-sns">
           <div class="sub-menu-div" onclick="closeMenu()">
-            <img src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg" alt>
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
             <span>Support &amp; Sales</span>
           </div>
           <ul class="sns-ul">
@@ -834,7 +922,8 @@ window.intercomSettings = {
                       data-gtm-label="shop"
                       data-gtm-action="click"
                       class="order-line-mobile"
-                    >Order online ›</a>
+                      >Order online ›</a
+                    >
                   </div>
                 </section>
               </li>
@@ -850,7 +939,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="contact-sales"
                       data-gtm-action="click"
-                    >Contact sales ›</a>
+                      >Contact sales ›</a
+                    >
                   </div>
                 </section>
               </li>
@@ -883,8 +973,11 @@ window.intercomSettings = {
                       data-gtm-label="start-guide"
                       data-gtm-action="click"
                       class="ot-2-guide"
-                    >OT-2 Start Guide ›</a>
-                    <span class="ot-2-guide">You received your robot, here's what's next</span>
+                      >OT-2 Start Guide ›</a
+                    >
+                    <span class="ot-2-guide"
+                      >You received your robot, here's what's next</span
+                    >
                   </div>
                 </section>
               </li>
@@ -899,7 +992,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="product-help"
                       data-gtm-action="click"
-                    >Product Help ›</a>
+                      >Product Help ›</a
+                    >
                     <span>Answer common technical questions</span>
                   </div>
                 </section>
@@ -915,7 +1009,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="github-support"
                       data-gtm-action="click"
-                    >Github ›</a>
+                      >Github ›</a
+                    >
                     <span>Contribute to open source protocol repository</span>
                   </div>
                 </section>
@@ -927,12 +1022,15 @@ window.intercomSettings = {
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
-                      href="https://intercom.help/opentrons-protocol-designer/intro/opentrons-standard-labware"
+                      href="https://support.opentrons.com/en/articles/4168651-opentrons-standard-labware"
                       data-gtm-category="d-header"
                       data-gtm-label="labware-library"
                       data-gtm-action="click"
-                    >Labware Library ›</a>
-                    <span>Understand what labware is compatible with the OT-2</span>
+                      >Labware Library ›</a
+                    >
+                    <span
+                      >Understand what labware is compatible with the OT-2</span
+                    >
                   </div>
                 </section>
               </li>
@@ -947,7 +1045,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="ot-app"
                       data-gtm-action="click"
-                    >Install the app ›</a>
+                      >Install the app ›</a
+                    >
                   </div>
                 </section>
               </li>
@@ -963,7 +1062,8 @@ window.intercomSettings = {
                       data-gtm-category="d-header"
                       data-gtm-label="contact-support"
                       data-gtm-action="click"
-                    >Contact support ›</a>
+                      >Contact support ›</a
+                    >
                   </div>
                 </section>
               </li>
@@ -977,117 +1077,199 @@ window.intercomSettings = {
 
 {%- if theme_fixed_sidebar|lower == 'true' %}
 <div class="document">
-    {{ sidebar() }} {%- block document %}
-    <div class="documentwrapper">
-        {%- if render_sidebar %}
-        <div class="bodywrapper">
-            {%- endif %}
-            <div class="body" role="main">
-                {% if pagename == 'index' %}
-                  <div class="banner_wrapper banner_v1">
-                    <div class="heading_group">
-                      <h2 id="heading_2">We thought you’d like to know…</h2>
-                      <h4 id="heading_4">The documentation you are viewing is for version 1 of the OT-2 Python Protocol API. While this older version will still be supported, we encourage you to use <a href="../v2/index.html">version 2</a> of the API to ensure you are leveraging all of the most up to date capabilities.</h4>
-                    </div>
-                  </div>
-                  {% else %}
-                  <div class="banner_wrapper banner_v1" >
-                      <p> You are currently viewing the documentation for version 1 of the Opentrons OT-2 Python Protocol API. To view documentation for version 2 of the API, <a href="../v2/index.html">click here</a>.
-                      </p>
-                  </div>
-                  {%- endif %}
-                {% block body %}{% endblock %}
-            </div>
-            {%- if render_sidebar %}
+  {{ sidebar() }} {%- block document %}
+  <div class="documentwrapper">
+    {%- if render_sidebar %}
+    <div class="bodywrapper">
+      {%- endif %}
+      <div class="body" role="main">
+        {% if pagename == 'index' %}
+        <div class="banner_wrapper banner_v1">
+          <div class="heading_group">
+            <h2 id="heading_2">We thought you’d like to know…</h2>
+            <h4 id="heading_4">
+              The documentation you are viewing is for version 1 of the OT-2
+              Python Protocol API. While this older version will still be
+              supported, we encourage you to use
+              <a href="../v2/index.html">version 2</a> of the API to ensure you
+              are leveraging all of the most up to date capabilities.
+            </h4>
+          </div>
         </div>
-        {%- endif %}
+        {% else %}
+        <div class="banner_wrapper banner_v1">
+          <p>
+            You are currently viewing the documentation for version 1 of the
+            Opentrons OT-2 Python Protocol API. To view documentation for
+            version 2 of the API, <a href="../v2/index.html">click here</a>.
+          </p>
+        </div>
+        {%- endif %} {% block body %}{% endblock %}
+      </div>
+      {%- if render_sidebar %}
     </div>
-    {%- endblock %}
-    <div class="clearer"></div>
+    {%- endif %}
+  </div>
+  {%- endblock %}
+  <div class="clearer"></div>
 </div>
 {%- else %} {{ super() }} {%- endif %} {%- endblock %} {%- block footer %}
 <footer>
   <div class="wrapper">
-
     <section class="social-signup">
       <div class="social-links">
-        <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"
-        ga-on="click"
-        ga-event-category="Social"
-        ga-event-action="Open Facebook"
-        ><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo"/></a>
-        <a href="https://twitter.com/OpenTrons_" target="_blank"
-        ga-on="click"
-        ga-event-category="Social"
-        ga-event-action="Open Twitter"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
-        <a href="https://www.instagram.com/opentronslab/" target="_blank"
-        ga-on="click"
-        ga-event-category="Social"
-        ga-event-action="Open Instagram"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
-        <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"
-        ga-on="click"
-        ga-event-category="Social"
-        ga-event-action="Open Youtube"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+        <a
+          href="https://www.facebook.com/OpenTrons-Labworks/"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Facebook"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png"
+            alt="facebook logo"
+        /></a>
+        <a
+          href="https://twitter.com/OpenTrons_"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Twitter"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png"
+            alt="twitter logo"
+        /></a>
+        <a
+          href="https://www.instagram.com/opentronslab/"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Instagram"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png"
+            alt="instagram logo"
+        /></a>
+        <a
+          href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Youtube"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png"
+            alt="youtube logo"
+        /></a>
       </div>
       <h3>Sign Up For Our Newsletter</h3>
       <div id="mc_embed_signup">
-        <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <form
+          action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c"
+          method="post"
+          id="mc-embedded-subscribe-form"
+          name="mc-embedded-subscribe-form"
+          class="validate"
+          target="_blank"
+          novalidate
+        >
           <div id="mc_embed_signup_scroll">
-            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required
-            ga-on="input"
-            ga-event-category="Mailchimp"
-            ga-event-action="Enter Email"
-            >
-            <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value=""></div>
-            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe"
-            ga-on="click"
-            ga-event-category="Mailchimp"
-            ga-event-action="Newsletter Signup">
+            <input
+              type="email"
+              value=""
+              name="EMAIL"
+              class="email-newsletter"
+              id="mce-EMAIL"
+              placeholder="email address"
+              required
+              ga-on="input"
+              ga-event-category="Mailchimp"
+              ga-event-action="Enter Email"
+            />
+            <div style="position: absolute; left: -5000px;" aria-hidden="true">
+              <input
+                type="text"
+                name="b_000595683fb96c5fb3c54cf53_ba66060a9c"
+                tabindex="-1"
+                value=""
+              />
+            </div>
+            <input
+              type="submit"
+              value="Subscribe"
+              name="subscribe"
+              id="mc-embedded-subscribe"
+              class="gray subscribe"
+              ga-on="click"
+              ga-event-category="Mailchimp"
+              ga-event-action="Newsletter Signup"
+            />
           </div>
         </form>
       </div>
-      <p class="copyrite">&#169;&nbsp;OPENTRONS <script type="text/javascript">document.write(new Date().getFullYear())</script></p>
+      <p class="copyrite">
+        &#169;&nbsp;OPENTRONS
+        <script type="text/javascript">
+          document.write(new Date().getFullYear())
+        </script>
+      </p>
     </section>
     <section class="footer-menu">
       <ul>
         <li>Products</li>
-        <li><a href="https://opentrons.com/robots" >OT-One</a></li>
-        <li><a href="https://opentrons.com/ot-2" >OT-2</a></li>
-        <li><a href="https://opentrons.com/pipettes" >OT-2 Pipettes</a></li>
-        <li><a href="https://opentrons.com/modules" >Modules</a></li>
-        <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
-        <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+        <li><a href="https://opentrons.com/robots">OT-One</a></li>
+        <li><a href="https://opentrons.com/ot-2">OT-2</a></li>
+        <li><a href="https://opentrons.com/pipettes">OT-2 Pipettes</a></li>
+        <li><a href="https://opentrons.com/modules">Modules</a></li>
+        <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+        <li>
+          <a href="https://protocols.opentrons.com/" target="_blank"
+            >Protocol Library</a
+          >
+        </li>
       </ul>
       <ul>
         <li>Company</li>
-        <li><a href="https://opentrons.com/about" >About</a></li>
-        <li><a href="https://opentrons.com/team" >Team</a></li>
+        <li><a href="https://opentrons.com/about">About</a></li>
+        <li><a href="https://opentrons.com/team">Team</a></li>
         <li><a href="https://blog.opentrons.com/">Blog</a></li>
-        <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
-        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">WE'RE HIRING</a></li>
+        <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+        <li>
+          <a href="https://opentrons.com/jobs" target="_blank" class="hiring"
+            >WE'RE HIRING</a
+          >
+        </li>
       </ul>
       <ul>
         <li>Resources</li>
-        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
-          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
-          <li><a href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md" target="_blank">Open Source</a></li>
+        <li>
+          <a href="https://support.opentrons.com" target="_blank">Support</a>
+        </li>
+        <li>
+          <a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md"
+            target="_blank"
+            >Open Source</a
+          >
+        </li>
       </ul>
       <ul>
         <li><a href="https://shop.opentrons.com/" class="buy">Buy</a></li>
       </ul>
-
     </section>
-
   </div>
 </footer>
 <script>
-
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-WCDX9CX');
-
+  ;(function(w, d, s, l, i) {
+    w[l] = w[l] || []
+    w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s),
+      dl = l != 'dataLayer' ? '&l=' + l : ''
+    j.async = true
+    j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+    f.parentNode.insertBefore(j, f)
+  })(window, document, 'script', 'dataLayer', 'GTM-WCDX9CX')
 </script>
 <script>
   function toggleMenu(menu) {
@@ -1131,7 +1313,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       mobileMenu.classList.add('dnone')
     }
     subMenu.forEach(e => {
-      if(e.classList.contains('showmenu')) {
+      if (e.classList.contains('showmenu')) {
         e.classList.remove('showmenu')
       }
     })
@@ -1161,14 +1343,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       close()
     }
   })
-
-  </script>
-
+</script>
 
 {% if theme_github_banner|lower != 'false' %}
-<a href="https://github.com/{{ theme_github_user }}/{{ theme_github_repo }}" class="github">
-    <img style="position: absolute; top: 0; right: 0; border: 0;" src="{{ pathto('_static/' ~ theme_github_banner, 1) if theme_github_banner|lower != 'true' else 'https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png' }}" alt="Fork me on GitHub" class="github" />
+<a
+  href="https://github.com/{{ theme_github_user }}/{{ theme_github_repo }}"
+  class="github"
+>
+  <img
+    style="position: absolute; top: 0; right: 0; border: 0;"
+    src="{{ pathto('_static/' ~ theme_github_banner, 1) if theme_github_banner|lower != 'true' else 'https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png' }}"
+    alt="Fork me on GitHub"
+    class="github"
+  />
 </a>
-{% endif %} {% if theme_analytics_id %}
-
-{% endif %} {%- endblock %}
+{% endif %} {% if theme_analytics_id %} {% endif %} {%- endblock %}
