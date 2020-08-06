@@ -9,11 +9,11 @@ For example, the complex command ``transfer`` (see :ref:`v2-complex-commands`) e
 
 The examples in this section would be added to the following:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.6'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -36,13 +36,13 @@ Pick Up Tip
 
 Before any liquid handling can be done, your pipette must have a tip on it. The command :py:meth:`.InstrumentContext.pick_up_tip` will move the pipette over to the specified tip, then press down into it to create a vacuum seal. The below example picks up the tip at location ``'A1'`` of the tiprack previously loaded in slot 3.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    pipette.pick_up_tip(tiprack['A1'])
 
 If you have associated a tiprack with your pipette such as in the :ref:`new-pipette` or :ref:`protocol_api-protocols-and-instruments` sections, then you can simply call
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.pick_up_tip()
 
@@ -56,7 +56,7 @@ Drop Tip
 Once finished with a tip, the pipette will remove the tip when we call :py:meth:`.InstrumentContext.drop_tip`. You can specify where to drop the tip by passing in a location. The below example drops the tip back at its original location on the tip rack.
 If no location is specified, the OT-2 will drop the tip in the fixed trash in slot 12 of the deck.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.pick_up_tip()
     pipette.drop_tip(tiprack['A1'])  # drop back in A1 of the tiprack
@@ -73,7 +73,7 @@ Return Tip
 
 To return the tip to the original location, you can call :py:meth:`.InstrumentContext.return_tip`. The example below will automatically return the tip to ``'A3'`` on the tip rack.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.pick_up_tip(tiprack['A3'])
     pipette.return_tip()
@@ -86,7 +86,7 @@ To return the tip to the original location, you can call :py:meth:`.InstrumentCo
 
 In API version 2.2 or above:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     tip_rack = protocol.load_labware(
             'opentrons_96_tiprack_300ul', 1)
@@ -99,7 +99,7 @@ In API version 2.2 or above:
 
 In API version 2.0 and 2.1:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     tip_rack = protocol.load_labware(
             'opentrons_96_tiprack_300ul', 1)
@@ -115,11 +115,11 @@ Iterating Through Tips
 
 For this section, instead of using the protocol defined above, consider this setup:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -135,7 +135,7 @@ This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_we
 
 When a list of tip racks is associated with a pipette in its ``tip_racks`` argument, the pipette will automatically pick up the next unused tip in the list whenever you call :py:meth:`.InstrumentContext.pick_up_tip`. The pipette will first use all tips in the first tiprack, then move on to the second, and so on:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.pick_up_tip()  # picks up tip_rack_1:A1
     pipette.return_tip()
@@ -150,14 +150,14 @@ When a list of tip racks is associated with a pipette in its ``tip_racks`` argum
 
 If you try to :py:meth:`.InstrumentContext.pick_up_tip()` again when all the tips have been used, the Protocol API will show you an error:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     # this will raise an exception if run after the previous code block
     pipette.pick_up_tip()
 
 To change the location of the first tip used by the pipette, you can use :py:obj:`.InstrumentContext.starting_tip`:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.starting_tip = tip_rack_1.well('C3')
     pipette.pick_up_tip()  # pick up C3 from "tip_rack_1"
@@ -165,7 +165,7 @@ To change the location of the first tip used by the pipette, you can use :py:obj
 
 To reset the tip tracking, you can call :py:meth:`.InstrumentContext.reset_tipracks`:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     # Use up all tips
     for _ in range(96+96):
@@ -191,9 +191,9 @@ This section describes the :py:class:`.InstrumentContext` 's liquid-handling com
 
 The examples in this section should be inserted in the following:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -213,7 +213,7 @@ Aspirate
 
 To aspirate is to pull liquid up into the pipette's tip. When calling :py:meth:`.InstrumentContext.aspirate` on a pipette, you can specify the volume to aspirate in µL, where to aspirate from, and how fast to aspirate liquid.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.aspirate(50, plate['A1'], rate=2.0)  # aspirate 50uL from plate:A1
 
@@ -225,7 +225,7 @@ The ``rate`` parameter is a multiplication factor of the pipette's default aspir
 
 You can also simply specify the volume to aspirate, and not mention a location. The pipette will aspirate from its current location (which we previously set as ``plate['A1'])``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.aspirate(50)                     # aspirate 50uL from current position
 
@@ -252,7 +252,7 @@ Dispense
 
 To dispense is to push out liquid from the pipette's tip. The usage of :py:meth:`.InstrumentContext.dispense` in the Protocol API is similar to :py:meth:`.InstrumentContext.aspirate`, in that you can specify volume in µL and location, or only volume.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.dispense(50, plate['B1'], rate=2.0) # dispense 50uL to plate:B1 at twice the normal rate
     pipette.dispense(50)              # dispense 50uL to current position at the normal rate
@@ -287,7 +287,7 @@ To blow out is to push an extra amount of air through the pipette's tip, to make
 
 When calling :py:meth:`.InstrumentContext.blow_out`, you can specify a location to blow out the remaining liquid. If no location is specified, the pipette will blow out from its current position.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.blow_out()            # blow out in current location
     pipette.blow_out(plate['B3']) # blow out in current plate:B3
@@ -306,7 +306,7 @@ When calling :py:meth:`.InstrumentContext.touch_tip` on a pipette, you have the 
 
 :py:meth:`.InstrumentContext.touch_tip` can take up to 4 arguments: ``touch_tip(location, radius, v_offset, speed)``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.touch_tip()            # touch tip within current location
     pipette.touch_tip(v_offset=-2) # touch tip 2mm below the top of the current location
@@ -337,7 +337,7 @@ To mix is to perform a series of ``aspirate`` and ``dispense`` commands in a row
 
 The ``mix`` command takes up to three arguments: ``mix(repetitions, volume, location)``:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     # mix 4 times, 100uL, in plate:A2
     pipette.mix(4, 100, plate.['A2'])
@@ -359,7 +359,7 @@ Air Gap
 
 When dealing with certain liquids, you may need to aspirate air after aspirating the liquid to prevent it from sliding out of the pipette's tip. A call to :py:meth:`.InstrumentContext.air_gap` with a volume in µL will aspirate that much air into the tip. ``air_gap`` takes up to two arguments: ``air_gap(volume, height)``:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.aspirate(100, plate['B4'])
     pipette.air_gap(20)
@@ -382,7 +382,7 @@ You can use :py:meth:`.InstrumentContext.move_to` to move a pipette to any locat
 
 For example, you can move to the first tip in your tip rack:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.move_to(tiprack['A1'].top())
 
@@ -391,7 +391,7 @@ Unlike commands that require labware, like :ref:`new-aspirate` or :ref:`new-disp
 
 You can also specify at what height you would like the robot to move to inside of a location using :py:meth:`.Well.top` and :py:meth:`.Well.bottom` methods on that location (more on these methods and others like them in the :ref:`v2-location-within-wells` section):
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.move_to(plate['A1'].bottom())  # move to the bottom of well A1
     pipette.move_to(plate['A1'].top())     # move to the top of well A1
@@ -401,7 +401,7 @@ You can also specify at what height you would like the robot to move to inside o
 The above commands will cause the robot's head to first move upwards, then over to above the target location, then finally downwards until the target location is reached.
 If instead you would like the robot to move in a straight line to the target location, you can set the movement strategy to ``'direct'``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.move_to(plate['A1'].top(), force_direct=True)
 
@@ -411,7 +411,7 @@ If instead you would like the robot to move in a straight line to the target loc
 
 Usually the above option is useful when moving inside of a well. Take a look at the below sequence of movements, which first move the head to a well, and use 'direct' movements inside that well, then finally move on to a different well.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     pipette.move_to(plate['A1'].top())
     pipette.move_to(plate['A1'].bottom(1), force_direct=True)
@@ -428,7 +428,7 @@ Sometimes you need to pause your protocol, for instance to wait for something to
 
 The value passed into ``delay()`` is the number of minutes or seconds the OT-2 will wait until moving on to the next command.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     protocol.delay(seconds=2)             # pause for 2 seconds
     protocol.delay(minutes=5)             # pause for 5 minutes
@@ -441,11 +441,11 @@ The method :py:meth:`.ProtocolContext.pause` will pause protocol execution at a 
 You can resume by pressing 'resume' in your Opentrons App. You can optionally specify a message that
 will be displayed in the Opentrons App when protocol execution pauses.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # The start of your protocol goes here...
@@ -472,11 +472,11 @@ To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentCon
 
 None of these functions take any arguments:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
@@ -493,11 +493,11 @@ Comment
 The method :py:meth:`.ProtocolContext.comment` lets you display messages in the Opentrons App during protocol execution:
 
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         protocol.comment('Hello, world!')
@@ -511,11 +511,11 @@ Control and Monitor Robot Rail Lights
 You can turn the robot rail lights on or off in the protocol using :py:meth:`.ProtocolContext.set_rail_lights`:
 
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.6'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # turn on robot rail lights
@@ -530,7 +530,7 @@ You can turn the robot rail lights on or off in the protocol using :py:meth:`.Pr
 You can also check whether the rail lights are on or off in the protocol using :py:obj:`.ProtocolContext.rail_lights_on`:
 
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     protocol.rail_lights_on  # returns True when the lights are on,
                              # False when the lights are off
@@ -548,7 +548,7 @@ The door safety switch feature flag has been added to the OT-2 software since th
 You can also check whether or not the robot door is closed at a specific point in time in the protocol using :py:obj:`.ProtocolContext.door_closed`:
 
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     protocol.door_closed  # return True when the door is closed,
                           # False when the door is open

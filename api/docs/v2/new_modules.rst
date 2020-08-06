@@ -19,11 +19,11 @@ Like labware and pipettes, you must inform the Protocol API of the modules you w
 
 Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an object representing the module.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
          # Load a Magnetic Module GEN2 in deck slot 1.
@@ -104,11 +104,11 @@ Loading Labware Onto Your Module
 
 Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded. You do this using :py:meth:`.ModuleContext.load_labware`. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
          module = protocol.load_module('Temperature Module', slot)
@@ -152,11 +152,11 @@ Temperature Modules are represented in code by :py:class:`.TemperatureModuleCont
 The Temperature Module has the following methods that can be accessed during a protocol. For the purposes of this
 section, assume we have the following already:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         temp_mod = protocol.load_module('temperature module', '1')
@@ -170,7 +170,7 @@ Set Temperature
 
 To set the Temperature Module to 4 °C do the following:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     temp_mod.set_temperature(4)
 
@@ -187,7 +187,7 @@ Read the Current Temperature
 
 You can read the current real-time temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.temperature` property:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     temp_mod.temperature
 
@@ -198,7 +198,7 @@ Read the Target Temperature
 
 You can read the current target temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.target` property:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     temp_mod.target
 
@@ -209,7 +209,7 @@ Check the Status
 
 The :py:obj:`.TemperatureModuleContext.status` property is a string that is one of  ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     temp_mod.status
 
@@ -218,7 +218,7 @@ Deactivate
 
 This function will stop heating or cooling and will turn off the fan on the Temperature Module.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     temp_mod.deactivate()
 
@@ -243,11 +243,11 @@ The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` objec
 
 For the purposes of this section, assume we have the following already:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         mag_mod = protocol.load_module('magnetic module', '1')
@@ -265,7 +265,7 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
 
 - If neither ``height_from_base``, ``height`` nor ``offset`` is specified **and** the labware is supported on the Magnetic Module, the magnets will raise to a reasonable default height based on the specified labware.
 
-  .. code-block:: python
+  .. substitution-code-block:: python
 
       mag_mod.engage()
 
@@ -273,7 +273,7 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
 
 - The recommended way to specify the magnets' position is to utilize the ``height_from_base`` parameter, which allows you to raise the height of the magnets relative to the base of the labware.
 
-  .. code-block:: python
+  .. substitution-code-block:: python
 
       mag_mod.engage(height_from_base=13.5)
 
@@ -286,7 +286,7 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
 
 - You can also specify ``height``, which should be a distance in mm from the home position of the magnets.
 
-  .. code-block:: python
+  .. substitution-code-block:: python
 
       mag_mod.engage(height=18.5)
 
@@ -294,7 +294,7 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
 
 - An ``offset`` can be applied to move the magnets relatively from the default engage height of the labware, **if** the labware is supported on the Magnetic Module.
 
-  .. code-block:: python
+  .. substitution-code-block:: python
 
       mag_mod.engage(offset=-2)
 
@@ -309,7 +309,7 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
 Disengage
 =========
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    mag_mod.disengage()
 
@@ -322,7 +322,7 @@ Check the Status
 
 The :py:obj:`.MagneticModuleContext.status` property is a string that is one of ``'engaged'`` or ``'disengaged'``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     mag_mod.status
 
@@ -344,11 +344,11 @@ The lid can control its temperature between 37 °C to 110 °C. Please see our `s
 
 For the purposes of this section, assume we have the following already:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tc_mod = protocol.load_module('Thermocycler Module')
@@ -370,7 +370,7 @@ The Thermocycler can control its temperature with the lid open or closed. When t
 Open Lid
 --------
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     tc_mod.open_lid()
 
@@ -380,7 +380,7 @@ Open Lid
 Close Lid
 ---------
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     tc_mod.close_lid()
 
@@ -398,7 +398,7 @@ Set Lid Temperature
 
 :py:meth:`.ThermocyclerContext.set_lid_temperature` takes one parameter: the ``temperature`` you wish the lid to be set to. The protocol will only proceed once the lid temperature has been reached.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     tc_mod.set_lid_temperature(temperature)
 
@@ -416,7 +416,7 @@ Temperature
 
 If you only specify a ``temperature`` in °C, the Thermocycler will hold this temperature indefinitely until powered off.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
         tc_mod.set_block_temperature(4)
 
@@ -433,7 +433,7 @@ In the example below, the Thermocycler will hold the 50 µl samples at the speci
 
 If you do not specify a hold time the protocol will proceed once the temperature specified is reached.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
         tc_mod.set_block_temperature(4, hold_time_seconds=15, hold_time_minutes=45, block_max_volume=50)
 
@@ -444,7 +444,7 @@ Block Max Volume
 
 The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Specifying an accurate volume allows the Thermocycler to precisely track the temperature of the samples. The ``block_max_volume`` parameter is specified in µL and is the volume of the most-full well in the labware that is loaded on the Thermocycler's block. If not specified, it defaults to 25 µL.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
         tc_mod.set_block_temperature(4, hold_time_seconds=20, block_max_volume=80)
 
@@ -456,7 +456,7 @@ Ramp Rate
 
 Lastly, you can modify the ``ramp_rate`` in °C/sec for a given ``temperature``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
         tc_mod.set_block_temperature(4, hold_time_seconds=60, ramp_rate=0.5)
 
@@ -477,7 +477,7 @@ The Thermocycler can rapidly cycle through temperatures to execute heat-sensitiv
 Thermocycler profiles are defined for the Protocol API as lists of dicts. Each dict should have a ``temperature`` key, which specifies the temperature of a profile step, and either or both of ``hold_time_seconds`` or ``hold_time_minutes``, which specify the duration of the step. For instance, this profile commands the Thermocycler to drive its temperature to 10 °C for 30 seconds, and then 60 °C for 45 seconds:
 
 
-.. code-block:: python
+.. substitution-code-block:: python
 
         profile = [
           {'temperature': 10, 'hold_time_seconds': 30},
@@ -487,7 +487,7 @@ Once you have written your profile, you command the Thermocycler to execute it u
 
 For instance, you can execute the profile defined above 100 times for a 30 µL-per-well volume like this:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
         profile = [
           {'temperature': 10, 'hold_time_seconds': 30},
@@ -513,7 +513,7 @@ Basic Status
 
 The :py:obj:`.ThermocyclerContext.status` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     tc_mod.status
 
@@ -524,7 +524,7 @@ Lid Position
 
 The current status of the lid position. It can be one of the strings ``'open'``, ``'closed'`` or ``'in_between'``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     tc_mod.lid_position
 
@@ -535,7 +535,7 @@ Heated Lid Temperature Status
 
 The current status of the heated lid temperature controller. It can be one of the strings ``'holding at target'``, ``'heating'``, ``'idle'``,  or ``'error'``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     tc_mod.lid_temperature_status
 
@@ -546,7 +546,7 @@ Block Temperature Status
 
 The current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, ``'heating'``, ``'idle'``, or ``'error'``.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     tc_mod.block_temperature_status
 
@@ -565,7 +565,7 @@ Deactivate
 
 This deactivates both the well block and the heated lid of the Thermocycler.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
   tc_mod.deactivate()
 
@@ -574,7 +574,7 @@ Deactivate Lid
 
 This deactivates only the heated lid of the Thermocycler.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
   tc_mod.deactivate_lid()
 
@@ -585,7 +585,7 @@ Deactivate Block
 
 This deactivates only the well block of the Thermocycler.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
   tc_mod.deactivate_block()
 

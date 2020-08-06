@@ -21,12 +21,12 @@ Expressing Versions
 
 You must specify the API version you are targeting at the top of your Python protocol. This is done in the ``metadata`` block, using the key ``'apiLevel'``:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    from opentrons import protocol_api
 
    metadata = {
-       'apiLevel': '2.2',
+       'apiLevel': '|apiLevel|',
        'author': 'A. Biologist'}
 
    def run(protocol: protocol_api.ProtocolContext):
@@ -40,7 +40,7 @@ Version specification is required by the system. If you do not specify your targ
 The version you specify determines the features and behaviors available to your protocol. For instance, if Opentrons adds the ability to set the volume units in a call to ``aspirate`` in version 2.1, then you must specify version 2.1 in your metadata. A protocol like this:
 
 
-.. code-block:: python
+.. substitution-code-block:: python
 
 
    from opentrons import protocol_api

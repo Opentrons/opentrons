@@ -11,7 +11,7 @@ When you load labware, you specify the name of the labware (e.g. ``'corning_96_w
 
 In the example given in the :ref:`overview-section-v2` section, we loaded labware like this:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
     tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
@@ -21,7 +21,7 @@ which informed the protocol context that the deck contains a 300 µL tiprack in 
 
 A third optional argument can be used to give the labware a nickname to be displayed in the Opentrons App.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat',
                                   location='2',
@@ -73,12 +73,12 @@ The ending well will be in the bottom right, see the diagram below for further e
 
 .. image:: ../img/well_iteration/Well_Iteration.png
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     '''
     Examples in this section expect the following
     '''
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
 
@@ -120,7 +120,7 @@ wells within it by using dictionary indexing. If a well does not exist in this l
 you will receive a ``KeyError``. This is equivalent to using the return value of
 :py:meth:`.Labware.wells_by_name`:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     a1 = plate['A1']
     d6 = plate.wells_by_name()['D6']
@@ -134,7 +134,7 @@ Wells can be referenced by their name, as demonstrated above.
 However, they can also be referenced with zero-indexing, with the first well in
 a labware being at position 0.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     plate.wells()[0]   # well A1
     plate.wells()[23]  # well D6
@@ -160,7 +160,7 @@ You can access a specific row or column of wells by using the
 :py:meth:`.Labware.rows_by_name` and :py:meth:`.Labware.columns_by_name` methods
 on a labware. These methods both return a dictionary with the row or column name as the keys:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     row_dict = plate.rows_by_name()['A']
     row_list = plate.rows()[0] # equivalent to the line above
@@ -172,7 +172,7 @@ on a labware. These methods both return a dictionary with the row or column name
 
 will print out...
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     Column "1" has 4 wells
     Row "A" has 6 wells
@@ -181,14 +181,14 @@ Since these methods return either lists or dictionaries, you can iterate through
 
 For example, to access the individual wells of row ``'A'`` in a well plate, you can do:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     for well in plate.rows()[0]:
         print(well)
 
 or,
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     for well_obj in plate.rows_by_name()['A'].values():
         print(well_obj)
@@ -231,7 +231,7 @@ don't want to be contacting the liquid. In addition, :py:meth:`.Well.top` takes 
 optional argument ``z``, which is a distance in mm to move relative to the top
 vertically (positive numbers move up, and negative numbers move down):
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    plate['A1'].top()     # This is the top center of the well
    plate['A1'].top(z=1)  # This is 1mm above the top center of the well
@@ -249,7 +249,7 @@ or any other operation where you want to be contacting the liquid. In addition,
 to move relative to the bottom vertically (positive numbers move up, and negative
 numbers move down):
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    plate['A1'].bottom()     # This is the bottom center of the well
    plate['A1'].bottom(z=1)  # This is 1mm above the bottom center of the well
@@ -281,7 +281,7 @@ The method :py:meth:`.Well.center` returns a position centered in the well both
 vertically and horizontally. This can be a good place to start for precise
 control of positions within the well for unusual or custom labware.
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    plate['A1'].center() # This is the vertical and horizontal center of the well
 
@@ -303,11 +303,11 @@ It will return a new location, representing the original location with that offs
 
 For example:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    from opentrons import types
 
-   metadata = {'apiLevel': '2.2'}
+   metadata = {'apiLevel': '|apiLevel|'}
 
    def run(protocol):
         plate = protocol.load_labware(

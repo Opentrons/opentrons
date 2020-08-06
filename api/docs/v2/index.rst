@@ -53,7 +53,7 @@ The design goal of this API is to make code readable and easy to understand. For
 
 If we were to rewrite this with the Python Protocol API, it would look like the following:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
     from opentrons import protocol_api
 
@@ -62,7 +62,7 @@ If we were to rewrite this with the Python Protocol API, it would look like the 
         'protocolName': 'My Protocol',
         'author': 'Name <email@address.com>',
         'description': 'Simple protocol to get started using OT2',
-        'apiLevel': '2.2'
+        'apiLevel': '|apiLevel|'
     }
 
     # protocol run function. the part after the colon lets your editor know
@@ -110,11 +110,11 @@ The Run Function and the Protocol Context
 
 Protocols are structured around a function called ``run(protocol)``, defined in code like this:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    from opentrons import protocol_api
 
-   metadata = {'apiLevel': '2.2'}
+   metadata = {'apiLevel': '|apiLevel|'}
 
    def run(protocol: protocol_api.ProtocolContext):
        pass
@@ -148,13 +148,13 @@ Our example protocol above loads
 
 * a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
 
 * an `Opentrons 300µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 1:
 
-.. code-block:: python
+.. substitution-code-block:: python
 
    tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
 
