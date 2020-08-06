@@ -70,6 +70,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     aspirateDelay,
     aspirateFlowRateUlSec,
     aspirateOffsetFromBottomMm,
+    dispenseDelay,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
   } = args
@@ -108,6 +109,29 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const dispenseCommands = flatMap(
         destWellChunk,
         (destWell: string, wellIndex: number): Array<CurriedCommandCreator> => {
+          const delayAfterDispenseCommands =
+            dispenseDelay != null
+              ? [
+                  curryCommandCreator(moveToWell, {
+                    pipette: args.pipette,
+                    labware: args.destLabware,
+                    well: destWell,
+                    offset: {
+                      x: 0,
+                      y: 0,
+                      z: dispenseDelay.mmFromBottom,
+                    },
+                  }),
+                  curryCommandCreator(delay, {
+                    commandCreatorFnName: 'delay',
+                    description: null,
+                    name: null,
+                    meta: null,
+                    wait: dispenseDelay.seconds,
+                  }),
+                ]
+              : []
+
           const touchTipAfterDispenseCommand = args.touchTipAfterDispense
             ? [
                 curryCommandCreator(touchTip, {
@@ -129,6 +153,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
+            ...delayAfterDispenseCommands,
             ...touchTipAfterDispenseCommand,
           ]
         }

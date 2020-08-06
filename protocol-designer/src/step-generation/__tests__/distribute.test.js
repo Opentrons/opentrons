@@ -53,7 +53,7 @@ beforeEach(() => {
     disposalWell: 'A1',
     mixBeforeAspirate: null,
     aspirateDelay: null,
-
+    dispenseDelay: null,
     touchTipAfterDispense: false,
   }
 
@@ -328,13 +328,13 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       aspirateHelper('A1', 300),
-      ...delayWithOffset('A1'),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
       dispenseHelper('A2', 100),
       dispenseHelper('A3', 100),
       dispenseHelper('A4', 100),
 
       aspirateHelper('A1', 100),
-      ...delayWithOffset('A1'),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
       dispenseHelper('A5', 100),
     ])
   })
@@ -458,6 +458,39 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       dispenseHelper('A4', volume),
       dispenseHelper('A5', volume),
       blowoutSingleToSourceA1,
+    ])
+  })
+
+  it('delay after dispense', () => {
+    const distributeArgs: DistributeArgs = {
+      ...mixinArgs,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3', 'A4', 'A5'],
+      changeTip: 'never',
+      volume: 100,
+      dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      // no blowout
+      disposalVolume: 0,
+    }
+
+    const result = distribute(
+      distributeArgs,
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 300),
+      dispenseHelper('A2', 100),
+      ...delayWithOffset('A2', DEST_LABWARE),
+      dispenseHelper('A3', 100),
+      ...delayWithOffset('A3', DEST_LABWARE),
+      dispenseHelper('A4', 100),
+      ...delayWithOffset('A4', DEST_LABWARE),
+
+      aspirateHelper('A1', 100),
+      dispenseHelper('A5', 100),
+      ...delayWithOffset('A5', DEST_LABWARE),
     ])
   })
 })

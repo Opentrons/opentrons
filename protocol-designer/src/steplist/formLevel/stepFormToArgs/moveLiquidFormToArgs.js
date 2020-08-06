@@ -167,6 +167,7 @@ export const moveLiquidFormToArgs = (
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),
     aspirateDelay: null, // TODO(IL, 2020-08-05): implement in #6219
+    dispenseDelay: null, // TODO(IL, 2020-08-05): implement in #6219
     mixInDestination,
     touchTipAfterAspirate,
     touchTipAfterAspirateOffsetMmFromBottom,
