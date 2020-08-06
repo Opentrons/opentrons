@@ -18,8 +18,31 @@ import type {
   ConsolidateArgs,
   DistributeArgs,
   TransferArgs,
+  InnerDelayArgs,
   InnerMixArgs,
 } from '../../../step-generation'
+
+export function getDelayData(
+  hydratedFormData: $PropertyType<HydratedMoveLiquidFormData, 'fields'>,
+  checkboxField: 'aspirate_delay_checkbox' | 'dispense_delay_checkbox',
+  secondsField: 'aspirate_delay_seconds' | 'dispense_delay_seconds',
+  mmFromBottomField:
+    | 'aspirate_delay_tip_position'
+    | 'dispense_delay_tip_position'
+): ?InnerDelayArgs {
+  const checkbox = hydratedFormData[checkboxField]
+  const seconds = hydratedFormData[secondsField]
+  const mmFromBottom = hydratedFormData[mmFromBottomField]
+
+  if (
+    checkbox &&
+    (typeof seconds === 'number' && seconds > 0) &&
+    (typeof mmFromBottom === 'number' && mmFromBottom > 0)
+  ) {
+    return { seconds, mmFromBottom }
+  }
+  return null
+}
 
 export function getMixData(
   hydratedFormData: *,
@@ -139,6 +162,19 @@ export const moveLiquidFormToArgs = (
     'dispense_mix_volume',
     'dispense_mix_times'
   )
+  const aspirateDelay = getDelayData(
+    fields,
+    'aspirate_delay_checkbox',
+    'aspirate_delay_seconds',
+    'aspirate_delay_tip_position'
+  )
+
+  const dispenseDelay = getDelayData(
+    fields,
+    'dispense_delay_checkbox',
+    'dispense_delay_seconds',
+    'dispense_delay_tip_position'
+  )
 
   const blowoutLocation =
     (fields.blowout_checkbox && fields.blowout_location) || null
@@ -166,8 +202,8 @@ export const moveLiquidFormToArgs = (
 
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),
-    aspirateDelay: null, // TODO(IL, 2020-08-05): implement in #6219
-    dispenseDelay: null, // TODO(IL, 2020-08-05): implement in #6219
+    aspirateDelay,
+    dispenseDelay,
     mixInDestination,
     touchTipAfterAspirate,
     touchTipAfterAspirateOffsetMmFromBottom,
