@@ -60,8 +60,8 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
 
     migration.check_index_version(index_path)
     index_file = io.read_cal_file(str(index_path))
-
-    for key, data in index_file.items():
+    calibration_index = index_file.get('data', {})
+    for key, data in calibration_index.items():
         cal_path = offset_path / f'{key}.json'
         if cal_path.exists():
             cal_blob = io.read_cal_file(str(cal_path))

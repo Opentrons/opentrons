@@ -2,6 +2,9 @@ import typing
 from . import file_operators as io, types as local_types
 
 
+MAX_VERSION = 1
+
+
 def check_index_version(index_path: local_types.StrPath):
     index_file = io.read_cal_file(str(index_path))
     version = index_file.get('version', 0)
@@ -30,7 +33,7 @@ def migrate_index_0_to_1(index_path: local_types.StrPath):
     the correct format so users do not lose their calibrations
     """
     index_file = io.read_cal_file(str(index_path))
-    migrated_file: typing.Dict = {}
+    updated_entries: typing.Dict = {}
     for key, data in index_file.items():
         uri = key
         full_hash = data['slot']
@@ -41,10 +44,10 @@ def migrate_index_0_to_1(index_path: local_types.StrPath):
                 'fullParent': full_parent}
         else:
             module = {}
-        migrated_file[full_hash] = {
+        updated_entries[full_hash] = {
             "uri": f'{uri}',
             "slot": full_hash,
             "module": module
             }
-    migrated_file['version'] = 1
+    migrated_file = {'version': 1, 'data': updated_entries}
     io.save_to_file(index_path, migrated_file)

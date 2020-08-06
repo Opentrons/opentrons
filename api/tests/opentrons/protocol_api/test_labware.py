@@ -519,7 +519,7 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
 
     lw_path = labware_offset_tempdir / 'index.json'
     info = file_operators.read_cal_file(lw_path)
-    assert info[full_id] == blob
+    assert info['data'][full_id] == blob
 
 
 def test_delete_one_calibration(set_up_index_file):

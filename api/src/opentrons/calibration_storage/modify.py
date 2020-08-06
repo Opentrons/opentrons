@@ -13,7 +13,8 @@ from opentrons import config
 from . import (
     file_operators as io,
     types as local_types,
-    helpers)
+    helpers,
+    migration)
 
 if typing.TYPE_CHECKING:
     from .dev_types import (TipLengthCalibration, PipTipLengthCalibration)
@@ -35,6 +36,7 @@ def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
         config.get_opentrons_path('labware_calibration_offsets_dir_v2')
     index_file = offset / 'index.json'
     if index_file.exists():
+        migration.check_index_version(index_file)
         blob = io.read_cal_file(str(index_file))
     else:
         blob = {}
@@ -46,11 +48,15 @@ def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
     else:
         mod_dict = {}
     full_id = f'{lw_hash}{parent}'
-    blob[full_id] = {
-            "uri": f'{uri}',
-            "slot": full_id,
-            "module": mod_dict
-        }
+    new_index_data = {
+        "uri": f'{uri}',
+        "slot": full_id,
+        "module": mod_dict}
+    if blob.get('data'):
+        blob['data'][full_id] = new_index_data
+    else:
+        blob['data'] = {full_id: new_index_data}
+    blob['version'] = migration.MAX_VERSION
     io.save_to_file(index_file, blob)
 
 

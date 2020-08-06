@@ -36,7 +36,7 @@ def _remove_offset_from_index(calibration_id: local_types.CalibrationID):
     index_path = offset_path / 'index.json'
     blob = io.read_cal_file(str(index_path))
 
-    del blob[calibration_id]
+    del blob['data'][calibration_id]
     io.save_to_file(index_path, blob)
 
 
@@ -52,7 +52,7 @@ def delete_offset_file(calibration_id: local_types.CalibrationID):
     try:
         _remove_offset_from_index(calibration_id)
         offset.unlink()
-    except FileNotFoundError:
+    except (FileNotFoundError, KeyError):
         pass
 
 
