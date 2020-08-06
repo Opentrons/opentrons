@@ -408,7 +408,7 @@ describe('advanced options', () => {
     }
   })
   describe('...aspirate options', () => {
-    it('pre-wet tip should aspirate and dispense transfer volume from source well of each subtransfer', () => {
+    it('pre-wet tip should aspirate and dispense the transfer volume from source well of each subtransfer', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -434,7 +434,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('touchTip after aspirate should touchTip on each source well, for every aspirate', () => {
+    it('should touchTip after aspirate on each source well, for every aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -454,7 +454,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('touchTip after dispense should touchTip on each dest well, for every dispense', () => {
+    it('should touchTip after dispense on each dest well, for every dispense', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -474,7 +474,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('mix before aspirate', () => {
+    it('should mix before aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -513,7 +513,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('delays after aspirate', () => {
+    it('should delay after aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -537,7 +537,7 @@ describe('advanced options', () => {
   })
 
   describe('...dispense options', () => {
-    it('mix after dispense', () => {
+    it('should mix after dispense', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -576,7 +576,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('delays after dispense', () => {
+    it('should delay after dispense', () => {
       advArgs = {
         ...advArgs,
         volume: 350,

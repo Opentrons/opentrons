@@ -223,7 +223,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  it('mix on aspirate', () => {
+  it('should mix on aspirate', () => {
     const data = {
       ...mixinArgs,
       volume: 125,
@@ -281,7 +281,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  it('mix after dispense', () => {
+  it('should mix after dispense', () => {
     const data = {
       ...mixinArgs,
       volume: 100,
@@ -314,7 +314,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  it('mix after dispense with blowout to trash: first mix, then blowout', () => {
+  it('should mix after dispense with blowout to trash: first mix, then blowout', () => {
     const data = {
       ...mixinArgs,
       volume: 100,
@@ -395,7 +395,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  it('delay after aspirate', () => {
+  it('should delay after aspirate', () => {
     const data = {
       ...mixinArgs,
       volume: 150,
@@ -425,7 +425,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  it('delay after dispense', () => {
+  it('should delay after dispense', () => {
     const data = {
       ...mixinArgs,
       volume: 150,
