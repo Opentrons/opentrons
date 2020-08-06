@@ -1081,12 +1081,12 @@ def filter_tipracks_to_start(
         lambda tr: starting_point.parent is not tr, tipracks))
 
 
-def _get_parent_identifier(
-        parent: Union['Well', str, DeckItem, None]) -> str:
+def _get_parent_identifier(labware: 'Labware') -> str:
     """
     Helper function to return whether a labware is on top of a
     module or not.
     """
+    parent = labware.parent
     # TODO (lc, 07-14-2020): Once we implement calibrations per slot,
     # this function should either return a slot using `first_parent` or
     # the module it is attached to.
@@ -1098,7 +1098,7 @@ def _get_parent_identifier(
 
 
 def _get_labware_path(labware: 'Labware'):
-    parent_id = _get_parent_identifier(labware.parent)
+    parent_id = _get_parent_identifier(labware)
     labware_hash = helpers.hash_labware_def(labware._definition)
     return f'{labware_hash}{parent_id}.json'
 
