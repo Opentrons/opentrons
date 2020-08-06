@@ -1,7 +1,7 @@
 // @flow
 import { of } from 'rxjs'
 import { ofType } from 'redux-observable'
-import { tap, filter, mergeMap, withLatestFrom } from 'rxjs/operators'
+import { filter, mergeMap, withLatestFrom } from 'rxjs/operators'
 
 import { getConnectedRobotName } from '../../../robot/selectors'
 import * as Actions from '../actions'

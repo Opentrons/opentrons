@@ -1090,7 +1090,10 @@ def _get_parent_identifier(
     # TODO (lc, 07-14-2020): Once we implement calibrations per slot,
     # this function should either return a slot using `first_parent` or
     # the module it is attached to.
+
+    MODULE_LOG.info(f'in get parent identifier {parent}')
     if isinstance(parent, DeckItem) and parent.separate_calibration:
+        MODULE_LOG.info(f'in get parent identifier in if, sep cal {parent.separate_calibration}')
         # treat a given labware on a given module type as same
         return parent.load_name
     else:
@@ -1137,7 +1140,8 @@ def load_from_definition(
 def save_calibration(labware: 'Labware', delta: Point):
     definition = labware._definition
     labware_path = _get_labware_path(labware)
-    parent = _get_parent_identifier(labware)
+    parent = _get_parent_identifier(labware.parent)
+    MODULE_LOG.info(f'in save calibration lp: {labware_path}, parent: {parent}')
     modify.save_labware_calibration(
         labware_path, definition, delta, parent=parent)
     labware.set_calibration(delta)
