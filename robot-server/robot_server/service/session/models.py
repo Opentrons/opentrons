@@ -198,6 +198,19 @@ class TipLengthCalibrationCommand(CommandDefinition):
         return "calibration.tipLength"
 
 
+class DeckCalibrationCommand(CommandDefinition):
+    """Deck Calibration Specific"""
+    move_to_tip_rack = "moveToTipRack"
+    move_to_deck = "moveToDeck"
+    move_to_point_one = "moveToPointOne"
+    move_to_point_two = "moveToPointTwo"
+    move_to_point_three = "moveToPointThree"
+
+    @staticmethod
+    def namespace():
+        return "calibration.deck"
+
+
 """
 IMPORTANT: See note for SessionCreateParamType
 
@@ -215,6 +228,7 @@ CommandDefinitionType = typing.Union[
     CalibrationCommand,
     CalibrationCheckCommand,
     TipLengthCalibrationCommand,
+    DeckCalibrationCommand,
     ProtocolCommand
 ]
 
@@ -274,7 +288,7 @@ class BasicSessionCommand(BaseModel):
     @staticmethod
     @lru_cache(maxsize=1)
     def _pre_namespace_mapping() -> typing.Dict[str, CommandDefinition]:
-        """Create a dictionary of pre-namespace name to CommandDefintion"""
+        """Create a dictionary of pre-namespace name to CommandDefinition"""
         # A tuple of CommandDefinition enums which need to be identified by
         # localname and full namespaced name
         pre_namespace_ns = CalibrationCheckCommand, CalibrationCommand
