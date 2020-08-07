@@ -402,7 +402,7 @@ describe('labware calibration selectors', () => {
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
-          slot: '3',
+          slot: '4',
         }: $Shape<ProtocolLabware>),
       ])
       getModulesBySlot.mockReturnValue({})

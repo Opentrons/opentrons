@@ -1,7 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
 import head from 'lodash/head'
-import isEqual from 'lodash/isEqual'
 import uniqWith from 'lodash/uniqWith'
 
 import {
@@ -73,11 +72,7 @@ export const getUniqueProtocolLabwareSummaries: (
   ) => {
     const uniqueLabware = uniqWith<BaseProtocolLabware>(
       baseLabwareList,
-      (labwareA, labwareB) => {
-        const { definition: _defA, ...labwareIdentityA } = labwareA
-        const { definition: _defB, ...labwareIdentityB } = labwareB
-        return isEqual(labwareIdentityA, labwareIdentityB)
-      }
+      matchesLabwareIdentity
     )
 
     return uniqueLabware.map(lw => {
