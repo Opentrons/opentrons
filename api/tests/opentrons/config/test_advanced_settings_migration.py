@@ -1,7 +1,7 @@
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
-good_file_version = 6
+good_file_version = 7
 good_file_settings = {
     'shortFixedTrash': None,
     'calibrateToBottom': None,
@@ -14,6 +14,7 @@ good_file_settings = {
     'useV1HttpApi': None,
     'enableDoorSafetySwitch': None,
     'enableTipLengthCalibration': None,
+    'enableHttpProtocolSessions': None,
 }
 
 
@@ -45,7 +46,8 @@ def test_migrates_versionless_new_config():
       'useProtocolApi2': None,
       'useV1HttpApi': None,
       'enableDoorSafetySwitch': None,
-      'enableTipLengthCalibration': None
+      'enableTipLengthCalibration': None,
+      'enableHttpProtocolSessions': None,
     }
 
 
@@ -69,7 +71,8 @@ def test_migrates_versionless_old_config():
       'useProtocolApi2': None,
       'useV1HttpApi': None,
       'enableDoorSafetySwitch': None,
-      'enableTipLengthCalibration': None
+      'enableTipLengthCalibration': None,
+      'enableHttpProtocolSessions': None,
     }
 
 
@@ -105,7 +108,8 @@ def test_migrates_v1_config():
         'enableApi1BackCompat': None,
         'useV1HttpApi': None,
         'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
     }
 
 
@@ -134,7 +138,8 @@ def test_migrates_v2_config():
         'enableApi1BackCompat': None,
         'useV1HttpApi': None,
         'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
     }
 
 
@@ -162,7 +167,8 @@ def test_migrates_v3_config():
         'enableApi1BackCompat': False,
         'useV1HttpApi': None,
         'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
     }
 
 
@@ -191,7 +197,8 @@ def test_migrates_v4_config():
         'enableApi1BackCompat': False,
         'useV1HttpApi': False,
         'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
     }
 
 
@@ -221,7 +228,8 @@ def test_migrates_v5_config():
         'enableApi1BackCompat': False,
         'useV1HttpApi': False,
         'enableDoorSafetySwitch': True,
-        'enableTipLengthCalibration': None
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
     }
 
 
@@ -240,5 +248,6 @@ def test_ensures_config():
              'disableLogAggregation': True,
              'useProtocolApi2': None,
              'enableDoorSafetySwitch': None,
-             'enableTipLengthCalibration': None
+             'enableTipLengthCalibration': None,
+             'enableHttpProtocolSessions': None,
          }

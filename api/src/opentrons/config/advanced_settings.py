@@ -159,6 +159,13 @@ settings = [
         description='Do not activate this unless you are a developer. '
                     'Enables the in-progress robot calibration flows '
                     'for tip length, deck, and instrument calibration.'
+    ),
+    SettingDefinition(
+        _id='enableHttpProtocolSessions',
+        title='Enable Experimental HTTP Protocol Sessions',
+        description='Do not activate this unless you are a developer. '
+                    'Activating this will disable protocol running from the '
+                    'Opentrons application.'
     )
 ]
 
@@ -335,8 +342,18 @@ def _migrate5to6(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate6to7(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 7 of the feature flags file. Adds the
+    enableHttpProtocolSessions config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap['enableHttpProtocolSessions'] = None
+    return newmap
+
+
 _MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4,
-               _migrate4to5, _migrate5to6]
+               _migrate4to5, _migrate5to6, _migrate6to7]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should

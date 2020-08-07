@@ -60,7 +60,13 @@ stages:
           description: !re_search "Enables the in-progress robot calibration flows"
           restart_required: false
           value: !anything
-        links: !anydict 
+        - id: enableHttpProtocolSessions
+          old_id: Null
+          title: Enable Experimental HTTP Protocol Sessions
+          description: !re_search "Activating this will disable protocol running from the Opentrons applicatio"
+          restart_required: false
+          value: !anything
+        links: !anydict
 
 ---
 # All Possible Settings with bool values
@@ -70,7 +76,7 @@ marks:
       - run_server
   - parametrize:
       key: id
-      vals: 
+      vals:
       - shortFixedTrash
       - calibrateToBottom
       - deckCalibrationDots
@@ -78,6 +84,8 @@ marks:
       - disableHomeOnBoot
       - useOldAspirationFunctions
       - enableDoorSafetySwitch
+      - enableTipLengthCalibration
+      - enableHttpProtocolSessions
   - parametrize:
       key: value
       vals:
@@ -107,7 +115,7 @@ marks:
       - run_server
   - parametrize:
       key: id
-      vals: 
+      vals:
       - shortFixedTrash
       - calibrateToBottom
       - deckCalibrationDots
@@ -115,6 +123,8 @@ marks:
       - disableHomeOnBoot
       - useOldAspirationFunctions
       - enableDoorSafetySwitch
+      - enableTipLengthCalibration
+      - enableHttpProtocolSessions
 stages:
   - name: Set each setting to acceptable values 
     request:
