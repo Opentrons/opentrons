@@ -22,12 +22,6 @@ describe('TipPickUp', () => {
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
-  const getConfirmTipButton = wrapper =>
-    wrapper.find('PrimaryButton[children="Yes, continue"]').find('button')
-
-  const getInvalidateTipButton = wrapper =>
-    wrapper.find('PrimaryButton[children="No, try again"]').find('button')
-
   beforeEach(() => {
     render = (props: $Shape<React.ElementProps<typeof TipPickUp>> = {}) => {
       const {
@@ -78,50 +72,13 @@ describe('TipPickUp', () => {
       )
     })
   })
-  it('clicking pick up tip proceeds to inspect, and confirm', () => {
-    const wrapper = render()
-
-    act(() => getPickUpTipButton(wrapper).invoke('onClick')())
-    wrapper.update()
-
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.tipCalCommands.PICK_UP_TIP
-    )
-
-    act(() => getConfirmTipButton(wrapper).invoke('onClick')())
-    wrapper.update()
-
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT
-    )
-  })
-  it('clicking pick up tip proceeds to inspect, and invalidate returns to jog', () => {
+  it('clicking pick up tip sends pick up tip command', () => {
     const wrapper = render()
 
     act(() => getPickUpTipButton(wrapper).invoke('onClick')())
     wrapper.update()
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.tipCalCommands.PICK_UP_TIP
-    )
-
-    act(() => getInvalidateTipButton(wrapper).invoke('onClick')())
-    wrapper.update()
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.tipCalCommands.INVALIDATE_TIP
-    )
-
-    act(() => getJogButton(wrapper, 'left').invoke('onClick')())
-    wrapper.update()
-    act(() => getPickUpTipButton(wrapper).invoke('onClick')())
-    wrapper.update()
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.tipCalCommands.PICK_UP_TIP
-    )
-
-    act(() => getConfirmTipButton(wrapper).invoke('onClick')())
-    wrapper.update()
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT
     )
   })
 })

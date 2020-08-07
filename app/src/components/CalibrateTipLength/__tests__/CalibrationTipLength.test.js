@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
+import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
@@ -13,6 +14,7 @@ import { Introduction } from '../Introduction'
 import { DeckSetup } from '../DeckSetup'
 import { MeasureNozzle } from '../MeasureNozzle'
 import { TipPickUp } from '../TipPickUp'
+import { TipConfirmation } from '../TipConfirmation'
 import { MeasureTip } from '../MeasureTip'
 import { CompleteConfirmation } from '../CompleteConfirmation'
 
@@ -28,16 +30,6 @@ type CalibrateTipLengthSpec = {
   ...
 }
 
-// const getRobotSessionOfType: JestMockFn<
-//   [State, string, Sessions.SessionType],
-//   $Call<
-//     typeof Sessions.getRobotSessionOfType,
-//     State,
-//     string,
-//     Sessions.SessionType
-//   >
-// > = Sessions.getRobotSessionOfType
-
 const mockGetDeckDefinitions: JestMockFn<
   [],
   $Call<typeof getDeckDefinitions, any>
@@ -52,14 +44,15 @@ describe('CalibrateTipLength', () => {
     ...mockTipLengthCalibrationSessionAttributes,
   }
 
-  // const getBackButton = wrapper =>
-  //   wrapper.find({ title: 'exit' }).find('button')
+  const getExitButton = wrapper =>
+    wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
     Introduction,
     DeckSetup,
     MeasureNozzle,
     TipPickUp,
+    TipConfirmation,
     MeasureTip,
     CompleteConfirmation,
   ]
@@ -69,6 +62,7 @@ describe('CalibrateTipLength', () => {
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: MeasureNozzle, currentStep: 'measuringNozzleOffset' },
     { component: TipPickUp, currentStep: 'preparingPipette' },
+    { component: TipConfirmation, currentStep: 'inspectingTip' },
     { component: MeasureTip, currentStep: 'measuringTipOffset' },
     { component: CompleteConfirmation, currentStep: 'calibrationComplete' },
   ]
@@ -128,5 +122,14 @@ describe('CalibrateTipLength', () => {
         }
       })
     })
+  })
+
+  it('renders confirm exit modal on exit click', () => {
+    const wrapper = render()
+
+    expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
+    act(() => getExitButton(wrapper).invoke('onClick')())
+    wrapper.update()
+    expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
 })

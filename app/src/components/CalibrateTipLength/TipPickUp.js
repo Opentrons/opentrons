@@ -51,9 +51,7 @@ const ASSET_MAP = {
   single: singleDemoAsset,
 }
 export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
-  const { sendSessionCommand, isMulti, tipRack, lastRequestStatus } = props
-
-  const [showTipInspection, setShowTipInspection] = React.useState(false)
+  const { sendSessionCommand, isMulti, tipRack } = props
 
   const demoAsset = ASSET_MAP[isMulti ? 'multi' : 'single']
 
@@ -68,8 +66,7 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
   )
 
   const pickUpTip = () => {
-    sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP, {}, false)
-    setShowTipInspection(true)
+    sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP, {})
   }
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
@@ -82,17 +79,7 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
     )
   }
 
-  const invalidateTip = () => {
-    setShowTipInspection(false)
-    sendSessionCommand(Sessions.tipCalCommands.INVALIDATE_TIP)
-  }
-  const confirmTip = () => {
-    sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT)
-  }
-
-  return lastRequestStatus !== PENDING && showTipInspection ? (
-    <InspectingTip invalidateTip={invalidateTip} confirmTip={confirmTip} />
-  ) : (
+  return (
     <>
       <Flex
         marginY={SPACING_2}
@@ -145,54 +132,15 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
             </div>
           </Flex>
         </Box>
-        <div>
+        <Box>
           <JogControls jog={jog} />
-        </div>
+        </Box>
         <Flex width="100%">
           <PrimaryButton onClick={pickUpTip} className={styles.command_button}>
-            {lastRequestStatus === PENDING ? (
-              <Icon name="ot-spinner" height={SPACING_3} spin />
-            ) : (
-              TIP_PICK_UP_BUTTON_TEXT
-            )}
+            {TIP_PICK_UP_BUTTON_TEXT}
           </PrimaryButton>
         </Flex>
       </Flex>
     </>
-  )
-}
-
-const CONFIRM_TIP_BODY = 'Did pipette pick up tips successfully?'
-const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, continue'
-const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
-
-type InspectingTipProps = {|
-  invalidateTip: () => void,
-  confirmTip: () => void,
-|}
-
-export function InspectingTip(props: InspectingTipProps): React.Node {
-  return (
-    <Flex
-      width="100%"
-      flexDirection={DIRECTION_COLUMN}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-      marginY={SPACING_3}
-    >
-      <Text marginBottom={SPACING_3}>{CONFIRM_TIP_BODY}</Text>
-      <PrimaryButton
-        className={styles.pick_up_tip_confirmation_button}
-        onClick={props.invalidateTip}
-      >
-        {CONFIRM_TIP_NO_BUTTON_TEXT}
-      </PrimaryButton>
-      <PrimaryButton
-        className={styles.pick_up_tip_confirmation_button}
-        onClick={props.confirmTip}
-      >
-        {CONFIRM_TIP_YES_BUTTON_TEXT}
-      </PrimaryButton>
-    </Flex>
   )
 }

@@ -29,5 +29,4 @@ export type CalibrateTipLengthChildProps = {|
     trackRequest?: boolean
   ) => void,
   deleteSession: () => void,
-  lastRequestStatus: RequestStatus | null,
 |}

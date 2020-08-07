@@ -24,6 +24,7 @@ import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { MeasureNozzle } from './MeasureNozzle'
 import { TipPickUp } from './TipPickUp'
+import { TipConfirmation } from './TipConfirmation'
 import { MeasureTip } from './MeasureTip'
 import { CompleteConfirmation } from './CompleteConfirmation'
 import { ConfirmExitModal } from './ConfirmExitModal'
@@ -46,6 +47,7 @@ const PANEL_BY_STEP: {
   labwareLoaded: DeckSetup,
   measuringNozzleOffset: MeasureNozzle,
   preparingPipette: TipPickUp,
+  inspectingTip: TipConfirmation,
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
@@ -73,17 +75,6 @@ export function CalibrateTipLength(
       getRequestById(state, last(requestIds))
     )?.status ?? null
 
-  const longOngoingCommandId = React.useRef<string | null>(null)
-  const longOngoingCommandIsPending: boolean = React.useMemo(
-    () =>
-      useSelector<State, RequestState | null>(state =>
-        longOngoingCommandId.current !== null
-          ? getRequestById(state, longOngoingCommandId.current)
-          : null
-      )?.status === PENDING,
-    [longOngoingCommandId.current]
-  )
-
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)
     return spec ? spec.channels > 1 : false
@@ -106,9 +97,10 @@ export function CalibrateTipLength(
       session.id,
       { command, data }
     )
-    dispatchRequest(sessionCommand)
     if (loadingSpinner) {
-      longOngoingCommandId.current = last(requestIds)
+      dispatchRequest(sessionCommand)
+    } else {
+      dispatch(sessionCommand)
     }
   }
 
@@ -136,10 +128,7 @@ export function CalibrateTipLength(
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
-  console.log('rendered', longOngoingCommandIsPending)
-  console.log('lrs', lastRequestStatus)
-  console.log('logid', longOngoingCommandId.current)
-  if (longOngoingCommandIsPending) {
+  if (lastRequestStatus === PENDING) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
@@ -158,7 +147,6 @@ export function CalibrateTipLength(
           calBlock={calBlock}
           sendSessionCommand={sendCommand}
           deleteSession={deleteSession}
-          lastRequestStatus={lastRequestStatus}
         />
       </ModalPage>
       {showConfirmExit && (
