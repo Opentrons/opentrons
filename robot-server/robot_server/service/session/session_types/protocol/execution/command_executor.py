@@ -157,8 +157,6 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
     async def on_protocol_event(self, cmd: typing.Any):
         """A protocol event arrived"""
         # These are broker notifications from Session object.
-        import threading
-        log.info(f"AA {threading.current_thread()}")
         topic = cmd.get('topic')
         if topic == Session.TOPIC:
             payload = cmd.get('payload')

@@ -34,18 +34,18 @@ class _Worker:
         self._protocol_runner.add_listener(self._on_command)
         self._loop = loop
         self._listener = listener
-        # For passing AsyncCommand from main to worker task
+        # For passing WorkerDirective from main to worker task
         self._async_command_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
-        # Protocol running AsyncCommand handling task
+        # Protocol running WorkerDirective handling task
         self._async_command_task = self._loop.create_task(self._runner_task())
 
     async def handle_run(self):
         """Begin running the protocol"""
-        await self._set_command(WorkerDirective.start_run)
+        await self._set_directive(WorkerDirective.start_run)
 
     async def handle_simulate(self):
         """Begin a simulation"""
-        await self._set_command(WorkerDirective.start_simulate)
+        await self._set_directive(WorkerDirective.start_simulate)
 
     async def handle_cancel(self):
         """Cancel a running protocol"""
@@ -62,14 +62,14 @@ class _Worker:
     async def close(self):
         """Shutdown the worker. Cancel run and terminate worker task"""
         # Kill the command task
-        await self._set_command(WorkerDirective.terminate)
+        await self._set_directive(WorkerDirective.terminate)
         # Kill the protocol
         self._protocol_runner.cancel()
         # Wait for run task to finish
         await self._async_command_task
 
-    async def _set_command(self, comm: WorkerDirective):
-        """Enqueue a command for the worker"""
+    async def _set_directive(self, comm: WorkerDirective):
+        """Enqueue a directive for the worker"""
         await self._async_command_queue.put(comm)
 
     async def _runner_task(self):
@@ -96,15 +96,22 @@ class _Worker:
 
     async def _load(self):
         """Load the protocol"""
-        await self._loop.run_in_executor(None, self._protocol_runner.load)
+        await self._call_in_executor(self._protocol_runner.load)
 
     async def _simulate(self):
         """Simulate the protocol"""
-        await self._loop.run_in_executor(None, self._protocol_runner.simulate)
+        await self._call_in_executor(self._protocol_runner.simulate)
 
     async def _run(self):
         """Run the protocol"""
-        await self._loop.run_in_executor(None, self._protocol_runner.run)
+        await self._call_in_executor(self._protocol_runner.run)
+
+    async def _call_in_executor(self, func: typing.Callable[[], None]):
+        try:
+            await self._loop.run_in_executor(None, func)
+        except Exception as e:
+            log.exception("Failed")
+            await self._listener.on_error(str(e))
 
     def _on_command(self, msg):
         """ProtocolRunner command listener"""

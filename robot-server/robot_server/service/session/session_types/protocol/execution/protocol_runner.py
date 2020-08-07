@@ -4,7 +4,6 @@ import os
 import sys
 import typing
 
-from opentrons.api.dev_types import State
 from opentrons.broker import Broker
 from opentrons.commands import command_types
 from opentrons.hardware_control import ThreadedAsyncLock, ThreadManager
@@ -50,10 +49,6 @@ class ProtocolRunner:
         self._broker.subscribe(command_types.COMMAND, self._on_message)
         self._broker.subscribe(ApiProtocolSession.TOPIC, self._on_message)
         self._listeners: typing.List[ListenerType] = []
-
-    @property
-    def protocol_state(self) -> typing.Optional['State']:
-        return self._session.state if self._session else None
 
     def add_listener(self, listener: ListenerType):
         """Add a command listener"""
@@ -113,16 +108,18 @@ class ProtocolRunnerContext:
     def __init__(self, protocol: UploadedProtocol):
         self._protocol = protocol
         self._cwd = None
+        self._path = None
 
     def __enter__(self):
         self._cwd = os.getcwd()
         # Change working directory to temp dir
         os.chdir(self._protocol.meta.directory.name)
-        # Add temp dir to path
+        # Add temp dir to path after caching path
+        self._path = sys.path.copy()
         sys.path.append(self._protocol.meta.directory.name)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Undo working directory and path modifications
         os.chdir(self._cwd)
-        sys.path.remove(self._protocol.meta.directory.name)
+        sys.path = self._path
