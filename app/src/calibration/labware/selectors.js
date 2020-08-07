@@ -1,7 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
 import head from 'lodash/head'
-import isEqual from 'lodash/isEqual'
 import uniqWith from 'lodash/uniqWith'
 
 import {
