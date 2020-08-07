@@ -163,7 +163,7 @@ In your Jupyter notebook, you can use the Python Protocol API simulator by doing
 .. code-block:: python
 
     from opentrons import simulate
-    protocol = simulate.get_protocol_api('2.0')
+    protocol = simulate.get_protocol_api('|apiLevel|')
     p300 = protocol.load_instrument('p300_single', 'right')
     ...
 
