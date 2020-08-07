@@ -27,7 +27,6 @@ wheel = "==0.30.0"
 pytest-aiohttp = "*"
 typeguard = "*"
 sphinx-substitution-extensions = "*"
-v = {version = "*", editable = true}
 
 [packages]
 aionotify = "==0.2.0"
