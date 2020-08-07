@@ -5,6 +5,7 @@ strict:
 marks:
   - usefixtures:
       - run_server
+      - set_enable_http_protocol_sessions
 stages:
   - name: Create the session
     request:
@@ -20,12 +21,54 @@ stages:
     response:
       status_code: 404
 ---
+test_name: Protocol Session Cannot be created due to feature flag
+strict:
+  - json:on
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload a protocol to use with the session
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocol_file: "tests/integration/protocols/phony_proto.py"
+    response:
+      save:
+        json:
+          protocol_id: data.id
+      status_code: 201
+  - name: Can't create session due to feature flag
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: protocol
+            createParams:
+              protocolId: "{protocol_id}"
+    response:
+      status_code: 400
+      json:
+        errors:
+        - status: "400"
+          title: Creation Failed
+          detail: "Failed to create session of type 'protocol': HTTP Protocol Session feature is disabled."
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      method: DELETE
+---
 test_name: Protocol session life cycle
 strict:
   - json:on
 marks:
   - usefixtures:
       - run_server
+      - set_enable_http_protocol_sessions
 stages:
   - name: Upload a protocol to use with the session
     request:
