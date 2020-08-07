@@ -161,6 +161,7 @@ Using Jupyter
 In your Jupyter notebook, you can use the Python Protocol API simulator by doing
 
 .. code-block:: python
+   :substitutions:
 
     from opentrons import simulate
     protocol = simulate.get_protocol_api('|apiLevel|')
