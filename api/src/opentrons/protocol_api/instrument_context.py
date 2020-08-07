@@ -468,8 +468,6 @@ class InstrumentContext(CommandPublisher):
                 return [
                     # right edge
                     where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
-                    # left edge
-                    where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
                     # center
                     where._from_center_cartesian(x=0, y=0, z=1) + offset_pt,
                 ]
