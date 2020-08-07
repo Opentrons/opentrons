@@ -8,6 +8,7 @@ from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
 from uuid import uuid4
 
 from opentrons.api.util import RobotBusy, robot_is_busy
+from opentrons.config.feature_flags import enable_http_protocol_sessions
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons import robot
@@ -214,6 +215,10 @@ class Session(RobotBusy):
     def build_and_prep(
         cls, name, contents, hardware, loop, broker, motion_lock, extra_labware
     ):
+        if enable_http_protocol_sessions():
+            raise RuntimeError("Cannot run protocol due to HTTP Protocol "
+                               "Session feature being enabled.")
+
         protocol = parse(contents, filename=name,
                          extra_labware={helpers.uri_from_definition(defn): defn
                                         for defn in extra_labware})
