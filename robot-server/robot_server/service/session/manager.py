@@ -10,8 +10,9 @@ from robot_server.service.session.errors import SessionCreationException, \
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType, SessionType
-from robot_server.service.session.session_types import NullSession, \
-    CheckSession, SessionMetaData, TipLengthCalibration, DefaultSession
+from robot_server.service.session.session_types import (
+    NullSession, CheckSession, SessionMetaData, TipLengthCalibration,
+    DeckCalibrationSession, DefaultSession)
 from robot_server.service.session.session_types.protocol_session import \
     ProtocolSession
 
@@ -21,6 +22,7 @@ SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
     SessionType.null: NullSession,
     SessionType.calibration_check: CheckSession,
     SessionType.tip_length_calibration: TipLengthCalibration,
+    SessionType.deck_calibration: DeckCalibrationSession,
     SessionType.default: DefaultSession,
     SessionType.protocol: ProtocolSession,
 }

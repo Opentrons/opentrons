@@ -9,6 +9,8 @@ from robot_server.robot.calibration.check import (
     models as calibration_check_models)
 from robot_server.robot.calibration.tip_length import (
     models as tip_length_calibration_models)
+from robot_server.robot.calibration.deck import (
+    models as deck_calibration_models)
 
 from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
@@ -57,6 +59,7 @@ class SessionType(str, Enum):
         'tipLengthCalibration',
         tip_length_calibration_models.SessionCreateParams
     )
+    deck_calibration = 'deckCalibration'
     protocol = ('protocol', ProtocolCreateParams)
 
     @property
@@ -90,6 +93,7 @@ Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
 SessionDetails = typing.Union[
     calibration_check_models.CalibrationSessionStatus,
     tip_length_calibration_models.TipCalibrationSessionStatus,
+    deck_calibration_models.DeckCalibrationSessionStatus,
     EmptyModel
 ]
 

@@ -1,0 +1,296 @@
+---
+test_name: Deck calibration session full flow
+strict:
+  - json:on
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create the session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: deckCalibration
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id: data.id
+
+  - name: Get the session
+    request: &get_session
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data: &session_data
+          id: "{session_id}"
+          type: Session
+          attributes: &session_data_attributes
+            sessionType: deckCalibration
+            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+.\\d+"
+            createParams: null
+            details: &session_data_attribute_details
+              currentStep: sessionStarted
+              instrument: !anydict
+              labware: !anylist
+
+  - name: Load labware
+    request: &post_command
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.loadLabware
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: labwareLoaded
+
+  - name: Move to tiprack
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.deck.moveToTipRack
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: preparingPipette
+
+  - name: Move to deck
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.deck.moveToDeck
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: joggingToDeck
+
+  - name: Jog pipette to deck
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.jog
+            data:
+              vector: [0, 0, -10]
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: joggingToDeck
+
+  - name: Save deck height
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.saveOffset
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: joggingToDeck
+
+  - name: Move to point one
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.deck.moveToPointOne
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: savingPointOne
+
+  - name: Move to point two
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.deck.moveToPointTwo
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: savingPointTwo
+
+  - name: Move to point three
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.deck.moveToPointThree
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: savingPointThree
+
+  - name: Exit Session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.exitSession
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: sessionExited
+
+  - name: Delete the session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: DELETE
+    response:
+      status_code: 200
+
+  - name: There are no session except default
+    request:
+        url: "{host:s}:{port:d}/sessions"
+        method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          - id: "default"
+            type: Session
+            attributes:
+              sessionType: default
+              createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+              details: {}
+              createParams: null

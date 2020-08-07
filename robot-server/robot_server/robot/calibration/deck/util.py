@@ -1,0 +1,25 @@
+from enum import Enum
+
+from http import HTTPStatus
+from robot_server.service.errors import RobotServerError
+from robot_server.service.json_api.errors import Error
+
+
+class DeckCalibrationError(Enum):
+    NO_PIPETTE = (
+        HTTPStatus.FORBIDDEN,
+        'No pipettes Attached',
+        'No pipettes present')
+
+
+class DeckCalibrationException(RobotServerError):
+    def __init__(self, whicherror: DeckCalibrationError, *fmt_args):
+        super().__init__(
+            whicherror.value[0],
+            Error(
+                id=str(whicherror),
+                status=str(whicherror.value[0]),
+                title=whicherror.value[1],
+                detail=whicherror.value[2].format(*fmt_args)
+            )
+        )

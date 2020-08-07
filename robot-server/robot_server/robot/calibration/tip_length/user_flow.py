@@ -30,7 +30,7 @@ from .constants import (
     MOVE_TO_REF_POINT_SAFETY_BUFFER,
     TRASH_REF_POINT_OFFSET
 )
-from .models import (
+from ..helper_classes import (
     RequiredLabware,
     AttachedPipette
 )
