@@ -13,7 +13,8 @@ The commands in this section execute long or complex series of the commands desc
 
 The examples in this section will use the following set up:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -126,13 +127,13 @@ Basic
 
 This example below transfers 100 µL from well ``'A1'`` to well ``'B1'`` using the P300 Single pipette, automatically picking up a new tip and then disposing of it when finished.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(100, plate.wells_by_name()['A1'], plate.wells_by_name()['B1'])
 
 When you are using a multi-channel pipette, you can transfer the entire column (8 wells) in the plate to another using:
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(100, plate.wells_by_name()['A1'], plate.wells_by_name()['A2'])
 
@@ -152,13 +153,13 @@ Large Volumes
 
 Volumes larger than the pipette's ``max_volume`` (see :ref:`defaults`) will automatically divide into smaller transfers.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(700, plate.wells_by_name()['A2'], plate.wells_by_name()['B2'])
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring 700 from well A2 in "1" to well B2 in "1"
     Picking up tip well A1 in "2"
@@ -176,13 +177,13 @@ One to One
 Transfer commands are most useful when moving liquid between multiple wells. This will be a one to one transfer
 from where well ``A1``'s contents are transferred to well ``A2``, well ``B1``'s contents to ``B2``,and so on. This is the scenario displayed in the :ref:`transfer-image` visualization.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(100, plate.columns_by_name()['1'], plate.columns_by_name()['2'])
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring 100 from wells A1...H1 in "1" to wells A2...H2 in "1"
     Picking up tip well A1 in "2"
@@ -211,14 +212,14 @@ One to Many
 
 You can transfer from a single source to multiple destinations, and the other way around (many sources to one destination).
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(100, plate.wells_by_name()['A1'], plate.columns_by_name()['2'])
 
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring 100 from well A1 in "1" to wells A2...H2 in "1"
     Picking up tip well A1 in "2"
@@ -247,7 +248,7 @@ List of Volumes
 
 Instead of applying a single volume amount to all source/destination wells, you can instead pass a list of volumes.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(
         [20, 40, 60],
@@ -257,7 +258,7 @@ Instead of applying a single volume amount to all source/destination wells, you 
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring [20, 40, 60] from well A1 in "1" to wells B1...B3 in "1"
     Picking up tip well A1 in "2"
@@ -285,13 +286,13 @@ Consolidate
 
 Volumes going to the same destination well are combined within the same tip, so that multiple aspirates can be combined to a single dispense. This is the scenario described by the :ref:`consolidate-image` graphic.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.consolidate(30, plate.columns_by_name()['2'], plate.wells_by_name()['A1'])
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Consolidating 30 from wells A2...H2 in "1" to well A1 in "1"
     Transferring 30 from wells A2...H2 in "1" to well A1 in "1"
@@ -309,7 +310,7 @@ will have the steps...
 
 If there are multiple destination wells, the pipette will not combine the transfers - it will aspirate from one source, dispense into the target, then aspirate from the other source.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.consolidate(
       30,
@@ -319,7 +320,7 @@ If there are multiple destination wells, the pipette will not combine the transf
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Consolidating 30 from wells A1...H1 in "1" to wells A1...A2 in "1"
     Transferring 30 from wells A1...H1 in "1" to wells A1...A2 in "1"
@@ -344,14 +345,14 @@ Distribute
 
 Volumes from the same source well are combined within the same tip, so that one aspirate can provide for multiple dispenses. This is the scenario in the :ref:`distribute-image` graphic.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.distribute(55, plate.wells_by_name()['A1'], plate.rows_by_name()['A'])
 
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Distributing 55 from well A1 in "1" to wells A1...A12 in "1"
     Transferring 55 from well A1 in "1" to wells A1...A12 in "1"
@@ -380,7 +381,7 @@ The pipette will aspirate more liquid than it intends to dispense by the minimum
 
 If there are multiple source wells, the pipette will never combine their volumes into the same tip.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.distribute(
       30,
@@ -389,7 +390,7 @@ If there are multiple source wells, the pipette will never combine their volumes
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Distributing 30 from wells A1...A2 in "1" to wells A1...A12 in "1"
     Transferring 30 from wells A1...A2 in "1" to wells A1...A12 in "1"
@@ -459,7 +460,7 @@ Transfer commands will by default use the same tip for each well, then finally d
 
 The pipette can optionally get a new tip at the beginning of each aspirate, to help avoid cross contamination.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(
         100,
@@ -470,7 +471,7 @@ The pipette can optionally get a new tip at the beginning of each aspirate, to h
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring 100 from wells A1...A3 in "1" to wells B1...B3 in "1"
     Picking up tip well A1 in "2"
@@ -492,7 +493,7 @@ Never Get a New Tip
 
 For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()`` elsewhere in your protocol, the transfer command can ignore picking up or dropping tips.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.pick_up_tip()
     ...
@@ -507,7 +508,7 @@ For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()``
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Picking up tip well A1 in "2"
     ...
@@ -527,7 +528,7 @@ Use One Tip
 
 The default behavior of complex commands is to use one tip:
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(
         100,
@@ -537,7 +538,7 @@ The default behavior of complex commands is to use one tip:
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Picking up tip well A1 in "2"
     Transferring 100 from wells A1...A3 in "1" to wells B1...B3 in "1"
@@ -554,7 +555,7 @@ will have the steps...
 
 By default, compelx commands will drop the pipette's tips in the trash container. However, if you wish to instead return the tip to its tip rack, you can set ``trash=False``.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(
         100,
@@ -565,7 +566,7 @@ By default, compelx commands will drop the pipette's tips in the trash container
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring 100 from well A1 in "1" to well B1 in "1"
     Picking up tip well A1 in "2"
@@ -581,7 +582,7 @@ will have the steps...
 
 A :ref:`touch-tip` can be performed after every aspirate and dispense by setting ``touch_tip=True``.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(
         100,
@@ -592,7 +593,7 @@ A :ref:`touch-tip` can be performed after every aspirate and dispense by setting
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring 100 from well A1 in "1" to well A2 in "1"
     Picking up tip well A1 in "2"
@@ -609,7 +610,7 @@ will have the steps...
 
 A :ref:`blow-out` can be performed after every dispense that leaves the tip empty by setting ``blow_out=True``.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(
         100,
@@ -620,7 +621,7 @@ A :ref:`blow-out` can be performed after every dispense that leaves the tip empt
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring 100 from well A1 in "1" to well A2 in "1"
     Picking up tip well A1 in "2"
@@ -636,7 +637,7 @@ will have the steps...
 
 A :ref:`mix` can be performed before every aspirate by setting ``mix_before=``, and after every dispense by setting ``mix_after=``. The value of ``mix_before=`` or ``mix_after=`` must be a tuple; the first value is the number of repetitions, the second value is the amount of liquid to mix.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(
         100,
@@ -648,7 +649,7 @@ A :ref:`mix` can be performed before every aspirate by setting ``mix_before=``, 
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring 100 from well A1 in "1" to well A2 in "1"
     Picking up tip well A1 in "2"
@@ -675,7 +676,7 @@ will have the steps...
 
 An :ref:`air-gap` can be performed after every aspirate by setting ``air_gap=volume``, where the value is the volume of air in µL to aspirate after aspirating the liquid. The entire volume in the tip, air gap and the liquid volume, will be dispensed all at once at the destination specified in the complex command.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.transfer(
         100,
@@ -686,7 +687,7 @@ An :ref:`air-gap` can be performed after every aspirate by setting ``air_gap=vol
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Transferring 100 from well A1 in "1" to well A2 in "1"
     Picking up tip well A1 in "2"
@@ -705,7 +706,7 @@ When dispensing multiple times from the same tip in :py:meth:`.InstrumentContext
 
 The default disposal volume is the pipette's minimum volume (see :ref:`Defaults`), which will be blown out at the trash after the dispenses.
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     pipette.distribute(
         30,
@@ -716,7 +717,7 @@ The default disposal volume is the pipette's minimum volume (see :ref:`Defaults`
 
 will have the steps...
 
-.. substitution-code-block:: python
+.. code-block:: python
 
     Distributing 30 from wells A1...A2 in "1" to wells A2...H2 in "1"
     Transferring 30 from wells A1...A2 in "1" to wells A2...H2 in "1"

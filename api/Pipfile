@@ -26,6 +26,8 @@ wheel = "==0.30.0"
 "c445fee" = {editable = true, path = "./../shared-data/python"}
 pytest-aiohttp = "*"
 typeguard = "*"
+sphinx-substitution-extensions = "*"
+v = {version = "*", editable = true}
 
 [packages]
 aionotify = "==0.2.0"

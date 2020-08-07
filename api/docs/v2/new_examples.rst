@@ -14,7 +14,8 @@ Basic Transfer
 
 Moving 100 µL from one well to another:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -30,7 +31,8 @@ Moving 100 µL from one well to another:
 
 This accomplishes the same thing as the following basic commands:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -54,7 +56,8 @@ Loops
 
 Loops in Python allow your protocol to perform many actions, or act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``7``, and uses that loop's current value to transfer from all wells in a reservoir to each row of a plate:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -81,7 +84,8 @@ Multiple Air Gaps
 
 The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from the first five wells in the reservoir, while creating an air gap between each sample.
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -111,7 +115,8 @@ Dilution
 
 This example first spreads a diluent to all wells of a plate. It then dilutes 8 samples from the reservoir across the 8 columns of the plate.
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -148,7 +153,8 @@ Plate Mapping
 
 This example deposits various volumes of liquids into the same plate of wells and automatically refill the tip volume when it runs out.
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 

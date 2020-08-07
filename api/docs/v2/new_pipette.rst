@@ -16,7 +16,8 @@ Loading A Pipette
 
 Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext.load_instrument`. This method requires the model of the instrument to load, the mount to load it in, and (optionally) a list of associated tipracks:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -58,7 +59,8 @@ pipettes will always aspirate and dispense on all channels simultaneously.
 
 For instance, to aspirate from the first column of a 96-well plate you would write:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -97,7 +99,8 @@ other well starting with the first (rows A, C, E, G, I, K, M, and O); specifying
 B1 similarly accesses every other well, but starting with the second (rows B, D,
 F, H, J, L, N, and P).
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -195,7 +198,8 @@ throughout your protocol. This removes the need to specify tip locations in
 
 For instance, in this protocol you can see the effects of specifying tipracks:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
    from opentrons import protocol_api
 
@@ -259,7 +263,8 @@ Opentrons pipettes aspirate or dispense at different rates. These flow rates can
 
 Each of these attributes can be altered without affecting the others.
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -329,7 +334,8 @@ Changing these attributes will affect *all* aspirates and dispenses, even those
 executed as part of a transfer.
 
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api, types
 
@@ -376,7 +382,8 @@ the overall speed of the gantry. Its default is 400 mm/s.
    shouldn't make this value higher than the default without extensive experimentation.
 
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api, types
 
@@ -405,7 +412,8 @@ speed limits take effect for both pipettes and all motions. These can be set for
 axes, assigning to a key sets a max speed, and deleting a key or setting it to ``None``
 resets that axis's limit to the default:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     metadata = {'apiLevel': '|apiLevel|'}
 

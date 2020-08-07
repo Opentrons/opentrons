@@ -53,7 +53,8 @@ The design goal of this API is to make code readable and easy to understand. For
 
 If we were to rewrite this with the Python Protocol API, it would look like the following:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -110,7 +111,8 @@ The Run Function and the Protocol Context
 
 Protocols are structured around a function called ``run(protocol)``, defined in code like this:
 
-.. substitution-code-block:: python
+.. code-block:: python
+    :substitutions:
 
    from opentrons import protocol_api
 
@@ -148,13 +150,13 @@ Our example protocol above loads
 
 * a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2:
 
-.. substitution-code-block:: python
+.. code-block:: python
 
    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
 
 * an `Opentrons 300µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 1:
 
-.. substitution-code-block:: python
+.. code-block:: python
 
    tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
 
