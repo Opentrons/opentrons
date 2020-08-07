@@ -62,7 +62,10 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         :param configuration: The session configuration
         """
         self._worker_directive = WorkerDirective.none
-        self._worker_state: 'State' = None
+        # We're using Session to manage state so I'm not
+        #  adding states. Don't want to start with `None` and `stopped` seems
+        #  the most reasonable start state.
+        self._worker_state: 'State' = 'stopped'
         self._worker = self.create_worker(configuration, protocol, self)
         self._handlers: typing.Dict[CommandDefinitionType, typing.Any] = {
             ProtocolCommand.start_run: self._worker.handle_run,

@@ -63,7 +63,7 @@ class _Worker:
         """Shutdown the worker. Cancel run and terminate worker task"""
         # Kill the command task
         await self._set_command(WorkerDirective.terminate)
-        # Kill the protocl
+        # Kill the protocol
         self._protocol_runner.cancel()
         # Wait for run task to finish
         await self._async_command_task

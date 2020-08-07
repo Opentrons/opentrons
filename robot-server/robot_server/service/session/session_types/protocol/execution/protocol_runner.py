@@ -55,13 +55,6 @@ class ProtocolRunner:
     def protocol_state(self) -> typing.Optional['State']:
         return self._session.state if self._session else None
 
-    @property
-    def session(self) -> ApiProtocolSession:
-        """Access the session"""
-        if not self._session:
-            raise ProtocolRunnerException("Session is not loaded yet")
-        return self._session
-
     def add_listener(self, listener: ListenerType):
         """Add a command listener"""
         self._listeners.append(listener)
@@ -85,25 +78,30 @@ class ProtocolRunner:
 
     def run(self):
         """Run the protocol"""
-        with ProtocolRunnerContext(self._protocol):
-            self.session.run()
+        if self._session:
+            with ProtocolRunnerContext(self._protocol):
+                self._session.run()
 
     def simulate(self):
         """Simulate the protocol"""
-        with ProtocolRunnerContext(self._protocol):
-            self.session.refresh()
+        if self._session:
+            with ProtocolRunnerContext(self._protocol):
+                self._session.refresh()
 
     def cancel(self):
         """Cancel running"""
-        self.session.stop()
+        if self._session:
+            self._session.stop()
 
     def pause(self):
         """Pause running"""
-        self.session.pause()
+        if self._session:
+            self._session.pause()
 
     def resume(self):
         """Resume running"""
-        self.session.resume()
+        if self._session:
+            self._session.resume()
 
     def _on_message(self, msg):
         """Dispatch the events"""
