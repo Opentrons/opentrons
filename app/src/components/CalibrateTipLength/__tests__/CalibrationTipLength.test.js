@@ -6,6 +6,7 @@ import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
+import { getRequestById } from '../../../robot-api'
 import * as Sessions from '../../../sessions'
 import { mockTipLengthCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
 
@@ -18,10 +19,12 @@ import { TipConfirmation } from '../TipConfirmation'
 import { MeasureTip } from '../MeasureTip'
 import { CompleteConfirmation } from '../CompleteConfirmation'
 
+import type { State } from '../../../types'
 import type { TipLengthCalibrationStep } from '../../../sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')
+jest.mock('../../../robot-api/selectors')
 
 type CalibrateTipLengthSpec = {
   component: React.AbstractComponent<any>,
@@ -34,6 +37,11 @@ const mockGetDeckDefinitions: JestMockFn<
   [],
   $Call<typeof getDeckDefinitions, any>
 > = getDeckDefinitions
+
+const mockGetRequestById: JestMockFn<
+  [State, string],
+  $Call<typeof getRequestById, State, string>
+> = getRequestById
 
 describe('CalibrateTipLength', () => {
   let mockStore
@@ -131,5 +139,14 @@ describe('CalibrateTipLength', () => {
     act(() => getExitButton(wrapper).invoke('onClick')())
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
+  })
+
+  it('renders spinner when last tracked request is pending, and not present otherwise', () => {
+    const wrapper = render()
+    expect(wrapper.find('SpinnerModalPage').exists()).toBe(false)
+
+    mockGetRequestById.mockReturnValue({ status: 'pending' })
+    wrapper.setProps({})
+    expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
   })
 })
