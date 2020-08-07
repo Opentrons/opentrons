@@ -7,6 +7,7 @@ class DeckCalibrationState(str, Enum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     preparingPipette = "preparingPipette"
+    inspectingTip = "inspectingTip"
     joggingToDeck = "joggingToDeck"
     savingPointOne = "savingPointOne"
     savingPointTwo = "savingPointTwo"
