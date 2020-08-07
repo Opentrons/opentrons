@@ -76,9 +76,9 @@ The OT-2's command line is accessible either by creating a new terminal in Jupyt
 
 To execute a protocol via SSH, copy it to the OT-2 using a program like ``scp`` and then use the command line program ``opentrons_execute``:
 
-.. code-block:: shell
+.. prompt:: bash
 
-   # opentrons_execute /data/my_protocol.py
+   opentrons_execute /data/my_protocol.py
 
 
 You can access help on the usage of ``opentrons_execute`` by calling ``opentrons_execute --help``. This script has a couple options to let you customize what it prints out when you run it. By default, it will print out the same runlog you see in the Opentrons App when running a protocol, as it executes; it will also print out internal logs at level ``warning`` or above. Both of these behaviors can be changed.
