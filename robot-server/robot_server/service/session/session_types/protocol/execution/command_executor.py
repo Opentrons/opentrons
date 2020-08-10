@@ -102,7 +102,8 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                 self.current_state, {}
         ):
             raise UnsupportedCommandException(
-                f"Can't do '{command_def}' during self.{self.current_state}")
+                f"Can't execute '{command_def}' during "
+                f"state '{self.current_state}'")
 
         # TODO: Amit 8/3/2020 - proper schema for command list
         self._commands.append(asdict(command))
