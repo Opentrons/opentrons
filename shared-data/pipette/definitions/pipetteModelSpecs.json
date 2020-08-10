@@ -1437,6 +1437,7 @@
         "min": 0,
         "max": 100
       },
+      "idleCurrent": 0.3,
       "quirks": []
     },
     "p20_multi_v2.0": {
@@ -3563,6 +3564,7 @@
         "min": 0,
         "max": 100
       },
+      "idleCurrent": 0.3,
       "quirks": []
     },
     "p300_multi_v1": {
@@ -5154,7 +5156,8 @@
         "max": 100
       },
       "quirks": ["pickupTipShake"],
-      "returnTipHeight": 0.83
+      "returnTipHeight": 0.83,
+      "idleCurrent": 0.3
     }
   },
   "mutableConfigs": [
