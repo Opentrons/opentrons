@@ -8,8 +8,9 @@ from robot_server.service.json_api.errors import Error
 class DeckCalibrationError(Enum):
     NO_PIPETTE = (
         HTTPStatus.FORBIDDEN,
-        'No pipettes Attached',
-        'No pipettes present')
+        'No Pipettes Attached',
+        'At least one pipette must be attached to the OT-2 to '
+        'run deck calibration')
 
 
 class DeckCalibrationException(RobotServerError):

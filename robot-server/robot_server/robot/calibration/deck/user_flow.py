@@ -15,6 +15,7 @@ from .constants import (
     TIP_RACK_SLOT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER)
 from .state_machine import DeckCalibrationStateMachine
+# TODO: uncomment the following to raise deck cal errors
 # from .util import (
 #     DeckCalibrationException as ErrorExc,
 #     DeckCalibrationError as Error)
@@ -90,15 +91,7 @@ class DeckCalibrationUserFlow:
 
     def get_required_labware(self) -> List[RequiredLabware]:
         lw = self._get_tip_rack_lw()
-        return [
-            RequiredLabware(
-                slot=lw._parent,
-                loadName=lw.load_name,
-                namespace=lw._definition['namespace'],
-                version=str(lw._definition['version']),
-                isTiprack=lw.is_tiprack,
-                definition=lw._definition)
-            ]
+        return [RequiredLabware.from_lw(lw)]
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state

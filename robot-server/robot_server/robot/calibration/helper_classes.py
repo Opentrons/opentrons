@@ -6,6 +6,8 @@ from uuid import uuid4, UUID
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocol_api import labware
+from opentrons.types import DeckLocation
 
 
 if typing.TYPE_CHECKING:
@@ -132,10 +134,27 @@ class AttachedPipette(BaseModel):
 
 
 class RequiredLabware(BaseModel):
-    """A model describing all tipracks required, based on pipettes attached."""
-    slot: str
+    """
+    A model that describes a single labware required for performing a
+    calibration action.
+    """
+    slot: DeckLocation
     loadName: str
     namespace: str
     version: str
     isTiprack: bool
     definition: dict
+
+    @classmethod
+    def from_lw(cls,
+                lw: labware.Labware,
+                slot: typing.Optional[DeckLocation] = None):
+        if not slot:
+            slot = lw._parent  # type: ignore
+        return cls(
+            slot=slot,
+            loadName=lw.load_name,
+            namespace=lw._definition['namespace'],
+            version=str(lw._definition['version']),
+            isTiprack=lw.is_tiprack,
+            definition=lw._definition)
