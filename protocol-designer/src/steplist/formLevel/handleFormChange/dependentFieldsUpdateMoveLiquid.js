@@ -231,8 +231,10 @@ const clampAirGapVolume = (
   rawForm: FormData,
   pipetteEntities: PipetteEntities
 ): FormPatch => {
-  const patchedAspirateAirgapVolume = patch.aspirate_airGap_volume
-  const pipetteId = patch.pipette || rawForm.pipette
+  const patchedAspirateAirgapVolume =
+    patch.aspirate_airGap_volume ?? rawForm?.aspirate_airGap_volume
+
+  const pipetteId = patch.pipette ?? rawForm.pipette
 
   if (
     patchedAspirateAirgapVolume &&
