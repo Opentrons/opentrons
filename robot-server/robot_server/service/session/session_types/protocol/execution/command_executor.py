@@ -151,6 +151,9 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
     async def on_error(self, err):
         """worker listener callback"""
         log.info(f"on_error: {err}")
+        # TODO Amit 08/10/2020 Store err as part of ProtocolSession response
+        #  schema.
+        self.current_state = "error"
 
     async def on_protocol_event(self, cmd: typing.Any):
         """worker listener callback"""
