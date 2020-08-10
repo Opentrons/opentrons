@@ -55,12 +55,10 @@ export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
         <p className={styles.intro_content}>{TIP_LENGTH_CAL_INTRO_BODY}</p>
         <h5>{LABWARE_REQS}</h5>
         <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING_3}>
-          {tipRack && (
-            <RequiredLabwareCard
-              loadName={tipRack.loadName}
-              isTiprack={tipRack.isTiprack}
-            />
-          )}
+          <RequiredLabwareCard
+            loadName={tipRack.loadName}
+            isTiprack={tipRack.isTiprack}
+          />
           {calBlock && (
             <RequiredLabwareCard
               loadName={calBlock.loadName}

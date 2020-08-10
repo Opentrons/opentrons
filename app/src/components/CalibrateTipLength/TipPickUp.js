@@ -86,9 +86,7 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
       >
         <h3 className={styles.intro_header}>
           {TIP_PICK_UP_HEADER}
-          {tipRack?.definition
-            ? getLabwareDisplayName(tipRack.definition).replace('µL', 'uL')
-            : null}
+          {getLabwareDisplayName(tipRack.definition).replace('µL', 'uL')}
         </h3>
         <Box
           padding={SPACING_3}

@@ -17,7 +17,7 @@ export type CalibrateTipLengthParentProps = {|
 export type CalibrateTipLengthChildProps = {|
   isMulti: boolean,
   mount: string,
-  tipRack: TipLengthCalibrationLabware | null,
+  tipRack: TipLengthCalibrationLabware,
   calBlock: TipLengthCalibrationLabware | null,
   sendSessionCommand: (
     command: SessionCommandString,
