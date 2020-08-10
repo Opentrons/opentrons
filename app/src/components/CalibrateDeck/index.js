@@ -115,8 +115,9 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
   }
 
   const { currentStep } = session?.details
-  // TODO: IMMEDIATELY pull actual tipRack from session details
+  // TODO: IMMEDIATELY pull actual tipRack and isMulti from session details
   const tipRack = {}
+  const isMulti = false
   const Panel = PANEL_BY_STEP[currentStep]
 
   return Panel ? (
@@ -129,6 +130,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
           sendSessionCommand={sendCommand}
           deleteSession={deleteSession}
           tipRack={tipRack}
+          isMulti={isMulti}
         />
       </ModalPage>
       {showConfirmExit && (
