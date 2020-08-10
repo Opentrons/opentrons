@@ -14,11 +14,13 @@ import * as Sessions from '../../sessions'
 import type { CalibrateTipLengthChildProps } from './types'
 import styles from './styles.css'
 
-const CONFIRM_TIP_BODY = 'Did pipette pick up tips successfully?'
+const CONFIRM_TIP_BODY = 'Did pipette pick up tip successfully?'
 const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, continue'
 const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
 
-export function TipConfirmation(props: CalibrateTipLengthChildProps): React.Node {
+export function TipConfirmation(
+  props: CalibrateTipLengthChildProps
+): React.Node {
   const { sendSessionCommand } = props
 
   const invalidateTip = () => {

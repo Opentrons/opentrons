@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import {
-  Icon,
   Box,
   Flex,
   PrimaryButton,
@@ -16,14 +15,11 @@ import {
   SPACING_2,
   SPACING_3,
   TEXT_ALIGN_CENTER,
-  SPACING_1,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { PENDING } from '../../robot-api'
 import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
-import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
 import type { CalibrateTipLengthChildProps } from './types'
 import styles from './styles.css'
@@ -66,7 +62,7 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
   )
 
   const pickUpTip = () => {
-    sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP, {})
+    sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP)
   }
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {

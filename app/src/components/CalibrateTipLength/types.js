@@ -1,15 +1,11 @@
 // @flow
 
-import type { RequestStatus } from '../../robot-api/types'
 import type {
   SessionCommandString,
   SessionCommandData,
   TipLengthCalibrationSession,
 } from '../../sessions/types'
-import type {
-  TipLengthCalibrationInstrument,
-  TipLengthCalibrationLabware,
-} from '../../sessions/tip-length-calibration/types'
+import type { TipLengthCalibrationLabware } from '../../sessions/tip-length-calibration/types'
 
 export type CalibrateTipLengthParentProps = {|
   robotName: string,

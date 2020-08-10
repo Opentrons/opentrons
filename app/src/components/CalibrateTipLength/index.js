@@ -81,10 +81,9 @@ export function CalibrateTipLength(
   }, [instrument])
 
   const tipRack: TipLengthCalibrationLabware | null =
-    labware.find(l => l.isTiprack) ?? null
-  const calBlock: TipLengthCalibrationLabware | null = hasBlock
-    ? labware.find(l => !l.isTiprack) ?? null
-    : null
+    (labware && labware.find(l => l.isTiprack)) ?? null
+  const calBlock: TipLengthCalibrationLabware | null =
+    hasBlock && labware ? labware.find(l => !l.isTiprack) ?? null : null
 
   function sendCommand(
     command: SessionCommandString,
