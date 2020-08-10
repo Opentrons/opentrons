@@ -21,7 +21,7 @@ import type { RequestState } from '../../robot-api/types'
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { TipPickUp } from './TipPickUp'
-import { ConfirmTip } from './ConfirmTip'
+import { TipConfirmation } from './TipConfirmation'
 import { SaveZPoint } from './SaveZPoint'
 import { SaveXYPoint } from './SaveXYPoint'
 import { CompleteConfirmation } from './CompleteConfirmation'
@@ -39,7 +39,7 @@ const PANEL_BY_STEP: {
   sessionStarted: Introduction,
   labwareLoaded: DeckSetup,
   preparingPipette: TipPickUp,
-  inspectingTip: ConfirmTip,
+  inspectingTip: TipConfirmation,
   joggingToDeck: SaveZPoint,
   joggingToPointOne: SaveXYPoint,
   joggingToPointTwo: SaveXYPoint,
