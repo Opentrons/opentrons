@@ -61,14 +61,15 @@ export function Pipettes(props: Props): React.Node {
       />
       {robotName &&
         !!currentPipette &&
-        !!tipRackDef &&
         (ff.enableCalibrationOverhaul ? (
-          <CalibrateTipLengthControl
-            mount={currentPipette.mount}
-            robotName={robotName}
-            hasCalibrated={currentPipette.probed}
-            tipRackDefinition={tipRackDef}
-          />
+          !!tipRackDef ? (
+            <CalibrateTipLengthControl
+              mount={currentPipette.mount}
+              robotName={robotName}
+              hasCalibrated={currentPipette.probed}
+              tipRackDefinition={tipRackDef}
+            />
+          ) : null
         ) : (
           <TipProbe {...currentPipette} />
         ))}
