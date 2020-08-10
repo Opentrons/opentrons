@@ -110,7 +110,7 @@ class _Worker:
         try:
             await self._loop.run_in_executor(None, func)
         except Exception as e:
-            log.exception("Failed")
+            log.exception("Protocol running error:")
             await self._listener.on_error(str(e))
 
     def _on_command(self, msg):

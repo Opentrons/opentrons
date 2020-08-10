@@ -61,7 +61,6 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         :param protocol: The protocol resource to use
         :param configuration: The session configuration
         """
-        self._worker_directive = WorkerDirective.none
         # We're using Session to manage state so I'm not
         #  adding states. Don't want to start with `None` and `stopped` seems
         #  the most reasonable start state.
@@ -134,7 +133,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
 
     @current_state.setter
     def current_state(self, state: 'State'):
-        log.info(f"New worker state: '{state}'")
+        log.info(f"New state: '{state}'")
         self._worker_state = state
 
     async def clean_up(self):
@@ -142,20 +141,19 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         await self._worker.close()
 
     async def on_directive(self, directive: WorkerDirective):
-        """"""
-        log.debug(f"on_directive: {directive}")
-        self._worker_directive = directive
+        """worker listener callback"""
+        log.info(f"on_directive: {directive}")
 
     async def on_ready(self):
-        """"""
-        log.debug("on_ready")
+        """worker listener callback"""
+        log.info("on_ready")
 
     async def on_error(self, err):
-        """"""
-        log.debug(f"on_error: {err}")
+        """worker listener callback"""
+        log.info(f"on_error: {err}")
 
     async def on_protocol_event(self, cmd: typing.Any):
-        """A protocol event arrived"""
+        """worker listener callback"""
         # These are broker notifications from Session object.
         topic = cmd.get('topic')
         if topic == Session.TOPIC:
