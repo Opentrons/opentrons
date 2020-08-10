@@ -485,7 +485,9 @@ async def test_http_protocol_sessions_enabled(session_manager, protocol):
     enabled."""
     with patch.object(session, "enable_http_protocol_sessions") as m:
         m.return_value = True
-        with pytest.raises(RuntimeError,
-                           match="Cannot run protocol due to HTTP Protocol "
-                                 "Session feature being enabled"):
+        with pytest.raises(
+                RuntimeError,
+                match="Please disable the 'Enable Experimental HTTP Protocol "
+                      "Sessions' advanced setting for this robot if you'd "
+                      "like to upload protocols from the Opentrons App"):
             session_manager.create(name='<blank>', contents=protocol.text)

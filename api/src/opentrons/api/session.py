@@ -216,8 +216,10 @@ class Session(RobotBusy):
         cls, name, contents, hardware, loop, broker, motion_lock, extra_labware
     ):
         if enable_http_protocol_sessions():
-            raise RuntimeError("Cannot run protocol due to HTTP Protocol "
-                               "Session feature being enabled.")
+            raise RuntimeError(
+                "Please disable the 'Enable Experimental HTTP Protocol "
+                "Sessions' advanced setting for this robot if you'd like to "
+                "upload protocols from the Opentrons App")
 
         protocol = parse(contents, filename=name,
                          extra_labware={helpers.uri_from_definition(defn): defn

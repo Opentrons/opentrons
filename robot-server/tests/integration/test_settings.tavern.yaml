@@ -63,8 +63,8 @@ stages:
         - id: enableHttpProtocolSessions
           old_id: Null
           title: Enable Experimental HTTP Protocol Sessions
-          description: !re_search "Activating this will disable protocol running from the Opentrons applicatio"
-          restart_required: false
+          description: !re_search "Activating this will disable protocol running from the Opentrons application"
+          restart_required: true
           value: !anything
         links: !anydict
 

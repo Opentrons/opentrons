@@ -165,7 +165,8 @@ settings = [
         title='Enable Experimental HTTP Protocol Sessions',
         description='Do not activate this unless you are a developer. '
                     'Activating this will disable protocol running from the '
-                    'Opentrons application.'
+                    'Opentrons application.',
+        restart_required=True,
     )
 ]
 
