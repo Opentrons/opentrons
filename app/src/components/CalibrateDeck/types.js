@@ -22,4 +22,5 @@ export type CalibrateDeckChildProps = {|
   deleteSession: () => void,
   tipRack: DeckCalibrationLabware,
   isMulti: boolean,
+  mount: string,
 |}
