@@ -195,9 +195,7 @@ class TipCalibrationUserFlow:
                 self._hw_pipette.critical_point)
 
     async def _get_current_point(self):
-        cp = self._get_critical_point()
-        return await self._hardware.gantry_position(self._mount,
-                                                    critical_point=cp)
+        return await self._hardware.gantry_position(self._mount)
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
@@ -262,10 +260,8 @@ class TipCalibrationUserFlow:
             coeff = self._hw_pipette.config.return_tip_height
             to_pt = self._tip_origin_pt - Point(0, 0, tip_length * coeff)
 
-            cp = self._get_critical_point()
             await self._hardware.move_to(mount=self._mount,
-                                         abs_position=to_pt,
-                                         critical_point=cp)
+                                         abs_position=to_pt)
             await self._hardware.drop_tip(self._mount)
             self._tip_origin_pt = None
 
