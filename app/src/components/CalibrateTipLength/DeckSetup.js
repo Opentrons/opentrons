@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
+import compact from 'lodash/compact'
 import { OutlineButton, RobotWorkSpace } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
@@ -18,7 +19,9 @@ const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
-  const { hasBlock, labware, sendSessionCommand } = props
+  const { calBlock, tipRack, sendSessionCommand } = props
+
+  const allLabware = compact([tipRack, calBlock])
 
   const proceed = () => {
     sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT)
@@ -27,7 +30,7 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   return (
     <>
       <div className={styles.prompt}>
-        {hasBlock ? (
+        {calBlock ? (
           <p className={styles.prompt_text}>{DECK_SETUP_WITH_BLOCK_PROMPT}</p>
         ) : (
           <p className={styles.prompt_text}>{DECK_SETUP_NO_BLOCK_PROMPT}</p>
@@ -60,7 +63,7 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
               deckSlotsById,
               (slot: $Values<typeof deckSlotsById>, slotId) => {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
-                const labwareForSlot = labware.find(l => l.slot === slotId)
+                const labwareForSlot = allLabware.find(l => l.slot === slotId)
                 const labwareDef = labwareForSlot?.definition
 
                 return labwareDef ? (

@@ -39,7 +39,7 @@ export function CompleteConfirmation(
           <h3>{COMPLETE_HEADER}</h3>
         </Flex>
         <Text marginY={SPACING_4} className={styles.complete_summary}>
-          {props.hasBlock ? COMPLETE_BODY : null}
+          {props.calBlock ? COMPLETE_BODY : null}
         </Text>
 
         {/* TODO: add block removal demo asset */}
