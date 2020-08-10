@@ -109,7 +109,7 @@ stages:
             details:
               protocolId: "{protocol_id}"
               currentState: !anystr
-              executedCommands: !anylist
+              commands: !anylist
         links: !anydict
   - name: Get the session
     request:
