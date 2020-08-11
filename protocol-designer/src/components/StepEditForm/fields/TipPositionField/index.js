@@ -30,10 +30,10 @@ function getLabwareFieldForPositioningField(
   const fieldMap: { [TipOffsetFields]: StepFieldName } = {
     aspirate_mmFromBottom: 'aspirate_labware',
     aspirate_touchTip_mmFromBottom: 'aspirate_labware',
-    aspirate_delay_tip_position: 'aspirate_labware',
+    aspirate_delay_mmFromBottom: 'aspirate_labware',
     dispense_mmFromBottom: 'dispense_labware',
     dispense_touchTip_mmFromBottom: 'dispense_labware',
-    dispense_delay_tip_position: 'dispense_labware',
+    dispense_delay_mmFromBottom: 'dispense_labware',
     mix_mmFromBottom: 'labware',
     mix_touchTip_mmFromBottom: 'labware',
   }
