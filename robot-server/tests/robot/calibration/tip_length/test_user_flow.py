@@ -203,6 +203,7 @@ async def test_invalidate_tip(mock_user_flow):
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
+            critical_point=uf._hw_pipette.critical_point
         ),
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
@@ -221,6 +222,7 @@ async def test_exit(mock_user_flow):
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
+            critical_point=uf._hw_pipette.critical_point
         ),
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
