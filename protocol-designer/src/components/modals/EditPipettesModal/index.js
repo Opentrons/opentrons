@@ -129,7 +129,7 @@ const makeUpdatePipettes = (
     id => !(id in nextPipettes)
   )
 
-  // SubstitutionMap represents a map of oldId => newId
+  // SubstitutionMap represents a map of oldPipetteId => newPipetteId
   // When a pipette's tiprack changes, the ids will be the same
   type SubstitutionMap = { [pipetteId: string]: string }
 
