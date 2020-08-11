@@ -54,6 +54,7 @@ The design goal of this API is to make code readable and easy to understand. For
 If we were to rewrite this with the Python Protocol API, it would look like the following:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
@@ -62,7 +63,7 @@ If we were to rewrite this with the Python Protocol API, it would look like the 
         'protocolName': 'My Protocol',
         'author': 'Name <email@address.com>',
         'description': 'Simple protocol to get started using OT2',
-        'apiLevel': '2.2'
+        'apiLevel': '|apiLevel|'
     }
 
     # protocol run function. the part after the colon lets your editor know
@@ -111,10 +112,11 @@ The Run Function and the Protocol Context
 Protocols are structured around a function called ``run(protocol)``, defined in code like this:
 
 .. code-block:: python
+    :substitutions:
 
    from opentrons import protocol_api
 
-   metadata = {'apiLevel': '2.2'}
+   metadata = {'apiLevel': '|apiLevel|'}
 
    def run(protocol: protocol_api.ProtocolContext):
        pass

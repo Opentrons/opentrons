@@ -17,10 +17,11 @@ Loading A Pipette
 Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext.load_instrument`. This method requires the model of the instrument to load, the mount to load it in, and (optionally) a list of associated tipracks:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a P50 multi on the left slot
@@ -59,10 +60,11 @@ pipettes will always aspirate and dispense on all channels simultaneously.
 For instance, to aspirate from the first column of a 96-well plate you would write:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.6'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 300uL tips
@@ -98,10 +100,11 @@ B1 similarly accesses every other well, but starting with the second (rows B, D,
 F, H, J, L, N, and P).
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.6'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 300uL tips
@@ -196,10 +199,11 @@ throughout your protocol. This removes the need to specify tip locations in
 For instance, in this protocol you can see the effects of specifying tipracks:
 
 .. code-block:: python
+    :substitutions:
 
    from opentrons import protocol_api
 
-   metadata = {'apiLevel': '2.2'}
+   metadata = {'apiLevel': '|apiLevel|'}
 
    def run(protocol: protocol_api.ProtocolContext):
        tiprack_left = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
@@ -260,10 +264,11 @@ Opentrons pipettes aspirate or dispense at different rates. These flow rates can
 Each of these attributes can be altered without affecting the others.
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
@@ -330,10 +335,11 @@ executed as part of a transfer.
 
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
@@ -377,10 +383,11 @@ the overall speed of the gantry. Its default is 400 mm/s.
 
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
@@ -406,8 +413,9 @@ axes, assigning to a key sets a max speed, and deleting a key or setting it to `
 resets that axis's limit to the default:
 
 .. code-block:: python
+    :substitutions:
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
         protocol.max_speeds['X'] = 50  # limit x axis to 50 mm/s

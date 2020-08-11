@@ -22,11 +22,12 @@ Expressing Versions
 You must specify the API version you are targeting at the top of your Python protocol. This is done in the ``metadata`` block, using the key ``'apiLevel'``:
 
 .. code-block:: python
+  :substitutions:
 
    from opentrons import protocol_api
 
    metadata = {
-       'apiLevel': '2.2',
+       'apiLevel': '|apiLevel|',
        'author': 'A. Biologist'}
 
    def run(protocol: protocol_api.ProtocolContext):

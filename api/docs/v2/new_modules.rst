@@ -20,10 +20,11 @@ Like labware and pipettes, you must inform the Protocol API of the modules you w
 Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an object representing the module.
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
          # Load a Magnetic Module GEN2 in deck slot 1.
@@ -105,10 +106,11 @@ Loading Labware Onto Your Module
 Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded. You do this using :py:meth:`.ModuleContext.load_labware`. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
          module = protocol.load_module('Temperature Module', slot)
@@ -153,10 +155,11 @@ The Temperature Module has the following methods that can be accessed during a p
 section, assume we have the following already:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         temp_mod = protocol.load_module('temperature module', '1')
@@ -244,10 +247,11 @@ The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` objec
 For the purposes of this section, assume we have the following already:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         mag_mod = protocol.load_module('magnetic module', '1')
@@ -345,10 +349,11 @@ The lid can control its temperature between 37 °C to 110 °C. Please see our `s
 For the purposes of this section, assume we have the following already:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tc_mod = protocol.load_module('Thermocycler Module')
