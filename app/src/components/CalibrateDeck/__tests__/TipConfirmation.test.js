@@ -53,7 +53,7 @@ describe('TipConfirmation', () => {
     wrapper.update()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.MOVE_TO_POINT_ONE
+      Sessions.deckCalCommands.MOVE_TO_DECK
     )
   })
   it('clicking invalidate tip send invalidate tip command', () => {

@@ -48,7 +48,7 @@ describe('TipPickUp', () => {
     const wrapper = render()
 
     const jogDirections = ['left', 'right', 'back', 'forward', 'up', 'down']
-    const jogParamsByDirection = {
+    const jogVectorsByDirection = {
       up: [0, 0, 0.1],
       down: [0, 0, -0.1],
       left: [-0.1, 0, 0],
@@ -62,7 +62,7 @@ describe('TipPickUp', () => {
 
       expect(mockSendCommand).toHaveBeenCalledWith(
         Sessions.deckCalCommands.JOG,
-        { vector: jogParamsByDirection[direction] },
+        { vector: jogVectorsByDirection[direction] },
         false
       )
     })

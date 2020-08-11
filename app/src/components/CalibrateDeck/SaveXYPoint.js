@@ -1,10 +1,8 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton, Icon, type Mount } from '@opentrons/components'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { PrimaryButton } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
-import type { RobotCalibrationCheckComparison } from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrateDeckChildProps } from './types'
 import { JogControls } from '../JogControls'

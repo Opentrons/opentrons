@@ -4,12 +4,10 @@ import {
   Flex,
   Icon,
   PrimaryButton,
-  Text,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   DIRECTION_COLUMN,
   SPACING_3,
-  SPACING_4,
 } from '@opentrons/components'
 import styles from './styles.css'
 import type { CalibrateDeckChildProps } from './types'

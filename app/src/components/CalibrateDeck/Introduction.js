@@ -23,7 +23,7 @@ import { getLatestLabwareDef } from '../../getLabware'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
-//TODO: IMMEDIATELY insert final copy
+// TODO: IMMEDIATELY insert final copy
 const DECK_CAL_INTRO_BODY = ''
 const DECK_CALIBRATION_INTRO_HEADER = 'deck calibration'
 
