@@ -21,3 +21,39 @@ def test_command_type_empty():
         **{'command': models.CalibrationCommand.load_labware,
            'data': {}})
     assert c.data == models.EmptyModel()
+
+
+@pytest.mark.parametrize(argnames="create_params",
+                         argvalues=[
+                            {'createParams': None},
+                            {'createParams': {}},
+                            {}
+                         ])
+def test_basic_session_type_validation_no_create_params(create_params):
+    """Test that when create params have no mandatory members we accept null,
+    and {}"""
+    body = {
+        "sessionType": "null",
+    }
+    body.update(create_params)
+
+    session = models.BasicSession(**body)
+    assert session.createParams == create_params.get('createParams')
+
+
+@pytest.mark.parametrize(argnames="create_params",
+                         argvalues=[
+                            {'createParams': None},
+                            {'createParams': {}},
+                            {}
+                         ])
+def test_basic_session_type_validation_with_create_params(create_params):
+    """Test that when create params have mandatory members we reject invalid
+    createParams"""
+    body = {
+        "sessionType": "protocol",
+    }
+    body.update(create_params)
+
+    with pytest.raises(ValueError):
+        models.BasicSession(**body)
