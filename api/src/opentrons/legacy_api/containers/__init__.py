@@ -221,11 +221,12 @@ def _look_up_offsets(labware_hash):
         return Point(x=0, y=0, z=0)
 
 
-def save_new_offsets(labware_hash, delta):
+def save_new_offsets(labware_hash, delta, definition):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
     old_delta = _look_up_offsets(labware_hash)
+    uri = cal_helpers.uri_from_definition(definition)
 
     # Note that the next line looks incorrect (like it's letting the prior
     # value leak into the new one). That's sort of correct, but this actually
@@ -245,7 +246,7 @@ def save_new_offsets(labware_hash, delta):
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     calibration_data = modify._helper_offset_data_format(
         str(labware_offset_path), new_delta)
-    modify._add_to_index_offset_file('', '', '', labware_hash)
+    modify._add_to_index_offset_file('', '', uri, labware_hash)
     io.save_to_file(labware_offset_path, calibration_data)
 
 
@@ -271,6 +272,7 @@ def load_new_labware_def(definition):
     container_name = definition['parameters']['loadName']
     log.info(f"Container name {container_name}, hash {labware_hash}")
     container.properties['labware_hash'] = labware_hash
+    container.properties['definition'] = definition
     container.properties['type'] = container_name
     lw_quirks = definition['parameters'].get('quirks', [])
     if definition['parameters']['isMagneticModuleCompatible']:
