@@ -1334,7 +1334,10 @@ class API(HardwareAPILike):
             await self._shake_off_tips_pick_up(mount)
             await self._shake_off_tips_pick_up(mount)
 
-        await self.retract(mount, instr.config.pick_up_distance)
+        retract_target = instr.config.pick_up_distance\
+            + checked_increment * checked_presses\
+            + 2  # tiny little margin to avoid the switch itself
+        await self.retract(mount, retract_target)
 
     def set_current_tiprack_diameter(self, mount, tiprack_diameter):
         instr = self._attached_instruments[mount]

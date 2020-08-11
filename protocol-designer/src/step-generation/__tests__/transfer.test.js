@@ -1,20 +1,21 @@
 // @flow
 import {
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  DEFAULT_PIPETTE,
+  delayWithOffset,
+  DEST_LABWARE,
+  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  dropTipHelper,
   getErrorResult,
   getFlowRateAndOffsetParams,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
   makeAspirateHelper,
+  makeContext,
   makeDispenseHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
-  dropTipHelper,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  SOURCE_LABWARE,
 } from '../__fixtures__'
 import { transfer } from '../commandCreators/compound/transfer'
 
@@ -40,6 +41,8 @@ beforeEach(() => {
     preWetTip: false,
     touchTipAfterAspirate: false,
     mixBeforeAspirate: null,
+    aspirateDelay: null,
+    dispenseDelay: null,
 
     touchTipAfterDispense: false,
     mixInDestination: null,
@@ -405,7 +408,7 @@ describe('advanced options', () => {
     }
   })
   describe('...aspirate options', () => {
-    it('pre-wet tip should aspirate and dispense transfer volume from source well of each subtransfer', () => {
+    it('pre-wet tip should aspirate and dispense the transfer volume from source well of each subtransfer', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -431,7 +434,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('touchTip after aspirate should touchTip on each source well, for every aspirate', () => {
+    it('should touchTip after aspirate on each source well, for every aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -451,7 +454,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('touchTip after dispense should touchTip on each dest well, for every dispense', () => {
+    it('should touchTip after dispense on each dest well, for every dispense', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -471,7 +474,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('mix before aspirate', () => {
+    it('should mix before aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -510,11 +513,31 @@ describe('advanced options', () => {
       ])
     })
 
+    it('should delay after aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 300),
+
+        aspirateHelper('A1', 50),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 50),
+      ])
+    })
+
     it.todo('air gap => ???') // TODO determine behavior
   })
 
   describe('...dispense options', () => {
-    it('mix after dispense', () => {
+    it('should mix after dispense', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -550,6 +573,26 @@ describe('advanced options', () => {
         aspirateHelper('A1', 50),
         dispenseHelper('B1', 50),
         ...mixCommands,
+      ])
+    })
+
+    it('should delay after dispense', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
+        ...delayWithOffset('B1', DEST_LABWARE),
+
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
+        ...delayWithOffset('B1', DEST_LABWARE),
       ])
     })
   })

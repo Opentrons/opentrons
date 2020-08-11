@@ -1,9 +1,11 @@
 // @flow
 
+import type { ModuleModel } from '@opentrons/shared-data'
 import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
 } from '../../robot-api/types'
+import type { Labware } from '../../robot/types'
 
 import typeof {
   FETCH_LABWARE_CALIBRATIONS,
@@ -36,11 +38,12 @@ export type FetchLabwareCalibrationsFailureAction = {|
 
 // selector types
 
+export type LabwareCalibrationData = {| x: number, y: number, z: number |}
 export type LabwareSummary = {|
   displayName: string,
   parentDisplayName: string | null,
   quantity: number,
-  calibration: {| x: number, y: number, z: number |} | null,
+  calibration: LabwareCalibrationData | null,
   legacy: boolean,
 |}
 
@@ -48,3 +51,12 @@ export type LawareCalibrationAction =
   | FetchLabwareCalibrationsAction
   | FetchLabwareCalibrationsSuccessAction
   | FetchLabwareCalibrationsFailureAction
+
+export type BaseProtocolLabware = {|
+  ...Labware,
+  calibrationData: LabwareCalibrationData | null,
+  loadName: string,
+  namespace: string | null,
+  version: number | null,
+  parent: ModuleModel | null,
+|}

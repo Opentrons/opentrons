@@ -13,7 +13,14 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
 } from '../../utils'
-import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
+import {
+  aspirate,
+  delay,
+  dispense,
+  moveToWell,
+  replaceTip,
+  touchTip,
+} from '../atomic'
 import { mixUtil } from './mix'
 
 export const consolidate: CommandCreator<ConsolidateArgs> = (
@@ -58,12 +65,14 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
   // when we decide to rename these fields/args... probably all the way up to the UI level.
   const {
+    aspirateDelay,
     aspirateFlowRateUlSec,
-    dispenseFlowRateUlSec,
-    blowoutFlowRateUlSec,
     aspirateOffsetFromBottomMm,
-    dispenseOffsetFromBottomMm,
+    blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
+    dispenseDelay,
+    dispenseFlowRateUlSec,
+    dispenseOffsetFromBottomMm,
   } = args
 
   const maxWellsPerChunk = Math.floor(
@@ -83,6 +92,29 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           sourceWell: string,
           wellIndex: number
         ): Array<CurriedCommandCreator> => {
+          const delayAfterAspirateCommands =
+            aspirateDelay != null
+              ? [
+                  curryCommandCreator(moveToWell, {
+                    pipette: args.pipette,
+                    labware: args.sourceLabware,
+                    well: sourceWell,
+                    offset: {
+                      x: 0,
+                      y: 0,
+                      z: aspirateDelay.mmFromBottom,
+                    },
+                  }),
+                  curryCommandCreator(delay, {
+                    commandCreatorFnName: 'delay',
+                    description: null,
+                    name: null,
+                    meta: null,
+                    wait: aspirateDelay.seconds,
+                  }),
+                ]
+              : []
+
           const touchTipAfterAspirateCommand = args.touchTipAfterAspirate
             ? [
                 curryCommandCreator(touchTip, {
@@ -104,6 +136,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
+            ...delayAfterAspirateCommands,
             ...touchTipAfterAspirateCommand,
           ]
         }
@@ -174,6 +207,29 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           })
         : []
 
+      const delayAfterDispenseCommands =
+        dispenseDelay != null
+          ? [
+              curryCommandCreator(moveToWell, {
+                pipette: args.pipette,
+                labware: args.destLabware,
+                well: args.destWell,
+                offset: {
+                  x: 0,
+                  y: 0,
+                  z: dispenseDelay.mmFromBottom,
+                },
+              }),
+              curryCommandCreator(delay, {
+                commandCreatorFnName: 'delay',
+                description: null,
+                name: null,
+                meta: null,
+                wait: dispenseDelay.seconds,
+              }),
+            ]
+          : []
+
       const blowoutCommand = blowoutUtil({
         pipette: args.pipette,
         sourceLabwareId: args.sourceLabware,
@@ -199,6 +255,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),
+        ...delayAfterDispenseCommands,
         ...mixAfterCommands,
         ...touchTipAfterDispenseCommands,
         ...blowoutCommand,

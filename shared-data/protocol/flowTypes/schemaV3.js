@@ -61,7 +61,8 @@ export type MoveToSlotParams = {|
     y: number,
     z: number,
   |},
-  minimumZHeight: number,
+  minimumZHeight?: number,
+  forceDirect?: boolean,
 |}
 
 export type DelayParams = {|

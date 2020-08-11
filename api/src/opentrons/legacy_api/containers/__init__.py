@@ -245,6 +245,7 @@ def save_new_offsets(labware_hash, delta):
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     calibration_data = modify._helper_offset_data_format(
         str(labware_offset_path), new_delta)
+    modify._add_to_index_offset_file('', '', '', labware_hash)
     io.save_to_file(labware_offset_path, calibration_data)
 
 

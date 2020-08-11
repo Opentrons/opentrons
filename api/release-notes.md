@@ -1,32 +1,23 @@
-# Robot OS Changes from 3.18.1 to 3.19.0
+# Robot OS Changes from 3.19.0 to 3.20.0
+
+## Note
+
+This robot software update contains an update to the motor controller board. Your OT-2 will take longer than normal to connect to the Opentrons App during this update.
 
 ## Features
-- Add support for Robot Calibration Check, a new tool to help troubleshoot robot
-  accuracy problems
-- Add support for automatically pausing protocols when the OT-2's door is open
-  or top window is removed. To enable this feature, select it in the robot
-  Advanced Settings page.
-- New Python Protocol API level: [2.5](http://docs.opentrons.com/edge/v2/versioning.html#version-2-5)
-- In Protocol API level 2.5, you can access new utility commands to control
-  robot lights and sense the status of the robot door
-- Since using an incorrect tiprack for a pipette (for instance, a 1000ul tiprack
-  with a P300 Single GEN2) can cause ``LabwareHeightErrors``,
-  ``opentrons_simulate`` will now warn you when you use the wrong standard
-  Opentrons tiprack with a pipette, and the ``LabwareHeightError`` text now
-  suggests use of the wrong tiprack as a cause for the error.
+- New Python Protocol API Version: 2.6. In API Version 2.6, P1000 Single GEN2, P300 Single GEN2, and P20 Single GEN2 pipettes perform all operations twice as fast by default. Protocols creaated in Protocol Designer, and protocols using API Version 2.5 or earlier, are unchanged.
+- Flow rates are now displayed in the runlog directly, in units of µL/s, rather than as a multiplier of the default rate. Thank you to Benedict Carling (https://github.com/Benedict-Carling) for this change!
   
   
 ## Bugfixes
-- Fix a series of issues involving the app freezing around pausing and resuming
-  protocols
-- Load a more realistic deck transform when simulating protocols via
-  `opentrons_simulate` to avoid `LabwareHeightErrors` during command line
-  simulation ([#5908](https://github.com/opentrons/opentrons/issues/5908))
-  ([03757d9](https://github.com/opentrons/opentrons/commit/03757d9))
-- Fix an issue causing plate temperature uniformity errors if the Thermocycler
-  lid is opened immediately after a `set_block_temperature` ([#5602](https://github.com/opentrons/opentrons/issues/5602))  
-- Fix an issue causing incorrect display of delay times in Protocol Designer
-  protocols ([#5414](https://github.com/opentrons/opentrons/issues/5414)) 
+- Instrument offsets (the calibration values saved from Pipette Calibration before protocol runs) are now cleared before running Deck Calibration, through either the in-app or CLI tools. This fixes an issue where incorrect instrument offsets would cause deck calibrations to be incorrect.
+- Fix an issue where an OT-2 might disconnect from a connected USB interface after an unpredictable amount of time. While the OT-2 will still take a while to be detected on a USB interface, it should no longer spuriously disconnect.
+- Fix an issue where the OT-2 would home its Z-axis twice after some pick up tip operations. The robot should now only home once (note - there will be two vertical movements, since the homing procedure requires two passes).
+- Fix an issue where uploading large protocols, or connecting to a robot that was running a large protocol, would result in an error in the Opentrons App with the message "ACK error".
+- Fix an issue with improper spacing in run log messages for Thermocycler block temperatures. Thank you to Benedict Carling (https://github.com/Benedict-Carling) for this change!
+- Update an unclear warning message when using Jupyter Notebook to interact with the OT-2. Thank you to Theo Sanderson (https://github.com/theosanderson) for this change!
+
+
 
 For more details about this release, please see the full [technical change
 log][changelog]

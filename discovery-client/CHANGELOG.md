@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.20.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.20.0-alpha.1...v3.20.0-alpha.2) (2020-08-10)
+
+**Note:** Version bump only for package @opentrons/discovery-client
+
+
+
+
+
+# [3.20.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.20.0-alpha.0...v3.20.0-alpha.1) (2020-08-10)
+
+**Note:** Version bump only for package @opentrons/discovery-client
+
+
+
+
+
+# [3.20.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.19.0...v3.20.0-alpha.0) (2020-08-06)
+
+
+### Bug Fixes
+
+* **app:** simplify discovery state to avoid stale IPs and health data ([#6193](https://github.com/Opentrons/opentrons/issues/6193)) ([0e089a7](https://github.com/Opentrons/opentrons/commit/0e089a7)), closes [#5985](https://github.com/Opentrons/opentrons/issues/5985) [#5250](https://github.com/Opentrons/opentrons/issues/5250)
+
+
+
+
+
 # [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
 
 

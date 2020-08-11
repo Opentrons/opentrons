@@ -30,6 +30,8 @@ export type InnerMixArgs = {|
   times: number,
 |}
 
+export type InnerDelayArgs = {| seconds: number, mmFromBottom: number |}
+
 type CommonArgs = {|
   /** Optional user-readable name for this step */
   name: ?string,
@@ -58,12 +60,16 @@ export type SharedTransferLikeArgs = {
   touchTipAfterAspirateOffsetMmFromBottom: number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
+  /** Delay after every aspirate */
+  aspirateDelay: ?InnerDelayArgs,
   /** Flow rate in uL/sec for all aspirates */
   aspirateFlowRateUlSec: number,
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm: number,
 
   // ===== DISPENSE SETTINGS =====
+  /** Delay after every dispense */
+  dispenseDelay: ?InnerDelayArgs,
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean,
   /** Optional offset for touch tip after dispense (if null, use PD default) */
@@ -316,6 +322,7 @@ export type ErrorType =
   | 'TIP_VOLUME_EXCEEDED'
   | 'MISSING_TEMPERATURE_STEP'
   | 'THERMOCYCLER_LID_CLOSED'
+  | 'INVALID_SLOT'
 
 export type CommandCreatorError = {|
   message: string,

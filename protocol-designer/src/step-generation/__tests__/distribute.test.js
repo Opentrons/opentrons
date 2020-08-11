@@ -1,22 +1,23 @@
 // @flow
 import {
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  blowoutHelper,
+  DEFAULT_PIPETTE,
+  delayWithOffset,
+  DEST_LABWARE,
+  dropTipHelper,
+  FIXED_TRASH_ID,
+  getErrorResult,
+  getFlowRateAndOffsetParams,
   getRobotInitialStateNoTipsRemain,
   getRobotStateWithTipStandard,
-  makeContext,
   getSuccessResult,
-  getErrorResult,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  FIXED_TRASH_ID,
-  getFlowRateAndOffsetParams,
   makeAspirateHelper,
+  makeContext,
   makeDispenseHelper,
-  blowoutHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
-  dropTipHelper,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  SOURCE_LABWARE,
 } from '../__fixtures__'
 import { distribute } from '../commandCreators/compound/distribute'
 import type { DistributeArgs } from '../types'
@@ -51,7 +52,8 @@ beforeEach(() => {
     disposalLabware: FIXED_TRASH_ID,
     disposalWell: 'A1',
     mixBeforeAspirate: null,
-
+    aspirateDelay: null,
+    dispenseDelay: null,
     touchTipAfterDispense: false,
   }
 
@@ -212,7 +214,7 @@ describe('tip handling for multiple distribute chunks', () => {
 })
 
 describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position', () => {
-  it('mix before aspirate, then aspirate disposal volume', () => {
+  it('should mix before aspirate, then aspirate disposal volume', () => {
     // NOTE this also tests "uneven final chunk" eg A6 in [A2 A3 | A4 A5 | A6]
     // which is especially relevant to disposal volume
     const distributeArgs: DistributeArgs = {
@@ -268,7 +270,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
   })
 
   // TODO(IL, 2020-02-28): pre-wet volume is not implemented for distribute! #5122
-  it.todo('pre-wet tip')
+  it.todo('should pre-wet tip')
   // (() => {
   //   const distributeArgs: DistributeArgs = {
   //     ...mixinArgs,
@@ -306,7 +308,38 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
   //   ])
   // })
 
-  it('touch tip after aspirate', () => {
+  it('should delay after aspirate', () => {
+    const distributeArgs: DistributeArgs = {
+      ...mixinArgs,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3', 'A4', 'A5'],
+      changeTip: 'never',
+      volume: 100,
+      aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      // no blowout
+      disposalVolume: 0,
+    }
+
+    const result = distribute(
+      distributeArgs,
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 300),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
+      dispenseHelper('A2', 100),
+      dispenseHelper('A3', 100),
+      dispenseHelper('A4', 100),
+
+      aspirateHelper('A1', 100),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
+      dispenseHelper('A5', 100),
+    ])
+  })
+
+  it('should touch tip after aspirate', () => {
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -337,7 +370,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
 
-  it('touch tip after dispense', () => {
+  it('should touch tip after dispense', () => {
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -370,7 +403,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
 
-  it('mix before aspirate w/ disposal vol', () => {
+  it('should mix before aspirate w/ disposal vol', () => {
     const volume = 130
     const disposalVolume = 20
     const disposalLabware = SOURCE_LABWARE
@@ -425,6 +458,39 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       dispenseHelper('A4', volume),
       dispenseHelper('A5', volume),
       blowoutSingleToSourceA1,
+    ])
+  })
+
+  it('should delay after dispense', () => {
+    const distributeArgs: DistributeArgs = {
+      ...mixinArgs,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3', 'A4', 'A5'],
+      changeTip: 'never',
+      volume: 100,
+      dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      // no blowout
+      disposalVolume: 0,
+    }
+
+    const result = distribute(
+      distributeArgs,
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 300),
+      dispenseHelper('A2', 100),
+      ...delayWithOffset('A2', DEST_LABWARE),
+      dispenseHelper('A3', 100),
+      ...delayWithOffset('A3', DEST_LABWARE),
+      dispenseHelper('A4', 100),
+      ...delayWithOffset('A4', DEST_LABWARE),
+
+      aspirateHelper('A1', 100),
+      dispenseHelper('A5', 100),
+      ...delayWithOffset('A5', DEST_LABWARE),
     ])
   })
 })

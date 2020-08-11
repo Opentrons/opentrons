@@ -5,7 +5,7 @@ import { act } from 'react-dom/test-utils'
 
 import { BadCalibration } from '../BadCalibration'
 
-describe('Introduction', () => {
+describe('BadCalibration', () => {
   const mockDeleteSession = jest.fn()
 
   const getExitButton = wrapper =>

@@ -11,6 +11,8 @@ from opentrons.calibration_storage import (
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api.geometry import Deck
+from opentrons.protocol_api.module_geometry import (
+    ModuleGeometry, MagneticModuleModel, ModuleType)
 
 test_data = {
     'circular_well_json': {
@@ -504,7 +506,7 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
 
     lw_uri = helpers.uri_from_definition(definition)
 
-    str_parent = labware._get_parent_identifier(lw.parent)
+    str_parent = labware._get_parent_identifier(lw)
     slot = '1'
     if str_parent:
         mod_dict = {str_parent: f'{slot}-{str_parent}'}
@@ -519,7 +521,7 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
 
     lw_path = labware_offset_tempdir / 'index.json'
     info = file_operators.read_cal_file(lw_path)
-    assert info[full_id] == blob
+    assert info['data'][full_id] == blob
 
 
 def test_delete_one_calibration(set_up_index_file):
@@ -548,3 +550,20 @@ def test_delete_one_calibration(set_up_index_file):
     load_names = get_load_names(all_cals)
 
     assert lw_to_delete not in load_names
+
+
+def test_get_parent_identifier():
+    labware_name = 'corning_96_wellplate_360ul_flat'
+    labware_def = labware.get_labware_definition(labware_name)
+    lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
+    # slots have no parent identifier
+    assert labware._get_parent_identifier(lw) == ''
+    # modules do
+    mmg = ModuleGeometry('my magdeck',
+                         MagneticModuleModel.MAGNETIC_V1,
+                         ModuleType.MAGNETIC,
+                         Point(0, 0, 0), 10, 10, Location(Point(1, 2, 3), '3'),
+                         APIVersion(2, 4))
+    lw = labware.Labware(labware_def, mmg.location)
+    assert labware._get_parent_identifier(lw)\
+        == MagneticModuleModel.MAGNETIC_V1.value
