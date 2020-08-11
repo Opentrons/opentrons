@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Awaitable, Callable, Dict, Tuple
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple
 
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
@@ -15,6 +15,13 @@ from .constants import (
     TIP_RACK_SLOT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER)
 from .state_machine import DeckCalibrationStateMachine
+# TODO: uncomment the following to raise deck cal errors
+# from .util import (
+#     DeckCalibrationException as ErrorExc,
+#     DeckCalibrationError as Error)
+from ..helper_classes import (
+    RequiredLabware,
+    AttachedPipette)
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -35,6 +42,9 @@ class DeckCalibrationUserFlow:
     def __init__(self,
                  hardware: ThreadManager):
         self._hardware = hardware
+        # TODO: uncomment the following to raise the no pipette error
+        # if not any(self._hardware._attached_instruments.values()):
+        #     raise ErrorExc(Error.NO_PIPETTE)
         self._hw_pipette, self._mount = self._select_target_pipette()
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
@@ -66,6 +76,22 @@ class DeckCalibrationUserFlow:
     @property
     def current_state(self) -> State:
         return self._current_state
+
+    def get_pipette(self) -> Optional[AttachedPipette]:
+        # TODO: always return AttachedPipette
+        if self._hw_pipette is None:
+            return None
+        else:
+            return AttachedPipette(
+                model=self._hw_pipette.model,
+                name=self._hw_pipette.name,
+                tip_length=self._hw_pipette.config.tip_length,
+                mount=str(self._mount),
+                serial=self._hw_pipette.pipette_id)
+
+    def get_required_labware(self) -> List[RequiredLabware]:
+        lw = self._get_tip_rack_lw()
+        return [RequiredLabware.from_lw(lw)]
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state

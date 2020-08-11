@@ -10,6 +10,10 @@ from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState)
 from robot_server.robot.calibration.tip_length.state_machine import (
     TipCalibrationStateMachine)
+from robot_server.robot.calibration.deck.constants import (
+    DeckCalibrationState)
+from robot_server.robot.calibration.deck.state_machine import (
+    DeckCalibrationStateMachine)
 
 
 def build_calibration_check_plot(
@@ -81,6 +85,41 @@ def build_tip_length_calibration_plot(
     return d
 
 
+def build_deck_calibration_plot(
+        wildcard_separate: bool,
+        plot_actions: bool) -> gv.Digraph:
+    d = gv.Digraph('Deck Calibration Session')
+
+    deck_cal = DeckCalibrationStateMachine()
+    for state in deck_cal._state_machine._states:
+        d.node(state.name,  state.value)
+
+    uniq_edge_map = {}
+    for from_state, to_states_by_command in \
+            deck_cal._state_machine._transitions.items():
+        if from_state == DeckCalibrationState.WILDCARD and \
+                not wildcard_separate:
+            all_states = (s.name for s in DeckCalibrationState)
+            for s in all_states:
+                d.edge(from_state.name, s.name)
+        else:
+            for command, ts in to_states_by_command.items():
+                edge_key = f'{from_state.name}->{ts.name}'
+                existing_edge = uniq_edge_map.get(
+                        f'{from_state.name}->{ts.name}', None)
+                if existing_edge:
+                    uniq_edge_map[edge_key] = \
+                        (existing_edge[0], existing_edge[1],
+                         f'{existing_edge[2]} | {command.name}')
+                else:
+                    uniq_edge_map[edge_key] = (from_state.name, ts.name,
+                                               command.name)
+    for k, v in uniq_edge_map.items():
+        fs, ts, c = v
+        d.edge(fs, ts, label=c)
+    return d
+
+
 def build_argparser(
         parent: argparse.ArgumentParser = None) -> argparse.ArgumentParser:
     if not parent:
@@ -88,7 +127,8 @@ def build_argparser(
             description='Build plots of sessions')
     parent.add_argument('session', metavar='SESSION',
                         choices=['calibration_check',
-                                 'tip_length_calibration'],
+                                 'tip_length_calibration'
+                                 'deck_calibration'],
                         help='The session to check')
     parent.add_argument('output', metavar='OUTFILE',
                         type=argparse.FileType('wb'),
@@ -117,13 +157,16 @@ if __name__ == '__main__':
     parser = build_argparser()
     args = parser.parse_args()
     if args.session == 'calibration_check':
-        graph = build_calibration_check_plot(not args.wildcard_integrated,
-                                             args.actions)
-        graph.format = args.format
-        args.output.write(graph.pipe())
+        graph = build_calibration_check_plot(
+            not args.wildcard_integrated,
+            args.actions)
     elif args.session == 'tip_length_calibration':
         graph = build_tip_length_calibration_plot(
             not args.wildcard_integrated,
             args.actions)
-        graph.format = args.format
-        args.output.write(graph.pipe())
+    elif args.session == 'deck_calibration':
+        graph = build_deck_calibration_plot(
+            not args.wildcard_integrated,
+            args.actions)
+    graph.format = args.format
+    args.output.write(graph.pipe())

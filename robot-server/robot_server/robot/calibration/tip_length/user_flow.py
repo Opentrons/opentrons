@@ -30,7 +30,7 @@ from .constants import (
     MOVE_TO_REF_POINT_SAFETY_BUFFER,
     TRASH_REF_POINT_OFFSET
 )
-from .models import (
+from ..helper_classes import (
     RequiredLabware,
     AttachedPipette
 )
@@ -106,15 +106,8 @@ class TipCalibrationUserFlow:
         slots = self._deck.get_non_fixture_slots()
         lw_by_slot = {s: self._deck[s] for s in slots if self._deck[s]}
         return [
-            RequiredLabware(
-                slot=s,
-                loadName=lw.load_name,
-                namespace=lw._definition['namespace'],  # type: ignore
-                version=str(lw._definition['version']),  # type: ignore
-                isTiprack=lw.is_tiprack,  # type: ignore
-                definition=lw._definition,  # type: ignore
-            ) for s, lw in lw_by_slot.items()
-        ]
+            RequiredLabware.from_lw(lw, s)  # type: ignore
+            for s, lw in lw_by_slot.items()]
 
     async def handle_command(self,
                              name: Any,
