@@ -76,7 +76,7 @@ Once Python is installed, install the `opentrons package <https://pypi.org/proje
 
    pip install opentrons
 
-You should see some output that ends with ``Successfully installed opentrons-3.13.1`` (the version number may be different).
+You should see some output that ends with :substitution-code:`Successfully installed opentrons-|release|`.
 
 Jupyter Installation
 ^^^^^^^^^^^^^^^^^^^^
