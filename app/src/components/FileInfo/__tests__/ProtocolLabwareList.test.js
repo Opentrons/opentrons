@@ -92,7 +92,7 @@ describe('ProtocolLabwareList Component', () => {
       item2.containsAllMatchingElements([
         <Text>V1 Labware</Text>,
         <Text>x 3</Text>,
-        <Text>Legacy definition</Text>,
+        <Text>N/A</Text>,
       ])
     ).toBe(true)
     /* eslint-enable react/jsx-key */

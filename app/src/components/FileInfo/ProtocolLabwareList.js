@@ -23,7 +23,7 @@ import type { LabwareSummary } from '../../calibration/types'
 const TYPE = 'Type'
 const QUANTITY = 'Quantity'
 const CALIBRATION_DATA = 'Calibration Data'
-const LEGACY_DEFINITION = 'Legacy definition'
+const LEGACY_DEFINITION = 'N/A'
 const NOT_CALIBRATED = 'Not yet calibrated'
 const CALIBRATION_DESCRIPTION = 'Calibrated offset from labware origin point'
 

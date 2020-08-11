@@ -26,6 +26,7 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
     slot,
     calibratorMount,
     isTiprack,
+    isLegacy,
     confirmed,
     isDisabled,
     onClick,
@@ -87,6 +88,7 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
               <CalibrationData
                 calibrationData={calibrationData}
                 calibratedThisSession={confirmed}
+                legacy={isLegacy}
               />
             </div>
           </div>
