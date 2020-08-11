@@ -83,7 +83,7 @@ Jupyter Installation
 
 You must make sure that you install the ``opentrons`` package for whichever kernel and virtual environment the notebook is using. A generally good way to do this is
 
-.. prompt:: bash
+.. prompt:: python >>>
 
    import sys
    !{sys.executable} -m pip install opentrons
@@ -132,7 +132,7 @@ directory in which you run it. You can change the directory
 ``opentrons_simulate`` searches for custom labware with the
 ``--custom-labware-path`` option:
 
-.. prompt:: bash
+.. code-block:: shell
 
    python.exe -m opentrons.simulate --custom-labware-path="C:\Custom Labware"
 
