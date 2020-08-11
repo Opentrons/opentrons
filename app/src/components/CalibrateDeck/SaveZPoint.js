@@ -27,7 +27,7 @@ const assetMap = {
   },
 }
 
-const SAVE_Z_HEADER = 'save z-axis in slot 5'
+const SAVE_Z_HEADER = 'save z-axis offset'
 
 const JOG_UNTIL = 'Jog the pipette until the tip is'
 const JUST_BARELY_TOUCHING = 'barely touching (less than 0.1mm)'
@@ -35,9 +35,9 @@ const DECK_IN = 'the deck in'
 const SLOT_5 = 'slot 5'
 const THEN = 'Then press the'
 const SAVE_POINT = 'save z-axis'
-const TO_DETERMINE_MATCH = 'button to save z-axis calibration coordinate.'
+const TO_SAVE = 'button to save z-axis calibration coordinate.'
 
-export function CheckHeight(props: CalibrateDeckChildProps): React.Node {
+export function SaveZPoint(props: CalibrateDeckChildProps): React.Node {
   const { isMulti, mount, sendSessionCommand } = props
 
   const demoAsset = React.useMemo(
@@ -46,9 +46,13 @@ export function CheckHeight(props: CalibrateDeckChildProps): React.Node {
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(Sessions.deckCalCommands.JOG, {
-      vector: formatJogVector(axis, dir, step),
-    })
+    sendSessionCommand(
+      Sessions.deckCalCommands.JOG,
+      {
+        vector: formatJogVector(axis, dir, step),
+      },
+      false
+    )
   }
 
   const savePoint = () => {
@@ -72,7 +76,7 @@ export function CheckHeight(props: CalibrateDeckChildProps): React.Node {
             <br />
             {THEN}
             <b>&nbsp;{SAVE_POINT}&nbsp;</b>
-            {TO_DETERMINE_MATCH}
+            {TO_SAVE}
           </p>
         </div>
         <div className={styles.step_check_video_wrapper}>

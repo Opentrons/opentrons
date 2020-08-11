@@ -15,6 +15,7 @@ import type {
   SessionCommandString,
   SessionCommandData,
 } from '../../sessions/types'
+import { mockDeckCalTipRack } from '../../sessions/__fixtures__/deck-calibration.js'
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
@@ -41,9 +42,9 @@ const PANEL_BY_STEP: {
   preparingPipette: TipPickUp,
   inspectingTip: TipConfirmation,
   joggingToDeck: SaveZPoint,
-  joggingToPointOne: SaveXYPoint,
-  joggingToPointTwo: SaveXYPoint,
-  joggingToPointThree: SaveXYPoint,
+  savingPointOne: SaveXYPoint,
+  savingPointTwo: SaveXYPoint,
+  savingPointThree: SaveXYPoint,
   calibrationComplete: CompleteConfirmation,
 }
 const PANEL_STYLE_BY_STEP: {
@@ -54,9 +55,9 @@ const PANEL_STYLE_BY_STEP: {
   preparingPipette: styles.modal_contents,
   inspectingTip: styles.modal_contents,
   joggingToDeck: styles.modal_contents,
-  joggingToPointOne: styles.modal_contents,
-  joggingToPointTwo: styles.modal_contents,
-  joggingToPointThree: styles.modal_contents,
+  savingPointOne: styles.modal_contents,
+  savingPointTwo: styles.modal_contents,
+  savingPointThree: styles.modal_contents,
   calibrationComplete: styles.terminal_modal_contents,
 }
 export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
@@ -97,13 +98,19 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
-    sendCommand(Sessions.tipCalCommands.EXIT)
+    sendCommand(Sessions.deckCalCommands.EXIT)
     deleteSession()
   }, true)
 
   if (!session) {
     return null
   }
+
+  const { currentStep } = session?.details
+  // TODO: IMMEDIATELY pull actual tipRack, isMulti, and mount from session details
+  const tipRack = mockDeckCalTipRack
+  const isMulti = false
+  const mount = 'left'
 
   const titleBarProps = {
     title: TIP_LENGTH_CALIBRATION_SUBTITLE,
@@ -114,13 +121,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
-  const { currentStep } = session?.details
-  // TODO: IMMEDIATELY pull actual tipRack, isMulti, and mount from session details
-  const tipRack = {}
-  const isMulti = false
-  const mount = 'left'
   const Panel = PANEL_BY_STEP[currentStep]
-
   return Panel ? (
     <>
       <ModalPage

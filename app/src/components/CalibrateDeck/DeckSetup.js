@@ -20,7 +20,7 @@ export function DeckSetup(props: CalibrateDeckChildProps): React.Node {
   const { tipRack, sendSessionCommand } = props
 
   const proceed = () => {
-    sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT)
+    sendSessionCommand(Sessions.deckCalCommands.MOVE_TO_TIP_RACK)
   }
 
   return (

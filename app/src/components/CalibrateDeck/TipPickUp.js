@@ -68,11 +68,11 @@ export function TipPickUp(props: CalibrateDeckChildProps): React.Node {
   )
 
   const pickUpTip = () => {
-    sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP)
+    sendSessionCommand(Sessions.deckCalCommands.PICK_UP_TIP)
   }
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(Sessions.tipCalCommands.JOG, {
+    sendSessionCommand(Sessions.deckCalCommands.JOG, {
       vector: formatJogVector(axis, dir, step),
     })
   }

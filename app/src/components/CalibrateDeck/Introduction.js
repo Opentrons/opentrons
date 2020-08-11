@@ -69,7 +69,7 @@ export function Introduction(props: CalibrateDeckChildProps): React.Node {
       <Flex width="100%">
         <PrimaryButton
           onClick={() =>
-            sendSessionCommand(Sessions.tipCalCommands.LOAD_LABWARE)
+            sendSessionCommand(Sessions.deckCalCommands.LOAD_LABWARE)
           }
           className={styles.continue_button}
         >

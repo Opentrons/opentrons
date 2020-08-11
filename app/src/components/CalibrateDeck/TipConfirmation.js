@@ -22,10 +22,10 @@ export function TipConfirmation(props: CalibrateDeckChildProps): React.Node {
   const { sendSessionCommand } = props
 
   const invalidateTip = () => {
-    sendSessionCommand(Sessions.tipCalCommands.INVALIDATE_TIP)
+    sendSessionCommand(Sessions.deckCalCommands.INVALIDATE_TIP)
   }
   const confirmTip = () => {
-    sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT)
+    sendSessionCommand(Sessions.deckCalCommands.MOVE_TO_DECK)
   }
 
   return (
