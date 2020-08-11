@@ -140,13 +140,17 @@ class TipCalibrationUserFlow:
         pass
 
     async def move_to_tip_rack(self):
-        point = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
-                MOVE_TO_TIP_RACK_SAFETY_BUFFER
+        # point safely above target tip well in tip rack
+        pt_above_well = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
+            MOVE_TO_TIP_RACK_SAFETY_BUFFER
         if self._tip_origin_pt is not None:
-            # use saved jogged to x and y values only if returning tip to rack
-            point = Point(self._tip_origin_pt.x, self._tip_origin_pt.y,
-                          point.z)
-        await self._move(Location(point, None))
+            # use jogged to x and y offsets only if returning tip to rack
+            await self._move(Location(Point(self._tip_origin_pt.x,
+                                            self._tip_origin_pt.y,
+                                            pt_above_well.z),
+                                      None))
+        else:
+            await self._move(Location(pt_above_well, None))
 
     async def move_to_reference_point(self):
         to_loc = self._get_reference_point()
