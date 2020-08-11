@@ -200,6 +200,8 @@ export type HydratedMoveLiquidFormData = {
     aspirate_mix_checkbox: ?boolean,
     aspirate_mix_volume: ?number,
     aspirate_mix_times: ?number,
+    aspirate_airGap_checkbox: ?boolean,
+    aspirate_airGap_volume: ?number,
 
     aspirate_delay_checkbox: boolean,
     aspirate_delay_seconds: ?number,

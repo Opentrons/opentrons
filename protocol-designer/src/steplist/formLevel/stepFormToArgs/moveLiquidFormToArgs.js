@@ -49,6 +49,21 @@ export function getDelayData(
   return null
 }
 
+// NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
+export function getAirGapData(
+  hydratedFormData: $PropertyType<HydratedMoveLiquidFormData, 'fields'>,
+  checkboxField: 'aspirate_airGap_checkbox', // | 'dispense_airGap_checkbox'
+  volumeField: 'aspirate_airGap_volume' // | 'dispense_airGap_volume'
+): number | null {
+  const checkbox = hydratedFormData[checkboxField]
+  const volume = hydratedFormData[volumeField]
+
+  if (checkbox && typeof volume === 'number') {
+    return volume
+  }
+  return null
+}
+
 export function getMixData(
   hydratedFormData: *,
   checkboxField: *,
@@ -194,6 +209,12 @@ export const moveLiquidFormToArgs = (
 
   const blowoutOffsetFromTopMm = DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
 
+  const aspirateAirGapVolume = getAirGapData(
+    fields,
+    'aspirate_airGap_checkbox',
+    'aspirate_airGap_volume'
+  )
+
   const commonFields = {
     pipette: pipetteId,
     volume,
@@ -217,6 +238,7 @@ export const moveLiquidFormToArgs = (
     preWetTip: Boolean(fields.preWetTip),
     aspirateDelay,
     dispenseDelay,
+    aspirateAirGapVolume,
     mixInDestination,
     touchTipAfterAspirate,
     touchTipAfterAspirateOffsetMmFromBottom,
