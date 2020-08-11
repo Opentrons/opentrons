@@ -1109,7 +1109,10 @@ class Robot(CommandPublisher):
             entry._coordinates = entry._coordinates + delta
 
         if save and container.properties.get('labware_hash'):
-            save_new_offsets(container.properties['labware_hash'], delta)
+            save_new_offsets(
+                container.properties['labware_hash'],
+                delta,
+                container.properties['definition'])
         elif save and new_container_name:
             database.save_new_container(container, new_container_name)
         elif save:
