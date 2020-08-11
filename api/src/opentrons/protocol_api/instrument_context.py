@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import (Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union)
 
 
@@ -412,7 +413,8 @@ class InstrumentContext(CommandPublisher):
                   location: Well = None,
                   radius: float = 1.0,
                   v_offset: float = -3.0,
-                  speed: float = 30.0) -> 'InstrumentContext':
+                  speed: float = 30.0,
+                  dwell_time: float = 0.3) -> 'InstrumentContext':
         """
         Touch the pipette tip to the sides of a well, with the intent of
         removing left-over droplets
@@ -496,6 +498,7 @@ class InstrumentContext(CommandPublisher):
 
         for edge in _build_edges(location, v_offset):
             self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
+            time.sleep(dwell_time)
         return self
 
     @cmds.publish.both(command=cmds.air_gap)
