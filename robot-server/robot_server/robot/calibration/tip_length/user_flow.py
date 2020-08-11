@@ -133,10 +133,17 @@ class TipCalibrationUserFlow:
         pass
 
     async def move_to_tip_rack(self):
-        point = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
-                MOVE_TO_TIP_RACK_SAFETY_BUFFER
-        to_loc = Location(point, None)
-        await self._move(to_loc)
+        # point safely above target tip well in tip rack
+        pt_above_well = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
+            MOVE_TO_TIP_RACK_SAFETY_BUFFER
+        if self._tip_origin_pt is not None:
+            # use jogged to x and y offsets only if returning tip to rack
+            await self._move(Location(Point(self._tip_origin_pt.x,
+                                            self._tip_origin_pt.y,
+                                            pt_above_well.z),
+                                      None))
+        else:
+            await self._move(Location(pt_above_well, None))
 
     async def move_to_reference_point(self):
         to_loc = self._get_reference_point()
@@ -188,9 +195,7 @@ class TipCalibrationUserFlow:
                 self._hw_pipette.critical_point)
 
     async def _get_current_point(self):
-        cp = self._get_critical_point()
-        return await self._hardware.gantry_position(self._mount,
-                                                    critical_point=cp)
+        return await self._hardware.gantry_position(self._mount)
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
@@ -204,7 +209,8 @@ class TipCalibrationUserFlow:
             self._hw_pipette.update_config_item('pick_up_current', 0.1)
 
         # grab position of active nozzle for ref when returning tip later
-        self._tip_origin_pt = await self._get_current_point()
+        self._tip_origin_pt = await self._hardware.gantry_position(
+            self._mount, critical_point=self._get_critical_point())
 
         tip_length = self._get_default_tip_length()
         await self._hardware.pick_up_tip(self._mount, tip_length)
@@ -254,7 +260,6 @@ class TipCalibrationUserFlow:
             tip_length = self._get_default_tip_length()
             coeff = self._hw_pipette.config.return_tip_height
             to_pt = self._tip_origin_pt - Point(0, 0, tip_length * coeff)
-
             cp = self._get_critical_point()
             await self._hardware.move_to(mount=self._mount,
                                          abs_position=to_pt,
