@@ -5,22 +5,24 @@ import { act } from 'react-dom/test-utils'
 import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
 
-import { DeckSetup } from '../DeckSetup'
+import { TipConfirmation } from '../TipConfirmation'
 
-jest.mock('../../../getLabware')
-
-jest.mock('@opentrons/components/src/deck/RobotWorkSpace', () => ({
-  RobotWorkSpace: () => <></>,
-}))
-
-describe('DeckSetup', () => {
+describe('TipConfirmation', () => {
   let render
 
   const mockSendCommand = jest.fn()
   const mockDeleteSession = jest.fn()
 
+  const getConfirmTipButton = wrapper =>
+    wrapper.find('PrimaryButton[children="Yes, continue"]').find('button')
+
+  const getInvalidateTipButton = wrapper =>
+    wrapper.find('PrimaryButton[children="No, try again"]').find('button')
+
   beforeEach(() => {
-    render = (props: $Shape<React.ElementProps<typeof DeckSetup>> = {}) => {
+    render = (
+      props: $Shape<React.ElementProps<typeof TipConfirmation>> = {}
+    ) => {
       const {
         pipMount = 'left',
         isMulti = false,
@@ -29,7 +31,7 @@ describe('DeckSetup', () => {
         deleteSession = mockDeleteSession,
       } = props
       return mount(
-        <DeckSetup
+        <TipConfirmation
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
@@ -44,14 +46,23 @@ describe('DeckSetup', () => {
     jest.resetAllMocks()
   })
 
-  it('clicking continue proceeds to next step', () => {
+  it('clicking confirm tip attached sends pick up tip command', () => {
     const wrapper = render()
 
-    act(() => wrapper.find('button').invoke('onClick')())
+    act(() => getConfirmTipButton(wrapper).invoke('onClick')())
     wrapper.update()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.MOVE_TO_TIP_RACK
+      Sessions.deckCalCommands.MOVE_TO_POINT_ONE
+    )
+  })
+  it('clicking invalidate tip send invalidate tip command', () => {
+    const wrapper = render()
+
+    act(() => getInvalidateTipButton(wrapper).invoke('onClick')())
+    wrapper.update()
+    expect(mockSendCommand).toHaveBeenCalledWith(
+      Sessions.deckCalCommands.INVALIDATE_TIP
     )
   })
 })

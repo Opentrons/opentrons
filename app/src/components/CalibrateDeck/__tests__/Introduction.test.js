@@ -2,10 +2,7 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import {
-  mockTipLengthCalBlock,
-  mockTipLengthTipRack,
-} from '../../../sessions/__fixtures__'
+import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
 
 import { Introduction } from '../Introduction'
@@ -26,7 +23,7 @@ describe('Introduction', () => {
       const {
         pipMount = 'left',
         isMulti = false,
-        tipRack = mockTipLengthTipRack,
+        tipRack = mockDeckCalTipRack,
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
       } = props
