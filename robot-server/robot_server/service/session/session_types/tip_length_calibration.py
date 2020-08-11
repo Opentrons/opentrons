@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, cast, Awaitable
 from opentrons.types import Mount
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
@@ -31,13 +31,15 @@ class TipLengthCalibrationCommandExecutor(CallableExecutor):
 class TipLengthCalibration(BaseSession):
     def __init__(self, configuration: SessionConfiguration,
                  instance_meta: SessionMetaData,
-                 tip_cal_user_flow: TipCalibrationUserFlow
+                 tip_cal_user_flow: TipCalibrationUserFlow,
+                 shutdown_handler: Awaitable[None] = None
                  ):
         super().__init__(configuration, instance_meta)
         self._tip_cal_user_flow = tip_cal_user_flow
         self._command_executor = TipLengthCalibrationCommandExecutor(
             self._tip_cal_user_flow.handle_command
         )
+        self._shutdown_coroutine = shutdown_handler
 
     @classmethod
     async def create(cls, configuration: SessionConfiguration,
@@ -46,6 +48,11 @@ class TipLengthCalibration(BaseSession):
         has_calibration_block = instance_meta.create_params.hasCalibrationBlock
         mount = instance_meta.create_params.mount
         tip_rack_def = instance_meta.create_params.tipRackDefinition
+        # if lights are on already it's because the user clicked the button,
+        # so a) we don't need to turn them on now and b) we shouldn't turn them
+        # off after
+        session_controls_lights =\
+            not configuration.hardware.get_lights()['rails']
         try:
             tip_cal_user_flow = TipCalibrationUserFlow(
                     hardware=configuration.hardware,
@@ -55,9 +62,16 @@ class TipLengthCalibration(BaseSession):
         except (AssertionError, CalibrationException) as e:
             raise SessionCreationException(str(e))
 
+        if session_controls_lights:
+            await configuration.hardware.set_lights(rails=True)
+            shutdown_handler = configuration.hardware.set_lights(rails=False)
+        else:
+            shutdown_handler = None
+
         return cls(configuration=configuration,
                    instance_meta=instance_meta,
-                   tip_cal_user_flow=tip_cal_user_flow)
+                   tip_cal_user_flow=tip_cal_user_flow,
+                   shutdown_handler=shutdown_handler)
 
     @property
     def command_executor(self) -> CommandExecutor:
@@ -77,3 +91,7 @@ class TipLengthCalibration(BaseSession):
             currentStep=self._tip_cal_user_flow.current_state,
             labware=self._tip_cal_user_flow.get_required_labware(),
         )
+
+    async def clean_up(self):
+        if self._shutdown_coroutine:
+            await self._shutdown_coroutine
