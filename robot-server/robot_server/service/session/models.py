@@ -39,7 +39,7 @@ class ProtocolCreateParams(BaseModel):
 
 class SessionType(str, Enum):
     """The available session types"""
-    def __new__(cls, value, create_param_model=type(None)):
+    def __new__(cls, value, create_param_model=None):
         """Create a session type enum with the optional create param model
 
         IMPORTANT: Model definition must appear in SessionCreateParamType
@@ -231,7 +231,15 @@ class BasicSession(BaseModel):
     def check_data_type(cls, v, values):
         """Validate that the session type and create params model match"""
         create_params = values.get('createParams')
-        if not isinstance(create_params, v.model):
+        if v.model is None:
+            # If model is None then we will accept either None or an
+            # EmptyModel (ie "{}")
+            is_valid_type = create_params is None or\
+                            isinstance(create_params, EmptyModel)
+        else:
+            is_valid_type = isinstance(create_params, v.model)
+
+        if not is_valid_type:
             raise ValueError(f"Invalid create param for session type {v}. "
                              f"Expecting {v.model}")
         return v
