@@ -19,6 +19,7 @@ import typeof {
   CREATE_SESSION_COMMAND_FAILURE,
   SESSION_TYPE_CALIBRATION_CHECK,
   SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+  SESSION_TYPE_DECK_CALIBRATION,
 } from './constants'
 
 import type {
@@ -29,16 +30,20 @@ import type {
 
 import * as CalCheckTypes from './calibration-check/types'
 import * as TipLengthCalTypes from './tip-length-calibration/types'
+import * as DeckCalTypes from './deck-calibration/types'
 import * as CalCheckConstants from './calibration-check/constants'
 import * as TipCalConstants from './tip-length-calibration/constants'
+import * as DeckCalConstants from './deck-calibration/constants'
 
 export type * from './calibration-check/types'
 export type * from './tip-length-calibration/types'
+export type * from './deck-calibration/types'
 
 // The available session types
 export type SessionType =
   | SESSION_TYPE_CALIBRATION_CHECK
   | SESSION_TYPE_TIP_LENGTH_CALIBRATION
+  | SESSION_TYPE_DECK_CALIBRATION
 
 export type SessionParams =
   | {||}
@@ -47,6 +52,7 @@ export type SessionParams =
 export type SessionCommandString =
   | $Values<typeof CalCheckConstants.checkCommands>
   | $Values<typeof TipCalConstants.tipCalCommands>
+  | $Values<typeof DeckCalConstants.deckCalCommands>
 
 // TODO(al, 2020-05-11): data should be properly typed with all
 // known command types
@@ -64,9 +70,16 @@ export type TipLengthCalibrationSessionResponseAttributes = {|
   createParams: TipLengthCalTypes.TipLengthCalibrationSessionParams,
 |}
 
+export type DeckCalibrationSessionResponseAttributes = {|
+  sessionType: SESSION_TYPE_DECK_CALIBRATION,
+  details: DeckCalTypes.DeckCalibrationSessionDetails,
+  createParams: {},
+|}
+
 export type SessionResponseAttributes =
   | CalibrationCheckSessionResponseAttributes
   | TipLengthCalibrationSessionResponseAttributes
+  | DeckCalibrationSessionResponseAttributes
 
 export type CalibrationCheckSession = {|
   ...CalibrationCheckSessionResponseAttributes,
@@ -78,7 +91,15 @@ export type TipLengthCalibrationSession = {|
   id: string,
 |}
 
-export type Session = CalibrationCheckSession | TipLengthCalibrationSession
+export type DeckCalibrationSession = {|
+  ...DeckCalibrationSessionResponseAttributes,
+  id: string,
+|}
+
+export type Session =
+  | CalibrationCheckSession
+  | TipLengthCalibrationSession
+  | DeckCalibrationSession
 
 export type SessionCommandAttributes = {|
   command: SessionCommandString,

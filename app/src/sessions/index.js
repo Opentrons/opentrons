@@ -5,6 +5,7 @@ import type {
   SessionType,
   CalibrationCheckSession,
   TipLengthCalibrationSession,
+  DeckCalibrationSession,
 } from './types'
 
 export * from './actions'
@@ -16,4 +17,5 @@ export type {
   SessionType,
   CalibrationCheckSession,
   TipLengthCalibrationSession,
+  DeckCalibrationSession,
 }
