@@ -57,7 +57,7 @@ const assetMap = {
   },
 }
 
-const CHECK_POINT_XY_HEADER = 'Save X and Y-axis offset in'
+const SAVE_XY_POINT_HEADER = 'Save X and Y-axis offset in'
 const SLOT = 'slot'
 const JOG_UNTIL = 'Jog the robot until the tip is'
 const PRECISELY_CENTERED = 'precisely centered'
@@ -100,7 +100,7 @@ export function SaveXYPoint(props: CalibrateDeckChildProps): React.Node {
     <>
       <div className={styles.modal_header}>
         <h3>
-          {CHECK_POINT_XY_HEADER}
+          {SAVE_XY_POINT_HEADER}
           &nbsp;
           {`${SLOT} ${slotNumber || ''}`}
         </h3>
