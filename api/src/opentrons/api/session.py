@@ -7,8 +7,8 @@ from time import time, sleep
 from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
 from uuid import uuid4
 
-from opentrons.api.util import RobotBusy, robot_is_busy
-from opentrons.config.feature_flags import enable_http_protocol_sessions
+from opentrons.api.util import (RobotBusy, robot_is_busy,
+                                requires_http_protocols_disabled)
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons import robot
@@ -57,6 +57,7 @@ class SessionManager:
         self._broker.set_logger(self._command_logger)
         self._motion_lock = lock
 
+    @requires_http_protocols_disabled
     def create(
             self,
             name: str,
@@ -114,6 +115,7 @@ class SessionManager:
         finally:
             self._session_lock = False
 
+    @requires_http_protocols_disabled
     def create_from_bundle(self, name: str, contents: str) -> 'Session':
         """ Create a protocol session from a base64'd zip file.
 
@@ -150,6 +152,7 @@ class SessionManager:
         finally:
             self._session_lock = False
 
+    @requires_http_protocols_disabled
     def create_with_extra_labware(
             self,
             name: str,
@@ -215,12 +218,6 @@ class Session(RobotBusy):
     def build_and_prep(
         cls, name, contents, hardware, loop, broker, motion_lock, extra_labware
     ):
-        if enable_http_protocol_sessions():
-            raise RuntimeError(
-                "Please disable the 'Enable Experimental HTTP Protocol "
-                "Sessions' advanced setting for this robot if you'd like to "
-                "upload protocols from the Opentrons App")
-
         protocol = parse(contents, filename=name,
                          extra_labware={helpers.uri_from_definition(defn): defn
                                         for defn in extra_labware})
