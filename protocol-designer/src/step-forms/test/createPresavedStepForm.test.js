@@ -146,9 +146,14 @@ describe('createPresavedStepForm', () => {
         // default fields
         ...(airGapEnabled
           ? {
+              aspirate_airGap_checkbox: false,
               aspirate_airGap_volume: '1',
+              aspirate_delay_checkbox: false,
+              aspirate_delay_mmFromBottom: '1',
               aspirate_delay_seconds: '1',
+              dispense_delay_checkbox: false,
               dispense_delay_seconds: '1',
+              dispense_delay_mmFromBottom: '0.5',
             }
           : {}),
         aspirate_flowRate: null,
@@ -156,7 +161,7 @@ describe('createPresavedStepForm', () => {
         aspirate_mix_checkbox: false,
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
-        aspirate_mmFromBottom: 1,
+        aspirate_mmFromBottom: '1',
         aspirate_touchTip_checkbox: false,
         aspirate_wellOrder_first: 't2b',
         aspirate_wellOrder_second: 'l2r',
@@ -170,7 +175,7 @@ describe('createPresavedStepForm', () => {
         dispense_mix_checkbox: false,
         dispense_mix_times: null,
         dispense_mix_volume: null,
-        dispense_mmFromBottom: 0.5,
+        dispense_mmFromBottom: '0.5',
         dispense_touchTip_checkbox: false,
         dispense_wellOrder_first: 't2b',
         dispense_wellOrder_second: 'l2r',
@@ -199,7 +204,7 @@ describe('createPresavedStepForm', () => {
       // default fields
       labware: null,
       wells: [],
-      mix_mmFromBottom: 0.5,
+      mix_mmFromBottom: '0.5',
       mix_wellOrder_first: 't2b',
       mix_wellOrder_second: 'l2r',
       blowout_checkbox: false,
