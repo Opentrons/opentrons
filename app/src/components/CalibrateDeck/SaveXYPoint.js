@@ -99,21 +99,20 @@ export function SaveXYPoint(props: CalibrateDeckChildProps): React.Node {
       <div className={styles.modal_header}>
         <h3>
           {SAVE_XY_POINT_HEADER}
-          &nbsp;
-          {`${SLOT} ${slotNumber || ''}`}
+          {` ${SLOT} ${slotNumber || ''}`}
         </h3>
       </div>
       <div className={styles.step_check_wrapper}>
         <div className={styles.step_check_body_wrapper}>
           <p className={styles.tip_pick_up_demo_body}>
             {JOG_UNTIL}
-            <b>&nbsp;{PRECISELY_CENTERED}&nbsp;</b>
+            <b>{` ${PRECISELY_CENTERED} `}</b>
             {ABOVE_THE_CROSS}
-            <b>&nbsp;{`${SLOT} ${slotNumber || ''}`}.&nbsp;</b>
+            <b>{` ${SLOT} ${slotNumber || ''}`}.</b>
             <br />
             <br />
             {THEN}
-            <b>&nbsp;{SAVE_POINT}&nbsp;</b>
+            <b>{` ${SAVE_POINT} `}</b>
             {TO_SAVE}
           </p>
         </div>

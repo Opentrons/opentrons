@@ -67,13 +67,13 @@ export function SaveZPoint(props: CalibrateDeckChildProps): React.Node {
         <div className={styles.step_check_body_wrapper}>
           <p className={styles.tip_pick_up_demo_body}>
             {JOG_UNTIL}
-            <b>&nbsp;{JUST_BARELY_TOUCHING}&nbsp;</b>
+            <b>{` ${JUST_BARELY_TOUCHING} `}</b>
             {DECK_IN}
-            <b>&nbsp;{SLOT_5}.&nbsp;</b>
+            <b>{` ${SLOT_5}.`}</b>
             <br />
             <br />
             {THEN}
-            <b>&nbsp;{SAVE_POINT}&nbsp;</b>
+            <b>{` ${SAVE_POINT} `}</b>
             {TO_SAVE}
           </p>
         </div>

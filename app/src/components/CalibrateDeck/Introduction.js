@@ -56,13 +56,9 @@ export function Introduction(props: CalibrateDeckChildProps): React.Node {
         </Flex>
         <Box fontSize={FONT_SIZE_BODY_1} marginY={SPACING_3}>
           <Text>
-            <b className={styles.tipracks_note_header}>{NOTE_HEADER}</b>
-            &nbsp;
+            <b className={styles.tipracks_note_header}>{`${NOTE_HEADER} `}</b>
             {IT_IS}
-            &nbsp;
-            <u>{EXTREMELY}</u>
-            &nbsp;
-            {NOTE_BODY}
+            <u>{` ${EXTREMELY} `}</u>
           </Text>
         </Box>
       </Flex>
