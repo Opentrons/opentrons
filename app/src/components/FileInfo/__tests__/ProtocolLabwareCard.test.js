@@ -50,7 +50,7 @@ describe('ProtocolLabwareCard', () => {
       calibration: null,
       parentDisplayName: null,
       displayName: 'LABWARE DISPLAY NAME',
-      legacy: false,
+      calDataAvailable: true,
     },
   ]
 

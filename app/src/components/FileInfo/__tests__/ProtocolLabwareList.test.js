@@ -11,21 +11,21 @@ const LABWARE = [
     parentDisplayName: null,
     quantity: 2,
     calibration: null,
-    legacy: false,
+    calDataAvailable: true,
   },
   {
     displayName: 'Other Opentrons Labware',
     parentDisplayName: 'MODULE GEN1',
     quantity: 1,
     calibration: { x: 1.2, y: 3, z: 4.5 },
-    legacy: false,
+    calDataAvailable: true,
   },
   {
     displayName: 'V1 Labware',
     parentDisplayName: null,
     quantity: 3,
     calibration: null,
-    legacy: true,
+    calDataAvailable: false,
   },
 ]
 

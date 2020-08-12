@@ -56,6 +56,7 @@ export type LabwareCalibration = {|
   namespace: string,
   version: number,
   parent: string,
+  definitionHash: string,
 |}
 
 export type LabwareCalibrationModel = {|

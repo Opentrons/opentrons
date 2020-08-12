@@ -1,4 +1,5 @@
 // @flow
+import omit from 'lodash/omit'
 import * as Fixtures from '../__fixtures__'
 import * as StatusFixtures from '../../__fixtures__'
 import * as Selectors from '../selectors'
@@ -68,6 +69,8 @@ describe('labware calibration selectors', () => {
             type: wellPlate96Def.parameters.loadName,
             definition: wellPlate96Def,
             slot: '3',
+            definitionHash:
+              Fixtures.mockLabwareCalibration1.attributes.definitionHash,
           }: $Shape<ProtocolLabware>),
           ({
             type: 'some_v1_labware',
@@ -142,12 +145,14 @@ describe('labware calibration selectors', () => {
           parentDisplayName: null,
           quantity: 1,
           calibration: { x: 1.2, y: 4.6, z: 7.9 },
+          calDataAvailable: true,
         },
         {
           displayName: 'some_v1_labware',
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })
@@ -215,6 +220,7 @@ describe('labware calibration selectors', () => {
           version: wellPlate96Def.version,
           parent: 'magneticModuleV1',
           calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
+          definitionHash: attributes.definitionHash,
         },
         {
           type: 'some_v1_labware',
@@ -293,6 +299,69 @@ describe('labware calibration selectors', () => {
           namespace: wellPlate96Def.namespace,
           version: wellPlate96Def.version,
           parent: null,
+          definitionHash: attributes.definitionHash,
+          calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
+        },
+        {
+          type: 'some_v1_labware',
+          definition: null,
+          slot: '1',
+          loadName: 'some_v1_labware',
+          namespace: null,
+          version: null,
+          parent: null,
+          calibrationData: null,
+        },
+      ])
+    })
+
+    it('grabs no calibration data for labware if definitionHash not present', () => {
+      const lwCalibration = Fixtures.mockLabwareCalibration1
+      const { attributes } = lwCalibration
+      const { calibrationData } = attributes
+
+      const oldLwCal = {
+        ...omit(lwCalibration, 'definitionHash'),
+        attributes: {
+          ...attributes,
+          parent: '',
+          loadName: wellPlate96Def.parameters.loadName,
+          namespace: wellPlate96Def.namespace,
+          version: wellPlate96Def.version,
+          calibrationData: {
+            ...calibrationData,
+            offset: {
+              ...calibrationData.offset,
+              value: [1.23, 4.56, 7.89],
+            },
+          },
+        },
+      }
+
+      getModulesBySlot.mockReturnValue({})
+
+      state = ({
+        calibration: {
+          robotName: {
+            calibrationStatus: null,
+            labwareCalibrations: {
+              meta: {},
+              data: [oldLwCal],
+            },
+          },
+        },
+      }: $Shape<State>)
+
+      expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
+        {
+          type: wellPlate96Def.parameters.loadName,
+          definition: wellPlate96Def,
+          slot: '3',
+          loadName: wellPlate96Def.parameters.loadName,
+          namespace: wellPlate96Def.namespace,
+          version: wellPlate96Def.version,
+          parent: null,
+          definitionHash: attributes.definitionHash,
           calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
         },
         {
@@ -323,6 +392,8 @@ describe('labware calibration selectors', () => {
             type: wellPlate96Def.parameters.loadName,
             definition: wellPlate96Def,
             slot: '3',
+            definitionHash:
+              Fixtures.mockLabwareCalibration1.attributes.definitionHash,
           }: $Shape<ProtocolLabware>),
           ({
             type: 'some_v1_labware',
@@ -363,12 +434,14 @@ describe('labware calibration selectors', () => {
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
         {
           displayName: 'some_v1_labware',
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })
@@ -382,12 +455,14 @@ describe('labware calibration selectors', () => {
           parentDisplayName: 'Magnetic Module GEN1',
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
         {
           displayName: 'some_v1_labware',
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })
@@ -397,11 +472,13 @@ describe('labware calibration selectors', () => {
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
+          definitionHash: '123fakeDefinitionHash',
           slot: '3',
         }: $Shape<ProtocolLabware>),
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
+          definitionHash: '123fakeDefinitionHash',
           slot: '4',
         }: $Shape<ProtocolLabware>),
       ])
@@ -415,6 +492,7 @@ describe('labware calibration selectors', () => {
           parentDisplayName: null,
           quantity: 2,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })
@@ -424,11 +502,13 @@ describe('labware calibration selectors', () => {
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
+          definitionHash: '123fakeDefinitionHash',
           slot: '2',
         }: $Shape<ProtocolLabware>),
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
+          definitionHash: '123fakeDefinitionHash',
           slot: '3',
         }: $Shape<ProtocolLabware>),
       ])
@@ -451,12 +531,14 @@ describe('labware calibration selectors', () => {
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
         {
           displayName: wellPlate96Def.metadata.displayName,
           parentDisplayName: 'Magnetic Module GEN1',
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })

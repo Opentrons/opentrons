@@ -9,7 +9,11 @@ import {
 } from '@opentrons/shared-data'
 
 import { selectors as robotSelectors } from '../../robot'
-import { matchesLabwareIdentity, formatCalibrationData } from './utils'
+import {
+  matchesLabwareIdentityForQuantity,
+  matchesLabwareIdentityForCalibration,
+  formatCalibrationData,
+} from './utils'
 
 import type { State } from '../../types'
 import type { LabwareCalibrationModel } from '../types'
@@ -43,7 +47,7 @@ export const getProtocolLabwareList: (
       }
       const calData = calibrations
         .filter(({ attributes }) =>
-          matchesLabwareIdentity(attributes, baseLabware)
+          matchesLabwareIdentityForCalibration(attributes, baseLabware)
         )
         .map(formatCalibrationData)
 
@@ -72,23 +76,29 @@ export const getUniqueProtocolLabwareSummaries: (
   ) => {
     const uniqueLabware = uniqWith<BaseProtocolLabware>(
       baseLabwareList,
-      matchesLabwareIdentity
+      matchesLabwareIdentityForQuantity
     )
 
     return uniqueLabware.map(lw => {
-      const { definition: def, loadName, parent, calibrationData } = lw
+      const {
+        definition: def,
+        loadName,
+        parent,
+        calibrationData,
+        definitionHash,
+      } = lw
       const displayName = def ? getLabwareDisplayName(def) : loadName
       const parentDisplayName = parent ? getModuleDisplayName(parent) : null
 
       const quantity = baseLabwareList.filter(t =>
-        matchesLabwareIdentity(t, lw)
+        matchesLabwareIdentityForQuantity(t, lw)
       ).length
       const summary: LabwareSummary = {
         displayName,
         parentDisplayName,
         quantity,
         calibration: calibrationData,
-        legacy: lw.isLegacy,
+        calDataAvailable: definitionHash !== null,
       }
 
       return summary

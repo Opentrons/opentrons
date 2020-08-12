@@ -71,7 +71,7 @@ export function ProtocolLabwareList(
             parentDisplayName,
             quantity,
             calibration,
-            legacy,
+            calDataAvailable,
           } = lw
 
           return (
@@ -88,14 +88,14 @@ export function ProtocolLabwareList(
               </Box>
               <Text {...QUANTITY_COL_STYLE}>x {quantity}</Text>
               <Text {...CAL_DATA_COL_STYLE}>
-                {calibration !== null ? (
+                {!calDataAvailable ? (
+                  LEGACY_DEFINITION
+                ) : calibration !== null ? (
                   <>
                     {renderCalValue('x', calibration.x)}
                     {renderCalValue('y', calibration.y)}
                     {renderCalValue('z', calibration.z)}
                   </>
-                ) : legacy ? (
-                  LEGACY_DEFINITION
                 ) : (
                   NOT_CALIBRATED
                 )}
