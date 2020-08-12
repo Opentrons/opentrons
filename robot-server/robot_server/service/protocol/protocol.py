@@ -1,3 +1,4 @@
+import logging
 import typing
 from datetime import datetime
 from tempfile import TemporaryDirectory
@@ -8,6 +9,9 @@ from fastapi import UploadFile
 
 from robot_server.service.protocol.errors import ProtocolAlreadyExistsException
 from robot_server.util import FileMeta, save_upload
+
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -79,5 +83,6 @@ class UploadedProtocol:
 
     def get_contents(self) -> str:
         """Read the protocol file contents as a string"""
+
         with self.meta.protocol_file.path.open("r") as f:
             return f.read()

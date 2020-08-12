@@ -106,7 +106,10 @@ stages:
             createParams:
               protocolId: "{protocol_id}"
             createdAt: !anystr
-            details: {}
+            details:
+              protocolId: "{protocol_id}"
+              currentState: !anystr
+              commands: !anylist
         links: !anydict
   - name: Get the session
     request:
@@ -115,19 +118,6 @@ stages:
     response:
       status_code: 200
       json: *proto_session
-  - name: Try to simulate
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
-      method: POST
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: protocol.startSimulate
-            data: {}
-    response:
-      # Fails due to command execution not implemented yet
-      status_code: 400
   - name: Delete the session
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}"

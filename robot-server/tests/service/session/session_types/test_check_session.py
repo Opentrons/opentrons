@@ -98,6 +98,7 @@ def check_session_instance(patch_build_session, hardware, loop) -> BaseSession:
         CheckSession.create(
             configuration=SessionConfiguration(hardware=hardware,
                                                is_active=lambda x: False,
+                                               motion_lock=None,
                                                protocol_manager=None),
             instance_meta=SessionMetaData()
         )
@@ -152,6 +153,7 @@ async def test_create_session_error(hardware, patch_build_session,
         await CheckSession.create(
             configuration=SessionConfiguration(hardware=hardware,
                                                is_active=lambda x: False,
+                                               motion_lock=None,
                                                protocol_manager=None),
             instance_meta=SessionMetaData()
         )

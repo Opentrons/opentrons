@@ -2,18 +2,18 @@ import asyncio
 import logging
 from typing import Optional, Tuple, Dict, Type
 
-from opentrons.hardware_control import ThreadManager
+from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.errors import SessionCreationException, \
-    UnsupportedFeature
+    UnsupportedFeature, SessionException
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType, SessionType
 from robot_server.service.session.session_types import (
     NullSession, CheckSession, SessionMetaData, TipLengthCalibration,
     DeckCalibrationSession, DefaultSession)
-from robot_server.service.session.session_types.protocol_session import \
+from robot_server.service.session.session_types.protocol.session import \
     ProtocolSession
 
 log = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ class SessionManager:
 
     def __init__(self,
                  hardware: ThreadManager,
+                 motion_lock: ThreadedAsyncLock,
                  protocol_manager: ProtocolManager):
         """
         Construct the session manager
@@ -48,6 +49,7 @@ class SessionManager:
         self._session_common = SessionConfiguration(
             hardware=hardware,
             is_active=self.is_active,
+            motion_lock=motion_lock,
             protocol_manager=protocol_manager
         )
         # Create the default session.
@@ -88,6 +90,14 @@ class SessionManager:
             await session.clean_up()
             log.debug(f"Removed session: {session}")
         return session
+
+    async def remove_all(self):
+        """Remove all sessions"""
+        for session in self._sessions.keys():
+            try:
+                await self.remove(session)
+            except SessionException:
+                log.exception(f"Failed to remove '{session}'")
 
     def get_by_id(self, identifier: IdentifierType) \
             -> Optional[BaseSession]:

@@ -12,7 +12,10 @@ from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.protocol.protocol import UploadedProtocol
-
+from robot_server.service.session.session_types.protocol.execution.\
+    command_executor import ProtocolCommandExecutor
+from robot_server.service.session.session_types.protocol.models import \
+    ProtocolSessionDetails
 
 log = logging.getLogger(__name__)
 
@@ -23,16 +26,13 @@ class ProtocolSession(BaseSession):
                  configuration: SessionConfiguration,
                  instance_meta: SessionMetaData,
                  protocol: UploadedProtocol):
-        """
-        Constructor
-
-        :param configuration:
-        :param instance_meta:
-        :param protocol:
-        """
+        """Constructor"""
         super().__init__(configuration, instance_meta)
         self._uploaded_protocol = protocol
-        self._command_executor = CommandExecutor()
+        self._command_executor = ProtocolCommandExecutor(
+            protocol=self._uploaded_protocol,
+            configuration=configuration
+        )
 
     @classmethod
     async def create(cls, configuration: SessionConfiguration,
@@ -49,7 +49,11 @@ class ProtocolSession(BaseSession):
         return cls(configuration, instance_meta, protocol)
 
     def _get_response_details(self) -> models.SessionDetails:
-        return models.EmptyModel()
+        return ProtocolSessionDetails(
+            protocolId=self._uploaded_protocol.meta.identifier,
+            currentState=self._command_executor.current_state,
+            commands=self._command_executor.commands
+        )
 
     @property
     def command_executor(self) -> CommandExecutor:
@@ -62,3 +66,6 @@ class ProtocolSession(BaseSession):
     @property
     def session_type(self) -> models.SessionType:
         return models.SessionType.protocol
+
+    async def clean_up(self):
+        return await self._command_executor.clean_up()
