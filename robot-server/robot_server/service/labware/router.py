@@ -52,7 +52,8 @@ def _format_calibrations(
             loadName=details.load_name,
             namespace=details.namespace,
             version=details.version,
-            parent=parent_info)
+            parent=parent_info,
+            definitionHash=calInfo.labware_id)
         formatted_calibrations.append(
                 lw_models.ResponseDataModel.create(
                     attributes=formatted_cal,

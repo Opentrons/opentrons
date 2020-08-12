@@ -71,8 +71,7 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
                     calibration=calibration,
                     parent=_format_parent(data),
                     labware_id=key,
-                    uri=data['uri']
-                ))
+                    uri=data['uri']))
     return all_calibrations
 
 
