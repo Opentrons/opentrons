@@ -4,6 +4,8 @@ from numpy import insert, dot  # type: ignore
 from numpy.linalg import inv  # type: ignore
 from typing import List, Tuple, Union
 
+from opentrons.calibration_storage.types import AttitudeMatrix
+
 mod_log = logging.getLogger(__name__)
 
 # (TODO(lc, 8/11/2020): temporary type until
@@ -15,6 +17,33 @@ AxisPosition = Union[
 def identity_deck_transform(size: int = 4):
     """ The default deck transform """
     return np.identity(size)
+
+
+def solve_attitude(
+        expected: List[Tuple[float, float, float]],
+        actual: List[Tuple[float, float, float]]
+        ) -> AttitudeMatrix:
+    ex = np.array([
+        list(point)
+        for point in expected
+    ]).transpose()
+    ac = np.array([
+            list(point)
+            for point in actual
+        ]).transpose()
+    t = np.dot(ac, inv(ex))
+
+    mask_transform = np.array([
+        [True, True, False],
+        [True, True, False],
+        [False, False, False]])
+    masked_array = np.ma.masked_array(t, ~mask_transform)
+
+    no_z_component = np.zeros((3, 3))
+    np.put(no_z_component, [8, 8], 1)
+
+    transform = masked_array.filled(0) + no_z_component
+    return transform.round(4).tolist()
 
 
 def solve(expected: List[Tuple[float, float]],
@@ -151,10 +180,10 @@ def apply_transform(
                          with_offsets=False
     :return: corresponding XYZ point in space B
     """
-    extended = 1 if with_offsets else 0
-    test_stuff = list(pos) + [extended]
-    mod_log.info(test_stuff)
-    return tuple(dot(t, list(pos) + [extended])[:3])  # type: ignore
+    if with_offsets:
+        return tuple(dot(t, list(pos) + [1])[:3])  # type: ignore
+    else:
+        return tuple(dot(t, list(pos))[:3])  # type: ignore
 
 
 def apply_reverse(

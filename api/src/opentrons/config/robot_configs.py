@@ -99,6 +99,11 @@ DEFAULT_DECK_CALIBRATION: List[List[float]] = [
     [0.00, 0.00, 1.00, 0.00],
     [0.00, 0.00, 0.00, 1.00]]
 
+DEFAULT_DECK_CALIBRATION_V2: List[List[float]] = [
+    [1.00, 0.00, 0.00],
+    [0.00, 1.00, 0.00],
+    [0.00, 0.00, 1.00]]
+
 DEFAULT_SIMULATION_CALIBRATION: List[List[float]] = [
     [1.0, 0.0, 0.0, 0.0],
     [0.0, 1.0, 0.0, 0.0],

@@ -220,6 +220,18 @@ async def use_new_calibration(monkeypatch):
 # -----end feature flag fixtures-----------
 
 
+@pytest.fixture(params=[False, True])
+async def toggle_new_calibration(request):
+    if request.param:
+        await config.advanced_settings.set_adv_setting(
+            'enableTipLengthCalibration', True)
+        yield
+        await config.advanced_settings.set_adv_setting(
+            'enableTipLengthCalibration', False)
+    else:
+        yield
+
+
 @pytest.fixture
 async def dc_session(request, hardware, monkeypatch, loop):
     """

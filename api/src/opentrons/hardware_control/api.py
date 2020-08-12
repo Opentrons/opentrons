@@ -7,7 +7,6 @@ from collections import OrderedDict
 from typing import Dict, Union, List, Optional, Tuple, TYPE_CHECKING
 
 from opentrons_shared_data.pipette import name_for_model
-
 from opentrons import types as top_types
 from opentrons.util import linal
 from functools import lru_cache
@@ -92,9 +91,9 @@ class API(HardwareAPILike):
     def robot_calibration(self) -> rb_cal.RobotCalibration:
         return self._robot_calibration
 
-    @robot_calibration.setter
-    def robot_calibration(
+    def set_robot_calibration(
             self, robot_calibration: rb_cal.RobotCalibration):
+        self._calculate_valid_attitude.cache_clear()
         self._robot_calibration = robot_calibration
 
     @property
@@ -252,8 +251,10 @@ class API(HardwareAPILike):
         calibration is valid or not based on the following use-cases:
 
         """
+
         curr_cal = np.array(self._config.gantry_calibration)
         row, col = curr_cal.shape
+
         rank = np.linalg.matrix_rank(curr_cal)
 
         id_matrix = linal.identity_deck_transform()
@@ -735,39 +736,32 @@ class API(HardwareAPILike):
         with_enum = {Axis[k]: v for k, v in smoothie_pos.items()}
         plunger_axes = {k: v for k, v in with_enum.items()
                         if k not in Axis.gantry_axes()}
+        right = (
+            with_enum[Axis.X], with_enum[Axis.Y],
+            with_enum[Axis.by_mount(top_types.Mount.RIGHT)])
+        left = (with_enum[Axis.X],
+                with_enum[Axis.Y],
+                with_enum[Axis.by_mount(top_types.Mount.LEFT)])
         # Tell apply_transform to just do the change of base part of the
         # transform rather than the full affine transform, because this is
         # an offset
         if ff.enable_calibration_overhaul():
             gantry_calibration =\
                 self.robot_calibration.deck_calibration.attitude
-            gantry = (with_enum[Axis.X], with_enum[Axis.Y])
-            change_base = linal.apply_reverse(
-                gantry_calibration, gantry, with_offsets=False)
-            left_mount = with_enum[Axis.by_mount(top_types.Mount.LEFT)]
-            right_mount = with_enum[Axis.by_mount(top_types.Mount.RIGHT)]
-            deck_pos = {
-                Axis.X: change_base[0],
-                Axis.Y: change_base[1],
-                Axis.by_mount(top_types.Mount.RIGHT): right_mount,
-                Axis.by_mount(top_types.Mount.LEFT): left_mount
-            }
+            right_deck = linal.apply_reverse(
+                gantry_calibration, right, with_offsets=False)
+            left_deck = linal.apply_reverse(
+                gantry_calibration, left, with_offsets=False)
         else:
             gantry_calibration = self._config.gantry_calibration
-            right = (
-                with_enum[Axis.X], with_enum[Axis.Y],
-                with_enum[Axis.by_mount(top_types.Mount.RIGHT)])
-            left = (with_enum[Axis.X],
-                    with_enum[Axis.Y],
-                    with_enum[Axis.by_mount(top_types.Mount.LEFT)])
             right_deck = linal.apply_reverse(gantry_calibration,
                                              right)
             left_deck = linal.apply_reverse(gantry_calibration,
                                             left)
-            deck_pos = {Axis.X: right_deck[0],
-                        Axis.Y: right_deck[1],
-                        Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
-                        Axis.by_mount(top_types.Mount.LEFT): left_deck[2]}
+        deck_pos = {Axis.X: right_deck[0],
+                    Axis.Y: right_deck[1],
+                    Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
+                    Axis.by_mount(top_types.Mount.LEFT): left_deck[2]}
         deck_pos.update(plunger_axes)
         return deck_pos
 
@@ -883,27 +877,13 @@ class API(HardwareAPILike):
         else:
             m_offset = top_types.Point(0, 0, 0)
         cp = self._critical_point_for(mount, critical_point)
-        offset_vector = top_types.Point(0, 0, 0)
 
-        if ff.enable_calibration_overhaul():
-            target_position = OrderedDict((
-                (Axis.X, abs_position.x),
-                (Axis.Y, abs_position.y),
-                (z_axis, abs_position.z)))
-            offset_vector = top_types.Point(
-                m_offset.x - cp.x,
-                m_offset.y - cp.y,
-                m_offset.z - cp.z)
-        else:
-            target_position = OrderedDict((
-                (Axis.X, abs_position.x - m_offset.x - cp.x),
-                (Axis.Y, abs_position.y - m_offset.y - cp.y),
-                (z_axis, abs_position.z - m_offset.z - cp.z))
-            )
-
-        await self._move(
-            target_position, speed=speed,
-            max_speeds=max_speeds, offset_vector=offset_vector)
+        target_position = OrderedDict((
+            (Axis.X, abs_position.x - m_offset.x - cp.x),
+            (Axis.Y, abs_position.y - m_offset.y - cp.y),
+            (z_axis, abs_position.z - m_offset.z - cp.z))
+        )
+        await self._move(target_position, speed=speed, max_speeds=max_speeds)
 
     async def move_rel(self, mount: top_types.Mount, delta: top_types.Point,
                        speed: float = None,
@@ -958,49 +938,10 @@ class API(HardwareAPILike):
         await self._move(all_axes_pos, speed, False,
                          acquire_lock=acquire_lock)
 
-    async def _transform_deck_position(
-            self,
-            target_position: 'OrderedDict[Axis, float]',
-            offset_vector: top_types.Point) -> Tuple[float, float, float]:
-        if ff.enable_calibration_overhaul():
-            to_transform = tuple((
-                    tp
-                    for ax, tp in target_position.items()
-                    if ax in Axis.gantry_axes()))
-            if len(to_transform) != 2:
-                self._log.error("Move derived {} axes to transform from {}"
-                                .format(len(to_transform), target_position))
-                raise ValueError("Moves must specify either exactly an"
-                                 "X and Y or neither of them")
-            intermediate_matrix = linal.apply_transform(
-                self.robot_calibration.deck_calibration.attitude,
-                to_transform[0:2],  # type: ignore
-                with_offsets=False)
-            offsets = (
-                offset_vector.x,
-                offset_vector.y,
-                to_transform[-1] - offset_vector.z)
-            return linal.add_matrices(intermediate_matrix, offsets)
-        else:
-            to_transform = tuple((
-                    tp
-                    for ax, tp in target_position.items()
-                    if ax in Axis.gantry_axes()))
-            if len(to_transform) != 3:
-                self._log.error("Move derived {} axes to transform from {}"
-                                .format(len(to_transform), target_position))
-                raise ValueError("Moves must specify either exactly an "
-                                 "x, y, and (z or a) or none of them")
-
-            return linal.apply_transform(
-                self._config.gantry_calibration,
-                to_transform)  # type: ignore
-
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
                     speed: float = None, home_flagged_axes: bool = True,
                     max_speeds: Dict[Axis, float] = None,
-                    acquire_lock: bool = True,
-                    offset_vector: top_types.Point = top_types.Point(0, 0, 0)):
+                    acquire_lock: bool = True):
         """ Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
@@ -1020,15 +961,29 @@ class API(HardwareAPILike):
         # need to transform
         smoothie_pos = {ax.name: pos for ax, pos in target_position.items()
                         if ax not in Axis.gantry_axes()}
+        to_transform = tuple((tp
+                              for ax, tp in target_position.items()
+                              if ax in Axis.gantry_axes()))
 
+        if len(to_transform) != 3:
+            self._log.error("Move derived {} axes to transform from {}"
+                            .format(len(to_transform), target_position))
+            raise ValueError("Moves must specify either exactly an "
+                             "x, y, and (z or a) or none of them")
         # Type ignored below because linal.apply_transform (rightly) specifies
         # Tuple[float, float, float] and the implied type from
         # target_position.items() is (rightly) Tuple[float, ...] with unbounded
         # size; unfortunately, mypy can’t quite figure out the length check
         # above that makes this OK
-        transformed = await self._transform_deck_position(
-            target_position, offset_vector)
-
+        if ff.enable_calibration_overhaul():
+            transformed = linal.apply_transform(
+                self.robot_calibration.deck_calibration.attitude,
+                to_transform,  # type: ignore
+                with_offsets=False)
+        else:
+            transformed = linal.apply_transform(
+                self._config.gantry_calibration,
+                to_transform)  # type: ignore
         # Since target_position is an OrderedDict with the axes ordered by
         # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
         # by the len(to_transform) check above) we can use an enumerate to
