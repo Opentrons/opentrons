@@ -34,7 +34,6 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
     calibrationData,
     definitionHash,
   } = props
-  console.log(definitionHash, 'DEF HASH IN LLI')
 
   const url = `/calibrate/labware/${slot}`
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
