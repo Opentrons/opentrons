@@ -36,7 +36,8 @@ def deep_dict():
                              # Failure cases
                              [None, None],
                              [[], None],
-                             [['b', 1.3], None],  # look out that float isn't interpreted as index
+                             # look out that float isn't interpreted as index
+                             [['b', 1.3], None],
                          ])
 def test_deep_get(deep_dict, key, expected_result):
     assert helpers.deep_get(deep_dict, key) == expected_result
