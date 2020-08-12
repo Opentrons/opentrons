@@ -480,14 +480,44 @@ def run(ctx):
                 future.result()
 
 
-async def test_http_protocol_sessions_enabled(session_manager, protocol):
+@pytest.mark.parametrize(argnames="create_func,extra_kwargs",
+                         argvalues=[
+                             [session.SessionManager.create, {}],
+                             [session.SessionManager.create_from_bundle, {}],
+                             [session.SessionManager.create_with_extra_labware,
+                              {"extra_labware": {}}]
+                         ])
+def test_http_protocol_sessions_disabled(session_manager, protocol,
+                                         create_func, extra_kwargs):
+    """Test that we can create a session if enableHttpProtocolSessions is
+    disabled."""
+    with patch.object(session.Session, "build_and_prep") as mock_build:
+        with patch("opentrons.api.util.enable_http_protocol_sessions") as m:
+            m.return_value = False
+            create_func(session_manager,
+                        name='<blank>',
+                        contents=protocol.text, **extra_kwargs)
+            mock_build.assert_called_once()
+
+
+@pytest.mark.parametrize(argnames="create_func,extra_kwargs",
+                         argvalues=[
+                             [session.SessionManager.create, {}],
+                             [session.SessionManager.create_from_bundle, {}],
+                             [session.SessionManager.create_with_extra_labware,
+                              {"extra_labware": {}}]
+                         ])
+async def test_http_protocol_sessions_enabled(session_manager, protocol,
+                                              create_func, extra_kwargs):
     """Test that we cannot create a session if enableHttpProtocolSessions is
     enabled."""
-    with patch.object(session, "enable_http_protocol_sessions") as m:
-        m.return_value = True
-        with pytest.raises(
-                RuntimeError,
-                match="Please disable the 'Enable Experimental HTTP Protocol "
-                      "Sessions' advanced setting for this robot if you'd "
-                      "like to upload protocols from the Opentrons App"):
-            session_manager.create(name='<blank>', contents=protocol.text)
+    with patch.object(session.Session, "build_and_prep"):
+        with patch("opentrons.api.util.enable_http_protocol_sessions") as m:
+            m.return_value = True
+            with pytest.raises(
+                    RuntimeError,
+                    match="Please disable the 'Enable Experimental HTTP "
+                          "Protocol Sessions' advanced setting for this robot "
+                          "if you'd like to upload protocols from the "
+                          "Opentrons App"):
+                session_manager.create(name='<blank>', contents=protocol.text)
