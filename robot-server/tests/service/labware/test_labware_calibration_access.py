@@ -33,7 +33,7 @@ def test_access_individual_labware(api_client, grab_id):
         'namespace': 'opentrons',
         'version': 1,
         'parent': '',
-        'labwareId': calibration_id}
+        'definitionHash': calibration_id}
 
     resp = api_client.get(f'/labware/calibrations/{calibration_id}')
     assert resp.status_code == 200

@@ -38,7 +38,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
           - attributes:
@@ -47,7 +47,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
           - attributes:
@@ -56,7 +56,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
           - attributes:
@@ -65,7 +65,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
           - attributes:
@@ -74,7 +74,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
 
@@ -103,7 +103,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
 ---
@@ -132,7 +132,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
           - attributes:
@@ -141,7 +141,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
           - attributes:
@@ -150,7 +150,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
           - attributes:
@@ -159,7 +159,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
           - attributes:
@@ -168,7 +168,7 @@ stages:
               parent: !anystr
               namespace: 'opentrons'
               version: 1
-              labwareId: !anystr
+              definitionHash: !anystr
             id: !anystr
             type: 'LabwareCalibration'
 ---

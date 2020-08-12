@@ -53,7 +53,7 @@ def _format_calibrations(
             namespace=details.namespace,
             version=details.version,
             parent=parent_info,
-            labwareId=calInfo.labware_id)
+            definitionHash=calInfo.labware_id)
         formatted_calibrations.append(
                 lw_models.ResponseDataModel.create(
                     attributes=formatted_cal,

@@ -58,7 +58,7 @@ class LabwareCalibration(BaseModel):
         Field(...,
               description="The module associated with this offset or an empty"
                           " string if the offset is associated with a slot")
-    labwareId: str =\
+    definitionHash: str =\
         Field(...,
               description="The sha256 hash of key labware definition details")
 
