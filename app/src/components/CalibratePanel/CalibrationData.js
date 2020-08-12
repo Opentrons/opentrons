@@ -13,10 +13,10 @@ const LEGACY_DEFINITION = 'Calibration Data N/A'
 export function CalibrationData(props: {|
   calibrationData: LabwareCalibrationData | null,
   calibratedThisSession: boolean,
-  legacy: boolean,
+  calDataAvailable: boolean,
 |}): React.Node {
-  const { calibrationData, calibratedThisSession, legacy } = props
-  if (legacy) {
+  const { calibrationData, calibratedThisSession, calDataAvailable } = props
+  if (!calDataAvailable) {
     return (
       <Text as="i" marginTop={SPACING_2}>
         {LEGACY_DEFINITION}

@@ -31,6 +31,9 @@ class Container:
             self.slot = _get_parent_slot_legacy(container).get_name()
             self.is_legacy = container.properties.get(
                 'labware_hash') is None
+            self.definition_hash = container.properties.get(
+                'labware_hash', None)
+
         else:
             # will be labware's load name or label
             self.name = container.name

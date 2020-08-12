@@ -44,7 +44,7 @@ export type LabwareSummary = {|
   parentDisplayName: string | null,
   quantity: number,
   calibration: LabwareCalibrationData | null,
-  legacy: boolean,
+  calDataAvailable: boolean,
 |}
 
 export type LawareCalibrationAction =

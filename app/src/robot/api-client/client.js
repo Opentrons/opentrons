@@ -631,7 +631,7 @@ export function client(dispatch) {
         type,
         isTiprack,
         isLegacy,
-        definitionHash,
+        definitionHash: definitionHash ?? null,
       }
 
       if (isTiprack && apiContainer.instruments.length > 0) {
