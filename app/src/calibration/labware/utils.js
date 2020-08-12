@@ -1,7 +1,6 @@
 // @flow
 
 import round from 'lodash/round'
-import assert from 'assert'
 import type { LabwareCalibrationModel, LabwareCalibration } from '../types'
 import type { LabwareCalibrationData, BaseProtocolLabware } from './types'
 

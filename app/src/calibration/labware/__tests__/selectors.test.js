@@ -145,12 +145,14 @@ describe('labware calibration selectors', () => {
           parentDisplayName: null,
           quantity: 1,
           calibration: { x: 1.2, y: 4.6, z: 7.9 },
+          calDataAvailable: true,
         },
         {
           displayName: 'some_v1_labware',
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })
@@ -432,12 +434,14 @@ describe('labware calibration selectors', () => {
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
         {
           displayName: 'some_v1_labware',
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })
@@ -451,12 +455,14 @@ describe('labware calibration selectors', () => {
           parentDisplayName: 'Magnetic Module GEN1',
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
         {
           displayName: 'some_v1_labware',
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })
@@ -486,6 +492,7 @@ describe('labware calibration selectors', () => {
           parentDisplayName: null,
           quantity: 2,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })
@@ -524,12 +531,14 @@ describe('labware calibration selectors', () => {
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
         {
           displayName: wellPlate96Def.metadata.displayName,
           parentDisplayName: 'Magnetic Module GEN1',
           quantity: 1,
           calibration: null,
+          calDataAvailable: true,
         },
       ])
     })
