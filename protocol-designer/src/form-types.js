@@ -201,6 +201,14 @@ export type HydratedMoveLiquidFormData = {
     aspirate_mix_volume: ?number,
     aspirate_mix_times: ?number,
 
+    aspirate_delay_checkbox: boolean,
+    aspirate_delay_seconds: ?number,
+    aspirate_delay_mmFromBottom: ?number,
+
+    dispense_delay_checkbox: boolean,
+    dispense_delay_seconds: ?number,
+    dispense_delay_mmFromBottom: ?number,
+
     dispense_labware: LabwareEntity,
     dispense_wells: Array<string>,
     dispense_wellOrder_first: WellOrderOption,
