@@ -62,7 +62,7 @@ describe('move liquid step form -> command creator args', () => {
         aspirate_mix_times: null,
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: null,
-        aspirate_delay_tip_position: null,
+        aspirate_delay_mmFromBottom: null,
 
         dispense_labware: {
           id: 'destLabwareId',
@@ -81,7 +81,7 @@ describe('move liquid step form -> command creator args', () => {
         dispense_mix_times: null,
         dispense_delay_checkbox: false,
         dispense_delay_seconds: null,
-        dispense_delay_tip_position: null,
+        dispense_delay_mmFromBottom: null,
 
         aspirate_wells_grouped: false,
         preWetTip: false,
@@ -182,7 +182,7 @@ describe('move liquid step form -> command creator args', () => {
       checkboxField: 'aspirate_delay_checkbox',
       formFields: {
         aspirate_delay_seconds: 11,
-        aspirate_delay_tip_position: 12,
+        aspirate_delay_mmFromBottom: 12,
       },
       expectedArgsUnchecked: { aspirateDelay: null },
       expectedArgsChecked: { aspirateDelay: { seconds: 11, mmFromBottom: 12 } },
@@ -191,7 +191,7 @@ describe('move liquid step form -> command creator args', () => {
       checkboxField: 'dispense_delay_checkbox',
       formFields: {
         dispense_delay_seconds: 11,
-        dispense_delay_tip_position: 12,
+        dispense_delay_mmFromBottom: 12,
       },
       expectedArgsUnchecked: { dispenseDelay: null },
       expectedArgsChecked: { dispenseDelay: { seconds: 11, mmFromBottom: 12 } },

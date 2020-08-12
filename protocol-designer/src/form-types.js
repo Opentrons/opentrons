@@ -203,11 +203,11 @@ export type HydratedMoveLiquidFormData = {
 
     aspirate_delay_checkbox: boolean,
     aspirate_delay_seconds: ?number,
-    aspirate_delay_tip_position: ?number,
+    aspirate_delay_mmFromBottom: ?number,
 
     dispense_delay_checkbox: boolean,
     dispense_delay_seconds: ?number,
-    dispense_delay_tip_position: ?number,
+    dispense_delay_mmFromBottom: ?number,
 
     dispense_labware: LabwareEntity,
     dispense_wells: Array<string>,
