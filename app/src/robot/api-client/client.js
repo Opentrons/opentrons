@@ -620,9 +620,19 @@ export function client(dispatch) {
         slot,
         position,
         is_legacy: isLegacy,
+        definition_hash: definitionHash,
       } = apiContainer
       const isTiprack = containerIsTiprack(apiContainer)
-      const labware = { _id, name, slot, position, type, isTiprack, isLegacy }
+      const labware = {
+        _id,
+        name,
+        slot,
+        position,
+        type,
+        isTiprack,
+        isLegacy,
+        definitionHash,
+      }
 
       if (isTiprack && apiContainer.instruments.length > 0) {
         // if tiprack used by both pipettes, prefer single for calibration

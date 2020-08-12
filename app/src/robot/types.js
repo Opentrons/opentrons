@@ -142,6 +142,8 @@ export type StateLabware = {|
   isLegacy: boolean,
   // instrument mount to use as the calibrator if isTiprack is true
   calibratorMount: ?Mount,
+  // string identity of a labware; combines all definition properties that would effect a run
+  definitionHash: string,
 |}
 
 export type Labware = {|

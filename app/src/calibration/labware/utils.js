@@ -15,9 +15,7 @@ export const matchesLabwareIdentity = (
   compare: LabwareCalibration | BaseProtocolLabware
 ): boolean => {
   return (
-    target.loadName === compare.loadName &&
-    target.namespace === compare.namespace &&
-    target.version === compare.version &&
+    target.definitionHash === compare.definitionHash &&
     normalizeParent(target.parent) === normalizeParent(compare.parent)
   )
 }

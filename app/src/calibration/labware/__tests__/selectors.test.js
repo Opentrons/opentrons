@@ -68,6 +68,8 @@ describe('labware calibration selectors', () => {
             type: wellPlate96Def.parameters.loadName,
             definition: wellPlate96Def,
             slot: '3',
+            definitionHash:
+              Fixtures.mockLabwareCalibration1.attributes.definitionHash,
           }: $Shape<ProtocolLabware>),
           ({
             type: 'some_v1_labware',
@@ -215,6 +217,7 @@ describe('labware calibration selectors', () => {
           version: wellPlate96Def.version,
           parent: 'magneticModuleV1',
           calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
+          definitionHash: attributes.definitionHash,
         },
         {
           type: 'some_v1_labware',
@@ -293,6 +296,7 @@ describe('labware calibration selectors', () => {
           namespace: wellPlate96Def.namespace,
           version: wellPlate96Def.version,
           parent: null,
+          definitionHash: attributes.definitionHash,
           calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
         },
         {
@@ -323,6 +327,8 @@ describe('labware calibration selectors', () => {
             type: wellPlate96Def.parameters.loadName,
             definition: wellPlate96Def,
             slot: '3',
+            definitionHash:
+              Fixtures.mockLabwareCalibration1.attributes.definitionHash,
           }: $Shape<ProtocolLabware>),
           ({
             type: 'some_v1_labware',
@@ -397,11 +403,13 @@ describe('labware calibration selectors', () => {
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
+          definitionHash: '123fakeDefinitionHash',
           slot: '3',
         }: $Shape<ProtocolLabware>),
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
+          definitionHash: '123fakeDefinitionHash',
           slot: '4',
         }: $Shape<ProtocolLabware>),
       ])
@@ -424,11 +432,13 @@ describe('labware calibration selectors', () => {
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
+          definitionHash: '123fakeDefinitionHash',
           slot: '2',
         }: $Shape<ProtocolLabware>),
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
+          definitionHash: '123fakeDefinitionHash',
           slot: '3',
         }: $Shape<ProtocolLabware>),
       ])
