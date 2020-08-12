@@ -1,4 +1,5 @@
 // @flow
+import typeof { PENDING, SUCCESS, FAILURE } from './constants'
 
 export type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
@@ -103,11 +104,13 @@ export type RobotApiV2ErrorResponseBody = {|
 
 // API request tracking state
 
+export type RequestStatus = PENDING | SUCCESS | FAILURE
+
 export type RequestState =
-  | $ReadOnly<{| status: 'pending' |}>
-  | $ReadOnly<{| status: 'success', response: RobotApiResponseMeta |}>
+  | $ReadOnly<{| status: PENDING |}>
+  | $ReadOnly<{| status: SUCCESS, response: RobotApiResponseMeta |}>
   | $ReadOnly<{|
-      status: 'failure',
+      status: FAILURE,
       response: RobotApiResponseMeta,
       error: {| message?: string |} | RobotApiV2ErrorResponseBody,
     |}>

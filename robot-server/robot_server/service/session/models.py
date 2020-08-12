@@ -9,6 +9,8 @@ from robot_server.robot.calibration.check import (
     models as calibration_check_models)
 from robot_server.robot.calibration.tip_length import (
     models as tip_length_calibration_models)
+from robot_server.robot.calibration.deck import (
+    models as deck_calibration_models)
 
 from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
@@ -57,6 +59,7 @@ class SessionType(str, Enum):
         'tipLengthCalibration',
         tip_length_calibration_models.SessionCreateParams
     )
+    deck_calibration = 'deckCalibration'
     protocol = ('protocol', ProtocolCreateParams)
 
     @property
@@ -90,6 +93,7 @@ Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
 SessionDetails = typing.Union[
     calibration_check_models.CalibrationSessionStatus,
     tip_length_calibration_models.TipCalibrationSessionStatus,
+    deck_calibration_models.DeckCalibrationSessionStatus,
     EmptyModel
 ]
 
@@ -198,6 +202,19 @@ class TipLengthCalibrationCommand(CommandDefinition):
         return "calibration.tipLength"
 
 
+class DeckCalibrationCommand(CommandDefinition):
+    """Deck Calibration Specific"""
+    move_to_tip_rack = "moveToTipRack"
+    move_to_deck = "moveToDeck"
+    move_to_point_one = "moveToPointOne"
+    move_to_point_two = "moveToPointTwo"
+    move_to_point_three = "moveToPointThree"
+
+    @staticmethod
+    def namespace():
+        return "calibration.deck"
+
+
 """
 IMPORTANT: See note for SessionCreateParamType
 
@@ -215,6 +232,7 @@ CommandDefinitionType = typing.Union[
     CalibrationCommand,
     CalibrationCheckCommand,
     TipLengthCalibrationCommand,
+    DeckCalibrationCommand,
     ProtocolCommand
 ]
 
@@ -274,7 +292,7 @@ class BasicSessionCommand(BaseModel):
     @staticmethod
     @lru_cache(maxsize=1)
     def _pre_namespace_mapping() -> typing.Dict[str, CommandDefinition]:
-        """Create a dictionary of pre-namespace name to CommandDefintion"""
+        """Create a dictionary of pre-namespace name to CommandDefinition"""
         # A tuple of CommandDefinition enums which need to be identified by
         # localname and full namespaced name
         pre_namespace_ns = CalibrationCheckCommand, CalibrationCommand

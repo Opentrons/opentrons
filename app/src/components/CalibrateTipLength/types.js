@@ -1,13 +1,11 @@
 // @flow
+
 import type {
   SessionCommandString,
   SessionCommandData,
   TipLengthCalibrationSession,
 } from '../../sessions/types'
-import type {
-  TipLengthCalibrationInstrument,
-  TipLengthCalibrationLabware,
-} from '../../sessions/tip-length-calibration/types'
+import type { TipLengthCalibrationLabware } from '../../sessions/tip-length-calibration/types'
 
 export type CalibrateTipLengthParentProps = {|
   robotName: string,
@@ -17,13 +15,14 @@ export type CalibrateTipLengthParentProps = {|
 |}
 
 export type CalibrateTipLengthChildProps = {|
-  instrument: TipLengthCalibrationInstrument,
-  labware: Array<TipLengthCalibrationLabware>,
+  isMulti: boolean,
+  mount: string,
+  tipRack: TipLengthCalibrationLabware,
+  calBlock: TipLengthCalibrationLabware | null,
   sendSessionCommand: (
     command: SessionCommandString,
     data?: SessionCommandData,
     trackRequest?: boolean
   ) => void,
-  hasBlock: boolean,
   deleteSession: () => void,
 |}

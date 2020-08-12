@@ -20,7 +20,6 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
-import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
 import type { CalibrateTipLengthChildProps } from './types'
 import styles from './styles.css'
@@ -48,16 +47,7 @@ const ASSET_MAP = {
   single: singleDemoAsset,
 }
 export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
-  const { sendSessionCommand } = props
-  // TODO: get real isMulti and tiprack from the session
-  const tiprack = {}
-  const isMulti = true
-
-  const [showTipInspection, setShowTipInspection] = React.useState(false)
-  const tiprackDef = React.useMemo(
-    () => getLatestLabwareDef(tiprack?.loadName),
-    [tiprack]
-  )
+  const { sendSessionCommand, isMulti, tipRack } = props
 
   const demoAsset = ASSET_MAP[isMulti ? 'multi' : 'single']
 
@@ -73,26 +63,19 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
 
   const pickUpTip = () => {
     sendSessionCommand(Sessions.tipCalCommands.PICK_UP_TIP)
-    setShowTipInspection(true)
   }
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(Sessions.tipCalCommands.JOG, {
-      vector: formatJogVector(axis, dir, step),
-    })
+    sendSessionCommand(
+      Sessions.tipCalCommands.JOG,
+      {
+        vector: formatJogVector(axis, dir, step),
+      },
+      false
+    )
   }
 
-  const invalidateTip = () => {
-    setShowTipInspection(false)
-    sendSessionCommand(Sessions.tipCalCommands.INVALIDATE_TIP)
-  }
-  const confirmTip = () => {
-    sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT)
-  }
-
-  return showTipInspection ? (
-    <InspectingTip invalidateTip={invalidateTip} confirmTip={confirmTip} />
-  ) : (
+  return (
     <>
       <Flex
         marginY={SPACING_2}
@@ -103,9 +86,7 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
       >
         <h3 className={styles.intro_header}>
           {TIP_PICK_UP_HEADER}
-          {tiprackDef
-            ? getLabwareDisplayName(tiprackDef).replace('µL', 'uL')
-            : null}
+          {getLabwareDisplayName(tipRack.definition).replace('µL', 'uL')}
         </h3>
         <Box
           padding={SPACING_3}
@@ -145,9 +126,9 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
             </div>
           </Flex>
         </Box>
-        <div>
+        <Box>
           <JogControls jog={jog} />
-        </div>
+        </Box>
         <Flex width="100%">
           <PrimaryButton onClick={pickUpTip} className={styles.command_button}>
             {TIP_PICK_UP_BUTTON_TEXT}
@@ -155,40 +136,5 @@ export function TipPickUp(props: CalibrateTipLengthChildProps): React.Node {
         </Flex>
       </Flex>
     </>
-  )
-}
-
-const CONFIRM_TIP_BODY = 'Did pipette pick up tips successfully?'
-const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, continue'
-const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
-
-type InspectingTipProps = {|
-  invalidateTip: () => void,
-  confirmTip: () => void,
-|}
-
-export function InspectingTip(props: InspectingTipProps): React.Node {
-  return (
-    <Flex
-      width="100%"
-      flexDirection={DIRECTION_COLUMN}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
-      marginY={SPACING_3}
-    >
-      <Text marginBottom={SPACING_3}>{CONFIRM_TIP_BODY}</Text>
-      <PrimaryButton
-        className={styles.pick_up_tip_confirmation_button}
-        onClick={props.invalidateTip}
-      >
-        {CONFIRM_TIP_NO_BUTTON_TEXT}
-      </PrimaryButton>
-      <PrimaryButton
-        className={styles.pick_up_tip_confirmation_button}
-        onClick={props.confirmTip}
-      >
-        {CONFIRM_TIP_YES_BUTTON_TEXT}
-      </PrimaryButton>
-    </Flex>
   )
 }

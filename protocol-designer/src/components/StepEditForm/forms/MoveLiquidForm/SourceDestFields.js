@@ -72,7 +72,7 @@ export const SourceDestFields = (props: Props): React.Node => {
           {...focusHandlers}
         />
         <TipPositionField
-          fieldName={addFieldNamePrefix('delay_tip_position')}
+          fieldName={addFieldNamePrefix('delay_mmFromBottom')}
         />
       </CheckboxRowField>
     ) : null

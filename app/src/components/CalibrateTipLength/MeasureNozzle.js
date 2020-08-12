@@ -63,21 +63,18 @@ const BLOCK = 'block in'
 const FLAT_SURFACE = 'flat surface'
 const OF_THE_TRASH_BIN = 'of the trash bin'
 const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis'
+const SLOT = 'slot'
 
 export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
-  const { sendSessionCommand, hasBlock } = props
-  // TODO: get real isMulti and mount and slotName from the session
-  const mount = 'left'
-  const isMulti = false
-  const slotName = 'slot 3'
+  const { sendSessionCommand, calBlock, mount, isMulti } = props
 
-  const referencePointStr = hasBlock ? (
+  const referencePointStr = calBlock ? (
     BLOCK
   ) : (
     <Text as="strong">{`${FLAT_SURFACE} `}</Text>
   )
-  const referenceSlotStr = hasBlock ? (
-    <Text as="strong">{` ${slotName}`}</Text>
+  const referenceSlotStr = calBlock ? (
+    <Text as="strong">{` ${SLOT} ${calBlock.slot}`}</Text>
   ) : (
     OF_THE_TRASH_BIN
   )
@@ -85,10 +82,10 @@ export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
   const demoAsset = React.useMemo(
     () =>
       mount &&
-      assetMap[hasBlock ? 'block' : 'trash'][mount][
+      assetMap[calBlock ? 'block' : 'trash'][mount][
         isMulti ? 'multi' : 'single'
       ],
-    [mount, isMulti, hasBlock]
+    [mount, isMulti, calBlock]
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {

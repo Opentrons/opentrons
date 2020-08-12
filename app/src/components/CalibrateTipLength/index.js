@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
 
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ModalPage,
   SpinnerModalPage,
@@ -14,14 +15,16 @@ import type { State } from '../../types'
 import type {
   SessionCommandString,
   SessionCommandData,
+  TipLengthCalibrationLabware,
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
-import type { RequestState } from '../../robot-api/types'
+import type { RequestState, RequestStatus } from '../../robot-api/types'
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { MeasureNozzle } from './MeasureNozzle'
 import { TipPickUp } from './TipPickUp'
+import { TipConfirmation } from './TipConfirmation'
 import { MeasureTip } from './MeasureTip'
 import { CompleteConfirmation } from './CompleteConfirmation'
 import { ConfirmExitModal } from './ConfirmExitModal'
@@ -44,6 +47,7 @@ const PANEL_BY_STEP: {
   labwareLoaded: DeckSetup,
   measuringNozzleOffset: MeasureNozzle,
   preparingPipette: TipPickUp,
+  inspectingTip: TipConfirmation,
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
@@ -62,17 +66,29 @@ export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
   const { session, robotName, hasBlock, closeWizard } = props
+  const { currentStep, instrument, labware } = session?.details || {}
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const dispatch = useDispatch()
 
-  const requestStatus = useSelector<State, RequestState | null>(state =>
-    getRequestById(state, last(requestIds))
-  )?.status
+  const lastRequestStatus: RequestStatus | null =
+    useSelector<State, RequestState | null>(state =>
+      getRequestById(state, last(requestIds))
+    )?.status ?? null
+
+  const isMulti = React.useMemo(() => {
+    const spec = instrument && getPipetteModelSpecs(instrument.model)
+    return spec ? spec.channels > 1 : false
+  }, [instrument])
+
+  const tipRack: TipLengthCalibrationLabware | null =
+    (labware && labware.find(l => l.isTiprack)) ?? null
+  const calBlock: TipLengthCalibrationLabware | null =
+    hasBlock && labware ? labware.find(l => !l.isTiprack) ?? null : null
 
   function sendCommand(
     command: SessionCommandString,
     data: SessionCommandData = {},
-    trackRequest: boolean = true
+    loadingSpinner: boolean = true
   ) {
     if (session === null) return
     const sessionCommand = Sessions.createSessionCommand(
@@ -80,7 +96,7 @@ export function CalibrateTipLength(
       session.id,
       { command, data }
     )
-    if (trackRequest) {
+    if (loadingSpinner) {
       dispatchRequest(sessionCommand)
     } else {
       dispatch(sessionCommand)
@@ -102,7 +118,7 @@ export function CalibrateTipLength(
     deleteSession()
   }, true)
 
-  if (!session) {
+  if (!session || !tipRack) {
     return null
   }
 
@@ -111,11 +127,10 @@ export function CalibrateTipLength(
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
-  if (requestStatus === PENDING) {
+  if (lastRequestStatus === PENDING) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
-  const { currentStep, instrument, labware } = session?.details
   const Panel = PANEL_BY_STEP[currentStep]
 
   return Panel ? (
@@ -125,9 +140,10 @@ export function CalibrateTipLength(
         contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
       >
         <Panel
-          instrument={instrument}
-          labware={labware}
-          hasBlock={hasBlock}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase()}
+          tipRack={tipRack}
+          calBlock={calBlock}
           sendSessionCommand={sendCommand}
           deleteSession={deleteSession}
         />

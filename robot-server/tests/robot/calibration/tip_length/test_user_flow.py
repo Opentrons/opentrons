@@ -139,9 +139,13 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
      stub_jog_data, 'move_rel'),
     (CalibrationCommand.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
     (TipLengthCalibrationCommand.move_to_reference_point, 'labwareLoaded',
-     {}, 'gantry_position'),
-    (TipLengthCalibrationCommand.move_to_reference_point, 'preparingPipette',
-     {}, 'gantry_position'),
+     {}, 'move_to'),
+    (TipLengthCalibrationCommand.move_to_reference_point, 'inspectingTip',
+     {}, 'move_to'),
+    (TipLengthCalibrationCommand.move_to_tip_rack, 'measuringNozzleOffset',
+     {}, 'move_to'),
+    (TipLengthCalibrationCommand.move_to_tip_rack, 'measuringTipOffset',
+     {}, 'move_to'),
 ]
 
 
