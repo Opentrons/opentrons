@@ -6,6 +6,7 @@ import os
 import shutil
 from unittest.mock import MagicMock
 
+import requests
 from fastapi import routing
 import pytest
 from starlette.testclient import TestClient
@@ -140,3 +141,18 @@ def set_up_index_file_temporary_directory(server_temp_directory):
 def session_manager(hardware) -> SessionManager:
     return SessionManager(hardware,
                           ProtocolManager())
+
+
+@pytest.fixture
+def set_enable_http_protocol_sessions():
+    """For integration tests that need to set then clear the
+    enableHttpProtocolSessions feature flag"""
+    url = "http://localhost:31950/settings"
+    data = {
+        "id": "enableHttpProtocolSessions",
+        "value": True
+    }
+    requests.post(url, json=data)
+    yield None
+    data['value'] = None
+    requests.post(url, json=data)

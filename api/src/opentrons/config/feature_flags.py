@@ -31,3 +31,7 @@ def enable_door_safety_switch():
 
 def enable_calibration_overhaul():
     return advs.get_setting_with_env_overload('enableTipLengthCalibration')
+
+
+def enable_http_protocol_sessions():
+    return advs.get_setting_with_env_overload('enableHttpProtocolSessions')
