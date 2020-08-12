@@ -33,7 +33,7 @@ import type { ViewableRobot } from '../../discovery/types'
 
 import { TitledControl } from '../TitledControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
-import { DeckCalibrationWarning } from './DeckCalibrationWarning'
+import { DeckCalibrationControl } from './DeckCalibrationControl'
 
 type Props = {|
   robot: ViewableRobot,
@@ -64,7 +64,7 @@ export function ControlsCard(props: Props): React.Node {
   })
   const notConnectable = status !== CONNECTABLE
   const toggleLights = () => dispatch(updateLights(robotName, !lightsOn))
-  const startCalibration = () => {
+  const startLegacyDeckCalibration = () => {
     dispatch(startDeckCalibration(robot)).then(() =>
       dispatch(push(calibrateDeckUrl))
     )
@@ -102,25 +102,12 @@ export function ControlsCard(props: Props): React.Node {
   return (
     <Card title={TITLE} disabled={notConnectable}>
       {/* TODO(mc, 2020-06-22): move to DeckCalibrationControl component */}
-      <TitledControl
-        borderBottom={BORDER_SOLID_LIGHT}
-        title="Calibrate deck"
-        description={<Text>{CALIBRATE_DECK_DESCRIPTION}</Text>}
-        control={
-          <SecondaryBtn
-            width="9rem"
-            onClick={startCalibration}
-            disabled={buttonDisabled}
-          >
-            Calibrate
-          </SecondaryBtn>
-        }
-      >
-        <DeckCalibrationWarning
-          deckCalibrationStatus={deckCalStatus}
-          marginTop={SPACING_2}
-        />
-      </TitledControl>
+      <DeckCalibrationControl
+        robotName={robotName}
+        buttonDisabled={buttonDisabled}
+        deckCalStatus={deckCalStatus}
+        startLegacyDeckCalibration={startLegacyDeckCalibration}
+      />
       <LabeledButton
         label="Home all axes"
         buttonProps={{
