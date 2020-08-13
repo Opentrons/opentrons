@@ -1,6 +1,6 @@
 from http import HTTPStatus
 from typing import Set, Dict, Any, Union
-from robot_server.service.errors import RobotServerError
+from robot_server.service.errors import BaseRobotServerError
 from robot_server.service.json_api.errors import Error
 from robot_server.service.session.models import CommandDefinition
 from .constants import STATE_WILDCARD
@@ -10,7 +10,7 @@ from .deck.constants import DeckCalibrationState
 ValidState = Union[TipCalibrationState, DeckCalibrationState]
 
 
-class StateTransitionError(RobotServerError):
+class StateTransitionError(BaseRobotServerError):
     def __init__(self,
                  action: CommandDefinition,
                  state: ValidState,

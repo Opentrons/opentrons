@@ -1,10 +1,10 @@
 from dataclasses import dataclass, asdict
 from enum import Enum
-from http import HTTPStatus
 from typing import List, Dict, Any, Optional
 
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
+from starlette import status as status_codes
 
 from robot_server.service.json_api.errors import ErrorResponse, Error, \
     ErrorSource, ResourceLinks
@@ -17,7 +17,7 @@ class V1HandlerError(Exception):
         self.message = message
 
 
-class RobotServerError(Exception):
+class BaseRobotServerError(Exception):
     def __init__(self, status_code: int, error: Error):
         self.status_code = status_code
         self.error = error
@@ -28,9 +28,6 @@ class ErrorCreateDef:
     status_code: int
     title: str
     format_string: str
-    links: Optional[ResourceLinks] = None
-    source: Optional[ErrorSource] = None
-    meta: Optional[Dict] = None
 
 
 class ErrorDef(ErrorCreateDef, Enum):
@@ -40,38 +37,44 @@ class ErrorDef(ErrorCreateDef, Enum):
         super().__init__(**(asdict(e)))
 
 
-class DefinedRobotServerError(RobotServerError):
-    """A RobotServerError that uses an ErrorDef enum"""
+class RobotServerError(BaseRobotServerError):
+    """A BaseRobotServerError that uses an ErrorDef enum"""
     def __init__(self,
                  definition: ErrorDef,
                  error_id: str = None,
+                 links: Optional[ResourceLinks] = None,
+                 source: Optional[ErrorSource] = None,
+                 meta: Optional[Dict] = None,
                  *fmt_args, **fmt_kw_args):
         """
         Constructor.
 
         :param definition: The ErrorDef enum defining error
-        :param error_id: optional error id (ErrorDef name is used if not defined)
+        :param error_id: optional error id
+        :param links: optional links
+        :param source: optional source of error
+        :param meta: optional metadata about error
         :param fmt_args: format_string args
         :param fmt_kw_args: format_string kw_args
         """
         super().__init__(
             definition.status_code,
             Error(
-                id=error_id if error_id else str(definition.name),
-                links=definition.links,
+                id=error_id,
+                links=links,
                 status=str(definition.status_code),
                 title=definition.title,
                 detail=definition.format_string.format(*fmt_args,
                                                        **fmt_kw_args),
-                source=definition.source,
-                meta=definition.meta
+                source=source,
+                meta=meta
             ))
 
 
 def build_unhandled_exception_response(exception: Exception) \
         -> ErrorResponse:
     error = Error(
-        status=str(HTTPStatus.INTERNAL_SERVER_ERROR.value),
+        status=str(status_codes.HTTP_500_INTERNAL_SERVER_ERROR),
         detail=f'Unhandled exception: {type(exception)}',
         title='Internal Server Error'
     )
@@ -139,3 +142,26 @@ def consolidate_fastapi_response(all_exceptions: List[Dict[str, Any]]) -> str:
 
     all_errs = ". ".join(error_to_str(exc) for exc in all_exceptions)
     return all_errs
+
+
+class CommonErrorDef(ErrorDef):
+    """Generic common defined errors"""
+    INTERNAL_SERVER_ERROR = ErrorCreateDef(
+        status_code=status_codes.HTTP_500_INTERNAL_SERVER_ERROR,
+        title='Internal Server Error',
+        format_string='{error}'
+    )
+    NOT_IMPLEMENTED = ErrorCreateDef(
+        status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
+        title='Not implemented',
+        format_string='Method not implemented')
+    RESOURCE_NOT_FOUND = ErrorCreateDef(
+        status_code=status_codes.HTTP_404_NOT_FOUND,
+        title='Resource Not Found',
+        format_string="Resource type '{resource}' with id '{id}' was not found"
+    )
+    ACTION_FORBIDDEN = ErrorCreateDef(
+        status_code=status_codes.HTTP_403_FORBIDDEN,
+        title='Action Forbidden',
+        format_string='{reason}'
+    )

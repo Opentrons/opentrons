@@ -1,7 +1,7 @@
 from enum import Enum
 
 from http import HTTPStatus
-from robot_server.service.errors import RobotServerError
+from robot_server.service.errors import BaseRobotServerError
 from robot_server.service.json_api.errors import Error
 
 
@@ -16,7 +16,7 @@ class TipCalibrationError(Enum):
         'Bad definition for tip rack under calibration')
 
 
-class TipCalibrationException(RobotServerError):
+class TipCalibrationException(BaseRobotServerError):
     def __init__(self, whicherror: TipCalibrationError, *fmt_args):
         super().__init__(
             whicherror.value[0],

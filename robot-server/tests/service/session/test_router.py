@@ -130,12 +130,11 @@ def test_create_session_error(api_client,
     })
     assert response.json() == {
         'errors': [{
-            'detail': "Failed to create session of type 'null': Please "
-                      "attach pipettes before proceeding.",
-            'status': '400',
-            'title': 'Creation Failed'}
+            'detail': "Please attach pipettes before proceeding",
+            'status': '403',
+            'title': 'Action Forbidden'}
         ]}
-    assert response.status_code == 400
+    assert response.status_code == 403
 
 
 def test_create_session(api_client,
@@ -173,10 +172,10 @@ def test_delete_session_not_found(api_client):
     response = api_client.delete("/sessions/check")
     assert response.json() == {
         'errors': [{
-            'detail': "Cannot find session with id 'check'.",
+            'detail': "Resource type 'session' with id 'check' was not found",
             'links': {'POST': '/sessions'},
             'status': '404',
-            'title': 'No session'
+            'title': 'Resource Not Found'
         }]
     }
     assert response.status_code == 404
@@ -204,10 +203,10 @@ def test_get_session_not_found(api_client):
     response = api_client.get("/sessions/1234")
     assert response.json() == {
         'errors': [{
-            'detail': "Cannot find session with id '1234'.",
+            'detail': "Resource type 'session' with id '1234' was not found",
             'links': {'POST': '/sessions'},
             'status': '404',
-            'title': 'No session'
+            'title': 'Resource Not Found'
         }]
     }
     assert response.status_code == 404
@@ -274,10 +273,10 @@ def test_execute_command_no_session(api_client, mock_session_meta):
                      JogPosition(vector=(1, 2, 3,))))
     assert response.json() == {
         'errors': [{
-            'detail': f"Cannot find session with id '{mock_session_meta.identifier}'.",  # noqa: e501
+            'detail': f"Resource type 'session' with id '{mock_session_meta.identifier}' was not found",
             'links': {'POST': '/sessions'},
             'status': '404',
-            'title': 'No session'
+            'title': 'Resource Not Found'
         }]
     }
     assert response.status_code == 404
@@ -386,8 +385,8 @@ def test_execute_command_no_body(api_client,
 
 @pytest.mark.parametrize(argnames="exception,expected_status",
                          argvalues=[
-                             [UnsupportedCommandException, 400],
-                             [CommandExecutionException, 400],
+                             [UnsupportedCommandException, 403],
+                             [CommandExecutionException, 403],
                          ])
 def test_execute_command_error(api_client,
                                session_manager_with_session,
@@ -412,7 +411,7 @@ def test_execute_command_error(api_client,
             {
                 'detail': 'Cannot do it',
                 'status': f'{expected_status}',
-                'title': 'Command execution error'
+                'title': 'Action Forbidden'
             }
         ]
     }
@@ -436,10 +435,11 @@ def test_execute_command_session_inactive(
     assert response.json() == {
         'errors': [
             {
-                'detail': 'Only the active session can execute commands',
+                'title': 'Action Forbidden',
                 'status': '403',
-                'title': f"Session '{mock_session_meta.identifier}'"
-                         f" is not active"
+                'detail': f"Session '{mock_session_meta.identifier}'"
+                         f" is not active. Only the active session can "
+                         f"execute commands"
             }
         ]
     }

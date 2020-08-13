@@ -1,7 +1,7 @@
 from enum import Enum
 
 from http import HTTPStatus
-from robot_server.service.errors import RobotServerError
+from robot_server.service.errors import BaseRobotServerError
 from robot_server.service.json_api.errors import Error
 
 
@@ -13,7 +13,7 @@ class DeckCalibrationError(Enum):
         'run deck calibration')
 
 
-class DeckCalibrationException(RobotServerError):
+class DeckCalibrationException(BaseRobotServerError):
     def __init__(self, whicherror: DeckCalibrationError, *fmt_args):
         super().__init__(
             whicherror.value[0],

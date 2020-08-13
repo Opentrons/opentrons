@@ -1,10 +1,10 @@
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND,\
     HTTP_500_INTERNAL_SERVER_ERROR
-from robot_server.service.errors import RobotServerError
+from robot_server.service.errors import BaseRobotServerError
 from robot_server.service.json_api.errors import Error
 
 
-class ProtocolException(RobotServerError):
+class ProtocolException(BaseRobotServerError):
     """Base of all protocol exceptions"""
     def __init__(self, status_code, **kwargs):
         super().__init__(status_code=status_code,
@@ -35,7 +35,7 @@ class ProtocolIOException(ProtocolException):
                                      detail=msg))
 
 
-class ProtocolUploadCountLimitReached(RobotServerError):
+class ProtocolUploadCountLimitReached(BaseRobotServerError):
     """Maximum protocol upload count reached"""
     def __init__(self, msg: str):
         super().__init__(status_code=HTTP_403_FORBIDDEN,
