@@ -11,8 +11,8 @@ def test_save_calibration(ot_config_tempdir):
         'robot_calibration_dir') / 'deck_calibration.json'
     pip_id = 'fakePip'
     lw_hash = 'fakeHash'
-    e = [(1, 1, 3), (2, 2, 2), (1, 2, 1)]
-    a = [(1.1, 3.1, 1.1), (2.1, 2.1, 2.2), (1.1, 2.1, 1.1)]
+    e = ((1, 1, 3), (2, 2, 2), (1, 2, 1))
+    a = ((1.1, 3.1, 1.1), (2.1, 2.1, 2.2), (1.1, 2.1, 1.1))
     transform = [[0.975, 0.05, 0.0], [-1.025, 1.05, 0.0], [0.0, 0.0, 1.0]]
     expected = {
         'attitude': transform,

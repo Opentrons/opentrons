@@ -289,11 +289,10 @@ class API(HardwareAPILike):
         row, col = curr_cal.shape
         rank = np.linalg.matrix_rank(curr_cal)
 
-        id_matrix = linal.identity_deck_transform(size=3)
         if row != rank:
             # Check that the matrix is non-singular
             return DeckTransformState.SINGULARITY
-        elif np.array_equal(curr_cal, id_matrix):
+        elif not self.robot_calibration.deck_calibration.last_modified:
             # Check that the matrix is not an identity
             return DeckTransformState.IDENTITY
         else:
@@ -742,9 +741,7 @@ class API(HardwareAPILike):
         left = (with_enum[Axis.X],
                 with_enum[Axis.Y],
                 with_enum[Axis.by_mount(top_types.Mount.LEFT)])
-        # Tell apply_transform to just do the change of base part of the
-        # transform rather than the full affine transform, because this is
-        # an offset
+
         if ff.enable_calibration_overhaul():
             gantry_calibration =\
                 self.robot_calibration.deck_calibration.attitude
@@ -754,6 +751,9 @@ class API(HardwareAPILike):
                 gantry_calibration, left, with_offsets=False)
         else:
             gantry_calibration = self._config.gantry_calibration
+            # Tell apply_transform to just do the change of
+            # base part of the transform rather than the full
+            # affine transform, because this is an offset
             right_deck = linal.apply_reverse(gantry_calibration,
                                              right)
             left_deck = linal.apply_reverse(gantry_calibration,
@@ -873,15 +873,15 @@ class API(HardwareAPILike):
         await self._cache_and_maybe_retract_mount(mount)
         z_axis = Axis.by_mount(mount)
         if mount == top_types.Mount.LEFT:
-            m_offset = top_types.Point(*self._config.mount_offset)
+            offset = top_types.Point(*self._config.mount_offset)
         else:
-            m_offset = top_types.Point(0, 0, 0)
+            offset = top_types.Point(0, 0, 0)
         cp = self._critical_point_for(mount, critical_point)
 
         target_position = OrderedDict((
-            (Axis.X, abs_position.x - m_offset.x - cp.x),
-            (Axis.Y, abs_position.y - m_offset.y - cp.y),
-            (z_axis, abs_position.z - m_offset.z - cp.z))
+            (Axis.X, abs_position.x - offset.x - cp.x),
+            (Axis.Y, abs_position.y - offset.y - cp.y),
+            (z_axis, abs_position.z - offset.z - cp.z))
         )
         await self._move(target_position, speed=speed, max_speeds=max_speeds)
 
@@ -956,14 +956,13 @@ class API(HardwareAPILike):
         await self._wait_for_is_running()
         # Transform only the x, y, and (z or a) axes specified since this could
         # get the b or c axes as well
-
+        to_transform = tuple((tp
+                              for ax, tp in target_position.items()
+                              if ax in Axis.gantry_axes()))
         # Pre-fill the dict we’ll send to the backend with the axes we don’t
         # need to transform
         smoothie_pos = {ax.name: pos for ax, pos in target_position.items()
                         if ax not in Axis.gantry_axes()}
-        to_transform = tuple((tp
-                              for ax, tp in target_position.items()
-                              if ax in Axis.gantry_axes()))
 
         if len(to_transform) != 3:
             self._log.error("Move derived {} axes to transform from {}"
@@ -1011,8 +1010,6 @@ class API(HardwareAPILike):
                                 bounds[ax.name][0], bounds[ax.name][1]))
         checked_maxes = max_speeds or {}
         str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
-        self._log.info("Final smoothie position")
-        self._log.info(smoothie_pos)
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)

@@ -1,12 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Tuple, List, Optional
+from typing import Optional
 
 from opentrons.config import robot_configs
 from opentrons.calibration_storage import modify, types, get
 from opentrons.util import linal
-
-SolvedPoints = List[Tuple[float, float, float]]
 
 
 @dataclass
@@ -23,7 +21,7 @@ class RobotCalibration:
 
 
 def save_attitude_matrix(
-        expected: SolvedPoints, actual: SolvedPoints,
+        expected: linal.SolvePoints, actual: linal.SolvePoints,
         pipette_id: str, tiprack_hash: str):
     attitude = linal.solve_attitude(expected, actual)
     modify.save_robot_deck_attitude(attitude, pipette_id, tiprack_hash)

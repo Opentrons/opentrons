@@ -1,6 +1,6 @@
 from opentrons.hardware_control.util import DeckTransformState
 from opentrons.hardware_control.robot_calibration import (
-    DeckCalibration, RobotCalibration)
+    DeckCalibration, RobotCalibration, load)
 
 
 async def test_validating_calibration(hardware):
@@ -35,7 +35,8 @@ async def test_validating_calibration(hardware):
 async def test_validating_attitude(hardware, use_new_calibration):
 
     singular_matrix = [[0, 0, 0], [0, 0, 0], [0, 0, 1]]
-    deck_cal = DeckCalibration(attitude=singular_matrix)
+    deck_cal = DeckCalibration(
+        attitude=singular_matrix, last_modified='sometime')
 
     hardware.set_robot_calibration(RobotCalibration(deck_calibration=deck_cal))
 
@@ -43,7 +44,7 @@ async def test_validating_attitude(hardware, use_new_calibration):
 
     identity_matrix = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     deck_cal.attitude = identity_matrix
-    hardware.set_robot_calibration(RobotCalibration(deck_calibration=deck_cal))
+    hardware.set_robot_calibration(load())
     assert hardware.validate_calibration() == DeckTransformState.IDENTITY
 
     inrange_matrix = [[1, 0, 1], [0, 1, 2], [0, 0, 1]]

@@ -5,6 +5,7 @@ from numpy.linalg import inv  # type: ignore
 from typing import List, Tuple, Union
 
 from opentrons.calibration_storage.types import AttitudeMatrix
+from opentrons.config import feature_flags as ff
 
 mod_log = logging.getLogger(__name__)
 
@@ -13,15 +14,23 @@ mod_log = logging.getLogger(__name__)
 AxisPosition = Union[
     Tuple[float, float, float], Tuple[float, float]]
 
+SolvePoints = Tuple[
+    Tuple[float, float, float],
+    Tuple[float, float, float],
+    Tuple[float, float, float]]
 
-def identity_deck_transform(size: int = 4):
+
+def identity_deck_transform() -> np.ndarray:
     """ The default deck transform """
-    return np.identity(size)
+    if ff.enable_calibration_overhaul():
+        return np.identity(3)
+    else:
+        return np.identity(4)
 
 
 def solve_attitude(
-        expected: List[Tuple[float, float, float]],
-        actual: List[Tuple[float, float, float]]
+        expected: SolvePoints,
+        actual: SolvePoints
         ) -> AttitudeMatrix:
     ex = np.array([
         list(point)
