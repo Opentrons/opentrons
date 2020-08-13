@@ -1,4 +1,4 @@
-from opentrons.protocol_api import module_geometry
+from opentrons.protocol_api import module_geometry, labware
 from opentrons.legacy_api.containers import Slot, placeable
 
 
@@ -31,6 +31,9 @@ class Container:
             self.slot = _get_parent_slot_legacy(container).get_name()
             self.is_legacy = container.properties.get(
                 'labware_hash') is None
+            self.definition_hash = container.properties.get(
+                'labware_hash', None)
+
         else:
             # will be labware's load name or label
             self.name = container.name
@@ -41,6 +44,8 @@ class Container:
             self.position = position
             self.is_legacy = False
             self.is_tiprack = container.is_tiprack
+            self.definition_hash = labware.get_labware_hash_with_parent(
+                container)
         self.instruments = [
             Instrument(instrument)
             for instrument in instruments]

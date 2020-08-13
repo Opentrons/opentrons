@@ -74,11 +74,12 @@ The ending well will be in the bottom right, see the diagram below for further e
 .. image:: ../img/well_iteration/Well_Iteration.png
 
 .. code-block:: python
+    :substitutions:
 
     '''
     Examples in this section expect the following
     '''
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
 
@@ -304,10 +305,11 @@ It will return a new location, representing the original location with that offs
 For example:
 
 .. code-block:: python
+    :substitutions:
 
    from opentrons import types
 
-   metadata = {'apiLevel': '2.2'}
+   metadata = {'apiLevel': '|apiLevel|'}
 
    def run(protocol):
         plate = protocol.load_labware(

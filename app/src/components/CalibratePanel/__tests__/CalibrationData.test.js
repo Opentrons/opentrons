@@ -9,11 +9,16 @@ describe('CalibrationData', () => {
 
   beforeEach(() => {
     render = (props = {}) => {
-      const { calibrationData = null, calibratedThisSession = false } = props
+      const {
+        calibrationData = null,
+        calibratedThisSession = false,
+        calDataAvailable = true,
+      } = props
       return mount(
         <CalibrationData
           calibrationData={calibrationData}
           calibratedThisSession={calibratedThisSession}
+          calDataAvailable={calDataAvailable}
         />
       )
     }
@@ -46,5 +51,12 @@ describe('CalibrationData', () => {
       calibratedThisSession: true,
     })
     expect(wrapper.text().includes('Updated data')).toBe(true)
+  })
+
+  it('displays calibration data n/a when labware is calDataAvailable', () => {
+    const wrapper = render({
+      calDataAvailable: false,
+    })
+    expect(wrapper.text().includes('Calibration Data N/A')).toBe(true)
   })
 })

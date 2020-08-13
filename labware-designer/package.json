@@ -10,7 +10,7 @@
   "name": "labware-designer",
   "productName": "Opentrons Labware Designer",
   "private": true,
-  "version": "3.19.0",
+  "version": "3.20.0",
   "description": "Labware Designer",
   "main": "src/index.js",
   "bugs": {
@@ -19,6 +19,6 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/shared-data": "3.19.0"
+    "@opentrons/shared-data": "3.20.0"
   }
 }
