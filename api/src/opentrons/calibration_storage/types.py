@@ -7,6 +7,7 @@ from os import PathLike
 
 CalibrationID = typing.NewType('CalibrationID', str)
 StrPath = typing.Union[str, PathLike]
+AttitudeMatrix = typing.List[typing.List[float]]
 
 
 class TipLengthCalNotFound(Exception):

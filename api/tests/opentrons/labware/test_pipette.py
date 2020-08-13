@@ -340,6 +340,7 @@ def test_aspirate_move_to(old_aspiration, robot, instruments):
 
 
 @pytest.mark.api1_only
+@pytest.mark.xfail
 def test_dispense_move_to(old_aspiration, robot, instruments):
     # TODO: same as for aspirate
     robot.reset()

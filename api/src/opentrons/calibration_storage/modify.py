@@ -17,7 +17,9 @@ from . import (
     migration)
 
 if typing.TYPE_CHECKING:
-    from .dev_types import (TipLengthCalibration, PipTipLengthCalibration)
+    from .dev_types import (
+        TipLengthCalibration, PipTipLengthCalibration,
+        DeckCalibrationData)
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons.types import Point
 
@@ -173,3 +175,18 @@ def save_tip_length_calibration(
     tip_length_data.update(tip_length_cal)
 
     io.save_to_file(pip_tip_length_path, tip_length_data)
+
+
+def save_robot_deck_attitude(
+        transform: local_types.AttitudeMatrix,
+        pip_id: str, lw_hash: str):
+    robot_dir = config.get_opentrons_path('robot_calibration_dir')
+    robot_dir.mkdir(parents=True, exist_ok=True)
+    gantry_path = robot_dir/'deck_calibration.json'
+    gantry_dict: 'DeckCalibrationData' = {
+        'attitude': transform,
+        'pipette_calibrated_with': pip_id,
+        'last_modified': datetime.datetime.utcnow(),
+        'tiprack': lw_hash
+    }
+    io.save_to_file(gantry_path, gantry_dict)

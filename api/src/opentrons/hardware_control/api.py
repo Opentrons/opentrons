@@ -8,11 +8,11 @@ from typing import (Any, Dict, Union, List, Optional, Tuple,
                     TYPE_CHECKING, cast)
 
 from opentrons_shared_data.pipette import name_for_model
-
 from opentrons import types as top_types
 from opentrons.util import linal
 from functools import lru_cache
-from opentrons.config import robot_configs, pipette_config
+from opentrons.config import (
+    robot_configs, pipette_config, feature_flags as ff)
 from opentrons.drivers.types import MoveSplit
 
 from .util import use_or_initialize_loop, DeckTransformState
@@ -26,7 +26,7 @@ from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
                     DoorStateNotification)
-from . import modules
+from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
@@ -87,6 +87,16 @@ class API(HardwareAPILike):
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
         self._door_state = DoorState.CLOSED
+        self._robot_calibration = rb_cal.load()
+
+    @property
+    def robot_calibration(self) -> rb_cal.RobotCalibration:
+        return self._robot_calibration
+
+    def set_robot_calibration(
+            self, robot_calibration: rb_cal.RobotCalibration):
+        self._calculate_valid_attitude.cache_clear()
+        self._robot_calibration = robot_calibration
 
     @property
     def door_state(self) -> DoorState:
@@ -231,7 +241,10 @@ class API(HardwareAPILike):
 
         Once decorators are more fully supported, we can remove this.
         """
-        return self._calculate_valid_calibration()
+        if ff.enable_calibration_overhaul():
+            return self._calculate_valid_attitude()
+        else:
+            return self._calculate_valid_calibration()
 
     @lru_cache(maxsize=1)
     def _calculate_valid_calibration(self) -> DeckTransformState:
@@ -240,8 +253,10 @@ class API(HardwareAPILike):
         calibration is valid or not based on the following use-cases:
 
         """
+
         curr_cal = np.array(self._config.gantry_calibration)
         row, col = curr_cal.shape
+
         rank = np.linalg.matrix_rank(curr_cal)
 
         id_matrix = linal.identity_deck_transform()
@@ -258,6 +273,30 @@ class API(HardwareAPILike):
         elif outofrange:
             # Check that the matrix is not out of range.
             return DeckTransformState.BAD_CALIBRATION
+        else:
+            # Transform as it stands is sufficient.
+            return DeckTransformState.OK
+
+    @lru_cache(maxsize=1)
+    def _calculate_valid_attitude(self) -> DeckTransformState:
+        """
+        This function determines whether the current gantry
+        calibration is valid or not based on the following use-cases:
+
+        TODO(lc, 8/10/2020): Expand on this method, or create
+        another method to diagnose bad instrument offset data
+        """
+        curr_cal = np.array(
+            self.robot_calibration.deck_calibration.attitude)
+        row, col = curr_cal.shape
+        rank = np.linalg.matrix_rank(curr_cal)
+
+        if row != rank:
+            # Check that the matrix is non-singular
+            return DeckTransformState.SINGULARITY
+        elif not self.robot_calibration.deck_calibration.last_modified:
+            # Check that the matrix is not an identity
+            return DeckTransformState.IDENTITY
         else:
             # Transform as it stands is sufficient.
             return DeckTransformState.OK
@@ -716,18 +755,29 @@ class API(HardwareAPILike):
         with_enum = {Axis[k]: v for k, v in smoothie_pos.items()}
         plunger_axes = {k: v for k, v in with_enum.items()
                         if k not in Axis.gantry_axes()}
-        right = (with_enum[Axis.X], with_enum[Axis.Y],
-                 with_enum[Axis.by_mount(top_types.Mount.RIGHT)])
-        # Tell apply_transform to just do the change of base part of the
-        # transform rather than the full affine transform, because this is
-        # an offset
+        right = (
+            with_enum[Axis.X], with_enum[Axis.Y],
+            with_enum[Axis.by_mount(top_types.Mount.RIGHT)])
         left = (with_enum[Axis.X],
                 with_enum[Axis.Y],
                 with_enum[Axis.by_mount(top_types.Mount.LEFT)])
-        right_deck = linal.apply_reverse(self._config.gantry_calibration,
-                                         right)
-        left_deck = linal.apply_reverse(self._config.gantry_calibration,
-                                        left)
+
+        if ff.enable_calibration_overhaul():
+            gantry_calibration =\
+                self.robot_calibration.deck_calibration.attitude
+            right_deck = linal.apply_reverse(
+                gantry_calibration, right, with_offsets=False)
+            left_deck = linal.apply_reverse(
+                gantry_calibration, left, with_offsets=False)
+        else:
+            gantry_calibration = self._config.gantry_calibration
+            # Tell apply_transform to just do the change of
+            # base part of the transform rather than the full
+            # affine transform, because this is an offset
+            right_deck = linal.apply_reverse(gantry_calibration,
+                                             right)
+            left_deck = linal.apply_reverse(gantry_calibration,
+                                            left)
         deck_pos = {Axis.X: right_deck[0],
                     Axis.Y: right_deck[1],
                     Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
@@ -848,12 +898,11 @@ class API(HardwareAPILike):
             offset = top_types.Point(0, 0, 0)
         cp = self._critical_point_for(mount, critical_point)
 
-        target_position = OrderedDict(
-            ((Axis.X, abs_position.x - offset.x - cp.x),
-             (Axis.Y, abs_position.y - offset.y - cp.y),
-             (z_axis, abs_position.z - offset.z - cp.z))
+        target_position = OrderedDict((
+            (Axis.X, abs_position.x - offset.x - cp.x),
+            (Axis.Y, abs_position.y - offset.y - cp.y),
+            (z_axis, abs_position.z - offset.z - cp.z))
         )
-
         await self._move(target_position, speed=speed, max_speeds=max_speeds)
 
     async def move_rel(self, mount: top_types.Mount, delta: top_types.Point,
@@ -934,22 +983,26 @@ class API(HardwareAPILike):
         # need to transform
         smoothie_pos = {ax.name: pos for ax, pos in target_position.items()
                         if ax not in Axis.gantry_axes()}
-        # We’d better have all of (x, y, (z or a)) or none of them since the
-        # gantry transform requires them all
+
         if len(to_transform) != 3:
             self._log.error("Move derived {} axes to transform from {}"
                             .format(len(to_transform), target_position))
-            raise ValueError("Moves must specify either exactly an x, y, and "
-                             "(z or a) or none of them")
-
+            raise ValueError("Moves must specify either exactly an "
+                             "x, y, and (z or a) or none of them")
         # Type ignored below because linal.apply_transform (rightly) specifies
         # Tuple[float, float, float] and the implied type from
         # target_position.items() is (rightly) Tuple[float, ...] with unbounded
         # size; unfortunately, mypy can’t quite figure out the length check
         # above that makes this OK
-        transformed = linal.apply_transform(
-            self._config.gantry_calibration, to_transform)  # type: ignore
-
+        if ff.enable_calibration_overhaul():
+            transformed = linal.apply_transform(
+                self.robot_calibration.deck_calibration.attitude,
+                to_transform,  # type: ignore
+                with_offsets=False)
+        else:
+            transformed = linal.apply_transform(
+                self._config.gantry_calibration,
+                to_transform)  # type: ignore
         # Since target_position is an OrderedDict with the axes ordered by
         # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
         # by the len(to_transform) check above) we can use an enumerate to

@@ -191,7 +191,12 @@ CONFIG_ELEMENTS = (
                   Path('tip_lengths'),
                   ConfigElementType.DIR,
                   'The dir where tip length calibration of each tiprack for '
-                  'each unique pipette is stored')
+                  'each unique pipette is stored'),
+    ConfigElement('robot_calibration_dir',
+                  'Robot Calibration Directory',
+                  Path('robot'),
+                  ConfigElementType.DIR,
+                  'The dir where robot calibration is stored')
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
