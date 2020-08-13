@@ -1,11 +1,13 @@
+from dataclasses import dataclass, asdict
+from enum import Enum
 from http import HTTPStatus
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
 from robot_server.service.json_api.errors import ErrorResponse, Error, \
-    ErrorSource
+    ErrorSource, ResourceLinks
 
 
 class V1HandlerError(Exception):
@@ -19,6 +21,51 @@ class RobotServerError(Exception):
     def __init__(self, status_code: int, error: Error):
         self.status_code = status_code
         self.error = error
+
+
+@dataclass(frozen=True)
+class ErrorCreateDef:
+    status_code: int
+    title: str
+    format_string: str
+    links: Optional[ResourceLinks] = None
+    source: Optional[ErrorSource] = None
+    meta: Optional[Dict] = None
+
+
+class ErrorDef(ErrorCreateDef, Enum):
+    """An enumeration of ErrorCreateDef Error definitions for use by
+    RobotServerErrorDefined"""
+    def __init__(self, e) -> None:
+        super().__init__(**(asdict(e)))
+
+
+class DefinedRobotServerError(RobotServerError):
+    """A RobotServerError that uses an ErrorDef enum"""
+    def __init__(self,
+                 definition: ErrorDef,
+                 error_id: str = None,
+                 *fmt_args, **fmt_kw_args):
+        """
+        Constructor.
+
+        :param definition: The ErrorDef enum defining error
+        :param error_id: optional error id (ErrorDef name is used if not defined)
+        :param fmt_args: format_string args
+        :param fmt_kw_args: format_string kw_args
+        """
+        super().__init__(
+            definition.status_code,
+            Error(
+                id=error_id if error_id else str(definition.name),
+                links=definition.links,
+                status=str(definition.status_code),
+                title=definition.title,
+                detail=definition.format_string.format(*fmt_args,
+                                                       **fmt_kw_args),
+                source=definition.source,
+                meta=definition.meta
+            ))
 
 
 def build_unhandled_exception_response(exception: Exception) \
