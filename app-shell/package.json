@@ -2,7 +2,7 @@
   "name": "@opentrons/app-shell",
   "private": true,
   "productName": "Opentrons",
-  "version": "3.20.0-alpha.4",
+  "version": "3.20.0-alpha.5",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
   "scripts": {
@@ -27,9 +27,9 @@
     ]
   },
   "devDependencies": {
-    "@opentrons/app": "3.20.0-alpha.4",
-    "@opentrons/discovery-client": "3.20.0-alpha.4",
-    "@opentrons/shared-data": "3.20.0-alpha.4"
+    "@opentrons/app": "3.20.0-alpha.5",
+    "@opentrons/discovery-client": "3.20.0-alpha.5",
+    "@opentrons/shared-data": "3.20.0-alpha.5"
   },
   "dependencies": {
     "@thi.ng/paths": "1.6.5",
