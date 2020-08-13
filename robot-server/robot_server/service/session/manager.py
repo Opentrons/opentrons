@@ -82,13 +82,15 @@ class SessionManager:
             -> Optional[BaseSession]:
         """Remove a session"""
         if identifier == DefaultSession.DEFAULT_ID:
-            raise UnsupportedFeature(f"Cannot remove {identifier} session")
+            raise SessionException(
+                reason=f"Cannot remove {identifier} session"
+            )
 
         session = self.deactivate(identifier)
         if session:
             del self._sessions[session.meta.identifier]
             await session.clean_up()
-            log.debug(f"Removed session: {session}")
+            log.info(f"Removed session: {session}")
         return session
 
     async def remove_all(self):

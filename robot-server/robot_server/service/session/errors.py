@@ -20,7 +20,8 @@ class SessionCreationException(SessionException):
 
 class UnsupportedFeature(SessionException):
     """A feature is not supported"""
-    pass
+    def __init__(self):
+        super().__init__(reason="This feature is not supported")
 
 
 class UnsupportedCommandException(SessionCommandException):
