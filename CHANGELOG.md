@@ -3,64 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.20.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v3.20.0-alpha.4...v3.20.0-alpha.5) (2020-08-13)
-
+# [3.20.0](https://github.com/Opentrons/opentrons/compare/v3.19.0...v3.20.0) (2020-08-13)
 
 ### Bug Fixes
 
 * **api:** use the hash-with-parent for rpc cal hashes ([#6355](https://github.com/Opentrons/opentrons/issues/6355)) ([6675154](https://github.com/Opentrons/opentrons/commit/6675154))
-
-
-
-
-
-# [3.20.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v3.20.0-alpha.3...v3.20.0-alpha.4) (2020-08-12)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [3.20.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.20.0-alpha.2...v3.20.0-alpha.3) (2020-08-11)
-
-
-### Bug Fixes
-
 * **api:** Save v2 labware in api v1 with URIs ([#6325](https://github.com/Opentrons/opentrons/issues/6325)) ([c6e3688](https://github.com/Opentrons/opentrons/commit/c6e3688))
 * **robot-server:** Robot server createParams bug ([fa7a35e](https://github.com/Opentrons/opentrons/commit/fa7a35e))
-
-
-
-
-
-# [3.20.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.20.0-alpha.1...v3.20.0-alpha.2) (2020-08-10)
-
-
-### Bug Fixes
-
 * **app:** fix tip probe button in apiV1 protocols ([#6318](https://github.com/Opentrons/opentrons/issues/6318)) ([3b75f5d](https://github.com/Opentrons/opentrons/commit/3b75f5d))
-
-
-
-
-
-# [3.20.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.20.0-alpha.0...v3.20.0-alpha.1) (2020-08-10)
-
-
-### Bug Fixes
-
 * **app:** fix labware list uniqueing logic for file info page ([#6309](https://github.com/Opentrons/opentrons/issues/6309)) ([ca85b7e](https://github.com/Opentrons/opentrons/commit/ca85b7e))
-
-
-
-
-
-# [3.20.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.19.0...v3.20.0-alpha.0) (2020-08-06)
-
-
-### Bug Fixes
-
 * **api:** add missing space to runlog entry for set block temperature ([#6259](https://github.com/Opentrons/opentrons/issues/6259)) ([2c24069](https://github.com/Opentrons/opentrons/commit/2c24069)), closes [#6258](https://github.com/Opentrons/opentrons/issues/6258)
 * **api:** avoid hitting endstop during retract fast home ([#6299](https://github.com/Opentrons/opentrons/issues/6299)) ([997e156](https://github.com/Opentrons/opentrons/commit/997e156))
 * **api:** Clarify what is behind GPIO connection problems ([#6204](https://github.com/Opentrons/opentrons/issues/6204)) ([5148f96](https://github.com/Opentrons/opentrons/commit/5148f96)), closes [#6164](https://github.com/Opentrons/opentrons/issues/6164)
