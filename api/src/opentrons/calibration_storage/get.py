@@ -138,6 +138,8 @@ def get_robot_deck_attitude() -> typing.Optional['DeckCalibrationData']:
     robot_dir = config.get_opentrons_path('robot_calibration_dir')
     gantry_path = robot_dir / 'deck_calibration.json'
     if gantry_path.exists():
-        return io.read_cal_file(gantry_path)  # type: ignore
+        data = io.read_cal_file(gantry_path)
+        assert 'attitude' in data.keys(), 'Not valid deck calibration data'
+        return data  # type: ignore
     else:
         return None
