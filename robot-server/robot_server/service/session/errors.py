@@ -32,8 +32,3 @@ class UnsupportedCommandException(SessionCommandException):
 class CommandExecutionException(SessionCommandException):
     """An error occurred during command execution"""
     pass
-
-
-class CommandExecutionConflict(SessionCommandException):
-    """A command cannot execute due to conflict with current state"""
-    pass

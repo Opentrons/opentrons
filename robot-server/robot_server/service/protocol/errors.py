@@ -1,43 +1,36 @@
-from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND,\
-    HTTP_500_INTERNAL_SERVER_ERROR
-from robot_server.service.errors import BaseRobotServerError
-from robot_server.service.json_api.errors import Error
+from robot_server.service.errors import RobotServerError, CommonErrorDef
 
 
-class ProtocolException(BaseRobotServerError):
+class ProtocolException(RobotServerError):
     """Base of all protocol exceptions"""
-    def __init__(self, status_code, **kwargs):
-        super().__init__(status_code=status_code,
-                         error=Error(**kwargs))
+    pass
 
 
 class ProtocolNotFoundException(ProtocolException):
-    """Protocol name is not found"""
-    def __init__(self, msg: str):
-        super().__init__(status_code=HTTP_404_NOT_FOUND,
-                         title="Resource not found",
-                         detail=msg)
+    """Protocol is not found"""
+    def __init__(self, identifier: str):
+        super().__init__(definition=CommonErrorDef.RESOURCE_NOT_FOUND,
+                         resource='protocol',
+                         id=identifier)
 
 
 class ProtocolAlreadyExistsException(ProtocolException):
     """Attempting to overwrite an existing resource"""
-    def __init__(self, msg: str):
-        super().__init__(status_code=HTTP_403_FORBIDDEN,
-                         title="Resource already exists",
-                         detail=msg)
+    def __init__(self, identifier: str):
+        super().__init__(definition=CommonErrorDef.RESOURCE_ALREADY_EXISTS,
+                         resource="protocol",
+                         id=identifier)
 
 
 class ProtocolIOException(ProtocolException):
     """IO Failure"""
     def __init__(self, msg: str):
-        super().__init__(status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-                         error=Error(title="IO Error",
-                                     detail=msg))
+        super().__init__(definition=CommonErrorDef.INTERNAL_SERVER_ERROR,
+                         error=msg)
 
 
-class ProtocolUploadCountLimitReached(BaseRobotServerError):
+class ProtocolUploadCountLimitReached(ProtocolException):
     """Maximum protocol upload count reached"""
     def __init__(self, msg: str):
-        super().__init__(status_code=HTTP_403_FORBIDDEN,
-                         error=Error(title="",
-                                     detail=msg))
+        super().__init__(definition=CommonErrorDef.ACTION_FORBIDDEN,
+                         reason=msg)

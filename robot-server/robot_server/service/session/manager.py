@@ -4,6 +4,7 @@ from typing import Optional, Tuple, Dict, Type
 
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
+from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedFeature, SessionException
@@ -70,8 +71,10 @@ class SessionManager:
         session = await cls.create(configuration=self._session_common,
                                    instance_meta=session_meta_data)
         if session.meta.identifier in self._sessions:
-            raise SessionCreationException(
-                f"Session with id {session.meta.identifier} already exists"
+            raise RobotServerError(
+                definition=CommonErrorDef.RESOURCE_ALREADY_EXISTS,
+                resource="session",
+                id=session.meta.identifier
             )
         self._sessions[session.meta.identifier] = session
         self._active.active_id = session.meta.identifier

@@ -165,3 +165,8 @@ class CommonErrorDef(ErrorDef):
         title='Action Forbidden',
         format_string='{reason}'
     )
+    RESOURCE_ALREADY_EXISTS = ErrorCreateDef(
+        status_code=status_codes.HTTP_403_FORBIDDEN,
+        title='Resource Exists',
+        format_string="A '{resource}' with id '{id}' already exists"
+    )

@@ -19,7 +19,7 @@ stages:
         errors:
           - status: "403"
             title: !anystr
-            detail: !re_match "Session with id default already exists"
+            detail: !re_match "A 'session' with id 'default' already exists"
 ---
 test_name: Default session cannot be deleted
 marks:

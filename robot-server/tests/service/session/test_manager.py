@@ -2,7 +2,7 @@ import asyncio
 from unittest.mock import patch, MagicMock
 import pytest
 
-
+from robot_server.service.errors import RobotServerError
 from robot_server.service.session.errors import SessionCreationException, \
     SessionException
 from robot_server.service.session.manager import SessionMetaData, BaseSession
@@ -159,7 +159,7 @@ class TestDefaultSession:
         assert session_manager.is_active(DefaultSession.DEFAULT_ID) is True
 
     async def test_add_fails(self, session_manager):
-        with pytest.raises(SessionCreationException):
+        with pytest.raises(RobotServerError):
             await session_manager.add(session_type=SessionType.default,
                                       session_meta_data=SessionMetaData())
 
