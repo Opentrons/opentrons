@@ -1097,12 +1097,17 @@ def _get_parent_identifier(labware: 'Labware') -> str:
         return ''  # treat all slots as same
 
 
-def get_labware_hash(labware: 'Labware'):
+def get_labware_hash(labware: 'Labware') -> str:
     return helpers.hash_labware_def(labware._definition)
 
 
-def _get_labware_path(labware: 'Labware'):
-    return f'{get_labware_hash(labware)}{_get_parent_identifier(labware)}.json'
+def get_labware_hash_with_parent(labware: 'Labware') -> str:
+    return helpers.hash_labware_def(labware._definition)\
+        + _get_parent_identifier(labware)
+
+
+def _get_labware_path(labware: 'Labware') -> str:
+    return f'{get_labware_hash_with_parent(labware)}.json'
 
 
 def load_from_definition(

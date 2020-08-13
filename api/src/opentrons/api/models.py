@@ -44,7 +44,8 @@ class Container:
             self.position = position
             self.is_legacy = False
             self.is_tiprack = container.is_tiprack
-            self.definition_hash = labware.get_labware_hash(container)
+            self.definition_hash = labware.get_labware_hash_with_parent(
+                container)
         self.instruments = [
             Instrument(instrument)
             for instrument in instruments]
