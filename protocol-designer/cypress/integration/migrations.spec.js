@@ -10,39 +10,48 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
   const testCases = [
     {
-      title: 'preFlexGrandfatheredProtocol 1.0.0 -> 4.0.x, schema 3',
+      title: 'preFlexGrandfatheredProtocol 1.0.0 -> PD 5.0.x, schema 3',
       importFixture:
         '../../fixtures/protocol/1/preFlexGrandfatheredProtocol.json',
       expectedExportFixture:
-        '../../fixtures/protocol/3/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
+        '../../fixtures/protocol/5/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
       newLabwareDefsMigrationModal: true,
       unusedPipettes: false,
       apiUpdateRequiredMigrationModal: false,
       genericMigrationModal: false,
     },
     {
-      title: 'example_1_1_0 -> 4.0.x, schema 3',
+      title: 'example_1_1_0 -> PD 5.0.x, schema 3',
       importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:
-        '../../fixtures/protocol/3/example_1_1_0MigratedFromV1_0_0.json',
+        '../../fixtures/protocol/5/example_1_1_0MigratedFromV1_0_0.json',
       newLabwareDefsMigrationModal: true,
       unusedPipettes: true,
       apiUpdateRequiredMigrationModal: false,
       genericMigrationModal: false,
     },
     {
-      title: 'doItAllV3 -> import and re-export should preserve data',
+      title: 'doItAllV3 -> PD 5.0.x, schema 3',
       importFixture: '../../fixtures/protocol/3/doItAllV3.json',
-      expectedExportFixture: '../../fixtures/protocol/3/doItAllV3.json',
+      expectedExportFixture: '../../fixtures/protocol/5/doItAllV3.json',
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,
       apiUpdateRequiredMigrationModal: false,
       genericMigrationModal: false,
     },
     {
-      title: 'doItAllV4 -> import and re-export should preserve data',
+      title: 'doItAllV4 -> PD 5.0.x, schema 4',
       importFixture: '../../fixtures/protocol/4/doItAllV4.json',
-      expectedExportFixture: '../../fixtures/protocol/4/doItAllV4.json',
+      expectedExportFixture: '../../fixtures/protocol/5/doItAllV4.json',
+      newLabwareDefsMigrationModal: false,
+      unusedPipettes: false,
+      apiUpdateRequiredMigrationModal: true,
+      genericMigrationModal: true, // TODO(IL, 2020-08-13): is this modal supposed to be hidden in this particular case?
+    },
+    {
+      title: 'doItAllV5 -> import and re-export should preserve data',
+      importFixture: '../../fixtures/protocol/5/doItAllV5.json',
+      expectedExportFixture: '../../fixtures/protocol/5/doItAllV5.json',
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,
       apiUpdateRequiredMigrationModal: true,
@@ -136,8 +145,8 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
               assert.match(
                 savedFile.designerApplication.version,
-                /^4\.0\.\d+$/,
-                'designerApplication.version is 4.0.x'
+                /^5\.0\.\d+$/,
+                'designerApplication.version is 5.0.x'
               )
               ;[savedFile, expectedFile].forEach(f => {
                 // Homogenize fields we don't want to compare
