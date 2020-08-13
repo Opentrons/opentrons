@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.20.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v3.20.0-alpha.4...v3.20.0-alpha.5) (2020-08-13)
+
+
+### Bug Fixes
+
+* **api:** use the hash-with-parent for rpc cal hashes ([#6355](https://github.com/Opentrons/opentrons/issues/6355)) ([6675154](https://github.com/Opentrons/opentrons/commit/6675154))
+
+
+
+
+
 # [3.20.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v3.20.0-alpha.3...v3.20.0-alpha.4) (2020-08-12)
 
 **Note:** Version bump only for package opentrons
