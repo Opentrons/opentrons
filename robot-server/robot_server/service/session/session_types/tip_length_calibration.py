@@ -4,7 +4,6 @@ from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 from robot_server.robot.calibration.tip_length.models import \
     TipCalibrationSessionStatus, SessionCreateParams
-from robot_server.robot.calibration.session import CalibrationException
 from robot_server.service.session.errors import (SessionCreationException,
                                                  CommandExecutionException)
 from robot_server.service.session.command_execution import \
@@ -24,7 +23,7 @@ class TipLengthCalibrationCommandExecutor(CallableExecutor):
     async def execute(self, command: Command) -> CompletedCommand:
         try:
             return await super().execute(command)
-        except (CalibrationException, AssertionError) as e:
+        except AssertionError as e:
             raise CommandExecutionException(str(e))
 
 
@@ -59,7 +58,7 @@ class TipLengthCalibration(BaseSession):
                     mount=Mount[mount.upper()],
                     has_calibration_block=has_calibration_block,
                     tip_rack=cast('LabwareDefinition', tip_rack_def))
-        except (AssertionError, CalibrationException) as e:
+        except AssertionError as e:
             raise SessionCreationException(str(e))
 
         if session_controls_lights:

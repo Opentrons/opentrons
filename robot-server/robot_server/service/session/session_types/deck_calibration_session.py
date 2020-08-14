@@ -2,7 +2,6 @@ from robot_server.robot.calibration.deck.user_flow import \
     DeckCalibrationUserFlow
 from robot_server.robot.calibration.deck.models import \
     DeckCalibrationSessionStatus
-from robot_server.robot.calibration.session import CalibrationException
 from robot_server.service.session.errors import (SessionCreationException,
                                                  CommandExecutionException)
 from robot_server.service.session.command_execution import \
@@ -19,7 +18,7 @@ class DeckCalibrationCommandExecutor(CallableExecutor):
     async def execute(self, command: Command) -> CompletedCommand:
         try:
             return await super().execute(command)
-        except (CalibrationException, AssertionError) as e:
+        except AssertionError as e:
             raise CommandExecutionException(str(e))
 
 
@@ -41,7 +40,7 @@ class DeckCalibrationSession(BaseSession):
         try:
             deck_cal_user_flow = DeckCalibrationUserFlow(
                 hardware=configuration.hardware)
-        except (AssertionError, CalibrationException) as e:
+        except AssertionError as e:
             raise SessionCreationException(str(e))
 
         return cls(configuration=configuration,

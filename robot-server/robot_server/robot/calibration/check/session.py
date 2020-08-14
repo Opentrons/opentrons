@@ -5,7 +5,7 @@ from enum import Enum
 from dataclasses import dataclass
 
 from robot_server.robot.calibration.session import CalibrationSession, \
-    CalibrationException, HEIGHT_SAFETY_BUFFER
+    HEIGHT_SAFETY_BUFFER
 from opentrons.types import Mount, Point, Location
 
 from robot_server.robot.calibration.check.util import StateMachine, WILDCARD
@@ -403,7 +403,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             if self.pipettes[mount]['has_tip']:
                 try:
                     await self._trash_tip(mount)
-                except (CalibrationException, AssertionError):
+                except AssertionError:
                     pass
         await self.hardware.home()
         if not self._lights_on_before:

@@ -18,14 +18,6 @@ from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
 
 
-class CalibrationException(Exception):
-    pass
-
-
-class NoPipetteException(CalibrationException):
-    pass
-
-
 class SessionManager:
     """Small wrapper to keep track of robot calibration sessions created."""
     def __init__(self):
