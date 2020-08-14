@@ -4,8 +4,11 @@ import map from 'lodash/map'
 import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
-
-import { swatchColors, Tooltip, useHoverTooltip } from '@opentrons/components'
+import { Tooltip, useHoverTooltip } from '@opentrons/components'
+import { IngredPill } from './IngredPill'
+import { PDListItem } from '../lists'
+import { swatchColors } from '../swatchColors'
+import { formatVolume, formatPercentage } from './utils'
 import type { LocationLiquidState } from '../../step-generation'
 import type {
   SubstepIdentifier,
@@ -13,10 +16,7 @@ import type {
   WellIngredientVolumeData,
   WellIngredientNames,
 } from '../../steplist/types'
-import { IngredPill } from './IngredPill'
-import { PDListItem } from '../lists'
 import styles from './StepItem.css'
-import { formatVolume, formatPercentage } from './utils'
 
 type SubstepRowProps = {|
   volume?: ?number | ?string,

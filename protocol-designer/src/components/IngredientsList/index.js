@@ -2,11 +2,12 @@
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import * as React from 'react'
 
-import { IconButton, SidePanel, swatchColors } from '@opentrons/components'
+import { IconButton, SidePanel } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { PDTitledList, PDListItem } from '../lists'
 import { StepDescription } from '../StepDescription'
+import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
 import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
