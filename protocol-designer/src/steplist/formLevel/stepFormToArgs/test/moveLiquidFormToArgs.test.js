@@ -451,7 +451,7 @@ describe('getAirGapData', () => {
   it('should return null when the checkbox field is false', () => {
     expect(
       getAirGapData(
-        { aspirate_airGap_checkbox: false, aspirate_airGap_volume: null },
+        { aspirate_airGap_checkbox: false, aspirate_airGap_volume: 20 },
         'aspirate_airGap_checkbox',
         'aspirate_airGap_volume'
       )
