@@ -73,6 +73,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     dispenseDelay,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
+    mixFirstAspirate,
+    mixInDestination,
   } = args
 
   const maxWellsPerChunk = Math.floor(
@@ -164,17 +166,19 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ]
         : []
 
-      const mixBeforeCommands = args.mixFirstAspirate
+      const mixBeforeCommands = mixFirstAspirate
         ? mixUtil({
             pipette: args.pipette,
             labware: args.sourceLabware,
             well: sourceWellChunk[0],
-            volume: args.mixFirstAspirate.volume,
-            times: args.mixFirstAspirate.times,
+            volume: mixFirstAspirate.volume,
+            times: mixFirstAspirate.times,
             aspirateOffsetFromBottomMm,
             dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,
+            aspirateDelay,
+            dispenseDelay,
           })
         : []
 
@@ -193,17 +197,19 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           })
         : []
 
-      const mixAfterCommands = args.mixInDestination
+      const mixAfterCommands = mixInDestination
         ? mixUtil({
             pipette: args.pipette,
             labware: args.destLabware,
             well: args.destWell,
-            volume: args.mixInDestination.volume,
-            times: args.mixInDestination.times,
+            volume: mixInDestination.volume,
+            times: mixInDestination.times,
             aspirateOffsetFromBottomMm: dispenseOffsetFromBottomMm,
             dispenseOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,
+            aspirateDelay,
+            dispenseDelay,
           })
         : []
 

@@ -512,6 +512,49 @@ describe('advanced options', () => {
         dispenseHelper('B1', 50),
       ])
     })
+    it('should delay after mix aspirate and regular aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        mixBeforeAspirate: {
+          volume: 250,
+          times: 2,
+        },
+        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      // mixes will include the delays after aspirating
+      const mixCommandsWithDelays = [
+        // mix 1
+        aspirateHelper('A1', 250),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        // mix 2
+        aspirateHelper('A1', 250),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+      ]
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        ...mixCommandsWithDelays,
+        aspirateHelper('A1', 300),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 300),
+
+        ...mixCommandsWithDelays,
+        aspirateHelper('A1', 50),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 50),
+      ])
+    })
 
     it('should delay after aspirate', () => {
       advArgs = {
@@ -573,6 +616,56 @@ describe('advanced options', () => {
         aspirateHelper('A1', 50),
         dispenseHelper('B1', 50),
         ...mixCommands,
+      ])
+    })
+    it('should delay after mix dispense and after dispense', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        mixInDestination: {
+          volume: 250,
+          times: 2,
+        },
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      // mixes will include the delays after aspirating
+      const mixCommandsWithDelays = [
+        // mix 1
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        dispenseHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        ...delayWithOffset('B1', DEST_LABWARE),
+        // mix 2
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        dispenseHelper('B1', 250, {
+          labware: DEST_LABWARE,
+        }),
+        ...delayWithOffset('B1', DEST_LABWARE),
+      ]
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
+        // delay after dispense
+        ...delayWithOffset('B1', DEST_LABWARE),
+        ...mixCommandsWithDelays,
+
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
+        // delay after dispense
+        ...delayWithOffset('B1', DEST_LABWARE),
+        ...mixCommandsWithDelays,
       ])
     })
 
