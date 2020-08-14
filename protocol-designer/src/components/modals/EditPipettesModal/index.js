@@ -164,7 +164,7 @@ const makeUpdatePipettes = (
   const pipettesWithNewTiprackIdentityMap: SubstitutionMap = pipettesWithNewTipracks.reduce(
     (acc: SubstitutionMap, id: string): SubstitutionMap => {
       return {
-        ...acc, // $FlowFixMe (SA, 2020-09-10): can't assign type of computed id value
+        ...acc,
         ...{ [id]: id },
       }
     },
