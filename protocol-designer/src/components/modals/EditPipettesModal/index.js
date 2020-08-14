@@ -3,6 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
+import filter from 'lodash/filter'
 import mapValues from 'lodash/mapValues'
 
 import { uuid } from '../../../utils'
@@ -127,8 +128,13 @@ const makeUpdatePipettes = (
   const pipetteIdsToDelete: Array<string> = Object.keys(prevPipettes).filter(
     id => !(id in nextPipettes)
   )
-  const substitutionMap = pipetteIdsToDelete.reduce(
-    (acc: { [string]: string }, deletedId: string): { [string]: string } => {
+
+  // SubstitutionMap represents a map of oldPipetteId => newPipetteId
+  // When a pipette's tiprack changes, the ids will be the same
+  type SubstitutionMap = { [pipetteId: string]: string }
+
+  const pipetteReplacementMap: SubstitutionMap = pipetteIdsToDelete.reduce(
+    (acc: SubstitutionMap, deletedId: string): SubstitutionMap => {
       const deletedPipette = prevPipettes[deletedId]
       const replacementId = Object.keys(nextPipettes).find(
         newId => nextPipettes[newId].mount === deletedPipette.mount
@@ -139,6 +145,36 @@ const makeUpdatePipettes = (
     },
     {}
   )
+
+  const pipettesWithNewTipracks: Array<string> = filter(
+    nextPipettes,
+    (nextPipette: $Values<typeof nextPipettes>) => {
+      const newPipetteId = nextPipette.id
+      const tiprackChanged =
+        newPipetteId in prevPipettes &&
+        nextPipette.tiprackDefURI !== prevPipettes[newPipetteId].tiprackDefURI
+      return tiprackChanged
+    }
+  ).map(pipette => pipette.id)
+
+  // this creates an identity map with all pipette ids that have new tipracks
+  // this will be used so that handleFormChange gets called even though the
+  // pipette id itself has not changed (only it's tiprack)
+
+  const pipettesWithNewTiprackIdentityMap: SubstitutionMap = pipettesWithNewTipracks.reduce(
+    (acc: SubstitutionMap, id: string): SubstitutionMap => {
+      return {
+        ...acc,
+        ...{ [id]: id },
+      }
+    },
+    {}
+  )
+
+  const substitutionMap = {
+    ...pipetteReplacementMap,
+    ...pipettesWithNewTiprackIdentityMap,
+  }
 
   // substitute deleted pipettes with new pipettes on the same mount, if any
   if (!isEmpty(substitutionMap) && orderedStepIds.length > 0) {
