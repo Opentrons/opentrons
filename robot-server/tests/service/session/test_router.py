@@ -273,7 +273,7 @@ def test_execute_command_no_session(api_client, mock_session_meta):
                      JogPosition(vector=(1, 2, 3,))))
     assert response.json() == {
         'errors': [{
-            'detail': f"Resource type 'session' with id '{mock_session_meta.identifier}' was not found",
+            'detail': f"Resource type 'session' with id '{mock_session_meta.identifier}' was not found",  # noqa: e5011
             'links': {'POST': '/sessions'},
             'status': '404',
             'title': 'Resource Not Found'

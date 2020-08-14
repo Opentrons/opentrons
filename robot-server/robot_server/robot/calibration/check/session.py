@@ -13,6 +13,7 @@ from robot_server.robot.calibration.check.models import ComparisonStatus
 from robot_server.robot.calibration.helper_classes import (
     CheckMove, DeckCalibrationError, PipetteRank, PipetteInfo, PipetteStatus
 )
+from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import OffsetVector,\
     CalibrationCommand, CalibrationCheckCommand
 from opentrons.hardware_control import ThreadManager
@@ -22,6 +23,7 @@ from .constants import (PIPETTE_TOLERANCES,
                         P1000_OK_TIP_PICK_UP_VECTOR,
                         DEFAULT_OK_TIP_PICK_UP_VECTOR,
                         MOVE_TO_TIP_RACK_SAFETY_BUFFER)
+from ..errors import CalibrationError
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -435,8 +437,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 CalibrationCheckState.inspectingSecondTip:
             return CalibrationCheckState.preparingSecondPipette
         else:
-            raise CalibrationException(
-                f"No transition available for state {self.current_state_name}")
+            raise RobotServerError(
+                definition=CalibrationError.NO_STATE_TRANSITION,
+                state=self.current_state_name)
 
     async def _is_tip_pick_up_dangerous(self):
         """

@@ -7,7 +7,7 @@ from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.errors import SessionCreationException, \
-    UnsupportedFeature, SessionException
+    SessionException
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType, SessionType

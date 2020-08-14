@@ -5,7 +5,7 @@ from opentrons import types
 from opentrons.hardware_control import API, ThreadManager
 
 from robot_server.robot.calibration.check import session, util
-from robot_server.robot.calibration.session import NoPipetteException
+from robot_server.service.errors import RobotServerError
 
 
 @pytest.fixture
@@ -355,8 +355,11 @@ async def test_session_started_to_bad_state(check_calibration_session):
 async def test_session_no_pipettes_error():
     simulator = ThreadManager(API.build_hardware_simulator)
 
-    with pytest.raises(NoPipetteException):
+    with pytest.raises(RobotServerError) as e:
         await session.CheckCalibrationSession.build(simulator)
+
+    assert e.value.status_code == 403
+    assert e.value.error.title == "No Pipette Attached"
 
 
 async def test_session_started_to_end_state(check_calibration_session):

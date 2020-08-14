@@ -5,7 +5,7 @@ from fastapi import APIRouter
 
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.access import models as access
-from robot_server.service.json_api import ErrorResponse, Error
+from robot_server.service.json_api import ErrorResponse
 
 router = APIRouter()
 

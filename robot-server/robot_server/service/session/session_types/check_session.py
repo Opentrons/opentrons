@@ -20,7 +20,7 @@ class CheckSessionStateExecutor(CallableExecutor):
         try:
             return await super().execute(command)
         except (CalibrationException, StateMachineError, AssertionError) as e:
-            raise CommandExecutionException(e)
+            raise CommandExecutionException(str(e))
 
 
 class CheckSession(BaseSession):
