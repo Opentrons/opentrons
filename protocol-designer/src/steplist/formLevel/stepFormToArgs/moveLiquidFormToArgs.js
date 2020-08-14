@@ -53,7 +53,7 @@ export function getAirGapData(
   const checkbox = hydratedFormData[checkboxField]
   const volume = hydratedFormData[volumeField]
 
-  if (checkbox && typeof volume === 'number') {
+  if (checkbox && typeof volume === 'number' && volume > 0) {
     return volume
   }
   return null
