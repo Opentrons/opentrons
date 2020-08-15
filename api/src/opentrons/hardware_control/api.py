@@ -118,6 +118,9 @@ class API(HardwareAPILike):
             except Exception:
                 mod_log.exception('Errored during door state event callback')
 
+    def _reset_last_mount(self):
+        self._last_moved_mount = None
+
     @classmethod
     async def build_hardware_controller(
             cls, config: robot_configs.robot_config = None,
@@ -639,6 +642,7 @@ class API(HardwareAPILike):
     # Gantry/frame (i.e. not pipette) action API
     async def home_z(self, mount: top_types.Mount = None):
         """ Home the two z-axes """
+        self._reset_last_mount()
         if not mount:
             axes = [Axis.Z, Axis.A]
         else:
@@ -693,6 +697,7 @@ class API(HardwareAPILike):
                      home everything.
         """
         await self._wait_for_is_running()
+        self._reset_last_mount()
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
