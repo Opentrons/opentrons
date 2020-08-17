@@ -1,6 +1,18 @@
 // @flow
 import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
-import type { DeckCalibrationSessionDetails } from '../types'
+import type {
+  DeckCalibrationSessionDetails,
+  DeckCalibrationLabware,
+} from '../types'
+
+export const mockDeckCalTipRack: DeckCalibrationLabware = {
+  slot: '8',
+  loadName: 'opentrons_96_tiprack_300ul',
+  namespace: 'opentrons',
+  version: 1,
+  isTiprack: true,
+  definition: tipRackFixture,
+}
 
 export const mockDeckCalibrationSessionDetails: DeckCalibrationSessionDetails = {
   instrument: {
@@ -11,14 +23,5 @@ export const mockDeckCalibrationSessionDetails: DeckCalibrationSessionDetails = 
     serial: 'fake serial 1',
   },
   currentStep: 'sessionStarted',
-  labware: [
-    {
-      slot: '8',
-      loadName: 'opentrons_96_tiprack_300ul',
-      namespace: 'opentrons',
-      version: 1,
-      isTiprack: true,
-      definition: tipRackFixture,
-    },
-  ],
+  labware: [mockDeckCalTipRack],
 }
