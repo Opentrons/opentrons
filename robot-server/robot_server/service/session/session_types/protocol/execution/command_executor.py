@@ -1,7 +1,9 @@
 import asyncio
 import logging
 import typing
-from dataclasses import asdict
+from datetime import datetime
+
+from opentrons.util.helpers import deep_get
 
 if typing.TYPE_CHECKING:
     from opentrons.api.dev_types import State
@@ -20,6 +22,7 @@ from robot_server.service.session.session_types.protocol.execution.\
 from robot_server.service.session.session_types.protocol.execution.worker \
     import _Worker, WorkerListener, WorkerDirective
 from robot_server.util import duration
+from robot_server.service.session.session_types.protocol import models
 
 
 log = logging.getLogger(__name__)
@@ -73,8 +76,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             ProtocolCommand.resume: self._worker.handle_resume,
             ProtocolCommand.pause: self._worker.handle_pause,
         }
-        # TODO: Amit 8/3/2020 - proper schema for command list
-        self._commands: typing.List[typing.Any] = []
+        self._commands: typing.List[models.ProtocolSessionEvent] = []
 
     @staticmethod
     def create_worker(configuration: SessionConfiguration,
@@ -105,9 +107,6 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                 f"Can't execute '{command_def}' during "
                 f"state '{self.current_state}'")
 
-        # TODO: Amit 8/3/2020 - proper schema for command list
-        self._commands.append(asdict(command))
-
         handler = self._handlers.get(command_def)
         if not handler:
             raise UnsupportedCommandException(
@@ -117,6 +116,16 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         with duration() as timed:
             await handler()
 
+        self._commands.append(
+            models.ProtocolSessionEvent(
+                source=models.EventSource.session_command,
+                event=command.content.name,
+                commandId=command.meta.identifier,
+                startedAt=timed.start,
+                completedAt=timed.end,
+            )
+        )
+
         return CompletedCommand(
             content=command.content,
             meta=command.meta,
@@ -124,8 +133,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                                  completed_at=timed.end))
 
     @property
-    def commands(self):
-        # TODO: Amit 8/3/2020 - proper schema for command list
+    def commands(self) -> typing.List[models.ProtocolSessionEvent]:
         return self._commands
 
     @property
@@ -167,9 +175,21 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             else:
                 self.current_state = payload.get('state')
         else:
-            # TODO: Amit 8/3/2020 - proper schema for command list
-            self._commands.append({
-                    'name': cmd.get('name'),
-                    'desc': cmd['payload']['text'],
-                    'when': cmd.get('$')
-            })
+            before = cmd.get('$') == 'before'
+            name = cmd.get('name')
+            if before:
+                params = {'text': deep_get(cmd, ('payload', 'text',))}
+                command = models.ProtocolSessionEvent(
+                    source=models.EventSource.protocol_event,
+                    event=name,
+                    startedAt=datetime.utcnow(),
+                    params=params)
+            else:
+                result = deep_get(cmd, ('payload', 'return',))
+                command = models.ProtocolSessionEvent(
+                    source=models.EventSource.protocol_event,
+                    event=name,
+                    completedAt=datetime.utcnow(),
+                    result=result)
+
+            self._commands.append(command)
