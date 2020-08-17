@@ -90,5 +90,5 @@ async def test_execute(loop, command, worker_method_name,
         # Worker handler was called
         getattr(mock_worker, worker_method_name).assert_called_once()
         # Command is added to command list
-        assert len(protocol_command_executor.commands) == 1
-        assert protocol_command_executor.commands[0].event == command
+        assert len(protocol_command_executor.events) == 1
+        assert protocol_command_executor.events[0].event == command

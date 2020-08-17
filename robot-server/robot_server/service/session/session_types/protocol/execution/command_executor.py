@@ -76,7 +76,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             ProtocolCommand.resume: self._worker.handle_resume,
             ProtocolCommand.pause: self._worker.handle_pause,
         }
-        self._commands: typing.List[models.ProtocolSessionEvent] = []
+        self._events: typing.List[models.ProtocolSessionEvent] = []
 
     @staticmethod
     def create_worker(configuration: SessionConfiguration,
@@ -116,7 +116,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         with duration() as timed:
             await handler()
 
-        self._commands.append(
+        self._events.append(
             models.ProtocolSessionEvent(
                 source=models.EventSource.session_command,
                 event=command.content.name,
@@ -133,8 +133,8 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                                  completed_at=timed.end))
 
     @property
-    def commands(self) -> typing.List[models.ProtocolSessionEvent]:
-        return self._commands
+    def events(self) -> typing.List[models.ProtocolSessionEvent]:
+        return self._events
 
     @property
     def current_state(self) -> 'State':
@@ -179,17 +179,17 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             name = cmd.get('name')
             if before:
                 params = {'text': deep_get(cmd, ('payload', 'text',))}
-                command = models.ProtocolSessionEvent(
+                event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
                     event=name,
                     startedAt=datetime.utcnow(),
                     params=params)
             else:
                 result = deep_get(cmd, ('payload', 'return',))
-                command = models.ProtocolSessionEvent(
+                event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
                     event=name,
                     completedAt=datetime.utcnow(),
                     result=result)
 
-            self._commands.append(command)
+            self._events.append(event)
