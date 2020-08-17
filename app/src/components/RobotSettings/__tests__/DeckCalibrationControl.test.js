@@ -5,7 +5,6 @@ import { mount } from 'enzyme'
 
 import * as Sessions from '../../../sessions'
 import * as Config from '../../../config'
-import * as RobotSelectors from '../../../robot/selectors'
 
 import { DeckCalibrationControl } from '../DeckCalibrationControl'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
