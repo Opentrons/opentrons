@@ -59,6 +59,7 @@ export function Introduction(props: CalibrateDeckChildProps): React.Node {
             <b className={styles.tipracks_note_header}>{`${NOTE_HEADER} `}</b>
             {IT_IS}
             <u>{` ${EXTREMELY} `}</u>
+            {NOTE_BODY}
           </Text>
         </Box>
       </Flex>

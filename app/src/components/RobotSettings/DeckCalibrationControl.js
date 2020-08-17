@@ -1,38 +1,19 @@
 // @flow
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { push } from 'connected-react-router'
+import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 import {
-  useInterval,
-  Card,
   Text,
-  LabeledToggle,
-  LabeledButton,
   SecondaryBtn,
   BORDER_SOLID_LIGHT,
   SPACING_2,
 } from '@opentrons/components'
 
-import { startDeckCalibration } from '../../http-api-client'
-
-import {
-  home,
-  fetchLights,
-  updateLights,
-  getLightsOn,
-  ROBOT,
-} from '../../robot-controls'
 import { getFeatureFlags } from '../../config'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
-import * as Calibration from '../../calibration'
-import { restartRobot } from '../../robot-admin'
-import { selectors as robotSelectors } from '../../robot'
-import { CONNECTABLE } from '../../discovery'
 
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
+import type { State } from '../../types'
 import type { DeckCalibrationStatus } from '../../calibration/types'
 
 import { Portal } from '../portal'
@@ -61,19 +42,17 @@ export function DeckCalibrationControl(props: Props): React.Node {
   } = props
 
   const [showWizard, setShowWizard] = React.useState(false)
-  const startDeckCalibration = () => {
-    // TODO: IMMEDIATELY launch new deck cal wizard
-  }
 
   const [dispatchRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
     const reqId = last(requestIds) ?? null
-    return RobotApi.getRequestById(state, reqId)
+    return reqId ? RobotApi.getRequestById(state, reqId) : null
   })
   const requestStatus = requestState?.status ?? null
 
   const ff = useSelector(getFeatureFlags)
 
+  // TODO: BC 2020-08-17 specifically track the success of the session response
   React.useEffect(() => {
     if (requestStatus === RobotApi.SUCCESS) setShowWizard(true)
   }, [requestStatus])
