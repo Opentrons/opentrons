@@ -125,12 +125,14 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   aspirate_delay_seconds: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
+    castValue: Number,
   },
   aspirate_delay_mmFromBottom: {
     castValue: Number,
   },
   dispense_delay_seconds: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
+    castValue: Number,
   },
   dispense_delay_mmFromBottom: {
     castValue: Number,
