@@ -51,7 +51,10 @@ def test_access_individual_labware(api_client, grab_id):
     assert body == {
         'errors': [{
             'status': '404',
-            'title': '{calibrationId} does not exist.'}]}
+            'title': 'Resource Not Found',
+            'detail': "Resource type 'calibration' with id "
+                      "'funnyId' was not found"
+        }]}
 
 
 def test_delete_individual_labware(api_client, grab_id):
@@ -62,7 +65,10 @@ def test_delete_individual_labware(api_client, grab_id):
     assert body == {
         'errors': [{
             'status': '404',
-            'title': '{calibrationId} does not exist.'}]}
+            'title': 'Resource Not Found',
+            'detail': "Resource type 'calibration' with id "
+                      "'funnyId' was not found"
+        }]}
 
     resp = api_client.delete(f'/labware/calibrations/{calibration_id}')
     assert resp.status_code == 200

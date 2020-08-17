@@ -4,9 +4,10 @@ from typing import Optional, Tuple, Dict, Type
 
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
+from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.errors import SessionCreationException, \
-    UnsupportedFeature, SessionException
+    SessionException
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType, SessionType
@@ -70,8 +71,10 @@ class SessionManager:
         session = await cls.create(configuration=self._session_common,
                                    instance_meta=session_meta_data)
         if session.meta.identifier in self._sessions:
-            raise SessionCreationException(
-                f"Session with id {session.meta.identifier} already exists"
+            raise RobotServerError(
+                definition=CommonErrorDef.RESOURCE_ALREADY_EXISTS,
+                resource="session",
+                id=session.meta.identifier
             )
         self._sessions[session.meta.identifier] = session
         self._active.active_id = session.meta.identifier
@@ -82,13 +85,15 @@ class SessionManager:
             -> Optional[BaseSession]:
         """Remove a session"""
         if identifier == DefaultSession.DEFAULT_ID:
-            raise UnsupportedFeature(f"Cannot remove {identifier} session")
+            raise SessionException(
+                reason=f"Cannot remove {identifier} session"
+            )
 
         session = self.deactivate(identifier)
         if session:
             del self._sessions[session.meta.identifier]
             await session.clean_up()
-            log.debug(f"Removed session: {session}")
+            log.info(f"Removed session: {session}")
         return session
 
     async def remove_all(self):

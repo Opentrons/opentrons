@@ -3,9 +3,9 @@ from datetime import datetime
 from starlette import status as status_codes
 from fastapi import APIRouter
 
-from robot_server.service.errors import RobotServerError
+from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.access import models as access
-from robot_server.service.json_api import ErrorResponse, Error
+from robot_server.service.json_api import ErrorResponse
 
 router = APIRouter()
 
@@ -14,8 +14,7 @@ router = APIRouter()
             description="Get all created access tokens",
             response_model=access.MultipleAccessTokenResponse)
 async def get_access_tokens() -> access.MultipleAccessTokenResponse:
-    raise RobotServerError(status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
-                           error=Error(title="Not implemented"))
+    raise RobotServerError(definition=CommonErrorDef.NOT_IMPLEMENTED)
 
 
 @router.post("/access/tokens",
@@ -29,7 +28,7 @@ async def create_access_token() -> access.AccessTokenResponse:
         data=access.ResponseDataModel.create(
             attributes=access.AccessTokenInfo(
                 token=token,
-                createdOn=datetime.utcnow()),
+                createdAt=datetime.utcnow()),
             resource_id=token,
         ))
 
@@ -42,8 +41,7 @@ async def create_access_token() -> access.AccessTokenResponse:
                })
 async def delete_access_token(access_token: access.TokenType) \
         -> access.AccessTokenResponse:
-    raise RobotServerError(status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
-                           error=Error(title="Not implemented"))
+    raise RobotServerError(definition=CommonErrorDef.NOT_IMPLEMENTED)
 
 
 @router.get("/access/controls/{scope}",
@@ -54,8 +52,7 @@ async def delete_access_token(access_token: access.TokenType) \
             })
 async def get_control(scope: access.ControlScope) \
         -> access.AccessTokenResponse:
-    raise RobotServerError(status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
-                           error=Error(title="Not implemented"))
+    raise RobotServerError(definition=CommonErrorDef.NOT_IMPLEMENTED)
 
 
 @router.post("/access/controls/{scope}",
@@ -67,8 +64,7 @@ async def get_control(scope: access.ControlScope) \
 async def post_control(scope: access.ControlScope,
                        access_token: access.AccessTokenRequest) \
         -> access.AccessTokenResponse:
-    raise RobotServerError(status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
-                           error=Error(title="Not implemented"))
+    raise RobotServerError(definition=CommonErrorDef.NOT_IMPLEMENTED)
 
 
 @router.put("/access/controls/{scope}/{token}",
@@ -80,8 +76,7 @@ async def post_control(scope: access.ControlScope,
 async def put_control(scope: access.ControlScope,
                       token: access.TokenType) \
         -> access.AccessTokenResponse:
-    raise RobotServerError(status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
-                           error=Error(title="Not implemented"))
+    raise RobotServerError(definition=CommonErrorDef.NOT_IMPLEMENTED)
 
 
 @router.delete("/access/controls/{scope}/{token}",
@@ -93,5 +88,4 @@ async def put_control(scope: access.ControlScope,
 async def release_control(scope: access.ControlScope,
                           token: access.TokenType) \
         -> access.AccessTokenResponse:
-    raise RobotServerError(status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
-                           error=Error(title="Not implemented"))
+    raise RobotServerError(definition=CommonErrorDef.NOT_IMPLEMENTED)

@@ -1,9 +1,8 @@
-from http import HTTPStatus
 from typing import Set, Dict, Any, Union
 from robot_server.service.errors import RobotServerError
-from robot_server.service.json_api.errors import Error
 from robot_server.service.session.models import CommandDefinition
 from .constants import STATE_WILDCARD
+from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
 from .deck.constants import DeckCalibrationState
 
@@ -13,17 +12,10 @@ ValidState = Union[TipCalibrationState, DeckCalibrationState]
 class StateTransitionError(RobotServerError):
     def __init__(self,
                  action: CommandDefinition,
-                 state: ValidState,
-                 session_name: str):
-        super().__init__(
-            HTTPStatus.CONFLICT,
-            Error(
-                id='{}.StateTransitionError'.format(session_name),
-                status=str(HTTPStatus.CONFLICT),
-                title='Illegal State Transition',
-                detail=f'The action {action} may not occur in the state '
-                       f'{state}')
-            )
+                 state: ValidState):
+        super().__init__(definition=CalibrationError.BAD_STATE_TRANSITION,
+                         action=action,
+                         state=state.name)
 
 
 TransitionMap = Dict[Any, Set[Dict[Any, Any]]]

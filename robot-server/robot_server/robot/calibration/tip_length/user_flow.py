@@ -8,6 +8,8 @@ from opentrons.calibration_storage import modify
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import geometry, labware
+
+from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand, \
     TipLengthCalibrationCommand
 from robot_server.robot.calibration.constants import (
@@ -18,9 +20,6 @@ from robot_server.robot.calibration.constants import (
 from .state_machine import (
     TipCalibrationStateMachine
 )
-from .util import (
-    TipCalibrationException as ErrorExc, TipCalibrationError as Error
-)
 from .constants import (
     TipCalibrationState as State,
     TRASH_WELL,
@@ -30,6 +29,7 @@ from .constants import (
     MOVE_TO_REF_POINT_SAFETY_BUFFER,
     TRASH_REF_POINT_OFFSET
 )
+from ..errors import CalibrationError
 from ..helper_classes import (
     RequiredLabware,
     AttachedPipette
@@ -65,7 +65,9 @@ class TipCalibrationUserFlow:
         self._has_calibration_block = has_calibration_block
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
-            raise ErrorExc(Error.NO_PIPETTE, mount)
+            raise RobotServerError(
+                definition=CalibrationError.NO_PIPETTE_ON_MOUNT,
+                mount=mount)
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
@@ -232,7 +234,7 @@ class TipCalibrationUserFlow:
                 self._tip_rack_definition,
                 self._deck.position_for(TIP_RACK_SLOT))
         except Exception:
-            raise ErrorExc(Error.BAD_DEF)
+            raise RobotServerError(definition=CalibrationError.BAD_LABWARE_DEF)
 
     def _get_alt_tip_racks(self) -> Set[str]:
         pip_vol = self._hw_pipette.config.max_volume

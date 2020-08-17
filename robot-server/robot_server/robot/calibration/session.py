@@ -6,6 +6,7 @@ from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK,
     STANDARD_DECK
 )
+from robot_server.robot.calibration.errors import CalibrationError
 from robot_server.robot.calibration.helper_classes import PipetteInfo, \
     PipetteRank, LabwareInfo, Moves, CheckMove
 from opentrons.config import feature_flags as ff
@@ -14,13 +15,7 @@ from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import geometry, labware
 from opentrons.types import Mount, Point, Location
 
-
-class CalibrationException(Exception):
-    pass
-
-
-class NoPipetteException(CalibrationException):
-    pass
+from robot_server.service.errors import RobotServerError
 
 
 class SessionManager:
@@ -82,8 +77,9 @@ class CalibrationSession:
                                                            mount=mount)
             return pip_info_by_mount
         else:
-            raise NoPipetteException("Cannot start calibration check "
-                                     "with fewer than one pipette.")
+            raise RobotServerError(
+                definition=CalibrationError.NO_PIPETTE_ATTACHED,
+                flow='calibration check')
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
         """

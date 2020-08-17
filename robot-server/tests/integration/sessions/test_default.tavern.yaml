@@ -14,12 +14,12 @@ stages:
           attributes:
             sessionType: default
     response:
-      status_code: 400
+      status_code: 403
       json:
         errors:
-          - status: "400"
+          - status: "403"
             title: !anystr
-            detail: !re_match ".+Session with id default already exists.+"
+            detail: !re_match "A 'session' with id 'default' already exists"
 ---
 test_name: Default session cannot be deleted
 marks:
@@ -31,12 +31,12 @@ stages:
       url: "{host:s}:{port:d}/sessions/default"
       method: DELETE
     response:
-      status_code: 400
+      status_code: 403
       json:
         errors:
-          - status: "400"
+          - status: "403"
             title: !anystr
-            detail: !re_match ".+Cannot remove default session.+"
+            detail: !re_match "Cannot remove default session"
 ---
 test_name: Get the default
 marks:
@@ -100,6 +100,6 @@ stages:
             command: calibration.loadLabware
             data: {}
     response:
-      status_code: 400
+      status_code: 403
 
 

@@ -61,4 +61,4 @@ class DeckCalibrationStateMachine:
         if next_state:
             return next_state
         else:
-            raise StateTransitionError(command, from_state, 'DeckCalibration')
+            raise StateTransitionError(command, from_state)

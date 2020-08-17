@@ -1,7 +1,6 @@
 from robot_server.robot.calibration.check.session import\
     CheckCalibrationSession
 from robot_server.robot.calibration.check import models as calibration_models
-from robot_server.robot.calibration.session import CalibrationException
 from robot_server.robot.calibration.check.util import StateMachineError
 
 from robot_server.service.session import models
@@ -19,8 +18,8 @@ class CheckSessionStateExecutor(CallableExecutor):
     async def execute(self, command: Command) -> CompletedCommand:
         try:
             return await super().execute(command)
-        except (CalibrationException, StateMachineError, AssertionError) as e:
-            raise CommandExecutionException(e)
+        except (StateMachineError, AssertionError) as e:
+            raise CommandExecutionException(str(e))
 
 
 class CheckSession(BaseSession):
@@ -44,7 +43,7 @@ class CheckSession(BaseSession):
             calibration_check = await CheckCalibrationSession.build(
                 configuration.hardware
             )
-        except (AssertionError, CalibrationException) as e:
+        except AssertionError as e:
             raise SessionCreationException(str(e))
 
         return cls(

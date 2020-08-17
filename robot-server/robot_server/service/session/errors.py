@@ -1,11 +1,11 @@
-# TODO: Amit 07/30/2020 - SessionException should derive from RobotServerError
-#   and provide an easy way to customize the HTTP status code along with
-#   other Error attributes
+from robot_server.service.errors import RobotServerError, CommonErrorDef
 
 
-class SessionException(Exception):
+class SessionException(RobotServerError):
     """Base of all session exceptions"""
-    pass
+    def __init__(self, reason: str):
+        super().__init__(definition=CommonErrorDef.ACTION_FORBIDDEN,
+                         reason=reason)
 
 
 class SessionCommandException(SessionException):
@@ -20,7 +20,8 @@ class SessionCreationException(SessionException):
 
 class UnsupportedFeature(SessionException):
     """A feature is not supported"""
-    pass
+    def __init__(self):
+        super().__init__(reason="This feature is not supported")
 
 
 class UnsupportedCommandException(SessionCommandException):
@@ -30,9 +31,4 @@ class UnsupportedCommandException(SessionCommandException):
 
 class CommandExecutionException(SessionCommandException):
     """An error occurred during command execution"""
-    pass
-
-
-class CommandExecutionConflict(SessionCommandException):
-    """A command cannot execute due to conflict with current state"""
     pass
