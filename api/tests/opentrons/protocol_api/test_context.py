@@ -926,3 +926,10 @@ def test_api_per_call_checking(monkeypatch):
     ctx = papi.ProtocolContext(api_version=APIVersion(2, 0))
     with pytest.raises(papi.util.APIVersionError):
         ctx.disconnect()
+
+
+def test_home_plunger(monkeypatch):
+    ctx = papi.ProtocolContext(api_version=APIVersion(2, 0))
+    ctx.home()
+    instr = ctx.load_instrument('p1000_single', 'left')
+    instr.home_plunger()
