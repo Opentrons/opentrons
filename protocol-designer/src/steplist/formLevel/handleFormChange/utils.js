@@ -66,10 +66,16 @@ export function getMaxDisposalVolumeForMultidispense(
     rawForm.path === 'multiDispense',
     `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${rawForm.path}`
   )
-  const volume = Number(rawForm.volume)
   const pipetteEntity = pipetteEntities[rawForm.pipette]
   const pipetteCapacity = getPipetteCapacity(pipetteEntity)
-  return round(pipetteCapacity - volume * 2, DISPOSAL_VOL_DIGITS)
+
+  const volume = Number(rawForm.volume)
+  const airGapChecked = rawForm['aspirate_airGap_checkbox']
+  let airGapVolume = airGapChecked
+    ? Number(rawForm['aspirate_airGap_volume'])
+    : 0
+  airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
+  return round(pipetteCapacity - volume * 2 - airGapVolume, DISPOSAL_VOL_DIGITS)
 }
 
 // Ensures that 2x volume can fit in pipette
@@ -79,7 +85,6 @@ export function volumeInCapacityForMulti(
   rawForm: FormData,
   pipetteEntities: PipetteEntities
 ): boolean {
-  const volume = Number(rawForm.volume)
   assert(
     rawForm.pipette in pipetteEntities,
     `volumeInCapacityForMulti expected pipette ${rawForm.pipette} to be in pipetteEntities`
@@ -87,7 +92,18 @@ export function volumeInCapacityForMulti(
   const pipetteEntity = pipetteEntities[rawForm.pipette]
   const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)
 
-  return volume > 0 && pipetteCapacity > 0 && volume * 2 <= pipetteCapacity
+  const volume = Number(rawForm.volume)
+  const airGapChecked = rawForm['aspirate_airGap_checkbox']
+  let airGapVolume = airGapChecked
+    ? Number(rawForm['aspirate_airGap_volume'])
+    : 0
+  airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
+
+  return (
+    volume > 0 &&
+    pipetteCapacity > 0 &&
+    volume * 2 + airGapVolume <= pipetteCapacity
+  )
 }
 
 type GetDefaultWellsArgs = {
