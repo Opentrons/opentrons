@@ -1,12 +1,16 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, PropertyMock
+from datetime import datetime
 import pytest
 
-from robot_server.service.session.command_execution.command import Command,\
-    CommandContent
+from robot_server.service.session.command_execution.command import Command, CommandContent  # noqa: E501
 from robot_server.service.session.errors import UnsupportedCommandException
 from robot_server.service.session.models import ProtocolCommand, EmptyModel
+from robot_server.service.session.session_types.protocol.execution import \
+    command_executor
 from robot_server.service.session.session_types.protocol.execution.command_executor import ProtocolCommandExecutor  # noqa: E501
-from robot_server.service.session.session_types.protocol.execution.worker import _Worker  # noqa:
+from robot_server.service.session.session_types.protocol.execution.worker import _Worker  # noqa: E501
+from robot_server.service.session.session_types.protocol.models import \
+    ProtocolSessionEvent, EventSource
 
 
 @pytest.fixture()
@@ -28,6 +32,18 @@ def mock_worker():
 def protocol_command_executor(mock_worker):
     ProtocolCommandExecutor.create_worker = MagicMock(return_value=mock_worker)
     return ProtocolCommandExecutor(None, None)
+
+
+@pytest.fixture
+def dt() -> datetime:
+    return datetime(200, 4, 1)
+
+
+@pytest.fixture
+def patch_utcnow(dt: datetime):
+    with patch.object(command_executor, 'datetime') as p:
+        p.utcnow.side_effect = lambda: dt
+        yield p
 
 
 @pytest.mark.parametrize(argnames="current_state,accepted_commands",
@@ -71,7 +87,7 @@ async def test_command_state_reject(loop,
 @pytest.mark.parametrize(argnames="command,worker_method_name",
                          argvalues=[
                              [ProtocolCommand.start_run, "handle_run"],
-                             [ProtocolCommand.start_simulate, "handle_simulate"],  # noqa:
+                             [ProtocolCommand.start_simulate, "handle_simulate"],  # noqa: E501
                              [ProtocolCommand.cancel, "handle_cancel"],
                              [ProtocolCommand.pause, "handle_pause"],
                              [ProtocolCommand.resume, "handle_resume"]
@@ -81,7 +97,7 @@ async def test_execute(loop, command, worker_method_name,
     # Patch the state command filter to allow all commands
     with patch.object(ProtocolCommandExecutor,
                       "STATE_COMMAND_MAP",
-                      new={protocol_command_executor.current_state: ProtocolCommand}):  # noqa:
+                      new={protocol_command_executor.current_state: ProtocolCommand}):  # noqa: E501
         protocol_command = Command(content=CommandContent(
             name=command,
             data=EmptyModel())
@@ -92,3 +108,69 @@ async def test_execute(loop, command, worker_method_name,
         # Command is added to command list
         assert len(protocol_command_executor.events) == 1
         assert protocol_command_executor.events[0].event == command
+
+
+class TestOnProtocolEvent:
+
+    async def test_topic_session_payload(self, protocol_command_executor):
+        mock_session = MagicMock()
+        mock_session.state = "some_state"
+        await protocol_command_executor.on_protocol_event({
+            'topic': 'session',
+            'payload': mock_session
+        })
+        assert protocol_command_executor.current_state == "some_state"
+
+    async def test_topic_dict_payload(self, protocol_command_executor):
+        await protocol_command_executor.on_protocol_event({
+            'topic': 'session',
+            'payload': {
+                'state': 'some_state'
+            }
+        })
+        assert protocol_command_executor.current_state == "some_state"
+
+    @pytest.mark.parametrize(argnames="payload",
+                             argvalues=[{},
+                                        {'topic': 'soosion'},
+                                        {'$': 'soosion'}
+                                        ])
+    async def test_body_invalid(self, protocol_command_executor, payload):
+        ProtocolCommandExecutor.current_state = PropertyMock()
+        await protocol_command_executor.on_protocol_event(payload)
+        assert len(protocol_command_executor.events) == 0
+        ProtocolCommandExecutor.current_state.assert_not_called()
+
+    async def test_before(self, protocol_command_executor, patch_utcnow, dt):
+        payload = {
+            '$': 'before',
+            'name': 'some event',
+            'payload': {
+                'text': 'this is what happened'
+            }
+        }
+        await protocol_command_executor.on_protocol_event(payload)
+        assert protocol_command_executor.events == [
+            ProtocolSessionEvent(source=EventSource.protocol_event,
+                                 event="some event",
+                                 startedAt=dt,
+                                 params={'text': 'this is what happened'}
+                                 )
+        ]
+
+    async def test_after(self, protocol_command_executor, patch_utcnow, dt):
+        payload = {
+            '$': 'after',
+            'name': 'some event',
+            'payload': {
+                'return': "done"
+            }
+        }
+        await protocol_command_executor.on_protocol_event(payload)
+        assert protocol_command_executor.events == [
+            ProtocolSessionEvent(source=EventSource.protocol_event,
+                                 event="some event",
+                                 completedAt=dt,
+                                 result="done"
+                                 )
+        ]

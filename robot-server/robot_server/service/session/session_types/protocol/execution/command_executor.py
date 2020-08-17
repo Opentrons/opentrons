@@ -170,26 +170,28 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         topic = cmd.get('topic')
         if topic == Session.TOPIC:
             payload = cmd.get('payload')
-            if isinstance(payload, Session):
-                self.current_state = payload.state
-            else:
+            if isinstance(payload, dict):
                 self.current_state = payload.get('state')
+            elif hasattr(payload, 'state'):
+                self.current_state = payload.state
         else:
-            before = cmd.get('$') == 'before'
-            name = cmd.get('name')
-            if before:
+            dollar_val = cmd.get('$')
+            event_name = cmd.get('name')
+            event = None
+            if dollar_val == 'before':
                 params = {'text': deep_get(cmd, ('payload', 'text',))}
                 event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
-                    event=name,
+                    event=event_name,
                     startedAt=datetime.utcnow(),
                     params=params)
-            else:
+            elif dollar_val == 'after':
                 result = deep_get(cmd, ('payload', 'return',))
                 event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
-                    event=name,
+                    event=event_name,
                     completedAt=datetime.utcnow(),
                     result=result)
 
-            self._events.append(event)
+            if event:
+                self._events.append(event)
