@@ -172,8 +172,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                 dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
                 aspirateFlowRateUlSec,
                 dispenseFlowRateUlSec,
-                aspirateDelay,
-                dispenseDelay,
+                aspirateDelaySeconds: aspirateDelay?.seconds,
+                dispenseDelaySeconds: dispenseDelay?.seconds,
               })
             : []
 
@@ -235,8 +235,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                 dispenseOffsetFromBottomMm,
                 aspirateFlowRateUlSec,
                 dispenseFlowRateUlSec,
-                aspirateDelay,
-                dispenseDelay,
+                aspirateDelaySeconds: aspirateDelay?.seconds,
+                dispenseDelaySeconds: dispenseDelay?.seconds,
               })
             : []
 

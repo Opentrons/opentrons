@@ -523,18 +523,23 @@ describe('advanced options', () => {
         aspirateDelay: { seconds: 12, mmFromBottom: 14 },
       }
 
+      const delayCommand = {
+        command: 'delay',
+        params: { wait: 12 },
+      }
+
       // mixes will include the delays after aspirating
       const mixCommandsWithDelays = [
         // mix 1
         aspirateHelper('A1', 250),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
+        delayCommand,
         dispenseHelper('A1', 250, {
           labware: SOURCE_LABWARE,
           offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
         }),
         // mix 2
         aspirateHelper('A1', 250),
-        ...delayWithOffset('A1', SOURCE_LABWARE),
+        delayCommand,
         dispenseHelper('A1', 250, {
           labware: SOURCE_LABWARE,
           offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -629,6 +634,11 @@ describe('advanced options', () => {
         dispenseDelay: { seconds: 12, mmFromBottom: 14 },
       }
 
+      const delayCommand = {
+        command: 'delay',
+        params: { wait: 12 },
+      }
+
       // mixes will include the delays after aspirating
       const mixCommandsWithDelays = [
         // mix 1
@@ -640,7 +650,7 @@ describe('advanced options', () => {
           labware: DEST_LABWARE,
           offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
         }),
-        ...delayWithOffset('B1', DEST_LABWARE),
+        delayCommand,
         // mix 2
         aspirateHelper('B1', 250, {
           labware: DEST_LABWARE,
@@ -649,7 +659,7 @@ describe('advanced options', () => {
         dispenseHelper('B1', 250, {
           labware: DEST_LABWARE,
         }),
-        ...delayWithOffset('B1', DEST_LABWARE),
+        delayCommand,
       ]
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)

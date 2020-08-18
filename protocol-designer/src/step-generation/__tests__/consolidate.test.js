@@ -42,20 +42,24 @@ function tripleMix(
   } = {}
 ) {
   const { delayAfterAspirate, delayAfterDispense } = delayParams
-  return [
-    aspirateHelper(well, volume, params),
-    ...(delayAfterAspirate ? delayWithOffset(well, params.labware) : []),
-    dispenseHelper(well, volume, params),
-    ...(delayAfterDispense ? delayWithOffset(well, params.labware) : []),
-    aspirateHelper(well, volume, params),
-    ...(delayAfterAspirate ? delayWithOffset(well, params.labware) : []),
-    dispenseHelper(well, volume, params),
-    ...(delayAfterDispense ? delayWithOffset(well, params.labware) : []),
-    aspirateHelper(well, volume, params),
-    ...(delayAfterAspirate ? delayWithOffset(well, params.labware) : []),
-    dispenseHelper(well, volume, params),
-    ...(delayAfterDispense ? delayWithOffset(well, params.labware) : []),
+
+  const delayCommand = [
+    {
+      command: 'delay',
+      params: { wait: 12 },
+    },
   ]
+
+  return [...Array(3)].reduce(
+    (acc, _) => [
+      ...acc,
+      aspirateHelper(well, volume, params),
+      ...(delayAfterAspirate ? delayCommand : []),
+      dispenseHelper(well, volume, params),
+      ...(delayAfterDispense ? delayCommand : []),
+    ],
+    []
+  )
 }
 
 let invariantContext

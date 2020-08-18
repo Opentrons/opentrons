@@ -177,8 +177,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,
-            aspirateDelay,
-            dispenseDelay,
+            aspirateDelaySeconds: aspirateDelay?.seconds,
+            dispenseDelaySeconds: dispenseDelay?.seconds,
           })
         : []
 
@@ -208,8 +208,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             dispenseOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,
-            aspirateDelay,
-            dispenseDelay,
+            aspirateDelaySeconds: aspirateDelay?.seconds,
+            dispenseDelaySeconds: dispenseDelay?.seconds,
           })
         : []
 

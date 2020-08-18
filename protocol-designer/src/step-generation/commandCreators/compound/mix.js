@@ -8,22 +8,14 @@ import {
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import type {
-  InnerDelayArgs,
   MixArgs,
   CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
-import {
-  aspirate,
-  dispense,
-  delay,
-  moveToWell,
-  replaceTip,
-  touchTip,
-} from '../atomic'
+import { aspirate, dispense, delay, replaceTip, touchTip } from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
-export function mixUtil(args: {
+export function mixUtil(args: {|
   pipette: string,
   labware: string,
   well: string,
@@ -33,9 +25,9 @@ export function mixUtil(args: {
   dispenseOffsetFromBottomMm: number,
   aspirateFlowRateUlSec: number,
   dispenseFlowRateUlSec: number,
-  aspirateDelay?: ?InnerDelayArgs,
-  dispenseDelay?: ?InnerDelayArgs,
-}): Array<CurriedCommandCreator> {
+  aspirateDelaySeconds?: number,
+  dispenseDelaySeconds?: number,
+|}): Array<CurriedCommandCreator> {
   const {
     pipette,
     labware,
@@ -46,31 +38,19 @@ export function mixUtil(args: {
     dispenseOffsetFromBottomMm,
     aspirateFlowRateUlSec,
     dispenseFlowRateUlSec,
-    aspirateDelay,
-    dispenseDelay,
+    aspirateDelaySeconds,
+    dispenseDelaySeconds,
   } = args
 
-  const getDelayCommands = (
-    delayArgs: ?InnerDelayArgs
-  ): Array<CurriedCommandCreator> =>
-    delayArgs
+  const getDelayCommand = seconds =>
+    seconds
       ? [
-          curryCommandCreator(moveToWell, {
-            pipette: args.pipette,
-            labware: labware,
-            well: well,
-            offset: {
-              x: 0,
-              y: 0,
-              z: delayArgs.mmFromBottom,
-            },
-          }),
           curryCommandCreator(delay, {
             commandCreatorFnName: 'delay',
             description: null,
             name: null,
             meta: null,
-            wait: delayArgs.seconds,
+            wait: seconds,
           }),
         ]
       : []
@@ -85,7 +65,7 @@ export function mixUtil(args: {
         offsetFromBottomMm: aspirateOffsetFromBottomMm,
         flowRate: aspirateFlowRateUlSec,
       }),
-      ...getDelayCommands(aspirateDelay),
+      ...getDelayCommand(aspirateDelaySeconds),
       curryCommandCreator(dispense, {
         pipette,
         volume,
@@ -94,7 +74,7 @@ export function mixUtil(args: {
         offsetFromBottomMm: dispenseOffsetFromBottomMm,
         flowRate: dispenseFlowRateUlSec,
       }),
-      ...getDelayCommands(dispenseDelay),
+      ...getDelayCommand(dispenseDelaySeconds),
     ],
     times
   )

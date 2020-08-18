@@ -357,17 +357,22 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     )
     const res = getSuccessResult(result)
 
+    const delayCommand = {
+      command: 'delay',
+      params: { wait: 12 },
+    }
+
     const mixCommandsWithDelay = [
       // mix 1
       aspirateHelper('A1', 50),
-      ...delayWithOffset('A1', SOURCE_LABWARE),
+      delayCommand,
       dispenseHelper('A1', 50, {
         labware: SOURCE_LABWARE,
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
       }),
       // mix 2
       aspirateHelper('A1', 50),
-      ...delayWithOffset('A1', SOURCE_LABWARE),
+      delayCommand,
       dispenseHelper('A1', 50, {
         labware: SOURCE_LABWARE,
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -562,6 +567,11 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     )
     const res = getSuccessResult(result)
 
+    const delayCommand = {
+      command: 'delay',
+      params: { wait: 12 },
+    }
+
     const mixCommandsWithDelay = [
       // mix 1
       aspirateHelper('A1', 50),
@@ -569,14 +579,14 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         labware: SOURCE_LABWARE,
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
       }),
-      ...delayWithOffset('A1', SOURCE_LABWARE),
+      delayCommand,
       // mix 2
       aspirateHelper('A1', 50),
       dispenseHelper('A1', 50, {
         labware: SOURCE_LABWARE,
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
       }),
-      ...delayWithOffset('A1', SOURCE_LABWARE),
+      delayCommand,
     ]
     expect(res.commands).toEqual([
       ...mixCommandsWithDelay,
