@@ -25,7 +25,7 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
-                    DoorStateNotification)
+                    DoorStateNotification, PipettePair)
 from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
@@ -851,7 +851,8 @@ class API(HardwareAPILike):
                                z=cur_pos[Axis.by_mount(mount)])
 
     async def move_to(
-            self, mount: top_types.Mount, abs_position: top_types.Point,
+            self, mount: Union[top_types.Mount, PipettePair],
+            abs_position: top_types.Point,
             speed: float = None,
             critical_point: CriticalPoint = None,
             max_speeds: Dict[Axis, float] = None):
@@ -895,22 +896,51 @@ class API(HardwareAPILike):
         if not self._current_position:
             await self.home()
 
-        await self._cache_and_maybe_retract_mount(mount)
-        z_axis = Axis.by_mount(mount)
-        if mount == top_types.Mount.LEFT:
-            offset = top_types.Point(*self._config.mount_offset)
+        if isinstance(mount, PipettePair):
+            primary_mount = mount.primary
+            secondary_mount: Optional[top_types.Mount] = mount.secondary
         else:
-            offset = top_types.Point(0, 0, 0)
-        cp = self._critical_point_for(mount, critical_point)
+            primary_mount = mount
+            secondary_mount = None
 
-        target_position = OrderedDict((
-            (Axis.X, abs_position.x - offset.x - cp.x),
-            (Axis.Y, abs_position.y - offset.y - cp.y),
-            (z_axis, abs_position.z - offset.z - cp.z))
-        )
-        await self._move(target_position, speed=speed, max_speeds=max_speeds)
+        if primary_mount == top_types.Mount.LEFT:
+            primary_offset = top_types.Point(*self._config.mount_offset)
+            s_offset = top_types.Point(0, 0, 0)
+        else:
+            primary_offset = top_types.Point(0, 0, 0)
+            s_offset = top_types.Point(*self._config.mount_offset)
 
-    async def move_rel(self, mount: top_types.Mount, delta: top_types.Point,
+        if secondary_mount:
+            primary_z = Axis.by_mount(primary_mount)
+            secondary_z = Axis.by_mount(secondary_mount)
+            primary_cp = self._critical_point_for(
+                primary_mount, critical_point)
+            s_cp = self._critical_point_for(
+                secondary_mount, critical_point)
+            target_position = OrderedDict(
+                ((Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
+                 (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
+                 (primary_z, abs_position.z - primary_offset.z - primary_cp.z),
+                 (secondary_z, abs_position.z - s_offset.z - s_cp.z)
+                 ))
+        else:
+            primary_cp =\
+                self._critical_point_for(primary_mount, critical_point)
+            primary_z = Axis.by_mount(primary_mount)
+            secondary_z = None
+            target_position = OrderedDict(
+                ((Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
+                 (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
+                 (primary_z, abs_position.z - primary_offset.z - primary_cp.z)
+                 ))
+
+        await self._cache_and_maybe_retract_mount(primary_mount)
+        await self._move(
+            target_position, speed=speed,
+            max_speeds=max_speeds, secondary_z=secondary_z)
+
+    async def move_rel(self, mount: Union[top_types.Mount, PipettePair],
+                       delta: top_types.Point,
                        speed: float = None,
                        max_speeds: Dict[Axis, float] = None):
         """ Move the critical point of the specified mount by a specified
@@ -921,18 +951,35 @@ class API(HardwareAPILike):
         if not self._current_position:
             await self.home()
 
-        await self._cache_and_maybe_retract_mount(mount)
+        if isinstance(mount, PipettePair):
+            primary_mount = mount.primary
+            secondary_mount: Optional[top_types.Mount] = mount.secondary
+        else:
+            primary_mount = mount
+            secondary_mount = None
 
-        z_axis = Axis.by_mount(mount)
-        target_position = OrderedDict(
-            ((Axis.X,
-              self._current_position[Axis.X] + delta.x),
-             (Axis.Y,
-              self._current_position[Axis.Y] + delta.y),
-             (z_axis,
-              self._current_position[z_axis] + delta.z))
-        )
-        await self._move(target_position, speed=speed, max_speeds=max_speeds)
+        if secondary_mount:
+            primary_z = Axis.by_mount(primary_mount)
+            secondary_z = Axis.by_mount(secondary_mount)
+            target_position = OrderedDict(
+                ((Axis.X, self._current_position[Axis.X] + delta.x),
+                 (Axis.Y, self._current_position[Axis.Y] + delta.y),
+                 (primary_z, self._current_position[primary_z] + delta.z),
+                 (secondary_z, self._current_position[secondary_z] + delta.z))
+            )
+        else:
+            z_axis = Axis.by_mount(primary_mount)
+            secondary_z = None
+            target_position = OrderedDict(
+                ((Axis.X, self._current_position[Axis.X] + delta.x),
+                 (Axis.Y, self._current_position[Axis.Y] + delta.y),
+                 (z_axis, self._current_position[z_axis] + delta.z))
+            )
+
+        await self._cache_and_maybe_retract_mount(primary_mount)
+        await self._move(
+            target_position, speed=speed,
+            max_speeds=max_speeds, secondary_z=secondary_z)
 
     async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
         """ Retract the 'other' mount if necessary
@@ -963,10 +1010,39 @@ class API(HardwareAPILike):
         await self._move(all_axes_pos, speed, False,
                          acquire_lock=acquire_lock)
 
+    def _get_transformed(
+            self,
+            to_transform_primary: Tuple[float, ...],
+            to_transform_secondary: Tuple[float, ...]
+            ) -> Tuple[Tuple, Tuple]:
+        # Type ignored below because linal.apply_transform (rightly) specifies
+        # Tuple[float, float, float] and the implied type from
+        # target_position.items() is (rightly) Tuple[float, ...] with unbounded
+        # size; unfortunately, mypy can’t quite figure out the length check
+        # above that makes this OK
+        if ff.enable_calibration_overhaul():
+            primary_transformed = linal.apply_transform(
+                self.robot_calibration.deck_calibration.attitude,
+                to_transform_primary,  # type: ignore
+                with_offsets=False)
+            secondary_transformed = linal.apply_transform(
+                self.robot_calibration.deck_calibration.attitude,
+                to_transform_secondary,  # type: ignore
+                with_offsets=False)
+        else:
+            primary_transformed = linal.apply_transform(
+                self._config.gantry_calibration,
+                to_transform_primary)  # type: ignore
+            secondary_transformed = linal.apply_transform(
+                self._config.gantry_calibration,
+                to_transform_secondary)  # type: ignore
+        return primary_transformed, secondary_transformed
+
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
                     speed: float = None, home_flagged_axes: bool = True,
                     max_speeds: Dict[Axis, float] = None,
-                    acquire_lock: bool = True):
+                    acquire_lock: bool = True,
+                    secondary_z: Axis = None):
         """ Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
@@ -981,33 +1057,30 @@ class API(HardwareAPILike):
         await self._wait_for_is_running()
         # Transform only the x, y, and (z or a) axes specified since this could
         # get the b or c axes as well
-        to_transform = tuple((tp
-                              for ax, tp in target_position.items()
-                              if ax in Axis.gantry_axes()))
+        to_transform_primary = tuple((tp
+                                      for ax, tp in target_position.items()
+                                      if (ax in Axis.gantry_axes()
+                                          and ax != secondary_z)))
+        if secondary_z:
+            to_transform_secondary = tuple(
+                (0, 0, target_position[secondary_z]))
+        else:
+            to_transform_secondary = tuple((0, 0, 0))
         # Pre-fill the dict we’ll send to the backend with the axes we don’t
         # need to transform
         smoothie_pos = {ax.name: pos for ax, pos in target_position.items()
                         if ax not in Axis.gantry_axes()}
 
-        if len(to_transform) != 3:
+        if len(to_transform_primary) != 3:
             self._log.error("Move derived {} axes to transform from {}"
-                            .format(len(to_transform), target_position))
+                            .format(len(to_transform_primary),
+                                    target_position))
             raise ValueError("Moves must specify either exactly an "
                              "x, y, and (z or a) or none of them")
-        # Type ignored below because linal.apply_transform (rightly) specifies
-        # Tuple[float, float, float] and the implied type from
-        # target_position.items() is (rightly) Tuple[float, ...] with unbounded
-        # size; unfortunately, mypy can’t quite figure out the length check
-        # above that makes this OK
-        if ff.enable_calibration_overhaul():
-            transformed = linal.apply_transform(
-                self.robot_calibration.deck_calibration.attitude,
-                to_transform,  # type: ignore
-                with_offsets=False)
-        else:
-            transformed = linal.apply_transform(
-                self._config.gantry_calibration,
-                to_transform)  # type: ignore
+
+        primary_transformed, secondary_transformed =\
+            self._get_transformed(to_transform_primary, to_transform_secondary)
+        transformed = (*primary_transformed, secondary_transformed[2])
         # Since target_position is an OrderedDict with the axes ordered by
         # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
         # by the len(to_transform) check above) we can use an enumerate to
