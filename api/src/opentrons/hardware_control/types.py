@@ -173,11 +173,18 @@ class ExecutionState(enum.Enum):
 
 
 class PipettePair(enum.Enum):
-    PRIMARY_LEFT = top_types.Mount.LEFT
-    PRIMARY_RIGHT = top_types.Mount.RIGHT
+    PRIMARY_LEFT = enum.auto()
+    PRIMARY_RIGHT = enum.auto()
 
     @property
-    def secondary(self):
+    def primary(self) -> top_types.Mount:
+        if self.name == 'PRIMARY_RIGHT':
+            return top_types.Mount.RIGHT
+        else:
+            return top_types.Mount.LEFT
+
+    @property
+    def secondary(self) -> top_types.Mount:
         if self.name == 'PRIMARY_RIGHT':
             return top_types.Mount.LEFT
         else:

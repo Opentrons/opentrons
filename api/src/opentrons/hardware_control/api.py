@@ -892,8 +892,8 @@ class API(HardwareAPILike):
             await self.home()
 
         if isinstance(mount, PipettePair):
-            primary_mount = mount.value
-            secondary_mount = mount.secondary
+            primary_mount = mount.primary
+            secondary_mount: Optional[top_types.Mount] = mount.secondary
         else:
             primary_mount = mount
             secondary_mount = None
@@ -947,8 +947,8 @@ class API(HardwareAPILike):
             await self.home()
 
         if isinstance(mount, PipettePair):
-            primary_mount = mount.value
-            secondary_mount = mount.secondary
+            primary_mount = mount.primary
+            secondary_mount: Optional[top_types.Mount] = mount.secondary
         else:
             primary_mount = mount
             secondary_mount = None
