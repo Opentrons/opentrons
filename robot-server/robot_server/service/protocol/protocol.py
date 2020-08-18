@@ -8,8 +8,7 @@ from pathlib import Path
 from fastapi import UploadFile
 
 from robot_server.service.protocol.errors import ProtocolAlreadyExistsException
-from robot_server.util import FileMeta, save_upload
-
+from robot_server.util import FileMeta, save_upload, utc_now
 
 log = logging.getLogger(__name__)
 
@@ -20,8 +19,8 @@ class UploadedProtocolMeta:
     protocol_file: FileMeta
     directory: TemporaryDirectory
     support_files: typing.List[FileMeta] = field(default_factory=list)
-    last_modified_at: datetime = field(default_factory=datetime.utcnow)
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    last_modified_at: datetime = field(default_factory=utc_now)
+    created_at: datetime = field(default_factory=utc_now)
 
 
 class UploadedProtocol:
@@ -70,7 +69,7 @@ class UploadedProtocol:
         self._meta = replace(
             self._meta,
             support_files=self._meta.support_files + [file_meta],
-            last_modified_at=datetime.utcnow()
+            last_modified_at=utc_now()
         )
 
     def clean_up(self):

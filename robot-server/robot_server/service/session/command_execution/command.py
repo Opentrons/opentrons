@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from robot_server.service.session.models import IdentifierType, \
     create_identifier, CommandDefinitionType, CommandDataType, CommandStatus
+from robot_server.util import utc_now
 
 
 @dataclass(frozen=True)
@@ -14,7 +15,7 @@ class CommandContent:
 @dataclass(frozen=True)
 class CommandMeta:
     identifier: IdentifierType = field(default_factory=create_identifier)
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=utc_now)
 
 
 @dataclass(frozen=True)

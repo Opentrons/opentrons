@@ -15,7 +15,7 @@ from robot_server.service.session.session_types.protocol import \
     models as protocol_session_models
 from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
-
+from robot_server.util import utc_now
 
 IdentifierType = typing.NewType('IdentifierType', str)
 
@@ -314,7 +314,7 @@ class BasicSessionCommand(BaseModel):
 class SessionCommand(BasicSessionCommand):
     """A session command response"""
     status: CommandStatus
-    createdAt: datetime = Field(..., default_factory=datetime.utcnow)
+    createdAt: datetime = Field(..., default_factory=utc_now)
     startedAt: typing.Optional[datetime]
     completedAt: typing.Optional[datetime]
 

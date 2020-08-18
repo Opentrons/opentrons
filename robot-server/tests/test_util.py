@@ -27,7 +27,7 @@ def mock_utcnow(mock_start_time):
             return ret
 
     with patch.object(util, 'datetime') as p:
-        p.utcnow.side_effect = _TimeIncrementer(mock_start_time)
+        p.now.side_effect = _TimeIncrementer(mock_start_time)
         yield p
 
 
