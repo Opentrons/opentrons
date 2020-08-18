@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from robot_server.service.session.models import IdentifierType, \
     create_identifier, CommandDefinitionType, CommandDataType, CommandStatus
-from robot_server.util import utc_now
+from opentrons.util.helpers import utc_now
 
 
 @dataclass(frozen=True)

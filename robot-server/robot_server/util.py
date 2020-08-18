@@ -1,14 +1,9 @@
 import hashlib
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import UploadFile
-
-
-def utc_now() -> datetime:
-    """Return the UTC time with timezone"""
-    return datetime.now(tz=timezone.utc)
+from opentrons.util.helpers import utc_now
 
 
 class duration:

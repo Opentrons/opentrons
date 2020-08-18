@@ -15,7 +15,7 @@ from robot_server.service.session.session_types.protocol import \
     models as protocol_session_models
 from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
-from robot_server.util import utc_now
+from opentrons.util.helpers import utc_now
 
 IdentifierType = typing.NewType('IdentifierType', str)
 

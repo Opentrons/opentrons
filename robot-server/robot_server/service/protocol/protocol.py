@@ -8,7 +8,8 @@ from pathlib import Path
 from fastapi import UploadFile
 
 from robot_server.service.protocol.errors import ProtocolAlreadyExistsException
-from robot_server.util import FileMeta, save_upload, utc_now
+from robot_server.util import FileMeta, save_upload
+from opentrons.util.helpers import utc_now
 
 log = logging.getLogger(__name__)
 

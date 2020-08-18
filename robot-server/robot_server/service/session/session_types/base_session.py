@@ -7,7 +7,7 @@ from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session import models
-from robot_server.util import utc_now
+from opentrons.util.helpers import utc_now
 
 
 @dataclass(frozen=True)

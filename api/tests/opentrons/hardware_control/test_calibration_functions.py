@@ -1,9 +1,9 @@
-import datetime
 import numpy as np
 
 from opentrons import config
 from opentrons.calibration_storage import file_operators as io
 from opentrons.hardware_control import robot_calibration
+from opentrons.util.helpers import utc_now
 
 
 def test_save_calibration(ot_config_tempdir):
@@ -32,7 +32,7 @@ def test_load_calibration(ot_config_tempdir):
     data = {
         'attitude': [[1, 0, 1], [0, 1, -.5], [0, 0, 1]],
         'pipette_calibrated_with': 'fake',
-        'last_modified': datetime.datetime.utcnow(),
+        'last_modified': utc_now(),
         'tiprack': 'hash'
     }
     io.save_to_file(pathway, data)
