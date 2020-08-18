@@ -5,10 +5,10 @@ This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
 import typing
-import datetime
 from pathlib import Path
 
 from opentrons import config
+from opentrons.util.helpers import utc_now
 
 from . import (
     file_operators as io,
@@ -113,7 +113,7 @@ def create_tip_length_data(
 
     tip_length_data: 'TipLengthCalibration' = {
         'tipLength': length,
-        'lastModified': datetime.datetime.utcnow()
+        'lastModified': utc_now()
     }
 
     data = {labware_hash + parent: tip_length_data}
@@ -125,14 +125,14 @@ def _helper_offset_data_format(filepath: str, delta: 'Point') -> dict:
         calibration_data = {
             "default": {
                 "offset": [delta.x, delta.y, delta.z],
-                "lastModified": datetime.datetime.utcnow()
+                "lastModified": utc_now()
             }
         }
     else:
         calibration_data = io.read_cal_file(filepath)
         calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
         calibration_data['default']['lastModified'] =\
-            datetime.datetime.utcnow()
+            utc_now()
     return calibration_data
 
 
@@ -186,7 +186,7 @@ def save_robot_deck_attitude(
     gantry_dict: 'DeckCalibrationData' = {
         'attitude': transform,
         'pipette_calibrated_with': pip_id,
-        'last_modified': datetime.datetime.utcnow(),
+        'last_modified': utc_now(),
         'tiprack': lw_hash
     }
     io.save_to_file(gantry_path, gantry_dict)

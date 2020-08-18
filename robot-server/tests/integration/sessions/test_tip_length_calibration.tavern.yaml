@@ -37,7 +37,7 @@ stages:
           type: Session
           attributes:
             sessionType: tipLengthCalibration
-            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+.\\d+"
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             details: &session_data_attribute_details
               currentStep: sessionStarted
               instrument: !anydict
@@ -105,7 +105,7 @@ stages:
             type: Session
             attributes:
               sessionType: default
-              createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
               details: {}
               createParams: null
 

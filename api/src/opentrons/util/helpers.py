@@ -1,4 +1,5 @@
 import typing
+from datetime import datetime, timezone
 
 
 def deep_get(obj: typing.Union[typing.Mapping, typing.Sequence],
@@ -23,3 +24,8 @@ def deep_get(obj: typing.Union[typing.Mapping, typing.Sequence],
             return default
 
     return obj
+
+
+def utc_now() -> datetime:
+    """Return the UTC time with timezone"""
+    return datetime.now(tz=timezone.utc)
