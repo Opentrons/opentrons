@@ -36,13 +36,13 @@ def protocol_command_executor(mock_worker):
 
 @pytest.fixture
 def dt() -> datetime:
-    return datetime(200, 4, 1)
+    return datetime(2000, 4, 1)
 
 
 @pytest.fixture
-def patch_utcnow(dt: datetime):
+def patch_utc_now(dt: datetime):
     with patch.object(command_executor, 'datetime') as p:
-        p.utcnow.side_effect = lambda: dt
+        p.now.side_effect = lambda tz: dt
         yield p
 
 
@@ -141,7 +141,7 @@ class TestOnProtocolEvent:
         assert len(protocol_command_executor.events) == 0
         ProtocolCommandExecutor.current_state.assert_not_called()
 
-    async def test_before(self, protocol_command_executor, patch_utcnow, dt):
+    async def test_before(self, protocol_command_executor, patch_utc_now, dt):
         payload = {
             '$': 'before',
             'name': 'some event',
@@ -152,25 +152,26 @@ class TestOnProtocolEvent:
         await protocol_command_executor.on_protocol_event(payload)
         assert protocol_command_executor.events == [
             ProtocolSessionEvent(source=EventSource.protocol_event,
-                                 event="some event",
-                                 startedAt=dt,
-                                 params={'text': 'this is what happened'}
-                                 )
+                                 event="some event.start",
+                                 timestamp=dt,
+                                 params={'text': 'this is what happened'})
         ]
 
-    async def test_after(self, protocol_command_executor, patch_utcnow, dt):
+    async def test_after(self, protocol_command_executor, patch_utc_now, dt):
         payload = {
             '$': 'after',
             'name': 'some event',
             'payload': {
+                'text': 'this is it',
                 'return': "done"
             }
         }
         await protocol_command_executor.on_protocol_event(payload)
         assert protocol_command_executor.events == [
             ProtocolSessionEvent(source=EventSource.protocol_event,
-                                 event="some event",
-                                 completedAt=dt,
+                                 event="some event.end",
+                                 timestamp=dt,
+                                 params={'text': 'this is it'},
                                  result="done"
                                  )
         ]

@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import typing
-from datetime import datetime
+from datetime import datetime, timezone
 
 from opentrons.util.helpers import deep_get
 
@@ -121,8 +121,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                 source=models.EventSource.session_command,
                 event=command.content.name,
                 commandId=command.meta.identifier,
-                startedAt=timed.start,
-                completedAt=timed.end,
+                timestamp=timed.end,
             )
         )
 
@@ -178,20 +177,24 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             dollar_val = cmd.get('$')
             event_name = cmd.get('name')
             event = None
+            params = {'text': deep_get(cmd, ('payload', 'text',))}
+            timestamp = datetime.now(tz=timezone.utc)
             if dollar_val == 'before':
-                params = {'text': deep_get(cmd, ('payload', 'text',))}
                 event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
-                    event=event_name,
-                    startedAt=datetime.utcnow(),
-                    params=params)
+                    event=f'{event_name}.start',
+                    params=params,
+                    timestamp=timestamp,
+                )
             elif dollar_val == 'after':
                 result = deep_get(cmd, ('payload', 'return',))
                 event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
-                    event=event_name,
-                    completedAt=datetime.utcnow(),
-                    result=result)
+                    event=f'{event_name}.end',
+                    params=params,
+                    timestamp=timestamp,
+                    result=result,
+                )
 
             if event:
                 self._events.append(event)
