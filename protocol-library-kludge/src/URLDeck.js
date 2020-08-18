@@ -104,7 +104,7 @@ export class URLDeck extends React.Component<{||}> {
                       slot.position[1]
                     })`}
                   >
-                    <Module model={moduleModel} mode={'default'} />
+                    <Module model={moduleModel} mode={'default'} slot={slot} />
                   </g>
                 )}
                 {labware && (
