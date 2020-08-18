@@ -35,7 +35,7 @@ TIP_RACK_LOOKUP_BY_MAX_VOL: Dict[str, LabwareLookUp] = {
             FILTERTIPRACK_10,
             FILTERTIPRACK_20}),
     '20': LabwareLookUp(
-        load_name=TIPRACK_20,
+        load_name=TIPRACK_10,
         alternatives={
             TIPRACK_20,
             FILTERTIPRACK_10,

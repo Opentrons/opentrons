@@ -8,6 +8,10 @@ from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.protocol_api import geometry, labware
 from opentrons.types import Mount, Point, Location
+
+from robot_server.robot.calibration.constants import \
+    TIP_RACK_LOOKUP_BY_MAX_VOL
+from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import (
     CalibrationCommand, DeckCalibrationCommand)
 from robot_server.robot.calibration.constants import (
@@ -19,9 +23,7 @@ from .constants import (
     MOVE_TO_TIP_RACK_SAFETY_BUFFER)
 from .state_machine import DeckCalibrationStateMachine
 # TODO: uncomment the following to raise deck cal errors
-# from .util import (
-#     DeckCalibrationException as ErrorExc,
-#     DeckCalibrationError as Error)
+from ..errors import CalibrationError
 from ..helper_classes import (
     RequiredLabware,
     AttachedPipette)
@@ -45,9 +47,6 @@ class DeckCalibrationUserFlow:
     def __init__(self,
                  hardware: ThreadManager):
         self._hardware = hardware
-        # TODO: uncomment the following to raise the no pipette error
-        # if not any(self._hardware._attached_instruments.values()):
-        #     raise ErrorExc(Error.NO_PIPETTE)
         self._hw_pipette, self._mount = self._select_target_pipette()
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
@@ -103,15 +102,35 @@ class DeckCalibrationUserFlow:
         self._current_state = to_state
 
     def _select_target_pipette(self) -> Tuple[Pipette, Mount]:
-        # TODO: select pipette for deck calibration
-        # return pipette and mount
-        return self._hardware._attached_instruments[Mount.LEFT], Mount.LEFT
+        """
+        Select pipette for calibration based on:
+        1: smaller max volume
+        2: single-channel over multi
+        3: right mount over left
+        """
+        if not any(self._hardware._attached_instruments.values()):
+            raise RobotServerError(
+                definition=CalibrationError.NO_PIPETTE_ATTACHED,
+                flow='Deck Calibration')
+        pips = {m: p for m, p in self._hardware._attached_instruments.items()
+                if p}
+        if len(pips) == 1:
+            for mount, pip in pips.items():
+                return pip, mount
+
+        right_pip = pips[Mount.RIGHT]
+        left_pip = pips[Mount.LEFT]
+        if right_pip.config.max_volume > left_pip.config.max_volume or \
+                right_pip.config.channels > left_pip.config.channels:
+            return left_pip, Mount.LEFT
+        else:
+            return right_pip, Mount.RIGHT
 
     def _get_tip_rack_lw(self) -> labware.Labware:
-        # TODO: select tiprack based on chosen pipette model
+        pip_vol = self._hw_pipette.config.max_volume
+        lw_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
         return labware.load(
-            "opentrons_96_tiprack_10ul",
-            self._deck.position_for(TIP_RACK_SLOT))
+            lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
     async def handle_command(self,
                              name: Any,
