@@ -271,6 +271,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
   })
 
   // TODO(IL, 2020-02-28): pre-wet volume is not implemented for distribute! #5122
+  //
+  // TODO(IL, 2020-08-18): don't forget to add delay tests for pre-wet when that is implemented
   it.todo('should pre-wet tip')
   // (() => {
   //   const distributeArgs: DistributeArgs = {

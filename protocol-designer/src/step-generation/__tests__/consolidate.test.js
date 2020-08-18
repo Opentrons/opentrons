@@ -505,6 +505,118 @@ describe('consolidate single-channel', () => {
     ])
   })
 
+  it('pre-wet tip should use the aspirate delay when specified', () => {
+    // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
+    const data = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'once',
+      preWetTip: true,
+      sourceWells: ['A1', 'A2', 'A3', 'A4'],
+      aspirateDelay: { mmFromBottom: 14, seconds: 12 },
+    }
+
+    const preWetVol = data.volume // NOTE same as volume above... for now
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    // TODO IMMEDIATELY: make this a tiny fixture
+    const delayCommand = {
+      command: 'delay',
+      params: { wait: 12 },
+    }
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      // pre-wet tip
+      aspirateHelper('A1', preWetVol),
+      delayCommand,
+      dispenseHelper('A1', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      // done pre-wet
+
+      aspirateHelper('A1', 150),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
+      aspirateHelper('A2', 150),
+      ...delayWithOffset('A2', SOURCE_LABWARE),
+      dispenseHelper('B1', 300),
+
+      // pre-wet tip, now with A3
+      aspirateHelper('A3', preWetVol),
+      delayCommand,
+      dispenseHelper('A3', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      // done pre-wet
+
+      aspirateHelper('A3', 150),
+      ...delayWithOffset('A3', SOURCE_LABWARE),
+      aspirateHelper('A4', 150),
+      ...delayWithOffset('A4', SOURCE_LABWARE),
+      dispenseHelper('B1', 300),
+    ])
+  })
+
+  it('pre-wet tip should use the dispense delay when specified', () => {
+    // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
+    const data = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'once',
+      preWetTip: true,
+      sourceWells: ['A1', 'A2', 'A3', 'A4'],
+      dispenseDelay: { mmFromBottom: 14, seconds: 12 },
+    }
+
+    const preWetVol = data.volume // NOTE same as volume above... for now
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    // TODO IMMEDIATELY: make this a tiny fixture
+    const delayCommand = {
+      command: 'delay',
+      params: { wait: 12 },
+    }
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      // pre-wet tip
+      aspirateHelper('A1', preWetVol),
+      dispenseHelper('A1', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      delayCommand,
+      // done pre-wet
+
+      aspirateHelper('A1', 150),
+      aspirateHelper('A2', 150),
+      dispenseHelper('B1', 300),
+      ...delayWithOffset('B1', DEST_LABWARE),
+
+      // pre-wet tip, now with A3
+      aspirateHelper('A3', preWetVol),
+      dispenseHelper('A3', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      delayCommand,
+      // done pre-wet
+
+      aspirateHelper('A3', 150),
+      aspirateHelper('A4', 150),
+      dispenseHelper('B1', 300),
+      ...delayWithOffset('B1', DEST_LABWARE),
+    ])
+  })
+
   it('should delay after aspirate', () => {
     const data = {
       ...mixinArgs,
