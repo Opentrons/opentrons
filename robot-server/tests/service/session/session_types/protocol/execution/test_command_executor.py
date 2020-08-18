@@ -153,6 +153,7 @@ class TestOnProtocolEvent:
         assert protocol_command_executor.events == [
             ProtocolSessionEvent(source=EventSource.protocol_event,
                                  event="some event.start",
+                                 commandId="1",
                                  timestamp=dt,
                                  params={'text': 'this is what happened'})
         ]
@@ -166,12 +167,49 @@ class TestOnProtocolEvent:
                 'return': "done"
             }
         }
+        protocol_command_executor._id_maker.create_id()
         await protocol_command_executor.on_protocol_event(payload)
         assert protocol_command_executor.events == [
             ProtocolSessionEvent(source=EventSource.protocol_event,
                                  event="some event.end",
+                                 commandId="1",
                                  timestamp=dt,
-                                 params={'text': 'this is it'},
                                  result="done"
                                  )
+        ]
+
+    async def test_ids(self, protocol_command_executor, patch_utc_now, dt):
+        before = {
+            '$': 'before',
+            'name': 'event'
+        }
+        after = {
+            '$': 'after',
+            'name': 'event'
+        }
+
+        await protocol_command_executor.on_protocol_event(before)
+        await protocol_command_executor.on_protocol_event(after)
+
+        await protocol_command_executor.on_protocol_event(before)
+        await protocol_command_executor.on_protocol_event(before)
+        await protocol_command_executor.on_protocol_event(after)
+        await protocol_command_executor.on_protocol_event(after)
+
+        await protocol_command_executor.on_protocol_event(before)
+        await protocol_command_executor.on_protocol_event(before)
+        await protocol_command_executor.on_protocol_event(before)
+        await protocol_command_executor.on_protocol_event(after)
+        await protocol_command_executor.on_protocol_event(after)
+        await protocol_command_executor.on_protocol_event(after)
+
+        await protocol_command_executor.on_protocol_event(before)
+        await protocol_command_executor.on_protocol_event(after)
+
+        ids = [x.commandId for x in protocol_command_executor.events]
+        assert ids == [
+            "1", "1",
+            "2", "3", "3", "2",
+            "4", "5", "6", "6", "5", "4",
+            "7", "7"
         ]

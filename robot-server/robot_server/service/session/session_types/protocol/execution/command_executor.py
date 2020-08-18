@@ -77,6 +77,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             ProtocolCommand.pause: self._worker.handle_pause,
         }
         self._events: typing.List[models.ProtocolSessionEvent] = []
+        self._id_maker = IdMaker()
 
     @staticmethod
     def create_worker(configuration: SessionConfiguration,
@@ -177,13 +178,13 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             dollar_val = cmd.get('$')
             event_name = cmd.get('name')
             event = None
-            params = {'text': deep_get(cmd, ('payload', 'text',))}
             timestamp = datetime.now(tz=timezone.utc)
             if dollar_val == 'before':
                 event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
                     event=f'{event_name}.start',
-                    params=params,
+                    commandId=self._id_maker.create_id(),
+                    params={'text': deep_get(cmd, ('payload', 'text',))},
                     timestamp=timestamp,
                 )
             elif dollar_val == 'after':
@@ -191,10 +192,30 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                 event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
                     event=f'{event_name}.end',
-                    params=params,
+                    commandId=self._id_maker.use_last_id(),
                     timestamp=timestamp,
                     result=result,
                 )
 
             if event:
                 self._events.append(event)
+
+
+class IdMaker:
+    """Helper to create ids for pairs of before/after command pairs"""
+
+    def __init__(self):
+        """Constructor"""
+        self._id_stack: typing.List[str] = []
+        self._next_id = 1
+
+    def create_id(self) -> str:
+        """Create a new id on the stack"""
+        s = str(self._next_id)
+        self._id_stack.append(s)
+        self._next_id += 1
+        return s
+
+    def use_last_id(self) -> str:
+        """Use the the most recently created id"""
+        return self._id_stack.pop()
