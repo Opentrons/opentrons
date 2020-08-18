@@ -4,6 +4,7 @@ import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   blowoutHelper,
   DEFAULT_PIPETTE,
+  delayCommand,
   delayWithOffset,
   DEST_LABWARE,
   DISPENSE_OFFSET_FROM_BOTTOM_MM,
@@ -43,20 +44,13 @@ function tripleMix(
 ) {
   const { delayAfterAspirate, delayAfterDispense } = delayParams
 
-  const delayCommand = [
-    {
-      command: 'delay',
-      params: { wait: 12 },
-    },
-  ]
-
   return [...Array(3)].reduce(
     (acc, _) => [
       ...acc,
       aspirateHelper(well, volume, params),
-      ...(delayAfterAspirate ? delayCommand : []),
+      ...(delayAfterAspirate ? [delayCommand(12)] : []),
       dispenseHelper(well, volume, params),
-      ...(delayAfterDispense ? delayCommand : []),
+      ...(delayAfterDispense ? [delayCommand(12)] : []),
     ],
     []
   )
@@ -521,18 +515,12 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
 
-    // TODO IMMEDIATELY: make this a tiny fixture
-    const delayCommand = {
-      command: 'delay',
-      params: { wait: 12 },
-    }
-
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
 
       // pre-wet tip
       aspirateHelper('A1', preWetVol),
-      delayCommand,
+      delayCommand(12),
       dispenseHelper('A1', preWetVol, {
         labware: SOURCE_LABWARE,
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -547,7 +535,7 @@ describe('consolidate single-channel', () => {
 
       // pre-wet tip, now with A3
       aspirateHelper('A3', preWetVol),
-      delayCommand,
+      delayCommand(12),
       dispenseHelper('A3', preWetVol, {
         labware: SOURCE_LABWARE,
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -578,12 +566,6 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
 
-    // TODO IMMEDIATELY: make this a tiny fixture
-    const delayCommand = {
-      command: 'delay',
-      params: { wait: 12 },
-    }
-
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
 
@@ -593,7 +575,7 @@ describe('consolidate single-channel', () => {
         labware: SOURCE_LABWARE,
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
       }),
-      delayCommand,
+      delayCommand(12),
       // done pre-wet
 
       aspirateHelper('A1', 150),
@@ -607,7 +589,7 @@ describe('consolidate single-channel', () => {
         labware: SOURCE_LABWARE,
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
       }),
-      delayCommand,
+      delayCommand(12),
       // done pre-wet
 
       aspirateHelper('A3', 150),

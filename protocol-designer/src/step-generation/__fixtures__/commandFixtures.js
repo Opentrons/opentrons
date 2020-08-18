@@ -172,6 +172,11 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
   },
 })
 
+export const delayCommand = (seconds: number): Command => ({
+  command: 'delay',
+  params: { wait: seconds },
+})
+
 export const delayWithOffset = (
   well: string,
   labware: string
