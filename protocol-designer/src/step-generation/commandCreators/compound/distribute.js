@@ -236,6 +236,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
             dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,
+            aspirateDelaySeconds: aspirateDelay?.seconds,
+            dispenseDelaySeconds: dispenseDelay?.seconds,
           })
         : []
 
