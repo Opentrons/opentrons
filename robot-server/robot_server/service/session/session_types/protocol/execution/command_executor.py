@@ -178,11 +178,15 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             event_name = cmd.get('name')
             event = None
             if dollar_val == 'before':
+                # text may be a format string using the payload vals as kwargs
+                text = deep_get(cmd, ('payload', 'text',), "")
+                if text:
+                    text = text.format(**cmd.get('payload', {}))
                 event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
                     event=f'{event_name}.start',
                     commandId=self._id_maker.create_id(),
-                    params={'text': deep_get(cmd, ('payload', 'text',))},
+                    params={'text': text},
                     timestamp=utc_now(),
                 )
             elif dollar_val == 'after':

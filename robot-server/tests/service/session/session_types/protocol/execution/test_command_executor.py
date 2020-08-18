@@ -158,6 +158,46 @@ class TestOnProtocolEvent:
                                  params={'text': 'this is what happened'})
         ]
 
+    async def test_before_text_is_none(self, protocol_command_executor,
+                                       patch_utc_now, dt):
+        payload = {
+            '$': 'before',
+            'name': 'some event',
+            'payload': {
+                'text': None
+            }
+        }
+        await protocol_command_executor.on_protocol_event(payload)
+        assert protocol_command_executor.events == [
+            ProtocolSessionEvent(source=EventSource.protocol_event,
+                                 event="some event.start",
+                                 commandId="1",
+                                 timestamp=dt,
+                                 params={'text': None})
+        ]
+
+    async def test_before_text_is_format_string(self,
+                                                protocol_command_executor,
+                                                patch_utc_now,
+                                                dt):
+        payload = {
+            '$': 'before',
+            'name': 'some event',
+            'payload': {
+                'text': '{oh} {no}',
+                'oh': 2,
+                'no': 5
+            }
+        }
+        await protocol_command_executor.on_protocol_event(payload)
+        assert protocol_command_executor.events == [
+            ProtocolSessionEvent(source=EventSource.protocol_event,
+                                 event="some event.start",
+                                 commandId="1",
+                                 timestamp=dt,
+                                 params={'text': '2 5'})
+        ]
+
     async def test_after(self, protocol_command_executor, patch_utc_now, dt):
         payload = {
             '$': 'after',
