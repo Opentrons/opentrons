@@ -41,8 +41,8 @@ def dt() -> datetime:
 
 @pytest.fixture
 def patch_utc_now(dt: datetime):
-    with patch.object(command_executor, 'datetime') as p:
-        p.now.side_effect = lambda tz: dt
+    with patch.object(command_executor, 'utc_now') as p:
+        p.return_value = dt
         yield p
 
 
