@@ -43,7 +43,7 @@ beforeEach(() => {
     mixBeforeAspirate: null,
     aspirateDelay: null,
     dispenseDelay: null,
-
+    aspirateAirGapVolume: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
