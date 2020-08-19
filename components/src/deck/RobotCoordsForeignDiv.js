@@ -36,7 +36,7 @@ export const RobotCoordsForeignDiv = (
     >
       <div
         {...innerDivProps}
-        style={transformWithSVG ? { transform } : {}}
+        style={transformWithSVG ? {} : { transform }}
         xmlns="http://www.w3.org/1999/xhtml"
       >
         {children}
