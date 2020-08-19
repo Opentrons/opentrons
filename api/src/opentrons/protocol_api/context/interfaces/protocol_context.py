@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 from abc import ABC, abstractmethod
 from typing import (Dict, List, Optional, Union, TYPE_CHECKING)
