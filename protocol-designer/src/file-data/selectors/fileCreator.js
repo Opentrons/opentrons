@@ -26,6 +26,7 @@ import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6
 import type { ModuleEntity } from '../../step-forms'
 import type { Selector } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
+import type { Timeline } from '../../step-generation/types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -50,6 +51,26 @@ const _isV3Command = (command: Command): boolean =>
   command.command === 'moveToSlot' ||
   command.command === 'delay'
 
+// This is a HACK to allow PD to not have to export protocols under the not-yet-released
+// v6 schema with the dispenseAirGap command, by replacing all dispenseAirGaps with dispenses
+// Once we have v6 in the wild, just use the ordinary getRobotStateTimeline and
+// delete this getRobotStateTimelineWithoutAirGapDispenseCommand.
+export const getRobotStateTimelineWithoutAirGapDispenseCommand: Selector<Timeline> = createSelector(
+  getRobotStateTimeline,
+  robotStateTimeline => {
+    const timeline = robotStateTimeline.timeline.map(frame => ({
+      ...frame,
+      commands: frame.commands.map(command => {
+        if (command.command === 'dispenseAirGap') {
+          return { ...command, command: 'dispense' }
+        }
+        return command
+      }),
+    }))
+    return { ...robotStateTimeline, timeline }
+  }
+)
+
 /** If there are any module entities or and v4-specific commands,
  ** export as a v4 protocol. Otherwise, export as v3.
  **
@@ -58,7 +79,7 @@ const _isV3Command = (command: Command): boolean =>
  ** form/timeline errors. Checking for v4 commands should be redundant,
  ** we do it just in case non-V3 commands somehow sneak in despite having no modules. */
 export const getIsV4Protocol: Selector<boolean> = createSelector(
-  getRobotStateTimeline,
+  getRobotStateTimelineWithoutAirGapDispenseCommand,
   stepFormSelectors.getModuleEntities,
   (robotStateTimeline, moduleEntities) => {
     const noModules = isEmpty(moduleEntities)
@@ -74,7 +95,7 @@ export const getIsV4Protocol: Selector<boolean> = createSelector(
 export const createFile: Selector<PDProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
-  getRobotStateTimeline,
+  getRobotStateTimelineWithoutAirGapDispenseCommand,
   dismissSelectors.getAllDismissedWarnings,
   ingredSelectors.getLiquidGroupsById,
   ingredSelectors.getLiquidsByLabwareId,
