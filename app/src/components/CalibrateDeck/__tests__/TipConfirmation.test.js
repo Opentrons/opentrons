@@ -29,6 +29,7 @@ describe('TipConfirmation', () => {
         tipRack = mockDeckCalTipRack,
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
+        currentStep = Sessions.DECK_STEP_INSPECTING_TIP,
       } = props
       return mount(
         <TipConfirmation
@@ -37,6 +38,7 @@ describe('TipConfirmation', () => {
           tipRack={tipRack}
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
+          currentStep={currentStep}
         />
       )
     }

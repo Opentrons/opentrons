@@ -14,9 +14,6 @@ describe('SaveXYPoint', () => {
   const mockSendCommand = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getSaveButton = wrapper =>
-    wrapper.find('PrimaryButton[children="save x and y-axis"]').find('button')
-
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
@@ -30,6 +27,7 @@ describe('SaveXYPoint', () => {
         tipRack = mockDeckCalTipRack,
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
+        currentStep = Sessions.DECK_STEP_SAVING_POINT_ONE,
       } = props
       return mount(
         <SaveXYPoint
@@ -38,6 +36,7 @@ describe('SaveXYPoint', () => {
           tipRack={tipRack}
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
+          currentStep={currentStep}
         />
       )
     }
@@ -140,10 +139,14 @@ describe('SaveXYPoint', () => {
     })
   })
 
-  it('sends save offset command when primary button is clicked', () => {
+  it('sends save offset and move to point two commands when current step is savingPointOne', () => {
     const wrapper = render()
 
-    act(() => getSaveButton(wrapper).invoke('onClick')())
+    act(() =>
+      wrapper
+        .find('PrimaryButton[children="save calibration and move to slot 3"]')
+        .invoke('onClick')()
+    )
     wrapper.update()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
@@ -151,6 +154,44 @@ describe('SaveXYPoint', () => {
     )
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.deckCalCommands.MOVE_TO_POINT_TWO
+    )
+  })
+
+  it('sends save offset and move to point three commands when current step is savingPointTwo', () => {
+    const wrapper = render({ currentStep: Sessions.DECK_STEP_SAVING_POINT_TWO })
+
+    act(() =>
+      wrapper
+        .find('PrimaryButton[children="save calibration and move to slot 7"]')
+        .invoke('onClick')()
+    )
+    wrapper.update()
+
+    expect(mockSendCommand).toHaveBeenCalledWith(
+      Sessions.deckCalCommands.SAVE_OFFSET
+    )
+    expect(mockSendCommand).toHaveBeenCalledWith(
+      Sessions.deckCalCommands.MOVE_TO_POINT_THREE
+    )
+  })
+
+  it('sends save offset and move to tip rack commands when current step is savingPointThree', () => {
+    const wrapper = render({
+      currentStep: Sessions.DECK_STEP_SAVING_POINT_THREE,
+    })
+
+    act(() =>
+      wrapper
+        .find('PrimaryButton[children="save calibration"]')
+        .invoke('onClick')()
+    )
+    wrapper.update()
+
+    expect(mockSendCommand).toHaveBeenCalledWith(
+      Sessions.deckCalCommands.SAVE_OFFSET
+    )
+    expect(mockSendCommand).toHaveBeenCalledWith(
+      Sessions.deckCalCommands.MOVE_TO_TIP_RACK
     )
   })
 })

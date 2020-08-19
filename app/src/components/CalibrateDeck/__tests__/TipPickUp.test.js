@@ -27,6 +27,7 @@ describe('TipPickUp', () => {
         tipRack = mockDeckCalTipRack,
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
+        currentStep = Sessions.DECK_STEP_PREPARING_PIPETTE,
       } = props
       return mount(
         <TipPickUp
@@ -35,6 +36,7 @@ describe('TipPickUp', () => {
           tipRack={tipRack}
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
+          currentStep={currentStep}
         />
       )
     }
