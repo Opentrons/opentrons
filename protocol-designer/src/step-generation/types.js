@@ -62,7 +62,7 @@ export type SharedTransferLikeArgs = {
   changeTip: ChangeTipOptions,
   /** Delay after every aspirate */
   aspirateDelay: ?InnerDelayArgs,
-  /** Delay after every aspirate */
+  /** Air gap after every aspirate */
   aspirateAirGapVolume: number | null,
   /** Flow rate in uL/sec for all aspirates */
   aspirateFlowRateUlSec: number,

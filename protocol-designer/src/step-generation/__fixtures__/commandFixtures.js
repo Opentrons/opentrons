@@ -1,6 +1,7 @@
 // @flow
 import { tiprackWellNamesFlat } from './data'
 import type {
+  AirGapParams,
   AspirateParams,
   BlowoutParams,
   DispenseParams,
@@ -94,6 +95,10 @@ type MakeAspDispHelper<P> = (
   bakedParams?: $Shape<P>
 ) => (well: string, volume: number, params?: $Shape<P>) => Command
 
+type MakeAirGapHelper<P> = (
+  bakedParams: $Shape<P> & { offsetFromBottomMm: number }
+) => (well: string, volume: number, params?: $Shape<P>) => Command
+
 const _defaultAspirateParams = {
   pipette: DEFAULT_PIPETTE,
   labware: SOURCE_LABWARE,
@@ -110,6 +115,22 @@ export const makeAspirateHelper: MakeAspDispHelper<AspirateParams> = bakedParams
     well,
     volume,
     offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    flowRate: ASPIRATE_FLOW_RATE,
+    ...params,
+  },
+})
+
+export const makeAirGapHelper: MakeAirGapHelper<AirGapParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
+  command: 'airGap',
+  params: {
+    ..._defaultAspirateParams,
+    ...bakedParams,
+    well,
+    volume,
     flowRate: ASPIRATE_FLOW_RATE,
     ...params,
   },

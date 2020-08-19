@@ -11,6 +11,7 @@ import {
   getFlowRateAndOffsetParams,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
   makeDispenseHelper,
@@ -20,6 +21,8 @@ import {
 } from '../__fixtures__'
 import { transfer } from '../commandCreators/compound/transfer'
 
+// well depth for 96 plate is 10.54, so need to add 1mm to top of well
+const airGapHelper = makeAirGapHelper({offsetFromBottomMm: 11.54})
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
@@ -637,7 +640,28 @@ describe('advanced options', () => {
       ])
     })
 
-    it.todo('air gap => ???') // TODO determine behavior
+    it('should air gap after aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateAirGapVolume: 5,
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        // aspirate air gap
+        airGapHelper('A1', 5)
+        // dispense air gap
+        dispenseHelper('B1', 300),
+
+        aspirateHelper('A1', 50),
+        // air gap
+        // dispense air gap
+        dispenseHelper('B1', 50),
+      ])
+    })
   })
 
   describe('...dispense options', () => {
