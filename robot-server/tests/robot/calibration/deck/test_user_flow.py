@@ -62,6 +62,28 @@ async def test_pick_up_tip(mock_user_flow):
     assert uf._tip_origin_pt == cur_pt
 
 
+async def test_save_default_pick_up_current(mock_hw):
+    # make sure pick up current for multi-channels is
+    # modified during tip pick up
+    pip = pipette.Pipette("p20_multi_v2.1",
+                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          'testid')
+    mock_hw._attached_instruments[Mount.LEFT] = pip
+    uf = DeckCalibrationUserFlow(hardware=mock_hw)
+
+    def mock_update_config_item(*args, **kwargs):
+        pass
+
+    uf._hw_pipette.update_config_item = MagicMock(
+        side_effect=mock_update_config_item)
+    default_current = pip.config.pick_up_current
+    update_config_calls = [
+        call('pick_up_current', 0.1),
+        call('pick_up_current', default_current)]
+    await uf.pick_up_tip()
+    uf._hw_pipette.update_config_item.assert_has_calls(update_config_calls)
+
+
 async def test_return_tip(mock_user_flow):
     uf = mock_user_flow
     uf._tip_origin_pt = Point(1, 1, 1)
