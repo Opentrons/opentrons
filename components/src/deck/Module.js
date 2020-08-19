@@ -34,6 +34,7 @@ export function Module(props: ModuleProps): React.Node {
   let { xDimension: width, yDimension: height } = slot.boundingBox
   const shouldFlip = FLIPPED_SLOTS.includes(slot.id)
 
+  // TODO: BC 2019-7-23 get these from shared-data module defs, once available
   switch (model) {
     case MAGNETIC_MODULE_V1:
     case MAGNETIC_MODULE_V2: {
