@@ -1,6 +1,6 @@
 // @flow
 import type { State } from '../types'
-import { every } from 'lodash'
+import { some } from 'lodash'
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -113,7 +113,7 @@ const getIntercomPropsFromCalibrationCheck: (
     return val
   }
 
-  const succeeded = every(
+  const succeeded = !some(
     Object.keys(comparisonsByStep).map(k =>
       boolValueOrNull(comparisonsByStep[k].exceedsThreshold)
     )

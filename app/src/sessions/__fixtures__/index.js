@@ -261,7 +261,7 @@ export const mockCalibrationCheckSessionIntercomProps = {
     mockRobotCalibrationCheckSessionDetails.instruments.left.model,
   rightPipetteModel:
     mockRobotCalibrationCheckSessionDetails.instruments.right.model,
-  succeeded: false,
+  succeeded: true,
   comparingFirstPipetteHeightExceedsThreshold:
     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
       .comparingFirstPipetteHeight.exceedsThreshold,
