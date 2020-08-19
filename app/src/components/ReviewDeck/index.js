@@ -10,7 +10,7 @@ import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import secureTCLatchSrc from '../../img/secure_tc_latch.png'
+import secureTCLatchSrc from '../../assets/images/secure_tc_latch.png'
 import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
 
 import { Portal } from '../portal'

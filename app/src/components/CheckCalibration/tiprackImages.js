@@ -6,15 +6,15 @@
 
 export const tiprackImages = {
   opentrons_96_tiprack_1000ul: [
-    require('../../img/labware/opentrons_96_tiprack_1000ul_side_view.jpg'),
+    require('../../assets/images/labware/opentrons_96_tiprack_1000ul_side_view.jpg'),
   ],
   opentrons_96_tiprack_10ul: [
-    require('../../img/labware/opentrons_96_tiprack_10ul_side_view.jpg'),
+    require('../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg'),
   ],
   opentrons_96_tiprack_20ul: [
-    require('../../img/labware/opentrons_96_tiprack_10ul_side_view.jpg'),
+    require('../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg'),
   ],
   opentrons_96_tiprack_300ul: [
-    require('../../img/labware/opentrons_96_tiprack_300ul_side_view.jpg'),
+    require('../../assets/images/labware/opentrons_96_tiprack_300ul_side_view.jpg'),
   ],
 }

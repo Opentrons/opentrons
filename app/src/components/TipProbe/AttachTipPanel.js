@@ -10,8 +10,8 @@ import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import attachSingle from '../../img/attach_tip_single.png'
-import attachMulti from '../../img/attach_tip_multi.png'
+import attachSingle from '../../assets/images/attach_tip_single.png'
+import attachMulti from '../../assets/images/attach_tip_multi.png'
 import styles from './tip-probe.css'
 
 import type { Dispatch } from '../../types'

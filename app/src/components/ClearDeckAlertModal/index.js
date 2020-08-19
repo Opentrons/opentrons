@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
-import removeTrashSrc from './img/trash@3x.png'
+import removeTrashSrc from './assets/images/trash@3x.png'
 import styles from './styles.css'
 
 export type ClearDeckAlertModalProps = {|
