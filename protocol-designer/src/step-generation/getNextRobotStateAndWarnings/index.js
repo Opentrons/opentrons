@@ -25,7 +25,7 @@ import {
   forSetTemperature,
   forDeactivateTemperature,
 } from './temperatureUpdates'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type {
   InvariantContext,
   RobotState,
@@ -56,9 +56,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'pickUpTip':
       forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
       break
-    case 'airGap':
-      // TODO: IL 2019-11-19 implement air gap (eventually)
-      break
     case 'magneticModule/engageMagnet':
       forEngageMagnet(command.params, invariantContext, robotStateAndWarnings)
       break
@@ -71,6 +68,8 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'touchTip':
     case 'delay':
+    case 'airGap':
+    case 'dispenseAirGap':
     case 'moveToWell':
       // these commands don't have any effects on the state
       break

@@ -22,7 +22,7 @@ import type {
   FileLabware,
   FileModule,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { ModuleEntity } from '../../step-forms'
 import type { Selector } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
