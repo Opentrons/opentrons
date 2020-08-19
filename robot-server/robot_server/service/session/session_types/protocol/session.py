@@ -52,7 +52,7 @@ class ProtocolSession(BaseSession):
         return ProtocolSessionDetails(
             protocolId=self._uploaded_protocol.meta.identifier,
             currentState=self._command_executor.current_state,
-            commands=self._command_executor.commands
+            events=self._command_executor.events
         )
 
     @property
