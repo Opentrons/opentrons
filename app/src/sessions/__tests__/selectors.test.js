@@ -131,6 +131,61 @@ const SPECS: Array<SelectorSpec> = [
     args: ['germanium-cobweb', 'fake_nonexistent_session_id'],
     expected: null,
   },
+  {
+    name:
+      'getIntercomEventPropsForRobotSessionById returns props for check cal session',
+    selector: Selectors.getIntercomEventPropsForRobotSessionById,
+    state: {
+      sessions: {
+        'germanium-cobweb': {
+          robotSessions: {
+            [Fixtures.mockSessionId]:
+              Fixtures.mockCalibrationCheckSessionAttributes,
+          },
+        },
+      },
+    },
+    args: ['germanium-cobweb', Fixtures.mockSessionId],
+    expected: Fixtures.mockCalibrationCheckSessionIntercomProps,
+  },
+  {
+    name:
+      'getIntercomEventPropsForRobotSessionById returns null for untracked session type',
+    selector: Selectors.getIntercomEventPropsForRobotSessionById,
+    state: {
+      sessions: {
+        'germanium-cobweb': {
+          robotSessions: {
+            [Fixtures.mockSessionId]: {
+              ...Fixtures.mockCalibrationCheckSessionAttributes,
+              sessionType: 'FakeUntrackedSessionType',
+            },
+          },
+        },
+      },
+    },
+    args: ['germanium-cobweb', Fixtures.mockSessionId],
+    expected: null,
+  },
+  {
+    name:
+      'getIntercomEventPropsForRobotSessionById returns null if session not found',
+    selector: Selectors.getIntercomEventPropsForRobotSessionById,
+    state: {
+      sessions: {
+        'germanium-cobweb': {
+          robotSessions: {
+            [Fixtures.mockSessionId]: {
+              ...Fixtures.mockCalibrationCheckSessionAttributes,
+              sessionType: 'FakeUntrackedSessionType',
+            },
+          },
+        },
+      },
+    },
+    args: ['germanium-cobweb', 'fake_nonexistent_session_id'],
+    expected: null,
+  },
 ]
 
 describe('sessions selectors', () => {
