@@ -291,8 +291,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []
 
-          // air gap(spirateAirGapVolume)
-          // dispenseAirGap(aspirateAirGapVolume)
           const airGapAfterAspirateCommands = aspirateAirGapVolume
             ? [
                 curryCommandCreator(airGap, {

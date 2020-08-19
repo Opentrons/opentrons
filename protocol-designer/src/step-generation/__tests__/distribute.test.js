@@ -13,9 +13,11 @@ import {
   getRobotInitialStateNoTipsRemain,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
   makeDispenseHelper,
+  makeDispenseAirGapHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
@@ -23,6 +25,11 @@ import {
 import { distribute } from '../commandCreators/compound/distribute'
 import type { DistributeArgs } from '../types'
 
+// well depth for 96 plate is 10.54, so need to add 1mm to top of well
+const airGapHelper = makeAirGapHelper({ offsetFromBottomMm: 11.54 })
+const dispenseAirGapHelper = makeDispenseAirGapHelper({
+  offsetFromBottomMm: 11.54,
+})
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
@@ -342,6 +349,122 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       dispenseHelper('A5', 100),
     ])
   })
+  it('should delay after air gap aspirate and regular aspirate', () => {
+    const distributeArgs: DistributeArgs = {
+      ...mixinArgs,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3', 'A4', 'A5'],
+      changeTip: 'never',
+      volume: 100,
+      aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      aspirateAirGapVolume: 5,
+      // no blowout
+      disposalVolume: 0,
+    }
+
+    const result = distribute(
+      distributeArgs,
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 200),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
+
+      airGapHelper('A1', 5),
+      delayCommand(12),
+
+      dispenseAirGapHelper('A2', 5),
+      dispenseHelper('A2', 100),
+      dispenseHelper('A3', 100),
+
+      aspirateHelper('A1', 200),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
+
+      airGapHelper('A1', 5),
+      delayCommand(12),
+      dispenseAirGapHelper('A4', 5),
+      dispenseHelper('A4', 100),
+      dispenseHelper('A5', 100),
+    ])
+  })
+
+  it('should air gap after aspirate and break into two chunks', () => {
+    const distributeArgs: DistributeArgs = {
+      ...mixinArgs,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3', 'A4', 'A5'],
+      changeTip: 'never',
+      volume: 100,
+      aspirateAirGapVolume: 5,
+      // no blowout
+      disposalVolume: 0,
+    }
+
+    const result = distribute(
+      distributeArgs,
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 200),
+      airGapHelper('A1', 5),
+      dispenseAirGapHelper('A2', 5),
+      dispenseHelper('A2', 100),
+      dispenseHelper('A3', 100),
+
+      aspirateHelper('A1', 200),
+      airGapHelper('A1', 5),
+      dispenseAirGapHelper('A4', 5),
+      dispenseHelper('A4', 100),
+      dispenseHelper('A5', 100),
+    ])
+  })
+
+  it('should delay after air gap dispense and regular dispense', () => {
+    const distributeArgs: DistributeArgs = {
+      ...mixinArgs,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3', 'A4', 'A5'],
+      changeTip: 'never',
+      volume: 100,
+      dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      aspirateAirGapVolume: 5,
+      // no blowout
+      disposalVolume: 0,
+    }
+
+    const result = distribute(
+      distributeArgs,
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 200),
+      airGapHelper('A1', 5),
+
+      dispenseAirGapHelper('A2', 5),
+      delayCommand(12),
+      dispenseHelper('A2', 100),
+      ...delayWithOffset('A2', DEST_LABWARE),
+      dispenseHelper('A3', 100),
+      ...delayWithOffset('A3', DEST_LABWARE),
+
+      aspirateHelper('A1', 200),
+      airGapHelper('A1', 5),
+
+      dispenseAirGapHelper('A4', 5),
+      delayCommand(12),
+      dispenseHelper('A4', 100),
+      ...delayWithOffset('A4', DEST_LABWARE),
+      dispenseHelper('A5', 100),
+      ...delayWithOffset('A5', DEST_LABWARE),
+    ])
+  })
+
   it('should delay after mix aspirate and regular aspirate', () => {
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
