@@ -7,7 +7,7 @@ import type {
   DispenseParams,
   TouchTipParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results
@@ -99,6 +99,8 @@ type MakeAirGapHelper<P> = (
   bakedParams: $Shape<P> & { offsetFromBottomMm: number }
 ) => (well: string, volume: number, params?: $Shape<P>) => Command
 
+type MakeDispenseAirGapHelper<P> = MakeAirGapHelper<P>
+
 const _defaultAspirateParams = {
   pipette: DEFAULT_PIPETTE,
   labware: SOURCE_LABWARE,
@@ -163,6 +165,21 @@ export const makeDispenseHelper: MakeAspDispHelper<DispenseParams> = bakedParams
   params
 ) => ({
   command: 'dispense',
+  params: {
+    ..._defaultDispenseParams,
+    ...bakedParams,
+    well,
+    volume,
+    ...params,
+  },
+})
+
+export const makeDispenseAirGapHelper: MakeDispenseAirGapHelper<AirGapParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
+  command: 'dispenseAirGap',
   params: {
     ..._defaultDispenseParams,
     ...bakedParams,
