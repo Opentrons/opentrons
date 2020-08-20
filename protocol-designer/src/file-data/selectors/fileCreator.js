@@ -40,10 +40,10 @@ const applicationVersion: string = process.env.OT_PD_VERSION || ''
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
 // NOTE: V3 commands are a subset of V4 commands.
+// 'airGap' is specified in the V3 schema but was never implemented, so it doesn't count.
 const _isV3Command = (command: Command): boolean =>
   command.command === 'aspirate' ||
   command.command === 'dispense' ||
-  command.command === 'airGap' ||
   command.command === 'blowout' ||
   command.command === 'touchTip' ||
   command.command === 'pickUpTip' ||
@@ -91,6 +91,17 @@ export const getIsV4Protocol: Selector<boolean> = createSelector(
   }
 )
 
+const requiresV5 = (command: Command): boolean =>
+  command.command === 'moveToWell'
+export const getRequiresV5: Selector<boolean> = createSelector(
+  getRobotStateTimelineWithoutAirGapDispenseCommand,
+  robotStateTimeline => {
+    return robotStateTimeline.timeline.some(timelineFrame =>
+      timelineFrame.commands.some(command => requiresV5)
+    )
+  }
+)
+
 // $FlowFixMe(IL, 2020-03-02): presence of non-v3 commands should make 'isV4Protocol' true
 export const createFile: Selector<PDProtocolFile> = createSelector(
   getFileMetadata,
@@ -107,6 +118,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
   getIsV4Protocol,
+  getRequiresV5,
   (
     fileMetadata,
     initialRobotState,
@@ -121,7 +133,8 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
     pipetteEntities,
     labwareNicknamesById,
     labwareDefsByURI,
-    isV4Protocol
+    isV4Protocol,
+    requiresV5
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
@@ -233,7 +246,15 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       labwareDefinitions,
     }
 
-    if (isV4Protocol) {
+    if (requiresV5) {
+      return {
+        ...protocolFile,
+        $otSharedSchema: '#/protocol/schemas/5',
+        schemaVersion: 5,
+        modules,
+        commands,
+      }
+    } else if (isV4Protocol) {
       return {
         ...protocolFile,
         $otSharedSchema: '#/protocol/schemas/4',
