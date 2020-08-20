@@ -177,7 +177,7 @@ export function SaveXYPoint(props: CalibrateDeckChildProps): React.Node {
       <div className={styles.tip_pick_up_controls_wrapper}>
         <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['x', 'y']} />
       </div>
-      <Flex width="100%">
+      <Flex width="100%" marginBottom={SPACING_3}>
         <PrimaryButton onClick={savePoint} className={styles.command_button}>
           {buttonText}
         </PrimaryButton>

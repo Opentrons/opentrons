@@ -14,7 +14,9 @@ describe('SaveZPoint', () => {
   const mockDeleteSession = jest.fn()
 
   const getSaveButton = wrapper =>
-    wrapper.find('PrimaryButton[children="save z-axis"]').find('button')
+    wrapper
+      .find('PrimaryButton[children="remember z-axis and move to slot 1"]')
+      .find('button')
 
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')

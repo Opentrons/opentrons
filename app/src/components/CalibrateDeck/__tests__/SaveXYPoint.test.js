@@ -8,6 +8,11 @@ import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
 import { SaveXYPoint } from '../SaveXYPoint'
 
+const currentStepBySlot = {
+  '1': Sessions.DECK_STEP_SAVING_POINT_ONE,
+  '3': Sessions.DECK_STEP_SAVING_POINT_TWO,
+  '7': Sessions.DECK_STEP_SAVING_POINT_THREE,
+}
 describe('SaveXYPoint', () => {
   let render
 
@@ -47,60 +52,57 @@ describe('SaveXYPoint', () => {
 
   it('displays proper asset', () => {
     const slot1LeftMultiSrc = 'SLOT_1_LEFT_MULTI_X-Y.webm'
-    // TODO: IMMEDIATELY Uncomment all other cases when supported in component
-    // const slot1LeftSingleSrc = 'SLOT_1_LEFT_SINGLE_X-Y.webm'
-    // const slot1RightMultiSrc = 'SLOT_1_RIGHT_MULTI_X-Y.webm'
-    // const slot1RightSingleSrc = 'SLOT_1_RIGHT_SINGLE_X-Y.webm'
-    // const slot3LeftMultiSrc = 'SLOT_3_LEFT_MULTI_X-Y.webm'
-    // const slot3LeftSingleSrc = 'SLOT_3_LEFT_SINGLE_X-Y.webm'
-    // const slot3RightMultiSrc = 'SLOT_3_RIGHT_MULTI_X-Y.webm'
-    // const slot3RightSingleSrc = 'SLOT_3_RIGHT_SINGLE_X-Y.webm'
-    // const slot7LeftMultiSrc = 'SLOT_7_LEFT_MULTI_X-Y.webm'
-    // const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y.webm'
-    // const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y.webm'
-    // const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y.webm'
+    const slot1LeftSingleSrc = 'SLOT_1_LEFT_SINGLE_X-Y.webm'
+    const slot1RightMultiSrc = 'SLOT_1_RIGHT_MULTI_X-Y.webm'
+    const slot1RightSingleSrc = 'SLOT_1_RIGHT_SINGLE_X-Y.webm'
+    const slot3LeftMultiSrc = 'SLOT_3_LEFT_MULTI_X-Y.webm'
+    const slot3LeftSingleSrc = 'SLOT_3_LEFT_SINGLE_X-Y.webm'
+    const slot3RightMultiSrc = 'SLOT_3_RIGHT_MULTI_X-Y.webm'
+    const slot3RightSingleSrc = 'SLOT_3_RIGHT_SINGLE_X-Y.webm'
+    const slot7LeftMultiSrc = 'SLOT_7_LEFT_MULTI_X-Y.webm'
+    const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y.webm'
+    const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y.webm'
+    const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y.webm'
     const assetMap: { [string]: { [Mount]: { ... }, ... }, ... } = {
       '1': {
         left: {
-          // TODO: IMMEDIATELY Uncomment other channel cases when supported in component
           multi: slot1LeftMultiSrc,
-          // single: slot1LeftSingleSrc,
+          single: slot1LeftSingleSrc,
         },
-        // TODO: IMMEDIATELY Uncomment other mount cases when supported in component
-        // right: {
-        //   multi: slot1RightMultiSrc,
-        //   single: slot1RightSingleSrc,
-        // },
+        right: {
+          multi: slot1RightMultiSrc,
+          single: slot1RightSingleSrc,
+        },
       },
-      // TODO: IMMEDIATELY Uncomment other slot cases when supported in component
-      // '3': {
-      //   left: {
-      //     multi: slot3LeftMultiSrc,
-      //     single: slot3LeftSingleSrc,
-      //   },
-      //   right: {
-      //     multi: slot3RightMultiSrc,
-      //     single: slot3RightSingleSrc,
-      //   },
-      // },
-      // '7': {
-      //   left: {
-      //     multi: slot7LeftMultiSrc,
-      //     single: slot7LeftSingleSrc,
-      //   },
-      //   right: {
-      //     multi: slot7RightMultiSrc,
-      //     single: slot7RightSingleSrc,
-      //   },
-      // },
+      '3': {
+        left: {
+          multi: slot3LeftMultiSrc,
+          single: slot3LeftSingleSrc,
+        },
+        right: {
+          multi: slot3RightMultiSrc,
+          single: slot3RightSingleSrc,
+        },
+      },
+      '7': {
+        left: {
+          multi: slot7LeftMultiSrc,
+          single: slot7LeftSingleSrc,
+        },
+        right: {
+          multi: slot7RightMultiSrc,
+          single: slot7RightSingleSrc,
+        },
+      },
     }
     Object.keys(assetMap).forEach(slotNumber => {
       const xyStep = assetMap[slotNumber]
       Object.keys(xyStep).forEach(mountString => {
         Object.keys(xyStep[mountString]).forEach(channelString => {
           const wrapper = render({
-            mount: mountString,
+            pipMount: mountString,
             isMulti: channelString === 'multi',
+            currentStep: currentStepBySlot[slotNumber],
           })
           expect(getVideo(wrapper).prop('src')).toEqual(
             xyStep[mountString][channelString]
