@@ -27,6 +27,7 @@ describe('DeckSetup', () => {
         tipRack = mockDeckCalTipRack,
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
+        currentStep = Sessions.DECK_STEP_LABWARE_LOADED,
       } = props
       return mount(
         <DeckSetup
@@ -35,6 +36,7 @@ describe('DeckSetup', () => {
           tipRack={tipRack}
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
+          currentStep={currentStep}
         />
       )
     }

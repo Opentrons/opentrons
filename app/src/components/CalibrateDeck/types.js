@@ -5,7 +5,10 @@ import type {
   DeckCalibrationSession,
 } from '../../sessions/types'
 
-import type { DeckCalibrationLabware } from '../../sessions/deck-calibration/types'
+import type {
+  DeckCalibrationLabware,
+  DeckCalibrationStep,
+} from '../../sessions/deck-calibration/types'
 
 export type CalibrateDeckParentProps = {|
   robotName: string,
@@ -23,4 +26,5 @@ export type CalibrateDeckChildProps = {|
   tipRack: DeckCalibrationLabware,
   isMulti: boolean,
   mount: string,
+  currentStep: DeckCalibrationStep,
 |}

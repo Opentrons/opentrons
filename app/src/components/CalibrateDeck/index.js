@@ -37,28 +37,28 @@ const EXIT = 'exit'
 const PANEL_BY_STEP: {
   [string]: React.ComponentType<CalibrateDeckChildProps>,
 } = {
-  sessionStarted: Introduction,
-  labwareLoaded: DeckSetup,
-  preparingPipette: TipPickUp,
-  inspectingTip: TipConfirmation,
-  joggingToDeck: SaveZPoint,
-  savingPointOne: SaveXYPoint,
-  savingPointTwo: SaveXYPoint,
-  savingPointThree: SaveXYPoint,
-  calibrationComplete: CompleteConfirmation,
+  [Sessions.DECK_STEP_SESSION_STARTED]: Introduction,
+  [Sessions.DECK_STEP_LABWARE_LOADED]: DeckSetup,
+  [Sessions.DECK_STEP_PREPARING_PIPETTE]: TipPickUp,
+  [Sessions.DECK_STEP_INSPECTING_TIP]: TipConfirmation,
+  [Sessions.DECK_STEP_JOGGING_TO_DECK]: SaveZPoint,
+  [Sessions.DECK_STEP_SAVING_POINT_ONE]: SaveXYPoint,
+  [Sessions.DECK_STEP_SAVING_POINT_TWO]: SaveXYPoint,
+  [Sessions.DECK_STEP_SAVING_POINT_THREE]: SaveXYPoint,
+  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
 const PANEL_STYLE_BY_STEP: {
   [string]: string,
 } = {
-  sessionStarted: styles.terminal_modal_contents,
-  labwareLoaded: styles.page_content_dark,
-  preparingPipette: styles.modal_contents,
-  inspectingTip: styles.modal_contents,
-  joggingToDeck: styles.modal_contents,
-  savingPointOne: styles.modal_contents,
-  savingPointTwo: styles.modal_contents,
-  savingPointThree: styles.modal_contents,
-  calibrationComplete: styles.terminal_modal_contents,
+  [Sessions.DECK_STEP_SESSION_STARTED]: styles.terminal_modal_contents,
+  [Sessions.DECK_STEP_LABWARE_LOADED]: styles.page_content_dark,
+  [Sessions.DECK_STEP_PREPARING_PIPETTE]: styles.modal_contents,
+  [Sessions.DECK_STEP_INSPECTING_TIP]: styles.modal_contents,
+  [Sessions.DECK_STEP_JOGGING_TO_DECK]: styles.modal_contents,
+  [Sessions.DECK_STEP_SAVING_POINT_ONE]: styles.modal_contents,
+  [Sessions.DECK_STEP_SAVING_POINT_TWO]: styles.modal_contents,
+  [Sessions.DECK_STEP_SAVING_POINT_THREE]: styles.modal_contents,
+  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: styles.terminal_modal_contents,
 }
 export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
   const { session, robotName, closeWizard } = props
@@ -134,6 +134,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
           tipRack={tipRack}
           isMulti={isMulti}
           mount={mount}
+          currentStep={currentStep}
         />
       </ModalPage>
       {showConfirmExit && (

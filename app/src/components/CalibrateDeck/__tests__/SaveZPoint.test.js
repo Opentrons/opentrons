@@ -29,6 +29,7 @@ describe('SaveZPoint', () => {
         tipRack = mockDeckCalTipRack,
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
+        currentStep = Sessions.DECK_STEP_JOGGING_TO_DECK,
       } = props
       return mount(
         <SaveZPoint
@@ -37,6 +38,7 @@ describe('SaveZPoint', () => {
           tipRack={tipRack}
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
+          currentStep={currentStep}
         />
       )
     }
