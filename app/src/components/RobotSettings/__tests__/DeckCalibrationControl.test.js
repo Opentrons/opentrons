@@ -85,9 +85,10 @@ describe('ControlsCard', () => {
   it('button launches new deck calibration after confirm if feature flag for calibration overhaul is truthy', () => {
     getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
     const wrapper = render()
-    expect(wrapper.find('ConfirmStartDeckCalModel').exists()).toBe(false)
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
     getDeckCalButton(wrapper).invoke('onClick')()
-    expect(wrapper.find('ConfirmStartDeckCalModel').exists()).toBe(true)
+    wrapper.update()
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(true)
 
     getConfirmDeckCalButton(wrapper).invoke('onClick')()
 
@@ -103,13 +104,14 @@ describe('ControlsCard', () => {
   it('button launches new deck calibration and cancel closes if feature flag for calibration overhaul is truthy', () => {
     getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
     const wrapper = render()
-    expect(wrapper.find('ConfirmStartDeckCalModel').exists()).toBe(false)
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
     getDeckCalButton(wrapper).invoke('onClick')()
-    expect(wrapper.find('ConfirmStartDeckCalModel').exists()).toBe(true)
+    wrapper.update()
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(true)
 
     getCancelDeckCalButton(wrapper).invoke('onClick')()
 
-    expect(wrapper.find('ConfirmStartDeckCalModel').exists()).toBe(false)
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
     expect(mockStore.dispatch).not.toHaveBeenCalledWith({
       ...Sessions.ensureSession(
         'robot-name',
