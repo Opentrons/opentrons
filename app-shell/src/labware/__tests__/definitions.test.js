@@ -112,17 +112,17 @@ describe('labware directory utilities', () => {
           {
             filename: files[0],
             data: { name: 'a' },
-            created: expect.any(Number),
+            modified: expect.any(Number),
           },
           {
             filename: files[1],
             data: { name: 'b' },
-            created: expect.any(Number),
+            modified: expect.any(Number),
           },
           {
             filename: files[2],
             data: { name: 'c' },
-            created: expect.any(Number),
+            modified: expect.any(Number),
           },
         ])
       })
@@ -145,13 +145,13 @@ describe('labware directory utilities', () => {
           {
             filename: files[0],
             data: { name: 'a' },
-            created: expect.any(Number),
+            modified: expect.any(Number),
           },
-          { filename: files[1], data: null, created: expect.any(Number) },
+          { filename: files[1], data: null, modified: expect.any(Number) },
           {
             filename: files[2],
             data: { name: 'c' },
-            created: expect.any(Number),
+            modified: expect.any(Number),
           },
         ])
       })
@@ -175,7 +175,7 @@ describe('labware directory utilities', () => {
             {
               filename: expectedName,
               data: { name: 'a' },
-              created: expect.any(Number),
+              modified: expect.any(Number),
             },
           ])
         })
@@ -203,7 +203,7 @@ describe('labware directory utilities', () => {
           expect(files).toContainEqual({
             filename: expectedName,
             data: { name: 'a' },
-            created: expect.any(Number),
+            modified: expect.any(Number),
           })
         })
     })

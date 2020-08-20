@@ -6,7 +6,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 type LabwareFileProps = {|
   filename: string,
-  created: number,
+  modified: number,
 |}
 
 type ValidatedLabwareProps = {|

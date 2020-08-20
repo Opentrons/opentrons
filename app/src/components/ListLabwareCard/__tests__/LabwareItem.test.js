@@ -17,14 +17,14 @@ describe('LabwareItem', () => {
     type: CustomLabware.INVALID_LABWARE_FILE,
     filename: 'some_file.json',
     // Oct 21, 2019, 20:00:00 UTC
-    created: 1571688000000,
+    modified: 1571688000000,
   }
 
   const validFile: ValidLabwareFile = {
     type: CustomLabware.VALID_LABWARE_FILE,
     filename: 'some_file.json',
     // Oct 21, 2019, 20:00:00 UTC
-    created: 1571688000000,
+    modified: 1571688000000,
     definition: {
       ...CustomLabwareFixtures.mockDefinition,
       parameters: {

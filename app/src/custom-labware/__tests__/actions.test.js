@@ -23,15 +23,15 @@ describe('custom labware actions', () => {
       creator: actions.customLabwareList,
       args: [
         [
-          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 },
-          { type: 'INVALID_LABWARE_FILE', filename: 'b.json', created: 1 },
+          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 },
+          { type: 'INVALID_LABWARE_FILE', filename: 'b.json', modified: 1 },
         ],
       ],
       expected: {
         type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [
-          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 },
-          { type: 'INVALID_LABWARE_FILE', filename: 'b.json', created: 1 },
+          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 },
+          { type: 'INVALID_LABWARE_FILE', filename: 'b.json', modified: 1 },
         ],
         meta: { source: 'poll' },
       },
@@ -40,13 +40,13 @@ describe('custom labware actions', () => {
       name: 'customLabwareList from source',
       creator: actions.customLabwareList,
       args: [
-        [{ type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 }],
+        [{ type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 }],
         'changeDirectory',
       ],
       expected: {
         type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [
-          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 },
+          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 },
         ],
         meta: { source: 'changeDirectory' },
       },
@@ -103,7 +103,7 @@ describe('custom labware actions', () => {
     {
       name: 'addCustomLabwareFailure with failed labware',
       creator: actions.addCustomLabwareFailure,
-      args: [{ type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 }],
+      args: [{ type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 }],
       expected: {
         type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
         payload: {
@@ -111,7 +111,7 @@ describe('custom labware actions', () => {
           labware: {
             type: 'INVALID_LABWARE_FILE',
             filename: 'a.json',
-            created: 0,
+            modified: 0,
           },
         },
       },
