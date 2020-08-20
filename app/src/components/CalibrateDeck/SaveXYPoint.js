@@ -9,6 +9,8 @@ import {
   DIRECTION_ROW,
   SPACING_3,
   BORDER_SOLID_LIGHT,
+  FONT_SIZE_HEADER,
+  FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -131,10 +133,14 @@ export function SaveXYPoint(props: CalibrateDeckChildProps): React.Node {
   return (
     <>
       <div className={styles.modal_header}>
-        <h3>
+        <Text
+          fontSize={FONT_SIZE_HEADER}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          textTransform="uppercase"
+        >
           {SAVE_XY_POINT_HEADER}
           {` ${SLOT} ${slotNumber || ''}`}
-        </h3>
+        </Text>
       </div>
       <Flex
         flexDirection={DIRECTION_ROW}
