@@ -8,7 +8,7 @@ import type {
 import type { Mount } from '../../robot'
 import type { Direction } from './types'
 
-import screwdriverSrc from './images/screwdriver.svg'
+import screwdriverSrc from '../../assets/images/change-pip/screwdriver.svg'
 import styles from './styles.css'
 
 type Diagram = 'screws' | 'tab'
@@ -32,8 +32,8 @@ export function getDiagramsSrc(props: DiagramProps): string {
   const channelsKey = channels === 8 ? 'multi' : 'single'
 
   return displayCategory === 'GEN2'
-    ? require(`./images/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
-    : require(`./images/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
+    ? require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
+    : require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
 }
 
 export function InstructionStep(props: Props): React.Node {

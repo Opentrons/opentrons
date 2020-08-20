@@ -26,9 +26,8 @@ import type { CalibrateDeckChildProps } from './types'
 import styles from './styles.css'
 import { formatJogVector } from './utils'
 
-// TODO: put these assets in a shared location
-import multiDemoAsset from '../CheckCalibration/videos/A1_Multi_Channel_REV1.webm'
-import singleDemoAsset from '../CheckCalibration/videos/A1_Single_Channel_REV1.webm'
+import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
+import singleDemoAsset from '../../assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
 
 const TIP_PICK_UP_HEADER = 'Position pipette over '
 const TIP_PICK_UP_BUTTON_TEXT = 'Pick up tip'

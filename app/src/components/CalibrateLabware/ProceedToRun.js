@@ -8,7 +8,7 @@ import some from 'lodash/some'
 
 import { selectors as robotSelectors } from '../../robot'
 import type { Dispatch } from '../../types'
-import pcrSealSrc from '../../img/place_pcr_seal.png'
+import pcrSealSrc from '../../assets/images/place_pcr_seal.png'
 import { Portal } from '../portal'
 import styles from './styles.css'
 import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
