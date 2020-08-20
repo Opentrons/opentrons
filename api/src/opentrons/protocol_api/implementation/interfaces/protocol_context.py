@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import contextlib
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import (Dict, List, Optional, Union)
 
 from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.protocols.types import APIVersion
+from opentrons.protocol_api.implementation.interfaces.versioned import \
+    ApiVersioned
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.module_geometry import ModuleGeometry
 from opentrons.protocol_api.geometry import Deck
@@ -17,13 +18,7 @@ from opentrons.protocol_api.util import AxisMaxSpeeds
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-class AbstractProtocolContextImpl(ABC):
-    """Abstract interface for an implementation of a protocol context"""
-
-    @abstractmethod
-    def get_api_version(self) -> APIVersion:
-        """Get the api version of the protocol"""
-        ...
+class AbstractProtocolContext(ApiVersioned):
 
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:
