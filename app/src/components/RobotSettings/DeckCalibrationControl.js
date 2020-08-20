@@ -7,6 +7,7 @@ import {
   SecondaryBtn,
   BORDER_SOLID_LIGHT,
   SPACING_2,
+  useConditionalConfirm,
 } from '@opentrons/components'
 
 import { getFeatureFlags } from '../../config'
@@ -20,6 +21,7 @@ import { Portal } from '../portal'
 import { TitledControl } from '../TitledControl'
 import { CalibrateDeck } from '../CalibrateDeck'
 import { DeckCalibrationWarning } from './DeckCalibrationWarning'
+import { ConfirmStartDeckCalModal } from './ConfirmStartDeckCalModal'
 
 type Props = {|
   robotName: string,
@@ -78,8 +80,16 @@ export function DeckCalibrationControl(props: Props): React.Node {
     return null
   })
 
+  const {
+    showConfirmation: showConfirmStart,
+    confirm: confirmStart,
+    cancel: cancelStart,
+  } = useConditionalConfirm(() => {
+    handleStartDeckCalSession()
+  }, true)
+
   const handleButtonClick = ff.enableCalibrationOverhaul
-    ? handleStartDeckCalSession
+    ? confirmStart
     : startLegacyDeckCalibration
 
   return (
@@ -103,6 +113,14 @@ export function DeckCalibrationControl(props: Props): React.Node {
           marginTop={SPACING_2}
         />
       </TitledControl>
+      {showConfirmStart && (
+        <Portal>
+          <ConfirmStartDeckCalModal
+            confirm={confirmStart}
+            cancel={cancelStart}
+          />
+        </Portal>
+      )}
       {showWizard && (
         <Portal>
           <CalibrateDeck
