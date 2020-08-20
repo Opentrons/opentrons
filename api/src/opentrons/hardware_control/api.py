@@ -670,7 +670,7 @@ class API(HardwareAPILike):
                 await stack.enter_async_context(self._motion_lock)
             with self._backend.save_current():
                 self._backend.set_active_current(
-                    checked_axis, instr.config.plunger_current)
+                    {checked_axis: instr.config.plunger_current})
                 smoothie_pos = self._backend.home([checked_axis.name.upper()])
                 smoothie_pos.update(self._backend.update_position())
                 # either we were passed False for our acquire_lock and we
@@ -993,22 +993,42 @@ class API(HardwareAPILike):
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
 
-    async def _move_plunger(self, mount: top_types.Mount, dist: float,
-                            speed: float = None,
+    async def _move_plunger(self, mount: Union[top_types.Mount, PipettePair],
+                            dist: float, speed: float = None,
                             acquire_lock: bool = True):
-        z_axis = Axis.by_mount(mount)
-        pl_axis = Axis.of_plunger(mount)
-        all_axes_pos = OrderedDict(
-            ((Axis.X,
-              self._current_position[Axis.X]),
-             (Axis.Y,
-              self._current_position[Axis.Y]),
-             (z_axis,
-              self._current_position[z_axis]),
-             (pl_axis, dist))
-        )
+        if isinstance(mount, PipettePair):
+            primary_z = Axis.by_mount(mount.primary)
+            primary_pl_axis = Axis.of_plunger(mount.primary)
+            secondary_z = Axis.by_mount(mount.secondary)
+            second_pl_axis = Axis.of_plunger(mount.secondary)
+            all_axes_pos = OrderedDict((
+                (Axis.X,
+                 self._current_position[Axis.X]),
+                (Axis.Y,
+                 self._current_position[Axis.Y]),
+                (primary_z,
+                 self._current_position[primary_z]),
+                (secondary_z,
+                 self._current_position[secondary_z]),
+                (primary_pl_axis, dist),
+                (second_pl_axis, dist))
+            )
+        else:
+            primary_z = Axis.by_mount(mount)
+            primary_pl_axis = Axis.of_plunger(mount)
+            secondary_z = None
+            all_axes_pos = OrderedDict((
+                (Axis.X,
+                 self._current_position[Axis.X]),
+                (Axis.Y,
+                 self._current_position[Axis.Y]),
+                (primary_z,
+                 self._current_position[primary_z]),
+                (primary_pl_axis, dist))
+            )
         await self._move(all_axes_pos, speed, False,
-                         acquire_lock=acquire_lock)
+                         acquire_lock=acquire_lock,
+                         secondary_z=secondary_z)
 
     def _get_transformed(
             self,
@@ -1134,13 +1154,30 @@ class API(HardwareAPILike):
     async def disengage_axes(self, which: List[Axis]):
         self._backend.disengage_axes([ax.name for ax in which])
 
-    async def retract(self, mount: top_types.Mount, margin: float = 10):
+    async def retract(
+            self,
+            mount: Union[top_types.Mount, PipettePair],
+            margin: float = 10,
+            z_axis: bool = True):
         """ Pull the specified mount up to its home position.
 
         Works regardless of critical point or home status.
         """
         await self._wait_for_is_running()
-        smoothie_ax = Axis.by_mount(mount).name.upper()
+        if isinstance(mount, PipettePair):
+            if z_axis:
+                primary_ax = Axis.by_mount(mount.primary).name.upper()
+                secondary_ax = Axis.by_mount(mount.secondary).name.upper()
+            else:
+                primary_ax = Axis.of_plunger(mount.primary).name.upper()
+                secondary_ax = Axis.of_plunger(mount.secondary).name.upper()
+            smoothie_ax = primary_ax + secondary_ax
+        else:
+            if z_axis:
+                smoothie_ax = Axis.by_mount(mount).name.upper()
+            else:
+                smoothie_ax = Axis.of_plunger(mount).name.upper()
+
         async with self._motion_lock:
             smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
             self._current_position = self._deck_from_smoothie(smoothie_pos)
@@ -1284,7 +1321,7 @@ class API(HardwareAPILike):
             return
 
         self._backend.set_active_current(
-            Axis.of_plunger(mount), this_pipette.config.plunger_current)
+            {Axis.of_plunger(mount): this_pipette.config.plunger_current})
         dist = self._plunger_position(
                 this_pipette,
                 this_pipette.current_volume + asp_vol,
@@ -1338,7 +1375,7 @@ class API(HardwareAPILike):
             return
 
         self._backend.set_active_current(
-             Axis.of_plunger(mount), this_pipette.config.plunger_current)
+             {Axis.of_plunger(mount): this_pipette.config.plunger_current})
         dist = self._plunger_position(
                 this_pipette,
                 this_pipette.current_volume - disp_vol,
@@ -1382,8 +1419,8 @@ class API(HardwareAPILike):
             raise top_types.PipetteNotAttachedError(
                 "No pipette attached to {} mount".format(mount.name))
 
-        self._backend.set_active_current(Axis.of_plunger(mount),
-                                         this_pipette.config.plunger_current)
+        self._backend.set_active_current({Axis.of_plunger(mount):
+                                          this_pipette.config.plunger_current})
         speed = self._plunger_speed(
             this_pipette, this_pipette.blow_out_flow_rate, 'dispense')
         try:
@@ -1397,8 +1434,41 @@ class API(HardwareAPILike):
             this_pipette.set_current_volume(0)
             this_pipette.ready_to_aspirate = False
 
+    def _prepare_for_tip_action(
+            self,
+            mount: Union[top_types.Mount, PipettePair],
+            action: str) -> Tuple[
+                Pipette, top_types.Mount,
+                Optional[Pipette], Optional[top_types.Mount]]:
+
+        secondary_mount: Optional[top_types.Mount] = None
+        if isinstance(mount, PipettePair):
+            primary_mount = mount.primary
+            secondary_mount = mount.secondary
+            instr1 = self._attached_instruments[primary_mount]
+            instr2 = self._attached_instruments[secondary_mount]
+            assert instr1 and instr2, \
+                (f'No instrument on {primary_mount.name}'
+                 ' or {secondary_mount.name}')
+            if action == 'pickup':
+                assert not instr1.has_tip and not instr2.has_tip, \
+                    'Tip already attached'
+            else:
+                assert instr1.has_tip and instr2.has_tip, \
+                    'Cannot drop tip without a tip attached'
+        else:
+            primary_mount = mount
+            instr1 = self._attached_instruments[primary_mount]
+            instr2 = None
+            assert instr1, f'No instrument on {primary_mount.name}'
+            if action == 'pickup':
+                assert not instr1.has_tip, 'Tip already attached'
+            else:
+                assert instr1.has_tip, 'Cannot drop tip without a tip attached'
+        return instr1, primary_mount, instr2, secondary_mount
+
     async def pick_up_tip(self,
-                          mount,
+                          mount: Union[top_types.Mount, PipettePair],
                           tip_length: float,
                           presses: int = None,
                           increment: float = None):
@@ -1406,7 +1476,7 @@ class API(HardwareAPILike):
         Pick up tip from current location.
 
         This is achieved by attempting to move the instrument down by its
-        `pick_up_distance`, in a series of presses. This distance is larger
+        `pick_up_distance`, in a series of presses. This distance is largerr
         than the space available in the tip, so the stepper motor will
         eventually skip steps, which is resolved by homing afterwards. The
         pick up operation is done at a current specified in the pipette config,
@@ -1418,25 +1488,39 @@ class API(HardwareAPILike):
         If ``presses`` or ``increment`` is not specified (or is ``None``),
         their value is taken from the pipette configuration.
         """
-        instr = self._attached_instruments[mount]
-        assert instr
-        assert not instr.has_tip, 'Tip already attached'
-        instr_ax = Axis.by_mount(mount)
-        plunger_ax = Axis.of_plunger(mount)
-        self._log.info('Picking up tip on {}'.format(instr.name))
+        p_instr, p_mount, s_instr, s_mount =\
+            self._prepare_for_tip_action(mount, 'pickup')
+        self._log.info('Picking up tip on {}'.format(p_instr.name))
+        if s_instr and s_mount:
+            p1 = Axis.of_plunger(p_mount)
+            p2 = Axis.of_plunger(s_mount)
+            pz_ax = Axis.by_mount(p_mount)
+            sz_ax = Axis.by_mount(s_mount)
+            plunger_currents = {
+                p1: p_instr.config.plunger_current,
+                p2: s_instr.config.plunger_current}
+            z_axis_currents = {
+                pz_ax: p_instr.config.pick_up_current,
+                sz_ax: s_instr.config.pick_up_current}
+        else:
+            p1 = Axis.of_plunger(p_mount)
+            pz_ax = Axis.by_mount(p_mount)
+            plunger_currents = {
+                p1: p_instr.config.plunger_current}
+            z_axis_currents = {pz_ax: p_instr.config.pick_up_current}
+
+        self._backend.set_active_current(plunger_currents)
         # Initialize plunger to bottom position
-        self._backend.set_active_current(plunger_ax,
-                                         instr.config.plunger_current)
         await self._move_plunger(
-            mount, instr.config.bottom)
+            mount, p_instr.config.bottom)
 
         if not presses or presses < 0:
-            checked_presses = instr.config.pick_up_presses
+            checked_presses = p_instr.config.pick_up_presses
         else:
             checked_presses = presses
 
         if not increment or increment < 0:
-            checked_increment = instr.config.pick_up_increment
+            checked_increment = p_instr.config.pick_up_increment
         else:
             checked_increment = increment
 
@@ -1445,27 +1529,29 @@ class API(HardwareAPILike):
         for i in range(checked_presses):
             # move nozzle down into the tip
             with self._backend.save_current():
-                self._backend.set_active_current(instr_ax,
-                                                 instr.config.pick_up_current)
-                dist = -1.0 * instr.config.pick_up_distance\
+                self._backend.set_active_current(z_axis_currents)
+                dist = -1.0 * p_instr.config.pick_up_distance\
                     + -1.0 * checked_increment * i
                 target_pos = top_types.Point(0, 0, dist)
                 await self.move_rel(
-                    mount, target_pos, instr.config.pick_up_speed)
+                    mount, target_pos, p_instr.config.pick_up_speed)
             # move nozzle back up
             backup_pos = top_types.Point(0, 0, -dist)
             await self.move_rel(mount, backup_pos)
-        instr.add_tip(tip_length=tip_length)
-        instr.set_current_volume(0)
+        p_instr.add_tip(tip_length=tip_length)
+        p_instr.set_current_volume(0)
+        if s_instr:
+            s_instr.add_tip(tip_length=tip_length)
+            s_instr.set_current_volume(0)
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
-        if 'pickupTipShake' in instr.config.quirks:
+        if 'pickupTipShake' in p_instr.config.quirks:
             await self._shake_off_tips_pick_up(mount)
             await self._shake_off_tips_pick_up(mount)
 
-        retract_target = instr.config.pick_up_distance\
+        retract_target = p_instr.config.pick_up_distance\
             + checked_increment * checked_presses\
             + 2  # tiny little margin to avoid the switch itself
         await self.retract(mount, retract_target)
@@ -1486,7 +1572,10 @@ class API(HardwareAPILike):
             .format(mount, tip_volume))
         instr.working_volume = tip_volume
 
-    async def drop_tip(self, mount, home_after=True):
+    async def drop_tip(
+            self,
+            mount: Union[top_types.Mount, PipettePair],
+            home_after=True):
         """
         Drop tip at the current location
 
@@ -1496,45 +1585,55 @@ class API(HardwareAPILike):
                                 dropping the tip, and is also used to recover
                                 the ejector shroud after a drop.
         """
-        maybe_instr = self._attached_instruments[mount]
-        assert maybe_instr, f'No instrument on {mount.name}'
-        instr = maybe_instr
-        assert instr.has_tip, 'Cannot drop tip without a tip attached'
-        self._log.info("Dropping tip off from {}".format(instr.name))
-        plunger_ax = Axis.of_plunger(mount)
-        droptip = instr.config.drop_tip
-        bottom = instr.config.bottom
+
+        p_instr, p_mount, s_instr, s_mount =\
+            self._prepare_for_tip_action(mount, 'drop')
+        self._log.info("Dropping tip off from {}".format(p_instr.name))
+        if s_instr and s_mount:
+            p1 = Axis.of_plunger(p_mount)
+            p2 = Axis.of_plunger(s_mount)
+            plunger_currents = {
+                p1: p_instr.config.plunger_current,
+                p2: s_instr.config.plunger_current}
+            drop_tip_currents = {
+                p1: p_instr.config.drop_tip_current,
+                p2: s_instr.config.drop_tip_current}
+        else:
+            p1 = Axis.of_plunger(p_mount)
+            plunger_currents = {
+                p1: p_instr.config.plunger_current}
+            drop_tip_currents = {
+                p1: p_instr.config.drop_tip_current}
+
+        bottom = p_instr.config.bottom
+        droptip = p_instr.config.drop_tip
 
         async def _drop_tip():
-            self._backend.set_active_current(plunger_ax,
-                                             instr.config.plunger_current)
+            self._backend.set_active_current(plunger_currents)
             await self._move_plunger(mount, bottom)
-            self._backend.set_active_current(plunger_ax,
-                                             instr.config.drop_tip_current)
+            self._backend.set_active_current(drop_tip_currents)
             await self._move_plunger(
-                mount, droptip, speed=instr.config.drop_tip_speed)
+                mount, droptip, speed=p_instr.config.drop_tip_speed)
             if home_after:
                 safety_margin = abs(bottom-droptip)
-                async with self._motion_lock:
-                    smoothie_pos = self._backend.fast_home(
-                        plunger_ax.name.upper(), safety_margin)
-                    self._current_position = self._deck_from_smoothie(
-                        smoothie_pos)
-                self._backend.set_active_current(
-                    plunger_ax, instr.config.plunger_current)
+                await self.retract(mount, safety_margin, z_axis=False)
+                self._backend.set_active_current(plunger_currents)
                 await self._move_plunger(mount, bottom)
 
-        if 'doubleDropTip' in instr.config.quirks:
+        if 'doubleDropTip' in p_instr.config.quirks:
             await _drop_tip()
         await _drop_tip()
-        if 'dropTipShake' in instr.config.quirks:
+        if 'dropTipShake' in p_instr.config.quirks:
             await self._shake_off_tips_drop(mount,
-                                            instr.current_tiprack_diameter)
-        self._backend.set_active_current(plunger_ax,
-                                         instr.config.plunger_current)
-        instr.set_current_volume(0)
-        instr.current_tiprack_diameter = 0.0
-        instr.remove_tip()
+                                            p_instr.current_tiprack_diameter)
+        self._backend.set_active_current(plunger_currents)
+        p_instr.set_current_volume(0)
+        p_instr.current_tiprack_diameter = 0.0
+        p_instr.remove_tip()
+        if s_instr:
+            s_instr.set_current_volume(0)
+            s_instr.current_tiprack_diameter = 0.0
+            s_instr.remove_tip()
 
     async def _shake_off_tips_drop(self, mount, tiprack_diameter):
         # tips don't always fall off, especially if resting against
@@ -1556,7 +1655,9 @@ class API(HardwareAPILike):
         up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)
         await self.move_rel(mount, up_pos)
 
-    async def _shake_off_tips_pick_up(self, mount):
+    async def _shake_off_tips_pick_up(
+            self,
+            mount: Union[top_types.Mount, PipettePair]):
         # tips don't always fall off, especially if resting against
         # tiprack or other tips below it. To ensure the tip has fallen
         # first, shake the pipette to dislodge partially-sealed tips,

@@ -13,7 +13,7 @@ from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 from . import modules
 from .execution_manager import ExecutionManager
-from .types import BoardRevision
+from .types import BoardRevision, Axis
 
 
 if TYPE_CHECKING:
@@ -158,8 +158,9 @@ class Simulator:
         return self._position
 
     def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
-        self._position[axis] = _HOME_POSITION[axis]
-        self._engaged_axes[axis] = True
+        for ax in axis:
+            self._position[ax] = _HOME_POSITION[ax]
+            self._engaged_axes[ax] = True
         return self._position
 
     def get_attached_instruments(
@@ -232,7 +233,7 @@ class Simulator:
                     'id': None}
         return to_return
 
-    def set_active_current(self, axis, amp):
+    def set_active_current(self, axis_currents: Dict[Axis, float]):
         pass
 
     async def watch_modules(self, register_modules: 'RegisterModules'):

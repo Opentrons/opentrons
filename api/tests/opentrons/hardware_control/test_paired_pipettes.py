@@ -1,8 +1,26 @@
+import pytest
 from unittest import mock
 
 from opentrons import hardware_control as hc
 from opentrons.hardware_control.types import PipettePair, Axis
 from opentrons import types
+
+
+@pytest.fixture
+def dummy_instruments():
+    dummy_instruments_attached = {
+        types.Mount.LEFT: {
+            'model': 'p300_single_v2.0',
+            'id': 'fake',
+            'name': 'p300_single_gen2'
+        },
+        types.Mount.RIGHT: {
+            'model': 'p300_single_v2.0',
+            'id': 'fake2',
+            'name': 'p300_single_gen2',
+        }
+    }
+    return dummy_instruments_attached
 
 
 async def test_move_z_axis(hardware_api, monkeypatch):
@@ -67,3 +85,93 @@ async def test_move_currents(smoothie, monkeypatch, loop):
                                types.Point(0, 0, 0))
     expected_call_list = [mock.call('XYAZ')]
     assert mock_active_axes.call_args_list == expected_call_list
+
+
+async def test_pick_up_tip(
+        dummy_instruments, loop, is_robot, toggle_new_calibration):
+    hw_api = await hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    mount = PipettePair.PRIMARY_RIGHT
+    await hw_api.home()
+    await hw_api.cache_instruments()
+    tip_position = types.Point(12.13, 9, 150)
+    target_position = {Axis.X: 12.13,
+                       Axis.Y: 9.0,
+                       Axis.Z: 218.0,     # Z retracts after pick_up
+                       Axis.A: 218.0,
+                       Axis.B: -14.5,
+                       Axis.C: -14.5}
+    await hw_api.move_to(mount, tip_position)
+
+    # Note: pick_up_tip without a tip_length argument requires the pipette on
+    # the associated mount to have an assoc=iated tip rack from which to infer
+    # the tip length. That behavior is not tested here.
+    tip_length = 25.0
+    await hw_api.pick_up_tip(mount, tip_length)
+    assert hw_api._attached_instruments[mount.primary].has_tip
+    assert hw_api._attached_instruments[mount.primary].current_volume == 0
+    second = mount.secondary
+    assert hw_api._attached_instruments[second].has_tip
+    assert hw_api._attached_instruments[second].current_volume == 0
+    assert hw_api._current_position == target_position
+
+
+async def test_drop_tip(
+        dummy_instruments, loop, is_robot, toggle_new_calibration):
+    hw_api = await hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    mount = PipettePair.PRIMARY_RIGHT
+    await hw_api.home()
+    await hw_api.cache_instruments()
+    tip_position = types.Point(12.13, 9, 150)
+
+    await hw_api.move_to(mount, tip_position)
+
+    tip_length = 25.0
+    await hw_api.pick_up_tip(mount, tip_length)
+    await hw_api.drop_tip(mount)
+    assert not hw_api._attached_instruments[mount.primary].has_tip
+    assert hw_api._attached_instruments[mount.primary].current_volume == 0
+    assert not hw_api._attached_instruments[mount.secondary].has_tip
+    assert hw_api._attached_instruments[mount.secondary].current_volume == 0
+
+
+async def test_tip_action_currents(
+        dummy_instruments, smoothie, monkeypatch, loop):
+    smoothie.simulating = False
+    hardware_api = await hc.API.build_hardware_controller(loop=loop)
+    mock_active_current = mock.Mock()
+    monkeypatch.setattr(
+        hardware_api._backend._smoothie_driver,
+        'set_active_current',
+        mock_active_current)
+
+    def fake_attached(stuff):
+        return dummy_instruments
+    monkeypatch.setattr(
+        hardware_api._backend, 'get_attached_instruments', fake_attached)
+
+    mount = PipettePair.PRIMARY_RIGHT
+    await hardware_api.home()
+    await hardware_api.cache_instruments()
+    mock_active_current.reset_mock()
+
+    tip_length = 25.0
+    await hardware_api.pick_up_tip(mount, tip_length)
+    expected_call_list = [
+        mock.call({'C': 1.0, 'B': 1.0}),
+        mock.call({'A': 0.125, 'Z': 0.125}),
+        mock.call({
+            'X': 1.25, 'Y': 1.25, 'Z': 0.8,
+            'A': 0.8, 'B': 0.05, 'C': 0.05})]
+    assert mock_active_current.call_args_list == expected_call_list
+    mock_active_current.reset_mock()
+
+    await hardware_api.drop_tip(mount)
+
+    expected_call_list = [
+        mock.call({'C': 1.0, 'B': 1.0}),
+        mock.call({'C': 1.25, 'B': 1.25}),
+        mock.call({'C': 1.0, 'B': 1.0}),
+        mock.call({'C': 1.0, 'B': 1.0})]
+    assert mock_active_current.call_args_list == expected_call_list
