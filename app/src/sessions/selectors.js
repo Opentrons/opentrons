@@ -106,16 +106,10 @@ const getIntercomPropsFromCalibrationCheck: (
     },
     initialStepData
   )
-  const boolValueOrNull: (val?: boolean) => boolean = val => {
-    if (val === undefined || val === null) {
-      return false
-    }
-    return val
-  }
 
   const succeeded = !some(
     Object.keys(comparisonsByStep).map(k =>
-      boolValueOrNull(comparisonsByStep[k].exceedsThreshold)
+      Boolean(comparisonsByStep[k].exceedsThreshold)
     )
   )
   return {
