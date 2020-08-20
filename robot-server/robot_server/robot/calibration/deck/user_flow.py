@@ -1,6 +1,8 @@
 import logging
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple
 
+from opentrons.calibration_storage import get
+from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
@@ -10,6 +12,7 @@ from robot_server.service.session.models import (
     CalibrationCommand, DeckCalibrationCommand)
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK)
+import robot_server.robot.calibration.util as uf
 from .constants import (
     DeckCalibrationState as State,
     TIP_RACK_SLOT,
@@ -50,10 +53,13 @@ class DeckCalibrationUserFlow:
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
         self._deck = geometry.Deck(load_name=deck_load_name)
-        self._initialize_deck()
+        self._tip_rack = self._get_tip_rack_lw()
+        self._deck[TIP_RACK_SLOT] = self._tip_rack
 
         self._current_state = State.sessionStarted
         self._state_machine = DeckCalibrationStateMachine()
+
+        self._tip_origin_pt: Optional[Point] = None
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
@@ -99,17 +105,13 @@ class DeckCalibrationUserFlow:
     def _select_target_pipette(self) -> Tuple[Pipette, Mount]:
         # TODO: select pipette for deck calibration
         # return pipette and mount
-        return self._hardware._attached_instruments[Mount.RIGHT], Mount.RIGHT
+        return self._hardware._attached_instruments[Mount.LEFT], Mount.LEFT
 
     def _get_tip_rack_lw(self) -> labware.Labware:
         # TODO: select tiprack based on chosen pipette model
         return labware.load(
             "opentrons_96_tiprack_10ul",
             self._deck.position_for(TIP_RACK_SLOT))
-
-    def _initialize_deck(self):
-        tip_rack_lw = self._get_tip_rack_lw()
-        self._deck[TIP_RACK_SLOT] = tip_rack_lw
 
     async def handle_command(self,
                              name: Any,
@@ -133,7 +135,7 @@ class DeckCalibrationUserFlow:
             f'from {self._current_state} to {next_state}')
 
     def _get_critical_point(self) -> CriticalPoint:
-        return CriticalPoint.FRONT_NOZZLE
+        return CriticalPoint.NOZZLE
         # TODO: uncomment the following after _select_target_pipette
         # is complette:
         # return (CriticalPoint.FRONT_NOZZLE if
@@ -173,18 +175,30 @@ class DeckCalibrationUserFlow:
     async def save_offset(self):
         pass
 
+    def _get_tip_length(self) -> float:
+        try:
+            return get.load_tip_length_calibration(
+                self._hw_pipette.pipette_id,  # type: ignore
+                self._tip_rack._definition,
+                '')['tipLength']
+        except TipLengthCalNotFound:
+            tip_overlap = self._hw_pipette.config.tip_overlap.get(
+                self._tip_rack.uri,
+                self._hw_pipette.config.tip_overlap['default'])
+            tip_length = self._tip_rack.tip_length
+            return tip_length - tip_overlap
+
     async def pick_up_tip(self):
-        pass
+        await uf.pick_up_tip(self, tip_length=self._get_tip_length())
 
     async def invalidate_tip(self):
-        await self._return_tip()
-        await self.move_to_tip_rack()
+        await uf.invalidate_tip(self)
 
     async def _return_tip(self):
-        pass
+        await uf.return_tip(self, tip_length=self._get_tip_length())
 
-    async def _move(self, *args):
-        pass
+    async def _move(self, to_loc: Location):
+        await uf.move(self, to_loc)
 
     async def exit_session(self):
         await self._return_tip()
