@@ -9,8 +9,6 @@ from opentrons.hardware_control import (SynchronousAdapter, modules,
                                         API, ExecutionManager)
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
-from opentrons.protocol_api.context.interfaces.protocol_context import \
-    AbstractProtocolContext
 from opentrons.protocols.types import APIVersion, Protocol
 from .labware import (
     Labware, get_labware_definition, load_from_definition)
@@ -42,7 +40,7 @@ SHORT_TRASH_DECK = 'ot2_short_trash'
 STANDARD_DECK = 'ot2_standard'
 
 
-class ProtocolContext(AbstractProtocolContext, CommandPublisher):
+class ProtocolContext(CommandPublisher):
     """ The Context class is a container for the state of a protocol.
 
     It encapsulates many of the methods formerly found in the Robot class,

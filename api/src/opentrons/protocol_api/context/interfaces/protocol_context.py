@@ -7,41 +7,41 @@ from typing import (Dict, List, Optional, Union, TYPE_CHECKING)
 from opentrons import types
 from opentrons.hardware_control import API
 from opentrons.protocols.types import APIVersion
+from opentrons.protocol_api.labware import Labware
+from opentrons.protocol_api.module_geometry import ModuleGeometry
+from opentrons.protocol_api.geometry import Deck
+from opentrons.protocol_api.instrument_context import InstrumentContext
+from opentrons.protocol_api.protocol_context import ModuleTypes
+from opentrons.protocol_api.module_contexts import ModuleContext
+from opentrons.protocol_api.util import AxisMaxSpeeds
+
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from opentrons.protocol_api.labware import Labware
-    from opentrons.protocol_api.module_geometry import ModuleGeometry
-    from opentrons.protocol_api.geometry import Deck
-    from opentrons.protocol_api.instrument_context import InstrumentContext
-    from opentrons.protocol_api.protocol_context import ModuleTypes
-    from opentrons.protocol_api.module_contexts import ModuleContext
-    from opentrons.protocol_api.util import AxisMaxSpeeds
 
 
 class AbstractProtocolContext(ABC):
 
-    @property
     @abstractmethod
-    def api_version(self) -> 'APIVersion':
+    def get_api_version(self) -> APIVersion:
+        """Get the api version by the protocol"""
         ...
 
-    @property
     @abstractmethod
-    def bundled_data(self) -> Dict[str, bytes]:
+    def get_bundled_data(self) -> Dict[str, bytes]:
+        """Get a mapping of name to contents"""
         ...
 
     @abstractmethod
     def cleanup(self):
         ...
 
-    @property
     @abstractmethod
-    def max_speeds(self) -> 'AxisMaxSpeeds':
+    def get_max_speeds(self) -> AxisMaxSpeeds:
         ...
 
     @abstractmethod
-    def commands(self):
+    def get_commands(self):
         ...
 
     @abstractmethod
@@ -71,7 +71,7 @@ class AbstractProtocolContext(ABC):
             labware_def: 'LabwareDefinition',
             location: types.DeckLocation,
             label: str = None,
-    ) -> 'Labware':
+    ) -> Labware:
         ...
 
     @abstractmethod
@@ -82,7 +82,7 @@ class AbstractProtocolContext(ABC):
             label: str = None,
             namespace: str = None,
             version: int = None,
-    ) -> 'Labware':
+    ) -> Labware:
         ...
 
     @abstractmethod
@@ -93,24 +93,23 @@ class AbstractProtocolContext(ABC):
             label: str = None,
             namespace: str = None,
             version: int = 1
-    ) -> 'Labware':
+    ) -> Labware:
         ...
 
-    @property
     @abstractmethod
-    def loaded_labwares(self) -> Dict[int, Union['Labware', 'ModuleGeometry']]:
+    def get_loaded_labwares(self) -> Dict[int, Union[Labware, ModuleGeometry]]:
         ...
 
     @abstractmethod
     def load_module(
-            self, module_name: str,
+            self,
+            module_name: str,
             location: Optional[types.DeckLocation] = None,
-            configuration: str = None) -> 'ModuleTypes':
+            configuration: str = None) -> ModuleTypes:
         ...
 
-    @property
     @abstractmethod
-    def loaded_modules(self) -> Dict[int, 'ModuleContext']:
+    def get_loaded_modules(self) -> Dict[int, 'ModuleContext']:
         ...
 
     @abstractmethod
@@ -118,13 +117,13 @@ class AbstractProtocolContext(ABC):
             self,
             instrument_name: str,
             mount: Union[types.Mount, str],
-            tip_racks: List['Labware'] = None,
+            tip_racks: List[Labware] = None,
             replace: bool = False) -> 'InstrumentContext':
         ...
 
-    @property
     @abstractmethod
-    def loaded_instruments(self) -> Dict[str, Optional['InstrumentContext']]:
+    def get_loaded_instruments(self) \
+            -> Dict[str, Optional['InstrumentContext']]:
         ...
 
     @abstractmethod
@@ -147,26 +146,22 @@ class AbstractProtocolContext(ABC):
     def home(self):
         ...
 
-    @property
     @abstractmethod
-    def deck(self) -> 'Deck':
+    def get_deck(self) -> Deck:
         ...
 
-    @property
     @abstractmethod
-    def fixed_trash(self) -> 'Labware':
+    def get_fixed_trash(self) -> Labware:
         ...
 
     @abstractmethod
     def set_rail_lights(self, on: bool):
         ...
 
-    @property
     @abstractmethod
-    def rail_lights_on(self) -> bool:
+    def get_rail_lights_on(self) -> bool:
         ...
 
-    @property
     @abstractmethod
     def door_closed(self) -> bool:
         ...
