@@ -17,7 +17,6 @@ import type {
   SessionCommandData,
   DeckCalibrationLabware,
 } from '../../sessions/types'
-import { mockDeckCalTipRack } from '../../sessions/__fixtures__/deck-calibration.js'
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
