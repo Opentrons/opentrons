@@ -19,7 +19,13 @@ from robot_server.robot.calibration.constants import (
 import robot_server.robot.calibration.util as uf
 from .constants import (
     DeckCalibrationState as State,
+    JOG_TO_DECK_SLOT,
+    JOG_TO_DECK_Y_SHIFT,
+    POINT_ONE_ID,
+    POINT_TWO_ID,
+    POINT_THREE_ID,
     TIP_RACK_SLOT,
+    MOVE_TO_POINT_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER)
 from .state_machine import DeckCalibrationStateMachine
 # TODO: uncomment the following to raise deck cal errors
@@ -59,6 +65,8 @@ class DeckCalibrationUserFlow:
         self._state_machine = DeckCalibrationStateMachine()
 
         self._tip_origin_pt: Optional[Point] = None
+        self._z_height_reference: Optional[float] = None
+        self._saved_points: tuple = ()
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
@@ -162,9 +170,7 @@ class DeckCalibrationUserFlow:
         #         self._hw_pipette.critical_point)
 
     async def _get_current_point(self) -> Point:
-        cp = self._get_critical_point()
-        return await self._hardware.gantry_position(self._mount,
-                                                    critical_point=cp)
+        return await self._hardware.gantry_position(self._mount)
 
     async def load_labware(self):
         pass
@@ -180,19 +186,35 @@ class DeckCalibrationUserFlow:
         await self._move(to_loc)
 
     async def move_to_deck(self):
-        pass
+        deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
+        ydim = self._deck.get_slot_definition(
+            JOG_TO_DECK_SLOT)['boundingBox']['yDimension']
+        new_pt = deck_pt + Point(0, (ydim/2)-JOG_TO_DECK_Y_SHIFT, 0) + \
+            MOVE_TO_POINT_SAFETY_BUFFER
+        to_loc = Location(new_pt, None)
+        await self._move(to_loc)
+
+    def _get_cal_point_location(self, point_id: str) -> Location:
+        assert self._z_height_reference
+        coords = self._deck.get_calibration_position(point_id).position
+        loc = Location(Point(*coords), None)
+        return loc.move(point=Point(0, 0, self._z_height_reference))
 
     async def move_to_point_one(self):
-        pass
+        await self._move(self._get_cal_point_location(POINT_ONE_ID))
 
     async def move_to_point_two(self):
-        pass
+        await self._move(self._get_cal_point_location(POINT_TWO_ID))
 
     async def move_to_point_three(self):
-        pass
+        await self._move(self._get_cal_point_location(POINT_THREE_ID))
 
     async def save_offset(self):
-        pass
+        cur_pt = await self._get_current_point()
+        if self.current_state == State.joggingToDeck:
+            self._z_height_reference = cur_pt.z
+        else:
+            self._saved_points += (tuple(cur_pt),)
 
     def _get_tip_length(self) -> float:
         try:

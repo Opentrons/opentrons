@@ -5,6 +5,8 @@ from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from robot_server.robot.calibration.deck.user_flow import \
     DeckCalibrationUserFlow
+from robot_server.robot.calibration.deck.constants import \
+    POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID
 
 
 @pytest.fixture
@@ -130,3 +132,42 @@ async def test_return_tip(mock_user_flow):
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
     uf._hardware.drop_tip.assert_called()
+async def test_jog(mock_user_flow):
+    uf = mock_user_flow
+    await uf.jog(vector=(0, 0, 0.1))
+    assert await uf._get_current_point() == Point(0, 0, 0.1)
+    await uf.jog(vector=(1, 0, 0))
+    assert await uf._get_current_point() == Point(1, 0, 0.1)
+
+
+@pytest.mark.parametrize("point_id",
+                         [POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID])
+async def test_get_cal_point_location(mock_user_flow, point_id):
+    uf = mock_user_flow
+    uf._z_height_reference = 30
+
+    pt_list = uf._deck.get_calibration_position(point_id).position
+    exp = Point(pt_list[0], pt_list[1], 30)
+
+    assert uf._get_cal_point_location(point_id).point == exp
+
+
+async def test_save_offsets(mock_user_flow):
+    uf = mock_user_flow
+    uf._current_state = 'joggingToDeck'
+    assert uf._z_height_reference is None
+
+    await uf._hardware.move_to(
+            mount=uf._mount,
+            abs_position=Point(x=10, y=10, z=10),
+            critical_point=uf._hw_pipette.critical_point
+        )
+    await uf.save_offset()
+    assert uf._z_height_reference == 10
+
+    exp = ()
+    for state in ['savingPointOne', 'savingPointTwo', 'savingPointThree']:
+        uf._current_state = state
+        await uf.save_offset()
+        exp += ((10, 10, 10),)
+        assert uf._saved_points == exp
