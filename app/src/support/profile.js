@@ -3,7 +3,12 @@
 import { version as appVersion } from '../../package.json'
 import { FF_PREFIX, getRobotAnalyticsData } from '../analytics'
 import { getConnectedRobot } from '../discovery'
-import { createLogger } from '../logger'
+import {
+  getIntercomAppId,
+  bootIntercom,
+  updateIntercomProfile,
+  setUserId,
+} from './intercom-binding'
 import * as Pipettes from '../pipettes'
 import * as RobotSettings from '../robot-settings'
 import * as SystemInfo from '../system-info'
@@ -15,26 +20,11 @@ import type { SupportProfileUpdate } from './types'
 
 type SupportConfig = $PropertyType<Config, 'support'>
 
-const log = createLogger(__filename)
-
-let userId: string | null = null
-
-// pulled in from environment at build time
-const getIntercomAppId = () => process.env.OT_APP_INTERCOM_ID
-
-const callIntercom = (command: string, props?: SupportProfileUpdate): void => {
-  if (getIntercomAppId() && global.Intercom) {
-    log.debug('Sending to Intercom', { command, props })
-    global.Intercom(command, props)
-  }
-}
-
 export function initializeProfile(config: SupportConfig): void {
-  userId = config.userId
+  setUserId(config.userId)
 
-  callIntercom(Constants.INTERCOM_BOOT, {
+  bootIntercom({
     app_id: getIntercomAppId(),
-    user_id: userId,
     created_at: config.createdAt,
     name: config.name,
     [Constants.PROFILE_APP_VERSION]: appVersion,
@@ -42,9 +32,7 @@ export function initializeProfile(config: SupportConfig): void {
 }
 
 export function updateProfile(update: SupportProfileUpdate): void {
-  if (userId) {
-    callIntercom(Constants.INTERCOM_UPDATE, { ...update, user_id: userId })
-  }
+  updateIntercomProfile(update)
 }
 
 export function makeProfileUpdate(

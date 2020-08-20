@@ -1,13 +1,24 @@
 // @flow
 import { version } from '../../../package.json'
 import { initializeProfile, updateProfile } from '../profile'
+import * as IntercomBinding from '../intercom-binding'
+import type { IntercomPayload } from '../types'
 
 import type { Config } from '../../config/types'
 
 type SupportConfig = $PropertyType<Config, 'support'>
 
+const bootIntercom: JestMockFn<[IntercomPayload], void> =
+  IntercomBinding.bootIntercom
+const updateIntercomProfile: JestMockFn<[IntercomPayload], void> =
+  IntercomBinding.updateIntercomProfile
+const setUserId: JestMockFn<[string], void> = IntercomBinding.setUserId
+const getIntercomAppId: JestMockFn<[], ?string> =
+  IntercomBinding.getIntercomAppId
+
+jest.mock('../intercom-binding')
+
 describe('support profile tests', () => {
-  const intercom = jest.fn()
   const CONFIG: SupportConfig = {
     userId: 'some-user-id',
     createdAt: 1234,
@@ -16,61 +27,30 @@ describe('support profile tests', () => {
   }
 
   beforeEach(() => {
-    process.env.OT_APP_INTERCOM_ID = 'some-intercom-app-id'
-    global.Intercom = intercom
+    getIntercomAppId.mockReturnValue('some-intercom-app-id')
   })
 
   afterEach(() => {
     jest.resetAllMocks()
-    delete process.env.OT_APP_INTERCOM_ID
-    delete global.Intercom
   })
 
   it('should be able to initialize Intercom with a user_id', () => {
     initializeProfile(CONFIG)
-
-    expect(intercom).toHaveBeenCalledWith('boot', {
+    expect(setUserId).toHaveBeenCalledWith('some-user-id')
+    expect(bootIntercom).toHaveBeenCalledWith({
       app_id: 'some-intercom-app-id',
-      user_id: 'some-user-id',
       created_at: 1234,
       name: 'Some Name',
       'App Version': version,
     })
   })
 
-  it('should noop boot calls if no intercom app ID', () => {
-    delete process.env.OT_APP_INTERCOM_ID
-    initializeProfile(CONFIG)
-    expect(intercom).toHaveBeenCalledTimes(0)
-  })
-
-  it('should noop boot calls if no global.Intercom', () => {
-    delete global.Intercom
-    initializeProfile(CONFIG)
-    expect(intercom).toHaveBeenCalledTimes(0)
-  })
-
   it('should be able to update the Intercom profile', () => {
     initializeProfile(CONFIG)
     updateProfile({ some: 'update' })
 
-    expect(intercom).toHaveBeenCalledWith('update', {
-      user_id: 'some-user-id',
+    expect(updateIntercomProfile).toHaveBeenCalledWith({
       some: 'update',
     })
-  })
-
-  it('should noop update calls if no intercom app ID', () => {
-    delete process.env.OT_APP_INTERCOM_ID
-    initializeProfile(CONFIG)
-    updateProfile({ some: 'update' })
-    expect(intercom).toHaveBeenCalledTimes(0)
-  })
-
-  it('should noop update calls if no global.Intercom', () => {
-    delete global.Intercom
-    initializeProfile(CONFIG)
-    updateProfile({ some: 'update' })
-    expect(intercom).toHaveBeenCalledTimes(0)
   })
 })

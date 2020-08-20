@@ -6,6 +6,8 @@ import { tap, filter, withLatestFrom, ignoreElements } from 'rxjs/operators'
 import * as Cfg from '../config'
 import { initializeProfile, makeProfileUpdate, updateProfile } from './profile'
 
+import { makeIntercomEvent, sendEvent } from './intercom-event'
+
 import type { Epic } from '../types'
 import type { ConfigInitializedAction } from '../config/types'
 
@@ -28,7 +30,17 @@ const updateProfileEpic: Epic = (action$, state$) => {
   )
 }
 
+const sendEventEpic: Epic = (action$, state$) => {
+  return action$.pipe(
+    withLatestFrom(state$, makeIntercomEvent),
+    filter(maybeSend => maybeSend !== null),
+    tap(sendEvent),
+    ignoreElements()
+  )
+}
+
 export const supportEpic: Epic = combineEpics(
   initializeSupportEpic,
-  updateProfileEpic
+  updateProfileEpic,
+  sendEventEpic
 )

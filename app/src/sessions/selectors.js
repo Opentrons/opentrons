@@ -1,5 +1,6 @@
 // @flow
 import type { State } from '../types'
+import { some } from 'lodash'
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -30,6 +31,95 @@ export function getRobotSessionOfType(
   return foundSessionId ? sessionsById[foundSessionId] : null
 }
 
+const getMountEventPropsFromCalibrationCheck: (
+  session: Types.CalibrationCheckSession
+) => Types.AnalyticsModelsByMount = session => {
+  const { instruments } = session.details
+  const initialModelsByMount: $Shape<Types.AnalyticsModelsByMount> = {}
+  const modelsByMount: Types.AnalyticsModelsByMount = Object.keys(
+    instruments
+  ).reduce(
+    (acc: Types.AnalyticsModelsByMount, mount: string) => ({
+      ...acc,
+      [`${mount.toLowerCase()}PipetteModel`]: instruments[mount].model,
+    }),
+    initialModelsByMount
+  )
+  return modelsByMount
+}
+
+const getSharedAnalyticsPropsFromCalibrationCheck: (
+  session: Types.CalibrationCheckSession
+) => Types.SharedAnalyticsProps = session => ({
+  sessionType: session.sessionType,
+})
+
+const getAnalyticsPropsFromCalibrationCheck: (
+  session: Types.CalibrationCheckSession
+) => Types.CalibrationCheckSessionAnalyticsProps = session => {
+  const { comparisonsByStep } = session.details
+  const initialStepData: $Shape<Types.CalibrationCheckAnalyticsData> = {}
+  const normalizedStepData = Object.keys(comparisonsByStep).reduce(
+    (
+      acc: Types.CalibrationCheckAnalyticsData,
+      stepName: Types.RobotCalibrationCheckStep
+    ) => {
+      const {
+        differenceVector,
+        thresholdVector,
+        exceedsThreshold,
+        transformType,
+      } = comparisonsByStep[stepName]
+      return {
+        ...acc,
+        [`${stepName}DifferenceVector`]: differenceVector,
+        [`${stepName}ThresholdVector`]: thresholdVector,
+        [`${stepName}ExceedsThreshold`]: exceedsThreshold,
+        [`${stepName}ErrorSource`]: transformType,
+      }
+    },
+    initialStepData
+  )
+  return {
+    ...getSharedAnalyticsPropsFromCalibrationCheck(session),
+    ...getMountEventPropsFromCalibrationCheck(session),
+    ...normalizedStepData,
+  }
+}
+
+const getIntercomPropsFromCalibrationCheck: (
+  session: Types.CalibrationCheckSession
+) => Types.CalibrationCheckSessionIntercomProps = session => {
+  const { comparisonsByStep } = session.details
+  const initialStepData: $Shape<Types.CalibrationCheckIntercomData> = {}
+  const normalizedStepData = Object.keys(comparisonsByStep).reduce(
+    (
+      acc: Types.CalibrationCheckIntercomData,
+      stepName: Types.RobotCalibrationCheckStep
+    ) => {
+      const { exceedsThreshold, transformType } = comparisonsByStep[stepName]
+      return {
+        ...acc,
+        [`${stepName}ExceedsThreshold`]: exceedsThreshold,
+        [`${stepName}ErrorSource`]: transformType,
+      }
+    },
+    initialStepData
+  )
+
+  const succeeded = !some(
+    Object.keys(comparisonsByStep).map(k =>
+      Boolean(comparisonsByStep[k].exceedsThreshold)
+    )
+  )
+  return {
+    ...getSharedAnalyticsPropsFromCalibrationCheck(session),
+    ...getMountEventPropsFromCalibrationCheck(session),
+    ...normalizedStepData,
+    succeeded: succeeded,
+  }
+}
+
 export const getAnalyticsPropsForRobotSessionById: (
   state: State,
   robotName: string,
@@ -39,44 +129,22 @@ export const getAnalyticsPropsForRobotSessionById: (
   if (!session) return null
 
   if (session.sessionType === Constants.SESSION_TYPE_CALIBRATION_CHECK) {
-    const { instruments, comparisonsByStep } = session.details
-    const initialModelsByMount: $Shape<Types.AnalyticsModelsByMount> = {}
-    const modelsByMount: Types.AnalyticsModelsByMount = Object.keys(
-      instruments
-    ).reduce(
-      (acc: Types.AnalyticsModelsByMount, mount: string) => ({
-        ...acc,
-        [`${mount.toLowerCase()}PipetteModel`]: instruments[mount].model,
-      }),
-      initialModelsByMount
-    )
-    const initialStepData: $Shape<Types.CalibrationCheckAnalyticsData> = {}
-    const normalizedStepData = Object.keys(comparisonsByStep).reduce(
-      (
-        acc: Types.CalibrationCheckAnalyticsData,
-        stepName: Types.RobotCalibrationCheckStep
-      ) => {
-        const {
-          differenceVector,
-          thresholdVector,
-          exceedsThreshold,
-          transformType,
-        } = comparisonsByStep[stepName]
-        return {
-          ...acc,
-          [`${stepName}DifferenceVector`]: differenceVector,
-          [`${stepName}ThresholdVector`]: thresholdVector,
-          [`${stepName}ExceedsThreshold`]: exceedsThreshold,
-          [`${stepName}ErrorSource`]: transformType,
-        }
-      },
-      initialStepData
-    )
-    return {
-      sessionType: session.sessionType,
-      ...modelsByMount,
-      ...normalizedStepData,
-    }
+    return getAnalyticsPropsFromCalibrationCheck(session)
+  } else {
+    // the exited session type doesn't report to analytics
+    return null
+  }
+}
+
+export const getIntercomEventPropsForRobotSessionById: (
+  state: State,
+  robotName: string,
+  sessionId: string
+) => Types.SessionIntercomProps | null = (state, robotName, sessionId) => {
+  const session = getRobotSessionById(state, robotName, sessionId)
+  if (!session) return null
+  if (session.sessionType === Constants.SESSION_TYPE_CALIBRATION_CHECK) {
+    return getIntercomPropsFromCalibrationCheck(session)
   } else {
     // the exited session type doesn't report to analytics
     return null
