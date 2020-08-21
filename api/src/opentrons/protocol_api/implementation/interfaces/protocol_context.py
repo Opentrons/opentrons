@@ -156,7 +156,7 @@ class AbstractProtocolContextImpl(ABC):
         ...
 
     @abstractmethod
-    def set_rail_lights(self, on: bool):
+    def set_rail_lights(self, on: bool) -> None:
         ...
 
     @abstractmethod
