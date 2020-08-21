@@ -26,7 +26,7 @@ class AbstractWell(ApiVersioned):
         ...
 
     @abstractmethod
-    def set_has_tip(self, value: bool):
+    def set_has_tip(self, value: bool) -> None:
         ...
 
     @abstractmethod
@@ -34,7 +34,7 @@ class AbstractWell(ApiVersioned):
         ...
 
     @abstractmethod
-    def get_display_name(self):
+    def get_display_name(self) -> str:
         ...
 
     @abstractmethod
@@ -73,7 +73,7 @@ class AbstractLabware(ApiVersioned, DeckItem):
         ...
 
     @abstractmethod
-    def set_name(self, new_name: str):
+    def set_name(self, new_name: str) -> None:
         ...
 
     @abstractmethod
@@ -93,7 +93,7 @@ class AbstractLabware(ApiVersioned, DeckItem):
         ...
 
     @abstractmethod
-    def set_calibration(self, delta: Point):
+    def set_calibration(self, delta: Point) -> None:
         ...
 
     @abstractmethod
@@ -105,10 +105,6 @@ class AbstractLabware(ApiVersioned, DeckItem):
         ...
 
     @abstractmethod
-    def wells(self, *args) -> List[Well]:
-        ...
-
-    @abstractmethod
     def wells_by_name(self) -> Dict[str, Well]:
         ...
 
@@ -117,19 +113,11 @@ class AbstractLabware(ApiVersioned, DeckItem):
         ...
 
     @abstractmethod
-    def rows(self, *args) -> List[List[Well]]:
-        ...
-
-    @abstractmethod
     def rows_by_name(self) -> Dict[str, List[Well]]:
         ...
 
     @abstractmethod
     def rows_by_index(self) -> Dict[str, List[Well]]:
-        ...
-
-    @abstractmethod
-    def columns(self, *args) -> List[List[Well]]:
         ...
 
     @abstractmethod
@@ -174,5 +162,5 @@ class AbstractLabware(ApiVersioned, DeckItem):
         ...
 
     @abstractmethod
-    def reset(self):
+    def reset(self) -> None:
         ...

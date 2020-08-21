@@ -1,23 +1,18 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import typing
 
 from opentrons import types
 from opentrons.protocol_api.transfers import TransferOptions
-from opentrons.protocols.types import APIVersion
-
+from opentrons.protocol_api.implementation.interfaces.versioned import \
+    ApiVersioned
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocol_api.util import (FlowRates, PlungerSpeeds, Clearances)
 
 
-class AbstractInstrumentContextImpl(ABC):
-
-    @abstractmethod
-    def get_api_version(self) -> APIVersion:
-        """Get the api version of the protocol"""
-        ...
+class AbstractInstrumentContextImpl(ApiVersioned):
 
     @abstractmethod
     def get_starting_tip(self) -> typing.Optional[Well]:
