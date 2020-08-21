@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import typing
 
 from opentrons import types
-from opentrons.protocol_api import transfers
+from opentrons.protocol_api.transfers import TransferOptions
 from opentrons.protocols.types import APIVersion
 
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
@@ -27,7 +27,7 @@ class AbstractInstrumentContextImpl(ABC):
         ...
 
     @abstractmethod
-    def reset_tipracks(self):
+    def reset_tipracks(self) -> None:
         ...
 
     @abstractmethod
@@ -35,21 +35,21 @@ class AbstractInstrumentContextImpl(ABC):
         ...
 
     @abstractmethod
-    def set_default_speed(self, speed: float):
+    def set_default_speed(self, speed: float) -> None:
         ...
 
     @abstractmethod
     def aspirate(self,
                  volume: float,
                  location: types.Location,
-                 rate: float = 1.0):
+                 rate: float = 1.0) -> None:
         ...
 
     @abstractmethod
     def dispense(self,
                  volume: float,
                  location: types.Location,
-                 rate: float = 1.0):
+                 rate: float = 1.0) -> None:
         ...
 
     @abstractmethod
@@ -57,11 +57,11 @@ class AbstractInstrumentContextImpl(ABC):
             volume: float,
             location: types.Location,
             repetitions: int = 1,
-            rate: float = 1.0):
+            rate: float = 1.0) -> None:
         ...
 
     @abstractmethod
-    def blow_out(self, location: types.Location):
+    def blow_out(self, location: types.Location) -> None:
         ...
 
     @abstractmethod
@@ -69,58 +69,39 @@ class AbstractInstrumentContextImpl(ABC):
                   location: Well,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
-                  speed: float = 60.0):
+                  speed: float = 60.0) -> None:
         ...
 
     @abstractmethod
     def air_gap(self,
+                location: types.Location,
                 volume: float,
-                height: float):
+                height: float) -> None:
         ...
 
     @abstractmethod
-    def return_tip(self, home_after: bool = True):
+    def return_tip(self, home_after: bool = True) -> None:
         ...
 
     @abstractmethod
     def pick_up_tip(self,
                     location: types.Location,
                     presses: int = None,
-                    increment: float = None):
+                    increment: float = None) -> None:
         ...
 
     @abstractmethod
     def drop_tip(self,
                  location: types.Location,
-                 home_after: bool = True):
+                 home_after: bool = True) -> None:
         ...
 
     @abstractmethod
-    def home(self):
+    def home(self) -> None:
         ...
 
     @abstractmethod
-    def home_plunger(self):
-        ...
-
-    @abstractmethod
-    def distribute(self,
-                   volume: float,
-                   source: Well,
-                   dest: typing.List[Well],
-                   mode: str,
-                   disposal_volume: float,
-                   mix_after: typing.Tuple[int, int]):
-        ...
-
-    @abstractmethod
-    def consolidate(self,
-                    volume: float,
-                    source: typing.List[Well],
-                    dest: Well,
-                    mode: str,
-                    disposal_volume: float,
-                    mix_before: typing.Tuple[int, int]):
+    def home_plunger(self) -> None:
         ...
 
     @abstractmethod
@@ -129,18 +110,11 @@ class AbstractInstrumentContextImpl(ABC):
                  source: AdvancedLiquidHandling,
                  dest: AdvancedLiquidHandling,
                  mode: str,
-                 blow_out: transfers.BlowOutStrategy,
-                 drop_tip: transfers.DropTipStrategy,
-                 touch_tip: transfers.TouchTipStrategy,
-                 mix_strategy: transfers.MixStrategy,
-                 mix_options: transfers.Mix,
-                 new_tip: str,
-                 disposal_volume: float,
-                 air_gap: float):
+                 transfer_options: TransferOptions) -> None:
         ...
 
     @abstractmethod
-    def delay(self):
+    def delay(self) -> None:
         ...
 
     @abstractmethod
@@ -148,7 +122,7 @@ class AbstractInstrumentContextImpl(ABC):
                 location: types.Location,
                 force_direct: bool = False,
                 minimum_z_height: float = None,
-                speed: float = None):
+                speed: float = None) -> None:
         ...
 
     @abstractmethod
