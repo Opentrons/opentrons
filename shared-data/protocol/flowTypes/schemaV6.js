@@ -8,7 +8,6 @@ export type Command =
   | {| command: 'dispenseAirGap', params: AirGapParams |}
 
 // NOTE: must be kept in sync with '../schemas/5.json'
-// TODO IMMEDIATELY: figure this out
 export type ProtocolFile<DesignerApplicationData> = {|
   ...V3ProtocolFile<DesignerApplicationData>,
   $otSharedSchema: '#/protocol/schemas/5',
