@@ -1487,26 +1487,26 @@ class API(HardwareAPILike):
                 assert instr1.has_tip, 'Cannot drop tip without a tip attached'
         return instr1, primary_mount, instr2, secondary_mount
 
-    @typing.overload
+    @overload
     def _instruments_for(
-            self, mount: top_types.Mount) -> Tuple[PipetteHandlingData]: ...
+        self, mount: top_types.Mount) -> Tuple[PipetteHandlingData]: ...
 
-    @typing.overload
+    @overload
     def _instruments_for(
-            self, mount: PipettePair) -> Tuple[PipetteHandlingData, PipetteHandlingData]: ...
-        
-    @typing.overload
+        self, mount: PipettePair) ->\
+        Tuple[PipetteHandlingData, PipetteHandlingData]: ...
+
     def _instruments_for(self, mount):
         if isinstance(mount, PipettePair):
             primary_mount = mount.primary
             secondary_mount = mount.secondary
             instr1 = self._attached_instruments[primary_mount]
             instr2 = self._attached_instruments[secondary_mount]
-            return tuple((instr1, primary_mount), (instr2, secondary_mount))
+            return ((instr1, primary_mount), (instr2, secondary_mount))
         else:
             primary_mount = mount
             instr1 = self._attached_instruments[primary_mount]
-            return tuple((instr1, primary_mount))
+            return ((instr1, primary_mount), )
 
     def _ready_for_pick_up_tip(self, targets: Sequence[PipetteHandlingData]):
         for pipettes in targets:
@@ -1515,15 +1515,17 @@ class API(HardwareAPILike):
                     f'No pipette attached to {pipettes[1].name} mount')
             assert not pipettes[0].has_tip,\
                 'Cannot pick up tip with a tip attached'
+            self._log.info(f'Picking up tip on {pipettes[0].name}')
 
     def _ready_for_tip_action(
             self, targets: Sequence[PipetteHandlingData], action: str):
         for pipettes in targets:
             if not pipettes[0]:
-                raise top_types.NoPipetteAttachedError(
+                raise top_types.PipetteNotAttachedError(
                     f'No pipette attached to {pipettes[1].name} mount')
             assert pipettes[0].has_tip,\
                 f'Cannot perform {action} without a tip attached'
+            self._log.info(f'{action} on {pipettes[0].name}')
 
     async def pick_up_tip(self,
                           mount: Union[top_types.Mount, PipettePair],
@@ -1570,7 +1572,7 @@ class API(HardwareAPILike):
                     "Number of pipette pickups must match")
             checked_presses = all_presses[0]
         else:
-            checked_presses = tuple(presses)
+            checked_presses = presses
 
         if not increment or increment < 0:
             checked_increment = tuple(
