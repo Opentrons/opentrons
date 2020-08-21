@@ -15,9 +15,9 @@ def dummy_instruments():
             'name': 'p300_single_gen2'
         },
         types.Mount.RIGHT: {
-            'model': 'p300_single_v2.0',
+            'model': 'p20_single_v2.0',
             'id': 'fake2',
-            'name': 'p300_single_gen2',
+            'name': 'p20_single_gen2',
         }
     }
     return dummy_instruments_attached
@@ -100,7 +100,7 @@ async def test_pick_up_tip(
                        Axis.Z: 218.0,     # Z retracts after pick_up
                        Axis.A: 218.0,
                        Axis.B: -14.5,
-                       Axis.C: -14.5}
+                       Axis.C: -8.5}
     await hw_api.move_to(mount, tip_position)
 
     # Note: pick_up_tip without a tip_length argument requires the pipette on
@@ -158,9 +158,10 @@ async def test_tip_action_currents(
 
     tip_length = 25.0
     await hardware_api.pick_up_tip(mount, tip_length)
+
     expected_call_list = [
         mock.call({'C': 1.0, 'B': 1.0}),
-        mock.call({'A': 0.125, 'Z': 0.125}),
+        mock.call({'A': 0.1, 'Z': 0.125}),
         mock.call({
             'X': 1.25, 'Y': 1.25, 'Z': 0.8,
             'A': 0.8, 'B': 0.05, 'C': 0.05})]
@@ -171,7 +172,7 @@ async def test_tip_action_currents(
 
     expected_call_list = [
         mock.call({'C': 1.0, 'B': 1.0}),
-        mock.call({'C': 1.25, 'B': 1.25}),
+        mock.call({'C': 1.0, 'B': 1.25}),
         mock.call({'C': 1.0, 'B': 1.0}),
         mock.call({'C': 1.0, 'B': 1.0})]
     assert mock_active_current.call_args_list == expected_call_list

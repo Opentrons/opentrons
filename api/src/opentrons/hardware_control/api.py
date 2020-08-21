@@ -5,7 +5,7 @@ import pathlib
 import numpy as np  # type: ignore
 from collections import OrderedDict
 from typing import (Any, Dict, Union, List, Optional, Tuple,
-                    TYPE_CHECKING, cast, TypeVar)
+                    TYPE_CHECKING, cast, overload, Sequence)
 
 from opentrons_shared_data.pipette import name_for_model
 from opentrons import types as top_types
@@ -39,8 +39,7 @@ mod_log = logging.getLogger(__name__)
 
 
 InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
-PipetteHandlingData = TypeVar(
-    'PipetteHandlingData', Tuple[Pipette, top_types.Mount])
+PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 
 class API(HardwareAPILike):
@@ -679,7 +678,7 @@ class API(HardwareAPILike):
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
                 await self._move_plunger(checked_mount,
-                                         instr.config.bottom,
+                                         (instr.config.bottom,),
                                          acquire_lock=False)
 
     async def home_plunger(self, mount: top_types.Mount):
@@ -1032,6 +1031,22 @@ class API(HardwareAPILike):
                          acquire_lock=acquire_lock,
                          secondary_z=secondary_z)
 
+    async def _move_relative_to_target(
+            self, instruments: Tuple[PipetteHandlingData, ...],
+            target: Tuple[float, ...], speed: float = None):
+        base_dict = OrderedDict((
+            (Axis.X, self._current_position[Axis.X] + target[0]),
+            (Axis.Y, self._current_position[Axis.Y] + target[1])))
+        secondary_z = None
+        for idx, instr in enumerate(instruments):
+            z = Axis.by_mount(instr[1])
+            target_index = idx + 2
+            base_dict[z] =\
+                self._current_position[z] + target[target_index]
+            if idx == 1:
+                secondary_z = z
+        await self._move(base_dict, speed=speed, secondary_z=secondary_z)
+
     def _get_transformed(
             self,
             to_transform_primary: Tuple[float, ...],
@@ -1156,6 +1171,12 @@ class API(HardwareAPILike):
     async def disengage_axes(self, which: List[Axis]):
         self._backend.disengage_axes([ax.name for ax in which])
 
+    def _fast_home(
+            self, axes: Sequence[str],
+            margin: float) -> Dict[str, float]:
+        converted_axes = ''.join(axes)
+        return self._backend.fast_home(converted_axes, margin)
+
     async def retract(
             self,
             mount: Union[top_types.Mount, PipettePair],
@@ -1168,12 +1189,12 @@ class API(HardwareAPILike):
         if isinstance(mount, PipettePair):
             primary_ax = Axis.by_mount(mount.primary).name.upper()
             secondary_ax = Axis.by_mount(mount.secondary).name.upper()
-            smoothie_ax = primary_ax + secondary_ax
+            smoothie_ax: Tuple[str, ...] = (primary_ax, secondary_ax)
         else:
-            smoothie_ax = Axis.by_mount(mount).name.upper()
+            smoothie_ax = (Axis.by_mount(mount).name.upper(), )
 
         async with self._motion_lock:
-            smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
+            smoothie_pos = self._fast_home(smoothie_ax, margin)
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _critical_point_for(
@@ -1260,11 +1281,11 @@ class API(HardwareAPILike):
                 this_pipette.blow_out_flow_rate,
                 'aspirate')
             await self._move_plunger(
-                mount, [this_pipette.config.bottom],
+                mount, (this_pipette.config.bottom, ),
                 speed=(speed*rate))
         this_pipette.ready_to_aspirate = True
 
-    async def aspirate(self, mount: Union[top_types.Mount, PipettePair],
+    async def aspirate(self, mount: top_types.Mount,
                        volume: float = None, rate: float = 1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -1323,7 +1344,7 @@ class API(HardwareAPILike):
         flow_rate = this_pipette.aspirate_flow_rate * rate
         speed = self._plunger_speed(this_pipette, flow_rate, 'aspirate')
         try:
-            await self._move_plunger(mount, [dist], speed=speed)
+            await self._move_plunger(mount, (dist, ), speed=speed)
         except Exception:
             self._log.exception('Aspirate failed')
             this_pipette.set_current_volume(0)
@@ -1377,7 +1398,7 @@ class API(HardwareAPILike):
         flow_rate = this_pipette.dispense_flow_rate * rate
         speed = self._plunger_speed(this_pipette, flow_rate, 'dispense')
         try:
-            await self._move_plunger(mount, tuple(dist), speed=speed)
+            await self._move_plunger(mount, (dist, ), speed=speed)
         except Exception:
             self._log.exception('Dispense failed')
             this_pipette.set_current_volume(0)
@@ -1419,7 +1440,7 @@ class API(HardwareAPILike):
             this_pipette, this_pipette.blow_out_flow_rate, 'dispense')
         try:
             await self._move_plunger(
-                mount, tuple(this_pipette.config.blow_out),
+                mount, (this_pipette.config.blow_out, ),
                 speed=speed)
         except Exception:
             self._log.exception('Blow out failed')
@@ -1461,26 +1482,26 @@ class API(HardwareAPILike):
                 assert instr1.has_tip, 'Cannot drop tip without a tip attached'
         return instr1, primary_mount, instr2, secondary_mount
 
-    @typing.overload
+    @overload
     def _instruments_for(
-            self, mount: top_types.Mount) -> Tuple[PipetteHandlingData]: ...
+        self, mount: top_types.Mount) -> Tuple[PipetteHandlingData]: ...
 
-    @typing.overload
+    @overload
     def _instruments_for(
-            self, mount: PipettePair) -> Tuple[PipetteHandlingData, PipetteHandlingData]: ...
-        
-    @typing.overload
+        self, mount: PipettePair) ->\
+        Tuple[PipetteHandlingData, PipetteHandlingData]: ...
+
     def _instruments_for(self, mount):
         if isinstance(mount, PipettePair):
             primary_mount = mount.primary
             secondary_mount = mount.secondary
             instr1 = self._attached_instruments[primary_mount]
             instr2 = self._attached_instruments[secondary_mount]
-            return tuple((instr1, primary_mount), (instr2, secondary_mount))
+            return ((instr1, primary_mount), (instr2, secondary_mount))
         else:
             primary_mount = mount
             instr1 = self._attached_instruments[primary_mount]
-            return tuple((instr1, primary_mount))
+            return ((instr1, primary_mount), )
 
     def _ready_for_pick_up_tip(self, targets: Sequence[PipetteHandlingData]):
         for pipettes in targets:
@@ -1489,15 +1510,17 @@ class API(HardwareAPILike):
                     f'No pipette attached to {pipettes[1].name} mount')
             assert not pipettes[0].has_tip,\
                 'Cannot pick up tip with a tip attached'
+            self._log.info(f'Picking up tip on {pipettes[0].name}')
 
     def _ready_for_tip_action(
             self, targets: Sequence[PipetteHandlingData], action: str):
         for pipettes in targets:
             if not pipettes[0]:
-                raise top_types.NoPipetteAttachedError(
+                raise top_types.PipetteNotAttachedError(
                     f'No pipette attached to {pipettes[1].name} mount')
             assert pipettes[0].has_tip,\
                 f'Cannot perform {action} without a tip attached'
+            self._log.info(f'{action} on {pipettes[0].name}')
 
     async def pick_up_tip(self,
                           mount: Union[top_types.Mount, PipettePair],
@@ -1521,7 +1544,7 @@ class API(HardwareAPILike):
         their value is taken from the pipette configuration.
         """
         instruments = self._instruments_for(mount)
-        self._log.info('Picking up tip on {}'.format(p_instr.name))
+        self._ready_for_pick_up_tip(instruments)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
             for instr in instruments}
@@ -1537,33 +1560,39 @@ class API(HardwareAPILike):
             mount, bottom_positions)
 
         if not presses or presses < 0:
-            checked_presses = tuple(
+            all_presses = tuple(
                 instr[0].config.pick_up_presses for instr in instruments)
-            if len(checked_presses) > 1 and checked_presses[0] != checked_presses[1]:
+            if len(all_presses) > 1 and all_presses[0] != all_presses[1]:
                 raise ValueError("Number of pipette pickups much match")
+            checked_presses = all_presses[0]
         else:
-            checked_presses = tuple(presses)
+            checked_presses = presses
 
         if not increment or increment < 0:
             checked_increment = tuple(
                 instr[0].config.pick_up_increment for instr in instruments)
         else:
-            checked_increment = tuple(increment)
+            checked_increment = (increment, )
 
+        pick_up_speed = min(
+            instr[0].config.pick_up_speed for instr in instruments)
         # Press the nozzle into the tip <presses> number of times,
         # moving further by <increment> mm after each press
         for i in range(checked_presses):
             # move nozzle down into the tip
             with self._backend.save_current():
                 self._backend.set_active_current(z_axis_currents)
-                dist = -1.0 * p_instr.config.pick_up_distance\
-                    + -1.0 * checked_increment * i
-                target_pos = top_types.Point(0, 0, dist)
-                await self.move_rel(
-                    mount, target_pos, p_instr.config.pick_up_speed)
+                dist = tuple(-1.0 * instr[0].config.pick_up_distance
+                             + -1.0 * checked_increment[idx] * i
+                             for idx, instr in enumerate(instruments))
+                target_pos = (0, 0, *dist)
+                await self._move_relative_to_target(
+                    instruments, target_pos, pick_up_speed)
+
             # move nozzle back up
-            backup_pos = top_types.Point(0, 0, -dist)
-            await self.move_rel(mount, backup_pos)
+            backup_pos = (0, 0, *tuple(-d for d in dist))
+            await self._move_relative_to_target(
+                instruments, backup_pos)
         for instr in instruments:
             instr[0].add_tip(tip_length=tip_length)
             instr[0].set_current_volume(0)
@@ -1571,17 +1600,18 @@ class API(HardwareAPILike):
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
-        if any(['pickupTipShake' in instr.config.quirks
+        if any(['pickupTipShake' in instr[0].config.quirks
                 for instr in instruments]):
             await self._shake_off_tips_pick_up(mount)
             await self._shake_off_tips_pick_up(mount)
 
-        retract_target = tuple(instr[0].config.pick_up_distance\
-            + checked_increment[idx] * checked_presses[idx]\
-            + 2  # tiny little margin to avoid the switch itself
-            for instr, idx in enumerate(instruments))
-        
-        await self.retract(mount, max(retract_targets))
+        # Here we add in the debounce distance for the switch as
+        # a safety precaution
+        retract_target = max(instr[0].config.pick_up_distance
+                             + checked_increment[idx] * checked_presses + 2
+                             for idx, instr in enumerate(instruments))
+
+        await self.retract(mount, retract_target)
 
     def set_current_tiprack_diameter(self, mount, tiprack_diameter):
         instr = self._attached_instruments[mount]
@@ -1614,41 +1644,46 @@ class API(HardwareAPILike):
         """
 
         instruments = self._instruments_for(mount)
-        self._ready_for_tip_action(instruments)
-        for instr in instruments:
-            self._log.info("Dropping tip off from {}".format(instr[0].name))
-        plunger_curents = {
-            Axis.of_plunger(instr[1]): instr.config.plunger_current
+        self._ready_for_tip_action(instruments, 'drop tip')
+        plunger_currents = {
+            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
             for instr in instruments}
         drop_tip_currents = {
-            Axis.of_plunger(instr[1]): instr.config.plunger_current
+            Axis.of_plunger(instr[1]): instr[0].config.drop_tip_current
             for instr in instruments}
+        plunger_axes = tuple(
+            Axis.of_plunger(instr[1]).name.upper() for instr in instruments)
 
-        bottom = tuple(instr.config.bottom for instr in instruments)
-        droptip = tuple(instr.config.drop_tip for instr in instruments)
+        bottom = tuple(instr[0].config.bottom for instr in instruments)
+        droptip = tuple(instr[0].config.drop_tip for instr in instruments)
+        speed = min(instr[0].config.drop_tip_speed for instr in instruments)
 
         async def _drop_tip():
             self._backend.set_active_current(plunger_currents)
             await self._move_plunger(mount, bottom)
             self._backend.set_active_current(drop_tip_currents)
             await self._move_plunger(
-                mount, droptip, speed=p_instr.config.drop_tip_speed)
+                mount, droptip, speed=speed)
             if home_after:
-                safety_margin = abs(bottom-droptip)
-                # change back to fast home
-                await self.retract(mount, safety_margin, z_axis=False)
+                safety_margin = abs(max(bottom)-max(droptip))
+                smoothie_pos = self._fast_home(
+                    plunger_axes, safety_margin)
+                self._current_position = self._deck_from_smoothie(
+                    smoothie_pos)
                 self._backend.set_active_current(plunger_currents)
                 await self._move_plunger(mount, bottom)
 
-        if any(['doubleDropTip' in instr.config.quirks
+        if any(['doubleDropTip' in instr[0].config.quirks
                 for instr in instruments]):
             await _drop_tip()
         await _drop_tip()
 
-        if any(['dropTipShake' in instr.config.quirks
+        if any(['dropTipShake' in instr[0].config.quirks
                 for instr in instruments]):
-            await self._shake_off_tips_drop(mount,
-                                            p_instr.current_tiprack_diameter)
+            diameter = min(
+                instr[0].current_tiprack_diameter
+                for instr in instruments)
+            await self._shake_off_tips_drop(mount, diameter)
         self._backend.set_active_current(plunger_currents)
         for instr in instruments:
             instr[0].set_current_volume(0)
