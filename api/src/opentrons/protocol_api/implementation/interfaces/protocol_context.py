@@ -22,7 +22,7 @@ class AbstractProtocolContextImpl(ABC):
 
     @abstractmethod
     def get_api_version(self) -> APIVersion:
-        """Get the api version by the protocol"""
+        """Get the api version of the protocol"""
         ...
 
     @abstractmethod
