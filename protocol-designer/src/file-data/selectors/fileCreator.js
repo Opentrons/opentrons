@@ -97,7 +97,7 @@ export const getRequiresV5: Selector<boolean> = createSelector(
   getRobotStateTimelineWithoutAirGapDispenseCommand,
   robotStateTimeline => {
     return robotStateTimeline.timeline.some(timelineFrame =>
-      timelineFrame.commands.some(command => requiresV5)
+      timelineFrame.commands.some(command => requiresV5(command))
     )
   }
 )
