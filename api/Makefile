@@ -120,6 +120,14 @@ docs/dist/%: docs/root/%
 .PHONY: docs
 docs: docs/dist/index.html docs/dist/v1 docs/dist/v2 docs/dist/ot1
 
+.PHONY: docs-v2-material
+docs-v2-material:
+	$(sphinx_build) -b html -d docs/build/doctrees -n docs/v2-material docs/build/material
+
+.PHONY: docs-v2-ref
+docs-v2-ref:
+	$(sphinx_build) -b html -d docs/build/ref-doctree -n docs/v2-ref docs/build/api-ref
+
 .PHONY: docs-clean
 docs-clean:
 	$(SHX) rm -rf docs/dist docs/build
