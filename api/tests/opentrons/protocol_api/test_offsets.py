@@ -324,7 +324,8 @@ def test_load_calibration(monkeypatch, clear_calibration):
     test_labware.set_calibration(Point(0, 0, 0))
     test_labware.tip_length = 46.8
     lookup_path = labware._get_labware_path(test_labware)
-    calibration_point = get.get_labware_calibration(lookup_path)
+    calibration_point =\
+        get.get_labware_calibration(lookup_path, test_labware._definition)
     assert calibration_point == test_offset
 
 

@@ -41,23 +41,26 @@ def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
     else:
         blob = {}
 
-    if parent:
-        mod_dict = {
-            'parent': parent,
-            'fullParent': f'{slot}-{parent}'}
-    else:
-        mod_dict = {}
     full_id = f'{lw_hash}{parent}'
-    new_index_data = {
-        "uri": f'{uri}',
-        "slot": full_id,
-        "module": mod_dict}
-    if blob.get('data'):
-        blob['data'][full_id] = new_index_data
-    else:
-        blob['data'] = {full_id: new_index_data}
-    blob['version'] = migration.MAX_VERSION
-    io.save_to_file(index_file, blob)
+    try:
+        blob['data'][full_id]
+    except KeyError:
+        if parent:
+            mod_dict = {
+                'parent': parent,
+                'fullParent': f'{slot}-{parent}'}
+        else:
+            mod_dict = {}
+        new_index_data = {
+            "uri": f'{uri}',
+            "slot": full_id,
+            "module": mod_dict}
+        if blob.get('data'):
+            blob['data'][full_id] = new_index_data
+        else:
+            blob['data'] = {full_id: new_index_data}
+        blob['version'] = migration.MAX_VERSION
+        io.save_to_file(index_file, blob)
 
 
 def save_labware_calibration(

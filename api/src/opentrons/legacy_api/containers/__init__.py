@@ -212,11 +212,11 @@ def _load_new_well(well_data, saved_offset, lw_quirks):
     return (well, well_tuple)
 
 
-def _look_up_offsets(labware_hash):
+def _look_up_offsets(labware_hash, definition):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     if labware_offset_path.exists():
-        return get.get_labware_calibration(labware_offset_path)
+        return get.get_labware_calibration(labware_offset_path, definition)
     else:
         return Point(x=0, y=0, z=0)
 
@@ -225,7 +225,7 @@ def save_new_offsets(labware_hash, delta, definition):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
-    old_delta = _look_up_offsets(labware_hash)
+    old_delta = _look_up_offsets(labware_hash, definition)
     uri = cal_helpers.uri_from_definition(definition)
 
     # Note that the next line looks incorrect (like it's letting the prior
@@ -267,7 +267,7 @@ def load_new_labware_def(definition):
     """ Load a labware definition in the new schema into a placeable
     """
     labware_hash = cal_helpers.hash_labware_def(definition)
-    saved_offset = _look_up_offsets(labware_hash)
+    saved_offset = _look_up_offsets(labware_hash, definition)
     container = Container()
     container_name = definition['parameters']['loadName']
     log.info(f"Container name {container_name}, hash {labware_hash}")

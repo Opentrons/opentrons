@@ -1110,6 +1110,14 @@ def _get_labware_path(labware: 'Labware') -> str:
     return f'{get_labware_hash_with_parent(labware)}.json'
 
 
+def _get_index_file_information(
+        labware: 'Labware') -> Tuple[str, 'LabwareDefinition', str]:
+    definition = labware._definition
+    labware_path = _get_labware_path(labware)
+    parent = _get_parent_identifier(labware)
+    return labware_path, definition, parent
+
+
 def load_from_definition(
         definition: 'LabwareDefinition',
         parent: Location,
@@ -1135,18 +1143,17 @@ def load_from_definition(
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
     labware = Labware(definition, parent, label, api_level)
-    lookup_path = _get_labware_path(labware)
-    offset = get.get_labware_calibration(lookup_path)
+    index_info = _get_index_file_information(labware)
+    offset = get.get_labware_calibration(
+        index_info[0], index_info[1], parent=index_info[2])
     labware.set_calibration(offset)
     return labware
 
 
 def save_calibration(labware: 'Labware', delta: Point):
-    definition = labware._definition
-    labware_path = _get_labware_path(labware)
-    parent = _get_parent_identifier(labware)
+    index_info = _get_index_file_information(labware)
     modify.save_labware_calibration(
-        labware_path, definition, delta, parent=parent)
+        index_info[0], index_info[1], delta, parent=index_info[2])
     labware.set_calibration(delta)
 
 
