@@ -63,7 +63,9 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
               deckSlotsById,
               (slot: $Values<typeof deckSlotsById>, slotId) => {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
-                const labwareForSlot = allLabware.find(l => l.slot === slotId)
+                const labwareForSlot = allLabware.find(
+                  l => String(l.slot) === slotId
+                )
                 const labwareDef = labwareForSlot?.definition
 
                 return labwareDef ? (
