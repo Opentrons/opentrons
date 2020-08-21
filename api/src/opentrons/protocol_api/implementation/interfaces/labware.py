@@ -1,40 +1,40 @@
+from __future__ import annotations
+
 from abc import abstractmethod
 
 from typing import (List, Dict, Optional, Union, TYPE_CHECKING)
 
-from opentrons.protocol_api.context.interfaces.versioned import ApiVersioned
+from opentrons.protocol_api.implementation.interfaces.versioned import \
+    ApiVersioned
 from opentrons.protocol_api.definitions import DeckItem
+from opentrons.protocol_api.labware import Labware, Well
+from opentrons.protocol_api.module_geometry import ModuleGeometry
 
 from opentrons.types import Location, Point
 if TYPE_CHECKING:
-    from opentrons.protocol_api.module_geometry import ModuleGeometry
     from opentrons_shared_data.labware.dev_types import LabwareParameters
 
 
 class AbstractWell(ApiVersioned):
 
-    @property
     @abstractmethod
-    def parent(self) -> 'AbstractLabware':
+    def get_parent(self) -> Labware:
         ...
 
-    @property
     @abstractmethod
     def has_tip(self) -> bool:
         ...
 
     @abstractmethod
-    def _set_has_tip(self, value: bool):
+    def set_has_tip(self, value: bool):
         ...
 
-    @property
     @abstractmethod
-    def diameter(self) -> Optional[float]:
+    def get_diameter(self) -> Optional[float]:
         ...
 
-    @property
     @abstractmethod
-    def display_name(self):
+    def get_display_name(self):
         ...
 
     @abstractmethod
@@ -53,131 +53,124 @@ class AbstractWell(ApiVersioned):
 class AbstractLabware(ApiVersioned, DeckItem):
 
     @abstractmethod
-    def __getitem__(self, key: str) -> AbstractWell:
+    def __getitem__(self, key: str) -> Well:
         ...
 
-    @property
     @abstractmethod
-    def uri(self) -> str:
+    def get_uri(self) -> str:
         ...
 
-    @property
     @abstractmethod
-    def parent(self) -> Union['AbstractLabware',
-                              AbstractWell,
+    def parent(self) -> Union[Labware,
+                              Well,
                               str,
-                              'ModuleGeometry',
+                              ModuleGeometry,
                               None]:
         ...
 
-    @property
     @abstractmethod
-    def name(self) -> str:
+    def get_name(self) -> str:
         ...
 
     @abstractmethod
-    def _set_name(self, new_name: str):
+    def set_name(self, new_name: str):
         ...
 
-    @property
     @abstractmethod
-    def load_name(self) -> str:
+    def get_load_name(self) -> str:
         ...
 
-    @property
     @abstractmethod
-    def parameters(self) -> 'LabwareParameters':
+    def get_parameters(self) -> 'LabwareParameters':
         ...
 
-    @property
     @abstractmethod
-    def quirks(self) -> List[str]:
+    def get_quirks(self) -> List[str]:
         ...
 
-    @property
     @abstractmethod
-    def magdeck_engage_height(self) -> Optional[float]:
+    def get_magdeck_engage_height(self) -> Optional[float]:
         ...
 
     @abstractmethod
     def set_calibration(self, delta: Point):
         ...
 
-    @property
     @abstractmethod
-    def calibrated_offset(self) -> Point:
+    def get_calibrated_offset(self) -> Point:
         ...
 
     @abstractmethod
-    def well(self, idx) -> AbstractWell:
+    def well(self, idx) -> Well:
         ...
 
     @abstractmethod
-    def wells(self, *args) -> List[AbstractWell]:
+    def wells(self, *args) -> List[Well]:
         ...
 
     @abstractmethod
-    def wells_by_name(self) -> Dict[str, AbstractWell]:
+    def wells_by_name(self) -> Dict[str, Well]:
         ...
 
     @abstractmethod
-    def wells_by_index(self) -> Dict[str, AbstractWell]:
+    def wells_by_index(self) -> Dict[str, Well]:
         ...
 
     @abstractmethod
-    def rows(self, *args) -> List[List[AbstractWell]]:
+    def rows(self, *args) -> List[List[Well]]:
         ...
 
     @abstractmethod
-    def rows_by_name(self) -> Dict[str, List[AbstractWell]]:
+    def rows_by_name(self) -> Dict[str, List[Well]]:
         ...
 
     @abstractmethod
-    def rows_by_index(self) -> Dict[str, List[AbstractWell]]:
+    def rows_by_index(self) -> Dict[str, List[Well]]:
         ...
 
     @abstractmethod
-    def columns(self, *args) -> List[List[AbstractWell]]:
+    def columns(self, *args) -> List[List[Well]]:
         ...
 
     @abstractmethod
-    def columns_by_name(self) -> Dict[str, List[AbstractWell]]:
+    def columns_by_name(self) -> Dict[str, List[Well]]:
         ...
 
     @abstractmethod
-    def columns_by_index(self) -> Dict[str, List[AbstractWell]]:
+    def columns_by_index(self) -> Dict[str, List[Well]]:
         ...
 
-    @property
     @abstractmethod
     def is_tiprack(self) -> bool:
         ...
 
-    @property
     @abstractmethod
-    def tip_length(self) -> float:
+    def get_tip_length(self) -> float:
         ...
 
     @abstractmethod
-    def _set_tip_length(self, length: float):
+    def set_tip_length(self, length: float):
         ...
 
     @abstractmethod
     def next_tip(self,
                  num_tips: int = 1,
-                 starting_tip: AbstractWell = None) -> Optional[AbstractWell]:
+                 starting_tip: Well = None) -> Optional[Well]:
         ...
 
     @abstractmethod
-    def use_tips(self, start_well: AbstractWell, num_channels: int = 1):
+    def use_tips(self, start_well: Well, num_channels: int = 1):
         ...
 
     @abstractmethod
-    def previous_tip(self, num_tips: int = 1) -> Optional[AbstractWell]:
+    def previous_tip(self,
+                     num_tips: int = 1) -> Optional[Well]:
         ...
 
     @abstractmethod
-    def return_tips(self, start_well: AbstractWell, num_channels: int = 1):
+    def return_tips(self,
+                    start_well: Well,
+                    num_channels: int = 1):
         ...
 
     @abstractmethod
