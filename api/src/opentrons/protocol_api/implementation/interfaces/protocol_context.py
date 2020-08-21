@@ -20,7 +20,8 @@ if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-class AbstractProtocolContext(ABC):
+class AbstractProtocolContextImpl(ABC):
+    """Abstract interface for an implementation of a protocol context"""
 
     @abstractmethod
     def get_api_version(self) -> APIVersion:
