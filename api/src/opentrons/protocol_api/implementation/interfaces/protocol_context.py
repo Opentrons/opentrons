@@ -34,7 +34,7 @@ class AbstractProtocolContextImpl(ABC):
         ...
 
     @abstractmethod
-    def cleanup(self):
+    def cleanup(self) -> None:
         ...
 
     @abstractmethod
@@ -42,11 +42,11 @@ class AbstractProtocolContextImpl(ABC):
         ...
 
     @abstractmethod
-    def get_commands(self):
+    def get_commands(self) -> List[str]:
         ...
 
     @abstractmethod
-    def clear_commands(self):
+    def clear_commands(self) -> None:
         ...
 
     @contextlib.contextmanager
@@ -55,11 +55,11 @@ class AbstractProtocolContextImpl(ABC):
         ...
 
     @abstractmethod
-    def connect(self, hardware: API):
+    def connect(self, hardware: API) -> None:
         ...
 
     @abstractmethod
-    def disconnect(self):
+    def disconnect(self) -> None:
         ...
 
     @abstractmethod
@@ -110,7 +110,7 @@ class AbstractProtocolContextImpl(ABC):
         ...
 
     @abstractmethod
-    def get_loaded_modules(self) -> Dict[int, 'ModuleContext']:
+    def get_loaded_modules(self) -> Dict[int, ModuleContext]:
         ...
 
     @abstractmethod
@@ -119,32 +119,35 @@ class AbstractProtocolContextImpl(ABC):
             instrument_name: str,
             mount: Union[types.Mount, str],
             tip_racks: List[Labware] = None,
-            replace: bool = False) -> 'InstrumentContext':
+            replace: bool = False) -> InstrumentContext:
         ...
 
     @abstractmethod
     def get_loaded_instruments(self) \
-            -> Dict[str, Optional['InstrumentContext']]:
+            -> Dict[str, Optional[InstrumentContext]]:
         ...
 
     @abstractmethod
-    def pause(self, msg=None):
+    def pause(self, msg: str = None) -> None:
         ...
 
     @abstractmethod
-    def resume(self):
+    def resume(self) -> None:
         ...
 
     @abstractmethod
-    def comment(self, msg):
+    def comment(self, msg: str) -> None:
         ...
 
     @abstractmethod
-    def delay(self, seconds=0, minutes=0, msg=None):
+    def delay(self,
+              seconds=0,
+              minutes=0,
+              msg: str = None) -> None:
         ...
 
     @abstractmethod
-    def home(self):
+    def home(self) -> None:
         ...
 
     @abstractmethod
