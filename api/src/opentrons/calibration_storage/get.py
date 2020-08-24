@@ -90,12 +90,6 @@ def _get_tip_length_data(
             'be loaded')
 
 
-def _maybe_add_labware_to_index_file(definition, parent, slot):
-    labware_hash = helpers.hash_labware_def(definition)
-    uri = helpers.uri_from_definition(definition)
-    modify._add_to_index_offset_file(parent, slot, uri, labware_hash)
-
-
 def get_labware_calibration(
         lookup_path: local_types.StrPath,
         definition: 'LabwareDefinition',
@@ -113,7 +107,7 @@ def get_labware_calibration(
     offset = Point(0, 0, 0)
     labware_path = offset_path / lookup_path
     if labware_path.exists():
-        _maybe_add_labware_to_index_file(definition, parent, slot)
+        modify.add_existing_labware_to_index_file(definition, parent, slot)
         migration.check_index_version(offset_path / 'index.json')
         calibration_data = io.read_cal_file(str(labware_path))
         offset_array = calibration_data['default']['offset']

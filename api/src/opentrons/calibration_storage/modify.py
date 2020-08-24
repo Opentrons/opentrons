@@ -63,6 +63,13 @@ def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
         io.save_to_file(index_file, blob)
 
 
+def add_existing_labware_to_index_file(
+        definition: 'LabwareDefinition', parent: str = '', slot: str = ''):
+    labware_hash = helpers.hash_labware_def(definition)
+    uri = helpers.uri_from_definition(definition)
+    _add_to_index_offset_file(parent, slot, uri, labware_hash)
+
+
 def save_labware_calibration(
         labware_path: local_types.StrPath,
         definition: 'LabwareDefinition',
