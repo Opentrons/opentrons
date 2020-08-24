@@ -123,7 +123,7 @@ async def test_return_tip(mock_user_flow):
     # should move to return tip
     move_calls = [
         call(
-            mount=Mount.LEFT,
+            mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
             critical_point=uf._get_critical_point()
         ),
