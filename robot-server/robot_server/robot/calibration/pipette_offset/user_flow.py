@@ -1,13 +1,14 @@
 import logging
 from typing import Any, Awaitable, Callable, Dict, List, Optional
 
+from opentrons.calibration_storage import get
+from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.protocol_api import geometry, labware
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import (
-    CalibrationCommand, OffsetCalCommand)
+from robot_server.service.session.models import CalibrationCommand
 from robot_server.robot.calibration.constants import (
     TIP_RACK_LOOKUP_BY_MAX_VOL,
     SHORT_TRASH_DECK,
@@ -18,10 +19,10 @@ from ..helper_classes import (
     RequiredLabware,
     AttachedPipette)
 from .constants import (
-    OffsetCalibrationState as State,
+    PipetteOffsetCalibrationState as State,
     TIP_RACK_SLOT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER)
-from .state_machine import OffsetCalibrationStateMachine
+from .state_machine import PipetteOffsetCalibrationStateMachine
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ COMMAND_HANDLER = Callable[..., Awaitable]
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
 
-class OffsetCalibrationUserFlow:
+class PipetteOffsetCalibrationUserFlow:
     def __init__(self,
                  hardware: ThreadManager,
                  mount: Mount = Mount.RIGHT):
@@ -58,7 +59,7 @@ class OffsetCalibrationUserFlow:
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
         self._current_state = State.sessionStarted
-        self._state_machine = OffsetCalibrationStateMachine()
+        self._state_machine = PipetteOffsetCalibrationStateMachine()
 
         self._tip_origin_pt: Optional[Point] = None
 
@@ -69,8 +70,8 @@ class OffsetCalibrationUserFlow:
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CalibrationCommand.save_offset: self.save_offset,
             CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
-            OffsetCalCommand.move_to_measure_z: self.move_to_measure_z,
-            OffsetCalCommand.move_to_measure_xy: self.move_to_measure_xy,
+            CalibrationCommand.move_to_deck: self.move_to_deck,
+            CalibrationCommand.move_to_point_one: self.move_to_point_one,
             CalibrationCommand.exit: self.exit_session,
         }
 
@@ -121,7 +122,7 @@ class OffsetCalibrationUserFlow:
             await handler(**data)
         self._set_current_state(next_state)
         MODULE_LOG.debug(
-            f'OffsetCalUserFlow handled command {name}, transitioned'
+            f'PipetteOffsetCalUserFlow handled command {name}, transitioned'
             f'from {self._current_state} to {next_state}')
 
     def _get_critical_point(self) -> CriticalPoint:
@@ -145,10 +146,23 @@ class OffsetCalibrationUserFlow:
         to_loc = Location(point, None)
         await self._move(to_loc)
 
-    async def move_to_measure_z(self):
+    def _get_tip_length(self) -> float:
+        try:
+            return get.load_tip_length_calibration(
+                self._hw_pipette.pipette_id,  # type: ignore
+                self._tip_rack._definition,
+                '')['tipLength']
+        except TipLengthCalNotFound:
+            tip_overlap = self._hw_pipette.config.tip_overlap.get(
+                self._tip_rack.uri,
+                self._hw_pipette.config.tip_overlap['default'])
+            tip_length = self._tip_rack.tip_length
+            return tip_length - tip_overlap
+
+    async def move_to_deck(self):
         pass
 
-    async def move_to_measure_xy(self):
+    async def move_to_point_one(self):
         pass
 
     async def save_offset(self):

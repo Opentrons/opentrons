@@ -3,13 +3,13 @@ from opentrons.types import Point
 from robot_server.robot.calibration.constants import STATE_WILDCARD
 
 
-class OffsetCalibrationState(str, Enum):
+class PipetteOffsetCalibrationState(str, Enum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     preparingPipette = "preparingPipette"
     inspectingTip = "inspectingTip"
-    measuringZ = "MeasuringZ"
-    measuringXY = "MeasuringXY"
+    joggingToDeck = "joggingToDeck"
+    joggingToPointOne = "joggingToPointOne"
     calibrationComplete = "calibrationComplete"
     sessionExited = "sessionExited"
     WILDCARD = STATE_WILDCARD
