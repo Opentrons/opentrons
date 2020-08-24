@@ -60,4 +60,23 @@ export const announcements: Array<Announcement> = [
       </>
     ),
   },
+  {
+    announcementKey: 'airGapDelaySettings',
+    heading: "We've updated the Protocol Designer",
+    image: null,
+    message: (
+      <>
+        <p>
+          Protocol Designer Beta now includes support for more pipetting
+          settings: Air gap and Delay.{' '}
+        </p>
+        <p>
+          Note: Protocols using new features{' '}
+          <strong>may require an app and robot update to run.</strong> You will
+          need to have the OT-2 app and orbot on the latest versions (
+          <strong>3.20 or higher</strong>).{' '}
+        </p>
+      </>
+    ),
+  },
 ]
