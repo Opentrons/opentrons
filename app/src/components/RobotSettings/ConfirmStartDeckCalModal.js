@@ -13,7 +13,7 @@ const HEADING = 'Are you sure you want to continue?'
 const CANCEL = 'cancel'
 const EXIT = 'continue'
 const WARNING =
-  'Performing a deck calibration will clear your instrument offset calibrations.'
+  'Performing a deck calibration will clear your pipette offset calibrations.'
 
 export function ConfirmStartDeckCalModal(
   props: ConfirmStartDeckCalModalProps
