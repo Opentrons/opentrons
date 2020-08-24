@@ -26,6 +26,12 @@ describe('ControlsCard', () => {
   const getDeckCalButton = wrapper =>
     wrapper.find('TitledControl[title="Calibrate deck"]').find('button')
 
+  const getCancelDeckCalButton = wrapper =>
+    wrapper.find('OutlineButton[children="cancel"]').find('button')
+
+  const getConfirmDeckCalButton = wrapper =>
+    wrapper.find('OutlineButton[children="continue"]').find('button')
+
   beforeEach(() => {
     jest.useFakeTimers()
     mockStore = {
@@ -76,12 +82,37 @@ describe('ControlsCard', () => {
     )
   })
 
-  it('button launches new deck calibration button if feature flag for calibration overhaul is truthy', () => {
+  it('button launches new deck calibration after confirm if feature flag for calibration overhaul is truthy', () => {
     getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
     const wrapper = render()
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
     getDeckCalButton(wrapper).invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(true)
+
+    getConfirmDeckCalButton(wrapper).invoke('onClick')()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith({
+      ...Sessions.ensureSession(
+        'robot-name',
+        Sessions.SESSION_TYPE_DECK_CALIBRATION
+      ),
+      meta: expect.objectContaining({ requestId: expect.any(String) }),
+    })
+  })
+
+  it('button launches new deck calibration and cancel closes if feature flag for calibration overhaul is truthy', () => {
+    getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+    const wrapper = render()
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
+    getDeckCalButton(wrapper).invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(true)
+
+    getCancelDeckCalButton(wrapper).invoke('onClick')()
+
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
+    expect(mockStore.dispatch).not.toHaveBeenCalledWith({
       ...Sessions.ensureSession(
         'robot-name',
         Sessions.SESSION_TYPE_DECK_CALIBRATION

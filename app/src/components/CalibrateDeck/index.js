@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
 
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ModalPage,
   SpinnerModalPage,
@@ -14,8 +15,8 @@ import type { State } from '../../types'
 import type {
   SessionCommandString,
   SessionCommandData,
+  DeckCalibrationLabware,
 } from '../../sessions/types'
-import { mockDeckCalTipRack } from '../../sessions/__fixtures__/deck-calibration.js'
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
@@ -62,6 +63,7 @@ const PANEL_STYLE_BY_STEP: {
 }
 export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
   const { session, robotName, closeWizard } = props
+  const { currentStep, instrument, labware } = session?.details || {}
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const dispatch = useDispatch()
 
@@ -102,15 +104,17 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     deleteSession()
   }, true)
 
-  if (!session) {
+  const isMulti = React.useMemo(() => {
+    const spec = instrument && getPipetteModelSpecs(instrument.model)
+    return spec ? spec.channels > 1 : false
+  }, [instrument])
+
+  const tipRack: DeckCalibrationLabware | null =
+    (labware && labware.find(l => l.isTiprack)) ?? null
+
+  if (!session || !tipRack) {
     return null
   }
-
-  const { currentStep } = session?.details
-  // TODO: IMMEDIATELY pull actual tipRack, isMulti, and mount from session details
-  const tipRack = mockDeckCalTipRack
-  const isMulti = false
-  const mount = 'left'
 
   const titleBarProps = {
     title: TIP_LENGTH_CALIBRATION_SUBTITLE,
@@ -133,7 +137,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
           deleteSession={deleteSession}
           tipRack={tipRack}
           isMulti={isMulti}
-          mount={mount}
+          mount={instrument?.mount.toLowerCase()}
           currentStep={currentStep}
         />
       </ModalPage>

@@ -56,7 +56,7 @@ export function DeckSetup(props: CalibrateDeckChildProps): React.Node {
               (slot: $Values<typeof deckSlotsById>, slotId) => {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
                 const labwareDef =
-                  tipRack?.slot === slotId ? tipRack?.definition : null
+                  String(tipRack?.slot) === slotId ? tipRack?.definition : null
 
                 return labwareDef ? (
                   <CalibrationLabwareRender

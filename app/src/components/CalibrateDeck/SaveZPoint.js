@@ -1,6 +1,17 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton } from '@opentrons/components'
+import { css } from 'styled-components'
+import {
+  PrimaryButton,
+  Flex,
+  Text,
+  FONT_WEIGHT_SEMIBOLD,
+  FONT_SIZE_HEADER,
+  FONT_SIZE_BODY_2,
+  DIRECTION_ROW,
+  SPACING_3,
+  BORDER_SOLID_LIGHT,
+} from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
@@ -25,15 +36,16 @@ const assetMap = {
   },
 }
 
-const SAVE_Z_HEADER = 'save z-axis offset'
+const HEADER = 'z-axis in slot 5'
 
 const JOG_UNTIL = 'Jog the pipette until the tip is'
 const JUST_BARELY_TOUCHING = 'barely touching (less than 0.1mm)'
 const DECK_IN = 'the deck in'
 const SLOT_5 = 'slot 5'
 const THEN = 'Then press the'
-const SAVE_POINT = 'save z-axis'
-const TO_SAVE = 'button to save z-axis calibration coordinate.'
+const BUTTON_TEXT = 'remember z-axis and move to slot 1'
+const TO_USE_Z =
+  'button to use this z position for the rest of deck calibration'
 
 export function SaveZPoint(props: CalibrateDeckChildProps): React.Node {
   const { isMulti, mount, sendSessionCommand } = props
@@ -61,42 +73,54 @@ export function SaveZPoint(props: CalibrateDeckChildProps): React.Node {
   return (
     <>
       <div className={styles.modal_header}>
-        <h3>{SAVE_Z_HEADER}</h3>
+        <Text
+          textTransform="uppercase"
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          fontSize={FONT_SIZE_HEADER}
+        >
+          {HEADER}
+        </Text>
       </div>
-      <div className={styles.step_check_wrapper}>
-        <div className={styles.step_check_body_wrapper}>
-          <p className={styles.tip_pick_up_demo_body}>
-            {JOG_UNTIL}
-            <b>{` ${JUST_BARELY_TOUCHING} `}</b>
-            {DECK_IN}
-            <b>{` ${SLOT_5}.`}</b>
-            <br />
-            <br />
-            {THEN}
-            <b>{` ${SAVE_POINT} `}</b>
-            {TO_SAVE}
-          </p>
-        </div>
-        <div className={styles.step_check_video_wrapper}>
-          <video
-            key={demoAsset}
-            className={styles.step_check_video}
-            autoPlay={true}
-            loop={true}
-            controls={false}
-          >
-            <source src={demoAsset} />
-          </video>
-        </div>
-      </div>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        padding={SPACING_3}
+        border={BORDER_SOLID_LIGHT}
+        marginTop={SPACING_3}
+      >
+        <Text
+          fontSize={FONT_SIZE_BODY_2}
+          css={css`
+            align-self: center;
+          `}
+        >
+          {JOG_UNTIL}
+          <b>{` ${JUST_BARELY_TOUCHING} `}</b>
+          {DECK_IN}
+          <b>{SLOT_5}.</b>
+          <br />
+          <br />
+          {THEN}
+          <b>{` ${BUTTON_TEXT} `}</b>
+          {TO_USE_Z}.
+        </Text>
+        <video
+          key={demoAsset}
+          className={styles.step_check_video}
+          autoPlay={true}
+          loop={true}
+          controls={false}
+        >
+          <source src={demoAsset} />
+        </video>
+      </Flex>
       <div className={styles.tip_pick_up_controls_wrapper}>
         <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
       </div>
-      <div className={styles.button_row}>
+      <Flex width="100%" marginBottom={SPACING_3}>
         <PrimaryButton onClick={savePoint} className={styles.command_button}>
-          {SAVE_POINT}
+          {BUTTON_TEXT}
         </PrimaryButton>
-      </div>
+      </Flex>
     </>
   )
 }

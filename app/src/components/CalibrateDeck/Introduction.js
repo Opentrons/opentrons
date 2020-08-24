@@ -13,18 +13,21 @@ import {
   Link,
   PrimaryButton,
   Text,
+  useConditionalConfirm,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
 import styles from './styles.css'
-import type { CalibrateDeckChildProps } from './types'
 import { labwareImages } from './labwareImages'
 import { getLatestLabwareDef } from '../../getLabware'
+import { Portal } from '../portal'
+import { ConfirmClearDeckModal } from './ConfirmClearDeckModal'
+import type { CalibrateDeckChildProps } from './types'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
-// TODO: IMMEDIATELY insert final copy
-const DECK_CAL_INTRO_BODY = ''
+const DECK_CAL_INTRO_BODY =
+  'Deck calibration ensures positional accuracy so that your robot moves as expected. It will accurately establish the OT-2’s deck orientation relative to the gantry.'
 const DECK_CALIBRATION_INTRO_HEADER = 'deck calibration'
 
 const LABWARE_REQS = 'For this process you will require:'
@@ -35,10 +38,17 @@ const NOTE_BODY =
   'important you perform this calibration using the exact tips specified in your protocol, as the robot uses the corresponding labware definition data to find the tip.'
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 
-const CONTINUE = 'Continue to deck calibration'
+const CONTINUE = 'Continue to calibrate deck'
 
 export function Introduction(props: CalibrateDeckChildProps): React.Node {
   const { tipRack, sendSessionCommand } = props
+
+  const { showConfirmation, confirm: proceed, cancel } = useConditionalConfirm(
+    () => {
+      sendSessionCommand(Sessions.deckCalCommands.LOAD_LABWARE)
+    },
+    true
+  )
 
   return (
     <>
@@ -64,15 +74,15 @@ export function Introduction(props: CalibrateDeckChildProps): React.Node {
         </Box>
       </Flex>
       <Flex width="100%">
-        <PrimaryButton
-          onClick={() =>
-            sendSessionCommand(Sessions.deckCalCommands.LOAD_LABWARE)
-          }
-          className={styles.continue_button}
-        >
+        <PrimaryButton onClick={proceed} className={styles.continue_button}>
           {CONTINUE}
         </PrimaryButton>
       </Flex>
+      {showConfirmation && (
+        <Portal>
+          <ConfirmClearDeckModal confirm={proceed} cancel={cancel} />
+        </Portal>
+      )}
     </>
   )
 }

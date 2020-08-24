@@ -25,6 +25,7 @@ export function ConfirmExitModal(props: ConfirmExitModalProps): React.Node {
         { children: EXIT, onClick: exit },
       ]}
       alertOverlay
+      iconName={null}
     >
       {WARNING}
     </AlertModal>
