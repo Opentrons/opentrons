@@ -164,6 +164,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # go to bottom last. (If there is more than one well, use the last well first
     # because the pipette is already at the last well at this point)
     for well_loc in reversed(well_locs):
+        well = test_labware.well(well_loc)
         set_speeds(RATE)
         pipette.move_to(well.bottom())
         protocol.pause("Moved to the bottom of the well")
