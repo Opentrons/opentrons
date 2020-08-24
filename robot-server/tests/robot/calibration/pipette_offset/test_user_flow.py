@@ -1,9 +1,8 @@
 import pytest
-from unittest.mock import MagicMock, ANY, patch, call
+from unittest.mock import MagicMock, call
 from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
-from opentrons.protocol_api.labware import get_labware_definition
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand

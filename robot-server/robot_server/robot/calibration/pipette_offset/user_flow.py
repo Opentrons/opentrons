@@ -21,6 +21,9 @@ from ..helper_classes import (
 from .constants import (
     PipetteOffsetCalibrationState as State,
     TIP_RACK_SLOT,
+    JOG_TO_DECK_SLOT,
+    POINT_ONE_ID,
+    MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER)
 from .state_machine import PipetteOffsetCalibrationStateMachine
 
@@ -160,10 +163,17 @@ class PipetteOffsetCalibrationUserFlow:
             return tip_length - tip_overlap
 
     async def move_to_deck(self):
-        pass
+        deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
+        ydim = self._deck.get_slot_definition(
+            JOG_TO_DECK_SLOT)['boundingBox']['yDimension']
+        new_pt = deck_pt + Point(0, (ydim/2), 0) + \
+            MOVE_TO_DECK_SAFETY_BUFFER
+        to_loc = Location(new_pt, None)
+        await self._move(to_loc)
 
     async def move_to_point_one(self):
-        pass
+        coords = self._deck.get_calibration_position(POINT_ONE_ID).position
+        await self._move(Location(Point(*coords), None))
 
     async def save_offset(self):
         pass
