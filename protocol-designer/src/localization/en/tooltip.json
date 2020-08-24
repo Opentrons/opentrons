@@ -15,15 +15,15 @@
 
   "step_fields": {
     "defaults": {
-      "aspirate_airGap_checkbox": "Aspirate air before moving to destination well",
+      "aspirate_airGap_checkbox": "Aspirate air before moving to next well",
       "aspirate_flowRate": "The speed at which the pipette aspirates",
       "dispense_flowRate": "The speed at which the pipette dispenses",
       "aspirate_mix_checkbox": "Pipette up and down before aspirating",
       "dispense_mix_checkbox": "Pipette up and down after dispensing",
       "aspirate_tipPosition": "Where in the well the pipette aspirates from",
       "dispense_tipPosition": "Where in the well the pipette dispenses to",
-      "aspirate_delay_checkbox": "Delay pipette movement after aspirating",
-      "dispense_delay_checkbox": "Delay pipette movement after dispensing",
+      "aspirate_delay_checkbox": "Delay pipette movement after each aspirate in this step",
+      "dispense_delay_checkbox": "Delay pipette movement after each dispense in this step",
 
       "blowout_checkbox": "Where to dispose of remaining volume in tip",
       "blowout_location": "Where to dispose of remaining volume in tip",
