@@ -53,6 +53,7 @@ const FLEXBOX_PROPS = [
   'justifyContent',
   'flexDirection',
   'flexWrap',
+  'alignSelf',
 ]
 
 const LAYOUT_PROPS = [

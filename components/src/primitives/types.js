@@ -49,6 +49,7 @@ export type BorderProps = {|
 export type FlexboxProps = {|
   flex?: string | number,
   alignItems?: string,
+  alignSelf?: string,
   justifyContent?: string,
   flexDirection?: string,
   flexWrap?: string,
