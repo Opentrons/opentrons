@@ -4,7 +4,9 @@ from typing import List, Tuple
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from robot_server.robot.calibration.deck.user_flow import \
-    DeckCalibrationUserFlow
+    DeckCalibrationUserFlow, tuplefy_cal_point_dicts
+from robot_server.robot.calibration.deck.constants import \
+    POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID, DeckCalibrationState
 
 
 @pytest.fixture
@@ -130,3 +132,76 @@ async def test_return_tip(mock_user_flow):
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
     uf._hardware.drop_tip.assert_called()
+
+
+async def test_jog(mock_user_flow):
+    uf = mock_user_flow
+    await uf.jog(vector=(0, 0, 0.1))
+    assert await uf._get_current_point() == Point(0, 0, 0.1)
+    await uf.jog(vector=(1, 0, 0))
+    assert await uf._get_current_point() == Point(1, 0, 0.1)
+
+
+@pytest.mark.parametrize(
+    "state,point_id", [
+        (DeckCalibrationState.joggingToDeck, POINT_ONE_ID),
+        (DeckCalibrationState.savingPointOne, POINT_TWO_ID),
+        (DeckCalibrationState.savingPointTwo, POINT_THREE_ID)])
+async def test_get_move_to_cal_point_location(mock_user_flow,
+                                              state, point_id):
+    uf = mock_user_flow
+    uf._z_height_reference = 30
+
+    pt_list = uf._deck.get_calibration_position(point_id).position
+    exp = Point(pt_list[0], pt_list[1], 30)
+
+    uf._current_state = state
+    assert uf._get_move_to_point_loc_by_state().point == exp
+
+
+async def test_save_z_height(mock_user_flow):
+    uf = mock_user_flow
+    uf._current_state = DeckCalibrationState.joggingToDeck
+    assert uf._z_height_reference is None
+
+    await uf._hardware.move_to(
+            mount=uf._mount,
+            abs_position=Point(x=10, y=10, z=10),
+            critical_point=uf._hw_pipette.critical_point
+        )
+    await uf.save_offset()
+    assert uf._z_height_reference == 10
+
+
+@pytest.mark.parametrize(
+    "state,point_id", [
+        (DeckCalibrationState.savingPointOne, POINT_ONE_ID),
+        (DeckCalibrationState.savingPointTwo, POINT_TWO_ID),
+        (DeckCalibrationState.savingPointThree, POINT_THREE_ID)])
+async def test_save_cal_point_offsets(mock_user_flow, state, point_id):
+    uf = mock_user_flow
+
+    def mock_save_attitude_matrix(*args, **kwargs):
+        pass
+
+    uf._save_attitude_matrix = mock_save_attitude_matrix
+    uf._current_state = state
+    await uf._hardware.move_to(
+            mount=uf._mount,
+            abs_position=Point(x=10, y=10, z=10),
+            critical_point=uf._hw_pipette.critical_point
+        )
+
+    assert state not in uf._saved_points
+    await uf.save_offset()
+    assert uf._saved_points[point_id] == Point(10, 10, 10)
+
+
+def test_tuplefy_cal_point_dicts():
+    saved_points = {
+        '1BLC': Point(1, 1, 3),
+        '3BRC': Point(2, 2, 2),
+        '7TLC': Point(1, 2, 1)}
+
+    a = tuplefy_cal_point_dicts(saved_points)
+    assert a == ((1, 1, 3), (2, 2, 2), (1, 2, 1))
