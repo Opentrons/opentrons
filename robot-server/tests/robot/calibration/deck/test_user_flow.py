@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, call
+from typing import List, Tuple
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from robot_server.robot.calibration.deck.user_flow import \
@@ -38,6 +39,34 @@ def mock_hw(hardware):
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
     return hardware
+
+
+pipette_combos: List[Tuple[List[str], Mount]] = [
+    (['p20_multi_v2.1', 'p20_multi_v2.1'], Mount.RIGHT),
+    (['p20_single_v2.1', 'p20_multi_v2.1'], Mount.LEFT),
+    (['p20_multi_v2.1', 'p300_single_v2.1'], Mount.LEFT),
+    (['p300_multi_v2.1', 'p1000_single_v2.1'], Mount.LEFT),
+    (['p1000_single_v2.1', ''], Mount.LEFT),
+    (['', 'p300_multi_v2.1'], Mount.RIGHT)
+]
+
+
+@pytest.mark.parametrize('pipettes,target_mount', pipette_combos)
+def test_user_flow_select_pipette(pipettes, target_mount, hardware):
+    pip, pip2 = None, None
+    if pipettes[0]:
+        pip = pipette.Pipette(pipettes[0],
+                              {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                              'testId')
+    if pipettes[1]:
+        pip2 = pipette.Pipette(pipettes[1],
+                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                               'testId2')
+    hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
+
+    uf = DeckCalibrationUserFlow(hardware=hardware)
+    assert uf._hw_pipette == \
+        hardware._attached_instruments[target_mount]
 
 
 @pytest.fixture
@@ -94,7 +123,7 @@ async def test_return_tip(mock_user_flow):
     # should move to return tip
     move_calls = [
         call(
-            mount=Mount.LEFT,
+            mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
             critical_point=uf._get_critical_point()
         ),
