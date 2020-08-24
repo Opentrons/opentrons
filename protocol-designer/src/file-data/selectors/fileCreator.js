@@ -22,10 +22,11 @@ import type {
   FileLabware,
   FileModule,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { ModuleEntity } from '../../step-forms'
 import type { Selector } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
+import type { Timeline } from '../../step-generation/types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -39,16 +40,36 @@ const applicationVersion: string = process.env.OT_PD_VERSION || ''
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
 // NOTE: V3 commands are a subset of V4 commands.
+// 'airGap' is specified in the V3 schema but was never implemented, so it doesn't count.
 const _isV3Command = (command: Command): boolean =>
   command.command === 'aspirate' ||
   command.command === 'dispense' ||
-  command.command === 'airGap' ||
   command.command === 'blowout' ||
   command.command === 'touchTip' ||
   command.command === 'pickUpTip' ||
   command.command === 'dropTip' ||
   command.command === 'moveToSlot' ||
   command.command === 'delay'
+
+// This is a HACK to allow PD to not have to export protocols under the not-yet-released
+// v6 schema with the dispenseAirGap command, by replacing all dispenseAirGaps with dispenses
+// Once we have v6 in the wild, just use the ordinary getRobotStateTimeline and
+// delete this getRobotStateTimelineWithoutAirGapDispenseCommand.
+export const getRobotStateTimelineWithoutAirGapDispenseCommand: Selector<Timeline> = createSelector(
+  getRobotStateTimeline,
+  robotStateTimeline => {
+    const timeline = robotStateTimeline.timeline.map(frame => ({
+      ...frame,
+      commands: frame.commands.map(command => {
+        if (command.command === 'dispenseAirGap') {
+          return { ...command, command: 'dispense' }
+        }
+        return command
+      }),
+    }))
+    return { ...robotStateTimeline, timeline }
+  }
+)
 
 /** If there are any module entities or and v4-specific commands,
  ** export as a v4 protocol. Otherwise, export as v3.
@@ -58,7 +79,7 @@ const _isV3Command = (command: Command): boolean =>
  ** form/timeline errors. Checking for v4 commands should be redundant,
  ** we do it just in case non-V3 commands somehow sneak in despite having no modules. */
 export const getIsV4Protocol: Selector<boolean> = createSelector(
-  getRobotStateTimeline,
+  getRobotStateTimelineWithoutAirGapDispenseCommand,
   stepFormSelectors.getModuleEntities,
   (robotStateTimeline, moduleEntities) => {
     const noModules = isEmpty(moduleEntities)
@@ -70,11 +91,22 @@ export const getIsV4Protocol: Selector<boolean> = createSelector(
   }
 )
 
+const requiresV5 = (command: Command): boolean =>
+  command.command === 'moveToWell'
+export const getRequiresV5: Selector<boolean> = createSelector(
+  getRobotStateTimelineWithoutAirGapDispenseCommand,
+  robotStateTimeline => {
+    return robotStateTimeline.timeline.some(timelineFrame =>
+      timelineFrame.commands.some(command => requiresV5(command))
+    )
+  }
+)
+
 // $FlowFixMe(IL, 2020-03-02): presence of non-v3 commands should make 'isV4Protocol' true
 export const createFile: Selector<PDProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
-  getRobotStateTimeline,
+  getRobotStateTimelineWithoutAirGapDispenseCommand,
   dismissSelectors.getAllDismissedWarnings,
   ingredSelectors.getLiquidGroupsById,
   ingredSelectors.getLiquidsByLabwareId,
@@ -86,6 +118,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
   getIsV4Protocol,
+  getRequiresV5,
   (
     fileMetadata,
     initialRobotState,
@@ -100,7 +133,8 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
     pipetteEntities,
     labwareNicknamesById,
     labwareDefsByURI,
-    isV4Protocol
+    isV4Protocol,
+    requiresV5
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
@@ -212,7 +246,15 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       labwareDefinitions,
     }
 
-    if (isV4Protocol) {
+    if (requiresV5) {
+      return {
+        ...protocolFile,
+        $otSharedSchema: '#/protocol/schemas/5',
+        schemaVersion: 5,
+        modules,
+        commands,
+      }
+    } else if (isV4Protocol) {
       return {
         ...protocolFile,
         $otSharedSchema: '#/protocol/schemas/4',

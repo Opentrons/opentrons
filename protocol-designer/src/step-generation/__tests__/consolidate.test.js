@@ -15,6 +15,7 @@ import {
   getInitialRobotStateStandard,
   getRobotStatePickedUpTipStandard,
   getSuccessResult,
+  makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
   makeDispenseHelper,
@@ -27,6 +28,7 @@ import type {
   DispenseParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
+const airGapHelper = makeAirGapHelper({ offsetFromBottomMm: 11.54 })
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
@@ -629,6 +631,49 @@ describe('consolidate single-channel', () => {
     ])
   })
 
+  it('should delay after air gap aspirate and regular aspirate', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 100,
+      aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      changeTip: 'once',
+      aspirateAirGapVolume: 5,
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    // break into single chunks because volume + air gap volume is too big for multi aspirate
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      aspirateHelper('A1', 100),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
+      airGapHelper('A1', 5),
+      delayCommand(12),
+
+      aspirateHelper('A2', 100),
+      ...delayWithOffset('A2', SOURCE_LABWARE),
+      airGapHelper('A2', 5),
+      delayCommand(12),
+
+      dispenseHelper('B1', 210),
+
+      aspirateHelper('A3', 100),
+      ...delayWithOffset('A3', SOURCE_LABWARE),
+      airGapHelper('A3', 5),
+      delayCommand(12),
+
+      aspirateHelper('A4', 100),
+      ...delayWithOffset('A4', SOURCE_LABWARE),
+      airGapHelper('A4', 5),
+      delayCommand(12),
+
+      dispenseHelper('B1', 210),
+    ])
+  })
+
   it('should delay after dispense', () => {
     const data = {
       ...mixinArgs,
@@ -736,7 +781,77 @@ describe('consolidate single-channel', () => {
     expect(res.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
   })
 
-  it.todo('air gap') // TODO Ian 2018-04-05 determine air gap behavior
+  it('should air gap after aspirate and dispense all air + liquid at once', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 100,
+      changeTip: 'once',
+      aspirateAirGapVolume: 5,
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    // break into single chunks because volume + air gap volume is too big for multi aspirate
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      aspirateHelper('A1', 100),
+      airGapHelper('A1', 5),
+
+      aspirateHelper('A2', 100),
+      airGapHelper('A2', 5),
+
+      dispenseHelper('B1', 210),
+
+      aspirateHelper('A3', 100),
+      airGapHelper('A3', 5),
+
+      aspirateHelper('A4', 100),
+      airGapHelper('A4', 5),
+
+      dispenseHelper('B1', 210),
+    ])
+  })
+
+  it('should air gap after aspirate and break into single chunks and dispense all air + liquid at once', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'once',
+      aspirateAirGapVolume: 5,
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    // break into single chunks because volume + air gap volume is too big for multi aspirate
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      aspirateHelper('A1', 150),
+      airGapHelper('A1', 5),
+
+      dispenseHelper('B1', 155),
+
+      aspirateHelper('A2', 150),
+      airGapHelper('A2', 5),
+
+      dispenseHelper('B1', 155),
+
+      aspirateHelper('A3', 150),
+      airGapHelper('A3', 5),
+
+      dispenseHelper('B1', 155),
+
+      aspirateHelper('A4', 150),
+      airGapHelper('A4', 5),
+
+      dispenseHelper('B1', 155),
+    ])
+  })
 })
 
 describe('consolidate multi-channel', () => {

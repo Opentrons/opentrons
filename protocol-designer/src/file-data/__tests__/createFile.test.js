@@ -3,6 +3,7 @@ import Ajv from 'ajv'
 import isEmpty from 'lodash/isEmpty'
 import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
 import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
+import protocolV5Schema from '@opentrons/shared-data/protocol/schemas/5.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
 import { createFile } from '../selectors'
 import {
@@ -17,6 +18,7 @@ import {
 } from '../__fixtures__/createFile/commonFields'
 import * as engageMagnet from '../__fixtures__/createFile/engageMagnet'
 import * as noModules from '../__fixtures__/createFile/noModules'
+import * as v5Fixture from '../__fixtures__/createFile/v5Fixture'
 
 const getAjvValidator = _protocolSchema => {
   const ajv = new Ajv({
@@ -58,7 +60,8 @@ describe('createFile selector', () => {
       pipetteEntities,
       labwareNicknamesById,
       labwareDefsByURI,
-      false // isV4Protocol
+      false, // isV4Protocol
+      false // requiresV5
     )
 
     expectResultToMatchSchema(result, protocolV3Schema)
@@ -85,7 +88,8 @@ describe('createFile selector', () => {
       pipetteEntities,
       labwareNicknamesById,
       labwareDefsByURI,
-      true // isV4Protocol
+      true, // isV4Protocol
+      false // requiresV5
     )
 
     expectResultToMatchSchema(result, protocolV4Schema)
@@ -93,6 +97,34 @@ describe('createFile selector', () => {
     // check for false positives: if the output is lacking these entities, we don't
     // have the opportunity to validate their part of the schema
     expect(!isEmpty(result.modules)).toBe(true)
+    expect(!isEmpty(result.labware)).toBe(true)
+    expect(!isEmpty(result.pipettes)).toBe(true)
+  })
+
+  it('should return a schema-valid JSON V5 protocol, if there are any moveToWell commands', () => {
+    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    const result = createFile.resultFunc(
+      fileMetadata,
+      v5Fixture.initialRobotState,
+      v5Fixture.robotStateTimeline,
+      dismissedWarnings,
+      ingredients,
+      ingredLocations,
+      v5Fixture.savedStepForms,
+      v5Fixture.orderedStepIds,
+      labwareEntities,
+      v5Fixture.moduleEntities,
+      pipetteEntities,
+      labwareNicknamesById,
+      labwareDefsByURI,
+      true, // isV4Protocol
+      true // requiresV5
+    )
+
+    expectResultToMatchSchema(result, protocolV5Schema)
+
+    // check for false positives: if the output is lacking these entities, we don't
+    // have the opportunity to validate their part of the schema
     expect(!isEmpty(result.labware)).toBe(true)
     expect(!isEmpty(result.pipettes)).toBe(true)
   })
