@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import logging
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple
+from typing import (
+    Any, Awaitable, Callable, Dict, List, Optional, Tuple,
+    Union, TYPE_CHECKING)
 
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
+from opentrons.calibration_storage import helpers
 from opentrons.config import feature_flags as ff
+from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.protocol_api import geometry, labware
@@ -12,6 +18,8 @@ from opentrons.types import Mount, Point, Location
 from robot_server.robot.calibration.constants import \
     TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.service.errors import RobotServerError
+from opentrons.util import linal
+
 from robot_server.service.session.models import (
     CalibrationCommand, DeckCalibrationCommand)
 from robot_server.robot.calibration.constants import (
@@ -20,19 +28,23 @@ import robot_server.robot.calibration.util as uf
 from .constants import (
     DeckCalibrationState as State,
     JOG_TO_DECK_SLOT,
-    JOG_TO_DECK_Y_SHIFT,
     POINT_ONE_ID,
     POINT_TWO_ID,
     POINT_THREE_ID,
     TIP_RACK_SLOT,
-    MOVE_TO_POINT_SAFETY_BUFFER,
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER)
+    MOVE_TO_DECK_SAFETY_BUFFER,
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER,
+    MOVE_POINT_STATE_MAP,
+    SAVE_POINT_STATE_MAP)
 from .state_machine import DeckCalibrationStateMachine
 # TODO: uncomment the following to raise deck cal errors
 from ..errors import CalibrationError
 from ..helper_classes import (
     RequiredLabware,
     AttachedPipette)
+
+if TYPE_CHECKING:
+    from .dev_types import SavedPoints, ExpectedPoints
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -47,6 +59,15 @@ and gantry system.
 COMMAND_HANDLER = Callable[..., Awaitable]
 
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
+
+
+def tuplefy_cal_point_dicts(
+        pt_dicts: Union[ExpectedPoints, SavedPoints]) -> linal.SolvePoints:
+    return (
+        tuple(pt_dicts[POINT_ONE_ID]),  # type: ignore
+        tuple(pt_dicts[POINT_TWO_ID]),
+        tuple(pt_dicts[POINT_THREE_ID])
+        )
 
 
 class DeckCalibrationUserFlow:
@@ -66,7 +87,8 @@ class DeckCalibrationUserFlow:
 
         self._tip_origin_pt: Optional[Point] = None
         self._z_height_reference: Optional[float] = None
-        self._saved_points: tuple = ()
+        self._expected_points = self._build_expected_points_dict()
+        self._saved_points: SavedPoints = {}
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
@@ -140,6 +162,21 @@ class DeckCalibrationUserFlow:
         return labware.load(
             lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
+    def _initialize_deck(self):
+        tip_rack_lw = self._get_tip_rack_lw()
+        self._deck[TIP_RACK_SLOT] = tip_rack_lw
+
+    def _build_expected_points_dict(self) -> ExpectedPoints:
+        pos_1 = self._deck.get_calibration_position(POINT_ONE_ID).position
+        pos_2 = self._deck.get_calibration_position(POINT_TWO_ID).position
+        pos_3 = self._deck.get_calibration_position(POINT_THREE_ID).position
+        exp_pt: ExpectedPoints = {
+            POINT_ONE_ID: Point(*pos_1),
+            POINT_TWO_ID: Point(*pos_2),
+            POINT_THREE_ID: Point(*pos_3)
+        }
+        return exp_pt
+
     async def handle_command(self,
                              name: Any,
                              data: Dict[Any, Any]):
@@ -189,32 +226,48 @@ class DeckCalibrationUserFlow:
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
         ydim = self._deck.get_slot_definition(
             JOG_TO_DECK_SLOT)['boundingBox']['yDimension']
-        new_pt = deck_pt + Point(0, (ydim/2)-JOG_TO_DECK_Y_SHIFT, 0) + \
-            MOVE_TO_POINT_SAFETY_BUFFER
+        new_pt = deck_pt + Point(0, (ydim/2), 0) + \
+            MOVE_TO_DECK_SAFETY_BUFFER
         to_loc = Location(new_pt, None)
         await self._move(to_loc)
 
-    def _get_cal_point_location(self, point_id: str) -> Location:
+    def _get_move_to_point_loc_by_state(self) -> Location:
         assert self._z_height_reference
-        coords = self._deck.get_calibration_position(point_id).position
+        pt_id = MOVE_POINT_STATE_MAP[self._current_state]
+        coords = self._deck.get_calibration_position(pt_id).position
         loc = Location(Point(*coords), None)
         return loc.move(point=Point(0, 0, self._z_height_reference))
 
     async def move_to_point_one(self):
-        await self._move(self._get_cal_point_location(POINT_ONE_ID))
+        await self._move(self._get_move_to_point_loc_by_state())
 
     async def move_to_point_two(self):
-        await self._move(self._get_cal_point_location(POINT_TWO_ID))
+        await self._move(self._get_move_to_point_loc_by_state())
 
     async def move_to_point_three(self):
-        await self._move(self._get_cal_point_location(POINT_THREE_ID))
+        await self._move(self._get_move_to_point_loc_by_state())
 
     async def save_offset(self):
         cur_pt = await self._get_current_point()
         if self.current_state == State.joggingToDeck:
             self._z_height_reference = cur_pt.z
         else:
-            self._saved_points += (tuple(cur_pt),)
+            pt_id = SAVE_POINT_STATE_MAP[self._current_state]
+            self._saved_points[pt_id] = cur_pt
+
+            if self._current_state == State.savingPointThree:
+                self._save_attitude_matrix()
+
+    def _save_attitude_matrix(self):
+        e = tuplefy_cal_point_dicts(self._expected_points)
+        a = tuplefy_cal_point_dicts(self._saved_points)
+        tiprack_hash = helpers.hash_labware_def(
+            self._deck[TIP_RACK_SLOT]._definition) + ''
+        robot_cal.save_attitude_matrix(
+            expected=e,
+            actual=a,
+            pipette_id=self._hw_pipette.pipette_id,
+            tiprack_hash=tiprack_hash)
 
     def _get_tip_length(self) -> float:
         try:
