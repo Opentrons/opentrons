@@ -9,8 +9,8 @@ from robot_server.robot.calibration.deck.state_machine import \
 
 valid_commands: List[Tuple[str, str, str]] = [
     (CalCommand.load_labware, 'sessionStarted', 'labwareLoaded'),
-    (DeckCommand.move_to_tip_rack, 'labwareLoaded', 'preparingPipette'),
-    (DeckCommand.move_to_tip_rack, 'preparingPipette', 'preparingPipette'),
+    (CalCommand.move_to_tip_rack, 'labwareLoaded', 'preparingPipette'),
+    (CalCommand.move_to_tip_rack, 'preparingPipette', 'preparingPipette'),
     (CalCommand.jog, 'preparingPipette', 'preparingPipette'),
     (CalCommand.pick_up_tip, 'preparingPipette', 'inspectingTip'),
     (CalCommand.invalidate_tip, 'inspectingTip', 'preparingPipette'),
@@ -26,7 +26,7 @@ valid_commands: List[Tuple[str, str, str]] = [
     (DeckCommand.move_to_point_three, 'savingPointTwo', 'savingPointThree'),
     (CalCommand.jog, 'savingPointThree', 'savingPointThree'),
     (CalCommand.save_offset, 'savingPointThree', 'savingPointThree'),
-    (DeckCommand.move_to_tip_rack, 'savingPointThree', 'calibrationComplete'),
+    (CalCommand.move_to_tip_rack, 'savingPointThree', 'calibrationComplete'),
     (CalCommand.exit, 'calibrationComplete', 'sessionExited'),
     (CalCommand.exit, 'sessionStarted', 'sessionExited'),
     (CalCommand.exit, 'labwareLoaded', 'sessionExited'),

@@ -170,6 +170,7 @@ class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
     load_labware = "loadLabware"
     jog = ("jog", JogPosition)
+    move_to_tip_rack = "moveToTipRack"
     pick_up_tip = "pickUpTip"
     confirm_tip_attached = "confirmTip"
     invalidate_tip = "invalidateTip"
@@ -215,6 +216,16 @@ class DeckCalibrationCommand(CommandDefinition):
     @staticmethod
     def namespace():
         return "calibration.deck"
+
+
+class OffsetCalibrationCommand(CommandDefinition):
+    """Offset Calibration Specific"""
+    move_to_measure_z = "moveToMeasureZ"
+    move_to_measure_xy = "moveToMeasureXY"
+
+    @staticmethod
+    def namespace():
+        return "calibration.offset"
 
 
 """

@@ -12,12 +12,12 @@ DECK_CALIBRATION_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
         CalibrationCommand.load_labware: State.labwareLoaded
     },
     State.labwareLoaded: {
-        DeckCalCommand.move_to_tip_rack: State.preparingPipette
+        CalibrationCommand.move_to_tip_rack: State.preparingPipette
     },
     State.preparingPipette: {
         CalibrationCommand.jog: State.preparingPipette,
         CalibrationCommand.pick_up_tip: State.inspectingTip,
-        DeckCalCommand.move_to_tip_rack: State.preparingPipette,
+        CalibrationCommand.move_to_tip_rack: State.preparingPipette,
     },
     State.inspectingTip: {
         CalibrationCommand.invalidate_tip: State.preparingPipette,
@@ -41,7 +41,7 @@ DECK_CALIBRATION_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.savingPointThree: {
         CalibrationCommand.jog: State.savingPointThree,
         CalibrationCommand.save_offset: State.savingPointThree,
-        DeckCalCommand.move_to_tip_rack: State.calibrationComplete
+        CalibrationCommand.move_to_tip_rack: State.calibrationComplete
     },
     State.WILDCARD: {
         CalibrationCommand.exit: State.sessionExited

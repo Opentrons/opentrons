@@ -144,9 +144,9 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
      {}, 'move_to'),
     (TipLengthCalibrationCommand.move_to_reference_point, 'inspectingTip',
      {}, 'move_to'),
-    (TipLengthCalibrationCommand.move_to_tip_rack, 'measuringNozzleOffset',
+    (CalibrationCommand.move_to_tip_rack, 'measuringNozzleOffset',
      {}, 'move_to'),
-    (TipLengthCalibrationCommand.move_to_tip_rack, 'measuringTipOffset',
+    (CalibrationCommand.move_to_tip_rack, 'measuringTipOffset',
      {}, 'move_to'),
 ]
 

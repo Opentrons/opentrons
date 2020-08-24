@@ -95,7 +95,7 @@ class DeckCalibrationUserFlow:
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CalibrationCommand.save_offset: self.save_offset,
-            DeckCalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
+            CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
             DeckCalibrationCommand.move_to_deck: self.move_to_deck,
             DeckCalibrationCommand.move_to_point_one: self.move_to_point_one,
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
