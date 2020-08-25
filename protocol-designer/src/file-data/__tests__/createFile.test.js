@@ -182,10 +182,12 @@ describe('getRequiresAtLeastV5', () => {
   })
   it('should return false if protocol has no airGap and no moveToWell', () => {
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
-    expect(getRequiresAtLeastV5.resultFunc(noModules.robotStateTimeline)).toBe(false)
-    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
-    expect(getRequiresAtLeastV5.resultFunc(engageMagnet.robotStateTimeline)).toBe(
+    expect(getRequiresAtLeastV5.resultFunc(noModules.robotStateTimeline)).toBe(
       false
     )
+    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    expect(
+      getRequiresAtLeastV5.resultFunc(engageMagnet.robotStateTimeline)
+    ).toBe(false)
   })
 })
