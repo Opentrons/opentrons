@@ -28,7 +28,7 @@ MODULE_LOG = logging.getLogger(__name__)
 
 """
 A collection of functions that allow a consumer to prepare and update
-calibration data associated with the orientation of a specific physical
+calibration data associated with the position of a specific physical
 pipette attached to the gantry, in relation to the deck
 """
 
