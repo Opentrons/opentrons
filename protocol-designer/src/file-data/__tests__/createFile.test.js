@@ -5,7 +5,7 @@ import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
 import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
 import protocolV5Schema from '@opentrons/shared-data/protocol/schemas/5.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
-import { createFile, getRequiresV5 } from '../selectors'
+import { createFile, getRequiresAtLeastV5 } from '../selectors'
 import {
   fileMetadata,
   dismissedWarnings,
@@ -101,7 +101,7 @@ describe('createFile selector', () => {
     expect(!isEmpty(result.pipettes)).toBe(true)
   })
 
-  it('should return a schema-valid JSON V5 protocol, if getRequiresV5 returns true', () => {
+  it('should return a schema-valid JSON V5 protocol, if getRequiresAtLeastV5 returns true', () => {
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
     const result = createFile.resultFunc(
       fileMetadata,
@@ -130,7 +130,7 @@ describe('createFile selector', () => {
   })
 })
 
-describe('getRequiresV5', () => {
+describe('getRequiresAtLeastV5', () => {
   it('should return true if protocol has airGap', () => {
     const airGapTimeline = {
       timeline: [
@@ -152,7 +152,7 @@ describe('getRequiresV5', () => {
       ],
     }
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
-    expect(getRequiresV5.resultFunc(airGapTimeline)).toBe(true)
+    expect(getRequiresAtLeastV5.resultFunc(airGapTimeline)).toBe(true)
   })
 
   it('should return true if protocol has moveToWell', () => {
@@ -178,13 +178,13 @@ describe('getRequiresV5', () => {
       ],
     }
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
-    expect(getRequiresV5.resultFunc(moveToWellTimeline)).toBe(true)
+    expect(getRequiresAtLeastV5.resultFunc(moveToWellTimeline)).toBe(true)
   })
   it('should return false if protocol has no airGap and no moveToWell', () => {
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
-    expect(getRequiresV5.resultFunc(noModules.robotStateTimeline)).toBe(false)
+    expect(getRequiresAtLeastV5.resultFunc(noModules.robotStateTimeline)).toBe(false)
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
-    expect(getRequiresV5.resultFunc(engageMagnet.robotStateTimeline)).toBe(
+    expect(getRequiresAtLeastV5.resultFunc(engageMagnet.robotStateTimeline)).toBe(
       false
     )
   })

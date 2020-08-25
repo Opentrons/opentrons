@@ -78,7 +78,7 @@ export const getRobotStateTimelineWithoutAirGapDispenseCommand: Selector<Timelin
  ** without having module entities b/c this will produce "no module for this step"
  ** form/timeline errors. Checking for v4 commands should be redundant,
  ** we do it just in case non-V3 commands somehow sneak in despite having no modules. */
-export const getIsV4Protocol: Selector<boolean> = createSelector(
+export const getRequiresAtLeastV4: Selector<boolean> = createSelector(
   getRobotStateTimelineWithoutAirGapDispenseCommand,
   stepFormSelectors.getModuleEntities,
   (robotStateTimeline, moduleEntities) => {
@@ -95,7 +95,7 @@ export const getIsV4Protocol: Selector<boolean> = createSelector(
 // for users in terms of managing robot stack upgrades, so we will force v5
 const _requiresV5 = (command: Command): boolean =>
   command.command === 'moveToWell' || command.command === 'airGap'
-export const getRequiresV5: Selector<boolean> = createSelector(
+export const getRequiresAtLeastV5: Selector<boolean> = createSelector(
   getRobotStateTimelineWithoutAirGapDispenseCommand,
   robotStateTimeline => {
     return robotStateTimeline.timeline.some(timelineFrame =>
@@ -119,8 +119,8 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
-  getIsV4Protocol,
-  getRequiresV5,
+  getRequiresAtLeastV4,
+  getRequiresAtLeastV5,
   (
     fileMetadata,
     initialRobotState,
@@ -135,8 +135,8 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
     pipetteEntities,
     labwareNicknamesById,
     labwareDefsByURI,
-    isV4Protocol,
-    requiresV5
+    requiresAtLeastV4Protocol,
+    requiresAtLeastV5Protocol
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
@@ -248,7 +248,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       labwareDefinitions,
     }
 
-    if (requiresV5) {
+    if (requiresAtLeastV5Protocol) {
       return {
         ...protocolFile,
         $otSharedSchema: '#/protocol/schemas/5',
@@ -256,7 +256,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
         modules,
         commands,
       }
-    } else if (isV4Protocol) {
+    } else if (requiresAtLeastV4Protocol) {
       return {
         ...protocolFile,
         $otSharedSchema: '#/protocol/schemas/4',

@@ -9,7 +9,7 @@ import {
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import { FileSidebar, v4WarningContent } from '../FileSidebar'
+import { FileSidebar, v4WarningContent, v5WarningContent } from '../FileSidebar'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
 import type { HintArgs } from '../../Hints/useBlockingHint'
 
@@ -45,7 +45,8 @@ describe('FileSidebar', () => {
       pipettesOnDeck: {},
       modulesOnDeck: {},
       savedStepForms: {},
-      isV4Protocol: false,
+      requiresAtLeastV4Protocol: false,
+      requiresAtLeastV5Protocol: false,
     }
 
     commands = [
@@ -86,6 +87,9 @@ describe('FileSidebar', () => {
         pipette: pipetteLeftId,
       },
     }
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   it('create new button creates new protocol', () => {
@@ -198,7 +202,7 @@ describe('FileSidebar', () => {
     )
   })
 
-  it('blocking hint is shown when protocol contains modules', () => {
+  it('blocking hint is shown when protocol is v4', () => {
     props.downloadData.fileData.commands = commands
     props.pipettesOnDeck = {
       pipetteLeftId: {
@@ -218,7 +222,9 @@ describe('FileSidebar', () => {
 
     mockUseBlockingHint.mockReturnValue(<MockHintComponent />)
 
-    const wrapper = mount(<FileSidebar {...props} isV4Protocol={true} />)
+    const wrapper = mount(
+      <FileSidebar {...props} requiresAtLeastV4Protocol={true} />
+    )
 
     expect(wrapper.exists(MockHintComponent)).toEqual(true)
     // Before save button is clicked, enabled should be false
@@ -238,6 +244,43 @@ describe('FileSidebar', () => {
       enabled: true,
       hintKey: 'export_v4_protocol_3_18',
       content: v4WarningContent,
+      handleCancel: expect.any(Function),
+      handleContinue: expect.any(Function),
+    })
+  })
+
+  it('blocking hint is shown when protocol is v5', () => {
+    props.downloadData.fileData.commands = commands
+    props.savedStepForms = savedStepForms
+
+    const MockHintComponent = () => {
+      return <div></div>
+    }
+
+    mockUseBlockingHint.mockReturnValue(<MockHintComponent />)
+
+    const wrapper = mount(
+      <FileSidebar {...props} requiresAtLeastV5Protocol={true} />
+    )
+
+    expect(wrapper.exists(MockHintComponent)).toEqual(true)
+    // Before save button is clicked, enabled should be false
+    expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
+      enabled: false,
+      hintKey: 'export_v5_protocol_3_20',
+      content: v5WarningContent,
+      handleCancel: expect.any(Function),
+      handleContinue: expect.any(Function),
+    })
+
+    const downloadButton = wrapper.find(PrimaryButton).at(0)
+    downloadButton.simulate('click')
+
+    // After save button is clicked, enabled should be true
+    expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
+      enabled: true,
+      hintKey: 'export_v5_protocol_3_20',
+      content: v5WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })
