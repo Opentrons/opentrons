@@ -4,7 +4,6 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { getPrereleaseFeatureFlag } from '../../../persist'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -200,11 +199,6 @@ const updatePatchOnPipetteChange = (
       airGapVolume = `${pipetteSpec.minVolume}`
     }
 
-    // TODO: remove this when FF is removed
-    const airGapEnabled = getPrereleaseFeatureFlag(
-      'OT_PD_ENABLE_AIR_GAP_AND_DELAY'
-    )
-
     return {
       ...patch,
       ...getDefaultFields(
@@ -216,7 +210,7 @@ const updatePatchOnPipetteChange = (
         'aspirate_mmFromBottom',
         'dispense_mmFromBottom'
       ),
-      ...(airGapEnabled ? { aspirate_airGap_volume: airGapVolume } : {}),
+      aspirate_airGap_volume: airGapVolume,
     }
   }
 

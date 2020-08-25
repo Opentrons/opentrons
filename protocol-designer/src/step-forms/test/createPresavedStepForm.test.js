@@ -9,18 +9,11 @@ import {
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
-import { getPrereleaseFeatureFlag } from '../../persist'
 import { getStateAndContextTempTCModules } from '../../step-generation/__fixtures__'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
 } from '../utils/createPresavedStepForm'
-jest.mock('../../persist')
-
-const mockGetPrereleaseFeatureFlag: JestMockFn<
-  string,
-  boolean
-> = getPrereleaseFeatureFlag
 
 const stepId = 'stepId123'
 const EXAMPLE_ENGAGE_HEIGHT = '18'
@@ -128,66 +121,56 @@ describe('createPresavedStepForm', () => {
     })
   })
 
-  // TODO(IL, 2020-07-28): remove `false` case when 'OT_PD_ENABLE_AIR_GAP_AND_DELAY' FF is removed
-  ;[true, false].forEach(airGapEnabled => {
-    it(`should call handleFormChange with a default pipette for "moveLiquid" step (air gap FF enabled: ${airGapEnabled})`, () => {
-      mockGetPrereleaseFeatureFlag.mockImplementation(
-        ff => ff === 'OT_PD_ENABLE_AIR_GAP_AND_DELAY' && airGapEnabled
-      )
-      const args = {
-        ...defaultArgs,
-        stepType: 'moveLiquid',
-      }
+  it(`should call handleFormChange with a default pipette for "moveLiquid" step`, () => {
+    const args = {
+      ...defaultArgs,
+      stepType: 'moveLiquid',
+    }
 
-      expect(createPresavedStepForm(args)).toEqual({
-        id: stepId,
-        pipette: 'leftPipetteId',
-        stepType: 'moveLiquid',
-        // default fields
-        ...(airGapEnabled
-          ? {
-              aspirate_airGap_checkbox: false,
-              aspirate_airGap_volume: '1',
-              aspirate_delay_checkbox: false,
-              aspirate_delay_mmFromBottom: '1',
-              aspirate_delay_seconds: '1',
-              dispense_delay_checkbox: false,
-              dispense_delay_seconds: '1',
-              dispense_delay_mmFromBottom: '0.5',
-            }
-          : {}),
-        aspirate_flowRate: null,
-        aspirate_labware: null,
-        aspirate_mix_checkbox: false,
-        aspirate_mix_times: null,
-        aspirate_mix_volume: null,
-        aspirate_mmFromBottom: '1',
-        aspirate_touchTip_checkbox: false,
-        aspirate_wellOrder_first: 't2b',
-        aspirate_wellOrder_second: 'l2r',
-        aspirate_wells: [],
-        aspirate_wells_grouped: false,
-        blowout_checkbox: false,
-        blowout_location: 'trashId',
-        changeTip: 'always',
-        dispense_flowRate: null,
-        dispense_labware: null,
-        dispense_mix_checkbox: false,
-        dispense_mix_times: null,
-        dispense_mix_volume: null,
-        dispense_mmFromBottom: '0.5',
-        dispense_touchTip_checkbox: false,
-        dispense_wellOrder_first: 't2b',
-        dispense_wellOrder_second: 'l2r',
-        dispense_wells: [],
-        disposalVolume_checkbox: true,
-        disposalVolume_volume: '1',
-        path: 'single',
-        preWetTip: false,
-        stepDetails: '',
-        stepName: 'transfer',
-        volume: null,
-      })
+    expect(createPresavedStepForm(args)).toEqual({
+      id: stepId,
+      pipette: 'leftPipetteId',
+      stepType: 'moveLiquid',
+      // default fields
+      aspirate_airGap_checkbox: false,
+      aspirate_airGap_volume: '1',
+      aspirate_delay_checkbox: false,
+      aspirate_delay_mmFromBottom: '1',
+      aspirate_delay_seconds: '1',
+      dispense_delay_checkbox: false,
+      dispense_delay_seconds: '1',
+      dispense_delay_mmFromBottom: '0.5',
+      aspirate_flowRate: null,
+      aspirate_labware: null,
+      aspirate_mix_checkbox: false,
+      aspirate_mix_times: null,
+      aspirate_mix_volume: null,
+      aspirate_mmFromBottom: '1',
+      aspirate_touchTip_checkbox: false,
+      aspirate_wellOrder_first: 't2b',
+      aspirate_wellOrder_second: 'l2r',
+      aspirate_wells: [],
+      aspirate_wells_grouped: false,
+      blowout_checkbox: false,
+      blowout_location: 'trashId',
+      changeTip: 'always',
+      dispense_flowRate: null,
+      dispense_labware: null,
+      dispense_mix_checkbox: false,
+      dispense_mix_times: null,
+      dispense_mix_volume: null,
+      dispense_mmFromBottom: '0.5',
+      dispense_touchTip_checkbox: false,
+      dispense_wellOrder_first: 't2b',
+      dispense_wellOrder_second: 'l2r',
+      dispense_wells: [],
+      disposalVolume_checkbox: true,
+      disposalVolume_volume: '1',
+      path: 'single',
+      preWetTip: false,
+      stepDetails: '',
+      stepName: 'transfer',
+      volume: null,
     })
   })
 
