@@ -12,19 +12,15 @@ from robot_server.service.session.models import CalibrationCommand
 from robot_server.robot.calibration.constants import (
     TIP_RACK_LOOKUP_BY_MAX_VOL,
     SHORT_TRASH_DECK,
-    STANDARD_DECK)
-import robot_server.robot.calibration.util as uf
-from ..errors import CalibrationError
-from ..helper_classes import (
-    RequiredLabware,
-    AttachedPipette)
-from .constants import (
-    PipetteOffsetCalibrationState as State,
-    TIP_RACK_SLOT,
-    JOG_TO_DECK_SLOT,
+    STANDARD_DECK,
     POINT_ONE_ID,
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER)
+import robot_server.robot.calibration.util as uf
+from ..errors import CalibrationError
+from ..helper_classes import (RequiredLabware, AttachedPipette)
+from .constants import (PipetteOffsetCalibrationState as State,
+                        TIP_RACK_SLOT, JOG_TO_DECK_SLOT)
 from .state_machine import PipetteOffsetCalibrationStateMachine
 
 
@@ -47,7 +43,6 @@ class PipetteOffsetCalibrationUserFlow:
                  hardware: ThreadManager,
                  mount: Mount = Mount.RIGHT):
         self._hardware = hardware
-        # TODO: make mount a required createParam
         self._mount = mount
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
@@ -86,7 +81,7 @@ class PipetteOffsetCalibrationUserFlow:
     def current_state(self) -> State:
         return self._current_state
 
-    def get_pipette(self) -> Optional[AttachedPipette]:
+    def get_pipette(self) -> AttachedPipette:
         return AttachedPipette(
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
@@ -95,8 +90,7 @@ class PipetteOffsetCalibrationUserFlow:
             serial=self._hw_pipette.pipette_id)
 
     def get_required_labware(self) -> List[RequiredLabware]:
-        lw = self._get_tip_rack_lw()
-        return [RequiredLabware.from_lw(lw)]
+        return [RequiredLabware.from_lw(self._tip_rack)]
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state

@@ -1,7 +1,8 @@
-from typing import Dict, Optional, List, Any
+from typing import Optional, List
 from pydantic import BaseModel, Field
 
 from ..helper_classes import AttachedPipette, RequiredLabware
+from ..dev_types import NextSteps
 
 
 class SessionCreateParams(BaseModel):
@@ -27,7 +28,7 @@ class TipCalibrationSessionStatus(BaseModel):
     currentStep: str = Field(
         ...,
         description="Current step of tip calibration user flow")
-    nextSteps: Optional[Dict[str, Dict[str, Dict[str, Any]]]] =\
+    nextSteps: Optional[NextSteps] =\
         Field(None, description="Next Available Steps in Session")
     labware: List[RequiredLabware]
 
