@@ -1,3 +1,9 @@
+# Opentrons App Changes from 3.20.0 to 3.20.1
+
+## Bugfixes
+- Fix an issue where calibration data might not be properly viewable in the File Info and Calibration pages when a protocol using a piece of labware for the first time is uploaded.
+
+
 # Opentrons App Changes from 3.19.0 to 3.20.0
 
 ## Features
