@@ -420,7 +420,7 @@ class Deck(UserDict):
         return types.Point(
             defn['position'][0] + defn['boundingBox']['xDimension']/2,
             defn['position'][1] + defn['boundingBox']['yDimension']/2,
-            defn['position'][2] + defn['boundingBox']['yDimension']/2)
+            defn['position'][2] + defn['boundingBox']['zDimension']/2)
 
     def resolve_module_location(
             self, module_type: ModuleType,
