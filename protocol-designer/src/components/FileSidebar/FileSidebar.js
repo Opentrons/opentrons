@@ -210,8 +210,6 @@ export function FileSidebar(props: Props): React.Node {
       modulesWithoutStep,
     })
 
-  // type T = {| isV4: boolean |}
-
   const getExportHintContent = (): {|
     hintKey: HintKey,
     content: React.Node,
