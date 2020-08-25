@@ -1,7 +1,7 @@
 # Robot OS Changes from 3.20.0 to 3.20.1
 
 ## Bugfixes
-- Fix an issue introduced in 3.20.1 where protocol uploads might fail if the robot had been upgraded from Robot Software version 3.18.0 or previous ([#6394](https://github.com/Opentrons/opentrons/issues/6394))
+- Fix an issue introduced in 3.20.0 where protocol uploads might fail if the robot had been upgraded from Robot Software version 3.18.0 or previous ([#6394](https://github.com/Opentrons/opentrons/issues/6394))
 
 # Robot OS Changes from 3.19.0 to 3.20.0
 
@@ -28,4 +28,3 @@ For more details about this release, please see the full [technical change
 log][changelog]
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
-
