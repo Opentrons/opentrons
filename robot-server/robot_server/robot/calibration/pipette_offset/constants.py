@@ -1,5 +1,6 @@
 from enum import Enum
 from robot_server.robot.calibration.constants import STATE_WILDCARD
+from typing_extensions import Final
 
 
 class PipetteOffsetCalibrationState(str, Enum):
@@ -14,5 +15,5 @@ class PipetteOffsetCalibrationState(str, Enum):
     WILDCARD = STATE_WILDCARD
 
 
-JOG_TO_DECK_SLOT = '5'
-TIP_RACK_SLOT = '8'
+JOG_TO_DECK_SLOT: Final = '5'
+TIP_RACK_SLOT: Final = '8'

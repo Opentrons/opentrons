@@ -2,6 +2,7 @@ import argparse
 from typing import Dict
 
 import graphviz as gv
+import robot_server.service.session.session_types
 from robot_server.robot.calibration.check.session import (
     CalibrationCheckState,
     CHECK_TRANSITIONS
