@@ -1,13 +1,12 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List
 
 from ..helper_classes import AttachedPipette, RequiredLabware
 
 
 class DeckCalibrationSessionStatus(BaseModel):
     """The current status of a deck calibration session."""
-    # TODO: make instrument not optional
-    instrument: Optional[AttachedPipette]
+    instrument: AttachedPipette
     currentStep: str = Field(
         ...,
         description="Current step of deck calibration user flow")

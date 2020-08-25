@@ -205,7 +205,7 @@ async def test_invalidate_tip(mock_user_flow):
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._hw_pipette.critical_point
+            critical_point=uf._get_critical_point_override()
         ),
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
@@ -224,7 +224,7 @@ async def test_exit(mock_user_flow):
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._hw_pipette.critical_point
+            critical_point=uf._get_critical_point_override()
         ),
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
@@ -291,7 +291,7 @@ async def test_save_offsets(mock_user_flow):
         await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=10),
-            critical_point=uf._hw_pipette.critical_point
+            critical_point=uf._get_critical_point_override()
         )
         await uf.save_offset()
         assert uf._nozzle_height_at_reference == 10
@@ -301,7 +301,7 @@ async def test_save_offsets(mock_user_flow):
         await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=40),
-            critical_point=uf._hw_pipette.critical_point
+            critical_point=uf._get_critical_point_override()
         )
         await uf.save_offset()
         create_tip_length_data_patch.assert_called_with(ANY, '', 30)

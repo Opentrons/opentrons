@@ -127,7 +127,7 @@ async def test_return_tip(mock_user_flow):
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._get_critical_point()
+            critical_point=uf._get_critical_point_override()
         ),
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
