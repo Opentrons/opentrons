@@ -91,13 +91,15 @@ export const getIsV4Protocol: Selector<boolean> = createSelector(
   }
 )
 
-const requiresV5 = (command: Command): boolean =>
-  command.command === 'moveToWell'
+// Note: though airGap is supported in the v4 executor, we want to simplify things
+// for users in terms of managing robot stack upgrades, so we will force v5
+const _requiresV5 = (command: Command): boolean =>
+  command.command === 'moveToWell' || command.command === 'airGap'
 export const getRequiresV5: Selector<boolean> = createSelector(
   getRobotStateTimelineWithoutAirGapDispenseCommand,
   robotStateTimeline => {
     return robotStateTimeline.timeline.some(timelineFrame =>
-      timelineFrame.commands.some(command => requiresV5(command))
+      timelineFrame.commands.some(command => _requiresV5(command))
     )
   }
 )
