@@ -13,6 +13,7 @@ def mock_status_str():
            "NTPSynchronized=no\n" \
            "TimeUSec=Fri 2020-08-14 21:44:16 UTC\n"
 
+
 @pytest.fixture
 def mock_status_dict():
     return {'Timezone': 'Etc/UTC',

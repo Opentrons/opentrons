@@ -40,6 +40,10 @@ async def _time_status(loop: asyncio.AbstractEventLoop = None
 
 async def _set_time(time: str,
                     loop: asyncio.AbstractEventLoop = None) -> Tuple[str, str]:
+    """
+    :return: tuple of output of date --set (usually the new date)
+        & error, if any
+    """
     proc = await asyncio.create_subprocess_shell(
         f'date --utc --set \"{time}\"',
         stdout=asyncio.subprocess.PIPE,
