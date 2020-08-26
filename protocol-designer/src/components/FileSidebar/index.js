@@ -23,8 +23,7 @@ type SP = {|
   pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
   modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
   savedStepForms: SavedStepFormState,
-  requiresAtLeastV4Protocol: boolean,
-  requiresAtLeastV5Protocol: boolean,
+  schemaVersion: number,
 |}
 
 export const FileSidebar: React.AbstractComponent<{||}> = connect<
@@ -59,8 +58,7 @@ function mapStateToProps(state: BaseState): SP {
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
-    requiresAtLeastV4Protocol: fileDataSelectors.getRequiresAtLeastV4(state),
-    requiresAtLeastV5Protocol: fileDataSelectors.getRequiresAtLeastV5(state),
+    schemaVersion: fileDataSelectors.getExportedFileSchemaVersion(state),
   }
 }
 
@@ -76,8 +74,7 @@ function mergeProps(
     pipettesOnDeck,
     modulesOnDeck,
     savedStepForms,
-    requiresAtLeastV4Protocol,
-    requiresAtLeastV5Protocol,
+    schemaVersion,
   } = stateProps
   const { dispatch } = dispatchProps
   return {
@@ -98,7 +95,6 @@ function mergeProps(
     pipettesOnDeck,
     modulesOnDeck,
     savedStepForms,
-    requiresAtLeastV4Protocol,
-    requiresAtLeastV5Protocol,
+    schemaVersion,
   }
 }

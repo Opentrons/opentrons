@@ -45,8 +45,7 @@ describe('FileSidebar', () => {
       pipettesOnDeck: {},
       modulesOnDeck: {},
       savedStepForms: {},
-      requiresAtLeastV4Protocol: false,
-      requiresAtLeastV5Protocol: false,
+      schemaVersion: 3,
     }
 
     commands = [
@@ -222,9 +221,7 @@ describe('FileSidebar', () => {
 
     mockUseBlockingHint.mockReturnValue(<MockHintComponent />)
 
-    const wrapper = mount(
-      <FileSidebar {...props} requiresAtLeastV4Protocol={true} />
-    )
+    const wrapper = mount(<FileSidebar {...props} schemaVersion={4} />)
 
     expect(wrapper.exists(MockHintComponent)).toEqual(true)
     // Before save button is clicked, enabled should be false
@@ -259,9 +256,7 @@ describe('FileSidebar', () => {
 
     mockUseBlockingHint.mockReturnValue(<MockHintComponent />)
 
-    const wrapper = mount(
-      <FileSidebar {...props} requiresAtLeastV5Protocol={true} />
-    )
+    const wrapper = mount(<FileSidebar {...props} schemaVersion={5} />)
 
     expect(wrapper.exists(MockHintComponent)).toEqual(true)
     // Before save button is clicked, enabled should be false

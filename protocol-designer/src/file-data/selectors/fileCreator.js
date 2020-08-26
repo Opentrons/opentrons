@@ -103,6 +103,19 @@ export const getRequiresAtLeastV5: Selector<boolean> = createSelector(
     )
   }
 )
+export const getExportedFileSchemaVersion: Selector<number> = createSelector(
+  getRequiresAtLeastV4,
+  getRequiresAtLeastV5,
+  (requiresV4, requiresV5) => {
+    if (requiresV5) {
+      return 5
+    } else if (requiresV4) {
+      return 4
+    } else {
+      return 3
+    }
+  }
+)
 
 // $FlowFixMe(IL, 2020-03-02): presence of non-v3 commands should make 'isV4Protocol' true
 export const createFile: Selector<PDProtocolFile> = createSelector(

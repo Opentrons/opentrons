@@ -37,8 +37,7 @@ type Props = {|
   pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
   modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
   savedStepForms: SavedStepFormState,
-  requiresAtLeastV4Protocol: boolean,
-  requiresAtLeastV5Protocol: boolean,
+  schemaVersion: number,
 |}
 
 const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
@@ -175,8 +174,7 @@ export function FileSidebar(props: Props): React.Node {
     modulesOnDeck,
     pipettesOnDeck,
     savedStepForms,
-    requiresAtLeastV4Protocol,
-    requiresAtLeastV5Protocol,
+    schemaVersion,
   } = props
   const [
     showExportWarningModal,
@@ -215,10 +213,11 @@ export function FileSidebar(props: Props): React.Node {
     content: React.Node,
   |} => {
     return {
-      hintKey: requiresAtLeastV5Protocol
-        ? 'export_v5_protocol_3_20'
-        : 'export_v4_protocol_3_18',
-      content: requiresAtLeastV5Protocol ? v5WarningContent : v4WarningContent,
+      hintKey:
+        schemaVersion === 5
+          ? 'export_v5_protocol_3_20'
+          : 'export_v4_protocol_3_18',
+      content: schemaVersion === 5 ? v5WarningContent : v4WarningContent,
     }
   }
 
@@ -258,7 +257,7 @@ export function FileSidebar(props: Props): React.Node {
                 children: 'CONTINUE WITH EXPORT',
                 className: modalStyles.long_button,
                 onClick: () => {
-                  if (requiresAtLeastV4Protocol || requiresAtLeastV5Protocol) {
+                  if (schemaVersion > 3) {
                     setShowExportWarningModal(false)
                     setShowBlockingHint(true)
                   } else {
@@ -290,10 +289,7 @@ export function FileSidebar(props: Props): React.Node {
                 if (hasWarning) {
                   scrollToTop()
                   setShowExportWarningModal(true)
-                } else if (
-                  requiresAtLeastV4Protocol ||
-                  requiresAtLeastV5Protocol
-                ) {
+                } else if (schemaVersion > 3) {
                   scrollToTop()
                   setShowBlockingHint(true)
                 } else {
