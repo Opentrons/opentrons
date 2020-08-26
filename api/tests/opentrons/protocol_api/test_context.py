@@ -831,7 +831,7 @@ def test_tip_length_for(loop, monkeypatch):
             ['opentrons/geb_96_tiprack_10ul/1'])
 
 
-def test_tip_length_for_caldata(loop, monkeypatch, use_tip_length_cal):
+def test_tip_length_for_caldata(loop, monkeypatch, use_new_calibration):
     ctx = papi.ProtocolContext(loop)
     instr = ctx.load_instrument('p20_single_gen2', 'left')
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
@@ -926,3 +926,10 @@ def test_api_per_call_checking(monkeypatch):
     ctx = papi.ProtocolContext(api_version=APIVersion(2, 0))
     with pytest.raises(papi.util.APIVersionError):
         ctx.disconnect()
+
+
+def test_home_plunger(monkeypatch):
+    ctx = papi.ProtocolContext(api_version=APIVersion(2, 0))
+    ctx.home()
+    instr = ctx.load_instrument('p1000_single', 'left')
+    instr.home_plunger()

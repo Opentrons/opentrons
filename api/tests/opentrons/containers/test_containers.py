@@ -1,4 +1,3 @@
-import datetime
 import math
 from unittest import mock
 
@@ -19,6 +18,8 @@ from opentrons.legacy_api.containers.placeable import (
     Deck,
     Slot,
     unpack_location)
+from opentrons.util.helpers import utc_now
+
 from tests.opentrons import generate_plate
 # TODO: Modify all calls to get a Well to use the `wells` method
 # TODO: remove `unpack_location` calls
@@ -248,7 +249,7 @@ def test_load_tip_length_calibration_v1(robot):
 
     tip_length_data = {
             'tipLength': 19.99,
-            'lastModified': datetime.datetime.utcnow()}
+            'lastModified': utc_now()}
     tip_length_cal = {hash: tip_length_data}
     pip_id = 'fake_id'
     modify.save_tip_length_calibration(

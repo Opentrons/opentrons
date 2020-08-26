@@ -36,7 +36,7 @@ export type LabwareItemProps = {|
 
 export function LabwareItem(props: LabwareItemProps): React.Node {
   const { file } = props
-  const { type, filename, created, definition = null } = file
+  const { type, filename, modified, definition = null } = file
   const apiName = definition?.parameters.loadName || NA
   const displayName = definition?.metadata.displayName || NA
   const displayCategory = definition
@@ -75,7 +75,7 @@ export function LabwareItem(props: LabwareItemProps): React.Node {
         )}
       </div>
       <p className={styles.item_date_column}>
-        {format(new Date(created), 'yyyy-MM-dd')}
+        {format(new Date(modified), 'yyyy-MM-dd')}
       </p>
     </li>
   )

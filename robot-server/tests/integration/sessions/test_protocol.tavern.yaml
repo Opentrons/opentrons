@@ -51,12 +51,12 @@ stages:
             createParams:
               protocolId: "{protocol_id}"
     response:
-      status_code: 400
+      status_code: 403
       json:
         errors:
-        - status: "400"
-          title: Creation Failed
-          detail: "Failed to create session of type 'protocol': HTTP Protocol Session feature is disabled."
+        - status: "403"
+          title: Action Forbidden
+          detail: "HTTP Protocol Session feature is disabled"
   - name: Delete the protocol
     request:
       url: "{host:s}:{port:d}/protocols/{protocol_id}"
@@ -109,7 +109,7 @@ stages:
             details:
               protocolId: "{protocol_id}"
               currentState: !anystr
-              commands: !anylist
+              events: !anylist
         links: !anydict
   - name: Get the session
     request:

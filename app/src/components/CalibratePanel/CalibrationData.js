@@ -8,13 +8,21 @@ import type { LabwareCalibrationData } from '../../calibration/labware/types'
 const NOT_CALIBRATED = 'Not yet calibrated'
 const UPDATED_DATA = 'Updated data'
 const EXISTING_DATA = 'Existing data'
+const LEGACY_DEFINITION = 'Calibration Data N/A'
 
 export function CalibrationData(props: {|
   calibrationData: LabwareCalibrationData | null,
   calibratedThisSession: boolean,
+  calDataAvailable: boolean,
 |}): React.Node {
-  const { calibrationData, calibratedThisSession } = props
-  if (calibrationData === null) {
+  const { calibrationData, calibratedThisSession, calDataAvailable } = props
+  if (!calDataAvailable) {
+    return (
+      <Text as="i" marginTop={SPACING_2}>
+        {LEGACY_DEFINITION}
+      </Text>
+    )
+  } else if (calibrationData === null) {
     return (
       <Text as="i" marginTop={SPACING_2}>
         {NOT_CALIBRATED}

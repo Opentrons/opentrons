@@ -14,7 +14,7 @@ from robot_server.service.legacy.models import V1BasicResponse
 from .errors import V1HandlerError, \
     transform_http_exception_to_json_api_errors, \
     transform_validation_error_to_json_api_errors, \
-    consolidate_fastapi_response, RobotServerError, ErrorResponse, \
+    consolidate_fastapi_response, BaseRobotServerError, ErrorResponse, \
     build_unhandled_exception_response
 from .dependencies import get_rpc_server, get_protocol_manager, api_wrapper, \
         verify_hardware, get_session_manager
@@ -108,9 +108,9 @@ async def api_version_check(request: Request, call_next) -> Response:
     return response
 
 
-@app.exception_handler(RobotServerError)
+@app.exception_handler(BaseRobotServerError)
 async def robot_server_exception_handler(request: Request,
-                                         exc: RobotServerError) \
+                                         exc: BaseRobotServerError) \
         -> JSONResponse:
     """Catch robot server exceptions"""
     if not exc.error.status:
@@ -118,7 +118,8 @@ async def robot_server_exception_handler(request: Request,
     log.error(f"RobotServerError: {exc.error}")
     return JSONResponse(
         status_code=exc.status_code,
-        content=ErrorResponse(errors=[exc.error]).dict(exclude_unset=True)
+        content=ErrorResponse(errors=[exc.error]).dict(exclude_unset=True,
+                                                       exclude_none=True)
     )
 
 

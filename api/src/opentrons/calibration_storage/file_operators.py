@@ -49,7 +49,7 @@ def read_cal_file(
 
 def save_to_file(
         filepath: StrPath,
-        data: typing.Dict,
+        data: typing.Mapping,
         encoder: EncoderType = DateTimeEncoder):
     """
     Function used to save data to a file

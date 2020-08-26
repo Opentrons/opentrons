@@ -822,7 +822,7 @@ class InstrumentContext(CommandPublisher):
 
         :returns: This instance.
         """
-        self._hw_manager.hardware.home_plunger(self.mount)
+        self._hw_manager.hardware.home_plunger(self._mount)
         return self
 
     @cmds.publish.both(command=cmds.distribute)

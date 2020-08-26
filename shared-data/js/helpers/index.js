@@ -138,6 +138,11 @@ export function splitWellsOnColumn(
   }, [])
 }
 
+export const getWellDepth = (
+  labwareDef: LabwareDefinition2,
+  well: string
+): number => labwareDef.wells[well].depth
+
 // NOTE: this is used in PD for converting "offset from top" to "mm from bottom".
 // Assumes all wells have same offset because multi-offset not yet supported.
 // TODO: Ian 2019-07-13 return {[string: well]: offset} to support multi-offset
@@ -145,7 +150,7 @@ export const getWellsDepth = (
   labwareDef: LabwareDefinition2,
   wells: Array<string>
 ): number => {
-  const offsets = wells.map(well => labwareDef.wells[well].depth)
+  const offsets = wells.map(well => getWellDepth(labwareDef, well))
   if (uniq(offsets).length !== 1) {
     console.warn(
       `expected wells ${JSON.stringify(

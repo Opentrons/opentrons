@@ -1,20 +1,20 @@
 import hashlib
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 
 from fastapi import UploadFile
+from opentrons.util.helpers import utc_now
 
 
 class duration:
     """Context manager to mark start and end times of a block"""
 
     def __enter__(self):
-        self.start = datetime.utcnow()
+        self.start = utc_now()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.end = datetime.utcnow()
+        self.end = utc_now()
 
 
 @dataclass(frozen=True)

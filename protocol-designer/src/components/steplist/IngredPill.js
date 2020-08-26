@@ -1,11 +1,7 @@
 // @flow
 import * as React from 'react'
-import {
-  Pill,
-  swatchColors,
-  MIXED_WELL_COLOR,
-  type UseHoverTooltipResult,
-} from '@opentrons/components'
+import { Pill, type UseHoverTooltipResult } from '@opentrons/components'
+import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import styles from './StepItem.css'
 import type {
   WellIngredientVolumeData,

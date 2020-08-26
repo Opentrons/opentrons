@@ -6,6 +6,7 @@ import { mount } from 'enzyme'
 import * as RobotControls from '../../../robot-controls'
 import * as RobotAdmin from '../../../robot-admin'
 import * as Calibration from '../../../calibration'
+import * as Config from '../../../config'
 import * as RobotSelectors from '../../../robot/selectors'
 
 import { ControlsCard } from '../ControlsCard'
@@ -20,6 +21,7 @@ import type { ViewableRobot } from '../../../discovery/types'
 jest.mock('../../../robot-controls/selectors')
 jest.mock('../../../robot/selectors')
 jest.mock('../../../config/selectors')
+jest.mock('../../../sessions/selectors')
 jest.mock('../../../calibration/selectors')
 
 jest.mock('../CheckCalibrationControl', () => ({
@@ -52,6 +54,11 @@ const getDeckCalibrationStatus: JestMockFn<
   [State, string],
   $Call<typeof Calibration.getDeckCalibrationStatus, State, string>
 > = Calibration.getDeckCalibrationStatus
+
+const getFeatureFlags: JestMockFn<
+  [State],
+  $Call<typeof Config.getFeatureFlags, State>
+> = Config.getFeatureFlags
 
 describe('ControlsCard', () => {
   let mockStore
@@ -89,6 +96,7 @@ describe('ControlsCard', () => {
     }
 
     getDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
+    getFeatureFlags.mockReturnValue({})
 
     render = (robot: ViewableRobot = mockRobot) => {
       return mount(

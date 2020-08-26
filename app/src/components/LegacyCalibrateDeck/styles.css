@@ -1,0 +1,32 @@
+@import '@opentrons/components';
+
+.attach_tip_contents {
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+}
+
+.attach_tip_instructions {
+  @apply --font-body-2-dark;
+
+  max-width: 60%;
+
+  & p {
+    margin: 1rem 0;
+  }
+
+  & > button {
+    margin-top: 3rem;
+  }
+}
+
+.attach_tip_diagram {
+  max-width: 30%;
+
+  /* TODO: (ka 2018-4-30): revist once we have both single and multi  */
+  & > img {
+    margin-top: 1rem;
+    width: 100%;
+    height: auto;
+  }
+}

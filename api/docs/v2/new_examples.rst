@@ -15,10 +15,11 @@ Basic Transfer
 Moving 100 µL from one well to another:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -31,10 +32,11 @@ Moving 100 µL from one well to another:
 This accomplishes the same thing as the following basic commands:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -55,10 +57,11 @@ Loops
 Loops in Python allow your protocol to perform many actions, or act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``7``, and uses that loop's current value to transfer from all wells in a reservoir to each row of a plate:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -82,10 +85,11 @@ Multiple Air Gaps
 The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from the first five wells in the reservoir, while creating an air gap between each sample.
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -112,10 +116,11 @@ Dilution
 This example first spreads a diluent to all wells of a plate. It then dilutes 8 samples from the reservoir across the 8 columns of the plate.
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -149,10 +154,11 @@ Plate Mapping
 This example deposits various volumes of liquids into the same plate of wells and automatically refill the tip volume when it runs out.
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)

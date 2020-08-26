@@ -41,7 +41,7 @@ export function parseLabwareFiles(
 
     return Promise.all([readTask, statTask]).then(([data, stats]) => ({
       filename: f,
-      created: stats.birthtimeMs,
+      modified: stats.mtimeMs,
       data,
     }))
   })

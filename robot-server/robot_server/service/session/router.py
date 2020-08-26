@@ -5,12 +5,10 @@ from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
 
 from robot_server.service.dependencies import get_session_manager
-from robot_server.service.errors import RobotServerError
-from robot_server.service.json_api import Error, ResourceLink,\
-    ResponseDataModel
+from robot_server.service.errors import RobotServerError, CommonErrorDef
+from robot_server.service.json_api import ResourceLink, ResponseDataModel
 from robot_server.service.session.command_execution import create_command
-from robot_server.service.session.errors import SessionCreationException, \
-    SessionCommandException, SessionException, CommandExecutionConflict
+from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session import models as route_models
 from robot_server.service.session.session_types import SessionMetaData
@@ -29,15 +27,13 @@ def get_session(manager: SessionManager,
     if not found_session:
         # There is no session raise error
         raise RobotServerError(
-            status_code=http_status_codes.HTTP_404_NOT_FOUND,
-            error=Error(
-                title="No session",
-                detail=f"Cannot find session with id '{session_id}'.",
-                links={
-                    "POST": api_router.url_path_for(
-                        create_session_handler.__name__)
-                }
-            )
+            definition=CommonErrorDef.RESOURCE_NOT_FOUND,
+            links={
+                "POST":
+                    api_router.url_path_for(create_session_handler.__name__)
+            },
+            resource='session',
+            id=session_id
         )
     return found_session
 
@@ -46,8 +42,7 @@ def get_session(manager: SessionManager,
              description="Create a session",
              response_model_exclude_unset=True,
              response_model=route_models.SessionResponse,
-             status_code=http_status_codes.HTTP_201_CREATED,
-             )
+             status_code=http_status_codes.HTTP_201_CREATED)
 async def create_session_handler(
         create_request: route_models.SessionCreateRequest,
         session_manager: SessionManager = Depends(get_session_manager)) \
@@ -55,23 +50,11 @@ async def create_session_handler(
     """Create a session"""
     session_type = create_request.data.attributes.sessionType
     create_params = create_request.data.attributes.createParams
-    try:
-        new_session = await session_manager.add(
-            session_type=session_type,
-            session_meta_data=SessionMetaData(create_params=create_params))
-    # TODO: Amit 07/30/2020 - SessionCreationException should be a
-    #  RobotServerError. Customized by raiser with status code and rest of
-    #  Error attributes. The job here would be to log and re-raise.
-    except SessionCreationException as e:
-        log.exception("Failed to create session")
-        raise RobotServerError(
-            status_code=http_status_codes.HTTP_400_BAD_REQUEST,
-            error=Error(
-                title="Creation Failed",
-                detail=f"Failed to create session of type "
-                       f"'{session_type}': {str(e)}.",
-            )
-        )
+
+    new_session = await session_manager.add(
+        session_type=session_type,
+        session_meta_data=SessionMetaData(create_params=create_params))
+
     return route_models.SessionResponse(
         data=ResponseDataModel.create(
             attributes=new_session.get_response_model(),
@@ -93,21 +76,7 @@ async def delete_session_handler(
                               session_id=session_id,
                               api_router=router)
 
-    try:
-        await session_manager.remove(session_obj.meta.identifier)
-    # TODO: Amit 07/30/2020 - SessionException should be a RobotServerError.
-    #  Customized by raiser with status code and rest of
-    #  Error attributes. The job here would be to log and re-raise.
-    except SessionException as e:
-        log.exception("Failed to remove a session session")
-        raise RobotServerError(
-            status_code=http_status_codes.HTTP_400_BAD_REQUEST,
-            error=Error(
-                title="Removal Failed",
-                detail=f"Failed to remove session "
-                       f"'{session_id}': {str(e)}.",
-            )
-        )
+    await session_manager.remove(session_obj.meta.identifier)
 
     return route_models.SessionResponse(
         data=ResponseDataModel.create(
@@ -176,40 +145,14 @@ async def session_command_execute_handler(
                               session_id=session_id,
                               api_router=router)
     if not session_manager.is_active(session_obj.meta.identifier):
-        raise RobotServerError(
-            status_code=http_status_codes.HTTP_403_FORBIDDEN,
-            error=Error(
-                title=f"Session '{session_id}' is not active",
-                detail="Only the active session can execute commands",
-            )
-        )
+        raise CommandExecutionException(
+            reason=f"Session '{session_id}' is not active. "
+                   "Only the active session can execute commands")
 
-    try:
-        command = create_command(command_request.data.attributes.command,
-                                 command_request.data.attributes.data)
-        command_result = await session_obj.command_executor.execute(command)
-        log.debug(f"Command completed {command}")
-    # TODO: Amit 07/30/2020 - SessionCommandException should be a
-    #  RobotServerError. Customized by raiser with status code and rest of
-    #  Error attributes. The job here would be to log and re-raise.
-    except CommandExecutionConflict as e:
-        log.exception("Failed to execute command due to conflict")
-        raise RobotServerError(
-            status_code=http_status_codes.HTTP_409_CONFLICT,
-            error=Error(
-                title="Command execution conflict",
-                detail=str(e),
-            )
-        )
-    except SessionCommandException as e:
-        log.exception("Failed to execute command")
-        raise RobotServerError(
-            status_code=http_status_codes.HTTP_400_BAD_REQUEST,
-            error=Error(
-                title="Command execution error",
-                detail=str(e),
-            )
-        )
+    command = create_command(command_request.data.attributes.command,
+                             command_request.data.attributes.data)
+    command_result = await session_obj.command_executor.execute(command)
+    log.info(f"Command completed {command}")
 
     return route_models.CommandResponse(
         data=ResponseDataModel.create(

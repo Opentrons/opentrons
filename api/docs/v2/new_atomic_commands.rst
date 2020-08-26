@@ -10,10 +10,11 @@ For example, the complex command ``transfer`` (see :ref:`v2-complex-commands`) e
 The examples in this section would be added to the following:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.6'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -116,10 +117,11 @@ Iterating Through Tips
 For this section, instead of using the protocol defined above, consider this setup:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -192,8 +194,9 @@ This section describes the :py:class:`.InstrumentContext` 's liquid-handling com
 The examples in this section should be inserted in the following:
 
 .. code-block:: python
+    :substitutions:
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -442,10 +445,11 @@ You can resume by pressing 'resume' in your Opentrons App. You can optionally sp
 will be displayed in the Opentrons App when protocol execution pauses.
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # The start of your protocol goes here...
@@ -473,10 +477,11 @@ To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentCon
 None of these functions take any arguments:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
@@ -494,10 +499,11 @@ The method :py:meth:`.ProtocolContext.comment` lets you display messages in the 
 
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         protocol.comment('Hello, world!')
@@ -512,10 +518,11 @@ You can turn the robot rail lights on or off in the protocol using :py:meth:`.Pr
 
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.6'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # turn on robot rail lights

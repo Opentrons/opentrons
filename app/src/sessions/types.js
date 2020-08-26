@@ -296,32 +296,41 @@ export type AnalyticsModelsByMount = {|
   rightPipetteModel?: string,
 |}
 
-type VectorTuple = [number, number, number]
-export type CalibrationCheckAnalyticsData = {|
-  comparingFirstPipetteHeightDifferenceVector?: VectorTuple,
-  comparingFirstPipetteHeightThresholdVector?: VectorTuple,
+export type CalibrationCheckCommonEventData = {|
   comparingFirstPipetteHeightExceedsThreshold?: boolean,
   comparingFirstPipetteHeightErrorSource?: string,
-  comparingFirstPipettePointOneDifferenceVector?: VectorTuple,
-  comparingFirstPipettePointOneThresholdVector?: VectorTuple,
   comparingFirstPipettePointOneExceedsThreshold?: boolean,
   comparingFirstPipettePointOneErrorSource?: string,
-  comparingFirstPipettePointTwoDifferenceVector?: VectorTuple,
-  comparingFirstPipettePointTwoThresholdVector?: VectorTuple,
   comparingFirstPipettePointTwoExceedsThreshold?: boolean,
   comparingFirstPipettePointTwoErrorSource?: string,
-  comparingFirstPipettePointThreeDifferenceVector?: VectorTuple,
-  comparingFirstPipettePointThreeThresholdVector?: VectorTuple,
   comparingFirstPipettePointThreeExceedsThreshold?: boolean,
   comparingFirstPipettePointThreeErrorSource?: string,
-  comparingSecondPipetteHeightDifferenceVector?: VectorTuple,
-  comparingSecondPipetteHeightThresholdVector?: VectorTuple,
   comparingSecondPipetteHeightExceedsThreshold?: boolean,
   comparingSecondPipetteHeightErrorSource?: string,
-  comparingSecondPipettePointOneDifferenceVector?: VectorTuple,
-  comparingSecondPipettePointOneThresholdVector?: VectorTuple,
   comparingSecondPipettePointOneExceedsThreshold?: boolean,
   comparingSecondPipettePointOneErrorSource?: string,
+|}
+
+export type CalibrationCheckIntercomData = {|
+  ...CalibrationCheckCommonEventData,
+  succeeded: boolean,
+|}
+
+type VectorTuple = [number, number, number]
+export type CalibrationCheckAnalyticsData = {|
+  ...CalibrationCheckCommonEventData,
+  comparingFirstPipetteHeightDifferenceVector?: VectorTuple,
+  comparingFirstPipetteHeightThresholdVector?: VectorTuple,
+  comparingFirstPipettePointOneDifferenceVector?: VectorTuple,
+  comparingFirstPipettePointOneThresholdVector?: VectorTuple,
+  comparingFirstPipettePointTwoDifferenceVector?: VectorTuple,
+  comparingFirstPipettePointTwoThresholdVector?: VectorTuple,
+  comparingFirstPipettePointThreeDifferenceVector?: VectorTuple,
+  comparingFirstPipettePointThreeThresholdVector?: VectorTuple,
+  comparingSecondPipetteHeightDifferenceVector?: VectorTuple,
+  comparingSecondPipetteHeightThresholdVector?: VectorTuple,
+  comparingSecondPipettePointOneDifferenceVector?: VectorTuple,
+  comparingSecondPipettePointOneThresholdVector?: VectorTuple,
 |}
 
 export type SharedAnalyticsProps = {|
@@ -334,4 +343,11 @@ export type CalibrationCheckSessionAnalyticsProps = {|
   ...CalibrationCheckAnalyticsData,
 |}
 
+export type CalibrationCheckSessionIntercomProps = {|
+  ...SharedAnalyticsProps,
+  ...AnalyticsModelsByMount,
+  ...CalibrationCheckIntercomData,
+|}
+
 export type SessionAnalyticsProps = CalibrationCheckSessionAnalyticsProps
+export type SessionIntercomProps = CalibrationCheckSessionIntercomProps

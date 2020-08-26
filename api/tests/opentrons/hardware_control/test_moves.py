@@ -4,6 +4,8 @@ from opentrons import types
 from opentrons import hardware_control as hc
 from opentrons.config import robot_configs
 from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.hardware_control.robot_calibration import (
+    RobotCalibration, DeckCalibration)
 
 
 async def test_controller_home(loop, is_robot):
@@ -71,7 +73,7 @@ async def test_home_specific_sim(hardware_api, monkeypatch, is_robot):
                                               Axis.C: 19}
 
 
-async def test_retract(hardware_api):
+async def test_retract(hardware_api, toggle_new_calibration):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     await hardware_api.retract(types.Mount.RIGHT, 10)
@@ -83,7 +85,7 @@ async def test_retract(hardware_api):
                                               Axis.C: 19}
 
 
-async def test_move(hardware_api, is_robot):
+async def test_move(hardware_api, is_robot, toggle_new_calibration):
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
     target_position1 = {Axis.X: 30,
@@ -135,7 +137,8 @@ async def test_move_extras_passed_through(hardware_api, monkeypatch):
     assert mock_be_move.call_args_list[0][1]['axis_max_speeds'] == {'Y': 20}
 
 
-async def test_mount_offset_applied(hardware_api, is_robot):
+async def test_mount_offset_applied(
+        hardware_api, is_robot, toggle_new_calibration):
     await hardware_api.home()
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.LEFT
@@ -149,7 +152,8 @@ async def test_mount_offset_applied(hardware_api, is_robot):
     assert hardware_api._current_position == target_position
 
 
-async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
+async def test_critical_point_applied(
+        hardware_api, monkeypatch, is_robot, toggle_new_calibration):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -243,7 +247,38 @@ async def test_deck_cal_applied(monkeypatch, loop):
     assert called_with['Z'] == 30
 
 
-async def test_other_mount_retracted(hardware_api, is_robot):
+async def test_attitude_deck_cal_applied(
+        monkeypatch, loop, use_new_calibration):
+    new_gantry_cal = [
+        [1.0047, -0.0046, 0.0],
+        [0.0011, 1.0038, 0.0],
+        [0.0, 0.0, 1.0]]
+    called_with = None
+
+    def mock_move(position, speed=None, home_flagged_axes=True,
+                  axis_max_speeds=None):
+        nonlocal called_with
+        called_with = position
+
+    hardware_api = await hc.API.build_hardware_simulator(loop=loop)
+    monkeypatch.setattr(hardware_api._backend, 'move', mock_move)
+    deck_cal = RobotCalibration(
+        deck_calibration=DeckCalibration(attitude=new_gantry_cal))
+    hardware_api.set_robot_calibration(deck_cal)
+    await hardware_api.home()
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    assert called_with['X'] == 0.0
+    assert called_with['Y'] == 0.0
+    assert called_with['A'] == 0.0
+    # Check that mount offset is also applied
+    await hardware_api.move_to(types.Mount.LEFT, types.Point(0, 0, 0))
+    assert round(called_with['X'], 2) == 34.16
+    assert round(called_with['Y'], 2) == 0.04
+    assert round(called_with['Z'], 2) == 0.0
+
+
+async def test_other_mount_retracted(
+        hardware_api, is_robot, toggle_new_calibration):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     assert await hardware_api.gantry_position(types.Mount.RIGHT)\
@@ -253,7 +288,7 @@ async def test_other_mount_retracted(hardware_api, is_robot):
         == types.Point(54, 20, 218)
 
 
-async def catch_oob_moves(hardware_api, is_robot):
+async def catch_oob_moves(hardware_api, is_robot, toggle_new_calibration):
     await hardware_api.home()
     # Check axis max checking for move and move rel
     with pytest.raises(RuntimeError):
@@ -309,7 +344,8 @@ async def catch_oob_moves(hardware_api, is_robot):
     await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, 0))
 
 
-async def test_shake_during_pick_up(hardware_api, monkeypatch):
+async def test_shake_during_pick_up(
+        hardware_api, monkeypatch, toggle_new_calibration):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -345,7 +381,8 @@ async def test_shake_during_pick_up(hardware_api, monkeypatch):
     move_rel.assert_has_calls(move_rel_calls)
 
 
-async def test_shake_during_drop(hardware_api, monkeypatch):
+async def test_shake_during_drop(
+        hardware_api, monkeypatch, toggle_new_calibration):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},

@@ -33,7 +33,7 @@ stages:
           type: Session
           attributes: &session_data_attributes
             sessionType: calibrationCheck
-            createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             createParams: null
             details: &session_data_attribute_details
               currentStep: sessionStarted
@@ -659,7 +659,7 @@ stages:
             type: Session
             attributes:
               sessionType: default
-              createdAt: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
               details: {}
               createParams: null
 ---

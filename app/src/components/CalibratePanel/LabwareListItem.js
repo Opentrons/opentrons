@@ -32,6 +32,7 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
     definition,
     parent,
     calibrationData,
+    definitionHash,
   } = props
 
   const url = `/calibrate/labware/${slot}`
@@ -87,6 +88,9 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
               <CalibrationData
                 calibrationData={calibrationData}
                 calibratedThisSession={confirmed}
+                // the definitionHash will only be absent if old labware
+                // or robot version <= 3.19
+                calDataAvailable={definitionHash !== null}
               />
             </div>
           </div>

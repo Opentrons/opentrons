@@ -1,7 +1,8 @@
 import asyncio
 import logging
 import typing
-from dataclasses import asdict
+
+from opentrons.util.helpers import deep_get, utc_now
 
 if typing.TYPE_CHECKING:
     from opentrons.api.dev_types import State
@@ -20,6 +21,7 @@ from robot_server.service.session.session_types.protocol.execution.\
 from robot_server.service.session.session_types.protocol.execution.worker \
     import _Worker, WorkerListener, WorkerDirective
 from robot_server.util import duration
+from robot_server.service.session.session_types.protocol import models
 
 
 log = logging.getLogger(__name__)
@@ -73,8 +75,8 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             ProtocolCommand.resume: self._worker.handle_resume,
             ProtocolCommand.pause: self._worker.handle_pause,
         }
-        # TODO: Amit 8/3/2020 - proper schema for command list
-        self._commands: typing.List[typing.Any] = []
+        self._events: typing.List[models.ProtocolSessionEvent] = []
+        self._id_maker = IdMaker()
 
     @staticmethod
     def create_worker(configuration: SessionConfiguration,
@@ -105,9 +107,6 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                 f"Can't execute '{command_def}' during "
                 f"state '{self.current_state}'")
 
-        # TODO: Amit 8/3/2020 - proper schema for command list
-        self._commands.append(asdict(command))
-
         handler = self._handlers.get(command_def)
         if not handler:
             raise UnsupportedCommandException(
@@ -117,6 +116,15 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         with duration() as timed:
             await handler()
 
+        self._events.append(
+            models.ProtocolSessionEvent(
+                source=models.EventSource.session_command,
+                event=command.content.name,
+                commandId=command.meta.identifier,
+                timestamp=timed.end,
+            )
+        )
+
         return CompletedCommand(
             content=command.content,
             meta=command.meta,
@@ -124,9 +132,8 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                                  completed_at=timed.end))
 
     @property
-    def commands(self):
-        # TODO: Amit 8/3/2020 - proper schema for command list
-        return self._commands
+    def events(self) -> typing.List[models.ProtocolSessionEvent]:
+        return self._events
 
     @property
     def current_state(self) -> 'State':
@@ -162,14 +169,55 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         topic = cmd.get('topic')
         if topic == Session.TOPIC:
             payload = cmd.get('payload')
-            if isinstance(payload, Session):
-                self.current_state = payload.state
-            else:
+            if isinstance(payload, dict):
                 self.current_state = payload.get('state')
+            elif hasattr(payload, 'state'):
+                self.current_state = payload.state
         else:
-            # TODO: Amit 8/3/2020 - proper schema for command list
-            self._commands.append({
-                    'name': cmd.get('name'),
-                    'desc': cmd['payload']['text'],
-                    'when': cmd.get('$')
-            })
+            dollar_val = cmd.get('$')
+            event_name = cmd.get('name')
+            event = None
+            if dollar_val == 'before':
+                # text may be a format string using the payload vals as kwargs
+                text = deep_get(cmd, ('payload', 'text',), "")
+                if text:
+                    text = text.format(**cmd.get('payload', {}))
+                event = models.ProtocolSessionEvent(
+                    source=models.EventSource.protocol_event,
+                    event=f'{event_name}.start',
+                    commandId=self._id_maker.create_id(),
+                    params={'text': text},
+                    timestamp=utc_now(),
+                )
+            elif dollar_val == 'after':
+                result = deep_get(cmd, ('payload', 'return',))
+                event = models.ProtocolSessionEvent(
+                    source=models.EventSource.protocol_event,
+                    event=f'{event_name}.end',
+                    commandId=self._id_maker.use_last_id(),
+                    timestamp=utc_now(),
+                    result=result,
+                )
+
+            if event:
+                self._events.append(event)
+
+
+class IdMaker:
+    """Helper to create ids for pairs of before/after command pairs"""
+
+    def __init__(self):
+        """Constructor"""
+        self._id_stack: typing.List[str] = []
+        self._next_id = 1
+
+    def create_id(self) -> str:
+        """Create a new id on the stack"""
+        s = str(self._next_id)
+        self._id_stack.append(s)
+        self._next_id += 1
+        return s
+
+    def use_last_id(self) -> str:
+        """Use the the most recently created id"""
+        return self._id_stack.pop()

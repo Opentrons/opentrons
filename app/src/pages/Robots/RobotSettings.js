@@ -33,7 +33,7 @@ import {
   ConnectAlertModal,
 } from '../../components/RobotSettings'
 import { UpdateBuildroot } from '../../components/RobotSettings/UpdateBuildroot'
-import { CalibrateDeck } from '../../components/CalibrateDeck'
+import { CalibrateDeck } from '../../components/LegacyCalibrateDeck'
 import { ConnectBanner } from '../../components/RobotSettings/ConnectBanner'
 import { ReachableRobotBanner } from '../../components/RobotSettings/ReachableRobotBanner'
 import { RestartRequiredBanner } from '../../components/RobotSettings/RestartRequiredBanner'

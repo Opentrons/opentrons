@@ -6,8 +6,6 @@ from robot_server.robot.calibration.check.session import \
 from robot_server.robot.calibration.helper_classes import PipetteInfo,\
     PipetteRank
 from opentrons import types
-from robot_server.robot.calibration.session import CalibrationException, \
-    NoPipetteException
 from robot_server.robot.calibration.check.util import StateMachineError
 
 from robot_server.service.session.command_execution import create_command
@@ -139,9 +137,7 @@ def session_hardware_info(mock_cal_session):
 
 
 @pytest.mark.parametrize(argnames="build_exception",
-                         argvalues=[AssertionError,
-                                    CalibrationException,
-                                    NoPipetteException])
+                         argvalues=[AssertionError])
 async def test_create_session_error(hardware, patch_build_session,
                                     build_exception):
     async def raiser(x):
@@ -199,9 +195,7 @@ async def test_session_command_execute_no_body(check_session_instance,
 
 @pytest.mark.parametrize(argnames="command_exception",
                          argvalues=[AssertionError,
-                                    StateMachineError,
-                                    CalibrationException,
-                                    NoPipetteException])
+                                    StateMachineError])
 async def test_session_command_execute_raise(check_session_instance,
                                              mock_cal_session,
                                              command_exception):

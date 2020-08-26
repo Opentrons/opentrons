@@ -2,7 +2,7 @@
 import { createSelector } from 'reselect'
 import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 import { getWellSetForMultichannel } from '../utils'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 
 import mapValues from 'lodash/mapValues'
 

@@ -6,8 +6,10 @@ from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
 from opentrons.calibration_storage import modify
 from opentrons.hardware_control import ThreadManager, CriticalPoint
-from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import geometry, labware
+
+import robot_server.robot.calibration.util as uf
+from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand, \
     TipLengthCalibrationCommand
 from robot_server.robot.calibration.constants import (
@@ -18,9 +20,6 @@ from robot_server.robot.calibration.constants import (
 from .state_machine import (
     TipCalibrationStateMachine
 )
-from .util import (
-    TipCalibrationException as ErrorExc, TipCalibrationError as Error
-)
 from .constants import (
     TipCalibrationState as State,
     TRASH_WELL,
@@ -30,6 +29,7 @@ from .constants import (
     MOVE_TO_REF_POINT_SAFETY_BUFFER,
     TRASH_REF_POINT_OFFSET
 )
+from ..errors import CalibrationError
 from ..helper_classes import (
     RequiredLabware,
     AttachedPipette
@@ -65,7 +65,9 @@ class TipCalibrationUserFlow:
         self._has_calibration_block = has_calibration_block
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
-            raise ErrorExc(Error.NO_PIPETTE, mount)
+            raise RobotServerError(
+                definition=CalibrationError.NO_PIPETTE_ON_MOUNT,
+                mount=mount)
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
@@ -202,26 +204,10 @@ class TipCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def pick_up_tip(self):
-        saved_default = None
-        if self._hw_pipette.config.channels > 1:
-            # reduce pick up current for multichannel pipette picking up 1 tip
-            saved_default = self._hw_pipette.config.pick_up_current
-            self._hw_pipette.update_config_item('pick_up_current', 0.1)
-
-        # grab position of active nozzle for ref when returning tip later
-        self._tip_origin_pt = await self._hardware.gantry_position(
-            self._mount, critical_point=self._get_critical_point())
-
-        tip_length = self._get_default_tip_length()
-        await self._hardware.pick_up_tip(self._mount, tip_length)
-
-        if saved_default:
-            self._hw_pipette.update_config_item('pick_up_current',
-                                                saved_default)
+        await uf.pick_up_tip(self, tip_length=self._get_default_tip_length())
 
     async def invalidate_tip(self):
-        await self._return_tip()
-        await self.move_to_tip_rack()
+        await uf.invalidate_tip(self)
 
     async def exit_session(self):
         await self._return_tip()
@@ -232,7 +218,7 @@ class TipCalibrationUserFlow:
                 self._tip_rack_definition,
                 self._deck.position_for(TIP_RACK_SLOT))
         except Exception:
-            raise ErrorExc(Error.BAD_DEF)
+            raise RobotServerError(definition=CalibrationError.BAD_LABWARE_DEF)
 
     def _get_alt_tip_racks(self) -> Set[str]:
         pip_vol = self._hw_pipette.config.max_volume
@@ -249,37 +235,7 @@ class TipCalibrationUserFlow:
                 self._deck.position_for(cb_setup['slot']))
 
     async def _return_tip(self):
-        """
-        Move pipette with tip to tip rack well, such that
-        the tip is inside the well, but not so deep that
-        the tip rack will block the sheath from ejecting fully.
-        Each pipette config contains a coefficient to apply to an
-        attached tip's length to determine proper z offset
-        """
-        if self._tip_origin_pt and self._hw_pipette.has_tip:
-            tip_length = self._get_default_tip_length()
-            coeff = self._hw_pipette.config.return_tip_height
-            to_pt = self._tip_origin_pt - Point(0, 0, tip_length * coeff)
-            cp = self._get_critical_point()
-            await self._hardware.move_to(mount=self._mount,
-                                         abs_position=to_pt,
-                                         critical_point=cp)
-            await self._hardware.drop_tip(self._mount)
-            self._tip_origin_pt = None
+        await uf.return_tip(self, tip_length=self._get_default_tip_length())
 
     async def _move(self, to_loc: Location):
-        from_pt = await self._get_current_point()
-        from_loc = Location(from_pt, None)
-        cp = self._get_critical_point()
-
-        max_height = self._hardware.get_instrument_max_height(self._mount)
-
-        safe = geometry.safe_height(
-            from_loc, to_loc, self._deck, max_height)
-        moves = plan_arc(from_pt, to_loc.point, safe,
-                         origin_cp=None,
-                         dest_cp=cp)
-        for move in moves:
-            await self._hardware.move_to(mount=self._mount,
-                                         abs_position=move[0],
-                                         critical_point=move[1])
+        await uf.move(self, to_loc)

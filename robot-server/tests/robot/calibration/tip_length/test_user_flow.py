@@ -4,6 +4,8 @@ from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from opentrons.protocol_api.labware import get_labware_definition
+
+from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import (
     CalibrationCommand, TipLengthCalibrationCommand)
 from robot_server.robot.calibration.tip_length.user_flow import \
@@ -303,3 +305,16 @@ async def test_save_offsets(mock_user_flow):
         )
         await uf.save_offset()
         create_tip_length_data_patch.assert_called_with(ANY, '', 30)
+
+
+@pytest.mark.parametrize(argnames="mount",
+                         argvalues=[Mount.RIGHT, Mount.LEFT])
+def test_no_pipette(hardware, mount):
+    hardware._attached_instruments = {mount: None}
+    with pytest.raises(RobotServerError) as error:
+        TipCalibrationUserFlow(hardware=hardware,
+                               mount=mount,
+                               has_calibration_block=None,
+                               tip_rack=None)
+
+    assert error.value.error.detail == f"No pipette present on {mount} mount"

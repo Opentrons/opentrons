@@ -74,7 +74,9 @@ function LevelingVideo(props: { pipetteName: string, mount: Mount }) {
         loop={true}
         controls={true}
       >
-        <source src={require(`./videos/${pipetteName}-${mount}.webm`)} />
+        <source
+          src={require(`../../assets/videos/pip-leveling/${pipetteName}-${mount}.webm`)}
+        />
       </video>
     </div>
   )

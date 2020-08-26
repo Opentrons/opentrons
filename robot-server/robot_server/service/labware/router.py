@@ -12,8 +12,8 @@ from opentrons.calibration_storage import (
     delete)
 
 from robot_server.service.labware import models as lw_models
-from robot_server.service.errors import RobotServerError
-from robot_server.service.json_api import ErrorResponse, Error
+from robot_server.service.errors import RobotServerError, CommonErrorDef
+from robot_server.service.json_api import ErrorResponse
 
 router = APIRouter()
 
@@ -52,7 +52,8 @@ def _format_calibrations(
             loadName=details.load_name,
             namespace=details.namespace,
             version=details.version,
-            parent=parent_info)
+            parent=parent_info,
+            definitionHash=calInfo.labware_id)
         formatted_calibrations.append(
                 lw_models.ResponseDataModel.create(
                     attributes=formatted_cal,
@@ -148,9 +149,9 @@ async def get_specific_labware_calibration(
             calibration = cal
             break
     if not calibration:
-        error = Error(title='{calibrationId} does not exist.')
-        raise RobotServerError(status_code=status.HTTP_404_NOT_FOUND,
-                               error=error)
+        raise RobotServerError(definition=CommonErrorDef.RESOURCE_NOT_FOUND,
+                               resource='calibration',
+                               id=calibrationId)
 
     formatted_calibrations = _format_calibrations([calibration])
     return lw_models.SingleCalibrationResponse(
@@ -166,6 +167,6 @@ async def delete_specific_labware_calibration(
     try:
         delete.delete_offset_file(calibrationId)
     except (FileNotFoundError, KeyError):
-        error = Error(title='{calibrationId} does not exist.')
-        raise RobotServerError(status_code=status.HTTP_404_NOT_FOUND,
-                               error=error)
+        raise RobotServerError(definition=CommonErrorDef.RESOURCE_NOT_FOUND,
+                               resource='calibration',
+                               id=calibrationId)

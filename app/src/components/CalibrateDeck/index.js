@@ -1,202 +1,149 @@
 // @flow
+// Tip Length Calibration Orchestration Component
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { push, goBack } from 'connected-react-router'
-import { Switch, Route, withRouter } from 'react-router-dom'
-
-import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
-import type { OP, SP, DP, CalibrateDeckProps, CalibrationStep } from './types'
+import { useSelector, useDispatch } from 'react-redux'
+import last from 'lodash/last'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { chainActions } from '../../util'
-import { createLogger } from '../../logger'
-
-import { home, ROBOT } from '../../robot-controls'
 import {
-  startDeckCalibration,
-  deckCalibrationCommand,
-  clearDeckCalibration,
-  makeGetDeckCalibrationCommandState,
-  makeGetDeckCalibrationStartState,
-} from '../../http-api-client'
+  ModalPage,
+  SpinnerModalPage,
+  useConditionalConfirm,
+} from '@opentrons/components'
 
-import { ErrorModal } from '../modals'
-import { ClearDeckAlert } from './ClearDeckAlert'
-import { InUseModal } from './InUseModal'
-import { NoPipetteModal } from './NoPipetteModal'
-import { InstructionsModal } from './InstructionsModal'
-import { ExitAlertModal } from './ExitAlertModal'
+import type { State } from '../../types'
+import type {
+  SessionCommandString,
+  SessionCommandData,
+  DeckCalibrationLabware,
+} from '../../sessions/types'
+import * as Sessions from '../../sessions'
+import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
+import type { RequestState } from '../../robot-api/types'
+import { Introduction } from './Introduction'
+import { DeckSetup } from './DeckSetup'
+import { TipPickUp } from './TipPickUp'
+import { TipConfirmation } from './TipConfirmation'
+import { SaveZPoint } from './SaveZPoint'
+import { SaveXYPoint } from './SaveXYPoint'
+import { CompleteConfirmation } from './CompleteConfirmation'
+import { ConfirmExitModal } from './ConfirmExitModal'
+import styles from './styles.css'
 
-const log = createLogger(__filename)
+import type { CalibrateDeckParentProps, CalibrateDeckChildProps } from './types'
 
-const RE_STEP = '(1|2|3|4|5|6)'
-const BAD_PIPETTE_ERROR = 'Unexpected pipette response from robot'
-const ERROR_DESCRIPTION =
-  'An unexpected error has cleared your deck calibration progress, please try again.'
+const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Deck calibration'
+const EXIT = 'exit'
 
-export const CalibrateDeck: React.AbstractComponent<
-  $Diff<OP, ContextRouter>
-> = withRouter(
-  connect<CalibrateDeckProps, OP, SP, _, _, _>(
-    makeMapStateToProps,
-    mapDispatchToProps
-  )(CalibrateDeckComponent)
-)
+const PANEL_BY_STEP: {
+  [string]: React.ComponentType<CalibrateDeckChildProps>,
+} = {
+  [Sessions.DECK_STEP_SESSION_STARTED]: Introduction,
+  [Sessions.DECK_STEP_LABWARE_LOADED]: DeckSetup,
+  [Sessions.DECK_STEP_PREPARING_PIPETTE]: TipPickUp,
+  [Sessions.DECK_STEP_INSPECTING_TIP]: TipConfirmation,
+  [Sessions.DECK_STEP_JOGGING_TO_DECK]: SaveZPoint,
+  [Sessions.DECK_STEP_SAVING_POINT_ONE]: SaveXYPoint,
+  [Sessions.DECK_STEP_SAVING_POINT_TWO]: SaveXYPoint,
+  [Sessions.DECK_STEP_SAVING_POINT_THREE]: SaveXYPoint,
+  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
+}
+const PANEL_STYLE_BY_STEP: {
+  [string]: string,
+} = {
+  [Sessions.DECK_STEP_SESSION_STARTED]: styles.terminal_modal_contents,
+  [Sessions.DECK_STEP_LABWARE_LOADED]: styles.page_content_dark,
+  [Sessions.DECK_STEP_PREPARING_PIPETTE]: styles.modal_contents,
+  [Sessions.DECK_STEP_INSPECTING_TIP]: styles.modal_contents,
+  [Sessions.DECK_STEP_JOGGING_TO_DECK]: styles.modal_contents,
+  [Sessions.DECK_STEP_SAVING_POINT_ONE]: styles.modal_contents,
+  [Sessions.DECK_STEP_SAVING_POINT_TWO]: styles.modal_contents,
+  [Sessions.DECK_STEP_SAVING_POINT_THREE]: styles.modal_contents,
+  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: styles.terminal_modal_contents,
+}
+export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
+  const { session, robotName, closeWizard } = props
+  const { currentStep, instrument, labware } = session?.details || {}
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const dispatch = useDispatch()
 
-function CalibrateDeckComponent(props: CalibrateDeckProps) {
+  const requestStatus = useSelector<State, RequestState | null>(state =>
+    getRequestById(state, last(requestIds))
+  )?.status
+
+  function sendCommand(
+    command: SessionCommandString,
+    data: SessionCommandData = {},
+    loadingSpinner: boolean = true
+  ) {
+    if (session === null) return
+    const sessionCommand = Sessions.createSessionCommand(
+      robotName,
+      session.id,
+      { command, data }
+    )
+    if (loadingSpinner) {
+      dispatchRequest(sessionCommand)
+    } else {
+      dispatch(sessionCommand)
+    }
+  }
+
+  function deleteSession() {
+    session?.id &&
+      dispatchRequest(Sessions.deleteSession(robotName, session.id))
+    closeWizard()
+  }
+
   const {
-    startRequest,
-    commandRequest,
-    pipetteProps,
-    exitError,
-    match: { path },
-  } = props
+    showConfirmation: showConfirmExit,
+    confirm: confirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(() => {
+    sendCommand(Sessions.deckCalCommands.EXIT)
+    deleteSession()
+  }, true)
 
-  if (pipetteProps && !pipetteProps.pipette) {
-    return (
-      <ErrorModal
-        description={ERROR_DESCRIPTION}
-        close={exitError}
-        error={{ name: 'BadData', message: BAD_PIPETTE_ERROR }}
-      />
-    )
+  const isMulti = React.useMemo(() => {
+    const spec = instrument && getPipetteModelSpecs(instrument.model)
+    return spec ? spec.channels > 1 : false
+  }, [instrument])
+
+  const tipRack: DeckCalibrationLabware | null =
+    (labware && labware.find(l => l.isTiprack)) ?? null
+
+  if (!session || !tipRack) {
+    return null
   }
 
-  if (commandRequest.error) {
-    return (
-      <ErrorModal
-        description={ERROR_DESCRIPTION}
-        close={exitError}
-        error={commandRequest.error}
-      />
-    )
+  const titleBarProps = {
+    title: TIP_LENGTH_CALIBRATION_SUBTITLE,
+    back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
-  return (
-    <Switch>
-      <Route
-        path={path}
-        exact
-        render={() => {
-          const { error } = startRequest
-
-          if (error) {
-            const { status } = error
-
-            // conflict: token already issued
-            if (status === 409) {
-              return (
-                <InUseModal forceStart={props.forceStart} close={exitError} />
-              )
-            }
-
-            // forbidden: no pipette attached
-            if (status === 403) {
-              return <NoPipetteModal close={exitError} />
-            }
-
-            return (
-              <ErrorModal
-                description={ERROR_DESCRIPTION}
-                close={exitError}
-                error={error}
-              />
-            )
-          }
-
-          if (pipetteProps && pipetteProps.pipette) {
-            return <ClearDeckAlert {...props} />
-          }
-
-          return null
-        }}
-      />
-      <Route
-        path={`${path}/step-:step${RE_STEP}`}
-        render={stepProps => {
-          if (!pipetteProps || !pipetteProps.pipette) return null
-
-          const {
-            match: { params, url: stepUrl },
-          } = stepProps
-          const step: CalibrationStep = (params.step: any)
-          const exitUrl = `${stepUrl}/exit`
-
-          const startedProps = {
-            ...props,
-            exitUrl,
-            pipette: pipetteProps.pipette,
-            mount: pipetteProps.mount,
-            calibrationStep: step,
-          }
-
-          return (
-            <div>
-              <InstructionsModal {...startedProps} />
-              <Route
-                path={exitUrl}
-                render={() => (
-                  <ExitAlertModal back={props.back} exit={props.exit} />
-                )}
-              />
-            </div>
-          )
-        }}
-      />
-    </Switch>
-  )
-}
-
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getDeckCalCommand = makeGetDeckCalibrationCommandState()
-  const getDeckCalStartState = makeGetDeckCalibrationStartState()
-
-  return (state, ownProps) => {
-    const { robot } = ownProps
-    const startRequest = getDeckCalStartState(state, robot)
-    const pipetteInfo = startRequest.response && startRequest.response.pipette
-    const pipetteProps = pipetteInfo
-      ? {
-          mount: pipetteInfo.mount,
-          pipette: getPipetteModelSpecs(pipetteInfo.model),
-        }
-      : null
-
-    if (pipetteProps && !pipetteProps.pipette) {
-      log.error('Invalid pipette received from API', { pipetteInfo })
-    }
-
-    return {
-      startRequest,
-      pipetteProps,
-      commandRequest: getDeckCalCommand(state, robot),
-    }
+  if (requestStatus === PENDING) {
+    return <SpinnerModalPage titleBar={titleBarProps} />
   }
-}
 
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const { robot, parentUrl } = ownProps
-
-  return {
-    jog: (axis, direction, step) =>
-      dispatch(
-        deckCalibrationCommand(robot, { command: 'jog', axis, direction, step })
-      ),
-    forceStart: () => dispatch(startDeckCalibration(robot, true)),
-    // exit button click in title bar, opens exit alert modal, confirm exit click
-    exit: () =>
-      dispatch(
-        chainActions(
-          deckCalibrationCommand(robot, { command: 'release' }),
-          push(parentUrl),
-          home(robot.name, ROBOT)
-        )
-      ),
-    // exit from error modal
-    exitError: () =>
-      dispatch(chainActions(clearDeckCalibration(robot), push(parentUrl))),
-    // cancel button click in exit alert modal
-    back: () => dispatch(goBack()),
-  }
+  const Panel = PANEL_BY_STEP[currentStep]
+  return Panel ? (
+    <>
+      <ModalPage
+        titleBar={titleBarProps}
+        contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
+      >
+        <Panel
+          sendSessionCommand={sendCommand}
+          deleteSession={deleteSession}
+          tipRack={tipRack}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase()}
+          currentStep={currentStep}
+        />
+      </ModalPage>
+      {showConfirmExit && (
+        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
+      )}
+    </>
+  ) : null
 }

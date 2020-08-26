@@ -23,9 +23,10 @@ Protocol Structure
 To take advantage of Jupyter's ability to run only parts of your protocol, you have to restructure your protocol - turn it inside out. Rather than writing a single ``run`` function that contains all your protocol logic, you can use the function :py:meth:`opentrons.execute.get_protocol_api`, into which you pass the same API version (see :ref:`v2-versioning`) that you would specify in your protocol's metadata:
 
 .. code-block:: python
+    :substitutions:
 
     import opentrons.execute
-    protocol = opentrons.execute.get_protocol_api('2.0')
+    protocol = opentrons.execute.get_protocol_api('|apiLevel|')
     protocol.home()
 
 
@@ -51,13 +52,14 @@ Running A Previously-Written Protocol
 If you have a protocol that you have already written you can run it directly in Jupyter. Copy the protocol into a cell and execute it - this won't cause the OT-2 to move, it just makes the function available. Then, call the ``run`` function you just defined, and give it a :py:class:`.ProtocolContext`:
 
 .. code-block:: python
+    :substitutions:
 
    import opentrons.execute
    from opentrons import protocol_api
    def run(protocol: protocol_api.ProtocolContext):
        # the contents of your protocol are here...
 
-   protocol = opentrons.execute.get_protocol_api('2.0')
+   protocol = opentrons.execute.get_protocol_api('|apiLevel|')
    run(protocol)  # your protocol will now run
 
 
@@ -74,9 +76,9 @@ The OT-2's command line is accessible either by creating a new terminal in Jupyt
 
 To execute a protocol via SSH, copy it to the OT-2 using a program like ``scp`` and then use the command line program ``opentrons_execute``:
 
-.. code-block:: shell
+.. prompt:: bash
 
-   # opentrons_execute /data/my_protocol.py
+   opentrons_execute /data/my_protocol.py
 
 
 You can access help on the usage of ``opentrons_execute`` by calling ``opentrons_execute --help``. This script has a couple options to let you customize what it prints out when you run it. By default, it will print out the same runlog you see in the Opentrons App when running a protocol, as it executes; it will also print out internal logs at level ``warning`` or above. Both of these behaviors can be changed.

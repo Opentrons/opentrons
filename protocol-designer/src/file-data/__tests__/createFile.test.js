@@ -3,8 +3,9 @@ import Ajv from 'ajv'
 import isEmpty from 'lodash/isEmpty'
 import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
 import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
+import protocolV5Schema from '@opentrons/shared-data/protocol/schemas/5.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
-import { createFile } from '../selectors'
+import { createFile, getRequiresV5 } from '../selectors'
 import {
   fileMetadata,
   dismissedWarnings,
@@ -17,6 +18,7 @@ import {
 } from '../__fixtures__/createFile/commonFields'
 import * as engageMagnet from '../__fixtures__/createFile/engageMagnet'
 import * as noModules from '../__fixtures__/createFile/noModules'
+import * as v5Fixture from '../__fixtures__/createFile/v5Fixture'
 
 const getAjvValidator = _protocolSchema => {
   const ajv = new Ajv({
@@ -58,7 +60,8 @@ describe('createFile selector', () => {
       pipetteEntities,
       labwareNicknamesById,
       labwareDefsByURI,
-      false // isV4Protocol
+      false, // isV4Protocol
+      false // requiresV5
     )
 
     expectResultToMatchSchema(result, protocolV3Schema)
@@ -85,7 +88,8 @@ describe('createFile selector', () => {
       pipetteEntities,
       labwareNicknamesById,
       labwareDefsByURI,
-      true // isV4Protocol
+      true, // isV4Protocol
+      false // requiresV5
     )
 
     expectResultToMatchSchema(result, protocolV4Schema)
@@ -95,5 +99,93 @@ describe('createFile selector', () => {
     expect(!isEmpty(result.modules)).toBe(true)
     expect(!isEmpty(result.labware)).toBe(true)
     expect(!isEmpty(result.pipettes)).toBe(true)
+  })
+
+  it('should return a schema-valid JSON V5 protocol, if getRequiresV5 returns true', () => {
+    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    const result = createFile.resultFunc(
+      fileMetadata,
+      v5Fixture.initialRobotState,
+      v5Fixture.robotStateTimeline,
+      dismissedWarnings,
+      ingredients,
+      ingredLocations,
+      v5Fixture.savedStepForms,
+      v5Fixture.orderedStepIds,
+      labwareEntities,
+      v5Fixture.moduleEntities,
+      pipetteEntities,
+      labwareNicknamesById,
+      labwareDefsByURI,
+      true, // isV4Protocol
+      true // requiresV5
+    )
+
+    expectResultToMatchSchema(result, protocolV5Schema)
+
+    // check for false positives: if the output is lacking these entities, we don't
+    // have the opportunity to validate their part of the schema
+    expect(!isEmpty(result.labware)).toBe(true)
+    expect(!isEmpty(result.pipettes)).toBe(true)
+  })
+})
+
+describe('getRequiresV5', () => {
+  it('should return true if protocol has airGap', () => {
+    const airGapTimeline = {
+      timeline: [
+        {
+          commands: [
+            {
+              command: 'airGap',
+              params: {
+                pipette: 'pipetteId',
+                volume: 1,
+                labware: 'plateId',
+                well: 'A1',
+                offsetFromBottomMm: 15.81,
+                flowRate: 3.78,
+              },
+            },
+          ],
+        },
+      ],
+    }
+    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    expect(getRequiresV5.resultFunc(airGapTimeline)).toBe(true)
+  })
+
+  it('should return true if protocol has moveToWell', () => {
+    const moveToWellTimeline = {
+      timeline: [
+        {
+          commands: [
+            {
+              command: 'moveToWell',
+              params: {
+                pipette: 'pipetteId',
+                labware: 'plateId',
+                well: 'B1',
+                offset: {
+                  x: 0,
+                  y: 0,
+                  z: 1,
+                },
+              },
+            },
+          ],
+        },
+      ],
+    }
+    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    expect(getRequiresV5.resultFunc(moveToWellTimeline)).toBe(true)
+  })
+  it('should return false if protocol has no airGap and no moveToWell', () => {
+    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    expect(getRequiresV5.resultFunc(noModules.robotStateTimeline)).toBe(false)
+    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    expect(getRequiresV5.resultFunc(engageMagnet.robotStateTimeline)).toBe(
+      false
+    )
   })
 })

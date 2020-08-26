@@ -15,6 +15,7 @@ from opentrons.calibration_storage import (
     types as cs_types)
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
+from opentrons.util.helpers import utc_now
 
 MOCK_HASH = 'mock_hash'
 PIPETTE_ID = 'pipette_id'
@@ -133,7 +134,7 @@ def test_save_labware_calibration(monkeypatch, clear_calibration):
 
 
 def test_json_datetime_encoder():
-    fake_time = datetime.datetime.utcnow()
+    fake_time = utc_now()
     original = {'mock_hash': {'tipLength': 25.0, 'lastModified': fake_time}}
 
     encoded = json.dumps(original, cls=ed.DateTimeEncoder)
@@ -143,14 +144,9 @@ def test_json_datetime_encoder():
 
 def test_create_tip_length_calibration_data(monkeypatch):
 
-    fake_time = datetime.datetime.utcnow()
+    fake_time = utc_now()
 
-    class fake_datetime:
-        @classmethod
-        def utcnow(cls):
-            return fake_time
-
-    monkeypatch.setattr(datetime, 'datetime', fake_datetime)
+    monkeypatch.setattr(modify, 'utc_now', lambda: fake_time)
 
     monkeypatch.setattr(
         helpers,
@@ -260,7 +256,7 @@ def test_clear_tip_length_calibration_data(monkeypatch):
 
 
 def test_schema_shape(monkeypatch, clear_calibration):
-    fake_time = datetime.datetime.utcnow()
+    fake_time = utc_now()
     time_string = fake_time.isoformat()
     from_iso = datetime.datetime.fromisoformat(time_string)
 
@@ -268,10 +264,6 @@ def test_schema_shape(monkeypatch, clear_calibration):
         @classmethod
         def fromisoformat(cls, obj):
             return from_iso
-
-        @classmethod
-        def utcnow(cls):
-            return fake_time
 
         @classmethod
         def isoformat(cls):
@@ -324,7 +316,8 @@ def test_load_calibration(monkeypatch, clear_calibration):
     test_labware.set_calibration(Point(0, 0, 0))
     test_labware.tip_length = 46.8
     lookup_path = labware._get_labware_path(test_labware)
-    calibration_point = get.get_labware_calibration(lookup_path)
+    calibration_point =\
+        get.get_labware_calibration(lookup_path, test_labware._definition)
     assert calibration_point == test_offset
 
 

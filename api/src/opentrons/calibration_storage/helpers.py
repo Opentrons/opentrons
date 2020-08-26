@@ -37,9 +37,15 @@ def details_from_uri(uri: str, delimiter='/') -> local_types.UriDetails:
     """
     Unpack a labware URI to get the namespace, loadname and version
     """
-    info = uri.split(delimiter)
-    return local_types.UriDetails(
-        namespace=info[0], load_name=info[1], version=int(info[2]))
+    if uri:
+        info = uri.split(delimiter)
+        return local_types.UriDetails(
+            namespace=info[0], load_name=info[1], version=int(info[2]))
+    else:
+        # Here we are assuming that the 'uri' passed in is actually
+        # the loadname, though sometimes it may be an empty string.
+        return local_types.UriDetails(
+            namespace='', load_name=uri, version=1)
 
 
 def uri_from_details(namespace: str, load_name: str,

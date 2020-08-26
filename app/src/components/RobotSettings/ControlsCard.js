@@ -6,12 +6,8 @@ import { push } from 'connected-react-router'
 import {
   useInterval,
   Card,
-  Text,
   LabeledToggle,
   LabeledButton,
-  SecondaryBtn,
-  BORDER_SOLID_LIGHT,
-  SPACING_2,
 } from '@opentrons/components'
 
 import { startDeckCalibration } from '../../http-api-client'
@@ -31,9 +27,8 @@ import { CONNECTABLE } from '../../discovery'
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 
-import { TitledControl } from '../TitledControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
-import { DeckCalibrationWarning } from './DeckCalibrationWarning'
+import { DeckCalibrationControl } from './DeckCalibrationControl'
 
 type Props = {|
   robot: ViewableRobot,
@@ -41,9 +36,6 @@ type Props = {|
 |}
 
 const TITLE = 'Robot Controls'
-
-const CALIBRATE_DECK_DESCRIPTION =
-  "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
 
 const CONNECT_TO_ROBOT = 'Connect to robot to control'
 const PROTOCOL_IS_RUNNING = 'Protocol is running'
@@ -64,7 +56,7 @@ export function ControlsCard(props: Props): React.Node {
   })
   const notConnectable = status !== CONNECTABLE
   const toggleLights = () => dispatch(updateLights(robotName, !lightsOn))
-  const startCalibration = () => {
+  const startLegacyDeckCalibration = () => {
     dispatch(startDeckCalibration(robot)).then(() =>
       dispatch(push(calibrateDeckUrl))
     )
@@ -101,26 +93,12 @@ export function ControlsCard(props: Props): React.Node {
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
-      {/* TODO(mc, 2020-06-22): move to DeckCalibrationControl component */}
-      <TitledControl
-        borderBottom={BORDER_SOLID_LIGHT}
-        title="Calibrate deck"
-        description={<Text>{CALIBRATE_DECK_DESCRIPTION}</Text>}
-        control={
-          <SecondaryBtn
-            width="9rem"
-            onClick={startCalibration}
-            disabled={buttonDisabled}
-          >
-            Calibrate
-          </SecondaryBtn>
-        }
-      >
-        <DeckCalibrationWarning
-          deckCalibrationStatus={deckCalStatus}
-          marginTop={SPACING_2}
-        />
-      </TitledControl>
+      <DeckCalibrationControl
+        robotName={robotName}
+        buttonDisabled={buttonDisabled}
+        deckCalStatus={deckCalStatus}
+        startLegacyDeckCalibration={startLegacyDeckCalibration}
+      />
       <LabeledButton
         label="Home all axes"
         buttonProps={{

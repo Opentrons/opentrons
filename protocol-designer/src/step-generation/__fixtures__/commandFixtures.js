@@ -1,12 +1,13 @@
 // @flow
 import { tiprackWellNamesFlat } from './data'
 import type {
+  AirGapParams,
   AspirateParams,
   BlowoutParams,
   DispenseParams,
   TouchTipParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results
@@ -94,6 +95,12 @@ type MakeAspDispHelper<P> = (
   bakedParams?: $Shape<P>
 ) => (well: string, volume: number, params?: $Shape<P>) => Command
 
+type MakeAirGapHelper<P> = (
+  bakedParams: $Shape<P> & { offsetFromBottomMm: number }
+) => (well: string, volume: number, params?: $Shape<P>) => Command
+
+type MakeDispenseAirGapHelper<P> = MakeAirGapHelper<P>
+
 const _defaultAspirateParams = {
   pipette: DEFAULT_PIPETTE,
   labware: SOURCE_LABWARE,
@@ -110,6 +117,22 @@ export const makeAspirateHelper: MakeAspDispHelper<AspirateParams> = bakedParams
     well,
     volume,
     offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    flowRate: ASPIRATE_FLOW_RATE,
+    ...params,
+  },
+})
+
+export const makeAirGapHelper: MakeAirGapHelper<AirGapParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
+  command: 'airGap',
+  params: {
+    ..._defaultAspirateParams,
+    ...bakedParams,
+    well,
+    volume,
     flowRate: ASPIRATE_FLOW_RATE,
     ...params,
   },
@@ -151,6 +174,21 @@ export const makeDispenseHelper: MakeAspDispHelper<DispenseParams> = bakedParams
   },
 })
 
+export const makeDispenseAirGapHelper: MakeDispenseAirGapHelper<AirGapParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
+  command: 'dispenseAirGap',
+  params: {
+    ..._defaultDispenseParams,
+    ...bakedParams,
+    well,
+    volume,
+    ...params,
+  },
+})
+
 const _defaultTouchTipParams = {
   pipette: DEFAULT_PIPETTE,
   labware: SOURCE_LABWARE,
@@ -170,6 +208,11 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
     well,
     ...params,
   },
+})
+
+export const delayCommand = (seconds: number): Command => ({
+  command: 'delay',
+  params: { wait: seconds },
 })
 
 export const delayWithOffset = (

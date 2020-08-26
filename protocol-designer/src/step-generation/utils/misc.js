@@ -24,10 +24,7 @@ import type {
 import { curryCommandCreator } from './curryCommandCreator'
 import { blowout } from '../commandCreators/atomic/blowout'
 
-// TODO(IL, 2020-06-15): this AIR const is duplicated in @opentrons/components.
-// We can't import that here, because it makes @opentrons/components into
-// a dependency of step-generation (which breaks the web worker)
-export const AIR = '__air__'
+export const AIR: '__air__' = '__air__'
 
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'

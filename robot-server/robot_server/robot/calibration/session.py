@@ -1,3 +1,4 @@
+import contextlib
 import typing
 from uuid import UUID, uuid4
 
@@ -6,6 +7,7 @@ from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK,
     STANDARD_DECK
 )
+from robot_server.robot.calibration.errors import CalibrationError
 from robot_server.robot.calibration.helper_classes import PipetteInfo, \
     PipetteRank, LabwareInfo, Moves, CheckMove
 from opentrons.config import feature_flags as ff
@@ -14,13 +16,8 @@ from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import geometry, labware
 from opentrons.types import Mount, Point, Location
 
-
-class CalibrationException(Exception):
-    pass
-
-
-class NoPipetteException(CalibrationException):
-    pass
+from robot_server.service.errors import RobotServerError
+from .util import save_default_pick_up_current
 
 
 class SessionManager:
@@ -82,8 +79,9 @@ class CalibrationSession:
                                                            mount=mount)
             return pip_info_by_mount
         else:
-            raise NoPipetteException("Cannot start calibration check "
-                                     "with fewer than one pipette.")
+            raise RobotServerError(
+                definition=CalibrationError.NO_PIPETTE_ATTACHED,
+                flow='calibration check')
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
         """
@@ -170,12 +168,7 @@ class CalibrationSession:
     async def _pick_up_tip(self, mount: Mount):
         pip_info = self._pip_info_by_mount[mount]
         instr = self._hardware._attached_instruments[mount]
-        saved_default = None
-        if pip_info.critical_point:
-            # If the pipette we're picking up tip for
-            # has a critical point, we know it is a multichannel
-            saved_default = instr.config.pick_up_current
-            instr.update_config_item('pick_up_current', 0.1)
+
         if pip_info.tiprack_id:
             lw_info = self.get_tiprack(pip_info.tiprack_id)
             # Note: ABC DeckItem cannot have tiplength b/c of
@@ -191,9 +184,13 @@ class CalibrationSession:
             tip_length = full_length - overlap
         else:
             tip_length = self.pipettes[mount]['fallback_tip_length']
-        await self.hardware.pick_up_tip(mount, tip_length)
-        if saved_default:
-            instr.update_config_item('pick_up_current', saved_default)
+
+        with contextlib.ExitStack() as stack:
+            if pip_info.critical_point:
+                # If the pipette we're picking up tip for
+                # has a critical point, we know it is a multichannel
+                stack.enter_context(save_default_pick_up_current(instr))
+            await self.hardware.pick_up_tip(mount, tip_length)
 
     async def _trash_tip(self, mount: Mount):
         trash_lw = self._deck.get_fixed_trash()

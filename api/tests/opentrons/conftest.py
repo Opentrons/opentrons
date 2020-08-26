@@ -137,14 +137,19 @@ def config_tempdir(tmpdir, template_db):
 
 
 @pytest.fixture
-def labware_offset_tempdir(tmpdir):
+def ot_config_tempdir(tmpdir):
     os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
     config.reload()
 
-    yield config.get_opentrons_path('labware_calibration_offsets_dir_v2')
+    yield tmpdir
 
     del os.environ['OT_API_CONFIG_DIR']
     config.reload()
+
+
+@pytest.fixture
+def labware_offset_tempdir(ot_config_tempdir):
+    yield config.get_opentrons_path('labware_calibration_offsets_dir_v2')
 
 
 @pytest.mark.apiv1
@@ -206,13 +211,25 @@ async def old_aspiration(monkeypatch):
 
 
 @pytest.fixture
-async def use_tip_length_cal(monkeypatch):
+async def use_new_calibration(monkeypatch):
     await config.advanced_settings.set_adv_setting(
         'enableTipLengthCalibration', True)
     yield
     await config.advanced_settings.set_adv_setting(
         'enableTipLengthCalibration', False)
 # -----end feature flag fixtures-----------
+
+
+@pytest.fixture(params=[False, True])
+async def toggle_new_calibration(request):
+    if request.param:
+        await config.advanced_settings.set_adv_setting(
+            'enableTipLengthCalibration', True)
+        yield
+        await config.advanced_settings.set_adv_setting(
+            'enableTipLengthCalibration', False)
+    else:
+        yield
 
 
 @pytest.fixture

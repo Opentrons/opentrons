@@ -5,10 +5,10 @@ This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
 import typing
-import datetime
 from pathlib import Path
 
 from opentrons import config
+from opentrons.util.helpers import utc_now
 
 from . import (
     file_operators as io,
@@ -17,7 +17,9 @@ from . import (
     migration)
 
 if typing.TYPE_CHECKING:
-    from .dev_types import (TipLengthCalibration, PipTipLengthCalibration)
+    from .dev_types import (
+        TipLengthCalibration, PipTipLengthCalibration,
+        DeckCalibrationData)
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons.types import Point
 
@@ -41,23 +43,33 @@ def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
     else:
         blob = {}
 
-    if parent:
-        mod_dict = {
-            'parent': parent,
-            'fullParent': f'{slot}-{parent}'}
-    else:
-        mod_dict = {}
     full_id = f'{lw_hash}{parent}'
-    new_index_data = {
-        "uri": f'{uri}',
-        "slot": full_id,
-        "module": mod_dict}
-    if blob.get('data'):
-        blob['data'][full_id] = new_index_data
-    else:
-        blob['data'] = {full_id: new_index_data}
-    blob['version'] = migration.MAX_VERSION
-    io.save_to_file(index_file, blob)
+    try:
+        blob['data'][full_id]
+    except KeyError:
+        if parent:
+            mod_dict = {
+                'parent': parent,
+                'fullParent': f'{slot}-{parent}'}
+        else:
+            mod_dict = {}
+        new_index_data = {
+            "uri": f'{uri}',
+            "slot": full_id,
+            "module": mod_dict}
+        if blob.get('data'):
+            blob['data'][full_id] = new_index_data
+        else:
+            blob['data'] = {full_id: new_index_data}
+        blob['version'] = migration.MAX_VERSION
+        io.save_to_file(index_file, blob)
+
+
+def add_existing_labware_to_index_file(
+        definition: 'LabwareDefinition', parent: str = '', slot: str = ''):
+    labware_hash = helpers.hash_labware_def(definition)
+    uri = helpers.uri_from_definition(definition)
+    _add_to_index_offset_file(parent, slot, uri, labware_hash)
 
 
 def save_labware_calibration(
@@ -111,7 +123,7 @@ def create_tip_length_data(
 
     tip_length_data: 'TipLengthCalibration' = {
         'tipLength': length,
-        'lastModified': datetime.datetime.utcnow()
+        'lastModified': utc_now()
     }
 
     data = {labware_hash + parent: tip_length_data}
@@ -123,14 +135,14 @@ def _helper_offset_data_format(filepath: str, delta: 'Point') -> dict:
         calibration_data = {
             "default": {
                 "offset": [delta.x, delta.y, delta.z],
-                "lastModified": datetime.datetime.utcnow()
+                "lastModified": utc_now()
             }
         }
     else:
         calibration_data = io.read_cal_file(filepath)
         calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
         calibration_data['default']['lastModified'] =\
-            datetime.datetime.utcnow()
+            utc_now()
     return calibration_data
 
 
@@ -173,3 +185,18 @@ def save_tip_length_calibration(
     tip_length_data.update(tip_length_cal)
 
     io.save_to_file(pip_tip_length_path, tip_length_data)
+
+
+def save_robot_deck_attitude(
+        transform: local_types.AttitudeMatrix,
+        pip_id: str, lw_hash: str):
+    robot_dir = config.get_opentrons_path('robot_calibration_dir')
+    robot_dir.mkdir(parents=True, exist_ok=True)
+    gantry_path = robot_dir/'deck_calibration.json'
+    gantry_dict: 'DeckCalibrationData' = {
+        'attitude': transform,
+        'pipette_calibrated_with': pip_id,
+        'last_modified': utc_now(),
+        'tiprack': lw_hash
+    }
+    io.save_to_file(gantry_path, gantry_dict)

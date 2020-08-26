@@ -92,6 +92,7 @@ function DeckMapComponent(props: Props) {
                   <ModuleItem
                     model={moduleInSlot.model}
                     mode={moduleInSlot.mode || 'default'}
+                    slot={slot}
                   />
                 </g>
               )}

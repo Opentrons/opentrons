@@ -4,6 +4,7 @@ import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   blowoutHelper,
   DEFAULT_PIPETTE,
+  delayCommand,
   delayWithOffset,
   DEST_LABWARE,
   DISPENSE_OFFSET_FROM_BOTTOM_MM,
@@ -14,6 +15,7 @@ import {
   getInitialRobotStateStandard,
   getRobotStatePickedUpTipStandard,
   getSuccessResult,
+  makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
   makeDispenseHelper,
@@ -26,6 +28,7 @@ import type {
   DispenseParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
+const airGapHelper = makeAirGapHelper({ offsetFromBottomMm: 11.54 })
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
@@ -35,16 +38,24 @@ const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
 function tripleMix(
   well: string,
   volume: number,
-  params: $Shape<AspirateParams> | $Shape<DispenseParams>
+  params: $Shape<AspirateParams> | $Shape<DispenseParams>,
+  delayParams?: {
+    delayAfterAspirate?: boolean,
+    delayAfterDispense?: boolean,
+  } = {}
 ) {
-  return [
-    aspirateHelper(well, volume, params),
-    dispenseHelper(well, volume, params),
-    aspirateHelper(well, volume, params),
-    dispenseHelper(well, volume, params),
-    aspirateHelper(well, volume, params),
-    dispenseHelper(well, volume, params),
-  ]
+  const { delayAfterAspirate, delayAfterDispense } = delayParams
+
+  return [...Array(3)].reduce(
+    (acc, _) => [
+      ...acc,
+      aspirateHelper(well, volume, params),
+      ...(delayAfterAspirate ? [delayCommand(12)] : []),
+      dispenseHelper(well, volume, params),
+      ...(delayAfterDispense ? [delayCommand(12)] : []),
+    ],
+    []
+  )
 }
 
 let invariantContext
@@ -77,6 +88,7 @@ beforeEach(() => {
     mixFirstAspirate: null,
     aspirateDelay: null,
     dispenseDelay: null,
+    aspirateAirGapVolume: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
@@ -223,6 +235,55 @@ describe('consolidate single-channel', () => {
     ])
   })
 
+  it('should delay after mix aspirate AND regular aspirate in first well of chunk only', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 100,
+      changeTip: 'once',
+      mixFirstAspirate: { times: 3, volume: 50 },
+      aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      ...tripleMix(
+        'A1',
+        50,
+        {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        },
+        { delayAfterAspirate: true }
+      ),
+
+      aspirateHelper('A1', 100),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
+      aspirateHelper('A2', 100),
+      ...delayWithOffset('A2', SOURCE_LABWARE),
+      aspirateHelper('A3', 100),
+      ...delayWithOffset('A3', SOURCE_LABWARE),
+      dispenseHelper('B1', 300),
+
+      ...tripleMix(
+        'A4',
+        50,
+        {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        },
+        { delayAfterAspirate: true }
+      ),
+
+      aspirateHelper('A4', 100),
+      ...delayWithOffset('A4', SOURCE_LABWARE),
+      dispenseHelper('B1', 100),
+    ])
+  })
+
   it('should mix on aspirate', () => {
     const data = {
       ...mixinArgs,
@@ -314,6 +375,51 @@ describe('consolidate single-channel', () => {
     ])
   })
 
+  it('should delay after mix dispense AND regular dispense', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 100,
+      changeTip: 'once',
+      mixInDestination: { times: 3, volume: 53 },
+      dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+      aspirateHelper('A1', 100),
+      aspirateHelper('A2', 100),
+      aspirateHelper('A3', 100),
+      dispenseHelper('B1', 300),
+      ...delayWithOffset('B1', DEST_LABWARE),
+      ...tripleMix(
+        'B1',
+        53,
+        {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        },
+        { delayAfterDispense: true }
+      ),
+
+      aspirateHelper('A4', 100),
+      dispenseHelper('B1', 100),
+      ...delayWithOffset('B1', DEST_LABWARE),
+
+      ...tripleMix(
+        'B1',
+        53,
+        {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        },
+        { delayAfterDispense: true }
+      ),
+    ])
+  })
+
   it('should mix after dispense with blowout to trash: first mix, then blowout', () => {
     const data = {
       ...mixinArgs,
@@ -395,6 +501,106 @@ describe('consolidate single-channel', () => {
     ])
   })
 
+  it('pre-wet tip should use the aspirate delay when specified', () => {
+    // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
+    const data = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'once',
+      preWetTip: true,
+      sourceWells: ['A1', 'A2', 'A3', 'A4'],
+      aspirateDelay: { mmFromBottom: 14, seconds: 12 },
+    }
+
+    const preWetVol = data.volume // NOTE same as volume above... for now
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      // pre-wet tip
+      aspirateHelper('A1', preWetVol),
+      delayCommand(12),
+      dispenseHelper('A1', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      // done pre-wet
+
+      aspirateHelper('A1', 150),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
+      aspirateHelper('A2', 150),
+      ...delayWithOffset('A2', SOURCE_LABWARE),
+      dispenseHelper('B1', 300),
+
+      // pre-wet tip, now with A3
+      aspirateHelper('A3', preWetVol),
+      delayCommand(12),
+      dispenseHelper('A3', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      // done pre-wet
+
+      aspirateHelper('A3', 150),
+      ...delayWithOffset('A3', SOURCE_LABWARE),
+      aspirateHelper('A4', 150),
+      ...delayWithOffset('A4', SOURCE_LABWARE),
+      dispenseHelper('B1', 300),
+    ])
+  })
+
+  it('pre-wet tip should use the dispense delay when specified', () => {
+    // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
+    const data = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'once',
+      preWetTip: true,
+      sourceWells: ['A1', 'A2', 'A3', 'A4'],
+      dispenseDelay: { mmFromBottom: 14, seconds: 12 },
+    }
+
+    const preWetVol = data.volume // NOTE same as volume above... for now
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      // pre-wet tip
+      aspirateHelper('A1', preWetVol),
+      dispenseHelper('A1', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      delayCommand(12),
+      // done pre-wet
+
+      aspirateHelper('A1', 150),
+      aspirateHelper('A2', 150),
+      dispenseHelper('B1', 300),
+      ...delayWithOffset('B1', DEST_LABWARE),
+
+      // pre-wet tip, now with A3
+      aspirateHelper('A3', preWetVol),
+      dispenseHelper('A3', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      delayCommand(12),
+      // done pre-wet
+
+      aspirateHelper('A3', 150),
+      aspirateHelper('A4', 150),
+      dispenseHelper('B1', 300),
+      ...delayWithOffset('B1', DEST_LABWARE),
+    ])
+  })
+
   it('should delay after aspirate', () => {
     const data = {
       ...mixinArgs,
@@ -422,6 +628,49 @@ describe('consolidate single-channel', () => {
       ...delayWithOffset('A4', SOURCE_LABWARE),
 
       dispenseHelper('B1', 300),
+    ])
+  })
+
+  it('should delay after air gap aspirate and regular aspirate', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 100,
+      aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      changeTip: 'once',
+      aspirateAirGapVolume: 5,
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    // break into single chunks because volume + air gap volume is too big for multi aspirate
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      aspirateHelper('A1', 100),
+      ...delayWithOffset('A1', SOURCE_LABWARE),
+      airGapHelper('A1', 5),
+      delayCommand(12),
+
+      aspirateHelper('A2', 100),
+      ...delayWithOffset('A2', SOURCE_LABWARE),
+      airGapHelper('A2', 5),
+      delayCommand(12),
+
+      dispenseHelper('B1', 210),
+
+      aspirateHelper('A3', 100),
+      ...delayWithOffset('A3', SOURCE_LABWARE),
+      airGapHelper('A3', 5),
+      delayCommand(12),
+
+      aspirateHelper('A4', 100),
+      ...delayWithOffset('A4', SOURCE_LABWARE),
+      airGapHelper('A4', 5),
+      delayCommand(12),
+
+      dispenseHelper('B1', 210),
     ])
   })
 
@@ -532,7 +781,77 @@ describe('consolidate single-channel', () => {
     expect(res.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
   })
 
-  it.todo('air gap') // TODO Ian 2018-04-05 determine air gap behavior
+  it('should air gap after aspirate and dispense all air + liquid at once', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 100,
+      changeTip: 'once',
+      aspirateAirGapVolume: 5,
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    // break into single chunks because volume + air gap volume is too big for multi aspirate
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      aspirateHelper('A1', 100),
+      airGapHelper('A1', 5),
+
+      aspirateHelper('A2', 100),
+      airGapHelper('A2', 5),
+
+      dispenseHelper('B1', 210),
+
+      aspirateHelper('A3', 100),
+      airGapHelper('A3', 5),
+
+      aspirateHelper('A4', 100),
+      airGapHelper('A4', 5),
+
+      dispenseHelper('B1', 210),
+    ])
+  })
+
+  it('should air gap after aspirate and break into single chunks and dispense all air + liquid at once', () => {
+    const data = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'once',
+      aspirateAirGapVolume: 5,
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    // break into single chunks because volume + air gap volume is too big for multi aspirate
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+
+      aspirateHelper('A1', 150),
+      airGapHelper('A1', 5),
+
+      dispenseHelper('B1', 155),
+
+      aspirateHelper('A2', 150),
+      airGapHelper('A2', 5),
+
+      dispenseHelper('B1', 155),
+
+      aspirateHelper('A3', 150),
+      airGapHelper('A3', 5),
+
+      dispenseHelper('B1', 155),
+
+      aspirateHelper('A4', 150),
+      airGapHelper('A4', 5),
+
+      dispenseHelper('B1', 155),
+    ])
+  })
 })
 
 describe('consolidate multi-channel', () => {
@@ -562,6 +881,7 @@ describe('consolidate multi-channel', () => {
     mixFirstAspirate: null,
     aspirateDelay: null,
     dispenseDelay: null,
+    aspirateAirGapVolume: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,

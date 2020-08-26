@@ -231,8 +231,10 @@ const clampAirGapVolume = (
   rawForm: FormData,
   pipetteEntities: PipetteEntities
 ): FormPatch => {
-  const patchedAspirateAirgapVolume = patch.aspirate_airGap_volume
-  const pipetteId = patch.pipette || rawForm.pipette
+  const patchedAspirateAirgapVolume =
+    patch.aspirate_airGap_volume ?? rawForm?.aspirate_airGap_volume
+
+  const pipetteId = patch.pipette ?? rawForm.pipette
 
   if (
     patchedAspirateAirgapVolume &&
@@ -248,6 +250,10 @@ const clampAirGapVolume = (
       minAirGapVolume,
       maxAirGapVolume
     )
+
+    if (clampedAirGapVolume === Number(patchedAspirateAirgapVolume))
+      return patch
+
     return {
       ...patch,
       aspirate_airGap_volume: String(clampedAirGapVolume),
@@ -544,8 +550,8 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
-    chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
     chainPatch => clampAirGapVolume(chainPatch, rawForm, pipetteEntities),
+    chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchMixFields(chainPatch, rawForm),
     chainPatch => updatePatchBlowoutFields(chainPatch, rawForm),
   ])

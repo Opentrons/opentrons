@@ -2,6 +2,7 @@
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
+  delayCommand,
   delayWithOffset,
   DEST_LABWARE,
   DISPENSE_OFFSET_FROM_BOTTOM_MM,
@@ -10,15 +11,22 @@ import {
   getFlowRateAndOffsetParams,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  makeAirGapHelper,
   makeAspirateHelper,
   makeContext,
   makeDispenseHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
+  makeDispenseAirGapHelper,
 } from '../__fixtures__'
 import { transfer } from '../commandCreators/compound/transfer'
 
+// well depth for 96 plate is 10.54, so need to add 1mm to top of well
+const airGapHelper = makeAirGapHelper({ offsetFromBottomMm: 11.54 })
+const dispenseAirGapHelper = makeDispenseAirGapHelper({
+  offsetFromBottomMm: 11.54,
+})
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
@@ -43,7 +51,7 @@ beforeEach(() => {
     mixBeforeAspirate: null,
     aspirateDelay: null,
     dispenseDelay: null,
-
+    aspirateAirGapVolume: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
@@ -434,6 +442,66 @@ describe('advanced options', () => {
       ])
     })
 
+    it('pre-wet tip should use the aspirate delay when specified', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        preWetTip: true,
+        aspirateDelay: { mmFromBottom: 14, seconds: 12 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // pre-wet aspirate/dispense
+        aspirateHelper('A1', 300),
+        delayCommand(12),
+        dispenseHelper('A1', 300, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+
+        // "real" aspirate/dispenses
+        aspirateHelper('A1', 300),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 300),
+
+        aspirateHelper('A1', 50),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 50),
+      ])
+    })
+
+    it('pre-wet tip should use the dispense delay when specified', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        preWetTip: true,
+        dispenseDelay: { mmFromBottom: 14, seconds: 12 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // pre-wet aspirate/dispense
+        aspirateHelper('A1', 300),
+        dispenseHelper('A1', 300, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+
+        // "real" aspirate/dispenses
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
+        ...delayWithOffset('B1', DEST_LABWARE),
+
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
+        ...delayWithOffset('B1', DEST_LABWARE),
+      ])
+    })
+
     it('should touchTip after aspirate on each source well, for every aspirate', () => {
       advArgs = {
         ...advArgs,
@@ -512,6 +580,49 @@ describe('advanced options', () => {
         dispenseHelper('B1', 50),
       ])
     })
+    it('should delay after mix aspirate and regular aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        mixBeforeAspirate: {
+          volume: 250,
+          times: 2,
+        },
+        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      // mixes will include the delays after aspirating
+      const mixCommandsWithDelays = [
+        // mix 1
+        aspirateHelper('A1', 250),
+        delayCommand(12),
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        // mix 2
+        aspirateHelper('A1', 250),
+        delayCommand(12),
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+      ]
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        ...mixCommandsWithDelays,
+        aspirateHelper('A1', 300),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 300),
+
+        ...mixCommandsWithDelays,
+        aspirateHelper('A1', 50),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 50),
+      ])
+    })
 
     it('should delay after aspirate', () => {
       advArgs = {
@@ -533,7 +644,107 @@ describe('advanced options', () => {
       ])
     })
 
-    it.todo('air gap => ???') // TODO determine behavior
+    it('should air gap after aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateAirGapVolume: 5,
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 295),
+        airGapHelper('A1', 5),
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 295),
+
+        aspirateHelper('A1', 55),
+        airGapHelper('A1', 5),
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 55),
+      ])
+    })
+    it('should air gap after aspirate and break into two chunks', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 300,
+        aspirateAirGapVolume: 5,
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 150),
+        airGapHelper('A1', 5),
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 150),
+
+        aspirateHelper('A1', 150),
+        airGapHelper('A1', 5),
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 150),
+      ])
+    })
+    it('should delay after air gap aspirate and regular aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateAirGapVolume: 5,
+        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 295),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+
+        airGapHelper('A1', 5),
+        delayCommand(12),
+
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 295),
+
+        aspirateHelper('A1', 55),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+
+        airGapHelper('A1', 5),
+        delayCommand(12),
+
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 55),
+      ])
+    })
+    it('should delay after air gap dispense and regular dispense', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateAirGapVolume: 5,
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 295),
+        airGapHelper('A1', 5),
+
+        dispenseAirGapHelper('B1', 5),
+        delayCommand(12),
+
+        dispenseHelper('B1', 295),
+        ...delayWithOffset('B1', DEST_LABWARE),
+
+        aspirateHelper('A1', 55),
+        airGapHelper('A1', 5),
+
+        dispenseAirGapHelper('B1', 5),
+        delayCommand(12),
+        dispenseHelper('B1', 55),
+        ...delayWithOffset('B1', DEST_LABWARE),
+      ])
+    })
   })
 
   describe('...dispense options', () => {
@@ -573,6 +784,56 @@ describe('advanced options', () => {
         aspirateHelper('A1', 50),
         dispenseHelper('B1', 50),
         ...mixCommands,
+      ])
+    })
+    it('should delay after mix dispense and after dispense', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        mixInDestination: {
+          volume: 250,
+          times: 2,
+        },
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      // mixes will include the delays after aspirating
+      const mixCommandsWithDelays = [
+        // mix 1
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        dispenseHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+        // mix 2
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        dispenseHelper('B1', 250, {
+          labware: DEST_LABWARE,
+        }),
+        delayCommand(12),
+      ]
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
+        // delay after dispense
+        ...delayWithOffset('B1', DEST_LABWARE),
+        ...mixCommandsWithDelays,
+
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
+        // delay after dispense
+        ...delayWithOffset('B1', DEST_LABWARE),
+        ...mixCommandsWithDelays,
       ])
     })
 

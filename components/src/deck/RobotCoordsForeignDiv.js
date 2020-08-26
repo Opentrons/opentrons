@@ -10,6 +10,7 @@ export type RobotCoordsForeignDivProps = {|
   className?: string,
   innerDivProps?: React.ElementProps<'div'>,
   transformWithSVG?: boolean,
+  extraTransform?: string,
 |}
 
 export const RobotCoordsForeignDiv = (
@@ -24,18 +25,18 @@ export const RobotCoordsForeignDiv = (
     className,
     innerDivProps,
     transformWithSVG = false,
+    extraTransform = '',
   } = props
 
+  const transform = `scale(1, -1) ${extraTransform}`
   return (
     <foreignObject
       {...{ x, y, height, width, className }}
-      transform={transformWithSVG ? 'scale(1, -1)' : null}
+      transform={transformWithSVG ? transform : extraTransform}
     >
       <div
         {...innerDivProps}
-        style={{
-          transform: transformWithSVG ? 'none' : 'scale(1, -1)',
-        }}
+        style={transformWithSVG ? {} : { transform }}
         xmlns="http://www.w3.org/1999/xhtml"
       >
         {children}

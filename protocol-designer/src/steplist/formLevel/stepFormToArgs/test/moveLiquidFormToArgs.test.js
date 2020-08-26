@@ -5,6 +5,7 @@ import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import {
   moveLiquidFormToArgs,
+  getAirGapData,
   getDelayData,
   getMixData,
   type HydratedMoveLiquidFormData,
@@ -195,6 +196,15 @@ describe('move liquid step form -> command creator args', () => {
       },
       expectedArgsUnchecked: { dispenseDelay: null },
       expectedArgsChecked: { dispenseDelay: { seconds: 11, mmFromBottom: 12 } },
+    },
+    // AIRGAP
+    {
+      checkboxField: 'aspirate_airGap_checkbox',
+      formFields: {
+        aspirate_airGap_volume: 20,
+      },
+      expectedArgsUnchecked: { aspirateAirGapVolume: null },
+      expectedArgsChecked: { aspirateAirGapVolume: 20 },
     },
   ]
 
@@ -434,5 +444,26 @@ describe('getDelayData', () => {
         'offsetField'
       )
     ).toEqual({ seconds: 30, mmFromBottom: 2 })
+  })
+})
+
+describe('getAirGapData', () => {
+  it('should return null when the checkbox field is false', () => {
+    expect(
+      getAirGapData(
+        { aspirate_airGap_checkbox: false, aspirate_airGap_volume: 20 },
+        'aspirate_airGap_checkbox',
+        'aspirate_airGap_volume'
+      )
+    ).toBe(null)
+  })
+  it('should return the air gap volume when the air gap checkbox is true', () => {
+    expect(
+      getAirGapData(
+        { aspirate_airGap_checkbox: true, aspirate_airGap_volume: 20 },
+        'aspirate_airGap_checkbox',
+        'aspirate_airGap_volume'
+      )
+    ).toBe(20)
   })
 })

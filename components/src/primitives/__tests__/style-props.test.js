@@ -260,6 +260,32 @@ describe('style props', () => {
       expect(wrapper).toHaveStyleRule('align-items', 'stretch')
     })
 
+    it('should be able to set align-self', () => {
+      const wrapper = shallow(<TestStyles alignSelf={Styles.ALIGN_NORMAL} />)
+      expect(wrapper).toHaveStyleRule('align-self', 'normal')
+
+      wrapper.setProps({ alignSelf: Styles.ALIGN_START })
+      expect(wrapper).toHaveStyleRule('align-self', 'start')
+
+      wrapper.setProps({ alignSelf: Styles.ALIGN_END })
+      expect(wrapper).toHaveStyleRule('align-self', 'end')
+
+      wrapper.setProps({ alignSelf: Styles.ALIGN_FLEX_START })
+      expect(wrapper).toHaveStyleRule('align-self', 'flex-start')
+
+      wrapper.setProps({ alignSelf: Styles.ALIGN_FLEX_END })
+      expect(wrapper).toHaveStyleRule('align-self', 'flex-end')
+
+      wrapper.setProps({ alignSelf: Styles.ALIGN_CENTER })
+      expect(wrapper).toHaveStyleRule('align-self', 'center')
+
+      wrapper.setProps({ alignSelf: Styles.ALIGN_BASELINE })
+      expect(wrapper).toHaveStyleRule('align-self', 'baseline')
+
+      wrapper.setProps({ alignSelf: Styles.ALIGN_STRETCH })
+      expect(wrapper).toHaveStyleRule('align-self', 'stretch')
+    })
+
     it('should be able to set justify-content', () => {
       const wrapper = shallow(
         <TestStyles justifyContent={Styles.JUSTIFY_NORMAL} />

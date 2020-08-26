@@ -9,11 +9,12 @@ from opentrons.types import Point
 
 from . import (
     types as local_types,
-    file_operators as io, helpers, migration)
+    file_operators as io, helpers, migration, modify)
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from .dev_types import (
-        TipLengthCalibration, CalibrationIndexDict, CalibrationDict)
+        TipLengthCalibration, CalibrationIndexDict,
+        CalibrationDict, DeckCalibrationData)
 
 
 def _format_calibration_type(
@@ -71,8 +72,7 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
                     calibration=calibration,
                     parent=_format_parent(data),
                     labware_id=key,
-                    uri=data['uri']
-                ))
+                    uri=data['uri']))
     return all_calibrations
 
 
@@ -91,7 +91,11 @@ def _get_tip_length_data(
             'be loaded')
 
 
-def get_labware_calibration(lookup_path: local_types.StrPath) -> Point:
+def get_labware_calibration(
+        lookup_path: local_types.StrPath,
+        definition: 'LabwareDefinition',
+        parent: str = '',
+        slot: str = '') -> Point:
     """
     Find the delta of a given labware, if it exists.
 
@@ -104,6 +108,7 @@ def get_labware_calibration(lookup_path: local_types.StrPath) -> Point:
     offset = Point(0, 0, 0)
     labware_path = offset_path / lookup_path
     if labware_path.exists():
+        modify.add_existing_labware_to_index_file(definition, parent, slot)
         migration.check_index_version(offset_path / 'index.json')
         calibration_data = io.read_cal_file(str(labware_path))
         offset_array = calibration_data['default']['offset']
@@ -134,3 +139,14 @@ def load_tip_length_calibration(
         pip_id=pip_id,
         labware_hash=labware_hash + parent,
         labware_load_name=load_name)
+
+
+def get_robot_deck_attitude() -> typing.Optional['DeckCalibrationData']:
+    robot_dir = config.get_opentrons_path('robot_calibration_dir')
+    gantry_path = robot_dir / 'deck_calibration.json'
+    if gantry_path.exists():
+        data = io.read_cal_file(gantry_path)
+        assert 'attitude' in data.keys(), 'Not valid deck calibration data'
+        return data  # type: ignore
+    else:
+        return None

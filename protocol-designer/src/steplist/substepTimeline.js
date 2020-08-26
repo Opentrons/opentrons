@@ -4,7 +4,7 @@ import pick from 'lodash/pick'
 import { getWellsForTips } from '../step-generation/utils'
 import { getNextRobotStateAndWarningsSingleCommand } from '../step-generation/getNextRobotStateAndWarnings'
 
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { Channels } from '@opentrons/components'
 import type {
   CommandCreatorError,

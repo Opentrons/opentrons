@@ -23,7 +23,7 @@ import type { LabwareSummary } from '../../calibration/types'
 const TYPE = 'Type'
 const QUANTITY = 'Quantity'
 const CALIBRATION_DATA = 'Calibration Data'
-const LEGACY_DEFINITION = 'Legacy definition'
+const LEGACY_DEFINITION = 'N/A'
 const NOT_CALIBRATED = 'Not yet calibrated'
 const CALIBRATION_DESCRIPTION = 'Calibrated offset from labware origin point'
 
@@ -71,7 +71,7 @@ export function ProtocolLabwareList(
             parentDisplayName,
             quantity,
             calibration,
-            legacy,
+            calDataAvailable,
           } = lw
 
           return (
@@ -88,14 +88,14 @@ export function ProtocolLabwareList(
               </Box>
               <Text {...QUANTITY_COL_STYLE}>x {quantity}</Text>
               <Text {...CAL_DATA_COL_STYLE}>
-                {calibration !== null ? (
+                {!calDataAvailable ? (
+                  LEGACY_DEFINITION
+                ) : calibration !== null ? (
                   <>
                     {renderCalValue('x', calibration.x)}
                     {renderCalValue('y', calibration.y)}
                     {renderCalValue('z', calibration.z)}
                   </>
-                ) : legacy ? (
-                  LEGACY_DEFINITION
                 ) : (
                   NOT_CALIBRATED
                 )}

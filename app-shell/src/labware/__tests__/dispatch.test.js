@@ -126,10 +126,10 @@ describe('labware module dispatches', () => {
   it('reads and parses definition files', () => {
     const mockDirectoryListing = ['a.json', 'b.json', 'c.json', 'd.json']
     const mockParsedFiles = [
-      { filename: 'a.json', created: 0, data: {} },
-      { filename: 'b.json', created: 1, data: {} },
-      { filename: 'c.json', created: 2, data: {} },
-      { filename: 'd.json', created: 3, data: {} },
+      { filename: 'a.json', modified: 0, data: {} },
+      { filename: 'b.json', modified: 1, data: {} },
+      { filename: 'c.json', modified: 2, data: {} },
+      { filename: 'd.json', modified: 3, data: {} },
     ]
 
     readLabwareDirectory.mockResolvedValueOnce(mockDirectoryListing)
@@ -246,7 +246,7 @@ describe('labware module dispatches', () => {
 
     const mockNewUncheckedFile = {
       filename: '/path/to/labware.json',
-      created: 0,
+      modified: 0,
       data: {},
     }
 
