@@ -2,32 +2,26 @@ from typing import Optional, List
 from pydantic import BaseModel, Field
 
 from ..helper_classes import AttachedPipette, RequiredLabware
+
 from ..dev_types import NextSteps
 
 
 class SessionCreateParams(BaseModel):
-    """The parameters required to start a tip length calibration session."""
+    """
+    The parameters required to start a pipette offset calibration session.
+    """
     mount: str = Field(
         ...,
         description='The mount on which the pipette is attached, left or right'
     )
-    hasCalibrationBlock: bool = Field(
-        ...,
-        description='True if the user wants to use a calibration block; '
-                    'False otherwise'
-    )
-    tipRackDefinition: dict = Field(
-        ...,
-        description='The full labware definition of the tip rack to calibrate.'
-    )
 
 
-class TipCalibrationSessionStatus(BaseModel):
-    """The current status of a tip length calibration session."""
+class PipetteOffsetCalibrationSessionStatus(BaseModel):
+    """The current status of a pipette offset calibration session."""
     instrument: AttachedPipette
     currentStep: str = Field(
         ...,
-        description="Current step of tip calibration user flow")
+        description="Current step of pipette offset user flow")
     nextSteps: Optional[NextSteps] =\
         Field(None, description="Next Available Steps in Session")
     labware: List[RequiredLabware]
@@ -58,14 +52,6 @@ class TipCalibrationSessionStatus(BaseModel):
                           "isTiprack": "true",
                           "definition": {"ordering": "the ordering section..."}
                       },
-                      {
-                          "slot": "3",
-                          "loadName": "cal_block_loadname",
-                          "namespace": "opentrons",
-                          "version": "1",
-                          "isTiprack": "false",
-                          "definition": {"ordering": "the ordering section..."}
-                      }
                     ]
                 }
             ]

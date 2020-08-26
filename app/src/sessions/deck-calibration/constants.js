@@ -21,12 +21,11 @@ const CONFIRM_TIP: 'calibration.confirmTip' = 'calibration.confirmTip'
 const INVALIDATE_TIP: 'calibration.invalidateTip' = 'calibration.invalidateTip'
 const SAVE_OFFSET: 'calibration.saveOffset' = 'calibration.saveOffset'
 const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
-const MOVE_TO_TIP_RACK: 'calibration.deck.moveToTipRack' =
-  'calibration.deck.moveToTipRack'
-const MOVE_TO_DECK: 'calibration.deck.moveToDeck' =
-  'calibration.deck.moveToDeck'
-const MOVE_TO_POINT_ONE: 'calibration.deck.moveToPointOne' =
-  'calibration.deck.moveToPointOne'
+const MOVE_TO_TIP_RACK: 'calibration.moveToTipRack' =
+  'calibration.moveToTipRack'
+const MOVE_TO_DECK: 'calibration.moveToDeck' = 'calibration.moveToDeck'
+const MOVE_TO_POINT_ONE: 'calibration.moveToPointOne' =
+  'calibration.moveToPointOne'
 const MOVE_TO_POINT_TWO: 'calibration.deck.moveToPointTwo' =
   'calibration.deck.moveToPointTwo'
 const MOVE_TO_POINT_THREE: 'calibration.deck.moveToPointThree' =

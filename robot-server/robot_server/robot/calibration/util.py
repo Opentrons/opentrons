@@ -11,13 +11,16 @@ from robot_server.service.session.models import CommandDefinition
 from .constants import STATE_WILDCARD
 from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
+from .pipette_offset.constants import PipetteOffsetCalibrationState
 from .deck.constants import DeckCalibrationState
 
 if TYPE_CHECKING:
     from .deck.user_flow import DeckCalibrationUserFlow
     from .tip_length.user_flow import TipCalibrationUserFlow
+    from .pipette_offset.user_flow import PipetteOffsetCalibrationUserFlow
 
-ValidState = Union[TipCalibrationState, DeckCalibrationState]
+ValidState = Union[TipCalibrationState, DeckCalibrationState,
+                   PipetteOffsetCalibrationState]
 
 
 class StateTransitionError(RobotServerError):
@@ -71,7 +74,9 @@ class SimpleStateMachine:
 
 
 CalibrationUserFlow = Union[
-    'DeckCalibrationUserFlow', 'TipCalibrationUserFlow']
+    'DeckCalibrationUserFlow',
+    'TipCalibrationUserFlow',
+    'PipetteOffsetCalibrationUserFlow']
 
 
 async def invalidate_tip(user_flow: CalibrationUserFlow):

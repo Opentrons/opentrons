@@ -86,7 +86,7 @@ class TipCalibrationUserFlow:
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CalibrationCommand.save_offset: self.save_offset,
             TipLengthCalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
-            TipLengthCalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,  # noqa: E501
+            CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
         }
 

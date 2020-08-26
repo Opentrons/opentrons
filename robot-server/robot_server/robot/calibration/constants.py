@@ -1,5 +1,7 @@
 from typing import Dict, Set
+from typing_extensions import Final
 from dataclasses import dataclass
+from opentrons.types import Point
 
 STATE_WILDCARD = '*'
 
@@ -59,3 +61,11 @@ TIP_RACK_LOOKUP_BY_MAX_VOL: Dict[str, LabwareLookUp] = {
 
 SHORT_TRASH_DECK = 'ot2_short_trash'
 STANDARD_DECK = 'ot2_standard'
+
+POINT_ONE_ID: Final = '1BLC'
+POINT_TWO_ID: Final = '3BRC'
+POINT_THREE_ID: Final = '7TLC'
+
+MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
+MOVE_TO_POINT_SAFETY_BUFFER = Point(0, 0, 5)
+MOVE_TO_DECK_SAFETY_BUFFER = Point(0, -10, 5)

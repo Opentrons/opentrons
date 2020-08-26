@@ -23,17 +23,14 @@ from opentrons.util import linal
 from robot_server.service.session.models import (
     CalibrationCommand, DeckCalibrationCommand)
 from robot_server.robot.calibration.constants import (
-    SHORT_TRASH_DECK, STANDARD_DECK)
+    SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER, POINT_ONE_ID, POINT_TWO_ID,
+    POINT_THREE_ID)
 import robot_server.robot.calibration.util as uf
 from .constants import (
     DeckCalibrationState as State,
     JOG_TO_DECK_SLOT,
-    POINT_ONE_ID,
-    POINT_TWO_ID,
-    POINT_THREE_ID,
     TIP_RACK_SLOT,
-    MOVE_TO_DECK_SAFETY_BUFFER,
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER,
     MOVE_POINT_STATE_MAP,
     SAVE_POINT_STATE_MAP)
 from .state_machine import DeckCalibrationStateMachine
@@ -95,9 +92,9 @@ class DeckCalibrationUserFlow:
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CalibrationCommand.save_offset: self.save_offset,
-            DeckCalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
-            DeckCalibrationCommand.move_to_deck: self.move_to_deck,
-            DeckCalibrationCommand.move_to_point_one: self.move_to_point_one,
+            CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
+            CalibrationCommand.move_to_deck: self.move_to_deck,
+            CalibrationCommand.move_to_point_one: self.move_to_point_one,
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
             DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,

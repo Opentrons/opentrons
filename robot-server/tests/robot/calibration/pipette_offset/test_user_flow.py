@@ -1,15 +1,13 @@
 import pytest
-from unittest.mock import MagicMock, ANY, patch, call
+from unittest.mock import MagicMock, call
 from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
-from opentrons.protocol_api.labware import get_labware_definition
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import (
-    CalibrationCommand, TipLengthCalibrationCommand)
-from robot_server.robot.calibration.tip_length.user_flow import \
-    TipCalibrationUserFlow
+from robot_server.service.session.models import CalibrationCommand
+from robot_server.robot.calibration.pipette_offset.user_flow import \
+    PipetteOffsetCalibrationUserFlow
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
 
@@ -103,51 +101,21 @@ def mock_hw(hardware):
     return hardware
 
 
-@pytest.fixture(params=[True, False])
-def mock_user_flow(mock_hw, request):
-    has_calibration_block = request.param
+@pytest.fixture
+def mock_user_flow(mock_hw):
     mount = next(k for k, v in
                  mock_hw._attached_instruments.items() if v)
-    pip_model = mock_hw._attached_instruments[mount].model
-    tip_rack = get_labware_definition(pipette_map[pip_model], 'opentrons', '1')
-    m = TipCalibrationUserFlow(
-        hardware=mock_hw,
-        mount=mount,
-        has_calibration_block=has_calibration_block,
-        tip_rack=tip_rack)
-
-    yield m
-
-
-@pytest.fixture(params=[True, False])
-def mock_user_flow_all_combos(mock_hw_all_combos, request):
-    has_calibration_block = request.param
-    hw = mock_hw_all_combos
-    mount = next(k for k, v in
-                 hw._attached_instruments.items() if v)
-    pip_model = hw._attached_instruments[mount].model
-    tip_rack = get_labware_definition(pipette_map[pip_model], 'opentrons', '1')
-    m = TipCalibrationUserFlow(
-        hardware=hw,
-        mount=mount,
-        has_calibration_block=has_calibration_block,
-        tip_rack=tip_rack)
+    m = PipetteOffsetCalibrationUserFlow(hardware=mock_hw, mount=mount)
 
     yield m
 
 
 hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
-    (CalibrationCommand.jog, 'measuringNozzleOffset',
-     stub_jog_data, 'move_rel'),
+    (CalibrationCommand.jog, 'preparingPipette', stub_jog_data, 'move_rel'),
     (CalibrationCommand.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
-    (TipLengthCalibrationCommand.move_to_reference_point, 'labwareLoaded',
-     {}, 'move_to'),
-    (TipLengthCalibrationCommand.move_to_reference_point, 'inspectingTip',
-     {}, 'move_to'),
-    (CalibrationCommand.move_to_tip_rack, 'measuringNozzleOffset',
-     {}, 'move_to'),
-    (CalibrationCommand.move_to_tip_rack, 'measuringTipOffset',
-     {}, 'move_to'),
+    (CalibrationCommand.move_to_deck, 'inspectingTip', {}, 'move_to'),
+    (CalibrationCommand.move_to_point_one, 'joggingToDeck', {}, 'move_to'),
+    (CalibrationCommand.move_to_tip_rack, 'labwareLoaded', {}, 'move_to'),
 ]
 
 
@@ -156,25 +124,6 @@ async def test_move_to_tip_rack(mock_user_flow):
     await uf.move_to_tip_rack()
     cur_pt = await uf._get_current_point()
     assert cur_pt == uf._deck['8'].wells()[0].top().point + Point(0, 0, 10)
-
-
-async def test_move_to_reference_point(mock_user_flow_all_combos):
-    uf = mock_user_flow_all_combos
-    await uf.move_to_reference_point()
-    buff = Point(0, 0, 5)
-    trash_offset = Point(-57.84, -55, 0)  # offset from center of trash
-    cur_pt = await uf._get_current_point()
-    if uf._has_calibration_block:
-        if uf._mount == Mount.LEFT:
-            assert cur_pt == \
-                uf._deck['3'].wells_by_name()['A1'].top().point + buff
-        else:
-            assert cur_pt == \
-                uf._deck['1'].wells_by_name()['A2'].top().point + buff
-    else:
-        assert cur_pt == \
-            uf._deck.get_fixed_trash().wells_by_name()['A1'].top().point + \
-            trash_offset + buff
 
 
 async def test_jog(mock_user_flow):
@@ -193,32 +142,13 @@ async def test_pick_up_tip(mock_user_flow):
     assert uf._tip_origin_pt == Point(0, 0, 0)
 
 
-async def test_invalidate_tip(mock_user_flow):
+async def test_return_tip(mock_user_flow):
     uf = mock_user_flow
     uf._tip_origin_pt = Point(1, 1, 1)
     uf._hw_pipette._has_tip = True
     z_offset = uf._hw_pipette.config.return_tip_height * \
-        uf._get_default_tip_length()
-    await uf.invalidate_tip()
-    # should move to return tip
-    move_calls = [
-        call(
-            mount=Mount.RIGHT,
-            abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._get_critical_point_override()
-        ),
-    ]
-    uf._hardware.move_to.assert_has_calls(move_calls)
-    uf._hardware.drop_tip.assert_called()
-
-
-async def test_exit(mock_user_flow):
-    uf = mock_user_flow
-    uf._tip_origin_pt = Point(1, 1, 1)
-    uf._hw_pipette._has_tip = True
-    z_offset = uf._hw_pipette.config.return_tip_height * \
-        uf._get_default_tip_length()
-    await uf.invalidate_tip()
+        uf._get_tip_length()
+    await uf._return_tip()
     # should move to return tip
     move_calls = [
         call(
@@ -244,67 +174,11 @@ def test_load_trash(mock_user_flow):
         'opentrons_1_trash_1100ml_fixed'
 
 
-def test_load_deck(mock_user_flow_all_combos):
-    uf = mock_user_flow_all_combos
+def test_load_deck(mock_user_flow):
+    uf = mock_user_flow
     pip_model = uf._hw_pipette.model
     tip_rack = pipette_map[pip_model]
     assert uf._deck['8'].load_name == tip_rack
-
-
-def test_load_cal_block(mock_user_flow_all_combos):
-    uf = mock_user_flow_all_combos
-    if uf._has_calibration_block:
-        if uf._mount == Mount.RIGHT:
-            assert uf._deck['1'].load_name == \
-                    'opentrons_calibrationblock_short_side_left'
-            assert uf._deck['3'] is None
-        else:
-            assert uf._deck['3'].load_name == \
-                    'opentrons_calibrationblock_short_side_right'
-            assert uf._deck['1'] is None
-    else:
-        assert uf._deck['1'] is None
-        assert uf._deck['3'] is None
-
-
-async def test_get_reference_location(mock_user_flow_all_combos):
-    uf = mock_user_flow_all_combos
-    result = uf._get_reference_point()
-    if uf._has_calibration_block:
-        if uf._mount == Mount.LEFT:
-            exp = uf._deck['3'].wells()[0].top().move(Point(0, 0, 5))
-        else:
-            exp = uf._deck['1'].wells()[1].top().move(Point(0, 0, 5))
-    else:
-        exp = uf._deck.get_fixed_trash().wells()[0].top().move(
-            Point(-57.84, -55, 5))
-    assert result == exp
-
-
-async def test_save_offsets(mock_user_flow):
-    with patch(
-            'opentrons.calibration_storage.modify.create_tip_length_data'
-    ) as create_tip_length_data_patch:
-        uf = mock_user_flow
-        uf._current_state = 'measuringNozzleOffset'
-        assert uf._nozzle_height_at_reference is None
-        await uf._hardware.move_to(
-            mount=uf._mount,
-            abs_position=Point(x=10, y=10, z=10),
-            critical_point=uf._get_critical_point_override()
-        )
-        await uf.save_offset()
-        assert uf._nozzle_height_at_reference == 10
-
-        uf._current_state = 'measuringTipOffset'
-        uf._hw_pipette._has_tip = True
-        await uf._hardware.move_to(
-            mount=uf._mount,
-            abs_position=Point(x=10, y=10, z=40),
-            critical_point=uf._get_critical_point_override()
-        )
-        await uf.save_offset()
-        create_tip_length_data_patch.assert_called_with(ANY, '', 30)
 
 
 @pytest.mark.parametrize(argnames="mount",
@@ -312,9 +186,7 @@ async def test_save_offsets(mock_user_flow):
 def test_no_pipette(hardware, mount):
     hardware._attached_instruments = {mount: None}
     with pytest.raises(RobotServerError) as error:
-        TipCalibrationUserFlow(hardware=hardware,
-                               mount=mount,
-                               has_calibration_block=None,
-                               tip_rack=None)
+        PipetteOffsetCalibrationUserFlow(hardware=hardware,
+                                         mount=mount)
 
     assert error.value.error.detail == f"No pipette present on {mount} mount"

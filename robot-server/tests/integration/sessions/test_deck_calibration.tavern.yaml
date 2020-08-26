@@ -74,7 +74,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: calibration.deck.moveToTipRack
+            command: calibration.moveToTipRack
             data: {}
     response:
       status_code: 200
@@ -115,7 +115,7 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: inspectingTip  
+              currentStep: inspectingTip
 
   - name: Invalidate the tip
     request:
@@ -161,7 +161,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: calibration.deck.moveToDeck
+            command: calibration.moveToDeck
             data: {}
     response:
       status_code: 200
@@ -238,7 +238,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: calibration.deck.moveToPointOne
+            command: calibration.moveToPointOne
             data: {}
     response:
       status_code: 200
