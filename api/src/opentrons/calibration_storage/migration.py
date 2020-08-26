@@ -6,10 +6,13 @@ MAX_VERSION = 1
 
 
 def check_index_version(index_path: local_types.StrPath):
-    index_file = io.read_cal_file(str(index_path))
-    version = index_file.get('version', 0)
-    if version == 0:
-        migrate_index_0_to_1(index_path)
+    try:
+        index_file = io.read_cal_file(str(index_path))
+        version = index_file.get('version', 0)
+        if version == 0:
+            migrate_index_0_to_1(index_path)
+    except FileNotFoundError:
+        pass
 
 
 def migrate_index_0_to_1(index_path: local_types.StrPath):

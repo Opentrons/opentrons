@@ -38,7 +38,7 @@ export function FileInfo(props: FileInfoProps): React.Node {
       <InformationCard />
       <ProtocolPipettesCard robotName={robot.name} />
       <ProtocolModulesCard robot={robot} />
-      <ProtocolLabwareCard robotName={robot.name} />
+      {sessionLoaded && <ProtocolLabwareCard robotName={robot.name} />}
       {uploadError && <UploadError uploadError={uploadError} />}
       {sessionLoaded && !uploadError && <Continue />}
     </Box>
