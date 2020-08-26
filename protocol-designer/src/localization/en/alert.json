@@ -38,7 +38,7 @@
     },
     "export_v5_protocol_3_20": {
       "title": "Robot and app update may be required",
-      "body1": "This protocol uses settings that can only run on app and robot server version 3.20 or higher. Please ensure your OT-2 is updated to the correct version",
+      "body1": "This protocol uses settings that can only run on app and robot server version",
       "body2": "3.20 or higher",
       "body3": ". Please ensure your OT-2 is updated to the correct version."
     },
