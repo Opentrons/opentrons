@@ -37,7 +37,6 @@ from .constants import (
     MOVE_POINT_STATE_MAP,
     SAVE_POINT_STATE_MAP)
 from .state_machine import DeckCalibrationStateMachine
-# TODO: uncomment the following to raise deck cal errors
 from ..errors import CalibrationError
 from ..helper_classes import (
     RequiredLabware,
@@ -113,16 +112,12 @@ class DeckCalibrationUserFlow:
         return self._current_state
 
     def get_pipette(self) -> Optional[AttachedPipette]:
-        # TODO: always return AttachedPipette
-        if self._hw_pipette is None:
-            return None
-        else:
-            return AttachedPipette(
-                model=self._hw_pipette.model,
-                name=self._hw_pipette.name,
-                tip_length=self._hw_pipette.config.tip_length,
-                mount=str(self._mount),
-                serial=self._hw_pipette.pipette_id)
+        return AttachedPipette(
+            model=self._hw_pipette.model,
+            name=self._hw_pipette.name,
+            tip_length=self._hw_pipette.config.tip_length,
+            mount=str(self._mount),
+            serial=self._hw_pipette.pipette_id)
 
     def get_required_labware(self) -> List[RequiredLabware]:
         lw = self._get_tip_rack_lw()
@@ -171,9 +166,9 @@ class DeckCalibrationUserFlow:
         pos_2 = self._deck.get_calibration_position(POINT_TWO_ID).position
         pos_3 = self._deck.get_calibration_position(POINT_THREE_ID).position
         exp_pt: ExpectedPoints = {
-            POINT_ONE_ID: Point(*pos_1),
-            POINT_TWO_ID: Point(*pos_2),
-            POINT_THREE_ID: Point(*pos_3)
+            POINT_ONE_ID: Point(*pos_1)._replace(z=1.0),
+            POINT_TWO_ID: Point(*pos_2)._replace(z=1.0),
+            POINT_THREE_ID: Point(*pos_3)._replace(z=1.0)
         }
         return exp_pt
 
@@ -198,13 +193,9 @@ class DeckCalibrationUserFlow:
             f'DeckCalUserFlow handled command {name}, transitioned'
             f'from {self._current_state} to {next_state}')
 
-    def _get_critical_point(self) -> CriticalPoint:
-        return CriticalPoint.NOZZLE
-        # TODO: uncomment the following after _select_target_pipette
-        # is complette:
-        # return (CriticalPoint.FRONT_NOZZLE if
-        #         self._hw_pipette.config.channels == 8 else
-        #         self._hw_pipette.critical_point)
+    def _get_critical_point_override(self) -> Optional[CriticalPoint]:
+        return (CriticalPoint.FRONT_NOZZLE if
+                self._hw_pipette.config.channels == 8 else None)
 
     async def _get_current_point(self) -> Point:
         return await self._hardware.gantry_position(self._mount)
@@ -226,7 +217,7 @@ class DeckCalibrationUserFlow:
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
         ydim = self._deck.get_slot_definition(
             JOG_TO_DECK_SLOT)['boundingBox']['yDimension']
-        new_pt = deck_pt + Point(0, (ydim/2), 0) + \
+        new_pt = deck_pt - Point(0, (ydim/2), deck_pt.z) + \
             MOVE_TO_DECK_SAFETY_BUFFER
         to_loc = Location(new_pt, None)
         await self._move(to_loc)
@@ -295,4 +286,5 @@ class DeckCalibrationUserFlow:
         await uf.move(self, to_loc)
 
     async def exit_session(self):
+        await self.move_to_tip_rack()
         await self._return_tip()

@@ -1,12 +1,12 @@
 // @flow
-import { getIsV4Protocol } from '../selectors/fileCreator'
+import { getRequiresAtLeastV4 } from '../selectors/fileCreator'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
 import type { ModuleEntities } from '../../step-forms'
 
-describe('getIsV4Protocol selector', () => {
+describe('getRequiresAtLeastV4 selector', () => {
   const testCases: Array<{|
     testName: string,
     robotStateTimeline: {
@@ -48,7 +48,7 @@ describe('getIsV4Protocol selector', () => {
     ({ testName, robotStateTimeline, moduleEntities, expected }) => {
       it(testName, () => {
         // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
-        const result = getIsV4Protocol.resultFunc(
+        const result = getRequiresAtLeastV4.resultFunc(
           robotStateTimeline,
           moduleEntities
         )

@@ -191,6 +191,13 @@ class PipettePair(enum.Enum):
             return top_types.Mount.RIGHT
 
 
+class HardwareAction(enum.Enum):
+    DROPTIP = enum.auto()
+
+    def __str__(self):
+        return self.name
+
+
 class ExecutionCancelledError(RuntimeError):
     pass
 
@@ -200,4 +207,12 @@ class MustHomeError(RuntimeError):
 
 
 class NoTipAttachedError(RuntimeError):
+    pass
+
+
+class TipAttachedError(RuntimeError):
+    pass
+
+
+class PairedPipetteConfigValueError(RuntimeError):
     pass
