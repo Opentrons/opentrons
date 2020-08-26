@@ -675,7 +675,7 @@ class ProtocolContext(CommandPublisher):
         (Note that for each slot only the last labware used in a command will
         be available for calibration in the OpenTrons UI, and that the
         tallest labware on the deck will be calculated using only currently
-        loaded labware, meaning that the labware loaded should always 
+        loaded labware, meaning that the labware loaded should always
         reflect the labware physically on the deck (or be higher than the
         labware on the deck).
         """
