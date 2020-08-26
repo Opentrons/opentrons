@@ -1,7 +1,8 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
+from typing import (Any, Dict, List, Optional,
+                    Tuple, TYPE_CHECKING, Union, Sequence)
 try:
     import aionotify  # type: ignore
 except OSError:
@@ -108,8 +109,11 @@ class Controller:
             args = tuple()
         return self._smoothie_driver.home(*args)
 
-    def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
-        return self._smoothie_driver.fast_home(axis, margin)
+    def fast_home(
+            self, axes: Sequence[str],
+            margin: float) -> Dict[str, float]:
+        converted_axes = ''.join(axes)
+        return self._smoothie_driver.fast_home(converted_axes, margin)
 
     def get_attached_instruments(
             self, expected: Dict[Mount, Union['PipetteModel', 'PipetteName']])\

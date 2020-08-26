@@ -2,7 +2,7 @@ import asyncio
 import copy
 import logging
 from threading import Event
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Union
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Union, Sequence
 from contextlib import contextmanager
 from opentrons import types
 from opentrons.config.pipette_config import (config_models,
@@ -157,7 +157,8 @@ class Simulator:
                                    for ax in checked_axes})
         return self._position
 
-    def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
+    def fast_home(
+            self, axis: Sequence[str], margin: float) -> Dict[str, float]:
         for ax in axis:
             self._position[ax] = _HOME_POSITION[ax]
             self._engaged_axes[ax] = True

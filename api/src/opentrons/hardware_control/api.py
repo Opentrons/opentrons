@@ -25,7 +25,8 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
-                    DoorStateNotification, PipettePair)
+                    DoorStateNotification, PipettePair, TipAttachedError,
+                    HardwareAction, PairedPipetteConfigValueError)
 from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
@@ -851,6 +852,19 @@ class API(HardwareAPILike):
                                y=cur_pos[Axis.Y],
                                z=cur_pos[Axis.by_mount(mount)])
 
+    @overload
+    def _mounts(
+        self,
+        z_axis: PipettePair) -> Tuple[top_types.Mount, top_types.Mount]: ...
+
+    @overload
+    def _mounts(self, z_axis: top_types.Mount) -> Tuple[top_types.Mount]: ...
+
+    def _mounts(self, z_axis):
+        if isinstance(z_axis, PipettePair):
+            return (z_axis.primary, z_axis.secondary)
+        return (z_axis, )
+
     async def move_to(
             self, mount: Union[top_types.Mount, PipettePair],
             abs_position: top_types.Point,
@@ -897,12 +911,14 @@ class API(HardwareAPILike):
         if not self._current_position:
             await self.home()
 
-        if isinstance(mount, PipettePair):
-            primary_mount = mount.primary
-            secondary_mount: Optional[top_types.Mount] = mount.secondary
-        else:
-            primary_mount = mount
-            secondary_mount = None
+        mounts = self._mounts(mount)
+        primary_mount = mounts[0]
+        secondary_mount = None
+        # Even with overloads, mypy cannot accept a length check on
+        # a tuple to confirm whether there are one or two mounts
+        # see: https://github.com/python/mypy/issues/1178
+        if len(mounts) > 1:
+            secondary_mount = mounts[1]  # type: ignore
 
         if primary_mount == top_types.Mount.LEFT:
             primary_offset = top_types.Point(*self._config.mount_offset)
@@ -952,12 +968,14 @@ class API(HardwareAPILike):
         if not self._current_position:
             await self.home()
 
-        if isinstance(mount, PipettePair):
-            primary_mount = mount.primary
-            secondary_mount: Optional[top_types.Mount] = mount.secondary
-        else:
-            primary_mount = mount
-            secondary_mount = None
+        mounts = self._mounts(mount)
+        primary_mount = mounts[0]
+        secondary_mount = None
+        # Even with overloads, mypy cannot accept a length check on
+        # a tuple to confirm whether there are one or two mounts
+        # see: https://github.com/python/mypy/issues/1178
+        if len(mounts) > 1:
+            secondary_mount = mounts[1]  # type: ignore
 
         if secondary_mount:
             primary_z = Axis.by_mount(primary_mount)
@@ -997,55 +1015,41 @@ class API(HardwareAPILike):
     async def _move_plunger(self, mount: Union[top_types.Mount, PipettePair],
                             dist: Sequence[float], speed: float = None,
                             acquire_lock: bool = True):
-        if isinstance(mount, PipettePair):
-            primary_z = Axis.by_mount(mount.primary)
-            primary_pl_axis = Axis.of_plunger(mount.primary)
-            secondary_z = Axis.by_mount(mount.secondary)
-            second_pl_axis = Axis.of_plunger(mount.secondary)
-            all_axes_pos = OrderedDict((
-                (Axis.X,
-                 self._current_position[Axis.X]),
-                (Axis.Y,
-                 self._current_position[Axis.Y]),
-                (primary_z,
-                 self._current_position[primary_z]),
-                (secondary_z,
-                 self._current_position[secondary_z]),
-                (primary_pl_axis, dist[0]),
-                (second_pl_axis, dist[1]))
-            )
-        else:
-            primary_z = Axis.by_mount(mount)
-            primary_pl_axis = Axis.of_plunger(mount)
-            secondary_z = None
-            all_axes_pos = OrderedDict((
-                (Axis.X,
-                 self._current_position[Axis.X]),
-                (Axis.Y,
-                 self._current_position[Axis.Y]),
-                (primary_z,
-                 self._current_position[primary_z]),
-                (primary_pl_axis, dist[0]))
-            )
+        all_axes_pos = OrderedDict((
+            (Axis.X, self._current_position[Axis.X]),
+            (Axis.Y, self._current_position[Axis.Y]),
+        ))
+        plunger_pos = OrderedDict()
+        mounts = self._mounts(mount)
+        secondary_z = None
+        for idx, m in enumerate(mounts):
+            z = Axis.by_mount(m)
+            plunger = Axis.of_plunger(m)
+            all_axes_pos[z] = self._current_position[z]
+            plunger_pos[plunger] = dist[idx]
+            if idx == 1:
+                secondary_z = z
+        all_axes_pos.update(plunger_pos)
         await self._move(all_axes_pos, speed, False,
                          acquire_lock=acquire_lock,
                          secondary_z=secondary_z)
 
-    async def _move_relative_to_target(
-            self, instruments: Tuple[PipetteHandlingData, ...],
-            target: Tuple[float, ...], speed: float = None):
-        base_dict = OrderedDict((
+    async def _move_relative_n_axes(
+            self, mount: Union[top_types.Mount, PipettePair],
+            target: Sequence[float], speed: float = None):
+        all_axes_pos = OrderedDict((
             (Axis.X, self._current_position[Axis.X] + target[0]),
             (Axis.Y, self._current_position[Axis.Y] + target[1])))
+        mounts = self._mounts(mount)
         secondary_z = None
-        for idx, instr in enumerate(instruments):
-            z = Axis.by_mount(instr[1])
+        for idx, m in enumerate(mounts):
+            z = Axis.by_mount(m)
             target_index = idx + 2
-            base_dict[z] =\
+            all_axes_pos[z] =\
                 self._current_position[z] + target[target_index]
             if idx == 1:
                 secondary_z = z
-        await self._move(base_dict, speed=speed, secondary_z=secondary_z)
+        await self._move(all_axes_pos, speed=speed, secondary_z=secondary_z)
 
     def _get_transformed(
             self,
@@ -1107,7 +1111,6 @@ class API(HardwareAPILike):
         # need to transform
         smoothie_pos = {ax.name: pos for ax, pos in target_position.items()
                         if ax not in Axis.gantry_axes()}
-
         if len(to_transform_primary) != 3:
             self._log.error("Move derived {} axes to transform from {}"
                             .format(len(to_transform_primary),
@@ -1449,39 +1452,6 @@ class API(HardwareAPILike):
             this_pipette.set_current_volume(0)
             this_pipette.ready_to_aspirate = False
 
-    def _prepare_for_tip_action(
-            self,
-            mount: Union[top_types.Mount, PipettePair],
-            action: str) -> Tuple[
-                Pipette, top_types.Mount,
-                Optional[Pipette], Optional[top_types.Mount]]:
-
-        secondary_mount: Optional[top_types.Mount] = None
-        if isinstance(mount, PipettePair):
-            primary_mount = mount.primary
-            secondary_mount = mount.secondary
-            instr1 = self._attached_instruments[primary_mount]
-            instr2 = self._attached_instruments[secondary_mount]
-            assert instr1 and instr2, \
-                (f'No instrument on {primary_mount.name}'
-                 ' or {secondary_mount.name}')
-            if action == 'pickup':
-                assert not instr1.has_tip and not instr2.has_tip, \
-                    'Tip already attached'
-            else:
-                assert instr1.has_tip and instr2.has_tip, \
-                    'Cannot drop tip without a tip attached'
-        else:
-            primary_mount = mount
-            instr1 = self._attached_instruments[primary_mount]
-            instr2 = None
-            assert instr1, f'No instrument on {primary_mount.name}'
-            if action == 'pickup':
-                assert not instr1.has_tip, 'Tip already attached'
-            else:
-                assert instr1.has_tip, 'Cannot drop tip without a tip attached'
-        return instr1, primary_mount, instr2, secondary_mount
-
     @overload
     def _instruments_for(
         self, mount: top_types.Mount) -> Tuple[PipetteHandlingData]: ...
@@ -1508,19 +1478,22 @@ class API(HardwareAPILike):
             if not pipettes[0]:
                 raise top_types.PipetteNotAttachedError(
                     f'No pipette attached to {pipettes[1].name} mount')
-            assert not pipettes[0].has_tip,\
-                'Cannot pick up tip with a tip attached'
-            self._log.info(f'Picking up tip on {pipettes[0].name}')
+            if pipettes[0].has_tip:
+                raise TipAttachedError(
+                    'Cannot pick up tip with a tip attached')
+            self._log.debug(f'Picking up tip on {pipettes[0].name}')
 
     def _ready_for_tip_action(
-            self, targets: Sequence[PipetteHandlingData], action: str):
+            self, targets: Sequence[PipetteHandlingData],
+            action: HardwareAction):
         for pipettes in targets:
             if not pipettes[0]:
                 raise top_types.PipetteNotAttachedError(
                     f'No pipette attached to {pipettes[1].name} mount')
-            assert pipettes[0].has_tip,\
-                f'Cannot perform {action} without a tip attached'
-            self._log.info(f'{action} on {pipettes[0].name}')
+            if not pipettes[0].has_tip:
+                raise NoTipAttachedError(
+                    f'Cannot perform {action} without a tip attached')
+            self._log.debug(f'{action} on {pipettes[0].name}')
 
     async def pick_up_tip(self,
                           mount: Union[top_types.Mount, PipettePair],
@@ -1531,7 +1504,7 @@ class API(HardwareAPILike):
         Pick up tip from current location.
 
         This is achieved by attempting to move the instrument down by its
-        `pick_up_distance`, in a series of presses. This distance is largerr
+        `pick_up_distance`, in a series of presses. This distance is larger
         than the space available in the tip, so the stepper motor will
         eventually skip steps, which is resolved by homing afterwards. The
         pick up operation is done at a current specified in the pipette config,
@@ -1563,7 +1536,8 @@ class API(HardwareAPILike):
             all_presses = tuple(
                 instr[0].config.pick_up_presses for instr in instruments)
             if len(all_presses) > 1 and all_presses[0] != all_presses[1]:
-                raise ValueError("Number of pipette pickups much match")
+                raise PairedPipetteConfigValueError(
+                    "Number of pipette pickups must match")
             checked_presses = all_presses[0]
         else:
             checked_presses = presses
@@ -1586,13 +1560,12 @@ class API(HardwareAPILike):
                              + -1.0 * checked_increment[idx] * i
                              for idx, instr in enumerate(instruments))
                 target_pos = (0, 0, *dist)
-                await self._move_relative_to_target(
-                    instruments, target_pos, pick_up_speed)
+                await self._move_relative_n_axes(
+                    mount, target_pos, pick_up_speed)
 
             # move nozzle back up
             backup_pos = (0, 0, *tuple(-d for d in dist))
-            await self._move_relative_to_target(
-                instruments, backup_pos)
+            await self._move_relative_n_axes(mount, backup_pos)
         for instr in instruments:
             instr[0].add_tip(tip_length=tip_length)
             instr[0].set_current_volume(0)
@@ -1644,7 +1617,7 @@ class API(HardwareAPILike):
         """
 
         instruments = self._instruments_for(mount)
-        self._ready_for_tip_action(instruments, 'drop tip')
+        self._ready_for_tip_action(instruments, HardwareAction.DROPTIP)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
             for instr in instruments}
@@ -1666,7 +1639,7 @@ class API(HardwareAPILike):
                 mount, droptip, speed=speed)
             if home_after:
                 safety_margin = abs(max(bottom)-max(droptip))
-                smoothie_pos = self._fast_home(
+                smoothie_pos = self._backend.fast_home(
                     plunger_axes, safety_margin)
                 self._current_position = self._deck_from_smoothie(
                     smoothie_pos)
