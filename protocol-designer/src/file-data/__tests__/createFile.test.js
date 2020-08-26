@@ -185,8 +185,8 @@ describe('getRequiresAtLeastV5', () => {
     expect(getRequiresAtLeastV5.resultFunc(noModules.robotStateTimeline)).toBe(
       false
     )
-    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
     expect(
+      // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
       getRequiresAtLeastV5.resultFunc(engageMagnet.robotStateTimeline)
     ).toBe(false)
   })
