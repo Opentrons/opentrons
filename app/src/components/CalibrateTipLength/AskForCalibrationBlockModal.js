@@ -34,7 +34,7 @@ const USE_TRASH = 'Use trash bin for now'
 const REMEMBER = "Remember my selection and don't ask again"
 const CAN_CHANGE =
   '(You can change this selection under More > Robots > Advanced Settings)'
-const SUPPORT_URL = 'https://www.opentrons.com/contact-support'
+const BLOCK_REQUEST_URL = 'https://opentrons-ux.typeform.com/to/DgvBE9Ir'
 const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 
 const NOTE_SPACING = '1.75rem'
@@ -71,7 +71,7 @@ export function AskForCalibrationBlockModal(props: Props): React.Node {
               <Text marginBottom={SPACING_3}>
                 {IF_NO_BLOCK}
                 &nbsp;
-                <Link href={SUPPORT_URL} external>
+                <Link href={BLOCK_REQUEST_URL} external>
                   {CONTACT_US}
                 </Link>
                 &nbsp;
