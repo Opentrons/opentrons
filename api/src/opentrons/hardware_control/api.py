@@ -1467,41 +1467,6 @@ class API(HardwareAPILike):
             secondary_mount = mount.secondary
             instr1 = self._attached_instruments[primary_mount]
             instr2 = self._attached_instruments[secondary_mount]
-            assert instr1 and instr2, \
-                (f'No instrument on {primary_mount.name}'
-                 ' or {secondary_mount.name}')
-            if action == 'pickup':
-                assert not instr1.has_tip and not instr2.has_tip, \
-                    'Tip already attached'
-            else:
-                assert instr1.has_tip and instr2.has_tip, \
-                    'Cannot drop tip without a tip attached'
-        else:
-            primary_mount = mount
-            instr1 = self._attached_instruments[primary_mount]
-            instr2 = None
-            assert instr1, f'No instrument on {primary_mount.name}'
-            if action == 'pickup':
-                assert not instr1.has_tip, 'Tip already attached'
-            else:
-                assert instr1.has_tip, 'Cannot drop tip without a tip attached'
-        return instr1, primary_mount, instr2, secondary_mount
-
-    @overload
-    def _instruments_for(
-        self, mount: top_types.Mount) -> Tuple[PipetteHandlingData]: ...
-
-    @overload
-    def _instruments_for(
-        self, mount: PipettePair) ->\
-        Tuple[PipetteHandlingData, PipetteHandlingData]: ...
-
-    def _instruments_for(self, mount):
-        if isinstance(mount, PipettePair):
-            primary_mount = mount.primary
-            secondary_mount = mount.secondary
-            instr1 = self._attached_instruments[primary_mount]
-            instr2 = self._attached_instruments[secondary_mount]
             return ((instr1, primary_mount), (instr2, secondary_mount))
         else:
             primary_mount = mount
@@ -1513,19 +1478,22 @@ class API(HardwareAPILike):
             if not pipettes[0]:
                 raise top_types.PipetteNotAttachedError(
                     f'No pipette attached to {pipettes[1].name} mount')
-            assert not pipettes[0].has_tip,\
-                'Cannot pick up tip with a tip attached'
-            self._log.info(f'Picking up tip on {pipettes[0].name}')
+            if pipettes[0].has_tip:
+                raise TipAttachedError(
+                    'Cannot pick up tip with a tip attached')
+            self._log.debug(f'Picking up tip on {pipettes[0].name}')
 
     def _ready_for_tip_action(
-            self, targets: Sequence[PipetteHandlingData], action: str):
+            self, targets: Sequence[PipetteHandlingData],
+            action: HardwareAction):
         for pipettes in targets:
             if not pipettes[0]:
                 raise top_types.PipetteNotAttachedError(
                     f'No pipette attached to {pipettes[1].name} mount')
-            assert pipettes[0].has_tip,\
-                f'Cannot perform {action} without a tip attached'
-            self._log.info(f'{action} on {pipettes[0].name}')
+            if not pipettes[0].has_tip:
+                raise NoTipAttachedError(
+                    f'Cannot perform {action} without a tip attached')
+            self._log.debug(f'{action} on {pipettes[0].name}')
 
     async def pick_up_tip(self,
                           mount: Union[top_types.Mount, PipettePair],
@@ -1536,7 +1504,7 @@ class API(HardwareAPILike):
         Pick up tip from current location.
 
         This is achieved by attempting to move the instrument down by its
-        `pick_up_distance`, in a series of presses. This distance is largerr
+        `pick_up_distance`, in a series of presses. This distance is larger
         than the space available in the tip, so the stepper motor will
         eventually skip steps, which is resolved by homing afterwards. The
         pick up operation is done at a current specified in the pipette config,
