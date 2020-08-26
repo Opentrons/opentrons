@@ -6,9 +6,6 @@ from opentrons.hardware_control import pipette
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand
-from robot_server.robot.calibration.constants import POINT_ONE_ID
-from robot_server.robot.calibration.pipette_offset.constants import \
-    PipetteOffsetCalibrationState
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
 
