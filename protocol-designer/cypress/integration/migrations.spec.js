@@ -17,7 +17,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
         '../../fixtures/protocol/5/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
       newLabwareDefsMigrationModal: true,
       unusedPipettes: false,
-      apiUpdateRequiredMigrationModal: false,
+      exportModalCopy: null,
       genericMigrationModal: false,
     },
     {
@@ -27,7 +27,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
         '../../fixtures/protocol/5/example_1_1_0MigratedFromV1_0_0.json',
       newLabwareDefsMigrationModal: true,
       unusedPipettes: true,
-      apiUpdateRequiredMigrationModal: false,
+      exportModalCopy: null,
       genericMigrationModal: false,
     },
     {
@@ -36,7 +36,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture: '../../fixtures/protocol/5/doItAllV3.json',
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,
-      apiUpdateRequiredMigrationModal: false,
+      exportModalCopy: null,
       genericMigrationModal: false,
     },
     {
@@ -45,8 +45,9 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture: '../../fixtures/protocol/5/doItAllV4.json',
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,
-      apiUpdateRequiredMigrationModal: true,
-      genericMigrationModal: true, // TODO(IL, 2020-08-13): is this modal supposed to be hidden in this particular case?
+      exportModalCopy:
+        'Robot requirements for running module inclusive JSON protocols',
+      genericMigrationModal: true,
     },
     {
       title: 'doItAllV5 -> import and re-export should preserve data',
@@ -54,7 +55,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture: '../../fixtures/protocol/5/doItAllV5.json',
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,
-      apiUpdateRequiredMigrationModal: true,
+      exportModalCopy: 'server version 3.20 or higher',
       genericMigrationModal: false,
     },
   ]
@@ -66,7 +67,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture,
       newLabwareDefsMigrationModal,
       unusedPipettes,
-      apiUpdateRequiredMigrationModal,
+      exportModalCopy,
       genericMigrationModal,
     }) => {
       it(title, () => {
@@ -124,11 +125,9 @@ describe('Protocol fixtures migrate and match snapshots', () => {
               .click()
           }
 
-          if (apiUpdateRequiredMigrationModal) {
+          if (exportModalCopy) {
             cy.get('div')
-              .contains(
-                'Robot requirements for running module inclusive JSON protocols'
-              )
+              .contains(exportModalCopy)
               .should('exist')
             cy.get('button')
               .contains('continue', { matchCase: false })
