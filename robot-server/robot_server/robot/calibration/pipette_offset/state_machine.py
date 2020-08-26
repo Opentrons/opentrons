@@ -25,10 +25,10 @@ PIP_OFFSET_CAL_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.joggingToDeck: {
         CalibrationCommand.jog: State.joggingToDeck,
         CalibrationCommand.save_offset: State.joggingToDeck,
-        CalibrationCommand.move_to_point_one: State.joggingToPointOne,
+        CalibrationCommand.move_to_point_one: State.savingPointOne,
     },
-    State.joggingToPointOne: {
-        CalibrationCommand.jog: State.joggingToPointOne,
+    State.savingPointOne: {
+        CalibrationCommand.jog: State.savingPointOne,
         CalibrationCommand.save_offset: State.calibrationComplete,
     },
     State.calibrationComplete: {

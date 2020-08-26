@@ -122,10 +122,9 @@ class PipetteOffsetCalibrationUserFlow:
             f'PipetteOffsetCalUserFlow handled command {name}, transitioned'
             f'from {self._current_state} to {next_state}')
 
-    def _get_critical_point(self) -> CriticalPoint:
+    def _get_critical_point_override(self) -> Optional[CriticalPoint]:
         return (CriticalPoint.FRONT_NOZZLE if
-                self._hw_pipette.config.channels == 8 else
-                self._hw_pipette.critical_point)
+                self._hw_pipette.config.channels == 8 else None)
 
     async def _get_current_point(self) -> Point:
         return await self._hardware.gantry_position(self._mount)
@@ -160,7 +159,7 @@ class PipetteOffsetCalibrationUserFlow:
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
         ydim = self._deck.get_slot_definition(
             JOG_TO_DECK_SLOT)['boundingBox']['yDimension']
-        new_pt = deck_pt + Point(0, (ydim/2), 0) + \
+        new_pt = deck_pt + Point(0, -1 * ydim/2, 0) + \
             MOVE_TO_DECK_SAFETY_BUFFER
         to_loc = Location(new_pt, None)
         await self._move(to_loc)
@@ -170,7 +169,12 @@ class PipetteOffsetCalibrationUserFlow:
         await self._move(Location(Point(*coords), None))
 
     async def save_offset(self):
-        pass
+        cur_pt = await self._get_current_point()
+        if self.current_state == State.joggingToDeck:
+            self._z_height_reference = cur_pt.z
+        elif self._current_state == State.savingPointOne:
+            # TODO: save pipette offset
+            pass
 
     async def pick_up_tip(self):
         await uf.pick_up_tip(self, tip_length=self._get_tip_length())
@@ -185,4 +189,5 @@ class PipetteOffsetCalibrationUserFlow:
         await uf.move(self, to_loc)
 
     async def exit_session(self):
+        await self.move_to_tip_rack()
         await self._return_tip()

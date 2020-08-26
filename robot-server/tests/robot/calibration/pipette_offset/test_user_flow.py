@@ -6,6 +6,9 @@ from opentrons.hardware_control import pipette
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand
+from robot_server.robot.calibration.constants import POINT_ONE_ID
+from robot_server.robot.calibration.pipette_offset.constants import \
+    PipetteOffsetCalibrationState
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
 
@@ -142,38 +145,19 @@ async def test_pick_up_tip(mock_user_flow):
     assert uf._tip_origin_pt == Point(0, 0, 0)
 
 
-async def test_invalidate_tip(mock_user_flow):
+async def test_return_tip(mock_user_flow):
     uf = mock_user_flow
     uf._tip_origin_pt = Point(1, 1, 1)
     uf._hw_pipette._has_tip = True
     z_offset = uf._hw_pipette.config.return_tip_height * \
         uf._get_tip_length()
-    await uf.invalidate_tip()
+    await uf._return_tip()
     # should move to return tip
     move_calls = [
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._hw_pipette.critical_point
-        ),
-    ]
-    uf._hardware.move_to.assert_has_calls(move_calls)
-    uf._hardware.drop_tip.assert_called()
-
-
-async def test_exit(mock_user_flow):
-    uf = mock_user_flow
-    uf._tip_origin_pt = Point(1, 1, 1)
-    uf._hw_pipette._has_tip = True
-    z_offset = uf._hw_pipette.config.return_tip_height * \
-        uf._get_tip_length()
-    await uf.invalidate_tip()
-    # should move to return tip
-    move_calls = [
-        call(
-            mount=Mount.RIGHT,
-            abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._hw_pipette.critical_point
+            critical_point=uf._get_critical_point_override()
         ),
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)

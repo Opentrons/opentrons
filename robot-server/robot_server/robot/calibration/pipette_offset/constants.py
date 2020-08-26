@@ -9,7 +9,7 @@ class PipetteOffsetCalibrationState(str, Enum):
     preparingPipette = "preparingPipette"
     inspectingTip = "inspectingTip"
     joggingToDeck = "joggingToDeck"
-    joggingToPointOne = "joggingToPointOne"
+    savingPointOne = "savingPointOne"
     calibrationComplete = "calibrationComplete"
     sessionExited = "sessionExited"
     WILDCARD = STATE_WILDCARD
