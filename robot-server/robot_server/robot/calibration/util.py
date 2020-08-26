@@ -93,8 +93,9 @@ def save_default_pick_up_current(instr: Pipette):
 
 async def pick_up_tip(user_flow: CalibrationUserFlow, tip_length: float):
     # grab position of active nozzle for ref when returning tip later
+    cp = user_flow._get_critical_point_override()
     user_flow._tip_origin_pt = await user_flow._hardware.gantry_position(
-        user_flow._mount, critical_point=user_flow._get_critical_point())
+        user_flow._mount, critical_point=cp)
 
     with contextlib.ExitStack() as stack:
         if user_flow._hw_pipette.config.channels > 1:
@@ -115,7 +116,7 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
     if user_flow._tip_origin_pt and user_flow._hw_pipette.has_tip:
         coeff = user_flow._hw_pipette.config.return_tip_height
         to_pt = user_flow._tip_origin_pt - Point(0, 0, tip_length * coeff)
-        cp = user_flow._get_critical_point()
+        cp = user_flow._get_critical_point_override()
         await user_flow._hardware.move_to(mount=user_flow._mount,
                                           abs_position=to_pt,
                                           critical_point=cp)
@@ -126,7 +127,7 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
 async def move(user_flow: CalibrationUserFlow, to_loc: Location):
     from_pt = await user_flow._get_current_point()
     from_loc = Location(from_pt, None)
-    cp = user_flow._get_critical_point()
+    cp = user_flow._get_critical_point_override()
 
     max_height = user_flow._hardware.get_instrument_max_height(
         user_flow._mount)
