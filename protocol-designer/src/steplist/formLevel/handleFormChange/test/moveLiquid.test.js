@@ -5,7 +5,6 @@ import {
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { getPrereleaseFeatureFlag } from '../../../../persist'
 import {
   dependentFieldsUpdateMoveLiquid,
   updatePatchBlowoutFields,
@@ -19,18 +18,7 @@ let pipetteEntities
 let labwareEntities
 let handleFormHelper
 
-jest.mock('../../../../persist')
-
-const mockGetPrereleaseFeatureFlag: JestMockFn<
-  string,
-  boolean
-> = getPrereleaseFeatureFlag
-
 beforeEach(() => {
-  mockGetPrereleaseFeatureFlag.mockImplementation(
-    ff => ff === 'OT_PD_ENABLE_AIR_GAP_AND_DELAY'
-  )
-
   pipetteEntities = {
     pipetteId: {
       name: 'p10_single',

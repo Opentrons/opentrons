@@ -1,5 +1,4 @@
 // @flow
-import { getPrereleaseFeatureFlag } from '../../persist'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -10,10 +9,6 @@ import {
   FIXED_TRASH_ID,
 } from '../../constants'
 import type { StepType, StepFieldName } from '../../form-types'
-
-const isAirGapDelayEnabled = () =>
-  getPrereleaseFeatureFlag('OT_PD_ENABLE_AIR_GAP_AND_DELAY')
-// TODO: Ian 2019-01-17 move this somewhere more central - see #2926
 
 export function getDefaultsForStepType(
   stepType: StepType
@@ -69,18 +64,14 @@ export function getDefaultsForStepType(
         blowout_location: FIXED_TRASH_ID,
         preWetTip: false,
 
-        ...(isAirGapDelayEnabled()
-          ? {
-              aspirate_airGap_checkbox: false,
-              aspirate_airGap_volume: null,
-              aspirate_delay_checkbox: false,
-              aspirate_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
-              aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-              dispense_delay_checkbox: false,
-              dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-              dispense_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
-            }
-          : {}),
+        aspirate_airGap_checkbox: false,
+        aspirate_airGap_volume: null,
+        aspirate_delay_checkbox: false,
+        aspirate_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
+        aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+        dispense_delay_checkbox: false,
+        dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+        dispense_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
       }
     case 'pause':
       return {

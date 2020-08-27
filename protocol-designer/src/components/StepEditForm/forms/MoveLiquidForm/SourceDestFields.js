@@ -1,10 +1,8 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import { i18n } from '../../../../localization'
-import { selectors as featureFlagSelectors } from '../../../../feature-flags'
 
 import type { FocusHandlers } from '../../types'
 
@@ -30,7 +28,6 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export const SourceDestFields = (props: Props): React.Node => {
-  const delayEnabled = useSelector(featureFlagSelectors.getEnableAirGapDelay)
   const { className, focusHandlers, prefix } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
@@ -55,27 +52,24 @@ export const SourceDestFields = (props: Props): React.Node => {
     </CheckboxRowField>
   )
 
-  const getDelayFields = () =>
-    delayEnabled ? (
-      <CheckboxRowField
-        name={addFieldNamePrefix('delay_checkbox')}
-        label={i18n.t('form.step_edit_form.field.delay.label')}
+  const getDelayFields = () => (
+    <CheckboxRowField
+      name={addFieldNamePrefix('delay_checkbox')}
+      label={i18n.t('form.step_edit_form.field.delay.label')}
+      className={styles.small_field}
+      tooltipComponent={i18n.t(
+        `tooltip.step_fields.defaults.${addFieldNamePrefix('delay_checkbox')}`
+      )}
+    >
+      <TextField
+        name={addFieldNamePrefix('delay_seconds')}
+        units={i18n.t('application.units.seconds')}
         className={styles.small_field}
-        tooltipComponent={i18n.t(
-          `tooltip.step_fields.defaults.${addFieldNamePrefix('delay_checkbox')}`
-        )}
-      >
-        <TextField
-          name={addFieldNamePrefix('delay_seconds')}
-          units={i18n.t('application.units.seconds')}
-          className={styles.small_field}
-          {...focusHandlers}
-        />
-        <TipPositionField
-          fieldName={addFieldNamePrefix('delay_mmFromBottom')}
-        />
-      </CheckboxRowField>
-    ) : null
+        {...focusHandlers}
+      />
+      <TipPositionField fieldName={addFieldNamePrefix('delay_mmFromBottom')} />
+    </CheckboxRowField>
+  )
 
   return (
     <div className={className}>
@@ -102,22 +96,6 @@ export const SourceDestFields = (props: Props): React.Node => {
             />
             {getMixFields()}
             {getDelayFields()}
-            {!delayEnabled && (
-              <CheckboxRowField
-                disabled
-                tooltipComponent={i18n.t('tooltip.not_in_beta')}
-                name="aspirate_airGap_checkbox"
-                label={i18n.t('form.step_edit_form.field.airGap.label')}
-                className={styles.small_field}
-              >
-                <TextField
-                  disabled
-                  name="aspirate_airGap_volume"
-                  units={i18n.t('application.units.microliter')}
-                  {...focusHandlers}
-                />
-              </CheckboxRowField>
-            )}
           </React.Fragment>
         )}
         {prefix === 'dispense' && (
@@ -155,7 +133,7 @@ export const SourceDestFields = (props: Props): React.Node => {
           </CheckboxRowField>
         )}
 
-        {prefix === 'aspirate' && delayEnabled && (
+        {prefix === 'aspirate' && (
           <CheckboxRowField
             tooltipComponent={i18n.t(
               `tooltip.step_fields.defaults.${addFieldNamePrefix(
