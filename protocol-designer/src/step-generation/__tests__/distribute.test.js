@@ -755,7 +755,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
 
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
-      console.log(JSON.stringify(res.commands, null, 4))
       expect(res.commands).toEqual([
         {
           command: 'aspirate',
