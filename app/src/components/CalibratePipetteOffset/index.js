@@ -1,5 +1,5 @@
 // @flow
-// Deck Calibration Orchestration Component
+// Pipette Offset Calibration Orchestration Component
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
@@ -20,48 +20,50 @@ import type {
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
-import { Introduction } from './Introduction'
-import { DeckSetup } from './DeckSetup'
-import { TipPickUp } from './TipPickUp'
-import { TipConfirmation } from './TipConfirmation'
-import { SaveZPoint } from './SaveZPoint'
-import { SaveXYPoint } from './SaveXYPoint'
-import { CompleteConfirmation } from './CompleteConfirmation'
-import { ConfirmExitModal } from './ConfirmExitModal'
-import styles from './styles.css'
+import { Introduction } from '../CalibrateDeck/Introduction'
+import { DeckSetup } from '../CalibrateDeck/DeckSetup'
+import { TipPickUp } from '../CalibrateDeck/TipPickUp'
+import { TipConfirmation } from '../CalibrateDeck/TipConfirmation'
+import { SaveZPoint } from '../CalibrateDeck/SaveZPoint'
+import { SaveXYPoint } from '../CalibrateDeck/SaveXYPoint'
+import { CompleteConfirmation } from '../CalibrateDeck/CompleteConfirmation'
+import { ConfirmExitModal } from '../CalibrateDeck/ConfirmExitModal'
+import styles from '../CalibrateDeck/styles.css'
 
-import type { CalibrateDeckParentProps, CalibrateDeckChildProps } from './types'
+import type {
+  CalibratePipetteOffsetParentProps,
+  CalibratePipetteOffsetChildProps,
+} from './types'
 
-const DECK_CALIBRATION_SUBTITLE = 'Deck calibration'
+const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
 const EXIT = 'exit'
 
 const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibrateDeckChildProps>,
+  [string]: React.ComponentType<CalibratePipetteOffsetChildProps>,
 } = {
-  [Sessions.DECK_STEP_SESSION_STARTED]: Introduction,
-  [Sessions.DECK_STEP_LABWARE_LOADED]: DeckSetup,
-  [Sessions.DECK_STEP_PREPARING_PIPETTE]: TipPickUp,
-  [Sessions.DECK_STEP_INSPECTING_TIP]: TipConfirmation,
-  [Sessions.DECK_STEP_JOGGING_TO_DECK]: SaveZPoint,
-  [Sessions.DECK_STEP_SAVING_POINT_ONE]: SaveXYPoint,
-  [Sessions.DECK_STEP_SAVING_POINT_TWO]: SaveXYPoint,
-  [Sessions.DECK_STEP_SAVING_POINT_THREE]: SaveXYPoint,
-  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
+  [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: Introduction,
+  [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: DeckSetup,
+  [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: TipPickUp,
+  [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: TipConfirmation,
+  [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: SaveZPoint,
+  [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: SaveXYPoint,
+  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
 const PANEL_STYLE_BY_STEP: {
   [string]: string,
 } = {
-  [Sessions.DECK_STEP_SESSION_STARTED]: styles.terminal_modal_contents,
-  [Sessions.DECK_STEP_LABWARE_LOADED]: styles.page_content_dark,
-  [Sessions.DECK_STEP_PREPARING_PIPETTE]: styles.modal_contents,
-  [Sessions.DECK_STEP_INSPECTING_TIP]: styles.modal_contents,
-  [Sessions.DECK_STEP_JOGGING_TO_DECK]: styles.modal_contents,
-  [Sessions.DECK_STEP_SAVING_POINT_ONE]: styles.modal_contents,
-  [Sessions.DECK_STEP_SAVING_POINT_TWO]: styles.modal_contents,
-  [Sessions.DECK_STEP_SAVING_POINT_THREE]: styles.modal_contents,
-  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: styles.terminal_modal_contents,
+  [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: styles.terminal_modal_contents,
+  [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: styles.page_content_dark,
+  [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: styles.modal_contents,
+  [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: styles.modal_contents,
+  [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: styles.modal_contents,
+  [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: styles.modal_contents,
+  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]:
+    styles.terminal_modal_contents,
 }
-export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
+export function CalibratePipetteOffset(
+  props: CalibratePipetteOffsetParentProps
+): React.Node {
   const { session, robotName, closeWizard } = props
   const { currentStep, instrument, labware } = session?.details || {}
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
@@ -117,7 +119,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
   }
 
   const titleBarProps = {
-    title: DECK_CALIBRATION_SUBTITLE,
+    title: PIPETTE_OFFSET_CALIBRATION_SUBTITLE,
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 

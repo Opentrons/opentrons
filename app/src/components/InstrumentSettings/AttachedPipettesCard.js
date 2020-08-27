@@ -54,12 +54,14 @@ export function AttachedPipettesCard(props: Props): React.Node {
     <Card title={PIPETTES}>
       <CardContentFlex>
         <PipetteInfo
+          robotName={robotName}
           mount={LEFT}
           pipette={pipettes.left}
           changeUrl={makeChangeUrl(LEFT)}
           settingsUrl={settings.left ? makeConfigureUrl(LEFT) : null}
         />
         <PipetteInfo
+          robotName={robotName}
           mount={RIGHT}
           pipette={pipettes.right}
           changeUrl={makeChangeUrl(RIGHT)}

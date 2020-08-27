@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING, Any, Dict
 from pydantic import BaseModel, Field
 
 from ..helper_classes import AttachedPipette, RequiredLabware, NextSteps
@@ -20,7 +20,7 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
     currentStep: str = Field(
         ...,
         description="Current step of pipette offset user flow")
-    nextSteps: Optional[NextSteps] =\
+    nextSteps: Optional['NextSteps'] =\
         Field(None, description="Next Available Steps in Session")
     labware: List[RequiredLabware]
 

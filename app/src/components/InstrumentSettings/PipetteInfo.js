@@ -9,10 +9,12 @@ import {
   InstrumentDiagram,
 } from '@opentrons/components'
 import styles from './styles.css'
+import { PipetteOffsetCalibrationControl } from './PipetteOffsetCalibrationControl'
 
 import type { Mount, AttachedPipette } from '../../pipettes/types'
 
 export type PipetteInfoProps = {|
+  robotName: string,
   mount: Mount,
   pipette: AttachedPipette | null,
   changeUrl: string,
@@ -27,7 +29,7 @@ const LABEL_BY_MOUNT = {
 const SERIAL_NUMBER = 'Serial number'
 
 export function PipetteInfo(props: PipetteInfoProps): React.Node {
-  const { mount, pipette, changeUrl, settingsUrl } = props
+  const { robotName, mount, pipette, changeUrl, settingsUrl } = props
   const label = LABEL_BY_MOUNT[mount]
   const displayName = pipette ? pipette.modelSpecs.displayName : null
   const serialNumber = pipette ? pipette.id : null
@@ -62,6 +64,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
             settings
           </OutlineButton>
         )}
+        <PipetteOffsetCalibrationControl robotName={robotName} mount={mount} />
       </div>
       <div className={styles.image}>
         {channels && (

@@ -3,6 +3,7 @@
 export * from './calibration-check/constants'
 export * from './tip-length-calibration/constants'
 export * from './deck-calibration/constants'
+export * from './pipette-offset-calibration/constants'
 
 export const SESSIONS_PATH: '/sessions' = '/sessions'
 
@@ -64,3 +65,5 @@ export const SESSION_TYPE_TIP_LENGTH_CALIBRATION: 'tipLengthCalibration' =
   'tipLengthCalibration'
 export const SESSION_TYPE_DECK_CALIBRATION: 'deckCalibration' =
   'deckCalibration'
+export const SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION: 'pipetteOffsetCalibration' =
+  'pipetteOffsetCalibration'
