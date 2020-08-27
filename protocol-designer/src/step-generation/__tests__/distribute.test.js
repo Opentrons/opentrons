@@ -752,6 +752,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        // mix (asp)
         {
           command: 'aspirate',
           params: {
@@ -786,6 +787,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             wait: 12,
           },
         },
+        // aspirate
         {
           command: 'aspirate',
           params: {
@@ -816,6 +818,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             wait: 11,
           },
         },
+        // touch tip (asp)
         {
           command: 'touchTip',
           params: {
@@ -825,6 +828,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             offsetFromBottomMm: 14.5,
           },
         },
+        // air gap
         {
           command: 'airGap',
           params: {
@@ -842,6 +846,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             wait: 11,
           },
         },
+        // dispense #1
         {
           command: 'dispenseAirGap',
           params: {
@@ -889,6 +894,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             wait: 12,
           },
         },
+        // touch tip (disp #1)
         {
           command: 'touchTip',
           params: {
@@ -898,6 +904,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             offsetFromBottomMm: 3.4,
           },
         },
+        // dispense #2
         {
           command: 'dispense',
           params: {
@@ -928,6 +935,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             wait: 12,
           },
         },
+        // touch tip (disp #2)
         {
           command: 'touchTip',
           params: {
@@ -937,6 +945,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
             offsetFromBottomMm: 3.4,
           },
         },
+        // blowout
         {
           command: 'blowout',
           params: {
