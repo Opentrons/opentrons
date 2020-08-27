@@ -1,13 +1,19 @@
+from __future__ import annotations
 import asyncio
 import copy
 import logging
 from threading import Event
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Union, Sequence
+from typing import (Dict, Optional, List, Tuple,
+                    TYPE_CHECKING, Sequence, cast)
 from contextlib import contextmanager
+
+from opentrons_shared_data.pipette import dummy_model_for_name
+
 from opentrons import types
 from opentrons.config.pipette_config import (config_models,
                                              config_names,
-                                             configs)
+                                             configs,
+                                             load)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
@@ -20,29 +26,14 @@ if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
         PipetteName, PipetteModel
     )
-    from .dev_types import RegisterModules, AttachedInstrument  # noqa (F501)
+    from .dev_types import (
+        RegisterModules, AttachedInstrument,
+        AttachedInstruments, InstrumentSpec)
     from opentrons.drivers.rpi_drivers.dev_types\
         import GPIODriverLike  # noqa(F501)
 
 
 MODULE_LOG = logging.getLogger(__name__)
-
-
-def find_config(prefix: str) -> 'PipetteModel':
-    """ Find the most recent config matching `prefix` """
-    if prefix in config_models:
-        return prefix  # type: ignore
-
-    # We need to check for the nickname of pipettes if the prefix given
-    # is not the exact model. This is because gen2 nicknames are not
-    # subsets of gen2 pipette model strings.
-    matches = [conf for conf in config_models
-               if configs[conf]['name'].startswith(prefix)]
-
-    if not matches:
-        raise KeyError('No match found for prefix {}'.format(prefix))
-    else:
-        return sorted(matches)[0]
 
 
 _HOME_POSITION = {'X': 418.0, 'Y': 353.0, 'Z': 218.0,
@@ -100,13 +91,13 @@ class Simulator:
 
         def _sanitize_attached_instrument(
                 passed_ai: Dict[str, Optional[str]] = None)\
-                -> 'AttachedInstrument':
+                -> InstrumentSpec:
             if not passed_ai or not passed_ai.get('model'):
                 return {'model': None, 'id': None}
             if passed_ai['model'] in config_models:
                 return passed_ai  # type: ignore
             if passed_ai['model'] in config_names:
-                return {'model': passed_ai['model'] + '_v1',   # type: ignore
+                return {'model': dummy_model_for_name(passed_ai['model']),   # type: ignore
                         'id': passed_ai.get('id')}
             raise KeyError(
                 'If you specify attached_instruments, the model '
@@ -132,7 +123,7 @@ class Simulator:
         self._gpio_chardev = SimulatingGPIOCharDev('gpiochip0')
 
     @property
-    def gpio_chardev(self) -> 'GPIODriverLike':
+    def gpio_chardev(self) -> GPIODriverLike:
         return self._gpio_chardev
 
     async def setup_gpio_chardev(self):
@@ -164,10 +155,53 @@ class Simulator:
             self._engaged_axes[ax] = True
         return self._position
 
+    def _attached_to_mount(
+            self,
+            mount: types.Mount,
+            expected_instr: Optional[PipetteName]
+    ) -> AttachedInstrument:
+        init_instr = self._attached_instruments.get(
+            mount,
+            {'model': None, 'id': None})
+        found_model = init_instr['model']
+        back_compat: List['PipetteName'] = []
+        if found_model:
+            back_compat = configs[found_model].get('backCompatNames', [])
+        if expected_instr and found_model\
+                and (not found_model.startswith(expected_instr)
+                     and expected_instr not in back_compat):
+            if self._strict_attached:
+                raise RuntimeError(
+                    'mount {}: expected instrument {} but got {}'
+                    .format(mount.name, expected_instr, found_model))
+            else:
+                return {
+                    'config': load(dummy_model_for_name(expected_instr)),
+                    'id': None}
+        elif found_model and expected_instr:
+            # Instrument detected matches instrument expected (note:
+            # "instrument detected" means passed as an argument to the
+            # constructor of this class)
+            return {'config': load(found_model, init_instr['id']),
+                    'id': init_instr['id']}
+        elif found_model:
+            # Instrument detected and no expected instrument specified
+            return {'config': load(found_model, init_instr['id']),
+                    'id': init_instr['id']}
+        elif expected_instr:
+            # Expected instrument specified and no instrument detected
+            return {
+                'config': load(dummy_model_for_name(expected_instr)),
+                'id': None}
+        else:
+            # No instrument detected or expected
+            return {
+                'config': None,
+                'id': None}
+
     def get_attached_instruments(
-            self, expected: Dict[types.Mount,
-                                 Union['PipetteModel', 'PipetteName']])\
-            -> Dict[types.Mount, 'AttachedInstrument']:
+            self, expected: Dict[types.Mount, PipetteName]
+    ) -> AttachedInstruments:
         """ Update the internal cache of attached instruments.
 
         This method allows after-init-time specification of attached simulated
@@ -186,58 +220,15 @@ class Simulator:
         :raises RuntimeError: If an instrument is expected but not found.
         :returns: A dict of mount to either instrument model names or `None`.
         """
-        to_return: Dict[types.Mount, 'AttachedInstrument'] = {}
-        allowed: List[Union['PipetteName', 'PipetteModel']]\
-            = config_models + config_names  # type: ignore
-        for mount in types.Mount:
-
-            expected_instr = expected.get(mount, None)
-            if expected_instr and expected_instr not in allowed:
-                raise RuntimeError(
-                    f'mount {mount.name}: invalid pipette type'
-                    f' {expected_instr}')
-            init_instr = self._attached_instruments.get(
-                mount,
-                {'model': None, 'id': None})
-            found_model = init_instr['model']
-            back_compat: List['PipetteName'] = []
-            if found_model:
-                back_compat = configs[found_model].get('backCompatNames', [])
-            if expected_instr and found_model\
-                    and (not found_model.startswith(expected_instr)
-                         and expected_instr not in back_compat):
-                if self._strict_attached:
-                    raise RuntimeError(
-                        'mount {}: expected instrument {} but got {}'
-                        .format(mount.name, expected_instr, found_model))
-                else:
-                    to_return[mount] = {
-                        'model': find_config(expected_instr),
-                        'id': None}
-            elif found_model and expected_instr:
-                # Instrument detected matches instrument expected (note:
-                # "instrument detected" means passed as an argument to the
-                # constructor of this class)
-                to_return[mount] = init_instr
-            elif found_model:
-                # Instrument detected and no expected instrument specified
-                to_return[mount] = init_instr
-            elif expected_instr:
-                # Expected instrument specified and no instrument detected
-                to_return[mount] = {
-                    'model': find_config(expected_instr),
-                    'id': None}
-            else:
-                # No instrument detected or expected
-                to_return[mount] = {
-                    'model': None,
-                    'id': None}
-        return to_return
+        return {
+            mount: self._attached_to_mount(mount, expected.get(mount))
+            for mount in types.Mount
+        }
 
     def set_active_current(self, axis_currents: Dict[Axis, float]):
         pass
 
-    async def watch_modules(self, register_modules: 'RegisterModules'):
+    async def watch_modules(self, register_modules: RegisterModules):
         new_mods_at_ports = [
             modules.ModuleAtPort(
                 port=f'/dev/ot_module_sim_{mod}{str(idx)}', name=mod)

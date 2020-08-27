@@ -141,7 +141,8 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
         return mount, value
 
     sim = await hc.API.build_hardware_simulator(loop=loop)
-    # With nothing specified at init or expected, we should have nothing
+    # With nothing specified at init or expected, we should have nothing afterwards
+    # and nothing should have been reconfigured
     sim._backend._smoothie_driver.update_steps_per_mm = mock.Mock(fake_func1)
     sim._backend._smoothie_driver.update_pipette_config = mock.Mock(fake_func2)
     sim._backend._smoothie_driver.set_dwelling_current = mock.Mock(fake_func1)
@@ -150,30 +151,20 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     attached = sim.attached_instruments
     assert attached == {
         types.Mount.LEFT: {}, types.Mount.RIGHT: {}}
-    steps_mm_calls = [mock.call({'B': 768}), mock.call({'C': 768})]
-    pip_config_calls = [
-        mock.call('Z', {'home': 220}),
-        mock.call('A', {'home': 220}),
-        mock.call('B', {'max_travel': 30}),
-        mock.call('C', {'max_travel': 30})]
-    current_calls = [mock.call({'B': 0.05}), mock.call({'C': 0.05})]
-    sim._backend._smoothie_driver.update_steps_per_mm.assert_has_calls(
-        steps_mm_calls, any_order=True)
-    sim._backend._smoothie_driver.update_pipette_config.assert_has_calls(
-        pip_config_calls, any_order=True)
-    sim._backend._smoothie_driver.set_dwelling_current.assert_has_calls(
-        current_calls, any_order=True)
+    sim._backend._smoothie_driver.update_steps_per_mm.assert_not_called()
+    sim._backend._smoothie_driver.update_pipette_config.assert_not_called()
+    sim._backend._smoothie_driver.set_dwelling_current.assert_not_called()
 
     sim._backend._smoothie_driver.update_steps_per_mm.reset_mock()
     sim._backend._smoothie_driver.update_pipette_config.reset_mock()
     # When we expect instruments, we should get what we expect since nothing
     # was specified at init time
     await sim.cache_instruments(
-        {types.Mount.LEFT: 'p10_single_v1.3',
-         types.Mount.RIGHT: 'p300_single_v2.0'})
+        {types.Mount.LEFT: 'p10_single',
+         types.Mount.RIGHT: 'p300_single_gen2'})
     attached = sim.attached_instruments
     assert attached[types.Mount.LEFT]['model']\
-        == 'p10_single_v1.3'
+        == 'p10_single_v1'
     assert attached[types.Mount.LEFT]['name']\
         == 'p10_single'
 
@@ -190,8 +181,8 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
         pip_config_calls, any_order=True)
 
     await sim.cache_instruments(
-        {types.Mount.LEFT: 'p10_single_v1.3',
-         types.Mount.RIGHT: 'p300_multi_v2.0'})
+        {types.Mount.LEFT: 'p10_single',
+         types.Mount.RIGHT: 'p300_multi_gen2'})
     current_calls = [mock.call({'B': 0.05}), mock.call({'C': 0.3})]
     sim._backend._smoothie_driver.set_dwelling_current.assert_has_calls(
         current_calls, any_order=True)
@@ -226,10 +217,8 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
 
     with pytest.raises(RuntimeError):
-        # When we say prefixes we really mean names or models should
-        # equally work with some special casing for gen2; if you do
-        # just some arbitrary stuff that happens to be a prefix, that
-        # absolutely should not work
+        # If you pass something that isn't a pipette name it absolutely
+        # should not work
         await sim.cache_instruments({types.Mount.LEFT: 'p10_sing'})
 
 

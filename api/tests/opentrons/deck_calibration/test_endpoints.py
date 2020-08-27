@@ -23,8 +23,7 @@ async def test_add_and_remove_tip(dc_session, instruments):
     hardware = dc_session.adapter
     hardware.reset()
     hardware.cache_instruments({
-        types.Mount.LEFT: 'p10_single_v1',
-        types.Mount.RIGHT: None})
+        types.Mount.LEFT: 'p10_single'})
     pip = hardware.attached_instruments[types.Mount.LEFT]
     dc_session.current_mount = types.Mount.LEFT
     mount = dc_session.current_mount
@@ -67,8 +66,7 @@ async def test_save_xy(dc_session, instruments):
     mount = types.Mount.LEFT
     hardware.reset()
     hardware.cache_instruments({
-        mount: 'p10_single_v1',
-        types.Mount.RIGHT: None})
+        mount: 'p10_single'})
     pip = hardware.attached_instruments[mount]
     dc_session.pipettes = {mount: pip}
     dc_session.current_mount = mount
@@ -108,8 +106,7 @@ async def test_save_z(dc_session, monkeypatch, instruments):
     mount = types.Mount.LEFT
     hardware.reset()
     hardware.cache_instruments({
-        mount: 'p10_single_v1',
-        types.Mount.RIGHT: None})
+        mount: 'p10_single'})
     pip = hardware.attached_instruments[mount]
     dc_session.pipettes = {mount: pip}
     dc_session.current_mount = mount
@@ -194,7 +191,14 @@ async def test_transform_calculation(dc_session, monkeypatch):
 
 
 # ------------ Session and token tests ----------------------
-async def test_create_session(hardware, monkeypatch):
+@pytest.mark.parametrize('left,right,correct', [
+        ('p300_multi_v1', 'p10_single_v1', 'p10_single_v1'),
+        ('p300_single_v1', 'p10_single_v1', 'p10_single_v1'),
+        ('p10_multi_v1', 'p300_multi_v1', 'p300_multi_v1'),
+        (None, 'p10_single_v1', 'p10_single_v1'),
+        ('p300_multi_v1', None, 'p300_multi_v1'),
+        ('p10_single_v1', 'p300_multi_v1', 'p10_single_v1')])
+async def test_create_session(hardware, monkeypatch, left, right, correct):
     """
     Tests that the call to initiate a session manager for factory
     calibration returns a good token, along with the correct preferred pipette
@@ -207,21 +211,17 @@ async def test_create_session(hardware, monkeypatch):
     monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
 
     # each tuple in this list is (left-mount, right-mount, correct-choice)
-    pipette_combinations = [
-        ('p300_multi_v1', 'p10_single_v1', 'p10_single_v1'),
-        ('p300_single_v1', 'p10_single_v1', 'p10_single_v1'),
-        ('p10_multi_v1', 'p300_multi_v1', 'p300_multi_v1'),
-        (None, 'p10_single_v1', 'p10_single_v1'),
-        ('p300_multi_v1', None, 'p300_multi_v1'),
-        ('p10_single_v1', 'p300_multi_v1', 'p10_single_v1')]
-    for left_model, right_model, preferred in pipette_combinations:
-        await hardware.cache_instruments(
-            {types.Mount.LEFT: left_model, types.Mount.RIGHT: right_model})
-        resp = await endpoints.create_session(False, hardware)
-        endpoints.session_wrapper.session = None
 
-        assert resp.token == dummy_token
-        assert resp.pipette.get('model') == preferred
+    hardware.managed_obj._backend._attached_instruments = {
+        types.Mount.LEFT: {'model': left, 'id': None},
+        types.Mount.RIGHT: {'model': right, 'id': None}
+    }
+    await hardware.cache_instruments()
+    resp = await endpoints.create_session(False, hardware)
+    endpoints.session_wrapper.session = None
+
+    assert resp.token == dummy_token
+    assert resp.pipette.get('model') == correct
 
 
 async def test_create_session_fail(monkeypatch, hardware):
@@ -277,8 +277,7 @@ async def test_release(hardware, monkeypatch, dc_session):
 
     # Set up pipettes
     await hardware.cache_instruments({
-        types.Mount.LEFT:  None,
-        types.Mount.RIGHT: 'p300_multi_v1'
+        types.Mount.RIGHT: 'p300_multi'
     })
 
     # Create a new session
@@ -359,10 +358,10 @@ async def test_set_and_jog_integration(hardware, monkeypatch):
 
     Then jog requests will work as expected.
     """
-    test_model = 'p300_multi_v1'
+    test_model = 'p300_multi'
     # Why does this need to be awaited for a synch adapter
     await hardware.cache_instruments(
-        {types.Mount.LEFT: None, types.Mount.RIGHT: test_model})
+        {types.Mount.RIGHT: test_model})
 
     dummy_token = 'Test Token'
 

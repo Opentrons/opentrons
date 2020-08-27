@@ -238,8 +238,7 @@ async def dc_session(request, hardware, monkeypatch, loop):
     Mock session manager for deck calibation
     """
     await hardware.cache_instruments({
-        types.Mount.LEFT: None,
-        types.Mount.RIGHT: 'p300_multi_v1'})
+        types.Mount.RIGHT: 'p300_multi'})
     ses = endpoints.SessionManager(hardware)
     endpoints.session_wrapper.session = ses
     yield ses

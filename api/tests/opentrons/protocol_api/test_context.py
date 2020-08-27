@@ -7,14 +7,13 @@ import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.pipette import name_for_model
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
-from opentrons.config.pipette_config import config_models
 from opentrons.protocol_api import paired_instrument_context as paired
 from opentrons.protocols.advanced_control import transfers as tf
+from opentrons.config.pipette_config import config_names
 from opentrons.protocols.types import APIVersion
 from opentrons.calibration_storage import get, types as cs_types
 
@@ -53,18 +52,16 @@ def get_labware_def(monkeypatch):
     monkeypatch.setattr(papi.labware, 'get_labware_definition', dummy_load)
 
 
-def test_load_instrument(loop):
+@pytest.mark.parametrize('name', config_names)
+def test_load_instrument(loop, name):
     ctx = papi.ProtocolContext(loop=loop)
     assert ctx.loaded_instruments == {}
-    for model in config_models:
-        loaded = ctx.load_instrument(model, Mount.LEFT, replace=True)
-        assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
-        assert loaded.model == model
-        instr_name = name_for_model(model)
-        loaded = ctx.load_instrument(instr_name, Mount.RIGHT, replace=True)
-        assert loaded.name == instr_name
-        assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
-
+    loaded = ctx.load_instrument(name, Mount.LEFT, replace=True)
+    assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
+    assert loaded.name == name
+    loaded = ctx.load_instrument(name, Mount.RIGHT, replace=True)
+    assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
+    assert loaded.name == name
 
 async def test_motion(loop, hardware):
     ctx = papi.ProtocolContext(loop)

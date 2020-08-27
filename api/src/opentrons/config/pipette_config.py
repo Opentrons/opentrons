@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass
 import logging
 import json
@@ -39,14 +40,14 @@ class PipetteConfig:
     drop_tip_speed: float
     min_volume: float
     max_volume: float
-    ul_per_mm: 'UlPerMm'
-    quirks: List['Quirk']
+    ul_per_mm: UlPerMm
+    quirks: List[Quirk]
     tip_length: float  # TODO(seth): remove
     # TODO: Replace entirely with tip length calibration
     tip_overlap: Dict[str, float]
     display_name: str
-    name: 'PipetteName'
-    back_compat_names: List['PipetteName']
+    name: PipetteName
+    back_compat_names: List[PipetteName]
     return_tip_height: float
     blow_out_flow_rate: float
     max_travel: float
@@ -56,6 +57,7 @@ class PipetteConfig:
     default_blow_out_flow_rates: Dict[str, float]
     default_aspirate_flow_rates: Dict[str, float]
     default_dispense_flow_rates: Dict[str, float]
+    model: PipetteModel
 
 
 # Notes:
@@ -92,7 +94,7 @@ VALID_QUIRKS = model_config()['validQuirks']
 
 
 def load(
-        pipette_model: 'PipetteModel',
+        pipette_model: PipetteModel,
         pipette_id: str = None) -> PipetteConfig:
     """
     Load pipette config data
@@ -209,6 +211,7 @@ def load(
         default_aspirate_flow_rates=cfg['defaultAspirateFlowRate'].get(
             'valuesByApiLevel',
             {'2.0': cfg['defaultAspirateFlowRate']['value']}),
+        model=pipette_model,
     )
 
     return res
@@ -281,7 +284,7 @@ def override(pipette_id: str, fields: TypeOverrides):
 
 def save_overrides(pipette_id: str,
                    overrides: TypeOverrides,
-                   model: 'PipetteModel'):
+                   model: PipetteModel):
     """
     Save overrides for the pipette.
 
@@ -362,7 +365,7 @@ def validate_quirks(quirks: List[str]):
 
 
 def ensure_value(
-        config: 'PipetteFusedSpec',
+        config: PipetteFusedSpec,
         name: Union[str, Tuple[str, ...]],
         mutable_config_list: List[str]):
     """

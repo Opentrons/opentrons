@@ -5,13 +5,14 @@ import pathlib
 from collections import OrderedDict
 from typing import (Any, Dict, Union, List, Optional, Tuple,
                     TYPE_CHECKING, cast, overload, Sequence)
+from opentrons.config.pipette_config import PipetteConfig
 
-from opentrons_shared_data.pipette import name_for_model
+from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.util import linal
 from functools import lru_cache
 from opentrons.config import (
-    robot_configs, pipette_config, feature_flags as ff)
+    robot_configs, feature_flags as ff)
 from opentrons.drivers.types import MoveSplit
 
 from .util import use_or_initialize_loop, DeckTransformState
@@ -30,7 +31,7 @@ from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
-        UlPerMmAction, PipetteModel, PipetteName
+        UlPerMmAction, PipetteName
     )
     from .dev_types import PipetteDict
 
@@ -340,20 +341,46 @@ class API(HardwareAPILike):
             await self._execution_manager.register_cancellable_task(delay_task)
         self.resume()
 
+    @staticmethod
+    def _may_skip_instr_config(
+            config: Optional[PipetteConfig],
+            attached: Optional[Pipette],
+            requested: Optional['PipetteName'],
+            serial: Optional[str]) -> bool:
+        if not config and not attached:
+            # nothing attached now, nothing used to be attached, nothing
+            # to reconfigure
+            return True
+
+        if config and attached:
+            # something was attached and something is attached. are they
+            # the same? we can tell by comparing serials
+            if serial == attached.pipette_id:
+                if requested:
+                    # if there is an explicit instrument request, in addition
+                    # to checking if the old and new responses are the same
+                    # we also have to make sure the old pipette is properly
+                    # configured to the request
+                    if requested == attached.acting_as:
+                        # no reconfiguration necessary
+                        return True
+                else:
+                    # if there is no request, make sure that the old pipette
+                    # did not have backcompat applied
+                    if attached.acting_as == attached.name:
+                        return True
+        return False
+
     async def cache_instruments(
             self,
-            require: Dict[
-                top_types.Mount, Union['PipetteModel', 'PipetteName']] = {}):
+            require: Dict[top_types.Mount, 'PipetteName'] = None):
         """
          - Get the attached instrument on each mount and
          - Cache their pipette configs from pipette-config.json
 
         :param require: If specified, the require should be a dict
-                        of mounts to instrument identifier describing
-                        the instruments expected to be present. This
-                        identifier can be either an instrument name or
-                        the more specific instrument model string
-                        (e.g. 'p10_single' or 'p10_single_v1.3'). This can
+                        of mounts to instrument names describing
+                        the instruments expected to be present. This can
                         save a subsequent of :py:attr:`attached_instruments`
                         and also serves as the hook for the hardware
                         simulator to decide what is attached.
@@ -361,27 +388,33 @@ class API(HardwareAPILike):
 
         """
         self._log.info("Updating instrument model cache")
-        found = self._backend.get_attached_instruments(require or {})
+        checked_require = require or {}
+        for mount, name in checked_require.items():
+            if name not in name_config():
+                raise RuntimeError(f'{name} is not a valid pipette name')
+        found = self._backend.get_attached_instruments(checked_require)
 
         for mount, instrument_data in found.items():
-            model = instrument_data.get('model')
-            req_instr = require.get(mount, None)
-            back_compat: List['PipetteName'] = []
+            config = instrument_data.get('config')
+            req_instr = checked_require.get(mount, None)
+            if self._may_skip_instr_config(
+                    config,
+                    self._attached_instruments[mount],
+                    req_instr,
+                    instrument_data.get('id')):
+                continue
+
             mount_axis = Axis.by_mount(mount)
             plunger_axis = Axis.of_plunger(mount)
             splits: Dict[str, MoveSplit] = {}
-            if model:
+            if config:
                 p = Pipette(
-                    model,
+                    config,
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
-                back_compat = p.config.back_compat_names
-                if req_instr and req_instr in back_compat:
-                    name_conf = pipette_config.name_config()
-                    bc_conf = name_conf[req_instr]  # type: ignore
-                    p.working_volume = bc_conf['maxVolume']
-                    p.update_config_item('min_volume', bc_conf['minVolume'])
-                    p.update_config_item('max_volume', bc_conf['maxVolume'])
+
+                if req_instr:
+                    p.act_as(req_instr)
 
                 self._attached_instruments[mount] = p
                 home_pos = p.config.home_position
@@ -396,19 +429,7 @@ class API(HardwareAPILike):
                         after_time=1800,
                         fullstep=True)
 
-            if req_instr and not self.is_simulator:
-                if not model:
-                    raise RuntimeError(
-                        f'mount {mount}: instrument {req_instr} was'
-                        f' requested, but no instrument is present')
-                name = name_for_model(model)
-                if req_instr not in (name, model)\
-                        and req_instr not in back_compat:
-                    raise RuntimeError(f'mount {mount}: instrument'
-                                       f' {req_instr} was requested'
-                                       f' but {model} is present')
-
-            if not model:
+            if not config:
                 self._attached_instruments[mount] = None
                 home_pos = self._config.default_pipette_configs['homePosition']
                 max_travel = self._config.default_pipette_configs['maxTravel']
