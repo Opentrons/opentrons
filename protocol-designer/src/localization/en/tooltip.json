@@ -22,7 +22,7 @@
       "dispense_mix_checkbox": "Pipette up and down after dispensing",
       "aspirate_tipPosition": "Where in the well the pipette aspirates from",
       "dispense_tipPosition": "Where in the well the pipette dispenses to",
-      "aspirate_delay_checkbox": "Delay pipette movement after each aspirate in this step",
+      "aspirate_delay_checkbox": "Delay pipette movement after each aspirate in this step, including any Air Gap",
       "dispense_delay_checkbox": "Delay pipette movement after each dispense in this step",
 
       "blowout_checkbox": "Where to dispose of remaining volume in tip",
