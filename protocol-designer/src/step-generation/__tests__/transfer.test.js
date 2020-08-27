@@ -891,6 +891,7 @@ describe('advanced options', () => {
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        // Pre-wet
         {
           command: 'aspirate',
           params: {
@@ -925,6 +926,7 @@ describe('advanced options', () => {
             wait: 12,
           },
         },
+        // mix (asp)
         {
           command: 'aspirate',
           params: {
@@ -959,6 +961,7 @@ describe('advanced options', () => {
             wait: 12,
           },
         },
+        // aspirate
         {
           command: 'aspirate',
           params: {
@@ -989,6 +992,7 @@ describe('advanced options', () => {
             wait: 11,
           },
         },
+        // touch tip (asp)
         {
           command: 'touchTip',
           params: {
@@ -998,6 +1002,7 @@ describe('advanced options', () => {
             offsetFromBottomMm: 14.5,
           },
         },
+        // air gap
         {
           command: 'airGap',
           params: {
@@ -1015,6 +1020,7 @@ describe('advanced options', () => {
             wait: 11,
           },
         },
+        // dispense
         {
           command: 'dispenseAirGap',
           params: {
@@ -1062,6 +1068,7 @@ describe('advanced options', () => {
             wait: 12,
           },
         },
+        // mix (disp)
         {
           command: 'aspirate',
           params: {
@@ -1096,6 +1103,7 @@ describe('advanced options', () => {
             wait: 12,
           },
         },
+        // touch tip (disp)
         {
           command: 'touchTip',
           params: {
@@ -1105,6 +1113,7 @@ describe('advanced options', () => {
             offsetFromBottomMm: 3.4,
           },
         },
+        // blowout
         {
           command: 'blowout',
           params: {
@@ -1115,6 +1124,9 @@ describe('advanced options', () => {
             offsetFromBottomMm: 80.3,
           },
         },
+        // next chunk from A1: remaining volume
+        // do not pre-wet
+        // mix (asp)
         {
           command: 'aspirate',
           params: {
@@ -1149,6 +1161,7 @@ describe('advanced options', () => {
             wait: 12,
           },
         },
+        // aspirate 81 (= total vol 350 - prev transfer's 269)
         {
           command: 'aspirate',
           params: {
@@ -1179,6 +1192,7 @@ describe('advanced options', () => {
             wait: 11,
           },
         },
+        // touch tip (asp)
         {
           command: 'touchTip',
           params: {
@@ -1188,6 +1202,7 @@ describe('advanced options', () => {
             offsetFromBottomMm: 14.5,
           },
         },
+        // air gap
         {
           command: 'airGap',
           params: {
@@ -1205,6 +1220,7 @@ describe('advanced options', () => {
             wait: 11,
           },
         },
+        // dispense air gap then liquid
         {
           command: 'dispenseAirGap',
           params: {
@@ -1252,6 +1268,7 @@ describe('advanced options', () => {
             wait: 12,
           },
         },
+        // mix (disp)
         {
           command: 'aspirate',
           params: {
@@ -1286,6 +1303,7 @@ describe('advanced options', () => {
             wait: 12,
           },
         },
+        // touch tip (disp)
         {
           command: 'touchTip',
           params: {
@@ -1295,6 +1313,7 @@ describe('advanced options', () => {
             offsetFromBottomMm: 3.4,
           },
         },
+        // blowout
         {
           command: 'blowout',
           params: {
