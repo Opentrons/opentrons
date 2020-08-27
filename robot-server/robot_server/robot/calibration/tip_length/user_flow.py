@@ -86,7 +86,7 @@ class TipCalibrationUserFlow:
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CalibrationCommand.save_offset: self.save_offset,
             TipLengthCalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
-            TipLengthCalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,  # noqa: E501
+            CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
         }
 
@@ -191,10 +191,9 @@ class TipCalibrationUserFlow:
         overlap = overlap_dict.get(tiprack.uri, default)
         return full_length - overlap
 
-    def _get_critical_point(self):
+    def _get_critical_point_override(self) -> Optional[CriticalPoint]:
         return (CriticalPoint.FRONT_NOZZLE if
-                self._hw_pipette.config.channels == 8 else
-                self._hw_pipette.critical_point)
+                self._hw_pipette.config.channels == 8 else None)
 
     async def _get_current_point(self):
         return await self._hardware.gantry_position(self._mount)
@@ -210,6 +209,7 @@ class TipCalibrationUserFlow:
         await uf.invalidate_tip(self)
 
     async def exit_session(self):
+        await self.move_to_tip_rack()
         await self._return_tip()
 
     def _get_tip_rack_lw(self) -> labware.Labware:

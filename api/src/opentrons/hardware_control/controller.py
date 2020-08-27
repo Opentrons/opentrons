@@ -1,7 +1,8 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
+from typing import (Any, Dict, List, Optional,
+                    Tuple, TYPE_CHECKING, Union, Sequence)
 try:
     import aionotify  # type: ignore
 except OSError:
@@ -15,7 +16,7 @@ from opentrons.types import Mount
 
 from . import modules
 from .execution_manager import ExecutionManager
-from .types import BoardRevision
+from .types import BoardRevision, Axis
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
@@ -108,8 +109,11 @@ class Controller:
             args = tuple()
         return self._smoothie_driver.home(*args)
 
-    def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
-        return self._smoothie_driver.fast_home(axis, margin)
+    def fast_home(
+            self, axes: Sequence[str],
+            margin: float) -> Dict[str, float]:
+        converted_axes = ''.join(axes)
+        return self._smoothie_driver.fast_home(converted_axes, margin)
 
     def get_attached_instruments(
             self, expected: Dict[Mount, Union['PipetteModel', 'PipetteName']])\
@@ -141,13 +145,14 @@ class Controller:
                 'id': found_id}
         return to_return
 
-    def set_active_current(self, axis, amp):
+    def set_active_current(self, axis_currents: Dict[Axis, float]):
         """
         This method sets only the 'active' current, i.e., the current for an
         axis' movement. Smoothie driver automatically resets the current for
         pipette axis to a low current (dwelling current) after each move
         """
-        self._smoothie_driver.set_active_current({axis.name: amp})
+        self._smoothie_driver.set_active_current(
+            {axis.name: amp for axis, amp in axis_currents.items()})
 
     @contextmanager
     def save_current(self):

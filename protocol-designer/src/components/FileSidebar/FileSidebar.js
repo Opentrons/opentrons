@@ -16,6 +16,7 @@ import modalStyles from '../modals/modal.css'
 import { getUnusedEntities } from './utils'
 import styles from './FileSidebar.css'
 
+import type { HintKey } from '../../tutorial'
 import type { PDProtocolFile } from '../../file-types'
 import type {
   InitialDeckSetup,
@@ -36,7 +37,7 @@ type Props = {|
   pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
   modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
   savedStepForms: SavedStepFormState,
-  isV4Protocol: boolean,
+  schemaVersion: number,
 |}
 
 const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
@@ -153,6 +154,16 @@ export const v4WarningContent: React.Node = (
   </div>
 )
 
+export const v5WarningContent: React.Node = (
+  <div>
+    <p>
+      {i18n.t(`alert.hint.export_v5_protocol_3_20.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v5_protocol_3_20.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v5_protocol_3_20.body3`)}
+    </p>
+  </div>
+)
+
 export function FileSidebar(props: Props): React.Node {
   const {
     canDownload,
@@ -163,16 +174,14 @@ export function FileSidebar(props: Props): React.Node {
     modulesOnDeck,
     pipettesOnDeck,
     savedStepForms,
-    isV4Protocol,
+    schemaVersion,
   } = props
   const [
     showExportWarningModal,
     setShowExportWarningModal,
   ] = React.useState<boolean>(false)
 
-  const [showV4ExportWarning, setShowV4ExportWarning] = React.useState<boolean>(
-    false
-  )
+  const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
   const cancelModal = () => setShowExportWarningModal(false)
 
@@ -199,13 +208,28 @@ export function FileSidebar(props: Props): React.Node {
       modulesWithoutStep,
     })
 
-  const blockingV4ExportHint = useBlockingHint({
-    enabled: isV4Protocol && showV4ExportWarning,
-    hintKey: 'export_v4_protocol_3_18',
-    content: v4WarningContent,
-    handleCancel: () => setShowV4ExportWarning(false),
+  const getExportHintContent = (): {|
+    hintKey: HintKey,
+    content: React.Node,
+  |} => {
+    return {
+      hintKey:
+        schemaVersion === 5
+          ? 'export_v5_protocol_3_20'
+          : 'export_v4_protocol_3_18',
+      content: schemaVersion === 5 ? v5WarningContent : v4WarningContent,
+    }
+  }
+
+  const { hintKey, content } = getExportHintContent()
+
+  const blockingExportHint = useBlockingHint({
+    enabled: showBlockingHint,
+    hintKey,
+    content,
+    handleCancel: () => setShowBlockingHint(false),
     handleContinue: () => {
-      setShowV4ExportWarning(false)
+      setShowBlockingHint(false)
       saveFile(downloadData)
     },
   })
@@ -217,7 +241,7 @@ export function FileSidebar(props: Props): React.Node {
 
   return (
     <>
-      {blockingV4ExportHint}
+      {blockingExportHint}
       {showExportWarningModal && (
         <Portal>
           <AlertModal
@@ -233,9 +257,9 @@ export function FileSidebar(props: Props): React.Node {
                 children: 'CONTINUE WITH EXPORT',
                 className: modalStyles.long_button,
                 onClick: () => {
-                  if (isV4Protocol) {
+                  if (schemaVersion > 3) {
                     setShowExportWarningModal(false)
-                    setShowV4ExportWarning(true)
+                    setShowBlockingHint(true)
                   } else {
                     saveFile(downloadData)
                     setShowExportWarningModal(false)
@@ -265,9 +289,9 @@ export function FileSidebar(props: Props): React.Node {
                 if (hasWarning) {
                   scrollToTop()
                   setShowExportWarningModal(true)
-                } else if (isV4Protocol) {
+                } else if (schemaVersion > 3) {
                   scrollToTop()
-                  setShowV4ExportWarning(true)
+                  setShowBlockingHint(true)
                 } else {
                   saveFile(downloadData)
                   onDownload()

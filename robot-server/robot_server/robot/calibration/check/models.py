@@ -1,7 +1,9 @@
 from uuid import UUID
-from typing import Dict, Optional, List, Any, Tuple
+from typing import Dict, Optional, List, Tuple
 from functools import partial
 from pydantic import BaseModel, Field
+
+from ..dev_types import NextSteps
 
 OffsetVector = Tuple[float, float, float]
 
@@ -65,7 +67,7 @@ class CalibrationSessionStatus(BaseModel):
     instruments: Dict[str, AttachedPipette]
     currentStep: str = Field(..., description="Current step of session")
     comparisonsByStep: Dict[str, ComparisonStatus]
-    nextSteps: Optional[Dict[str, Dict[str, Dict[str, Any]]]] =\
+    nextSteps: Optional[NextSteps] =\
         Field(None, description="Next Available Step in Session")
     labware: List[LabwareStatus]
 

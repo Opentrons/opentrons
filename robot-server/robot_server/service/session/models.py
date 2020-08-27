@@ -11,6 +11,8 @@ from robot_server.robot.calibration.tip_length import (
     models as tip_length_calibration_models)
 from robot_server.robot.calibration.deck import (
     models as deck_calibration_models)
+from robot_server.robot.calibration.pipette_offset import (
+    models as pipette_offset_calibration_models)
 from robot_server.service.session.session_types.protocol import \
     models as protocol_session_models
 from robot_server.service.json_api import \
@@ -61,6 +63,10 @@ class SessionType(str, Enum):
         tip_length_calibration_models.SessionCreateParams
     )
     deck_calibration = 'deckCalibration'
+    pipette_offset_calibration = (
+        'pipetteOffsetCalibration',
+        pipette_offset_calibration_models.SessionCreateParams
+    )
     protocol = ('protocol', ProtocolCreateParams)
 
     @property
@@ -81,6 +87,7 @@ https://pydantic-docs.helpmanual.io/usage/types/#literal-type
 """
 SessionCreateParamType = typing.Union[
     tip_length_calibration_models.SessionCreateParams,
+    pipette_offset_calibration_models.SessionCreateParams,
     ProtocolCreateParams,
     None,
     EmptyModel
@@ -95,6 +102,7 @@ SessionDetails = typing.Union[
     calibration_check_models.CalibrationSessionStatus,
     tip_length_calibration_models.TipCalibrationSessionStatus,
     deck_calibration_models.DeckCalibrationSessionStatus,
+    pipette_offset_calibration_models.PipetteOffsetCalibrationSessionStatus,
     protocol_session_models.ProtocolSessionDetails,
     EmptyModel
 ]
@@ -170,6 +178,9 @@ class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
     load_labware = "loadLabware"
     jog = ("jog", JogPosition)
+    move_to_tip_rack = "moveToTipRack"
+    move_to_point_one = "moveToPointOne"
+    move_to_deck = "moveToDeck"
     pick_up_tip = "pickUpTip"
     confirm_tip_attached = "confirmTip"
     invalidate_tip = "invalidateTip"
@@ -197,7 +208,6 @@ class CalibrationCheckCommand(CommandDefinition):
 class TipLengthCalibrationCommand(CommandDefinition):
     """Tip Length Calibration Specific"""
     move_to_reference_point = "moveToReferencePoint"
-    move_to_tip_rack = "moveToTipRack"
 
     @staticmethod
     def namespace():
@@ -206,9 +216,6 @@ class TipLengthCalibrationCommand(CommandDefinition):
 
 class DeckCalibrationCommand(CommandDefinition):
     """Deck Calibration Specific"""
-    move_to_tip_rack = "moveToTipRack"
-    move_to_deck = "moveToDeck"
-    move_to_point_one = "moveToPointOne"
     move_to_point_two = "moveToPointTwo"
     move_to_point_three = "moveToPointThree"
 

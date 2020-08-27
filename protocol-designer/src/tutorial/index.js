@@ -12,6 +12,7 @@ type HintKey =
   // blocking hints
   | 'custom_labware_with_modules'
   | 'export_v4_protocol_3_18'
+  | 'export_v5_protocol_3_20'
   | 'change_magnet_module_model'
 
 // DEPRECATED HINTS (keep a record to avoid name collisions with old persisted dismissal states)
