@@ -6,6 +6,7 @@ import type { PDProtocolFile } from '../../file-types'
 import { migrateFile as migrateFileOne } from './1_1_0'
 import { migrateFile as migrateFileThree } from './3_0_0'
 import { migrateFile as migrateFileFour } from './4_0_0'
+import { migrateFile as migrateFileFive } from './5_0_0'
 
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 
@@ -16,6 +17,7 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '1.1.0': migrateFileOne,
   '3.0.0': migrateFileThree,
   '4.0.0': migrateFileFour,
+  '5.0.0': migrateFileFive,
 }
 
 // get all versions to migrate newer than the file's applicationVersion
