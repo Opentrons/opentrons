@@ -1042,11 +1042,10 @@ class API(HardwareAPILike):
             (Axis.Y, self._current_position[Axis.Y] + target[1])))
         mounts = self._mounts(mount)
         secondary_z = None
-        for idx, m in enumerate(mounts):
+        for idx, m, in enumerate(mounts):
             z = Axis.by_mount(m)
-            target_index = idx + 2
-            all_axes_pos[z] =\
-                self._current_position[z] + target[target_index]
+            t_index = idx + 2
+            all_axes_pos[z] = self._current_position[z] + target[t_index]
             if idx == 1:
                 secondary_z = z
         await self._move(all_axes_pos, speed=speed, secondary_z=secondary_z)
@@ -1279,35 +1278,14 @@ class API(HardwareAPILike):
         self._ready_for_tip_action(
             instruments, HardwareAction.PREPARE_ASPIRATE)
 
-        if len(instruments) > 1 and\
-                any([instr[0].current_volume != 0 for instr in instruments]):
-            raise PairedPipetteConfigValueError(
-                "Paired pipettes must both have zero "
-                "volume to prepare for aspiration")
-
-        if any([instr[0].current_volume == 0 for instr in instruments]):
-            speed = min(self._plunger_speed(
+        with_zero = filter(lambda i: i[0].current_volume == 0, instruments)
+        for instr in with_zero:
+            speed = self._plunger_speed(
                         instr[0],
                         instr[0].blow_out_flow_rate, 'aspirate')
-                        for instr in instruments)
-            bottom = tuple(instr[0].config.bottom for instr in instruments)
-            await self._move_plunger(mount, bottom, speed=(speed*rate))
-
-        for instr in instruments:
+            bottom = (instr[0].config.bottom, )
+            await self._move_plunger(instr[1], bottom, speed=(speed*rate))
             instr[0].ready_to_aspirate = True
-
-    def _check_aspirate_volume(
-            self, instruments: Sequence[PipetteHandlingData],
-            volume: Optional[float]) -> Sequence[float]:
-        if volume is None:
-            for instr in instruments:
-                mod_log.debug(
-                    "No aspirate volume defined. Aspirating up to "
-                    f"{instr[0].name} max_volume "
-                    f"({instr[0].config.max_volume}uL)")
-            return tuple(instr[0].available_volume for instr in instruments)
-        else:
-            return (volume, )
 
     async def aspirate(self, mount: Union[top_types.Mount, PipettePair],
                        volume: float = None, rate: float = 1.0):
@@ -1336,32 +1314,34 @@ class API(HardwareAPILike):
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
             for instr in instruments}
 
-        asp_vol = self._check_aspirate_volume(instruments, volume)
+        if volume is None:
+            mod_log.debug(
+                "No aspirate volume defined. Aspirating up to "
+                "max_volume for the pipette")
+            asp_vol = tuple(instr[0].available_volume for instr in instruments)
+        else:
+            asp_vol = tuple(volume for instr in instruments)
 
-        def vol_check(idx: int) -> float:
-            nonlocal asp_vol
-            if len(asp_vol) > 1:
-                return asp_vol[idx]
-            else:
-                return asp_vol[0]
-
-        if 0 in asp_vol:
+        if all([vol == 0 for vol in asp_vol]):
             return
+        elif 0 in asp_vol:
+            raise PairedPipetteConfigValueError(
+                "Cannot only aspirate from one pipette")
 
-        for idx, instr in enumerate(instruments):
-            assert instr[0].ok_to_add_volume(vol_check(idx)), \
+        for instr, vol in zip(instruments, asp_vol):
+            assert instr[0].ok_to_add_volume(vol), \
                 "Cannot aspirate more than pipette max volume"
 
-        self._backend.set_active_current(plunger_currents)
         dist = tuple(self._plunger_position(
                      instr[0],
-                     instr[0].current_volume + vol_check(idx), 'aspirate')
-                     for idx, instr in enumerate(instruments))
+                     instr[0].current_volume + vol, 'aspirate')
+                     for instr, vol in zip(instruments, asp_vol))
         speed = min(
             self._plunger_speed(
                 instr[0], instr[0].aspirate_flow_rate * rate, 'aspirate')
             for instr in instruments)
         try:
+            self._backend.set_active_current(plunger_currents)
             await self._move_plunger(mount, dist, speed=speed)
         except Exception:
             self._log.exception('Aspirate failed')
@@ -1369,8 +1349,8 @@ class API(HardwareAPILike):
                 instr[0].set_current_volume(0)
             raise
         else:
-            for idx, instr in enumerate(instruments):
-                instr[0].add_current_volume(vol_check(idx))
+            for instr, vol in zip(instruments, asp_vol):
+                instr[0].add_current_volume(vol)
 
     async def dispense(self, mount: Union[top_types.Mount, PipettePair],
                        volume: float = None, rate: float = 1.0):
@@ -1396,32 +1376,29 @@ class API(HardwareAPILike):
                           "remaining liquid ({}uL) from pipette".format
                           (disp_vol))
         else:
-            disp_vol = (volume, )
+            disp_vol = tuple(volume for instr in instruments)
 
-        def vol_check(idx: int) -> float:
-            nonlocal disp_vol
-            if len(disp_vol) > 1:
-                return disp_vol[idx]
-            else:
-                return disp_vol[0]
         # Ensure we don't dispense more than the current volume
         disp_vol = tuple(
-            min(instr[0].current_volume, vol_check(idx))
-            for idx, instr in enumerate(instruments))
+            min(instr[0].current_volume, vol)
+            for instr, vol in zip(instruments, disp_vol))
 
-        if 0 in disp_vol:
+        if all([vol == 0 for vol in disp_vol]):
             return
+        elif 0 in disp_vol:
+            raise PairedPipetteConfigValueError(
+                "Cannot only dispense from one pipette")
 
-        self._backend.set_active_current(plunger_currents)
         dist = tuple(self._plunger_position(
                      instr[0],
-                     instr[0].current_volume - vol_check(idx), 'dispense')
-                     for idx, instr in enumerate(instruments))
+                     instr[0].current_volume - vol, 'dispense')
+                     for instr, vol in zip(instruments, disp_vol))
         speed = min(self._plunger_speed(instr[0],
                     instr[0].dispense_flow_rate * rate, 'dispense')
                     for instr in instruments)
 
         try:
+            self._backend.set_active_current(plunger_currents)
             await self._move_plunger(mount, dist, speed=speed)
         except Exception:
             self._log.exception('Dispense failed')
@@ -1429,8 +1406,8 @@ class API(HardwareAPILike):
                 instr[0].set_current_volume(0)
             raise
         else:
-            for idx, instr in enumerate(instruments):
-                instr[0].remove_current_volume(vol_check(idx))
+            for instr, vol in zip(instruments, disp_vol):
+                instr[0].remove_current_volume(vol)
 
     def _plunger_position(self, instr: Pipette, ul: float,
                           action: 'UlPerMmAction') -> float:
@@ -1571,10 +1548,10 @@ class API(HardwareAPILike):
             checked_presses = presses
 
         if not increment or increment < 0:
-            checked_increment = tuple(
+            check_incr = tuple(
                 instr[0].config.pick_up_increment for instr in instruments)
         else:
-            checked_increment = (increment, )
+            check_incr = tuple(increment for instr in instruments)
 
         pick_up_speed = min(
             instr[0].config.pick_up_speed for instr in instruments)
@@ -1585,8 +1562,8 @@ class API(HardwareAPILike):
             with self._backend.save_current():
                 self._backend.set_active_current(z_axis_currents)
                 dist = tuple(-1.0 * instr[0].config.pick_up_distance
-                             + -1.0 * checked_increment[idx] * i
-                             for idx, instr in enumerate(instruments))
+                             + -1.0 * incrt * i
+                             for instr, incrt in zip(instruments, check_incr))
                 target_pos = (0, 0, *dist)
                 await self._move_relative_n_axes(
                     mount, target_pos, pick_up_speed)
@@ -1609,8 +1586,8 @@ class API(HardwareAPILike):
         # Here we add in the debounce distance for the switch as
         # a safety precaution
         retract_target = max(instr[0].config.pick_up_distance
-                             + checked_increment[idx] * checked_presses + 2
-                             for idx, instr in enumerate(instruments))
+                             + incrt * checked_presses + 2
+                             for instr, incrt in zip(instruments, check_incr))
 
         await self.retract(mount, retract_target)
 
