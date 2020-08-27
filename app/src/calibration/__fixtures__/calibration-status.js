@@ -12,12 +12,18 @@ import type { CalibrationStatus } from '../types'
 export const mockCalibrationStatus: CalibrationStatus = {
   deckCalibration: {
     status: DECK_CAL_STATUS_IDENTITY,
-    data: [
-      [1.0, 0.0, 0.0, 0.0],
-      [0.0, 1.0, 0.0, 0.0],
-      [0.0, 0.0, 1.0, 0.0],
-      [0.0, 0.0, 0.0, 1.0],
-    ],
+    data: {
+      type: 'affine',
+      matrix: [
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+      ],
+      lastModified: null,
+      pipetteCalibratedWith: null,
+      tiprack: null,
+    },
   },
   instrumentCalibration: {
     right: {

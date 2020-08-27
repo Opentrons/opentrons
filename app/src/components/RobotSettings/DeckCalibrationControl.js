@@ -15,18 +15,23 @@ import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
 import type { State } from '../../types'
-import type { DeckCalibrationStatus } from '../../calibration/types'
+import type {
+  DeckCalibrationStatus,
+  DeckCalibrationData,
+} from '../../calibration/types'
 
 import { Portal } from '../portal'
 import { TitledControl } from '../TitledControl'
 import { CalibrateDeck } from '../CalibrateDeck'
 import { DeckCalibrationWarning } from './DeckCalibrationWarning'
 import { ConfirmStartDeckCalModal } from './ConfirmStartDeckCalModal'
+import { DeckCalibrationDownload } from './DeckCalibrationDownload'
 
 type Props = {|
   robotName: string,
   buttonDisabled: boolean,
   deckCalStatus: DeckCalibrationStatus | null,
+  deckCalData: DeckCalibrationData | null,
   startLegacyDeckCalibration: () => void,
 |}
 
@@ -40,6 +45,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
     robotName,
     buttonDisabled,
     deckCalStatus,
+    deckCalData,
     startLegacyDeckCalibration,
   } = props
 
@@ -110,6 +116,12 @@ export function DeckCalibrationControl(props: Props): React.Node {
       >
         <DeckCalibrationWarning
           deckCalibrationStatus={deckCalStatus}
+          marginTop={SPACING_2}
+        />
+        <DeckCalibrationDownload
+          deckCalibrationStatus={deckCalStatus}
+          deckCalibrationData={deckCalData}
+          robotName={robotName}
           marginTop={SPACING_2}
         />
       </TitledControl>

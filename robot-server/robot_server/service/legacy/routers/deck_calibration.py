@@ -3,7 +3,9 @@ from uuid import UUID
 from opentrons.config import robot_configs
 from starlette import status
 from fastapi import APIRouter, Depends
-from opentrons.hardware_control import ThreadManager
+from opentrons.config import feature_flags as ff
+from opentrons.hardware_control import ThreadManager, \
+    robot_calibration as robot_cal
 import opentrons.deck_calibration.endpoints as dc
 
 from robot_server.service.dependencies import get_hardware
@@ -11,7 +13,7 @@ from robot_server.service.errors import V1HandlerError
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.deck_calibration import DeckStart, \
     DeckStartResponse, DeckCalibrationDispatch, PipetteDeckCalibration, \
-    CalibrationStatus, DeckCalibrationStatus
+    CalibrationStatus, DeckCalibrationStatus, DeckCalibrationData, MatrixType
 
 router = APIRouter()
 
@@ -83,8 +85,21 @@ async def post_calibration_deck(operation: DeckCalibrationDispatch) \
 async def get_calibration_status(
         hardware: ThreadManager = Depends(get_hardware)) -> CalibrationStatus:
     robot_conf = robot_configs.load()
+    if ff.enable_calibration_overhaul():
+        deck_cal = robot_cal.load().deck_calibration
+        deck_cal_data = DeckCalibrationData(
+            type=MatrixType.attitude,
+            matrix=deck_cal.attitude,
+            lastModified=deck_cal.last_modified,
+            pipetteCalibratedWith=deck_cal.pipette_calibrated_with,
+            tiprack=deck_cal.tiprack)
+    else:
+        deck_cal_data = DeckCalibrationData(
+            type=MatrixType.affine,
+            matrix=robot_conf.gantry_calibration)
+
     return CalibrationStatus(
         deckCalibration=DeckCalibrationStatus(
             status=hardware.validate_calibration(),
-            data=robot_conf.gantry_calibration),
+            data=deck_cal_data),
         instrumentCalibration=robot_conf.instrument_offset)

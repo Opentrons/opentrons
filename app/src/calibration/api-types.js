@@ -13,15 +13,31 @@ export type DeckCalibrationStatus =
   | DECK_CAL_STATUS_BAD_CALIBRATION
   | DECK_CAL_STATUS_SINGULARITY
 
+export type AffineMatrix = [
+  [number, number, number, number],
+  [number, number, number, number],
+  [number, number, number, number],
+  [number, number, number, number]
+]
+
+export type AttitudeMatrix = [
+  [number, number, number, number],
+  [number, number, number, number],
+  [number, number, number, number]
+]
+
+export type DeckCalibrationData = {|
+  matrix: AffineMatrix | AttitudeMatrix,
+  lastModified: string | null,
+  pipetteCalibratedWith: string | null,
+  tiprack: string | null,
+  type: string,
+|}
+
 export type CalibrationStatus = {|
   deckCalibration: {|
     status: DeckCalibrationStatus,
-    data: [
-      [number, number, number, number],
-      [number, number, number, number],
-      [number, number, number, number],
-      [number, number, number, number]
-    ],
+    data: DeckCalibrationData,
   |},
   instrumentCalibration: {|
     right: {|

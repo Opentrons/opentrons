@@ -1,4 +1,5 @@
 import typing
+from datetime import datetime
 from enum import Enum
 from uuid import UUID
 
@@ -161,15 +162,41 @@ class InstrumentCalibrationStatus(BaseModel):
     left: InstrumentOffset
 
 
+class MatrixType(str, Enum):
+    """The deck calibration matrix type"""
+    affine = 'affine'
+    attitude = 'attitude'
+
+
+class DeckCalibrationData(BaseModel):
+    type: MatrixType = \
+        Field(...,
+              description="The type of deck calibration matrix:"
+                          "affine or attitude")
+    matrix: typing.List[typing.List[float]] = \
+        Field(...,
+              description="The deck calibration transform matrix")
+    lastModified: typing.Optional[datetime] = \
+        Field(None,
+              description="When this calibration was last modified")
+    pipetteCalibratedWith: typing.Optional[str] = \
+        Field(None,
+              description="The ID of the pipette used in this calibration")
+    tiprack: typing.Optional[str] = \
+        Field(None,
+              description="The sha256 hash of the tiprack used in this"
+                          "calibration")
+
+
 class DeckCalibrationStatus(BaseModel):
     status: DeckTransformState = \
         Field(...,
               description="An enum stating whether a user has a valid robot"
                           "deck calibration. See DeckTransformState"
                           "class for more information.")
-    data: typing.List[typing.List[float]] = \
+    data: DeckCalibrationData = \
         Field(...,
-              description="The deck calibration transform matrix")
+              description="Deck calibration data")
 
 
 class CalibrationStatus(BaseModel):
