@@ -890,6 +890,7 @@ describe('consolidate single-channel', () => {
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        // Pre-wet
         {
           command: 'aspirate',
           params: {
@@ -924,6 +925,7 @@ describe('consolidate single-channel', () => {
             wait: 12,
           },
         },
+        // First aspirate: source well A1
         {
           command: 'aspirate',
           params: {
@@ -963,6 +965,7 @@ describe('consolidate single-channel', () => {
             offsetFromBottomMm: 14.5,
           },
         },
+        // Air Gap: after aspirating from A1
         {
           command: 'airGap',
           params: {
@@ -980,6 +983,7 @@ describe('consolidate single-channel', () => {
             wait: 11,
           },
         },
+        // Second aspirate: source well A2
         {
           command: 'aspirate',
           params: {
@@ -1019,6 +1023,7 @@ describe('consolidate single-channel', () => {
             offsetFromBottomMm: 14.5,
           },
         },
+        // Air Gap: after aspirating from A2
         {
           command: 'airGap',
           params: {
@@ -1036,6 +1041,7 @@ describe('consolidate single-channel', () => {
             wait: 11,
           },
         },
+        // Dispense full air + liquid volume all together to dest well (45+31+45+31 = 152uL)
         {
           command: 'dispense',
           params: {
@@ -1066,6 +1072,7 @@ describe('consolidate single-channel', () => {
             wait: 12,
           },
         },
+        // Mix (disp)
         {
           command: 'aspirate',
           params: {
@@ -1100,6 +1107,7 @@ describe('consolidate single-channel', () => {
             wait: 12,
           },
         },
+        // Touch tip (disp)
         {
           command: 'touchTip',
           params: {
@@ -1109,6 +1117,7 @@ describe('consolidate single-channel', () => {
             offsetFromBottomMm: 3.4,
           },
         },
+        // Blowout to trash
         {
           command: 'blowout',
           params: {
