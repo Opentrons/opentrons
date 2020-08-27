@@ -98,8 +98,8 @@ describe('Calibration Download Component', () => {
   it('should not render last modified when deck calibration type is affine', () => {
     const wrapper = render({
       deckCalibrationData: {
-        type: 'random',
-        matrix: [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]],
+        type: 'affine',
+        matrix: [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
         lastModified: null,
         pipetteCalibratedWith: null,
         tiprack: null,

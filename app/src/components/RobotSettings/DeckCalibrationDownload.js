@@ -10,6 +10,7 @@ import {
 import { IconCta } from '../IconCta'
 import { saveAs } from 'file-saver'
 
+import type { StyleProps } from '@opentrons/components'
 import type {
   DeckCalibrationData,
   DeckCalibrationStatus,
@@ -24,7 +25,7 @@ export type DeckCalibrationDownloadProps = {|
   deckCalibrationStatus: DeckCalibrationStatus | null,
   deckCalibrationData: DeckCalibrationData | null,
   robotName: string,
-  ...styleProps,
+  ...StyleProps,
 |}
 
 export function DeckCalibrationDownload({
