@@ -743,10 +743,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         aspirateAirGapVolume: 31,
         // dispense column
         dispenseDelay: { seconds: 12, mmFromBottom: 14 },
-        mixInDestination: {
-          volume: 36,
-          times: 1,
-        },
         touchTipAfterDispense: true,
         blowoutLocation: 'trashId',
         blowoutFlowRateUlSec: 2.3,
