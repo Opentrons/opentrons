@@ -55,17 +55,24 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
     return { errors }
   }
 
+  const params: MoveToWellParams = {
+    pipette,
+    labware,
+    well,
+    offset,
+  }
+  // add optional fields only if specified
+  if (forceDirect != null) {
+    params.forceDirect = forceDirect
+  }
+  if (minimumZHeight != null) {
+    params.minimumZHeight = minimumZHeight
+  }
+
   const commands = [
     {
       command: 'moveToWell',
-      params: {
-        pipette,
-        labware,
-        well,
-        offset,
-        forceDirect,
-        minimumZHeight,
-      },
+      params,
     },
   ]
 

@@ -857,4 +857,474 @@ describe('advanced options', () => {
       ])
     })
   })
+
+  describe('all advanced settings enabled', () => {
+    it('should create commands in the expected order with expected params', () => {
+      const args = {
+        ...mixinArgs,
+        sourceWells: ['A1'],
+        destWells: ['B1'],
+        changeTip: 'never',
+        volume: 350,
+        // aspirate column
+        preWetTip: true,
+        mixBeforeAspirate: {
+          volume: 35,
+          times: 1,
+        },
+        aspirateDelay: { seconds: 11, mmFromBottom: 15 },
+        touchTipAfterAspirate: true,
+        touchTipAfterAspirateOffsetMmFromBottom: 14.5,
+        aspirateAirGapVolume: 31,
+        // dispense column
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        mixInDestination: {
+          volume: 36,
+          times: 1,
+        },
+        touchTipAfterDispense: true,
+        blowoutLocation: 'trashId',
+        blowoutFlowRateUlSec: 2.3,
+        blowoutOffsetFromTopMm: 3.3,
+      }
+
+      const result = transfer(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // Pre-wet
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 269,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 269,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // mix (asp)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 35,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 35,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // aspirate
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 269,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 15,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // touch tip (asp)
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 14.5,
+          },
+        },
+        // air gap
+        {
+          command: 'airGap',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 31,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 11.54,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // dispense
+        {
+          command: 'dispenseAirGap',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 31,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 11.54,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 269,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 14,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // mix (disp)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // touch tip (disp)
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.4,
+          },
+        },
+        // blowout
+        {
+          command: 'blowout',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'trashId',
+            well: 'A1',
+            flowRate: 2.3,
+            offsetFromBottomMm: 80.3,
+          },
+        },
+        // next chunk from A1: remaining volume
+        // do not pre-wet
+        // mix (asp)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 35,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 35,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // aspirate 81 (= total vol 350 - prev transfer's 269)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 81,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 15,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // touch tip (asp)
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 14.5,
+          },
+        },
+        // air gap
+        {
+          command: 'airGap',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 31,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 11.54,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // dispense air gap then liquid
+        {
+          command: 'dispenseAirGap',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 31,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 11.54,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 81,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 14,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // mix (disp)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // touch tip (disp)
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.4,
+          },
+        },
+        // blowout
+        {
+          command: 'blowout',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'trashId',
+            well: 'A1',
+            flowRate: 2.3,
+            offsetFromBottomMm: 80.3,
+          },
+        },
+      ])
+    })
+  })
 })
