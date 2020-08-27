@@ -1256,7 +1256,8 @@ class API(HardwareAPILike):
 
     # Pipette action API
     async def prepare_for_aspirate(
-            self, mount: Union[top_types.Mount, ], rate: float = 1.0):
+            self, mount: Union[top_types.Mount, PipettePair],
+            rate: float = 1.0):
         """
         Prepare the pipette for aspiration.
 
@@ -1274,21 +1275,41 @@ class API(HardwareAPILike):
         aspiration. To make the problem more obvious, :py:meth:`aspirate` will
         raise an exception if this method has not previously been called.
         """
-        this_pipette = self._attached_instruments[mount]
-        if not this_pipette:
-            raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount.name))
-        if this_pipette.current_volume == 0:
-            speed = self._plunger_speed(
-                this_pipette,
-                this_pipette.blow_out_flow_rate,
-                'aspirate')
-            await self._move_plunger(
-                mount, (this_pipette.config.bottom, ),
-                speed=(speed*rate))
-        this_pipette.ready_to_aspirate = True
+        instruments = self._instruments_for(mount)
+        self._ready_for_tip_action(
+            instruments, HardwareAction.PREPARE_ASPIRATE)
 
-    async def aspirate(self, mount: top_types.Mount,
+        if len(instruments) > 1 and\
+                any([instr[0].current_volume != 0 for instr in instruments]):
+            raise PairedPipetteConfigValueError(
+                "Paired pipettes must both have zero "
+                "volume to prepare for aspiration")
+
+        if any([instr[0].current_volume == 0 for instr in instruments]):
+            speed = min(self._plunger_speed(
+                        instr[0],
+                        instr[0].blow_out_flow_rate, 'aspirate')
+                        for instr in instruments)
+            bottom = tuple(instr[0].config.bottom for instr in instruments)
+            await self._move_plunger(mount, bottom, speed=(speed*rate))
+
+        for instr in instruments:
+            instr[0].ready_to_aspirate = True
+
+    def _check_aspirate_volume(
+            self, instruments: Sequence[PipetteHandlingData],
+            volume: Optional[float]) -> Sequence[float]:
+        if volume is None:
+            for instr in instruments:
+                mod_log.debug(
+                    "No aspirate volume defined. Aspirating up to "
+                    f"{instr[0].name} max_volume "
+                    f"({instr[0].config.max_volume}uL)")
+            return tuple(instr[0].available_volume for instr in instruments)
+        else:
+            return (volume, )
+
+    async def aspirate(self, mount: Union[top_types.Mount, PipettePair],
                        volume: float = None, rate: float = 1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -1309,54 +1330,50 @@ class API(HardwareAPILike):
         rate : [float] Set plunger speed for this aspirate, where
             speed = rate * aspirate_speed
         """
-        this_pipette = self._attached_instruments[mount]
-        if not this_pipette:
-            raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount.name))
+        instruments = self._instruments_for(mount)
+        self._ready_for_tip_action(instruments, HardwareAction.ASPIRATE)
+        plunger_currents = {
+            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
+            for instr in instruments}
 
-        if not this_pipette.has_tip:
-            raise NoTipAttachedError(
-                f'Aspirate is not allowed if there is no tip attached to the '
-                f'pipette. Please make sure that a tip is attached on the'
-                f'{mount.name.lower()} pipette before using liquid-handling '
-                f'commands')
+        asp_vol = self._check_aspirate_volume(instruments, volume)
 
-        if this_pipette.current_volume == 0\
-           and not this_pipette.ready_to_aspirate:
-            raise RuntimeError('Pipette not ready to aspirate')
+        def vol_check(idx: int) -> float:
+            nonlocal asp_vol
+            if len(asp_vol) > 1:
+                return asp_vol[idx]
+            else:
+                return asp_vol[0]
 
-        if volume is None:
-            asp_vol = this_pipette.available_volume
-            mod_log.debug(
-                "No aspirate volume defined. Aspirating up to pipette "
-                "max_volume ({}uL)".format(this_pipette.config.max_volume))
-        else:
-            asp_vol = volume
-
-        assert this_pipette.ok_to_add_volume(asp_vol), \
-            "Cannot aspirate more than pipette max volume"
-        if asp_vol == 0:
+        if 0 in asp_vol:
             return
 
-        self._backend.set_active_current(
-            {Axis.of_plunger(mount): this_pipette.config.plunger_current})
-        dist = self._plunger_position(
-                this_pipette,
-                this_pipette.current_volume + asp_vol,
-                'aspirate')
-        flow_rate = this_pipette.aspirate_flow_rate * rate
-        speed = self._plunger_speed(this_pipette, flow_rate, 'aspirate')
+        for idx, instr in enumerate(instruments):
+            assert instr[0].ok_to_add_volume(vol_check(idx)), \
+                "Cannot aspirate more than pipette max volume"
+
+        self._backend.set_active_current(plunger_currents)
+        dist = tuple(self._plunger_position(
+                     instr[0],
+                     instr[0].current_volume + vol_check(idx), 'aspirate')
+                     for idx, instr in enumerate(instruments))
+        speed = min(
+            self._plunger_speed(
+                instr[0], instr[0].aspirate_flow_rate * rate, 'aspirate')
+            for instr in instruments)
         try:
-            await self._move_plunger(mount, (dist, ), speed=speed)
+            await self._move_plunger(mount, dist, speed=speed)
         except Exception:
             self._log.exception('Aspirate failed')
-            this_pipette.set_current_volume(0)
+            for instr in instruments:
+                instr[0].set_current_volume(0)
             raise
         else:
-            this_pipette.add_current_volume(asp_vol)
+            for idx, instr in enumerate(instruments):
+                instr[0].add_current_volume(vol_check(idx))
 
-    async def dispense(self, mount: top_types.Mount, volume: float = None,
-                       rate: float = 1.0):
+    async def dispense(self, mount: Union[top_types.Mount, PipettePair],
+                       volume: float = None, rate: float = 1.0):
         """
         Dispense a volume of liquid in microliters(uL) using this pipette
         at the current location. If no volume is specified, `dispense` will
@@ -1367,47 +1384,53 @@ class API(HardwareAPILike):
         rate : [float] Set plunger speed for this dispense, where
             speed = rate * dispense_speed
         """
-        this_pipette = self._attached_instruments[mount]
-        if not this_pipette:
-            raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount.name))
+        instruments = self._instruments_for(mount)
+        self._ready_for_tip_action(instruments, HardwareAction.DISPENSE)
 
-        if not this_pipette.has_tip:
-            raise NoTipAttachedError(
-                f'Dispense is not allowed if there is no tip attached to the '
-                f'pipette. Please make sure that a tip is attached on the '
-                f'{mount.name.lower()} pipette before using liquid-handling '
-                f'commands')
-
+        plunger_currents = {
+            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
+            for instr in instruments}
         if volume is None:
-            disp_vol = this_pipette.current_volume
+            disp_vol = tuple(instr[0].current_volume for instr in instruments)
             mod_log.debug("No dispense volume specified. Dispensing all "
                           "remaining liquid ({}uL) from pipette".format
                           (disp_vol))
         else:
-            disp_vol = volume
-        # Ensure we don't dispense more than the current volume
-        disp_vol = min(this_pipette.current_volume, disp_vol)
+            disp_vol = (volume, )
 
-        if disp_vol == 0:
+        def vol_check(idx: int) -> float:
+            nonlocal disp_vol
+            if len(disp_vol) > 1:
+                return disp_vol[idx]
+            else:
+                return disp_vol[0]
+        # Ensure we don't dispense more than the current volume
+        disp_vol = tuple(
+            min(instr[0].current_volume, vol_check(idx))
+            for idx, instr in enumerate(instruments))
+
+        if 0 in disp_vol:
             return
 
-        self._backend.set_active_current(
-             {Axis.of_plunger(mount): this_pipette.config.plunger_current})
-        dist = self._plunger_position(
-                this_pipette,
-                this_pipette.current_volume - disp_vol,
-                'dispense')
-        flow_rate = this_pipette.dispense_flow_rate * rate
-        speed = self._plunger_speed(this_pipette, flow_rate, 'dispense')
+        self._backend.set_active_current(plunger_currents)
+        dist = tuple(self._plunger_position(
+                     instr[0],
+                     instr[0].current_volume - vol_check(idx), 'dispense')
+                     for idx, instr in enumerate(instruments))
+        speed = min(self._plunger_speed(instr[0],
+                    instr[0].dispense_flow_rate * rate, 'dispense')
+                    for instr in instruments)
+
         try:
-            await self._move_plunger(mount, (dist, ), speed=speed)
+            await self._move_plunger(mount, dist, speed=speed)
         except Exception:
             self._log.exception('Dispense failed')
-            this_pipette.set_current_volume(0)
+            for instr in instruments:
+                instr[0].set_current_volume(0)
             raise
         else:
-            this_pipette.remove_current_volume(disp_vol)
+            for idx, instr in enumerate(instruments):
+                instr[0].remove_current_volume(vol_check(idx))
 
     def _plunger_position(self, instr: Pipette, ul: float,
                           action: 'UlPerMmAction') -> float:
@@ -1427,30 +1450,31 @@ class API(HardwareAPILike):
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
         return round(ul_per_s, 6)
 
-    async def blow_out(self, mount):
+    async def blow_out(self, mount: Union[top_types.Mount, PipettePair]):
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
-        this_pipette = self._attached_instruments[mount]
-        if not this_pipette:
-            raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount.name))
+        instruments = self._instruments_for(mount)
+        self._ready_for_tip_action(instruments, HardwareAction.BLOWOUT)
+        plunger_currents = {
+            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
+            for instr in instruments}
+        blow_out = tuple(instr[0].config.blow_out for instr in instruments)
 
-        self._backend.set_active_current({Axis.of_plunger(mount):
-                                          this_pipette.config.plunger_current})
-        speed = self._plunger_speed(
-            this_pipette, this_pipette.blow_out_flow_rate, 'dispense')
+        self._backend.set_active_current(plunger_currents)
+        speed = max(self._plunger_speed(
+            instr[0], instr[0].blow_out_flow_rate, 'dispense')
+            for instr in instruments)
         try:
-            await self._move_plunger(
-                mount, (this_pipette.config.blow_out, ),
-                speed=speed)
+            await self._move_plunger(mount, blow_out, speed=speed)
         except Exception:
             self._log.exception('Blow out failed')
             raise
         finally:
-            this_pipette.set_current_volume(0)
-            this_pipette.ready_to_aspirate = False
+            for instr in instruments:
+                instr[0].set_current_volume(0)
+                instr[0].ready_to_aspirate = False
 
     @overload
     def _instruments_for(
@@ -1493,6 +1517,10 @@ class API(HardwareAPILike):
             if not pipettes[0].has_tip:
                 raise NoTipAttachedError(
                     f'Cannot perform {action} without a tip attached')
+            if (action == HardwareAction.ASPIRATE and
+                pipettes[0].current_volume == 0 and
+                    not pipettes[0].ready_to_aspirate):
+                raise RuntimeError('Pipette not ready to aspirate')
             self._log.debug(f'{action} on {pipettes[0].name}')
 
     async def pick_up_tip(self,
