@@ -4,6 +4,7 @@ export * from './calibration-check/constants'
 export * from './tip-length-calibration/constants'
 export * from './deck-calibration/constants'
 export * from './pipette-offset-calibration/constants'
+export * from './common-calibration/constants'
 
 export const SESSIONS_PATH: '/sessions' = '/sessions'
 

@@ -20,14 +20,16 @@ import type {
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
-import { Introduction } from '../CalibrateDeck/Introduction'
-import { DeckSetup } from '../CalibrateDeck/DeckSetup'
-import { TipPickUp } from '../CalibrateDeck/TipPickUp'
-import { TipConfirmation } from '../CalibrateDeck/TipConfirmation'
-import { SaveZPoint } from '../CalibrateDeck/SaveZPoint'
-import { SaveXYPoint } from '../CalibrateDeck/SaveXYPoint'
-import { CompleteConfirmation } from '../CalibrateDeck/CompleteConfirmation'
-import { ConfirmExitModal } from '../CalibrateDeck/ConfirmExitModal'
+import {
+  Introduction,
+  DeckSetup,
+  TipPickUp,
+  TipConfirmation,
+  SaveZPoint,
+  SaveXYPoint,
+  CompleteConfirmation,
+  ConfirmExitModal,
+} from '../CalibrationPanels'
 import styles from '../CalibrateDeck/styles.css'
 
 import type {
@@ -141,6 +143,7 @@ export function CalibratePipetteOffset(
           isMulti={isMulti}
           mount={instrument?.mount.toLowerCase()}
           currentStep={currentStep}
+          sessionType={session.sessionType}
         />
       </ModalPage>
       {showConfirmExit && (

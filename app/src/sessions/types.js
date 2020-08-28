@@ -20,6 +20,7 @@ import typeof {
   SESSION_TYPE_CALIBRATION_CHECK,
   SESSION_TYPE_TIP_LENGTH_CALIBRATION,
   SESSION_TYPE_DECK_CALIBRATION,
+  SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
 } from './constants'
 
 import type {
@@ -34,6 +35,7 @@ import * as DeckCalTypes from './deck-calibration/types'
 import * as CalCheckConstants from './calibration-check/constants'
 import * as TipCalConstants from './tip-length-calibration/constants'
 import * as DeckCalConstants from './deck-calibration/constants'
+import * as PipOffsetCalConstants from './pipette-offset-calibration/constants'
 
 export type * from './calibration-check/types'
 export type * from './tip-length-calibration/types'
@@ -44,6 +46,7 @@ export type SessionType =
   | SESSION_TYPE_CALIBRATION_CHECK
   | SESSION_TYPE_TIP_LENGTH_CALIBRATION
   | SESSION_TYPE_DECK_CALIBRATION
+  | SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
 
 export type SessionParams =
   | {||}
@@ -53,6 +56,7 @@ export type SessionCommandString =
   | $Values<typeof CalCheckConstants.checkCommands>
   | $Values<typeof TipCalConstants.tipCalCommands>
   | $Values<typeof DeckCalConstants.deckCalCommands>
+  | $Values<typeof PipOffsetCalConstants.pipOffsetCalCommands>
 
 // TODO(al, 2020-05-11): data should be properly typed with all
 // known command types

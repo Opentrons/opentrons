@@ -1,0 +1,197 @@
+@import '@opentrons/components';
+
+.success_status_icon {
+  width: 2.5rem;
+  margin-right: 0.75rem;
+  color: var(--c-success);
+}
+
+.intro_header {
+  @apply --font-header-dark;
+
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.intro_content {
+  @apply --font-body-2-dark;
+
+  margin-bottom: 1.5rem;
+}
+
+.alert_modal_padding {
+  padding: 4rem 1rem;
+}
+
+.terminal_modal_contents,
+.modal_contents {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 48rem;
+  min-height: 14rem;
+  padding: 1rem;
+}
+
+.terminal_modal_contents {
+  padding: 1rem 1.5rem;
+}
+
+.complete_summary {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  margin: 2rem 0;
+}
+
+.continue_button {
+  margin: 1.5rem 5rem 1rem;
+}
+
+.block_image {
+  max-height: 20rem;
+  max-width: 16rem;
+}
+
+.required_tiprack {
+  width: 50%;
+  border: 1px solid var('--c-med-gray');
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.required_tiprack:not(:last-child) {
+  margin-right: 0.625rem;
+}
+
+.tiprack_image_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+  height: 70%;
+}
+
+.tiprack_image {
+  width: 100%;
+  max-height: 100%;
+}
+
+.tiprack_display_name {
+  font-size: var('--fs-body-2');
+}
+
+/*
+TODO: BC 2020-04-01 consider abstracting this to a shared place
+ these styles were mostly copped from PD's VIEW MEASUREMENTs button
+ ideally these would both use the same component
+*/
+.tiprack_measurements_link {
+  padding: 1rem 0.5rem;
+  flex: 0.6;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font-size: var('--fs-body-2');
+
+  &:hover {
+    background-color: var(--c-bg-hover);
+  }
+}
+
+.tipracks_note_header {
+  text-transform: uppercase;
+}
+
+/* end copped styles */
+
+.prompt {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.prompt_text {
+  @apply --font-header-light;
+
+  font-weight: normal;
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.prompt_button {
+  display: block;
+  width: auto;
+  margin: 0.5rem 0 1rem 0;
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.page_content_dark {
+  display: flex;
+  padding: 1rem;
+  flex-direction: column;
+  align-items: center;
+  background-color: transparent;
+  height: 100%;
+}
+
+.deck_map_wrapper {
+  flex: 1 1 0;
+  align-self: stretch;
+  display: flex;
+  background-color: var(--c-bg-light);
+  border-radius: 6px;
+}
+
+.deck_map {
+  flex: 1;
+}
+
+.labware_ui_wrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.display_name {
+  @apply --truncate;
+
+  font-weight: var(--fw-semibold);
+  color: var(--c-font-light);
+  text-transform: uppercase;
+}
+
+.command_button {
+  margin: 0 5rem;
+}
+
+.pick_up_tip_confirmation_button {
+  margin-top: 1rem;
+  width: 80%;
+}
+
+.step_check_video_wrapper {
+  margin-left: 1rem;
+}
+
+.step_check_video {
+  max-width: 100%;
+  max-height: 15rem;
+}
+
+.loading_spinner {
+  width: 7.5rem;
+  margin-bottom: 3rem;
+}
