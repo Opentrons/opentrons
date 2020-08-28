@@ -534,3 +534,30 @@ async def test_blowout_flow_rate(dummy_instruments, loop, monkeypatch):
         pip.config.blow_out,
         speed=15
     )
+
+
+async def test_reset_instruments(dummy_instruments, loop, monkeypatch):
+    hw_api = await hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    hw_api.set_flow_rate(types.Mount.LEFT, 20)
+    # gut check
+    assert hw_api.attached_instruments[types.Mount.LEFT]['aspirate_flow_rate']\
+        == 20
+    old_l = hw_api._attached_instruments[types.Mount.LEFT]
+    old_r = hw_api._attached_instruments[types.Mount.RIGHT]
+    hw_api.reset_instrument(types.Mount.LEFT)
+    # left should have been reset, right should not
+    assert not (old_l is hw_api._attached_instruments[types.Mount.LEFT])
+    assert old_r is hw_api._attached_instruments[types.Mount.RIGHT]
+    # after the reset, the left should be more or less the same
+    assert old_l.pipette_id\
+        == hw_api._attached_instruments[types.Mount.LEFT].pipette_id
+    # but non-default configs should be changed
+    assert hw_api.attached_instruments[types.Mount.LEFT]['aspirate_flow_rate']\
+        != 20
+    old_l = hw_api._attached_instruments[types.Mount.LEFT]
+    old_r = hw_api._attached_instruments[types.Mount.RIGHT]
+
+    hw_api.reset_instrument()
+    assert not (old_l is hw_api._attached_instruments[types.Mount.LEFT])
+    assert not (old_r is hw_api._attached_instruments[types.Mount.LEFT])

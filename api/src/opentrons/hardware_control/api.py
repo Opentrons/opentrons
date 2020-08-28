@@ -371,12 +371,36 @@ class API(HardwareAPILike):
                         return True
         return False
 
+    def reset_instrument(self, mount: top_types.Mount = None):
+        """
+        Reset the internal state of a pipette by its mount, without doing
+        any lower level reconfiguration. This is useful to make sure that no
+        settings changes from a protocol persist.
+
+        :param mount: If specified, reset that mount. If not specified, reset both
+        """
+        def _reset(m: top_types.Mount):
+            p = self._attached_instruments[m]
+            if not p:
+                return
+            self._attached_instruments[m] = Pipette(
+                p._config,
+                self._config.instrument_offset[m.name.lower()],
+                p.pipette_id)
+            self._attached_instruments[m].act_as(p.acting_as)
+
+        if not mount:
+            for m in top_types.Mount:
+                _reset(m)
+        else:
+            _reset(mount)
+
     async def cache_instruments(
             self,
             require: Dict[top_types.Mount, 'PipetteName'] = None):
         """
-         - Get the attached instrument on each mount and
-         - Cache their pipette configs from pipette-config.json
+        Scan the attached instruments, take necessary configuration actions,
+        and set up hardware controller internal state if necessary.
 
         :param require: If specified, the require should be a dict
                         of mounts to instrument names describing
@@ -385,6 +409,16 @@ class API(HardwareAPILike):
                         and also serves as the hook for the hardware
                         simulator to decide what is attached.
         :raises RuntimeError: If an instrument is expected but not found.
+
+        .. note::
+
+            This function will only change the things that need to be changed.
+            If the same pipette (by serial) or the same lack of pipette is
+            observed on a mount before and after the scan, no action will be
+            taken. That makes this function appropriate for setting up the robot
+            for operation, but not for making sure that any previous settings
+            changes have been reset. For the latter use case, use
+            :py:meth:`reset_instrument`.
 
         """
         self._log.info("Updating instrument model cache")
