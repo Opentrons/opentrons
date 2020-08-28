@@ -63,7 +63,8 @@ async def test_moves_to_hotspot(hardware_api, monkeypatch,
     monkeypatch.setattr(hardware_api, 'move_rel', fake_move_rel)
     monkeypatch.setattr(hardware_api._backend, 'probe', fake_probe)
 
-    await hardware_api.cache_instruments({mount: name_for_model(pipette_model)})
+    await hardware_api.cache_instruments(
+        {mount: name_for_model(pipette_model)})
     await hardware_api.home()
 
     center = await hardware_api.locate_tip_probe_center(mount, 30)
@@ -106,7 +107,8 @@ async def test_moves_to_hotspot(hardware_api, monkeypatch,
 @pytest.mark.parametrize('mount', [Mount.RIGHT, Mount.LEFT])
 @pytest.mark.parametrize('pipette_model', pipette_config.config_models)
 async def test_update_instrument_offset(hardware_api, mount, pipette_model):
-    await hardware_api.cache_instruments({mount: name_for_model(pipette_model)})
+    await hardware_api.cache_instruments(
+        {mount: name_for_model(pipette_model)})
     p = Point(1, 2, 3)
     with pytest.raises(ValueError):
         await hardware_api.update_instrument_offset(mount)

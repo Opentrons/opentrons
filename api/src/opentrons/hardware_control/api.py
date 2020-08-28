@@ -377,17 +377,19 @@ class API(HardwareAPILike):
         any lower level reconfiguration. This is useful to make sure that no
         settings changes from a protocol persist.
 
-        :param mount: If specified, reset that mount. If not specified, reset both
+        :param mount: If specified, reset that mount. If not specified,
+                      reset both
         """
         def _reset(m: top_types.Mount):
             p = self._attached_instruments[m]
             if not p:
                 return
-            self._attached_instruments[m] = Pipette(
+            new_p = Pipette(
                 p._config,
                 self._config.instrument_offset[m.name.lower()],
                 p.pipette_id)
-            self._attached_instruments[m].act_as(p.acting_as)
+            new_p.act_as(p.acting_as)
+            self._attached_instruments[m] = new_p
 
         if not mount:
             for m in top_types.Mount:
@@ -415,9 +417,9 @@ class API(HardwareAPILike):
             This function will only change the things that need to be changed.
             If the same pipette (by serial) or the same lack of pipette is
             observed on a mount before and after the scan, no action will be
-            taken. That makes this function appropriate for setting up the robot
-            for operation, but not for making sure that any previous settings
-            changes have been reset. For the latter use case, use
+            taken. That makes this function appropriate for setting up the
+            robot for operation, but not for making sure that any previous
+            settings changes have been reset. For the latter use case, use
             :py:meth:`reset_instrument`.
 
         """

@@ -63,6 +63,7 @@ def test_load_instrument(loop, name):
     assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
     assert loaded.name == name
 
+
 async def test_motion(loop, hardware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)

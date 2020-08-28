@@ -4,7 +4,7 @@ import copy
 import logging
 from threading import Event
 from typing import (Dict, Optional, List, Tuple,
-                    TYPE_CHECKING, Sequence, cast)
+                    TYPE_CHECKING, Sequence)
 from contextlib import contextmanager
 
 from opentrons_shared_data.pipette import dummy_model_for_name
@@ -23,9 +23,7 @@ from .types import BoardRevision, Axis
 
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import (
-        PipetteName, PipetteModel
-    )
+    from opentrons_shared_data.pipette.dev_types import PipetteName
     from .dev_types import (
         RegisterModules, AttachedInstrument,
         AttachedInstruments, InstrumentSpec)
@@ -97,8 +95,10 @@ class Simulator:
             if passed_ai['model'] in config_models:
                 return passed_ai  # type: ignore
             if passed_ai['model'] in config_names:
-                return {'model': dummy_model_for_name(passed_ai['model']),   # type: ignore
-                        'id': passed_ai.get('id')}
+                return {
+                    'model':
+                    dummy_model_for_name(passed_ai['model']),  # type: ignore
+                    'id': passed_ai.get('id')}
             raise KeyError(
                 'If you specify attached_instruments, the model '
                 'should be pipette names or pipette models, but '
