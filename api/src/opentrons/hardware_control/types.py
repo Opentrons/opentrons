@@ -193,6 +193,10 @@ class PipettePair(enum.Enum):
 
 class HardwareAction(enum.Enum):
     DROPTIP = enum.auto()
+    ASPIRATE = enum.auto()
+    DISPENSE = enum.auto()
+    BLOWOUT = enum.auto()
+    PREPARE_ASPIRATE = enum.auto()
 
     def __str__(self):
         return self.name

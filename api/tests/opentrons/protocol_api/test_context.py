@@ -356,13 +356,16 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
     lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
-    instr = ctx.load_instrument('p10_single', Mount.RIGHT)
+    tiprack = ctx.load_labware('opentrons_96_tiprack_10ul', 2)
+    instr = ctx.load_instrument(
+        'p10_single', Mount.RIGHT, tip_racks=[tiprack])
 
     fake_hw_aspirate = mock.Mock()
     fake_move = mock.Mock()
     monkeypatch.setattr(API, 'aspirate', fake_hw_aspirate)
     monkeypatch.setattr(API, 'move_to', fake_move)
 
+    instr.pick_up_tip()
     instr.aspirate(2.0, lw.wells()[0].bottom())
     assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
 

@@ -136,6 +136,100 @@ async def test_drop_tip(
     assert hw_api._attached_instruments[mount.secondary].current_volume == 0
 
 
+async def test_prep_aspirate(
+        dummy_instruments, loop, toggle_new_calibration):
+    hw_api = await hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    mount = PipettePair.PRIMARY_RIGHT
+    await hw_api.pick_up_tip(mount, 20.0)
+
+    # If we're empty and haven't prepared, we should get an error
+    with pytest.raises(RuntimeError):
+        await hw_api.aspirate(mount, 1, 1.0)
+    # If we're empty and have prepared, we should be fine
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, 1)
+    # If we're not empty, we should be fine
+    await hw_api.aspirate(mount, 1)
+
+
+async def test_aspirate_new(dummy_instruments, loop):
+    hw_api = await hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    mount = PipettePair.PRIMARY_RIGHT
+    await hw_api.pick_up_tip(mount, 20.0)
+
+    aspirate_ul = 3.0
+    aspirate_rate = 2
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
+    plunger_left = -14.142003
+    plunger_right = -4.2254
+
+    pos = hw_api._current_position
+    assert pos[Axis.B] == plunger_left
+    assert pos[Axis.C] == plunger_right
+
+
+async def test_aspirate_old(dummy_instruments, loop, old_aspiration):
+    hw_api = await hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    mount = PipettePair.PRIMARY_RIGHT
+    await hw_api.pick_up_tip(mount, 20.0)
+
+    aspirate_ul = 3.0
+    aspirate_rate = 2
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
+    plunger_left = -14.142003
+    plunger_right = -4.2254
+
+    pos = hw_api._current_position
+    assert pos[Axis.B] == plunger_left
+    assert pos[Axis.C] == plunger_right
+
+
+async def test_dispense(dummy_instruments, loop):
+    hw_api = await hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    await hw_api.home()
+
+    await hw_api.cache_instruments()
+
+    mount = PipettePair.PRIMARY_RIGHT
+    await hw_api.pick_up_tip(mount, 20.0)
+
+    aspirate_ul = 10.0
+    aspirate_rate = 2
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
+
+    dispense_1 = 3.0
+    await hw_api.dispense(mount, dispense_1)
+    plunger_left_1 = -13.67942
+    plunger_right_1 = 1.062058
+
+    pos1 = hw_api._current_position
+    assert pos1[Axis.B] == plunger_left_1
+    assert pos1[Axis.C] == plunger_right_1
+
+    await hw_api.dispense(mount, rate=2)
+    plunger_left_2 = -14.5
+    plunger_right_2 = -8.5
+    pos2 = hw_api._current_position
+    assert pos2[Axis.B] == plunger_left_2
+    assert pos2[Axis.C] == plunger_right_2
+
+
 async def test_tip_action_currents(
         dummy_instruments, smoothie, monkeypatch, loop):
     smoothie.simulating = False
