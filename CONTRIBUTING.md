@@ -165,7 +165,7 @@ Your computer will need the following tools installed to be able to develop with
 - GNU Make - we use [Makefiles][] to manage our builds
 
 - cURL - used to push development updates to robots
-- On Linux, you will need libsystemd and headers. On Ubuntu, install `systemd-dev` and `python3-dev` before running `make setup`.
+- On Linux, you will need libsystemd and headers. On Ubuntu, install `libsystemd-dev` and `python3-dev` before running `make setup`.
 
 Once you're set up, clone the repository and install all project dependencies:
 
