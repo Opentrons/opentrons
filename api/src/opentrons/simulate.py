@@ -25,6 +25,8 @@ import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons import protocol_api
 from opentrons.protocols.api_support.util import HardwareToManage
+from opentrons.protocol_api.implementation.protocol_context import \
+    ProtocolContextImplementation
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
     PythonProtocol, BundleContents, APIVersion)
@@ -192,12 +194,16 @@ def _build_protocol_context(
     version specification for use with
     :py:meth:`.protocol_api.execute.run_protocol`
     """
-    context = protocol_api.contexts.ProtocolContext(
+    context_i = ProtocolContextImplementation(
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         api_version=version,
         extra_labware=extra_labware,
-        hardware=hardware_simulator,
+        hardware=hardware_simulator
+    )
+
+    context = protocol_api.contexts.ProtocolContext(
+        context_i
     )
     context.home()
     return context

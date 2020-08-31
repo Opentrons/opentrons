@@ -12,9 +12,9 @@ from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.module_geometry import ModuleGeometry
 from opentrons.protocol_api.geometry import Deck
 from opentrons.protocol_api.instrument_context import InstrumentContext
-from opentrons.protocol_api.protocol_context import ModuleTypes
-from opentrons.protocol_api.module_contexts import ModuleContext
-from opentrons.protocol_api.util import AxisMaxSpeeds
+from opentrons.protocol_api.module_contexts import ModuleContext, ModuleTypes
+from opentrons.protocol_api.util import AxisMaxSpeeds, \
+    HardwareManager
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -23,6 +23,14 @@ class AbstractProtocolContext(ApiVersioned):
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Get a mapping of name to contents"""
+        ...
+
+    @abstractmethod
+    def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
+        ...
+
+    @abstractmethod
+    def get_extra_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
         ...
 
     @abstractmethod
@@ -39,6 +47,10 @@ class AbstractProtocolContext(ApiVersioned):
 
     @abstractmethod
     def clear_commands(self) -> None:
+        ...
+
+    @abstractmethod
+    def get_hardware(self) -> HardwareManager:
         ...
 
     @contextlib.contextmanager
@@ -79,17 +91,6 @@ class AbstractProtocolContext(ApiVersioned):
         ...
 
     @abstractmethod
-    def load_labware_by_name(
-            self,
-            load_name: str,
-            location: types.DeckLocation,
-            label: str = None,
-            namespace: str = None,
-            version: int = 1
-    ) -> Labware:
-        ...
-
-    @abstractmethod
     def get_loaded_labwares(self) -> Dict[int, Union[Labware, ModuleGeometry]]:
         ...
 
@@ -109,7 +110,7 @@ class AbstractProtocolContext(ApiVersioned):
     def load_instrument(
             self,
             instrument_name: str,
-            mount: Union[types.Mount, str],
+            mount: types.Mount,
             tip_racks: List[Labware] = None,
             replace: bool = False) -> InstrumentContext:
         ...
@@ -134,7 +135,6 @@ class AbstractProtocolContext(ApiVersioned):
     @abstractmethod
     def delay(self,
               seconds=0,
-              minutes=0,
               msg: str = None) -> None:
         ...
 
