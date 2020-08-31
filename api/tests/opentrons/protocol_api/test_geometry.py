@@ -406,6 +406,8 @@ def test_should_dodge():
     # with a tc loaded, some positions should require dodging
     assert should_dodge_thermocycler(
         deck, deck.position_for(12), deck.position_for(1))
+    assert should_dodge_thermocycler(
+        deck, deck.position_for(9), deck.position_for(4))
     # but ones that weren't explicitly marked shouldn't
     assert not should_dodge_thermocycler(
         deck, deck.position_for(1), deck.position_for(2))
