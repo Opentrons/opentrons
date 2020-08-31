@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 from datetime import datetime, timezone
-from opentrons.system import time
+from robot_server.system import time
 
 
 @pytest.fixture

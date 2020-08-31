@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from fastapi import APIRouter
-from opentrons.system import time
+from robot_server.system import time
 from typing import Dict
 from robot_server.service.system import models as time_models
 from robot_server.service.system import errors
