@@ -22,7 +22,7 @@ from opentrons.types import Location, Point
 from opentrons.calibration_storage import helpers
 from opentrons.protocol_api import (ProtocolContext,
                                     labware, module_geometry)
-from opentrons.protocol_api.execute import run_protocol
+from opentrons.protocols.execution.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)

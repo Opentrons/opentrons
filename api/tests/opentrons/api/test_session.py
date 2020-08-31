@@ -13,7 +13,7 @@ from tests.opentrons.conftest import state
 from functools import partial
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.execute import ExceptionInProtocolError
+from opentrons.protocols.execution.execute import ExceptionInProtocolError
 
 state = partial(state, 'session')
 

@@ -1,5 +1,6 @@
 import pytest
-from opentrons.protocol_api import execute, ProtocolContext
+from opentrons.protocol_api import ProtocolContext
+from opentrons.protocols.execution import execute
 from opentrons.protocols.parse import parse
 
 

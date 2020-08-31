@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from opentrons import simulate, protocols
-from opentrons.protocol_api.execute import ExceptionInProtocolError
+from opentrons.protocols.execution.execute import ExceptionInProtocolError
 
 HERE = Path(__file__).parent
 

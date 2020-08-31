@@ -7,11 +7,11 @@ from typing import Any, Dict
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 
-from .contexts import ProtocolContext
-from .json_dispatchers import pipette_command_map, \
-    temperature_module_command_map, magnetic_module_command_map, \
-    thermocycler_module_command_map
-from . import execute_v3, execute_v4
+from opentrons.protocol_api.contexts import ProtocolContext
+from opentrons.protocols.execution.json_dispatchers import (
+    pipette_command_map, temperature_module_command_map,
+    magnetic_module_command_map, thermocycler_module_command_map)
+from opentrons.protocols.execution import execute_v4, execute_v3
 
 from opentrons.protocols.types import (PythonProtocol, Protocol,
                                        APIVersion, MalformedProtocolError)

@@ -1,7 +1,7 @@
 import logging
 from typing import TYPE_CHECKING
 from opentrons.types import Point
-from .types import LoadedLabware, Instruments
+from opentrons.protocols.execution.types import LoadedLabware, Instruments
 from .execute_v3 import _get_well
 if TYPE_CHECKING:
     from opentrons_shared_data.protocol.dev_types import (
