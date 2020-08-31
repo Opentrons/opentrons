@@ -2,15 +2,17 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  PrimaryButton,
+  PrimaryBtn,
   Flex,
   Text,
   FONT_SIZE_BODY_2,
   DIRECTION_ROW,
   SPACING_3,
+  SIZE_5,
   BORDER_SOLID_LIGHT,
   FONT_SIZE_HEADER,
   FONT_WEIGHT_SEMIBOLD,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -20,7 +22,6 @@ import type { DeckCalibrationStep } from '../../sessions/deck-calibration/types'
 import type { SessionCommandString, SessionType } from '../../sessions/types'
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
-import styles from './styles.css'
 
 import slot1LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
 import slot1LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
@@ -147,28 +148,21 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
 
   return (
     <>
-      <div className={styles.modal_header}>
-        <Text
-          fontSize={FONT_SIZE_HEADER}
-          fontWeight={FONT_WEIGHT_SEMIBOLD}
-          textTransform="uppercase"
-        >
-          {SAVE_XY_POINT_HEADER}
-          {` ${SLOT} ${slotNumber || ''}`}
-        </Text>
-      </div>
+      <Text
+        fontSize={FONT_SIZE_HEADER}
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        textTransform="uppercase"
+      >
+        {SAVE_XY_POINT_HEADER}
+        {` ${SLOT} ${slotNumber || ''}`}
+      </Text>
       <Flex
         flexDirection={DIRECTION_ROW}
         padding={SPACING_3}
         border={BORDER_SOLID_LIGHT}
         marginTop={SPACING_3}
       >
-        <Text
-          fontSize={FONT_SIZE_BODY_2}
-          css={css`
-            align-self: center;
-          `}
-        >
+        <Text fontSize={FONT_SIZE_BODY_2} alignSelf={JUSTIFY_CENTER}>
           {JOG_UNTIL}
           <b>{` ${PRECISELY_CENTERED} `}</b>
           {ABOVE_THE_CROSS}
@@ -181,7 +175,10 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
         </Text>
         <video
           key={String(demoAsset)}
-          className={styles.step_check_video}
+          css={css`
+            max-width: 100%;
+            max-height: 15rem;
+          `}
           autoPlay={true}
           loop={true}
           controls={false}
@@ -189,13 +186,15 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           <source src={demoAsset} />
         </video>
       </Flex>
-      <div className={styles.tip_pick_up_controls_wrapper}>
-        <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['x', 'y']} />
-      </div>
-      <Flex width="100%" marginBottom={SPACING_3}>
-        <PrimaryButton onClick={savePoint} className={styles.command_button}>
+      <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['x', 'y']} />
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_CENTER}
+        marginBottom={SPACING_3}
+      >
+        <PrimaryBtn onClick={savePoint} width={SIZE_5}>
           {buttonText}
-        </PrimaryButton>
+        </PrimaryBtn>
       </Flex>
     </>
   )

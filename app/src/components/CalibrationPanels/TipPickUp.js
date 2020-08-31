@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
+import { css } from 'styled-components'
 import {
   Box,
   Flex,
-  PrimaryButton,
+  PrimaryBtn,
   Text,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -15,6 +16,8 @@ import {
   SPACING_2,
   SPACING_3,
   TEXT_ALIGN_CENTER,
+  FONT_HEADER_DARK,
+  SPACING_5,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
@@ -23,7 +26,6 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
 import type { CalibrationPanelProps } from './types'
-import styles from './styles.css'
 import { formatJogVector } from './utils'
 
 import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
@@ -89,12 +91,16 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
         position={POSITION_RELATIVE}
         width="100%"
       >
-        <h3 className={styles.intro_header}>
+        <Text
+          css={FONT_HEADER_DARK}
+          marginBottom={SPACING_3}
+          textTransform="uppercase"
+        >
           {TIP_PICK_UP_HEADER}
           {tipRackDef
             ? getLabwareDisplayName(tipRackDef).replace('µL', 'uL')
             : null}
-        </h3>
+        </Text>
         <Box
           padding={SPACING_3}
           border={BORDER_SOLID_LIGHT}
@@ -120,26 +126,27 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
               <Text as="strong">{` ${FLUSH} `}</Text>
               {WITH_TOP_OF_TIP}
             </Text>
-            <div className={styles.step_check_video_wrapper}>
+            <Box marginLeft={SPACING_3}>
               <video
                 key={demoAsset}
-                className={styles.step_check_video}
+                css={css`
+                  max-width: 100%;
+                  max-height: 15rem;
+                `}
                 autoPlay={true}
                 loop={true}
                 controls={false}
               >
                 <source src={demoAsset} />
               </video>
-            </div>
+            </Box>
           </Flex>
         </Box>
-        <div>
-          <JogControls jog={jog} />
-        </div>
+        <JogControls jog={jog} />
         <Flex width="100%">
-          <PrimaryButton onClick={pickUpTip} className={styles.command_button}>
+          <PrimaryBtn onClick={pickUpTip} margin={`0 ${SPACING_5}`}>
             {TIP_PICK_UP_BUTTON_TEXT}
-          </PrimaryButton>
+          </PrimaryBtn>
         </Flex>
       </Flex>
     </>

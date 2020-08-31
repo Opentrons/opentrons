@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  PrimaryButton,
+  PrimaryBtn,
   Flex,
   Text,
   FONT_WEIGHT_SEMIBOLD,
@@ -18,7 +18,6 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from './types'
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
-import styles from './styles.css'
 
 import slot5LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
 import slot5LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
@@ -91,15 +90,13 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
 
   return (
     <>
-      <div className={styles.modal_header}>
-        <Text
-          textTransform="uppercase"
-          fontWeight={FONT_WEIGHT_SEMIBOLD}
-          fontSize={FONT_SIZE_HEADER}
-        >
-          {headerText}
-        </Text>
-      </div>
+      <Text
+        textTransform="uppercase"
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        fontSize={FONT_SIZE_HEADER}
+      >
+        {headerText}
+      </Text>
       <Flex
         flexDirection={DIRECTION_ROW}
         padding={SPACING_3}
@@ -124,7 +121,10 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
         </Text>
         <video
           key={demoAsset}
-          className={styles.step_check_video}
+          css={css`
+            max-width: 100%;
+            max-height: 15rem;
+          `}
           autoPlay={true}
           loop={true}
           controls={false}
@@ -132,13 +132,11 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
           <source src={demoAsset} />
         </video>
       </Flex>
-      <div className={styles.tip_pick_up_controls_wrapper}>
-        <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
-      </div>
+      <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
       <Flex width="100%" marginBottom={SPACING_3}>
-        <PrimaryButton onClick={savePoint} className={styles.command_button}>
+        <PrimaryBtn onClick={savePoint} margin={`0 ${SPACING_5}`}>
           {buttonText}
-        </PrimaryButton>
+        </PrimaryBtn>
       </Flex>
     </>
   )

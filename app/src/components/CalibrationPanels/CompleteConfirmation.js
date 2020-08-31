@@ -4,13 +4,13 @@ import {
   Flex,
   Icon,
   PrimaryButton,
+  COLOR_SUCCESS,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   DIRECTION_COLUMN,
   SPACING_3,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import styles from './styles.css'
 import type { CalibrationPanelProps } from './types'
 import * as Sessions from '../../sessions'
 
@@ -32,7 +32,12 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
       flex={1}
     >
       <Flex alignItems={ALIGN_CENTER} marginTop={SPACING_3}>
-        <Icon name="check-circle" className={styles.success_status_icon} />
+        <Icon
+          name="check-circle"
+          width="2.5rem"
+          marginRight={SPACING_3}
+          color={COLOR_SUCCES}
+        />
         <h3>{COMPLETE_HEADER}</h3>
       </Flex>
 
