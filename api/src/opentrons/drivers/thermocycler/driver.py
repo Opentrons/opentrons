@@ -401,6 +401,10 @@ class Thermocycler:
         self.lid_status = 'closed'
         return self.lid_status
 
+    def hold_time_probably_set(self, new_hold_time):
+        fuzzy_lower_boundary = new_hold_time - POLLING_FREQUENCY_MS / 1000 * 5
+        return min(fuzzy_lower_boundary, 0) <= self._hold_time <= new_hold_time
+
     async def set_temperature(self,
                               temp: float,
                               hold_time: float = None,
@@ -415,7 +419,7 @@ class Thermocycler:
                                           volume=volume)
         await self._write_and_wait(temp_cmd)
         retries = 0
-        while (self._target_temp != temp) or (self._hold_time != hold_time):
+        while (self._target_temp != temp) or not self.hold_time_probably_set(hold_time):
             await asyncio.sleep(0.1)    # Wait for the poller to update
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
