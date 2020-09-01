@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 from enum import Enum
+from typing import TYPE_CHECKING
 from robot_server.robot.calibration.constants import STATE_WILDCARD
-from typing_extensions import Final
+
+if TYPE_CHECKING:
+    from typing_extensions import Final
 
 
 class PipetteOffsetCalibrationState(str, Enum):

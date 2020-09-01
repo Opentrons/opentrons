@@ -1,8 +1,12 @@
-from typing import Optional, List
+from __future__ import annotations
+
+from typing import Optional, List, TYPE_CHECKING
 from pydantic import BaseModel, Field
 
 from ..helper_classes import AttachedPipette, RequiredLabware
-from ..dev_types import NextSteps
+
+if TYPE_CHECKING:
+    from ..dev_types import NextSteps
 
 
 class SessionCreateParams(BaseModel):

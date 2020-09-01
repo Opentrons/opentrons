@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 from uuid import UUID
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
 from functools import partial
 from pydantic import BaseModel, Field
 
-from ..dev_types import NextSteps
+if TYPE_CHECKING:
+    from ..dev_types import NextSteps
 
 OffsetVector = Tuple[float, float, float]
 
