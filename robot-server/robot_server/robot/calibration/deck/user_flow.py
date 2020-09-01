@@ -12,7 +12,8 @@ from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
-from opentrons.protocol_api import geometry, labware
+from opentrons.protocol_api import labware
+from opentrons.protocols.api_support import geometry
 from opentrons.types import Mount, Point, Location
 
 from robot_server.robot.calibration.constants import \

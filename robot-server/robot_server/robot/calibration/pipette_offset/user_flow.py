@@ -5,7 +5,8 @@ from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
-from opentrons.protocol_api import geometry, labware
+from opentrons.protocol_api import labware
+from opentrons.protocols.api_support import geometry
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand

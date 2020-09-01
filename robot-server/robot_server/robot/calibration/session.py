@@ -13,7 +13,8 @@ from robot_server.robot.calibration.helper_classes import PipetteInfo, \
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, Pipette, CriticalPoint
 from opentrons.hardware_control.util import plan_arc
-from opentrons.protocol_api import geometry, labware
+from opentrons.protocol_api import labware
+from opentrons.protocols.api_support import geometry
 from opentrons.types import Mount, Point, Location
 
 from robot_server.service.errors import RobotServerError
