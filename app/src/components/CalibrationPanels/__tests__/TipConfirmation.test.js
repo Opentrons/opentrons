@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
 import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
 
@@ -14,10 +13,10 @@ describe('TipConfirmation', () => {
   const mockDeleteSession = jest.fn()
 
   const getConfirmTipButton = wrapper =>
-    wrapper.find('PrimaryButton[children="Yes, continue"]').find('button')
+    wrapper.find('button[children="Yes, move to slot 5"]')
 
   const getInvalidateTipButton = wrapper =>
-    wrapper.find('PrimaryButton[children="No, try again"]').find('button')
+    wrapper.find('button[children="No, try again"]')
 
   beforeEach(() => {
     render = (
@@ -30,6 +29,7 @@ describe('TipConfirmation', () => {
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_INSPECTING_TIP,
+        sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
       return mount(
         <TipConfirmation
@@ -39,6 +39,7 @@ describe('TipConfirmation', () => {
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
           currentStep={currentStep}
+          sessionType={sessionType}
         />
       )
     }
@@ -51,20 +52,20 @@ describe('TipConfirmation', () => {
   it('clicking confirm tip attached sends pick up tip command', () => {
     const wrapper = render()
 
-    act(() => getConfirmTipButton(wrapper).invoke('onClick')())
+    getConfirmTipButton(wrapper).invoke('onClick')()
     wrapper.update()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.MOVE_TO_DECK
+      Sessions.sharedCalCommands.MOVE_TO_DECK
     )
   })
   it('clicking invalidate tip send invalidate tip command', () => {
     const wrapper = render()
 
-    act(() => getInvalidateTipButton(wrapper).invoke('onClick')())
+    getInvalidateTipButton(wrapper).invoke('onClick')()
     wrapper.update()
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.INVALIDATE_TIP
+      Sessions.sharedCalCommands.INVALIDATE_TIP
     )
   })
 })

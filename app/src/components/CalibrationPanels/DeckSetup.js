@@ -2,7 +2,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import {
-  OutlineButton,
   RobotWorkSpace,
   Flex,
   Text,
@@ -22,8 +21,7 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 
 import * as Sessions from '../../sessions'
 import type { CalibrationPanelProps } from './types'
-// TODO: IMMEDIATELY move CalibrationLabwareRender up to shared location in src/components
-import { CalibrationLabwareRender } from '../CalibrateTipLength/CalibrationLabwareRender'
+import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import styles from './styles.css'
 
 const DECK_SETUP_PROMPT =

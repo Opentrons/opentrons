@@ -1,3 +1,5 @@
+// @flow
+
 const LOAD_LABWARE: 'calibration.loadLabware' = 'calibration.loadLabware'
 const JOG: 'calibration.jog' = 'calibration.jog'
 const PICK_UP_TIP: 'calibration.pickUpTip' = 'calibration.pickUpTip'

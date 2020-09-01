@@ -2,7 +2,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
-import { SecondaryBtn, SPACING_2, SPACING_3 } from '@opentrons/components'
+import { css } from 'styled-components'
+import { SecondaryBtn, SPACING_2 } from '@opentrons/components'
 
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'

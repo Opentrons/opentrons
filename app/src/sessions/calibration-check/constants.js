@@ -54,6 +54,7 @@ const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
 
 export const checkCommands = {
   ...sharedCalCommands,
+  PREPARE_PIPETTE,
   COMPARE_POINT,
   GO_TO_NEXT_CHECK,
   EXIT,

@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
 import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
 
@@ -14,7 +13,7 @@ describe('TipPickUp', () => {
   const mockDeleteSession = jest.fn()
 
   const getPickUpTipButton = wrapper =>
-    wrapper.find('PrimaryButton[children="Pick up tip"]').find('button')
+    wrapper.find('button[children="Pick up tip"]')
 
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
@@ -28,6 +27,7 @@ describe('TipPickUp', () => {
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_PREPARING_PIPETTE,
+        sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
       return mount(
         <TipPickUp
@@ -37,6 +37,7 @@ describe('TipPickUp', () => {
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
           currentStep={currentStep}
+          sessionType={sessionType}
         />
       )
     }
@@ -59,11 +60,11 @@ describe('TipPickUp', () => {
       forward: [0, -0.1, 0],
     }
     jogDirections.forEach(direction => {
-      act(() => getJogButton(wrapper, direction).invoke('onClick')())
+      getJogButton(wrapper, direction).invoke('onClick')()
       wrapper.update()
 
       expect(mockSendCommand).toHaveBeenCalledWith(
-        Sessions.deckCalCommands.JOG,
+        Sessions.sharedCalCommands.JOG,
         { vector: jogVectorsByDirection[direction] },
         false
       )
@@ -72,10 +73,10 @@ describe('TipPickUp', () => {
   it('clicking pick up tip sends pick up tip command', () => {
     const wrapper = render()
 
-    act(() => getPickUpTipButton(wrapper).invoke('onClick')())
+    getPickUpTipButton(wrapper).invoke('onClick')()
     wrapper.update()
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.PICK_UP_TIP
+      Sessions.sharedCalCommands.PICK_UP_TIP
     )
   })
 })

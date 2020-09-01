@@ -19,7 +19,6 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   FONT_HEADER_DARK,
   SPACING_5,
-  SIZE_5,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 

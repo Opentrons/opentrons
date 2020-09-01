@@ -13,9 +13,7 @@ describe('Introduction', () => {
   const mockDeleteSession = jest.fn()
 
   const getContinueButton = wrapper =>
-    wrapper
-      .find('PrimaryButton[children="Continue to calibrate deck"]')
-      .find('button')
+    wrapper.find('button[data-test="continueButton"]')
 
   const getCancelDeckClearButton = wrapper =>
     wrapper.find('OutlineButton[children="cancel"]').find('button')
@@ -32,6 +30,7 @@ describe('Introduction', () => {
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_SESSION_STARTED,
+        sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
       return mount(
         <Introduction
@@ -41,6 +40,7 @@ describe('Introduction', () => {
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
           currentStep={currentStep}
+          sessionType={sessionType}
         />
       )
     }
@@ -79,5 +79,35 @@ describe('Introduction', () => {
     expect(mockSendCommand).not.toHaveBeenCalledWith(
       Sessions.deckCalCommands.LOAD_LABWARE
     )
+  })
+
+  it('pip offset cal session type shows correct text', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+    })
+    const allText = wrapper.text()
+    expect(allText).toContain('pipette offset calibration')
+    expect(allText).toContain('Calibrating pipette offset enables')
+    expect(allText).toContain('continue')
+
+    getContinueButton(wrapper).invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.text()).toContain(
+      'Before continuing to calibrate pipette offset'
+    )
+  })
+
+  it('deck cal session type shows correct text', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
+    })
+    const allText = wrapper.text()
+    expect(allText).toContain('deck calibration')
+    expect(allText).toContain('Deck calibration ensures positional accuracy')
+    expect(allText).toContain('continue to calibrate deck')
+
+    getContinueButton(wrapper).invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.text()).toContain('Before continuing to calibrate deck')
   })
 })

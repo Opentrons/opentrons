@@ -147,7 +147,11 @@ export function CalibratePipetteOffset(
         />
       </ModalPage>
       {showConfirmExit && (
-        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
+        <ConfirmExitModal
+          exit={confirmExit}
+          back={cancelExit}
+          sessionType={session.sessionType}
+        />
       )}
     </>
   ) : null

@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
 import type { Mount } from '@opentrons/components'
 
 import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
@@ -19,6 +18,9 @@ describe('SaveXYPoint', () => {
   const mockSendCommand = jest.fn()
   const mockDeleteSession = jest.fn()
 
+  const getSaveButton = (wrapper, direction) =>
+    wrapper.find('button[data-test="saveButton"]')
+
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
@@ -33,6 +35,7 @@ describe('SaveXYPoint', () => {
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_SAVING_POINT_ONE,
+        sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
       return mount(
         <SaveXYPoint
@@ -42,6 +45,7 @@ describe('SaveXYPoint', () => {
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
           currentStep={currentStep}
+          sessionType={sessionType}
         />
       )
     }
@@ -123,11 +127,11 @@ describe('SaveXYPoint', () => {
       forward: [0, -0.1, 0],
     }
     jogDirections.forEach(direction => {
-      act(() => getJogButton(wrapper, direction).invoke('onClick')())
+      getJogButton(wrapper, direction).invoke('onClick')()
       wrapper.update()
 
       expect(mockSendCommand).toHaveBeenCalledWith(
-        Sessions.deckCalCommands.JOG,
+        Sessions.sharedCalCommands.JOG,
         {
           vector: jogVectorByDirection[direction],
         },
@@ -141,59 +145,74 @@ describe('SaveXYPoint', () => {
     })
   })
 
-  it('sends save offset and move to point two commands when current step is savingPointOne', () => {
-    const wrapper = render()
+  it('deck cal session sends save offset and move to point two commands when current step is savingPointOne', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
+      currentStep: Sessions.DECK_STEP_SAVING_POINT_ONE,
+    })
 
-    act(() =>
-      wrapper
-        .find('PrimaryButton[children="save calibration and move to slot 3"]')
-        .invoke('onClick')()
-    )
+    expect(wrapper.text()).toContain('slot 1')
+    getSaveButton(wrapper).invoke('onClick')()
+
     wrapper.update()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.SAVE_OFFSET
+      Sessions.sharedCalCommands.SAVE_OFFSET
     )
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.deckCalCommands.MOVE_TO_POINT_TWO
     )
   })
 
-  it('sends save offset and move to point three commands when current step is savingPointTwo', () => {
-    const wrapper = render({ currentStep: Sessions.DECK_STEP_SAVING_POINT_TWO })
+  it('deck cal session sends save offset and move to point three commands when current step is savingPointTwo', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
+      currentStep: Sessions.DECK_STEP_SAVING_POINT_TWO,
+    })
 
-    act(() =>
-      wrapper
-        .find('PrimaryButton[children="save calibration and move to slot 7"]')
-        .invoke('onClick')()
-    )
+    expect(wrapper.text()).toContain('slot 3')
+    getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.SAVE_OFFSET
+      Sessions.sharedCalCommands.SAVE_OFFSET
     )
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.deckCalCommands.MOVE_TO_POINT_THREE
     )
   })
 
-  it('sends save offset and move to tip rack commands when current step is savingPointThree', () => {
+  it('deck cal session sends save offset and move to tip rack commands when current step is savingPointThree', () => {
     const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
       currentStep: Sessions.DECK_STEP_SAVING_POINT_THREE,
     })
 
-    act(() =>
-      wrapper
-        .find('PrimaryButton[children="save calibration"]')
-        .invoke('onClick')()
-    )
+    expect(wrapper.text()).toContain('slot 7')
+    getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.SAVE_OFFSET
+      Sessions.sharedCalCommands.SAVE_OFFSET
     )
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.MOVE_TO_TIP_RACK
+      Sessions.sharedCalCommands.MOVE_TO_TIP_RACK
+    )
+  })
+
+  it('pip offset cal session sends saveOffset when current step is savingPointOne', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+      currentStep: Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE,
+    })
+    const allText = wrapper.text()
+    expect(allText).toContain('save calibration')
+    expect(allText).toContain('slot 1')
+
+    getSaveButton(wrapper).invoke('onClick')()
+    wrapper.update()
+    expect(mockSendCommand).toHaveBeenCalledWith(
+      Sessions.sharedCalCommands.SAVE_OFFSET
     )
   })
 })

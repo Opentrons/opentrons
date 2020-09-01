@@ -84,9 +84,12 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     true
   )
 
-  const { headerText, bodyText, continueButtonText } = contentsBySessionType[
-    sessionType
-  ]
+  const {
+    headerText,
+    bodyText,
+    continueButtonText,
+    continuingTo,
+  } = contentsBySessionType[sessionType]
 
   return (
     <>
@@ -124,7 +127,12 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
         </Box>
       </Flex>
       <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
-        <PrimaryBtn onClick={proceed} flex="1" margin="1.5rem 5rem 1rem">
+        <PrimaryBtn
+          data-test="continueButton"
+          onClick={proceed}
+          flex="1"
+          margin="1.5rem 5rem 1rem"
+        >
           {continueButtonText}
         </PrimaryBtn>
       </Flex>

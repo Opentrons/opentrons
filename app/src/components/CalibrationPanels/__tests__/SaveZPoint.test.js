@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
 
 import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
@@ -14,9 +13,7 @@ describe('SaveZPoint', () => {
   const mockDeleteSession = jest.fn()
 
   const getSaveButton = wrapper =>
-    wrapper
-      .find('PrimaryButton[children="remember z-axis and move to slot 1"]')
-      .find('button')
+    wrapper.find('button[data-test="continueButton"]')
 
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
@@ -32,6 +29,7 @@ describe('SaveZPoint', () => {
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_JOGGING_TO_DECK,
+        sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
       return mount(
         <SaveZPoint
@@ -41,6 +39,7 @@ describe('SaveZPoint', () => {
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
           currentStep={currentStep}
+          sessionType={sessionType}
         />
       )
     }
@@ -83,7 +82,7 @@ describe('SaveZPoint', () => {
       down: [0, 0, -0.1],
     }
     jogDirections.forEach(direction => {
-      act(() => getJogButton(wrapper, direction).invoke('onClick')())
+      getJogButton(wrapper, direction).invoke('onClick')()
       wrapper.update()
 
       expect(mockSendCommand).toHaveBeenCalledWith(
@@ -104,7 +103,7 @@ describe('SaveZPoint', () => {
   it('sends save offset command when primary button is clicked', () => {
     const wrapper = render()
 
-    act(() => getSaveButton(wrapper).invoke('onClick')())
+    getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
@@ -113,5 +112,23 @@ describe('SaveZPoint', () => {
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.deckCalCommands.MOVE_TO_POINT_ONE
     )
+  })
+
+  it('pip offset cal session type shows correct text', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+    })
+    const allText = wrapper.text()
+    expect(allText).toContain('save calibration and move to slot 1')
+    expect(allText).toContain('calibrate z-axis in slot 5')
+  })
+
+  it('deck cal session type shows correct text', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
+    })
+    const allText = wrapper.text()
+    expect(allText).toContain('remember z-axis and move to slot 1')
+    expect(allText).toContain('z-axis in slot 5')
   })
 })

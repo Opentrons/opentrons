@@ -9,7 +9,6 @@ import {
   DIRECTION_ROW,
   SPACING_3,
   SPACING_5,
-  SIZE_5,
   BORDER_SOLID_LIGHT,
   FONT_SIZE_HEADER,
   FONT_WEIGHT_SEMIBOLD,
@@ -87,7 +86,7 @@ const contentsBySessionTypeByCurrentStep: {
     [DeckCalibrationStep]: {
       slotNumber: string,
       buttonText: string,
-      commandString: SessionCommandString,
+      moveCommandString: SessionCommandString | null,
     },
   },
 } = {
@@ -95,24 +94,24 @@ const contentsBySessionTypeByCurrentStep: {
     [Sessions.DECK_STEP_SAVING_POINT_ONE]: {
       slotNumber: '1',
       buttonText: MOVE_TO_POINT_TWO_BUTTON_TEXT,
-      commandString: Sessions.deckCalCommands.MOVE_TO_POINT_TWO,
+      moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_TWO,
     },
     [Sessions.DECK_STEP_SAVING_POINT_TWO]: {
       slotNumber: '3',
       buttonText: MOVE_TO_POINT_THREE_BUTTON_TEXT,
-      commandString: Sessions.deckCalCommands.MOVE_TO_POINT_THREE,
+      moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_THREE,
     },
     [Sessions.DECK_STEP_SAVING_POINT_THREE]: {
       slotNumber: '7',
       buttonText: BASE_BUTTON_TEXT,
-      commandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+      moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
     },
   },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: {
       slotNumber: '1',
       buttonText: BASE_BUTTON_TEXT,
-      commandString: Sessions.sharedCalCommands.SAVE_OFFSET,
+      moveCommandString: null,
     },
   },
 }
@@ -123,7 +122,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
   const {
     slotNumber,
     buttonText,
-    commandString,
+    moveCommandString,
   } = contentsBySessionTypeByCurrentStep[sessionType][currentStep]
 
   const demoAsset = React.useMemo(
@@ -144,7 +143,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
 
   const savePoint = () => {
     sendSessionCommand(Sessions.sharedCalCommands.SAVE_OFFSET)
-    sendSessionCommand(commandString)
+    moveCommandString && sendSessionCommand(moveCommandString)
   }
 
   return (
@@ -193,7 +192,12 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
         justifyContent={JUSTIFY_CENTER}
         marginBottom={SPACING_3}
       >
-        <PrimaryBtn onClick={savePoint} flex="1" marginX={SPACING_5}>
+        <PrimaryBtn
+          data-test="saveButton"
+          onClick={savePoint}
+          flex="1"
+          marginX={SPACING_5}
+        >
           {buttonText}
         </PrimaryBtn>
       </Flex>

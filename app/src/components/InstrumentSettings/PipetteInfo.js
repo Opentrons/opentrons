@@ -14,11 +14,7 @@ import {
   SPACING_2,
   SPACING_3,
   SIZE_4,
-  SIZE_5,
-  TEXT_ALIGN_RIGHT,
-  JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
-  POSITION_RELATIVE,
   ALIGN_FLEX_START,
   BORDER_SOLID_LIGHT,
 } from '@opentrons/components'
@@ -124,7 +120,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
 }
 
 export function LegacyPipetteInfo(props: PipetteInfoProps): React.Node {
-  const { robotName, mount, pipette, changeUrl, settingsUrl } = props
+  const { mount, pipette, changeUrl, settingsUrl } = props
   const label = LABEL_BY_MOUNT[mount]
   const displayName = pipette ? pipette.modelSpecs.displayName : null
   const serialNumber = pipette ? pipette.id : null

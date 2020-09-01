@@ -11,7 +11,6 @@ import {
   DIRECTION_ROW,
   SPACING_3,
   SPACING_5,
-  SIZE_5,
   BORDER_SOLID_LIGHT,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
@@ -141,7 +140,12 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
         marginBottom={SPACING_3}
         justifyContent={JUSTIFY_CENTER}
       >
-        <PrimaryBtn onClick={savePoint} flex="1" marginX={SPACING_5}>
+        <PrimaryBtn
+          data-test="continueButton"
+          onClick={savePoint}
+          flex="1"
+          marginX={SPACING_5}
+        >
           {buttonText}
         </PrimaryBtn>
       </Flex>
