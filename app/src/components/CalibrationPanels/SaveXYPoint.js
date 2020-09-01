@@ -8,6 +8,7 @@ import {
   FONT_SIZE_BODY_2,
   DIRECTION_ROW,
   SPACING_3,
+  SPACING_5,
   SIZE_5,
   BORDER_SOLID_LIGHT,
   FONT_SIZE_HEADER,
@@ -192,7 +193,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
         justifyContent={JUSTIFY_CENTER}
         marginBottom={SPACING_3}
       >
-        <PrimaryBtn onClick={savePoint} width={SIZE_5}>
+        <PrimaryBtn onClick={savePoint} flex="1" marginX={SPACING_5}>
           {buttonText}
         </PrimaryBtn>
       </Flex>

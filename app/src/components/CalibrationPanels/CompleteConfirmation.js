@@ -36,7 +36,7 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
           name="check-circle"
           width="2.5rem"
           marginRight={SPACING_3}
-          color={COLOR_SUCCES}
+          color={COLOR_SUCCESS}
         />
         <h3>{COMPLETE_HEADER}</h3>
       </Flex>

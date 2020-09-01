@@ -10,7 +10,10 @@ import {
   FONT_SIZE_BODY_2,
   DIRECTION_ROW,
   SPACING_3,
+  SPACING_5,
+  SIZE_5,
   BORDER_SOLID_LIGHT,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -133,8 +136,12 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
         </video>
       </Flex>
       <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
-      <Flex width="100%" marginBottom={SPACING_3}>
-        <PrimaryBtn onClick={savePoint} margin={`0 ${SPACING_5}`}>
+      <Flex
+        width="100%"
+        marginBottom={SPACING_3}
+        justifyContent={JUSTIFY_CENTER}
+      >
+        <PrimaryBtn onClick={savePoint} flex="1" marginX={SPACING_5}>
           {buttonText}
         </PrimaryBtn>
       </Flex>

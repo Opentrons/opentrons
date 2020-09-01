@@ -2,9 +2,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
-import { SecondaryBtn } from '@opentrons/components'
+import { SecondaryBtn, SPACING_2, SPACING_3 } from '@opentrons/components'
 
-import { getFeatureFlags } from '../../config'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
@@ -32,8 +31,6 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
     return reqId ? RobotApi.getRequestById(state, reqId) : null
   })
   const requestStatus = requestState?.status ?? null
-
-  const ff = useSelector(getFeatureFlags)
 
   // TODO: BC 2020-08-17 specifically track the success of the session response
   React.useEffect(() => {
@@ -67,7 +64,14 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
 
   return (
     <>
-      <SecondaryBtn width="9rem" onClick={handleStartPipOffsetCalSession}>
+      <SecondaryBtn
+        width="11rem"
+        marginTop={SPACING_2}
+        css={css`
+          padding: ${SPACING_2};
+        `}
+        onClick={handleStartPipOffsetCalSession}
+      >
         {BUTTON_TEXT}
       </SecondaryBtn>
       {showWizard && (

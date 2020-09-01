@@ -16,8 +16,10 @@ import {
   SPACING_2,
   SPACING_3,
   TEXT_ALIGN_CENTER,
+  TEXT_TRANSFORM_UPPERCASE,
   FONT_HEADER_DARK,
   SPACING_5,
+  SIZE_5,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
@@ -94,7 +96,7 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
         <Text
           css={FONT_HEADER_DARK}
           marginBottom={SPACING_3}
-          textTransform="uppercase"
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
         >
           {TIP_PICK_UP_HEADER}
           {tipRackDef
@@ -143,8 +145,8 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
           </Flex>
         </Box>
         <JogControls jog={jog} />
-        <Flex width="100%">
-          <PrimaryBtn onClick={pickUpTip} margin={`0 ${SPACING_5}`}>
+        <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
+          <PrimaryBtn onClick={pickUpTip} flex="1" marginX={SPACING_5}>
             {TIP_PICK_UP_BUTTON_TEXT}
           </PrimaryBtn>
         </Flex>
