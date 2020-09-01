@@ -22,7 +22,7 @@ describe('support profile tests', () => {
   const CONFIG: SupportConfig = {
     userId: 'some-user-id',
     createdAt: 1234,
-    name: 'Some Name',
+    name: null,
     email: null,
   }
 
@@ -40,7 +40,6 @@ describe('support profile tests', () => {
     expect(bootIntercom).toHaveBeenCalledWith({
       app_id: 'some-intercom-app-id',
       created_at: 1234,
-      name: 'Some Name',
       'App Version': version,
     })
   })

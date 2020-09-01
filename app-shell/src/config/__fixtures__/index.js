@@ -4,6 +4,7 @@ import type {
   ConfigV0,
   ConfigV1,
   ConfigV2,
+  ConfigV3,
 } from '@opentrons/app/src/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -77,5 +78,15 @@ export const MOCK_CONFIG_V2: ConfigV2 = {
   version: 2,
   calibration: {
     useTrashSurfaceForTipCal: null,
+  },
+}
+
+export const MOCK_CONFIG_V3: ConfigV3 = {
+  ...MOCK_CONFIG_V2,
+  version: 3,
+  support: {
+    ...MOCK_CONFIG_V2.support,
+    name: null,
+    email: null,
   },
 }
