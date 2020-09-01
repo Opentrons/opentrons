@@ -10,7 +10,7 @@ const makeResetConfigAction = robotName =>
     bar: false,
   })
 
-describe('robotAdminEpic handles fetching "factory reset" options', () => {
+describe('robotAdminEpic handles performing a "factory reset"', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
