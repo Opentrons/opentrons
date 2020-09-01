@@ -2,13 +2,13 @@ import enum
 from typing import (Any, Dict, List, Optional, Union, NamedTuple,
                     Callable, Generator, Iterator, Tuple,
                     TYPE_CHECKING, TypeVar)
-from .labware import Well
+from opentrons.protocol_api.labware import Well
 from opentrons import types
 from opentrons.protocols.types import APIVersion
 
 if TYPE_CHECKING:
-    from .contexts import InstrumentContext  # noqa (F501)
-    from .dev_types import Dictable  # noqa(F501)
+    from opentrons.protocol_api.contexts import InstrumentContext  # noqa (F501)
+    from opentrons.protocols.execution.dev_types import Dictable  # noqa(F501)
 
 
 class MixStrategy(enum.Enum):

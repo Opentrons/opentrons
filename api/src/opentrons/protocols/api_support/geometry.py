@@ -8,11 +8,11 @@ from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
 from opentrons_shared_data.deck import load as load_deck
-from .labware import (Labware, Well, load as load_lw,
-                      quirks_from_any_parent)
-from .definitions import DeckItem
+from opentrons.protocol_api.labware import (Labware, Well, load as load_lw,
+                                            quirks_from_any_parent)
+from opentrons.protocols.api_support.definitions import DeckItem
 from .module_geometry import ThermocyclerGeometry, ModuleGeometry, ModuleType
-from .util import first_parent
+from opentrons.protocols.api_support.util import first_parent
 
 if TYPE_CHECKING:
     from opentrons_shared_data.deck.dev_types import (
@@ -335,7 +335,7 @@ class Deck(UserDict):
         overlapping_items = self.get_collisions_for_item(slot_key_int, val)
         if item is not None:
             if slot_key_int == 12:
-                if 'fixedTrash' in item.parameters.get('quirks', []):
+                if FIXED_TRASH_ID in item.parameters.get('quirks', []):
                     pass
                 else:
                     raise ValueError(f'Deck location {key} '

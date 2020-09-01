@@ -24,7 +24,7 @@ import opentrons.commands
 import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons import protocol_api
-from opentrons.protocol_api.util import HardwareToManage
+from opentrons.protocols.api_support.util import HardwareToManage
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
     PythonProtocol, BundleContents, APIVersion)

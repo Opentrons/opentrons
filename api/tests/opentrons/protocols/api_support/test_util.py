@@ -4,8 +4,8 @@ import opentrons.protocol_api as papi
 from opentrons.types import Point, Location, Mount
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api.labware import Labware, get_labware_definition
-from opentrons.protocol_api.geometry import Deck
-from opentrons.protocol_api.util import (
+from opentrons.protocols.api_support.geometry import Deck
+from opentrons.protocols.api_support.util import (
     HardwareManager, AxisMaxSpeeds, build_edges, _find_value_for_api_version)
 from opentrons.hardware_control import API, adapters, types, ThreadManager
 

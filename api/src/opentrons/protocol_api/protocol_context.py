@@ -12,19 +12,19 @@ from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
 from .labware import (
     Labware, get_labware_definition, load_from_definition)
-from .module_geometry import (
+from opentrons.protocols.api_support.module_geometry import (
     ModuleGeometry, load_module, resolve_module_model,
     resolve_module_type, models_compatible, ModuleType,
     module_model_from_string)
-from .definitions import MAX_SUPPORTED_VERSION
-from . import geometry
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support import geometry
 from .instrument_context import InstrumentContext
 from .module_contexts import (
     ModuleContext, MagneticModuleContext, TemperatureModuleContext,
     ThermocyclerContext)
-from .util import (AxisMaxSpeeds, HardwareManager,
-                   requires_version, HardwareToManage, APIVersionError,
-                   convert_door_state_to_bool)
+from opentrons.protocols.api_support.util import (
+    AxisMaxSpeeds, HardwareManager, requires_version, HardwareToManage,
+    APIVersionError, convert_door_state_to_bool)
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 

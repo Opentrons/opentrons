@@ -2,6 +2,7 @@ import json
 from unittest import mock
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 import opentrons.protocol_api as papi
+import opentrons.protocols.api_support as papi_support
 from opentrons_shared_data import load_shared_data
 from opentrons.types import Point
 
@@ -411,7 +412,7 @@ def test_module_compatibility(get_module_fixture, monkeypatch):
         return get_module_fixture(model.value)
 
     monkeypatch.setattr(
-        papi.module_geometry, '_load_v2_module_def', load_fixtures)
+        papi_support.module_geometry, '_load_v2_module_def', load_fixtures)
 
     class DummyEnum:
         def __init__(self, value: str):
@@ -420,16 +421,16 @@ def test_module_compatibility(get_module_fixture, monkeypatch):
         def __eq__(self, other: 'DummyEnum') -> bool:
             return self.value == other.value
 
-    assert not papi.module_geometry.models_compatible(
+    assert not papi_support.module_geometry.models_compatible(
         DummyEnum('incompatibleGenerationV1'),
         DummyEnum('incompatibleGenerationV2'))
-    assert papi.module_geometry.models_compatible(
+    assert papi_support.module_geometry.models_compatible(
         DummyEnum('incompatibleGenerationV2'),
         DummyEnum('incompatibleGenerationV2'))
-    assert papi.module_geometry.models_compatible(
+    assert papi_support.module_geometry.models_compatible(
         DummyEnum('compatibleGenerationV1'),
         DummyEnum('compatibleGenerationV1'))
-    assert not papi.module_geometry.models_compatible(
+    assert not papi_support.module_geometry.models_compatible(
         DummyEnum('compatibleGenerationV1'),
         DummyEnum('incompatibleGenerationV1')
     )

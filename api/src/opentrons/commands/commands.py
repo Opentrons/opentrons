@@ -11,8 +11,8 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              Slot as OldSlot,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware
-from opentrons.protocol_api.module_geometry import ModuleGeometry
-from opentrons.protocol_api.util import FlowRates
+from opentrons.protocols.api_support.module_geometry import ModuleGeometry
+from opentrons.protocols.api_support.util import FlowRates
 from opentrons.types import Location
 from opentrons.drivers import utils
 

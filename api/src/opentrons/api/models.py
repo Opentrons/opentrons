@@ -1,4 +1,5 @@
-from opentrons.protocol_api import module_geometry, labware
+from opentrons.protocol_api import labware
+from opentrons.protocols.api_support import module_geometry
 from opentrons.legacy_api.containers import Slot, placeable
 
 

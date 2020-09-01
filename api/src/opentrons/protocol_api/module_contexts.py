@@ -10,9 +10,10 @@ from opentrons.protocols.types import APIVersion
 
 from .labware import (
     Labware, load, load_from_definition)
-from .module_geometry import ModuleGeometry, ThermocyclerGeometry
-from . import geometry
-from .util import requires_version
+from opentrons.protocols.api_support.module_geometry import ModuleGeometry,\
+    ThermocyclerGeometry
+from opentrons.protocols.api_support import geometry
+from opentrons.protocols.api_support.util import requires_version
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext

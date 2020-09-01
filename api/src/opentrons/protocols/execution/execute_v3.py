@@ -14,7 +14,7 @@ if TYPE_CHECKING:
         PipetteAccessParams, StandardLiquidHandlingParams,
         DelayParams, FlowRateParams, TouchTipParams,
         PipetteAccessWithOffsetParams, BlowoutParams, MoveToSlotParams)
-    from opentrons.protocol_api.dev_types import PipetteDispatch
+    from opentrons.protocols.execution.dev_types import PipetteDispatch
 
 MODULE_LOG = logging.getLogger(__name__)
 

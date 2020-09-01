@@ -23,7 +23,7 @@ from opentrons_shared_data.protocol.constants import (
 )
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.dev_types import (
+    from opentrons.protocols.execution.dev_types import (
         PipetteDispatch, JsonV4MagneticModuleDispatch,
         JsonV4TemperatureModuleDispatch,
         JsonV4ThermocyclerDispatch

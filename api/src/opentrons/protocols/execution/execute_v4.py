@@ -20,7 +20,7 @@ if TYPE_CHECKING:
         TemperatureModuleCommandId, MagneticModuleCommandId,
         ThermocyclerCommandId
     )
-    from opentrons.protocol_api.dev_types import (
+    from opentrons.protocols.execution.dev_types import (
         PipetteDispatch, JsonV4MagneticModuleDispatch,
         JsonV4TemperatureModuleDispatch,
         JsonV4ThermocyclerDispatch)

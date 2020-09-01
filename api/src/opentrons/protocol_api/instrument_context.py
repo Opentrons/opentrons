@@ -10,21 +10,21 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
-from .util import (
+from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances,
     clamp_value, requires_version, build_edges, first_parent)
 from opentrons.protocols.types import APIVersion
 from .labware import (
     filter_tipracks_to_start, Labware, OutOfTipsError, quirks_from_any_parent,
     select_tiprack_from_list, Well)
-from . import transfers, geometry
+from opentrons.protocols.api_support import geometry, transfers
 from .module_contexts import ThermocyclerContext
 from .paired_instrument_context import (
     PairedInstrumentContext, UnsupportedInstrumentPairingError)
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
-    from .util import HardwareManager
+    from opentrons.protocols.api_support.util import HardwareManager
 
 
 AdvancedLiquidHandling = Union[

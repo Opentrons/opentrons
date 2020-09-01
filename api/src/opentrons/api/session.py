@@ -21,7 +21,8 @@ from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.calibration_storage import helpers
 from opentrons.protocol_api import (ProtocolContext,
-                                    labware, module_geometry)
+                                    labware)
+from opentrons.protocols.api_support import module_geometry
 from opentrons.protocols.execution.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError,
