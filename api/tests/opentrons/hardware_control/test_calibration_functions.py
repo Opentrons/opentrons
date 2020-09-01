@@ -6,6 +6,20 @@ from opentrons.hardware_control import robot_calibration
 from opentrons.util.helpers import utc_now
 
 
+def test_migrate_affine_xy_to_attitude():
+    affine = [[1.0, 0.0, 0.0, 1.8],
+              [0.0, 1.0, 0.0, 3.9],
+              [0.0, 0.0, 1.0, -25.0],
+              [0.0, 0.0, 0.0, 1.0]]
+
+    expected = [[1.0, 1.8, 0.0],
+                [3.9, 1.0, 0.0],
+                [0.0, 0.0, 1.0]]
+
+    result = robot_calibration.migrate_affine_xy_to_attitude(affine)
+    assert result == expected
+
+
 def test_save_calibration(ot_config_tempdir):
     pathway = config.get_opentrons_path(
         'robot_calibration_dir') / 'deck_calibration.json'

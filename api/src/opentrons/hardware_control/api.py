@@ -2,7 +2,6 @@ import asyncio
 import contextlib
 import logging
 import pathlib
-import numpy as np  # type: ignore
 from collections import OrderedDict
 from typing import (Any, Dict, Union, List, Optional, Tuple,
                     TYPE_CHECKING, cast, overload, Sequence)
@@ -253,58 +252,13 @@ class API(HardwareAPILike):
 
     @lru_cache(maxsize=1)
     def _calculate_valid_calibration(self) -> DeckTransformState:
-        """
-        This function determines whether the current gantry
-        calibration is valid or not based on the following use-cases:
-
-        """
-
-        curr_cal = np.array(self._config.gantry_calibration)
-        row, col = curr_cal.shape
-
-        rank = np.linalg.matrix_rank(curr_cal)
-
-        id_matrix = linal.identity_deck_transform()
-
-        z = abs(curr_cal[2][-1])
-
-        outofrange = z < 16 or z > 34
-        if row != rank:
-            # Check that the matrix is non-singular
-            return DeckTransformState.SINGULARITY
-        elif np.array_equal(curr_cal, id_matrix):
-            # Check that the matrix is not an identity
-            return DeckTransformState.IDENTITY
-        elif outofrange:
-            # Check that the matrix is not out of range.
-            return DeckTransformState.BAD_CALIBRATION
-        else:
-            # Transform as it stands is sufficient.
-            return DeckTransformState.OK
+        return rb_cal.validate_gantry_calibration(
+            self._config.gantry_calibration)
 
     @lru_cache(maxsize=1)
     def _calculate_valid_attitude(self) -> DeckTransformState:
-        """
-        This function determines whether the current gantry
-        calibration is valid or not based on the following use-cases:
-
-        TODO(lc, 8/10/2020): Expand on this method, or create
-        another method to diagnose bad instrument offset data
-        """
-        curr_cal = np.array(
-            self.robot_calibration.deck_calibration.attitude)
-        row, col = curr_cal.shape
-        rank = np.linalg.matrix_rank(curr_cal)
-
-        if row != rank:
-            # Check that the matrix is non-singular
-            return DeckTransformState.SINGULARITY
-        elif not self.robot_calibration.deck_calibration.last_modified:
-            # Check that the matrix is not an identity
-            return DeckTransformState.IDENTITY
-        else:
-            # Transform as it stands is sufficient.
-            return DeckTransformState.OK
+        return rb_cal.validate_attitude_deck_calibration(
+            self._robot_calibration.deck_calibration)
 
     async def register_callback(self, cb):
         """ Allows the caller to register a callback, and returns a closure
