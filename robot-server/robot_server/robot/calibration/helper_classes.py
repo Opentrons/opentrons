@@ -158,3 +158,12 @@ class RequiredLabware(BaseModel):
             version=str(lw._definition['version']),
             isTiprack=lw.is_tiprack,
             definition=lw._definition)
+
+
+class NextStepLink(BaseModel):
+    url: str
+    params: typing.Dict[str, typing.Any]
+
+
+class NextSteps(BaseModel):
+    links: typing.Dict[str, NextStepLink]

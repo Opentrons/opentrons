@@ -1,12 +1,9 @@
-from __future__ import annotations
-
 from uuid import UUID
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
+from typing import Dict, Optional, List, Tuple
 from functools import partial
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from ..dev_types import NextSteps
+from ..helper_classes import NextSteps
 
 OffsetVector = Tuple[float, float, float]
 
@@ -71,10 +68,11 @@ class CalibrationSessionStatus(BaseModel):
     currentStep: str = Field(..., description="Current step of session")
     comparisonsByStep: Dict[str, ComparisonStatus]
     nextSteps: Optional[NextSteps] =\
-        Field(None, description="Next Available Step in Session")
+        Field(None, description="Next Available Steps in Session")
     labware: List[LabwareStatus]
 
     class Config:
+        arbitrary_types_allowed = True
         schema_extra = {
             "examples": [
                 {
