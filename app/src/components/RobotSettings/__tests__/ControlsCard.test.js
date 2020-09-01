@@ -14,6 +14,7 @@ import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
+import { OpenJupyterControl } from '../OpenJupyterControl'
 
 import type { State } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
@@ -276,5 +277,11 @@ describe('ControlsCard', () => {
     // TODO(lc, 2020-06-18): Mock out the new transform status such that
     // this should evaluate to true.
     expect(wrapper.exists(DeckCalibrationWarning)).toBe(true)
+  })
+
+  it('should render a OpenJupyterControl with the robot IP address', () => {
+    const wrapper = render()
+    const openJupyter = wrapper.find(OpenJupyterControl)
+    expect(openJupyter.prop('ip')).toBe(mockRobot.ip)
   })
 })

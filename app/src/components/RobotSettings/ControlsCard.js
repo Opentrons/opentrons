@@ -29,6 +29,7 @@ import type { ViewableRobot } from '../../discovery/types'
 
 import { CheckCalibrationControl } from './CheckCalibrationControl'
 import { DeckCalibrationControl } from './DeckCalibrationControl'
+import { OpenJupyterControl } from './OpenJupyterControl'
 
 type Props = {|
   robot: ViewableRobot,
@@ -133,6 +134,7 @@ export function ControlsCard(props: Props): React.Node {
           disabledReason={calCheckDisabledReason}
         />
       )}
+      <OpenJupyterControl ip={robot.ip} />
     </Card>
   )
 }
