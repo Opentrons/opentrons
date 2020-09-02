@@ -116,6 +116,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   )
 }
 
+// TODO: BC 2020-09-02 remove this component once calibration overhaul feature flag is removed
 export function LegacyPipetteInfo(props: PipetteInfoProps): React.Node {
   const { mount, pipette, changeUrl, settingsUrl } = props
   const label = LABEL_BY_MOUNT[mount]
