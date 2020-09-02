@@ -3,6 +3,7 @@ import logging
 from typing import Dict, Tuple, Union
 from datetime import datetime, timezone
 from opentrons.util.helpers import utc_now
+from robot_server.system import errors
 
 log = logging.getLogger(__name__)
 
@@ -10,14 +11,15 @@ log = logging.getLogger(__name__)
 def _str_to_dict(res_str) -> Dict[str, Union[str, bool]]:
     res_lines = res_str.splitlines()
     res_dict = {}
-    try:
-        for line in res_lines:
-            if line:
+
+    for line in res_lines:
+        if line:
+            try:
                 prop, val = line.split('=')
                 res_dict[prop] = val if val not in ['yes', 'no'] \
                     else val == 'yes'  # Convert yes/no to boolean value
-    except (ValueError, IndexError) as e:
-        raise Exception("Error converting timedatectl string: {}".format(e))
+            except (ValueError, IndexError) as e:
+                log.error("Error converting timedatectl string: {}".format(e))
     return res_dict
 
 
@@ -26,7 +28,7 @@ async def _time_status(loop: asyncio.AbstractEventLoop = None
     """
     Get details of robot's date & time, with specifics of RTC (if present)
     & status of NTP synchronization.
-    :return: Dictionary of status params
+    :return: Dictionary of status params.
     """
     proc = await asyncio.create_subprocess_shell(
         'timedatectl show',
@@ -42,7 +44,7 @@ async def _set_time(time: str,
                     loop: asyncio.AbstractEventLoop = None) -> Tuple[str, str]:
     """
     :return: tuple of output of date --set (usually the new date)
-        & error, if any
+        & error, if any.
     """
     proc = await asyncio.create_subprocess_shell(
         f'date --utc --set \"{time}\"',
@@ -56,27 +58,30 @@ async def _set_time(time: str,
 
 async def get_system_time(loop: asyncio.AbstractEventLoop = None) -> datetime:
     """
-    :return: Just the system time as a UTC datetime object
+    :return: Just the system time as a UTC datetime object.
     """
     return utc_now()
 
 
-async def set_system_time(
-                        new_time_dt: datetime,
-                        loop: asyncio.AbstractEventLoop = None
-                        ) -> Tuple[datetime, str]:
+async def set_system_time(new_time_dt: datetime,
+                          loop: asyncio.AbstractEventLoop = None
+                          ) -> datetime:
     """
     Set the system time unless system time is already being synchronized using
     an RTC or NTPsync.
-    :return: Tuple specifying current date read and error message, if any.
+    Raise error with message, if any.
+    :return: current date read.
     """
     status = await _time_status(loop)
-    if status.get('LocalRTC') or status.get('NTPSynchronized'):
+    if status.get('LocalRTC') is True or status.get('NTPSynchronized') is True:
         # TODO: Update this to handle RTC sync correctly once we introduce RTC
-        err = 'Cannot set system time; already synchronized with NTP or RTC'
+        raise errors.SystemTimeAlreadySynchronized(
+            'Cannot set system time; already synchronized with NTP or RTC')
     else:
         new_time_dt = new_time_dt.astimezone(tz=timezone.utc)
         new_time_str = new_time_dt.strftime("%Y-%m-%d %H:%M:%S")
         log.info(f'Setting time to {new_time_str} UTC')
-        out, err = await _set_time(new_time_str)
-    return utc_now(), err
+        _, err = await _set_time(new_time_str)
+        if err:
+            raise errors.SystemSetTimeException(err)
+    return utc_now()

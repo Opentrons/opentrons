@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock
 from datetime import datetime, timezone
 from robot_server.system import time
+from robot_server.system import errors
 
 
 @pytest.fixture
@@ -34,13 +35,16 @@ def test_str_to_dict(mock_status_str, mock_status_dict):
     status_dict = time._str_to_dict(mock_status_str)
     assert status_dict == mock_status_dict
 
-    # Test exception raised for unexpected status string
-    with pytest.raises(Exception, match="Error converting timedatectl.*"):
-        not_a_status_str = "Something that's not a timedatectl status"
-        time._str_to_dict(not_a_status_str)
+
+@pytest.mark.parametrize(
+    argnames=["mock_status_err_str"],
+    argvalues=[[""], ["There is no equal sign"], ["=== Too many ==="]])
+def test_str_to_dict_does_not_raise_error(mock_status_err_str):
+    res_dict = time._str_to_dict(mock_status_err_str)
+    assert res_dict == {}
 
 
-async def test_set_time_error_response(mock_status_dict):
+async def test_set_time_synchronized_error_response(mock_status_dict):
 
     async def async_mock_time_status(*args, **kwargs):
         _stat = mock_status_dict
@@ -49,9 +53,25 @@ async def test_set_time_error_response(mock_status_dict):
 
     time._time_status = MagicMock(side_effect=async_mock_time_status)
 
-    now, err = await time.set_system_time(datetime.now())
-    assert err == 'Cannot set system time; ' \
-                  'already synchronized with NTP or RTC'
+    with pytest.raises(errors.SystemTimeAlreadySynchronized):
+        await time.set_system_time(datetime.now())
+
+
+async def test_set_time_general_error_response(mock_status_dict):
+
+    async def async_mock_time_status(*args, **kwargs):
+        _stat = mock_status_dict
+        _stat.update(NTPSynchronized=False)
+        return _stat
+
+    async def async_mock_set_time(*args, **kwargs):
+        return "out", "An error occurred"
+
+    time._time_status = MagicMock(side_effect=async_mock_time_status)
+    time._set_time = MagicMock(side_effect=async_mock_set_time)
+
+    with pytest.raises(errors.SystemSetTimeException):
+        await time.set_system_time(datetime.now())
 
 
 async def test_set_time_response(mock_status_dict, mock_time):
@@ -62,7 +82,7 @@ async def test_set_time_response(mock_status_dict, mock_time):
         return _stat
 
     async def async_mock_set_time(*args, **kwargs):
-        return "out", "err"
+        return "out", ""
 
     time._time_status = MagicMock(side_effect=async_mock_time_status)
     time._set_time = MagicMock(side_effect=async_mock_set_time)

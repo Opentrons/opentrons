@@ -1,12 +1,18 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import patch
 from datetime import datetime, timezone
-from robot_server.system import time
+from robot_server.system import time, errors
 
 
 @pytest.fixture
 def mock_system_time():
     return datetime(2020, 8, 14, 21, 44, 16, tzinfo=timezone.utc)
+
+
+@pytest.fixture
+def mock_set_system_time(mock_system_time):
+    with patch.object(time, 'set_system_time') as p:
+        yield p
 
 
 @pytest.fixture
@@ -23,12 +29,11 @@ def response_links():
     }
 
 
-def test_raise_system_synchronized_error(api_client, mock_system_time):
-    async def mock_set_system_time(*args, **kwargs):
-        return mock_system_time, "Cannot set system time; " \
-                               "already synchronized with NTP or RTC"
-
-    time.set_system_time = MagicMock(side_effect=mock_set_system_time)
+def test_raise_system_synchronized_error(api_client,
+                                         mock_system_time,
+                                         mock_set_system_time):
+    mock_set_system_time.side_effect = errors.SystemTimeAlreadySynchronized(
+        'Cannot set system time; already synchronized with NTP or RTC')
 
     response = api_client.put("/system/time", json={
         "data": {
@@ -44,15 +49,12 @@ def test_raise_system_synchronized_error(api_client, mock_system_time):
         'title': 'Action Forbidden'}]}
     assert response.status_code == 403
 
-    # time.set_system_time.reset_mock(return_value=True, side_effect=True)
 
-
-@pytest.mark.skip
-def test_raise_system_exception(api_client, mock_system_time):
-    async def mock_set_system_time(*args, **kwargs):
-        return mock_system_time, "Something went wrong."
-
-    time.set_system_time = MagicMock(side_effect=mock_set_system_time)
+def test_raise_system_exception(api_client,
+                                mock_system_time,
+                                mock_set_system_time):
+    mock_set_system_time.side_effect = errors.SystemSetTimeException(
+        'Something went wrong')
 
     response = api_client.put("/system/time", json={
         "data": {
@@ -62,48 +64,36 @@ def test_raise_system_exception(api_client, mock_system_time):
         }
     })
     assert response.json() == {'errors': [{
-        'detail': 'Something went wrong.',
+        'detail': 'Something went wrong',
         'status': '500',
         'title': 'Internal Server Error'}]}
     assert response.status_code == 500
 
 
 def test_get_system_time(api_client, mock_system_time, response_links):
-    async def mock_get_system_time(*args, **kwargs):
+    with patch.object(time, 'get_system_time') as p:
+        async def mock_get_system_time(*args, **kwargs):
+            return mock_system_time
+        p.side_effect = mock_get_system_time
+
+        response = api_client.get("/system/time")
+        assert response.json() == {
+            'data': {
+                'attributes': {'systemTime': mock_system_time.isoformat()},
+                'id': 'time',
+                'type': 'SystemTimeAttributes'},
+            'links': response_links,
+            'meta': None
+        }
+        assert response.status_code == 200
+
+
+def test_set_system_time(api_client, mock_system_time,
+                         mock_set_system_time, response_links):
+    async def mock_side_effect(*args, **kwargs):
         return mock_system_time
-    time.get_system_time = MagicMock(side_effect=mock_get_system_time)
 
-    response = api_client.get("/system/time")
-    assert response.json() == {
-        'data': {
-            'attributes': {'systemTime': mock_system_time.isoformat()},
-            'id': 'time',
-            'type': 'SystemTimeAttributes'},
-        'links': response_links,
-        'meta': None
-    }
-    assert response.status_code == 200
-
-
-@pytest.mark.skip
-def test_set_with_missing_field(api_client, mock_system_time):
-
-    response = api_client.put("/system/time")
-    assert response.json() == {
-        'errors': [{
-            'detail': 'field required',
-            'source': {'pointer': '/body/new_time'},
-            'status': '422',
-            'title': 'value_error.missing'}]}
-    assert response.status_code == 422
-
-
-@pytest.mark.skip
-def test_set_system_time(api_client, mock_system_time, response_links):
-    async def mock_set_system_time(*args, **kwargs):
-        return mock_system_time, ""
-
-    time.set_system_time = MagicMock(side_effect=mock_set_system_time)
+    mock_set_system_time.side_effect = mock_side_effect
 
     # Correct request
     response = api_client.put("/system/time",

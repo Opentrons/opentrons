@@ -4,7 +4,6 @@ from fastapi import APIRouter
 from robot_server.system import time
 from typing import Dict
 from robot_server.service.system import models as time_models
-from robot_server.service.system import errors
 from robot_server.service.json_api import ResourceLink
 
 router = APIRouter()
@@ -57,11 +56,5 @@ async def get_time() -> time_models.SystemTimeResponse:
             response_model=time_models.SystemTimeResponse)
 async def set_time(new_time: time_models.SystemTimeRequest) \
         -> time_models.SystemTimeResponse:
-    sys_time, err = await time.set_system_time(
-        new_time.data.attributes.systemTime)
-    if err:
-        if 'already synchronized with NTP or RTC' in err:
-            raise errors.SystemTimeAlreadySynchronized(err)
-        else:
-            raise errors.SystemSetTimeException(err)
+    sys_time = await time.set_system_time(new_time.data.attributes.systemTime)
     return _create_response(sys_time)
