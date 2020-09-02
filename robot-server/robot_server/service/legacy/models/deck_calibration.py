@@ -151,6 +151,17 @@ class DeckCalibrationDispatch(BaseModel):
 
 Offset = typing.Tuple[float, float, float]
 
+AffineMatrix = typing.Tuple[
+  typing.Tuple[float, float, float, float],
+  typing.Tuple[float, float, float, float],
+  typing.Tuple[float, float, float, float],
+  typing.Tuple[float, float, float, float]]
+
+AttitudeMatrix = typing.Tuple[
+  typing.Tuple[float, float, float],
+  typing.Tuple[float, float, float],
+  typing.Tuple[float, float, float]]
+
 
 class InstrumentOffset(BaseModel):
     single: Offset
@@ -173,7 +184,7 @@ class DeckCalibrationData(BaseModel):
         Field(...,
               description="The type of deck calibration matrix:"
                           "affine or attitude")
-    matrix: typing.List[typing.List[float]] = \
+    matrix: typing.Union[AffineMatrix, AttitudeMatrix] = \
         Field(...,
               description="The deck calibration transform matrix")
     lastModified: typing.Optional[datetime] = \

@@ -26,13 +26,15 @@ export type AttitudeMatrix = [
   [number, number, number]
 ]
 
-export type DeckCalibrationData = {|
+export type DeckCalibrationInfo = {|
   matrix: AffineMatrix | AttitudeMatrix,
   lastModified: string | null,
   pipetteCalibratedWith: string | null,
   tiprack: string | null,
   type: string,
 |}
+
+export type DeckCalibrationData = DeckCalibrationInfo | AffineMatrix
 
 export type CalibrationStatus = {|
   deckCalibration: {|

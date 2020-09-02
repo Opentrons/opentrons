@@ -37,8 +37,9 @@ export function DeckCalibrationDownload({
   if (deckCalStatus === null) {
     return null
   }
-
-  const isAttitude = deckCalData?.type === 'attitude'
+  const deckCalType = deckCalData?.type ?? 'affine'
+  const deckCalMatrix = deckCalData?.matrix ?? deckCalData
+  const isAttitude = deckCalType === 'attitude'
   const timestamp = deckCalData?.lastModified
     ? new Date(deckCalData.lastModified).toLocaleString()
     : null
@@ -47,8 +48,8 @@ export function DeckCalibrationDownload({
     const report = isAttitude
       ? deckCalData
       : {
-          type: deckCalData?.type,
-          matrix: deckCalData?.matrix,
+          type: deckCalType,
+          matrix: deckCalMatrix,
         }
     const data = new Blob([JSON.stringify(report)], {
       type: 'application/json',
@@ -66,6 +67,7 @@ export function DeckCalibrationDownload({
           </Flex>
         )}
         <Flex>
+          <Text>{}</Text>
           <IconCta
             iconName="download"
             text={DOWNLOAD}
