@@ -9,6 +9,8 @@ from opentrons.hardware_control import (SynchronousAdapter, modules,
                                         API, ExecutionManager)
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
+from opentrons.protocols.api_support.constants import SHORT_TRASH_DECK, \
+    STANDARD_DECK
 from opentrons.protocols.types import APIVersion, Protocol
 from .labware import (
     Labware, get_labware_definition, load_from_definition)
@@ -35,9 +37,6 @@ ModuleTypes = Union[
     'MagneticModuleContext',
     'ThermocyclerContext'
 ]
-
-SHORT_TRASH_DECK = 'ot2_short_trash'
-STANDARD_DECK = 'ot2_standard'
 
 
 class ProtocolContext(CommandPublisher):

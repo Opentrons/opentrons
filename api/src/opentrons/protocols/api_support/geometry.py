@@ -7,6 +7,7 @@ from typing import List, Optional, Tuple, Dict, TYPE_CHECKING
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
+from opentrons.protocols.api_support.constants import STANDARD_DECK
 from opentrons_shared_data.deck import load as load_deck
 from opentrons.protocol_api.labware import (Labware, Well, load as load_lw,
                                             quirks_from_any_parent)
@@ -275,7 +276,7 @@ def plan_moves(
 
 
 class Deck(UserDict):
-    def __init__(self, load_name='ot2_standard'):
+    def __init__(self, load_name=STANDARD_DECK):
         super().__init__()
         row_offset = 90.5
         col_offset = 132.5
