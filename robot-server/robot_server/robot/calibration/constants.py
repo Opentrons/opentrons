@@ -1,7 +1,12 @@
-from typing import Dict, Set
-from typing_extensions import Final
+from __future__ import annotations
+
+from typing import Dict, Set, TYPE_CHECKING
 from dataclasses import dataclass
 from opentrons.types import Point
+
+if TYPE_CHECKING:
+    from typing_extensions import Final
+
 
 STATE_WILDCARD = '*'
 
