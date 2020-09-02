@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from functools import lru_cache
 import logging
-from typing import (Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union)
-
+from typing import Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union
 
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
@@ -18,6 +19,8 @@ from .labware import (
     select_tiprack_from_list, Well)
 from . import transfers, geometry
 from .module_contexts import ThermocyclerContext
+from .paired_instrument_context import (
+    PairedInstrumentContext, UnsupportedInstrumentPairingError)
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
@@ -59,8 +62,8 @@ class InstrumentContext(CommandPublisher):
     """
 
     def __init__(self,
-                 ctx: 'ProtocolContext',
-                 hardware_mgr: 'HardwareManager',
+                 ctx: ProtocolContext,
+                 hardware_mgr: HardwareManager,
                  mount: types.Mount,
                  log_parent: logging.Logger,
                  at_version: APIVersion,
@@ -1344,6 +1347,69 @@ class InstrumentContext(CommandPublisher):
     def __str__(self):
         return '{} on {} mount'.format(self.hw_pipette['display_name'],
                                        self._mount.name.lower())
+
+    @requires_version(2, 7)
+    def pair_with(
+            self, instrument: 'InstrumentContext') -> PairedInstrumentContext:
+        """ This function allows you to pair both of your pipettes and use
+        them simultaneously. The function implicitly decides a primary
+        and secondary pipette based on which instrument you call this
+        function on.
+
+        :param instrument: The secondary instrument you wish to use
+
+        :raises UnsupportedInstrumentPairingError: If you try to pair
+        pipettes that are not currently supported together.
+        :returns: PairedInstrumentContext: This is the object you
+        will call commands on.
+
+        This function returns a :py:class:`PairedInstrumentContext`.
+        The building block commands are the same (pick_up_tip, aspirate etc),
+        and when you want to move pipettes simultaneously you need to use the
+        :py:class:`PairedInstrumentContext`.
+
+
+        Limitations:
+        1. This function utilizes a "primary" and "secondary" pipette to make
+        positional decisions. The consequence of doing this is that all X & Y
+        positions are based on the primary pipette only.
+        2. At this time, only pipettes of the same type are supported for
+        pipette pairing. This means that you cannot utilize a p1000 single
+        channel and a p300 single channel at the same time.
+
+        .. code-block :: python
+
+            right_pipette = ctx.load_instrument('p300_single_gen2', 'right')
+            left_pipette = ctx.load_instrument('p300_single_gen2', 'left')
+
+            # In this scenario, the right pipette is the primary pipette
+            # while the left pipette is the secondary pipette. All XY
+            # locations will be based on the right pipette.
+            right_paired_with_left = right_pipette.pair_with(left_pipette)
+            right_paired_with_left.pick_up_tip()
+            right_paired_with_left.drop_tip()
+
+            # In this scenario, the left pipette is the primary pipette
+            # while the right pipette is the secondary pipette. All XY
+            # locations will be based on the left pipette.
+            left_paired_with_right = left_pipette.pair_with(right_pipette)
+            left_paired_with_right.pick_up_tip()
+            left_paired_with_right.drop_tip()
+
+        .. note::
+
+            Before using this method, you should seriously consider whether
+            this is the best fit for your use-case especially given the
+            limitations listed above.
+        """
+        if instrument.name != self.name:
+            raise UnsupportedInstrumentPairingError(
+                'At this time, you cannot pair'
+                f'{instrument.name} with {self.name}')
+
+        return PairedInstrumentContext(
+            primary_instrument=self, secondary_instrument=instrument,
+            api_version=self.api_version, trash=self.trash_container)
 
     @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:

@@ -106,6 +106,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.6     |          3.20.0             |
 +-------------+-----------------------------+
+|     2.7     |          3.21.0             |
++-------------+-----------------------------+
 
 Changes in API Versions
 -----------------------
@@ -165,3 +167,10 @@ Version 2.6
   speeds
     - Protocols that manually configure pipette flow rates will be unaffected
     - For a comparison between API Versions, see :ref:`defaults`
+
+
+Version 2.7
++++++++++++
+
+- You can now move both pipettes simultaneously on the robot! See :py:meth:`.InstrumentContext.pair_with` for
+  further information on how to use this new feature.
