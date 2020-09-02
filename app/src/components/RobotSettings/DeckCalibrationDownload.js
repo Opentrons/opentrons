@@ -14,6 +14,7 @@ import type { StyleProps } from '@opentrons/components'
 import type {
   DeckCalibrationData,
   DeckCalibrationStatus,
+  DeckCalibrationInfo,
 } from '../../calibration/types'
 
 const LAST_CALIBRATED = 'Last calibrated:'
@@ -34,23 +35,24 @@ export function DeckCalibrationDownload({
   robotName: name,
   ...styleProps
 }: DeckCalibrationDownloadProps): React.Node {
-  if (deckCalStatus === null) {
+  if (deckCalStatus === null || deckCalData === null) {
     return null
   }
-  const deckCalType = deckCalData?.type ?? 'affine'
-  const deckCalMatrix = deckCalData?.matrix ?? deckCalData
-  const isAttitude = deckCalType === 'attitude'
-  const timestamp = deckCalData?.lastModified
-    ? new Date(deckCalData.lastModified).toLocaleString()
-    : null
+  const deckCalType = deckCalData.type ? deckCalData.type : 'affine'
+  const deckCalMatrix = deckCalData.matrix ? deckCalData.matrix : deckCalData
+  const timestamp =
+    typeof deckCalData.lastModified === 'string'
+      ? new Date(deckCalData.lastModified).toLocaleString()
+      : null
 
   const handleDownloadButtonClick = () => {
-    const report = isAttitude
-      ? deckCalData
-      : {
-          type: deckCalType,
-          matrix: deckCalMatrix,
-        }
+    const report =
+      deckCalType === 'attitude'
+        ? deckCalData
+        : {
+            type: deckCalType,
+            matrix: deckCalMatrix,
+          }
     const data = new Blob([JSON.stringify(report)], {
       type: 'application/json',
     })
@@ -60,14 +62,13 @@ export function DeckCalibrationDownload({
   return (
     <>
       <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
-        {isAttitude && (
+        {deckCalType === 'attitude' && (
           <Flex marginBottom={SPACING_1}>
             <Text marginRight={SPACING_4}>{LAST_CALIBRATED}</Text>
             <Text>{timestamp}</Text>
           </Flex>
         )}
         <Flex>
-          <Text>{}</Text>
           <IconCta
             iconName="download"
             text={DOWNLOAD}
