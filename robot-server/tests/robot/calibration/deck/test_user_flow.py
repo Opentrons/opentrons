@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, call
 from typing import List, Tuple
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
+from opentrons.config.pipette_config import load
 from robot_server.robot.calibration.deck.user_flow import \
     DeckCalibrationUserFlow, tuplefy_cal_point_dicts
 from robot_server.robot.calibration.deck.constants import \
@@ -11,7 +12,7 @@ from robot_server.robot.calibration.deck.constants import \
 
 @pytest.fixture
 def mock_hw(hardware):
-    pip = pipette.Pipette("p300_single_v2.1",
+    pip = pipette.Pipette(load("p300_single_v2.1", 'testiId'),
                           {
                               'single': [0, 0, 0],
                               'multi': [0, 0, 0]
@@ -57,11 +58,11 @@ pipette_combos: List[Tuple[List[str], Mount]] = [
 def test_user_flow_select_pipette(pipettes, target_mount, hardware):
     pip, pip2 = None, None
     if pipettes[0]:
-        pip = pipette.Pipette(pipettes[0],
+        pip = pipette.Pipette(load(pipettes[0], 'testId'),
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                               'testId')
     if pipettes[1]:
-        pip2 = pipette.Pipette(pipettes[1],
+        pip2 = pipette.Pipette(load(pipettes[1], 'testId'),
                                {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                                'testId2')
     hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
@@ -96,7 +97,7 @@ async def test_pick_up_tip(mock_user_flow):
 async def test_save_default_pick_up_current(mock_hw):
     # make sure pick up current for multi-channels is
     # modified during tip pick up
-    pip = pipette.Pipette("p20_multi_v2.1",
+    pip = pipette.Pipette(load("p20_multi_v2.1", 'testId'),
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           'testid')
     mock_hw._attached_instruments[Mount.LEFT] = pip

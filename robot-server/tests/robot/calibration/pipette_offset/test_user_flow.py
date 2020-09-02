@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, call
 from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
+from opentrons.config.pipette_config import load
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand
@@ -30,7 +31,7 @@ pipette_map = {
 @pytest.fixture(params=pipette_map.keys())
 def mock_hw_pipette_all_combos(request):
     model = request.param
-    return pipette.Pipette(model,
+    return pipette.Pipette(load(model, 'testId'),
                            {
                                'single': [0, 0, 0],
                                'multi': [0, 0, 0]
@@ -69,7 +70,7 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
 
 @pytest.fixture
 def mock_hw(hardware):
-    pip = pipette.Pipette("p300_single_v2.1",
+    pip = pipette.Pipette(load("p300_single_v2.1", 'testId'),
                           {
                               'single': [0, 0, 0],
                               'multi': [0, 0, 0]
