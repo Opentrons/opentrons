@@ -3,7 +3,7 @@ from typing import Set, Dict, Any, Union, TYPE_CHECKING
 
 from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
-from opentrons.protocols.api_support import geometry
+from opentrons.protocols.geometry import util as geometry
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError

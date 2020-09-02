@@ -7,7 +7,7 @@ from opentrons.config import feature_flags as ff
 from opentrons.calibration_storage import modify
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.protocol_api import labware
-from opentrons.protocols.api_support import geometry
+from opentrons.protocols.geometry import util as geometry
 
 import robot_server.robot.calibration.util as uf
 from robot_server.service.errors import RobotServerError
