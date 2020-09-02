@@ -14,12 +14,12 @@ from opentrons.protocols.api_support.constants import SHORT_TRASH_DECK, \
 from opentrons.protocols.types import APIVersion, Protocol
 from .labware import (
     Labware, get_labware_definition, load_from_definition)
-from opentrons.protocols.api_support.module_geometry import (
+from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, load_module, resolve_module_model,
     resolve_module_type, models_compatible, ModuleType,
     module_model_from_string)
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.api_support import geometry
 from .instrument_context import InstrumentContext
 from .module_contexts import (
     ModuleContext, MagneticModuleContext, TemperatureModuleContext,
@@ -102,7 +102,7 @@ class ProtocolContext(CommandPublisher):
         self._loop = loop or asyncio.get_event_loop()
         deck_load_name = SHORT_TRASH_DECK if fflags.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck_layout = geometry.Deck(load_name=deck_load_name)
+        self._deck_layout = Deck(load_name=deck_load_name)
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
         self._modules: Set[ModuleContext] = set()
@@ -658,7 +658,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def deck(self) -> geometry.Deck:
+    def deck(self) -> Deck:
         """ The object holding the deck layout of the robot.
 
         This object behaves like a dictionary with keys for both numeric

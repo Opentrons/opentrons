@@ -4,7 +4,7 @@ from copy import deepcopy
 import pytest
 from opentrons.types import Location, Point
 from opentrons.protocols.parse import parse
-from opentrons.protocols.api_support.geometry import Deck
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import (
     ProtocolContext, InstrumentContext, labware, MAX_SUPPORTED_VERSION)
 from opentrons.protocols.execution import execute

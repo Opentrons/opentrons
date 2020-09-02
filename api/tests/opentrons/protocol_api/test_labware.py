@@ -4,15 +4,15 @@ import pytest
 
 from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION)
-from opentrons.protocols.api_support import module_geometry
+from opentrons.protocols.geometry import module_geometry
 
 from opentrons_shared_data import load_shared_data
 from opentrons.calibration_storage import (
     helpers, get, delete, file_operators)
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion
-from opentrons.protocols.api_support.geometry import Deck
-from opentrons.protocols.api_support.module_geometry import (
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, MagneticModuleModel, ModuleType)
 
 test_data = {

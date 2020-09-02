@@ -1,10 +1,11 @@
 import pytest
 
 from opentrons.types import Location, Point
-from opentrons.protocols.api_support.geometry import (
-    Deck, plan_moves, safe_height, first_parent, should_dodge_thermocycler)
+from opentrons.protocols.geometry.util import (
+    plan_moves, safe_height, first_parent, should_dodge_thermocycler)
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import labware
-from opentrons.protocols.api_support import module_geometry
+from opentrons.protocols.geometry import module_geometry
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 

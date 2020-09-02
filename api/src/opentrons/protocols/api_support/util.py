@@ -13,7 +13,7 @@ from opentrons.hardware_control import (types, SynchronousAdapter, API,
 if TYPE_CHECKING:
     from opentrons.protocol_api.contexts import InstrumentContext
     from opentrons.protocol_api.labware import Well
-    from opentrons.protocols.api_support.geometry import Deck
+    from opentrons.protocols.geometry.deck import Deck
     from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
 
 
