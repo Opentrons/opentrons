@@ -62,6 +62,6 @@ def fuse_specs(
 
 def dummy_model_for_name(pipette_name: PipetteName) -> PipetteModel:
     if 'gen2' in pipette_name:
-        return '_'.join(pipette_name.split('_')[:-1]) + '_v2.0'
+        return '_'.join(pipette_name.split('_')[:-1]) + '_v2.0'  # type: ignore
     else:
-        return pipette_name + '_v1'
+        return pipette_name + '_v1'  # type: ignore
