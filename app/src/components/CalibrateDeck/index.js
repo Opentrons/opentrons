@@ -20,6 +20,9 @@ import type {
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
+
+// TODO: BC 2020-09-02 use shared components from CalibrationPanels for child
+// components, and delete duplicate files in this directory
 import { DeckSetup } from '../CalibrationPanels'
 import { Introduction } from './Introduction'
 import { TipPickUp } from './TipPickUp'
