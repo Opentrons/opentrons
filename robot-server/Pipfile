@@ -8,7 +8,7 @@ python_version = "3.7"
 
 [dev-packages]
 c445fee = {editable = true,path = "./../api"}
-pytest = "*"
+pytest = "==5.4.3"
 pytest-cov = "*"
 mypy = "==0.740"
 atomicwrites = {version = "*",sys_platform = "== 'win32'"}
