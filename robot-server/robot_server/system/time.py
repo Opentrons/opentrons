@@ -19,7 +19,8 @@ def _str_to_dict(res_str) -> Dict[str, Union[str, bool]]:
                 res_dict[prop] = val if val not in ['yes', 'no'] \
                     else val == 'yes'  # Convert yes/no to boolean value
             except (ValueError, IndexError) as e:
-                log.error("Error converting timedatectl string: {}".format(e))
+                log.error(f'Error converting timedatectl status line {line}:'
+                          f' {e}')
     return res_dict
 
 
