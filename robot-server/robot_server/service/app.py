@@ -24,6 +24,7 @@ from robot_server.service.access.router import router as access_router
 from robot_server.service.session.router import router as session_router
 from robot_server.service.labware.router import router as labware_router
 from robot_server.service.protocol.router import router as protocol_router
+from robot_server.service.system.router import router as system_router
 
 
 log = logging.getLogger(__name__)
@@ -66,6 +67,9 @@ app.include_router(router=routes,
                            "model": ErrorResponse
                        }
                    })
+
+app.include_router(router=system_router,
+                   tags=["System Control"])
 
 
 @app.on_event("startup")
