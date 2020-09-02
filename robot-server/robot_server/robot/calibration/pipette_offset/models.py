@@ -20,7 +20,7 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
     currentStep: str = Field(
         ...,
         description="Current step of pipette offset user flow")
-    nextSteps: Optional['NextSteps'] =\
+    nextSteps: Optional[NextSteps] =\
         Field(None, description="Next Available Steps in Session")
     labware: List[RequiredLabware]
 
