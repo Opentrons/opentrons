@@ -6,6 +6,7 @@ config BR2_PACKAGE_PYTHON_OPENTRONS_ROBOT_SERVER
   select BR2_PACKAGE_PYTHON_UVICORN # runtime
   select BR2_PACKAGE_PYTHON_MULTIPART # runtime
   select BR2_PACKAGE_PYTHON_DOTENV # runtime
+  select BR2_PACKAGE_PYTHON_TYPING_EXTENSIONS # runtime
   select BR2_PACKAGE_PYTHON_WSPROTO # runtime
   help
     Opentrons HTTP server. Controls an OT2 robot.
