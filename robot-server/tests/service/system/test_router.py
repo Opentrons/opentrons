@@ -70,24 +70,6 @@ def test_raise_system_exception(api_client,
     assert response.status_code == 500
 
 
-def test_get_system_time(api_client, mock_system_time, response_links):
-    with patch.object(time, 'get_system_time') as p:
-        async def mock_get_system_time(*args, **kwargs):
-            return mock_system_time
-        p.side_effect = mock_get_system_time
-
-        response = api_client.get("/system/time")
-        assert response.json() == {
-            'data': {
-                'attributes': {'systemTime': mock_system_time.isoformat()},
-                'id': 'time',
-                'type': 'SystemTimeAttributes'},
-            'links': response_links,
-            'meta': None
-        }
-        assert response.status_code == 200
-
-
 def test_set_system_time(api_client, mock_system_time,
                          mock_set_system_time, response_links):
     async def mock_side_effect(*args, **kwargs):
