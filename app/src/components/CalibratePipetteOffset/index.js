@@ -32,16 +32,14 @@ import {
 } from '../CalibrationPanels'
 import styles from '../CalibrateDeck/styles.css'
 
-import type {
-  CalibratePipetteOffsetParentProps,
-  CalibratePipetteOffsetChildProps,
-} from './types'
+import type { CalibratePipetteOffsetParentProps } from './types'
+import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
 const EXIT = 'exit'
 
 const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibratePipetteOffsetChildProps>,
+  [string]: React.ComponentType<CalibrationPanelProps>,
 } = {
   [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: Introduction,
   [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: DeckSetup,

@@ -82,9 +82,6 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           <LabeledValue
             label={label}
             value={(displayName || 'None').replace(/-/, '‑')} // non breaking hyphen
-            css={css`
-              width: 5rem;
-            `}
           />
           <LabeledValue label={SERIAL_NUMBER} value={serialNumber || 'None'} />
         </Flex>

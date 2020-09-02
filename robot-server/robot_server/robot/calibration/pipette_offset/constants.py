@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from enum import Enum
-from typing import TYPE_CHECKING
 from robot_server.robot.calibration.constants import STATE_WILDCARD
 
 if TYPE_CHECKING:

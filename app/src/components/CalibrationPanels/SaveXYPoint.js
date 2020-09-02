@@ -18,8 +18,11 @@ import {
 import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from './types'
-import type { DeckCalibrationStep } from '../../sessions/deck-calibration/types'
-import type { SessionCommandString, SessionType } from '../../sessions/types'
+import type {
+  SessionCommandString,
+  SessionType,
+  CalibrationSessionStep,
+} from '../../sessions/types'
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
 
@@ -83,7 +86,7 @@ const MOVE_TO_POINT_THREE_BUTTON_TEXT = `${BASE_BUTTON_TEXT} and move to slot 7`
 
 const contentsBySessionTypeByCurrentStep: {
   [SessionType]: {
-    [DeckCalibrationStep]: {
+    [CalibrationSessionStep]: {
       slotNumber: string,
       buttonText: string,
       moveCommandString: SessionCommandString | null,

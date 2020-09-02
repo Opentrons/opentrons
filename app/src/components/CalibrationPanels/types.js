@@ -3,23 +3,11 @@ import type {
   SessionCommandString,
   SessionCommandData,
   SessionType,
+  CalibrationSessionStep,
 } from '../../sessions/types'
-import type {
-  RobotCalibrationCheckLabware,
-  RobotCalibrationCheckStep,
-} from '../../sessions/calibration-check/types'
-import type {
-  DeckCalibrationLabware,
-  DeckCalibrationStep,
-} from '../../sessions/deck-calibration/types'
-import type {
-  PipetteOffsetCalibrationLabware,
-  PipetteOffsetCalibrationStep,
-} from '../../sessions/pipette-offset-calibration/types'
-import type {
-  TipLengthCalibrationLabware,
-  TipLengthCalibrationStep,
-} from '../../sessions/tip-length-calibration/types'
+import type { DeckCalibrationLabware } from '../../sessions/deck-calibration/types'
+import type { PipetteOffsetCalibrationLabware } from '../../sessions/pipette-offset-calibration/types'
+import type { TipLengthCalibrationLabware } from '../../sessions/tip-length-calibration/types'
 
 export type CalibrationPanelProps = {|
   sendSessionCommand: (
@@ -29,16 +17,11 @@ export type CalibrationPanelProps = {|
   ) => void,
   deleteSession: () => void,
   tipRack:
-    | RobotCalibrationCheckLabware
     | DeckCalibrationLabware
     | PipetteOffsetCalibrationLabware
     | TipLengthCalibrationLabware,
   isMulti: boolean,
   mount: string,
-  currentStep:
-    | RobotCalibrationCheckStep
-    | DeckCalibrationStep
-    | PipetteOffsetCalibrationStep
-    | TipLengthCalibrationStep,
+  currentStep: CalibrationSessionStep,
   sessionType: SessionType,
 |}

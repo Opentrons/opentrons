@@ -58,19 +58,21 @@ const contentsBySessionType: {
   [SessionType]: {
     headerText: string,
     bodyText: string,
+    continueButtonText: string,
+    continuingToText: string,
   },
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     headerText: DECK_CAL_HEADER,
     bodyText: DECK_CAL_BODY,
     continueButtonText: `${CONTINUE} ${DECK_CAL_PROCEDURE}`,
-    continuingTo: DECK_CAL_PROCEDURE,
+    continuingToText: DECK_CAL_PROCEDURE,
   },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     headerText: PIP_OFFSET_CAL_HEADER,
     bodyText: PIP_OFFSET_CAL_BODY,
     continueButtonText: CONTINUE,
-    continuingTo: PIP_OFFSET_CAL_PROCEDURE,
+    continuingToText: PIP_OFFSET_CAL_PROCEDURE,
   },
 }
 
@@ -88,7 +90,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     headerText,
     bodyText,
     continueButtonText,
-    continuingTo,
+    continuingToText,
   } = contentsBySessionType[sessionType]
 
   return (
@@ -139,7 +141,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
       {showConfirmation && (
         <Portal>
           <ConfirmClearDeckModal
-            continuingTo={continuingTo}
+            continuingTo={continuingToText}
             confirm={proceed}
             cancel={cancel}
           />

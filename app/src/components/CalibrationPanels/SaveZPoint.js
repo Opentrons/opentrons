@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
+import type { SessionType } from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from './types'
 import { JogControls } from '../JogControls'

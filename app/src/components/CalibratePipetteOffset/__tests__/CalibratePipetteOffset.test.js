@@ -8,28 +8,30 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 
 import { getRequestById } from '../../../robot-api'
 import * as Sessions from '../../../sessions'
-import { mockDeckCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
+import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
 
-import { CalibrateDeck } from '../index'
-import { Introduction } from '../Introduction'
-import { DeckSetup } from '../../CalibrationPanels/DeckSetup'
-import { TipPickUp } from '../TipPickUp'
-import { TipConfirmation } from '../TipConfirmation'
-import { SaveZPoint } from '../SaveZPoint'
-import { SaveXYPoint } from '../SaveXYPoint'
-import { CompleteConfirmation } from '../CompleteConfirmation'
+import { CalibratePipetteOffset } from '../index'
+import {
+  Introduction,
+  DeckSetup,
+  TipPickUp,
+  TipConfirmation,
+  SaveZPoint,
+  SaveXYPoint,
+  CompleteConfirmation,
+} from '../../CalibrationPanels'
 
 import type { State } from '../../../types'
-import type { DeckCalibrationStep } from '../../../sessions/types'
+import type { PipetteOffsetCalibrationStep } from '../../../sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')
 jest.mock('../../../robot-api/selectors')
 
-type CalibrateDeckSpec = {
+type CalibratePipetteOffsetSpec = {
   component: React.AbstractComponent<any>,
   childProps?: {},
-  currentStep: DeckCalibrationStep,
+  currentStep: PipetteOffsetCalibrationStep,
   ...
 }
 
@@ -43,13 +45,13 @@ const mockGetRequestById: JestMockFn<
   $Call<typeof getRequestById, State, string>
 > = getRequestById
 
-describe('CalibrateDeck', () => {
+describe('CalibratePipetteOffset', () => {
   let mockStore
   let render
   let dispatch
-  let mockDeckCalSession: Sessions.DeckCalibrationSession = {
+  let mockPipOffsetCalSession: Sessions.PipetteOffsetCalibrationSession = {
     id: 'fake_session_id',
-    ...mockDeckCalibrationSessionAttributes,
+    ...mockPipetteOffsetCalibrationSessionAttributes,
   }
 
   const getExitButton = wrapper =>
@@ -65,15 +67,13 @@ describe('CalibrateDeck', () => {
     CompleteConfirmation,
   ]
 
-  const SPECS: Array<CalibrateDeckSpec> = [
+  const SPECS: Array<CalibratePipetteOffsetSpec> = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: TipPickUp, currentStep: 'preparingPipette' },
     { component: TipConfirmation, currentStep: 'inspectingTip' },
     { component: SaveZPoint, currentStep: 'joggingToDeck' },
     { component: SaveXYPoint, currentStep: 'savingPointOne' },
-    { component: SaveXYPoint, currentStep: 'savingPointTwo' },
-    { component: SaveXYPoint, currentStep: 'savingPointThree' },
     { component: CompleteConfirmation, currentStep: 'calibrationComplete' },
   ]
 
@@ -88,16 +88,16 @@ describe('CalibrateDeck', () => {
     }
     mockGetDeckDefinitions.mockReturnValue({})
 
-    mockDeckCalSession = {
+    mockPipOffsetCalSession = {
       id: 'fake_session_id',
-      ...mockDeckCalibrationSessionAttributes,
+      ...mockPipetteOffsetCalibrationSessionAttributes,
     }
 
     render = () => {
       return mount(
-        <CalibrateDeck
+        <CalibratePipetteOffset
           robotName="robot-name"
-          session={mockDeckCalSession}
+          session={mockPipOffsetCalSession}
           closeWizard={() => {}}
         />,
         {
@@ -114,10 +114,10 @@ describe('CalibrateDeck', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      mockDeckCalSession = {
-        ...mockDeckCalSession,
+      mockPipOffsetCalSession = {
+        ...mockPipOffsetCalSession,
         details: {
-          ...mockDeckCalSession.details,
+          ...mockPipOffsetCalSession.details,
           currentStep: spec.currentStep,
         },
       }
