@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Union
 
 from opentrons import types
@@ -18,11 +20,10 @@ class UnsupportedInstrumentPairingError(Exception):
 class PairedInstrumentContext(CommandPublisher):
 
     def __init__(self,
-                 primary_instrument: 'InstrumentContext',
-                 secondary_instrument: 'InstrumentContext',
+                 primary_instrument: InstrumentContext,
+                 secondary_instrument: InstrumentContext,
                  api_version: APIVersion,
-                 trash: Labware = None,
-                 **config_kwargs) -> None:
+                 trash: Labware = None) -> None:
 
         self._primary_instrument = primary_instrument
         self._secondary_instrument = secondary_instrument
@@ -43,7 +44,7 @@ class PairedInstrumentContext(CommandPublisher):
     def pick_up_tip(
             self, location: Union[types.Location, Well] = None,
             presses: int = None,
-            increment: float = None) -> 'PairedInstrumentContext':
+            increment: float = None) -> PairedInstrumentContext:
         pass
 
     @requires_version(2, 7)
@@ -51,33 +52,33 @@ class PairedInstrumentContext(CommandPublisher):
             self,
             location: Union[types.Location, Well] = None,
             home_after: bool = True)\
-            -> 'PairedInstrumentContext':
+            -> PairedInstrumentContext:
         pass
 
     @requires_version(2, 7)
     def aspirate(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> 'PairedInstrumentContext':
+                 rate: float = 1.0) -> PairedInstrumentContext:
         pass
 
     @requires_version(2, 7)
     def dispense(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> 'PairedInstrumentContext':
+                 rate: float = 1.0) -> PairedInstrumentContext:
         pass
 
     @requires_version(2, 7)
     def air_gap(self,
                 volume: float = None,
-                height: float = None) -> 'PairedInstrumentContext':
+                height: float = None) -> PairedInstrumentContext:
         pass
 
     @requires_version(2, 7)
     def blow_out(self,
                  location: Union[types.Location, Well] = None
-                 ) -> 'PairedInstrumentContext':
+                 ) -> PairedInstrumentContext:
         pass
 
     @requires_version(2, 7)
@@ -85,7 +86,7 @@ class PairedInstrumentContext(CommandPublisher):
             repetitions: int = 1,
             volume: float = None,
             location: Union[types.Location, Well] = None,
-            rate: float = 1.0) -> 'PairedInstrumentContext':
+            rate: float = 1.0) -> PairedInstrumentContext:
         pass
 
     @requires_version(2, 7)
@@ -93,17 +94,17 @@ class PairedInstrumentContext(CommandPublisher):
                   location: Well = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
-                  speed: float = 60.0) -> 'PairedInstrumentContext':
+                  speed: float = 60.0) -> PairedInstrumentContext:
         pass
 
     @requires_version(2, 7)
     def return_tip(self,
-                   home_after: bool = True) -> 'PairedInstrumentContext':
+                   home_after: bool = True) -> PairedInstrumentContext:
         pass
 
     @requires_version(2, 7)
     def move_to(self, location: types.Location, force_direct: bool = False,
                 minimum_z_height: float = None,
                 speed: float = None
-                ) -> 'PairedInstrumentContext':
+                ) -> PairedInstrumentContext:
         pass

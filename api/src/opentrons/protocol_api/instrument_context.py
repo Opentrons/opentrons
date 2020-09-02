@@ -158,7 +158,7 @@ class InstrumentContext(CommandPublisher):
     def aspirate(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> 'InstrumentContext':
+                 rate: float = 1.0) -> InstrumentContext:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
         from the specified location
@@ -257,7 +257,7 @@ class InstrumentContext(CommandPublisher):
     def dispense(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> 'InstrumentContext':
+                 rate: float = 1.0) -> InstrumentContext:
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location.
@@ -342,7 +342,7 @@ class InstrumentContext(CommandPublisher):
             repetitions: int = 1,
             volume: float = None,
             location: Union[types.Location, Well] = None,
-            rate: float = 1.0) -> 'InstrumentContext':
+            rate: float = 1.0) -> InstrumentContext:
         """
         Mix a volume of liquid (uL) using this pipette.
         If no location is specified, the pipette will mix from its current
@@ -402,7 +402,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def blow_out(self,
                  location: Union[types.Location, Well] = None
-                 ) -> 'InstrumentContext':
+                 ) -> InstrumentContext:
         """
         Blow liquid out of the tip.
 
@@ -463,7 +463,7 @@ class InstrumentContext(CommandPublisher):
                   location: Well = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
-                  speed: float = 60.0) -> 'InstrumentContext':
+                  speed: float = 60.0) -> InstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of
         removing left-over droplets
@@ -541,7 +541,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def air_gap(self,
                 volume: float = None,
-                height: float = None) -> 'InstrumentContext':
+                height: float = None) -> InstrumentContext:
         """
         Pull air into the pipette current tip at the current location
 
@@ -588,7 +588,7 @@ class InstrumentContext(CommandPublisher):
 
     @cmds.publish.both(command=cmds.return_tip)
     @requires_version(2, 0)
-    def return_tip(self, home_after: bool = True) -> 'InstrumentContext':
+    def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
         If a tip is currently attached to the pipette, then it will return the
         tip to it's location in the tiprack.
@@ -622,7 +622,7 @@ class InstrumentContext(CommandPublisher):
     def pick_up_tip(  # noqa(C901)
             self, location: Union[types.Location, Well] = None,
             presses: int = None,
-            increment: float = None) -> 'InstrumentContext':
+            increment: float = None) -> InstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands with
 
@@ -721,7 +721,7 @@ class InstrumentContext(CommandPublisher):
             self,
             location: Union[types.Location, Well] = None,
             home_after: bool = True)\
-            -> 'InstrumentContext':
+            -> InstrumentContext:
         """
         Drop the current tip.
 
@@ -805,7 +805,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def home(self) -> 'InstrumentContext':
+    def home(self) -> InstrumentContext:
         """ Home the robot.
 
         :returns: This instance.
@@ -820,7 +820,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def home_plunger(self) -> 'InstrumentContext':
+    def home_plunger(self) -> InstrumentContext:
         """ Home the plunger associated with this mount
 
         :returns: This instance.
@@ -834,7 +834,7 @@ class InstrumentContext(CommandPublisher):
                    volume: float,
                    source: Well,
                    dest: List[Well],
-                   *args, **kwargs) -> 'InstrumentContext':
+                   *args, **kwargs) -> InstrumentContext:
         """
         Move a volume of liquid from one source to multiple destinations.
 
@@ -862,7 +862,7 @@ class InstrumentContext(CommandPublisher):
                     volume: float,
                     source: List[Well],
                     dest: Well,
-                    *args, **kwargs) -> 'InstrumentContext':
+                    *args, **kwargs) -> InstrumentContext:
         """
         Move liquid from multiple wells (sources) to a single well(destination)
 
@@ -889,7 +889,7 @@ class InstrumentContext(CommandPublisher):
                  source: AdvancedLiquidHandling,
                  dest: AdvancedLiquidHandling,
                  trash=True,
-                 **kwargs) -> 'InstrumentContext':
+                 **kwargs) -> InstrumentContext:
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
         # TODO: Reach consensus on kwargs
@@ -1095,7 +1095,7 @@ class InstrumentContext(CommandPublisher):
     def move_to(self, location: types.Location, force_direct: bool = False,
                 minimum_z_height: float = None,
                 speed: float = None
-                ) -> 'InstrumentContext':
+                ) -> InstrumentContext:
         """ Move the instrument.
 
         :param location: The location to move to.
@@ -1350,7 +1350,7 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def pair_with(
-            self, instrument: 'InstrumentContext') -> PairedInstrumentContext:
+            self, instrument: InstrumentContext) -> PairedInstrumentContext:
         """ This function allows you to pair both of your pipettes and use
         them simultaneously. The function implicitly decides a primary
         and secondary pipette based on which instrument you call this
@@ -1364,7 +1364,8 @@ class InstrumentContext(CommandPublisher):
         will call commands on.
 
         This function returns a :py:class:`PairedInstrumentContext`.
-        The building block commands are the same (pick_up_tip, aspirate etc),
+        The building block commands are the same as an individual pipette's
+        building block commands found at :ref:`v2-atomic-commands`,
         and when you want to move pipettes simultaneously you need to use the
         :py:class:`PairedInstrumentContext`.
 
@@ -1374,27 +1375,40 @@ class InstrumentContext(CommandPublisher):
         positional decisions. The consequence of doing this is that all X & Y
         positions are based on the primary pipette only.
         2. At this time, only pipettes of the same type are supported for
-        pipette pairing. This means that you cannot utilize a p1000 single
-        channel and a p300 single channel at the same time.
+        pipette pairing. This means that you cannot utilize a P1000 Single
+        channel and a P300 Single channel at the same time.
 
         .. code-block :: python
+            :substitutions:
 
-            right_pipette = ctx.load_instrument('p300_single_gen2', 'right')
-            left_pipette = ctx.load_instrument('p300_single_gen2', 'left')
+            from opentrons import protocol_api
 
-            # In this scenario, the right pipette is the primary pipette
-            # while the left pipette is the secondary pipette. All XY
-            # locations will be based on the right pipette.
-            right_paired_with_left = right_pipette.pair_with(left_pipette)
-            right_paired_with_left.pick_up_tip()
-            right_paired_with_left.drop_tip()
+            # metadata
+            metadata = {
+                'protocolName': 'My Protocol',
+                'author': 'Name <email@address.com>',
+                'description': 'Simple paired pipette protocol,
+                'apiLevel': '|apiLevel|'
+            }
 
-            # In this scenario, the left pipette is the primary pipette
-            # while the right pipette is the secondary pipette. All XY
-            # locations will be based on the left pipette.
-            left_paired_with_right = left_pipette.pair_with(right_pipette)
-            left_paired_with_right.pick_up_tip()
-            left_paired_with_right.drop_tip()
+            def run(ctx: protocol_api.ProtocolContext):
+                right_pipette = ctx.load_instrument(
+                    'p300_single_gen2', 'right')
+                left_pipette = ctx.load_instrument('p300_single_gen2', 'left')
+
+                # In this scenario, the right pipette is the primary pipette
+                # while the left pipette is the secondary pipette. All XY
+                # locations will be based on the right pipette.
+                right_paired_with_left = right_pipette.pair_with(left_pipette)
+                right_paired_with_left.pick_up_tip()
+                right_paired_with_left.drop_tip()
+
+                # In this scenario, the left pipette is the primary pipette
+                # while the right pipette is the secondary pipette. All XY
+                # locations will be based on the left pipette.
+                left_paired_with_right = left_pipette.pair_with(right_pipette)
+                left_paired_with_right.pick_up_tip()
+                left_paired_with_right.drop_tip()
 
         .. note::
 

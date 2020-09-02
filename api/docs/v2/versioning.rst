@@ -174,3 +174,7 @@ Version 2.7
 
 - You can now move both pipettes simultaneously on the robot! See :py:meth:`.InstrumentContext.pair_with` for
   further information on how to use this new feature.
+
+  .. note::
+
+  This feature is still under development.
