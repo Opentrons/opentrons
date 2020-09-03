@@ -11,7 +11,8 @@ from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import config_models
-from opentrons.protocol_api import transfers as tf
+from opentrons.protocol_api import (
+    transfers as tf, paired_instrument_context as paired)
 from opentrons.protocols.types import APIVersion
 from opentrons.calibration_storage import get, types as cs_types
 
@@ -181,6 +182,22 @@ def test_pipette_info(loop):
     model = ctx._hw_manager.hardware.attached_instruments[Mount.LEFT]['model']
     assert left.name == name
     assert left.model == model
+
+
+def test_pipette_pairing(loop):
+    ctx = papi.ProtocolContext(loop)
+    right = ctx.load_instrument('p300_multi', Mount.RIGHT)
+    left = ctx.load_instrument('p300_multi', Mount.LEFT)
+
+    paired_object = right.pair_with(left)
+    assert isinstance(paired_object, paired.PairedInstrumentContext)
+
+    ctx = papi.ProtocolContext(loop)
+    right = ctx.load_instrument('p300_multi', Mount.RIGHT)
+    left = ctx.load_instrument('p300_multi_gen2', Mount.LEFT)
+
+    with pytest.raises(paired.UnsupportedInstrumentPairingError):
+        right.pair_with(left)
 
 
 def test_pick_up_and_drop_tip(loop, get_labware_def):
