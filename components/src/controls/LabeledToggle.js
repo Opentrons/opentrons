@@ -8,6 +8,7 @@ import styles from './styles.css'
 export type LabeledToggleProps = {|
   label: string,
   toggledOn: boolean,
+  disabled?: boolean,
   children?: React.Node,
   onClick: () => mixed,
   /** optional data test id for the container */
@@ -15,7 +16,7 @@ export type LabeledToggleProps = {|
 |}
 
 export function LabeledToggle(props: LabeledToggleProps): React.Node {
-  const { label, toggledOn, onClick } = props
+  const { label, toggledOn, disabled, onClick } = props
 
   return (
     <LabeledControl
@@ -24,6 +25,7 @@ export function LabeledToggle(props: LabeledToggleProps): React.Node {
         <ToggleButton
           className={styles.labeled_toggle_button}
           toggledOn={toggledOn}
+          disabled={disabled}
           onClick={onClick}
         />
       }

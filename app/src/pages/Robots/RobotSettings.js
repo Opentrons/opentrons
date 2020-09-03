@@ -10,8 +10,9 @@ import {
 } from '../../robot'
 import { CONNECTABLE, REACHABLE } from '../../discovery'
 import {
+  UPGRADE,
   getBuildrootUpdateSeen,
-  getBuildrootRobot,
+  getBuildrootUpdateDisplayInfo,
   getBuildrootUpdateInProgress,
   getBuildrootUpdateAvailable,
 } from '../../buildroot'
@@ -205,15 +206,18 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   const movementStatus = getMovementStatus(state, robot.name)
   const movementError = getMovementError(state, robot.name)
   const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
-  const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot)
+  const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot.name)
   const updateInProgress = getBuildrootUpdateInProgress(state, robot)
-  const currentBrRobot = getBuildrootRobot(state)
+  const { autoUpdateDisabledReason } = getBuildrootUpdateDisplayInfo(
+    state,
+    robot.name
+  )
 
   const showUpdateModal =
     updateInProgress ||
     (!buildrootUpdateSeen &&
-      buildrootUpdateType === 'upgrade' &&
-      currentBrRobot === null)
+      buildrootUpdateType === UPGRADE &&
+      autoUpdateDisabledReason === null)
 
   return {
     updateInProgress,

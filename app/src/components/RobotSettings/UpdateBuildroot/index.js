@@ -29,7 +29,7 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): React.Node {
   const [viewUpdateInfo, setViewUpdateInfo] = React.useState(false)
   const session = useSelector(getBuildrootSession)
   const robotUpdateType = useSelector((state: State) =>
-    getBuildrootUpdateAvailable(state, robot)
+    getBuildrootUpdateAvailable(state, robotName)
   )
   const dispatch = useDispatch<Dispatch>()
   const { step, error } = session || { step: null, error: null }

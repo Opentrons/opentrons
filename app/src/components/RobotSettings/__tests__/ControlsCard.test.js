@@ -192,7 +192,7 @@ describe('ControlsCard', () => {
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
-      'Connect to robot to control'
+      'Cannot connect to robot'
     )
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)

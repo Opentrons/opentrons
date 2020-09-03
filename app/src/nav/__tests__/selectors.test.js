@@ -12,7 +12,7 @@ import * as Selectors from '../selectors'
 import { NOT_APPLICABLE, OUTDATED } from '../../system-info'
 
 import type { State } from '../../types'
-import type { Robot, ViewableRobot } from '../../discovery/types'
+import type { Robot } from '../../discovery/types'
 
 type SelectorSpec = {|
   name: string,
@@ -51,12 +51,8 @@ const mockGetU2EWindowsDriverStatus: JestMockFn<
 > = SystemInfoSelectors.getU2EWindowsDriverStatus
 
 const mockGetBuildrootUpdateAvailable: JestMockFn<
-  [State, ViewableRobot],
-  $Call<
-    typeof BuildrootSelectors.getBuildrootUpdateAvailable,
-    State,
-    ViewableRobot
-  >
+  [State, string],
+  $Call<typeof BuildrootSelectors.getBuildrootUpdateAvailable, State, string>
 > = BuildrootSelectors.getBuildrootUpdateAvailable
 
 const mockGetIsRunning: JestMockFn<
@@ -336,7 +332,7 @@ describe('nav selectors', () => {
       after: () => {
         expect(mockGetBuildrootUpdateAvailable).toHaveBeenCalledWith(
           mockState,
-          mockRobot
+          mockRobot.name
         )
       },
       expected: [

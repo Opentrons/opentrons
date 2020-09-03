@@ -83,6 +83,7 @@ export type StyleProps = {|
   ...FlexboxProps,
   ...LayoutProps,
   ...PositionProps,
+  className?: string,
 |}
 
 export type PrimitiveComponent<Instance> = StyledComponent<

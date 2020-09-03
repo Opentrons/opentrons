@@ -2,6 +2,8 @@
 // UI components for displaying connection info
 import * as React from 'react'
 import cx from 'classnames'
+
+import { CONNECTABLE, REACHABLE } from '../../discovery'
 import { CardContentHalf } from '../layout'
 import styles from './styles.css'
 
@@ -10,9 +12,27 @@ import type {
   SimpleInterfaceStatus,
 } from '../../networking/types'
 
-type ConnectionStatusProps = { type: string, status: ?InternetStatus }
+const USB: 'USB' = 'USB'
+const WI_FI: 'Wi-Fi' = 'Wi-Fi'
 
-function shortStatusToDescription(status: ?InternetStatus) {
+type ConnectionStatusProps = {|
+  type: typeof USB | typeof WI_FI,
+  ipAddress: string,
+  status: typeof CONNECTABLE | typeof REACHABLE,
+  internetStatus: InternetStatus | null,
+|}
+
+const statusToDescription = (
+  status: typeof CONNECTABLE | typeof REACHABLE,
+  type: typeof USB | typeof WI_FI,
+  ipAddress: string
+) => {
+  return `Your app is ${
+    status === CONNECTABLE ? 'currently connected' : 'trying to connect'
+  } to your robot via ${type} at IP address ${ipAddress}`
+}
+
+const internetStatusToDescription = (status: InternetStatus | null) => {
   switch (status) {
     case 'full':
       return 'The robot is connected to a network and has full access to the Internet.'
@@ -30,14 +50,14 @@ function shortStatusToDescription(status: ?InternetStatus) {
 export function ConnectionStatusMessage(
   props: ConnectionStatusProps
 ): React.Node {
-  const { type, status } = props
+  const { type, ipAddress, status, internetStatus } = props
 
   return (
     <div className={styles.connection_status}>
-      <p>Your app is currently connected to your robot via {type}</p>
+      <p>{statusToDescription(status, type, ipAddress)}</p>
       <p>
         <strong>Internet: </strong>
-        {shortStatusToDescription(status)}
+        {internetStatusToDescription(internetStatus)}
       </p>
     </div>
   )
@@ -85,22 +105,22 @@ function NetworkAddresses(props: NetworkAddressProps) {
   const ip = props.connection?.ipAddress || 'Unknown'
   const subnet = props.connection?.subnetMask || 'Unknown'
   const mac = props.connection?.macAddress || 'Unknown'
-  const labelStyles = cx(styles.connection_label, {
+  const classNames = cx(styles.wireless_info, {
     [styles.disabled]: props.disabled,
   })
 
   return (
-    <div className={styles.wireless_info}>
+    <div className={classNames}>
       <p>
-        <span className={labelStyles}>{type} IP: </span>
+        <span className={styles.connection_label}>{type} IP: </span>
         {ip}
       </p>
       <p>
-        <span className={labelStyles}>{type} Subnet Mask: </span>
+        <span className={styles.connection_label}>{type} Subnet Mask: </span>
         {subnet}
       </p>
       <p>
-        <span className={labelStyles}>{type} MAC Address: </span>
+        <span className={styles.connection_label}>{type} MAC Address: </span>
         {mac}
       </p>
     </div>

@@ -28,11 +28,10 @@ export function RobotItemComponent(props: RobotItemProps): React.Node {
   const { robot, match } = props
   const { name, displayName, status, local: isLocal } = robot
   const isUpgradable = useSelector((state: State) => {
-    return getBuildrootUpdateAvailable(state, robot) === UPGRADE
+    return getBuildrootUpdateAvailable(state, name) === UPGRADE
   })
   const isConnectable = status === CONNECTABLE
-  // NOTE(mc, 2020-03-30): redundant && true to satisfy Flow
-  const isConnected = Boolean(robot.connected && true)
+  const isConnected = robot.connected
   const isSelected = robot.name === match.params.name
   const connectInProgress = useSelector(
     (state: State) => RobotSelectors.getConnectRequest(state).inProgress

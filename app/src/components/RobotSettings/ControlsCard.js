@@ -37,6 +37,7 @@ type Props = {|
 
 const TITLE = 'Robot Controls'
 
+const CANNOT_CONNECT = 'Cannot connect to robot'
 const CONNECT_TO_ROBOT = 'Connect to robot to control'
 const PROTOCOL_IS_RUNNING = 'Protocol is running'
 const BAD_DECK_CALIBRATION =
@@ -73,7 +74,9 @@ export function ControlsCard(props: Props): React.Node {
   )
 
   let buttonDisabledReason = null
-  if (notConnectable || !robot.connected) {
+  if (notConnectable) {
+    buttonDisabledReason = CANNOT_CONNECT
+  } else if (!robot.connected) {
     buttonDisabledReason = CONNECT_TO_ROBOT
   } else if (isRunning) {
     buttonDisabledReason = PROTOCOL_IS_RUNNING
@@ -92,7 +95,7 @@ export function ControlsCard(props: Props): React.Node {
   const buttonDisabled = Boolean(buttonDisabledReason)
 
   return (
-    <Card title={TITLE} disabled={notConnectable}>
+    <Card title={TITLE}>
       <DeckCalibrationControl
         robotName={robotName}
         buttonDisabled={buttonDisabled}
@@ -123,6 +126,7 @@ export function ControlsCard(props: Props): React.Node {
         label="Lights"
         toggledOn={Boolean(lightsOn)}
         onClick={toggleLights}
+        disabled={buttonDisabled}
       >
         <p>Control lights on deck.</p>
       </LabeledToggle>

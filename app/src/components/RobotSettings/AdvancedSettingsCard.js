@@ -20,6 +20,7 @@ import {
   LabeledButton,
   LabeledToggle,
   Icon,
+  BORDER_SOLID_LIGHT,
 } from '@opentrons/components'
 
 import { UploadRobotUpdate } from './UploadRobotUpdate'
@@ -60,7 +61,7 @@ export function AdvancedSettingsCard(
   )
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
   const dispatch = useDispatch<Dispatch>()
-  const disabled = status !== CONNECTABLE
+  const controlsDisabled = status !== CONNECTABLE
   const logsAvailable = health && health.logs
 
   const showLogOptoutModal = settings.some(
@@ -74,7 +75,7 @@ export function AdvancedSettingsCard(
   }, [dispatch, name])
 
   return (
-    <Card title={TITLE} disabled={disabled}>
+    <Card title={TITLE}>
       <LabeledButton
         label="Download Logs"
         buttonProps={{
@@ -83,7 +84,7 @@ export function AdvancedSettingsCard(
           ) : (
             'Download'
           ),
-          disabled: disabled || !logsAvailable || robotLogsDownloading,
+          disabled: controlsDisabled || !logsAvailable || robotLogsDownloading,
           onClick: () => dispatch(downloadLogs(robot)),
         }}
       >
@@ -92,7 +93,7 @@ export function AdvancedSettingsCard(
       <LabeledButton
         label="Factory Reset"
         buttonProps={{
-          disabled,
+          disabled: controlsDisabled,
           Component: Link,
           to: resetUrl,
           children: 'Reset',
@@ -100,17 +101,18 @@ export function AdvancedSettingsCard(
       >
         <p>Restore robot to factory configuration</p>
       </LabeledButton>
+      <UploadRobotUpdate robotName={name} borderBottom={BORDER_SOLID_LIGHT} />
       {settings.map(({ id, title, description, value }) => (
         <LabeledToggle
           key={id}
           label={title}
           toggledOn={value === true}
+          disabled={controlsDisabled}
           onClick={() => dispatch(updateSetting(name, id, !value))}
         >
           <p>{description}</p>
         </LabeledToggle>
       ))}
-      <UploadRobotUpdate robotName={name} />
       {showLogOptoutModal && (
         <Portal>
           <AlertModal
