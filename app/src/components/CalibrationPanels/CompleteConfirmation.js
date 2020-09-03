@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   Flex,
   Icon,
-  PrimaryButton,
+  PrimaryBtn,
   COLOR_SUCCESS,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -12,12 +12,24 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import type { CalibrationPanelProps } from './types'
+import type { SessionType } from '../../sessions/types'
 import * as Sessions from '../../sessions'
 
-const COMPLETE_HEADER = 'Deck calibration complete'
+const DECK_CAL_HEADER = 'Deck calibration complete'
+const PIP_OFFSET_CAL_HEADER = 'Pipette offset calibration complete'
 const RETURN_TIP = 'Return tip to tip rack and exit'
 
+const contentsBySessionType: { [SessionType]: { headerText: string } } = {
+  [Sessions.SESSION_TYPE_DECK_CALIBRATION]: { headerText: DECK_CAL_HEADER },
+  [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
+    headerText: PIP_OFFSET_CAL_HEADER,
+  },
+}
+
 export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
+  const { sessionType } = props
+  const { headerText } = contentsBySessionType[sessionType]
+
   const exitSession = () => {
     props.sendSessionCommand(Sessions.sharedCalCommands.EXIT)
     props.deleteSession()
@@ -38,12 +50,16 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
           marginRight={SPACING_3}
           color={COLOR_SUCCESS}
         />
-        <h3>{COMPLETE_HEADER}</h3>
+        <h3>{headerText}</h3>
       </Flex>
 
-      <PrimaryButton marginY={SPACING_3} onClick={exitSession}>
+      <PrimaryBtn
+        data-test="continueButton"
+        marginY={SPACING_3}
+        onClick={exitSession}
+      >
         {RETURN_TIP}
-      </PrimaryButton>
+      </PrimaryBtn>
     </Flex>
   )
 }

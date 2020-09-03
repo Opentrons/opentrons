@@ -103,7 +103,9 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           settings
         </OutlineButton>
       )}
-      <PipetteOffsetCalibrationControl robotName={robotName} mount={mount} />
+      {serialNumber && (
+        <PipetteOffsetCalibrationControl robotName={robotName} mount={mount} />
+      )}
     </Flex>
   )
 
