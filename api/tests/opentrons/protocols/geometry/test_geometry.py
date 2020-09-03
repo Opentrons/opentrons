@@ -1,7 +1,7 @@
 import pytest
 
 from opentrons.types import Location, Point
-from opentrons.protocols.geometry.util import (
+from opentrons.protocols.geometry.planning import (
     plan_moves, safe_height, first_parent, should_dodge_thermocycler)
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import labware

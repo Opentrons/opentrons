@@ -12,7 +12,7 @@ from .labware import (
     Labware, load, load_from_definition)
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry,\
     ThermocyclerGeometry
-from opentrons.protocols.geometry import util
+from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import requires_version
 
 if TYPE_CHECKING:
@@ -436,8 +436,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def flag_unsafe_move(self,
                          to_loc: types.Location,
                          from_loc: types.Location):
-        to_lw, to_well = util.split_loc_labware(to_loc)
-        from_lw, from_well = util.split_loc_labware(from_loc)
+        to_lw, to_well = planning.split_loc_labware(to_loc)
+        from_lw, from_well = planning.split_loc_labware(from_loc)
         if self.labware is not None and \
                 (self.labware is to_lw or self.labware is from_lw) and \
                 self.lid_position != 'open':

@@ -14,7 +14,7 @@ from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, Pipette, CriticalPoint
 from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry import util as geometry
+from opentrons.protocols.geometry import deck, planning
 from opentrons.types import Mount, Point, Location
 
 from robot_server.service.errors import RobotServerError
@@ -44,7 +44,7 @@ class CalibrationSession:
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck = geometry.Deck(load_name=deck_load_name)
+        self._deck = deck.Deck(load_name=deck_load_name)
         self._pip_info_by_mount = self._get_pip_info_by_mount(
                 hardware.get_attached_instruments())
         self._labware_info = self._determine_required_labware()
@@ -238,7 +238,7 @@ class CalibrationSession:
         cp = cp_override or self._pip_info_by_mount[mount].critical_point
 
         max_height = self.hardware.get_instrument_max_height(mount)
-        safe = geometry.safe_height(
+        safe = planning.safe_height(
             from_loc, to_loc, self._deck, max_height)
         moves = plan_arc(from_pt, to_loc.point, safe,
                          origin_cp=None,

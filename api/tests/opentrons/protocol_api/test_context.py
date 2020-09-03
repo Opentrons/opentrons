@@ -134,7 +134,7 @@ async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
                 (Point(1, 2, 10), None),
                 (Point(1, 2, 3), None)]
 
-    monkeypatch.setattr(papi_geometry.util, 'plan_moves', fake_plan_move)
+    monkeypatch.setattr(papi_geometry.planning, 'plan_moves', fake_plan_move)
     # When we move without a cache, the from location should be the gantry
     # position
     right.move_to(lw.wells()[0].top())

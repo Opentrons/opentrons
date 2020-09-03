@@ -3,7 +3,7 @@ from typing import Set, Dict, Any, Union, TYPE_CHECKING
 
 from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
-from opentrons.protocols.geometry import util as geometry
+from opentrons.protocols.geometry import planning
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
@@ -137,7 +137,7 @@ async def move(user_flow: CalibrationUserFlow, to_loc: Location):
     max_height = user_flow._hardware.get_instrument_max_height(
         user_flow._mount)
 
-    safe = geometry.safe_height(
+    safe = planning.safe_height(
         from_loc, to_loc, user_flow._deck, max_height)
     moves = plan_arc(from_pt, to_loc.point, safe,
                      origin_cp=None,

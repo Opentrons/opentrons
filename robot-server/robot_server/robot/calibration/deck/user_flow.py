@@ -13,7 +13,7 @@ from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry import util as geometry
+from opentrons.protocols.geometry import deck
 from opentrons.types import Mount, Point, Location
 
 from robot_server.robot.calibration.constants import \
@@ -75,7 +75,7 @@ class DeckCalibrationUserFlow:
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck = geometry.Deck(load_name=deck_load_name)
+        self._deck = deck.Deck(load_name=deck_load_name)
         self._tip_rack = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 

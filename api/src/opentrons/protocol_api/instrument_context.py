@@ -17,7 +17,7 @@ from opentrons.protocols.types import APIVersion
 from .labware import (
     filter_tipracks_to_start, Labware, OutOfTipsError, quirks_from_any_parent,
     select_tiprack_from_list, Well)
-from opentrons.protocols.geometry import util
+from opentrons.protocols.geometry import planning
 from opentrons.protocols.advanced_control import transfers
 from .module_contexts import ThermocyclerContext
 from .paired_instrument_context import (
@@ -1133,11 +1133,11 @@ class InstrumentContext(CommandPublisher):
 
         instr_max_height = \
             self._hw_manager.hardware.get_instrument_max_height(self._mount)
-        moves = util.plan_moves(from_loc, location, self._ctx.deck,
-                                instr_max_height,
-                                force_direct=force_direct,
-                                minimum_z_height=minimum_z_height
-                                )
+        moves = planning.plan_moves(from_loc, location, self._ctx.deck,
+                                    instr_max_height,
+                                    force_direct=force_direct,
+                                    minimum_z_height=minimum_z_height
+                                    )
         self._log.debug("move_to: {}->{} via:\n\t{}"
                         .format(from_loc, location, moves))
         try:
