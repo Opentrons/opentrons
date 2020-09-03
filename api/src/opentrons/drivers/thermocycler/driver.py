@@ -401,7 +401,7 @@ class Thermocycler:
         self.lid_status = 'closed'
         return self.lid_status
 
-    def hold_time_probably_set(self, new_hold_time) -> bool:
+    def hold_time_probably_set(self, new_hold_time: Optional[float]) -> bool:
         """
         Since we can only get hold time *remaining* from TC, by the time we
         read hold_time after a set_temperature, the hold_time in TC could have
@@ -410,7 +410,9 @@ class Thermocycler:
         of the new hold time. The number of seconds is determined by status
         polling frequency.
         """
-        lower_bound = max(0, new_hold_time - HOLD_TIME_FUZZY_SECONDS)
+        if new_hold_time is None:
+            return True
+        lower_bound = max(0.0, new_hold_time - HOLD_TIME_FUZZY_SECONDS)
         return lower_bound <= self._hold_time <= new_hold_time
 
     async def set_temperature(self,

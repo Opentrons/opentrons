@@ -1,4 +1,5 @@
 import asyncio
+import time
 from unittest import mock
 from opentrons.hardware_control import modules, ExecutionManager
 
@@ -141,6 +142,17 @@ async def test_set_temperature(monkeypatch, loop):
     await hw_tc.set_temperature(40, hold_time_minutes=5.5)
     set_temp_driver_mock.assert_called_once_with(temp=40,
                                                  hold_time=330,
+                                                 volume=None,
+                                                 ramp_rate=None)
+    set_temp_driver_mock.reset_mock()
+
+    # Test hold_time < HOLD_TIME_FUZZY_SECONDS
+    start = time.time()
+    await hw_tc.set_temperature(40, hold_time_seconds=2)
+    time_taken = time.time() - start
+    assert 1.9 < time_taken < 2.1
+    set_temp_driver_mock.assert_called_once_with(temp=40,
+                                                 hold_time=2,
                                                  volume=None,
                                                  ramp_rate=None)
     set_temp_driver_mock.reset_mock()
