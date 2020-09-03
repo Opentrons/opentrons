@@ -38,10 +38,10 @@ export function DeckCalibrationDownload({
   if (deckCalStatus === null || deckCalData === null) {
     return null
   }
-  const deckCalType = deckCalData.type ? deckCalData.type : 'affine'
-  const deckCalMatrix = deckCalData.matrix ? deckCalData.matrix : deckCalData
+  const deckCalType = deckCalData?.type ? deckCalData.type : 'affine'
+  const deckCalMatrix = deckCalData?.matrix ? deckCalData.matrix : deckCalData
   const timestamp =
-    typeof deckCalData.lastModified === 'string'
+    typeof deckCalData?.lastModified === 'string'
       ? new Date(deckCalData.lastModified).toLocaleString()
       : null
 
