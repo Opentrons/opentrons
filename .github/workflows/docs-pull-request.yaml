@@ -1,0 +1,53 @@
+# This workflow builds API docs on pull requests that touch the parts
+# of the api/ project that are used by the docs; the docs source themselves;
+# or the CI/makefile tooling used to build the docs.
+
+name: 'API docs'
+
+on:
+  # Most of the time we run on pull requests to handle external RPs
+  pull_request_target:
+    paths:
+      - 'api/src/opentrons/protocol_api/**'
+      - 'api/docs/**'
+  # The pull_request_target context, though, runs the workflow in the base
+  # branch. That means we can't test workflow/action changes in pull requests
+  # there. So we can instead have a very limited on-push hook that only fires
+  # when github ci config is changed.
+  push:
+    push:
+    branches-ignore: # ignore any release- or edge-related thing (handled elsewhere)
+      - 'edge'
+      - 'master'
+      - 'chore_release-**'
+      - 'chore_bump-**'
+    tags-ignore:
+      - '*'
+    paths:
+      - '.github/workflows/docs-pull-request.yaml'
+      - '.github/actions/python/**'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: opentrons documentation build
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'api'
+      - name: 'Setup Docs'
+        run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
+      - name: 'Build docs'
+        run: |
+          make -C api docs
