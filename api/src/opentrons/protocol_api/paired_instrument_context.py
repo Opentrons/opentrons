@@ -6,7 +6,7 @@ from opentrons import types
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion
 
-from .util import requires_version
+from opentrons.protocols.api_support.util import requires_version
 from .labware import Labware, Well
 
 if TYPE_CHECKING:
