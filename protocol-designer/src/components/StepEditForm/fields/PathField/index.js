@@ -5,7 +5,11 @@ import { Path } from './Path'
 import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getWellRatio } from '../../../../steplist/utils'
-import { volumeInCapacityForMulti } from '../../../../steplist/formLevel/handleFormChange/utils'
+import { getPipetteCapacity } from '../../../../pipettes/pipetteData'
+import {
+  volumeInCapacityForMultiDispense,
+  volumeInCapacityForMultiAspirate,
+} from '../../../../steplist/formLevel/handleFormChange/utils'
 
 import type { PipetteEntities } from '../../../../step-forms'
 import type { FormData, PathOption } from '../../../../form-types'
@@ -21,14 +25,10 @@ function getDisabledPathMap(
 ): ?{ [PathOption]: string } {
   if (!rawForm || !rawForm.pipette) return null
 
-  const withinCapacityForMultiPath = volumeInCapacityForMulti(
-    rawForm,
-    pipetteEntities
-  )
   const wellRatio = getWellRatio(rawForm.aspirate_wells, rawForm.dispense_wells)
   const changeTip = rawForm.changeTip
 
-  let disabledPathMap = {}
+  let disabledPathMap: { multiAspirate: string, multiAspirate: string } = {}
 
   // changeTip is lowest priority disable reasoning
   if (changeTip === 'perDest') {
@@ -48,13 +48,40 @@ function getDisabledPathMap(
   }
 
   // transfer volume overwrites change tip disable reasoning
-  if (!withinCapacityForMultiPath) {
+  const pipetteEntity = pipetteEntities[rawForm.pipette]
+  const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)
+
+  const volume = Number(rawForm.volume)
+  const airGapChecked = rawForm['aspirate_airGap_checkbox']
+  let airGapVolume = airGapChecked
+    ? Number(rawForm['aspirate_airGap_volume'])
+    : 0
+  airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
+
+  const withinCapacityForMultiDispense = volumeInCapacityForMultiDispense({
+    volume,
+    pipetteCapacity,
+    airGapVolume,
+  })
+
+  const withinCapacityForMultiAspirate = volumeInCapacityForMultiAspirate({
+    volume,
+    pipetteCapacity,
+    airGapVolume,
+  })
+
+  if (!withinCapacityForMultiDispense) {
+    disabledPathMap = {
+      ...disabledPathMap,
+      multiDispense: i18n.t(
+        'form.step_edit_form.field.path.subtitle.volume_too_high'
+      ),
+    }
+  }
+  if (!withinCapacityForMultiAspirate) {
     disabledPathMap = {
       ...disabledPathMap,
       multiAspirate: i18n.t(
-        'form.step_edit_form.field.path.subtitle.volume_too_high'
-      ),
-      multiDispense: i18n.t(
         'form.step_edit_form.field.path.subtitle.volume_too_high'
       ),
     }

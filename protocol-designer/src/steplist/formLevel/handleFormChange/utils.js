@@ -99,6 +99,38 @@ export function volumeInCapacityForMulti(
     : 0
   airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
 
+  return rawForm.path === 'multiAspirate'
+    ? volumeInCapacityForMultiAspirate({
+        volume,
+        pipetteCapacity,
+        airGapVolume,
+      })
+    : volumeInCapacityForMultiDispense({
+        volume,
+        pipetteCapacity,
+        airGapVolume,
+      })
+}
+
+export function volumeInCapacityForMultiAspirate(args: {
+  volume: number,
+  pipetteCapacity: number,
+  airGapVolume: number,
+}): boolean {
+  const { volume, pipetteCapacity, airGapVolume } = args
+  return (
+    volume > 0 &&
+    pipetteCapacity > 0 &&
+    volume * 2 + airGapVolume * 2 <= pipetteCapacity
+  )
+}
+
+export function volumeInCapacityForMultiDispense(args: {
+  volume: number,
+  pipetteCapacity: number,
+  airGapVolume: number,
+}): boolean {
+  const { volume, pipetteCapacity, airGapVolume } = args
   return (
     volume > 0 &&
     pipetteCapacity > 0 &&
