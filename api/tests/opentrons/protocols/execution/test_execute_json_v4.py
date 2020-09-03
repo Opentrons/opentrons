@@ -1,7 +1,7 @@
 from unittest import mock
 import pytest
 from opentrons.protocols.parse import parse
-from opentrons.protocols.execution.execute_v4 import (
+from opentrons.protocols.execution.execute_json_v4 import (
     dispatch_json, _engage_magnet, _disengage_magnet, load_modules_from_json,
     _temperature_module_set_temp,
     _temperature_module_deactivate,
@@ -16,7 +16,7 @@ from opentrons.protocols.execution.execute_v4 import (
     assert_no_async_tc_behavior,
     assert_tc_commands_do_not_use_unimplemented_params,
     TC_SPANNING_SLOT)
-import opentrons.protocols.execution.execute_v4 as v4
+import opentrons.protocols.execution.execute_json_v4 as v4
 from opentrons.protocol_api import (
     MagneticModuleContext, TemperatureModuleContext, ThermocyclerContext,
     ProtocolContext)

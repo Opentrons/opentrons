@@ -8,7 +8,7 @@ from starlette.websockets import WebSocket, WebSocketState
 from starlette.status import WS_1001_GOING_AWAY
 
 from . import serialize
-from opentrons.protocols.execution.execute import ExceptionInProtocolError
+from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from concurrent.futures import ThreadPoolExecutor
 
 

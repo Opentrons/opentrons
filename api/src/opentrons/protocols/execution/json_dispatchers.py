@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING
-from opentrons.protocols.execution.execute_v3 import _blowout, _pick_up_tip, \
-    _drop_tip, _aspirate, _dispense, _touch_tip, _air_gap
-from opentrons.protocols.execution.execute_v4 import _engage_magnet, \
+from opentrons.protocols.execution.execute_json_v3 import (
+    _blowout, _pick_up_tip, _drop_tip, _aspirate, _dispense, _touch_tip,
+    _air_gap)
+from opentrons.protocols.execution.execute_json_v4 import _engage_magnet, \
     _disengage_magnet, _temperature_module_set_temp, \
     _temperature_module_deactivate, \
     _temperature_module_await_temp, \
@@ -12,7 +13,7 @@ from opentrons.protocols.execution.execute_v4 import _engage_magnet, \
     _thermocycler_set_block_temperature, \
     _thermocycler_set_lid_temperature, \
     _thermocycler_run_profile
-from opentrons.protocols.execution.execute_v5 import _move_to_well
+from opentrons.protocols.execution.execute_json_v5 import _move_to_well
 
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
 

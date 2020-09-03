@@ -3,7 +3,7 @@ from typing import Dict, List, TYPE_CHECKING, Union
 from opentrons.protocol_api.contexts import ProtocolContext, \
     MagneticModuleContext, TemperatureModuleContext, ModuleContext, \
     ThermocyclerContext
-from .execute_v3 import _delay, _move_to_slot
+from .execute_json_v3 import _delay, _move_to_slot
 from opentrons.protocols.execution.types import LoadedLabware, Instruments
 from opentrons_shared_data.protocol.constants import (
     JsonRobotCommand, JsonPipetteCommand)
