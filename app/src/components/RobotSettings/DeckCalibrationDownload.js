@@ -14,7 +14,6 @@ import type { StyleProps } from '@opentrons/components'
 import type {
   DeckCalibrationData,
   DeckCalibrationStatus,
-  DeckCalibrationInfo,
 } from '../../calibration/types'
 
 const LAST_CALIBRATED = 'Last calibrated:'
