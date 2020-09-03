@@ -214,14 +214,19 @@ stages:
         deckCalibration:
           status: OK
           data:
-            - &matrix_row
-              - !anyfloat
-              - !anyfloat
-              - !anyfloat
-              - !anyfloat
-            - *matrix_row
-            - *matrix_row
-            - *matrix_row
+            type: affine
+            matrix:
+              - &matrix_row
+                - !anyfloat
+                - !anyfloat
+                - !anyfloat
+                - !anyfloat
+              - *matrix_row
+              - *matrix_row
+              - *matrix_row
+            lastModified: null
+            pipetteCalibratedWith: null
+            tiprack: null
         instrumentCalibration:
           right: &inst
             single: &vector
