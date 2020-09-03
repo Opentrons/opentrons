@@ -1,7 +1,6 @@
 // @flow
 // mock HTTP responses for pipettes endpoints
-
-export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
+import { mockRobot } from '../../robot-api/__fixtures__'
 
 export const mockRestartSuccess = {
   host: mockRobot,
