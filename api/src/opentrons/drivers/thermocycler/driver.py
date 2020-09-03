@@ -76,6 +76,7 @@ DEFAULT_TC_TIMEOUT = 40
 DEFAULT_COMMAND_RETRIES = 3
 DEFAULT_STABILIZE_DELAY = 0.1
 POLLING_FREQUENCY_MS = 1000
+HOLD_TIME_FUZZY_SECONDS = POLLING_FREQUENCY_MS / 1000 * 5
 TEMP_THRESHOLD = 0.3
 
 
@@ -222,7 +223,6 @@ class TCPoller(threading.Thread):
         self._poller.register(self._send_read_file, select.POLLIN)
         self._poller.register(self._halt_read_file, select.POLLIN)
         self._poller.register(self._connection, select.POLLIN)
-
         serial_thread_name = 'tc_serial_poller_{}'.format(hash(self))
         super().__init__(target=self._serial_poller, name=serial_thread_name)
         log.info("Starting TC thread {}".format(serial_thread_name))
@@ -401,9 +401,17 @@ class Thermocycler:
         self.lid_status = 'closed'
         return self.lid_status
 
-    def hold_time_probably_set(self, new_hold_time):
-        fuzzy_lower_boundary = new_hold_time - POLLING_FREQUENCY_MS / 1000 * 5
-        return min(fuzzy_lower_boundary, 0) <= self._hold_time <= new_hold_time
+    def hold_time_probably_set(self, new_hold_time) -> bool:
+        """
+        Since we can only get hold time *remaining* from TC, by the time we
+        read hold_time after a set_temperature, the hold_time in TC could have
+        started counting down. So instead of checking for equality, we will
+        have to check if the hold_time returned from TC is within a few seconds
+        of the new hold time. The number of seconds is determined by status
+        polling frequency.
+        """
+        lower_bound = max(0, new_hold_time - HOLD_TIME_FUZZY_SECONDS)
+        return lower_bound <= self._hold_time <= new_hold_time
 
     async def set_temperature(self,
                               temp: float,
@@ -419,7 +427,8 @@ class Thermocycler:
                                           volume=volume)
         await self._write_and_wait(temp_cmd)
         retries = 0
-        while (self._target_temp != temp) or not self.hold_time_probably_set(hold_time):
+        while self._target_temp != temp or \
+                not self.hold_time_probably_set(hold_time):
             await asyncio.sleep(0.1)    # Wait for the poller to update
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
