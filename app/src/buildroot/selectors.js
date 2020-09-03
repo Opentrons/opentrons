@@ -101,7 +101,6 @@ export const getBuildrootRobot: State => ViewableRobot | null = createSelector(
   }
 )
 
-// TODO(mc, 2020-09-03): switch to robotName instead of robot
 export const getBuildrootUpdateAvailable: (
   state: State,
   robotName: string
