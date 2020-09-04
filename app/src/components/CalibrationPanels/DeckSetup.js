@@ -47,7 +47,7 @@ export function DeckSetup(props: CalibrationPanelProps): React.Node {
         <Text
           color={C_WHITE}
           fontSize={FONT_SIZE_HEADER}
-          margin={`${SPACING_2} 0`}
+          marginY={SPACING_2}
           textAlign={TEXT_ALIGN_CENTER}
         >
           {DECK_SETUP_PROMPT}
