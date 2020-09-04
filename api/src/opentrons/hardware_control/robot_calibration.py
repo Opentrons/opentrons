@@ -81,15 +81,15 @@ def validate_gantry_calibration(gantry_cal: List[List[float]]):
 def migrate_affine_xy_to_attitude(
         gantry_cal: List[List[float]]) -> types.AttitudeMatrix:
     masked_transform = np.array([
-        [False, False, False, True],
-        [False, False, False, True],
+        [True, True, True, False],
+        [True, True, True, False],
         [False, False, False, False],
         [False, False, False, False]])
     masked_array = np.ma.masked_array(gantry_cal, ~masked_transform)
     attitude_array = np.zeros((3, 3))
-    np.put(attitude_array, [0, 4, 8], 1)
-    np.put(attitude_array, [1], masked_array[0].compressed())
-    np.put(attitude_array, [3], masked_array[1].compressed())
+    np.put(attitude_array, [0, 1, 2], masked_array[0].compressed())
+    np.put(attitude_array, [3, 4, 5], masked_array[1].compressed())
+    np.put(attitude_array, 8, 1)
     return attitude_array.tolist()
 
 
