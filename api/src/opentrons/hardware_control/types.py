@@ -190,6 +190,15 @@ class PipettePair(enum.Enum):
         else:
             return top_types.Mount.RIGHT
 
+    @classmethod
+    def of_mount(cls, mount: top_types.Mount) -> 'PipettePair':
+        pair = {top_types.Mount.LEFT: cls.PRIMARY_LEFT,
+                top_types.Mount.RIGHT: cls.PRIMARY_RIGHT}
+        return pair[mount]
+
+
+
+
 
 class HardwareAction(enum.Enum):
     DROPTIP = enum.auto()
