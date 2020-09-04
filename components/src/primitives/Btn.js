@@ -84,6 +84,8 @@ export const PrimaryBtn: BtnComponent = styled(Btn)`
     color: ${Styles.C_MED_GRAY};
     box-shadow: none;
   }
+
+  ${styleProps}
 `
 
 /**
@@ -112,6 +114,8 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
     background-color: ${Styles.C_WHITE};
     color: ${Styles.C_MED_GRAY};
   }
+
+  ${styleProps}
 `
 
 /**
@@ -138,6 +142,8 @@ export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
     background-color: ${Styles.C_TRANSPARENT};
     color: ${Styles.C_MED_GRAY};
   }
+
+  ${styleProps}
 `
 
 /**

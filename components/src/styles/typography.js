@@ -61,3 +61,9 @@ export const FONT_BODY_1_LIGHT: CSSRules = css`
   font-weight: ${FONT_WEIGHT_REGULAR};
   color: ${C_WHITE};
 `
+
+export const FONT_BODY_2_DARK: CSSRules = css`
+  font-size: ${FONT_SIZE_BODY_2};
+  font-weight: ${FONT_WEIGHT_REGULAR};
+  color: ${C_DARK_GRAY};
+`

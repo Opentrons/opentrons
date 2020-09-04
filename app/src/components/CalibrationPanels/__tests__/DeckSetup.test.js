@@ -28,6 +28,7 @@ describe('DeckSetup', () => {
         sendSessionCommand = mockSendCommand,
         deleteSession = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_LABWARE_LOADED,
+        sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
       return mount(
         <DeckSetup
@@ -37,6 +38,7 @@ describe('DeckSetup', () => {
           sendSessionCommand={sendSessionCommand}
           deleteSession={deleteSession}
           currentStep={currentStep}
+          sessionType={sessionType}
         />
       )
     }
@@ -53,7 +55,7 @@ describe('DeckSetup', () => {
     wrapper.update()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.MOVE_TO_TIP_RACK
+      Sessions.sharedCalCommands.MOVE_TO_TIP_RACK
     )
   })
 })

@@ -1,41 +1,71 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
-import { OutlineButton, RobotWorkSpace } from '@opentrons/components'
+import {
+  RobotWorkSpace,
+  Flex,
+  Text,
+  LightSecondaryBtn,
+  DIRECTION_COLUMN,
+  JUSTIFY_CENTER,
+  ALIGN_CENTER,
+  ALIGN_STRETCH,
+  TEXT_ALIGN_CENTER,
+  FONT_SIZE_HEADER,
+  C_WHITE,
+  C_NEAR_WHITE,
+  SPACING_2,
+  SPACING_3,
+} from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../sessions'
-import type { CalibrateDeckChildProps } from './types'
-// TODO: IMMEDIATELY move CalibrationLabwareRender up to shared location in src/components
-import { CalibrationLabwareRender } from '../CalibrateTipLength/CalibrationLabwareRender'
+import type { CalibrationPanelProps } from './types'
+import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import styles from './styles.css'
 
 const DECK_SETUP_PROMPT =
   'Place full tip rack on the deck within the designated slot as illustrated below.'
 const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 
-export function DeckSetup(props: CalibrateDeckChildProps): React.Node {
+export function DeckSetup(props: CalibrationPanelProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
   const { tipRack, sendSessionCommand } = props
 
   const proceed = () => {
-    sendSessionCommand(Sessions.deckCalCommands.MOVE_TO_TIP_RACK)
+    sendSessionCommand(Sessions.sharedCalCommands.MOVE_TO_TIP_RACK)
   }
 
   return (
     <>
-      <div className={styles.prompt}>
-        <p className={styles.prompt_text}>{DECK_SETUP_PROMPT}</p>
-        <OutlineButton
-          className={styles.prompt_button}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
+      >
+        <Text
+          color={C_WHITE}
+          fontSize={FONT_SIZE_HEADER}
+          marginY={SPACING_2}
+          textAlign={TEXT_ALIGN_CENTER}
+        >
+          {DECK_SETUP_PROMPT}
+        </Text>
+        <LightSecondaryBtn
           onClick={proceed}
-          inverted
+          alignSelf={ALIGN_CENTER}
+          margin={`${SPACING_2} 0 ${SPACING_3} 0`}
         >
           {DECK_SETUP_BUTTON_TEXT}
-        </OutlineButton>
-      </div>
-      <div className={styles.deck_map_wrapper}>
+        </LightSecondaryBtn>
+      </Flex>
+      <Flex
+        flex="1 1 0"
+        alignSelf={ALIGN_STRETCH}
+        backgroundColor={C_NEAR_WHITE}
+        borderRadius="6px"
+      >
         <RobotWorkSpace
           deckLayerBlocklist={[
             'fixedBase',
@@ -69,7 +99,7 @@ export function DeckSetup(props: CalibrateDeckChildProps): React.Node {
             )
           }
         </RobotWorkSpace>
-      </div>
+      </Flex>
     </>
   )
 }

@@ -11,6 +11,10 @@ import {
   mockTipLengthCalibrationSessionParams,
 } from './tip-length-calibration'
 import { mockDeckCalibrationSessionDetails } from './deck-calibration'
+import {
+  mockPipetteOffsetCalibrationSessionDetails,
+  mockPipetteOffsetCalibrationSessionParams,
+} from './pipette-offset-calibration'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
@@ -41,6 +45,12 @@ export const mockDeckCalibrationSessionAttributes: Types.DeckCalibrationSessionR
   sessionType: Constants.SESSION_TYPE_DECK_CALIBRATION,
   createParams: {},
   details: mockDeckCalibrationSessionDetails,
+}
+
+export const mockPipetteOffsetCalibrationSessionAttributes: Types.PipetteOffsetCalibrationSessionResponseAttributes = {
+  sessionType: Constants.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+  createParams: mockPipetteOffsetCalibrationSessionParams,
+  details: mockPipetteOffsetCalibrationSessionDetails,
 }
 
 export const mockSession: Types.Session = {
