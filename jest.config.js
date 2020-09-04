@@ -16,6 +16,7 @@ module.exports = {
     '\\.(jpg|png|gif|svg|woff|woff2|webm)$':
       '@opentrons/components/src/__mocks__/file.js',
   },
+  modulePathIgnorePatterns: ['shared-data/python/**'],
   transformIgnorePatterns: ['/node_modules/(?!@opentrons/)'],
   collectCoverageFrom: [
     'app/src/**/*.js',
