@@ -1,0 +1,72 @@
+# This workflow runs tests and lint on pull requests that touch the
+# shared-data project or its CI configuration.
+
+name: 'shared-data pull requests'
+
+on:
+  # Most of the time, we run on pull requests, which lets us handle external PRs
+  pull_request_target:
+    paths:
+      - 'Makefile'
+      - 'shared-data/*/**'
+  # The pull_request_target context, though, runs the workflow in the base
+  # branch. That means we can't test workflow/action changes in pull requests
+  # there. So we can instead have a very limited on-push hook that only fires
+  # when github ci config is changed.
+  push:
+    branches-ignore: # ignore any release- or edge-related thing (handled elsewhere)
+      - 'edge'
+      - 'master'
+      - 'chore_release-**'
+      - 'chore_bump-**'
+    tags-ignore:
+      - '*'
+    paths:
+      - '.github/workflows/shared-data-pull-request.yaml'
+      - '.github/actions/python/**'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  python-lint:
+    name: shared-data package python lint
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+      - name: Lint
+        run: make -C shared-data/python lint
+  python-test:
+    name: shared-data package python tests
+    needs: [python-lint]
+    strategy:
+      matrix:
+        # Disabling osx until we can update to a pipenv including
+        # https://github.com/pypa/pipenv/pull/3096 (should be 2018.11.14
+        # or subsequent)
+        os: ['windows-latest', 'ubuntu-latest']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+      - name: Test
+        run: make -C shared-data/python test
