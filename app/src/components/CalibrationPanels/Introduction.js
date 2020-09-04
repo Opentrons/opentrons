@@ -168,7 +168,7 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
     <Flex
       width="50%"
       border={`1px solid ${C_MED_GRAY}`}
-      padding={`0 ${SPACING_3}`}
+      paddingX={SPACING_3}
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
     >
