@@ -52,10 +52,7 @@ jobs:
     needs: [python-lint]
     strategy:
       matrix:
-        # Disabling osx until we can update to a pipenv including
-        # https://github.com/pypa/pipenv/pull/3096 (should be 2018.11.14
-        # or subsequent)
-        os: ['windows-latest', 'ubuntu-latest']
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'

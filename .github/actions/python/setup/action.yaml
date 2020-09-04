@@ -12,6 +12,6 @@ runs:
     - shell: bash
       run: |
         npm install --global shx@0.2.2
-        pip install pipenv==2018.10.9
+        pip install pipenv==2020.8.13
     - shell: bash
       run: 'make -C ${{ inputs.project}} setup'
