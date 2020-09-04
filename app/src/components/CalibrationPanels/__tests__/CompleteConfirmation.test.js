@@ -13,7 +13,7 @@ describe('CompleteConfirmation', () => {
   const mockDeleteSession = jest.fn()
 
   const getContinueButton = wrapper =>
-    wrapper.find('button[data-test="continueButton"]')
+    wrapper.find('button[title="Return tip to tip rack and exit"]')
 
   beforeEach(() => {
     render = (

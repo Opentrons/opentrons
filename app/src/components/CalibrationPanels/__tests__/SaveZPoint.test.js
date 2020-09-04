@@ -12,8 +12,7 @@ describe('SaveZPoint', () => {
   const mockSendCommand = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getSaveButton = wrapper =>
-    wrapper.find('button[data-test="continueButton"]')
+  const getSaveButton = wrapper => wrapper.find('button[title="save"]')
 
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')

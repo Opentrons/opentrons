@@ -22,7 +22,8 @@ import {
   Text,
   useConditionalConfirm,
   FONT_SIZE_BODY_2,
-  C_MED_GRAY,
+  BORDER_SOLID_MEDIUM,
+  C_NEAR_WHITE,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -154,11 +155,8 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
 type RequiredLabwareCardProps = {| loadName: string |}
 
 const linkStyles = css`
-  cursor: pointer;
-  text-decoration: none;
-
   &:hover {
-    background-color: var(--c-bg-hover);
+    background-color: ${C_NEAR_WHITE};
   }
 `
 
@@ -167,13 +165,13 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
   return (
     <Flex
       width="50%"
-      border={`1px solid ${C_MED_GRAY}`}
-      padding={`0 ${SPACING_3}`}
+      border={BORDER_SOLID_MEDIUM}
+      paddingX={SPACING_3}
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
     >
       <Flex
-        padding={`${SPACING_3} 0`}
+        paddingY={SPACING_3}
         height="70%"
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}

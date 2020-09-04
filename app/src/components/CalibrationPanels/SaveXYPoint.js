@@ -13,6 +13,7 @@ import {
   FONT_SIZE_HEADER,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
+  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -154,7 +155,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
       <Text
         fontSize={FONT_SIZE_HEADER}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        textTransform="uppercase"
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
       >
         {SAVE_XY_POINT_HEADER}
         {` ${SLOT} ${slotNumber || ''}`}
@@ -196,7 +197,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
         marginBottom={SPACING_3}
       >
         <PrimaryBtn
-          data-test="saveButton"
+          title="save"
           onClick={savePoint}
           flex="1"
           marginX={SPACING_5}

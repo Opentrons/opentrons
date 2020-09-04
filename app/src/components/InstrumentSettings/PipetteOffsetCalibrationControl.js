@@ -2,7 +2,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
-import { css } from 'styled-components'
 import { SecondaryBtn, SPACING_2 } from '@opentrons/components'
 
 import * as RobotApi from '../../robot-api'
@@ -68,9 +67,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
       <SecondaryBtn
         width="11rem"
         marginTop={SPACING_2}
-        css={css`
-          padding: ${SPACING_2};
-        `}
+        padding={SPACING_2}
         onClick={handleStartPipOffsetCalSession}
       >
         {BUTTON_TEXT}

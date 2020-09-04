@@ -30,6 +30,8 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
   const { sessionType } = props
   const { headerText } = contentsBySessionType[sessionType]
 
+  // TODO: BC 2020-09-04 avoid potential race condition by having an epic send the delete
+  // session command upon a successful exit response
   const exitSession = () => {
     props.sendSessionCommand(Sessions.sharedCalCommands.EXIT)
     props.deleteSession()
@@ -53,11 +55,7 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
         <h3>{headerText}</h3>
       </Flex>
 
-      <PrimaryBtn
-        data-test="continueButton"
-        marginY={SPACING_3}
-        onClick={exitSession}
-      >
+      <PrimaryBtn title={RETURN_TIP} marginY={SPACING_3} onClick={exitSession}>
         {RETURN_TIP}
       </PrimaryBtn>
     </Flex>

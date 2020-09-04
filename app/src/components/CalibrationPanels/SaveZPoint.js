@@ -13,6 +13,8 @@ import {
   SPACING_5,
   BORDER_SOLID_LIGHT,
   JUSTIFY_CENTER,
+  ALIGN_CENTER,
+  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -94,7 +96,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
   return (
     <>
       <Text
-        textTransform="uppercase"
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         fontSize={FONT_SIZE_HEADER}
       >
@@ -106,12 +108,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
         border={BORDER_SOLID_LIGHT}
         marginTop={SPACING_3}
       >
-        <Text
-          fontSize={FONT_SIZE_BODY_2}
-          css={css`
-            align-self: center;
-          `}
-        >
+        <Text fontSize={FONT_SIZE_BODY_2} alignSelf={ALIGN_CENTER}>
           {JOG_UNTIL}
           <b>{` ${JUST_BARELY_TOUCHING} `}</b>
           {DECK_IN}
@@ -142,7 +139,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
         justifyContent={JUSTIFY_CENTER}
       >
         <PrimaryBtn
-          data-test="continueButton"
+          title="save"
           onClick={savePoint}
           flex="1"
           marginX={SPACING_5}
