@@ -173,7 +173,7 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
       alignItems={ALIGN_CENTER}
     >
       <Flex
-        padding={`${SPACING_3} 0`}
+        paddingY={SPACING_3}
         height="70%"
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
