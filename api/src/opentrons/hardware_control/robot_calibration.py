@@ -106,13 +106,13 @@ def load_attitude_matrix() -> DeckCalibration:
         gantry_cal = robot_configs.load().gantry_calibration
         if validate_gantry_calibration(gantry_cal) == DeckTransformState.OK:
             log.debug(
-                "Attitude deck calibration matrix not found. Mirgating "
+                "Attitude deck calibration matrix not found. Migrating "
                 "existing affine deck calibration matrix to {}".format(
                     config.get_opentrons_path('robot_calibration_dir')))
             attitude = migrate_affine_xy_to_attitude(gantry_cal)
             modify.save_robot_deck_attitude(transform=attitude,
-                                            pip_id='UNKNOWN',
-                                            lw_hash='UNKNOWN')
+                                            pip_id=None,
+                                            lw_hash=None)
             calibration_data = get.get_robot_deck_attitude()
 
     if calibration_data:
