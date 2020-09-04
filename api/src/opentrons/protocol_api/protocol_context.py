@@ -350,10 +350,11 @@ class ProtocolContext:
                 "mount should be either an instance of opentrons.types.Mount"
                 " or a string, but is {}.".format(mount))
 
-        return self._implementation.load_instrument(instrument_name=instrument_name,
-                                                    mount=checked_mount,
-                                                    tip_racks=tip_racks,
-                                                    replace=replace)
+        return self._implementation.load_instrument(
+            instrument_name=instrument_name,
+            mount=checked_mount,
+            tip_racks=tip_racks,
+            replace=replace)
 
     @property  # type: ignore
     @requires_version(2, 0)

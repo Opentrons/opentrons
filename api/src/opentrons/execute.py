@@ -11,7 +11,7 @@ import logging
 import os
 import sys
 from typing import (Any, Callable, Dict, List, Optional, TextIO, Union,
-                    TYPE_CHECKING)
+                    TYPE_CHECKING, cast)
 
 import opentrons
 from opentrons import protocol_api, __version__
@@ -19,6 +19,8 @@ from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import (MAX_SUPPORTED_VERSION)
 from opentrons.protocols.execution import execute as execute_apiv2
 from opentrons import commands
+from opentrons.protocol_api.implementation.protocol_context import \
+    ProtocolContextImplementation
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import APIVersion, PythonProtocol
 from opentrons.hardware_control import API, ThreadManager
@@ -101,12 +103,16 @@ def get_protocol_api(
         extra_labware = labware_from_paths(
             [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
-    context = protocol_api.ProtocolContext(hardware=_THREAD_MANAGED_HW,
-                                           bundled_labware=bundled_labware,
-                                           bundled_data=bundled_data,
-                                           extra_labware=extra_labware,
-                                           api_version=checked_version)
-    context._hw_manager.hardware.cache_instruments()
+    context_imp = ProtocolContextImplementation(
+        hardware=_THREAD_MANAGED_HW,
+        bundled_labware=bundled_labware,
+        bundled_data=bundled_data,
+        extra_labware=extra_labware,
+        api_version=checked_version
+    )
+
+    context = protocol_api.ProtocolContext(implementation=context_imp)
+    context_imp.get_hardware().hardware.cache_instruments()
     return context
 
 
@@ -288,7 +294,11 @@ def execute(protocol_file: TextIO,
             bundled_data=bundled_data,
             extra_labware=gpa_extras)
         if emit_runlog:
-            context.broker.subscribe(
+            # TODO amit 2020-9-4 remove this cast.
+            #  We will stop using Broker soon and not need this.
+            broker = cast('ProtocolContextImplementation',
+                          context._implementation).broker
+            broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
         context.home()
         try:

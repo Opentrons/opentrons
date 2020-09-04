@@ -13,7 +13,7 @@ import os
 import pathlib
 import queue
 from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
-                    Optional, Union, TYPE_CHECKING)
+                    Optional, Union, TYPE_CHECKING, cast)
 
 
 import opentrons
@@ -194,17 +194,14 @@ def _build_protocol_context(
     version specification for use with
     :py:meth:`.protocol_api.execute.run_protocol`
     """
-    context_i = ProtocolContextImplementation(
+    ctx_impl = ProtocolContextImplementation(
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         api_version=version,
         extra_labware=extra_labware,
         hardware=hardware_simulator
     )
-
-    context = protocol_api.contexts.ProtocolContext(
-        context_i
-    )
+    context = protocol_api.contexts.ProtocolContext(implementation=ctx_impl)
     context.home()
     return context
 
@@ -346,7 +343,13 @@ def simulate(protocol_file: TextIO,
             bundled_data=getattr(protocol, 'bundled_data', None),
             hardware_simulator=hardware_simulator,
             extra_labware=gpa_extras)
-        scraper = CommandScraper(stack_logger, log_level, context.broker)
+        # TODO amit 2020-9-4 remove this cast.
+        #  We will stop using Broker soon and not need this.
+        broker = cast('ProtocolContextImplementation',
+                      context._implementation).broker
+        scraper = CommandScraper(stack_logger,
+                                 log_level,
+                                 broker)
         try:
             execute.run_protocol(protocol, context)
             if isinstance(protocol, PythonProtocol)\

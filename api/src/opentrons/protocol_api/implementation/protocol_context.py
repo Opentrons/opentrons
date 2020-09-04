@@ -214,7 +214,9 @@ class ProtocolContextImplementation(AbstractProtocolContext, CommandPublisher):
             labware_def, location, label)
 
     def get_loaded_labwares(self) -> Dict[int, Union[Labware, ModuleGeometry]]:
-        def _only_labwares() -> Iterator[Tuple[int, Union[Labware, ModuleGeometry]]]:
+        def _only_labwares() -> Iterator[
+            Tuple[int, Union[Labware, ModuleGeometry]]
+        ]:
             for slotnum, slotitem in self._deck_layout.items():
                 if isinstance(slotitem, Labware):
                     yield slotnum, slotitem

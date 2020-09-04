@@ -516,7 +516,8 @@ class InstrumentContext(CommandPublisher):
             if not self._location_cache.location:
                 raise RuntimeError('No valid current location cache present')
             else:
-                location = self._location_cache.location_labware  # type: ignore
+                location = \
+                    self._location_cache.location_labware  # type: ignore
                 # type checked below
 
         if isinstance(location, Well):
