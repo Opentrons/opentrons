@@ -412,6 +412,8 @@ class Thermocycler:
         """
         if new_hold_time is None:
             return True
+        if self._hold_time is None:
+            return False
         lower_bound = max(0.0, new_hold_time - HOLD_TIME_FUZZY_SECONDS)
         return lower_bound <= self._hold_time <= new_hold_time
 

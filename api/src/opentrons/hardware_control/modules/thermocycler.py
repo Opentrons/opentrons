@@ -161,7 +161,7 @@ class Thermocycler(mod_abc.AbstractModule):
             self._current_cycle_index = rep + 1  # science starts at 1
             for step_idx, step in enumerate(steps):
                 await self._execute_cycle_step(step, step_idx, volume)
-                await self.wait_for_hold()  # What does this wait do?
+                await self.wait_for_hold()
 
     async def cycle_temperatures(self,
                                  steps: List[types.ThermocyclerStep],
@@ -212,7 +212,8 @@ class Thermocycler(mod_abc.AbstractModule):
         # because of the driver's status poller delays, it is impossible to
         # know for certain if self.hold_time holds the most recent value.
         # So instead of counting on the cached self.hold_time, it is better to
-        # just wait for hold_time time
+        # just wait for hold_time time. (Skip if hold_time = 0 since we don't
+        # want to wait in that case. Cached self.hold_time would be 0 anyway)
         if 0 < hold_time <= HOLD_TIME_FUZZY_SECONDS:
             await asyncio.sleep(hold_time)
         else:
