@@ -3,6 +3,7 @@ import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { getSelectedStepId } from '../ui/steps/selectors'
+import { UNSAVED_STEP_FORM_PSEUDO_ID } from './constants'
 import type { FormWarning } from '../steplist'
 import type { BaseState, Selector } from '../types'
 import type {
@@ -33,8 +34,13 @@ export const getDismissedFormWarningTypesForSelectedStep: Selector<
 > = createSelector(
   getDismissedFormWarningTypesPerStep,
   getSelectedStepId,
-  (dismissedWarnings, stepId) =>
-    (stepId != null && dismissedWarnings[stepId]) || []
+  (dismissedWarnings, stepId) => {
+    console.log({ stepId, dismissedWarnings })
+    if (stepId == null) {
+      return dismissedWarnings[UNSAVED_STEP_FORM_PSEUDO_ID] || []
+    }
+    return dismissedWarnings[stepId] || []
+  }
 )
 
 /** Non-dismissed form-level warnings for selected step */

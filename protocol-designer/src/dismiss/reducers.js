@@ -4,12 +4,15 @@ import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 
 import { getPDMetadata } from '../file-types'
-
+import { getStepIdOrUnsaved, UNSAVED_STEP_FORM_PSEUDO_ID } from './constants'
 import type { Reducer } from 'redux'
 import type { DismissFormWarning, DismissTimelineWarning } from './actions'
 import type { BaseState, Action } from '../types'
 import type { LoadFileAction } from '../load-file'
-import type { DeleteStepAction } from '../steplist/actions'
+import type {
+  CancelStepFormAction,
+  DeleteStepAction,
+} from '../steplist/actions'
 import type { StepIdType } from '../form-types'
 
 export type WarningType = string
@@ -30,12 +33,8 @@ const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
       state: DismissedWarningState,
       action: DismissFormWarning
     ): DismissedWarningState => {
-      const { stepId, type } = action.payload
-      if (stepId == null) {
-        console.warn('Tried to dismiss form warning with no stepId')
-        return state
-      }
-
+      const { type } = action.payload
+      const stepId = getStepIdOrUnsaved(action.payload.stepId)
       return {
         ...state,
         form: {
@@ -48,11 +47,8 @@ const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
       state: DismissedWarningState,
       action: DismissTimelineWarning
     ): DismissedWarningState => {
-      const { stepId, type } = action.payload
-      if (stepId == null) {
-        console.warn('Tried to dismiss timeline warning with no stepId')
-        return state
-      }
+      const { type } = action.payload
+      const stepId = getStepIdOrUnsaved(action.payload.stepId)
       return {
         ...state,
         timeline: {
@@ -77,6 +73,13 @@ const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
       action: LoadFileAction
     ): DismissedWarningState =>
       getPDMetadata(action.payload.file).dismissedWarnings,
+    CANCEL_STEP_FORM: (
+      state: DismissedWarningState,
+      action: CancelStepFormAction
+    ): DismissedWarningState => ({
+      form: omit(state.form, UNSAVED_STEP_FORM_PSEUDO_ID),
+      timeline: omit(state.timeline, UNSAVED_STEP_FORM_PSEUDO_ID),
+    }),
   },
   { form: {}, timeline: {} }
 )
