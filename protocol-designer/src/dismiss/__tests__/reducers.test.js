@@ -1,6 +1,6 @@
 // @flow
 import { _allReducers } from '../reducers'
-import { UNSAVED_STEP_FORM_PSEUDO_ID } from '../constants'
+import { PRESAVED_STEP_FORM_PSUDO_ID } from '../constants'
 const { dismissedWarnings } = _allReducers
 
 let initialState
@@ -35,7 +35,7 @@ describe('dismissedWarnings reducer', () => {
       },
     }
     expect(dismissedWarnings(state, action)).toEqual({
-      form: { [UNSAVED_STEP_FORM_PSEUDO_ID]: ['BELOW_PIPETTE_MINIMUM_VOLUME'] },
+      form: { [PRESAVED_STEP_FORM_PSUDO_ID]: ['BELOW_PIPETTE_MINIMUM_VOLUME'] },
       timeline: {},
     })
   })
@@ -67,7 +67,7 @@ describe('dismissedWarnings reducer', () => {
     expect(dismissedWarnings(state, action)).toEqual({
       form: {},
       timeline: {
-        [UNSAVED_STEP_FORM_PSEUDO_ID]: ['ASPIRATE_MORE_THAN_WELL_CONTENTS'],
+        [PRESAVED_STEP_FORM_PSUDO_ID]: ['ASPIRATE_MORE_THAN_WELL_CONTENTS'],
       },
     })
   })
@@ -99,11 +99,11 @@ describe('dismissedWarnings reducer', () => {
     const state = {
       form: {
         otherStepId: ['whatever_form'],
-        [UNSAVED_STEP_FORM_PSEUDO_ID]: ['BELOW_PIPETTE_MINIMUM_VOLUME'],
+        [PRESAVED_STEP_FORM_PSUDO_ID]: ['BELOW_PIPETTE_MINIMUM_VOLUME'],
       },
       timeline: {
         otherStepId: ['whatever_timeline'],
-        [UNSAVED_STEP_FORM_PSEUDO_ID]: ['ASPIRATE_MORE_THAN_WELL_CONTENTS'],
+        [PRESAVED_STEP_FORM_PSUDO_ID]: ['ASPIRATE_MORE_THAN_WELL_CONTENTS'],
       },
     }
     const action = {

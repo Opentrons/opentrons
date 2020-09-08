@@ -1,5 +1,5 @@
 // @flow
-export const UNSAVED_STEP_FORM_PSEUDO_ID = '__UNSAVED_FORM__'
+export const PRESAVED_STEP_FORM_PSUDO_ID = '__PRESAVED_FORM_DISMISS__'
 
-export const getStepIdOrUnsaved = (stepId: ?string): string =>
-  stepId || UNSAVED_STEP_FORM_PSEUDO_ID
+export const getStepIdOrPseudoId = (stepId: ?string): string =>
+  stepId || PRESAVED_STEP_FORM_PSUDO_ID
