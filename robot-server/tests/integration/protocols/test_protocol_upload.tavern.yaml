@@ -9,8 +9,8 @@ stages:
       url: "{host:s}:{port:d}/protocols"
       method: POST
       files:
-        protocol_file: "tests/integration/protocols/phony_proto.py"
-        support_files: "tests/integration/protocols/data.csv"
+        protocolFile: "tests/integration/protocols/phony_proto.py"
+        supportFiles: "tests/integration/protocols/data.csv"
     response:
       status_code: 201
       json: &response
@@ -57,7 +57,7 @@ stages:
       url: "{host:s}:{port:d}/protocols"
       method: POST
       files:
-        protocol_file: "tests/integration/protocols/phony_proto.py"
+        protocolFile: "tests/integration/protocols/phony_proto.py"
     response:
       status_code: 201
       json:
