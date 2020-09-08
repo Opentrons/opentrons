@@ -21,15 +21,15 @@ router = APIRouter()
              response_model=route_models.ProtocolResponse,
              status_code=http_status_codes.HTTP_201_CREATED)
 async def create_protocol(
-        protocol_file: UploadFile = File(..., description="The protocol file"),
-        support_files: typing.List[UploadFile] = Body(
+        protocolFile: UploadFile = File(..., description="The protocol file"),
+        supportFiles: typing.List[UploadFile] = Body(
             default=list(),
             description="Any support files needed by the protocol (ie data "
                         "files, additional python files)"),
         protocol_manager=Depends(get_protocol_manager)):
     """Create protocol from proto file plus optional support files"""
-    new_proto = protocol_manager.create(protocol_file=protocol_file,
-                                        support_files=support_files,)
+    new_proto = protocol_manager.create(protocol_file=protocolFile,
+                                        support_files=supportFiles,)
     return route_models.ProtocolResponse(data=_to_response(new_proto))
 
 
@@ -44,38 +44,38 @@ async def get_protocols(
     )
 
 
-@router.get("/protocols/{protocol_id}",
+@router.get("/protocols/{protocolId}",
             description="Get a protocol",
             response_model_exclude_unset=True,
             response_model=route_models.ProtocolResponse)
 async def get_protocol(
-        protocol_id: str,
+        protocolId: str,
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
-    proto = protocol_manager.get(protocol_id)
+    proto = protocol_manager.get(protocolId)
     return route_models.ProtocolResponse(data=_to_response(proto))
 
 
-@router.delete("/protocols/{protocol_id}",
+@router.delete("/protocols/{protocolId}",
                description="Delete a protocol",
                response_model_exclude_unset=True,
                response_model=route_models.ProtocolResponse)
 async def delete_protocol(
-        protocol_id: str,
+        protocolId: str,
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
-    proto = protocol_manager.remove(protocol_id)
+    proto = protocol_manager.remove(protocolId)
     return route_models.ProtocolResponse(data=_to_response(proto))
 
 
-@router.post("/protocols/{protocol_id}",
+@router.post("/protocols/{protocolId}",
              description="Add a file to protocol",
              response_model_exclude_unset=True,
              response_model=route_models.ProtocolResponse,
              status_code=http_status_codes.HTTP_201_CREATED)
 async def create_protocol_file(
-        protocol_id: str,
+        protocolId: str,
         file: UploadFile = File(...),
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
-    proto = protocol_manager.get(protocol_id)
+    proto = protocol_manager.get(protocolId)
     proto.add(file)
     return route_models.ProtocolResponse(data=_to_response(proto))
 

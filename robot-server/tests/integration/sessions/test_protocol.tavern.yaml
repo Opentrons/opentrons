@@ -33,7 +33,7 @@ stages:
       url: "{host:s}:{port:d}/protocols"
       method: POST
       files:
-        protocol_file: "tests/integration/protocols/phony_proto.py"
+        protocolFile: "tests/integration/protocols/phony_proto.py"
     response:
       save:
         json:
@@ -75,7 +75,7 @@ stages:
       url: "{host:s}:{port:d}/protocols"
       method: POST
       files:
-        protocol_file: "tests/integration/protocols/phony_proto.py"
+        protocolFile: "tests/integration/protocols/phony_proto.py"
     response:
       save:
         json:
