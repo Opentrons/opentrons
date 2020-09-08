@@ -1,6 +1,7 @@
 // @flow
 import last from 'lodash/last'
 import { getNextRobotStateAndWarningsSingleCommand } from '../getNextRobotStateAndWarnings'
+import { stripNoOpCommands } from './stripNoOpCommands'
 import type {
   InvariantContext,
   RobotState,
@@ -8,6 +9,7 @@ import type {
   CurriedCommandCreator,
   RobotStateAndWarnings,
 } from '../types'
+
 export const commandCreatorsTimeline = (
   commandCreators: Array<CurriedCommandCreator>,
   invariantContext: InvariantContext,
@@ -37,8 +39,8 @@ export const commandCreatorsTimeline = (
         }
       }
 
-      const commands = commandCreatorResult.commands
-      const nextRobotStateAndWarnings = commands.reduce(
+      const strippedCommands = stripNoOpCommands(commandCreatorResult.commands)
+      const nextRobotStateAndWarnings = strippedCommands.reduce(
         (acc: RobotStateAndWarnings, command) =>
           getNextRobotStateAndWarningsSingleCommand(
             command,
