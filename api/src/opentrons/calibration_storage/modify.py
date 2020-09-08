@@ -189,7 +189,8 @@ def save_tip_length_calibration(
 
 def save_robot_deck_attitude(
         transform: local_types.AttitudeMatrix,
-        pip_id: str, lw_hash: str):
+        pip_id: typing.Optional[str],
+        lw_hash: typing.Optional[str]):
     robot_dir = config.get_opentrons_path('robot_calibration_dir')
     robot_dir.mkdir(parents=True, exist_ok=True)
     gantry_path = robot_dir/'deck_calibration.json'
