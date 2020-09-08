@@ -193,6 +193,7 @@ def save_robot_deck_attitude(
         pip_id: typing.Optional[str],
         lw_hash: typing.Optional[str]):
     robot_dir = config.get_opentrons_path('robot_calibration_dir')
+    print(robot_dir)
     robot_dir.mkdir(parents=True, exist_ok=True)
     gantry_path = robot_dir/'deck_calibration.json'
     gantry_dict: 'DeckCalibrationData' = {
