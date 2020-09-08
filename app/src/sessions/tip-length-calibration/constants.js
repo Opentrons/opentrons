@@ -17,11 +17,8 @@ export const TIP_LENGTH_STEP_CALIBRATION_COMPLETE: 'calibrationComplete' =
 
 const MOVE_TO_REFERENCE_POINT: 'calibration.tipLength.moveToReferencePoint' =
   'calibration.tipLength.moveToReferencePoint'
-const MOVE_TO_TIP_RACK: 'calibration.tipLength.moveToTipRack' =
-  'calibration.tipLength.moveToTipRack'
 
 export const tipCalCommands = {
   ...sharedCalCommands,
   MOVE_TO_REFERENCE_POINT,
-  MOVE_TO_TIP_RACK,
 }
