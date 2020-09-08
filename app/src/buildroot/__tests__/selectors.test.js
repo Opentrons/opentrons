@@ -3,7 +3,7 @@ import { mockReachableRobot } from '../../discovery/__fixtures__'
 import {
   HEALTH_STATUS_NOT_OK,
   getViewableRobots,
-  getRobotApiVersionByName,
+  getRobotApiVersion,
   getRobotByName,
 } from '../../discovery'
 
@@ -12,7 +12,7 @@ jest.mock('../../discovery/selectors')
 describe('buildroot selectors', () => {
   beforeEach(() => {
     getViewableRobots.mockReturnValue([])
-    getRobotApiVersionByName.mockReturnValue(null)
+    getRobotApiVersion.mockReturnValue(null)
     getRobotByName.mockReturnValue(null)
   })
 
@@ -90,10 +90,13 @@ describe('buildroot selectors', () => {
           version: '1.0.0',
         },
       },
-      args: ['robot-name'],
+      args: [{ name: 'robot-name' }],
       expected: 'upgrade',
       setup: () => {
-        getRobotApiVersionByName.mockReturnValue('0.9.9')
+        getRobotApiVersion.mockImplementation(robot => {
+          expect(robot).toEqual({ name: 'robot-name' })
+          return '0.9.9'
+        })
       },
     },
     {
@@ -107,7 +110,10 @@ describe('buildroot selectors', () => {
       args: [{ name: 'robot-name' }],
       expected: 'downgrade',
       setup: () => {
-        getRobotApiVersionByName.mockReturnValue('1.0.1')
+        getRobotApiVersion.mockImplementation(robot => {
+          expect(robot).toEqual({ name: 'robot-name' })
+          return '1.0.1'
+        })
       },
     },
     {
@@ -121,7 +127,10 @@ describe('buildroot selectors', () => {
       args: [{ name: 'robot-name' }],
       expected: 'reinstall',
       setup: () => {
-        getRobotApiVersionByName.mockReturnValue('1.0.0')
+        getRobotApiVersion.mockImplementation(robot => {
+          expect(robot).toEqual({ name: 'robot-name' })
+          return '1.0.0'
+        })
       },
     },
     {
@@ -135,8 +144,22 @@ describe('buildroot selectors', () => {
       args: [{ name: 'robot-name' }],
       expected: null,
       setup: () => {
-        getRobotApiVersionByName.mockReturnValue('1.0.0')
+        getRobotApiVersion.mockImplementation(robot => {
+          expect(robot).toEqual({ name: 'robot-name' })
+          return '1.0.0'
+        })
       },
+    },
+    {
+      name: 'getBuildrootUpdateAvailable with no robot version available',
+      selector: selectors.getBuildrootUpdateAvailable,
+      state: {
+        buildroot: {
+          version: '1.0.0',
+        },
+      },
+      args: [{ name: 'robot-name' }],
+      expected: null,
     },
     {
       name: 'getBuildrootUpdateSession',
@@ -269,7 +292,7 @@ describe('buildroot selectors', () => {
       expected: {
         autoUpdateAction: expect.stringMatching(/unavailable/i),
         autoUpdateDisabledReason: expect.stringMatching(
-          /no update files found/i
+          /unable to retrieve update/i
         ),
         updateFromFileDisabledReason: null,
       },
@@ -281,7 +304,10 @@ describe('buildroot selectors', () => {
       state: { buildroot: { version: '1.0.0' } },
       setup: () => {
         getRobotByName.mockReturnValue(mockReachableRobot)
-        getRobotApiVersionByName.mockReturnValue('0.9.9')
+        getRobotApiVersion.mockImplementation(robot => {
+          expect(robot).toEqual(mockReachableRobot)
+          return '0.9.9'
+        })
       },
       expected: {
         autoUpdateAction: expect.stringMatching(/upgrade/i),

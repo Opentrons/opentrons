@@ -206,7 +206,7 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   const movementStatus = getMovementStatus(state, robot.name)
   const movementError = getMovementError(state, robot.name)
   const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
-  const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot.name)
+  const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot)
   const updateInProgress = getBuildrootUpdateInProgress(state, robot)
   const { autoUpdateDisabledReason } = getBuildrootUpdateDisplayInfo(
     state,

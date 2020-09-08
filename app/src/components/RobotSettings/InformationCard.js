@@ -99,8 +99,7 @@ export function InformationCard(props: InformationCardProps): React.Node {
           as={Link}
           to={!updateDisabled ? updateUrl : '#'}
           flex={FLEX_NONE}
-          paddingX={0}
-          width="9rem"
+          minWidth="9rem"
           className={cx({ disabled: updateDisabled })}
         >
           {autoUpdateAction}

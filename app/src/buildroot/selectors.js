@@ -5,7 +5,7 @@ import { createSelector } from 'reselect'
 import {
   HEALTH_STATUS_OK,
   getViewableRobots,
-  getRobotApiVersionByName,
+  getRobotApiVersion,
   getRobotByName,
 } from '../discovery'
 import * as Constants from './constants'
@@ -21,12 +21,12 @@ import type {
 
 // TODO(mc, 2020-08-02): i18n
 const UPDATE_SERVER_UNAVAILABLE =
-  "Unable to update because your robot's update server is not responding"
+  "Unable to update because your robot's update server is not responding."
 const OTHER_ROBOT_UPDATING =
-  'Unable to update because the app is currently updating a different robot'
+  'Unable to update because the app is currently updating a different robot.'
 const NO_UPDATE_FILES =
-  'No update files found; please ensure your computer is connected to the internet and check again later'
-const UNAVAILABLE = 'Unavailable'
+  'Unable to retrieve update for this robot. Ensure your computer is connected to the internet and try again later.'
+const UNAVAILABLE = 'Update unavailable'
 
 export function getBuildrootUpdateVersion(state: State): string | null {
   return state.buildroot.version || null
@@ -101,30 +101,38 @@ export const getBuildrootRobot: State => ViewableRobot | null = createSelector(
   }
 )
 
-export const getBuildrootUpdateAvailable: (
-  state: State,
-  robotName: string
-) => BuildrootUpdateType | null = createSelector(
-  getRobotApiVersionByName,
-  state => getBuildrootUpdateVersion(state),
-  (currentVersion, updateVersion) => {
-    const validCurrent: string | null = semver.valid(currentVersion)
-    const validUpdate: string | null = semver.valid(updateVersion)
-    let type = null
+const getBuildrootUpdateType = (
+  currentVersion: string | null,
+  updateVersion: string | null
+): BuildrootUpdateType | null => {
+  const validCurrent: string | null = semver.valid(currentVersion)
+  const validUpdate: string | null = semver.valid(updateVersion)
+  let type = null
 
-    if (validUpdate) {
-      if (!validCurrent || semver.gt(validUpdate, validCurrent)) {
-        type = Constants.UPGRADE
-      } else if (semver.lt(validUpdate, validCurrent)) {
-        type = Constants.DOWNGRADE
-      } else if (semver.eq(validUpdate, validCurrent)) {
-        type = Constants.REINSTALL
-      }
+  if (validUpdate && validCurrent) {
+    if (semver.gt(validUpdate, validCurrent)) {
+      type = Constants.UPGRADE
+    } else if (semver.lt(validUpdate, validCurrent)) {
+      type = Constants.DOWNGRADE
+    } else if (semver.eq(validUpdate, validCurrent)) {
+      type = Constants.REINSTALL
     }
-
-    return type
   }
-)
+
+  console.log(currentVersion, updateVersion, type)
+
+  return type
+}
+
+export function getBuildrootUpdateAvailable(
+  state: State,
+  robot: ViewableRobot
+): BuildrootUpdateType | null {
+  const currentVersion = getRobotApiVersion(robot)
+  const updateVersion = getBuildrootUpdateVersion(state)
+
+  return getBuildrootUpdateType(currentVersion, updateVersion)
+}
 
 export const getBuildrootUpdateDisplayInfo: (
   state: State,
@@ -135,9 +143,11 @@ export const getBuildrootUpdateDisplayInfo: (
   updateFromFileDisabledReason: string | null,
 |} = createSelector(
   getRobotByName,
-  getBuildrootUpdateAvailable,
   state => getBuildrootRobot(state),
-  (robot, autoUpdateType, currentUpdatingRobot) => {
+  state => getBuildrootUpdateVersion(state),
+  (robot, currentUpdatingRobot, updateVersion) => {
+    const robotVersion = robot ? getRobotApiVersion(robot) : null
+    const autoUpdateType = getBuildrootUpdateType(robotVersion, updateVersion)
     const autoUpdateAction = autoUpdateType ?? UNAVAILABLE
     let autoUpdateDisabledReason = null
     let updateFromFileDisabledReason = null

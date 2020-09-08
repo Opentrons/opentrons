@@ -47,7 +47,7 @@ const getConnectedRobotPipettesMatch = (state: State): boolean => {
 const getConnectedRobotUpdateAvailable = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
   const robotUpdateType = connectedRobot
-    ? getBuildrootUpdateAvailable(state, connectedRobot.name)
+    ? getBuildrootUpdateAvailable(state, connectedRobot)
     : null
 
   return robotUpdateType === UPGRADE
