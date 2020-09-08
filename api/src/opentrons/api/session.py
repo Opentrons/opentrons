@@ -16,7 +16,7 @@ from opentrons.broker import Broker
 from opentrons.config import feature_flags as ff
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
-from opentrons.protocol_api.implementation.protocol_context import \
+from opentrons.protocols.implementation.protocol_context import \
     ProtocolContextImplementation
 from opentrons.protocols.types import PythonProtocol, APIVersion
 from opentrons.protocols.parse import parse

@@ -7,7 +7,7 @@ from opentrons.broker import Broker
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import CommandPublisher
-from opentrons.protocol_api.implementation.interfaces.protocol_context import \
+from opentrons.protocols.implementation.interfaces.protocol_context import \
     AbstractProtocolContext
 from opentrons.protocols.types import APIVersion
 

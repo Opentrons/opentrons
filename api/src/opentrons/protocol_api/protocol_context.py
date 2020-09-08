@@ -4,7 +4,7 @@ from typing import (Dict, List, Optional, Union, TYPE_CHECKING)
 
 from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.protocol_api.implementation.interfaces.protocol_context import \
+from opentrons.protocols.implementation.interfaces.protocol_context import \
     AbstractProtocolContext
 from opentrons.protocols.types import APIVersion
 from .labware import Labware

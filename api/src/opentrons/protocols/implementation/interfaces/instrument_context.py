@@ -4,12 +4,13 @@ from abc import abstractmethod
 import typing
 
 from opentrons import types
-from opentrons.protocol_api.transfers import TransferOptions
-from opentrons.protocol_api.implementation.interfaces.versioned import \
+from opentrons.protocols.advanced_control.transfers import TransferOptions
+from opentrons.protocols.implementation.interfaces.versioned import \
     ApiVersioned
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
 from opentrons.protocol_api.labware import Labware, Well
-from opentrons.protocol_api.util import (FlowRates, PlungerSpeeds, Clearances)
+from opentrons.protocols.api_support.util import (
+    FlowRates, PlungerSpeeds, Clearances)
 
 
 class AbstractInstrumentContextImpl(ApiVersioned):

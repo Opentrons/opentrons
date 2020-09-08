@@ -8,22 +8,22 @@ from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.hardware_control import ExecutionManager, SynchronousAdapter, \
     modules
-from opentrons.protocol_api import InstrumentContext, MAX_SUPPORTED_VERSION, \
-    geometry
-from opentrons.protocol_api.geometry import Deck
-from opentrons.protocol_api.implementation.interfaces.protocol_context import \
+from opentrons.protocol_api import InstrumentContext, MAX_SUPPORTED_VERSION
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.implementation.interfaces.protocol_context import \
     AbstractProtocolContext
-from opentrons.protocol_api.implementation.location_cache import LocationCache
+from opentrons.protocols.implementation.location_cache import LocationCache
 from opentrons.protocol_api.labware import Labware, load_from_definition, \
     get_labware_definition
 from opentrons.protocol_api.module_contexts import ModuleContext, \
     ThermocyclerContext, MagneticModuleContext, TemperatureModuleContext, \
     ModuleTypes
-from opentrons.protocol_api.module_geometry import ModuleGeometry, \
-    resolve_module_model, resolve_module_type, load_module, ModuleType, \
-    models_compatible, module_model_from_string
-from opentrons.protocol_api.util import AxisMaxSpeeds, HardwareToManage, \
-    HardwareManager, convert_door_state_to_bool, APIVersionError
+from opentrons.protocols.geometry.module_geometry import (
+    ModuleGeometry, resolve_module_model, resolve_module_type, load_module,
+    ModuleType, models_compatible, module_model_from_string)
+from opentrons.protocols.api_support.util import (
+    AxisMaxSpeeds, HardwareToManage, HardwareManager,
+    convert_door_state_to_bool, APIVersionError)
 from opentrons.protocols.types import APIVersion, Protocol
 from opentrons_shared_data.labware import LabwareDefinition
 
@@ -82,7 +82,7 @@ class ProtocolContextImplementation(AbstractProtocolContext, CommandPublisher):
         self._loop = loop or asyncio.get_event_loop()
         deck_load_name = SHORT_TRASH_DECK if fflags.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck_layout = geometry.Deck(load_name=deck_load_name)
+        self._deck_layout = Deck(load_name=deck_load_name)
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]] \
             = {mount: None for mount in types.Mount}
         self._modules: Set[ModuleContext] = set()

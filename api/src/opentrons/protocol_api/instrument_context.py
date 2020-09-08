@@ -14,9 +14,9 @@ from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances,
     clamp_value, requires_version, build_edges, first_parent)
-from opentrons.protocol_api.implementation.interfaces.protocol_context import \
+from opentrons.protocols.implementation.interfaces.protocol_context import \
     AbstractProtocolContext
-from opentrons.protocol_api.implementation.location_cache import LocationCache
+from opentrons.protocols.implementation.location_cache import LocationCache
 
 from opentrons.protocols.types import APIVersion
 from .labware import (

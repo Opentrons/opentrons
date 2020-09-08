@@ -4,11 +4,11 @@ from abc import abstractmethod
 
 from typing import (List, Dict, Optional, Union, TYPE_CHECKING)
 
-from opentrons.protocol_api.implementation.interfaces.versioned import \
+from opentrons.protocols.implementation.interfaces.versioned import \
     ApiVersioned
-from opentrons.protocol_api.definitions import DeckItem
+from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocol_api.labware import Labware, Well
-from opentrons.protocol_api.module_geometry import ModuleGeometry
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
 from opentrons.types import Location, Point
 if TYPE_CHECKING:
