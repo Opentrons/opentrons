@@ -1,16 +1,13 @@
 // @flow
-import type { _AspDispAirgapParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 
-// TODO IMMEDIATELY: clean up flow types here
-type AspOrDisp = {|
-  command: 'aspirate' | 'dispense' | 'airGap',
-  params: _AspDispAirgapParams,
-|}
-
-const _isEqualMix = (a: AspOrDisp, b: AspOrDisp): boolean => {
+const _isEqualMix = (
+  a: AspDispAirgapParams,
+  b: AspDispAirgapParams
+): boolean => {
   const compareParams = ['pipette', 'volume', 'labware', 'well']
-  return compareParams.every(param => a.params[param] === b.params[param])
+  return compareParams.every(param => a[param] === b[param])
 }
 
 export const _stripNoOpMixCommands = (
@@ -18,20 +15,22 @@ export const _stripNoOpMixCommands = (
 ): Array<Command> => {
   const result: Array<Command> = []
   commands.forEach((command, index) => {
+    // aspirate followed by dispense
     if (command.command === 'aspirate') {
-      const nextCommand = commands[index + 1]
+      const nextCommand: ?Command = commands[index + 1]
       if (
         nextCommand?.command === 'dispense' &&
-        _isEqualMix(command, nextCommand)
+        _isEqualMix(command.params, nextCommand.params)
       ) {
         return
       }
     }
+    // dispense preceded by aspirate
     if (command.command === 'dispense' && index > 0) {
-      const prevCommand = commands[index - 1]
+      const prevCommand: ?Command = commands[index - 1]
       if (
-        prevCommand.command === 'aspirate' &&
-        _isEqualMix(command, prevCommand)
+        prevCommand?.command === 'aspirate' &&
+        _isEqualMix(command.params, prevCommand.params)
       ) {
         return
       }
