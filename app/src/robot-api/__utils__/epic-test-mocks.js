@@ -43,7 +43,7 @@ export type EpicTestMocks<A, R> = {|
  * @returns {EpicTestMocks}
  */
 export const setupEpicTestMocks = <
-  A: { meta: { requestId: string } },
+  A: { meta: { requestId: string, ... }, ... },
   R: RobotApiResponse
 >(
   makeTriggerAction: (robotName: string) => A,

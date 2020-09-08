@@ -2,6 +2,8 @@
 // mock HTTP responses for pipettes endpoints
 import { mockRobot } from '../../robot-api/__fixtures__'
 
+export * from './system-time'
+
 export const mockRestartSuccess = {
   host: mockRobot,
   method: 'POST',
