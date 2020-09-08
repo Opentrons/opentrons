@@ -196,7 +196,12 @@ CONFIG_ELEMENTS = (
                   'Robot Calibration Directory',
                   Path('robot'),
                   ConfigElementType.DIR,
-                  'The dir where robot calibration is stored')
+                  'The dir where robot calibration is stored'),
+    ConfigElement('pipette_calibration_dir',
+                  'Pipette Calibration Directory',
+                  Path('robot') / 'pipettes',
+                  ConfigElementType.DIR,
+                  'The dir where pipette calibration is stored')
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
