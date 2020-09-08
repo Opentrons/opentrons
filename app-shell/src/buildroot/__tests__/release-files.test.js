@@ -33,6 +33,22 @@ describe('buildroot release files utilities', () => {
         })
     })
 
+    it('should leave support files alone', () => {
+      const dir = makeEmptyDir()
+      const releaseDir = path.join(dir, '4.0.0')
+      const releaseManifest = path.join(dir, 'releases.json')
+
+      return Promise.all([
+        fs.mkdir(releaseDir),
+        fse.writeJson(releaseManifest, { hello: 'world' }),
+      ])
+        .then(() => cleanupReleaseFiles(dir, '4.0.0'))
+        .then(() => fs.readdir(dir))
+        .then(files => {
+          expect(files).toEqual(['4.0.0', 'releases.json'])
+        })
+    })
+
     it('should delete other directories', () => {
       const dir = makeEmptyDir()
       const releaseDir = path.join(dir, '4.0.0')
