@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, call
 from typing import List, Tuple, Dict, Any
+from opentrons.calibration_storage import modify, helpers
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 
@@ -190,3 +191,31 @@ def test_no_pipette(hardware, mount):
                                          mount=mount)
 
     assert error.value.error.detail == f"No pipette present on {mount} mount"
+
+
+async def test_save_pipette_calibration(mock_user_flow):
+    uf = mock_user_flow
+
+    def mock_save_pipette_offset(*args, **kwargs):
+        pass
+
+    def mock_hash_labware_def(*args, **kwargs):
+        return 'fakeHash'
+
+    modify.save_pipette_calibration = \
+        MagicMock(side_effect=mock_save_pipette_offset)
+    helpers.hash_labware_def = MagicMock(side_effect=mock_hash_labware_def)
+
+    uf._current_state = 'savingPointOne'
+    await uf._hardware.move_to(
+            mount=uf._mount,
+            abs_position=Point(x=10, y=10, z=40),
+            critical_point=uf._get_critical_point_override()
+        )
+    await uf.save_offset()
+    modify.save_pipette_calibration.assert_called_with(
+        offset=Point(x=10, y=10, z=40),
+        pip_id=uf._hw_pipette.pipette_id,
+        tiprack_hash='fakeHash',
+        tiprack_uri=uf._tip_rack.uri
+    )

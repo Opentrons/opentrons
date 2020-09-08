@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Awaitable, Callable, Dict, List, Optional
 
-from opentrons.calibration_storage import get
+from opentrons.calibration_storage import get, modify, helpers
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
@@ -174,8 +174,13 @@ class PipetteOffsetCalibrationUserFlow:
         if self.current_state == State.joggingToDeck:
             self._z_height_reference = cur_pt.z
         elif self._current_state == State.savingPointOne:
-            # TODO: save pipette offset
-            pass
+            tiprack_hash = helpers.hash_labware_def(
+                self._deck[TIP_RACK_SLOT]._definition) + ''
+            modify.save_pipette_calibration(
+                offset=cur_pt,
+                pip_id=self._hw_pipette.pipette_id,
+                tiprack_hash=tiprack_hash,
+                tiprack_uri=self._tip_rack.uri)
 
     async def pick_up_tip(self):
         await uf.pick_up_tip(self, tip_length=self._get_tip_length())
