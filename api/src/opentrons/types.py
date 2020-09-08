@@ -7,7 +7,7 @@ if TYPE_CHECKING:
                         Tuple)
     from .protocol_api.labware import (  # noqa(F401) Used for typechecking
         Labware, Well)
-    from .protocol_api.module_geometry import ModuleGeometry  # noqa(F401)
+    from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa(F401)
 
 
 class PipetteNotAttachedError(KeyError):

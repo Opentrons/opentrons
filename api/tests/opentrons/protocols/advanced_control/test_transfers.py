@@ -2,7 +2,7 @@
 import pytest
 import opentrons.protocol_api as papi
 from opentrons.types import Mount, TransferTipPolicy
-from opentrons.protocol_api import transfers as tx
+from opentrons.protocols.advanced_control import transfers as tx
 from opentrons.protocols.types import APIVersion
 
 

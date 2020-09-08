@@ -11,11 +11,11 @@ from opentrons_shared_data.protocol.dev_types import (
 )
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContext
-    from .instrument_context import InstrumentContext
-    from .module_contexts import (
+    from opentrons.protocol_api.protocol_context import ProtocolContext
+    from opentrons.protocol_api.instrument_context import InstrumentContext
+    from opentrons.protocol_api.module_contexts import (
         MagneticModuleContext, ThermocyclerContext, TemperatureModuleContext)
-    from .labware import Labware
+    from opentrons.protocol_api.labware import Labware
 
 
 # this file defines types that require dev dependencies

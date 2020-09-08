@@ -11,9 +11,9 @@ from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
 if TYPE_CHECKING:
-    from .contexts import InstrumentContext
+    from opentrons.protocol_api.contexts import InstrumentContext
     from opentrons.protocol_api.labware import Well
-    from opentrons.protocol_api.geometry import Deck
+    from opentrons.protocols.geometry.deck import Deck
     from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
 
 

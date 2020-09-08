@@ -1,24 +1,26 @@
 from unittest import mock
 import pytest
 from opentrons.protocols.parse import parse
-from opentrons.protocol_api.execute_v4 import dispatch_json, _engage_magnet, \
-    _disengage_magnet, _temperature_module_set_temp, load_modules_from_json, \
-    _temperature_module_deactivate, \
-    _temperature_module_await_temp, \
-    _thermocycler_close_lid, \
-    _thermocycler_open_lid, \
-    _thermocycler_deactivate_block, \
-    _thermocycler_deactivate_lid, \
-    _thermocycler_set_block_temperature, \
-    _thermocycler_set_lid_temperature, \
-    _thermocycler_run_profile, \
-    assert_no_async_tc_behavior, \
-    assert_tc_commands_do_not_use_unimplemented_params, \
-    TC_SPANNING_SLOT
-import opentrons.protocol_api.execute_v4 as v4
-from opentrons.protocol_api import MagneticModuleContext, \
-    TemperatureModuleContext, ThermocyclerContext, \
-    ProtocolContext, execute
+from opentrons.protocols.execution.execute_json_v4 import (
+    dispatch_json, _engage_magnet, _disengage_magnet, load_modules_from_json,
+    _temperature_module_set_temp,
+    _temperature_module_deactivate,
+    _temperature_module_await_temp,
+    _thermocycler_close_lid,
+    _thermocycler_open_lid,
+    _thermocycler_deactivate_block,
+    _thermocycler_deactivate_lid,
+    _thermocycler_set_block_temperature,
+    _thermocycler_set_lid_temperature,
+    _thermocycler_run_profile,
+    assert_no_async_tc_behavior,
+    assert_tc_commands_do_not_use_unimplemented_params,
+    TC_SPANNING_SLOT)
+import opentrons.protocols.execution.execute_json_v4 as v4
+from opentrons.protocol_api import (
+    MagneticModuleContext, TemperatureModuleContext, ThermocyclerContext,
+    ProtocolContext)
+from opentrons.protocols.execution import execute
 from opentrons_shared_data.protocol.constants import (
     JsonPipetteCommand as JPC,
     JsonMagneticModuleCommand as JMMC,

@@ -18,7 +18,7 @@ from opentrons import config
 from opentrons.calibration_storage import delete
 from opentrons.protocol_api import labware
 from opentrons.types import Point
-from opentrons.protocol_api.geometry import Deck
+from opentrons.protocols.geometry.deck import Deck
 
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.manager import SessionManager

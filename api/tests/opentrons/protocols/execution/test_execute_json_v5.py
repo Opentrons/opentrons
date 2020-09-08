@@ -2,7 +2,7 @@ from unittest import mock
 from opentrons.types import Location, Point
 from opentrons.protocol_api import InstrumentContext, \
     labware, MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.execute_v5 import _move_to_well
+from opentrons.protocols.execution.execute_json_v5 import _move_to_well
 
 
 def test_move_to_well_with_optional_params():
@@ -33,7 +33,7 @@ def test_move_to_well_with_optional_params():
               'minimumZHeight': mock.sentinel.minimum_z_height}
 
     with mock.patch(
-            'opentrons.protocol_api.execute_v5._get_well',
+            'opentrons.protocols.execution.execute_json_v5._get_well',
             new=mock_get_well):
         _move_to_well(
             instruments, mock.sentinel.loaded_labware, params)
@@ -74,7 +74,7 @@ def test_move_to_well_without_optional_params():
               'well': 'someWell'}
 
     with mock.patch(
-            'opentrons.protocol_api.execute_v5._get_well',
+            'opentrons.protocols.execution.execute_json_v5._get_well',
             new=mock_get_well):
         _move_to_well(
             instruments, mock.sentinel.loaded_labware, params)

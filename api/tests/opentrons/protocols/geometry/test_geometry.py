@@ -1,11 +1,13 @@
 import pytest
 
 from opentrons.types import Location, Point
-from opentrons.protocol_api.geometry import (
-    Deck, plan_moves, safe_height, first_parent, should_dodge_thermocycler)
-from opentrons.protocol_api import labware, module_geometry
+from opentrons.protocols.geometry.planning import (
+    plan_moves, safe_height, first_parent, should_dodge_thermocycler)
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api import labware
+from opentrons.protocols.geometry import module_geometry
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.protocol_api.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 tall_lw_name = 'opentrons_96_tiprack_1000ul'
 labware_name = 'corning_96_wellplate_360ul_flat'

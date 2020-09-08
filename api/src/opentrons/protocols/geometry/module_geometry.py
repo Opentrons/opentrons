@@ -20,8 +20,10 @@ import jsonschema  # type: ignore
 from opentrons_shared_data import module
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.types import APIVersion
-from .definitions import MAX_SUPPORTED_VERSION, DeckItem, V2_MODULE_DEF_VERSION
-from .labware import Labware
+from opentrons.protocols.api_support.definitions import (
+    MAX_SUPPORTED_VERSION, V2_MODULE_DEF_VERSION)
+from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.protocol_api.labware import Labware
 
 if TYPE_CHECKING:
     from opentrons_shared_data.module.dev_types import (

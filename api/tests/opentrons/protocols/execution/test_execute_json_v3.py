@@ -1,16 +1,18 @@
-from .test_accessor_fn import minimalLabwareDef2
+from tests.opentrons.protocol_api.test_accessor_fn import minimalLabwareDef2
 from unittest import mock
 from copy import deepcopy
 import pytest
 from opentrons.types import Location, Point
 from opentrons.protocols.parse import parse
-from opentrons.protocol_api.geometry import Deck
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, \
-    execute, labware, MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.execute_v3 import _aspirate, _dispense, _delay, \
-    _drop_tip, _blowout, dispatch_json, _pick_up_tip, _touch_tip, _air_gap, \
-    _move_to_slot, load_labware_from_json_defs, _get_well, _set_flow_rate, \
-    _get_location_with_offset, load_pipettes_from_json
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api import (
+    ProtocolContext, InstrumentContext, labware, MAX_SUPPORTED_VERSION)
+from opentrons.protocols.execution import execute
+from opentrons.protocols.execution.execute_json_v3 import (
+    _aspirate, _dispense, _delay, _drop_tip, _blowout, dispatch_json,
+    _pick_up_tip, _touch_tip, _air_gap, _move_to_slot,
+    load_labware_from_json_defs, _get_well, _set_flow_rate,
+    _get_location_with_offset, load_pipettes_from_json)
 
 
 def test_load_pipettes_from_json():
@@ -130,8 +132,9 @@ def test_blowout():
     well = 'theWell'
     loaded_labware = {'someLabwareId': {'someWell': well}}
 
-    with mock.patch('opentrons.protocol_api.execute_v3._set_flow_rate',
-                    new=m.mock_set_flow_rate):
+    flow_rate_patch = \
+        'opentrons.protocols.execution.execute_json_v3._set_flow_rate'
+    with mock.patch(flow_rate_patch, new=m.mock_set_flow_rate):
         _blowout(instruments, loaded_labware, params)
 
     assert m.mock_calls == [
@@ -190,7 +193,7 @@ def test_air_gap():
     loaded_labware = {'someLabwareId': some_labware}
 
     with mock.patch(
-            'opentrons.protocol_api.execute_v3._set_flow_rate',
+            'opentrons.protocols.execution.execute_json_v3._set_flow_rate',
             new=m.mock_set_flow_rate):
         _air_gap(instruments, loaded_labware, params)
 
@@ -217,10 +220,10 @@ def test_aspirate():
     instruments = {'somePipetteId': m.pipette_mock}
 
     with mock.patch(
-            'opentrons.protocol_api.execute_v3._get_location_with_offset',
+            'opentrons.protocols.execution.execute_json_v3._get_location_with_offset',  # noqa: e501
             new=m.mock_get_location_with_offset):
         with mock.patch(
-                'opentrons.protocol_api.execute_v3._set_flow_rate',
+                'opentrons.protocols.execution.execute_json_v3._set_flow_rate',
                 new=m.mock_set_flow_rate):
             _aspirate(instruments, mock.sentinel.loaded_labware, params)
 
@@ -244,10 +247,10 @@ def test_dispense():
     instruments = {'somePipetteId': m.pipette_mock}
 
     with mock.patch(
-        'opentrons.protocol_api.execute_v3._get_location_with_offset',
+        'opentrons.protocols.execution.execute_json_v3._get_location_with_offset',  # noqa: e501
             new=m.mock_get_location_with_offset):
         with mock.patch(
-            'opentrons.protocol_api.execute_v3._set_flow_rate',
+            'opentrons.protocols.execution.execute_json_v3._set_flow_rate',
                 new=m.mock_set_flow_rate):
             _dispense(instruments, mock.sentinel.loaded_labware, params)
 
@@ -286,13 +289,13 @@ def test_touch_tip():
     instruments = {'somePipetteId': pipette_mock}
 
     with mock.patch(
-        'opentrons.protocol_api.execute_v3._get_location_with_offset',
+        'opentrons.protocols.execution.execute_json_v3._get_location_with_offset',  # noqa: e501
             new=mock_get_location_with_offset):
         with mock.patch(
-            'opentrons.protocol_api.execute_v3._get_well',
+            'opentrons.protocols.execution.execute_json_v3._get_well',
                 new=mock_get_well):
             with mock.patch(
-                'opentrons.protocol_api.execute_v3._set_flow_rate',
+                'opentrons.protocols.execution.execute_json_v3._set_flow_rate',
                     new=mock_set_flow_rate):
                 _touch_tip(instruments, mock.sentinel.loaded_labware, params)
 
@@ -346,7 +349,7 @@ def test_dispatch_json():
     }
 
     with mock.patch(
-        'opentrons.protocol_api.execute_v3.dispatcher_map',
+        'opentrons.protocols.execution.execute_json_v3.dispatcher_map',
             new=mock_dispatcher_map):
         protocol_data = {'commands': [
             {'command': 'delay', 'params': 'delay_params'},

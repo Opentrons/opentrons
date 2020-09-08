@@ -1,10 +1,10 @@
 import logging
 from typing import Dict, List, TYPE_CHECKING, Union
-from .contexts import ProtocolContext, \
+from opentrons.protocol_api.contexts import ProtocolContext, \
     MagneticModuleContext, TemperatureModuleContext, ModuleContext, \
     ThermocyclerContext
-from .execute_v3 import _delay, _move_to_slot
-from .types import LoadedLabware, Instruments
+from .execute_json_v3 import _delay, _move_to_slot
+from opentrons.protocols.execution.types import LoadedLabware, Instruments
 from opentrons_shared_data.protocol.constants import (
     JsonRobotCommand, JsonPipetteCommand)
 
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
         TemperatureModuleCommandId, MagneticModuleCommandId,
         ThermocyclerCommandId
     )
-    from .dev_types import (
+    from opentrons.protocols.execution.dev_types import (
         PipetteDispatch, JsonV4MagneticModuleDispatch,
         JsonV4TemperatureModuleDispatch,
         JsonV4ThermocyclerDispatch)
