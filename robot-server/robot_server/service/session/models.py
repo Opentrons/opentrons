@@ -185,6 +185,7 @@ class CalibrationCommand(CommandDefinition):
     move_to_tip_rack = "moveToTipRack"
     move_to_point_one = "moveToPointOne"
     move_to_deck = "moveToDeck"
+    move_to_reference_point = "moveToReferencePoint"
     pick_up_tip = "pickUpTip"
     confirm_tip_attached = "confirmTip"
     invalidate_tip = "invalidateTip"

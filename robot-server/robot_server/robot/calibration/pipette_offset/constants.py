@@ -11,8 +11,10 @@ if TYPE_CHECKING:
 class PipetteOffsetCalibrationState(str, Enum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
+    measuringNozzleOffset = "measuringNozzleOffset"
     preparingPipette = "preparingPipette"
     inspectingTip = "inspectingTip"
+    measuringTipOffset = "measuringTipOffset"
     joggingToDeck = "joggingToDeck"
     savingPointOne = "savingPointOne"
     calibrationComplete = "calibrationComplete"

@@ -12,6 +12,12 @@ PIP_OFFSET_CAL_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
         CalibrationCommand.load_labware: State.labwareLoaded
     },
     State.labwareLoaded: {
+        CalibrationCommand.move_to_tip_rack: State.preparingPipette,
+        CalibrationCommand.move_to_reference_point: State.measuringNozzleOffset
+    },
+    State.measuringNozzleOffset: {
+        CalibrationCommand.save_offset: State.measuringNozzleOffset,
+        CalibrationCommand.jog: State.measuringNozzleOffset,
         CalibrationCommand.move_to_tip_rack: State.preparingPipette
     },
     State.preparingPipette: {
@@ -21,18 +27,24 @@ PIP_OFFSET_CAL_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.inspectingTip: {
         CalibrationCommand.invalidate_tip: State.preparingPipette,
         CalibrationCommand.move_to_deck: State.joggingToDeck,
+        CalibrationCommand.move_to_reference_point: State.measuringTipOffset,
     },
     State.joggingToDeck: {
         CalibrationCommand.jog: State.joggingToDeck,
         CalibrationCommand.save_offset: State.joggingToDeck,
         CalibrationCommand.move_to_point_one: State.savingPointOne,
     },
+    State.measuringTipOffset: {
+        CalibrationCommand.jog: State.measuringTipOffset,
+        CalibrationCommand.save_offset: State.calibrationComplete,
+    },
     State.savingPointOne: {
         CalibrationCommand.jog: State.savingPointOne,
         CalibrationCommand.save_offset: State.calibrationComplete,
     },
     State.calibrationComplete: {
-        CalibrationCommand.move_to_tip_rack: State.calibrationComplete
+        CalibrationCommand.move_to_tip_rack: State.calibrationComplete,
+        CalibrationCommand.move_to_deck: State.joggingToDeck,
     },
     State.WILDCARD: {
         CalibrationCommand.exit: State.sessionExited
