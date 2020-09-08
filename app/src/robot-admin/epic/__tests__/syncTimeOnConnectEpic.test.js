@@ -6,7 +6,10 @@ import { EMPTY } from 'rxjs'
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import { GET, PUT } from '../../../robot-api'
 import { actions as RobotActions } from '../../../robot'
-import { mockFetchSystemTimeSuccess } from '../../__fixtures__'
+import {
+  mockFetchSystemTimeSuccess,
+  mockFetchSystemTimeFailure,
+} from '../../__fixtures__'
 import { robotAdminEpic } from '..'
 
 describe('syncTimeOnConnectEpic', () => {
@@ -88,6 +91,24 @@ describe('syncTimeOnConnectEpic', () => {
       expect(
         Math.abs(differenceInSeconds(new Date(), parseISO(updatedTime)))
       ).toBe(0)
+    })
+  })
+
+  it('should not try to update time if fetch fails', () => {
+    const mocks = setupEpicTestMocks(
+      robotName => (RobotActions.connect(robotName): any),
+      mockFetchSystemTimeFailure
+    )
+
+    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
+      const output$ = robotAdminEpic(action$, state$)
+
+      expectObservable(output$)
+      flush()
+
+      expect(mocks.fetchRobotApi).toHaveBeenCalledTimes(1)
     })
   })
 })
