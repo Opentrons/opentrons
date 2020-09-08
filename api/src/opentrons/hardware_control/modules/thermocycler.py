@@ -1,10 +1,13 @@
 import asyncio
-from typing import Union, Optional, List, Callable
-from opentrons.drivers.thermocycler.driver import (
-    SimulatingDriver, Thermocycler as ThermocyclerDriver)
 import logging
+from typing import Union, Optional, List, Callable
 from ..execution_manager import ExecutionManager
 from . import types, update, mod_abc
+from opentrons.drivers.thermocycler.driver import (
+    HOLD_TIME_FUZZY_SECONDS,
+    SimulatingDriver,
+    Thermocycler as ThermocyclerDriver)
+
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -127,7 +130,7 @@ class Thermocycler(mod_abc.AbstractModule):
                                            volume=volume)
         if hold_time:
             task = self._loop.create_task(
-                self.wait_for_hold())
+                self.wait_for_hold(hold_time))
         else:
             task = self._loop.create_task(
                 self.wait_for_temp())
@@ -201,12 +204,21 @@ class Thermocycler(mod_abc.AbstractModule):
         while self.status != 'holding at target':
             await asyncio.sleep(0.1)
 
-    async def wait_for_hold(self):
+    async def wait_for_hold(self, hold_time=0):
         """
         This method returns only when hold time has elapsed
         """
-        while self.hold_time != 0:
-            await asyncio.sleep(0.1)
+        # If hold time is within the HOLD_TIME_FUZZY_SECONDS time gap, then,
+        # because of the driver's status poller delays, it is impossible to
+        # know for certain if self.hold_time holds the most recent value.
+        # So instead of counting on the cached self.hold_time, it is better to
+        # just wait for hold_time time. (Skip if hold_time = 0 since we don't
+        # want to wait in that case. Cached self.hold_time would be 0 anyway)
+        if 0 < hold_time <= HOLD_TIME_FUZZY_SECONDS:
+            await asyncio.sleep(hold_time)
+        else:
+            while self.hold_time != 0:
+                await asyncio.sleep(0.1)
 
     @property
     def lid_target(self):
