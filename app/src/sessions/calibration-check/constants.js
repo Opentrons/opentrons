@@ -1,6 +1,8 @@
 // @flow
 // calibration check session contants
 
+import { sharedCalCommands } from '../common-calibration/constants'
+
 export const CHECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'
 export const CHECK_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
 export const CHECK_STEP_PREPARING_FIRST_PIPETTE: 'preparingFirstPipette' =
@@ -42,11 +44,6 @@ export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badCalibrationData' =
 export const CHECK_STEP_NO_PIPETTES_ATTACHED: 'noPipettesAttached' =
   'noPipettesAttached'
 
-const LOAD_LABWARE: 'calibration.loadLabware' = 'calibration.loadLabware'
-const JOG: 'calibration.jog' = 'calibration.jog'
-const PICK_UP_TIP: 'calibration.pickUpTip' = 'calibration.pickUpTip'
-const CONFIRM_TIP: 'calibration.confirmTip' = 'calibration.confirmTip'
-const INVALIDATE_TIP: 'calibration.invalidateTip' = 'calibration.invalidateTip'
 const PREPARE_PIPETTE: 'calibration.check.preparePipette' =
   'calibration.check.preparePipette'
 const COMPARE_POINT: 'calibration.check.comparePoint' =
@@ -56,12 +53,8 @@ const GO_TO_NEXT_CHECK: 'calibration.check.goToNextCheck' =
 const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
 
 export const checkCommands = {
-  LOAD_LABWARE,
+  ...sharedCalCommands,
   PREPARE_PIPETTE,
-  JOG,
-  PICK_UP_TIP,
-  CONFIRM_TIP,
-  INVALIDATE_TIP,
   COMPARE_POINT,
   GO_TO_NEXT_CHECK,
   EXIT,

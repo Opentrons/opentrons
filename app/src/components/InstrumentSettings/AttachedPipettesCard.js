@@ -12,7 +12,8 @@ import {
   getAttachedPipetteSettings,
 } from '../../pipettes'
 
-import { PipetteInfo } from './PipetteInfo'
+import { PipetteInfo, LegacyPipetteInfo } from './PipetteInfo'
+import { getFeatureFlags } from '../../config'
 import { CardContentFlex } from '../layout'
 import { Card, useInterval } from '@opentrons/components'
 
@@ -34,6 +35,8 @@ export function AttachedPipettesCard(props: Props): React.Node {
   const { robotName, makeChangeUrl, makeConfigureUrl } = props
   const dispatch = useDispatch<Dispatch>()
 
+  const ff = useSelector(getFeatureFlags)
+
   const pipettes = useSelector((state: State) =>
     getAttachedPipettes(state, robotName)
   )
@@ -50,16 +53,21 @@ export function AttachedPipettesCard(props: Props): React.Node {
     true
   )
 
+  const PipetteEl = ff.enableCalibrationOverhaul
+    ? PipetteInfo
+    : LegacyPipetteInfo
   return (
     <Card title={PIPETTES}>
       <CardContentFlex>
-        <PipetteInfo
+        <PipetteEl
+          robotName={robotName}
           mount={LEFT}
           pipette={pipettes.left}
           changeUrl={makeChangeUrl(LEFT)}
           settingsUrl={settings.left ? makeConfigureUrl(LEFT) : null}
         />
-        <PipetteInfo
+        <PipetteEl
+          robotName={robotName}
           mount={RIGHT}
           pipette={pipettes.right}
           changeUrl={makeChangeUrl(RIGHT)}

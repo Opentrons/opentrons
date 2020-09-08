@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { Box } from '../primitives'
 
 export type RobotCoordsForeignDivProps = {|
   width?: string | number,
@@ -34,13 +35,13 @@ export const RobotCoordsForeignDiv = (
       {...{ x, y, height, width, className }}
       transform={transformWithSVG ? transform : extraTransform}
     >
-      <div
+      <Box
         {...innerDivProps}
         style={transformWithSVG ? {} : { transform }}
         xmlns="http://www.w3.org/1999/xhtml"
       >
         {children}
-      </div>
+      </Box>
     </foreignObject>
   )
 }

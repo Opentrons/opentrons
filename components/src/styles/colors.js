@@ -16,6 +16,7 @@ export const COLOR_DISABLED = '#9c9c9c'
 export const COLOR_WARNING = '#e28200'
 export const COLOR_WARNING_LIGHT = '#ffd58f'
 export const COLOR_ERROR = '#d12929'
+export const COLOR_SUCCESS = '#60b120'
 
 // overlays
 export const OVERLAY_WHITE_10 = 'rgba(255, 255, 255, 0.1)'

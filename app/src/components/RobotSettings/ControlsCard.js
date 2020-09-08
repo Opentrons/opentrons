@@ -55,6 +55,9 @@ export function ControlsCard(props: Props): React.Node {
   const deckCalStatus = useSelector((state: State) => {
     return Calibration.getDeckCalibrationStatus(state, robotName)
   })
+  const deckCalData = useSelector((state: State) => {
+    return Calibration.getDeckCalibrationData(state, robotName)
+  })
   const notConnectable = status !== CONNECTABLE
   const toggleLights = () => dispatch(updateLights(robotName, !lightsOn))
   const startLegacyDeckCalibration = () => {
@@ -100,6 +103,7 @@ export function ControlsCard(props: Props): React.Node {
         robotName={robotName}
         buttonDisabled={buttonDisabled}
         deckCalStatus={deckCalStatus}
+        deckCalData={deckCalData}
         startLegacyDeckCalibration={startLegacyDeckCalibration}
       />
       <LabeledButton

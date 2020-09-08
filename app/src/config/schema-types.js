@@ -104,4 +104,15 @@ export type ConfigV2 = $ReadOnly<{|
   |}>,
 |}>
 
-export type Config = ConfigV2
+// v3 config changes default values but does not change schema
+export type ConfigV3 = $ReadOnly<{|
+  ...ConfigV2,
+  version: 3,
+  support: $ReadOnly<{|
+    ...$PropertyType<ConfigV2, 'support'>,
+    name: string | null,
+    email: string | null,
+  |}>,
+|}>
+
+export type Config = ConfigV3

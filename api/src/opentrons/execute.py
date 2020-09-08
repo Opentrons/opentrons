@@ -16,8 +16,8 @@ from typing import (Any, Callable, Dict, List, Optional, TextIO, Union,
 import opentrons
 from opentrons import protocol_api, __version__
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
-from opentrons.protocol_api import (execute as execute_apiv2,
-                                    MAX_SUPPORTED_VERSION)
+from opentrons.protocol_api import (MAX_SUPPORTED_VERSION)
+from opentrons.protocols.execution import execute as execute_apiv2
 from opentrons import commands
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import APIVersion, PythonProtocol

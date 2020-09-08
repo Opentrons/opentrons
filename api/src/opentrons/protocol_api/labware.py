@@ -23,16 +23,18 @@ from typing import (
 
 import jsonschema  # type: ignore
 
-from .util import ModifiedList, requires_version
+from opentrons.protocols.api_support.util import ModifiedList, requires_version
 from opentrons.calibration_storage import get, helpers, modify
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
-from .definitions import MAX_SUPPORTED_VERSION, DeckItem
-from .constants import (OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE,
-                        STANDARD_DEFS_PATH, USER_DEFS_PATH)
+from opentrons.protocols.api_support.definitions import (
+    MAX_SUPPORTED_VERSION)
+from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.protocols.api_support.constants import (
+    OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE, STANDARD_DEFS_PATH, USER_DEFS_PATH)
 if TYPE_CHECKING:
-    from .module_geometry import ModuleGeometry  # noqa(F401)
+    from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa(F401)
     from opentrons_shared_data.labware.dev_types import (
         LabwareDefinition, LabwareParameters, WellDefinition)
 

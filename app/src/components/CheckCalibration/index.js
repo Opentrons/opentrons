@@ -20,6 +20,8 @@ import type { RequestState } from '../../robot-api/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import * as SessionTypes from '../../sessions/types'
 
+// TODO: BC 2020-09-02 use shared components from CalibrationPanels for child
+// components, and delete duplicate files in this directory
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { TipPickUp } from './TipPickUp'

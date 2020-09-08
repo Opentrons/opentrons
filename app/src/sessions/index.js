@@ -6,6 +6,7 @@ import type {
   CalibrationCheckSession,
   TipLengthCalibrationSession,
   DeckCalibrationSession,
+  PipetteOffsetCalibrationSession,
 } from './types'
 
 export * from './actions'
@@ -18,4 +19,5 @@ export type {
   CalibrationCheckSession,
   TipLengthCalibrationSession,
   DeckCalibrationSession,
+  PipetteOffsetCalibrationSession,
 }
