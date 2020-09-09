@@ -1,7 +1,6 @@
 // @flow
 import { cloneDeep, set, get } from 'lodash'
 import { subSeconds, differenceInSeconds, parseISO } from 'date-fns'
-import { EMPTY } from 'rxjs'
 
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import { GET, PUT } from '../../../robot-api'
@@ -12,29 +11,36 @@ import {
 } from '../../__fixtures__'
 import { robotAdminEpic } from '..'
 
-describe('syncTimeOnConnectEpic', () => {
-  const makeTimeResponse = (time: Date) => {
-    const response = cloneDeep(mockFetchSystemTimeSuccess)
-    set(response, 'body.data.attributes.systemTime', time.toISOString())
-    return response
-  }
+const createConnectAction = robotName => (RobotActions.connect(robotName): any)
 
+const createTimeSuccessResponse = (time: Date) => {
+  const response = cloneDeep(mockFetchSystemTimeSuccess)
+  set(response, 'body.data.attributes.systemTime', time.toISOString())
+  return response
+}
+
+const createEpicOutput = (mocks, createHotObservable) => {
+  const action$ = createHotObservable('--a', { a: mocks.action })
+  const state$ = createHotObservable('s-s', { s: mocks.state })
+  const output$ = robotAdminEpic(action$, state$)
+
+  return output$
+}
+
+describe('syncTimeOnConnectEpic', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
 
   it("should fetch the robot's time on connect request", () => {
     const mocks = setupEpicTestMocks(
-      robotName => (RobotActions.connect(robotName): any),
-      makeTimeResponse(new Date())
+      createConnectAction,
+      createTimeSuccessResponse(new Date())
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
-      const output$ = robotAdminEpic(action$, state$)
-
-      expectObservable(output$)
+      const output$ = createEpicOutput(mocks, hot)
+      expectObservable(output$, '---')
       flush()
 
       expect(mocks.fetchRobotApi).toHaveBeenCalledTimes(1)
@@ -46,28 +52,23 @@ describe('syncTimeOnConnectEpic', () => {
   })
 
   it('should update time if off by more than a minute', () => {
-    const mocks = setupEpicTestMocks(
-      robotName => (RobotActions.connect(robotName): any)
-    )
+    const mocks = setupEpicTestMocks(createConnectAction)
 
     runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
       mocks.fetchRobotApi.mockImplementation((robot, request) => {
-        if (request.method === GET) {
+        if (request.method === GET && request.path === '/system/time') {
           const robotDate = subSeconds(new Date(), 61)
-          return cold('r', { r: makeTimeResponse(robotDate) })
+          return cold('r', { r: createTimeSuccessResponse(robotDate) })
         }
 
-        if (request.method === PUT) {
-          return cold('r', { r: makeTimeResponse(new Date()) })
+        if (request.method === PUT && request.path === '/system/time') {
+          return cold('r', { r: createTimeSuccessResponse(new Date()) })
         }
 
-        return EMPTY
+        return cold('#')
       })
 
-      const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
-      const output$ = robotAdminEpic(action$, state$)
-
+      const output$ = createEpicOutput(mocks, hot)
       expectObservable(output$, '---')
       flush()
 
@@ -96,16 +97,28 @@ describe('syncTimeOnConnectEpic', () => {
 
   it('should not try to update time if fetch fails', () => {
     const mocks = setupEpicTestMocks(
-      robotName => (RobotActions.connect(robotName): any),
+      createConnectAction,
       mockFetchSystemTimeFailure
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
-      const output$ = robotAdminEpic(action$, state$)
+      const output$ = createEpicOutput(mocks, hot)
+      expectObservable(output$, '---')
+      flush()
 
-      expectObservable(output$)
+      expect(mocks.fetchRobotApi).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it('should not try to update time if off by less than a minute', () => {
+    const mocks = setupEpicTestMocks(
+      robotName => (RobotActions.connect(robotName): any),
+      createTimeSuccessResponse(subSeconds(new Date(), 55))
+    )
+
+    runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
+      const output$ = createEpicOutput(mocks, hot)
+      expectObservable(output$, '---')
       flush()
 
       expect(mocks.fetchRobotApi).toHaveBeenCalledTimes(1)
