@@ -57,6 +57,10 @@ Used for analytics segmentation. In Travis CI, this is fed by `$TRAVIS_COMMIT`.
 
 Used for FullStory. Should be provided in the Travis build.
 
+### `OT_PD_MIXPANEL_ID`
+
+Used for Mixpanel. Should be provided in the Travis build.
+
 ### `OT_PD_SHOW_GATE`
 
 If truthy, uses the `GateModal` component in development. The `GateModal` component is always used in production.

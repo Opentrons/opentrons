@@ -1,6 +1,7 @@
 // @flow
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
+import { trackEventMiddleware } from './analytics/middleware'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
@@ -74,7 +75,9 @@ export function configureStore(): Store<
   const store = createStore<BaseState, Action, ThunkDispatch<*>>(
     reducer,
     /* preloadedState, */
-    composeEnhancers(applyMiddleware(timelineMiddleware, thunk))
+    composeEnhancers(
+      applyMiddleware(trackEventMiddleware, timelineMiddleware, thunk)
+    )
   )
 
   // give reselect tools access to state if in dev env

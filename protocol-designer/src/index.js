@@ -6,9 +6,14 @@ import { AppContainer } from 'react-hot-loader'
 import { configureStore } from './configureStore'
 import { App } from './components/App'
 import { initialize } from './initialize'
-const store = configureStore()
+import { initializeMixpanel } from './analytics/mixpanel'
 
+// initialize Redux
+const store = configureStore()
 initialize(store)
+
+// initialize analytics
+initializeMixpanel(store.getState())
 
 const render = Component => {
   ReactDOM.render(
