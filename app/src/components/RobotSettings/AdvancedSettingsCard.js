@@ -15,6 +15,7 @@ import { downloadLogs } from '../../shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
 import { Portal } from '../portal'
 import {
+  BORDER_SOLID_LIGHT,
   AlertModal,
   Card,
   LabeledButton,
@@ -101,6 +102,7 @@ export function AdvancedSettingsCard(
       >
         <p>Restore robot to factory configuration</p>
       </LabeledButton>
+      <OpenJupyterControl robotIp={ip} borderBottom={BORDER_SOLID_LIGHT} />
       {settings.map(({ id, title, description, value }) => (
         <LabeledToggle
           key={id}
@@ -112,7 +114,6 @@ export function AdvancedSettingsCard(
         </LabeledToggle>
       ))}
       <UploadRobotUpdate robotName={name} />
-      <OpenJupyterControl robotIp={ip} />
       {showLogOptoutModal && (
         <Portal>
           <AlertModal

@@ -5,6 +5,8 @@ import { SecondaryBtn, Link } from '@opentrons/components'
 import { useTrackEvent } from '../../analytics'
 import { TitledControl } from '../TitledControl'
 
+import type { StyleProps } from '@opentrons/components'
+
 // TODO(mc, 2020-09-09): i18n
 const OPEN = 'Open'
 const JUPYTER_NOTEBOOK = 'Jupyter Notebook'
@@ -29,14 +31,17 @@ const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
 
 export type OpenJupyterControlProps = {|
   robotIp: string,
+  ...StyleProps,
 |}
 
 export function OpenJupyterControl(props: OpenJupyterControlProps): React.Node {
-  const href = `http://${props.robotIp}:48888`
+  const { robotIp, ...styleProps } = props
+  const href = `http://${robotIp}:48888`
   const trackEvent = useTrackEvent()
 
   return (
     <TitledControl
+      {...styleProps}
       title={JUPYTER_NOTEBOOK}
       description={OPEN_JUPYTER_DESCRIPTION}
       control={

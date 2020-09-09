@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { BORDER_SOLID_LIGHT } from '@opentrons/components'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
 import * as RobotSettings from '../../../robot-settings'
@@ -41,5 +42,6 @@ describe('RobotSettings > AdvancedSettingsCard', () => {
     const openJupyter = wrapper.find(OpenJupyterControl)
 
     expect(openJupyter.prop('robotIp')).toBe(mockConnectableRobot.ip)
+    expect(openJupyter.prop('borderBottom')).toBe(BORDER_SOLID_LIGHT)
   })
 })
