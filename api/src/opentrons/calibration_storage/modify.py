@@ -205,7 +205,7 @@ def save_robot_deck_attitude(
 
 
 def save_pipette_calibration(
-        offset: local_types.PipetteOffset,
+        offset: 'Point',
         pip_id: str, mount: Mount,
         tiprack_hash: str, tiprack_uri: str):
     pip_dir = config.get_opentrons_path(
@@ -213,7 +213,7 @@ def save_pipette_calibration(
     pip_dir.mkdir(parents=True, exist_ok=True)
     offset_path = pip_dir/f'{pip_id}.json'
     offset_dict: 'PipetteCalibrationData' = {
-        'offset': offset,
+        'offset': [offset.x, offset.y, offset.z],
         'tiprack': tiprack_hash,
         'uri': tiprack_uri,
         'last_modified': utc_now(),
