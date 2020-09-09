@@ -3,6 +3,7 @@ import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
 } from '../step-forms/selectors'
+import { getFileMetadata } from '../file-data/selectors'
 import { trackEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
@@ -28,18 +29,30 @@ export const reduxActionToAnalyticsEvent = (
 
     if (stepArgs !== null) {
       const pipetteEntities = getPipetteEntities(state)
+      const fileMetadata = getFileMetadata(state)
+      const dateCreatedTimestamp = fileMetadata.created
 
       // additional fields for analytics, eg descriptive name for pipettes
       // (these fields are prefixed with double underscore only to make sure they
       // never accidentally overlap with actual fields)
-      const metadataFields = flattenNestedProperties(stepArgs)
+      const additionalProperties = flattenNestedProperties(stepArgs)
+
+      // Mixpanel wants YYYY-MM-DDTHH:MM:SS for Date type
+      additionalProperties.__dateCreated =
+        dateCreatedTimestamp != null && Number.isFinite(dateCreatedTimestamp)
+          ? new Date(dateCreatedTimestamp).toISOString()
+          : null
+
+      additionalProperties.__protocolName = fileMetadata.protocolName
+
       if (stepArgs.pipette) {
-        metadataFields.__pipetteName = pipetteEntities[(stepArgs?.pipette)].name
+        additionalProperties.__pipetteName =
+          pipetteEntities[(stepArgs?.pipette)].name
       }
 
       return {
         name: 'saveStep',
-        properties: { ...stepArgs, ...metadataFields },
+        properties: { ...stepArgs, ...additionalProperties },
       }
     }
   }
