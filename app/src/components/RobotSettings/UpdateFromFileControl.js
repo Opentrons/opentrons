@@ -39,12 +39,14 @@ const HIDDEN_CSS = css`
   clip: rect(1px 1px 1px 1px);
 `
 
-export type UploadRobotUpdateProps = {|
+export type UpdateFromFileControlProps = {|
   robotName: string,
   ...StyleProps,
 |}
 
-export function UploadRobotUpdate(props: UploadRobotUpdateProps): React.Node {
+export function UpdateFromFileControl(
+  props: UpdateFromFileControlProps
+): React.Node {
   const { robotName, ...styleProps } = props
   const dispatch = useDispatch<Dispatch>()
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
