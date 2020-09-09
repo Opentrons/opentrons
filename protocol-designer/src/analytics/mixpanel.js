@@ -55,6 +55,8 @@ export function setMixpanelTracking(optedIn: boolean) {
       // Register "super properties" which are included with all events
       mixpanel.register({
         appVersion: process.env.OT_PD_VERSION,
+        // NOTE(IL, 2020): Since PD may be in the same Mixpanel project as other OT web apps, this 'appName' property is intended to distinguish it
+        appName: 'protocolDesigner',
       })
     } else {
       console.debug(

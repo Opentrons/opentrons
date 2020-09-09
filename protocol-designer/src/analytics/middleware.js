@@ -1,7 +1,11 @@
 // @flow
+import {
+  getArgsAndErrorsByStepId,
+  getPipetteEntities,
+} from '../step-forms/selectors'
 import { trackEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
-import { getArgsAndErrorsByStepId } from '../step-forms/selectors'
+import { flattenNestedProperties } from './utils/flattenNestedProperties'
 import type { Middleware } from 'redux'
 import type { BaseState } from '../types'
 import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
@@ -20,11 +24,22 @@ export const reduxActionToAnalyticsEvent = (
     // to get nice cleaned-up data instead of the raw form data.
     const a: SaveStepFormAction = action
     const argsAndErrors = getArgsAndErrorsByStepId(state)[a.payload.id]
-    if (argsAndErrors.stepArgs !== null) {
+    const { stepArgs } = argsAndErrors
+
+    if (stepArgs !== null) {
+      const pipetteEntities = getPipetteEntities(state)
+
+      // additional fields for analytics, eg descriptive name for pipettes
+      // (these fields are prefixed with double underscore only to make sure they
+      // never accidentally overlap with actual fields)
+      const metadataFields = flattenNestedProperties(stepArgs)
+      if (stepArgs.pipette) {
+        metadataFields.__pipetteName = pipetteEntities[(stepArgs?.pipette)].name
+      }
+
       return {
         name: 'saveStep',
-        // TODO IMMEDIATELY: add human-readable pipette info instead of UUID?
-        properties: argsAndErrors.stepArgs,
+        properties: { ...stepArgs, ...metadataFields },
       }
     }
   }
