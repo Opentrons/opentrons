@@ -163,10 +163,10 @@ In your Jupyter notebook, you can use the Python Protocol API simulator by doing
 .. code-block:: python
    :substitutions:
 
-    from opentrons import simulate
-    protocol = simulate.get_protocol_api('|apiLevel|')
-    p300 = protocol.load_instrument('p300_single', 'right')
-    ...
+   from opentrons import simulate
+   protocol = simulate.get_protocol_api('|apiLevel|')
+   p300 = protocol.load_instrument('p300_single', 'right')
+   # ...
 
 The ``protocol`` object, which is an instance of :py:class:`.ProtocolContext`, is the same thing that gets passed to your protocol's ``run`` function, but set to simulate rather than control an OT-2. You can call all your protocol's functions on that object.
 

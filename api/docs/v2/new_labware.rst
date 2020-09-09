@@ -307,21 +307,21 @@ For example:
 .. code-block:: python
     :substitutions:
 
-   from opentrons import types
+    from opentrons import types
 
-   metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
-   def run(protocol):
-        plate = protocol.load_labware(
-           'corning_24_wellplate_3.4ml_flat', slot='1')
+    def run(protocol):
+            plate = protocol.load_labware(
+            'corning_24_wellplate_3.4ml_flat', slot='1')
 
-        # Get the center of well A1.
-        center_location = plate['A1'].center()
+            # Get the center of well A1.
+            center_location = plate['A1'].center()
 
-        # Get a location 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
-        adjusted_location = center_location.move(types.Point(x=1, y=1, z=1))
+            # Get a location 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
+            adjusted_location = center_location.move(types.Point(x=1, y=1, z=1))
 
-        # Move to 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
-        pipette.move_to(adjusted_location)
+            # Move to 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
+            pipette.move_to(adjusted_location)
 
 .. versionadded:: 2.0
