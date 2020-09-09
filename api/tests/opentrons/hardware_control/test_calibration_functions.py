@@ -4,6 +4,7 @@ from opentrons import config
 from opentrons.calibration_storage import file_operators as io
 from opentrons.hardware_control import robot_calibration
 from opentrons.util.helpers import utc_now
+from opentrons.types import Mount
 
 
 def test_migrate_affine_xy_to_attitude():
@@ -53,3 +54,22 @@ def test_load_calibration(ot_config_tempdir):
     obj = robot_calibration.load_attitude_matrix()
     transform = [[1, 0, 1], [0, 1, -.5], [0, 0, 1]]
     assert np.allclose(obj.attitude, transform)
+
+
+def test_load_pipette_offset(ot_config_tempdir):
+    pip_id = 'fakePip'
+    mount = Mount.LEFT
+    pip_dir = config.get_opentrons_path(
+        'pipette_calibration_dir') / 'left'
+    pip_dir.mkdir(parents=True, exist_ok=True)
+    pathway = pip_dir/'fakePip.json'
+    data = {
+        'offset': [1, 2, 3],
+        'tiprack': 'hash',
+        'uri': 'opentrons/opentrons_96_tiprack_10ul/1',
+        'last_modified': utc_now()
+    }
+    io.save_to_file(pathway, data)
+    obj = robot_calibration.load_pipette_offset(pip_id, mount)
+    offset = [1, 2, 3]
+    assert np.allclose(obj.offset, offset)

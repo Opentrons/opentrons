@@ -7,6 +7,7 @@ from typing import Optional, List
 from opentrons import config
 from opentrons.config import robot_configs, feature_flags as ff
 from opentrons.calibration_storage import modify, types, get
+from opentrons.types import Mount
 from opentrons.util import linal
 
 from .util import DeckTransformState
@@ -20,6 +21,14 @@ class DeckCalibration:
     last_modified: Optional[datetime] = None
     pipette_calibrated_with: Optional[str] = None
     tiprack: Optional[str] = None
+
+
+@dataclass
+class PipetteCalibration:
+    offset: types.PipetteOffset
+    tiprack: Optional[str] = None
+    uri: Optional[str] = None
+    last_modified: Optional[datetime] = None
 
 
 @dataclass
@@ -121,6 +130,18 @@ def load_attitude_matrix() -> DeckCalibration:
         deck_cal_obj = DeckCalibration(
             attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2)
     return deck_cal_obj
+
+
+def load_pipette_offset(
+        pip_id: Optional[str],
+        mount: Mount) -> PipetteCalibration:
+    pip_cal_obj = PipetteCalibration(
+        offset=robot_configs.DEFAULT_PIPETTE_OFFSET)
+    if pip_id:
+        pip_offset_data = get.get_pipette_offset(pip_id, mount)
+        if pip_offset_data:
+            pip_cal_obj = PipetteCalibration(**pip_offset_data)
+    return pip_cal_obj
 
 
 def load() -> RobotCalibration:
