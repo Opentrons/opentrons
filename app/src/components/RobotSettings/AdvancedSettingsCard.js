@@ -15,6 +15,7 @@ import { downloadLogs } from '../../shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
 import { Portal } from '../portal'
 import {
+  BORDER_SOLID_LIGHT,
   AlertModal,
   Card,
   LabeledButton,
@@ -23,6 +24,7 @@ import {
 } from '@opentrons/components'
 
 import { UploadRobotUpdate } from './UploadRobotUpdate'
+import { OpenJupyterControl } from './OpenJupyterControl'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -54,7 +56,7 @@ export function AdvancedSettingsCard(
   props: AdvancedSettingsCardProps
 ): React.Node {
   const { robot, resetUrl } = props
-  const { name, health, status } = robot
+  const { name, ip, health, status } = robot
   const settings = useSelector<State, RobotSettings>(state =>
     getRobotSettings(state, name)
   )
@@ -100,6 +102,7 @@ export function AdvancedSettingsCard(
       >
         <p>Restore robot to factory configuration</p>
       </LabeledButton>
+      <OpenJupyterControl robotIp={ip} borderBottom={BORDER_SOLID_LIGHT} />
       {settings.map(({ id, title, description, value }) => (
         <LabeledToggle
           key={id}
