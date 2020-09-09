@@ -45,6 +45,7 @@ class PipetteOffsetCalibrationUserFlow:
                  mount: Mount = Mount.RIGHT):
         self._hardware = hardware
         self._mount = mount
+        self._has_calibration_block = has_calibration_block
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
             raise RobotServerError(
@@ -54,13 +55,15 @@ class PipetteOffsetCalibrationUserFlow:
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
         self._deck = deck.Deck(load_name=deck_load_name)
-        self._tip_rack = self._get_tip_rack_lw()
-        self._deck[TIP_RACK_SLOT] = self._tip_rack
 
         self._current_state = State.sessionStarted
         self._state_machine = PipetteOffsetCalibrationStateMachine()
 
         self._tip_origin_pt: Optional[Point] = None
+        self.has_calibrated_tip_length: bool =\
+            self._get_stored_tip_length_cal() is not None
+
+        self._initialize_deck()
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
@@ -146,18 +149,37 @@ class PipetteOffsetCalibrationUserFlow:
         to_loc = Location(point, None)
         await self._move(to_loc)
 
-    def _get_tip_length(self) -> float:
+    def _get_stored_tip_length_cal(self) -> Optional[float]:
         try:
             return get.load_tip_length_calibration(
                 self._hw_pipette.pipette_id,  # type: ignore
                 self._tip_rack._definition,
                 '')['tipLength']
         except TipLengthCalNotFound:
+            return None
+
+    def _get_tip_length(self) -> float:
+        stored_tip_length_cal = self._get_stored_tip_length_cal()
+        if stored_tip_length_cal is None:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(
                 self._tip_rack.uri,
                 self._hw_pipette.config.tip_overlap['default'])
             tip_length = self._tip_rack.tip_length
+            self.has_calibrated_tip_length = False
             return tip_length - tip_overlap
+        else:
+            self.has_calibrated_tip_length = True
+            return stored_tip_length_cal
+
+    def _initialize_deck(self):
+        self._tip_rack = self._get_tip_rack_lw()
+        self._deck[TIP_RACK_SLOT] = self._tip_rack
+
+        if not self.has_calibrated_tip_length and self._has_calibration_block:
+          cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
+            self._deck[cb_setup['slot']] = labware.load(
+                cb_setup['load_name'],
+                self._deck.position_for(cb_setup['slot']))
 
     async def move_to_deck(self):
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
