@@ -175,7 +175,7 @@ class PipetteOffsetCalibrationUserFlow:
             self._z_height_reference = cur_pt.z
         elif self._current_state == State.savingPointOne:
             tiprack_hash = helpers.hash_labware_def(
-                self._deck[TIP_RACK_SLOT]._definition) + ''
+                self._tip_rack._definition)
             modify.save_pipette_calibration(
                 offset=cur_pt,
                 pip_id=self._hw_pipette.pipette_id,

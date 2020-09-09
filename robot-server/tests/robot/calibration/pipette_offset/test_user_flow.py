@@ -199,12 +199,8 @@ async def test_save_pipette_calibration(mock_user_flow):
     def mock_save_pipette_offset(*args, **kwargs):
         pass
 
-    def mock_hash_labware_def(*args, **kwargs):
-        return 'fakeHash'
-
     modify.save_pipette_calibration = \
         MagicMock(side_effect=mock_save_pipette_offset)
-    helpers.hash_labware_def = MagicMock(side_effect=mock_hash_labware_def)
 
     uf._current_state = 'savingPointOne'
     await uf._hardware.move_to(
@@ -212,10 +208,13 @@ async def test_save_pipette_calibration(mock_user_flow):
             abs_position=Point(x=10, y=10, z=40),
             critical_point=uf._get_critical_point_override()
         )
+
     await uf.save_offset()
+    tiprack_hash = helpers.hash_labware_def(uf._tip_rack._definition)
+
     modify.save_pipette_calibration.assert_called_with(
         offset=Point(x=10, y=10, z=40),
         pip_id=uf._hw_pipette.pipette_id,
-        tiprack_hash='fakeHash',
+        tiprack_hash=tiprack_hash,
         tiprack_uri=uf._tip_rack.uri
     )
