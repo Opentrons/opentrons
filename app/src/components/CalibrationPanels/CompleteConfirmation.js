@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   SPACING_3,
   JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import type { CalibrationPanelProps } from './types'
 import type { SessionType } from '../../sessions/types'
@@ -55,9 +56,11 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
         <h3>{headerText}</h3>
       </Flex>
 
-      <PrimaryBtn title={RETURN_TIP} marginY={SPACING_3} onClick={exitSession}>
-        {RETURN_TIP}
-      </PrimaryBtn>
+      <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
+        <PrimaryBtn title={RETURN_TIP} flex="1" onClick={exitSession}>
+          {RETURN_TIP}
+        </PrimaryBtn>
+      </Flex>
     </Flex>
   )
 }
