@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Set, TYPE_CHECKING
 from dataclasses import dataclass
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 
 if TYPE_CHECKING:
     from typing_extensions import Final
@@ -74,3 +74,20 @@ POINT_THREE_ID: Final = '7TLC'
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 MOVE_TO_POINT_SAFETY_BUFFER = Point(0, 0, 5)
 MOVE_TO_DECK_SAFETY_BUFFER = Point(0, 10, 5)
+MOVE_TO_REF_POINT_SAFETY_BUFFER = Point(0, 0, 5)
+
+TRASH_WELL = 'A1'
+TRASH_REF_POINT_OFFSET = Point(-57.84, -55, 0)  # offset from center of trash
+
+CAL_BLOCK_SETUP_BY_MOUNT: Dict[Mount, Dict[str, str]] = {
+    Mount.LEFT: {
+        'load_name': 'opentrons_calibrationblock_short_side_right',
+        'slot': '3',
+        'well': 'A1',
+    },
+    Mount.RIGHT: {
+        'load_name': 'opentrons_calibrationblock_short_side_left',
+        'slot': '1',
+        'well': 'A2',
+    }
+}

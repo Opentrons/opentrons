@@ -10,16 +10,13 @@ from opentrons.protocols.geometry import deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand
-from robot_server.robot.calibration.constants import (
-    TIP_RACK_LOOKUP_BY_MAX_VOL,
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
-    POINT_ONE_ID,
-    MOVE_TO_DECK_SAFETY_BUFFER,
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER)
 import robot_server.robot.calibration.util as uf
 from ..errors import CalibrationError
 from ..helper_classes import (RequiredLabware, AttachedPipette)
+from ..constants import TIP_RACK_LOOKUP_BY_MAX_VOL, SHORT_TRASH_DECK, \
+    STANDARD_DECK, POINT_ONE_ID, MOVE_TO_DECK_SAFETY_BUFFER, \
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER, CAL_BLOCK_SETUP_BY_MOUNT, \
+    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET
 from .constants import (PipetteOffsetCalibrationState as State,
                         TIP_RACK_SLOT, JOG_TO_DECK_SLOT)
 from .state_machine import PipetteOffsetCalibrationStateMachine
@@ -45,7 +42,7 @@ class PipetteOffsetCalibrationUserFlow:
                  mount: Mount = Mount.RIGHT):
         self._hardware = hardware
         self._mount = mount
-        self._has_calibration_block = has_calibration_block
+        self._has_calibration_block: Optional[bool] = None
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
             raise RobotServerError(
@@ -60,13 +57,14 @@ class PipetteOffsetCalibrationUserFlow:
         self._state_machine = PipetteOffsetCalibrationStateMachine()
 
         self._tip_origin_pt: Optional[Point] = None
-        self.has_calibrated_tip_length: bool =\
+        self._has_calibrated_tip_length: bool =\
             self._get_stored_tip_length_cal() is not None
-
-        self._initialize_deck()
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
+            CalibrationCommand.set_has_calibration_block:
+                self.set_has_calibration_block,
+            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
             CalibrationCommand.jog: self.jog,
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
@@ -84,6 +82,10 @@ class PipetteOffsetCalibrationUserFlow:
     @property
     def current_state(self) -> State:
         return self._current_state
+
+    @property
+    def has_calibrated_tip_length(self) -> State:
+        return self._has_calibrated_tip_length
 
     def get_pipette(self) -> AttachedPipette:
         return AttachedPipette(
@@ -137,7 +139,10 @@ class PipetteOffsetCalibrationUserFlow:
                                                     critical_point)
 
     async def load_labware(self):
-        pass
+        self._initialize_deck()
+
+    async def set_has_calibration_block(self, has_calibration_block: bool):
+        self._has_calibration_block = has_calibration_block
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
@@ -165,18 +170,18 @@ class PipetteOffsetCalibrationUserFlow:
                 self._tip_rack.uri,
                 self._hw_pipette.config.tip_overlap['default'])
             tip_length = self._tip_rack.tip_length
-            self.has_calibrated_tip_length = False
+            self._has_calibrated_tip_length = False
             return tip_length - tip_overlap
         else:
-            self.has_calibrated_tip_length = True
+            self._has_calibrated_tip_length = True
             return stored_tip_length_cal
 
     def _initialize_deck(self):
         self._tip_rack = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
-        if not self.has_calibrated_tip_length and self._has_calibration_block:
-          cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
+        if not self._has_calibrated_tip_length and self._has_calibration_block:
+            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
             self._deck[cb_setup['slot']] = labware.load(
                 cb_setup['load_name'],
                 self._deck.position_for(cb_setup['slot']))
@@ -211,6 +216,11 @@ class PipetteOffsetCalibrationUserFlow:
                 pip_id=self._hw_pipette.pipette_id,
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri)
+
+    async def move_to_reference_point(self):
+        await uf.move_to_reference_point(
+            self,
+            has_calibration_block=self._has_calibration_block)
 
     async def pick_up_tip(self):
         await uf.pick_up_tip(self, tip_length=self._get_tip_length())

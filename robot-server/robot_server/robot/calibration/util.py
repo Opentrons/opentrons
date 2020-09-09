@@ -3,12 +3,14 @@ from typing import Set, Dict, Any, Union, TYPE_CHECKING
 
 from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
+from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CommandDefinition
-from .constants import STATE_WILDCARD
+from .constants import STATE_WILDCARD, CAL_BLOCK_SETUP_BY_MOUNT, \
+    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET
 from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
 from .pipette_offset.constants import PipetteOffsetCalibrationState
@@ -146,3 +148,25 @@ async def move(user_flow: CalibrationUserFlow, to_loc: Location):
         await user_flow._hardware.move_to(mount=user_flow._mount,
                                           abs_position=move[0],
                                           critical_point=move[1])
+
+
+async def move_to_reference_point(user_flow: CalibrationUserFlow,
+                                  has_calibration_block: bool):
+    """
+    Move pipette with or without tip to static z reference point
+    Will be on Calibration Block if available, otherwise will be on
+    flat surface of trash fixed trash insert.
+    """
+    if has_calibration_block:
+        slot = CAL_BLOCK_SETUP_BY_MOUNT[user_flow._mount]['slot']
+        well = CAL_BLOCK_SETUP_BY_MOUNT[user_flow._mount]['well']
+        calblock: labware.Labware = user_flow._deck[slot]  # type: ignore
+        calblock_loc = calblock.wells_by_name()[well].top()
+        ref_loc = calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)
+    else:
+        trash = user_flow._deck.get_fixed_trash()
+        assert trash
+        trash_loc = trash.wells_by_name()[TRASH_WELL].top()
+        ref_loc = trash_loc.move(TRASH_REF_POINT_OFFSET +
+                                 MOVE_TO_REF_POINT_SAFETY_BUFFER)
+    await user_flow._move(ref_loc)

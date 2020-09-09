@@ -9,6 +9,7 @@ from .constants import PipetteOffsetCalibrationState as State
 
 PIP_OFFSET_CAL_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.sessionStarted: {
+        CalibrationCommand.set_has_calibration_block: State.sessionStarted,
         CalibrationCommand.load_labware: State.labwareLoaded
     },
     State.labwareLoaded: {

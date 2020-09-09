@@ -182,6 +182,7 @@ class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
     load_labware = "loadLabware"
     jog = ("jog", JogPosition)
+    set_has_calibration_block = ("setHasCalibrationBlock", bool)
     move_to_tip_rack = "moveToTipRack"
     move_to_point_one = "moveToPointOne"
     move_to_deck = "moveToDeck"

@@ -82,6 +82,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
             instrument=self._pip_offset_cal_user_flow.get_pipette(),
             currentStep=self._pip_offset_cal_user_flow.current_state,
             labware=self._pip_offset_cal_user_flow.get_required_labware(),
+            has_calibrated_tip_length=self.has_calibrated_tip_length,
         )
 
     async def clean_up(self):

@@ -11,30 +11,16 @@ from opentrons.protocols.geometry import deck
 
 import robot_server.robot.calibration.util as uf
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import CalibrationCommand, \
-    TipLengthCalibrationCommand
-from robot_server.robot.calibration.constants import (
-    TIP_RACK_LOOKUP_BY_MAX_VOL,
-    SHORT_TRASH_DECK,
-    STANDARD_DECK
-)
-from .state_machine import (
-    TipCalibrationStateMachine
-)
-from .constants import (
-    TipCalibrationState as State,
-    TRASH_WELL,
-    TIP_RACK_SLOT,
-    CAL_BLOCK_SETUP_BY_MOUNT,
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER,
-    MOVE_TO_REF_POINT_SAFETY_BUFFER,
+from robot_server.service.session.models import CalibrationCommand
+from robot_server.robot.calibration.constants import \
+    TIP_RACK_LOOKUP_BY_MAX_VOL, SHORT_TRASH_DECK, STANDARD_DECK
+from ..constants import TRASH_WELL, CAL_BLOCK_SETUP_BY_MOUNT, \
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER, MOVE_TO_REF_POINT_SAFETY_BUFFER, \
     TRASH_REF_POINT_OFFSET
-)
 from ..errors import CalibrationError
-from ..helper_classes import (
-    RequiredLabware,
-    AttachedPipette
-)
+from ..helper_classes import RequiredLabware, AttachedPipette
+from .constants import TipCalibrationState as State, TIP_RACK_SLOT
+from .state_machine import TipCalibrationStateMachine
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware import LabwareDefinition
@@ -86,7 +72,7 @@ class TipCalibrationUserFlow:
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CalibrationCommand.save_offset: self.save_offset,
-            TipLengthCalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
+            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
             CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
         }
@@ -148,24 +134,6 @@ class TipCalibrationUserFlow:
         else:
             await self._move(Location(pt_above_well, None))
 
-    async def move_to_reference_point(self):
-        to_loc = self._get_reference_point()
-        await self._move(to_loc)
-
-    def _get_reference_point(self) -> Location:
-        if self._has_calibration_block:
-            slot = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['slot']
-            well = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['well']
-            calblock: labware.Labware = self._deck[slot]  # type: ignore
-            calblock_loc = calblock.wells_by_name()[well].top()
-            return calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)
-        else:
-            trash = self._deck.get_fixed_trash()
-            assert trash
-            trash_loc = trash.wells_by_name()[TRASH_WELL].top()
-            return trash_loc.move(TRASH_REF_POINT_OFFSET +
-                                  MOVE_TO_REF_POINT_SAFETY_BUFFER)
-
     async def save_offset(self):
         if self._current_state == State.measuringNozzleOffset:
             # critical point would default to nozzle for z height
@@ -211,6 +179,11 @@ class TipCalibrationUserFlow:
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
                                       delta=Point(*vector))
+
+    async def move_to_reference_point(self):
+        await uf.move_to_reference_point(
+            self,
+            has_calibration_block=self._has_calibration_block)
 
     async def pick_up_tip(self):
         await uf.pick_up_tip(self, tip_length=self._get_default_tip_length())
