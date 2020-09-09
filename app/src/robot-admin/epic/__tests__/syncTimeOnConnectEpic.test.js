@@ -112,7 +112,7 @@ describe('syncTimeOnConnectEpic', () => {
 
   it('should not try to update time if off by less than a minute', () => {
     const mocks = setupEpicTestMocks(
-      robotName => (RobotActions.connect(robotName): any),
+      createConnectAction,
       createTimeSuccessResponse(subSeconds(new Date(), 55))
     )
 
