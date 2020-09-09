@@ -5,19 +5,34 @@ import { SecondaryBtn, Link } from '@opentrons/components'
 import { useTrackEvent } from '../../analytics'
 import { TitledControl } from '../TitledControl'
 
+// TODO(mc, 2020-09-09): i18n
 const OPEN = 'Open'
 const JUPYTER_NOTEBOOK = 'Jupyter Notebook'
-const OPEN_JUPYTER_DESCRIPTION =
-  "Open this OT-2's Jupyter Notebook in your web browser"
+const OPEN_JUPYTER_DESCRIPTION = (
+  <>
+    Open the{' '}
+    <Link external href="https://jupyter.org/">
+      Jupyter Notebook
+    </Link>{' '}
+    running on this OT-2 in your web browser. (Experimental feature! See{' '}
+    <Link
+      external
+      href="https://docs.opentrons.com/v2/new_advanced_running.html#jupyter-notebook"
+    >
+      documentation
+    </Link>{' '}
+    for more details.)
+  </>
+)
 
 const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
 
 export type OpenJupyterControlProps = {|
-  ip: string,
+  robotIp: string,
 |}
 
 export function OpenJupyterControl(props: OpenJupyterControlProps): React.Node {
-  const href = `http://${props.ip}:48888`
+  const href = `http://${props.robotIp}:48888`
   const trackEvent = useTrackEvent()
 
   return (

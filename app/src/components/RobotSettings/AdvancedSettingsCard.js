@@ -23,6 +23,7 @@ import {
 } from '@opentrons/components'
 
 import { UploadRobotUpdate } from './UploadRobotUpdate'
+import { OpenJupyterControl } from './OpenJupyterControl'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -54,7 +55,7 @@ export function AdvancedSettingsCard(
   props: AdvancedSettingsCardProps
 ): React.Node {
   const { robot, resetUrl } = props
-  const { name, health, status } = robot
+  const { name, ip, health, status } = robot
   const settings = useSelector<State, RobotSettings>(state =>
     getRobotSettings(state, name)
   )
@@ -111,6 +112,7 @@ export function AdvancedSettingsCard(
         </LabeledToggle>
       ))}
       <UploadRobotUpdate robotName={name} />
+      <OpenJupyterControl robotIp={ip} />
       {showLogOptoutModal && (
         <Portal>
           <AlertModal
