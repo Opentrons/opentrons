@@ -26,7 +26,6 @@ export function initializeProfile(config: SupportConfig): void {
   bootIntercom({
     app_id: getIntercomAppId(),
     created_at: config.createdAt,
-    name: config.name,
     [Constants.PROFILE_APP_VERSION]: appVersion,
   })
 }

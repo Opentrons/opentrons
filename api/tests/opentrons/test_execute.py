@@ -8,7 +8,7 @@ import pytest
 
 from opentrons import execute, types
 from opentrons.hardware_control import controller, api
-from opentrons.protocol_api.execute import ExceptionInProtocolError
+from opentrons.protocols.execution.errors import ExceptionInProtocolError
 
 HERE = Path(__file__).parent
 

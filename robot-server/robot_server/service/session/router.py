@@ -63,17 +63,17 @@ async def create_session_handler(
     )
 
 
-@router.delete("/sessions/{session_id}",
+@router.delete("/sessions/{sessionId}",
                description="Delete a session",
                response_model_exclude_unset=True,
                response_model=route_models.SessionResponse)
 async def delete_session_handler(
-        session_id: route_models.IdentifierType,
+        sessionId: route_models.IdentifierType,
         session_manager: SessionManager = Depends(get_session_manager)) \
         -> route_models.SessionResponse:
     """Delete a session"""
     session_obj = get_session(manager=session_manager,
-                              session_id=session_id,
+                              session_id=sessionId,
                               api_router=router)
 
     await session_manager.remove(session_obj.meta.identifier)
@@ -81,7 +81,7 @@ async def delete_session_handler(
     return route_models.SessionResponse(
         data=ResponseDataModel.create(
             attributes=session_obj.get_response_model(),
-            resource_id=session_id),
+            resource_id=sessionId),
         links={
             "POST": ResourceLink(href=router.url_path_for(
                 create_session_handler.__name__)),
@@ -89,23 +89,23 @@ async def delete_session_handler(
     )
 
 
-@router.get("/sessions/{session_id}",
+@router.get("/sessions/{sessionId}",
             description="Get session",
             response_model_exclude_unset=True,
             response_model=route_models.SessionResponse)
 async def get_session_handler(
-        session_id: route_models.IdentifierType,
+        sessionId: route_models.IdentifierType,
         session_manager: SessionManager = Depends(get_session_manager))\
         -> route_models.SessionResponse:
     session_obj = get_session(manager=session_manager,
-                              session_id=session_id,
+                              session_id=sessionId,
                               api_router=router)
 
     return route_models.SessionResponse(
         data=ResponseDataModel.create(
             attributes=session_obj.get_response_model(),
-            resource_id=session_id),
-        links=get_valid_session_links(session_id, router)
+            resource_id=sessionId),
+        links=get_valid_session_links(sessionId, router)
     )
 
 
@@ -129,12 +129,12 @@ async def get_sessions_handler(
     )
 
 
-@router.post("/sessions/{session_id}/commands/execute",
+@router.post("/sessions/{sessionId}/commands/execute",
              description="Create and execute a command immediately",
              response_model_exclude_unset=True,
              response_model=route_models.CommandResponse)
 async def session_command_execute_handler(
-        session_id: route_models.IdentifierType,
+        sessionId: route_models.IdentifierType,
         command_request: route_models.CommandRequest,
         session_manager: SessionManager = Depends(get_session_manager),
 ) -> route_models.CommandResponse:
@@ -142,11 +142,11 @@ async def session_command_execute_handler(
     Execute a session command
     """
     session_obj = get_session(manager=session_manager,
-                              session_id=session_id,
+                              session_id=sessionId,
                               api_router=router)
     if not session_manager.is_active(session_obj.meta.identifier):
         raise CommandExecutionException(
-            reason=f"Session '{session_id}' is not active. "
+            reason=f"Session '{sessionId}' is not active. "
                    "Only the active session can execute commands")
 
     command = create_command(command_request.data.attributes.command,
@@ -166,7 +166,7 @@ async def session_command_execute_handler(
             ),
             resource_id=command_result.meta.identifier
         ),
-        links=get_valid_session_links(session_id, router)
+        links=get_valid_session_links(sessionId, router)
     )
 
 
@@ -177,11 +177,11 @@ def get_valid_session_links(session_id: route_models.IdentifierType,
     return {
         "GET": ResourceLink(href=api_router.url_path_for(
             get_session_handler.__name__,
-            session_id=session_id)),
+            sessionId=session_id)),
         "POST": ResourceLink(href=api_router.url_path_for(
             session_command_execute_handler.__name__,
-            session_id=session_id)),
+            sessionId=session_id)),
         "DELETE": ResourceLink(href=api_router.url_path_for(
             delete_session_handler.__name__,
-            session_id=session_id)),
+            sessionId=session_id)),
     }

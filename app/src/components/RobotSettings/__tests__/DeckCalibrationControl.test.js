@@ -24,7 +24,10 @@ describe('ControlsCard', () => {
   let render
 
   const getDeckCalButton = wrapper =>
-    wrapper.find('TitledControl[title="Calibrate deck"]').find('button')
+    wrapper
+      .find('TitledControl[title="Calibrate deck"]')
+      .find('button')
+      .filter({ children: 'Calibrate' })
 
   const getCancelDeckCalButton = wrapper =>
     wrapper.find('OutlineButton[children="cancel"]').find('button')
@@ -49,6 +52,18 @@ describe('ControlsCard', () => {
         robotName = 'robot-name',
         buttonDisabled = false,
         deckCalStatus = 'OK',
+        deckCalData = {
+          type: 'affine',
+          matrix: [
+            [1, 2, 3, 4],
+            [5, 6, 7, 8],
+            [9, 10, 11, 12],
+            [13, 14, 15, 16],
+          ],
+          lastModified: null,
+          pipetteCalibratedWith: null,
+          tiprack: null,
+        },
         startLegacyDeckCalibration = () => {},
       } = props
       return mount(
@@ -56,6 +71,7 @@ describe('ControlsCard', () => {
           robotName={robotName}
           buttonDisabled={buttonDisabled}
           deckCalStatus={deckCalStatus}
+          deckCalData={deckCalData}
           startLegacyDeckCalibration={startLegacyDeckCalibration}
         />,
         {

@@ -1,7 +1,11 @@
 // @flow
 
 import type { State } from '../types'
-import type { CalibrationStatus, DeckCalibrationStatus } from './types'
+import type {
+  CalibrationStatus,
+  DeckCalibrationStatus,
+  DeckCalibrationData,
+} from './types'
 
 export const getCalibrationStatus = (
   state: State,
@@ -15,4 +19,11 @@ export const getDeckCalibrationStatus = (
   robotName: string
 ): DeckCalibrationStatus | null => {
   return getCalibrationStatus(state, robotName)?.deckCalibration.status ?? null
+}
+
+export const getDeckCalibrationData = (
+  state: State,
+  robotName: string
+): DeckCalibrationData | null => {
+  return getCalibrationStatus(state, robotName)?.deckCalibration.data ?? null
 }

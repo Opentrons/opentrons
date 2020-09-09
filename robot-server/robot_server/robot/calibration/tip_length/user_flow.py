@@ -6,7 +6,8 @@ from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
 from opentrons.calibration_storage import modify
 from opentrons.hardware_control import ThreadManager, CriticalPoint
-from opentrons.protocol_api import geometry, labware
+from opentrons.protocol_api import labware
+from opentrons.protocols.geometry import deck
 
 import robot_server.robot.calibration.util as uf
 from robot_server.service.errors import RobotServerError
@@ -73,7 +74,7 @@ class TipCalibrationUserFlow:
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck = geometry.Deck(load_name=deck_load_name)
+        self._deck = deck.Deck(load_name=deck_load_name)
         self._initialize_deck()
 
         self._current_state = State.sessionStarted

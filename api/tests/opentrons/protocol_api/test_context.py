@@ -4,6 +4,8 @@ import json
 from unittest import mock
 
 import opentrons.protocol_api as papi
+import opentrons.protocols.api_support as papi_support
+import opentrons.protocols.geometry as papi_geometry
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette import name_for_model
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
@@ -11,7 +13,8 @@ from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import config_models
-from opentrons.protocol_api import transfers as tf
+from opentrons.protocol_api import paired_instrument_context as paired
+from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.protocols.types import APIVersion
 from opentrons.calibration_storage import get, types as cs_types
 
@@ -131,7 +134,7 @@ async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
                 (Point(1, 2, 10), None),
                 (Point(1, 2, 3), None)]
 
-    monkeypatch.setattr(papi.geometry, 'plan_moves', fake_plan_move)
+    monkeypatch.setattr(papi_geometry.planning, 'plan_moves', fake_plan_move)
     # When we move without a cache, the from location should be the gantry
     # position
     right.move_to(lw.wells()[0].top())
@@ -181,6 +184,22 @@ def test_pipette_info(loop):
     model = ctx._hw_manager.hardware.attached_instruments[Mount.LEFT]['model']
     assert left.name == name
     assert left.model == model
+
+
+def test_pipette_pairing(loop):
+    ctx = papi.ProtocolContext(loop)
+    right = ctx.load_instrument('p300_multi', Mount.RIGHT)
+    left = ctx.load_instrument('p300_multi', Mount.LEFT)
+
+    paired_object = right.pair_with(left)
+    assert isinstance(paired_object, paired.PairedInstrumentContext)
+
+    ctx = papi.ProtocolContext(loop)
+    right = ctx.load_instrument('p300_multi', Mount.RIGHT)
+    left = ctx.load_instrument('p300_multi_gen2', Mount.LEFT)
+
+    with pytest.raises(paired.UnsupportedInstrumentPairingError):
+        right.pair_with(left)
 
 
 def test_pick_up_and_drop_tip(loop, get_labware_def):
@@ -927,7 +946,7 @@ def test_api_per_call_checking(monkeypatch):
     set_version_added(
         papi.ProtocolContext.disconnect, monkeypatch, APIVersion(2, 1))
     ctx = papi.ProtocolContext(api_version=APIVersion(2, 0))
-    with pytest.raises(papi.util.APIVersionError):
+    with pytest.raises(papi_support.util.APIVersionError):
         ctx.disconnect()
 
 

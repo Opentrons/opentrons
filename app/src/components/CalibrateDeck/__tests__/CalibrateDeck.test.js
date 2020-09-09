@@ -12,7 +12,7 @@ import { mockDeckCalibrationSessionAttributes } from '../../../sessions/__fixtur
 
 import { CalibrateDeck } from '../index'
 import { Introduction } from '../Introduction'
-import { DeckSetup } from '../DeckSetup'
+import { DeckSetup } from '../../CalibrationPanels/DeckSetup'
 import { TipPickUp } from '../TipPickUp'
 import { TipConfirmation } from '../TipConfirmation'
 import { SaveZPoint } from '../SaveZPoint'

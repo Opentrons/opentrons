@@ -1,9 +1,7 @@
 from typing import Optional, List
 from pydantic import BaseModel, Field
 
-from ..helper_classes import AttachedPipette, RequiredLabware
-
-from ..dev_types import NextSteps
+from ..helper_classes import AttachedPipette, RequiredLabware, NextSteps
 
 
 class SessionCreateParams(BaseModel):

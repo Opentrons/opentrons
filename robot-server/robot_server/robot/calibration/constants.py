@@ -1,7 +1,12 @@
-from typing import Dict, Set
-from typing_extensions import Final
+from __future__ import annotations
+
+from typing import Dict, Set, TYPE_CHECKING
 from dataclasses import dataclass
 from opentrons.types import Point
+
+if TYPE_CHECKING:
+    from typing_extensions import Final
+
 
 STATE_WILDCARD = '*'
 
@@ -68,4 +73,4 @@ POINT_THREE_ID: Final = '7TLC'
 
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 MOVE_TO_POINT_SAFETY_BUFFER = Point(0, 0, 5)
-MOVE_TO_DECK_SAFETY_BUFFER = Point(0, -10, 5)
+MOVE_TO_DECK_SAFETY_BUFFER = Point(0, 10, 5)

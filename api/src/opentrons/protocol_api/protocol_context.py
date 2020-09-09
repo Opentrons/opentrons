@@ -9,22 +9,24 @@ from opentrons.hardware_control import (SynchronousAdapter, modules,
                                         API, ExecutionManager)
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
+from opentrons.protocols.api_support.constants import SHORT_TRASH_DECK, \
+    STANDARD_DECK
 from opentrons.protocols.types import APIVersion, Protocol
 from .labware import (
     Labware, get_labware_definition, load_from_definition)
-from .module_geometry import (
+from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, load_module, resolve_module_model,
     resolve_module_type, models_compatible, ModuleType,
     module_model_from_string)
-from .definitions import MAX_SUPPORTED_VERSION
-from . import geometry
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from .instrument_context import InstrumentContext
 from .module_contexts import (
     ModuleContext, MagneticModuleContext, TemperatureModuleContext,
     ThermocyclerContext)
-from .util import (AxisMaxSpeeds, HardwareManager,
-                   requires_version, HardwareToManage, APIVersionError,
-                   convert_door_state_to_bool)
+from opentrons.protocols.api_support.util import (
+    AxisMaxSpeeds, HardwareManager, requires_version, HardwareToManage,
+    APIVersionError, convert_door_state_to_bool)
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -35,9 +37,6 @@ ModuleTypes = Union[
     'MagneticModuleContext',
     'ThermocyclerContext'
 ]
-
-SHORT_TRASH_DECK = 'ot2_short_trash'
-STANDARD_DECK = 'ot2_standard'
 
 
 class ProtocolContext(CommandPublisher):
@@ -103,7 +102,7 @@ class ProtocolContext(CommandPublisher):
         self._loop = loop or asyncio.get_event_loop()
         deck_load_name = SHORT_TRASH_DECK if fflags.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck_layout = geometry.Deck(load_name=deck_load_name)
+        self._deck_layout = Deck(load_name=deck_load_name)
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
         self._modules: Set[ModuleContext] = set()
@@ -659,7 +658,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def deck(self) -> geometry.Deck:
+    def deck(self) -> Deck:
         """ The object holding the deck layout of the robot.
 
         This object behaves like a dictionary with keys for both numeric

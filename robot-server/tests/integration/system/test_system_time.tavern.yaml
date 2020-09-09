@@ -1,0 +1,51 @@
+---
+test_name: GET Time
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: System Time GET request returns time in correct format
+    request:
+      url: "{host:s}:{port:d}/system/time"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          attributes:
+            systemTime: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          id: 'time'
+          type: 'SystemTimeAttributes'
+        links:
+          GET:
+            href: "/system/time"
+            meta: null
+          PUT:
+            href: "/system/time"
+            meta: null
+        meta: null
+
+---
+test_name: PUT Time
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: System Time PUT request without a time returns a missing field error
+    request:
+      url: "{host:s}:{port:d}/system/time"
+      method: PUT
+      json:
+        data:
+          id: "time"
+          type: "SystemTimeAttributes"
+          attributes: {}
+    response:
+      status_code: 422
+      json:
+        errors:
+          - status: "422"
+            title: "value_error.missing"
+            detail: "field required"
+            source:
+              pointer: "/body/new_time/data/attributes/systemTime"

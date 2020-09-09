@@ -56,7 +56,7 @@ clean-py:
 
 .PHONY: setup-py
 setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2018.10.9
+	$(OT_PYTHON) -m pip install pipenv==2020.8.13
 	$(MAKE) -C $(API_DIR) setup
 	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
 	$(MAKE) -C $(ROBOT_SERVER_DIR) setup

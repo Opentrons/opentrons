@@ -8,7 +8,7 @@ from uuid import uuid4 as uuid
 
 from starlette.testclient import WebSocketTestSession
 
-from opentrons.protocol_api.execute import ExceptionInProtocolError
+from opentrons.protocols.execution.errors import ExceptionInProtocolError
 
 from robot_server.service.dependencies import get_rpc_server
 from robot_server.service.legacy.rpc import rpc

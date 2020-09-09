@@ -1,5 +1,5 @@
 // @flow
-// Tip Length Calibration Orchestration Component
+// Deck Calibration Orchestration Component
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
@@ -20,8 +20,11 @@ import type {
 import * as Sessions from '../../sessions'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
+
+// TODO: BC 2020-09-02 use shared components from CalibrationPanels for child
+// components, and delete duplicate files in this directory
+import { DeckSetup } from '../CalibrationPanels'
 import { Introduction } from './Introduction'
-import { DeckSetup } from './DeckSetup'
 import { TipPickUp } from './TipPickUp'
 import { TipConfirmation } from './TipConfirmation'
 import { SaveZPoint } from './SaveZPoint'
@@ -32,7 +35,7 @@ import styles from './styles.css'
 
 import type { CalibrateDeckParentProps, CalibrateDeckChildProps } from './types'
 
-const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Deck calibration'
+const DECK_CALIBRATION_SUBTITLE = 'Deck calibration'
 const EXIT = 'exit'
 
 const PANEL_BY_STEP: {
@@ -117,7 +120,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
   }
 
   const titleBarProps = {
-    title: TIP_LENGTH_CALIBRATION_SUBTITLE,
+    title: DECK_CALIBRATION_SUBTITLE,
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 

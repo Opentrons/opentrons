@@ -36,6 +36,13 @@ async def test_set_block_temperature():
         await tc.set_temperature(21)
     assert command_log.pop(0) == 'M104 S21'
 
+    # hold set block temp
+    tc._target_temp = 21
+    tc._hold_time = 1
+    await tc.set_temperature(21, hold_time=1)
+    assert command_log.pop(0) == 'M104 S21 H1'
+    tc._hold_time = None
+
     # basic set block temp
     tc._target_temp = 21
     await tc.set_temperature(21)
@@ -50,13 +57,6 @@ async def test_set_block_temperature():
     tc._target_temp = 0.0
     await tc.set_temperature(-30)
     assert command_log.pop(0) == 'M104 S0.0'
-
-    # hold set block temp
-    tc._target_temp = 21
-    tc._hold_time = 1
-    await tc.set_temperature(21, hold_time=1)
-    assert command_log.pop(0) == 'M104 S21 H1'
-    tc._hold_time = None
 
     # volume set block temp
     tc._target_temp = 21
@@ -75,6 +75,47 @@ async def test_set_block_temperature():
     await tc.set_temperature(21, ramp_rate=3)
     assert command_log.pop(0) == 'M566 S3'
     assert command_log.pop(0) == 'M104 S21'
+
+
+async def test_set_temperature_with_fuzzy_hold_time():
+    tc = Thermocycler(lambda x: None)
+    command_log = []
+
+    async def _mock_write_and_wait(self, command):
+        nonlocal command_log
+        command_log.append(command)
+        return command
+
+    tc._write_and_wait = types.MethodType(_mock_write_and_wait, tc)
+
+    tc._current_temp = 21
+    tc._target_temp = 21
+
+    # set block temp with same temp as previous, different hold time
+    tc._hold_time = 48      # Hold time returned by thermocycler
+    try:
+        await tc.set_temperature(21, hold_time=50)
+    except ThermocyclerError:
+        pytest.fail("Fuzzy hold_time test failed")
+    assert command_log.pop(0) == 'M104 S21 H50'
+
+    # set block temp with same temp and different hold time. But serial poller
+    # did not read back from thermocycler within HOLD_TIME_FUZZY_SECONDS
+    tc._hold_time = 0
+    expected_error = "Thermocycler driver set the block temp to T=21 & " \
+                     "H=40 but status reads T=21 & H=0"
+    with pytest.raises(ThermocyclerError, match=expected_error):
+        await tc.set_temperature(21, hold_time=40)
+    assert command_log.pop(0) == 'M104 S21 H40'
+
+    # set block temp with same temp but hold_time < HOLD_TIME_FUZZY_SECONDS
+    # will return immediately regardless of no hold_time update read.
+    tc._hold_time = 0  # Hold time from previous set_temperature cmd
+    try:
+        await tc.set_temperature(21, hold_time=5)
+    except ThermocyclerError:
+        pytest.fail("Fuzzy hold_time test (with <=5 sec hold_time) failed")
+    assert command_log.pop(0) == 'M104 S21 H5'
 
 
 async def test_deactivates():
