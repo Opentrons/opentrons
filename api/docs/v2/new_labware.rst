@@ -307,13 +307,13 @@ For example:
 .. code-block:: python
     :substitutions:
 
-   from opentrons import types
+    from opentrons import types
 
-   metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
-   def run(protocol):
+    def run(protocol):
         plate = protocol.load_labware(
-           'corning_24_wellplate_3.4ml_flat', slot='1')
+        'corning_24_wellplate_3.4ml_flat', slot='1')
 
         # Get the center of well A1.
         center_location = plate['A1'].center()
