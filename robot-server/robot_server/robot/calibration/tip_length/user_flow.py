@@ -167,11 +167,16 @@ class TipCalibrationUserFlow:
                                   MOVE_TO_REF_POINT_SAFETY_BUFFER)
 
     async def save_offset(self):
-        cur_pt = await self._get_current_point()
         if self._current_state == State.measuringNozzleOffset:
+            # critical point would default to nozzle for z height
+            cur_pt = await self._get_current_point(
+                critical_point=None)
             self._nozzle_height_at_reference = cur_pt.z
         elif self._current_state == State.measuringTipOffset:
             assert self._hw_pipette.has_tip
+            # set critical point explicitly to nozzle
+            cur_pt = await self._get_current_point(
+                critical_point=CriticalPoint.NOZZLE)
             tip_length_offset = cur_pt.z - self._nozzle_height_at_reference
 
             # TODO: 07-22-2020 parent slot is not important when tracking
@@ -196,8 +201,10 @@ class TipCalibrationUserFlow:
         return (CriticalPoint.FRONT_NOZZLE if
                 self._hw_pipette.config.channels == 8 else None)
 
-    async def _get_current_point(self):
-        return await self._hardware.gantry_position(self._mount)
+    async def _get_current_point(
+            self,
+            critical_point: CriticalPoint = None) -> Point:
+        return await uf.get_current_point(self, critical_point)
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,

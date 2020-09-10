@@ -1,7 +1,7 @@
 import contextlib
-from typing import Set, Dict, Any, Union, TYPE_CHECKING
+from typing import Set, Dict, Any, Optional, Union, TYPE_CHECKING
 
-from opentrons.hardware_control import Pipette
+from opentrons.hardware_control import Pipette, CriticalPoint
 from opentrons.hardware_control.util import plan_arc
 from opentrons.protocols.geometry import planning
 from opentrons.types import Point, Location
@@ -79,6 +79,13 @@ CalibrationUserFlow = Union[
     'PipetteOffsetCalibrationUserFlow']
 
 
+async def get_current_point(
+        user_flow: CalibrationUserFlow,
+        critical_point: Optional[CriticalPoint]) -> Point:
+    return await user_flow._hardware.gantry_position(
+        user_flow._mount, critical_point)
+
+
 async def invalidate_tip(user_flow: CalibrationUserFlow):
     await user_flow._return_tip()
     await user_flow.move_to_tip_rack()
@@ -130,7 +137,7 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
 
 
 async def move(user_flow: CalibrationUserFlow, to_loc: Location):
-    from_pt = await user_flow._get_current_point()
+    from_pt = await user_flow._get_current_point(None)
     from_loc = Location(from_pt, None)
     cp = user_flow._get_critical_point_override()
 
