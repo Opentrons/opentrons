@@ -7,7 +7,7 @@ from fastapi import APIRouter, Query, Depends
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.json_api import ResourceLink, ResponseDataModel
-from robot_server.service.json_api.resource_links import ResourceLinkKeys
+from robot_server.service.json_api.resource_links import ResourceLinkKey
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import SessionManager, BaseSession
@@ -30,7 +30,7 @@ def get_session(manager: SessionManager,
         raise RobotServerError(
             definition=CommonErrorDef.RESOURCE_NOT_FOUND,
             links={
-                ResourceLinkKeys.self:
+                ResourceLinkKey.self:
                     ResourceLink(href=api_router.url_path_for(
                         create_session_handler.__name__)
                     )
@@ -86,7 +86,7 @@ async def delete_session_handler(
             attributes=session_obj.get_response_model(),
             resource_id=sessionId),
         links={
-            ResourceLinkKeys.self:
+            ResourceLinkKey.self:
                 ResourceLink(href=router.url_path_for(
                     create_session_handler.__name__
                 )),
@@ -180,7 +180,7 @@ def get_valid_session_links(session_id: route_models.IdentifierType,
         -> typing.Dict[str, ResourceLink]:
     """Get the valid links for a session"""
     return {
-        ResourceLinkKeys.self: ResourceLink(href=api_router.url_path_for(
+        ResourceLinkKey.self: ResourceLink(href=api_router.url_path_for(
             get_session_handler.__name__,
             sessionId=session_id)),
         "commandExecute": ResourceLink(href=api_router.url_path_for(

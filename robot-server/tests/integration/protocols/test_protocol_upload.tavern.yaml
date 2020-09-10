@@ -13,8 +13,8 @@ stages:
         supportFiles: "tests/integration/protocols/data.csv"
     response:
       status_code: 201
-      json: &response
-        data:
+      json:
+        data: &response_data
           id: phony_proto
           type: ProtocolResponseAttributes
           attributes:
@@ -24,20 +24,31 @@ stages:
               - basename: data.csv
             lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+        links:
+          self:
+            href: '/protocols/phony_proto'
   - name: Get the protocol
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
       method: GET
     response:
       status_code: 200
-      json: *response
+      json:
+        data: *response_data
+        links:
+          self:
+            href: '/protocols/phony_proto'
   - name: Delete the protocol
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
       method: DELETE
     response:
       status_code: 200
-      json: *response
+      json:
+        data: *response_data
+        links:
+          self:
+            href: '/protocols'
   - name: Get all protocols to see that there are none
     request:
       url: "{host:s}:{port:d}/protocols"
@@ -46,6 +57,9 @@ stages:
       status_code: 200
       json:
         data: []
+        links:
+          self:
+             href: '/protocols'
 ---
 test_name: Protocol lifecycle upload support
 marks:
@@ -70,6 +84,9 @@ stages:
             supportFiles: []
             lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+        links:
+          self:
+            href: '/protocols/phony_proto'
   - name: Get the protocol
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
@@ -86,6 +103,9 @@ stages:
             supportFiles: []
             lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+        links:
+          self:
+            href: '/protocols/phony_proto'
   - name: Upload a data file
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
@@ -105,6 +125,9 @@ stages:
             - basename: 'data.csv'
             lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+        links:
+          self:
+            href: '/protocols/phony_proto'
   - name: Delete the protocol
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
@@ -122,6 +145,9 @@ stages:
             - basename: 'data.csv'
             lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+        links:
+          self:
+            href: '/protocols'
   - name: Get all protocols to see that there are none
     request:
       url: "{host:s}:{port:d}/protocols"
@@ -130,3 +156,6 @@ stages:
       status_code: 200
       json:
         data: []
+        links:
+          self:
+            href: '/protocols'

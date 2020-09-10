@@ -12,7 +12,7 @@ class ResourceLink(BaseModel):
         Field(None, description="Meta data about the link")
 
 
-class ResourceLinkKeys(str, Enum):
+class ResourceLinkKey(str, Enum):
     # The key indicating the link to own resource
     self = "self"
 

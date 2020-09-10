@@ -4,6 +4,8 @@ import typing
 from starlette import status as http_status_codes
 from fastapi import APIRouter, UploadFile, File, Depends, Body
 
+from robot_server.service.json_api import ResourceLink
+from robot_server.service.json_api.resource_links import ResourceLinkKey
 from robot_server.service.protocol import models as route_models
 from robot_server.service.dependencies import get_protocol_manager
 from robot_server.service.protocol.manager import ProtocolManager
@@ -30,7 +32,14 @@ async def create_protocol(
     """Create protocol from proto file plus optional support files"""
     new_proto = protocol_manager.create(protocol_file=protocolFile,
                                         support_files=supportFiles,)
-    return route_models.ProtocolResponse(data=_to_response(new_proto))
+    return route_models.ProtocolResponse(
+        data=_to_response(new_proto),
+        links={
+            ResourceLinkKey.self: ResourceLink(
+                href=router.url_path_for(get_protocol.__name__,
+                                         protocolId=new_proto.meta.identifier))
+        }
+    )
 
 
 @router.get("/protocols",
@@ -40,7 +49,11 @@ async def create_protocol(
 async def get_protocols(
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
     return route_models.MultiProtocolResponse(
-        data=[_to_response(u) for u in protocol_manager.get_all()]
+        data=[_to_response(u) for u in protocol_manager.get_all()],
+        links={
+            ResourceLinkKey.self:
+                ResourceLink(href=router.url_path_for(get_protocols.__name__))
+        }
     )
 
 
@@ -52,7 +65,14 @@ async def get_protocol(
         protocolId: str,
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
     proto = protocol_manager.get(protocolId)
-    return route_models.ProtocolResponse(data=_to_response(proto))
+    return route_models.ProtocolResponse(
+        data=_to_response(proto),
+        links={
+            ResourceLinkKey.self:
+                ResourceLink(href=router.url_path_for(
+                    get_protocol.__name__, protocolId=proto.meta.identifier)
+                )
+        })
 
 
 @router.delete("/protocols/{protocolId}",
@@ -63,7 +83,13 @@ async def delete_protocol(
         protocolId: str,
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
     proto = protocol_manager.remove(protocolId)
-    return route_models.ProtocolResponse(data=_to_response(proto))
+    return route_models.ProtocolResponse(
+        data=_to_response(proto),
+        links={
+            ResourceLinkKey.self:
+                ResourceLink(href=router.url_path_for(get_protocols.__name__))
+        }
+    )
 
 
 @router.post("/protocols/{protocolId}",
@@ -77,7 +103,14 @@ async def create_protocol_file(
         protocol_manager: ProtocolManager = Depends(get_protocol_manager)):
     proto = protocol_manager.get(protocolId)
     proto.add(file)
-    return route_models.ProtocolResponse(data=_to_response(proto))
+    return route_models.ProtocolResponse(
+        data=_to_response(proto),
+        links={
+            ResourceLinkKey.self: ResourceLink(
+                href=router.url_path_for(get_protocol.__name__,
+                                         protocolId=proto.meta.identifier))
+        }
+    )
 
 
 def _to_response(uploaded_protocol: UploadedProtocol) \
