@@ -2,9 +2,7 @@ import logging
 from datetime import datetime
 from fastapi import APIRouter
 from robot_server.system import time
-from typing import Dict
 from robot_server.service.system import models as time_models
-from robot_server.service.json_api import ResourceLink
 
 router = APIRouter()
 log = logging.getLogger(__name__)
@@ -28,14 +26,11 @@ def _create_response(dt: datetime) \
     )
 
 
-def _get_valid_time_links(api_router: APIRouter) -> Dict[str, ResourceLink]:
+def _get_valid_time_links(api_router: APIRouter) \
+        -> time_models.SystemTimeLinks:
     """ Get valid links for time resource"""
-    return {
-        "GET": ResourceLink(href=api_router.url_path_for(
-            get_time.__name__)),
-        "PUT": ResourceLink(href=api_router.url_path_for(
-            set_time.__name__))
-    }
+    return time_models.SystemTimeLinks(systemTime=api_router.url_path_for(
+            get_time.__name__))
 
 
 @router.get("/system/time",

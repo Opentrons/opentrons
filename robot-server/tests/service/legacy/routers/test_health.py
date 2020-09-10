@@ -17,7 +17,8 @@ def test_health(api_client, hardware):
         "links": {
             "apiLog": "/logs/api.log",
             "serialLog": "/logs/serial.log",
-            "apiSpec": "/openapi.json"
+            "apiSpec": "/openapi.json",
+            "systemTime": "/system/time"
         }
     }
     resp = api_client.get('/health')

@@ -47,5 +47,6 @@ async def get_health(
                   links=Links(
                       apiLog='/logs/api.log',
                       serialLog='/logs/serial.log',
-                      apiSpec="/openapi.json"
+                      apiSpec="/openapi.json",
+                      systemTime="/system/time"
                   ))

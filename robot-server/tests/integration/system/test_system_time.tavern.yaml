@@ -17,12 +17,7 @@ stages:
           id: 'time'
           type: 'SystemTimeAttributes'
         links:
-          GET:
-            href: "/system/time"
-            meta: null
-          PUT:
-            href: "/system/time"
-            meta: null
+          systemTime: '/system/time'
         meta: null
 
 ---
