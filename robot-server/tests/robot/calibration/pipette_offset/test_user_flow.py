@@ -165,6 +165,9 @@ async def test_return_tip(mock_user_flow):
 @pytest.mark.parametrize('command,current_state,data,hw_meth', hw_commands)
 async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
     mock_user_flow._current_state = current_state
+    # z height reference must be present for moving to point one
+    if command == CalibrationCommand.move_to_point_one:
+        mock_user_flow._z_height_reference = 0.1
     await mock_user_flow.handle_command(command, data)
 
     getattr(mock_user_flow._hardware, hw_meth).assert_called()
