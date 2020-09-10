@@ -119,8 +119,6 @@ const getBuildrootUpdateType = (
     }
   }
 
-  console.log(currentVersion, updateVersion, type)
-
   return type
 }
 
