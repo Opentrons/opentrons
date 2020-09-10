@@ -7,6 +7,7 @@ from fastapi import APIRouter, Query, Depends
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.json_api import ResourceLink, ResponseDataModel
+from robot_server.service.json_api.resource_links import ResourceLinkKeys
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import SessionManager, BaseSession
@@ -29,8 +30,10 @@ def get_session(manager: SessionManager,
         raise RobotServerError(
             definition=CommonErrorDef.RESOURCE_NOT_FOUND,
             links={
-                "POST":
-                    api_router.url_path_for(create_session_handler.__name__)
+                ResourceLinkKeys.self:
+                    ResourceLink(href=api_router.url_path_for(
+                        create_session_handler.__name__)
+                    )
             },
             resource='session',
             id=session_id
@@ -83,8 +86,10 @@ async def delete_session_handler(
             attributes=session_obj.get_response_model(),
             resource_id=sessionId),
         links={
-            "POST": ResourceLink(href=router.url_path_for(
-                create_session_handler.__name__)),
+            ResourceLinkKeys.self:
+                ResourceLink(href=router.url_path_for(
+                    create_session_handler.__name__
+                )),
         }
     )
 
@@ -175,13 +180,10 @@ def get_valid_session_links(session_id: route_models.IdentifierType,
         -> typing.Dict[str, ResourceLink]:
     """Get the valid links for a session"""
     return {
-        "GET": ResourceLink(href=api_router.url_path_for(
+        ResourceLinkKeys.self: ResourceLink(href=api_router.url_path_for(
             get_session_handler.__name__,
             sessionId=session_id)),
-        "POST": ResourceLink(href=api_router.url_path_for(
+        "commandExecute": ResourceLink(href=api_router.url_path_for(
             session_command_execute_handler.__name__,
-            sessionId=session_id)),
-        "DELETE": ResourceLink(href=api_router.url_path_for(
-            delete_session_handler.__name__,
             sessionId=session_id)),
     }

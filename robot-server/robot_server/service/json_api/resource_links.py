@@ -1,4 +1,5 @@
 import typing
+from enum import Enum
 from pydantic import BaseModel, Field
 
 
@@ -11,4 +12,9 @@ class ResourceLink(BaseModel):
         Field(None, description="Meta data about the link")
 
 
-ResourceLinks = typing.Dict[str, typing.Union[str, ResourceLink]]
+class ResourceLinkKeys(str, Enum):
+    # The key indicating the link to own resource
+    self = "self"
+
+
+ResourceLinks = typing.Dict[str, ResourceLink]
