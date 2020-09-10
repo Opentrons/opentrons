@@ -381,6 +381,7 @@ class API(HardwareAPILike):
                       reset both
         """
         def _reset(m: top_types.Mount):
+            self._log.info(f"Resetting configuration for {m}")
             p = self._attached_instruments[m]
             if not p:
                 return
@@ -438,8 +439,12 @@ class API(HardwareAPILike):
                     self._attached_instruments[mount],
                     req_instr,
                     instrument_data.get('id')):
+                self._log.info(
+                    f"Skipping configuration on {mount.name}")
                 continue
 
+            self._log.info(
+                f"Doing full configuration on {mount.name}")
             mount_axis = Axis.by_mount(mount)
             plunger_axis = Axis.of_plunger(mount)
             splits: Dict[str, MoveSplit] = {}
@@ -650,6 +655,8 @@ class API(HardwareAPILike):
         information about their presence or state.
         """
         await self._execution_manager.reset()
+        self._attached_instruments = {
+            k: None for k in self._attached_instruments.keys()}
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
