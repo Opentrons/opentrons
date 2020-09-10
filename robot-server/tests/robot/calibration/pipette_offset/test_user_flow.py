@@ -217,6 +217,7 @@ async def test_save_pipette_calibration(mock_user_flow):
 
     modify.save_pipette_calibration.assert_called_with(
         offset=Point(x=10, y=10, z=40),
+        mount=uf._mount,
         pip_id=uf._hw_pipette.pipette_id,
         tiprack_hash=tiprack_hash,
         tiprack_uri=uf._tip_rack.uri
