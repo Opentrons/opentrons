@@ -1,12 +1,15 @@
-from typing import Union
+from typing import Union, Any, Dict
 
 from opentrons import types
+from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocols.geometry import planning
+from opentrons.protocols.api_support.util import first_parent
+from opentrons.calibration_storage import get
 
 from .labware import Labware, Well, quirks_from_any_parent
 from .module_contexts import ThermocyclerContext
-from . import geometry
 
 
 class PairedInstrument:
@@ -16,15 +19,30 @@ class PairedInstrument:
                  secondary_instrument,
                  mount,
                  ctx,
-                 hardware_manager):
+                 hardware_manager,
+                 log_parent):
         self.p_instrument = primary_instrument
         self.s_instrument = secondary_instrument
         self._mount = mount
         self._ctx = ctx
         self._hw_manager = hardware_manager
+        self._log = log_parent.getChild(repr(self))
     
         self._last_location: Union[Labware, Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
+
+    @property  # type: ignore
+    @requires_version(2, 0)
+    def hw_pipette(self) -> Dict[str, Any]:
+        """ View the information returned by the hardware API directly.
+
+        :raises: a :py:class:`.types.PipetteNotAttachedError` if the pipette is
+                 no longer attached (should not happen).
+        """
+        pipette = self._hw_manager.hardware.attached_instruments[self._mount]
+        if pipette is None:
+            raise types.PipetteNotAttachedError
+        return pipette
 
     def pick_up_tip(self, target, tiprack, presses, increment, secondary_target):
 
@@ -72,7 +90,7 @@ class PairedInstrument:
 
         instr_max_height = \
             self._hw_manager.hardware.get_instrument_max_height(self._mount)
-        moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
+        moves = planning.plan_moves(from_loc, location, self._ctx.deck,
                                     instr_max_height,
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height
@@ -90,3 +108,26 @@ class PairedInstrument:
         else:
             self._ctx.location_cache = location
         return self
+
+    @lru_cache(maxsize=12)
+    def _tip_length_for(self, tiprack: Labware) -> float:
+        """ Get the tip length, including overlap, for a tip from this rack """
+
+        def _build_length_from_overlap() -> float:
+            tip_overlap = self.hw_pipette['tip_overlap'].get(
+                tiprack.uri,
+                self.hw_pipette['tip_overlap']['default'])
+            tip_length = tiprack.tip_length
+            return tip_length - tip_overlap
+
+        if not enable_calibration_overhaul():
+            return _build_length_from_overlap()
+        else:
+            try:
+                parent = first_parent(tiprack) or ''
+                return get.load_tip_length_calibration(
+                    self.hw_pipette['pipette_id'],
+                    tiprack._definition,
+                    parent)['tipLength']
+            except TipLengthCalNotFound:
+                return _build_length_from_overlap()

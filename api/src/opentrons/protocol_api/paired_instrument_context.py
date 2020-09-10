@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 SECONDARY_WELL_SPACING = 4
 
+
 class UnsupportedInstrumentPairingError(Exception):
     pass
 
@@ -33,16 +34,18 @@ class PairedInstrumentContext(CommandPublisher):
                  mount: hc_types.PipettePair,
                  api_version: APIVersion,
                  hardware_manager,
-                 trash: Labware) -> None:
+                 trash: Labware,
+                 log_parent: logging.Logger) -> None:
         self._instruments = {
             mount.primary: primary_instrument,
             mount.secondary: secondary_instrument}
         self._api_version = api_version
-
-        self.trash_container = trash
+        self._log = log_parent.getChild(repr(self))
         self._tip_racks = list(set(primary_instrument.tip_racks) & set(secondary_instrument.tip_racks))
         self._starting_tip: Union[Well, None] = None
         self._mount = mount
+
+        self.trash_container = trash
         self.paired_instrument_obj = PairedInstrument(
             primary_instrument, secondary_instrument, mount, ctx, hardware_manager)
 
