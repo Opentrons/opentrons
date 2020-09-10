@@ -2,7 +2,7 @@
 # of the api/ project that are used by the docs; the docs source themselves;
 # or the CI/makefile tooling used to build the docs.
 
-name: 'API docs'
+name: 'API docs pull requests'
 
 on:
   # Most of the time we run on pull requests to handle external RPs
