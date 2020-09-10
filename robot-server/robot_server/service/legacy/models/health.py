@@ -2,6 +2,7 @@ import typing
 from pydantic import BaseModel, Field
 
 
+# TODO(mc, 2020-09-08): add systemTime to health links
 class Links(BaseModel):
     """A set of useful links"""
     apiLog: str = \
