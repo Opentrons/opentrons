@@ -27,7 +27,7 @@ export function ModuleControls(props: Props): React.Node {
           target={mod.data.targetTemp}
           title={
             mod.type === THERMOCYCLER_MODULE_TYPE
-              ? 'Base Temperature:'
+              ? 'Block Temperature:'
               : 'Temperature:'
           }
         />

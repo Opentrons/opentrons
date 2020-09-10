@@ -69,7 +69,7 @@ export const TemperatureControl = ({
   const displayName = getModuleDisplayName(module.model)
   const alertHeading = `Set ${displayName} Temp`
   const alertBody = `Pre heat or cool ${displayName}.`
-  const primaryFieldLabel = `Set ${isThermocycler ? 'Base' : ''} Temp:`
+  const primaryFieldLabel = `Set ${isThermocycler ? 'Block' : ''} Temp:`
   return (
     <>
       {!hasTarget && isModalOpen && (
