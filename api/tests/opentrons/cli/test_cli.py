@@ -8,7 +8,8 @@ except OSError:
     aionotify = None  # type: ignore
 from opentrons.config import (CONFIG,
                               robot_configs,
-                              advanced_settings as advs)
+                              advanced_settings as advs,
+                              pipette_config as pc)
 from opentrons.types import Mount
 from opentrons.deck_calibration import dc_main
 from opentrons.deck_calibration.dc_main import get_calibration_points
@@ -31,10 +32,10 @@ def hw_with_pipettes(monkeypatch, sync_hardware, model1, model2):
         def fake_gai(expected):
             return {
                 Mount.LEFT: {
-                    'model': model1[0],
+                    'config': pc.load(model1[0]),
                     'id': 'fakeid'},
                 Mount.RIGHT: {
-                    'model': model1[0],
+                    'config': pc.load(model1[0]),
                     'id': 'fakeid2'}}
         monkeypatch.setattr(
             sync_hardware._obj_to_adapt._backend,
@@ -44,8 +45,8 @@ def hw_with_pipettes(monkeypatch, sync_hardware, model1, model2):
 
         def fake_gai(expected):
             return {
-                Mount.LEFT: {'model': model2[0], 'id': 'fakeid'},
-                Mount.RIGHT: {'model': model2[0], 'id': 'fakeid2'}}
+                Mount.LEFT: {'config': pc.load(model2[0]), 'id': 'fakeid'},
+                Mount.RIGHT: {'config': pc.load(model2[0]), 'id': 'fakeid2'}}
 
         monkeypatch.setattr(
             sync_hardware._obj_to_adapt._backend,

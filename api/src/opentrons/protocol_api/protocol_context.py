@@ -553,9 +553,10 @@ class ProtocolContext(CommandPublisher):
             raise RuntimeError("Instrument already present in {} mount: {}"
                                .format(checked_mount.name.lower(),
                                        instr.name))
-        attached = {att_mount: instr.get('model', None)
+        attached = {att_mount: instr.get('name', None)
                     for att_mount, instr
-                    in self._hw_manager.hardware.attached_instruments.items()}
+                    in self._hw_manager.hardware.attached_instruments.items()
+                    if instr}
         attached[checked_mount] = instrument_name
         self._log.debug("cache instruments expectation: {}"
                         .format(attached))

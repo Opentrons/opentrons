@@ -1,16 +1,22 @@
+from __future__ import annotations
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
 import asyncio
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
+
+from typing_extensions import Protocol, TypedDict, Literal
 
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel, PipetteName, ChannelCount
 )
 
+from opentrons.drivers.types import MoveSplit
 from .modules import ModuleAtPort
 from .types import HardwareEventType
-from typing_extensions import Protocol, TypedDict, Literal
+
+from opentrons.types import Mount
+from opentrons.config.pipette_config import PipetteConfig
 
 
 class RegisterModules(Protocol):
@@ -30,9 +36,17 @@ class HasLoop(Protocol):
 DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
 
 
-class AttachedInstrument(TypedDict):
-    model: Optional[PipetteModel]
+class InstrumentSpec(TypedDict):
+    model: Union[PipetteModel, None]
     id: Optional[str]
+
+
+class AttachedInstrument(TypedDict):
+    config: Optional[PipetteConfig]
+    id: Optional[str]
+
+
+AttachedInstruments = Dict[Mount, AttachedInstrument]
 
 
 EIGHT_CHANNELS = Literal[8]
@@ -67,3 +81,11 @@ class PipetteDict(TypedDict):
     default_blow_out_speeds: Dict[str, float]
     ready_to_aspirate: bool
     has_tip: bool
+
+
+class InstrumentHardwareConfigs(TypedDict):
+    steps_per_mm: float
+    home_pos: float
+    max_travel: float
+    idle_current: float
+    splits: Optional[MoveSplit]

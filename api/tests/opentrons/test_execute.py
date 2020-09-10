@@ -9,6 +9,7 @@ import pytest
 from opentrons import execute, types
 from opentrons.hardware_control import controller, api
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
+from opentrons.config.pipette_config import load
 
 HERE = Path(__file__).parent
 
@@ -37,9 +38,9 @@ def test_execute_function_apiv2(protocol,
                                 mock_get_attached_instr):
 
     mock_get_attached_instr.return_value[types.Mount.LEFT]\
-        = {'model': 'p10_single_v1.5', 'id': 'testid'}
+        = {'config': load('p10_single_v1.5'), 'id': 'testid'}
     mock_get_attached_instr.return_value[types.Mount.RIGHT]\
-        = {'model': 'p300_single_v1.5', 'id': 'testid2'}
+        = {'config': load('p300_single_v1.5'), 'id': 'testid2'}
     entries = []
 
     def emit_runlog(entry):
@@ -69,7 +70,7 @@ def test_execute_function_json_v3_apiv2(get_json_protocol_fixture,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        'model': 'p10_single_v1.5', 'id': 'testid'}
+        'config': load('p10_single_v1.5'), 'id': 'testid'}
     execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
@@ -95,7 +96,7 @@ def test_execute_function_json_v4_apiv2(get_json_protocol_fixture,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        'model': 'p10_single_v1.5', 'id': 'testid'}
+        'config': load('p10_single_v1.5'), 'id': 'testid'}
     execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
@@ -121,7 +122,7 @@ def test_execute_function_json_v5_apiv2(get_json_protocol_fixture,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        'model': 'p10_single_v1.5', 'id': 'testid'}
+        'config': load('p10_single_v1.5'), 'id': 'testid'}
     execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
@@ -146,7 +147,7 @@ def test_execute_function_bundle_apiv2(get_bundle_fixture,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        'model': 'p10_single_v1.5', 'id': 'testid'}
+        'config': load('p10_single_v1.5'), 'id': 'testid'}
     execute.execute(
         bundle['filelike'], 'simple_bundle.zip', emit_runlog=emit_runlog)
     assert [item['payload']['text']
@@ -184,7 +185,7 @@ def test_execute_function_v1(protocol, protocol_file,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        'model': 'p300_single_v1.5', 'id': 'testid'}
+        'config': load('p300_single_v1.5'), 'id': 'testid'}
     execute.execute(protocol.filelike, 'testosaur.py', emit_runlog=emit_runlog)
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
@@ -209,7 +210,7 @@ def test_execute_extra_labware(protocol, protocol_file, monkeypatch,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        'model': 'p300_single_v2.0', 'id': 'testid'}
+        'config': load('p300_single_v2.0'), 'id': 'testid'}
     # make sure we can load labware explicitly
     # make sure we don't have an exception from not finding the labware
     execute.execute(protocol.filelike, 'custom_labware.py',

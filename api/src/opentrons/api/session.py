@@ -552,6 +552,7 @@ class Session(RobotBusy):
                 self.resume()
                 self._pre_run_hooks()
                 self._hardware.cache_instruments()
+                self._hardware.reset_instrument()
                 ctx = ProtocolContext.build_using(
                     self._protocol,
                     loop=self._loop,

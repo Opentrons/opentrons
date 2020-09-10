@@ -1,3 +1,4 @@
+from __future__ import annotations
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
@@ -11,7 +12,7 @@ except OSError:
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
-from opentrons.config.pipette_config import config_models
+from opentrons.config import pipette_config
 from opentrons.types import Mount
 
 from . import modules
@@ -22,7 +23,9 @@ if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
         PipetteModel, PipetteName
     )
-    from .dev_types import RegisterModules, AttachedInstrument  # noqa (F501)
+    from .dev_types import (
+        RegisterModules, AttachedInstrument, AttachedInstruments,
+        InstrumentHardwareConfigs)
     from opentrons.drivers.rpi_drivers.dev_types\
         import GPIODriverLike # noqa(F501)
 
@@ -71,7 +74,7 @@ class Controller:
                 'or door, likely because not running on linux')
 
     @property
-    def gpio_chardev(self) -> 'GPIODriverLike':
+    def gpio_chardev(self) -> GPIODriverLike:
         return self._gpio_chardev
 
     @property
@@ -115,9 +118,43 @@ class Controller:
         converted_axes = ''.join(axes)
         return self._smoothie_driver.fast_home(converted_axes, margin)
 
+    def _query_mount(
+            self,
+            mount: Mount,
+            expected: Union[PipetteModel, PipetteName, None]
+    ) -> AttachedInstrument:
+        found_model: Optional[PipetteModel]\
+                = self._smoothie_driver.read_pipette_model(  # type: ignore
+                    mount.name.lower())
+        if found_model and found_model not in pipette_config.config_models:
+            # TODO: Consider how to handle this error - it bubbles up now
+            # and will cause problems at higher levels
+            MODULE_LOG.error(
+                f'Bad model on {mount.name}: {found_model}')
+            found_model = None
+        found_id = self._smoothie_driver.read_pipette_id(
+            mount.name.lower())
+
+        if found_model:
+            config = pipette_config.load(found_model, found_id)
+            if expected:
+                acceptable = [config.name] + config.back_compat_names
+                if expected not in acceptable:
+                    raise RuntimeError(f'mount {mount}: instrument'
+                                       f' {expected} was requested'
+                                       f' but {config.model} is present')
+            return {'config': config,
+                    'id': found_id}
+        else:
+            if expected:
+                raise RuntimeError(
+                        f'mount {mount}: instrument {expected} was'
+                        f' requested, but no instrument is present')
+            return {'config': None, 'id': None}
+
     def get_attached_instruments(
-            self, expected: Dict[Mount, Union['PipetteModel', 'PipetteName']])\
-            -> Dict[Mount, 'AttachedInstrument']:
+            self, expected: Dict[Mount, PipetteName])\
+            -> AttachedInstruments:
         """ Find the instruments attached to our mounts.
         :param expected: is ignored, it is just meant to enforce
                           the same interface as the simulator, where
@@ -126,24 +163,11 @@ class Controller:
         :returns: A dict with mounts as the top-level keys. Each mount value is
             a dict with keys 'model' (containing an instrument model name or
             `None`) and 'id' (containing the serial number of the pipette
-            attached to that mount, or `None`).
+            attached to that mount, or `None`). Both mounts will always be
+            specified.
         """
-        to_return: Dict[Mount, 'AttachedInstrument'] = {}
-        for mount in Mount:
-            found_model: 'PipetteModel'\
-                = self._smoothie_driver.read_pipette_model(  # type: ignore
-                    mount.name.lower())
-            if found_model and found_model not in config_models:
-                # TODO: Consider how to handle this error - it bubbles up now
-                # and will cause problems at higher levels
-                MODULE_LOG.error(
-                    f'Bad model on {mount.name}: {found_model}')
-            found_id = self._smoothie_driver.read_pipette_id(
-                mount.name.lower())
-            to_return[mount] = {
-                'model': found_model,
-                'id': found_id}
-        return to_return
+        return {mount: self._query_mount(mount, expected.get(mount))
+                for mount in Mount}
 
     def set_active_current(self, axis_currents: Dict[Axis, float]):
         """
@@ -162,7 +186,7 @@ class Controller:
         finally:
             self._smoothie_driver.pop_active_current()
 
-    async def _handle_watch_event(self, register_modules: 'RegisterModules'):
+    async def _handle_watch_event(self, register_modules: RegisterModules):
         try:
             event = await self._module_watcher.get_event()
         except asyncio.IncompleteReadError:
@@ -192,7 +216,7 @@ class Controller:
                         'Exception in Module registration')
 
     async def watch_modules(self, loop: asyncio.AbstractEventLoop,
-                            register_modules: 'RegisterModules'):
+                            register_modules: RegisterModules):
         can_watch = aionotify is not None
         if can_watch:
             await self._module_watcher.setup(loop)
@@ -297,6 +321,23 @@ class Controller:
                     self.gpio_chardev.stop_door_switch_watcher(loop)
             except RuntimeError:
                 pass
+
+    def configure_mount(self, mount: Mount, config: InstrumentHardwareConfigs):
+        mount_axis = Axis.by_mount(mount)
+        plunger_axis = Axis.of_plunger(mount)
+
+        self._smoothie_driver.update_steps_per_mm(
+            {plunger_axis.name: config['steps_per_mm']})
+        self._smoothie_driver.update_pipette_config(
+            mount_axis.name, {'home': config['home_pos']})
+        self._smoothie_driver.update_pipette_config(
+            plunger_axis.name, {'max_travel': config['max_travel']})
+        self._smoothie_driver.set_dwelling_current(
+            {plunger_axis.name: config['idle_current']})
+        ms = config['splits']
+        if ms:
+            self._smoothie_driver.configure_splits_for(
+                {plunger_axis.name: ms})
 
     def __del__(self):
         self.clean_up()
