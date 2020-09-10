@@ -27,6 +27,7 @@ SECONDARY_WELL_SPACING = 4
 
 SECONDARY_WELL_SPACING = 4
 
+
 class UnsupportedInstrumentPairingError(Exception):
     pass
 
