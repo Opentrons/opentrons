@@ -181,6 +181,7 @@ class PipetteOffsetCalibrationUserFlow:
                 self._tip_rack._definition)
             modify.save_pipette_calibration(
                 offset=cur_pt,
+                mount=self._mount,
                 pip_id=self._hw_pipette.pipette_id,
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri)
