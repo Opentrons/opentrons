@@ -17,7 +17,7 @@ stages:
           id: 'time'
           type: 'SystemTimeAttributes'
         links:
-          systemTime: '/system/time'
+          self: '/system/time'
         meta: null
 
 ---
@@ -44,3 +44,20 @@ stages:
             detail: "field required"
             source:
               pointer: "/body/new_time/data/attributes/systemTime"
+  - name: System Time PUT request on a dev server raises error
+    request:
+      url: "{host:s}:{port:d}/system/time"
+      method: PUT
+      json:
+        data:
+          id: "time"
+          type: "SystemTimeAttributes"
+          attributes:
+            systemTime: "2020-09-10T21:00:15.741Z"
+    response:
+      status_code: 501
+      json:
+        errors:
+          - status: "501"
+            title: "Not implemented"
+            detail: "Method not implemented. Not supported on dev server."

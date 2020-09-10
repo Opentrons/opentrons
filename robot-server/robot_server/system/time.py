@@ -3,7 +3,9 @@ import logging
 from typing import Dict, Tuple, Union
 from datetime import datetime, timezone
 from opentrons.util.helpers import utc_now
+from opentrons.config import IS_ROBOT
 from robot_server.system import errors
+from robot_server.service.errors import CommonErrorDef
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +49,10 @@ async def _set_time(time: str,
     :return: tuple of output of date --set (usually the new date)
         & error, if any.
     """
+    if not IS_ROBOT:
+        raise errors.SystemSetTimeException(
+            msg="Not supported on dev server.",
+            definition=CommonErrorDef.NOT_IMPLEMENTED)
     proc = await asyncio.create_subprocess_shell(
         f'date --utc --set \"{time}\"',
         stdout=asyncio.subprocess.PIPE,

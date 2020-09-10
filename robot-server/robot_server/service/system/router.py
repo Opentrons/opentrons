@@ -22,15 +22,8 @@ def _create_response(dt: datetime) \
             ),
             resource_id="time"
         ),
-        links=_get_valid_time_links(router)
+        links={'self': '/system/time'}
     )
-
-
-def _get_valid_time_links(api_router: APIRouter) \
-        -> time_models.SystemTimeLinks:
-    """ Get valid links for time resource"""
-    return time_models.SystemTimeLinks(systemTime=api_router.url_path_for(
-            get_time.__name__))
 
 
 @router.get("/system/time",
