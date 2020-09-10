@@ -1100,6 +1100,7 @@ def select_tiprack_from_list_paired_pipettes(
         tip_racks: List[Labware],
         p_channels: int,
         s_channels: int,
+<<<<<<< HEAD
         starting_point: Well = None) -> Tuple[Labware, Well]:
     """
     Helper function utilized in :py:attr:`PairedInstrumentContext`
@@ -1116,11 +1117,17 @@ def select_tiprack_from_list_paired_pipettes(
     :raises TipSelectionError: if the starting tip specified
     does not exist in the filtered tipracks.
     """
+=======
+        spacing: int = 4, 
+        starting_point: Well = None) -> Tuple[Labware, Well, Well]:
+
+>>>>>>> Add hw manager, context, more tests
     try:
         first, rest = split_tipracks(tip_racks)
     except IndexError:
         raise OutOfTipsError
 
+<<<<<<< HEAD
     if starting_point and starting_point.parent is not first:
         raise TipSelectionError(
             'The starting tip you selected '
@@ -1135,11 +1142,25 @@ def select_tiprack_from_list_paired_pipettes(
     except IndexError:
         return select_tiprack_from_list_paired_pipettes(
             rest, p_channels, s_channels)
+=======
+    if starting_point:
+        assert starting_point.parent is first
+        col = chr(ord(starting_point.well_name[1]) + spacing)
+        assert first.columns()[int(col)]
+        secondary_point = first.columns()[int(col)][0]
+    else:
+        starting_point = first.wells()[0]
+        secondary_point = first.columns()[spacing][0]
+>>>>>>> Add hw manager, context, more tests
 
     primary_next_tip = first.next_tip(p_channels, starting_point)
     secondary_next_tip = first.next_tip(s_channels, secondary_point)
     if primary_next_tip and secondary_next_tip:
+<<<<<<< HEAD
         return first, primary_next_tip
+=======
+        return first, primary_next_tip, secondary_next_tip
+>>>>>>> Add hw manager, context, more tests
     else:
         return select_tiprack_from_list_paired_pipettes(
             rest, p_channels, s_channels)

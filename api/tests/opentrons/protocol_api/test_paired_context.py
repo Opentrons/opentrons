@@ -80,8 +80,5 @@ def test_pick_up_and_drop_tip_no_tipracks(loop):
 def test_return_tip(set_up_paired_instrument):
     paired, tipracks = set_up_paired_instrument
     paired.pick_up_tip()
-    assert not tipracks[1].wells()[0].has_tip
     paired.return_tip()
-    # At this point in time we are not returning
-    # tips to the tiprack.
-    assert not tipracks[1].wells()[0].has_tip
+    assert not tiprack.wells()[0].has_tip

@@ -25,6 +25,8 @@ if TYPE_CHECKING:
 SECONDARY_WELL_SPACING = 4
 
 
+SECONDARY_WELL_SPACING = 4
+
 class UnsupportedInstrumentPairingError(Exception):
     pass
 
@@ -186,7 +188,7 @@ class PairedInstrumentContext(CommandPublisher):
             tiprack = location.parent
             target = location
         elif not location:
-            tiprack, target = self._next_available_tip()
+            tiprack, target, secondary_target = self._next_available_tip()
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
