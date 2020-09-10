@@ -5,12 +5,14 @@ from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
+from opentrons.calibration_storage import modify
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CommandDefinition
 from .constants import STATE_WILDCARD, CAL_BLOCK_SETUP_BY_MOUNT, \
-    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET
+    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET, \
+    TIP_RACK_SLOT
 from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
 from .pipette_offset.constants import PipetteOffsetCalibrationState
@@ -170,3 +172,15 @@ async def move_to_reference_point(user_flow: CalibrationUserFlow,
         ref_loc = trash_loc.move(TRASH_REF_POINT_OFFSET +
                                  MOVE_TO_REF_POINT_SAFETY_BUFFER)
     await user_flow._move(ref_loc)
+
+
+def save_tip_length_calibration(user_flow: CalibrationUserFlow,
+                                tip_length_offset: float,
+                                tip_rack: labware.Labware):
+    # TODO: 07-22-2020 parent slot is not important when tracking
+    # tip length data, hence the empty string, we should remove it
+    # from create_tip_length_data in a refactor
+    tip_length_data = modify.create_tip_length_data(tip_rack._definition, '',
+                                                    tip_length_offset)
+    modify.save_tip_length_calibration(user_flow._hw_pipette.pipette_id,
+                                       tip_length_data)

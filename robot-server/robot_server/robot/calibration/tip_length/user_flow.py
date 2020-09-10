@@ -148,14 +148,10 @@ class TipCalibrationUserFlow:
                 critical_point=CriticalPoint.NOZZLE)
             tip_length_offset = cur_pt.z - self._nozzle_height_at_reference
 
-            # TODO: 07-22-2020 parent slot is not important when tracking
-            # tip length data, hence the empty string, we should remove it
-            # from create_tip_length_data in a refactor
-            tip_length_data = modify.create_tip_length_data(
-                self._tip_rack._definition, '',
-                tip_length_offset)
-            modify.save_tip_length_calibration(self._hw_pipette.pipette_id,
-                                               tip_length_data)
+            uf.save_tip_length_calibration(
+                self,
+                tip_length_offset=tip_length_offset,
+                tip_rack=self._tip_rack)
 
     def _get_default_tip_length(self) -> float:
         tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]  # type: ignore

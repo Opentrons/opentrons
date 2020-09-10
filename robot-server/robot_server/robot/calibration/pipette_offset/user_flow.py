@@ -15,8 +15,7 @@ from ..errors import CalibrationError
 from ..helper_classes import (RequiredLabware, AttachedPipette)
 from ..constants import TIP_RACK_LOOKUP_BY_MAX_VOL, SHORT_TRASH_DECK, \
     STANDARD_DECK, POINT_ONE_ID, MOVE_TO_DECK_SAFETY_BUFFER, \
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER, CAL_BLOCK_SETUP_BY_MOUNT, \
-    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER, CAL_BLOCK_SETUP_BY_MOUNT
 from .constants import (PipetteOffsetCalibrationState as State,
                         TIP_RACK_SLOT, JOG_TO_DECK_SLOT)
 from .state_machine import PipetteOffsetCalibrationStateMachine
@@ -37,9 +36,7 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
 
 class PipetteOffsetCalibrationUserFlow:
-    def __init__(self,
-                 hardware: ThreadManager,
-                 mount: Mount = Mount.RIGHT):
+    def __init__(self, hardware: ThreadManager, mount: Mount = Mount.RIGHT):
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block: Optional[bool] = None
@@ -57,6 +54,7 @@ class PipetteOffsetCalibrationUserFlow:
         self._state_machine = PipetteOffsetCalibrationStateMachine()
 
         self._tip_origin_pt: Optional[Point] = None
+        self._nozzle_height_at_reference: Optional[float] = None
         self._has_calibrated_tip_length: bool =\
             self._get_stored_tip_length_cal() is not None
 
@@ -149,8 +147,15 @@ class PipetteOffsetCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def move_to_tip_rack(self):
+        if self._current_state == State.labwareLoaded and \
+                not self._has_calibrated_tip_length:
+            raise RobotServerError(
+                definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
+                handler="move_to_tip_rack",
+                state=self._current_state,
+                condition="tip length calibration data exists")
         point = self._tip_rack.wells()[0].top().point + \
-                MOVE_TO_TIP_RACK_SAFETY_BUFFER
+            MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
         await self._move(to_loc)
 
@@ -187,6 +192,20 @@ class PipetteOffsetCalibrationUserFlow:
                 self._deck.position_for(cb_setup['slot']))
 
     async def move_to_deck(self):
+        if not self._has_calibrated_tip_length and \
+                self._current_state == State.inspectingTip:
+            raise RobotServerError(
+                definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
+                handler="move_to_deck",
+                state=self._current_state,
+                condition="tip length calibration data exists")
+        if self._current_state == State.calibrationComplete and \
+                False:  # TODO: raise if pipette offset already saved
+            raise RobotServerError(
+                definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
+                handler="move_to_deck",
+                state=self._current_state,
+                condition="no pipette offset data saved")
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
         ydim = self._deck.get_slot_definition(
             JOG_TO_DECK_SLOT)['boundingBox']['yDimension']
@@ -216,8 +235,24 @@ class PipetteOffsetCalibrationUserFlow:
                 pip_id=self._hw_pipette.pipette_id,
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri)
+        elif self._current_state == State.measuringNozzleOffset:
+            self._nozzle_height_at_reference = cur_pt.z
+        elif self._current_state == State.measuringTipOffset:
+            assert self._hw_pipette.has_tip
+            uf.save_tip_length_calibration(
+                self,
+                tip_length_offset=cur_pt.z - self._nozzle_height_at_reference,
+                tip_rack=self._tip_rack)
 
     async def move_to_reference_point(self):
+        if self._has_calibrated_tip_length and \
+                self._current_state in (State.labwareLoaded,
+                                        State.inspectingTip):
+            raise RobotServerError(
+                definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
+                handler="move_to_reference_point",
+                state=self._current_state,
+                condition="missing tip length calibration")
         await uf.move_to_reference_point(
             self,
             has_calibration_block=self._has_calibration_block)

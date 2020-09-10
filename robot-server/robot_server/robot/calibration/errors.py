@@ -26,6 +26,12 @@ class CalibrationError(ErrorDef):
         title='No State Transition',
         format_string='No transition available for state {state}'
     )
+    UNMET_STATE_TRANSITION_REQ = ErrorCreateDef(
+        status_code=HTTPStatus.CONFLICT,
+        title='Unmet State Transition Requirement',
+        format_string='The command handler {handler} may not occur in the state {state}'
+                      ' when "{condition}" is not true'
+    )
     ERROR_DURING_TRANSITION = ErrorCreateDef(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         title='Error During State Transition',
