@@ -1,8 +1,7 @@
 // @flow
-import forEach from 'lodash/forEach'
 import { uuid } from '../../../utils'
-import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../constants'
 import { selectors as stepFormSelectors } from '../../../step-forms'
+import { resetScrollElements } from '../utils'
 import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
 import type { Timeline } from '../../../step-generation'
@@ -110,13 +109,5 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> => (
     payload: formData,
   })
 
-  // scroll to top of all elements with the special class
-  forEach(
-    global.document.getElementsByClassName(
-      MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
-    ),
-    elem => {
-      elem.scrollTop = 0
-    }
-  )
+  resetScrollElements()
 }

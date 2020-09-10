@@ -1,8 +1,9 @@
 // @flow
 import sortBy from 'lodash/sortBy'
 import * as React from 'react'
-import { i18n } from '../../../localization'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
+import { i18n } from '../../../localization'
+import { resetScrollElements } from '../../../ui/steps/utils'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
 import modalStyles from '../../modals/modal.css'
@@ -16,14 +17,6 @@ type Props = {|
   flags: Flags,
   setFeatureFlags: (flags: Flags) => mixed,
 |}
-
-// TODO (ka 2019-10-28): This is a workaround, see #4446
-// but it solves the modal positioning problem caused by main page wrapper
-// being positioned absolute until we can figure out something better
-const scrollToTop = () => {
-  const editPage = document.getElementById('main-page')
-  if (editPage) editPage.scrollTop = 0
-}
 
 export const FeatureFlagCard = (props: Props): React.Node => {
   const [modalFlagName, setModalFlagName] = React.useState<FlagTypes | null>(
@@ -68,7 +61,7 @@ export const FeatureFlagCard = (props: Props): React.Node => {
           className={styles.toggle_button}
           toggledOn={Boolean(props.flags[flagName])}
           onClick={() => {
-            scrollToTop()
+            resetScrollElements()
             setModalFlagName(flagName)
           }}
         />

@@ -16,7 +16,6 @@ export {
   getWellSelectionLabwareKey,
   getCollapsedSteps,
 } from './selectors'
-export * from './constants'
 export type * from './actions/types'
 
 export const actions = { ..._actions, ..._thunks }

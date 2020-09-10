@@ -11,9 +11,10 @@ import {
 import { i18n } from '../../localization'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import { resetScrollElements } from '../../ui/steps/utils'
 import { Portal } from '../portals/MainPageModalPortal'
-import modalStyles from '../modals/modal.css'
 import { getUnusedEntities } from './utils'
+import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
 import type { HintKey } from '../../tutorial'
@@ -234,11 +235,6 @@ export function FileSidebar(props: Props): React.Node {
     },
   })
 
-  const scrollToTop = () => {
-    const editPage = document.getElementById('main-page')
-    if (editPage) editPage.scrollTop = 0
-  }
-
   return (
     <>
       {blockingExportHint}
@@ -287,10 +283,10 @@ export function FileSidebar(props: Props): React.Node {
             <PrimaryButton
               onClick={() => {
                 if (hasWarning) {
-                  scrollToTop()
+                  resetScrollElements()
                   setShowExportWarningModal(true)
                 } else if (schemaVersion > 3) {
-                  scrollToTop()
+                  resetScrollElements()
                   setShowBlockingHint(true)
                 } else {
                   saveFile(downloadData)
