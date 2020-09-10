@@ -44,3 +44,4 @@ def test_return_tip(set_up_paired_instrument):
     paired = set_up_paired_instrument
     paired.pick_up_tip()
     paired.return_tip()
+    assert not tiprack.wells()[0].has_tip

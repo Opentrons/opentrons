@@ -1425,7 +1425,7 @@ class InstrumentContext(CommandPublisher):
         return PairedInstrumentContext(
             primary_instrument=self, secondary_instrument=instrument, ctx=self._ctx,
             mount=PipettePair.of_mount(self._mount), api_version=self.api_version,
-            trash=self.trash_container)
+            hardware_manager=self._hw_manager, trash=self.trash_container)
 
     @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:

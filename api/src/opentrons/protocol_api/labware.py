@@ -57,7 +57,8 @@ class Well:
                  parent: Location,
                  display_name: str,
                  has_tip: bool,
-                 api_level: APIVersion) -> None:
+                 api_level: APIVersion,
+                 name: str = None) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -99,6 +100,10 @@ class Well:
                     well_props['shape']))
         self.max_volume = well_props['totalLiquidVolume']
         self._depth = well_props['depth']
+        if name:
+            self._name = name
+        else:
+            self._name = display_name
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -127,6 +132,11 @@ class Well:
     @property
     def display_name(self):
         return self._display_name
+
+    @property  # type: ignore
+    @requires_version(2, 7)
+    def well_name(self) -> str:
+        return self._name
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
@@ -391,7 +401,8 @@ class Labware(DeckItem):
                 Location(self._calibrated_offset, self),
                 "{} of {}".format(well, self._display_name),
                 self._is_tiprack,
-                self._api_version)
+                self._api_version,
+                well)
             for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0) -> Dict[str, List['Well']]:
@@ -1074,6 +1085,36 @@ def select_tiprack_from_list(
         return first, next_tip
     else:
         return select_tiprack_from_list(rest, num_channels)
+
+
+def select_tiprack_from_list_paired_pipettes(
+        tip_racks: List[Labware],
+        p_channels: int,
+        s_channels: int,
+        spacing: int = 4, 
+        starting_point: Well = None) -> Tuple[Labware, Well, Well]:
+
+    try:
+        first, rest = split_tipracks(tip_racks)
+    except IndexError:
+        raise OutOfTipsError
+
+    if starting_point:
+        assert starting_point.parent is first
+        col = chr(ord(starting_point.well_name[1]) + spacing)
+        assert first.columns()[int(col)]
+        secondary_point = first.columns()[int(col)][0]
+    else:
+        starting_point = first.wells()[0]
+        secondary_point = first.columns()[spacing][0]
+
+    primary_next_tip = first.next_tip(p_channels, starting_point)
+    secondary_next_tip = first.next_tip(s_channels, secondary_point)
+    if primary_next_tip and secondary_next_tip:
+        return first, primary_next_tip, secondary_next_tip
+    else:
+        return select_tiprack_from_list_paired_pipettes(
+            rest, p_channels, s_channels)
 
 
 def filter_tipracks_to_start(

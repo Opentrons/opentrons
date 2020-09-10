@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Union, Tuple, Optional, List
 
 from opentrons import types
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion
 
 from opentrons.protocols.api_support.util import requires_version
-from .labware import Labware, Well
+from .labware import (
+    Labware, Well, OutOfTipsError, select_tiprack_from_list_paired_pipettes,
+    filter_tipracks_to_start, quirks_from_any_parent)
 from .paired_instrument import PairedInstrument
 
 if TYPE_CHECKING:
@@ -15,6 +17,8 @@ if TYPE_CHECKING:
     from .instrument_context import InstrumentContext
     from opentrons.hardware_control import types as hc_types
 
+
+SECONDARY_WELL_SPACING = 4
 
 class UnsupportedInstrumentPairingError(Exception):
     pass
@@ -28,7 +32,8 @@ class PairedInstrumentContext(CommandPublisher):
                  ctx: ProtocolContext,
                  mount: hc_types.PipettePair,
                  api_version: APIVersion,
-                 trash: Labware = None) -> None:
+                 hardware_manager,
+                 trash: Labware) -> None:
         self._instruments = {
             mount.primary: primary_instrument,
             mount.secondary: secondary_instrument}
@@ -39,14 +44,14 @@ class PairedInstrumentContext(CommandPublisher):
         self._starting_tip: Union[Well, None] = None
         self._mount = mount
         self.paired_instrument_obj = PairedInstrument(
-            primary_instrument, secondary_instrument, mount, ctx)
+            primary_instrument, secondary_instrument, mount, ctx, hardware_manager)
 
     @property  # type: ignore
     @requires_version(2, 7)
     def api_version(self) -> APIVersion:
         pass
 
-    @property
+    @property  # type: ignore
     @requires_version(2, 7)
     def tip_racks(self) -> List[Labware]:
         return self._tip_racks
@@ -79,7 +84,9 @@ class PairedInstrumentContext(CommandPublisher):
         Pick up a tip for the pipette to run liquid-handling commands with
 
         If no location is passed, the Pipette will pick up the next available
-        tip in its :py:attr:`InstrumentContext.tip_racks` list.
+        tip in its :py:attr:`InstrumentContext.tip_racks` list. Pick up tip
+        will determine the next available tip based on both the primary
+        and secondary target. 
 
         The tip to pick up can be manually specified with the `location`
         argument. The `location` argument can be specified in several ways:
@@ -128,7 +135,7 @@ class PairedInstrumentContext(CommandPublisher):
             tiprack = location.parent
             target = location
         elif not location:
-            tiprack, target = self._next_available_tip()
+            tiprack, target, secondary_target = self._next_available_tip()
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -136,7 +143,8 @@ class PairedInstrumentContext(CommandPublisher):
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
-        self._get_secondary_target(tiprack, target)
+
+        secondary_target = self._get_secondary_target(tiprack, target)
         self.paired_instrument_obj.pick_up_tip(
             target, tiprack, presses, increment, secondary_target)
         return self
@@ -150,9 +158,9 @@ class PairedInstrumentContext(CommandPublisher):
         """
         Drop the current tip.
 
-        If no location is passed, the Pipette will drop the tip into its
-        :py:attr:`trash_container`, which if not specified defaults to
-        the fixed trash in slot 12.
+        If no location is passed, both pipette instruments will drop their
+        tips into :py:attr:`trash_container`, which if not specified defaults
+        to the fixed trash in slot 12.
 
         The location in which to drop the tip can be manually specified with
         the `location` argument. The `location` argument can be specified in
@@ -198,7 +206,7 @@ class PairedInstrumentContext(CommandPublisher):
             if 'fixedTrash' in quirks_from_any_parent(location):
                 target = location.top()
             else:
-                primary_pipette = self._instruments[self._mount]
+                primary_pipette = self._instruments[self._mount.primary]
                 target = self._drop_tip_target(location, primary_pipette)
         elif not location:
             target = self.trash_container.wells()[0].top()
@@ -271,7 +279,7 @@ class PairedInstrumentContext(CommandPublisher):
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             f'{loc}')
-        drop_loc = _drop_tip_target(loc, pipette)
+        drop_loc = self._drop_tip_target(loc, pipette)
         self.drop_tip(drop_loc, home_after=home_after)
 
         return self
@@ -289,41 +297,31 @@ class PairedInstrumentContext(CommandPublisher):
                         without arc motion.
         :param minimum_z_height: When specified, this Z margin is able to raise
                                  (but never lower) the mid-arc height.
-        :param speed: The speed at which to move. By default,
-                      :py:attr:`InstrumentContext.default_speed`. This controls
-                      the straight linear speed of the motion; to limit
-                      individual axis speeds, you can use
+        :param speed: The speed at which to move. If no speed is specified,
+                      this function will utilize the primary pipette's speed.
+                      This controls the straight linear speed of the motion;
+                      to limit individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
-        if self._ctx.location_cache:
-            from_lw = self._ctx.location_cache.labware
-        else:
-            from_lw = None
-
         if not speed:
             primary = self._instruments[self._mount.primary]
             speed = primary.default_speed
 
-        from_center = 'centerMultichannelOnWells'\
-            in quirks_from_any_parent(from_lw)
-        cp_override = CriticalPoint.XY_CENTER if from_center else None
-        from_loc = types.Location(
-            self._hw_manager.hardware.gantry_position(
-                self._mount, critical_point=cp_override),
-            from_lw)
         self.paired_instrument_obj.move_to(
-            from_loc, to_loc, force_direct, minimum_z_height, speed)
+            location, force_direct, minimum_z_height, speed)
         return self
 
-    def _next_available_tip(self, channels: int) -> Tuple[Labware, Well]:
+    def _next_available_tip(self) -> Tuple[Labware, Well, Well]:
         start = self.starting_tip
+        primary_channels = self._instruments[self._mount.primary].channels
+        secondary_channels = self._instruments[self._mount.secondary].channels
         if start is None:
-            return select_tiprack_from_list(
-                self.tip_racks, channels)
+            return select_tiprack_from_list_paired_pipettes(
+                self.tip_racks, primary_channels, secondary_channels)
         else:
-            return select_tiprack_from_list(
+            return select_tiprack_from_list_paired_pipettes(
                 filter_tipracks_to_start(start, self.tip_racks),
-                channels, start)
+                primary_channels, secondary_channels, starting_point=start)
 
     @staticmethod
     def _drop_tip_target(
@@ -335,8 +333,11 @@ class PairedInstrumentContext(CommandPublisher):
         return location.top(-z_height)
 
     @staticmethod
-    def _get_secondary_target(tiprack: Labware, primary_loc: Well) -> Well:
-        secondary_well
-        return secondary_well
-
-
+    def _get_secondary_target(tiprack: Labware, primary_loc: Well) -> Optional[Well]:
+        primary_well = primary_loc.well_name
+        secondary_column = chr(ord(primary_well[1]) + SECONDARY_WELL_SPACING)
+        secondary_well_name = primary_well[0] + secondary_column
+        try:
+            return tiprack[secondary_well_name]
+        except IndexError:
+            return None
