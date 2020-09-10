@@ -5,13 +5,16 @@ from __future__ import annotations
 import asyncio
 from typing import List, Optional, Dict, Union
 
+from typing_extensions import Protocol, TypedDict, Literal
+
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel, PipetteName, ChannelCount
 )
 
+from opentrons.drivers.types import MoveSplit
 from .modules import ModuleAtPort
 from .types import HardwareEventType
-from typing_extensions import Protocol, TypedDict, Literal
+
 from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
 
@@ -78,3 +81,11 @@ class PipetteDict(TypedDict):
     default_blow_out_speeds: Dict[str, float]
     ready_to_aspirate: bool
     has_tip: bool
+
+
+class InstrumentHardwareConfigs(TypedDict):
+    steps_per_mm: float
+    home_pos: float
+    max_travel: float
+    idle_current: float
+    splits: Optional[MoveSplit]

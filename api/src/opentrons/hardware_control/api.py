@@ -5,7 +5,6 @@ import pathlib
 from collections import OrderedDict
 from typing import (Any, Dict, Union, List, Optional, Tuple,
                     TYPE_CHECKING, cast, overload, Sequence)
-from opentrons.config.pipette_config import PipetteConfig
 
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
@@ -13,10 +12,10 @@ from opentrons.util import linal
 from functools import lru_cache
 from opentrons.config import (
     robot_configs, feature_flags as ff)
-from opentrons.drivers.types import MoveSplit
 
 from .util import use_or_initialize_loop, DeckTransformState
-from .pipette import Pipette
+from .pipette import (
+    Pipette, generate_hardware_configs, load_from_config_and_check_skip)
 from .controller import Controller
 from .simulator import Simulator
 from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
@@ -341,36 +340,6 @@ class API(HardwareAPILike):
             await self._execution_manager.register_cancellable_task(delay_task)
         self.resume()
 
-    @staticmethod
-    def _may_skip_instr_config(
-            config: Optional[PipetteConfig],
-            attached: Optional[Pipette],
-            requested: Optional['PipetteName'],
-            serial: Optional[str]) -> bool:
-        if not config and not attached:
-            # nothing attached now, nothing used to be attached, nothing
-            # to reconfigure
-            return True
-
-        if config and attached:
-            # something was attached and something is attached. are they
-            # the same? we can tell by comparing serials
-            if serial == attached.pipette_id:
-                if requested:
-                    # if there is an explicit instrument request, in addition
-                    # to checking if the old and new responses are the same
-                    # we also have to make sure the old pipette is properly
-                    # configured to the request
-                    if requested == attached.acting_as:
-                        # no reconfiguration necessary
-                        return True
-                else:
-                    # if there is no request, make sure that the old pipette
-                    # did not have backcompat applied
-                    if attached.acting_as == attached.name:
-                        return True
-        return False
-
     def reset_instrument(self, mount: top_types.Mount = None):
         """
         Reset the internal state of a pipette by its mount, without doing
@@ -434,58 +403,25 @@ class API(HardwareAPILike):
         for mount, instrument_data in found.items():
             config = instrument_data.get('config')
             req_instr = checked_require.get(mount, None)
-            if self._may_skip_instr_config(
-                    config,
-                    self._attached_instruments[mount],
-                    req_instr,
-                    instrument_data.get('id')):
+            p, may_skip = load_from_config_and_check_skip(
+                config,
+                self._attached_instruments[mount],
+                req_instr,
+                instrument_data.get('id'),
+                self._config.instrument_offset[mount.name.lower()])
+            self._attached_instruments[mount] = p
+            if req_instr and p:
+                p.act_as(req_instr)
+
+            if may_skip:
                 self._log.info(
                     f"Skipping configuration on {mount.name}")
                 continue
 
             self._log.info(
                 f"Doing full configuration on {mount.name}")
-            mount_axis = Axis.by_mount(mount)
-            plunger_axis = Axis.of_plunger(mount)
-            splits: Dict[str, MoveSplit] = {}
-            if config:
-                p = Pipette(
-                    config,
-                    self._config.instrument_offset[mount.name.lower()],
-                    instrument_data['id'])
-
-                if req_instr:
-                    p.act_as(req_instr)
-
-                self._attached_instruments[mount] = p
-                home_pos = p.config.home_position
-                max_travel = p.config.max_travel
-                steps_mm = p.config.steps_per_mm
-                idle_current = p.config.idle_current
-                if 'needsUnstick' in p.config.quirks:
-                    splits[plunger_axis.name.upper()] = MoveSplit(
-                        split_distance=1,
-                        split_current=1.75,
-                        split_speed=1,
-                        after_time=1800,
-                        fullstep=True)
-
-            if not config:
-                self._attached_instruments[mount] = None
-                home_pos = self._config.default_pipette_configs['homePosition']
-                max_travel = self._config.default_pipette_configs['maxTravel']
-                steps_mm = self._config.default_pipette_configs['stepsPerMM']
-                idle_current = self._config.low_current[plunger_axis.name]
-
-            self._backend._smoothie_driver.update_steps_per_mm(
-                {plunger_axis.name: steps_mm})
-            self._backend._smoothie_driver.update_pipette_config(
-                mount_axis.name, {'home': home_pos})
-            self._backend._smoothie_driver.update_pipette_config(
-                plunger_axis.name, {'max_travel': max_travel})
-            self._backend._smoothie_driver.set_dwelling_current(
-                {plunger_axis.name: idle_current})
-            self._backend._smoothie_driver.configure_splits_for(splits)
+            hw_config = generate_hardware_configs(p, self._config)
+            self._backend.configure_mount(mount, hw_config)
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 

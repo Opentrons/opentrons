@@ -3,19 +3,28 @@ from __future__ import annotations
 """
 from dataclasses import asdict, replace
 import logging
-from typing import Any, Dict, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Any, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING
 
 from opentrons.types import Point
 from opentrons.config import pipette_config
 from opentrons.config.feature_flags import enable_calibration_overhaul
+from opentrons.drivers.types import MoveSplit
+from opentrons.config.robot_configs import robot_config
 from .types import CriticalPoint
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
         UlPerMmAction, PipetteName, PipetteModel
     )
+    from .dev_types import InstrumentHardwareConfigs
+
+
+RECONFIG_KEYS = {'quirks'}
+
 
 mod_log = logging.getLogger(__name__)
+
+InstrumentOffsetConfig = Dict[str, Tuple[float, float, float]]
 
 
 class Pipette:
@@ -28,10 +37,11 @@ class Pipette:
     DictType = Dict[str, Union[str, float, bool]]
     #: The type of this data class as a dict
 
-    def __init__(self,
-                 config: pipette_config.PipetteConfig,
-                 inst_offset_config: Dict[str, Tuple[float, float, float]],
-                 pipette_id: str = None) -> None:
+    def __init__(
+            self,
+            config: pipette_config.PipetteConfig,
+            inst_offset_config: Union[InstrumentOffsetConfig, Point],
+            pipette_id: str = None) -> None:
         self._config = config
         self._acting_as = self._config.name
         self._name = self._config.name
@@ -45,8 +55,11 @@ class Pipette:
         self._tip_overlap_map = self._config.tip_overlap
         self._has_tip = False
         self._pipette_id = pipette_id
-        pip_type = 'multi' if self._config.channels == 8 else 'single'
-        self._instrument_offset = Point(*inst_offset_config[pip_type])
+        if isinstance(inst_offset_config, dict):
+            pip_type = 'multi' if self._config.channels == 8 else 'single'
+            self._instrument_offset = Point(*inst_offset_config[pip_type])
+        else:
+            self._instrument_offset = inst_offset_config
         self._log = mod_log.getChild(self._pipette_id
                                      if self._pipette_id else '<unknown>')
         self._log.info("loaded: {}, instr offset {}"
@@ -300,3 +313,116 @@ class Pipette:
                             'dispense_flow_rate': self.dispense_flow_rate,
                             'blow_out_flow_rate': self.blow_out_flow_rate})
         return config_dict
+
+
+def _reload_and_check_skip(
+        new_config: pipette_config.PipetteConfig,
+        attached_instr: Pipette) -> Tuple[Pipette, bool]:
+    # Once we have determined that the new and attached pipettes
+    # are similar enough that we might skip, see if the configs
+    # match closely enough.
+    # Returns a pipette object and True if we may skip hw reconfig
+    if new_config == attached_instr.config:
+        # Same config, good enough
+        return attached_instr, True
+    else:
+        newdict = asdict(new_config)
+        olddict = asdict(attached_instr.config)
+        changed: Set[str] = set()
+        for k in newdict.keys():
+            if newdict[k] != olddict[k]:
+                changed.add(k)
+        if changed.intersection(RECONFIG_KEYS):
+            # Something has changed that requires reconfig
+            p = Pipette(new_config,
+                        attached_instr._instrument_offset,
+                        attached_instr._pipette_id)
+            p.act_as(attached_instr.acting_as)
+            return p, False
+    # Good to skip
+    return attached_instr, True
+
+
+def load_from_config_and_check_skip(
+        config: Optional[pipette_config.PipetteConfig],
+        attached: Optional[Pipette],
+        requested: Optional[PipetteName],
+        serial: Optional[str],
+        instrument_offset: InstrumentOffsetConfig)\
+        -> Tuple[Optional[Pipette], bool]:
+    """
+    Given the pipette config for an attached pipette (if any) freshly read
+    from disk, and any attached instruments,
+
+    - Compare the new and configured pipette configs
+    - Load the new configs if they differ
+    - Return a bool indicating whether hardware reconfiguration may be
+      skipped
+    """
+
+    if not config and not attached:
+        # nothing attached now, nothing used to be attached, nothing
+        # to reconfigure
+        return attached, True
+
+    if config and attached:
+        # something was attached and something is attached. are they
+        # the same? we can tell by comparing serials
+        if serial == attached.pipette_id:
+            if requested:
+                # if there is an explicit instrument request, in addition
+                # to checking if the old and new responses are the same
+                # we also have to make sure the old pipette is properly
+                # configured to the request
+                if requested == attached.acting_as:
+                    # similar enough to check
+                    return _reload_and_check_skip(config, attached)
+            else:
+                # if there is no request, make sure that the old pipette
+                # did not have backcompat applied
+                if attached.acting_as == attached.name:
+                    # similar enough to check
+                    return _reload_and_check_skip(config, attached)
+
+    if config:
+        return Pipette(config, instrument_offset, serial), False
+    else:
+        return None, False
+
+
+def _build_splits(pipette: Pipette) -> Optional[MoveSplit]:
+    if 'needsUnstick' in pipette.config.quirks:
+        return MoveSplit(
+            split_distance=1,
+            split_current=1.75,
+            split_speed=1,
+            after_time=1800,
+            fullstep=True)
+    else:
+        return None
+
+
+def generate_hardware_configs(
+        pipette: Optional[Pipette],
+        robot_config: robot_config) -> InstrumentHardwareConfigs:
+    """
+    Fuse robot and pipette configuration to generate commands to send to
+    the motor driver if required
+    """
+    if pipette:
+        return {
+            'steps_per_mm': pipette.config.steps_per_mm,
+            'home_pos': pipette.config.home_position,
+            'max_travel': pipette.config.max_travel,
+            'idle_current': pipette.config.idle_current,
+            'splits': _build_splits(pipette)
+        }
+    else:
+        dpcs = robot_config.default_pipette_configs
+        return {
+            'steps_per_mm': dpcs['stepsPerMM'],
+            'home_pos': dpcs['homePosition'],
+            'max_travel': dpcs['maxTravel'],
+            'idle_current': robot_config.low_current['B'],
+            'splits': None
+        }

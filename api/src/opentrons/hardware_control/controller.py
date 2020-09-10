@@ -24,7 +24,8 @@ if TYPE_CHECKING:
         PipetteModel, PipetteName
     )
     from .dev_types import (
-        RegisterModules, AttachedInstrument, AttachedInstruments)  # noqa (F501)
+        RegisterModules, AttachedInstrument, AttachedInstruments,
+        InstrumentHardwareConfigs)
     from opentrons.drivers.rpi_drivers.dev_types\
         import GPIODriverLike # noqa(F501)
 
@@ -320,6 +321,23 @@ class Controller:
                     self.gpio_chardev.stop_door_switch_watcher(loop)
             except RuntimeError:
                 pass
+
+    def configure_mount(self, mount: Mount, config: InstrumentHardwareConfigs):
+        mount_axis = Axis.by_mount(mount)
+        plunger_axis = Axis.of_plunger(mount)
+
+        self._smoothie_driver.update_steps_per_mm(
+            {plunger_axis.name: config['steps_per_mm']})
+        self._smoothie_driver.update_pipette_config(
+            mount_axis.name, {'home': config['home_pos']})
+        self._smoothie_driver.update_pipette_config(
+            plunger_axis.name, {'max_travel': config['max_travel']})
+        self._smoothie_driver.set_dwelling_current(
+            {plunger_axis.name: config['idle_current']})
+        ms = config['splits']
+        if ms:
+            self._smoothie_driver.configure_splits_for(
+                {plunger_axis.name: ms})
 
     def __del__(self):
         self.clean_up()
