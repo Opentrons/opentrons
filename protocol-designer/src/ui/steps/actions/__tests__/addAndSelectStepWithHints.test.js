@@ -1,5 +1,6 @@
 // @flow
 import { addAndSelectStepWithHints } from '../thunks'
+import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import { addHint } from '../../../../tutorial/actions'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
@@ -55,7 +56,7 @@ describe('addAndSelectStepWithHints', () => {
       [
         {
           type: 'ADD_STEP',
-          payload: { id: stepId, stepType: 'pause' },
+          payload: { id: PRESAVED_STEP_ID, stepType: 'pause' },
           meta: { robotStateTimeline: 'mockGetRobotStateTimelineValue' },
         },
       ],
@@ -74,7 +75,7 @@ describe('addAndSelectStepWithHints', () => {
         {
           type: 'ADD_STEP',
           payload: {
-            id: stepId,
+            id: PRESAVED_STEP_ID,
             stepType: 'moveLiquid',
           },
           meta: { robotStateTimeline: 'mockGetRobotStateTimelineValue' },
@@ -144,7 +145,7 @@ describe('addAndSelectStepWithHints', () => {
           [
             {
               type: 'ADD_STEP',
-              payload: { id: stepId, stepType },
+              payload: { id: PRESAVED_STEP_ID, stepType },
               meta: { robotStateTimeline: 'mockGetRobotStateTimelineValue' },
             },
           ],

@@ -5,6 +5,7 @@ import {
   getUnsavedFormIsPristineSetTempForm,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
+import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 
 import { PAUSE_UNTIL_TEMP } from '../../../../constants'
 import { uuid } from '../../../../utils'
@@ -135,7 +136,13 @@ export const saveStepForm: () => ThunkAction<any> = () => (
   }
 
   // save the form
-  dispatch(_saveStepForm(unsavedForm))
+  if (unsavedForm.id === PRESAVED_STEP_ID) {
+    // if presaved, transform pseudo ID to real UUID upon save
+    const id = uuid()
+    dispatch(_saveStepForm({ ...unsavedForm, id }))
+  } else {
+    dispatch(_saveStepForm(unsavedForm))
+  }
 }
 
 /** "power action", mimicking saving the never-saved "set temperature X" step,
@@ -158,6 +165,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
     )
     return
   }
+  // TODO IMMEDIATELY: this is broken!!
   const { id } = unsavedSetTemperatureForm
 
   if (!isPristineSetTempForm) {
@@ -175,7 +183,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
     `tried to auto-add a pause until temp, but targetTemperature is missing: ${temperature}`
   )
   // save the set temperature step form that is currently open
-  dispatch(_saveStepForm(unsavedSetTemperatureForm))
+  dispatch(_saveStepForm(unsavedSetTemperatureForm)) // TODO IMMEDIATELY this is broken
 
   // add a new pause step form
   dispatch(
@@ -201,7 +209,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
 
   // this conditional is for Flow, the unsaved form should always exist
   if (unsavedPauseForm != null) {
-    dispatch(_saveStepForm(unsavedPauseForm))
+    dispatch(_saveStepForm(unsavedPauseForm)) // TODO IMMEDIATELY this is broken, ID
   } else {
     assert(false, 'could not auto-save pause form, getUnsavedForm returned')
   }
