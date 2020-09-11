@@ -27,6 +27,10 @@ stages:
         links:
           self:
             href: '/protocols/phony_proto'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
   - name: Get the protocol
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
@@ -38,6 +42,10 @@ stages:
         links:
           self:
             href: '/protocols/phony_proto'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
   - name: Delete the protocol
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
@@ -49,6 +57,8 @@ stages:
         links:
           self:
             href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
   - name: Get all protocols to see that there are none
     request:
       url: "{host:s}:{port:d}/protocols"
@@ -60,6 +70,8 @@ stages:
         links:
           self:
              href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
 ---
 test_name: Protocol lifecycle upload support
 marks:
@@ -87,6 +99,10 @@ stages:
         links:
           self:
             href: '/protocols/phony_proto'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
   - name: Get the protocol
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
@@ -106,6 +122,10 @@ stages:
         links:
           self:
             href: '/protocols/phony_proto'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
   - name: Upload a data file
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
@@ -128,6 +148,10 @@ stages:
         links:
           self:
             href: '/protocols/phony_proto'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
   - name: Delete the protocol
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
@@ -148,6 +172,8 @@ stages:
         links:
           self:
             href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
   - name: Get all protocols to see that there are none
     request:
       url: "{host:s}:{port:d}/protocols"
@@ -159,3 +185,5 @@ stages:
         links:
           self:
             href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'

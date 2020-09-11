@@ -1,5 +1,4 @@
 import logging
-import typing
 
 from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
@@ -7,17 +6,21 @@ from fastapi import APIRouter, Query, Depends
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.json_api import ResourceLink, ResponseDataModel
-from robot_server.service.json_api.resource_links import ResourceLinkKey
+from robot_server.service.json_api.resource_links import ResourceLinkKey, \
+    ResourceLinks
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session import models as route_models
 from robot_server.service.session.session_types import SessionMetaData
 
+
 router = APIRouter()
 
 
 log = logging.getLogger(__name__)
+
+PATH_SESSION_BY_ID = "/sessions/{sessionId}"
 
 
 def get_session(manager: SessionManager,
@@ -29,12 +32,7 @@ def get_session(manager: SessionManager,
         # There is no session raise error
         raise RobotServerError(
             definition=CommonErrorDef.RESOURCE_NOT_FOUND,
-            links={
-                ResourceLinkKey.self:
-                    ResourceLink(href=api_router.url_path_for(
-                        create_session_handler.__name__)
-                    )
-            },
+            links=get_sessions_links(api_router),
             resource='session',
             id=session_id
         )
@@ -66,7 +64,7 @@ async def create_session_handler(
     )
 
 
-@router.delete("/sessions/{sessionId}",
+@router.delete(PATH_SESSION_BY_ID,
                description="Delete a session",
                response_model_exclude_unset=True,
                response_model=route_models.SessionResponse)
@@ -85,16 +83,11 @@ async def delete_session_handler(
         data=ResponseDataModel.create(
             attributes=session_obj.get_response_model(),
             resource_id=sessionId),
-        links={
-            ResourceLinkKey.self:
-                ResourceLink(href=router.url_path_for(
-                    create_session_handler.__name__
-                )),
-        }
+        links=get_sessions_links(router),
     )
 
 
-@router.get("/sessions/{sessionId}",
+@router.get(PATH_SESSION_BY_ID,
             description="Get session",
             response_model_exclude_unset=True,
             response_model=route_models.SessionResponse)
@@ -134,7 +127,7 @@ async def get_sessions_handler(
     )
 
 
-@router.post("/sessions/{sessionId}/commands/execute",
+@router.post(f"{PATH_SESSION_BY_ID}/commands/execute",
              description="Create and execute a command immediately",
              response_model_exclude_unset=True,
              response_model=route_models.CommandResponse)
@@ -177,7 +170,7 @@ async def session_command_execute_handler(
 
 def get_valid_session_links(session_id: route_models.IdentifierType,
                             api_router: APIRouter) \
-        -> typing.Dict[str, ResourceLink]:
+        -> ResourceLinks:
     """Get the valid links for a session"""
     return {
         ResourceLinkKey.self: ResourceLink(href=api_router.url_path_for(
@@ -186,4 +179,18 @@ def get_valid_session_links(session_id: route_models.IdentifierType,
         "commandExecute": ResourceLink(href=api_router.url_path_for(
             session_command_execute_handler.__name__,
             sessionId=session_id)),
+        "sessions": ResourceLink(href=api_router.url_path_for(
+            get_sessions_handler.__name__)),
+        "sessionsById": ResourceLink(href=PATH_SESSION_BY_ID),
+    }
+
+
+def get_sessions_links(api_router: APIRouter) -> ResourceLinks:
+    """Get the valid links for the /sessions"""
+    return {
+        ResourceLinkKey.self:
+            ResourceLink(href=api_router.url_path_for(
+                get_sessions_handler.__name__)
+            ),
+        "sessionsById": ResourceLink(href=PATH_SESSION_BY_ID),
     }
