@@ -169,7 +169,8 @@ class PipetteOffsetCalibrationUserFlow:
         await self._move(to_loc)
 
     async def move_to_point_one(self):
-        assert self._z_height_reference
+        assert self._z_height_reference is not None, \
+            "saveOffset has not been called yet"
         coords = self._deck.get_calibration_position(POINT_ONE_ID).position
         point_loc = Location(Point(*coords), None)
         await self._move(
