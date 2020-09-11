@@ -1,0 +1,52 @@
+# This workflow runs tests and lint on pull requests that touch the
+# shared-data project or its CI configuration.
+
+name: 'shared-data pull requests (merge)'
+
+on:
+  # Most of the time, we run on pull requests, which lets us handle external PRs
+  pull_request:
+    paths:
+      - 'Makefile'
+      - 'shared-data/*/**'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  python-lint:
+    name: shared-data package python lint (merge)
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+      - name: Lint
+        run: make -C shared-data/python lint
+  python-test:
+    # Do minimal work on merge targets
+    name: shared-data package python tests (merge)
+    needs: [python-lint]
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+      - name: Test
+        run: make -C shared-data/python test

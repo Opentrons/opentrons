@@ -1,0 +1,39 @@
+# This workflow runs test and lint on pull requests that touch the
+# robot-server project or its dependencies
+
+name: 'Robot server pull request (merge)'
+
+on:
+  # Most of the time, we run on pull requests, which lets us handle external PRs
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'Makefile'
+      - 'shared-data/*/**'
+      - '!shared-data/js/**'
+      - 'robot-server/**'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint-test:
+    name: robot server package linting and tests (merge)
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'robot-server'
+      - name: Lint
+        run: make -C robot-server lint
+      - name: Test
+        run: make -C robot-server test

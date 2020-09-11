@@ -1,0 +1,51 @@
+# This workflow runs teests and lint on pull requests that touch
+# the update-server subpackage
+
+name: 'Update Server pull requests (merge)'
+
+on:
+  # Most of the time, we run on pull requests, which lets us handle external PRs
+  pull_request:
+    paths:
+      - 'update-server/**'
+      - 'Makefile'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'update server linting (merge)'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'update-server'
+      - name: Lint
+        run: make -C update-server lint
+  test:
+    name: 'update server package tests (merge)'
+    needs: [lint]
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'update-server'
+      - name: Test
+        run: make -C update-server test
