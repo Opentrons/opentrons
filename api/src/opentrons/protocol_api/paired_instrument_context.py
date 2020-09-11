@@ -60,6 +60,9 @@ class PairedInstrumentContext(CommandPublisher):
         self._starting_tip: Union[Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
 
+        self._starting_tip: Union[Well, None] = None
+        self._last_tip_picked_up_from: Union[Well, None] = None
+
         self.trash_container = trash
         self.paired_instrument_obj = PairedInstrument(
             primary_instrument, secondary_instrument, pair_policy,
@@ -189,7 +192,7 @@ class PairedInstrumentContext(CommandPublisher):
             tiprack = location.parent
             target = location
         elif not location:
-            tiprack, target, secondary_target = self._next_available_tip()
+            tiprack, target = self._next_available_tip()
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
