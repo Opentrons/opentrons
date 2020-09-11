@@ -1,29 +1,21 @@
-# This workflow runs tests and lint on pull requests that touch the
+# This workflow runs tests and lint on branch pushes that touch the
 # shared-data project or its CI configuration.
 
-name: 'shared-data pull requests'
+name: 'shared-data test/lint for non-release branch push'
 
 on:
-  # Most of the time, we run on pull requests, which lets us handle external PRs
-  pull_request_target:
+  push:
     paths:
       - 'Makefile'
       - 'shared-data/*/**'
-  # The pull_request_target context, though, runs the workflow in the base
-  # branch. That means we can't test workflow/action changes in pull requests
-  # there. So we can instead have a very limited on-push hook that only fires
-  # when github ci config is changed.
-  push:
-    branches-ignore: # ignore any release- or edge-related thing (handled elsewhere)
-      - 'edge'
+      - '.github/workflows/shared-data-pull-request-target.yaml'
+      - '.github/actions/python/**'
+    branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
       - 'chore_release-**'
       - 'chore_bump-**'
     tags-ignore:
       - '*'
-    paths:
-      - '.github/workflows/shared-data-pull-request-target.yaml'
-      - '.github/actions/python/**'
 
 defaults:
   run:

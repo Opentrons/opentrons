@@ -1,29 +1,20 @@
-# This workflow runs teests and lint on pull requests that touch
+# This workflow runs tests and lint on non-release branches pushed that alter
 # the update-server subpackage
 
-name: 'Update Server pull requests'
+name: 'Update Server test/lint for non-release branch push'
 
 on:
-  # Most of the time, we run on pull requests, which lets us handle external PRs
-  pull_request_target:
+  push:
     paths:
       - 'update-server/**'
       - 'Makefile'
-  # The pull_request_target context, though, runs the workflow in the base
-  # branch. That means we can't test workflow/action changes in pull requests
-  # there. So we can instead have a very limited on-push hook that only fires
-  # when github ci config is changed.
-  push:
-    branches-ignore: # ignore any release- or edge-related thing (handled elsewhere)
-      - 'edge'
-      - 'master'
-      - 'chore_release-*'
-      - 'chore_bump-*'
-    tags-ignore:
-      - '*'
-    paths:
       - '.github/workflows/update-server-pull-request-target.yaml'
       - '.github/actions/python/**'
+    branches-ignore: # ignore any release-related thing (handled elsewhere)
+      - 'master'
+      - 'chore_release-*'
+    tags-ignore:
+      - '*'
 
 defaults:
   run:

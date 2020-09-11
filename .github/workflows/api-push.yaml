@@ -1,31 +1,22 @@
-# This workflow runs tests and lint on pull requests that touch the api/
+# This workflow runs tests and lint on branches pushed that touch the api/
 # project or its CI configuration.
 
-name: 'API pull requests'
+name: 'API test/lint for non-release branch pushes'
 
 on:
-  # Most of the time, we run on pull requests, which lets us handle external PRs
-  pull_request_target:
+  push:
     paths:
       - 'api/**'
       - 'Makefile'
       - 'shared-data/*/**'
       - '!shared-data/js/**'
-  # The pull_request_target context, though, runs the workflow in the base
-  # branch. That means we can't test workflow/action changes in pull requests
-  # there. So we can instead have a very limited on-push hook that only fires
-  # when github ci config is changed.
-  push:
-    branches-ignore: # ignore any release- or edge-related thing (handled elsewhere)
-      - 'edge'
+      - '.github/workflows/api-push.yaml'
+      - '.github/actions/python/**'
+    branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
-      - 'chore_release-**'
-      - 'chore_bump-**'
+      - 'chore_release-*'
     tags-ignore:
       - '*'
-    paths:
-      - '.github/workflows/api-pull-request-target.yaml'
-      - '.github/actions/python/**'
 
 defaults:
   run:

@@ -1,31 +1,21 @@
-# This workflow builds API docs on pull requests that touch the parts
+# This workflow builds API docs on branch pushes that touch the parts
 # of the api/ project that are used by the docs; the docs source themselves;
 # or the CI/makefile tooling used to build the docs.
 
-name: 'API docs pull requests'
+name: 'API docs build for non-release branch push'
 
 on:
-  # Most of the time we run on pull requests to handle external RPs
-  pull_request_target:
+  push:
     paths:
       - 'api/src/opentrons/protocol_api/**'
       - 'api/docs/**'
-  # The pull_request_target context, though, runs the workflow in the base
-  # branch. That means we can't test workflow/action changes in pull requests
-  # there. So we can instead have a very limited on-push hook that only fires
-  # when github ci config is changed.
-  push:
-    push:
-    branches-ignore: # ignore any release- or edge-related thing (handled elsewhere)
-      - 'edge'
+      - '.github/workflows/docs-push.yaml'
+      - '.github/actions/python/**'
+    branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
       - 'chore_release-**'
-      - 'chore_bump-**'
     tags-ignore:
       - '*'
-    paths:
-      - '.github/workflows/docs-pull-request-target.yaml'
-      - '.github/actions/python/**'
 
 defaults:
   run:
