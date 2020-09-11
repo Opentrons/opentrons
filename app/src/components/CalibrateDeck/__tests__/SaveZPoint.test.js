@@ -24,6 +24,7 @@ describe('SaveZPoint', () => {
   const getVideo = wrapper => wrapper.find(`source`)
 
   beforeEach(() => {
+    jest.useFakeTimers()
     render = (props = {}) => {
       const {
         pipMount = 'left',
@@ -47,6 +48,8 @@ describe('SaveZPoint', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
+    jest.clearAllTimers()
+    jest.useRealTimers()
   })
 
   it('displays proper asset', () => {
@@ -106,6 +109,7 @@ describe('SaveZPoint', () => {
 
     act(() => getSaveButton(wrapper).invoke('onClick')())
     wrapper.update()
+    jest.runAllTimers()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.deckCalCommands.SAVE_OFFSET

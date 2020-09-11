@@ -22,7 +22,10 @@ export function CompleteConfirmation(
 ): React.Node {
   const exitSession = () => {
     props.sendSessionCommand(Sessions.deckCalCommands.EXIT)
-    props.deleteSession()
+    // TODO: IMMEDIATELY use actualy epic for managing chained dependent commands
+    setTimeout(() => {
+      props.deleteSession()
+    }, 300)
   }
   return (
     <Flex

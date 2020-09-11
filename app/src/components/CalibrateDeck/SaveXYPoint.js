@@ -125,7 +125,10 @@ export function SaveXYPoint(props: CalibrateDeckChildProps): React.Node {
 
   const savePoint = () => {
     sendSessionCommand(Sessions.deckCalCommands.SAVE_OFFSET)
-    sendSessionCommand(proceedCommand)
+    // TODO: IMMEDIATELY use actualy epic for managing chained dependent commands
+    setTimeout(() => {
+      sendSessionCommand(proceedCommand)
+    }, 300)
   }
 
   const buttonText = buttonTextByCurrentStep[currentStep] || ''
