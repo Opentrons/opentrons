@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from datetime import datetime, timezone
 from robot_server.system import time
 from robot_server.system import errors
@@ -53,8 +53,9 @@ async def test_set_time_synchronized_error_response(mock_status_dict):
 
     time._time_status = MagicMock(side_effect=async_mock_time_status)
 
-    with pytest.raises(errors.SystemTimeAlreadySynchronized):
-        await time.set_system_time(datetime.now())
+    with patch("robot_server.system.time.IS_ROBOT", new=True):
+        with pytest.raises(errors.SystemTimeAlreadySynchronized):
+            await time.set_system_time(datetime.now())
 
 
 async def test_set_time_general_error_response(mock_status_dict):
@@ -87,12 +88,13 @@ async def test_set_time_response(mock_status_dict, mock_time):
     time._time_status = MagicMock(side_effect=async_mock_time_status)
     time._set_time = MagicMock(side_effect=async_mock_set_time)
 
-    # System time gets set successfully
-    time._set_time.assert_not_called()
-    await time.set_system_time(mock_time)
-    time._set_time.assert_called_once()
+    with patch("robot_server.system.time.IS_ROBOT", new=True):
+        # System time gets set successfully
+        time._set_time.assert_not_called()
+        await time.set_system_time(mock_time)
+        time._set_time.assert_called_once()
 
-    # Datetime is converted to special format with UTC timezone for _set_time
-    await time.set_system_time(datetime.fromisoformat(
-        "2020-08-14T16:44:16-05:00"))   # from EST
-    time._set_time.assert_called_with("2020-08-14 21:44:16")  # to UTC
+        # Datetime is converted to the correct format with UTC for _set_time
+        await time.set_system_time(datetime.fromisoformat(
+            "2020-08-14T16:44:16-05:00"))   # from EST
+        time._set_time.assert_called_with("2020-08-14 21:44:16")  # to UTC

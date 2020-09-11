@@ -28,3 +28,4 @@ stages:
           serialLog: /logs/serial.log
           # Specific link can change.
           apiSpec: !re_match "/openapi.*"
+          systemTime: /system/time

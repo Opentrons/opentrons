@@ -14,6 +14,9 @@ class Links(BaseModel):
     apiSpec: str = \
         Field(...,
               description="The URI to this API specification")
+    systemTime: str = \
+        Field(...,
+              description="The URI for system time information")
 
 
 class Health(BaseModel):
@@ -61,7 +64,8 @@ class Health(BaseModel):
                   "links": {
                     "apiLog": "/logs/api.log",
                     "serialLog": "/logs/serial.log",
-                    "apiSpec": "/openapi.json"
+                    "apiSpec": "/openapi.json",
+                    "systemTime": "/system/time"
                   }
                 }
         }

@@ -154,7 +154,7 @@ class CommonErrorDef(ErrorDef):
     NOT_IMPLEMENTED = ErrorCreateDef(
         status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
         title='Not implemented',
-        format_string='Method not implemented')
+        format_string='Method not implemented. {error}')
     RESOURCE_NOT_FOUND = ErrorCreateDef(
         status_code=status_codes.HTTP_404_NOT_FOUND,
         title='Resource Not Found',
