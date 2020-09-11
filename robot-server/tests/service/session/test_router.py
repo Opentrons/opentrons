@@ -161,7 +161,7 @@ def test_create_session(api_client,
             'sessions': {
                 'href': '/sessions'
             },
-            'sessionsById': {
+            'sessionById': {
                 'href': '/sessions/{sessionId}'
             }
         }
@@ -178,7 +178,7 @@ def test_delete_session_not_found(api_client):
             'detail': "Resource type 'session' with id 'check' was not found",
             'links': {
                 'self': {'href': '/sessions'},
-                'sessionsById': {'href': '/sessions/{sessionId}'}
+                'sessionById': {'href': '/sessions/{sessionId}'}
             },
             'status': '404',
             'title': 'Resource Not Found'
@@ -200,7 +200,7 @@ def test_delete_session(api_client,
             'self': {
                 'href': '/sessions',
             },
-            'sessionsById': {
+            'sessionById': {
                 'href': '/sessions/{sessionId}'
             },
         }
@@ -215,7 +215,7 @@ def test_get_session_not_found(api_client):
             'detail': "Resource type 'session' with id '1234' was not found",
             'links': {
                 'self': {'href': '/sessions'},
-                'sessionsById': {'href': '/sessions/{sessionId}'}
+                'sessionById': {'href': '/sessions/{sessionId}'}
             },
             'status': '404',
             'title': 'Resource Not Found'
@@ -241,7 +241,7 @@ def test_get_session(api_client,
             'sessions': {
                 'href': '/sessions'
             },
-            'sessionsById': {
+            'sessionById': {
                 'href': '/sessions/{sessionId}'
             }
         }
@@ -291,7 +291,7 @@ def test_execute_command_no_session(api_client, mock_session_meta):
             'detail': f"Resource type 'session' with id '{mock_session_meta.identifier}' was not found",  # noqa: e5011
             'links': {
                 'self': {'href': '/sessions'},
-                'sessionsById': {'href': '/sessions/{sessionId}'}
+                'sessionById': {'href': '/sessions/{sessionId}'}
             },
             'status': '404',
             'title': 'Resource Not Found'
@@ -346,7 +346,7 @@ def test_execute_command(api_client,
             'sessions': {
                 'href': '/sessions'
             },
-            'sessionsById': {
+            'sessionById': {
                 'href': '/sessions/{sessionId}'
             },
         }
@@ -399,7 +399,7 @@ def test_execute_command_no_body(api_client,
             'sessions': {
                 'href': '/sessions'
             },
-            'sessionsById': {
+            'sessionById': {
                 'href': '/sessions/{sessionId}'
             },
         }

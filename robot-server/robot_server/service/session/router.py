@@ -168,6 +168,12 @@ async def session_command_execute_handler(
     )
 
 
+ROOT_RESOURCE = ResourceLink(
+    href=router.url_path_for(get_sessions_handler.__name__)
+)
+SESSIONS_BY_ID_RESOURCE = ResourceLink(href=PATH_SESSION_BY_ID)
+
+
 def get_valid_session_links(session_id: route_models.IdentifierType,
                             api_router: APIRouter) \
         -> ResourceLinks:
@@ -176,21 +182,19 @@ def get_valid_session_links(session_id: route_models.IdentifierType,
         ResourceLinkKey.self: ResourceLink(href=api_router.url_path_for(
             get_session_handler.__name__,
             sessionId=session_id)),
-        "commandExecute": ResourceLink(href=api_router.url_path_for(
-            session_command_execute_handler.__name__,
-            sessionId=session_id)),
-        "sessions": ResourceLink(href=api_router.url_path_for(
-            get_sessions_handler.__name__)),
-        "sessionsById": ResourceLink(href=PATH_SESSION_BY_ID),
+        ResourceLinkKey.session_command_execute: ResourceLink(
+            href=api_router.url_path_for(
+                session_command_execute_handler.__name__,
+                sessionId=session_id)
+        ),
+        ResourceLinkKey.sessions: ROOT_RESOURCE,
+        ResourceLinkKey.session_by_id: SESSIONS_BY_ID_RESOURCE,
     }
 
 
 def get_sessions_links(api_router: APIRouter) -> ResourceLinks:
     """Get the valid links for the /sessions"""
     return {
-        ResourceLinkKey.self:
-            ResourceLink(href=api_router.url_path_for(
-                get_sessions_handler.__name__)
-            ),
-        "sessionsById": ResourceLink(href=PATH_SESSION_BY_ID),
+        ResourceLinkKey.self: ROOT_RESOURCE,
+        ResourceLinkKey.session_by_id: SESSIONS_BY_ID_RESOURCE,
     }

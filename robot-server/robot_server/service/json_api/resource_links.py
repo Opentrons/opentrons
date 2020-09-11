@@ -15,6 +15,11 @@ class ResourceLink(BaseModel):
 class ResourceLinkKey(str, Enum):
     # The key indicating the link to own resource
     self = "self"
+    protocols = "protocols"
+    protocol_by_id = "protocolById"
+    sessions = "sessions"
+    session_by_id = "sessionById"
+    session_command_execute = "commandExecute"
 
 
 ResourceLinks = typing.Dict[str, ResourceLink]

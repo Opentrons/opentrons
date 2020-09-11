@@ -117,13 +117,15 @@ def _to_response(uploaded_protocol: UploadedProtocol) \
     )
 
 
+ROOT_RESOURCE = ResourceLink(href=router.url_path_for(get_protocols.__name__))
+PROTOCOL_BY_ID_RESOURCE = ResourceLink(href=PATH_PROTOCOL_ID)
+
+
 def get_root_links(api_router: APIRouter) -> ResourceLinks:
     """Get resource links for root path handlers"""
     return {
-        ResourceLinkKey.self: ResourceLink(
-            href=api_router.url_path_for(get_protocols.__name__)
-        ),
-        "protocolById": ResourceLink(href=PATH_PROTOCOL_ID),
+        ResourceLinkKey.self: ROOT_RESOURCE,
+        ResourceLinkKey.protocol_by_id: PROTOCOL_BY_ID_RESOURCE,
     }
 
 
@@ -134,8 +136,6 @@ def get_protocol_links(api_router: APIRouter, protocol_id: str) \
         ResourceLinkKey.self: ResourceLink(
             href=api_router.url_path_for(get_protocol.__name__,
                                          protocolId=protocol_id)),
-        "protocols": ResourceLink(
-            href=api_router.url_path_for(get_protocols.__name__)
-        ),
-        "protocolById": ResourceLink(href=PATH_PROTOCOL_ID)
+        ResourceLinkKey.protocols: ROOT_RESOURCE,
+        ResourceLinkKey.protocol_by_id: PROTOCOL_BY_ID_RESOURCE
     }
