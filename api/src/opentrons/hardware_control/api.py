@@ -1545,7 +1545,9 @@ class API(HardwareAPILike):
 
         await self.retract(mount, retract_target)
 
-    def set_current_tiprack_diameter(self, mount, tiprack_diameter):
+    def set_current_tiprack_diameter(
+            self, mount: Union[top_types.Mount, PipettePair],
+            tiprack_diameter: float):
         instruments = self._instruments_for(mount)
         for instr in instruments:
             assert instr[0]
@@ -1554,7 +1556,9 @@ class API(HardwareAPILike):
                 f"{instr[1]}, tip diameter: {tiprack_diameter} mm")
             instr[0].current_tiprack_diameter = tiprack_diameter
 
-    def set_working_volume(self, mount, tip_volume):
+    def set_working_volume(
+            self, mount: Union[top_types.Mount, PipettePair],
+            tip_volume: int):
         instruments = self._instruments_for(mount)
         for instr in instruments:
             assert instr[0]

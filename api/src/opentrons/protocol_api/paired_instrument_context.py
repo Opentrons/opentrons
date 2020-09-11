@@ -6,18 +6,20 @@ from typing import TYPE_CHECKING, Union, Tuple, List
 from opentrons import types
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion
+from opentrons.protocols.implementations.paired_instrument import\
+    PairedInstrument
 
 from opentrons.protocols.api_support.util import (
     requires_version, labware_column_shift)
 from .labware import (
     Labware, Well, OutOfTipsError, select_tiprack_from_list_paired_pipettes,
     filter_tipracks_to_start, quirks_from_any_parent)
-from .paired_instrument import PairedInstrument
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
     from .instrument_context import InstrumentContext
     from opentrons.hardware_control import types as hc_types
+    from opentrons.protocols.api_support.util import HardwareManager
 
 
 SECONDARY_WELL_SPACING = 4
@@ -37,27 +39,27 @@ class PairedInstrumentContext(CommandPublisher):
                  primary_instrument: InstrumentContext,
                  secondary_instrument: InstrumentContext,
                  ctx: ProtocolContext,
-                 mount: hc_types.PipettePair,
+                 pair_policy: hc_types.PipettePair,
                  api_version: APIVersion,
-                 hardware_manager,
+                 hardware_manager: HardwareManager,
                  trash: Labware,
                  log_parent: logging.Logger) -> None:
         self._instruments = {
-            mount.primary: primary_instrument,
-            mount.secondary: secondary_instrument}
+            pair_policy.primary: primary_instrument,
+            pair_policy.secondary: secondary_instrument}
         self._api_version = api_version
         self._log = log_parent.getChild(repr(self))
         self._tip_racks = list(
             set(primary_instrument.tip_racks) &
             set(secondary_instrument.tip_racks))
-        self._mount = mount
+        self._pair_policy = pair_policy
 
         self._starting_tip: Union[Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
 
         self.trash_container = trash
         self.paired_instrument_obj = PairedInstrument(
-            primary_instrument, secondary_instrument, mount,
+            primary_instrument, secondary_instrument, pair_policy,
             ctx, hardware_manager, self._log)
 
     @property  # type: ignore
@@ -96,19 +98,18 @@ class PairedInstrumentContext(CommandPublisher):
             increment: float = None) -> PairedInstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands with
+        a paired pipette object.
 
         If no location is passed, the Pipette will pick up the next available
-        tip in its :py:attr:`InstrumentContext.tip_racks` list. Pick up tip
-        will determine the next available tip based on both the primary
+        tip in its :py:attr:`PairedInstrumentContext.tip_racks` list. Pick up
+        tip will determine the next available tip based on both the primary
         and secondary target.
 
-        Since the XY position is determined by the primary pipette, you
-        must pass in the tiprack location that you wish to move the
-        pipette to. Based on pipette spacing, the robot will determine
-        how to move the secondary pipette.
+        If you choose to pass in a tip location, you must pass in the
+        tiprack location that you wish to move based on the primary pipette.
 
-        The tip to pick up can be manually specified with the `location`
-        argument. The `location` argument can be specified in several ways:
+        The tip to pick up can be manually specified with the ``location``
+        argument. The ``location`` argument can be specified in several ways:
 
         * If the only thing to specify is which well from which to pick
           up a tip, `location` can be a :py:class:`.Well`. For instance,
@@ -116,7 +117,8 @@ class PairedInstrumentContext(CommandPublisher):
           pick up a specific tip from it with
           ``instr.pick_up_tip(tiprack.wells()[0])``. This style of call can
           be used to make the robot pick up a tip from a tip rack that
-          was not specified when creating the :py:class:`.InstrumentContext`.
+          was not specified when creating the
+          :py:class:`.PairedInstrumentContext`.
 
         * If the position to move to in the well needs to be specified,
           for instance to tell the robot to run its pick up tip routine
@@ -148,10 +150,28 @@ class PairedInstrumentContext(CommandPublisher):
 
         .. note::
 
-        The current spacing of the two pipettes is approximately 34 milimeters,
-        or 5 columns in a 96 well SBS footprint. In practice, this means that
-        you can only pick up from 10 columns of the tiprack rather than the
-        full 12 columns of a 96 SBS footprint.
+            The current spacing of the two pipettes is approximately 34
+            millimeters, or 5 columns in a 96 well SBS footprint.
+            In practice, this means that you can only pick up from 10
+            columns of the tiprack rather than the full 12 columns of a 96
+            SBS footprint when utilizing the
+            :py:attr:`PairedInstrumentContext.pick_up_tip` command.
+            You can, however, use the regular
+            :py:attr:`InstrumentContext.pick_up_tip` to pick up the
+            remaining tips from the tiprack. See the code snippet below.
+
+        .. code-block:: python
+
+            >>> tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
+            >>> left = ctx.load_instrument('p300_multi', 'left', tip_racks=[tiprack])  # noqa(E501)
+            >>> right = ctx.load_instrument('p300_multi', 'right', tip_racks=[tiprack])  # noqa(E501)
+            >>> paired = right.pair_with(left)
+            >>> paired.pick_up_tip() # Pick up tips from the first and fifth column  # noqa(E501)
+            >>> paired.drop_tip()
+            >>> left.pick_up_tip() # Pick up tips from the second column
+            >>> left.drop_tip()
+            >>> right.pick_up_tip() # Pick up tips from third column
+            >>> right.drop_tip()
         """
         if location and isinstance(location, types.Location):
             if isinstance(location.labware, Labware):
@@ -178,7 +198,7 @@ class PairedInstrumentContext(CommandPublisher):
         # We must check that you can also pick up from
         # that tiprack with the second pipette attached.
         secondary_target = self._get_secondary_target(tiprack, target)
-        primary_pipette = self._instruments[self._mount.primary]
+        primary_pipette = self._instruments[self._pair_policy.primary]
         tip_length = primary_pipette._tip_length_for(tiprack)
         self.paired_instrument_obj.pick_up_tip(
             target, secondary_target, tiprack, presses, increment, tip_length)
@@ -198,13 +218,11 @@ class PairedInstrumentContext(CommandPublisher):
         tips into :py:attr:`trash_container`, which if not specified defaults
         to the fixed trash in slot 12.
 
-        Since the XY position is determined by the primary pipette, you
-        must pass in the tiprack location that you wish to move the
-        pipette to. Based on pipette spacing, the robot will determine
-        how to move the secondary pipette.
+        If you pass in a location, you must pass in the tiprack location that
+        you wish to move based on the primary pipette.
 
         The location in which to drop the tip can be manually specified with
-        the `location` argument. The `location` argument can be specified in
+        the ``location`` argument. The ``location`` argument can be specified
         several ways:
 
             - If the only thing to specify is which well into which to drop
@@ -249,7 +267,7 @@ class PairedInstrumentContext(CommandPublisher):
             if 'fixedTrash' in quirks_from_any_parent(location):
                 target = location.top()
             else:
-                primary_pipette = self._instruments[self._mount.primary]
+                primary_pipette = self._instruments[self._pair_policy.primary]
                 target = self._drop_tip_target(location, primary_pipette)
         elif not location:
             target = self.trash_container.wells()[0].top()
@@ -323,7 +341,7 @@ class PairedInstrumentContext(CommandPublisher):
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             f'{loc}')
-        primary_pipette = self._instruments[self._mount.primary]
+        primary_pipette = self._instruments[self._pair_policy.primary]
         drop_loc = self._drop_tip_target(loc, primary_pipette)
         self.drop_tip(drop_loc, home_after=home_after)
         return self
@@ -349,7 +367,7 @@ class PairedInstrumentContext(CommandPublisher):
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
         if not speed:
-            primary = self._instruments[self._mount.primary]
+            primary = self._instruments[self._pair_policy.primary]
             speed = primary.default_speed
 
         self.paired_instrument_obj.move_to(
@@ -361,8 +379,10 @@ class PairedInstrumentContext(CommandPublisher):
         # both the primary and secondary tip with a spacing
         # of approximately 34 mm.
         start = self.starting_tip
-        primary_channels = self._instruments[self._mount.primary].channels
-        secondary_channels = self._instruments[self._mount.secondary].channels
+        primary_channels =\
+            self._instruments[self._pair_policy.primary].channels
+        secondary_channels =\
+            self._instruments[self._pair_policy.secondary].channels
         if start is None:
             return select_tiprack_from_list_paired_pipettes(
                 self.tip_racks, primary_channels, secondary_channels)
@@ -382,11 +402,10 @@ class PairedInstrumentContext(CommandPublisher):
 
     @staticmethod
     def _get_secondary_target(tiprack: Labware, primary_loc: Well) -> Well:
-        secondary_well_name = labware_column_shift(
-            primary_loc, SECONDARY_WELL_SPACING)
         try:
-            return tiprack[secondary_well_name]
-        except KeyError:
+            return labware_column_shift(
+                primary_loc, tiprack, SECONDARY_WELL_SPACING)
+        except IndexError:
             raise PipettePairPickUpTipError(
-                f'The location you specified {primary_loc} is'
+                f'The location you specified ({primary_loc}) is'
                 'incompatible with a PipettePair pickup.')

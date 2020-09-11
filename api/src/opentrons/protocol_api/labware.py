@@ -43,6 +43,10 @@ if TYPE_CHECKING:
 MODULE_LOG = logging.getLogger(__name__)
 
 
+class TipSelectionError(Exception):
+    pass
+
+
 class OutOfTipsError(Exception):
     pass
 
@@ -1076,12 +1080,16 @@ def select_tiprack_from_list(
     except IndexError:
         raise OutOfTipsError
 
-    if starting_point:
-        assert starting_point.parent is first
+    if starting_point and starting_point.parent is not first:
+        raise TipSelectionError(
+            'The starting tip you selected '
+            f'does not exist in {first}')
+    elif starting_point:
+        first_well = starting_point
     else:
-        starting_point = first.wells()[0]
+        first_well = first.wells()[0]
 
-    next_tip = first.next_tip(num_channels, starting_point)
+    next_tip = first.next_tip(num_channels, first_well)
     if next_tip:
         return first, next_tip
     else:
@@ -1093,22 +1101,38 @@ def select_tiprack_from_list_paired_pipettes(
         p_channels: int,
         s_channels: int,
         starting_point: Well = None) -> Tuple[Labware, Well]:
+    """
+    Helper function utilized in :py:attr:`PairedInstrumentContext`
+    to determine which pipette tiprack to pick up from.
 
+    If a starting point is specified, this method with check
+    that the parent of that tip was correctly filtered.
+
+    If a starting point is not specified, this method will filter
+    tipracks until it finds a well that is not empty.
+
+    :return: A Tuple of the tiprack and well to move to. In this
+    instance the starting well is specific to the primary pipette.
+    :raises TipSelectionError: if the starting tip specified
+    does not exist in the filtered tipracks.
+    """
     try:
         first, rest = split_tipracks(tip_racks)
     except IndexError:
         raise OutOfTipsError
 
-    if starting_point:
-        assert starting_point.parent is first
+    if starting_point and starting_point.parent is not first:
+        raise TipSelectionError(
+            'The starting tip you selected '
+            f'does not exist in {first}')
+    elif starting_point:
         primary_well = starting_point
     else:
         primary_well = first.wells()[0]
 
-    secondary_well = labware_column_shift(primary_well)
     try:
-        secondary_point = first[secondary_well]
-    except KeyError:
+        secondary_point = labware_column_shift(primary_well, first)
+    except IndexError:
         return select_tiprack_from_list_paired_pipettes(
             rest, p_channels, s_channels)
 

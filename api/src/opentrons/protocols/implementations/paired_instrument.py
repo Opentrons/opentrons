@@ -1,25 +1,34 @@
-from typing import Union, Optional
+from __future__ import annotations
+
+import logging
+from typing import TYPE_CHECKING, Union, Optional
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocol_api.labware import (
+    Labware, Well, quirks_from_any_parent)
+from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.geometry import planning
 
-from .labware import Labware, Well, quirks_from_any_parent
-from .module_contexts import ThermocyclerContext
+if TYPE_CHECKING:
+    from opentrons.protocol_api.protocol_context import ProtocolContext
+    from opentrons.protocol_api.instrument_context import InstrumentContext
+    from opentrons.hardware_control import types as hc_types
+    from opentrons.protocols.api_support.util import HardwareManager
 
 
 class PairedInstrument:
 
     def __init__(self,
-                 primary_instrument,
-                 secondary_instrument,
-                 mount,
-                 ctx,
-                 hardware_manager,
-                 log_parent):
+                 primary_instrument: InstrumentContext,
+                 secondary_instrument: InstrumentContext,
+                 pair_policy: hc_types.PipettePair,
+                 ctx: ProtocolContext,
+                 hardware_manager: HardwareManager,
+                 log_parent: logging.Logger):
         self.p_instrument = primary_instrument
         self.s_instrument = secondary_instrument
-        self._mount = mount
+        self._pair_policy = pair_policy
         self._ctx = ctx
         self._hw_manager = hardware_manager
         self._log = log_parent.getChild(repr(self))
@@ -33,19 +42,20 @@ class PairedInstrument:
         self.move_to(target.top())
 
         self._hw_manager.hardware.set_current_tiprack_diameter(
-            self._mount, target.diameter)
+            self._pair_policy, target.diameter)
         self._hw_manager.hardware.pick_up_tip(
-            self._mount, tip_length, presses, increment)
+            self._pair_policy, tip_length, presses, increment)
 
         self._hw_manager.hardware.set_working_volume(
-            self._mount, target.max_volume)
+            self._pair_policy, target.max_volume)
 
         tiprack.use_tips(target, self.p_instrument.channels)
         tiprack.use_tips(secondary_target, self.s_instrument.channels)
 
     def drop_tip(self, target: types.Location, home_after: bool):
         self.move_to(target)
-        self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
+        self._hw_manager.hardware.drop_tip(
+            self._pair_policy, home_after=home_after)
         return self
 
     def move_to(self, location: types.Location, force_direct: bool = False,
@@ -61,7 +71,7 @@ class PairedInstrument:
         cp_override = CriticalPoint.XY_CENTER if from_center else None
         from_loc = types.Location(
             self._hw_manager.hardware.gantry_position(
-                self._mount.primary, critical_point=cp_override),
+                self._pair_policy.primary, critical_point=cp_override),
             from_lw)
 
         for mod in self._ctx._modules:
@@ -70,10 +80,10 @@ class PairedInstrument:
 
         primary_height = \
             self._hw_manager.hardware.get_instrument_max_height(
-                self._mount.primary)
+                self._pair_policy.primary)
         secondary_height = \
             self._hw_manager.hardware.get_instrument_max_height(
-                self._mount.secondary)
+                self._pair_policy.secondary)
         moves = planning.plan_moves(from_loc, location, self._ctx.deck,
                                     min(primary_height, secondary_height),
                                     force_direct=force_direct,
@@ -84,8 +94,8 @@ class PairedInstrument:
         try:
             for move in moves:
                 self._hw_manager.hardware.move_to(
-                    self._mount, move[0], critical_point=move[1], speed=speed,
-                    max_speeds=self._ctx.max_speeds.data)
+                    self._pair_policy, move[0], critical_point=move[1],
+                    speed=speed, max_speeds=self._ctx.max_speeds.data)
         except Exception:
             self._ctx.location_cache = None
             raise
