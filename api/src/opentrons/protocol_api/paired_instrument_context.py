@@ -7,7 +7,8 @@ from opentrons import types
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion
 
-from opentrons.protocols.api_support.util import requires_version
+from opentrons.protocols.api_support.util import (
+    requires_version, labware_column_shift)
 from .labware import (
     Labware, Well, OutOfTipsError, select_tiprack_from_list_paired_pipettes,
     filter_tipracks_to_start, quirks_from_any_parent)
@@ -231,7 +232,7 @@ class PairedInstrumentContext(CommandPublisher):
 
         :returns: This instance
 
-        :raises TyepError: If a location is not relative to a well. 
+        :raises TyepError: If a location is not relative to a well.
         """
         if location and isinstance(location, types.Location):
             if isinstance(location.labware, Well):
@@ -356,6 +357,9 @@ class PairedInstrumentContext(CommandPublisher):
         return self
 
     def _next_available_tip(self) -> Tuple[Labware, Well]:
+        # Here we will find the next available tip for
+        # both the primary and secondary tip with a spacing
+        # of approximately 34 mm.
         start = self.starting_tip
         primary_channels = self._instruments[self._mount.primary].channels
         secondary_channels = self._instruments[self._mount.secondary].channels
@@ -378,9 +382,8 @@ class PairedInstrumentContext(CommandPublisher):
 
     @staticmethod
     def _get_secondary_target(tiprack: Labware, primary_loc: Well) -> Well:
-        primary_well = primary_loc.well_name
-        secondary_column = str(int(primary_well[1::]) + SECONDARY_WELL_SPACING)
-        secondary_well_name = primary_well[0] + secondary_column
+        secondary_well_name = labware_column_shift(
+            primary_loc, SECONDARY_WELL_SPACING)
         try:
             return tiprack[secondary_well_name]
         except KeyError:

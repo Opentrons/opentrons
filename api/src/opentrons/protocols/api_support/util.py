@@ -102,6 +102,13 @@ def build_edges(
     return [edge for edge in astuple(new_edges) if edge]
 
 
+def labware_column_shift(initial_well: 'Well', well_spacing: int = 4) -> str:
+    unshifted_well = initial_well.well_name
+    shifted_column = str(int(unshifted_well[1::]) + well_spacing)
+    shifted_well_name = unshifted_well[0] + shifted_column
+    return shifted_well_name
+
+
 def first_parent(loc: top_types.LocationLabware) -> Optional[str]:
     """ Return the topmost parent of this location. It should be
     either a string naming a slot or a None if the location isn't

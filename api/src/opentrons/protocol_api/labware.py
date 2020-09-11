@@ -23,7 +23,8 @@ from typing import (
 
 import jsonschema  # type: ignore
 
-from opentrons.protocols.api_support.util import ModifiedList, requires_version
+from opentrons.protocols.api_support.util import (
+    ModifiedList, requires_version, labware_column_shift)
 from opentrons.calibration_storage import get, helpers, modify
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
@@ -1091,7 +1092,6 @@ def select_tiprack_from_list_paired_pipettes(
         tip_racks: List[Labware],
         p_channels: int,
         s_channels: int,
-        spacing: int = 4,
         starting_point: Well = None) -> Tuple[Labware, Well]:
 
     try:
@@ -1101,12 +1101,16 @@ def select_tiprack_from_list_paired_pipettes(
 
     if starting_point:
         assert starting_point.parent is first
-        col = chr(ord(starting_point.well_name[1]) + spacing)
-        assert first.columns()[int(col)]
-        secondary_point = first.columns()[int(col)][0]
+        primary_well = starting_point
     else:
-        starting_point = first.wells()[0]
-        secondary_point = first.columns()[spacing][0]
+        primary_well = first.wells()[0]
+
+    secondary_well = labware_column_shift(primary_well)
+    try:
+        secondary_point = first[secondary_well]
+    except KeyError:
+        return select_tiprack_from_list_paired_pipettes(
+            rest, p_channels, s_channels)
 
     primary_next_tip = first.next_tip(p_channels, starting_point)
     secondary_next_tip = first.next_tip(s_channels, secondary_point)
