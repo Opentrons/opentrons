@@ -3,34 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.21.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.21.0-alpha.1...v3.21.0-alpha.2) (2020-09-11)
-
+# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
 
 ### Bug Fixes
 
 * **app:** temporary fix for chained command race conditions in cal flows to unblock user testing ([#6530](https://github.com/Opentrons/opentrons/issues/6530)) ([3c17d9e](https://github.com/Opentrons/opentrons/commit/3c17d9e))
 * **robot-server:** calibraiton flows - fix assert statements ([#6529](https://github.com/Opentrons/opentrons/issues/6529)) ([a269b0f](https://github.com/Opentrons/opentrons/commit/a269b0f))
-
-
-
-
-
-# [3.21.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.0-alpha.0...v3.21.0-alpha.1) (2020-09-11)
-
-
-### Bug Fixes
-
 * **robot-server:** tip length cal -  use nozzle height for tip length calculation ([#6527](https://github.com/Opentrons/opentrons/issues/6527)) ([b87df49](https://github.com/Opentrons/opentrons/commit/b87df49))
-
-
-
-
-
-# [3.21.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-alpha.0) (2020-09-10)
-
-
-### Bug Fixes
-
 * **api:** can't inhibit creating Session in build_and_prep if http protocol sessions are enabled because.... THATS HOW PROTOCOL SESSIONS RUN PROTOCOLS ([#6345](https://github.com/Opentrons/opentrons/issues/6345)) ([b49c2a1](https://github.com/Opentrons/opentrons/commit/b49c2a1))
 * **api:** Document deck slot deletion ([#6260](https://github.com/Opentrons/opentrons/issues/6260)) ([b37e23a](https://github.com/Opentrons/opentrons/commit/b37e23a)), closes [#6214](https://github.com/Opentrons/opentrons/issues/6214)
 * **api:** fix Deck.get_slot_center z value ([#6435](https://github.com/Opentrons/opentrons/issues/6435)) ([ddc8965](https://github.com/Opentrons/opentrons/commit/ddc8965))

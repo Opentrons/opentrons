@@ -3,33 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.21.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.21.0-alpha.1...v3.21.0-alpha.2) (2020-09-11)
-
+# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
 
 ### Bug Fixes
 
 * **robot-server:** calibraiton flows - fix assert statements ([#6529](https://github.com/Opentrons/opentrons/issues/6529)) ([a269b0f](https://github.com/Opentrons/opentrons/commit/a269b0f))
-
-
-
-
-
-# [3.21.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.0-alpha.0...v3.21.0-alpha.1) (2020-09-11)
-
-
-### Bug Fixes
-
 * **robot-server:** tip length cal -  use nozzle height for tip length calculation ([#6527](https://github.com/Opentrons/opentrons/issues/6527)) ([b87df49](https://github.com/Opentrons/opentrons/commit/b87df49))
-
-
-
-
-
-# [3.21.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-alpha.0) (2020-09-10)
-
-
-### Bug Fixes
-
 * **robot-server:** add inspectingTip state to deck calibration ([#6313](https://github.com/Opentrons/opentrons/issues/6313)) ([c1fd90a](https://github.com/Opentrons/opentrons/commit/c1fd90a))
 * **robot-server:** correct move to deck safety buffer in y ([#6478](https://github.com/Opentrons/opentrons/issues/6478)) ([a124bb5](https://github.com/Opentrons/opentrons/commit/a124bb5))
 * **robot-server:** datetime responses are missing timezone. ([#6375](https://github.com/Opentrons/opentrons/issues/6375)) ([1a65835](https://github.com/Opentrons/opentrons/commit/1a65835)), closes [#6374](https://github.com/Opentrons/opentrons/issues/6374)

@@ -3,30 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.21.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.21.0-alpha.1...v3.21.0-alpha.2) (2020-09-11)
-
+# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
 
 ### Bug Fixes
 
 * **app:** temporary fix for chained command race conditions in cal flows to unblock user testing ([#6530](https://github.com/Opentrons/opentrons/issues/6530)) ([3c17d9e](https://github.com/Opentrons/opentrons/commit/3c17d9e))
-
-
-
-
-
-# [3.21.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.0-alpha.0...v3.21.0-alpha.1) (2020-09-11)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [3.21.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-alpha.0) (2020-09-10)
-
-
-### Bug Fixes
-
 * **app:** do not set the user's Intercom name to "Unknown User" ([#6468](https://github.com/Opentrons/opentrons/issues/6468)) ([66662a4](https://github.com/Opentrons/opentrons/commit/66662a4)), closes [#6461](https://github.com/Opentrons/opentrons/issues/6461)
 * **app:** fix layout of calibration panel complete confirmation button ([#6509](https://github.com/Opentrons/opentrons/issues/6509)) ([093bddb](https://github.com/Opentrons/opentrons/commit/093bddb))
 * **app:** flip modules on deck map when in slots 3, 6, or 9 ([#6383](https://github.com/Opentrons/opentrons/issues/6383)) ([d0347da](https://github.com/Opentrons/opentrons/commit/d0347da)), closes [#4422](https://github.com/Opentrons/opentrons/issues/4422)
