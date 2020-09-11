@@ -22,7 +22,7 @@ on:
     tags-ignore:
       - '*'
     paths:
-      - '.github/workflows/shared-data-pull-request.yaml'
+      - '.github/workflows/shared-data-pull-request-target.yaml'
       - '.github/actions/python/**'
 
 defaults:

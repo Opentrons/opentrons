@@ -25,7 +25,7 @@ on:
     tags-ignore:
       - '*'
     paths:
-      - '.github/workflows/robot-server-pull-request.yaml'
+      - '.github/workflows/robot-server-pull-request-target.yaml'
       - '.github/actions/python/**'
 
 defaults:

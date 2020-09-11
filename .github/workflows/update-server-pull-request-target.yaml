@@ -22,7 +22,7 @@ on:
     tags-ignore:
       - '*'
     paths:
-      - '.github/workflows/update-server-pull-request.yaml'
+      - '.github/workflows/update-server-pull-request-target.yaml'
       - '.github/actions/python/**'
 
 defaults:

@@ -24,7 +24,7 @@ on:
     tags-ignore:
       - '*'
     paths:
-      - '.github/workflows/docs-pull-request.yaml'
+      - '.github/workflows/docs-pull-request-target.yaml'
       - '.github/actions/python/**'
 
 defaults:
