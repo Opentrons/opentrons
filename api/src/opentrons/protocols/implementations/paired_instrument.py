@@ -102,3 +102,54 @@ class PairedInstrument:
         else:
             self._ctx.location_cache = location
         return self
+
+    def aspirate(volume, location, rate):
+        if location:
+            self.move_to(location)
+        elif self._ctx.location_cache:
+            self.move_to(self._ctx.location_cache)
+        else:
+            raise RuntimeError(
+                "If aspirate is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is.")     
+
+    def dispense(volume, location, rate):
+        if location:
+            self.move_to(location)
+        elif self._ctx.location_cache:
+            self.move_to(self._ctx.location_cache)
+        else:
+            raise RuntimeError(
+                "If dispense is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "aspirate) must previously have been called so the robot "
+                "knows where it is.")
+        self._hw_manager.hardware.dispense(self._mount, volume, rate)
+
+    def blow_out(location: types.Location):
+        if location:
+            self.move_to(location)
+        elif self._ctx.location_cache:
+            # if location cache exists, pipette blows out immediately at
+            # current location, no movement is needed
+            pass
+        else:
+            raise RuntimeError(
+                "If blow out is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is.")
+        self._hw_manager.hardware.blow_out(self._mount)
+    
+    def air_gap(volume: float, height: float):
+        loc = self._ctx.location_cache
+        if not loc or not isinstance(loc.labware, Well):
+            raise RuntimeError('No previous Well cached to perform air gap')
+        target = loc.labware.top(height)
+        self.move_to(target)
+        self.aspirate(volume)
+
+    def touch_tip():
+        return None

@@ -103,10 +103,6 @@ def build_edges(
     return [edge for edge in astuple(new_edges) if edge]
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Fixup: docstrings and file locations
 def labware_column_shift(
         initial_well: 'Well', tiprack: 'Labware',
         well_spacing: int = 4) -> 'Well':
@@ -115,16 +111,6 @@ def labware_column_shift(
     shifted_column = unshifted_column + well_spacing
     shifted_well = unshifted_index % 8
     return tiprack.columns()[shifted_column][shifted_well]
-<<<<<<< HEAD
-=======
-def labware_column_shift(initial_well: 'Well', well_spacing: int = 4) -> str:
-    unshifted_well = initial_well.well_name
-    shifted_column = str(int(unshifted_well[1::]) + well_spacing)
-    shifted_well_name = unshifted_well[0] + shifted_column
-    return shifted_well_name
->>>>>>> Fixup: slightly modify tip tracking
-=======
->>>>>>> Fixup: docstrings and file locations
 
 
 def first_parent(loc: top_types.LocationLabware) -> Optional[str]:
