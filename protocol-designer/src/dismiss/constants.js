@@ -1,5 +1,5 @@
 // @flow
-export const PRESAVED_STEP_FORM_PSEUDO_ID = '__PRESAVED_FORM_DISMISS__'
+import { PRESAVED_STEP_ID } from '../steplist/types'
 
 export const getStepIdOrPseudoId = (stepId: ?string): string =>
-  stepId || PRESAVED_STEP_FORM_PSEUDO_ID
+  stepId || PRESAVED_STEP_ID

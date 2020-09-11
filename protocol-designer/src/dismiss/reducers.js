@@ -4,7 +4,8 @@ import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 
 import { getPDMetadata } from '../file-types'
-import { getStepIdOrPseudoId, PRESAVED_STEP_FORM_PSEUDO_ID } from './constants'
+import { getStepIdOrPseudoId } from './constants'
+import { PRESAVED_STEP_ID } from '../steplist/types'
 import type { Reducer } from 'redux'
 import type { DismissFormWarning, DismissTimelineWarning } from './actions'
 import type { BaseState, Action } from '../types'
@@ -77,8 +78,8 @@ const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
       state: DismissedWarningState,
       action: CancelStepFormAction
     ): DismissedWarningState => ({
-      form: omit(state.form, PRESAVED_STEP_FORM_PSEUDO_ID),
-      timeline: omit(state.timeline, PRESAVED_STEP_FORM_PSEUDO_ID),
+      form: omit(state.form, PRESAVED_STEP_ID),
+      timeline: omit(state.timeline, PRESAVED_STEP_ID),
     }),
   },
   { form: {}, timeline: {} }
