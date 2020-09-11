@@ -129,8 +129,9 @@ class PipetteOffsetCalibrationUserFlow:
 
     async def _get_current_point(
             self,
-            critical_point: CriticalPoint = None) -> Point:
-        return await uf.get_current_point(self, critical_point)
+            critical_point: Optional[CriticalPoint]) -> Point:
+        return await self._hardware.gantry_position(self._mount,
+                                                    critical_point)
 
     async def load_labware(self):
         pass
