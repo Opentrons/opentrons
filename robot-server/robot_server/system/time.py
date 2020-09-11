@@ -49,10 +49,6 @@ async def _set_time(time: str,
     :return: tuple of output of date --set (usually the new date)
         & error, if any.
     """
-    if not IS_ROBOT:
-        raise errors.SystemSetTimeException(
-            msg="Not supported on dev server.",
-            definition=CommonErrorDef.NOT_IMPLEMENTED)
     proc = await asyncio.create_subprocess_shell(
         f'date --utc --set \"{time}\"',
         stdout=asyncio.subprocess.PIPE,
@@ -79,6 +75,11 @@ async def set_system_time(new_time_dt: datetime,
     Raise error with message, if any.
     :return: current date read.
     """
+    if not IS_ROBOT:
+        raise errors.SystemSetTimeException(
+            msg="Not supported on dev server.",
+            definition=CommonErrorDef.NOT_IMPLEMENTED)
+
     status = await _time_status(loop)
     if status.get('LocalRTC') is True or status.get('NTPSynchronized') is True:
         # TODO: Update this to handle RTC sync correctly once we introduce RTC
