@@ -1425,10 +1425,14 @@ class InstrumentContext(CommandPublisher):
         return PairedInstrumentContext(
             primary_instrument=self, secondary_instrument=instrument,
 <<<<<<< HEAD
+<<<<<<< HEAD
             ctx=self._ctx, pair_policy=PipettePair.of_mount(self._mount),
 =======
             ctx=self._ctx, mount=PipettePair.of_mount(self._mount),
 >>>>>>> feat(api): Add all tip handling and tracking functions for the paired instrument context
+=======
+            ctx=self._ctx, pair_policy=PipettePair.of_mount(self._mount),
+>>>>>>> Fixup: docstrings and file locations
             api_version=self.api_version, hardware_manager=self._hw_manager,
             trash=self.trash_container, log_parent=self._log)
 

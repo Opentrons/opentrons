@@ -60,9 +60,6 @@ class PairedInstrumentContext(CommandPublisher):
         self._starting_tip: Union[Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
 
-        self._starting_tip: Union[Well, None] = None
-        self._last_tip_picked_up_from: Union[Well, None] = None
-
         self.trash_container = trash
         self.paired_instrument_obj = PairedInstrument(
             primary_instrument, secondary_instrument, pair_policy,
