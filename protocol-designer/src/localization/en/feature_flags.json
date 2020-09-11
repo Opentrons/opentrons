@@ -7,5 +7,9 @@
     "title": "Disable module placement restrictions",
     "description_1": "Turn off all restrictions on module placement and related pipette crash guidance.",
     "description_2": "NOT recommended! Switching from default positions may cause crashes and the Protocol Designer cannot yet give guidance on what to expect. Use at your own discretion. "
+  },
+  "OT_PD_ENABLE_MIX_DELAY": {
+    "title": "Enable Mix > Delay advanced settings for Mix step",
+    "description": "Enable Delay advanced settings for Mix step"
   }
 }

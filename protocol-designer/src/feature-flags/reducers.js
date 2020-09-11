@@ -18,11 +18,12 @@ import type { Action } from '../types'
 // in the browser session, then corresponding env vars can be used to set the
 // initial values. Eg `OT_PD_PRERELEASE_MODE=1 make -C protocol-designer dev`
 // will initialize PRERELEASE_MODE to true (but as per the note above, that
-// initial value is only relevant matters if there is no persisted value already)
+// initial value is only relevant if there is no persisted value already)
 const initialFlags: Flags = {
   PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
+  OT_PD_ENABLE_MIX_DELAY: process.env.OT_PD_ENABLE_MIX_DELAY === '1' || false,
 }
 
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
