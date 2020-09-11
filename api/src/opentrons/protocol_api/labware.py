@@ -1091,8 +1091,8 @@ def select_tiprack_from_list_paired_pipettes(
         tip_racks: List[Labware],
         p_channels: int,
         s_channels: int,
-        spacing: int = 4, 
-        starting_point: Well = None) -> Tuple[Labware, Well, Well]:
+        spacing: int = 4,
+        starting_point: Well = None) -> Tuple[Labware, Well]:
 
     try:
         first, rest = split_tipracks(tip_racks)
@@ -1111,7 +1111,7 @@ def select_tiprack_from_list_paired_pipettes(
     primary_next_tip = first.next_tip(p_channels, starting_point)
     secondary_next_tip = first.next_tip(s_channels, secondary_point)
     if primary_next_tip and secondary_next_tip:
-        return first, primary_next_tip, secondary_next_tip
+        return first, primary_next_tip
     else:
         return select_tiprack_from_list_paired_pipettes(
             rest, p_channels, s_channels)

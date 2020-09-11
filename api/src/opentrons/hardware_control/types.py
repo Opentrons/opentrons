@@ -197,9 +197,6 @@ class PipettePair(enum.Enum):
         return pair[mount]
 
 
-
-
-
 class HardwareAction(enum.Enum):
     DROPTIP = enum.auto()
     ASPIRATE = enum.auto()
