@@ -130,7 +130,7 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
 
 
 async def move(user_flow: CalibrationUserFlow, to_loc: Location):
-    from_pt = await user_flow._get_current_point()
+    from_pt = await user_flow._get_current_point(None)
     from_loc = Location(from_pt, None)
     cp = user_flow._get_critical_point_override()
 

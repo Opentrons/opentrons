@@ -195,8 +195,11 @@ class DeckCalibrationUserFlow:
         return (CriticalPoint.FRONT_NOZZLE if
                 self._hw_pipette.config.channels == 8 else None)
 
-    async def _get_current_point(self) -> Point:
-        return await self._hardware.gantry_position(self._mount)
+    async def _get_current_point(
+            self,
+            critical_point: CriticalPoint = None) -> Point:
+        return await self._hardware.gantry_position(self._mount,
+                                                    critical_point)
 
     async def load_labware(self):
         pass
@@ -221,7 +224,8 @@ class DeckCalibrationUserFlow:
         await self._move(to_loc)
 
     def _get_move_to_point_loc_by_state(self) -> Location:
-        assert self._z_height_reference
+        assert self._z_height_reference is not None, \
+            "saveOffset has not been called yet"
         pt_id = MOVE_POINT_STATE_MAP[self._current_state]
         coords = self._deck.get_calibration_position(pt_id).position
         loc = Location(Point(*coords), None)
@@ -237,7 +241,7 @@ class DeckCalibrationUserFlow:
         await self._move(self._get_move_to_point_loc_by_state())
 
     async def save_offset(self):
-        cur_pt = await self._get_current_point()
+        cur_pt = await self._get_current_point(critical_point=None)
         if self.current_state == State.joggingToDeck:
             self._z_height_reference = cur_pt.z
         else:
