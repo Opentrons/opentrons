@@ -90,7 +90,10 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
 
   const savePoint = () => {
     sendSessionCommand(Sessions.sharedCalCommands.SAVE_OFFSET)
-    sendSessionCommand(Sessions.sharedCalCommands.MOVE_TO_POINT_ONE)
+    // TODO: IMMEDIATELY use actualy epic for managing chained dependent commands
+    setTimeout(() => {
+      sendSessionCommand(Sessions.sharedCalCommands.MOVE_TO_POINT_ONE)
+    }, 300)
   }
 
   return (

@@ -35,7 +35,10 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
   // session command upon a successful exit response
   const exitSession = () => {
     props.sendSessionCommand(Sessions.sharedCalCommands.EXIT)
-    props.deleteSession()
+    // TODO: IMMEDIATELY use actualy epic for managing chained dependent commands
+    setTimeout(() => {
+      props.deleteSession()
+    }, 300)
   }
   return (
     <Flex
