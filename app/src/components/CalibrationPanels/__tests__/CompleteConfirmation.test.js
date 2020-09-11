@@ -16,6 +16,7 @@ describe('CompleteConfirmation', () => {
     wrapper.find('button[title="Return tip to tip rack and exit"]')
 
   beforeEach(() => {
+    jest.useFakeTimers()
     render = (
       props: $Shape<React.ElementProps<typeof CompleteConfirmation>> = {}
     ) => {
@@ -44,6 +45,8 @@ describe('CompleteConfirmation', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+    jest.clearAllTimers()
+    jest.useRealTimers()
   })
 
   it('clicking continue sends exit command and deletes session', () => {
@@ -52,6 +55,7 @@ describe('CompleteConfirmation', () => {
     expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(false)
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
+    jest.runAllTimers()
     expect(mockDeleteSession).toHaveBeenCalled()
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.sharedCalCommands.EXIT
