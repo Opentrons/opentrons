@@ -107,8 +107,8 @@ class ProtocolRunner:
 class ProtocolRunnerContext:
     def __init__(self, protocol: UploadedProtocol):
         self._protocol = protocol
-        self._cwd = None
-        self._path = None
+        self._cwd: typing.Optional[str] = None
+        self._path: typing.Optional[typing.List[str]] = None
 
     def __enter__(self):
         self._cwd = os.getcwd()
@@ -121,5 +121,7 @@ class ProtocolRunnerContext:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Undo working directory and path modifications
-        os.chdir(self._cwd)
-        sys.path = self._path
+        if self._cwd:
+            os.chdir(self._cwd)
+        if self._path:
+            sys.path = self._path
