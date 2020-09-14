@@ -7,17 +7,16 @@ import { ErrorContents } from './ErrorContents'
 import { WarningContents } from './WarningContents'
 import { actions as dismissActions } from '../../dismiss'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
-import { getSelectedStepId } from '../../ui/steps'
+import { getNonNullSelectedItem } from '../../ui/steps/selectors'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { Alerts, type Props } from './Alerts'
 import type { CommandCreatorError } from '../../step-generation/types'
 import type { BaseState } from '../../types'
-import type { StepIdType } from '../../form-types'
 
 type SP = {|
   errors: $PropertyType<Props, 'errors'>,
   warnings: $PropertyType<Props, 'warnings'>,
-  _stepId: ?StepIdType,
+  _stepId: string,
 |}
 
 /** Errors and Warnings from step-generation are written for developers
@@ -46,7 +45,7 @@ function mapStateToProps(state: BaseState): SP {
       ),
       dismissId: warning.type,
     }))
-  const _stepId = getSelectedStepId(state)
+  const _stepId = getNonNullSelectedItem(state)?.id
 
   return {
     errors,
@@ -60,13 +59,14 @@ function mergeProps(
   dispatchProps: { dispatch: Dispatch<*> }
 ): Props {
   const { dispatch } = dispatchProps
+  const stepId = stateProps._stepId
   return {
     ...stateProps,
     dismissWarning: (dismissId: string) => {
       dispatch(
         dismissActions.dismissTimelineWarning({
           type: dismissId,
-          stepId: stateProps._stepId,
+          stepId,
         })
       )
     },

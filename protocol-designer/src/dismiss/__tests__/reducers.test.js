@@ -31,7 +31,7 @@ describe('dismissedWarnings reducer', () => {
       type: 'DISMISS_FORM_WARNING',
       payload: {
         type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
-        stepId: null, // no stepId
+        stepId: PRESAVED_STEP_ID,
       },
     }
     expect(dismissedWarnings(state, action)).toEqual({
@@ -63,7 +63,7 @@ describe('dismissedWarnings reducer', () => {
       type: 'DISMISS_TIMELINE_WARNING',
       payload: {
         type: 'ASPIRATE_MORE_THAN_WELL_CONTENTS',
-        stepId: null, // no stepId
+        stepId: PRESAVED_STEP_ID,
       },
     }
     expect(dismissedWarnings(state, action)).toEqual({
