@@ -209,7 +209,7 @@ class DeckCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def move_to_tip_rack(self):
-        point = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
+        point = self._tip_rack.wells()[0].top().point + \
                 MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
         await self._move(to_loc)
@@ -254,20 +254,19 @@ class DeckCalibrationUserFlow:
     def _save_attitude_matrix(self):
         e = tuplefy_cal_point_dicts(self._expected_points)
         a = tuplefy_cal_point_dicts(self._saved_points)
-        tiprack_hash = helpers.hash_labware_def(
-            self._deck[TIP_RACK_SLOT]._definition) + ''
-        robot_cal.save_attitude_matrix(
-            expected=e,
-            actual=a,
-            pipette_id=self._hw_pipette.pipette_id,
-            tiprack_hash=tiprack_hash)
+        tiprack_hash = helpers.hash_labware_def(self._tip_rack._definition)
+        pip_id = self._hw_pipette.pipette_id
+        assert pip_id
+        robot_cal.save_attitude_matrix(expected=e, actual=a, pipette_id=pip_id,
+                                       tiprack_hash=tiprack_hash)
 
     def _get_tip_length(self) -> float:
+        pip_id = self._hw_pipette.pipette_id
+        assert pip_id
         try:
-            return get.load_tip_length_calibration(
-                self._hw_pipette.pipette_id,  # type: ignore
-                self._tip_rack._definition,
-                '')['tipLength']
+            return get.load_tip_length_calibration(pip_id,
+                                                   self._tip_rack._definition,
+                                                   '')['tipLength']
         except TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(
                 self._tip_rack.uri,
