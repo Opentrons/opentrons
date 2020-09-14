@@ -50,7 +50,9 @@ class SessionType(str, Enum):
         IMPORTANT: Model definition must appear in SessionCreateParamType
         Union below.
         """
-        obj = str.__new__(cls, value)
+        # Ignoring type errors because this is exactly as described here
+        # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
+        obj = str.__new__(cls, value)  # type: ignore
         obj._value_ = value
         obj._model = create_param_model
         return obj
@@ -72,7 +74,7 @@ class SessionType(str, Enum):
     @property
     def model(self):
         """Get the data model of the create param model"""
-        return self._model
+        return self._model  # type: ignore
 
 
 """
@@ -124,7 +126,9 @@ class CommandDefinition(str, Enum):
         """
         namespace = cls.namespace()
         full_name = f"{namespace}.{value}" if namespace else value
-        obj = str.__new__(cls, full_name)
+        # Ignoring type errors because this is exactly as described here
+        # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
+        obj = str.__new__(cls, full_name)  # type: ignore
         obj._value_ = full_name
         obj._localname = value
         obj._model = model
@@ -133,7 +137,7 @@ class CommandDefinition(str, Enum):
     @property
     def model(self):
         """Get the data model of the payload of the command"""
-        return self._model
+        return self._model  # type: ignore
 
     @staticmethod
     def namespace():
@@ -147,7 +151,7 @@ class CommandDefinition(str, Enum):
     @property
     def localname(self):
         """Get the name of the command without the namespace"""
-        return self._localname
+        return self._localname  # type: ignore
 
 
 class RobotCommand(CommandDefinition):
