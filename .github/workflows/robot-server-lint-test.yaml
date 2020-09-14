@@ -26,6 +26,7 @@ on:
       - 'shared-data/*/**'
       - '!shared-data/js/**'
       - 'robot-server/**'
+  workflow_dispatch:
 
 defaults:
   run:

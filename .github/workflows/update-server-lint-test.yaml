@@ -24,6 +24,7 @@ on:
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
       - 'chore_release-*'
+  workflow_dispatch:
 
 defaults:
   run:

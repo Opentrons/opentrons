@@ -24,6 +24,7 @@ on:
       - 'chore_release-*'
     tags-ignore:
       - '*'
+  workflow_dispatch:
 
 
 defaults:
