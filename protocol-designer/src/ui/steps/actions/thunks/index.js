@@ -109,10 +109,14 @@ export type SaveStepFormAction = {|
   payload: FormData,
 |}
 
-export const _saveStepForm = (form: FormData): SaveStepFormAction => ({
-  type: SAVE_STEP_FORM,
-  payload: form,
-})
+export const _saveStepForm = (form: FormData): SaveStepFormAction => {
+  // if presaved, transform pseudo ID to real UUID upon save
+  const payload = form.id === PRESAVED_STEP_ID ? { ...form, id: uuid() } : form
+  return {
+    type: SAVE_STEP_FORM,
+    payload,
+  }
+}
 
 /** take unsavedForm state and put it into the payload */
 export const saveStepForm: () => ThunkAction<any> = () => (
@@ -136,13 +140,7 @@ export const saveStepForm: () => ThunkAction<any> = () => (
   }
 
   // save the form
-  if (unsavedForm.id === PRESAVED_STEP_ID) {
-    // if presaved, transform pseudo ID to real UUID upon save
-    const id = uuid()
-    dispatch(_saveStepForm({ ...unsavedForm, id }))
-  } else {
-    dispatch(_saveStepForm(unsavedForm))
-  }
+  dispatch(_saveStepForm(unsavedForm))
 }
 
 /** "power action", mimicking saving the never-saved "set temperature X" step,
@@ -165,7 +163,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
     )
     return
   }
-  // TODO IMMEDIATELY: this is broken!!
+
   const { id } = unsavedSetTemperatureForm
 
   if (!isPristineSetTempForm) {
@@ -183,7 +181,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
     `tried to auto-add a pause until temp, but targetTemperature is missing: ${temperature}`
   )
   // save the set temperature step form that is currently open
-  dispatch(_saveStepForm(unsavedSetTemperatureForm)) // TODO IMMEDIATELY this is broken
+  dispatch(_saveStepForm(unsavedSetTemperatureForm))
 
   // add a new pause step form
   dispatch(
@@ -209,7 +207,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
 
   // this conditional is for Flow, the unsaved form should always exist
   if (unsavedPauseForm != null) {
-    dispatch(_saveStepForm(unsavedPauseForm)) // TODO IMMEDIATELY this is broken, ID
+    dispatch(_saveStepForm(unsavedPauseForm))
   } else {
     assert(false, 'could not auto-save pause form, getUnsavedForm returned')
   }
