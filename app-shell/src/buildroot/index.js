@@ -26,6 +26,7 @@ import type {
 const log = createLogger('buildroot/index')
 
 const DIRECTORY = path.join(app.getPath('userData'), '__ot_buildroot__')
+const MANIFEST_CACHE = path.join(DIRECTORY, 'releases.json')
 
 let checkingForUpdates = false
 let updateSet: ReleaseSetFilepaths | null = null
@@ -119,18 +120,27 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Action => void {
 export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
   const manifestUrl: string = getConfig('buildroot').manifestUrl
 
-  return downloadManifest(manifestUrl).then(manifest => {
-    const urls = getReleaseSet(manifest, CURRENT_VERSION)
+  return downloadManifest(manifestUrl, MANIFEST_CACHE)
+    .then(manifest => {
+      const urls = getReleaseSet(manifest, CURRENT_VERSION)
 
-    if (urls === null) {
-      log.debug('No release files in manifest', {
+      if (urls === null) {
+        log.warn('No release files in manifest', {
+          version: CURRENT_VERSION,
+          manifest,
+        })
+      }
+
+      return urls
+    })
+    .catch((error: Error) => {
+      log.warn('Error retrieving release manifest', {
         version: CURRENT_VERSION,
-        manifest,
+        error,
       })
-    }
 
-    return urls
-  })
+      return null
+    })
 }
 
 // check for a buildroot update matching the current app version
