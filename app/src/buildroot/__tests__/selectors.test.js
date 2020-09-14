@@ -69,7 +69,7 @@ describe('buildroot selectors', () => {
     expect(result).toBe(false)
   })
 
-  it('should get update type when robot is behind the update', () => {
+  it('should return "upgrade" update type when robot is behind the update', () => {
     const state = { buildroot: { version: '1.0.0' } }
     const robot = { name: 'robot-name' }
 
@@ -83,7 +83,7 @@ describe('buildroot selectors', () => {
     expect(result).toBe('upgrade')
   })
 
-  it('should get update type when robot is ahead of the update', () => {
+  it('should return "downgrade" update type when robot is ahead of the update', () => {
     const state = { buildroot: { version: '1.0.0' } }
     const robot = { name: 'robot-name' }
 
@@ -94,7 +94,7 @@ describe('buildroot selectors', () => {
     expect(result).toBe('downgrade')
   })
 
-  it('should get update type when robot is matches the update', () => {
+  it('should get "reinstall" update type when robot matches the update', () => {
     const state = { buildroot: { version: '1.0.0' } }
     const robot = { name: 'robot-name' }
 
