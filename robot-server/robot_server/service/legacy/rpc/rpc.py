@@ -36,7 +36,7 @@ class RPCServer(object):
     def __init__(self, loop, root=None):
         self.monitor_events_task = None
         self.loop = loop or asyncio.get_event_loop()
-        self.objects = {}
+        self.objects: typing.Dict[typing.Any, typing.Any] = {}
         self.system = SystemCalls(self.objects)
 
         self.root = root
@@ -62,7 +62,8 @@ class RPCServer(object):
     def shutdown(self):
         for writer in self.clients:
             writer.task.cancel()
-        self.monitor_events_task.cancel()
+        if self.monitor_events_task:
+            self.monitor_events_task.cancel()
 
     async def on_shutdown(self):
         """
@@ -175,7 +176,7 @@ class RPCServer(object):
         obj = self.objects[_id]
         function = getattr(type(obj), name)
         args = self.resolve_args(args)
-        kwargs = {}
+        kwargs: typing.Dict[typing.Any, typing.Any] = {}
         # NOTE: since ECMAScript doesn't have a notion of named arguments
         # we are using a convention that the last dictionary parameter will
         # be expanded into kwargs. This introduces a risk of mistreating a
