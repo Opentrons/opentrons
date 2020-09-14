@@ -33,7 +33,7 @@ defaults:
 
 jobs:
   lint:
-    name: 'opentrons package linting (merge)'
+    name: 'opentrons package linting'
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
@@ -50,10 +50,12 @@ jobs:
       - name: Lint
         run: make -C api lint
   test:
-    name: 'opentrons package tests (merge)'
+    name: 'opentrons package tests'
     needs: [lint]
-    # Do minimal work on the merge-base
-    runs-on: 'ubuntu-latest'
+    strategy:
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'

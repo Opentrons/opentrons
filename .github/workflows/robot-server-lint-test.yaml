@@ -34,7 +34,7 @@ defaults:
 
 jobs:
   lint-test:
-    name: robot server package linting and tests
+    name: 'robot server package linting and tests'
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
