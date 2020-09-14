@@ -1,10 +1,24 @@
-# This workflow runs test and lint on pull requests that touch the
+# This workflow runs test and lint on branch pushes that touch the
 # robot-server project or its dependencies
 
-name: 'Robot server pull request (merge)'
+name: 'Robot server lint/test'
 
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
+  push:
+    paths:
+      - 'api/**'
+      - 'Makefile'
+      - 'shared-data/*/**'
+      - '!shared-data/js/**'
+      - 'robot-server/**'
+      - '.github/workflows/robot-server-push.yaml'
+      - '.github/actions/python/**'
+    branches-ignore: # ignore any release-related thing (handled elsewhere)
+      - 'master'
+      - 'chore_release-**'
+    tags-ignore:
+      - '*'
   pull_request:
     paths:
       - 'api/**'
@@ -19,7 +33,7 @@ defaults:
 
 jobs:
   lint-test:
-    name: robot server package linting and tests (merge)
+    name: robot server package linting and tests
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'

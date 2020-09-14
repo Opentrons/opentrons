@@ -2,7 +2,7 @@
 # of the api/ project that are used by the docs; the docs source themselves;
 # or the CI/makefile tooling used to build the docs.
 
-name: 'API docs build for non-release branch push'
+name: 'API docs build'
 
 on:
   push:

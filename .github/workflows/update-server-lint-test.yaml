@@ -1,22 +1,29 @@
-# This workflow runs tests and lint on branches pushed that touch the api/
-# project or its CI configuration.
+# This workflow runs tests and lint on non-release branches pushed that alter
+# the update-server subpackage
 
-name: 'API test/lint for non-release branch pushes'
+name: 'Update Server test/lint'
 
 on:
   push:
     paths:
-      - 'api/**'
+      - 'update-server/**'
       - 'Makefile'
-      - 'shared-data/*/**'
-      - '!shared-data/js/**'
-      - '.github/workflows/api-push.yaml'
+      - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
       - 'chore_release-*'
     tags-ignore:
       - '*'
+  pull_request:
+    paths:
+      - 'update-server/**'
+      - 'Makefile'
+      - '.github/workflows/update-server-lint-test.yaml'
+      - '.github/actions/python/**'
+    branches-ignore: # ignore any release-related thing (handled elsewhere)
+      - 'master'
+      - 'chore_release-*'
 
 defaults:
   run:
@@ -24,7 +31,7 @@ defaults:
 
 jobs:
   lint:
-    name: opentrons package linting
+    name: 'update server linting'
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
@@ -37,16 +44,13 @@ jobs:
 
       - uses: './.github/actions/python/setup'
         with:
-          project: 'api'
+          project: 'update-server'
       - name: Lint
-        run: make -C api lint
+        run: make -C update-server lint
   test:
-    name: opentrons package tests
+    name: 'update server package tests'
     needs: [lint]
-    strategy:
-      matrix:
-        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
-    runs-on: '${{ matrix.os }}'
+    runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
@@ -57,6 +61,6 @@ jobs:
           python-version: '3.7'
       - uses: './.github/actions/python/setup'
         with:
-          project: 'api'
+          project: 'update-server'
       - name: Test
-        run: make -C api test
+        run: make -C update-server test
