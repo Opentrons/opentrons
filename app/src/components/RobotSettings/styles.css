@@ -59,8 +59,7 @@
 }
 
 .connection_label {
-  @apply --font-body-1-dark;
-
+  font-size: var(--fs-body-1);
   font-weight: var(--fw-semibold);
   padding-bottom: 0.25rem;
 }
@@ -79,11 +78,6 @@
 
 .disabled {
   color: var(--c-font-disabled);
-}
-
-.file_input {
-  position: fixed;
-  clip: rect(1px 1px 1px 1px);
 }
 
 .restart_banner_message {

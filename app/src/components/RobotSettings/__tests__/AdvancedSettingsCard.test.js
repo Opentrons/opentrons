@@ -6,11 +6,17 @@ import { mountWithStore } from '@opentrons/components/__utils__'
 import * as RobotSettings from '../../../robot-settings'
 import { mockConnectableRobot } from '../../../discovery/__fixtures__'
 import { AdvancedSettingsCard } from '../AdvancedSettingsCard'
+import { UpdateFromFileControl } from '../UpdateFromFileControl'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
 import type { State } from '../../../types'
 
 jest.mock('react-router-dom', () => ({ Link: 'a' }))
+
+jest.mock('../UpdateFromFileControl', () => ({
+  UpdateFromFileControl: () => <></>,
+}))
+
 jest.mock('../../../analytics')
 jest.mock('../../../robot-settings/selectors')
 jest.mock('../../../shell/robot-logs/selectors')
@@ -35,6 +41,14 @@ describe('RobotSettings > AdvancedSettingsCard', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+  })
+
+  it('should render an UpdateFromFileControl', () => {
+    const { wrapper } = render()
+    const updateFromFile = wrapper.find(UpdateFromFileControl)
+
+    expect(updateFromFile.prop('robotName')).toBe(mockConnectableRobot.name)
+    expect(updateFromFile.prop('borderBottom')).toBe(BORDER_SOLID_LIGHT)
   })
 
   it('should render an OpenJupyterControl', () => {

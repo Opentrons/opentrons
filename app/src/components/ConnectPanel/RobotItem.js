@@ -31,8 +31,7 @@ export function RobotItemComponent(props: RobotItemProps): React.Node {
     return getBuildrootUpdateAvailable(state, robot) === UPGRADE
   })
   const isConnectable = status === CONNECTABLE
-  // NOTE(mc, 2020-03-30): redundant && true to satisfy Flow
-  const isConnected = Boolean(robot.connected && true)
+  const isConnected = robot.connected
   const isSelected = robot.name === match.params.name
   const connectInProgress = useSelector(
     (state: State) => RobotSelectors.getConnectRequest(state).inProgress

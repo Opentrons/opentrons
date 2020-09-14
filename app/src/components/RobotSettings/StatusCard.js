@@ -22,6 +22,7 @@ type Props = {| robot: ViewableRobot |}
 const TITLE = 'Status'
 const STATUS_LABEL = 'This robot is currently'
 const STATUS_VALUE_DISCONNECTED = 'Unknown - connect to view status'
+const STATUS_VALUE_NOT_CONNECTABLE = 'Not connectable'
 const STATUS_VALUE_DEFAULT = 'Idle'
 const CONNECT = 'connect'
 const DISCONNECT = 'disconnect'
@@ -29,14 +30,20 @@ const DISCONNECT = 'disconnect'
 export function StatusCard(props: Props): React.Node {
   const { robot } = props
   const dispatch = useDispatch<Dispatch>()
+  const connectable = robot.status === CONNECTABLE
   const connected = robot.connected != null && robot.connected === true
   const sessionStatus = useSelector(robotSelectors.getSessionStatus)
   const connectRequest = useSelector(robotSelectors.getConnectRequest)
-  const disabled = robot.status !== CONNECTABLE || connectRequest.inProgress
+  const connectButtonDisabled = !connectable || connectRequest.inProgress
+  let status = STATUS_VALUE_DEFAULT
 
-  const status = connected
-    ? (sessionStatus && capitalize(sessionStatus)) || STATUS_VALUE_DEFAULT
-    : STATUS_VALUE_DISCONNECTED
+  if (!connectable) {
+    status = STATUS_VALUE_NOT_CONNECTABLE
+  } else if (!connected) {
+    status = STATUS_VALUE_DISCONNECTED
+  } else if (sessionStatus) {
+    status = capitalize(sessionStatus)
+  }
 
   const handleClick = () => {
     if (connected) {
@@ -47,12 +54,12 @@ export function StatusCard(props: Props): React.Node {
   }
 
   return (
-    <Card title={TITLE} disabled={disabled}>
+    <Card title={TITLE}>
       <CardContentHalf>
         <LabeledValue label={STATUS_LABEL} value={status} />
       </CardContentHalf>
       <CardContentHalf>
-        <OutlineButton onClick={handleClick} disabled={disabled}>
+        <OutlineButton onClick={handleClick} disabled={connectButtonDisabled}>
           {connected ? (
             DISCONNECT
           ) : connectRequest.name === robot.name ? (

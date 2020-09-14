@@ -2,6 +2,7 @@
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
+import { UPGRADE } from '../../../buildroot'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
@@ -23,7 +24,7 @@ export function MigrationWarningModal(
   const buttons: Array<?ButtonProps> = [
     notNowButton,
     {
-      children: updateType === 'upgrade' ? 'view robot update' : 'update robot',
+      children: updateType === UPGRADE ? 'view robot update' : 'update robot',
       className: styles.view_update_button,
       onClick: proceed,
     },
