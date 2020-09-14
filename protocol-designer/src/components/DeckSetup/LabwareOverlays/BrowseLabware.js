@@ -3,12 +3,11 @@ import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import { Icon } from '@opentrons/components'
-import forEach from 'lodash/forEach'
 import { i18n } from '../../../localization'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
-import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../../../ui/steps'
+import { resetScrollElements } from '../../../ui/steps/utils'
 import styles from './LabwareOverlays.css'
 
 type OP = {|
@@ -35,15 +34,7 @@ function BrowseLabwareOverlay(props: Props) {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   drillDown: () => {
-    // scroll to top of all elements with the special class
-    forEach(
-      global.document.getElementsByClassName(
-        MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
-      ),
-      elem => {
-        elem.scrollTop = 0
-      }
-    )
+    resetScrollElements()
     dispatch(drillDownOnLabware(ownProps.labwareOnDeck.id))
   },
 })
