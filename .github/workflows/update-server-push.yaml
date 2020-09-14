@@ -8,7 +8,7 @@ on:
     paths:
       - 'update-server/**'
       - 'Makefile'
-      - '.github/workflows/update-server-pull-request-target.yaml'
+      - '.github/workflows/update-server-push.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
