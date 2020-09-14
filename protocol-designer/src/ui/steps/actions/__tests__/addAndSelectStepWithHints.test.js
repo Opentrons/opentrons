@@ -6,16 +6,12 @@ import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
 
-import { uuid } from '../../../../utils'
 jest.mock('../../../../tutorial/actions')
 jest.mock('../../../../ui/modules/selectors')
 jest.mock('../../../../labware-ingred/selectors')
 jest.mock('../../../../file-data/selectors')
-jest.mock('../../../../utils')
 const dispatch = jest.fn()
 const getState = jest.fn()
-const stepId = 'stepId'
-const mockUuid: JestMockFn<[], string> = uuid
 const addHintMock: JestMockFn<[any, string], any> = addHint
 const mockGetDeckHasLiquid: JestMockFn<[Object], any> =
   labwareIngredSelectors.getDeckHasLiquid
@@ -36,7 +32,6 @@ beforeEach(() => {
 
   addHintMock.mockReturnValue('addHintReturnValue')
 
-  mockUuid.mockReturnValue(stepId)
   mockGetDeckHasLiquid.mockReturnValue(true)
   mockGetMagnetModuleHasLabware.mockReturnValue(false)
   mockGetTemperatureModuleHasLabware.mockReturnValue(false)
