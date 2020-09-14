@@ -32,7 +32,7 @@ class StateTransitionError(RobotServerError):
                          state=state.name)
 
 
-TransitionMap = Dict[Any, Set[Dict[Any, Any]]]
+TransitionMap = Dict[Any, Dict[Any, Any]]
 
 
 class SimpleStateMachine:

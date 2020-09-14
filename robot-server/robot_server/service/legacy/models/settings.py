@@ -65,7 +65,9 @@ class AdvancedSettingRequest(BaseModel):
 class LogLevels(str, Enum):
     """Valid log levels"""
     def __new__(cls, value, level):
-        obj = str.__new__(cls, value)
+        # Ignoring type errors because this is exactly as described here
+        # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
+        obj = str.__new__(cls, value)  # type: ignore
         obj._value_ = value
         obj._level_id = level
         return obj
@@ -78,7 +80,7 @@ class LogLevels(str, Enum):
     @property
     def level_id(self):
         """The log level id as defined in logging lib"""
-        return self._level_id
+        return self._level_id  # type: ignore
 
 
 class LogLevel(BaseModel):
@@ -89,7 +91,7 @@ class LogLevel(BaseModel):
 
     @validator('log_level', pre=True)
     def lower_case_log_keys(cls, value):
-        return value if value is None else LogLevels(value.lower())
+        return value if value is None else LogLevels(value.lower(), None)
 
 
 class FactoryResetOption(BaseModel):

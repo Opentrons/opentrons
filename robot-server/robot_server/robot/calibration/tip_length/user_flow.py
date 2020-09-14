@@ -60,7 +60,6 @@ class TipCalibrationUserFlow:
                  mount: Mount,
                  has_calibration_block: bool,
                  tip_rack: 'LabwareDefinition'):
-        self._tip_rack_definition = tip_rack
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block = has_calibration_block
@@ -75,6 +74,7 @@ class TipCalibrationUserFlow:
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
         self._deck = deck.Deck(load_name=deck_load_name)
+        self._tip_rack = self._get_tip_rack_lw(tip_rack)
         self._initialize_deck()
 
         self._current_state = State.sessionStarted
@@ -137,7 +137,7 @@ class TipCalibrationUserFlow:
 
     async def move_to_tip_rack(self):
         # point safely above target tip well in tip rack
-        pt_above_well = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
+        pt_above_well = self._tip_rack.wells()[0].top().point + \
             MOVE_TO_TIP_RACK_SAFETY_BUFFER
         if self._tip_origin_pt is not None:
             # use jogged to x and y offsets only if returning tip to rack
@@ -174,6 +174,7 @@ class TipCalibrationUserFlow:
             self._nozzle_height_at_reference = cur_pt.z
         elif self._current_state == State.measuringTipOffset:
             assert self._hw_pipette.has_tip
+            assert self._nozzle_height_at_reference is not None
             # set critical point explicitly to nozzle
             cur_pt = await self._get_current_point(
                 critical_point=CriticalPoint.NOZZLE)
@@ -183,7 +184,7 @@ class TipCalibrationUserFlow:
             # tip length data, hence the empty string, we should remove it
             # from create_tip_length_data in a refactor
             tip_length_data = modify.create_tip_length_data(
-                self._deck[TIP_RACK_SLOT]._definition, '',
+                self._tip_rack._definition, '',
                 tip_length_offset)
             modify.save_tip_length_calibration(self._hw_pipette.pipette_id,
                                                tip_length_data)
@@ -221,10 +222,11 @@ class TipCalibrationUserFlow:
         await self.move_to_tip_rack()
         await self._return_tip()
 
-    def _get_tip_rack_lw(self) -> labware.Labware:
+    def _get_tip_rack_lw(self,
+                         tip_rack_def: 'LabwareDefinition') -> labware.Labware:
         try:
             return labware.load_from_definition(
-                self._tip_rack_definition,
+                tip_rack_def,
                 self._deck.position_for(TIP_RACK_SLOT))
         except Exception:
             raise RobotServerError(definition=CalibrationError.BAD_LABWARE_DEF)
@@ -234,8 +236,7 @@ class TipCalibrationUserFlow:
         return set(TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].alternatives)
 
     def _initialize_deck(self):
-        tip_rack_lw = self._get_tip_rack_lw()
-        self._deck[TIP_RACK_SLOT] = tip_rack_lw
+        self._deck[TIP_RACK_SLOT] = self._tip_rack
 
         if self._has_calibration_block:
             cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]

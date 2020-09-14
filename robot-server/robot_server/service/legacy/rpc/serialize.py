@@ -1,4 +1,5 @@
 import functools
+from typing import Any, List, Dict
 
 
 def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
@@ -41,7 +42,7 @@ def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
         return object_container(iterate(obj))
     elif hasattr(obj, '__dict__'):
         refs[id(obj)] = obj
-        items = []
+        items: List[Any] = []
         # If Type is iterable we will iterate generating numeric keys and
         # and merge with the output
         try:
@@ -60,6 +61,6 @@ def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
 
 
 def get_object_tree(obj, max_depth=0):
-    refs = {}
+    refs: Dict[Any, Any] = {}
     tree = _get_object_tree(max_depth, [], refs, 0, obj)
     return (tree, refs)
