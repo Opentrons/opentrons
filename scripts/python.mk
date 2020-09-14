@@ -1,8 +1,15 @@
+# this may be set as an environment variable to select the version of
+# python to run if pyenv is not available. it should always be set to
+# point to a python3.7
+OT_PYTHON ?= python
+
+
 pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
-pipenv := $(pipenv_envvars) python -m pipenv
+pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
 python := $(pipenv) run python
 pip := $(pipenv) run pip
 pytest := $(pipenv) run py.test
+
 
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated --clear)

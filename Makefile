@@ -1,6 +1,9 @@
 # opentrons platform makefile
 # https://github.com/Opentrons/opentrons
 
+# make OT_PYTHON available
+include ./scripts/python.mk
+
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
@@ -21,11 +24,6 @@ APP_SHELL_DIR := app-shell
 # empty, no .dev extension is appended, so this definition is here only as
 # documentation
 BUILD_NUMBER ?=
-
-# this may be set as an environment variable to select the version of
-# python to run if pyenv is not available. it should always be set to
-# point to a python3.6.
-OT_PYTHON ?= python
 
 # watch, coverage, and update snapshot variables for tests
 watch ?= false
@@ -52,7 +50,6 @@ clean-py:
 	$(MAKE) -C $(UPDATE_SERVER_DIR) clean
 	$(MAKE) -C $(ROBOT_SERVER_DIR) clean
 	$(MAKE) -C $(SHARED_DATA_DIR) clean
-
 
 .PHONY: setup-py
 setup-py:

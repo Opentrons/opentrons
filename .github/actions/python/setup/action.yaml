@@ -1,0 +1,17 @@
+name: 'Python Setup'
+description: 'Set up the environment to handle a monorepo python project'
+inputs:
+  project:
+    description: 'Which project (by subdirectory) to set up'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: '[[ "${OSTYPE}" =~ "linux" ]] && sudo apt-get install -y --no-install-recommends libsystemd-dev || echo "do nothing and avoid pipefail"'
+    - shell: bash
+      run: |
+        npm install --global shx@0.2.2
+        pip install pipenv==2020.8.13
+    - shell: bash
+      run: 'make -C ${{ inputs.project}} setup'
