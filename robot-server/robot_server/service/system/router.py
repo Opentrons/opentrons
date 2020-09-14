@@ -1,6 +1,9 @@
 import logging
 from datetime import datetime
 from fastapi import APIRouter
+
+from robot_server.service.json_api.resource_links import (
+    ResourceLinkKey, ResourceLink)
 from robot_server.system import time
 from robot_server.service.system import models as time_models
 
@@ -22,7 +25,9 @@ def _create_response(dt: datetime) \
             ),
             resource_id="time"
         ),
-        links={'self': '/system/time'}
+        links={
+            ResourceLinkKey.self: ResourceLink(href='/system/time')
+        }
     )
 
 

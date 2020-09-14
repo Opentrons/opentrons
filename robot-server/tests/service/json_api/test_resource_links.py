@@ -11,7 +11,7 @@ class ThingWithLink(BaseModel):
 def test_follows_structure():
     structure_to_validate = {
         'links': {
-            'self': '/items/1',
+            'self': {'href': '/items/1', 'meta': None},
         }
     }
     validated = ThingWithLink(**structure_to_validate)

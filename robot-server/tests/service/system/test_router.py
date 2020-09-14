@@ -17,7 +17,12 @@ def mock_set_system_time(mock_system_time):
 
 @pytest.fixture
 def response_links():
-    return {'self': '/system/time'}
+    return {
+        'self': {
+            'href': '/system/time',
+            'meta': None
+        }
+    }
 
 
 def test_raise_system_synchronized_error(api_client,

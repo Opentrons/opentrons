@@ -15,7 +15,7 @@ valid_error_objects = [
     {'title': 'Something went wrong'},
     {'detail': "oh wow, there's a few things we messed up there"},
     {'meta': {'num_errors_today': 10000}},
-    {'links': {'self': '/my/error-info?code=1005'}},
+    {'links': {'self': {'href': '/my/error-info?code=1005'}}},
     {'source': {'pointer': '/data/attributes/price'}},
 ]
 

@@ -17,7 +17,9 @@ stages:
           id: 'time'
           type: 'SystemTimeAttributes'
         links:
-          self: '/system/time'
+          self:
+            href: '/system/time'
+            meta: null
         meta: null
 
 ---
