@@ -473,7 +473,7 @@
           },
 
           {
-            "description": "Themocycler set target block temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "description": "Thermocycler set target block temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
@@ -494,7 +494,7 @@
           },
 
           {
-            "description": "Themocycler set target lid temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "description": "Thermocycler set target lid temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
@@ -512,7 +512,7 @@
           },
 
           {
-            "description": "Themocycler await block temperature command. Delay further protocol execution until the specified temperature is reached.",
+            "description": "Thermocycler await block temperature command. Delay further protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
@@ -530,7 +530,7 @@
           },
 
           {
-            "description": "Themocycler await lid temperature command. Delay further protocol execution until the specified temperature is reached.",
+            "description": "Thermocycler await lid temperature command. Delay further protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
