@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union
 
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, PipettePair
 from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
@@ -1424,7 +1424,9 @@ class InstrumentContext(CommandPublisher):
 
         return PairedInstrumentContext(
             primary_instrument=self, secondary_instrument=instrument,
-            api_version=self.api_version, trash=self.trash_container)
+            ctx=self._ctx, pair_policy=PipettePair.of_mount(self._mount),
+            api_version=self.api_version, hardware_manager=self._hw_manager,
+            trash=self.trash_container, log_parent=self._log)
 
     @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:

@@ -1545,21 +1545,27 @@ class API(HardwareAPILike):
 
         await self.retract(mount, retract_target)
 
-    def set_current_tiprack_diameter(self, mount, tiprack_diameter):
-        instr = self._attached_instruments[mount]
-        assert instr
-        self._log.info(
-            "Updating tip rack diameter on pipette mount: "
-            "{}, tip diameter: {} mm".format(mount, tiprack_diameter))
-        instr.current_tiprack_diameter = tiprack_diameter
+    def set_current_tiprack_diameter(
+            self, mount: Union[top_types.Mount, PipettePair],
+            tiprack_diameter: float):
+        instruments = self._instruments_for(mount)
+        for instr in instruments:
+            assert instr[0]
+            self._log.info(
+                "Updating tip rack diameter on pipette mount: "
+                f"{instr[1]}, tip diameter: {tiprack_diameter} mm")
+            instr[0].current_tiprack_diameter = tiprack_diameter
 
-    def set_working_volume(self, mount, tip_volume):
-        instr = self._attached_instruments[mount]
-        assert instr
-        self._log.info(
-            "Updating working volume on pipette mount: {}, tip volume: {} ul"
-            .format(mount, tip_volume))
-        instr.working_volume = tip_volume
+    def set_working_volume(
+            self, mount: Union[top_types.Mount, PipettePair],
+            tip_volume: int):
+        instruments = self._instruments_for(mount)
+        for instr in instruments:
+            assert instr[0]
+            self._log.info(
+                "Updating working volume on pipette mount:"
+                f"{instr[1]}, tip volume: {tip_volume} ul")
+            instr[0].working_volume = tip_volume
 
     async def drop_tip(
             self,
