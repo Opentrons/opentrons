@@ -79,21 +79,19 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(
-      Sessions.deckCalCommands.JOG,
-      {
+    sendSessionCommand({
+      command: Sessions.deckCalCommands.JOG,
+      data: {
         vector: formatJogVector(axis, dir, step),
       },
-      false
-    )
+    })
   }
 
   const savePoint = () => {
-    sendSessionCommand(Sessions.sharedCalCommands.SAVE_OFFSET)
-    // TODO: IMMEDIATELY use actualy epic for managing chained dependent commands
-    setTimeout(() => {
-      sendSessionCommand(Sessions.sharedCalCommands.MOVE_TO_POINT_ONE)
-    }, 300)
+    sendSessionCommand(
+      { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+      { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
+    )
   }
 
   return (

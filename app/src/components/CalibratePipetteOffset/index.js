@@ -2,7 +2,6 @@
 // Pipette Offset Calibration Orchestration Component
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import last from 'lodash/last'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
@@ -18,7 +17,11 @@ import type {
   DeckCalibrationLabware,
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
-import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
+import {
+  useDispatchApiRequests,
+  getRequestById,
+  PENDING,
+} from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
 import {
   Introduction,
@@ -32,8 +35,13 @@ import {
 } from '../CalibrationPanels'
 import styles from '../CalibrateDeck/styles.css'
 
-import type { CalibratePipetteOffsetParentProps } from './types'
+import type { CalibratePipetteOffsetParentProps, CommandToSend } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
+
+// session commands for which the full page spinner should not appear
+const spinnerCommandBlockList: Array<SessionCommandString> = [
+  Sessions.sharedCalCommands.JOG,
+]
 
 const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
 const EXIT = 'exit'
@@ -66,34 +74,38 @@ export function CalibratePipetteOffset(
 ): React.Node {
   const { session, robotName, closeWizard } = props
   const { currentStep, instrument, labware } = session?.details || {}
-  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const trackedRequestId = React.useRef<string | null>(null)
+  const [dispatchRequests, requestIds] = useDispatchApiRequests(
+    dispatchedAction => {
+      if (
+        dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
+        !spinnerCommandBlockList.includes(dispatchedAction.payload.command)
+      ) {
+        trackedRequestId.current = dispatchedAction.meta.requestId
+      }
+    }
+  )
   const dispatch = useDispatch()
 
-  const requestStatus = useSelector<State, RequestState | null>(state =>
-    getRequestById(state, last(requestIds))
-  )?.status
+  const showSpinner =
+    useSelector<State, RequestState | null>(state =>
+      getRequestById(state, trackedRequestId)
+    )?.status === PENDING
 
-  function sendCommand(
-    command: SessionCommandString,
-    data: SessionCommandData = {},
-    loadingSpinner: boolean = true
-  ) {
+  function sendCommands(...comms: Array<CommandToSend>) {
     if (session === null) return
-    const sessionCommand = Sessions.createSessionCommand(
-      robotName,
-      session.id,
-      { command, data }
+    const sessionCommands = comms.map(c =>
+      Sessions.createSessionCommand(robotName, session.id, {
+        command: c.command,
+        data: c.data || {},
+      })
     )
-    if (loadingSpinner) {
-      dispatchRequest(sessionCommand)
-    } else {
-      dispatch(sessionCommand)
-    }
+    dispatchRequests(...sessionCommands)
   }
 
   function deleteSession() {
     session?.id &&
-      dispatchRequest(Sessions.deleteSession(robotName, session.id))
+      dispatchRequests(Sessions.deleteSession(robotName, session.id))
     closeWizard()
   }
 
@@ -102,7 +114,7 @@ export function CalibratePipetteOffset(
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
-    sendCommand(Sessions.deckCalCommands.EXIT)
+    sendCommands(Sessions.deckCalCommands.EXIT)
     deleteSession()
   }, true)
 
@@ -123,7 +135,7 @@ export function CalibratePipetteOffset(
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
-  if (requestStatus === PENDING) {
+  if (showSpinner) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
@@ -135,7 +147,7 @@ export function CalibratePipetteOffset(
         contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
       >
         <Panel
-          sendSessionCommand={sendCommand}
+          sendSessionCommand={sendCommands}
           deleteSession={deleteSession}
           tipRack={tipRack}
           isMulti={isMulti}
