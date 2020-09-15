@@ -6,7 +6,7 @@ import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../dismiss'
-import { getNonNullSelectedItem } from '../../ui/steps/selectors'
+import { getSelectedItem } from '../../ui/steps/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getVisibleFormErrors,
@@ -81,7 +81,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
       description: warning.body || null,
       dismissId: warning.type,
     })),
-    stepId: getNonNullSelectedItem(state)?.id,
+    stepId: getSelectedItem(state)?.id,
   }
 }
 

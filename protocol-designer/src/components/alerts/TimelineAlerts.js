@@ -7,7 +7,7 @@ import { ErrorContents } from './ErrorContents'
 import { WarningContents } from './WarningContents'
 import { actions as dismissActions } from '../../dismiss'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
-import { getNonNullSelectedItem } from '../../ui/steps/selectors'
+import { getSelectedItem } from '../../ui/steps/selectors'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { Alerts, type Props } from './Alerts'
 import type { CommandCreatorError } from '../../step-generation/types'
@@ -45,7 +45,7 @@ function mapStateToProps(state: BaseState): SP {
       ),
       dismissId: warning.type,
     }))
-  const _stepId = getNonNullSelectedItem(state)?.id
+  const _stepId = getSelectedItem(state)?.id
 
   return {
     errors,
