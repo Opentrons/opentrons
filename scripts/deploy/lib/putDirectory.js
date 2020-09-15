@@ -47,7 +47,7 @@ module.exports = function putDirectory(
       pathlib.join(path, entry.name)
     )
     const destKey = `${destPrefix}/${relFromTop}`
-    console.log(`${dryrun ? 'DRYRUN: ' : ''}Put
+    console.log(`${dryrun ? 'DRYRUN: ' : ''}Putting
         Local File: ${pathlib.join(path, entry.name)}
         Destination: /${destBucket}/${destKey}
     `)
@@ -63,7 +63,12 @@ module.exports = function putDirectory(
         },
         putParams
       )
-      return s3.putObject(putObjectParams)
+      return s3
+        .putObject(putObjectParams)
+        .promise()
+        .then(() => {
+          console.debug(`Put of ${pathlib.join(path, entry.name)} done`)
+        })
     })
   }
 

@@ -5,7 +5,7 @@ const github = require('@actions/github')
 const putDirectory = require('../../../../scripts/deploy/lib/putDirectory')
 const AWS = require('aws-sdk')
 const projects = {
-  ['docs.opentrons.com']: '/api/docs/dist'
+  ['docs.opentrons.com']: '/api/docs/dist',
 }
 
 const run = () => {
@@ -16,8 +16,10 @@ const run = () => {
   const sandboxBucket = `sandbox.${domain}`
   core.info(`Deploying ${localDir} to ${sandboxBucket}`)
   return putDirectory(s3, localDir, sandboxBucket, context.ref, false)
-}()
+}
+
+run()
   .resolve()
-  .catch((err) => {
+  .catch(err => {
     github.setFailed(err)
   })
