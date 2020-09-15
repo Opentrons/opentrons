@@ -11,4 +11,4 @@ runs:
   using: 'composite'
   steps:
     - shell: bash
-      run: "aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${{ context.GITHUB_REF }} --acl=public-read"
+      run: "aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${{ github.ref }} --acl=public-read"
