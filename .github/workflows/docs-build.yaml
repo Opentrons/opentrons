@@ -2,7 +2,7 @@
 # of the api/ project that are used by the docs; the docs source themselves;
 # or the CI/makefile tooling used to build the docs.
 
-name: 'API docs build'
+name: 'API docs build and deploy'
 
 on:
   push:
@@ -24,7 +24,7 @@ defaults:
 
 jobs:
   build:
-    name: opentrons documentation build
+    name: opentrons documentation build and deploy
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
@@ -44,5 +44,8 @@ jobs:
           make -C api docs
       - name: 'Deploy docs to sandbox'
         uses: './.github/actions/webstack/deploy-to-sandbox'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
         with:
           domain: 'docs.opentrons.com'
