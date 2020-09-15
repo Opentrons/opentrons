@@ -4,7 +4,7 @@ import { createSelector } from 'reselect'
 import { getConnectedRobot } from '../discovery'
 import { getProtocolPipettesMatch } from '../pipettes'
 import { selectors as RobotSelectors } from '../robot'
-import { getBuildrootUpdateAvailable } from '../buildroot'
+import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
 import { getU2EWindowsDriverStatus, OUTDATED } from '../system-info'
 import { getFeatureFlags } from '../config'
@@ -36,25 +36,22 @@ const APP_UPDATE_AVAILABLE = 'An app update is available'
 const DRIVER_UPDATE_AVAILABLE = 'A driver update is available'
 const ROBOT_UPDATE_AVAILABLE = 'A robot software update is available'
 
-const getConnectedRobotPipettesMatch: State => boolean = createSelector(
-  state => state,
-  getConnectedRobot,
-  (state, connectedRobot) =>
-    connectedRobot
-      ? getProtocolPipettesMatch(state, connectedRobot.name)
-      : false
-)
+const getConnectedRobotPipettesMatch = (state: State): boolean => {
+  const connectedRobot = getConnectedRobot(state)
 
-const getConnectedRobotUpdateAvailable: State => boolean = createSelector(
-  state => state,
-  getConnectedRobot,
-  (state, connectedRobot) => {
-    const robotUpdateType = connectedRobot
-      ? getBuildrootUpdateAvailable(state, connectedRobot)
-      : null
-    return robotUpdateType === 'upgrade'
-  }
-)
+  return connectedRobot
+    ? getProtocolPipettesMatch(state, connectedRobot.name)
+    : false
+}
+
+const getConnectedRobotUpdateAvailable = (state: State): boolean => {
+  const connectedRobot = getConnectedRobot(state)
+  const robotUpdateType = connectedRobot
+    ? getBuildrootUpdateAvailable(state, connectedRobot)
+    : null
+
+  return robotUpdateType === UPGRADE
+}
 
 const getRunDisabledReason: State => string | null = createSelector(
   getConnectedRobot,

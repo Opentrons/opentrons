@@ -18,13 +18,9 @@ def mock_set_system_time(mock_system_time):
 @pytest.fixture
 def response_links():
     return {
-        "GET": {
-            "href": "/system/time",
-            "meta": None
-        },
-        "PUT": {
-            "href": "/system/time",
-            "meta": None
+        'self': {
+            'href': '/system/time',
+            'meta': None
         }
     }
 

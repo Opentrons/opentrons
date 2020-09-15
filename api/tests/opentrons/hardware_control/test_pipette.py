@@ -5,7 +5,7 @@ from opentrons.config import pipette_config
 
 
 def test_tip_tracking():
-    pip = pipette.Pipette('p10_single_v1',
+    pip = pipette.Pipette(pipette_config.load('p10_single_v1'),
                           {'single': [0, 0, 0],
                            'multi': [0, 0, 0]},
                           'testID')
@@ -26,7 +26,7 @@ def test_tip_tracking():
 @pytest.mark.parametrize('model', pipette_config.config_models)
 def test_critical_points(model):
     loaded = pipette_config.load(model)
-    pip = pipette.Pipette(model,
+    pip = pipette.Pipette(loaded,
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           'testID')
     mod_offset = Point(*loaded.model_offset)
@@ -51,7 +51,7 @@ def test_critical_point_tiplength(use_new_calibration, model):
     loaded = pipette_config.load(model)
     instr_z = 25
     pip = pipette.Pipette(
-        model,
+        loaded,
         {'single': [0, 0, instr_z], 'multi': [0, 0, instr_z]},
         'testID')
     mod_plus_instr = Point(*loaded.model_offset) + Point(0, 0, instr_z)
@@ -72,40 +72,41 @@ def test_critical_point_tiplength(use_new_calibration, model):
     assert pip.critical_point(types.CriticalPoint.TIP) == mod_plus_instr
 
 
-def test_volume_tracking():
-    for config in pipette_config.config_models:
-        loaded = pipette_config.load(config)
-        pip = pipette.Pipette(config,
-                              {'single': [0, 0, 0], 'multi': [0, 0, 0]},
-                              'testID')
-        assert pip.current_volume == 0.0
-        assert pip.available_volume == loaded.max_volume
-        assert pip.ok_to_add_volume(loaded.max_volume - 0.1)
-        pip.set_current_volume(0.1)
-        with pytest.raises(AssertionError):
-            pip.set_current_volume(loaded.max_volume + 0.1)
-        with pytest.raises(AssertionError):
-            pip.set_current_volume(-1)
-        assert pip.current_volume == 0.1
+@pytest.mark.parametrize('config_model', pipette_config.config_models)
+def test_volume_tracking(config_model):
+    loaded = pipette_config.load(config_model)
+    pip = pipette.Pipette(loaded,
+                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          'testID')
+    assert pip.current_volume == 0.0
+    assert pip.available_volume == loaded.max_volume
+    assert pip.ok_to_add_volume(loaded.max_volume - 0.1)
+    pip.set_current_volume(0.1)
+    with pytest.raises(AssertionError):
+        pip.set_current_volume(loaded.max_volume + 0.1)
+    with pytest.raises(AssertionError):
+        pip.set_current_volume(-1)
+    assert pip.current_volume == 0.1
+    pip.remove_current_volume(0.1)
+    with pytest.raises(AssertionError):
         pip.remove_current_volume(0.1)
-        with pytest.raises(AssertionError):
-            pip.remove_current_volume(0.1)
-        assert pip.current_volume == 0.0
-        pip.set_current_volume(loaded.max_volume)
-        assert not pip.ok_to_add_volume(0.1)
-        with pytest.raises(AssertionError):
-            pip.add_current_volume(0.1)
-        assert pip.current_volume == loaded.max_volume
+    assert pip.current_volume == 0.0
+    pip.set_current_volume(loaded.max_volume)
+    assert not pip.ok_to_add_volume(0.1)
+    with pytest.raises(AssertionError):
+        pip.add_current_volume(0.1)
+    assert pip.current_volume == loaded.max_volume
 
 
-def test_config_update():
-    for config in pipette_config.config_models:
-        pip = pipette.Pipette(config,
-                              {'single': [0, 0, 0], 'multi': [0, 0, 0]},
-                              'testID')
-        sample_plunger_pos = {'top': 19.5}
-        pip.update_config_item('top', sample_plunger_pos.get('top'))
-        assert pip.config.top == sample_plunger_pos.get('top')
+@pytest.mark.parametrize('config_model', pipette_config.config_models)
+def test_config_update(config_model):
+    loaded = pipette_config.load(config_model)
+    pip = pipette.Pipette(loaded,
+                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          'testID')
+    sample_plunger_pos = {'top': 19.5}
+    pip.update_config_item('top', sample_plunger_pos.get('top'))
+    assert pip.config.top == sample_plunger_pos.get('top')
 
 
 def test_smoothie_config_update(monkeypatch):
@@ -115,7 +116,8 @@ def test_smoothie_config_update(monkeypatch):
 
 @pytest.mark.parametrize('config_model', pipette_config.config_models)
 def test_tip_overlap(config_model):
-    pip = pipette.Pipette(config_model,
+    loaded = pipette_config.load(config_model)
+    pip = pipette.Pipette(loaded,
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           'testId')
     assert pip.config.tip_overlap\
@@ -123,7 +125,7 @@ def test_tip_overlap(config_model):
 
 
 def test_flow_rate_setting():
-    pip = pipette.Pipette('p300_single_v2.0',
+    pip = pipette.Pipette(pipette_config.load('p300_single_v2.0'),
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           'testId')
     # pipettes should load settings from config at init time

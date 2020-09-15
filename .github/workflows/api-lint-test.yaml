@@ -1,0 +1,71 @@
+# This workflow runs tests and lint on pull requests that touch the api/
+# project or its CI configuration.
+
+name: 'API test/lint'
+
+on:
+  # Most of the time, we run on pull requests, which lets us handle external PRs
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'Makefile'
+      - 'shared-data/*/**'
+      - '!shared-data/js/**'
+  push:
+    paths:
+      - 'api/**'
+      - 'Makefile'
+      - 'shared-data/*/**'
+      - '!shared-data/js/**'
+      - '.github/workflows/api-push.yaml'
+      - '.github/actions/python/**'
+    branches-ignore: # ignore any release-related thing (handled elsewhere)
+      - 'master'
+      - 'chore_release-*'
+    tags-ignore:
+      - '*'
+  workflow_dispatch:
+
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'opentrons package linting'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'api'
+      - name: Lint
+        run: make -C api lint
+  test:
+    name: 'opentrons package tests'
+    needs: [lint]
+    strategy:
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'api'
+      - name: Test
+        run: make -C api test

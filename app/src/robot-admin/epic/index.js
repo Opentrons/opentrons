@@ -5,6 +5,8 @@ import { combineEpics } from 'redux-observable'
 import { restartEpic, startDiscoveryOnRestartEpic } from './restartEpic'
 import { fetchResetOptionsEpic } from './fetchResetOptionsEpic'
 import { resetConfigEpic, restartOnResetConfigEpic } from './resetConfigEpic'
+import { syncTimeOnConnectEpic } from './syncTimeOnConnectEpic'
+
 import type { Epic } from '../../types'
 
 export const robotAdminEpic: Epic = combineEpics(
@@ -12,5 +14,6 @@ export const robotAdminEpic: Epic = combineEpics(
   startDiscoveryOnRestartEpic,
   fetchResetOptionsEpic,
   resetConfigEpic,
-  restartOnResetConfigEpic
+  restartOnResetConfigEpic,
+  syncTimeOnConnectEpic
 )

@@ -147,7 +147,10 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
 
   const savePoint = () => {
     sendSessionCommand(Sessions.sharedCalCommands.SAVE_OFFSET)
-    moveCommandString && sendSessionCommand(moveCommandString)
+    // TODO: IMMEDIATELY use actualy epic for managing chained dependent commands
+    setTimeout(() => {
+      moveCommandString && sendSessionCommand(moveCommandString)
+    }, 300)
   }
 
   return (

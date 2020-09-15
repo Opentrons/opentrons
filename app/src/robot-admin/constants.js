@@ -43,3 +43,5 @@ export const RESET_CONFIG_PATH: '/settings/reset' = '/settings/reset'
 
 export const RESET_CONFIG_OPTIONS_PATH: '/settings/reset/options' =
   '/settings/reset/options'
+
+export const SYSTEM_TIME_PATH: '/system/time' = '/system/time'

@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Awaitable, Callable, Dict, List, Optional
 
-from opentrons.calibration_storage import get
+from opentrons.calibration_storage import get, modify, helpers
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
@@ -127,8 +127,11 @@ class PipetteOffsetCalibrationUserFlow:
         return (CriticalPoint.FRONT_NOZZLE if
                 self._hw_pipette.config.channels == 8 else None)
 
-    async def _get_current_point(self) -> Point:
-        return await self._hardware.gantry_position(self._mount)
+    async def _get_current_point(
+            self,
+            critical_point: Optional[CriticalPoint]) -> Point:
+        return await self._hardware.gantry_position(self._mount,
+                                                    critical_point)
 
     async def load_labware(self):
         pass
@@ -138,7 +141,7 @@ class PipetteOffsetCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def move_to_tip_rack(self):
-        point = self._deck[TIP_RACK_SLOT].wells()[0].top().point + \
+        point = self._tip_rack.wells()[0].top().point + \
                 MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
         await self._move(to_loc)
@@ -166,16 +169,26 @@ class PipetteOffsetCalibrationUserFlow:
         await self._move(to_loc)
 
     async def move_to_point_one(self):
+        assert self._z_height_reference is not None, \
+            "saveOffset has not been called yet"
         coords = self._deck.get_calibration_position(POINT_ONE_ID).position
-        await self._move(Location(Point(*coords), None))
+        point_loc = Location(Point(*coords), None)
+        await self._move(
+            point_loc.move(point=Point(0, 0, self._z_height_reference)))
 
     async def save_offset(self):
-        cur_pt = await self._get_current_point()
+        cur_pt = await self._get_current_point(critical_point=None)
         if self.current_state == State.joggingToDeck:
             self._z_height_reference = cur_pt.z
         elif self._current_state == State.savingPointOne:
-            # TODO: save pipette offset
-            pass
+            tiprack_hash = helpers.hash_labware_def(
+                self._tip_rack._definition)
+            modify.save_pipette_calibration(
+                offset=cur_pt,
+                mount=self._mount,
+                pip_id=self._hw_pipette.pipette_id,
+                tiprack_hash=tiprack_hash,
+                tiprack_uri=self._tip_rack.uri)
 
     async def pick_up_tip(self):
         await uf.pick_up_tip(self, tip_length=self._get_tip_length())

@@ -23,7 +23,7 @@ const STATUS_REFRESH_MS = 5000
 
 export function ConnectionCard(props: Props): React.Node {
   const { robot } = props
-  const { name: robotName, status, local } = robot
+  const { name: robotName, status, local, ip } = robot
   const dispatch = useDispatch<Dispatch>()
   const internetStatus = useSelector((state: State) =>
     getInternetStatus(state, robotName)
@@ -36,10 +36,12 @@ export function ConnectionCard(props: Props): React.Node {
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
 
   return (
-    <Card key={robotName} title={CONNECTIVITY} disabled={disabled}>
+    <Card key={robotName} title={CONNECTIVITY}>
       <ConnectionStatusMessage
         type={local ? 'USB' : 'Wi-Fi'}
-        status={internetStatus}
+        status={status}
+        internetStatus={internetStatus}
+        ipAddress={ip}
       />
       <ConnectionInfo connection={wifi} title="Wi-Fi" disabled={disabled}>
         <SelectNetwork robotName={robotName} />

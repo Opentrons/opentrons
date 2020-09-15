@@ -1,0 +1,44 @@
+# This workflow builds API docs on branch pushes that touch the parts
+# of the api/ project that are used by the docs; the docs source themselves;
+# or the CI/makefile tooling used to build the docs.
+
+name: 'API docs build'
+
+on:
+  push:
+    paths:
+      - 'api/src/opentrons/protocol_api/**'
+      - 'api/docs/**'
+      - '.github/workflows/docs-push.yaml'
+      - '.github/actions/python/**'
+    branches-ignore: # ignore any release-related thing (handled elsewhere)
+      - 'master'
+      - 'chore_release-**'
+    tags-ignore:
+      - '*'
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: opentrons documentation build
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'api'
+      - name: 'Setup Docs'
+        run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
+      - name: 'Build docs'
+        run: |
+          make -C api docs

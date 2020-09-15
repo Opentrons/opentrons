@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import cx from 'classnames'
 import { i18n } from '../localization'
+import { resetScrollElements } from '../ui/steps/utils'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditPipettesModal } from './modals/EditPipettesModal'
 import { EditModulesCard } from './modules'
@@ -20,7 +21,6 @@ import { EditModules } from './EditModules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
-
 import type { FormikProps } from 'formik/@flow-typed'
 import type { ModuleRealType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
@@ -54,16 +54,8 @@ export class FilePage extends React.Component<Props, State> {
     moduleToEdit: null,
   }
 
-  // TODO (ka 2019-10-28): This is a workaround, see #4446
-  // but it solves the modal positioning problem caused by main page wrapper
-  // being positioned absolute until we can figure out something better
-  scrollToTop: () => void = () => {
-    const editPage = document.getElementById('main-page')
-    if (editPage) editPage.scrollTop = 0
-  }
-
   openEditPipetteModal: () => void = () => {
-    this.scrollToTop()
+    resetScrollElements()
     this.setState({ isEditPipetteModalOpen: true })
   }
 
@@ -74,7 +66,7 @@ export class FilePage extends React.Component<Props, State> {
     moduleType,
     moduleId
   ) => {
-    this.scrollToTop()
+    resetScrollElements()
     this.setState({
       moduleToEdit: { moduleType: moduleType, moduleId: moduleId },
     })

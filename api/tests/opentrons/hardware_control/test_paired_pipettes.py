@@ -4,6 +4,7 @@ from unittest import mock
 from opentrons import hardware_control as hc
 from opentrons.hardware_control.types import PipettePair, Axis
 from opentrons import types
+from opentrons.config import pipette_config as pc
 
 
 @pytest.fixture
@@ -241,7 +242,9 @@ async def test_tip_action_currents(
         mock_active_current)
 
     def fake_attached(stuff):
-        return dummy_instruments
+        return {mount: {'config': pc.load(value['model']),
+                        'id': value['id']}
+                for mount, value in dummy_instruments.items()}
     monkeypatch.setattr(
         hardware_api._backend, 'get_attached_instruments', fake_attached)
 

@@ -4,6 +4,7 @@ from typing import List, Tuple, Dict, Any
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from opentrons.protocol_api.labware import get_labware_definition
+from opentrons.config.pipette_config import load
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import (
@@ -32,7 +33,7 @@ pipette_map = {
 @pytest.fixture(params=pipette_map.keys())
 def mock_hw_pipette_all_combos(request):
     model = request.param
-    return pipette.Pipette(model,
+    return pipette.Pipette(load(model, 'testId'),
                            {
                                'single': [0, 0, 0],
                                'multi': [0, 0, 0]
@@ -71,7 +72,7 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
 
 @pytest.fixture
 def mock_hw(hardware):
-    pip = pipette.Pipette("p300_single_v2.1",
+    pip = pipette.Pipette(load("p300_single_v2.1", 'testId'),
                           {
                               'single': [0, 0, 0],
                               'multi': [0, 0, 0]
@@ -154,7 +155,7 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
 async def test_move_to_tip_rack(mock_user_flow):
     uf = mock_user_flow
     await uf.move_to_tip_rack()
-    cur_pt = await uf._get_current_point()
+    cur_pt = await uf._get_current_point(None)
     assert cur_pt == uf._deck['8'].wells()[0].top().point + Point(0, 0, 10)
 
 
@@ -163,7 +164,7 @@ async def test_move_to_reference_point(mock_user_flow_all_combos):
     await uf.move_to_reference_point()
     buff = Point(0, 0, 5)
     trash_offset = Point(-57.84, -55, 0)  # offset from center of trash
-    cur_pt = await uf._get_current_point()
+    cur_pt = await uf._get_current_point(None)
     if uf._has_calibration_block:
         if uf._mount == Mount.LEFT:
             assert cur_pt == \
@@ -180,9 +181,9 @@ async def test_move_to_reference_point(mock_user_flow_all_combos):
 async def test_jog(mock_user_flow):
     uf = mock_user_flow
     await uf.jog(vector=(0, 0, 0.1))
-    assert await uf._get_current_point() == Point(0, 0, 0.1)
+    assert await uf._get_current_point(None) == Point(0, 0, 0.1)
     await uf.jog(vector=(1, 0, 0))
-    assert await uf._get_current_point() == Point(1, 0, 0.1)
+    assert await uf._get_current_point(None) == Point(1, 0, 0.1)
 
 
 async def test_pick_up_tip(mock_user_flow):

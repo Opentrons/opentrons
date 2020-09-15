@@ -1,8 +1,10 @@
 import pytest
 from unittest.mock import MagicMock, call
 from typing import List, Tuple, Dict, Any
+from opentrons.calibration_storage import modify, helpers
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
+from opentrons.config.pipette_config import load
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand
@@ -30,7 +32,7 @@ pipette_map = {
 @pytest.fixture(params=pipette_map.keys())
 def mock_hw_pipette_all_combos(request):
     model = request.param
-    return pipette.Pipette(model,
+    return pipette.Pipette(load(model, 'testId'),
                            {
                                'single': [0, 0, 0],
                                'multi': [0, 0, 0]
@@ -69,7 +71,7 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
 
 @pytest.fixture
 def mock_hw(hardware):
-    pip = pipette.Pipette("p300_single_v2.1",
+    pip = pipette.Pipette(load("p300_single_v2.1", 'testId'),
                           {
                               'single': [0, 0, 0],
                               'multi': [0, 0, 0]
@@ -122,16 +124,16 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
 async def test_move_to_tip_rack(mock_user_flow):
     uf = mock_user_flow
     await uf.move_to_tip_rack()
-    cur_pt = await uf._get_current_point()
+    cur_pt = await uf._get_current_point(None)
     assert cur_pt == uf._deck['8'].wells()[0].top().point + Point(0, 0, 10)
 
 
 async def test_jog(mock_user_flow):
     uf = mock_user_flow
     await uf.jog(vector=(0, 0, 0.1))
-    assert await uf._get_current_point() == Point(0, 0, 0.1)
+    assert await uf._get_current_point(None) == Point(0, 0, 0.1)
     await uf.jog(vector=(1, 0, 0))
-    assert await uf._get_current_point() == Point(1, 0, 0.1)
+    assert await uf._get_current_point(None) == Point(1, 0, 0.1)
 
 
 async def test_pick_up_tip(mock_user_flow):
@@ -164,6 +166,9 @@ async def test_return_tip(mock_user_flow):
 @pytest.mark.parametrize('command,current_state,data,hw_meth', hw_commands)
 async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
     mock_user_flow._current_state = current_state
+    # z height reference must be present for moving to point one
+    if command == CalibrationCommand.move_to_point_one:
+        mock_user_flow._z_height_reference = 0.1
     await mock_user_flow.handle_command(command, data)
 
     getattr(mock_user_flow._hardware, hw_meth).assert_called()
@@ -190,3 +195,31 @@ def test_no_pipette(hardware, mount):
                                          mount=mount)
 
     assert error.value.error.detail == f"No pipette present on {mount} mount"
+
+
+async def test_save_pipette_calibration(mock_user_flow):
+    uf = mock_user_flow
+
+    def mock_save_pipette_offset(*args, **kwargs):
+        pass
+
+    modify.save_pipette_calibration = \
+        MagicMock(side_effect=mock_save_pipette_offset)
+
+    uf._current_state = 'savingPointOne'
+    await uf._hardware.move_to(
+            mount=uf._mount,
+            abs_position=Point(x=10, y=10, z=40),
+            critical_point=uf._get_critical_point_override()
+        )
+
+    await uf.save_offset()
+    tiprack_hash = helpers.hash_labware_def(uf._tip_rack._definition)
+
+    modify.save_pipette_calibration.assert_called_with(
+        offset=Point(x=10, y=10, z=40),
+        mount=uf._mount,
+        pip_id=uf._hw_pipette.pipette_id,
+        tiprack_hash=tiprack_hash,
+        tiprack_uri=uf._tip_rack.uri
+    )

@@ -6,16 +6,16 @@ from collections import OrderedDict
 from typing import (Any, Dict, Union, List, Optional, Tuple,
                     TYPE_CHECKING, cast, overload, Sequence)
 
-from opentrons_shared_data.pipette import name_for_model
+from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.util import linal
 from functools import lru_cache
 from opentrons.config import (
-    robot_configs, pipette_config, feature_flags as ff)
-from opentrons.drivers.types import MoveSplit
+    robot_configs, feature_flags as ff)
 
 from .util import use_or_initialize_loop, DeckTransformState
-from .pipette import Pipette
+from .pipette import (
+    Pipette, generate_hardware_configs, load_from_config_and_check_skip)
 from .controller import Controller
 from .simulator import Simulator
 from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
@@ -30,7 +30,7 @@ from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
-        UlPerMmAction, PipetteModel, PipetteName
+        UlPerMmAction, PipetteName
     )
     from .dev_types import PipetteDict
 
@@ -340,90 +340,88 @@ class API(HardwareAPILike):
             await self._execution_manager.register_cancellable_task(delay_task)
         self.resume()
 
+    def reset_instrument(self, mount: top_types.Mount = None):
+        """
+        Reset the internal state of a pipette by its mount, without doing
+        any lower level reconfiguration. This is useful to make sure that no
+        settings changes from a protocol persist.
+
+        :param mount: If specified, reset that mount. If not specified,
+                      reset both
+        """
+        def _reset(m: top_types.Mount):
+            self._log.info(f"Resetting configuration for {m}")
+            p = self._attached_instruments[m]
+            if not p:
+                return
+            new_p = Pipette(
+                p._config,
+                self._config.instrument_offset[m.name.lower()],
+                p.pipette_id)
+            new_p.act_as(p.acting_as)
+            self._attached_instruments[m] = new_p
+
+        if not mount:
+            for m in top_types.Mount:
+                _reset(m)
+        else:
+            _reset(mount)
+
     async def cache_instruments(
             self,
-            require: Dict[
-                top_types.Mount, Union['PipetteModel', 'PipetteName']] = {}):
+            require: Dict[top_types.Mount, 'PipetteName'] = None):
         """
-         - Get the attached instrument on each mount and
-         - Cache their pipette configs from pipette-config.json
+        Scan the attached instruments, take necessary configuration actions,
+        and set up hardware controller internal state if necessary.
 
         :param require: If specified, the require should be a dict
-                        of mounts to instrument identifier describing
-                        the instruments expected to be present. This
-                        identifier can be either an instrument name or
-                        the more specific instrument model string
-                        (e.g. 'p10_single' or 'p10_single_v1.3'). This can
+                        of mounts to instrument names describing
+                        the instruments expected to be present. This can
                         save a subsequent of :py:attr:`attached_instruments`
                         and also serves as the hook for the hardware
                         simulator to decide what is attached.
         :raises RuntimeError: If an instrument is expected but not found.
 
+        .. note::
+
+            This function will only change the things that need to be changed.
+            If the same pipette (by serial) or the same lack of pipette is
+            observed on a mount before and after the scan, no action will be
+            taken. That makes this function appropriate for setting up the
+            robot for operation, but not for making sure that any previous
+            settings changes have been reset. For the latter use case, use
+            :py:meth:`reset_instrument`.
+
         """
         self._log.info("Updating instrument model cache")
-        found = self._backend.get_attached_instruments(require or {})
+        checked_require = require or {}
+        for mount, name in checked_require.items():
+            if name not in name_config():
+                raise RuntimeError(f'{name} is not a valid pipette name')
+        found = self._backend.get_attached_instruments(checked_require)
 
         for mount, instrument_data in found.items():
-            model = instrument_data.get('model')
-            req_instr = require.get(mount, None)
-            back_compat: List['PipetteName'] = []
-            mount_axis = Axis.by_mount(mount)
-            plunger_axis = Axis.of_plunger(mount)
-            splits: Dict[str, MoveSplit] = {}
-            if model:
-                p = Pipette(
-                    model,
-                    self._config.instrument_offset[mount.name.lower()],
-                    instrument_data['id'])
-                back_compat = p.config.back_compat_names
-                if req_instr and req_instr in back_compat:
-                    name_conf = pipette_config.name_config()
-                    bc_conf = name_conf[req_instr]  # type: ignore
-                    p.working_volume = bc_conf['maxVolume']
-                    p.update_config_item('min_volume', bc_conf['minVolume'])
-                    p.update_config_item('max_volume', bc_conf['maxVolume'])
+            config = instrument_data.get('config')
+            req_instr = checked_require.get(mount, None)
+            p, may_skip = load_from_config_and_check_skip(
+                config,
+                self._attached_instruments[mount],
+                req_instr,
+                instrument_data.get('id'),
+                self._config.instrument_offset[mount.name.lower()])
+            self._attached_instruments[mount] = p
+            if req_instr and p:
+                p.act_as(req_instr)
 
-                self._attached_instruments[mount] = p
-                home_pos = p.config.home_position
-                max_travel = p.config.max_travel
-                steps_mm = p.config.steps_per_mm
-                idle_current = p.config.idle_current
-                if 'needsUnstick' in p.config.quirks:
-                    splits[plunger_axis.name.upper()] = MoveSplit(
-                        split_distance=1,
-                        split_current=1.75,
-                        split_speed=1,
-                        after_time=1800,
-                        fullstep=True)
+            if may_skip:
+                self._log.info(
+                    f"Skipping configuration on {mount.name}")
+                continue
 
-            if req_instr and not self.is_simulator:
-                if not model:
-                    raise RuntimeError(
-                        f'mount {mount}: instrument {req_instr} was'
-                        f' requested, but no instrument is present')
-                name = name_for_model(model)
-                if req_instr not in (name, model)\
-                        and req_instr not in back_compat:
-                    raise RuntimeError(f'mount {mount}: instrument'
-                                       f' {req_instr} was requested'
-                                       f' but {model} is present')
-
-            if not model:
-                self._attached_instruments[mount] = None
-                home_pos = self._config.default_pipette_configs['homePosition']
-                max_travel = self._config.default_pipette_configs['maxTravel']
-                steps_mm = self._config.default_pipette_configs['stepsPerMM']
-                idle_current = self._config.low_current[plunger_axis.name]
-
-            self._backend._smoothie_driver.update_steps_per_mm(
-                {plunger_axis.name: steps_mm})
-            self._backend._smoothie_driver.update_pipette_config(
-                mount_axis.name, {'home': home_pos})
-            self._backend._smoothie_driver.update_pipette_config(
-                plunger_axis.name, {'max_travel': max_travel})
-            self._backend._smoothie_driver.set_dwelling_current(
-                {plunger_axis.name: idle_current})
-            self._backend._smoothie_driver.configure_splits_for(splits)
+            self._log.info(
+                f"Doing full configuration on {mount.name}")
+            hw_config = generate_hardware_configs(p, self._config)
+            self._backend.configure_mount(mount, hw_config)
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 
@@ -593,6 +591,8 @@ class API(HardwareAPILike):
         information about their presence or state.
         """
         await self._execution_manager.reset()
+        self._attached_instruments = {
+            k: None for k in self._attached_instruments.keys()}
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
@@ -1545,21 +1545,27 @@ class API(HardwareAPILike):
 
         await self.retract(mount, retract_target)
 
-    def set_current_tiprack_diameter(self, mount, tiprack_diameter):
-        instr = self._attached_instruments[mount]
-        assert instr
-        self._log.info(
-            "Updating tip rack diameter on pipette mount: "
-            "{}, tip diameter: {} mm".format(mount, tiprack_diameter))
-        instr.current_tiprack_diameter = tiprack_diameter
+    def set_current_tiprack_diameter(
+            self, mount: Union[top_types.Mount, PipettePair],
+            tiprack_diameter: float):
+        instruments = self._instruments_for(mount)
+        for instr in instruments:
+            assert instr[0]
+            self._log.info(
+                "Updating tip rack diameter on pipette mount: "
+                f"{instr[1]}, tip diameter: {tiprack_diameter} mm")
+            instr[0].current_tiprack_diameter = tiprack_diameter
 
-    def set_working_volume(self, mount, tip_volume):
-        instr = self._attached_instruments[mount]
-        assert instr
-        self._log.info(
-            "Updating working volume on pipette mount: {}, tip volume: {} ul"
-            .format(mount, tip_volume))
-        instr.working_volume = tip_volume
+    def set_working_volume(
+            self, mount: Union[top_types.Mount, PipettePair],
+            tip_volume: int):
+        instruments = self._instruments_for(mount)
+        for instr in instruments:
+            assert instr[0]
+            self._log.info(
+                "Updating working volume on pipette mount:"
+                f"{instr[1]}, tip volume: {tip_volume} ul")
+            instr[0].working_volume = tip_volume
 
     async def drop_tip(
             self,

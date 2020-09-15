@@ -9,6 +9,7 @@ import cx from 'classnames'
 import { useConditionalConfirm } from '@opentrons/components'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
+import { resetScrollElements } from '../../ui/steps/utils'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
 import formStyles from '../forms/forms.css'
@@ -173,6 +174,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   )
 
   const toggleMoreOptionsModal = () => {
+    resetScrollElements()
     setShowMoreOptionsModal(!showMoreOptionsModal)
   }
 

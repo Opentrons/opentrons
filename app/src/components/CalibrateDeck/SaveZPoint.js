@@ -67,7 +67,10 @@ export function SaveZPoint(props: CalibrateDeckChildProps): React.Node {
 
   const savePoint = () => {
     sendSessionCommand(Sessions.deckCalCommands.SAVE_OFFSET)
-    sendSessionCommand(Sessions.deckCalCommands.MOVE_TO_POINT_ONE)
+    // TODO: IMMEDIATELY use actualy epic for managing chained dependent commands
+    setTimeout(() => {
+      sendSessionCommand(Sessions.deckCalCommands.MOVE_TO_POINT_ONE)
+    }, 300)
   }
 
   return (

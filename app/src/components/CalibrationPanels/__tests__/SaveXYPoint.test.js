@@ -27,6 +27,7 @@ describe('SaveXYPoint', () => {
   const getVideo = wrapper => wrapper.find(`source`)
 
   beforeEach(() => {
+    jest.useFakeTimers()
     render = (props = {}) => {
       const {
         pipMount = 'left',
@@ -52,6 +53,8 @@ describe('SaveXYPoint', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
+    jest.clearAllTimers()
+    jest.useRealTimers()
   })
 
   it('displays proper asset', () => {
@@ -155,6 +158,7 @@ describe('SaveXYPoint', () => {
     getSaveButton(wrapper).invoke('onClick')()
 
     wrapper.update()
+    jest.runAllTimers()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.sharedCalCommands.SAVE_OFFSET
@@ -173,6 +177,7 @@ describe('SaveXYPoint', () => {
     expect(wrapper.text()).toContain('slot 3')
     getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
+    jest.runAllTimers()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.sharedCalCommands.SAVE_OFFSET
@@ -191,6 +196,7 @@ describe('SaveXYPoint', () => {
     expect(wrapper.text()).toContain('slot 7')
     getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
+    jest.runAllTimers()
 
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.sharedCalCommands.SAVE_OFFSET
@@ -211,6 +217,7 @@ describe('SaveXYPoint', () => {
 
     getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
+    jest.runAllTimers()
     expect(mockSendCommand).toHaveBeenCalledWith(
       Sessions.sharedCalCommands.SAVE_OFFSET
     )

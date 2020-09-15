@@ -2,6 +2,7 @@
 from collections import UserDict
 import functools
 import logging
+import math
 from dataclasses import dataclass, field, astuple
 from typing import (Any, Callable, Dict, Optional,
                     TYPE_CHECKING, Union, List, Set)
@@ -12,7 +13,7 @@ from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
 if TYPE_CHECKING:
     from opentrons.protocol_api.contexts import InstrumentContext
-    from opentrons.protocol_api.labware import Well
+    from opentrons.protocol_api.labware import Well, Labware
     from opentrons.protocols.geometry.deck import Deck
     from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
 
@@ -100,6 +101,16 @@ def build_edges(
         return [edge for edge in astuple(edge_list) if edge]
     new_edges = determine_edge_path(where, mount, edge_list, deck)
     return [edge for edge in astuple(new_edges) if edge]
+
+
+def labware_column_shift(
+        initial_well: 'Well', tiprack: 'Labware',
+        well_spacing: int = 4) -> 'Well':
+    unshifted_index = tiprack.wells().index(initial_well)
+    unshifted_column = math.floor(unshifted_index/8)
+    shifted_column = unshifted_column + well_spacing
+    shifted_well = unshifted_index % 8
+    return tiprack.columns()[shifted_column][shifted_well]
 
 
 def first_parent(loc: top_types.LocationLabware) -> Optional[str]:

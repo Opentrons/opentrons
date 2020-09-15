@@ -1,29 +1,32 @@
 // @flow
 // RobotSettings card for robot status
 import * as React from 'react'
+import cx from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
+  Card,
+  Flex,
+  Box,
+  LabeledValue,
+  SecondaryBtn,
+  Tooltip,
+  useInterval,
+  useHoverTooltip,
+  ALIGN_FLEX_START,
+  FLEX_NONE,
+  SPACING_AUTO,
+  SPACING_3,
+} from '@opentrons/components'
+
+import { getBuildrootUpdateDisplayInfo } from '../../buildroot'
+import { checkShellUpdate } from '../../shell'
+import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
-  HEALTH_STATUS_OK,
 } from '../../discovery'
-
-import { getBuildrootRobot, getBuildrootUpdateAvailable } from '../../buildroot'
-
-import { checkShellUpdate } from '../../shell'
-
-import {
-  Card,
-  LabeledValue,
-  OutlineButton,
-  HoverTooltip,
-  useInterval,
-} from '@opentrons/components'
-
-import { CardRow, CardContentThird } from '../layout'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -38,13 +41,7 @@ const NAME_LABEL = 'Robot name'
 const SERVER_VERSION_LABEL = 'Server version'
 const FIRMWARE_VERSION_LABEL = 'Firmware version'
 const MAX_PROTOCOL_API_VERSION_LABEL = 'Max Protocol API Version'
-
-const UPDATE_SERVER_UNAVAILABLE =
-  "Unable to update because your robot's update server is not responding"
-const OTHER_ROBOT_UPDATING =
-  'Unable to update because your app is currently updating a different robot'
-const NO_UPDATE_FILES =
-  'No robot update files found for this version of the app; please check again later'
+const UNKNOWN = 'Unknown'
 
 const DEFAULT_MAX_API_VERSION = '1.0'
 
@@ -52,77 +49,67 @@ const UPDATE_RECHECK_DELAY_MS = 60000
 
 export function InformationCard(props: InformationCardProps): React.Node {
   const { robot, updateUrl } = props
-  const updateType = useSelector((state: State) =>
-    getBuildrootUpdateAvailable(state, robot)
+  const [updateBtnProps, updateBtnTooltipProps] = useHoverTooltip()
+  const { autoUpdateAction, autoUpdateDisabledReason } = useSelector(
+    (state: State) => {
+      return getBuildrootUpdateDisplayInfo(state, robot.name)
+    }
   )
+
   const dispatch = useDispatch<Dispatch>()
   const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
     dispatch,
   ])
 
-  const { displayName, serverHealthStatus } = robot
-  const buildrootRobot = useSelector(getBuildrootRobot)
+  const { displayName } = robot
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
   const maxApiVersion = getRobotProtocolApiVersion(robot)
-
-  const updateFilesUnavailable = updateType === null
-  const updateServerUnavailable = serverHealthStatus !== HEALTH_STATUS_OK
-  const otherRobotUpdating = Boolean(buildrootRobot && buildrootRobot !== robot)
-  const updateDisabled =
-    updateFilesUnavailable || updateServerUnavailable || otherRobotUpdating
-
-  const updateButtonText = updateType || 'up to date'
-  let updateButtonTooltip = null
-  if (otherRobotUpdating) {
-    updateButtonTooltip = <span>{OTHER_ROBOT_UPDATING}</span>
-  } else if (updateServerUnavailable) {
-    updateButtonTooltip = <span>{UPDATE_SERVER_UNAVAILABLE}</span>
-  } else if (updateFilesUnavailable) {
-    updateButtonTooltip = <span>{NO_UPDATE_FILES}</span>
-  }
+  const updateDisabled = autoUpdateDisabledReason !== null
 
   // check for available updates on an interval
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
 
   return (
     <Card title={TITLE}>
-      <CardContentThird>
-        <CardRow>
-          <LabeledValue label={NAME_LABEL} value={displayName} />
-        </CardRow>
-        <LabeledValue
-          label={FIRMWARE_VERSION_LABEL}
-          value={firmwareVersion || 'Unknown'}
-        />
-      </CardContentThird>
-      <CardContentThird>
-        <CardRow>
+      <Flex alignItems={ALIGN_FLEX_START} padding={SPACING_3}>
+        <Box marginRight={SPACING_3}>
+          <Box marginBottom={SPACING_3}>
+            <LabeledValue label={NAME_LABEL} value={displayName} />
+          </Box>
           <LabeledValue
-            label={SERVER_VERSION_LABEL}
-            value={version || 'Unknown'}
+            label={FIRMWARE_VERSION_LABEL}
+            value={firmwareVersion || UNKNOWN}
           />
-        </CardRow>
-        <LabeledValue
-          label={MAX_PROTOCOL_API_VERSION_LABEL}
-          value={maxApiVersion || DEFAULT_MAX_API_VERSION}
-        />
-      </CardContentThird>
-      <CardContentThird>
-        <HoverTooltip tooltipComponent={updateButtonTooltip}>
-          {hoverTooltipHandlers => (
-            <div {...hoverTooltipHandlers}>
-              <OutlineButton
-                Component={Link}
-                to={updateUrl}
-                disabled={updateDisabled}
-              >
-                {updateButtonText}
-              </OutlineButton>
-            </div>
-          )}
-        </HoverTooltip>
-      </CardContentThird>
+        </Box>
+        <Box marginRight={SPACING_AUTO}>
+          <Box marginBottom={SPACING_3}>
+            <LabeledValue
+              label={SERVER_VERSION_LABEL}
+              value={version || UNKNOWN}
+            />
+          </Box>
+          <LabeledValue
+            label={MAX_PROTOCOL_API_VERSION_LABEL}
+            value={maxApiVersion || DEFAULT_MAX_API_VERSION}
+          />
+        </Box>
+        <SecondaryBtn
+          {...updateBtnProps}
+          as={Link}
+          to={!updateDisabled ? updateUrl : '#'}
+          flex={FLEX_NONE}
+          minWidth="9rem"
+          className={cx({ disabled: updateDisabled })}
+        >
+          {autoUpdateAction}
+        </SecondaryBtn>
+        {autoUpdateDisabledReason !== null && (
+          <Tooltip {...updateBtnTooltipProps}>
+            {autoUpdateDisabledReason}
+          </Tooltip>
+        )}
+      </Flex>
     </Card>
   )
 }

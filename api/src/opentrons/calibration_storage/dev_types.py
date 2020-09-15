@@ -2,7 +2,7 @@ import typing
 from typing_extensions import TypedDict
 from datetime import datetime
 
-from .types import AttitudeMatrix
+from .types import AttitudeMatrix, PipetteOffset
 
 
 class TipLengthCalibration(TypedDict):
@@ -42,6 +42,13 @@ class CalibrationDict(TypedDict):
     """
     default: OffsetDict
     tipLength: TipLengthDict
+
+
+class PipetteCalibrationData(TypedDict):
+    offset: PipetteOffset
+    tiprack: str
+    uri: str
+    last_modified: datetime
 
 
 class DeckCalibrationData(TypedDict):

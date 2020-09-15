@@ -25,5 +25,5 @@ export const OVERLAY_WHITE_20 = 'rgba(255, 255, 255, 0.2)'
 // opacities
 export const OPACITY_DISABLED = 0.3
 
-// TDOD(isk: 3/2/20): Rename to be more generic (e.g. not FONT)
+// TODO(isk: 3/2/20): Rename to be more generic (e.g. not FONT)
 export const C_FONT_DISABLED = '#9c9c9c'

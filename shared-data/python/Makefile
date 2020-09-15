@@ -36,6 +36,9 @@ json_sources = $(filter %.json,$(shell $(SHX) find ..))
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
 
+.PHONY: setup
+setup: setup-py
+
 .PHONY: setup-py
 setup-py:
 	$(pipenv) sync $(pipenv_opts)

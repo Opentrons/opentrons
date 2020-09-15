@@ -3,7 +3,9 @@ import logging
 from typing import Dict, Tuple, Union
 from datetime import datetime, timezone
 from opentrons.util.helpers import utc_now
+from opentrons.config import IS_ROBOT
 from robot_server.system import errors
+from robot_server.service.errors import CommonErrorDef
 
 log = logging.getLogger(__name__)
 
@@ -73,6 +75,11 @@ async def set_system_time(new_time_dt: datetime,
     Raise error with message, if any.
     :return: current date read.
     """
+    if not IS_ROBOT:
+        raise errors.SystemSetTimeException(
+            msg="Not supported on dev server.",
+            definition=CommonErrorDef.NOT_IMPLEMENTED)
+
     status = await _time_status(loop)
     if status.get('LocalRTC') is True or status.get('NTPSynchronized') is True:
         # TODO: Update this to handle RTC sync correctly once we introduce RTC

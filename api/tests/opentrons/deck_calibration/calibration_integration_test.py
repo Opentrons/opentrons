@@ -19,17 +19,16 @@ from opentrons.hardware_control.types import CriticalPoint
 
 async def test_transform_from_moves_v2(
         hardware, monkeypatch):
-    test_mount, test_model = (types.Mount.LEFT, 'p300_multi_v1')
+    test_mount, test_model = (types.Mount.LEFT, 'p300_multi')
 
     await hardware.reset()
     await hardware.cache_instruments({
-        test_mount: test_model,
-        types.Mount.RIGHT: None})
+        test_mount: test_model})
     await hardware.home()
     resp = await dc.endpoints.create_session(False, hardware=hardware)
     token = resp.token
     assert resp.pipette.get('mount') == 'left'
-    assert resp.pipette.get('model') == test_model
+    assert resp.pipette.get('model') == test_model + '_v1'
 
     await dc.endpoints.attach_tip({'tipLength': 51.7})
 
