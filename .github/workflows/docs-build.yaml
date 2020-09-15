@@ -42,3 +42,7 @@ jobs:
       - name: 'Build docs'
         run: |
           make -C api docs
+      - name: 'Deploy docs to sandbox'
+        uses: './.github/actions/webstack/deploy-to-sandbox'
+        with:
+          domain: 'docs.opentrons.com'
