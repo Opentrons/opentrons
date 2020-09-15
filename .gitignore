@@ -26,6 +26,9 @@ build/
 api/docs/build/
 develop-eggs/
 dist/
+# not the dist dir in github actions
+!.github/**/dist
+
 downloads/
 eggs/
 .eggs/
