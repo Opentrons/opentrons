@@ -89,7 +89,7 @@ export function CalibratePipetteOffset(
 
   const showSpinner =
     useSelector<State, RequestState | null>(state =>
-      getRequestById(state, trackedRequestId)
+      getRequestById(state, trackedRequestId.current)
     )?.status === PENDING
 
   function sendCommands(...comms: Array<CommandToSend>) {
@@ -114,8 +114,14 @@ export function CalibratePipetteOffset(
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
-    sendCommands(Sessions.deckCalCommands.EXIT)
-    deleteSession()
+    dispatchRequests(
+      Sessions.createSessionCommand(robotName, session.id, {
+        command: Sessions.deckCalCommands.EXIT,
+        data: {},
+      }),
+      Sessions.deleteSession(robotName, session.id)
+    )
+    closeWizard()
   }, true)
 
   const isMulti = React.useMemo(() => {

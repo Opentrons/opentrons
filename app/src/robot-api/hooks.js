@@ -94,19 +94,23 @@ export function useDispatchApiRequests<
 
   const trackedRequestIsPending =
     useSelector<State, RequestState | null>(state =>
-      getRequestById(state, trackedRequestId)
+      getRequestById(state, trackedRequestId.current)
     )?.status === PENDING
 
-  if (!trackedRequestIsPending && unrequestedQueue.current.length > 0) {
+  const triggerNext = () => {
+    console.log('in trigger', unrequestedQueue.current)
     const action = dispatchRequest(unrequestedQueue.current[0])
     if (onDispatch) onDispatch(action)
     trackedRequestId.current = action.meta.requestId
     unrequestedQueue.current = unrequestedQueue.current.slice(1) // dequeue
   }
+  if (unrequestedQueue.current.length > 0 && !trackedRequestIsPending) {
+    triggerNext()
+  }
 
   const dispatchApiRequests = (...a: Array<A>) => {
-    console.log('called', a)
     unrequestedQueue.current = a
+    triggerNext()
   }
 
   return [dispatchApiRequests, requestIds]
