@@ -9,7 +9,7 @@ on:
     paths:
       - 'api/src/opentrons/protocol_api/**'
       - 'api/docs/**'
-      - '.github/workflows/docs-push.yaml'
+      - '.github/workflows/docs-build.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
