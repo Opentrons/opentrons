@@ -1,0 +1,17 @@
+{
+  "name": "deploy-to-sandbox",
+  "version": "1.0.0",
+  "description": "Deploy an Opentrons web stack project to its sandbox",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Opentrons Engineering",
+  "license": "Apache-2",
+  "dependencies": {
+    "@actions/core": "^1.2.5",
+    "@actions/github": "^4.0.0",
+    "aws-sdk": "^2.752.0"
+  }
+}

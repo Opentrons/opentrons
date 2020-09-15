@@ -52,6 +52,8 @@ pip-delete-this-directory.txt
 
 # node packages
 node_modules
+# but not the ones interned in action defs
+!.github/**/node_modules
 
 # Unit test / coverage reports
 htmlcov/
