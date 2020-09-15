@@ -12,6 +12,7 @@
   "dependencies": {
     "@actions/core": "^1.2.5",
     "@actions/github": "^4.0.0",
-    "aws-sdk": "^2.752.0"
+    "aws-sdk": "^2.752.0",
+    "mime": "^2.4.6"
   }
 }
