@@ -10,7 +10,7 @@ from opentrons.protocols.geometry import deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand
-import robot_server.robot.calibration.util as uf
+from robot_server.robot.calibration import util
 from ..errors import CalibrationError
 from ..helper_classes import (RequiredLabware, AttachedPipette)
 from ..constants import TIP_RACK_LOOKUP_BY_MAX_VOL, SHORT_TRASH_DECK, \
@@ -50,6 +50,7 @@ class PipetteOffsetCalibrationUserFlow:
             else STANDARD_DECK
         self._deck = deck.Deck(load_name=deck_load_name)
 
+        self._saved_offset_this_session = False
         self._current_state = State.sessionStarted
         self._state_machine = PipetteOffsetCalibrationStateMachine()
 
@@ -149,11 +150,9 @@ class PipetteOffsetCalibrationUserFlow:
     async def move_to_tip_rack(self):
         if self._current_state == State.labwareLoaded and \
                 not self._has_calibrated_tip_length:
-            raise RobotServerError(
-                definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
-                handler="move_to_tip_rack",
-                state=self._current_state,
-                condition="tip length calibration data exists")
+            self._flag_unmet_transition_req(
+                command_handler="move_to_tip_rack",
+                unmet_condition="tip length calibration data exists")
         point = self._tip_rack.wells()[0].top().point + \
             MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
@@ -162,7 +161,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_stored_tip_length_cal(self) -> Optional[float]:
         try:
             return get.load_tip_length_calibration(
-                self._hw_pipette.pipette_id,  # type: ignore
+                self._hw_pipette.pipette_id,
                 self._tip_rack._definition,
                 '')['tipLength']
         except TipLengthCalNotFound:
@@ -191,21 +190,25 @@ class PipetteOffsetCalibrationUserFlow:
                 cb_setup['load_name'],
                 self._deck.position_for(cb_setup['slot']))
 
+    def _flag_unmet_transition_req(self, command_handler: str,
+                                   unmet_condition: str):
+        raise RobotServerError(
+            definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
+            handler=command_handler,
+            state=self._current_state,
+            condition=unmet_condition)
+
     async def move_to_deck(self):
         if not self._has_calibrated_tip_length and \
                 self._current_state == State.inspectingTip:
-            raise RobotServerError(
-                definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
-                handler="move_to_deck",
-                state=self._current_state,
-                condition="tip length calibration data exists")
+            self._flag_unmet_transition_req(
+                command_handler="move_to_deck",
+                unmet_condition="tip length calibration data exists")
         if self._current_state == State.calibrationComplete and \
-                False:  # TODO: raise if pipette offset already saved
-            raise RobotServerError(
-                definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
-                handler="move_to_deck",
-                state=self._current_state,
-                condition="no pipette offset data saved")
+                self._saved_offset_this_session:
+            self._flag_unmet_transition_req(
+                command_handler="move_to_deck",
+                unmet_condition="offset not saved this session")
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
         ydim = self._deck.get_slot_definition(
             JOG_TO_DECK_SLOT)['boundingBox']['yDimension']
@@ -235,12 +238,13 @@ class PipetteOffsetCalibrationUserFlow:
                 pip_id=self._hw_pipette.pipette_id,
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri)
+            self._saved_offset_this_session = True
         elif self._current_state == State.measuringNozzleOffset:
             self._nozzle_height_at_reference = cur_pt.z
         elif self._current_state == State.measuringTipOffset:
             assert self._hw_pipette.has_tip
-            uf.save_tip_length_calibration(
-                self,
+            util.save_tip_length_calibration(
+                pipette_id=self._hw_pipette.pipette_id,
                 tip_length_offset=cur_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack)
 
@@ -248,26 +252,26 @@ class PipetteOffsetCalibrationUserFlow:
         if self._has_calibrated_tip_length and \
                 self._current_state in (State.labwareLoaded,
                                         State.inspectingTip):
-            raise RobotServerError(
-                definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
-                handler="move_to_reference_point",
-                state=self._current_state,
-                condition="missing tip length calibration")
-        await uf.move_to_reference_point(
-            self,
+            self._flag_unmet_transition_req(
+                command_handler="move_to_reference_point",
+                unmet_condition="missing tip length calibration")
+        ref_loc = util.get_reference_location(
+            mount=self._mount,
+            deck=self._deck,
             has_calibration_block=self._has_calibration_block)
+        await self._move(ref_loc)
 
     async def pick_up_tip(self):
-        await uf.pick_up_tip(self, tip_length=self._get_tip_length())
+        await util.pick_up_tip(self, tip_length=self._get_tip_length())
 
     async def invalidate_tip(self):
-        await uf.invalidate_tip(self)
+        await util.invalidate_tip(self)
 
     async def _return_tip(self):
-        await uf.return_tip(self, tip_length=self._get_tip_length())
+        await util.return_tip(self, tip_length=self._get_tip_length())
 
     async def _move(self, to_loc: Location):
-        await uf.move(self, to_loc)
+        await util.move(self, to_loc)
 
     async def exit_session(self):
         await self.move_to_tip_rack()

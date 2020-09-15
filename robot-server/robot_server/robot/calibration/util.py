@@ -5,8 +5,9 @@ from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.calibration_storage import modify
-from opentrons.types import Point, Location
+from opentrons.types import Point, Location, Mount
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CommandDefinition
@@ -152,29 +153,30 @@ async def move(user_flow: CalibrationUserFlow, to_loc: Location):
                                           critical_point=move[1])
 
 
-async def move_to_reference_point(user_flow: CalibrationUserFlow,
-                                  has_calibration_block: bool):
+async def get_reference_location(mount: Mount,
+                                 deck: Deck,
+                                 has_calibration_block: bool) -> Location:
     """
-    Move pipette with or without tip to static z reference point
+    Get location of static z reference point.
     Will be on Calibration Block if available, otherwise will be on
-    flat surface of trash fixed trash insert.
+    flat surface of fixed trash insert.
     """
     if has_calibration_block:
-        slot = CAL_BLOCK_SETUP_BY_MOUNT[user_flow._mount]['slot']
-        well = CAL_BLOCK_SETUP_BY_MOUNT[user_flow._mount]['well']
-        calblock: labware.Labware = user_flow._deck[slot]  # type: ignore
+        slot = CAL_BLOCK_SETUP_BY_MOUNT[mount]['slot']
+        well = CAL_BLOCK_SETUP_BY_MOUNT[mount]['well']
+        calblock: labware.Labware = deck[slot]  # type: ignore
         calblock_loc = calblock.wells_by_name()[well].top()
         ref_loc = calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)
     else:
-        trash = user_flow._deck.get_fixed_trash()
+        trash = deck.get_fixed_trash()
         assert trash
         trash_loc = trash.wells_by_name()[TRASH_WELL].top()
         ref_loc = trash_loc.move(TRASH_REF_POINT_OFFSET +
                                  MOVE_TO_REF_POINT_SAFETY_BUFFER)
-    await user_flow._move(ref_loc)
+    return ref_loc
 
 
-def save_tip_length_calibration(user_flow: CalibrationUserFlow,
+def save_tip_length_calibration(pipette_id: str,
                                 tip_length_offset: float,
                                 tip_rack: labware.Labware):
     # TODO: 07-22-2020 parent slot is not important when tracking
@@ -182,5 +184,4 @@ def save_tip_length_calibration(user_flow: CalibrationUserFlow,
     # from create_tip_length_data in a refactor
     tip_length_data = modify.create_tip_length_data(tip_rack._definition, '',
                                                     tip_length_offset)
-    modify.save_tip_length_calibration(user_flow._hw_pipette.pipette_id,
-                                       tip_length_data)
+    modify.save_tip_length_calibration(pipette_id, tip_length_data)

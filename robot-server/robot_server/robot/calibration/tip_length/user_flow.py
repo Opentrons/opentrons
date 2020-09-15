@@ -9,7 +9,7 @@ from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import deck
 
-import robot_server.robot.calibration.util as uf
+from robot_server.robot.calibration import util
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models import CalibrationCommand
 from robot_server.robot.calibration.constants import \
@@ -148,8 +148,8 @@ class TipCalibrationUserFlow:
                 critical_point=CriticalPoint.NOZZLE)
             tip_length_offset = cur_pt.z - self._nozzle_height_at_reference
 
-            uf.save_tip_length_calibration(
-                self,
+            util.save_tip_length_calibration(
+                pipette_id=self._hw_pipette.pipette_id,
                 tip_length_offset=tip_length_offset,
                 tip_rack=self._tip_rack)
 
@@ -177,15 +177,17 @@ class TipCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def move_to_reference_point(self):
-        await uf.move_to_reference_point(
-            self,
+        ref_loc = util.get_reference_location(
+            mount=self._mount,
+            deck=self._deck,
             has_calibration_block=self._has_calibration_block)
+        await self._move(ref_loc)
 
     async def pick_up_tip(self):
-        await uf.pick_up_tip(self, tip_length=self._get_default_tip_length())
+        await util.pick_up_tip(self, tip_length=self._get_default_tip_length())
 
     async def invalidate_tip(self):
-        await uf.invalidate_tip(self)
+        await util.invalidate_tip(self)
 
     async def exit_session(self):
         await self.move_to_tip_rack()
@@ -214,7 +216,7 @@ class TipCalibrationUserFlow:
                 self._deck.position_for(cb_setup['slot']))
 
     async def _return_tip(self):
-        await uf.return_tip(self, tip_length=self._get_default_tip_length())
+        await util.return_tip(self, tip_length=self._get_default_tip_length())
 
     async def _move(self, to_loc: Location):
-        await uf.move(self, to_loc)
+        await util.move(self, to_loc)
