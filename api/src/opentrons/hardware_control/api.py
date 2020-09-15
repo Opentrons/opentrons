@@ -1290,6 +1290,7 @@ class API(HardwareAPILike):
                      instr[0],
                      instr[0].current_volume + vol, 'aspirate')
                      for instr, vol in zip(instruments, asp_vol))
+
         speed = min(
             self._plunger_speed(
                 instr[0], instr[0].aspirate_flow_rate * rate, 'aspirate')

@@ -532,8 +532,8 @@ class InstrumentContext(CommandPublisher):
                 'location should be a Well, but it is {}'.format(location))
 
         edges = build_edges(
-            location, v_offset, self._api_version,
-            self._mount, self._ctx._deck_layout, radius)
+            location, v_offset, self._mount,
+            self._ctx._deck_layout, radius, self._api_version)
         for edge in edges:
             self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
         return self

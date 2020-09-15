@@ -9,6 +9,7 @@ from opentrons.protocol_api.labware import (
     Labware, Well, quirks_from_any_parent)
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.geometry import planning
+from opentrons.protocols.api_support.util import build_edges
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.protocol_context import ProtocolContext
@@ -61,6 +62,8 @@ class PairedInstrument:
     def move_to(self, location: types.Location, force_direct: bool = False,
                 minimum_z_height: Optional[float] = None,
                 speed: Optional[float] = None):
+        if not speed:
+            speed = self.p_instrument.default_speed
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
         else:
@@ -103,32 +106,60 @@ class PairedInstrument:
             self._ctx.location_cache = location
         return self
 
-    def aspirate(volume, location, rate):
+    def aspirate(
+            self, volume: Optional[float],
+            location: Optional[types.Location] = None,
+            rate: Optional[float] = 1.0):
         if location:
-            self.move_to(location)
+            loc = location
         elif self._ctx.location_cache:
-            self.move_to(self._ctx.location_cache)
+            loc = self._ctx.location_cache
         else:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
-                "knows where it is.")     
+                "knows where it is.")
 
-    def dispense(volume, location, rate):
+        if self.p_instrument.current_volume == 0:
+            # Make sure we're at the top of the labware and clear of any
+            # liquid to prepare the pipette for aspiration
+
+            if not self.p_instrument.hw_pipette['ready_to_aspirate']:
+                if isinstance(loc.labware, Well):
+                    self.move_to(loc.labware.top())
+                else:
+                    # TODO(seth,2019/7/29): This should be a warning exposed
+                    #  via rpc to the runapp
+                    self._log.warning(
+                        "When aspirate is called on something other than a "
+                        "well relative position, we can't move to the top of"
+                        " the well to prepare for aspiration. This might "
+                        "cause over aspiration if the previous command is a "
+                        "blow_out.")
+                self._hw_manager.hardware.prepare_for_aspirate(
+                    self._pair_policy)
+            self.move_to(loc)
+        elif loc != self._ctx.location_cache:
+            self.move_to(loc)
+        self._hw_manager.hardware.aspirate(self._pair_policy, volume, rate)
+
+    def dispense(
+            self, volume: Optional[float],
+            location: Optional[types.Location], rate: float):
         if location:
             self.move_to(location)
         elif self._ctx.location_cache:
-            self.move_to(self._ctx.location_cache)
+            pass
         else:
             raise RuntimeError(
                 "If dispense is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
-        self._hw_manager.hardware.dispense(self._mount, volume, rate)
+        self._hw_manager.hardware.dispense(self._pair_policy, volume, rate)
 
-    def blow_out(location: types.Location):
+    def blow_out(self, location: types.Location):
         if location:
             self.move_to(location)
         elif self._ctx.location_cache:
@@ -141,9 +172,9 @@ class PairedInstrument:
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
-        self._hw_manager.hardware.blow_out(self._mount)
-    
-    def air_gap(volume: float, height: float):
+        self._hw_manager.hardware.blow_out(self._pair_policy)
+
+    def air_gap(self, volume: Optional[float], height: float):
         loc = self._ctx.location_cache
         if not loc or not isinstance(loc.labware, Well):
             raise RuntimeError('No previous Well cached to perform air gap')
@@ -151,5 +182,35 @@ class PairedInstrument:
         self.move_to(target)
         self.aspirate(volume)
 
-    def touch_tip():
-        return None
+    def touch_tip(
+            self, location: Optional[Well], radius: float,
+            v_offset: float, speed: float):
+        if location is None:
+            if not self._ctx.location_cache:
+                raise RuntimeError('No valid current location cache present')
+            else:
+                location = self._ctx.location_cache.labware  # type: ignore
+                # type checked below
+        if isinstance(location, Well):
+            if 'touchTipDisabled' in quirks_from_any_parent(location):
+                self._log.info(f"Ignoring touch tip on labware {location}")
+                return self
+            if location.parent.is_tiprack:
+                self._log.warning('Touch_tip being performed on a tiprack. '
+                                  'Please re-check your code')
+
+            move_with_z_offset =\
+                location.top().point + types.Point(0, 0, v_offset)
+            to_loc = types.Location(move_with_z_offset, location)
+            self.move_to(to_loc)
+        else:
+            # If location is a not a valid well, raise a type error
+            raise TypeError(
+                'location should be a Well, but it is {}'.format(location))
+
+        edges = build_edges(
+            location, v_offset, self._pair_policy.primary,
+            self._ctx._deck_layout, radius)
+        for edge in edges:
+            self._hw_manager.hardware.move_to(
+                self._pair_policy, edge, speed)
