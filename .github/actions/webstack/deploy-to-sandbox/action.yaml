@@ -1,0 +1,9 @@
+name: 'Deploy standard OT webstack to sandbox'
+description: 'Push a webstack build to the sandbox for its branch'
+inputs:
+  domain:
+    description: 'The domain for the webstack in question'
+    required: true
+runs:
+  using: 'node12'
+  main: 'main.js'
