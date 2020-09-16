@@ -1,0 +1,17 @@
+name: 'Deploy standard OT webstack to sandbox'
+description: 'Push a webstack build to the sandbox for its branch (the current ref from the workflow context). AWS creds should be set in the environment by the workflow.'
+inputs:
+  domain:
+    description: 'The domain for the webstack in question'
+    required: true
+  distPath:
+    description: 'The path to the compiled distribution to upload'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: |
+        SHORTSLUG=`echo ${{ github.ref }} | sed -e "s/^\/\?refs\/\(?:tags\|heads\)\///"`
+        echo "Found ref slug ${SHORTSLUG} from ref ${{ github.ref }}"
+        aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${SHORTSLUG} --acl=public-read
