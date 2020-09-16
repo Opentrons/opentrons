@@ -3,12 +3,70 @@ from enum import Enum
 import typing
 from functools import lru_cache
 
+from opentrons import types
 from pydantic import BaseModel, Field, validator
 from robot_server.service.json_api import ResponseModel, RequestModel
 from opentrons.util.helpers import utc_now
 
 from robot_server.service.session.models.common import EmptyModel, \
     JogPosition
+from robot_server.robot.calibration.check import (
+    models as calibration_check_models)
+from robot_server.robot.calibration.tip_length import (
+    models as tip_length_calibration_models)
+from robot_server.robot.calibration.deck import (
+    models as deck_calibration_models)
+from robot_server.robot.calibration.pipette_offset import (
+    models as pipette_offset_calibration_models)
+from robot_server.service.legacy.models.control import Mount
+from robot_server.service.session.session_types.protocol import \
+    models as protocol_session_models
+from robot_server.service.json_api import \
+    ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
+from opentrons.util.helpers import utc_now
+
+
+class LoadLabware(BaseModel):
+    location: int = Field(...,
+                          description="Deck slot", ge=1, lt=12)
+    loadName: str = Field(...,
+                          description="Name used to reference a labware definition")
+    displayName: str = Field(...,
+                             description="User-readable name for labware")
+    namespace: str = Field(...,
+                           description="The namespace the labware definition belongs to.")
+    version: int = Field(...,
+                         description="")
+
+
+class LoadInstrument(BaseModel):
+    instrumentName: str = Field(...,
+                                description="The name of the instrument model")
+    mount: Mount
+
+
+class PipetteCommandBase(BaseModel):
+    pipetteId: str
+    labwareId: str
+    wellId: str
+
+
+class LiquidCommand(PipetteCommandBase):
+    volume: float = Field(
+        ...,
+        description="Amount of liquid in uL",
+        gt=0,
+    )
+    offsetFromBottom: float = Field(
+        ...,
+        description="Offset from the bottom of the well in mm",
+        gt=0,
+    )
+    flowRate: float = Field(
+        ...,
+        description="The absolute flow rate in uL/second.",
+        gt=0
+    )
 
 
 class CommandStatus(str, Enum):
@@ -79,6 +137,26 @@ class ProtocolCommand(CommandDefinition):
         return "protocol"
 
 
+class NEW(CommandDefinition):
+    load_labware = ("loadLabware", LoadLabware)
+    load_instrument = ("loadInstrument", LoadInstrument)
+
+    @staticmethod
+    def namespace():
+        return "NEW!"
+
+
+class PipetteCommand(CommandDefinition):
+    aspirate = ("aspirate", LiquidCommand)
+    dispense = ("dispense", LiquidCommand)
+    drop_tip = ("dropTip", PipetteCommandBase)
+    pick_up_tip = ("pickUpTip", PipetteCommandBase)
+
+    @staticmethod
+    def namespace():
+        return "pipette"
+
+
 class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
     load_labware = "loadLabware"
@@ -136,6 +214,10 @@ Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
 """
 CommandDataType = typing.Union[
     JogPosition,
+    LoadLabware,
+    LoadInstrument,
+    LiquidCommand,
+    PipetteCommand,
     EmptyModel
 ]
 
@@ -147,7 +229,9 @@ CommandDefinitionType = typing.Union[
     CalibrationCheckCommand,
     TipLengthCalibrationCommand,
     DeckCalibrationCommand,
-    ProtocolCommand
+    ProtocolCommand,
+    PipetteCommand,
+    NEW,
 ]
 
 
