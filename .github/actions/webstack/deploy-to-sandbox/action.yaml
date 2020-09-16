@@ -10,5 +10,18 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Set branch and tag name environment variables
+      shell: bash
+
+        uses: actions/github-script@v2
+        with:
+          script: |
+            const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
+            const tag = context.ref.startsWith('refs/tags/') ? branch : ''
+            core.exportVariable('OT_BRANCH', branch)
+            core.exportVariable('OT_TAG', tag)
     - shell: bash
-      run: "aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${{ github.ref }} --acl=public-read"
+      run: |
+        SHORTSLUG=`echo ${{ context.ref }} | sed -e "s/^\/refs\/\(?:tags\|heads\)\///"`
+        echo "Found ref slug ${SHORTSLUG}"
+        "aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${SHORTSLUG} --acl=public-read"
