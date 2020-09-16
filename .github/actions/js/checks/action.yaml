@@ -21,4 +21,4 @@ runs:
       run: |
         yarn flow check ${{ inputs.project }}
     - shell: bash
-      run: "[[ -z ${{ inputs.circular_deps }} ]] && yarn madge --no-spinner --no-color --circular ${{ inputs.project }}/src/index.js || echo 'no circular deps checking for ${{ inputs.project }}'"
+      run: "[[ -n '${{ inputs.circular_deps }}' ]] && yarn madge --no-spinner --no-color --circular ${{ inputs.project }}/src/index.js || echo 'no circular deps checking for ${{ inputs.project }}'"
