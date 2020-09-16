@@ -129,7 +129,7 @@ export function CalibratePipetteOffset(
         contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
       >
         <Panel
-          sendSessionCommand={sendCommands}
+          sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           tipRack={tipRack}
           isMulti={isMulti}
