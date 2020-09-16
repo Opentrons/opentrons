@@ -1,8 +1,6 @@
 // @flow
 import type { Action } from '../../types'
 import type {
-  SessionCommandString,
-  SessionCommandData,
   SessionCommandParams,
   PipetteOffsetCalibrationSession,
 } from '../../sessions/types'

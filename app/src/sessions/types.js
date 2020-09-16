@@ -69,6 +69,8 @@ export type CalibrationSessionStep =
   | DeckCalTypes.DeckCalibrationStep
   | PipOffsetCalTypes.PipetteOffsetCalibrationStep
 
+export type VectorTuple = [number, number, number]
+
 // TODO(al, 2020-05-11): data should be properly typed with all
 // known command types
 export type SessionCommandData = {| vector: VectorTuple |} | {||}
@@ -347,7 +349,6 @@ export type CalibrationCheckIntercomData = {|
   succeeded: boolean,
 |}
 
-export type VectorTuple = [number, number, number]
 export type CalibrationCheckAnalyticsData = {|
   ...CalibrationCheckCommonEventData,
   comparingFirstPipetteHeightDifferenceVector?: VectorTuple,

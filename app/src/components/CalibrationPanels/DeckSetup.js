@@ -31,10 +31,10 @@ const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 export function DeckSetup(props: CalibrationPanelProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
-  const { tipRack, sendSessionCommand } = props
+  const { tipRack, sendCommands } = props
 
   const proceed = () => {
-    sendSessionCommand({ command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK })
+    sendCommands({ command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK })
   }
 
   return (

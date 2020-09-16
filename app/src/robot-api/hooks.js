@@ -1,9 +1,8 @@
 // @flow
 // hooks for components that depend on API state
-import { useReducer, useCallback, useEffect, useRef, useState } from 'react'
+import { useReducer, useCallback, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniqueId from 'lodash/uniqueId'
-import last from 'lodash/last'
 
 import type { State, Action } from '../types'
 import { PENDING } from './constants'
@@ -104,7 +103,6 @@ export function useDispatchApiRequests<
     )?.status === PENDING
 
   if (unrequestedQueue.length > 0 && !trackedRequestIsPending) {
-    console.log('in trigger', unrequestedQueue, trackedRequestId)
     const action = dispatchRequest(unrequestedQueue[0])
     if (onDispatchedRequest) onDispatchedRequest(action)
     trackedRequestId.current = action.meta.requestId
@@ -112,7 +110,6 @@ export function useDispatchApiRequests<
   }
 
   const dispatchApiRequests = (...a: Array<A>) => {
-    console.log('in dars', a)
     setUnrequestedQueue([...unrequestedQueue, ...a])
   }
 

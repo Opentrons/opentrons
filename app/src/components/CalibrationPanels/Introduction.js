@@ -78,11 +78,11 @@ const contentsBySessionType: {
 }
 
 export function Introduction(props: CalibrationPanelProps): React.Node {
-  const { tipRack, sendSessionCommand, sessionType } = props
+  const { tipRack, sendCommands, sessionType } = props
 
   const { showConfirmation, confirm: proceed, cancel } = useConditionalConfirm(
     () => {
-      sendSessionCommand({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
+      sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
     },
     true
   )

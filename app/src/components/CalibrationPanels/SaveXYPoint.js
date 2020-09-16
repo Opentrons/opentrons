@@ -121,7 +121,7 @@ const contentsBySessionTypeByCurrentStep: {
 }
 
 export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
-  const { isMulti, mount, sendSessionCommand, currentStep, sessionType } = props
+  const { isMulti, mount, sendCommands, currentStep, sessionType } = props
 
   const {
     slotNumber,
@@ -136,7 +136,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand({
+    sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {
         vector: formatJogVector(axis, dir, step),
@@ -150,7 +150,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     if (moveCommandString) {
       commands = [...commands, { command: moveCommandString }]
     }
-    sendSessionCommand(...commands)
+    sendCommands(...commands)
   }
 
   return (

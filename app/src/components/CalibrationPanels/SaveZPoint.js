@@ -69,7 +69,7 @@ const contentsBySessionType: {
 }
 
 export function SaveZPoint(props: CalibrationPanelProps): React.Node {
-  const { isMulti, mount, sendSessionCommand, sessionType } = props
+  const { isMulti, mount, sendCommands, sessionType } = props
 
   const { headerText, buttonText } = contentsBySessionType[sessionType]
 
@@ -79,7 +79,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand({
+    sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {
         vector: formatJogVector(axis, dir, step),
@@ -88,7 +88,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
   }
 
   const savePoint = () => {
-    sendSessionCommand(
+    sendCommands(
       { command: Sessions.sharedCalCommands.SAVE_OFFSET },
       { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
     )

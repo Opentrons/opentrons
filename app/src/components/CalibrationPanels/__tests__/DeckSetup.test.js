@@ -16,7 +16,7 @@ jest.mock('@opentrons/components/src/deck/RobotWorkSpace', () => ({
 describe('DeckSetup', () => {
   let render
 
-  const mockSendCommand = jest.fn()
+  const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe('DeckSetup', () => {
         pipMount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
-        sendSessionCommand = mockSendCommand,
+        sendCommands = mockSendCommands,
         cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_LABWARE_LOADED,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
@@ -35,7 +35,7 @@ describe('DeckSetup', () => {
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
-          sendSessionCommand={sendSessionCommand}
+          sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
@@ -54,8 +54,8 @@ describe('DeckSetup', () => {
     act(() => wrapper.find('button').invoke('onClick')())
     wrapper.update()
 
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.MOVE_TO_TIP_RACK
-    )
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+    })
   })
 })

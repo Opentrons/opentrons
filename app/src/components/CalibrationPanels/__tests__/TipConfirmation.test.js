@@ -9,7 +9,7 @@ import { TipConfirmation } from '../TipConfirmation'
 describe('TipConfirmation', () => {
   let render
 
-  const mockSendCommand = jest.fn()
+  const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   const getConfirmTipButton = wrapper =>
@@ -26,7 +26,7 @@ describe('TipConfirmation', () => {
         pipMount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
-        sendSessionCommand = mockSendCommand,
+        sendCommands = mockSendCommands,
         cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_INSPECTING_TIP,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
@@ -36,7 +36,7 @@ describe('TipConfirmation', () => {
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
-          sendSessionCommand={sendSessionCommand}
+          sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
@@ -55,17 +55,17 @@ describe('TipConfirmation', () => {
     getConfirmTipButton(wrapper).invoke('onClick')()
     wrapper.update()
 
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.MOVE_TO_DECK
-    )
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.MOVE_TO_DECK,
+    })
   })
   it('clicking invalidate tip send invalidate tip command', () => {
     const wrapper = render()
 
     getInvalidateTipButton(wrapper).invoke('onClick')()
     wrapper.update()
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.INVALIDATE_TIP
-    )
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.INVALIDATE_TIP,
+    })
   })
 })

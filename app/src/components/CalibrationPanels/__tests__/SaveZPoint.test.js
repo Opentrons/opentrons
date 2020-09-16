@@ -9,7 +9,7 @@ import { SaveZPoint } from '../SaveZPoint'
 describe('SaveZPoint', () => {
   let render
 
-  const mockSendCommand = jest.fn()
+  const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   const getSaveButton = wrapper => wrapper.find('button[title="save"]')
@@ -20,13 +20,12 @@ describe('SaveZPoint', () => {
   const getVideo = wrapper => wrapper.find(`source`)
 
   beforeEach(() => {
-    jest.useFakeTimers()
     render = (props = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
-        sendSessionCommand = mockSendCommand,
+        sendCommands = mockSendCommands,
         cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_JOGGING_TO_DECK,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
@@ -36,7 +35,7 @@ describe('SaveZPoint', () => {
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
-          sendSessionCommand={sendSessionCommand}
+          sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
@@ -46,8 +45,6 @@ describe('SaveZPoint', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
-    jest.clearAllTimers()
-    jest.useRealTimers()
   })
 
   it('displays proper asset', () => {
@@ -87,13 +84,12 @@ describe('SaveZPoint', () => {
       getJogButton(wrapper, direction).invoke('onClick')()
       wrapper.update()
 
-      expect(mockSendCommand).toHaveBeenCalledWith(
-        Sessions.deckCalCommands.JOG,
-        {
+      expect(mockSendCommands).toHaveBeenCalledWith({
+        command: Sessions.deckCalCommands.JOG,
+        data: {
           vector: jogVectorByDirection[direction],
         },
-        false
-      )
+      })
     })
 
     const unavailableJogDirections = ['left', 'right', 'back', 'forward']
@@ -107,13 +103,14 @@ describe('SaveZPoint', () => {
 
     getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
-    jest.runAllTimers()
 
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.SAVE_OFFSET
-    )
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.MOVE_TO_POINT_ONE
+    expect(mockSendCommands).toHaveBeenCalledWith(
+      {
+        command: Sessions.deckCalCommands.SAVE_OFFSET,
+      },
+      {
+        command: Sessions.deckCalCommands.MOVE_TO_POINT_ONE,
+      }
     )
   })
 

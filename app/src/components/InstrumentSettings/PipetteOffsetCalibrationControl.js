@@ -47,7 +47,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
       }
       if (
         dispatchedAction.type === Sessions.DELETE_SESSION &&
-        pipOffsetCalSession?.id == dispatchedAction.payload.sessionId
+        pipOffsetCalSession?.id === dispatchedAction.payload.sessionId
       ) {
         deleteRequestId.current = dispatchedAction.meta.requestId
       }
@@ -81,7 +81,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
       setShowWizard(false)
       deleteRequestId.current = null
     }
-  }, [requestStatus])
+  }, [requestStatus, shouldClose])
 
   const handleStartPipOffsetCalSession = () => {
     dispatchRequests(

@@ -1,7 +1,6 @@
 // @flow
 // Pipette Offset Calibration Orchestration Component
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
@@ -10,20 +9,11 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import type { State } from '../../types'
 import type {
-  SessionCommandString,
-  SessionCommandData,
   DeckCalibrationLabware,
   SessionCommandParams,
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
-import {
-  useDispatchApiRequests,
-  getRequestById,
-  PENDING,
-} from '../../robot-api'
-import type { RequestState } from '../../robot-api/types'
 import {
   Introduction,
   DeckSetup,
@@ -38,11 +28,6 @@ import styles from '../CalibrateDeck/styles.css'
 
 import type { CalibratePipetteOffsetParentProps } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
-
-// session commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
-  Sessions.sharedCalCommands.JOG,
-]
 
 const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
 const EXIT = 'exit'

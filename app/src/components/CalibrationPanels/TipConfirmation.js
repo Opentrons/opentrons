@@ -18,13 +18,13 @@ const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, move to slot 5'
 const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
 
 export function TipConfirmation(props: CalibrationPanelProps): React.Node {
-  const { sendSessionCommand } = props
+  const { sendCommands } = props
 
   const invalidateTip = () => {
-    sendSessionCommand({ command: Sessions.sharedCalCommands.INVALIDATE_TIP })
+    sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_TIP })
   }
   const confirmTip = () => {
-    sendSessionCommand({ command: Sessions.sharedCalCommands.MOVE_TO_DECK })
+    sendCommands({ command: Sessions.sharedCalCommands.MOVE_TO_DECK })
   }
 
   return (
