@@ -70,17 +70,16 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
   )
 
   const pickUpTip = () => {
-    sendSessionCommand(Sessions.sharedCalCommands.PICK_UP_TIP)
+    sendSessionCommand({ command: Sessions.sharedCalCommands.PICK_UP_TIP })
   }
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(
-      Sessions.sharedCalCommands.JOG,
-      {
+    sendSessionCommand({
+      command: Sessions.sharedCalCommands.JOG,
+      data: {
         vector: formatJogVector(axis, dir, step),
       },
-      false
-    )
+    })
   }
 
   return (

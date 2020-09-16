@@ -1,5 +1,6 @@
 // @flow
 import type { JogAxis } from '../../http-api-client'
+import type { VectorTuple } from '../../sessions/types'
 
 const ORDERED_AXES: [JogAxis, JogAxis, JogAxis] = ['x', 'y', 'z']
 
@@ -8,7 +9,7 @@ export function formatJogVector(
   axis: string,
   direction: number,
   step: number
-): [number, number, number] {
+): VectorTuple {
   const vector = [0, 0, 0]
   const index = ORDERED_AXES.findIndex(a => a === axis)
   if (index >= 0) {

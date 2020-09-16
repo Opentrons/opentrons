@@ -2,6 +2,7 @@
 import type {
   SessionCommandString,
   SessionCommandData,
+  SessionCommandParams,
   PipetteOffsetCalibrationSession,
 } from '../../sessions/types'
 
@@ -16,14 +17,8 @@ export type CalibratePipetteOffsetParentProps = {|
   closeWizard: () => void,
 |}
 
-export type CommandToSend = {
-  command: SessionCommandString,
-  data?: SessionCommandData,
-  loadingSpinner?: boolean,
-}
-
 export type CalibratePipetteOffsetChildProps = {|
-  sendSessionCommands: (Array<CommandToSend>) => void,
+  sendSessionCommands: (...Array<SessionCommandParams>) => void,
   deleteSession: () => void,
   tipRack: PipetteOffsetCalibrationLabware,
   isMulti: boolean,

@@ -21,10 +21,10 @@ export function TipConfirmation(props: CalibrationPanelProps): React.Node {
   const { sendSessionCommand } = props
 
   const invalidateTip = () => {
-    sendSessionCommand(Sessions.sharedCalCommands.INVALIDATE_TIP)
+    sendSessionCommand({ command: Sessions.sharedCalCommands.INVALIDATE_TIP })
   }
   const confirmTip = () => {
-    sendSessionCommand(Sessions.sharedCalCommands.MOVE_TO_DECK)
+    sendSessionCommand({ command: Sessions.sharedCalCommands.MOVE_TO_DECK })
   }
 
   return (

@@ -15,6 +15,7 @@ import type {
   SessionCommandString,
   SessionCommandData,
   DeckCalibrationLabware,
+  SessionCommandParams,
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
 import {
@@ -35,7 +36,7 @@ import {
 } from '../CalibrationPanels'
 import styles from '../CalibrateDeck/styles.css'
 
-import type { CalibratePipetteOffsetParentProps, CommandToSend } from './types'
+import type { CalibratePipetteOffsetParentProps } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 // session commands for which the full page spinner should not appear
@@ -79,7 +80,9 @@ export function CalibratePipetteOffset(
     dispatchedAction => {
       if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
-        !spinnerCommandBlockList.includes(dispatchedAction.payload.command)
+        !spinnerCommandBlockList.includes(
+          dispatchedAction.payload.command.command
+        )
       ) {
         trackedRequestId.current = dispatchedAction.meta.requestId
       }
@@ -89,23 +92,33 @@ export function CalibratePipetteOffset(
 
   const showSpinner =
     useSelector<State, RequestState | null>(state =>
-      getRequestById(state, trackedRequestId.current)
+      trackedRequestId.current
+        ? getRequestById(state, trackedRequestId.current)
+        : null
     )?.status === PENDING
 
-  function sendCommands(...comms: Array<CommandToSend>) {
+  function sendCommands(...commands: Array<SessionCommandParams>) {
     if (session === null) return
-    const sessionCommands = comms.map(c =>
+    const sessionCommandActions = commands.map(c =>
       Sessions.createSessionCommand(robotName, session.id, {
         command: c.command,
         data: c.data || {},
       })
     )
-    dispatchRequests(...sessionCommands)
+    console.log('in send commands', commands, sessionCommandActions)
+    dispatchRequests(...sessionCommandActions)
   }
 
-  function deleteSession() {
-    session?.id &&
-      dispatchRequests(Sessions.deleteSession(robotName, session.id))
+  function cleanUp() {
+    if (session?.id) {
+      dispatchRequests(
+        Sessions.createSessionCommand(robotName, session.id, {
+          command: Sessions.sharedCalCommands.EXIT,
+          data: {},
+        }),
+        Sessions.deleteSession(robotName, session.id)
+      )
+    }
     closeWizard()
   }
 
@@ -114,14 +127,7 @@ export function CalibratePipetteOffset(
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
-    dispatchRequests(
-      Sessions.createSessionCommand(robotName, session.id, {
-        command: Sessions.deckCalCommands.EXIT,
-        data: {},
-      }),
-      Sessions.deleteSession(robotName, session.id)
-    )
-    closeWizard()
+    cleanUp()
   }, true)
 
   const isMulti = React.useMemo(() => {
@@ -154,7 +160,7 @@ export function CalibratePipetteOffset(
       >
         <Panel
           sendSessionCommand={sendCommands}
-          deleteSession={deleteSession}
+          deleteSession={cleanUp}
           tipRack={tipRack}
           isMulti={isMulti}
           mount={instrument?.mount.toLowerCase()}

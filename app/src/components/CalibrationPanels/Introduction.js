@@ -82,7 +82,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
 
   const { showConfirmation, confirm: proceed, cancel } = useConditionalConfirm(
     () => {
-      sendSessionCommand(Sessions.sharedCalCommands.LOAD_LABWARE)
+      sendSessionCommand({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
     },
     true
   )

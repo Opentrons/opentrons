@@ -80,7 +80,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
     sendSessionCommand({
-      command: Sessions.deckCalCommands.JOG,
+      command: Sessions.sharedCalCommands.JOG,
       data: {
         vector: formatJogVector(axis, dir, step),
       },

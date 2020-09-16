@@ -34,7 +34,7 @@ export function DeckSetup(props: CalibrationPanelProps): React.Node {
   const { tipRack, sendSessionCommand } = props
 
   const proceed = () => {
-    sendSessionCommand(Sessions.sharedCalCommands.MOVE_TO_TIP_RACK)
+    sendSessionCommand({ command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK })
   }
 
   return (

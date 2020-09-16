@@ -2,10 +2,13 @@
 // hooks for components that depend on API state
 import { useReducer, useCallback, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getRequestById } from './selectors'
 import uniqueId from 'lodash/uniqueId'
 import last from 'lodash/last'
+
+import type { State } from '../types'
 import { PENDING } from './constants'
+import { getRequestById } from './selectors'
+import type { RequestState } from './types'
 
 /**
  * React hook to attach a unique request ID to and dispatch an API action
@@ -31,7 +34,7 @@ import { PENDING } from './constants'
  * }
  */
 export function useDispatchApiRequest<A: { meta: { requestId: string } }>(): [
-  (A) => void,
+  (A) => A,
   Array<string>
 ] {
   const dispatch = useDispatch<(A) => void>()
@@ -84,9 +87,9 @@ export function useDispatchApiRequest<A: { meta: { requestId: string } }>(): [
  *   )
  * }
  */
-export function useDispatchApiRequests<
-  A: Array<{ meta: { requestId: string } }>
->(onDispatch: A => void = null): [(A) => void, Array<string>] {
+export function useDispatchApiRequests<A: { meta: { requestId: string } }>(
+  onDispatch: (A => void) | null = null
+): [(...Array<A>) => void, Array<string>] {
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
   const trackedRequestId = useRef<string | null>(null)
@@ -94,7 +97,9 @@ export function useDispatchApiRequests<
 
   const trackedRequestIsPending =
     useSelector<State, RequestState | null>(state =>
-      getRequestById(state, trackedRequestId.current)
+      trackedRequestId.current
+        ? getRequestById(state, trackedRequestId.current)
+        : null
     )?.status === PENDING
 
   const triggerNext = () => {
@@ -110,6 +115,7 @@ export function useDispatchApiRequests<
 
   const dispatchApiRequests = (...a: Array<A>) => {
     unrequestedQueue.current = a
+    console.log('in dars', a)
     triggerNext()
   }
 

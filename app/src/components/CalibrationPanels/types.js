@@ -2,6 +2,7 @@
 import type {
   SessionCommandString,
   SessionCommandData,
+  SessionCommandParams,
   SessionType,
   CalibrationSessionStep,
 } from '../../sessions/types'
@@ -10,11 +11,7 @@ import type { PipetteOffsetCalibrationLabware } from '../../sessions/pipette-off
 import type { TipLengthCalibrationLabware } from '../../sessions/tip-length-calibration/types'
 
 export type CalibrationPanelProps = {|
-  sendSessionCommand: (
-    command: SessionCommandString,
-    data?: SessionCommandData,
-    loadingSpinner?: boolean
-  ) => void,
+  sendSessionCommand: (...Array<SessionCommandParams>) => void,
   deleteSession: () => void,
   tipRack:
     | DeckCalibrationLabware
