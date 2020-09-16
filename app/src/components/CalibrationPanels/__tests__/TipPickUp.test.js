@@ -25,7 +25,7 @@ describe('TipPickUp', () => {
         isMulti = false,
         tipRack = mockDeckCalTipRack,
         sendSessionCommand = mockSendCommand,
-        deleteSession = mockDeleteSession,
+        cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_PREPARING_PIPETTE,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
@@ -35,7 +35,7 @@ describe('TipPickUp', () => {
           mount={pipMount}
           tipRack={tipRack}
           sendSessionCommand={sendSessionCommand}
-          deleteSession={deleteSession}
+          cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
         />

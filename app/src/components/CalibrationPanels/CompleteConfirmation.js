@@ -32,7 +32,7 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
   const { headerText } = contentsBySessionType[sessionType]
 
   const exitSession = () => {
-    props.deleteSession()
+    props.cleanUpAndExit()
   }
   return (
     <Flex

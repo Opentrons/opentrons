@@ -73,43 +73,41 @@ const PANEL_STYLE_BY_STEP: {
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
 ): React.Node {
-  const { session, robotName, closeWizard } = props
+  const {
+    session,
+    robotName,
+    closeWizard,
+    dispatchRequests,
+    showSpinner,
+  } = props
   const { currentStep, instrument, labware } = session?.details || {}
-  const trackedRequestId = React.useRef<string | null>(null)
-  const [dispatchRequests, requestIds] = useDispatchApiRequests(
-    dispatchedAction => {
-      if (
-        dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
-        !spinnerCommandBlockList.includes(
-          dispatchedAction.payload.command.command
-        )
-      ) {
-        trackedRequestId.current = dispatchedAction.meta.requestId
-      }
-    }
-  )
-  const dispatch = useDispatch()
 
-  const showSpinner =
-    useSelector<State, RequestState | null>(state =>
-      trackedRequestId.current
-        ? getRequestById(state, trackedRequestId.current)
-        : null
-    )?.status === PENDING
+  const {
+    showConfirmation: showConfirmExit,
+    confirm: confirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(() => {
+    cleanUpAndExit()
+  }, true)
+
+  const isMulti = React.useMemo(() => {
+    const spec = instrument && getPipetteModelSpecs(instrument.model)
+    return spec ? spec.channels > 1 : false
+  }, [instrument])
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
-    if (session === null) return
-    const sessionCommandActions = commands.map(c =>
-      Sessions.createSessionCommand(robotName, session.id, {
-        command: c.command,
-        data: c.data || {},
-      })
-    )
-    console.log('in send commands', commands, sessionCommandActions)
-    dispatchRequests(...sessionCommandActions)
+    if (session?.id) {
+      const sessionCommandActions = commands.map(c =>
+        Sessions.createSessionCommand(robotName, session.id, {
+          command: c.command,
+          data: c.data || {},
+        })
+      )
+      dispatchRequests(...sessionCommandActions)
+    }
   }
 
-  function cleanUp() {
+  function cleanUpAndExit() {
     if (session?.id) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
@@ -121,19 +119,6 @@ export function CalibratePipetteOffset(
     }
     closeWizard()
   }
-
-  const {
-    showConfirmation: showConfirmExit,
-    confirm: confirmExit,
-    cancel: cancelExit,
-  } = useConditionalConfirm(() => {
-    cleanUp()
-  }, true)
-
-  const isMulti = React.useMemo(() => {
-    const spec = instrument && getPipetteModelSpecs(instrument.model)
-    return spec ? spec.channels > 1 : false
-  }, [instrument])
 
   const tipRack: DeckCalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
@@ -160,7 +145,7 @@ export function CalibratePipetteOffset(
       >
         <Panel
           sendSessionCommand={sendCommands}
-          deleteSession={cleanUp}
+          cleanUpAndExit={cleanUpAndExit}
           tipRack={tipRack}
           isMulti={isMulti}
           mount={instrument?.mount.toLowerCase()}

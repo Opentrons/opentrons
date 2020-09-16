@@ -1,11 +1,11 @@
 // @flow
 // hooks for components that depend on API state
-import { useReducer, useCallback, useEffect, useRef } from 'react'
+import { useReducer, useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniqueId from 'lodash/uniqueId'
 import last from 'lodash/last'
 
-import type { State } from '../types'
+import type { State, Action } from '../types'
 import { PENDING } from './constants'
 import { getRequestById } from './selectors'
 import type { RequestState } from './types'
@@ -33,10 +33,9 @@ import type { RequestState } from './types'
  *   )
  * }
  */
-export function useDispatchApiRequest<A: { meta: { requestId: string } }>(): [
-  (A) => A,
-  Array<string>
-] {
+export function useDispatchApiRequest<
+  A: { ...Action, meta: { requestId: string } }
+>(): [(A) => A, Array<string>] {
   const dispatch = useDispatch<(A) => void>()
 
   // TODO(mc, 2019-11-06): evaluate whether or not this can be a ref
@@ -87,13 +86,15 @@ export function useDispatchApiRequest<A: { meta: { requestId: string } }>(): [
  *   )
  * }
  */
-export function useDispatchApiRequests<A: { meta: { requestId: string } }>(
-  onDispatch: (A => void) | null = null
+export function useDispatchApiRequests<
+  A: { ...Action, meta: { requestId: string } }
+>(
+  onDispatchedRequest: (A => void) | null
 ): [(...Array<A>) => void, Array<string>] {
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
   const trackedRequestId = useRef<string | null>(null)
-  const unrequestedQueue = useRef<Array<A>>([])
+  const [unrequestedQueue, setUnrequestedQueue] = useState<Array<A>>([])
 
   const trackedRequestIsPending =
     useSelector<State, RequestState | null>(state =>
@@ -102,21 +103,17 @@ export function useDispatchApiRequests<A: { meta: { requestId: string } }>(
         : null
     )?.status === PENDING
 
-  const triggerNext = () => {
-    console.log('in trigger', unrequestedQueue.current)
-    const action = dispatchRequest(unrequestedQueue.current[0])
-    if (onDispatch) onDispatch(action)
+  if (unrequestedQueue.length > 0 && !trackedRequestIsPending) {
+    console.log('in trigger', unrequestedQueue, trackedRequestId)
+    const action = dispatchRequest(unrequestedQueue[0])
+    if (onDispatchedRequest) onDispatchedRequest(action)
     trackedRequestId.current = action.meta.requestId
-    unrequestedQueue.current = unrequestedQueue.current.slice(1) // dequeue
-  }
-  if (unrequestedQueue.current.length > 0 && !trackedRequestIsPending) {
-    triggerNext()
+    setUnrequestedQueue(unrequestedQueue.slice(1))
   }
 
   const dispatchApiRequests = (...a: Array<A>) => {
-    unrequestedQueue.current = a
     console.log('in dars', a)
-    triggerNext()
+    setUnrequestedQueue([...unrequestedQueue, ...a])
   }
 
   return [dispatchApiRequests, requestIds]

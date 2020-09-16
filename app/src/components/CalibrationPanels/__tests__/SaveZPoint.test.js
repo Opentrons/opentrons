@@ -27,7 +27,7 @@ describe('SaveZPoint', () => {
         isMulti = false,
         tipRack = mockDeckCalTipRack,
         sendSessionCommand = mockSendCommand,
-        deleteSession = mockDeleteSession,
+        cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_JOGGING_TO_DECK,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
@@ -37,7 +37,7 @@ describe('SaveZPoint', () => {
           mount={pipMount}
           tipRack={tipRack}
           sendSessionCommand={sendSessionCommand}
-          deleteSession={deleteSession}
+          cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
         />

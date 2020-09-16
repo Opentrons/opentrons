@@ -34,7 +34,7 @@ describe('SaveXYPoint', () => {
         isMulti = false,
         tipRack = mockDeckCalTipRack,
         sendSessionCommand = mockSendCommand,
-        deleteSession = mockDeleteSession,
+        cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_SAVING_POINT_ONE,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
@@ -44,7 +44,7 @@ describe('SaveXYPoint', () => {
           mount={pipMount}
           tipRack={tipRack}
           sendSessionCommand={sendSessionCommand}
-          deleteSession={deleteSession}
+          cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
         />

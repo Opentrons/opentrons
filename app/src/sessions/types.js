@@ -71,7 +71,7 @@ export type CalibrationSessionStep =
 
 // TODO(al, 2020-05-11): data should be properly typed with all
 // known command types
-export type SessionCommandData = { vector: VectorTuple } | {}
+export type SessionCommandData = {| vector: VectorTuple |} | {||}
 export type SessionCommandParams = {
   command: SessionCommandString,
   data?: SessionCommandData,

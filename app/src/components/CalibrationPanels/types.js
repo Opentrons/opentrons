@@ -12,7 +12,7 @@ import type { TipLengthCalibrationLabware } from '../../sessions/tip-length-cali
 
 export type CalibrationPanelProps = {|
   sendSessionCommand: (...Array<SessionCommandParams>) => void,
-  deleteSession: () => void,
+  cleanUpAndExit: () => void,
   tipRack:
     | DeckCalibrationLabware
     | PipetteOffsetCalibrationLabware

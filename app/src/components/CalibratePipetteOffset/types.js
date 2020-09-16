@@ -1,4 +1,5 @@
 // @flow
+import type { Action } from '../../types'
 import type {
   SessionCommandString,
   SessionCommandData,
@@ -15,6 +16,10 @@ export type CalibratePipetteOffsetParentProps = {|
   robotName: string,
   session: PipetteOffsetCalibrationSession | null,
   closeWizard: () => void,
+  dispatchRequests: (
+    ...Array<{ ...Action, meta: { requestId: string } }>
+  ) => void,
+  showSpinner: boolean,
 |}
 
 export type CalibratePipetteOffsetChildProps = {|

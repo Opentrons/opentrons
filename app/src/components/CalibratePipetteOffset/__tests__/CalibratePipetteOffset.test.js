@@ -98,7 +98,9 @@ describe('CalibratePipetteOffset', () => {
         <CalibratePipetteOffset
           robotName="robot-name"
           session={mockPipOffsetCalSession}
-          closeWizard={() => {}}
+          closeWizard={jest.fn()}
+          dispatchRequests={jest.fn()}
+          showSpinner={false}
         />,
         {
           wrappingComponent: Provider,
