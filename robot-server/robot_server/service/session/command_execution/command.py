@@ -1,10 +1,11 @@
 from datetime import datetime
 from dataclasses import dataclass, field
+from typing import Optional
 
 from robot_server.service.session.models.command import (
     CommandDefinitionType, CommandDataType, CommandStatus)
-from robot_server.service.session.models.common import IdentifierType, \
-    create_identifier
+from robot_server.service.session.models.common import (
+    IdentifierType, create_identifier)
 from opentrons.util.helpers import utc_now
 
 
@@ -25,6 +26,7 @@ class CommandResult:
     started_at: datetime
     completed_at: datetime
     status: CommandStatus = CommandStatus.executed
+    data: Optional[CommandResultType] = None
 
 
 @dataclass(frozen=True)
