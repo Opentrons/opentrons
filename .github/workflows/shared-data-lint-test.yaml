@@ -65,7 +65,7 @@ jobs:
       - name: Test
         run: make -C shared-data/python test
   js-lint:
-    name: 'shared-data package js lint'
+    name: 'shared-data package js lint/test'
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
@@ -79,14 +79,5 @@ jobs:
       - uses: './.github/actions/js/checks'
         with:
           project: 'shared-data'
-  js-test:
-    name: 'shared-data package js test'
-    runs-on: 'ubuntu-latest'
-    needs: [js-lint]
-    steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
-        with:
-          node-version: '12'
       - name: 'test-js'
-        run: yarn jest --cover=true --ci=true shared-data
+        run: 'yarn jest --cover=true --ci=true shared-data'
