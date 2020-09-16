@@ -76,7 +76,7 @@ jobs:
         run: |
           yarn
           make -C shared-data setup-js
-      - uses: '.github/actions/js/checks'
+      - uses: './.github/actions/js/checks'
         with:
           project: 'shared-data'
   js-test:
