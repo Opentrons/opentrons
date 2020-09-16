@@ -22,8 +22,11 @@ export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 
 // ======= Selectors ===============================================
 
-/** fallbacks for selectedItem reducer, when null */
-export const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
+// NOTE: when the selected step is deleted, we need to fall back to the last step
+// (or the initial selected item, if there are no more saved steps).
+// Ideally this would happen in the selectedItem reducer itself,
+// but it's not easy to feed orderedStepIds into that reducer.
+export const getSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
   stepFormSelectors.getOrderedStepIds,
   (state, orderedStepIds) => {
@@ -35,12 +38,12 @@ export const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
 )
 
 export const getSelectedStepId: Selector<?StepIdType> = createSelector(
-  getNonNullSelectedItem,
+  getSelectedItem,
   item => (item.isStep ? item.id : null)
 )
 
 export const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
-  getNonNullSelectedItem,
+  getSelectedItem,
   item => (!item.isStep ? item.id : null)
 )
 
@@ -116,9 +119,8 @@ export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
 )
 
 // Hovered or selected item. Hovered has priority.
-// Uses fallback of getNonNullSelectedItem if not hovered or selected
 export const getActiveItem: Selector<SelectableItem> = createSelector(
-  getNonNullSelectedItem,
+  getSelectedItem,
   getHoveredItem,
   (selected, hovered) => (hovered != null ? hovered : selected)
 )

@@ -1,24 +1,14 @@
 // @flow
 import { addStep } from '../actions'
-import { uuid } from '../../../../utils'
-jest.mock('../../../../utils')
-
-const uuidMock: JestMockFn<[], string> = uuid
-const id = 'someUUID'
-
-beforeEach(() => {
-  jest.clearAllMocks()
-
-  uuidMock.mockReturnValue(id)
-})
+import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 
 describe('addStep', () => {
-  it('should dispatch an ADD_STEP action with given stepType and a UUID', () => {
+  it('should dispatch an ADD_STEP action with given stepType and id = PRESAVED_STEP_ID', () => {
     const stepType = 'transfer'
     expect(addStep({ stepType, robotStateTimeline: { timeline: [] } })).toEqual(
       {
         type: 'ADD_STEP',
-        payload: { stepType, id },
+        payload: { stepType, id: PRESAVED_STEP_ID },
         meta: { robotStateTimeline: { timeline: [] } },
       }
     )
