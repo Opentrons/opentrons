@@ -10,6 +10,7 @@ on:
       - 'shared-data/*/**'
       - '.github/workflows/shared-data-pull-request-target.yaml'
       - '.github/actions/python/**'
+      - '.github/actions/js/checks'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
       - 'chore_release-**'
@@ -63,3 +64,29 @@ jobs:
           project: 'shared-data/python'
       - name: Test
         run: make -C shared-data/python test
+  js-lint:
+    name: 'shared-data package js lint'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'setup-js'
+        run: |
+          yarn
+          make -C shared-data setup-js
+      - uses: '.github/actions/js/checks'
+        with:
+          project: 'shared-data'
+  js-test:
+    name: 'shared-data package js test'
+    runs-on: 'ubuntu-latest'
+    needs: [js-lint]
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'test-js'
+        run: yarn jest --cover=true --ci=true shared-data

@@ -1,0 +1,26 @@
+name: 'JS static analysis and lint'
+description: 'Run standard static analysis and lint tasks on a js subproject'
+inputs:
+  project:
+    description: 'Which project (by subdirectory) to run checks on'
+    required: true
+  circular_deps:
+    description: 'Whether to run circular dependency checks, which only work on certain projects'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: |
+        yarn eslint ".*.js" ${{ inputs.project }}/**/*.js"
+        yarn eslint --max-warnings 0 --ext .json ${{ inputs.project }}
+        yarn stylelint ${{ inputs.project }}/**/*.js ${{ inputs.project }}/*.js
+    - shell: bash
+      run: |
+        yarn flow check ${{ inputs.project }}
+    - shell: bash
+      run: "[[ -z ${{ inputs.circular_deps }} ]] \
+           && yarn madge --no-spinner --no-color --circular ${{ inputs.project }}/src/index.js \
+           || echo 'no circular deps checking for ${{ inputs.project }}'"
