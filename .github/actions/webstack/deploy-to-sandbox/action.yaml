@@ -10,16 +10,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Set branch and tag name environment variables
-      shell: bash
-
-        uses: actions/github-script@v2
-        with:
-          script: |
-            const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
-            const tag = context.ref.startsWith('refs/tags/') ? branch : ''
-            core.exportVariable('OT_BRANCH', branch)
-            core.exportVariable('OT_TAG', tag)
     - shell: bash
       run: |
         SHORTSLUG=`echo ${{ context.ref }} | sed -e "s/^\/refs\/\(?:tags\|heads\)\///"`
