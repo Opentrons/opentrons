@@ -8,9 +8,9 @@ on:
     paths:
       - 'Makefile'
       - 'shared-data/*/**'
-      - '.github/workflows/shared-data-pull-request-target.yaml'
+      - '.github/workflows/shared-data-lint-test.yaml'
       - '.github/actions/python/**'
-      - '.github/actions/js/checks'
+      - '.github/actions/js/checks/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
       - 'chore_release-**'
