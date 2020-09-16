@@ -29,11 +29,11 @@ export function ModuleControls(props: Props): React.Node {
           className={styles.temp_data_item}
           current={mod.data.currentTemp}
           target={mod.data.targetTemp}
-          title={`${
+          title={
             mod.type === THERMOCYCLER_MODULE_TYPE
               ? BLOCK_TEMPERATURE
               : TEMPERATURE
-          }`}
+          }
         />
         {mod.type === THERMOCYCLER_MODULE_TYPE && (
           <TemperatureData
