@@ -14,7 +14,7 @@ runs:
   steps:
     - shell: bash
       run: |
-        yarn eslint ".*.js" ${{ inputs.project }}/**/*.js"
+        yarn eslint .*.js ${{ inputs.project }}/**/*.js
         yarn eslint --max-warnings 0 --ext .json ${{ inputs.project }}
         yarn stylelint ${{ inputs.project }}/**/*.js ${{ inputs.project }}/*.js
     - shell: bash
