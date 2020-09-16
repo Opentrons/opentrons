@@ -18,16 +18,16 @@ describe('removePairs', () => {
   })
 
   const cases = [
-    // { input: [2], expected: [2] },
-    // { input: [2, 3], expected: [] },
-    // { input: [2, 3, 2, 3], expected: [] },
-    // { input: [2, 3, 2, 3, 2, 3], expected: [] },
-    // { input: [1, 2, 3], expected: [1] },
+    { input: [2], expected: [2] },
+    { input: [2, 3], expected: [] },
+    { input: [2, 3, 2, 3], expected: [] },
+    { input: [2, 3, 2, 3, 2, 3], expected: [] },
+    { input: [1, 2, 3], expected: [1] },
     { input: [2, 3, 4], expected: [4] },
-    // { input: [1, 2, 3, 4], expected: [1, 4] },
-    // { input: [1, 2, 3, 4, 2, 3], expected: [1, 4] },
-    // { input: [2, 3, 1, 2, 3, 4], expected: [1, 4] },
-    // { input: [2, 2, 2, 2], expected: [2, 2, 2, 2] },
+    { input: [1, 2, 3, 4], expected: [1, 4] },
+    { input: [1, 2, 3, 4, 2, 3], expected: [1, 4] },
+    { input: [2, 3, 1, 2, 3, 4], expected: [1, 4] },
+    { input: [2, 2, 2, 2], expected: [2, 2, 2, 2] },
   ]
   cases.forEach(({ input, expected }) =>
     it(`should do ${JSON.stringify(input)} => ${JSON.stringify(
