@@ -2,12 +2,13 @@ from pytest import raises
 
 from pydantic import ValidationError
 
-from robot_server.service.json_api.request import json_api_request
+from robot_server.service.json_api.request import (
+    RequestModel, RequestDataModel)
 from tests.service.helpers import ItemModel
 
 
 def test_attributes_as_dict():
-    DictRequest = json_api_request(dict)
+    DictRequest = RequestModel[RequestDataModel[dict]]
     obj_to_validate = {
         'data': {'type': 'item', 'attributes': {}}
     }
@@ -22,7 +23,7 @@ def test_attributes_as_dict():
 
 
 def test_attributes_as_item_model():
-    ItemRequest = json_api_request(ItemModel)
+    ItemRequest = RequestModel[RequestDataModel[ItemModel]]
     obj_to_validate = {
         'data': {
             'type': 'item',
@@ -39,7 +40,7 @@ def test_attributes_as_item_model():
 
 
 def test_attributes_as_item_model__empty_dict():
-    ItemRequest = json_api_request(ItemModel)
+    ItemRequest = RequestModel[RequestDataModel[ItemModel]]
     obj_to_validate = {
         'data': {
             'type': 'item',
@@ -67,7 +68,7 @@ def test_attributes_as_item_model__empty_dict():
 
 
 def test_attributes_required():
-    MyRequest = json_api_request(dict)
+    MyRequest = RequestModel[RequestDataModel[dict]]
     obj_to_validate = {
         'data': {'type': 'item', 'attributes': None}
     }
@@ -84,7 +85,7 @@ def test_attributes_required():
 
 
 def test_data_required():
-    MyRequest = json_api_request(dict)
+    MyRequest = RequestModel[RequestDataModel[dict]]
     obj_to_validate = {
         'data': None
     }
@@ -101,7 +102,7 @@ def test_data_required():
 
 
 def test_request_with_id():
-    MyRequest = json_api_request(dict)
+    MyRequest = RequestModel[RequestDataModel[dict]]
     obj_to_validate = {
         'data': {
             'type': 'item',
