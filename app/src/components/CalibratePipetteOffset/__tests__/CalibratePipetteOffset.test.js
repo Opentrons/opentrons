@@ -138,12 +138,12 @@ describe('CalibratePipetteOffset', () => {
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
 
-  it('does not render spinner when not shown', () => {
+  it('does not render spinner when showSpinner is false', () => {
     const wrapper = render({ showSpinner: false })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(false)
   })
 
-  it('renders spinner when last tracked request is pending', () => {
+  it('renders spinner when showSpinner is true', () => {
     const wrapper = render({ showSpinner: true })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
   })
