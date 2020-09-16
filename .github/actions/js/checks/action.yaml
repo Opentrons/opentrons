@@ -17,6 +17,7 @@ runs:
         yarn eslint .*.js ${{ inputs.project }}/**/*.js
         yarn eslint --max-warnings 0 --ext .json ${{ inputs.project }}
         yarn stylelint ${{ inputs.project }}/**/*.js ${{ inputs.project }}/*.js
+        yarn prettier --ignore-path .eslintignore --check ".*.@(js|yml)" "${{ inputs.project }}/**/*.@(js|json|md|yml)"
     - shell: bash
       run: |
         yarn flow check ${{ inputs.project }}
