@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Union, Tuple, List
+from typing import TYPE_CHECKING, Union, Tuple, List, Optional
 
-from opentrons import types
+from opentrons import types, hardware_control as hc
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion
 from opentrons.protocols.implementations.paired_instrument import\
     PairedInstrument
 
 from opentrons.protocols.api_support.util import (
-    requires_version, labware_column_shift)
+    requires_version, labware_column_shift, Clearances, clamp_value)
 from .labware import (
     Labware, Well, OutOfTipsError, select_tiprack_from_list_paired_pipettes,
     filter_tipracks_to_start, quirks_from_any_parent)
@@ -20,6 +20,9 @@ if TYPE_CHECKING:
     from .instrument_context import InstrumentContext
     from opentrons.hardware_control import types as hc_types
     from opentrons.protocols.api_support.util import HardwareManager
+
+
+SECONDARY_WELL_SPACING = 4
 
 
 SECONDARY_WELL_SPACING = 4
@@ -57,6 +60,9 @@ class PairedInstrumentContext(CommandPublisher):
         self._starting_tip: Union[Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
 
+        self._well_bottom_clearance = Clearances(
+            default_aspirate=1.0, default_dispense=1.0)
+
         self.trash_container = trash
         self.paired_instrument_obj = PairedInstrument(
             primary_instrument, secondary_instrument, pair_policy,
@@ -90,6 +96,35 @@ class PairedInstrumentContext(CommandPublisher):
         for tiprack in self.tip_racks:
             tiprack.reset()
         self.starting_tip = None
+
+    @property  # type: ignore
+    @requires_version(2, 7)
+    def well_bottom_clearance(self) -> Clearances:
+        """ The distance above the bottom of a well to aspirate or dispense.
+
+        This is an object with attributes ``aspirate`` and ``dispense``,
+        describing the default heights of the corresponding operation. The
+        default is 1.0mm for both aspirate and dispense.
+
+        When :py:meth:`aspirate` or :py:meth:`dispense` is given a
+        :py:class:`.Well` rather than a full :py:class:`.Location`, the robot
+        will move this distance above the bottom of the well to aspirate or
+        dispense.
+
+        Since the :py:class:`PairedInstrumentContext` controls both pipettes,
+        setting this value will override any pre-set value you may have
+        included on each individual :py:class:`InstrumentContext`. You
+        cannot specify a different clearance value for an individual
+        pipette using :py:class:`PairedInstrumentContext` at this time.
+
+        To change, set the corresponding attribute. For instance,
+
+        .. code-block:: python
+
+            instr.well_bottom_clearance.aspirate = 1
+
+        """
+        return self._well_bottom_clearance
 
     @requires_version(2, 7)
     def pick_up_tip(
@@ -286,26 +321,229 @@ class PairedInstrumentContext(CommandPublisher):
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> PairedInstrumentContext:
-        pass
+        """
+        Aspirate a volume of liquid (in microliters/uL) using both pipettes
+        from a specified location. You must pass in the location you
+        wish the primary pipette to move to.
+
+        For example, if your primary pipette is the left pipette and you
+        wish for it to move to well ``A1`` of a 96 SBS format plate you should
+        pass in well ``A1`` of this plate. The right pipette will automatically
+        aspirate from well ``A5`` of this plate.
+
+        If only a volume is passed, the pipettes will aspirate
+        from their current position. If only a location is passed (as in
+        ``instr.aspirate(location=wellplate['A1'])``,
+        :py:meth:`aspirate` will default to the amount of volume
+        available in both pipettes being used.
+
+        :param volume: The volume to aspirate, in microliters. If not
+                       specified, :py:attr:`max_volume`.
+        :type volume: int or float
+        :param location: Where to aspirate from. If `location` is a
+                         :py:class:`.Well`, the robot will aspirate from
+                         :py:obj:`well_bottom_clearance.aspirate` mm
+                         above the bottom of the well. If `location` is a
+                         :py:class:`.Location` (i.e. the result of
+                         :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
+                         robot will aspirate from the exact specified location.
+                         If unspecified, the robot will aspirate from the
+                         current position.
+        :param rate: The relative plunger speed for this aspirate. During
+                     this aspirate, the speed of the plunger will be
+                     `rate` * :py:attr:`aspirate_speed`. If not specified,
+                     defaults to 1.0 (speed will not be modified).
+        :type rate: float
+        :returns: This instance.
+
+        .. note::
+
+            If ``aspirate`` is called with a single argument, it will not try
+            to guess whether the argument is a volume or location - it is
+            required to be a volume. If you want to call ``aspirate`` with only
+            a location, specify it as a keyword argument:
+            ``instr.aspirate(location=wellplate['A1'])``
+
+        """
+        self._log.debug("aspirate {} from {} at {}"
+                        .format(volume,
+                                location if location else 'current position',
+                                rate))
+        loc: Optional[types.Location] = None
+        if isinstance(location, Well):
+            point, well = location.bottom()
+            loc = types.Location(
+                point + types.Point(0, 0,
+                                    self.well_bottom_clearance.aspirate),
+                well)
+        elif location is not None and not isinstance(location, types.Location):
+            raise TypeError(
+                'location should be a Well or Location, but it is {}'
+                .format(location))
+        else:
+            loc = location
+
+        self.paired_instrument_obj.aspirate(volume, loc, rate)
+        return self
 
     @requires_version(2, 7)
     def dispense(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> PairedInstrumentContext:
-        pass
+        """
+        Dispense a volume of liquid (in microliters/uL) using both pipettes
+        into the specified location.  You must pass in the location you
+        wish the primary pipette to move to.
+
+        For example, if your primary pipette is the left pipette and you
+        wish for it to move to well ``A1`` of a 96 SBS format plate you should
+        pass in well ``A1`` of this plate. The right pipette will automatically
+        dispense into well ``A5`` of this plate.
+
+        If only a volume is passed, the pipette will dispense from its current
+        position. If only a location is passed (as in
+        ``instr.dispense(location=wellplate['A1'])``), all of the liquid
+        aspirated into both pipettes will be dispensed (this volume is
+        accessible through :py:attr:`current_volume`).
+
+        :param volume: The volume of liquid to dispense, in microliters. If not
+                       specified, defaults to :py:attr:`current_volume`.
+        :type volume: int or float
+
+        :param location: Where to dispense into. If `location` is a
+                         :py:class:`.Well`, the robot will dispense into
+                         :py:obj:`well_bottom_clearance.dispense` mm
+                         above the bottom of the well. If `location` is a
+                         :py:class:`.Location` (i.e. the result of
+                         :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
+                         robot will dispense into the exact specified location.
+                         If unspecified, the robot will dispense into the
+                         current position.
+        :param rate: The relative plunger speed for this dispense. During
+                     this dispense, the speed of the plunger will be
+                     `rate` * :py:attr:`dispense_speed`. If not specified,
+                     defaults to 1.0 (speed will not be modified).
+        :type rate: float
+
+        :returns: This instance.
+
+        .. note::
+
+            If ``dispense`` is called with a single argument, it will not try
+            to guess whether the argument is a volume or location - it is
+            required to be a volume. If you want to call ``dispense`` with only
+            a location, specify it as a keyword argument:
+            ``instr.dispense(location=wellplate['A1'])``
+
+        """
+        self._log.debug("dispense {} from {} at {}"
+                        .format(volume,
+                                location if location else 'current position',
+                                rate))
+        if isinstance(location, Well):
+            if 'fixedTrash' in quirks_from_any_parent(location):
+                loc = location.top()
+            else:
+                point, well = location.bottom()
+                loc = types.Location(
+                    point + types.Point(0, 0,
+                                        self.well_bottom_clearance.dispense),
+                    well)
+        elif location is not None and not isinstance(location, types.Location):
+            raise TypeError(
+                'location should be a Well or Location, but it is {}'
+                .format(location))
+        else:
+            loc = location
+        self.paired_instrument_obj.dispense(volume, loc, rate)
+        return self
 
     @requires_version(2, 7)
     def air_gap(self,
                 volume: float = None,
                 height: float = None) -> PairedInstrumentContext:
-        pass
+        """
+        Pull air into the pipette current tip at the current location
+
+        :param volume: The amount in uL to aspirate air into the tube.
+                       (Default will use all remaining volume in tip)
+        :type volume: float
+
+        :param height: The number of millimiters to move above the current Well
+                       to air-gap aspirate. (Default: 5mm above current Well)
+        :type height: float
+
+        :raises NoTipAttachedError: If no tip is attached to the pipette
+
+        :raises RuntimeError: If location cache is None.
+                              This should happen if `touch_tip` is called
+                              without first calling a method that takes a
+                              location (eg, :py:meth:`.aspirate`,
+                              :py:meth:`dispense`)
+
+        :returns: This instance
+
+        .. note::
+
+            Both ``volume`` and height are optional, but unlike previous API
+            versions, if you want to specify only ``height`` you must do it
+            as a keyword argument: ``pipette.air_gap(height=2)``. If you
+            call ``air_gap`` with only one unnamed argument, it will always
+            be interpreted as a volume.
+
+
+        """
+        for instr in self._instruments.values():
+            if not instr.hw_pipette['has_tip']:
+                raise hc.NoTipAttachedError(
+                    'Pipette has no tip. Aborting air_gap')
+
+        if height is None:
+            height = 5
+        self.paired_instrument_obj.air_gap(volume, height)
+        return self
 
     @requires_version(2, 7)
     def blow_out(self,
                  location: Union[types.Location, Well] = None
                  ) -> PairedInstrumentContext:
-        pass
+        """
+        Blow liquid out of the tip.
+
+        If :py:attr:`dispense` is used to completely empty a pipette,
+        usually a small amount of liquid will remain in the tip. This
+        method moves the plunger past its usual stops to fully remove
+        any remaining liquid from the tip. Regardless of how much liquid
+        was in the tip when this function is called, after it is done
+        the tip will be empty.
+
+        :param location: The location to blow out into. If not specified,
+                         defaults to the current location of the pipette
+        :type location: :py:class:`.Well` or :py:class:`.Location` or None
+
+        :raises RuntimeError: If no location is specified and location cache is
+                              None. This should happen if `blow_out` is called
+                              without first calling a method that takes a
+                              location (eg, :py:meth:`.aspirate`,
+                              :py:meth:`dispense`)
+        :returns: This instance
+        """
+        if isinstance(location, Well):
+            if location.parent.is_tiprack:
+                self._log.warning('Blow_out being performed on a tiprack. '
+                                  'Please re-check your code')
+            loc = location.top()
+        elif location is not None and\
+                not isinstance(location, types.Location):
+            raise TypeError(
+                'location should be a Well or Location, but it is {}'
+                .format(location))
+        else:
+            loc = location
+
+        self.paired_instrument_obj.blow_out(loc)
+        return self
 
     @requires_version(2, 7)
     def mix(self,
@@ -313,7 +551,54 @@ class PairedInstrumentContext(CommandPublisher):
             volume: float = None,
             location: Union[types.Location, Well] = None,
             rate: float = 1.0) -> PairedInstrumentContext:
-        pass
+        """
+        Mix a volume of liquid (uL) using this pipette.
+        If no location is specified, the pipette will mix from its current
+        position. If no volume is passed, ``mix`` will default to the
+        pipette's :py:attr:`max_volume`.
+
+        :param repetitions: how many times the pipette should mix (default: 1)
+        :param volume: number of microliters to mix (default:
+                       :py:attr:`max_volume`)
+        :param location: a Well or a position relative to well.
+                         e.g, `plate.rows()[0][0].bottom()`
+        :type location: types.Location
+        :param rate: Set plunger speed for this mix, where,
+                     ``speed = rate * (aspirate_speed or dispense_speed)``
+        :raises NoTipAttachedError: If no tip is attached to the pipette.
+        :returns: This instance
+
+        .. note::
+
+            All the arguments to ``mix`` are optional; however, if you do
+            not want to specify one of them, all arguments after that one
+            should be keyword arguments. For instance, if you do not want
+            to specify volume, you would call
+            ``pipette.mix(1, location=wellplate['A1'])``. If you do not
+            want to specify repetitions, you would call
+            ``pipette.mix(volume=10, location=wellplate['A1'])``. Unlike
+            previous API versions, ``mix`` will not attempt to guess your
+            inputs; the first argument will always be interpreted as
+            ``repetitions``, the second as ``volume``, and the third as
+            ``location`` unless you use keywords.
+
+        """
+        self._log.debug(
+            'mixing {}uL with {} repetitions in {} at rate={}'.format(
+                volume, repetitions,
+                location if location else 'current position', rate))
+        for instr in self._instruments.values():
+            if not instr.hw_pipette['has_tip']:
+                raise hc.NoTipAttachedError(
+                    'Pipette has no tip. Aborting mix()')
+
+        self.aspirate(volume, location, rate)
+        while repetitions - 1 > 0:
+            self.dispense(volume, rate=rate)
+            self.aspirate(volume, rate=rate)
+            repetitions -= 1
+        self.dispense(volume, rate=rate)
+        return self
 
     @requires_version(2, 7)
     def touch_tip(self,
@@ -321,7 +606,51 @@ class PairedInstrumentContext(CommandPublisher):
                   radius: float = 1.0,
                   v_offset: float = -1.0,
                   speed: float = 60.0) -> PairedInstrumentContext:
-        pass
+        """
+        Touch the pipette tip to the sides of a well, with the intent of
+        removing left-over droplets. For :py:class:`PairedInstrumentContext`
+        we will only use the primary pipette for collision detection purposes.
+
+        :param location: If no location is passed, pipette will
+                         touch tip at current well's edges
+        :type location: :py:class:`.Well` or None
+        :param radius: Describes the proportion of the target well's
+                       radius. When `radius=1.0`, the pipette tip will move to
+                       the edge of the target well; when `radius=0.5`, it will
+                       move to 50% of the well's radius. Default: 1.0 (100%)
+        :type radius: float
+        :param v_offset: The offset in mm from the top of the well to touch tip
+                         A positive offset moves the tip higher above the well,
+                         while a negative offset moves it lower into the well
+                         Default: -1.0 mm
+        :type v_offset: float
+        :param speed: The speed for touch tip motion, in mm/s.
+                      Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
+        :type speed: float
+        :raises NoTipAttachedError: if no tip is attached to the pipette
+        :raises RuntimeError: If no location is specified and location cache is
+                              None. This should happen if `touch_tip` is called
+                              without first calling a method that takes a
+                              location (eg, :py:meth:`.aspirate`,
+                              :py:meth:`dispense`)
+        :returns: This instance
+
+        .. note::
+
+            This is behavior change from legacy API (which accepts any
+            :py:class:`.Placeable` as the ``location`` parameter)
+
+        """
+        for instr in self._instruments.values():
+            if not instr.hw_pipette['has_tip']:
+                raise hc.NoTipAttachedError(
+                    'Pipette has no tip to touch_tip()')
+
+        checked_speed = clamp_value(speed, 80, 1, 'touch_tip:')
+
+        self.paired_instrument_obj.touch_tip(
+            location, radius, v_offset, checked_speed)
+        return self
 
     @requires_version(2, 7)
     def return_tip(self,
@@ -366,10 +695,6 @@ class PairedInstrumentContext(CommandPublisher):
                       to limit individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
-        if not speed:
-            primary = self._instruments[self._pair_policy.primary]
-            speed = primary.default_speed
-
         self.paired_instrument_obj.move_to(
             location, force_direct, minimum_z_height, speed)
         return self
@@ -409,3 +734,8 @@ class PairedInstrumentContext(CommandPublisher):
             raise PipettePairPickUpTipError(
                 f'The location you specified ({primary_loc}) is'
                 'incompatible with a PipettePair pickup.')
+
+    @staticmethod
+    def _get_minimum_available_volume(instruments) -> float:
+        return min(
+            instr.hw_pipette['available_volume'] for instr in instruments)

@@ -82,9 +82,9 @@ def determine_edge_path(
 
 
 def build_edges(
-        where: 'Well', offset: float,
-        version: APIVersion, mount: top_types.Mount, deck: 'Deck',
-        radius: float = 1.0) -> List[top_types.Point]:
+        where: 'Well', offset: float, mount: top_types.Mount,
+        deck: 'Deck', radius: float = 1.0,
+        version: APIVersion = APIVersion(2, 7)) -> List[top_types.Point]:
     # Determine the touch_tip edges/points
     offset_pt = top_types.Point(0, 0, offset)
     edge_list = EdgeList(
