@@ -124,8 +124,9 @@ class PairedInstrument:
         if self.p_instrument.current_volume == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
-
-            if not self.p_instrument.hw_pipette['ready_to_aspirate']:
+            primary_ready = self.p_instrument.hw_pipette['ready_to_aspirate']
+            secondary_ready = self.s_instrument.hw_pipette['ready_to_aspirate']
+            if not primary_ready or not secondary_ready:
                 if isinstance(loc.labware, Well):
                     self.move_to(loc.labware.top())
                 else:
