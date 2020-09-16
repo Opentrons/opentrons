@@ -1,13 +1,15 @@
+from typing import List
+
 from pytest import raises
 from pydantic import BaseModel, ValidationError
 
-from robot_server.service.json_api.response import ResponseDataModel, \
-    json_api_response
+from robot_server.service.json_api.response import (
+    ResponseDataModel, ResponseModel)
 from tests.service.helpers import ItemModel
 
 
 def test_attributes_as_dict():
-    MyResponse = json_api_response(dict)
+    MyResponse = ResponseModel[ResponseDataModel[dict], dict]
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item', 'attributes': {}},
     }
@@ -24,7 +26,7 @@ def test_attributes_as_dict():
 
 
 def test_missing_attributes_dict():
-    MyResponse = json_api_response(dict)
+    MyResponse = ResponseModel[ResponseDataModel[dict], dict]
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item'}
     }
@@ -44,7 +46,7 @@ def test_missing_attributes_empty_model():
     class EmptyModel(BaseModel):
         pass
 
-    MyResponse = json_api_response(EmptyModel)
+    MyResponse = ResponseModel[ResponseDataModel[EmptyModel], dict]
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item'}
     }
@@ -62,7 +64,7 @@ def test_missing_attributes_empty_model():
 
 
 def test_attributes_as_item_model():
-    ItemResponse = json_api_response(ItemModel)
+    ItemResponse = ResponseModel[ResponseDataModel[ItemModel], dict]
     obj_to_validate = {
         'meta': None,
         'links': None,
@@ -93,7 +95,7 @@ def test_attributes_as_item_model():
 
 
 def test_list_item_model():
-    ItemResponse = json_api_response(ItemModel, use_list=True)
+    ItemResponse = ResponseModel[List[ResponseDataModel[ItemModel]], dict]
     obj_to_validate = {
         'meta': None,
         'links': None,
@@ -146,7 +148,7 @@ def test_list_item_model():
 
 
 def test_attributes_required():
-    ItemResponse = json_api_response(ItemModel)
+    ItemResponse = ResponseModel[ResponseDataModel[ItemModel], dict]
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item', 'attributes': None}
     }
@@ -163,7 +165,7 @@ def test_attributes_required():
 
 
 def test_attributes_as_item_model__empty_dict():
-    ItemResponse = json_api_response(ItemModel)
+    ItemResponse = ResponseModel[ResponseDataModel[ItemModel], dict]
     obj_to_validate = {
         'data': {
             'id': '123',
@@ -221,7 +223,7 @@ def test_resource_data_model_create_no_attributes():
 
 
 def test_response_constructed_with_resource_object():
-    ItemResponse = json_api_response(ItemModel)
+    ItemResponse = ResponseModel[ResponseDataModel[ItemModel], dict]
     item = ItemModel(name='pear', price=1.2, quantity=10)
     data = ResponseDataModel.create(
             resource_id='abc123',
@@ -244,7 +246,7 @@ def test_response_constructed_with_resource_object():
 
 
 def test_response_constructed_with_resource_object_list():
-    ItemResponse = json_api_response(ItemModel, use_list=True)
+    ItemResponse = ResponseModel[List[ResponseDataModel[ItemModel]], dict]
     items = (
         (1, ItemModel(name='apple', price=1.5, quantity=3)),
         (2, ItemModel(name='pear', price=1.2, quantity=10)),

@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Optional, Any
+from typing import Generic, TypeVar, Optional
 from pydantic import Field
 from pydantic.generics import GenericModel
 
@@ -44,15 +44,3 @@ class RequestModel(GenericModel, Generic[DataT]):
 
     def attributes(self):
         return self.data.attributes
-
-
-# Note(isk: 3/13/20): formats and returns request model
-def json_api_request(
-    attributes_model: Any
-):
-    type_string = attributes_model.__name__
-    request_data_model = RequestDataModel[attributes_model]  # type: ignore
-    request_data_model.__name__ = f'RequestData[{type_string}]'
-    request_model = RequestModel[request_data_model]
-    request_model.__name__ = f'Request[{type_string}]'
-    return request_model
