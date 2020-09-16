@@ -3,7 +3,6 @@ from enum import Enum
 import typing
 from functools import lru_cache
 
-from opentrons import types
 from pydantic import BaseModel, Field, validator
 from robot_server.service.json_api import ResponseModel, RequestModel
 from opentrons.util.helpers import utc_now
@@ -27,16 +26,21 @@ from opentrons.util.helpers import utc_now
 
 
 class LoadLabware(BaseModel):
-    location: int = Field(...,
-                          description="Deck slot", ge=1, lt=12)
-    loadName: str = Field(...,
-                          description="Name used to reference a labware definition")
-    displayName: str = Field(...,
-                             description="User-readable name for labware")
-    namespace: str = Field(...,
-                           description="The namespace the labware definition belongs to.")
-    version: int = Field(...,
-                         description="")
+    location: int = Field(
+        ...,
+        description="Deck slot", ge=1, lt=12)
+    loadName: str = Field(
+        ...,
+        description="Name used to reference a labware definition")
+    displayName: str = Field(
+        ...,
+        description="User-readable name for labware")
+    namespace: str = Field(
+        ...,
+        description="The namespace the labware definition belongs to")
+    version: int = Field(
+        ...,
+        description="The labware definition version")
 
 
 class LoadInstrument(BaseModel):
@@ -137,13 +141,13 @@ class ProtocolCommand(CommandDefinition):
         return "protocol"
 
 
-class NEW(CommandDefinition):
+class EquipmentCommand(CommandDefinition):
     load_labware = ("loadLabware", LoadLabware)
     load_instrument = ("loadInstrument", LoadInstrument)
 
     @staticmethod
     def namespace():
-        return "NEW!"
+        return "equipment"
 
 
 class PipetteCommand(CommandDefinition):
@@ -231,7 +235,7 @@ CommandDefinitionType = typing.Union[
     DeckCalibrationCommand,
     ProtocolCommand,
     PipetteCommand,
-    NEW,
+    EquipmentCommand,
 ]
 
 
