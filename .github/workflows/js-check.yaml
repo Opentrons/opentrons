@@ -25,13 +25,13 @@ defaults:
   run:
     shell: bash
 
+env:
+  CI: true
+
 jobs:
   checks:
     name: 'js checks'
     runs-on: 'ubuntu-latest'
-    defaults:
-      env:
-        CI: true
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
