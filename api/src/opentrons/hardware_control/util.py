@@ -86,7 +86,7 @@ def check_motion_bounds(
                 tsp=target_smoothie[ax],
                 tdp=target_deck.get(ax, 'unknown'),
                 dir='high',
-                limsp=bounds.get(ax, (None,'unknown'))[1],
+                limsp=bounds.get(ax, (None, 'unknown'))[1],
             )
             mod_log.warning(bounds_message)
             if checks.value & MotionChecks.HIGH.value:

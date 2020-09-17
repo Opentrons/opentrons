@@ -387,4 +387,5 @@ async def test_move_rel_bounds(
         hardware_api, toggle_new_calibration):
     with pytest.raises(OutOfBoundsMove):
         await hardware_api.move_rel(
-            types.Mount.RIGHT, types.Point(0, 0, 2000), check_bounds=MotionChecks.HIGH)
+            types.Mount.RIGHT, types.Point(0, 0, 2000),
+            check_bounds=MotionChecks.HIGH)
