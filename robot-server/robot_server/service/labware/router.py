@@ -164,8 +164,10 @@ async def get_specific_labware_calibration(
                                id=calibrationId)
 
     formatted_calibrations = _format_calibrations([calibration])
+    # TODO(mc, 2020-09-17): type of formatted_calibrations[0] does not match
+    # what SingleCalibrationResponse expects for data
     return lw_models.SingleCalibrationResponse(
-        data=formatted_calibrations[0])
+        data=formatted_calibrations[0])  # type: ignore[arg-type]
 
 
 @router.delete("/labware/calibrations/{calibrationId}",
