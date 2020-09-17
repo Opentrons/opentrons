@@ -33,9 +33,11 @@ def _format_calibrations(
         # TODO: Integrate datetime methods
         # to ensure that last_modified is the expected
         # value.
+        # TODO(mc, 2020-09-17): lw_offset types do not match the types
+        # expected by OffsetData
         offset = lw_models.OffsetData(
-            value=lw_offset.value,
-            lastModified=lw_offset.last_modified)
+            value=lw_offset.value,  # type: ignore[arg-type]
+            lastModified=lw_offset.last_modified)  # type: ignore[arg-type]
 
         tip_cal = calInfo.calibration.tip_length
         tip_length = lw_models.TipData(
@@ -114,7 +116,11 @@ async def get_all_labware_calibrations(
     all_calibrations = get_cal.get_all_calibrations()
 
     if not all_calibrations:
-        return lw_models.MultipleCalibrationsResponse(data=all_calibrations)
+        # TODO(mc, 2020-09-17): the type of all_calibrations does not match
+        # what MultipleCalibrationsResponse expects for data
+        return lw_models.MultipleCalibrationsResponse(
+            data=all_calibrations  # type: ignore[arg-type]
+        )
 
     if namespace:
         all_calibrations = list(filter(
@@ -134,7 +140,11 @@ async def get_all_labware_calibrations(
           all_calibrations))
     calibrations = _format_calibrations(all_calibrations)
 
-    return lw_models.MultipleCalibrationsResponse(data=calibrations)
+    # TODO(mc, 2020-09-17): the type of all_calibrations does not match
+    # what MultipleCalibrationsResponse expects for data
+    return lw_models.MultipleCalibrationsResponse(
+        data=calibrations  # type: ignore[arg-type]
+    )
 
 
 @router.get("/labware/calibrations/{calibrationId}",

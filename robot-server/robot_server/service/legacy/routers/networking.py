@@ -30,12 +30,15 @@ router = APIRouter()
 async def get_networking_status() -> NetworkingStatus:
     try:
         connectivity = await nmcli.is_connected()
+        # TODO(mc, 2020-09-17): interfaces should be typed
         interfaces = {i.value: await nmcli.iface_info(i)
                       for i in nmcli.NETWORK_IFACES}
         log.debug(f"Connectivity: {connectivity}")
         log.debug(f"Interfaces: {interfaces}")
-        return NetworkingStatus(status=ConnectivityStatus(connectivity),
-                                interfaces=interfaces)
+        return NetworkingStatus(
+            status=ConnectivityStatus(connectivity),
+            interfaces=interfaces  # type: ignore[arg-type]
+        )
     except (subprocess.CalledProcessError, FileNotFoundError, ValueError) as e:
         log.exception("Failed calling nmcli")
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, str(e))
@@ -157,14 +160,20 @@ async def delete_wifi_key(
             response_model=EapOptions)
 async def get_eap_options() -> EapOptions:
     options = [
-        EapVariant(name=m.qualified_name(),
-                   displayName=m.display_name(),
-                   options=[EapConfigOption(
-                       name=o.get('name'),
-                       displayName=o.get('displayName'),
-                       required=o.get('required'),
-                       type=EapConfigOptionType(o.get('type'))
-                   ) for o in m.args()])
+        EapVariant(
+            name=m.qualified_name(),
+            displayName=m.display_name(),
+            options=[
+                EapConfigOption(
+                    # TODO(mc, 2020-09-17): dict.get returns Optional but
+                    # EapConfigOption parameters are required
+                    name=o.get('name'),  # type: ignore[arg-type]
+                    displayName=o.get('displayName'),  # type: ignore[arg-type]
+                    required=o.get('required'),  # type: ignore[arg-type]
+                    type=EapConfigOptionType(o.get('type'))
+                ) for o in m.args()
+            ]
+        )
         for m in nmcli.EAP_TYPES
     ]
     result = EapOptions(options=options)

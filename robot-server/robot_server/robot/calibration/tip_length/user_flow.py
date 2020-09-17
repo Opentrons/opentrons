@@ -99,11 +99,14 @@ class TipCalibrationUserFlow:
         return self._current_state
 
     def get_pipette(self) -> AttachedPipette:
-        return AttachedPipette(model=self._hw_pipette.model,
-                               name=self._hw_pipette.name,
-                               tip_length=self._hw_pipette.config.tip_length,
-                               mount=str(self._mount),
-                               serial=self._hw_pipette.pipette_id)
+        # TODO(mc, 2020-09-17): s/tip_length/tipLength
+        return AttachedPipette(  # type: ignore[call-arg]
+            model=self._hw_pipette.model,
+            name=self._hw_pipette.name,
+            tip_length=self._hw_pipette.config.tip_length,
+            mount=str(self._mount),
+            serial=self._hw_pipette.pipette_id
+        )
 
     def get_required_labware(self) -> List[RequiredLabware]:
         slots = self._deck.get_non_fixture_slots()
