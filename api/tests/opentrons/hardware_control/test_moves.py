@@ -3,7 +3,8 @@ import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
 from opentrons.config import robot_configs
-from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.hardware_control.types import (
+    Axis, CriticalPoint, OutOfBoundsMove, MotionChecks)
 from opentrons.hardware_control.robot_calibration import (
     RobotCalibration, DeckCalibration)
 
@@ -288,62 +289,6 @@ async def test_other_mount_retracted(
         == types.Point(54, 20, 218)
 
 
-async def catch_oob_moves(hardware_api, is_robot, toggle_new_calibration):
-    await hardware_api.home()
-    # Check axis max checking for move and move rel
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(1, 0, 0))
-    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
-        == types.Point(418, 353, 218)
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 1, 0))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 0, 1))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(419, 353, 218))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(418, 354, 218))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(418, 353, 219))
-    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
-        == types.Point(418, 353, 218)
-    # Axis min checking for move and move rel
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(-1, 353, 218))
-    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
-        == types.Point(418, 353, 218)
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(418, -1, 218))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(418, 353, -1))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(-419, 0, 0))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, -354, 0))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 0, -219))
-    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
-        == types.Point(418, 353, 218)
-    # Make sure we are checking after mount offset and critical points
-    # are applied
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.LEFT, types.Point(33, 0, 0))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.LEFT, types.Point(385, 0, 0))
-    await hardware_api.move_to(types.Mount.RIGHT, types.Point(50, 50, 100))
-    await hardware_api.cache_instruments({types.Mount.LEFT: 'p10_single'})
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, 12))
-    await hardware_api.pick_up_tip(types.Mount.LEFT)
-    await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, 0))
-
-
 async def test_shake_during_pick_up(
         hardware_api, monkeypatch, toggle_new_calibration):
     await hardware_api.home()
@@ -436,3 +381,10 @@ async def test_shake_during_drop(
         mock.call(types.Mount.RIGHT, types.Point(-1, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(0, 0, 20))]
     move_rel.assert_has_calls(move_rel_calls)
+
+
+async def test_move_rel_bounds(
+        hardware_api, toggle_new_calibration):
+    with pytest.raises(OutOfBoundsMove):
+        await hardware_api.move_rel(
+            types.Mount.RIGHT, types.Point(0, 0, 2000), check_bounds=MotionChecks.HIGH)

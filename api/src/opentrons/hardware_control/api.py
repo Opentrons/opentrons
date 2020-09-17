@@ -915,7 +915,8 @@ class API(HardwareAPILike):
     async def move_rel(self, mount: Union[top_types.Mount, PipettePair],
                        delta: top_types.Point,
                        speed: float = None,
-                       max_speeds: Dict[Axis, float] = None):
+                       max_speeds: Dict[Axis, float] = None,
+                       check_bounds: MotionChecks = MotionChecks.NONE):
         """ Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
         'speed' sets the speed of all axes to the given value. So, if multiple
@@ -954,7 +955,8 @@ class API(HardwareAPILike):
         await self._cache_and_maybe_retract_mount(primary_mount)
         await self._move(
             target_position, speed=speed,
-            max_speeds=max_speeds, secondary_z=secondary_z)
+            max_speeds=max_speeds, secondary_z=secondary_z,
+            check_bounds=check_bounds)
 
     async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
         """ Retract the 'other' mount if necessary
