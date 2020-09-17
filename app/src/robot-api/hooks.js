@@ -88,7 +88,7 @@ export function useDispatchApiRequest<
 export function useDispatchApiRequests<
   A: { ...Action, meta: { requestId: string } }
 >(
-  onDispatchedRequest: (A => void) | null
+  onDispatchedRequest: (A => void) | null = null
 ): [(...Array<A>) => void, Array<string>] {
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
@@ -96,11 +96,11 @@ export function useDispatchApiRequests<
   const [unrequestedQueue, setUnrequestedQueue] = useState<Array<A>>([])
 
   const trackedRequestIsPending =
-    useSelector<State, RequestState | null>(state =>
-      trackedRequestId.current
+    useSelector<State, RequestState | null>(state => {
+      return trackedRequestId.current
         ? getRequestById(state, trackedRequestId.current)
         : null
-    )?.status === PENDING
+    })?.status === PENDING
 
   if (unrequestedQueue.length > 0 && !trackedRequestIsPending) {
     const action = dispatchRequest(unrequestedQueue[0])

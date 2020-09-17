@@ -1,20 +1,20 @@
 // @flow
 import * as React from 'react'
-import * as ReactRedux from 'react-redux'
-import { act } from 'react-dom/test-utils'
 import uniqueId from 'lodash/uniqueId'
 import { mount } from 'enzyme'
-import { useDispatchApiRequest } from '../hooks'
+import { mountWithStore } from '@opentrons/components/__utils__'
+import { PENDING, SUCCESS } from '../constants'
+import { useDispatchApiRequest, useDispatchApiRequests } from '../hooks'
 
-jest.mock('react-redux')
+import type { State } from '../../types'
+import { initializeState } from '@opentrons/discovery-client/src/store'
+
 jest.mock('lodash/uniqueId')
 
-const mockUseDispatch: JestMockFn<[], (mixed) => void> = ReactRedux.useDispatch
 const mockUniqueId: JestMockFn<[string | void], string> = uniqueId
 
 describe('useDispatchApiRequest', () => {
-  let wrapper
-  let mockDispatch
+  let render
 
   const TestUseDispatchApiRequest = () => {
     const mockAction: any = { type: 'mockAction', meta: {} }
@@ -29,11 +29,9 @@ describe('useDispatchApiRequest', () => {
 
   beforeEach(() => {
     let mockIdCounter = 0
-    mockDispatch = jest.fn()
     mockUniqueId.mockImplementation(() => `mockId_${mockIdCounter++}`)
-    mockUseDispatch.mockImplementation(() => mockDispatch)
 
-    wrapper = mount(<TestUseDispatchApiRequest />)
+    render = () => mountWithStore(<TestUseDispatchApiRequest />)
   })
 
   afterEach(() => {
@@ -41,31 +39,134 @@ describe('useDispatchApiRequest', () => {
   })
 
   it('adds meta.requestId to action and dispatches it', () => {
-    expect(mockDispatch).toHaveBeenCalledTimes(0)
+    const { wrapper, store } = render()
+    expect(store.dispatch).toHaveBeenCalledTimes(0)
 
-    act(() => wrapper.find('button').invoke('onClick')())
+    wrapper.find('button').invoke('onClick')()
     wrapper.update()
 
-    expect(mockDispatch).toHaveBeenCalledWith({
+    expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockAction',
       meta: { requestId: 'mockId_0' },
     })
   })
 
   it('adds requestId to requestIds list', () => {
-    act(() => wrapper.find('button').invoke('onClick')())
+    const { wrapper, store } = render()
+    wrapper.find('button').invoke('onClick')()
     wrapper.update()
 
     expect(wrapper.text()).toEqual('mockId_0')
   })
 
   it('can dispatch multiple requests', () => {
-    act(() => wrapper.find('button').invoke('onClick')())
+    const { wrapper, store } = render()
+    wrapper.find('button').invoke('onClick')()
     wrapper.update()
-    act(() => wrapper.find('button').invoke('onClick')())
+    wrapper.find('button').invoke('onClick')()
     wrapper.update()
 
-    expect(mockDispatch).toHaveBeenCalledTimes(2)
+    expect(store.dispatch).toHaveBeenCalledTimes(2)
     expect(wrapper.text()).toEqual('mockId_0 mockId_1')
+  })
+})
+
+describe('useDispatchApiRequests', () => {
+  let render
+
+  const TestUseDispatchApiRequests = props => {
+    const mockAction: any = { type: 'mockAction', meta: {} }
+    const mockOtherAction: any = { type: 'mockOtherAction', meta: {} }
+    const [dispatchRequests, requestIds] = useDispatchApiRequests()
+
+    return (
+      <button onClick={() => dispatchRequests(mockAction, mockOtherAction)}>
+        Click
+      </button>
+    )
+  }
+
+  beforeEach(() => {
+    let mockIdCounter = 0
+    mockUniqueId.mockImplementation(() => `mockId_${mockIdCounter++}`)
+
+    render = () =>
+      mountWithStore(<TestUseDispatchApiRequests />, {
+        initialState: {
+          robotApi: {},
+        },
+      })
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  it('dispatches first request first', () => {
+    const { store, wrapper } = render()
+    store.getState.mockReturnValue({
+      robotApi: {
+        mockId_0: {
+          status: PENDING,
+        },
+      },
+    })
+    wrapper.find('button').invoke('onClick')()
+    wrapper.update()
+
+    expect(store.dispatch).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledWith({
+      type: 'mockAction',
+      meta: { requestId: 'mockId_0' },
+    })
+  })
+
+  it('dispatches second if first not pending', () => {
+    const { store, wrapper } = render()
+    store.getState.mockReturnValue({
+      robotApi: {
+        mockId_0: {
+          status: SUCCESS,
+          response: { method: 'GET', ok: true, path: '/test', status: 200 },
+        },
+      },
+    })
+    wrapper.find('button').invoke('onClick')()
+    wrapper.update()
+
+    expect(store.dispatch).toHaveBeenCalledTimes(2)
+    expect(store.dispatch).toHaveBeenCalledWith({
+      type: 'mockAction',
+      meta: { requestId: 'mockId_0' },
+    })
+    expect(store.dispatch).toHaveBeenCalledWith({
+      type: 'mockOtherAction',
+      meta: { requestId: 'mockId_1' },
+    })
+  })
+
+  it('dispatches first and second, but waits for third if second is pending', () => {
+    const { store, wrapper } = render()
+    store.getState.mockReturnValue({
+      robotApi: {
+        mockId_0: {
+          status: SUCCESS,
+          response: { method: 'GET', ok: true, path: '/test', status: 200 },
+        },
+        mockId_1: { status: PENDING },
+      },
+    })
+    wrapper.find('button').invoke('onClick')()
+    wrapper.update()
+
+    expect(store.dispatch).toHaveBeenCalledTimes(2)
+    expect(store.dispatch).toHaveBeenCalledWith({
+      type: 'mockAction',
+      meta: { requestId: 'mockId_0' },
+    })
+    expect(store.dispatch).toHaveBeenCalledWith({
+      type: 'mockOtherAction',
+      meta: { requestId: 'mockId_1' },
+    })
   })
 })
