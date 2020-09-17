@@ -1,6 +1,6 @@
 from typing import Dict
 
-from robot_server.service.session.session_models.command import (
+from robot_server.service.session.models.command import (
     CommandDefinition, DeckCalibrationCommand as DeckCalCommand,
     CalibrationCommand)
 from robot_server.robot.calibration.util import (

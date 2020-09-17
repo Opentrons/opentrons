@@ -14,7 +14,7 @@ from robot_server.service.session.command_execution import CommandExecutor, \
     Command, CompletedCommand, CommandResult
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.errors import UnsupportedCommandException
-from robot_server.service.session.session_models.command import (
+from robot_server.service.session.models.command import (
     ProtocolCommand, CommandDefinitionType)
 from robot_server.service.session.session_types.protocol.execution.\
     protocol_runner import ProtocolRunner

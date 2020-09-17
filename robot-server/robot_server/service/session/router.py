@@ -3,7 +3,7 @@ import logging
 from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
 
-import robot_server.service.session.session_models.common
+from robot_server.service.session.models.common import IdentifierType
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.json_api import ResourceLink, ResponseDataModel
@@ -12,9 +12,9 @@ from robot_server.service.json_api.resource_links import ResourceLinkKey, \
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import SessionManager, BaseSession
-from robot_server.service.session.session_models.command import SessionCommand, \
+from robot_server.service.session.models.command import SessionCommand, \
     CommandResponse, CommandRequest
-from robot_server.service.session.session_models.session import SessionResponse, \
+from robot_server.service.session.models.session import SessionResponse, \
     SessionCreateRequest, MultiSessionResponse, SessionType
 from robot_server.service.session.session_types import SessionMetaData
 
@@ -28,7 +28,7 @@ PATH_SESSION_BY_ID = "/sessions/{sessionId}"
 
 
 def get_session(manager: SessionManager,
-                session_id: robot_server.service.session.session_models.common.IdentifierType,
+                session_id: IdentifierType,
                 api_router: APIRouter) -> BaseSession:
     """Get the session or raise a RobotServerError"""
     found_session = manager.get_by_id(session_id)
@@ -73,7 +73,7 @@ async def create_session_handler(
                response_model_exclude_unset=True,
                response_model=SessionResponse)
 async def delete_session_handler(
-        sessionId: robot_server.service.session.session_models.common.IdentifierType,
+        sessionId: IdentifierType,
         session_manager: SessionManager = Depends(get_session_manager)) \
         -> SessionResponse:
     """Delete a session"""
@@ -96,7 +96,7 @@ async def delete_session_handler(
             response_model_exclude_unset=True,
             response_model=SessionResponse)
 async def get_session_handler(
-        sessionId: robot_server.service.session.session_models.common.IdentifierType,
+        sessionId: IdentifierType,
         session_manager: SessionManager = Depends(get_session_manager))\
         -> SessionResponse:
     session_obj = get_session(manager=session_manager,
@@ -136,7 +136,7 @@ async def get_sessions_handler(
              response_model_exclude_unset=True,
              response_model=CommandResponse)
 async def session_command_execute_handler(
-        sessionId: robot_server.service.session.session_models.common.IdentifierType,
+        sessionId: IdentifierType,
         command_request: CommandRequest,
         session_manager: SessionManager = Depends(get_session_manager),
 ) -> CommandResponse:
@@ -178,7 +178,7 @@ ROOT_RESOURCE = ResourceLink(
 SESSIONS_BY_ID_RESOURCE = ResourceLink(href=PATH_SESSION_BY_ID)
 
 
-def get_valid_session_links(session_id: robot_server.service.session.session_models.common.IdentifierType,
+def get_valid_session_links(session_id: IdentifierType,
                             api_router: APIRouter) \
         -> ResourceLinks:
     """Get the valid links for a session"""

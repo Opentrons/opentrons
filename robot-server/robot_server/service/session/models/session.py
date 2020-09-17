@@ -5,7 +5,8 @@ import typing
 
 from pydantic import BaseModel, Field, validator
 
-from robot_server.robot.calibration.check.models import CalibrationSessionStatus
+from robot_server.robot.calibration.check.models import \
+    CalibrationSessionStatus
 from robot_server.robot.calibration.deck.models import \
     DeckCalibrationSessionStatus
 from robot_server.robot.calibration.pipette_offset.models import \
@@ -16,7 +17,7 @@ from robot_server.robot.calibration.tip_length.models import (
     TipCalibrationSessionStatus)
 from robot_server.service.json_api import RequestModel, RequestDataModel, \
     ResponseModel, ResponseDataModel
-from robot_server.service.session.session_models.common import EmptyModel
+from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.protocol.models import \
     ProtocolCreateParams, ProtocolSessionDetails
 

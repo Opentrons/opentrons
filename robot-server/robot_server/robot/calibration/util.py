@@ -7,7 +7,7 @@ from opentrons.protocols.geometry import planning
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.session_models.command import (
+from robot_server.service.session.models.command import (
     CommandDefinition)
 from .constants import STATE_WILDCARD
 from .errors import CalibrationError

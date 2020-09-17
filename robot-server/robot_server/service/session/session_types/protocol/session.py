@@ -5,7 +5,7 @@ from opentrons.config.feature_flags import enable_http_protocol_sessions
 
 from robot_server.service.session.errors import UnsupportedFeature, \
     SessionCreationException
-from robot_server.service.session.session_models.session import SessionType, \
+from robot_server.service.session.models.session import SessionType, \
     SessionDetails
 from robot_server.service.session.session_types import BaseSession, \
     SessionMetaData

@@ -8,7 +8,7 @@ from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
 from opentrons.util.helpers import utc_now
 
-from robot_server.service.session.session_models.common import EmptyModel, \
+from robot_server.service.session.models.common import EmptyModel, \
     JogPosition
 
 

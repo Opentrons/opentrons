@@ -6,7 +6,7 @@ from robot_server.robot.calibration.check.util import StateMachineError
 from robot_server.service.session.command_execution import \
     CommandQueue, CallableExecutor, Command, CompletedCommand
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.session_models.session import SessionType, \
+from robot_server.service.session.models.session import SessionType, \
     SessionDetails
 from robot_server.service.session.session_types.base_session \
     import BaseSession, SessionMetaData

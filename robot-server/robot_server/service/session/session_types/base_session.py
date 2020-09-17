@@ -3,11 +3,12 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
-import robot_server.service.session.session_models.common
+from robot_server.service.session.models.common import (
+    IdentifierType, create_identifier)
 from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.session_models import session as models
+from robot_server.service.session.models import session as models
 from opentrons.util.helpers import utc_now
 
 
@@ -16,8 +17,8 @@ class SessionMetaData:
     name: Optional[str] = None
     description: Optional[str] = None
     create_params: Optional[models.SessionCreateParamType] = None
-    identifier: robot_server.service.session.session_models.common.IdentifierType = field(
-        default_factory=robot_server.service.session.session_models.common.create_identifier
+    identifier: IdentifierType = field(
+        default_factory=create_identifier
     )
     created_at: datetime = field(default_factory=utc_now)
 

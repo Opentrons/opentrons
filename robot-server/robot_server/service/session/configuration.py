@@ -3,7 +3,7 @@ from typing import Callable
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.service.protocol.manager import ProtocolManager
-from robot_server.service.session.session_models.common import IdentifierType
+from robot_server.service.session.models.common import IdentifierType
 
 
 class SessionConfiguration:

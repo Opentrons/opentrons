@@ -1,22 +1,22 @@
 import pytest
 
-from robot_server.service.session.session_models.command import \
+from robot_server.service.session.models.command import \
     CalibrationCommand, BasicSessionCommand
-from robot_server.service.session.session_models.common import EmptyModel, \
+from robot_server.service.session.models.common import EmptyModel, \
     JogPosition
-from robot_server.service.session.session_models.session import BasicSession
+from robot_server.service.session.models.session import BasicSession
 
 
 def test_command_type_validation_jog():
     c = BasicSessionCommand(**{'command': CalibrationCommand.jog,
-                                      'data': {'vector': [1, 2, 3]}})
+                               'data': {'vector': [1, 2, 3]}})
     assert c.data == JogPosition(vector=(1, 2, 3,))
 
 
 def test_command_type_validation_jog_fail():
     with pytest.raises(ValueError):
         BasicSessionCommand(**{'command': CalibrationCommand.jog,
-                                      'data': {}})
+                               'data': {}})
 
 
 def test_command_type_empty():

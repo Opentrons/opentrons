@@ -1,13 +1,13 @@
 from typing import cast
 import dataclasses
 
-from robot_server.service.session.session_models.common import (
+from robot_server.service.session.models.common import (
     IdentifierType, EmptyModel)
 from robot_server.service.session.command_execution import CommandQueue, \
     CommandExecutor, DefaultHardwareExecutor
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.errors import UnsupportedFeature
-from robot_server.service.session.session_models.session import SessionType, \
+from robot_server.service.session.models.session import SessionType, \
     SessionDetails
 from robot_server.service.session.session_types import BaseSession, \
     SessionMetaData

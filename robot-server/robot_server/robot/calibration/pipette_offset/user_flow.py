@@ -17,7 +17,7 @@ from robot_server.robot.calibration.constants import (
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER)
 import robot_server.robot.calibration.util as uf
-from robot_server.service.session.session_models.command import \
+from robot_server.service.session.models.command import \
     CalibrationCommand
 from ..errors import CalibrationError
 from ..helper_classes import (RequiredLabware, AttachedPipette)

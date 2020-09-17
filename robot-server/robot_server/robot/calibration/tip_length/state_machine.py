@@ -1,5 +1,5 @@
 from typing import Dict
-from robot_server.service.session.session_models.command import (
+from robot_server.service.session.models.command import (
     CommandDefinition, TipLengthCalibrationCommand as TipCalCommand,
     CalibrationCommand)
 from robot_server.robot.calibration.util import (
