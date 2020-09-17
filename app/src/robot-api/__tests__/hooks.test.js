@@ -1,13 +1,9 @@
 // @flow
 import * as React from 'react'
 import uniqueId from 'lodash/uniqueId'
-import { mount } from 'enzyme'
 import { mountWithStore } from '@opentrons/components/__utils__'
 import { PENDING, SUCCESS } from '../constants'
 import { useDispatchApiRequest, useDispatchApiRequests } from '../hooks'
-
-import type { State } from '../../types'
-import { initializeState } from '@opentrons/discovery-client/src/store'
 
 jest.mock('lodash/uniqueId')
 
@@ -52,7 +48,7 @@ describe('useDispatchApiRequest', () => {
   })
 
   it('adds requestId to requestIds list', () => {
-    const { wrapper, store } = render()
+    const { wrapper } = render()
     wrapper.find('button').invoke('onClick')()
     wrapper.update()
 
@@ -77,7 +73,7 @@ describe('useDispatchApiRequests', () => {
   const TestUseDispatchApiRequests = props => {
     const mockAction: any = { type: 'mockAction', meta: {} }
     const mockOtherAction: any = { type: 'mockOtherAction', meta: {} }
-    const [dispatchRequests, requestIds] = useDispatchApiRequests()
+    const [dispatchRequests] = useDispatchApiRequests()
 
     return (
       <button onClick={() => dispatchRequests(mockAction, mockOtherAction)}>
