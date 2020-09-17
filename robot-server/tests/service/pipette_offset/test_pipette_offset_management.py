@@ -1,5 +1,3 @@
-import pytest
-
 PIPETTE_ID = 'pip_1'
 MOUNT = 'left'
 FAKE_PIPETTE_ID = 'fake'
