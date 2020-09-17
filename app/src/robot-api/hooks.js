@@ -76,7 +76,7 @@ export function useDispatchApiRequest<
  *
  * export function FetchPipettesButton(props: Props) {
  *   const { robotName } = props
- *   const [dispatchRequests, requestIds] = useDispatchApiRequest()
+ *   const [dispatchRequests, requestIds] = useDispatchApiRequests()
  *
  *   return (
  *     <button onClick={() => dispatchRequests([fetchPipettes(robotName), fetchModules(robotName)])}>
