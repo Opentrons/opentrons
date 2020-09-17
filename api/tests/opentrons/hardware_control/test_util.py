@@ -76,20 +76,20 @@ def test_cp_blending():
     'xformed,deck,bounds,check,catch,phrase',
     [
         # acceptable moves, iterating through checks
-        ({Axis.X: 2}, {Axis.X: -15}, {Axis.X: (1, 4)}, MotionChecks.NONE, False, ''),
-        ({Axis.X: 2}, {Axis.X: -10}, {Axis.X: (1, 4)}, MotionChecks.LOW, False, ''),
-        ({Axis.X: 2}, {Axis.X: 0}, {Axis.X: (1, 4)}, MotionChecks.HIGH, False, ''),
-        ({Axis.X: 2}, {Axis.X: 10}, {Axis.X: (1, 4)}, MotionChecks.BOTH, False, ''),
+        ({Axis.X: 2}, {Axis.X: -15}, {Axis.X: (1, 4)}, MotionChecks.NONE, False, ''),  # noqa(E501)
+        ({Axis.X: 2}, {Axis.X: -10}, {Axis.X: (1, 4)}, MotionChecks.LOW, False, ''),  # noqa(E501)
+        ({Axis.X: 2}, {Axis.X: 0}, {Axis.X: (1, 4)}, MotionChecks.HIGH, False, ''),  # noqa(E501)
+        ({Axis.X: 2}, {Axis.X: 10}, {Axis.X: (1, 4)}, MotionChecks.BOTH, False, ''),  # noqa(E501)
         # unacceptable low, with and without checking
-        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ''),
-        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, True, 'low'),
-        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, False, ''),
-        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, 'low'),
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ''),  # noqa(E501)
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, True, 'low'),  # noqa(E501)
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, False, ''),  # noqa(E501)
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, 'low'),  # noqa(E501)
         # unacceptable high, with and without checking
-        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ''),
-        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, False, ''),
-        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, True, 'high'),
-        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, 'high')
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ''),  # noqa(E501)
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, False, ''),  # noqa(E501)
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, True, 'high'),  # noqa(E501)
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, 'high')  # noqa(E501)
     ])
 def test_check_motion_bounds(xformed, deck, bounds, check, catch, phrase):
     if catch:
