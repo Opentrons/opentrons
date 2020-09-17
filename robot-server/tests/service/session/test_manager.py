@@ -6,7 +6,8 @@ from robot_server.service.errors import RobotServerError
 from robot_server.service.session.errors import SessionCreationException, \
     SessionException
 from robot_server.service.session.manager import SessionMetaData, BaseSession
-from robot_server.service.session.models import create_identifier, SessionType
+from robot_server.service.session.session_models.common import create_identifier
+from robot_server.service.session.session_models.session import SessionType
 from robot_server.service.session.session_types import DefaultSession
 
 

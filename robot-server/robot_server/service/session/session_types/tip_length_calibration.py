@@ -11,7 +11,7 @@ from robot_server.service.session.command_execution import \
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
-from ..models import SessionType, SessionDetails
+from ..session_models.session import SessionType, SessionDetails
 from ..errors import UnsupportedFeature
 
 if TYPE_CHECKING:

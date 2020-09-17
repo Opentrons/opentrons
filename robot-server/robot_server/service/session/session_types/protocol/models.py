@@ -30,3 +30,7 @@ class ProtocolSessionDetails(BaseModel):
     events: typing.List[ProtocolSessionEvent] =\
         Field(...,
               description="The events that have occurred thus far")
+
+
+class ProtocolCreateParams(BaseModel):
+    protocolId: str

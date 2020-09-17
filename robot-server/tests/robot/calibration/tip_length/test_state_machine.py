@@ -1,8 +1,8 @@
 import pytest
 from typing import List, Tuple
 
-from robot_server.service.session.models import CalibrationCommand, \
-    TipLengthCalibrationCommand
+from robot_server.service.session.session_models.command import (
+    CalibrationCommand, TipLengthCalibrationCommand)
 from robot_server.robot.calibration.tip_length.state_machine import \
     TipCalibrationStateMachine
 

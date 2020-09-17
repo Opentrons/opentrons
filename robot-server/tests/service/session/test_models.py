@@ -1,26 +1,31 @@
 import pytest
-from robot_server.service.session import models
+
+from robot_server.service.session.session_models.command import \
+    CalibrationCommand, BasicSessionCommand
+from robot_server.service.session.session_models.common import EmptyModel, \
+    JogPosition
+from robot_server.service.session.session_models.session import BasicSession
 
 
 def test_command_type_validation_jog():
-    c = models.BasicSessionCommand(**{'command': models.CalibrationCommand.jog,
+    c = BasicSessionCommand(**{'command': CalibrationCommand.jog,
                                       'data': {'vector': [1, 2, 3]}})
-    assert c.data == models.JogPosition(vector=(1, 2, 3,))
+    assert c.data == JogPosition(vector=(1, 2, 3,))
 
 
 def test_command_type_validation_jog_fail():
     with pytest.raises(ValueError):
-        models.BasicSessionCommand(**{'command': models.CalibrationCommand.jog,
+        BasicSessionCommand(**{'command': CalibrationCommand.jog,
                                       'data': {}})
 
 
 def test_command_type_empty():
     """Test that we create command correctly for
      commands that have no added data."""
-    c = models.BasicSessionCommand(
-        **{'command': models.CalibrationCommand.load_labware,
+    c = BasicSessionCommand(
+        **{'command': CalibrationCommand.load_labware,
            'data': {}})
-    assert c.data == models.EmptyModel()
+    assert c.data == EmptyModel()
 
 
 @pytest.mark.parametrize(argnames="create_params",
@@ -37,7 +42,7 @@ def test_basic_session_type_validation_no_create_params(create_params):
     }
     body.update(create_params)
 
-    session = models.BasicSession(**body)
+    session = BasicSession(**body)
     assert session.createParams == create_params.get('createParams')
 
 
@@ -56,4 +61,4 @@ def test_basic_session_type_validation_with_create_params(create_params):
     body.update(create_params)
 
     with pytest.raises(ValueError):
-        models.BasicSession(**body)
+        BasicSession(**body)

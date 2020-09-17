@@ -1,7 +1,8 @@
 import pytest
 from typing import List, Tuple
 
-from robot_server.service.session.models import CalibrationCommand
+from robot_server.service.session.session_models.command import\
+  CalibrationCommand
 from robot_server.robot.calibration.pipette_offset.state_machine import \
     PipetteOffsetCalibrationStateMachine
 

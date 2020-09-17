@@ -1,8 +1,10 @@
 from datetime import datetime
 from dataclasses import dataclass, field
 
-from robot_server.service.session.models import IdentifierType, \
-    create_identifier, CommandDefinitionType, CommandDataType, CommandStatus
+from robot_server.service.session.session_models.command import (
+    CommandDefinitionType, CommandDataType, CommandStatus)
+from robot_server.service.session.session_models.common import IdentifierType, \
+    create_identifier
 from opentrons.util.helpers import utc_now
 
 

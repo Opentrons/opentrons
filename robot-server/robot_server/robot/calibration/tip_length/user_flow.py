@@ -11,8 +11,8 @@ from opentrons.protocols.geometry import deck
 
 import robot_server.robot.calibration.util as uf
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import CalibrationCommand, \
-    TipLengthCalibrationCommand
+from robot_server.service.session.session_models.command import (
+    CalibrationCommand, TipLengthCalibrationCommand)
 from robot_server.robot.calibration.constants import (
     TIP_RACK_LOOKUP_BY_MAX_VOL,
     SHORT_TRASH_DECK,

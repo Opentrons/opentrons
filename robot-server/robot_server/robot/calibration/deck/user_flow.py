@@ -21,7 +21,7 @@ from robot_server.robot.calibration.constants import \
 from robot_server.service.errors import RobotServerError
 from opentrons.util import linal
 
-from robot_server.service.session.models import (
+from robot_server.service.session.session_models.command import (
     CalibrationCommand, DeckCalibrationCommand)
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
