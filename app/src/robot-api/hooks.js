@@ -79,7 +79,7 @@ export function useDispatchApiRequest<
  *   const [dispatchRequests, requestIds] = useDispatchApiRequest()
  *
  *   return (
- *     <button onClick={() => dispatchRequest([fetchPipettes(robotName), fetchModules(robotName)])}>
+ *     <button onClick={() => dispatchRequests([fetchPipettes(robotName), fetchModules(robotName)])}>
  *       Check Pipettes
  *     </button>
  *   )
