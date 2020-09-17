@@ -12,6 +12,25 @@ if TYPE_CHECKING:
 MODULE_LOG = logging.getLogger(__name__)
 
 
+class OutOfBoundsMove(RuntimeError):
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__()
+
+    def __str__(self) -> str:
+        return f'OutOfBoundsMove: {self.message}'
+
+    def __repr__(self) -> str:
+        return f'<{str(self.__class__)}: {self.message}>'
+
+
+class MotionChecks(enum.Enum):
+    NONE = 0
+    LOW = 1
+    HIGH = 2
+    BOTH = 3
+
+
 class Axis(enum.Enum):
     X = 0
     Y = 1
