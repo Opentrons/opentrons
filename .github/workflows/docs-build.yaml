@@ -38,6 +38,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
+      - uses: './.github/actions/util/build-env-vars'
       - name: 'Setup Docs'
         run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
       - name: 'Build docs'
@@ -51,3 +52,4 @@ jobs:
         with:
           domain: 'docs.opentrons.com'
           distPath: './api/docs/dist'
+          destPrefix: ${{ env.OT_BRANCH }}

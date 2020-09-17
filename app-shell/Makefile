@@ -101,6 +101,17 @@ dist-win: package-deps
 	$(builder) --win --x64
 	$(MAKE) _dist-collect-artifacts
 
+# Aliases matching github actions OS names for easier calling in
+# workflows
+.PHONY: dist-macos-latest
+dist-macos-latest: dist-osx
+
+.PHONY: dist-ubuntu-latest
+dist-ubuntu-latest: dist-linux
+
+.PHONY: dist-windows-latest
+dist-windows-latest: dist-win
+
 # copy distributable artifacts to the publish directory
 # update files will not exist for all OSs, so noop if cp errors
 .PHONY: _dist-collect-artifacts

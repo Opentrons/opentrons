@@ -1,0 +1,147 @@
+# Run tests, build the app, and deploy it cross platform
+
+name: 'App test, build, and deploy'
+
+on:
+  push:
+    paths:
+      - 'app/**/*'
+      - 'app-shell/**/*'
+      - 'components/**/*'
+      - 'shared-data/**/*'
+      - 'webpack-config/**/*'
+      - 'discovery-client/**/*'
+      - '*.js'
+      - 'scripts/**/*'
+      - '*.json'
+      - 'yarn.lock'
+      - '.github/workflows/app-test-build.yaml'
+      - '.github/actions/util/**/*'
+    branches:
+      - '*'
+    tags:
+      - 'v*'
+  pull_request:
+    paths:
+      - 'app/**/*'
+      - 'app-shell/**/*'
+      - 'components/**/*'
+      - 'shared-data/**/*'
+      - 'webpack-config/**/*'
+      - 'discovery-client/**/*'
+      - '*.js'
+      - '*.json'
+      - 'yarn.lock'
+      - 'scripts/**/*'
+  workflow_dispatch:
+
+#defaults:
+#  run:
+#    shell: bash
+
+env:
+  CI: true
+  OT_APP_DEPLOY_BUCKET: opentrons-app
+  OT_APP_DEPLOY_FOLDER: builds-actions  # Not the actual deploy target - change when we cut over
+
+jobs:
+  js-unit-test:
+    # unit tests for js frontend projects (e.g. not app-shell or discovery-client) do not need
+    # to run cross-platform
+    runs-on: 'ubuntu-latest'
+    name: 'opentrons app frontend unit tests'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'set complex environment variables and get yarn cache'
+        id: 'set-vars-get-cache'
+        uses: actions/github-script@v2
+        with:
+          script: |
+            const {execSync} = require('child_process')
+            const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
+            const tag = context.ref.startsWith('refs/tags/') ? branch : ''
+            const buildNumber = context.runNumber + 10000
+            core.exportVariable('OT_BRANCH', branch)
+            core.exportVariable('OT_TAG', tag)
+            core.exportVariable('OT_BUILD', buildNumber)
+            core.setOutput('yarnCacheDir', execSync('yarn cache dir'))
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.set-vars-get-cache.outputs.yarnCacheDir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: 'make setup-js'
+      - name: 'test frontend packages'
+        run: |
+          yarn jest --coverage=true --ci=true --testPathIgnorePatterns 'labware-.*' 'protocol-.*' 'app-shell' 'discovery-client'
+
+  build-app-test-backend:
+    # since js tests for "backend" projects (app-shell, discovery-client) need
+    # to run cross-platform just like builds, might as well do them in the same job
+    strategy:
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    name: 'opentrons app backend unit tests and build'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: './.github/actions/util/build-env-vars'
+      - name: 'get yarn cache'
+        id: 'get-cache'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const {execSync} = require('child_process')
+            core.setOutput('yarnCacheDir', execSync('yarn cache dir').toString())
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.get-cache.outputs.yarnCacheDir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: 'make setup-js'
+      - name: 'test native(er) packages'
+        run: |
+          yarn jest --coverage=true --ci=true --testPathPattern '(app-shell|discovery-client)'
+      - if: contains(matrix.os, 'ubuntu')
+        uses: 'codecov/codecov-action@v1'
+        with:
+          file: coverage.xml
+      # build the app and deploy it
+      - if: github.event_name != 'pull_request'
+        name: 'build app for ${{ matrix.os }}'
+        env:
+          OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
+          OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
+          WIN_CSC_LINK: ${{ secrets.OT_APP_CSC_WINDOWS }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_WINDOWS }}
+          CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS }}
+          CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
+          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
+        run: |
+           make -C app-shell dist-${{ matrix.os }}
+      - if: github.event_name != 'pull_request'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        name: 'deploy'
+        run: aws s3 sync --acl=public-read app-shell/dist/publish s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}
+      - if: github.event_name != 'pull_request'
+        name: 'upload github artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'opentrons app for ${{ matrix.os }}'
+          path: app-shell/dist/publish

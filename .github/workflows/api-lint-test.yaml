@@ -17,13 +17,13 @@ on:
       - 'Makefile'
       - 'shared-data/*/**'
       - '!shared-data/js/**'
-      - '.github/workflows/api-push.yaml'
-      - '.github/actions/python/**'
-    branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'master'
-      - 'chore_release-*'
-    tags-ignore:
+      - '.github/workflows/api-lint-test.yaml'
+      - '.github/actions/python/**/*'
+      - '.github/actions/util/**/*'
+    branches:
       - '*'
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 
@@ -64,8 +64,29 @@ jobs:
       - uses: 'actions/setup-python@v2'
         with:
           python-version: '3.7'
+      - uses: './.github/actions/util/build-env-vars'
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
       - name: Test
         run: make -C api test
+      - if: contains(matrix.os, 'ubuntu')
+        uses: 'codecov/codecov-action@v1'
+        with:
+          file: ./api/coverage.xml
+
+      # creds and repository configuration for deploying python wheels
+      - if: contains(matrix.os, 'ubuntu') && (github.event_name == 'push') && !env.OT_TAG
+        name: 'upload to test pypi'
+        uses: './.github/actions/python/pypi-deploy'
+        with:
+          project: 'api'
+          repository_url: 'https://test.pypi.org/legacy/'
+          password: '${{ secrets.OT_TEST_PYPI_PASSWORD }}'
+      - if: contains(matrix.os, 'ubuntu') && (github.event_name == 'push') && startsWith(env.OT_TAG, 'v')
+        name: 'upload to real pypi'
+        uses: './.github/actions/python/pypi-deploy'
+        with:
+          project: 'api'
+          repository_url: 'https://upload.pypi.org/legacy/'
+          password: '${{ secrets.OT_PYPI_PASSWORD }}'

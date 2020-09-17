@@ -1,0 +1,38 @@
+name: 'Deploy wheel to pypi'
+description: 'Deploy a python wheel to pypi or test pypi, depending on configuration. The python environment for the subproject must be set up already, and the complex environment variables must be defined.'
+inputs:
+  project:
+    description: 'Which project to run make deploy in'
+    required: true
+  repository_url:
+    description: 'The repository url to upload to. Creds will be determined based on this'
+    required: true
+  password:
+    description: 'The repository password'
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: |
+        echo "::add-mask::${{ inputs.password }}"
+        if [[ ${{ inputs.repository_url }} =~ "test" ]]; then
+          echo '::set-env name=SWALLOW_FAILURE::|| echo "Duplicate upload allowed on test"'
+          echo "Uploading to test pypi"
+        else if [[ ${{ inputs.repository_url }} =~ "upload.pypi.org" ]]; then
+                 echo "Uploading to prod pypi"
+             else
+                 echo "::error ::Invalid repository url ${{ inputs.repository_url }}"
+                 exit 1
+             fi
+        fi
+
+
+    - shell: bash
+      run: |
+        status=0
+        QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C ${{ inputs.project }} clean deploy twine_repository_url=${{ inputs.repository_url }} pypi_username=opentrons pypi_password=${{ inputs.password }} || status=$?
+        if [[ ${status} != 0 ]] && [[ ${{ inputs.repository_url }} =~ "test.pypi.org" ]]; then
+           echo "upload failures allowed to test pypi"
+           exit 0
+        fi
+        exit ${status}
