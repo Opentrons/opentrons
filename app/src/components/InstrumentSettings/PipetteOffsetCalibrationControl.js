@@ -1,14 +1,16 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import last from 'lodash/last'
 import { SecondaryBtn, SPACING_2 } from '@opentrons/components'
 
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
 import type { State } from '../../types'
-import type { SessionCommandString } from '../../sessions/types'
+import type {
+  SessionCommandString,
+  PipetteOffsetCalibrationSession,
+} from '../../sessions/types'
 import type { Mount } from '../../pipettes/types'
 import type { RequestState } from '../../robot-api/types'
 
@@ -34,22 +36,24 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
 
   const trackedRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
+  const createRequestId = React.useRef<string | null>(null)
 
-  const [dispatchRequests, requestIds] = RobotApi.useDispatchApiRequests(
+  const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
-      if (
+      if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
+        createRequestId.current = dispatchedAction.meta.requestId
+      } else if (
+        dispatchedAction.type === Sessions.DELETE_SESSION &&
+        pipOffsetCalSession?.id === dispatchedAction.payload.sessionId
+      ) {
+        deleteRequestId.current = dispatchedAction.meta.requestId
+      } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
         trackedRequestId.current = dispatchedAction.meta.requestId
-      }
-      if (
-        dispatchedAction.type === Sessions.DELETE_SESSION &&
-        pipOffsetCalSession?.id === dispatchedAction.payload.sessionId
-      ) {
-        deleteRequestId.current = dispatchedAction.meta.requestId
       }
     }
   )
@@ -68,20 +72,23 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
         : null
     )?.status === RobotApi.SUCCESS
 
-  const requestState = useSelector((state: State) => {
-    const reqId = last(requestIds) ?? null
-    return reqId ? RobotApi.getRequestById(state, reqId) : null
-  })
-  const requestStatus = requestState?.status ?? null
+  const shouldOpen =
+    useSelector((state: State) =>
+      createRequestId.current
+        ? RobotApi.getRequestById(state, createRequestId.current)
+        : null
+    )?.status === RobotApi.SUCCESS
 
-  // TODO: BC 2020-08-17 specifically track the success of the session response
   React.useEffect(() => {
-    if (requestStatus === RobotApi.SUCCESS) setShowWizard(true)
+    if (shouldOpen) {
+      setShowWizard(true)
+      createRequestId.current = null
+    }
     if (shouldClose) {
       setShowWizard(false)
       deleteRequestId.current = null
     }
-  }, [requestStatus, shouldClose])
+  }, [shouldOpen, shouldClose])
 
   const handleStartPipOffsetCalSession = () => {
     dispatchRequests(
@@ -93,19 +100,19 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
     )
   }
 
-  const pipOffsetCalSession = useSelector((state: State) => {
+  const pipOffsetCalSession = useSelector<
+    State,
+    PipetteOffsetCalibrationSession | null
+  >((state: State) => {
     const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
       state,
       robotName,
       Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
     )
-    if (
-      session &&
+    return session &&
       session.sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-    ) {
-      return session
-    }
-    return null
+      ? session
+      : null
   })
 
   return (
