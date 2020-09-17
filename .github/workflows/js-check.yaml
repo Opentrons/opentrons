@@ -1,0 +1,53 @@
+# This workflow runs checks (types, formatting, style) for our js projects
+# which cannot be meaningfully separated
+
+name: 'JS checks'
+
+on:
+  pull_request:
+    paths:
+      - '**/*.js'
+      - './.*.js'
+      - '**/*.json'
+      - '**/*.css'
+      - '**/*.md'
+  push:
+    paths:
+      - '**/*.js'
+      - './.*.js'
+      - '**/*.json'
+      - '**/*.md'
+      - '.github/workflows/js-check.yaml'
+      - '**/*.css'
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  checks:
+    name: 'js checks'
+    runs-on: 'ubuntu-latest'
+    defaults:
+      env:
+        CI: true
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node_version: '12'
+      - name: 'setup-js'
+        run: make setup-js
+      - name: 'lint js'
+        run: make lint-js
+      - name: 'typechecks'
+        run: make check-js
+      - name: 'circular deps'
+        run: make circular-dependencies-js
+      - name: 'lint json'
+        run: make lint-json
+      - name: 'lint css'
+        run: make lint-css
+      - name: 'stylecheck js'
+        run: make format
