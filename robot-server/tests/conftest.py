@@ -139,7 +139,6 @@ def set_up_index_file_temporary_directory(server_temp_directory):
 
 @pytest.fixture
 def set_up_pipette_offset_temp_directory(server_temp_directory):
-    delete.clear_pipette_offset_calibrations()
     pip_list = ['pip_1', 'pip_2']
     mount_list = [Mount.LEFT, Mount.RIGHT]
     for pip, mount in zip(pip_list, mount_list):

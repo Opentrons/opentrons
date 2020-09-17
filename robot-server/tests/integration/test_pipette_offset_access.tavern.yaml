@@ -130,7 +130,7 @@ marks: *cal_marks
 stages:
   - name: DELETE request with correct pipette AND mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset?pipette_id=pip_1&mount=left"
+      url: "{host:s}:{port:d}/calibration/pipette_offset?pipette_id=pip_2&mount=right"
       method: DELETE
     response:
         status_code: 200
