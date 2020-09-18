@@ -8,7 +8,7 @@ from tests.service.helpers import ItemModel
 
 
 def test_attributes_as_dict():
-    DictRequest = RequestModel[RequestDataModel[dict]]
+    DictRequest = RequestModel[dict]
     obj_to_validate = {
         'data': {'type': 'item', 'attributes': {}}
     }
@@ -23,7 +23,7 @@ def test_attributes_as_dict():
 
 
 def test_attributes_as_item_model():
-    ItemRequest = RequestModel[RequestDataModel[ItemModel]]
+    ItemRequest = RequestModel[ItemModel]
     obj_to_validate = {
         'data': {
             'type': 'item',
@@ -40,7 +40,7 @@ def test_attributes_as_item_model():
 
 
 def test_attributes_as_item_model__empty_dict():
-    ItemRequest = RequestModel[RequestDataModel[ItemModel]]
+    ItemRequest = RequestModel[ItemModel]
     obj_to_validate = {
         'data': {
             'type': 'item',
@@ -102,7 +102,7 @@ def test_data_required():
 
 
 def test_request_with_id():
-    MyRequest = RequestModel[RequestDataModel[dict]]
+    MyRequest = RequestModel[dict]
     obj_to_validate = {
         'data': {
             'type': 'item',
