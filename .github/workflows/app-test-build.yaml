@@ -59,8 +59,8 @@ jobs:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - name: 'set complex environment variables'
         run: |
-          echo ::set-env name=OT_BRANCH::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/\(heads\|pull\)\///")
-          echo ::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/:tags\///" | grep ^v)
+          echo ::set-env name=OT_BRANCH::$(echo ${{ github.ref }} | sed -E -e "s/^\/?refs\/(heads|pull)\///")
+          echo ::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -E -e "s/^\/?refs\/:tags\///" | grep ^v)
           echo ::set-env name=OT_BUILD::$(expr 10000 + ${{ github.run_number }})
       - name: 'setup-js'
         run: 'make setup-js'
