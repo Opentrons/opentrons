@@ -9,15 +9,14 @@ from opentrons.calibration_storage import (
 
 from robot_server.service.pipette_offset import models as pip_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
-from robot_server.service.json_api import ErrorResponse
-
+from robot_server.service.json_api import ErrorResponse, ResponseDataModel
 
 router = APIRouter()
 
 
 def _format_calibration(
     calibration: cal_types.PipetteOffsetCalibration
-) -> pip_models.PipetteOffsetCalibration:
+) -> ResponseDataModel[pip_models.PipetteOffsetCalibration]:
     formatted_cal = pip_models.PipetteOffsetCalibration(
         pipette=calibration.pipette,
         mount=calibration.mount,
@@ -42,7 +41,9 @@ async def get_all_pipette_offset_calibrations(
     all_calibrations = get_cal.get_all_pipette_offset_calibrations()
 
     if not all_calibrations:
-        return pip_models.MultipleCalibrationsResponse(data=all_calibrations)
+        return pip_models.MultipleCalibrationsResponse(
+            data=[_format_calibration(cal) for cal in all_calibrations]
+        )
 
     if pipette_id:
         all_calibrations = list(filter(
