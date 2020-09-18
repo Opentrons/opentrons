@@ -12,6 +12,6 @@ runs:
   steps:
     - shell: bash
       run: |
-        SHORTSLUG=`echo ${{ github.ref }} | sed -e "s/^\/\?refs\/\(?:tags\|heads\)\///"`
+        SHORTSLUG=`echo ${{ github.ref }} | sed -E -e "s/^\/?refs/(?:tags|heads)\///"`
         echo "Found ref slug ${SHORTSLUG} from ref ${{ github.ref }}"
         aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${SHORTSLUG} --acl=public-read
