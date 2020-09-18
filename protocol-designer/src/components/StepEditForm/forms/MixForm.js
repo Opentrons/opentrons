@@ -18,6 +18,7 @@ import {
   WellSelectionField,
   TipPositionField,
   WellOrderField,
+  DelayFields,
 } from '../fields'
 
 import type { FocusHandlers } from '../types'
@@ -113,6 +114,12 @@ export class MixForm extends React.Component<Props, State> {
                   label={i18n.t('form.step_edit_form.field.well_order.label')}
                 />
               </div>
+              <DelayFields
+                checkboxFieldName={'aspirate_delay_checkbox'}
+                secondsFieldName={'aspirate_delay_seconds'}
+                tipPositionFieldName={'mix_aspirate_delay_mmFromBottom'}
+                focusHandlers={focusHandlers}
+              />
             </div>
 
             <div className={styles.section_column}>
@@ -124,6 +131,12 @@ export class MixForm extends React.Component<Props, State> {
                 />
               </div>
               <div className={styles.checkbox_column}>
+                <DelayFields
+                  checkboxFieldName={'dispense_delay_checkbox'}
+                  secondsFieldName={'dispense_delay_seconds'}
+                  tipPositionFieldName={'mix_dispense_delay_mmFromBottom'}
+                  focusHandlers={focusHandlers}
+                />
                 <CheckboxRowField
                   className={styles.small_field}
                   label={i18n.t('form.step_edit_form.field.touchTip.label')}
