@@ -109,7 +109,7 @@ class PairedInstrument:
     def aspirate(
             self, volume: Optional[float],
             location: Optional[types.Location] = None,
-            rate: Optional[float] = 1.0):
+            rate: Optional[float] = 1.0) -> types.Location:
         if location:
             loc = location
         elif self._ctx.location_cache:
@@ -144,13 +144,17 @@ class PairedInstrument:
         elif loc != self._ctx.location_cache:
             self.move_to(loc)
         self._hw_manager.hardware.aspirate(self._pair_policy, volume, rate)
+        return loc
 
     def dispense(
             self, volume: Optional[float],
-            location: Optional[types.Location], rate: float):
+            location: Optional[types.Location],
+            rate: float) -> types.Location:
         if location:
+            loc = location
             self.move_to(location)
         elif self._ctx.location_cache:
+            loc = self._ctx.location_cache
             pass
         else:
             raise RuntimeError(
@@ -159,6 +163,7 @@ class PairedInstrument:
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
         self._hw_manager.hardware.dispense(self._pair_policy, volume, rate)
+        return loc
 
     def blow_out(self, location: types.Location):
         if location:

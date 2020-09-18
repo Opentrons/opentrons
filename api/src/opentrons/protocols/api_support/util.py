@@ -105,11 +105,12 @@ def build_edges(
 
 def labware_column_shift(
         initial_well: 'Well', tiprack: 'Labware',
-        well_spacing: int = 4) -> 'Well':
+        well_spacing: int = 4,
+        modulo_value: int = 8) -> 'Well':
     unshifted_index = tiprack.wells().index(initial_well)
-    unshifted_column = math.floor(unshifted_index/8)
+    unshifted_column = math.floor(unshifted_index/modulo_value)
     shifted_column = unshifted_column + well_spacing
-    shifted_well = unshifted_index % 8
+    shifted_well = unshifted_index % modulo_value
     return tiprack.columns()[shifted_column][shifted_well]
 
 

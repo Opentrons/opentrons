@@ -4,7 +4,7 @@ from opentrons.broker import Broker
 
 import functools
 import inspect
-from typing import Union, Sequence, List, Any
+from typing import Union, Sequence, List, Any, Optional
 
 from opentrons.legacy_api.containers import (Well as OldWell,
                                              Container as OldContainer,
@@ -93,6 +93,18 @@ def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
         )
 
 
+def combine_locations(location: Sequence) -> str:
+    if len(location) > 1:
+        loc1 = stringify_location(location[0])
+        loc2 = stringify_location(location[1])
+        return f'{loc1} and {loc2}'
+    elif len(location) == 1:
+        loc1 = stringify_location(location[0])
+        return f'{loc1}'
+    else:
+        return ''
+
+
 def stringify_location(location: Union[Location, None,
                                        OldWell, OldContainer,
                                        OldSlot, Sequence]) -> str:
@@ -147,6 +159,38 @@ def aspirate(instrument, volume, location, rate):
     )
 
 
+def paired_aspirate(
+        instruments: Sequence, volume: float,
+        locations: Sequence, rate: float):
+    location_text = combine_locations(locations)
+    template = 'Aspirating {volume} uL from {location} at {flow} uL/sec'
+    try:
+        flow_rate = min(
+            rate * FlowRates(instr).aspirate for instr in instruments)
+        text = template.format(
+                volume=float(volume), location=location_text, flow=flow_rate)
+    except AttributeError:
+        flow_mms = min(instr.speeds['aspirate'] for instr in instruments)
+        flow_ulsec = min(
+            flow_mms * instr._ul_per_mm(instr.max_volume, 'aspirate')
+            for instr in instruments)
+        flow_rate = rate * flow_ulsec
+        flow_rate = round(flow_rate, 1)
+        text = template.format(
+                volume=float(volume), location=location_text, flow=flow_rate)
+
+    return make_command(
+        name=command_types.ASPIRATE,
+        payload={
+            'instruments': instruments,
+            'volume': volume,
+            'locations': locations,
+            'rate': rate,
+            'text': text
+        }
+    )
+
+
 def dispense(instrument, volume, location, rate):
     location_text = stringify_location(location)
     template = 'Dispensing {volume} uL into {location} at {flow} uL/sec'
@@ -169,6 +213,38 @@ def dispense(instrument, volume, location, rate):
             'instrument': instrument,
             'volume': volume,
             'location': location,
+            'rate': rate,
+            'text': text
+        }
+    )
+
+
+def paired_dispense(
+        instruments: Sequence, volume: float,
+        locations: Sequence, rate: float):
+    location_text = combine_locations(locations)
+    template = 'Dispensing {volume} uL into {location} at {flow} uL/sec'
+    try:
+        flow_rate = min(
+            rate * FlowRates(instr).dispense for instr in instruments)
+        text = template.format(
+                volume=float(volume), location=location_text, flow=flow_rate)
+    except AttributeError:
+        flow_mms = min(instr.speeds['dispense'] for instr in instruments)
+        flow_ulsec = min(
+            flow_mms * instr._ul_per_mm(instr.max_volume, 'dispense')
+            for instr in instruments)
+        flow_rate = rate * flow_ulsec
+        flow_rate = round(flow_rate, 1)
+        text = template.format(
+                volume=float(volume), location=location_text, flow=flow_rate)
+
+    return make_command(
+        name=command_types.ASPIRATE,
+        payload={
+            'instruments': instruments,
+            'volume': volume,
+            'locations': locations,
             'rate': rate,
             'text': text
         }
@@ -286,6 +362,22 @@ def mix(instrument, repetitions, volume, location):
     )
 
 
+def paired_mix(
+        instruments: Sequence, locations: Sequence,
+        repetitions: int, volume: float):
+    text = f'Mixing {repetitions} times with a volume of {volume} ul'
+    return make_command(
+        name=command_types.MIX,
+        payload={
+            'instruments': instruments,
+            'locations': locations,
+            'volume': volume,
+            'repetitions': repetitions,
+            'text': text
+        }
+    )
+
+
 def blow_out(instrument, location):
     location_text = stringify_location(location)
     text = 'Blowing out'
@@ -303,12 +395,46 @@ def blow_out(instrument, location):
     )
 
 
+def paired_blow_out(instruments: Sequence, locations: Optional[Sequence]):
+    text = 'Blowing out'
+
+    if locations is not None:
+        location_text = combine_locations(locations)
+        text += f' at {location_text}'
+
+    return make_command(
+        name=command_types.BLOW_OUT,
+        payload={
+            'instruments': instruments,
+            'locations': locations,
+            'text': text
+        }
+    )
+
+
 def touch_tip(instrument):
     text = 'Touching tip'
+
     return make_command(
         name=command_types.TOUCH_TIP,
         payload={
             'instrument': instrument,
+            'text': text
+        }
+    )
+
+
+def paired_touch_tip(instruments: Sequence, locations: Optional[Sequence]):
+    text = 'Touching tip'
+
+    if locations is not None:
+        location_text = combine_locations(locations)
+        text += f' at {location_text}'
+    return make_command(
+        name=command_types.TOUCH_TIP,
+        payload={
+            'instruments': instruments,
+            'locations': locations,
             'text': text
         }
     )
@@ -347,6 +473,19 @@ def pick_up_tip(instrument, location):
     )
 
 
+def paired_pick_up_tip(instruments: Sequence, locations: Sequence):
+    location_text = combine_locations(locations)
+    text = f'Picking up tip from {location_text}'
+    return make_command(
+        name=command_types.PICK_UP_TIP,
+        payload={
+            'instruments': instruments,
+            'locations': locations,
+            'text': text
+        }
+    )
+
+
 def drop_tip(instrument, location):
     location_text = stringify_location(location)
     text = 'Dropping tip into {location}'.format(location=location_text)
@@ -355,6 +494,19 @@ def drop_tip(instrument, location):
         payload={
             'instrument': instrument,
             'location': location,
+            'text': text
+        }
+    )
+
+
+def paired_drop_tip(instruments: Sequence, locations: Sequence):
+    location_text = combine_locations(locations)
+    text = f'Dropping tip into {location_text}'
+    return make_command(
+        name=command_types.DROP_TIP,
+        payload={
+            'instruments': instruments,
+            'locations': locations,
             'text': text
         }
     )
@@ -620,6 +772,23 @@ def do_publish(broker, cmd, f, when, res, meta, *args, **kwargs):
         message['return'] = res
     publish_command(
         message={**payload, '$': when})
+
+
+def publish_paired(broker, cmd, when, res, *args):
+    """ Implement a second publisher outside of the decorator that
+    relies on the method providing all of the arguments required
+    rather than binding defaults to the signature"""
+    publish_command = functools.partial(
+        broker.publish,
+        topic=command_types.COMMAND)
+
+    payload = cmd(*args)
+
+    message = {**payload, '$': when}
+    if when == 'after':
+        message['return'] = res
+
+    publish_command(message=message)
 
 
 def _publish_dec(before, after, command, meta=None):
