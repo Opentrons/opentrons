@@ -1,6 +1,6 @@
-# Run tests and build the app cross-platform
+# Run tests, build the app, and deploy it cross platform
 
-name: 'App test and build'
+name: 'App test, build, and deploy'
 
 on:
   push:
@@ -38,6 +38,8 @@ defaults:
 
 env:
   CI: true
+  OT_APP_DEPLOY_BUCKET: opentrons-app
+  OT_APP_DEPLOY_FOLDER: builds-actions  # Not the actual deploy target - change when we cut over
 
 jobs:
   test:
@@ -69,9 +71,14 @@ jobs:
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns labware-.* protocol-.*
       - if: github.event_name != 'pull_request'
         name: 'build app'
-
         run: |
           echo OT_BRANCH: ${OT_BRANCH}
           echo OT_TAG: ${OT_TAG}
           echo OT_BUILD: ${OT_BUILD}
           make -C app-shell dist-${{ matrix.os }}
+      - if: github.event_name != 'pull_request'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+        name: 'deploy'
+        run: aws s3 sync --region=us-east-1 --acl=public-read app-shell/dist/publish s3://${OT_APP_DEPLOY_BUCKET}/${OT_APP_DEPLOY_FOLDER}
