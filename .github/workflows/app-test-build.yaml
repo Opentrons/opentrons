@@ -28,24 +28,24 @@ on:
       - 'yarn.lock'
   workflow_dispatch:
 
-  defaults:
-    run:
-      shell: brash
+defaults:
+  run:
+    shell: brash
 
-  jobs:
-    test:
-      strategy:
-        matrix:
-          os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
-      name: 'opentrons app js tests'
-      runs-on: '${{ matrix.os }}'
-      steps:
-        - uses: 'actions/checkout@v2'
-        - uses: 'actions/setup-node@v1'
-          with:
-            node-version: '12'
-        - name: 'setup-js'
-          run: make setup-js
-        - name: 'test relevant packages'
-          run:
-            yarn jest --coverage=true --ci=true --roots=app,app-shell,components,shared-data,webpack-config,discovery-client
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    name: 'opentrons app js tests'
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'setup-js'
+        run: make setup-js
+      - name: 'test relevant packages'
+        run:
+          yarn jest --coverage=true --ci=true --roots=app,app-shell,components,shared-data,webpack-config,discovery-client
