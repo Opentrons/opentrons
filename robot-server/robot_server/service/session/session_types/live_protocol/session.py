@@ -5,7 +5,6 @@ from robot_server.service.session.session_types import BaseSession
 
 
 class LiveProtocolSession(BaseSession):
-
     @property
     def command_executor(self) -> CommandExecutor:
         pass

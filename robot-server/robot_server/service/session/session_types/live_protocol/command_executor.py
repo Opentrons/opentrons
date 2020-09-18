@@ -3,13 +3,16 @@ from robot_server.service.session.command_execution import CommandExecutor, \
 from robot_server.service.session.errors import UnsupportedCommandException
 from robot_server.service.session.session_types.live_protocol.command_interface import \
     CommandInterface
+from robot_server.service.session.session_types.live_protocol.state_store import \
+    StateStore
 from robot_server.service.session import models
 from robot_server.util import duration
 
 
 class LiveProtocolCommandExecutor(CommandExecutor):
 
-    def __init__(self, command_interface: CommandInterface):
+    def __init__(self, command_interface: CommandInterface, state_store: StateStore):
+        self._store = state_store
         self._command_interface = command_interface
 
         self._handler_map = {
@@ -22,6 +25,10 @@ class LiveProtocolCommandExecutor(CommandExecutor):
         }
 
     async def execute(self, command: Command) -> CompletedCommand:
+        # add command to state
+        # self._store.handle_command_request(command)
+
+        # handle side-effects with timing
         handler = self._handler_map.get(command.content.name)
         if handler:
             with duration() as timed:
@@ -30,10 +37,17 @@ class LiveProtocolCommandExecutor(CommandExecutor):
             raise UnsupportedCommandException(
                 f"Command '{command.content.name}' is not supported."
             )
+
+        result = CommandResult(started_at=timed.start,
+                               completed_at=timed.end,
+                               data=data)
+
+        # add result to state
+        # self._store.handle_command_result(command, result)
+
+        # return completed command to session
         return CompletedCommand(
             content=command.content,
             meta=command.meta,
-            result=CommandResult(started_at=timed.start,
-                                 completed_at=timed.end,
-                                 data=data),
+            result=result,
         )
