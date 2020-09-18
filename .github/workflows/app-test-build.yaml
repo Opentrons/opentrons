@@ -53,7 +53,7 @@ jobs:
           node-version: '12'
       - name: 'set complex environment variables'
         run: |
-          echo ::set-env name=$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/\(heads\|pull\)\///")
+          echo ::set-env name=OT_BRANCH::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/\(heads\|pull\)\///")
           echo ::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/:tags\///" | grep ^v)
           echo ::set-env name=OT_BUILD::$(expr 10000 + ${{ github.run_number }})
 
