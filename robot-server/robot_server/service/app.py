@@ -22,6 +22,7 @@ from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
 from robot_server.service.access.router import router as access_router
 from robot_server.service.session.router import router as session_router
+from robot_server.service.pipette_offset.router import router as pip_os_router
 from robot_server.service.labware.router import router as labware_router
 from robot_server.service.protocol.router import router as protocol_router
 from robot_server.service.system.router import router as system_router
@@ -60,6 +61,8 @@ routes.include_router(router=labware_router,
                       tags=["Labware Calibration Management"])
 routes.include_router(router=protocol_router,
                       tags=["Protocol Management"])
+routes.include_router(router=pip_os_router,
+                      tags=["Pipette Offset Calibration Management"])
 
 app.include_router(router=routes,
                    responses={
