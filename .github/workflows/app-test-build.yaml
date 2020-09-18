@@ -30,7 +30,7 @@ on:
 
 defaults:
   run:
-    shell: brash
+    shell: bash
 
 env:
   CI: true
