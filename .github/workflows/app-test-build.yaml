@@ -53,20 +53,20 @@ jobs:
           node-version: '12'
       - name: 'set complex environment variables'
         run: |
-          echo ::set-env name=OT_BRANCH::"hi" #$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/heads\///")
-          echo ::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/tags\///")
+          echo ::set-env name=$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/\(heads\|pull\)\///")
+          echo ::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/:tags\///" | grep ^v)
           echo ::set-env name=OT_BUILD::$(expr 10000 + ${{ github.run_number }})
 
       - name: 'setup-js'
-        run: |
-          echo OT_BRANCH: ${OT_BRANCH}
-          echo OT_TAG: ${OT_TAG}
-          echo OT_BUILD: ${OT_BUILD}
-          exit 1
-          make setup-js
+        run: 'make setup-js'
       - name: 'test relevant packages'
         run:
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns labware-.* protocol-.*
       - if: github.event_name != 'pull_request'
         name: 'build app'
-        run: 'make -C app-shell dist-${{ matrix.os }}'
+
+        run: |
+          echo OT_BRANCH: ${OT_BRANCH}
+          echo OT_TAG: ${OT_TAG}
+          echo OT_BUILD: ${OT_BUILD}
+          make -C app-shell dist-${{ matrix.os }}
