@@ -59,6 +59,6 @@ jobs:
       - name: 'test relevant packages'
         run:
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns labware-.* protocol-.*
-      - if: github.event_name != pull_request
+      - if: github.event_name != 'pull_request'
         name: 'build app'
         run: 'make -C app-shell dist-${{ matrix.os }}'
