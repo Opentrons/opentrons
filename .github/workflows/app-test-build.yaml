@@ -1,5 +1,7 @@
 # Run tests and build the app cross-platform
 
+name: 'App test and build'
+
 on:
   push:
     paths:
@@ -12,6 +14,7 @@ on:
       - *.js
       - *.json
       - yarn.lock
+      - .github/workflows/app-test-build.yaml
   pull_request:
     paths:
       - app/**/*
