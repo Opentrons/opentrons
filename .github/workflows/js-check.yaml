@@ -37,6 +37,12 @@ jobs:
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '12'
+      - name: 'Cache node_modules'
+        uses: 'actions/cache@v2'
+        id: js-cache
+        with:
+          path: **/node_modules
+          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: make setup-js
       - name: 'lint js'
