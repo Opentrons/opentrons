@@ -7,6 +7,7 @@ from opentrons.protocol_api import labware
 from opentrons.api import models
 from opentrons.types import Point, Location, Mount
 from opentrons.hardware_control import CriticalPoint, API
+from opentrons.hardware_control.types import MotionChecks
 
 state = partial(state, 'calibration')
 
@@ -282,7 +283,7 @@ async def test_jog_api2(main_router, model):
             )
 
         expected = [
-            mock.call(Mount.RIGHT, point)
+            mock.call(Mount.RIGHT, point, check_bounds=MotionChecks.HIGH)
             for point in [Point(x=1), Point(y=2), Point(z=3)]]
 
         assert jog.mock_calls == expected

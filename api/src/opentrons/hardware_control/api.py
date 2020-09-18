@@ -13,7 +13,8 @@ from functools import lru_cache
 from opentrons.config import (
     robot_configs, feature_flags as ff)
 
-from .util import use_or_initialize_loop, DeckTransformState
+from .util import (
+    use_or_initialize_loop, DeckTransformState, check_motion_bounds)
 from .pipette import (
     Pipette, generate_hardware_configs, load_from_config_and_check_skip)
 from .controller import Controller
@@ -25,7 +26,8 @@ from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
                     DoorStateNotification, PipettePair, TipAttachedError,
-                    HardwareAction, PairedPipetteConfigValueError)
+                    HardwareAction, PairedPipetteConfigValueError,
+                    MotionChecks)
 from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
@@ -913,7 +915,8 @@ class API(HardwareAPILike):
     async def move_rel(self, mount: Union[top_types.Mount, PipettePair],
                        delta: top_types.Point,
                        speed: float = None,
-                       max_speeds: Dict[Axis, float] = None):
+                       max_speeds: Dict[Axis, float] = None,
+                       check_bounds: MotionChecks = MotionChecks.NONE):
         """ Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
         'speed' sets the speed of all axes to the given value. So, if multiple
@@ -952,7 +955,8 @@ class API(HardwareAPILike):
         await self._cache_and_maybe_retract_mount(primary_mount)
         await self._move(
             target_position, speed=speed,
-            max_speeds=max_speeds, secondary_z=secondary_z)
+            max_speeds=max_speeds, secondary_z=secondary_z,
+            check_bounds=check_bounds)
 
     async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
         """ Retract the 'other' mount if necessary
@@ -1036,7 +1040,8 @@ class API(HardwareAPILike):
                     speed: float = None, home_flagged_axes: bool = True,
                     max_speeds: Dict[Axis, float] = None,
                     acquire_lock: bool = True,
-                    secondary_z: Axis = None):
+                    secondary_z: Axis = None,
+                    check_bounds: MotionChecks = MotionChecks.NONE):
         """ Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
@@ -1070,7 +1075,6 @@ class API(HardwareAPILike):
                                     target_position))
             raise ValueError("Moves must specify either exactly an "
                              "x, y, and (z or a) or none of them")
-
         primary_transformed, secondary_transformed =\
             self._get_transformed(to_transform_primary, to_transform_secondary)
         transformed = (*primary_transformed, secondary_transformed[2])
@@ -1080,25 +1084,14 @@ class API(HardwareAPILike):
         # fuse the specified axes and the transformed values back together.
         # While we do this iteration, we’ll also check axis bounds.
         bounds = self._backend.axis_bounds
-        for idx, ax in enumerate(target_position.keys()):
-            if ax in Axis.gantry_axes():
-                smoothie_pos[ax.name] = transformed[idx]
-                if smoothie_pos[ax.name] < bounds[ax.name][0]\
-                   or smoothie_pos[ax.name] > bounds[ax.name][1]:
-                    deck_mins = self._deck_from_smoothie({ax: bound[0]
-                                                          for ax, bound
-                                                          in bounds.items()})
-                    deck_max = self._deck_from_smoothie({ax: bound[1]
-                                                         for ax, bound
-                                                         in bounds.items()})
-                    self._log.warning(
-                        "Out of bounds move: {}={} (transformed: {}) not in"
-                        "limits ({}, {}) (transformed: ({}, {})"
-                        .format(ax.name,
-                                target_position[ax],
-                                smoothie_pos[ax.name],
-                                deck_mins[ax], deck_max[ax],
-                                bounds[ax.name][0], bounds[ax.name][1]))
+        to_check = {ax: transformed[idx]
+                    for idx, ax in enumerate(target_position.keys())
+                    if ax in Axis.gantry_axes()}
+        check_motion_bounds(
+            to_check,
+            target_position,
+            bounds, check_bounds)
+        smoothie_pos.update({ax.name: pos for ax, pos in to_check.items()})
         checked_maxes = max_speeds or {}
         str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
         async with contextlib.AsyncExitStack() as stack:
