@@ -1,19 +1,23 @@
 from typing import cast
 import dataclasses
 
-from robot_server.service.session import models
+from robot_server.service.session.models.common import (
+    IdentifierType, EmptyModel)
 from robot_server.service.session.command_execution import CommandQueue, \
     CommandExecutor, DefaultHardwareExecutor
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.errors import UnsupportedFeature
+from robot_server.service.session.models.session import SessionType, \
+    SessionDetails
 from robot_server.service.session.session_types import BaseSession, \
     SessionMetaData
 
 
 class DefaultSession(BaseSession):
     """The default session providing limited command support."""
-    DEFAULT_ID: models.IdentifierType = cast(models.IdentifierType,
-                                             models.SessionType.default.value)
+    DEFAULT_ID: IdentifierType = cast(
+        IdentifierType,
+        SessionType.default.value)
 
     def __init__(self, configuration: SessionConfiguration,
                  instance_meta: SessionMetaData):
@@ -41,9 +45,9 @@ class DefaultSession(BaseSession):
     def command_queue(self) -> CommandQueue:
         raise UnsupportedFeature()
 
-    def _get_response_details(self) -> models.SessionDetails:
-        return models.EmptyModel()
+    def _get_response_details(self) -> SessionDetails:
+        return EmptyModel()
 
     @property
-    def session_type(self) -> models.SessionType:
-        return models.SessionType.default
+    def session_type(self) -> SessionType:
+        return SessionType.default

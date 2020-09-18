@@ -7,7 +7,7 @@ from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import (
+from robot_server.service.session.models.command import (
     CalibrationCommand, TipLengthCalibrationCommand)
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow

@@ -7,7 +7,7 @@ from opentrons.hardware_control import pipette
 from opentrons.config.pipette_config import load
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import CalibrationCommand
+from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
 

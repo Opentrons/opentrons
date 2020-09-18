@@ -25,7 +25,7 @@ class PipetteOffsetCalibration(BaseModel):
         Field(..., descriiption="The pipette ID")
     mount: str = \
         Field(..., description="The pipette mount")
-    offset: OffsetVector = \
+    offset: typing.List[float] = \
         Field(...,
               description="The pipette offset vector")
     tiprack: str = \

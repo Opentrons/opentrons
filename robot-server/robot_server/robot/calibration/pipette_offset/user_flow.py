@@ -9,7 +9,6 @@ from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import CalibrationCommand
 from robot_server.robot.calibration.constants import (
     TIP_RACK_LOOKUP_BY_MAX_VOL,
     SHORT_TRASH_DECK,
@@ -18,6 +17,8 @@ from robot_server.robot.calibration.constants import (
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER)
 import robot_server.robot.calibration.util as uf
+from robot_server.service.session.models.command import \
+    CalibrationCommand
 from ..errors import CalibrationError
 from ..helper_classes import (RequiredLabware, AttachedPipette)
 from .constants import (PipetteOffsetCalibrationState as State,

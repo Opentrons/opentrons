@@ -3,10 +3,11 @@ from robot_server.robot.calibration.check.session import\
 from robot_server.robot.calibration.check import models as calibration_models
 from robot_server.robot.calibration.check.util import StateMachineError
 
-from robot_server.service.session import models
 from robot_server.service.session.command_execution import \
     CommandQueue, CallableExecutor, Command, CompletedCommand
 from robot_server.service.session.configuration import SessionConfiguration
+from robot_server.service.session.models.session import SessionType, \
+    SessionDetails
 from robot_server.service.session.session_types.base_session \
     import BaseSession, SessionMetaData
 from robot_server.service.session.errors import SessionCreationException, \
@@ -55,7 +56,7 @@ class CheckSession(BaseSession):
         await super().clean_up()
         await self._calibration_check.delete_session()
 
-    def _get_response_details(self) -> models.SessionDetails:
+    def _get_response_details(self) -> SessionDetails:
         instruments = {
             str(k): calibration_models.AttachedPipette(
                 model=v.model,
@@ -98,5 +99,5 @@ class CheckSession(BaseSession):
         raise UnsupportedFeature()
 
     @property
-    def session_type(self) -> models.SessionType:
-        return models.SessionType.calibration_check
+    def session_type(self) -> SessionType:
+        return SessionType.calibration_check

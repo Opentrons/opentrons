@@ -4,7 +4,8 @@ from opentrons.hardware_control import ThreadManager
 from . import Command, CompletedCommand, CommandResult
 from . base_executor import CommandExecutor
 from ..errors import UnsupportedCommandException
-from ..models import CommandDataType, RobotCommand, CommandDefinition
+from ..models.command import (
+    CommandDataType, RobotCommand, CommandDefinition)
 from robot_server.util import duration
 
 
