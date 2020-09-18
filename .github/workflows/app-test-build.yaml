@@ -56,7 +56,7 @@ jobs:
         id: js-cache
         with:
           path: '**/node_modules'
-          key: 'node_modules-${{ runner.os }}-${{ hashFiles("yarn.lock") }}'
+          key: node_modules-${{ runner.os }}-${{ hashFiles("yarn.lock") }}
       - name: 'set complex environment variables'
         run: |
           echo ::set-env name=OT_BRANCH::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/\(heads\|pull\)\///")
