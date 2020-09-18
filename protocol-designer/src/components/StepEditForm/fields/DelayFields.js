@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react'
 import { i18n } from '../../../localization'
-import { TextField, CheckboxRowField, TipPositionField } from '.'
-
+import { TextField } from './TextField'
+import { CheckboxRowField } from './CheckboxRowField'
+import { TipPositionField } from './TipPositionField'
 import styles from '../StepEditForm.css'
 
 import type { FocusHandlers } from '../types'
