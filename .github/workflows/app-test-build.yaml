@@ -32,6 +32,9 @@ defaults:
   run:
     shell: brash
 
+env:
+  CI: true
+
 jobs:
   test:
     strategy:
