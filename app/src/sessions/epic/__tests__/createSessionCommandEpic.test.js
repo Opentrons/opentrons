@@ -35,7 +35,7 @@ describe('createSessionCommandEpic', () => {
         attributes: {
           command: 'calibration.jog',
           data: {
-            someData: 32,
+            vector: [32, 0, 0],
           },
         },
       },

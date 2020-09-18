@@ -31,14 +31,8 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
   const { sessionType } = props
   const { headerText } = contentsBySessionType[sessionType]
 
-  // TODO: BC 2020-09-04 avoid potential race condition by having an epic send the delete
-  // session command upon a successful exit response
   const exitSession = () => {
-    props.sendSessionCommand(Sessions.sharedCalCommands.EXIT)
-    // TODO: IMMEDIATELY use actualy epic for managing chained dependent commands
-    setTimeout(() => {
-      props.deleteSession()
-    }, 300)
+    props.cleanUpAndExit()
   }
   return (
     <Flex

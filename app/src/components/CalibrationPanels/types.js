@@ -1,7 +1,6 @@
 // @flow
 import type {
-  SessionCommandString,
-  SessionCommandData,
+  SessionCommandParams,
   SessionType,
   CalibrationSessionStep,
 } from '../../sessions/types'
@@ -10,12 +9,8 @@ import type { PipetteOffsetCalibrationLabware } from '../../sessions/pipette-off
 import type { TipLengthCalibrationLabware } from '../../sessions/tip-length-calibration/types'
 
 export type CalibrationPanelProps = {|
-  sendSessionCommand: (
-    command: SessionCommandString,
-    data?: SessionCommandData,
-    loadingSpinner?: boolean
-  ) => void,
-  deleteSession: () => void,
+  sendCommands: (...Array<SessionCommandParams>) => void,
+  cleanUpAndExit: () => void,
   tipRack:
     | DeckCalibrationLabware
     | PipetteOffsetCalibrationLabware

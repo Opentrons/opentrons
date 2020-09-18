@@ -50,7 +50,7 @@ const ASSET_MAP = {
   single: singleDemoAsset,
 }
 export function TipPickUp(props: CalibrationPanelProps): React.Node {
-  const { sendSessionCommand, tipRack, isMulti } = props
+  const { sendCommands, tipRack, isMulti } = props
 
   const tipRackDef = React.useMemo(
     () => getLatestLabwareDef(tipRack?.loadName),
@@ -70,17 +70,16 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
   )
 
   const pickUpTip = () => {
-    sendSessionCommand(Sessions.sharedCalCommands.PICK_UP_TIP)
+    sendCommands({ command: Sessions.sharedCalCommands.PICK_UP_TIP })
   }
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(
-      Sessions.sharedCalCommands.JOG,
-      {
+    sendCommands({
+      command: Sessions.sharedCalCommands.JOG,
+      data: {
         vector: formatJogVector(axis, dir, step),
       },
-      false
-    )
+    })
   }
 
   return (

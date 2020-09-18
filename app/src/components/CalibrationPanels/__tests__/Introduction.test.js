@@ -9,7 +9,7 @@ import { Introduction } from '../Introduction'
 describe('Introduction', () => {
   let render
 
-  const mockSendCommand = jest.fn()
+  const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   const getContinueButton = wrapper =>
@@ -27,8 +27,8 @@ describe('Introduction', () => {
         pipMount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
-        sendSessionCommand = mockSendCommand,
-        deleteSession = mockDeleteSession,
+        sendCommands = mockSendCommands,
+        cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_SESSION_STARTED,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
@@ -37,8 +37,8 @@ describe('Introduction', () => {
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
-          sendSessionCommand={sendSessionCommand}
-          deleteSession={deleteSession}
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
         />
@@ -60,9 +60,9 @@ describe('Introduction', () => {
 
     getConfirmDeckClearButton(wrapper).invoke('onClick')()
 
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.LOAD_LABWARE
-    )
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.deckCalCommands.LOAD_LABWARE,
+    })
   })
 
   it('clicking continue launches clear deck warning then cancel closes modal', () => {
@@ -76,9 +76,9 @@ describe('Introduction', () => {
     getCancelDeckClearButton(wrapper).invoke('onClick')()
 
     expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(false)
-    expect(mockSendCommand).not.toHaveBeenCalledWith(
-      Sessions.deckCalCommands.LOAD_LABWARE
-    )
+    expect(mockSendCommands).not.toHaveBeenCalledWith({
+      command: Sessions.deckCalCommands.LOAD_LABWARE,
+    })
   })
 
   it('pip offset cal session type shows correct text', () => {

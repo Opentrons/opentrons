@@ -9,7 +9,7 @@ import { TipPickUp } from '../TipPickUp'
 describe('TipPickUp', () => {
   let render
 
-  const mockSendCommand = jest.fn()
+  const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   const getPickUpTipButton = wrapper =>
@@ -24,8 +24,8 @@ describe('TipPickUp', () => {
         pipMount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
-        sendSessionCommand = mockSendCommand,
-        deleteSession = mockDeleteSession,
+        sendCommands = mockSendCommands,
+        cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_PREPARING_PIPETTE,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
@@ -34,8 +34,8 @@ describe('TipPickUp', () => {
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
-          sendSessionCommand={sendSessionCommand}
-          deleteSession={deleteSession}
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
         />
@@ -63,11 +63,10 @@ describe('TipPickUp', () => {
       getJogButton(wrapper, direction).invoke('onClick')()
       wrapper.update()
 
-      expect(mockSendCommand).toHaveBeenCalledWith(
-        Sessions.sharedCalCommands.JOG,
-        { vector: jogVectorsByDirection[direction] },
-        false
-      )
+      expect(mockSendCommands).toHaveBeenCalledWith({
+        command: Sessions.sharedCalCommands.JOG,
+        data: { vector: jogVectorsByDirection[direction] },
+      })
     })
   })
   it('clicking pick up tip sends pick up tip command', () => {
@@ -75,8 +74,8 @@ describe('TipPickUp', () => {
 
     getPickUpTipButton(wrapper).invoke('onClick')()
     wrapper.update()
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.PICK_UP_TIP
-    )
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.PICK_UP_TIP,
+    })
   })
 })
