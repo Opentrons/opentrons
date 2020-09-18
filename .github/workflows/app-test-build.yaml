@@ -53,9 +53,12 @@ jobs:
           node-version: '12'
       - name: 'set complex environment variables'
         run: |
-          echo '::set-env name=OT_BRANCH::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/heads\///")'
-          echo '::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/tags\///")'
-          echo '::set-env name=OT_BUILD::$(expr 10000 + ${{ github.run_number }})'
+          echo ::set-env name=OT_BRANCH::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/heads\///")
+          echo ::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/tags\///")
+          echo ::set-env name=OT_BUILD::$(expr 10000 + ${{ github.run_number }})
+          echo OT_BRANCH: ${OT_BRANCH}
+          echo OT_TAG: ${OT_TAG}
+          echo OT_BUILD: ${OT_BUILD}
       - name: 'setup-js'
         run: make setup-js
       - name: 'test relevant packages'
