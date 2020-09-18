@@ -56,12 +56,14 @@ jobs:
           echo ::set-env name=OT_BRANCH::"hi" #$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/heads\///")
           echo ::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/tags\///")
           echo ::set-env name=OT_BUILD::$(expr 10000 + ${{ github.run_number }})
+
+      - name: 'setup-js'
+        run: |
           echo OT_BRANCH: ${OT_BRANCH}
           echo OT_TAG: ${OT_TAG}
           echo OT_BUILD: ${OT_BUILD}
           exit 1
-      - name: 'setup-js'
-        run: make setup-js
+          make setup-js
       - name: 'test relevant packages'
         run:
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns labware-.* protocol-.*
