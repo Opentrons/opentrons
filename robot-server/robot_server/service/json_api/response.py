@@ -36,34 +36,33 @@ class ResponseDataModel(GenericModel, Generic[AttributesT]):
             type=attributes.__class__.__name__)
 
 
+DESCRIPTION_DATA = "the document’s 'primary data'"
+
+DESCRIPTION_LINKS = "a links object related to the primary data."
+
+DESCRIPTION_META = "a meta object that contains non-standard" \
+                             " meta-information."
+
 MetaT = TypeVar('MetaT')
 
 
 class ResponseModel(GenericModel, Generic[AttributesT, MetaT]):
-    """
-    """
-    meta: Optional[MetaT] = \
-        Field(None,
-              description="a meta object that contains non-standard"
-                          " meta-information.")
-    links: Optional[ResourceLinks] = \
-        Field(None,
-              description="a links object related to the primary data.")
-    data: ResponseDataModel[AttributesT] = \
-        Field(...,
-              description="the document’s 'primary data'")
+    """A response that returns a single resource"""
+
+    meta: Optional[MetaT] = Field(None, description=DESCRIPTION_META)
+    links: Optional[ResourceLinks] = Field(None, description=DESCRIPTION_LINKS)
+    data: ResponseDataModel[AttributesT] = Field(
+        ...,
+        description=DESCRIPTION_DATA
+    )
 
 
 class MultiResponseModel(GenericModel, Generic[AttributesT, MetaT]):
-    """
-    """
-    meta: Optional[MetaT] = \
-        Field(None,
-              description="a meta object that contains non-standard"
-                          " meta-information.")
-    links: Optional[ResourceLinks] = \
-        Field(None,
-              description="a links object related to the primary data.")
-    data: List[ResponseDataModel[AttributesT]] = \
-        Field(...,
-              description="the document’s 'primary data'")
+    """A response that returns multiple resources"""
+
+    meta: Optional[MetaT] = Field(None, description=DESCRIPTION_META)
+    links: Optional[ResourceLinks] = Field(None, description=DESCRIPTION_LINKS)
+    data: List[ResponseDataModel[AttributesT]] = Field(
+        ...,
+        description=DESCRIPTION_DATA
+    )
