@@ -254,6 +254,9 @@ def _pipette_settings_from_config(pc, pipette_id: str) -> PipetteSettings:
         **{k: v for k, v in mutuble_configs.items()}
     )
     c, m = pc.load_config_dict(pipette_id)
-    return PipetteSettings(info=PipetteSettingsInfo(name=c.get('name'),
-                                                    model=m),
-                           fields=fields)
+
+    # TODO(mc, 2020-09-17): s/fields/setting_fields (?)
+    return PipetteSettings(  # type: ignore[call-arg]
+        info=PipetteSettingsInfo(name=c.get('name'), model=m),
+        fields=fields
+    )

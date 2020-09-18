@@ -80,10 +80,12 @@ class CheckSession(BaseSession):
             self._calibration_check.labware_status.values()
         ]
 
+        # TODO(mc, 2020-09-17): type of get_comparisons_by_step doesn't quite
+        # match what CalibrationSessionStatus expects for comparisonsByStep
         return calibration_models.CalibrationSessionStatus(
             instruments=instruments,
             currentStep=self._calibration_check.current_state_name,
-            comparisonsByStep=self._calibration_check.get_comparisons_by_step(),  # noqa: e501
+            comparisonsByStep=self._calibration_check.get_comparisons_by_step(),  # type: ignore[arg-type] # noqa: e501
             labware=labware,
         )
 
