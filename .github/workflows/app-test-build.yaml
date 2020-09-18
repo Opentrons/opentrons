@@ -5,27 +5,27 @@ name: 'App test and build'
 on:
   push:
     paths:
-      - app/**/*
-      - app-shell/**/*
-      - components/**/*
-      - shared-data/**/*
-      - webpack-config/**/*
-      - discovery-client/**/*
-      - *.js
-      - *.json
-      - yarn.lock
-      - .github/workflows/app-test-build.yaml
+      - 'app/**/*'
+      - 'app-shell/**/*'
+      - 'components/**/*'
+      - 'shared-data/**/*'
+      - 'webpack-config/**/*'
+      - 'discovery-client/**/*'
+      - '*.js'
+      - '*.json'
+      - 'yarn.lock'
+      - '.github/workflows/app-test-build.yaml'
   pull_request:
     paths:
-      - app/**/*
-      - app-shell/**/*
-      - components/**/*
-      - shared-data/**/*
-      - webpack-config/**/*
-      - discovery-client/**/*
-      - *.js
-      - *.json
-      - yarn.lock
+      - 'app/**/*'
+      - 'app-shell/**/*'
+      - 'components/**/*'
+      - 'shared-data/**/*'
+      - 'webpack-config/**/*'
+      - 'discovery-client/**/*'
+      - '*.js'
+      - '*.json'
+      - 'yarn.lock'
   workflow_dispatch:
 
   defaults:
