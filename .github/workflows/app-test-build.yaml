@@ -15,6 +15,8 @@ on:
       - '*.json'
       - 'yarn.lock'
       - '.github/workflows/app-test-build.yaml'
+    tags:
+      - 'v*'
   pull_request:
     paths:
       - 'app/**/*'
@@ -47,8 +49,16 @@ jobs:
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '12'
+      - name: 'set complex environment variables'
+        run: |
+          echo '::set-env name=OT_BRANCH::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/heads\///")'
+          echo '::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -e "s/^\/\?refs\/tags\///")'
+          echo '::set-env name=OT_BUILD::$(expr 10000 + ${{ github.run_number }})'
       - name: 'setup-js'
         run: make setup-js
       - name: 'test relevant packages'
         run:
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns labware-.* protocol-.*
+      - if: github.event_name != pull_request
+        name: 'build app'
+        run: 'make -C app-shell dist-${{ matrix.os }}'
