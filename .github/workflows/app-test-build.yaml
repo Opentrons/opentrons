@@ -51,4 +51,4 @@ jobs:
         run: make setup-js
       - name: 'test relevant packages'
         run:
-          yarn jest --coverage=true --ci=true --roots=app,app-shell,components,shared-data,webpack-config,discovery-client
+          yarn jest --coverage=true --ci=true --testPathIgnorePatterns labware-.* protocol-.*
