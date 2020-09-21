@@ -1,10 +1,14 @@
 // @flow
 import type { InnerDelayArgs } from '../../../step-generation'
+import type {
+  DelayCheckboxFields,
+  DelaySecondFields,
+} from '../../../form-types'
 
 export function getDelayData<F: any>(
   hydratedFormData: F,
-  checkboxField: 'aspirate_delay_checkbox' | 'dispense_delay_checkbox',
-  secondsField: 'aspirate_delay_seconds' | 'dispense_delay_seconds',
+  checkboxField: DelayCheckboxFields,
+  secondsField: DelaySecondFields,
   mmFromBottomField:
     | 'aspirate_delay_mmFromBottom'
     | 'dispense_delay_mmFromBottom'
