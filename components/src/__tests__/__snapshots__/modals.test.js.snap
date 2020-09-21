@@ -160,6 +160,10 @@ exports[`modals Modal renders correctly with optional heading 1`] = `
 `;
 
 exports[`modals ModalPage renders correctly 1`] = `
+.c1 {
+  min-width: 0;
+}
+
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;
@@ -215,7 +219,7 @@ exports[`modals ModalPage renders correctly 1`] = `
     </h2>
   </header>
   <div
-    className="modal_page_contents"
+    className="c1 modal_page_contents"
   >
     children
   </div>
