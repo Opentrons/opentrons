@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Union, Optional
+from functools import partial
+from typing import TYPE_CHECKING, Union, Optional, Callable, Tuple
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
@@ -109,7 +110,7 @@ class PairedInstrument:
     def aspirate(
             self, volume: Optional[float],
             location: Optional[types.Location] = None,
-            rate: Optional[float] = 1.0):
+            rate: Optional[float] = 1.0) -> Tuple[types.Location, Callable]:
         if location:
             loc = location
         elif self._ctx.location_cache:
@@ -143,14 +144,19 @@ class PairedInstrument:
             self.move_to(loc)
         elif loc != self._ctx.location_cache:
             self.move_to(loc)
-        self._hw_manager.hardware.aspirate(self._pair_policy, volume, rate)
+
+        hw_aspirate = self._hw_manager.hardware.aspirate
+        return (loc, partial(hw_aspirate, self._pair_policy, volume, rate))
 
     def dispense(
             self, volume: Optional[float],
-            location: Optional[types.Location], rate: float):
+            location: Optional[types.Location],
+            rate: float) -> Tuple[types.Location, Callable]:
         if location:
+            loc = location
             self.move_to(location)
         elif self._ctx.location_cache:
+            loc = self._ctx.location_cache
             pass
         else:
             raise RuntimeError(
@@ -158,7 +164,8 @@ class PairedInstrument:
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
-        self._hw_manager.hardware.dispense(self._pair_policy, volume, rate)
+        hw_dispense = self._hw_manager.hardware.dispense
+        return (loc, partial(hw_dispense, self._pair_policy, volume, rate))
 
     def blow_out(self, location: types.Location):
         if location:
@@ -181,7 +188,10 @@ class PairedInstrument:
             raise RuntimeError('No previous Well cached to perform air gap')
         target = loc.labware.top(height)
         self.move_to(target)
-        self.aspirate(volume)
+        # Aspirate now returns a partial function for run log purposes
+        # but air gap only cares about executing an aspirate so here
+        # we automatically call the partial function
+        self.aspirate(volume)[1]()
 
     def touch_tip(
             self, location: Optional[Well], radius: float,

@@ -12,41 +12,21 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
+import { getDelayData } from './getDelayData'
 
 import type { HydratedMoveLiquidFormData } from '../../../form-types'
 import type {
   ConsolidateArgs,
   DistributeArgs,
   TransferArgs,
-  InnerDelayArgs,
   InnerMixArgs,
 } from '../../../step-generation'
 
-export function getDelayData(
-  hydratedFormData: $PropertyType<HydratedMoveLiquidFormData, 'fields'>,
-  checkboxField: 'aspirate_delay_checkbox' | 'dispense_delay_checkbox',
-  secondsField: 'aspirate_delay_seconds' | 'dispense_delay_seconds',
-  mmFromBottomField:
-    | 'aspirate_delay_mmFromBottom'
-    | 'dispense_delay_mmFromBottom'
-): ?InnerDelayArgs {
-  const checkbox = hydratedFormData[checkboxField]
-  const seconds = hydratedFormData[secondsField]
-  const mmFromBottom = hydratedFormData[mmFromBottomField]
-
-  if (
-    checkbox &&
-    (typeof seconds === 'number' && seconds > 0) &&
-    (typeof mmFromBottom === 'number' && mmFromBottom > 0)
-  ) {
-    return { seconds, mmFromBottom }
-  }
-  return null
-}
+type MoveLiquidFields = $PropertyType<HydratedMoveLiquidFormData, 'fields'>
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(
-  hydratedFormData: $PropertyType<HydratedMoveLiquidFormData, 'fields'>,
+  hydratedFormData: MoveLiquidFields,
   checkboxField: 'aspirate_airGap_checkbox', // | 'dispense_airGap_checkbox'
   volumeField: 'aspirate_airGap_volume' // | 'dispense_airGap_volume'
 ): number | null {
@@ -177,14 +157,14 @@ export const moveLiquidFormToArgs = (
     'dispense_mix_volume',
     'dispense_mix_times'
   )
-  const aspirateDelay = getDelayData(
+  const aspirateDelay = getDelayData<MoveLiquidFields>(
     fields,
     'aspirate_delay_checkbox',
     'aspirate_delay_seconds',
     'aspirate_delay_mmFromBottom'
   )
 
-  const dispenseDelay = getDelayData(
+  const dispenseDelay = getDelayData<MoveLiquidFields>(
     fields,
     'dispense_delay_checkbox',
     'dispense_delay_seconds',
@@ -226,7 +206,6 @@ export const moveLiquidFormToArgs = (
     aspirateDelay,
     dispenseDelay,
     aspirateAirGapVolume,
-    mixInDestination,
     touchTipAfterAspirate,
     touchTipAfterAspirateOffsetMmFromBottom,
     touchTipAfterDispense,
@@ -257,6 +236,7 @@ export const moveLiquidFormToArgs = (
         sourceWells,
         destWells,
         mixBeforeAspirate,
+        mixInDestination,
       }
       return transferStepArguments
     }
@@ -266,6 +246,7 @@ export const moveLiquidFormToArgs = (
         commandCreatorFnName: 'consolidate',
         blowoutLocation,
         mixFirstAspirate: mixBeforeAspirate,
+        mixInDestination,
         sourceWells,
         destWell: destWells[0],
       }

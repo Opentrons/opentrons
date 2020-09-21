@@ -36,6 +36,8 @@ function getLabwareFieldForPositioningField(
     dispense_delay_mmFromBottom: 'dispense_labware',
     mix_mmFromBottom: 'labware',
     mix_touchTip_mmFromBottom: 'labware',
+    mix_aspirate_delay_mmFromBottom: 'labware',
+    mix_dispense_delay_mmFromBottom: 'labware',
   }
   return fieldMap[fieldName]
 }

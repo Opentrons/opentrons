@@ -11,7 +11,7 @@ import {
   dropTipHelper,
   FIXED_TRASH_ID,
   getErrorResult,
-  getFlowRateAndOffsetParams,
+  getFlowRateAndOffsetParamsTransferLike,
   getInitialRobotStateStandard,
   getRobotStatePickedUpTipStandard,
   getSuccessResult,
@@ -27,7 +27,7 @@ import type {
   AspirateParams,
   DispenseParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-
+import type { ConsolidateArgs } from '../types'
 const airGapHelper = makeAirGapHelper({ offsetFromBottomMm: 11.54 })
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
@@ -61,7 +61,7 @@ function tripleMix(
 let invariantContext
 let initialRobotState
 let robotStatePickedUpOneTip
-let mixinArgs
+let mixinArgs: $Shape<ConsolidateArgs>
 
 beforeEach(() => {
   invariantContext = makeContext()
@@ -69,10 +69,9 @@ beforeEach(() => {
   robotStatePickedUpOneTip = getRobotStatePickedUpTipStandard(invariantContext)
 
   mixinArgs = {
+    ...getFlowRateAndOffsetParamsTransferLike(),
     // `volume` and `changeTip` should be explicit in tests,
     // those fields intentionally omitted from here
-    ...getFlowRateAndOffsetParams(),
-    stepType: 'consolidate',
     commandCreatorFnName: 'consolidate',
     name: 'Consolidate Test',
     description: 'test blah blah',
@@ -1137,8 +1136,8 @@ describe('consolidate multi-channel', () => {
       pipette: 'p300MultiId',
     })
 
-  const args = {
-    stepType: 'consolidate',
+  const args: $Shape<ConsolidateArgs> = {
+    ...getFlowRateAndOffsetParamsTransferLike(),
     commandCreatorFnName: 'consolidate',
     name: 'Consolidate Test',
     description: 'test blah blah',
@@ -1160,12 +1159,10 @@ describe('consolidate multi-channel', () => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
-
-    ...getFlowRateAndOffsetParams(),
   }
 
   it('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...args,
       volume: 140,
       changeTip: 'once',

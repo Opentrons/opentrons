@@ -762,6 +762,7 @@ def _get_labware(command):  # noqa(C901)
     modules.append(maybe_module)
 
     locations = command.get('locations')
+    multiple_instruments = command.get('instruments')
 
     if location:
         if isinstance(location, (Placeable)) or type(location) == tuple:
@@ -791,5 +792,10 @@ def _get_labware(command):  # noqa(C901)
         instruments.append(instrument)
         interactions.extend(
             [(instrument, container) for container in containers])
+    if multiple_instruments:
+        for instr in multiple_instruments:
+            instruments.append(instr)
+            interactions.extend(
+                [(instr, container) for container in containers])
 
     return instruments, containers, modules, interactions

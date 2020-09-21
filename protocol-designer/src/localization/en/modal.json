@@ -26,7 +26,9 @@
       "dispense_touchTip_mmFromBottom": "Change from where in the well the robot performs touch tip",
       "mix_touchTip_mmFromBottom": "Change from where in the well the robot performs touch tip",
       "aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating",
-      "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing"
+      "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing",
+      "mix_aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating",
+      "mix_dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing"
     },
     "field_label": "Distance from bottom of well"
   },
