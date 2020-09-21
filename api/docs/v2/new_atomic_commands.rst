@@ -183,6 +183,20 @@ To reset the tip tracking, you can call :py:meth:`.InstrumentContext.reset_tipra
 
 .. versionadded:: 2.0
 
+To check whether you should pick up a tip or not, you can utilize :py:meth:`.InstrumentContext.has_tip`:
+
+.. code-block:: python
+
+    for block in range(3):
+        if block == 0 and not pipette.has_tip:
+            pipette.pick_up_tip()
+        else:
+            m300.mix(mix_repetitions, 250, d)
+            m300.blow_out(s.bottom(10))
+            m300.return_tip()
+
+.. versionadded:: 2.7
+
 **********************
 
 ****************
