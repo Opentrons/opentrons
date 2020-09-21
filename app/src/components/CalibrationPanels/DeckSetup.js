@@ -20,6 +20,7 @@ import {
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../sessions'
+import type { SessionType, SessionCommandString } from '../../sessions/types'
 import type { CalibrationPanelProps } from './types'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import styles from './styles.css'
@@ -29,14 +30,30 @@ const DECK_SETUP_WITH_BLOCK_PROMPT =
 const DECK_SETUP_NO_BLOCK_PROMPT =
   'Place full tip rack on the deck within the designated slot as illustrated below.'
 const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
+const contentsBySessionType: {
+  [SessionType]: {
+    moveCommandString: SessionCommandString,
+  },
+} = {
+  [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
+    moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+  },
+  [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
+    moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+  },
+  [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
+    moveCommandString: Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT,
+  },
+}
 
 export function DeckSetup(props: CalibrationPanelProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
-  const { tipRack, calBlock, sendCommands } = props
+  const { tipRack, calBlock, sendCommands, sessionType } = props
+  const { moveCommandString } = contentsBySessionType[sessionType]
 
   const proceed = () => {
-    sendCommands({ command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK })
+    sendCommands({ command: moveCommandString })
   }
 
   return (
