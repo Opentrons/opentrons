@@ -46,12 +46,19 @@ const PIP_OFFSET_CAL_BODY =
   'Calibrating pipette offset enables robot to accurately establish the location of the mounted pipette’s nozzle, relative to the deck.'
 const PIP_OFFSET_CAL_PROCEDURE = 'to calibrate pipette offset'
 
+const TIP_LENGTH_CAL_HEADER = 'tip length calibration'
+const TIP_LENGTH_CAL_BODY =
+  "Tip length calibration measures the length of the pipette's tip separately from the pipette's nozzle."
+const TIP_LENGTH_CAL_PROCEDURE = 'to tip length calibration'
+
 const CONTINUE = 'continue'
 const LABWARE_REQS = 'For this process you will require:'
 const NOTE_HEADER = 'Please note:'
 const IT_IS = "It's"
 const EXTREMELY = 'extremely'
-const NOTE_BODY =
+const NOTE_BODY_OUTSIDE_PROTOCOL =
+  'important you perform this calibration using the Opentrons tips and tip racks specified above, as the robot determines accuracy based on the measurements of these tips.'
+const NOTE_BODY_PRE_PROTOCOL =
   'important you perform this calibration using the exact tips specified in your protocol, as the robot uses the corresponding labware definition data to find the tip.'
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 
@@ -61,6 +68,7 @@ const contentsBySessionType: {
     bodyText: string,
     continueButtonText: string,
     continuingToText: string,
+    noteBody: string,
   },
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
@@ -68,23 +76,32 @@ const contentsBySessionType: {
     bodyText: DECK_CAL_BODY,
     continueButtonText: `${CONTINUE} ${DECK_CAL_PROCEDURE}`,
     continuingToText: DECK_CAL_PROCEDURE,
+    noteBody: NOTE_BODY_OUTSIDE_PROTOCOL,
   },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     headerText: PIP_OFFSET_CAL_HEADER,
     bodyText: PIP_OFFSET_CAL_BODY,
     continueButtonText: CONTINUE,
     continuingToText: PIP_OFFSET_CAL_PROCEDURE,
+    noteBody: NOTE_BODY_OUTSIDE_PROTOCOL,
+  },
+  [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
+    headerText: TIP_LENGTH_CAL_HEADER,
+    bodyText: TIP_LENGTH_CAL_BODY,
+    continueButtonText: `${CONTINUE} ${TIP_LENGTH_CAL_PROCEDURE}`,
+    continuingToText: TIP_LENGTH_CAL_PROCEDURE,
+    noteBody: NOTE_BODY_PRE_PROTOCOL,
   },
 }
 
 export function Introduction(props: CalibrationPanelProps): React.Node {
-  const { tipRack, sendCommands, sessionType } = props
+  const { tipRack, calBlock, sendCommands, sessionType } = props
 
   const { showConfirmation, confirm: proceed, cancel } = useConditionalConfirm(
     () => {
       sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
     },
-    true
+    sessionType !== Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
   )
 
   const {
@@ -92,6 +109,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     bodyText,
     continueButtonText,
     continuingToText,
+    noteBody,
   } = contentsBySessionType[sessionType]
 
   return (
@@ -115,6 +133,12 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
         <h5>{LABWARE_REQS}</h5>
         <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING_3}>
           <RequiredLabwareCard loadName={tipRack.loadName} />
+          {calBlock && (
+            <RequiredLabwareCard
+              loadName={calBlock.loadName}
+              linkToMeasurements={false}
+            />
+          )}
         </Flex>
         <Box fontSize={FONT_SIZE_BODY_1} marginY={SPACING_3}>
           <Text>
@@ -125,7 +149,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
             >{`${NOTE_HEADER} `}</b>
             {IT_IS}
             <u>{` ${EXTREMELY} `}</u>
-            {NOTE_BODY}
+            {noteBody}
           </Text>
         </Box>
       </Flex>
@@ -152,7 +176,10 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
   )
 }
 
-type RequiredLabwareCardProps = {| loadName: string |}
+type RequiredLabwareCardProps = {|
+  loadName: string,
+  linkToMeasurements?: boolean,
+|}
 
 const linkStyles = css`
   &:hover {
@@ -161,7 +188,7 @@ const linkStyles = css`
 `
 
 function RequiredLabwareCard(props: RequiredLabwareCardProps) {
-  const { loadName } = props
+  const { loadName, linkToMeasurements = true } = props
   return (
     <Flex
       width="50%"
@@ -188,19 +215,21 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
       <Text fontSize={FONT_SIZE_BODY_2}>
         {getLatestLabwareDef(loadName)?.metadata.displayName}
       </Text>
-      <Link
-        external
-        padding={`${SPACING_3} ${SPACING_2}`}
-        flex="0.6"
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
-        textAlign={TEXT_ALIGN_CENTER}
-        fontSize={FONT_SIZE_BODY_2}
-        color="inherit"
-        css={linkStyles}
-        href={`${LABWARE_LIBRARY_PAGE_PATH}/${loadName}`}
-      >
-        {VIEW_TIPRACK_MEASUREMENTS}
-      </Link>
+      {linkToMeasurements && (
+        <Link
+          external
+          padding={`${SPACING_3} ${SPACING_2}`}
+          flex="0.6"
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textAlign={TEXT_ALIGN_CENTER}
+          fontSize={FONT_SIZE_BODY_2}
+          color="inherit"
+          css={linkStyles}
+          href={`${LABWARE_LIBRARY_PAGE_PATH}/${loadName}`}
+        >
+          {VIEW_TIPRACK_MEASUREMENTS}
+        </Link>
+      )}
     </Flex>
   )
 }

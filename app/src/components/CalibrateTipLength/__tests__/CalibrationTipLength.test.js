@@ -11,13 +11,16 @@ import * as Sessions from '../../../sessions'
 import { mockTipLengthCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
 
 import { CalibrateTipLength } from '../index'
-import { Introduction } from '../Introduction'
-import { DeckSetup } from '../DeckSetup'
+import {
+  Introduction,
+  DeckSetup,
+  TipPickUp,
+  TipConfirmation,
+  CompleteConfirmation,
+  ConfirmExitModal,
+} from '../../CalibrationPanels'
 import { MeasureNozzle } from '../MeasureNozzle'
-import { TipPickUp } from '../TipPickUp'
-import { TipConfirmation } from '../TipConfirmation'
 import { MeasureTip } from '../MeasureTip'
-import { CompleteConfirmation } from '../CompleteConfirmation'
 
 import type { State } from '../../../types'
 import type { TipLengthCalibrationStep } from '../../../sessions/types'
@@ -91,13 +94,16 @@ describe('CalibrateTipLength', () => {
       ...mockTipLengthCalibrationSessionAttributes,
     }
 
-    render = () => {
+    render = (props = {}) => {
+      const { showSpinner = false } = props
       return mount(
         <CalibrateTipLength
           robotName="robot-name"
           session={mockTipLengthSession}
           closeWizard={() => {}}
           hasBlock={true}
+          dispatchRequests={jest.fn()}
+          showSpinner={showSpinner}
         />,
         {
           wrappingComponent: Provider,
@@ -141,12 +147,13 @@ describe('CalibrateTipLength', () => {
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
 
-  it('renders spinner when last tracked request is pending, and not present otherwise', () => {
-    const wrapper = render()
+  it('does not render spinner when showSpinner is false', () => {
+    const wrapper = render({ showSpinner: false })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(false)
+  })
 
-    mockGetRequestById.mockReturnValue({ status: 'pending' })
-    wrapper.setProps({})
+  it('renders spinner when showSpinner is true', () => {
+    const wrapper = render({ showSpinner: true })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
   })
 })

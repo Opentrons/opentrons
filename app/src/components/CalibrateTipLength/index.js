@@ -40,10 +40,7 @@ import { MeasureNozzle } from './MeasureNozzle'
 import { MeasureTip } from './MeasureTip'
 import styles from './styles.css'
 
-import type {
-  CalibrateTipLengthParentProps,
-  CalibrateTipLengthChildProps,
-} from './types'
+import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
 
