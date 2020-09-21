@@ -29,6 +29,7 @@ BUILD_NUMBER ?=
 watch ?= false
 cover ?= true
 updateSnapshot ?= false
+testPathIgnorePatterns ?=
 
 FORMAT_FILE_GLOB = ".*.@(js|yml)" "**/*.@(js|json|md|yml)"
 
@@ -153,7 +154,8 @@ test-js:
 		--coverage=$(cover) \
 		--watch=$(watch) \
 		--updateSnapshot=$(updateSnapshot) \
-		--ci=$(if $(CI),true,false)
+		--ci=$(if $(CI),true,false) \
+	    $(if $(testPathIgnorePatterns),--testPathIgnorePatterns=$(testPathIgnorePatterns),)
 
 # lints and typechecks
 .PHONY: lint

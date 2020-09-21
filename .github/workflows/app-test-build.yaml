@@ -64,7 +64,7 @@ jobs:
         run: 'make setup-js'
       - name: 'test relevant packages'
         run: |
-          yarn jest --coverage=true --ci=true --testPathIgnorePatterns /labware-.*/ /protocol-.*/
+          make test-js coverage=true ci=true testPathIgnorePatterns='/labware-.*/ /protocol-.*/'
       - if: github.event_name != 'pull_request'
         name: 'build app'
         run: |
