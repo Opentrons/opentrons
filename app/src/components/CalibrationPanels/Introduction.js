@@ -8,7 +8,6 @@ import {
   SPACING_3,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
-  FONT_SIZE_BODY_1,
   ALIGN_FLEX_START,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
@@ -16,11 +15,12 @@ import {
   FONT_HEADER_DARK,
   FONT_BODY_2_DARK,
   TEXT_TRANSFORM_UPPERCASE,
-  TEXT_ALIGN_CENTER,
+  TEXT_ALIGN_LEFT,
   Link,
   PrimaryBtn,
   Text,
   useConditionalConfirm,
+  FONT_SIZE_BODY_1,
   FONT_SIZE_BODY_2,
   BORDER_SOLID_MEDIUM,
   C_NEAR_WHITE,
@@ -134,10 +134,13 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
         <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING_3}>
           <RequiredLabwareCard loadName={tipRack.loadName} />
           {calBlock && (
-            <RequiredLabwareCard
-              loadName={calBlock.loadName}
-              linkToMeasurements={false}
-            />
+            <>
+              <Box width={SPACING_2} />
+              <RequiredLabwareCard
+                loadName={calBlock.loadName}
+                linkToMeasurements={false}
+              />
+            </>
           )}
         </Flex>
         <Box fontSize={FONT_SIZE_BODY_1} marginY={SPACING_3}>
@@ -195,14 +198,13 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
       border={BORDER_SOLID_MEDIUM}
       paddingX={SPACING_3}
       flexDirection={DIRECTION_COLUMN}
-      alignItems={ALIGN_CENTER}
+      alignItems={ALIGN_FLEX_START}
     >
       <Flex
         paddingY={SPACING_3}
         height="70%"
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
       >
         <img
           css={css`
@@ -218,11 +220,11 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
       {linkToMeasurements && (
         <Link
           external
-          padding={`${SPACING_3} ${SPACING_2}`}
+          padding={`${SPACING_3} 0`}
           flex="0.6"
           textTransform={TEXT_TRANSFORM_UPPERCASE}
-          textAlign={TEXT_ALIGN_CENTER}
-          fontSize={FONT_SIZE_BODY_2}
+          textAlign={TEXT_ALIGN_LEFT}
+          fontSize={FONT_SIZE_BODY_1}
           color="inherit"
           css={linkStyles}
           href={`${LABWARE_LIBRARY_PAGE_PATH}/${loadName}`}
