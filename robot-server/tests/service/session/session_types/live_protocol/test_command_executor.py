@@ -3,7 +3,8 @@ import pytest
 
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.command_execution.command import \
-    CommandContent
+    CommandContent, CommandResult
+from robot_server.service.session.models import EmptyModel
 from robot_server.service.session.session_types.live_protocol.command_executor\
     import LiveProtocolCommandExecutor
 from robot_server.service.session import models
@@ -11,6 +12,8 @@ from robot_server.service.session.command_execution import Command, \
     CompletedCommand
 from robot_server.service.session.session_types.live_protocol.command_interface import \
     CommandInterface
+from robot_server.service.session.session_types.live_protocol.state_store import \
+    StateStore
 
 
 @pytest.fixture
@@ -31,8 +34,18 @@ def mock_command_interface() -> MagicMock:
 
 
 @pytest.fixture
-def command_executor(mock_command_interface) -> LiveProtocolCommandExecutor:
-    return LiveProtocolCommandExecutor(mock_command_interface)
+def mock_state_store() -> StateStore:
+    s = StateStore()
+    s.handle_command_request = MagicMock()
+    s.handle_command_result = MagicMock()
+    return s
+
+
+@pytest.fixture
+def command_executor(mock_command_interface, mock_state_store)\
+        -> LiveProtocolCommandExecutor:
+    return LiveProtocolCommandExecutor(command_interface=mock_command_interface,
+                                       state_store=mock_state_store)
 
 
 async def test_load_labware(command_executor, mock_command_interface):
@@ -147,3 +160,42 @@ async def test_tip_commands(command_executor, mock_command_interface,
             name=command_type,
             data=command_data)
 
+
+@pytest.fixture
+def state_store_command_executor(command_executor) -> LiveProtocolCommandExecutor:
+    """A fixture for use with testing state store calls"""
+    async def handle_command(c):
+        return 23
+
+    # Mock out the command handler map
+    command_executor._handler_map = {"test_command": handle_command}
+    return command_executor
+
+
+async def test_create_command_in_state_store(state_store_command_executor,
+                                             mock_state_store):
+    c = Command(content=CommandContent(
+        name="test_command",
+        data=EmptyModel()
+    ))
+    await state_store_command_executor.execute(c)
+
+    mock_state_store.handle_command_request.assert_called_once_with(c)
+
+
+async def test_command_result_in_state_store(state_store_command_executor,
+                                             mock_state_store):
+    c = Command(content=CommandContent(
+        name="test_command",
+        data=EmptyModel()
+    ))
+    await state_store_command_executor.execute(c)
+
+    mock_state_store.handle_command_result.assert_called()
+    assert mock_state_store.handle_command_result.call_args[0][0] == c
+    # Check that the result is the correct type
+    assert isinstance(mock_state_store.handle_command_result.call_args[0][1],
+                      CommandResult)
+    # Check that the data field in CommandResult is what was returned from
+    # the handler
+    assert mock_state_store.handle_command_result.call_args[0][1].data == 23

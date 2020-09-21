@@ -1,3 +1,4 @@
+import logging
 from robot_server.service.session.command_execution import CommandExecutor, \
     Command, CompletedCommand, CommandResult
 from robot_server.service.session.errors import UnsupportedCommandException
@@ -7,6 +8,8 @@ from robot_server.service.session.session_types.live_protocol.state_store import
     StateStore
 from robot_server.service.session import models
 from robot_server.util import duration
+
+log = logging.getLogger(__name__)
 
 
 class LiveProtocolCommandExecutor(CommandExecutor):
@@ -26,10 +29,11 @@ class LiveProtocolCommandExecutor(CommandExecutor):
 
     async def execute(self, command: Command) -> CompletedCommand:
         # add command to state
-        # self._store.handle_command_request(command)
+        self._store.handle_command_request(command)
 
         # handle side-effects with timing
         handler = self._handler_map.get(command.content.name)
+
         if handler:
             with duration() as timed:
                 data = await handler(command.content.data)
@@ -43,7 +47,7 @@ class LiveProtocolCommandExecutor(CommandExecutor):
                                data=data)
 
         # add result to state
-        # self._store.handle_command_result(command, result)
+        self._store.handle_command_result(command, result)
 
         # return completed command to session
         return CompletedCommand(
