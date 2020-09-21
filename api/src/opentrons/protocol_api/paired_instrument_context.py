@@ -413,7 +413,8 @@ class PairedInstrumentContext(CommandPublisher):
             c_vol = volume
 
         instruments = list(self._instruments.values())
-        primary_loc = self.paired_instrument_obj.aspirate(volume, loc, rate)
+        primary_loc, aspirate_func =\
+            self.paired_instrument_obj.aspirate(volume, loc, rate)
         if isinstance(primary_loc.labware, Well):
             labware = primary_loc.labware.parent
             well = primary_loc.labware
@@ -424,6 +425,7 @@ class PairedInstrumentContext(CommandPublisher):
             locations = [primary_loc]
         cmds.publish_paired(self.broker, cmds.paired_aspirate, 'before',
                             None, instruments, c_vol, locations, rate)
+        aspirate_func()
         cmds.publish_paired(self.broker, cmds.paired_aspirate, 'after',
                             self, instruments, c_vol, locations, rate)
         return self
@@ -505,7 +507,8 @@ class PairedInstrumentContext(CommandPublisher):
             c_vol = volume
 
         instruments = list(self._instruments.values())
-        primary_loc = self.paired_instrument_obj.dispense(volume, loc, rate)
+        primary_loc, dispense_func =\
+            self.paired_instrument_obj.dispense(volume, loc, rate)
 
         if isinstance(primary_loc.labware, Well):
             labware = primary_loc.labware.parent
@@ -517,6 +520,7 @@ class PairedInstrumentContext(CommandPublisher):
             locations = [primary_loc]
         cmds.publish_paired(self.broker, cmds.paired_dispense, 'before',
                             None, instruments, c_vol, locations, rate)
+        dispense_func()
         cmds.publish_paired(self.broker, cmds.paired_dispense, 'after',
                             self, instruments, c_vol, locations, rate)
         return self
