@@ -1,8 +1,6 @@
 // @flow
 // Deck Calibration Orchestration Component
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import last from 'lodash/last'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
@@ -11,35 +9,32 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import type { State } from '../../types'
-import type {
-  SessionCommandString,
-  SessionCommandData,
-  DeckCalibrationLabware,
-} from '../../sessions/types'
 import * as Sessions from '../../sessions'
-import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
-import type { RequestState } from '../../robot-api/types'
 
-// TODO: BC 2020-09-02 use shared components from CalibrationPanels for child
-// components, and delete duplicate files in this directory
-import { DeckSetup } from '../CalibrationPanels'
-import { Introduction } from './Introduction'
-import { TipPickUp } from './TipPickUp'
-import { TipConfirmation } from './TipConfirmation'
-import { SaveZPoint } from './SaveZPoint'
-import { SaveXYPoint } from './SaveXYPoint'
-import { CompleteConfirmation } from './CompleteConfirmation'
-import { ConfirmExitModal } from './ConfirmExitModal'
+import {
+  DeckSetup,
+  Introduction,
+  TipPickUp,
+  TipConfirmation,
+  SaveZPoint,
+  SaveXYPoint,
+  CompleteConfirmation,
+  ConfirmExitModal,
+} from '../CalibrationPanels'
 import styles from './styles.css'
 
-import type { CalibrateDeckParentProps, CalibrateDeckChildProps } from './types'
+import type {
+  DeckCalibrationLabware,
+  SessionCommandParams,
+} from '../../sessions/types'
+import type { CalibrationPanelProps } from '../CalibrationPanels/types'
+import type { CalibrateDeckParentProps } from './types'
 
 const DECK_CALIBRATION_SUBTITLE = 'Deck calibration'
 const EXIT = 'exit'
 
 const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibrateDeckChildProps>,
+  [string]: React.ComponentType<CalibrationPanelProps>,
 } = {
   [Sessions.DECK_STEP_SESSION_STARTED]: Introduction,
   [Sessions.DECK_STEP_LABWARE_LOADED]: DeckSetup,
@@ -65,52 +60,52 @@ const PANEL_STYLE_BY_STEP: {
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: styles.terminal_modal_contents,
 }
 export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
-  const { session, robotName, closeWizard } = props
+  const {
+    session,
+    robotName,
+    closeWizard,
+    dispatchRequests,
+    showSpinner,
+  } = props
   const { currentStep, instrument, labware } = session?.details || {}
-  const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const dispatch = useDispatch()
-
-  const requestStatus = useSelector<State, RequestState | null>(state =>
-    getRequestById(state, last(requestIds))
-  )?.status
-
-  function sendCommand(
-    command: SessionCommandString,
-    data: SessionCommandData = {},
-    loadingSpinner: boolean = true
-  ) {
-    if (session === null) return
-    const sessionCommand = Sessions.createSessionCommand(
-      robotName,
-      session.id,
-      { command, data }
-    )
-    if (loadingSpinner) {
-      dispatchRequest(sessionCommand)
-    } else {
-      dispatch(sessionCommand)
-    }
-  }
-
-  function deleteSession() {
-    session?.id &&
-      dispatchRequest(Sessions.deleteSession(robotName, session.id))
-    closeWizard()
-  }
 
   const {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
-    sendCommand(Sessions.deckCalCommands.EXIT)
-    deleteSession()
+    cleanUpAndExit()
   }, true)
 
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)
     return spec ? spec.channels > 1 : false
   }, [instrument])
+
+  function sendCommands(...commands: Array<SessionCommandParams>) {
+    if (session?.id) {
+      const sessionCommandActions = commands.map(c =>
+        Sessions.createSessionCommand(robotName, session.id, {
+          command: c.command,
+          data: c.data || {},
+        })
+      )
+      dispatchRequests(...sessionCommandActions)
+    }
+  }
+
+  function cleanUpAndExit() {
+    if (session?.id) {
+      dispatchRequests(
+        Sessions.createSessionCommand(robotName, session.id, {
+          command: Sessions.sharedCalCommands.EXIT,
+          data: {},
+        }),
+        Sessions.deleteSession(robotName, session.id)
+      )
+    }
+    closeWizard()
+  }
 
   const tipRack: DeckCalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
@@ -124,7 +119,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
-  if (requestStatus === PENDING) {
+  if (showSpinner) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
@@ -136,12 +131,13 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
         contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
       >
         <Panel
-          sendSessionCommand={sendCommand}
-          deleteSession={deleteSession}
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
           tipRack={tipRack}
           isMulti={isMulti}
           mount={instrument?.mount.toLowerCase()}
           currentStep={currentStep}
+          sessionType={session.sessionType}
         />
       </ModalPage>
       {showConfirmExit && (
