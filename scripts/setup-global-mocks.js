@@ -1,5 +1,6 @@
 'use strict'
 
+console.log('setting up global mocks')
 // electron and native stuff that will break in unit tests
 jest.mock('electron')
 jest.mock('electron-updater')
