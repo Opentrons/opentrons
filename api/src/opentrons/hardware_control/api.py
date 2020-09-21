@@ -359,6 +359,7 @@ class API(HardwareAPILike):
             new_p = Pipette(
                 p._config,
                 self._config.instrument_offset[m.name.lower()],
+                rb_cal.load_pipette_offset(p.pipette_id, m),
                 p.pipette_id)
             new_p.act_as(p.acting_as)
             self._attached_instruments[m] = new_p
@@ -405,12 +406,15 @@ class API(HardwareAPILike):
         for mount, instrument_data in found.items():
             config = instrument_data.get('config')
             req_instr = checked_require.get(mount, None)
+            pip_id = instrument_data.get('id')
+            pip_offset_cal = rb_cal.load_pipette_offset(pip_id, mount)
             p, may_skip = load_from_config_and_check_skip(
                 config,
                 self._attached_instruments[mount],
                 req_instr,
-                instrument_data.get('id'),
-                self._config.instrument_offset[mount.name.lower()])
+                pip_id,
+                self._config.instrument_offset[mount.name.lower()],
+                pip_offset_cal)
             self._attached_instruments[mount] = p
             if req_instr and p:
                 p.act_as(req_instr)
@@ -906,7 +910,10 @@ class API(HardwareAPILike):
                  (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
                  (primary_z, abs_position.z - primary_offset.z - primary_cp.z)
                  ))
-
+        mod_log.info(f"********** => target position: {target_position}")
+        mod_log.info(f"********** => absolute position: {abs_position}")
+        mod_log.info(f"********** => primary offset: {primary_offset}")
+        mod_log.info(f"********** => primary cp: {primary_cp}")
         await self._cache_and_maybe_retract_mount(primary_mount)
         await self._move(
             target_position, speed=speed,

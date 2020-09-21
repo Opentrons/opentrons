@@ -187,7 +187,8 @@ def load(
         dispense_flow_rate=cfg['defaultDispenseFlowRate']['value'],
         channels=ensure_value(cfg, 'channels', MUTABLE_CONFIGS),
         model_offset=ensure_value(cfg, 'modelOffset', MUTABLE_CONFIGS),
-        nozzle_offset=cfg.get('nozzleOffset', NOZZLE_OFFSET_DEFAULT),
+        nozzle_offset=cfg.get(  # type: ignore
+            'nozzleOffset', NOZZLE_OFFSET_DEFAULT),
         plunger_current=ensure_value(cfg, 'plungerCurrent', MUTABLE_CONFIGS),
         drop_tip_current=ensure_value(cfg, 'dropTipCurrent', MUTABLE_CONFIGS),
         drop_tip_speed=ensure_value(cfg, 'dropTipSpeed', MUTABLE_CONFIGS),

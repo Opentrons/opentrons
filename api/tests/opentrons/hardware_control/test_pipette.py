@@ -47,6 +47,29 @@ def test_critical_points(model):
 
 
 @pytest.mark.parametrize('model', pipette_config.config_models)
+def test_critical_points_cal_overhaul(model, use_new_calibration):
+    loaded = pipette_config.load(model)
+    pip = pipette.Pipette(loaded,
+                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          'testID')
+    nozzle_offset = Point(*loaded.nozzle_offset)
+    assert pip.critical_point() == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.TIP) == nozzle_offset
+    tip_length = 25.0
+    pip.add_tip(tip_length)
+    new = nozzle_offset._replace(
+        z=nozzle_offset.z - tip_length)
+    assert pip.critical_point() == new
+    assert pip.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.TIP) == new
+    pip.remove_tip()
+    assert pip.critical_point() == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.TIP) == nozzle_offset
+
+
+@pytest.mark.parametrize('model', pipette_config.config_models)
 def test_critical_point_tiplength(use_new_calibration, model):
     loaded = pipette_config.load(model)
     instr_z = 25
@@ -70,6 +93,32 @@ def test_critical_point_tiplength(use_new_calibration, model):
     assert pip.critical_point() == mod_plus_instr
     assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_plus_instr
     assert pip.critical_point(types.CriticalPoint.TIP) == mod_plus_instr
+
+
+# @pytest.mark.parametrize('model', pipette_config.config_models)
+# def test_critical_point_tiplength_cal_overhaul(use_new_calibration, model):
+#     loaded = pipette_config.load(model)
+#     instr_z = 25
+#     pip = pipette.Pipette(
+#         loaded,
+#         {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+#         'testID')
+#     mod_plus_instr = Point(*loaded.model_offset) + Point(0, 0, instr_z)
+#     assert pip.critical_point() == mod_plus_instr
+#     assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_plus_instr
+#     assert pip.critical_point(types.CriticalPoint.TIP) == mod_plus_instr
+#     tip_length = 25.0
+#     pip.add_tip(tip_length)
+#     # unlike the above case, mod offset should not change
+#     assert pip.critical_point() == mod_plus_instr - Point(0, 0, tip_length)
+#     assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_plus_instr
+#     # if there is a tip, we should see it here added
+#     assert pip.critical_point(types.CriticalPoint.TIP)\
+#         == mod_plus_instr - Point(0, 0, tip_length)
+#     pip.remove_tip()
+#     assert pip.critical_point() == mod_plus_instr
+#     assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_plus_instr
+#     assert pip.critical_point(types.CriticalPoint.TIP) == mod_plus_instr
 
 
 @pytest.mark.parametrize('config_model', pipette_config.config_models)
