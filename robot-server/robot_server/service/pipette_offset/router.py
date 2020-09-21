@@ -24,7 +24,7 @@ def _format_calibration(
         tiprack=calibration.tiprack,
         lastModified=calibration.last_modified)
 
-    return pip_models.ResponseDataModel.create(
+    return ResponseDataModel.create(
         attributes=formatted_cal,
         resource_id=f'{calibration.pipette}&{calibration.mount}')
 

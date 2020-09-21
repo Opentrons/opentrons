@@ -15,8 +15,8 @@ from robot_server.robot.calibration.pipette_offset.models import \
 from robot_server.robot.calibration.tip_length.models import (
     SessionCreateParams as TipLengthSessionCreateParams,
     TipCalibrationSessionStatus)
-from robot_server.service.json_api import RequestModel, RequestDataModel, \
-    ResponseModel, ResponseDataModel
+from robot_server.service.json_api import RequestModel, ResponseModel
+from robot_server.service.json_api.response import MultiResponseModel
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.protocol.models import \
     ProtocolCreateParams, ProtocolSessionDetails
@@ -128,11 +128,11 @@ class Session(BasicSession):
 
 # Session create and query requests/responses
 SessionCreateRequest = RequestModel[
-    RequestDataModel[BasicSession]
+    BasicSession
 ]
 SessionResponse = ResponseModel[
-    ResponseDataModel[Session], dict
+    Session, dict
 ]
-MultiSessionResponse = ResponseModel[
-    typing.List[ResponseDataModel[Session]], dict
+MultiSessionResponse = MultiResponseModel[
+    Session, dict
 ]

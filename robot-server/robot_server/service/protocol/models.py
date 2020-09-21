@@ -4,6 +4,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from robot_server.service.json_api import ResponseModel, ResponseDataModel
+from robot_server.service.json_api.response import MultiResponseModel
 
 
 class FileAttributes(BaseModel):
@@ -19,10 +20,6 @@ class ProtocolResponseAttributes(BaseModel):
 
 ProtocolResponseDataModel = ResponseDataModel[ProtocolResponseAttributes]
 
-ProtocolResponse = ResponseModel[
-    ProtocolResponseDataModel, dict
-]
+ProtocolResponse = ResponseModel[ProtocolResponseAttributes, dict]
 
-MultiProtocolResponse = ResponseModel[
-    typing.List[ProtocolResponseDataModel], dict
-]
+MultiProtocolResponse = MultiResponseModel[ProtocolResponseAttributes, dict]

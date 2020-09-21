@@ -4,8 +4,7 @@ import typing
 from functools import lru_cache
 
 from pydantic import BaseModel, Field, validator
-from robot_server.service.json_api import \
-    ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
+from robot_server.service.json_api import ResponseModel, RequestModel
 from opentrons.util.helpers import utc_now
 
 from robot_server.service.session.models.common import EmptyModel, \
@@ -198,8 +197,8 @@ class SessionCommand(BasicSessionCommand):
 
 # Session command requests/responses
 CommandRequest = RequestModel[
-    RequestDataModel[BasicSessionCommand]
+    BasicSessionCommand
 ]
 CommandResponse = ResponseModel[
-    ResponseDataModel[SessionCommand], dict
+    SessionCommand, dict
 ]

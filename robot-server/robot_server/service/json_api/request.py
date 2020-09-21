@@ -32,13 +32,10 @@ class RequestDataModel(GenericModel, Generic[AttributesT]):
             type=attributes.__class__.__name__)
 
 
-DataT = TypeVar('DataT', bound=RequestDataModel)
-
-
-class RequestModel(GenericModel, Generic[DataT]):
+class RequestModel(GenericModel, Generic[AttributesT]):
     """
     """
-    data: DataT = \
+    data: RequestDataModel[AttributesT] = \
         Field(...,
               description="the document’s 'primary data'")
 
