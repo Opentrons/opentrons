@@ -8,7 +8,6 @@ import * as Sessions from '../../sessions'
 import { getUseTrashSurfaceForTipCal } from '../../config'
 import { setUseTrashSurfaceForTipCal } from '../../calibration'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   CalibrateTipLength,
   AskForCalibrationBlockModal,
@@ -18,7 +17,10 @@ import { CalibrationInfoBox } from '../../components/CalibrationInfoBox'
 import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
 import { Portal } from '../../components/portal'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
+import type { SessionCommandString } from '../../sessions/types'
+import type { RequestState } from '../../robot-api/types'
 
 export type CalibrateTipLengthControlProps = {|
   robotName: string,
@@ -26,6 +28,11 @@ export type CalibrateTipLengthControlProps = {|
   mount: Mount,
   tipRackDefinition: LabwareDefinition2,
 |}
+
+// tip length calibration commands for which the full page spinner should not appear
+const spinnerCommandBlockList: Array<SessionCommandString> = [
+  Sessions.sharedCalCommands.JOG,
+]
 
 const IS_CALIBRATED = 'Pipette tip height is calibrated'
 const IS_NOT_CALIBRATED = 'Pipette tip height is not calibrated'
@@ -41,7 +48,30 @@ export function CalibrateTipLengthControl({
   const [showWizard, setShowWizard] = React.useState(false)
   const [showCalBlockPrompt, setShowCalBlockPrompt] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()
-  const [dispatchRequest, requestIds] = RobotApi.useDispatchApiRequest()
+
+  const trackedRequestId = React.useRef<string | null>(null)
+  const deleteRequestId = React.useRef<string | null>(null)
+  const createRequestId = React.useRef<string | null>(null)
+
+  const [dispatchRequests, requestIds] = RobotApi.useDispatchApiRequests(
+    dispatchedAction => {
+      if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
+        createRequestId.current = dispatchedAction.meta.requestId
+      } else if (
+        dispatchedAction.type === Sessions.DELETE_SESSION &&
+        tipLengthCalibrationSession?.id === dispatchedAction.payload.sessionId
+      ) {
+        deleteRequestId.current = dispatchedAction.meta.requestId
+      } else if (
+        dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
+        !spinnerCommandBlockList.includes(
+          dispatchedAction.payload.command.command
+        )
+      ) {
+        trackedRequestId.current = dispatchedAction.meta.requestId
+      }
+    }
+  )
 
   const useTrashSurfaceForTipCalSetting = useSelector(
     getUseTrashSurfaceForTipCal
@@ -49,16 +79,6 @@ export function CalibrateTipLengthControl({
   const useTrashSurface = React.useRef<boolean | null>(
     useTrashSurfaceForTipCalSetting
   )
-
-  const requestState = useSelector((state: State) => {
-    const reqId = last(requestIds) ?? null
-    return RobotApi.getRequestById(state, reqId)
-  })
-  const requestStatus = requestState?.status ?? null
-
-  React.useEffect(() => {
-    if (requestStatus === RobotApi.SUCCESS) setShowWizard(true)
-  }, [requestStatus])
 
   const tipLengthCalibrationSession = useSelector((state: State) => {
     const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
@@ -77,7 +97,7 @@ export function CalibrateTipLengthControl({
 
   const handleStart = () => {
     if (useTrashSurface.current !== null) {
-      dispatchRequest(
+      dispatchRequests(
         Sessions.ensureSession(
           robotName,
           Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
@@ -92,6 +112,38 @@ export function CalibrateTipLengthControl({
       setShowCalBlockPrompt(true)
     }
   }
+
+  const showSpinner =
+    useSelector<State, RequestState | null>(state =>
+      trackedRequestId.current
+        ? RobotApi.getRequestById(state, trackedRequestId.current)
+        : null
+    )?.status === RobotApi.PENDING
+
+  const shouldClose =
+    useSelector<State, RequestState | null>(state =>
+      deleteRequestId.current
+        ? RobotApi.getRequestById(state, deleteRequestId.current)
+        : null
+    )?.status === RobotApi.SUCCESS
+
+  const shouldOpen =
+    useSelector((state: State) =>
+      createRequestId.current
+        ? RobotApi.getRequestById(state, createRequestId.current)
+        : null
+    )?.status === RobotApi.SUCCESS
+
+  React.useEffect(() => {
+    if (shouldOpen) {
+      setShowWizard(true)
+      createRequestId.current = null
+    }
+    if (shouldClose) {
+      setShowWizard(false)
+      deleteRequestId.current = null
+    }
+  }, [shouldOpen, shouldClose])
 
   const setHasBlock = (hasBlock: boolean, rememberPreference: boolean) => {
     useTrashSurface.current = !hasBlock
@@ -114,7 +166,7 @@ export function CalibrateTipLengthControl({
         title={`${mount} pipette tip length calibration`}
       >
         <UncalibratedInfo
-          requestStatus={requestStatus}
+          showSpinner={showSpinner}
           hasCalibrated={hasCalibrated}
           handleStart={handleStart}
         />
@@ -131,6 +183,8 @@ export function CalibrateTipLengthControl({
             session={tipLengthCalibrationSession}
             closeWizard={handleCloseWizard}
             hasBlock={!useTrashSurface.current}
+            showSpinner={showSpinner}
+            dispatchRequests={dispatchRequests}
           />
         </Portal>
       )}
@@ -141,20 +195,23 @@ export function CalibrateTipLengthControl({
 type UncalibratedInfoProps = {|
   hasCalibrated: boolean,
   handleStart: () => void,
-  requestStatus: ?string,
+  showSpinner: boolean,
 |}
 function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
-  const { hasCalibrated, handleStart, requestStatus } = props
+  const { hasCalibrated, handleStart, showSpinner } = props
 
+  const buttonText = !hasCalibrated
+    ? CALIBRATE_TIP_LENGTH
+    : RECALIBRATE_TIP_LENGTH
   const leftChildren = (
     <div>
       <p>{!hasCalibrated ? IS_NOT_CALIBRATED : IS_CALIBRATED}</p>
       <PrimaryButton onClick={handleStart}>
-        {requestStatus === RobotApi.PENDING && (
+        {showSpinner ? (
           <Icon name="ot-spinner" height="1em" spin />
+        ) : (
+          buttonText
         )}
-        {requestStatus !== RobotApi.PENDING &&
-          (!hasCalibrated ? CALIBRATE_TIP_LENGTH : RECALIBRATE_TIP_LENGTH)}
       </PrimaryButton>
     </div>
   )

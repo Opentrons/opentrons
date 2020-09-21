@@ -9,28 +9,35 @@ import {
   ModalPage,
   SpinnerModalPage,
   useConditionalConfirm,
+  DISPLAY_FLEX,
+  DIRECTION_COLUMN,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  SPACING_3,
+  C_TRANSPARENT,
+  ALIGN_FLEX_START,
+  C_WHITE,
 } from '@opentrons/components'
 
 import type { State } from '../../types'
+import type { StyleProps } from '@opentrons/components'
 import type {
-  SessionCommandString,
-  SessionCommandData,
+  SessionCommandParams,
   TipLengthCalibrationLabware,
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
-import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
-import type { RequestState, RequestStatus } from '../../robot-api/types'
+import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
-// TODO: BC 2020-09-02 use shared components from CalibrationPanels for child
-// components, and delete duplicate files in this directory
-import { Introduction } from './Introduction'
-import { DeckSetup } from './DeckSetup'
+import {
+  Introduction,
+  DeckSetup,
+  TipPickUp,
+  TipConfirmation,
+  CompleteConfirmation,
+  ConfirmExitModal,
+} from '../CalibrationPanels'
 import { MeasureNozzle } from './MeasureNozzle'
-import { TipPickUp } from './TipPickUp'
-import { TipConfirmation } from './TipConfirmation'
 import { MeasureTip } from './MeasureTip'
-import { CompleteConfirmation } from './CompleteConfirmation'
-import { ConfirmExitModal } from './ConfirmExitModal'
 import styles from './styles.css'
 
 import type {
@@ -43,8 +50,32 @@ export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
 const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
 const EXIT = 'exit'
 
+const darkContentsStyleProps = {
+  display: DISPLAY_FLEX,
+  flexDirection: DIRECTION_COLUMN,
+  alignItems: ALIGN_CENTER,
+  padding: SPACING_3,
+  backgroundColor: C_TRANSPARENT,
+  height: '100%',
+}
+const contentsStyleProps = {
+  display: DISPLAY_FLEX,
+  backgroundColor: C_WHITE,
+  flexDirection: DIRECTION_COLUMN,
+  justifyContent: JUSTIFY_CENTER,
+  alignItems: ALIGN_FLEX_START,
+  padding: SPACING_3,
+  maxWidth: '48rem',
+  minHeight: '14rem',
+}
+
+const terminalContentsStyleProps = {
+  ...contentsStyleProps,
+  paddingX: '1.5rem',
+}
+
 const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibrateTipLengthChildProps>,
+  [string]: React.ComponentType<CalibrationPanelProps>,
 } = {
   sessionStarted: Introduction,
   labwareLoaded: DeckSetup,
@@ -54,29 +85,29 @@ const PANEL_BY_STEP: {
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
-const PANEL_STYLE_BY_STEP: {
-  [string]: string,
+const PANEL_STYLE_PROPS_BY_STEP: {
+  [string]: StyleProps,
 } = {
-  sessionStarted: styles.terminal_modal_contents,
-  labwareLoaded: styles.page_content_dark,
-  measuringNozzleOffset: styles.modal_contents,
-  preparingPipette: styles.modal_contents,
-  inspectingTip: styles.modal_contents,
-  measuringTipOffset: styles.modal_contents,
-  calibrationComplete: styles.terminal_modal_contents,
+  [Sessions.TIP_LENGTH_STEP_SESSION_STARTED]: terminalContentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_LABWARE_LOADED]: darkContentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_PREPARING_PIPETTE]: contentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_INSPECTING_TIP]: contentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET]: contentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_MEASURING_TIP_OFFSET]: contentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
-  const { session, robotName, hasBlock, closeWizard } = props
+  const {
+    session,
+    robotName,
+    hasBlock,
+    closeWizard,
+    showSpinner,
+    dispatchRequests,
+  } = props
   const { currentStep, instrument, labware } = session?.details || {}
-  const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const dispatch = useDispatch()
-
-  const lastRequestStatus: RequestStatus | null =
-    useSelector<State, RequestState | null>(state =>
-      getRequestById(state, last(requestIds))
-    )?.status ?? null
 
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)
@@ -88,27 +119,28 @@ export function CalibrateTipLength(
   const calBlock: TipLengthCalibrationLabware | null =
     hasBlock && labware ? labware.find(l => !l.isTiprack) ?? null : null
 
-  function sendCommand(
-    command: SessionCommandString,
-    data: SessionCommandData = {},
-    loadingSpinner: boolean = true
-  ) {
-    if (session === null) return
-    const sessionCommand = Sessions.createSessionCommand(
-      robotName,
-      session.id,
-      { command, data }
-    )
-    if (loadingSpinner) {
-      dispatchRequest(sessionCommand)
-    } else {
-      dispatch(sessionCommand)
+  function sendCommands(...commands: Array<SessionCommandParams>) {
+    if (session?.id) {
+      const sessionCommandActions = commands.map(c =>
+        Sessions.createSessionCommand(robotName, session.id, {
+          command: c.command,
+          data: c.data || {},
+        })
+      )
+      dispatchRequests(...sessionCommandActions)
     }
   }
 
-  function deleteSession() {
-    session?.id &&
-      dispatchRequest(Sessions.deleteSession(robotName, session.id))
+  function cleanUpAndExit() {
+    if (session?.id) {
+      dispatchRequests(
+        Sessions.createSessionCommand(robotName, session.id, {
+          command: Sessions.sharedCalCommands.EXIT,
+          data: {},
+        }),
+        Sessions.deleteSession(robotName, session.id)
+      )
+    }
     closeWizard()
   }
 
@@ -117,8 +149,7 @@ export function CalibrateTipLength(
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
-    sendCommand(Sessions.tipCalCommands.EXIT)
-    deleteSession()
+    cleanUpAndExit()
   }, true)
 
   if (!session || !tipRack) {
@@ -130,7 +161,7 @@ export function CalibrateTipLength(
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
-  if (lastRequestStatus === PENDING) {
+  if (showSpinner) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
@@ -140,15 +171,17 @@ export function CalibrateTipLength(
     <>
       <ModalPage
         titleBar={titleBarProps}
-        contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
+        innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
         <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
           isMulti={isMulti}
           mount={instrument?.mount.toLowerCase()}
           tipRack={tipRack}
           calBlock={calBlock}
-          sendSessionCommand={sendCommand}
-          deleteSession={deleteSession}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
         />
       </ModalPage>
       {showConfirmExit && (

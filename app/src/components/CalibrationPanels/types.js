@@ -19,4 +19,8 @@ export type CalibrationPanelProps = {|
   mount: string,
   currentStep: CalibrationSessionStep,
   sessionType: SessionType,
+  calBlock?:
+    | PipetteOffsetCalibrationLabware
+    | TipLengthCalibrationLabware
+    | null,
 |}
