@@ -64,6 +64,8 @@ def test_pick_up_and_drop_tip_no_tipracks(loop):
     target_location = tiprack['A1'].top()
 
     paired.pick_up_tip(target_location)
+    assert 'picking up tip' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
     assert not tiprack.wells()[0].has_tip
     assert not tiprack.columns()[4][0].has_tip
     overlap = right.hw_pipette['tip_overlap'][tiprack.uri]
@@ -74,7 +76,9 @@ def test_pick_up_and_drop_tip_no_tipracks(loop):
     assert r_pip.has_tip
     assert l_pip.has_tip
 
+    ctx.clear_commands()
     paired.drop_tip()
+    assert 'dropping tip' in ','.join([cmd.lower() for cmd in ctx.commands()])
     assert not r_pip.has_tip
     assert not l_pip.has_tip
 
@@ -102,6 +106,7 @@ def test_aspirate(set_up_paired_instrument, monkeypatch):
     paired.pick_up_tip()
     paired.aspirate(2.0, lw.wells()[0].bottom())
 
+    assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
     fake_hw_aspirate.assert_called_once_with(
         paired._pair_policy, 2.0, 1.0)
     assert fake_move.call_args_list[-1] ==\
@@ -160,9 +165,10 @@ def test_dispense(set_up_paired_instrument, monkeypatch):
 
     monkeypatch.setattr(API, 'dispense', fake_hw_dispense)
     monkeypatch.setattr(API, 'move_to', fake_move)
-    # paired.pick_up_tip()
+    paired.pick_up_tip()
     paired.dispense(2.0, lw.wells()[0].bottom())
-    # assert disp_called_with == (paired._pair_policy, 2.0, 1.0)
+    assert 'dispensing' in ','.join([cmd.lower() for cmd in ctx.commands()])
+    assert disp_called_with == (paired._pair_policy, 2.0, 1.0)
     assert move_called_with == (paired._pair_policy,
                                 lw.wells()[0].bottom().point,
                                 {'critical_point': None,
@@ -214,6 +220,7 @@ def test_mix(set_up_paired_instrument, monkeypatch):
     location = lw.wells()[0]
     rate = 2
     paired.mix(repetitions, volume, location, rate)
+    assert 'mixing' in ','.join([cmd.lower() for cmd in ctx.commands()])
     expected_mix_steps = [('aspirate', volume, location, 2),
                           ('dispense', volume, None, 2),
                           ('aspirate', volume, None, 2),
@@ -239,6 +246,7 @@ def test_blow_out(set_up_paired_instrument, monkeypatch):
     monkeypatch.setattr(paired.paired_instrument_obj, 'move_to', fake_move)
 
     paired.blow_out()
+    assert 'blowing out' in ','.join([cmd.lower() for cmd in ctx.commands()])
     # pipette should not move, if no location is passed
     assert move_location is None
 
@@ -266,6 +274,8 @@ def test_air_gap(set_up_paired_instrument, monkeypatch):
     assert r_pip.current_volume == 0
     assert l_pip.current_volume == 0
     paired.air_gap(20)
+
+    assert 'air gap' in ','.join([cmd.lower() for cmd in ctx.commands()])
 
     assert r_pip.current_volume == 20
     assert l_pip.current_volume == 20
@@ -314,6 +324,7 @@ def test_touch_tip_new_default_args(loop, monkeypatch):
     paired.aspirate(10, lw.wells()[0])
     monkeypatch.setattr(API, 'move_to', fake_hw_move)
     paired.touch_tip()
+    assert 'touching tip' in ','.join([cmd.lower() for cmd in ctx.commands()])
     z_offset = Point(0, 0, 1)   # default z offset of 1mm
     speed = 60                  # default speed
     edges = [lw.wells()[0]._from_center_cartesian(1, 0, 1) - z_offset,
