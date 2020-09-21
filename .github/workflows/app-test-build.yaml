@@ -67,7 +67,8 @@ jobs:
       - name: 'setup-js'
         run: 'make setup-js'
       - name: 'test relevant packages'
-        run:
+        run: |
+          echo "running in $(pwd)"
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns /labware-.*/ /protocol-.*/
       - if: github.event_name != 'pull_request'
         name: 'build app'
