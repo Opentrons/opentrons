@@ -34,6 +34,10 @@ on:
       - 'scripts/**/*'
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 env:
   CI: true
   OT_APP_DEPLOY_BUCKET: opentrons-app
