@@ -4,8 +4,8 @@ from datetime import datetime
 from functools import partial
 from pydantic import BaseModel, Field
 
-from robot_server.service.json_api import \
-    ResponseDataModel, ResponseModel
+from robot_server.service.json_api import ResponseModel
+from robot_server.service.json_api.response import MultiResponseModel
 
 OffsetVector = typing.Tuple[float, float, float]
 
@@ -101,11 +101,10 @@ class LabwareCalibration(BaseModel):
         }
 
 
-MultipleCalibrationsResponse = ResponseModel[
-    typing.List[ResponseDataModel[LabwareCalibration]], dict
+MultipleCalibrationsResponse = MultiResponseModel[
+    LabwareCalibration, dict
 ]
 
-
 SingleCalibrationResponse = ResponseModel[
-    ResponseDataModel[LabwareCalibration], dict
+    LabwareCalibration, dict
 ]

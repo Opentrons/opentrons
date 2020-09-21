@@ -13,7 +13,7 @@ from opentrons.calibration_storage import (
 
 from robot_server.service.labware import models as lw_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
-from robot_server.service.json_api import ErrorResponse
+from robot_server.service.json_api import ErrorResponse, ResponseDataModel
 
 router = APIRouter()
 
@@ -57,7 +57,7 @@ def _format_calibrations(
             parent=parent_info,
             definitionHash=calInfo.labware_id)
         formatted_calibrations.append(
-                lw_models.ResponseDataModel.create(
+                ResponseDataModel.create(
                     attributes=formatted_cal,
                     resource_id=calInfo.labware_id))
     return formatted_calibrations

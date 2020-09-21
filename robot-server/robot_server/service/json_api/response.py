@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Optional, List, Union
+from typing import Generic, TypeVar, Optional, List
 from pydantic import Field
 from pydantic.generics import GenericModel
 
@@ -36,21 +36,33 @@ class ResponseDataModel(GenericModel, Generic[AttributesT]):
             type=attributes.__class__.__name__)
 
 
-DataT = TypeVar('DataT', bound=Union[ResponseDataModel,
-                                     List[ResponseDataModel]])
+DESCRIPTION_DATA = "the document’s 'primary data'"
+
+DESCRIPTION_LINKS = "a links object related to the primary data."
+
+DESCRIPTION_META = "a meta object that contains non-standard" \
+                             " meta-information."
+
 MetaT = TypeVar('MetaT')
 
 
-class ResponseModel(GenericModel, Generic[DataT, MetaT]):
-    """
-    """
-    meta: Optional[MetaT] = \
-        Field(None,
-              description="a meta object that contains non-standard"
-                          " meta-information.")
-    data: DataT = \
-        Field(...,
-              description="the document’s 'primary data'")
-    links: Optional[ResourceLinks] = \
-        Field(None,
-              description="a links object related to the primary data.")
+class ResponseModel(GenericModel, Generic[AttributesT, MetaT]):
+    """A response that returns a single resource"""
+
+    meta: Optional[MetaT] = Field(None, description=DESCRIPTION_META)
+    links: Optional[ResourceLinks] = Field(None, description=DESCRIPTION_LINKS)
+    data: ResponseDataModel[AttributesT] = Field(
+        ...,
+        description=DESCRIPTION_DATA
+    )
+
+
+class MultiResponseModel(GenericModel, Generic[AttributesT, MetaT]):
+    """A response that returns multiple resources"""
+
+    meta: Optional[MetaT] = Field(None, description=DESCRIPTION_META)
+    links: Optional[ResourceLinks] = Field(None, description=DESCRIPTION_LINKS)
+    data: List[ResponseDataModel[AttributesT]] = Field(
+        ...,
+        description=DESCRIPTION_DATA
+    )

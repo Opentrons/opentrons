@@ -204,6 +204,23 @@ def save_robot_deck_attitude(
     io.save_to_file(gantry_path, gantry_dict)
 
 
+def _add_to_pipette_offset_index_file(pip_id: str, mount: Mount):
+    index_file = config.get_opentrons_path(
+        'pipette_calibration_dir') / 'index.json'
+    try:
+        index_data = index_data = io.read_cal_file(str(index_file))
+    except FileNotFoundError:
+        index_data = {}
+
+    mount_key = mount.name.lower()
+    if mount_key not in index_data:
+        index_data[mount_key] = [pip_id]
+    elif pip_id not in index_data[mount_key]:
+        index_data[mount_key].append(pip_id)
+
+    io.save_to_file(index_file, index_data)
+
+
 def save_pipette_calibration(
         offset: 'Point',
         pip_id: str, mount: Mount,
@@ -219,3 +236,4 @@ def save_pipette_calibration(
         'last_modified': utc_now(),
     }
     io.save_to_file(offset_path, offset_dict)
+    _add_to_pipette_offset_index_file(pip_id, mount)
