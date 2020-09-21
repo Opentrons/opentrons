@@ -113,7 +113,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
           {JOG_UNTIL}
           <b>{` ${JUST_BARELY_TOUCHING} `}</b>
           {DECK_IN}
-          <b>{TARGET_SLOT}.</b>
+          <b>{` ${TARGET_SLOT}`}.</b>
           <br />
           <br />
           {THEN}
