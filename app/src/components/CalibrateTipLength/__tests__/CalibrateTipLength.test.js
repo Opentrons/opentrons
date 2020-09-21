@@ -6,7 +6,6 @@ import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
-import { getRequestById } from '../../../robot-api'
 import * as Sessions from '../../../sessions'
 import { mockTipLengthCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
 
@@ -17,12 +16,10 @@ import {
   TipPickUp,
   TipConfirmation,
   CompleteConfirmation,
-  ConfirmExitModal,
 } from '../../CalibrationPanels'
 import { MeasureNozzle } from '../MeasureNozzle'
 import { MeasureTip } from '../MeasureTip'
 
-import type { State } from '../../../types'
 import type { TipLengthCalibrationStep } from '../../../sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
@@ -40,11 +37,6 @@ const mockGetDeckDefinitions: JestMockFn<
   [],
   $Call<typeof getDeckDefinitions, any>
 > = getDeckDefinitions
-
-const mockGetRequestById: JestMockFn<
-  [State, string],
-  $Call<typeof getRequestById, State, string>
-> = getRequestById
 
 describe('CalibrateTipLength', () => {
   let mockStore

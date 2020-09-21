@@ -1,8 +1,6 @@
 // @flow
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import last from 'lodash/last'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
@@ -19,7 +17,6 @@ import {
   C_WHITE,
 } from '@opentrons/components'
 
-import type { State } from '../../types'
 import type { StyleProps } from '@opentrons/components'
 import type {
   SessionCommandParams,
@@ -38,7 +35,6 @@ import {
 } from '../CalibrationPanels'
 import { MeasureNozzle } from './MeasureNozzle'
 import { MeasureTip } from './MeasureTip'
-import styles from './styles.css'
 
 import type { CalibrateTipLengthParentProps } from './types'
 
