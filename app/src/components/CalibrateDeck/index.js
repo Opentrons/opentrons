@@ -7,6 +7,14 @@ import {
   ModalPage,
   SpinnerModalPage,
   useConditionalConfirm,
+  DISPLAY_FLEX,
+  DIRECTION_COLUMN,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  SPACING_3,
+  C_TRANSPARENT,
+  ALIGN_FLEX_START,
+  C_WHITE,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -21,8 +29,8 @@ import {
   CompleteConfirmation,
   ConfirmExitModal,
 } from '../CalibrationPanels'
-import styles from './styles.css'
 
+import type { StyleProps } from '@opentrons/components'
 import type {
   DeckCalibrationLabware,
   SessionCommandParams,
@@ -32,6 +40,30 @@ import type { CalibrateDeckParentProps } from './types'
 
 const DECK_CALIBRATION_SUBTITLE = 'Deck calibration'
 const EXIT = 'exit'
+
+const darkContentsStyleProps = {
+  display: DISPLAY_FLEX,
+  flexDirection: DIRECTION_COLUMN,
+  alignItems: ALIGN_CENTER,
+  padding: SPACING_3,
+  backgroundColor: C_TRANSPARENT,
+  height: '100%',
+}
+const contentsStyleProps = {
+  display: DISPLAY_FLEX,
+  backgroundColor: C_WHITE,
+  flexDirection: DIRECTION_COLUMN,
+  justifyContent: JUSTIFY_CENTER,
+  alignItems: ALIGN_FLEX_START,
+  padding: SPACING_3,
+  maxWidth: '48rem',
+  minHeight: '14rem',
+}
+
+const terminalContentsStyleProps = {
+  ...contentsStyleProps,
+  paddingX: '1.5rem',
+}
 
 const PANEL_BY_STEP: {
   [string]: React.ComponentType<CalibrationPanelProps>,
@@ -46,18 +78,18 @@ const PANEL_BY_STEP: {
   [Sessions.DECK_STEP_SAVING_POINT_THREE]: SaveXYPoint,
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
-const PANEL_STYLE_BY_STEP: {
-  [string]: string,
+const PANEL_STYLE_PROPS_BY_STEP: {
+  [string]: StyleProps,
 } = {
-  [Sessions.DECK_STEP_SESSION_STARTED]: styles.terminal_modal_contents,
-  [Sessions.DECK_STEP_LABWARE_LOADED]: styles.page_content_dark,
-  [Sessions.DECK_STEP_PREPARING_PIPETTE]: styles.modal_contents,
-  [Sessions.DECK_STEP_INSPECTING_TIP]: styles.modal_contents,
-  [Sessions.DECK_STEP_JOGGING_TO_DECK]: styles.modal_contents,
-  [Sessions.DECK_STEP_SAVING_POINT_ONE]: styles.modal_contents,
-  [Sessions.DECK_STEP_SAVING_POINT_TWO]: styles.modal_contents,
-  [Sessions.DECK_STEP_SAVING_POINT_THREE]: styles.modal_contents,
-  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: styles.terminal_modal_contents,
+  [Sessions.DECK_STEP_SESSION_STARTED]: terminalContentsStyleProps,
+  [Sessions.DECK_STEP_LABWARE_LOADED]: darkContentsStyleProps,
+  [Sessions.DECK_STEP_PREPARING_PIPETTE]: contentsStyleProps,
+  [Sessions.DECK_STEP_INSPECTING_TIP]: contentsStyleProps,
+  [Sessions.DECK_STEP_JOGGING_TO_DECK]: contentsStyleProps,
+  [Sessions.DECK_STEP_SAVING_POINT_ONE]: contentsStyleProps,
+  [Sessions.DECK_STEP_SAVING_POINT_TWO]: contentsStyleProps,
+  [Sessions.DECK_STEP_SAVING_POINT_THREE]: contentsStyleProps,
+  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
 export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
   const {
@@ -128,7 +160,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     <>
       <ModalPage
         titleBar={titleBarProps}
-        contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
+        innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
         <Panel
           sendCommands={sendCommands}
