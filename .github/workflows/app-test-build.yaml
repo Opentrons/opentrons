@@ -32,10 +32,6 @@ on:
       - 'yarn.lock'
   workflow_dispatch:
 
-defaults:
-  run:
-    shell: bash
-
 env:
   CI: true
   OT_APP_DEPLOY_BUCKET: opentrons-app
@@ -68,7 +64,6 @@ jobs:
         run: 'make setup-js'
       - name: 'test relevant packages'
         run: |
-          echo "running in $(pwd)"
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns /labware-.*/ /protocol-.*/
       - if: github.event_name != 'pull_request'
         name: 'build app'
