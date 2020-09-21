@@ -7,6 +7,7 @@ jest.mock('electron-updater')
 jest.mock('electron-store')
 
 jest.mock('../components/src/deck/getDeckDefinitions')
+jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 
 jest.mock('../app/src/getLabware')
 jest.mock('../app/src/logger')
