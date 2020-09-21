@@ -16,7 +16,7 @@ import type { CalibrationPanelProps } from './types'
 
 const CONFIRM_TIP_BODY = 'Did pipette pick up tip successfully?'
 const YES_AND_MOVE_TO_DECK = 'Yes, move to slot 5'
-const YES_AND_CONTINUE = 'Yes, move to slot 5'
+const YES_AND_MOVE_TO_MEASURE_TIP = 'Yes, move to measure tip length'
 const NO_TRY_AGAIN = 'No, try again'
 
 const contentsBySessionType: {
@@ -34,7 +34,7 @@ const contentsBySessionType: {
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_DECK,
   },
   [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
-    yesButtonText: YES_AND_CONTINUE,
+    yesButtonText: YES_AND_MOVE_TO_MEASURE_TIP,
     moveCommandString: Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT,
   },
 }

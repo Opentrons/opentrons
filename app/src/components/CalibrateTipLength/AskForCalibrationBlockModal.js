@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 
 import styles from './styles.css'
-import { labwareImages } from './labwareImages'
+import { labwareImages } from '../CalibrationPanels/labwareImages'
 import { Portal } from '../portal'
 
 const ALERT_TIP_LENGTH_CAL_HEADER = 'Pipette calibration has been updated!'

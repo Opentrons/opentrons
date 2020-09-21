@@ -23,7 +23,7 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 import styles from './styles.css'
-import { formatJogVector } from './utils'
+import { formatJogVector } from '../CalibrationPanels/utils'
 import leftMultiBlockAsset from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
 import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_NO_TIP_(330x260)REV1.webm'
 import leftSingleBlockAsset from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_NO_TIP_(330x260)REV1.webm'

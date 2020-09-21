@@ -20,6 +20,8 @@ const warningBySessionType: { [SessionType]: string } = {
     'Doing so will return the pipette tip and exit deck calibration.',
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]:
     'Doing so will return the pipette tip and exit pipette offset calibration.',
+  [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]:
+    'Doing so will return the pipette tip and exit tip length calibration.',
 }
 
 export function ConfirmExitModal(props: ConfirmExitModalProps): React.Node {

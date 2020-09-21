@@ -13,7 +13,7 @@ import { MeasureNozzle } from '../MeasureNozzle'
 describe('MeasureNozzle', () => {
   let render
 
-  const mockSendCommand = jest.fn()
+  const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   const getContinueButton = wrapper =>
@@ -29,8 +29,10 @@ describe('MeasureNozzle', () => {
         isMulti = false,
         tipRack = mockTipLengthTipRack,
         calBlock = mockTipLengthCalBlock,
-        sendSessionCommand = mockSendCommand,
-        deleteSession = mockDeleteSession,
+        sendCommands = mockSendCommands,
+        cleanUpAndExit = mockDeleteSession,
+        currentStep = Sessions.TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET,
+        sessionType = Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
       } = props
       return mount(
         <MeasureNozzle
@@ -38,8 +40,10 @@ describe('MeasureNozzle', () => {
           mount={pipMount}
           tipRack={tipRack}
           calBlock={calBlock}
-          sendSessionCommand={sendSessionCommand}
-          deleteSession={deleteSession}
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          currentStep={currentStep}
+          sessionType={sessionType}
         />
       )
     }
@@ -61,11 +65,10 @@ describe('MeasureNozzle', () => {
       act(() => getJogButton(wrapper, direction).invoke('onClick')())
       wrapper.update()
 
-      expect(mockSendCommand).toHaveBeenCalledWith(
-        Sessions.tipCalCommands.JOG,
-        { vector: jogParamsByDirection[direction] },
-        false
-      )
+      expect(mockSendCommands).toHaveBeenCalledWith({
+        command: Sessions.tipCalCommands.JOG,
+        data: { vector: jogParamsByDirection[direction] },
+      })
     })
 
     const unavailableJogDirections = ['left', 'right', 'back', 'forward']
@@ -79,11 +82,9 @@ describe('MeasureNozzle', () => {
     act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.tipCalCommands.SAVE_OFFSET
-    )
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.tipCalCommands.MOVE_TO_TIP_RACK
+    expect(mockSendCommands).toHaveBeenCalledWith(
+      { command: Sessions.tipCalCommands.SAVE_OFFSET },
+      { command: Sessions.tipCalCommands.MOVE_TO_TIP_RACK }
     )
   })
 })
