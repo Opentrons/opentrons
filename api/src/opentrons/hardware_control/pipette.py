@@ -140,8 +140,7 @@ class Pipette:
         """
         if enable_calibration_overhaul():
             instr = self._instrument_offset
-            # offsets = self.model_offset
-            offsets = [self.model_offset[0], self.model_offset[1], self.nozzle_offset[2]]
+            offsets = self.nozzle_offset
         else:
             instr = self._instrument_offset._replace(z=0)
             offsets = self.model_offset
@@ -166,7 +165,6 @@ class Pipette:
                             mod_offset_xy[2] - tip_length)
 
         cp = mod_and_tip + instr
-        mod_log.info(f"************ ===> Critical point: {cp}")
 
         if self._log.isEnabledFor(logging.DEBUG):
             info_str = 'cp: {}{}: {} (from: '\
