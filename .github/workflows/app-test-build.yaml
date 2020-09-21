@@ -12,6 +12,7 @@ on:
       - 'webpack-config/**/*'
       - 'discovery-client/**/*'
       - '*.js'
+      - 'scripts/**/*'
       - '*.json'
       - 'yarn.lock'
       - '.github/workflows/app-test-build.yaml'
@@ -30,6 +31,7 @@ on:
       - '*.js'
       - '*.json'
       - 'yarn.lock'
+      - 'scripts/**/*'
   workflow_dispatch:
 
 env:
