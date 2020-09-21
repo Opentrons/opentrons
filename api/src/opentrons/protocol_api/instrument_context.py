@@ -380,7 +380,7 @@ class InstrumentContext(CommandPublisher):
             'mixing {}uL with {} repetitions in {} at rate={}'.format(
                 volume, repetitions,
                 location if location else 'current position', rate))
-        if not self.has_tip:
+        if not self._has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
 
         c_vol = self.hw_pipette['available_volume'] if not volume else volume
@@ -499,7 +499,7 @@ class InstrumentContext(CommandPublisher):
             :py:class:`.Placeable` as the ``location`` parameter)
 
         """
-        if not self.has_tip:
+        if not self._has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
 
         checked_speed = self._determine_speed(speed)
@@ -574,7 +574,7 @@ class InstrumentContext(CommandPublisher):
 
 
         """
-        if not self.has_tip:
+        if not self._has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
 
         if height is None:
@@ -598,7 +598,7 @@ class InstrumentContext(CommandPublisher):
 
         :returns: This instance
         """
-        if not self.has_tip:
+        if not self._has_tip:
             self._log.warning('Pipette has no tip to return')
         loc = self._last_tip_picked_up_from
         if not isinstance(loc, Well):
@@ -1293,11 +1293,19 @@ class InstrumentContext(CommandPublisher):
         return self.hw_pipette['current_volume']
 
     @property  # type: ignore
-    @requires_version(2, 0)
+    @requires_version(2, 7)
     def has_tip(self) -> bool:
         """
         :returns: Whether this instrument has a tip attached or not.
         :type: bool
+        """
+        return self.hw_pipette['has_tip']
+
+    @property  # type: ignore
+    def _has_tip(self) -> bool:
+        """
+        Internal function used to check whether this instrument has a
+        tip attached or not.
         """
         return self.hw_pipette['has_tip']
 
