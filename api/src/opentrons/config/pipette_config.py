@@ -35,6 +35,7 @@ class PipetteConfig:
     dispense_flow_rate: float
     channels: float
     model_offset: Tuple[float, float, float]
+    nozzle_offset: Tuple[float, float, float]
     plunger_current: float
     drop_tip_current: float
     drop_tip_speed: float
@@ -80,6 +81,8 @@ Z_OFFSET_P10 = -13  # longest single-channel pipette
 Z_OFFSET_P50 = 0
 Z_OFFSET_P300 = 0
 Z_OFFSET_P1000 = 20  # shortest single-channel pipette
+
+NOZZLE_OFFSET_DEFAULT = [0.0, 0.0, 0.0]
 
 LOW_CURRENT_DEFAULT = 0.05
 
@@ -184,6 +187,7 @@ def load(
         dispense_flow_rate=cfg['defaultDispenseFlowRate']['value'],
         channels=ensure_value(cfg, 'channels', MUTABLE_CONFIGS),
         model_offset=ensure_value(cfg, 'modelOffset', MUTABLE_CONFIGS),
+        nozzle_offset=cfg.get('nozzleOffset', NOZZLE_OFFSET_DEFAULT),
         plunger_current=ensure_value(cfg, 'plungerCurrent', MUTABLE_CONFIGS),
         drop_tip_current=ensure_value(cfg, 'dropTipCurrent', MUTABLE_CONFIGS),
         drop_tip_speed=ensure_value(cfg, 'dropTipSpeed', MUTABLE_CONFIGS),

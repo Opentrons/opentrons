@@ -66,6 +66,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, -13],
+      "nozzleOffset": [0.0, 0.0, 12],
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
@@ -191,6 +192,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, -13],
+      "nozzleOffset": [0.0, 0.0, 12],
       "ulPerMm": [
         {
           "aspirate": [
@@ -316,6 +318,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, -13],
+      "nozzleOffset": [0.0, 0.0, 12],
       "ulPerMm": [
         {
           "aspirate": [
@@ -441,6 +444,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, -13],
+      "nozzleOffset": [0.0, 0.0, 12],
       "ulPerMm": [
         {
           "aspirate": [
@@ -556,6 +560,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -680,6 +685,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -804,6 +810,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -928,6 +935,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -1043,6 +1051,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -1167,6 +1176,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, -14.55],
+      "nozzleOffset": [0.0, 0.0, 10.45],
       "plungerCurrent": {
         "value": 1.0,
         "min": 0.01,
@@ -1337,6 +1347,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, -14.55],
+      "nozzleOffset": [0.0, 0.0, 10.45],
       "plungerCurrent": {
         "value": 1.0,
         "min": 0.01,
@@ -1507,6 +1518,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -5.6],
+      "nozzleOffset": [0.0, 0.0, 19.4],
       "plungerCurrent": {
         "value": 1.0,
         "min": 0.01,
@@ -1678,6 +1690,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -5.6],
+      "nozzleOffset": [0.0, 0.0, 19.4],
       "plungerCurrent": {
         "value": 1.0,
         "min": 0.01,
@@ -1848,6 +1861,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
+      "nozzleOffset": [0.0, 0.0, 25.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -1969,6 +1983,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
+      "nozzleOffset": [0.0, 0.0, 25.0],
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
@@ -2090,6 +2105,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
+      "nozzleOffset": [0.0, 0.0, 25.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -2211,6 +2227,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
+      "nozzleOffset": [0.0, 0.0, 25.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -2326,6 +2343,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -2447,6 +2465,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -2568,6 +2587,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -2689,6 +2709,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -2803,6 +2824,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
+      "nozzleOffset": [0.0, 0.0, 25.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -2928,6 +2950,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
+      "nozzleOffset": [0.0, 0.0, 25.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -3054,6 +3077,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
+      "nozzleOffset": [0.0, 0.0, 25.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -3180,6 +3204,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
+      "nozzleOffset": [0.0, 0.0, 25.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -3297,6 +3322,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 4.45],
+      "nozzleOffset": [0.0, 0.0, 29.45],
       "ulPerMm": [
         {
           "aspirate": [
@@ -3465,6 +3491,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 4.45],
+      "nozzleOffset": [0.0, 0.0, 29.45],
       "ulPerMm": [
         {
           "aspirate": [
@@ -3633,6 +3660,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -3745,6 +3773,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -3856,6 +3885,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -3967,6 +3997,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
+      "nozzleOffset": [0.0, 0.0, 0.8],
       "ulPerMm": [
         {
           "aspirate": [
@@ -4079,6 +4110,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, 10.52],
+      "nozzleOffset": [0.0, 0.0, 35.52],
       "ulPerMm": [
         {
           "aspirate": [
@@ -4249,6 +4281,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, 10.52],
+      "nozzleOffset": [0.0, 0.0, 35.52],
       "ulPerMm": [
         {
           "aspirate": [
@@ -4418,6 +4451,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 20.0],
+      "nozzleOffset": [0.0, 0.0, 45.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -4534,6 +4568,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 20.0],
+      "nozzleOffset": [0.0, 0.0, 45.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -4650,6 +4685,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 20.0],
+      "nozzleOffset": [0.0, 0.0, 45.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -4766,6 +4802,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 20.0],
+      "nozzleOffset": [0.0, 0.0, 45.0],
       "ulPerMm": [
         {
           "aspirate": [
@@ -4883,6 +4920,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 25.14],
+      "nozzleOffset": [0.0, 0.0, 50.14],
       "ulPerMm": [
         {
           "aspirate": [
@@ -5053,6 +5091,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 25.14],
+      "nozzleOffset": [0.0, 0.0, 50.14],
       "ulPerMm": [
         {
           "aspirate": [

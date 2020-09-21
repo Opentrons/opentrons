@@ -47,6 +47,7 @@ class Pipette:
         self._name = self._config.name
         self._model = self._config.model
         self._model_offset = self._config.model_offset
+        self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
         self._working_volume = self._config.max_volume
         self._current_tip_length = 0.0
@@ -105,6 +106,10 @@ class Pipette:
     def model_offset(self):
         return self._model_offset
 
+    @property
+    def nozzle_offset(self):
+        return self._nozzle_offset
+
     def update_config_item(self, elem_name: str, elem_val: Any):
         self._log.info("updated config: {}={}".format(elem_name, elem_val))
         self._config = replace(self._config,
@@ -133,6 +138,14 @@ class Pipette:
         we have a tip, or :py:attr:`CriticalPoint.XY_CENTER` - the specified
         critical point will be used.
         """
+        if enable_calibration_overhaul():
+            instr = self._instrument_offset
+            # offsets = self.model_offset
+            offsets = [self.model_offset[0], self.model_offset[1], self.nozzle_offset[2]]
+        else:
+            instr = self._instrument_offset._replace(z=0)
+            offsets = self.model_offset
+
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
             tip_length = 0.0
@@ -140,24 +153,20 @@ class Pipette:
             cp_type = CriticalPoint.TIP
             tip_length = self.current_tip_length
         if cp_override == CriticalPoint.XY_CENTER:
-            mod_offset_xy = [0, 0, self.model_offset[2]]
+            mod_offset_xy = [0, 0, offsets[2]]
             cp_type = CriticalPoint.XY_CENTER
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
             mod_offset_xy = [
-                0, -self.model_offset[1], self.model_offset[2]]
+                0, -offsets[1], offsets[2]]
             cp_type = CriticalPoint.FRONT_NOZZLE
         else:
-            mod_offset_xy = self.model_offset
+            mod_offset_xy = offsets
         mod_and_tip = Point(mod_offset_xy[0],
                             mod_offset_xy[1],
                             mod_offset_xy[2] - tip_length)
 
-        if enable_calibration_overhaul():
-            instr = self._instrument_offset
-        else:
-            instr = self._instrument_offset._replace(z=0)
-
         cp = mod_and_tip + instr
+        mod_log.info(f"************ ===> Critical point: {cp}")
 
         if self._log.isEnabledFor(logging.DEBUG):
             info_str = 'cp: {}{}: {} (from: '\
