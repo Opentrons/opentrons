@@ -12,6 +12,7 @@ import { createNetworkInterfaceMonitor } from '../system-info'
 jest.mock('electron')
 jest.mock('electron-store')
 jest.mock('@opentrons/discovery-client')
+jest.mock('@opentrons/app/src/getLabware')
 jest.mock('../config')
 jest.mock('../system-info')
 
