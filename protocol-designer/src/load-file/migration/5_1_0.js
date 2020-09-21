@@ -1,0 +1,42 @@
+// @flow
+import mapValues from 'lodash/mapValues'
+
+export const PD_VERSION = '5.1.0'
+
+export const migrateSavedStepForms = (savedStepForms: {
+  [string]: any,
+  ...,
+}): { [string]: any, ... } => {
+  return mapValues(savedStepForms, stepForm => {
+    if (stepForm.stepType === 'mix') {
+      // add default values for new fields in Mix forms
+      return {
+        ...stepForm,
+        aspirate_delay_checkbox: false,
+        aspirate_delay_seconds: null,
+        mix_aspirate_delay_mmFromBottom: null,
+
+        dispense_delay_checkbox: false,
+        dispense_delay_seconds: null,
+        mix_dispense_delay_mmFromBottom: null,
+      }
+    }
+    return stepForm
+  })
+}
+
+export const migrateFile = (fileData: any): any => {
+  return {
+    ...fileData,
+    designerApplication: {
+      ...fileData.designerApplication,
+      version: PD_VERSION,
+      data: {
+        ...fileData.designerApplication.data,
+        savedStepForms: migrateSavedStepForms(
+          fileData.designerApplication.data.savedStepForms
+        ),
+      },
+    },
+  }
+}
