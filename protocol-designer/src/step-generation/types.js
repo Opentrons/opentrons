@@ -41,7 +41,7 @@ type CommonArgs = {|
 
 // ===== Processed form types. Used as args to call command creator fns =====
 
-export type SharedTransferLikeArgs = {
+export type SharedTransferLikeArgs = {|
   ...CommonArgs,
 
   pipette: string, // PipetteId
@@ -80,9 +80,10 @@ export type SharedTransferLikeArgs = {
   dispenseFlowRateUlSec: number,
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm: number,
-}
+|}
 
-export type ConsolidateArgs = {
+export type ConsolidateArgs = {|
+  ...SharedTransferLikeArgs,
   commandCreatorFnName: 'consolidate',
 
   sourceWells: Array<string>,
@@ -97,9 +98,10 @@ export type ConsolidateArgs = {
   mixFirstAspirate: ?InnerMixArgs,
   /** Mix in destination well after dispense */
   mixInDestination: ?InnerMixArgs,
-} & SharedTransferLikeArgs
+|}
 
-export type TransferArgs = {
+export type TransferArgs = {|
+  ...SharedTransferLikeArgs,
   commandCreatorFnName: 'transfer',
 
   sourceWells: Array<string>,
@@ -114,9 +116,10 @@ export type TransferArgs = {
   mixBeforeAspirate: ?InnerMixArgs,
   /** Mix in destination well after dispense */
   mixInDestination: ?InnerMixArgs,
-} & SharedTransferLikeArgs
+|}
 
-export type DistributeArgs = {
+export type DistributeArgs = {|
+  ...SharedTransferLikeArgs,
   commandCreatorFnName: 'distribute',
 
   sourceWell: string,
@@ -134,9 +137,9 @@ export type DistributeArgs = {
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?InnerMixArgs,
-} & SharedTransferLikeArgs
+|}
 
-export type MixArgs = {
+export type MixArgs = {|
   ...$Exact<CommonArgs>,
   commandCreatorFnName: 'mix',
   labware: string,
@@ -163,7 +166,10 @@ export type MixArgs = {
   /** flow rates in uL/sec */
   aspirateFlowRateUlSec: number,
   dispenseFlowRateUlSec: number,
-}
+  /** delays */
+  aspirateDelay: ?InnerDelayArgs,
+  dispenseDelay: ?InnerDelayArgs,
+|}
 
 export type PauseArgs = {|
   ...$Exact<CommonArgs>,

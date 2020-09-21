@@ -98,6 +98,8 @@ describe('generateRobotStateTimeline', () => {
           aspirateOffsetFromBottomMm: 0.5,
           dispenseOffsetFromBottomMm: 0.5,
           blowoutOffsetFromTopMm: 0,
+          aspirateDelay: null,
+          dispenseDelay: null,
         },
       },
     }

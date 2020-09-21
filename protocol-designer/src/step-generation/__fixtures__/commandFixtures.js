@@ -52,7 +52,7 @@ export const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
 export const BLOWOUT_OFFSET_FROM_TOP_MM = 3.3
 const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
 
-type FlowRateAndOffsetParams = {|
+type FlowRateAndOffsetParamsTransferlike = {|
   aspirateFlowRateUlSec: number,
   dispenseFlowRateUlSec: number,
   blowoutFlowRateUlSec: number,
@@ -61,9 +61,8 @@ type FlowRateAndOffsetParams = {|
   blowoutOffsetFromTopMm: number,
   touchTipAfterAspirateOffsetMmFromBottom: number,
   touchTipAfterDispenseOffsetMmFromBottom: number,
-  touchTipMmFromBottom: number,
 |}
-export const getFlowRateAndOffsetParams = (): FlowRateAndOffsetParams => ({
+export const getFlowRateAndOffsetParamsTransferLike = (): FlowRateAndOffsetParamsTransferlike => ({
   aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
   dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
   blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
@@ -74,6 +73,24 @@ export const getFlowRateAndOffsetParams = (): FlowRateAndOffsetParams => ({
   // for consolidate/distribute/transfer only
   touchTipAfterAspirateOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
   touchTipAfterDispenseOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+})
+
+type FlowRateAndOffsetParamsMix = {|
+  aspirateFlowRateUlSec: number,
+  dispenseFlowRateUlSec: number,
+  blowoutFlowRateUlSec: number,
+  aspirateOffsetFromBottomMm: number,
+  dispenseOffsetFromBottomMm: number,
+  blowoutOffsetFromTopMm: number,
+  touchTipMmFromBottom: number,
+|}
+export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => ({
+  aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
+  dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
+  blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
+  aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  blowoutOffsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
 
   // for mix only
   touchTipMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,

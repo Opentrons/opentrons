@@ -7,7 +7,7 @@ import {
   getSuccessResult,
   getErrorResult,
   replaceTipCommands,
-  getFlowRateAndOffsetParams,
+  getFlowRateAndOffsetParamsMix,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
@@ -30,6 +30,7 @@ let mixinArgs
 
 beforeEach(() => {
   mixinArgs = {
+    ...getFlowRateAndOffsetParamsMix(),
     commandCreatorFnName: 'mix',
     name: 'mix test',
     description: 'test blah blah',
@@ -39,7 +40,9 @@ beforeEach(() => {
 
     blowoutLocation: null,
     touchTip: false,
-    ...getFlowRateAndOffsetParams(),
+
+    aspirateDelay: null,
+    dispenseDelay: null,
   }
 
   invariantContext = makeContext()
@@ -117,7 +120,6 @@ describe('mix: advanced options', () => {
       times,
       wells: ['A1'],
       changeTip: 'once',
-      ...getFlowRateAndOffsetParams(),
     }
 
     const result = mix(args, invariantContext, robotStateWithTip)

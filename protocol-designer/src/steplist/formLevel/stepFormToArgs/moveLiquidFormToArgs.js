@@ -206,7 +206,6 @@ export const moveLiquidFormToArgs = (
     aspirateDelay,
     dispenseDelay,
     aspirateAirGapVolume,
-    mixInDestination,
     touchTipAfterAspirate,
     touchTipAfterAspirateOffsetMmFromBottom,
     touchTipAfterDispense,
@@ -237,6 +236,7 @@ export const moveLiquidFormToArgs = (
         sourceWells,
         destWells,
         mixBeforeAspirate,
+        mixInDestination,
       }
       return transferStepArguments
     }
@@ -246,6 +246,7 @@ export const moveLiquidFormToArgs = (
         commandCreatorFnName: 'consolidate',
         blowoutLocation,
         mixFirstAspirate: mixBeforeAspirate,
+        mixInDestination,
         sourceWells,
         destWell: destWells[0],
       }
