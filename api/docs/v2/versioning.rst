@@ -178,3 +178,6 @@ Version 2.7
   .. note::
 
   This feature is still under development.
+
+- Calling :py:meth:`.InstrumentContext.has_tip` will return whether a particular instrument
+  has a tip attached or not.
