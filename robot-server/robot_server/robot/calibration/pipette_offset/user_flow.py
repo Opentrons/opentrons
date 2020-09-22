@@ -61,6 +61,10 @@ class PipetteOffsetCalibrationUserFlow:
         self._current_state = State.sessionStarted
         self._state_machine = PipetteOffsetCalibrationStateMachine()
 
+        point_one_pos = \
+            self._deck.get_calibration_position(POINT_ONE_ID).position
+        self._cal_ref_point = Point(*point_one_pos)
+
         self._tip_origin_pt: Optional[Point] = None
 
         self._command_map: COMMAND_MAP = {
@@ -173,20 +177,24 @@ class PipetteOffsetCalibrationUserFlow:
     async def move_to_point_one(self):
         assert self._z_height_reference is not None, \
             "saveOffset has not been called yet"
-        coords = self._deck.get_calibration_position(POINT_ONE_ID).position
-        point_loc = Location(Point(*coords), None)
-        await self._move(
-            point_loc.move(point=Point(0, 0, self._z_height_reference)))
+        target_loc = Location(self._cal_ref_point, None)
+        target = target_loc.move(
+                point=Point(0, 0, self._z_height_reference))
+        await self._move(target)
 
     async def save_offset(self):
         cur_pt = await self._get_current_point(critical_point=None)
         if self.current_state == State.joggingToDeck:
             self._z_height_reference = cur_pt.z
         elif self._current_state == State.savingPointOne:
+            if self._hw_pipette.config.channels > 1:
+                cur_pt = await self._get_current_point(
+                    critical_point=CriticalPoint.FRONT_NOZZLE)
             tiprack_hash = helpers.hash_labware_def(
                 self._tip_rack._definition)
+            offset = self._cal_ref_point - cur_pt
             modify.save_pipette_calibration(
-                offset=cur_pt,
+                offset=offset,
                 mount=self._mount,
                 pip_id=self._hw_pipette.pipette_id,
                 tiprack_hash=tiprack_hash,
