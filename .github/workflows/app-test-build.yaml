@@ -34,9 +34,9 @@ on:
       - 'scripts/**/*'
   workflow_dispatch:
 
-defaults:
-  run:
-    shell: bash
+#defaults:
+#  run:
+#    shell: bash
 
 env:
   CI: true
@@ -74,10 +74,7 @@ jobs:
       - if: github.event_name != 'pull_request'
         name: 'build app'
         run: |
-          echo OT_BRANCH: ${OT_BRANCH}
-          echo OT_TAG: ${OT_TAG}
-          echo OT_BUILD: ${OT_BUILD}
-          make -C app-shell dist-${{ matrix.os }}
+           make -C app-shell dist-${{ matrix.os }}
       - if: github.event_name != 'pull_request'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
