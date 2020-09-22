@@ -3,6 +3,7 @@ from enum import Enum
 import typing
 from functools import lru_cache
 
+from opentrons_shared_data.pipette.dev_types import PipetteName
 from pydantic import BaseModel, Field, validator
 from robot_server.service.json_api import ResponseModel, RequestModel
 from opentrons.util.helpers import utc_now
@@ -32,7 +33,7 @@ class LoadLabware(BaseModel):
     loadName: str = Field(
         ...,
         description="Name used to reference a labware definition")
-    displayName: str = Field(
+    displayName: typing.Optional[str] = Field(
         ...,
         description="User-readable name for labware")
     namespace: str = Field(
@@ -44,8 +45,9 @@ class LoadLabware(BaseModel):
 
 
 class LoadInstrument(BaseModel):
-    instrumentName: str = Field(...,
-                                description="The name of the instrument model")
+    instrumentName: PipetteName = Field(
+        ...,
+        description="The name of the instrument model")
     mount: Mount
 
 
@@ -58,7 +60,8 @@ class PipetteCommandBase(BaseModel):
 class LiquidCommand(PipetteCommandBase):
     volume: float = Field(
         ...,
-        description="Amount of liquid in uL",
+        description="Amount of liquid in uL. Must be greater than 0 and less "
+                    "than a pipette-specific maximum volume.",
         gt=0,
     )
     offsetFromBottom: float = Field(
@@ -68,7 +71,9 @@ class LiquidCommand(PipetteCommandBase):
     )
     flowRate: float = Field(
         ...,
-        description="The absolute flow rate in uL/second.",
+        description="The absolute flow rate in uL/second. Must be greater "
+                    "than 0 and less than a pipette-specific maximum flow "
+                    "rate.",
         gt=0
     )
 
