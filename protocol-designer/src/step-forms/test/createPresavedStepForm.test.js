@@ -187,6 +187,8 @@ describe('createPresavedStepForm', () => {
       // default fields
       labware: null,
       wells: [],
+      aspirate_delay_checkbox: false,
+      aspirate_delay_seconds: '1',
       mix_mmFromBottom: '0.5',
       mix_wellOrder_first: 't2b',
       mix_wellOrder_second: 'l2r',

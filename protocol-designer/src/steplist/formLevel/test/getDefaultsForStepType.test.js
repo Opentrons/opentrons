@@ -1,36 +1,20 @@
 // @flow
 import {
   DEFAULT_CHANGE_TIP_OPTION,
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
-  DEFAULT_DELAY_SECONDS,
   FIXED_TRASH_ID,
-} from '../../constants'
-import type { StepType, StepFieldName } from '../../form-types'
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+  DEFAULT_DELAY_SECONDS,
+} from '../../../constants'
 
-export function getDefaultsForStepType(
-  stepType: StepType
-): { [StepFieldName]: any } {
-  switch (stepType) {
-    case 'mix':
-      return {
-        changeTip: DEFAULT_CHANGE_TIP_OPTION,
-        labware: null,
-        aspirate_delay_checkbox: false,
-        aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-        mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-        blowout_checkbox: false,
-        blowout_location: FIXED_TRASH_ID,
-        mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`, // NOTE: mix uses dispense for both asp + disp, for now
-        pipette: null,
-        volume: undefined,
-        wells: [],
-      }
-    case 'moveLiquid':
-      return {
+import { getDefaultsForStepType } from '..'
+
+describe('getDefaultsForStepType', () => {
+  describe('moveLiquid step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('moveLiquid')).toEqual({
         pipette: null,
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
@@ -74,9 +58,30 @@ export function getDefaultsForStepType(
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
-      }
-    case 'pause':
-      return {
+      })
+    })
+  })
+  describe('mix step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('mix')).toEqual({
+        changeTip: DEFAULT_CHANGE_TIP_OPTION,
+        labware: null,
+        aspirate_delay_checkbox: false,
+        aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+        mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+        mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        blowout_checkbox: false,
+        blowout_location: FIXED_TRASH_ID,
+        mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`, // NOTE: mix uses dispense for both asp + disp, for now
+        pipette: null,
+        volume: undefined,
+        wells: [],
+      })
+    })
+  })
+  describe('pause step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('pause')).toEqual({
         pauseAction: null,
         pauseHour: null,
         pauseMinute: null,
@@ -84,27 +89,39 @@ export function getDefaultsForStepType(
         pauseMessage: '',
         moduleId: null,
         pauseTemperature: null,
-      }
-    case 'manualIntervention':
-      return {
+      })
+    })
+  })
+  describe('manual intervention step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('manualIntervention')).toEqual({
         labwareLocationUpdate: {},
         pipetteLocationUpdate: {},
         moduleLocationUpdate: {},
-      }
-    case 'magnet':
-      return {
+      })
+    })
+  })
+  describe('magnet step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('magnet')).toEqual({
         moduleId: null,
         magnetAction: null,
         engageHeight: null,
-      }
-    case 'temperature':
-      return {
+      })
+    })
+  })
+  describe('temperature step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('temperature')).toEqual({
         moduleId: null,
         setTemperature: null,
         targetTemperature: null,
-      }
-    case 'thermocycler':
-      return {
+      })
+    })
+  })
+  describe('thermocycler step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('thermocycler')).toEqual({
         thermocyclerFormType: null,
         moduleId: null,
         blockIsActive: false,
@@ -121,8 +138,10 @@ export function getDefaultsForStepType(
         lidIsActiveHold: false,
         lidTargetTempHold: null,
         lidOpenHold: null,
-      }
-    default:
-      return {}
-  }
-}
+      })
+    })
+    it('should default to an empty object', () => {
+      expect(getDefaultsForStepType('')).toEqual({})
+    })
+  })
+})
