@@ -62,7 +62,8 @@ jobs:
           path: '**/node_modules'
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - name: 'set complex environment variables'
-        run: |
+        uses: actions/github-script@v2
+        with: |
           const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
           const tag = context.ref.startsWith('refs/tags/') ? branch : ''
           const buildNumber = parseInt(context.run_number) + 10000
