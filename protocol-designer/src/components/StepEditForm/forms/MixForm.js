@@ -117,7 +117,6 @@ export class MixForm extends React.Component<Props, State> {
               <DelayFields
                 checkboxFieldName={'aspirate_delay_checkbox'}
                 secondsFieldName={'aspirate_delay_seconds'}
-                tipPositionFieldName={'mix_aspirate_delay_mmFromBottom'}
                 focusHandlers={focusHandlers}
               />
             </div>
@@ -134,7 +133,6 @@ export class MixForm extends React.Component<Props, State> {
                 <DelayFields
                   checkboxFieldName={'dispense_delay_checkbox'}
                   secondsFieldName={'dispense_delay_seconds'}
-                  tipPositionFieldName={'mix_dispense_delay_mmFromBottom'}
                   focusHandlers={focusHandlers}
                 />
                 <CheckboxRowField

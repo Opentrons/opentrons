@@ -44,10 +44,8 @@ beforeEach(() => {
     mix_touchTip_mmFromBottom: null,
     aspirate_delay_checkbox: false,
     aspirate_delay_seconds: null,
-    mix_aspirate_delay_mmFromBottom: null,
     dispense_delay_checkbox: false,
     dispense_delay_seconds: null,
-    mix_dispense_delay_mmFromBottom: null,
   }
 })
 
@@ -100,13 +98,12 @@ describe('mix step form -> command creator args', () => {
       checkboxField: 'aspirate_delay_checkbox',
       formFields: {
         aspirate_delay_seconds: 15,
-        mix_aspirate_delay_mmFromBottom: 11.2,
       },
       expectedArgsUnchecked: {
         aspirateDelay: null,
       },
       expectedArgsChecked: {
-        aspirateDelay: { seconds: 15, mmFromBottom: 11.2 },
+        aspirateDelay: { seconds: 15 },
       },
     },
     // Dispense delay
@@ -114,13 +111,12 @@ describe('mix step form -> command creator args', () => {
       checkboxField: 'dispense_delay_checkbox',
       formFields: {
         dispense_delay_seconds: 15,
-        mix_dispense_delay_mmFromBottom: 11.2,
       },
       expectedArgsUnchecked: {
         dispenseDelay: null,
       },
       expectedArgsChecked: {
-        dispenseDelay: { seconds: 15, mmFromBottom: 11.2 },
+        dispenseDelay: { seconds: 15 },
       },
     },
   ]
