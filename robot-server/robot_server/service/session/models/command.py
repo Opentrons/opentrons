@@ -5,24 +5,12 @@ from functools import lru_cache
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from pydantic import BaseModel, Field, validator
-from robot_server.service.json_api import ResponseModel, RequestModel
-from opentrons.util.helpers import utc_now
 
-from robot_server.service.session.models.common import EmptyModel, \
-    JogPosition
-from robot_server.robot.calibration.check import (
-    models as calibration_check_models)
-from robot_server.robot.calibration.tip_length import (
-    models as tip_length_calibration_models)
-from robot_server.robot.calibration.deck import (
-    models as deck_calibration_models)
-from robot_server.robot.calibration.pipette_offset import (
-    models as pipette_offset_calibration_models)
+from robot_server.service.session.models.common import (
+    EmptyModel, JogPosition)
 from robot_server.service.legacy.models.control import Mount
-from robot_server.service.session.session_types.protocol import \
-    models as protocol_session_models
-from robot_server.service.json_api import \
-    ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
+from robot_server.service.json_api import (
+    ResponseModel, RequestModel)
 from opentrons.util.helpers import utc_now
 
 
@@ -226,7 +214,7 @@ CommandDataType = typing.Union[
     LoadLabware,
     LoadInstrument,
     LiquidCommand,
-    PipetteCommand,
+    PipetteCommandBase,
     EmptyModel
 ]
 
