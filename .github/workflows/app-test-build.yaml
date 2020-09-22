@@ -60,7 +60,7 @@ jobs:
         uses: actions/github-script@v2
         with:
           script: |
-            const {execSync} = require('child-process')
+            const {execSync} = require('child_process')
             const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
             const tag = context.ref.startsWith('refs/tags/') ? branch : ''
             const buildNumber = context.runNumber + 10000
