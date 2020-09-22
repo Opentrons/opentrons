@@ -63,13 +63,14 @@ jobs:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - name: 'set complex environment variables'
         uses: actions/github-script@v2
-        with: |
-          const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
-          const tag = context.ref.startsWith('refs/tags/') ? branch : ''
-          const buildNumber = parseInt(context.run_number) + 10000
-          core.exportVariable('OT_BRANCH', branch)
-          core.exportVariable('OT_TAG', tag)
-          core.exportVariable('OT_BUILD', buildNumber)
+        with:
+          script: |
+            const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
+            const tag = context.ref.startsWith('refs/tags/') ? branch : ''
+            const buildNumber = parseInt(context.run_number) + 10000
+            core.exportVariable('OT_BRANCH', branch)
+            core.exportVariable('OT_TAG', tag)
+            core.exportVariable('OT_BUILD', buildNumber)
       - name: 'setup-js'
         run: 'make setup-js'
       - name: 'test relevant packages'
