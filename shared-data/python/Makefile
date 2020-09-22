@@ -56,8 +56,7 @@ clean:
 wheel: $(wheel_file)
 
 
-$(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: setup.py $(py_sources) $(json_sources)
-	$(clean)
+$(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: setup.py $(py_sources) $(json_sources) clean
 	$(SHX) mkdir -p build
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) ls $(BUILD_DIR)
