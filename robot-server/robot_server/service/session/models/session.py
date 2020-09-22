@@ -50,6 +50,7 @@ class SessionType(str, Enum):
         PipetteOffsetSessionCreateParams
     )
     protocol = ('protocol', ProtocolCreateParams)
+    live_protocol = 'liveProtocol'
 
     @property
     def model(self):

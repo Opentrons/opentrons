@@ -4,16 +4,13 @@ import pytest
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.command_execution.command import \
     CommandContent, CommandResult
-from robot_server.service.session.models import EmptyModel
+from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.live_protocol.command_executor\
     import LiveProtocolCommandExecutor
-from robot_server.service.session import models
-from robot_server.service.session.command_execution import Command, \
-    CompletedCommand
-from robot_server.service.session.session_types.live_protocol.command_interface import \
-    CommandInterface
-from robot_server.service.session.session_types.live_protocol.state_store import \
-    StateStore
+from robot_server.service.session.models import command as models
+from robot_server.service.session.command_execution import Command
+from robot_server.service.session.session_types.live_protocol.command_interface import CommandInterface  # noqa: E501
+from robot_server.service.session.session_types.live_protocol.state_store import StateStore  # noqa: E501
 
 
 @pytest.fixture
@@ -44,8 +41,9 @@ def mock_state_store() -> StateStore:
 @pytest.fixture
 def command_executor(mock_command_interface, mock_state_store)\
         -> LiveProtocolCommandExecutor:
-    return LiveProtocolCommandExecutor(command_interface=mock_command_interface,
-                                       state_store=mock_state_store)
+    return LiveProtocolCommandExecutor(
+        command_interface=mock_command_interface,
+        state_store=mock_state_store)
 
 
 async def test_load_labware(command_executor, mock_command_interface):
@@ -84,7 +82,7 @@ async def test_load_instrument(command_executor, mock_command_interface):
 
     mock_command_interface.handle_load_instrument.side_effect = handler
 
-    command = models.LoadInstrumentRequest(instrumentName="instrument name",
+    command = models.LoadInstrumentRequest(instrumentName="p1000_single",
                                            mount=Mount.left)
     result = await command_executor.execute(
         Command(content=CommandContent(
@@ -92,7 +90,8 @@ async def test_load_instrument(command_executor, mock_command_interface):
             data=command))
     )
 
-    mock_command_interface.handle_load_instrument.assert_called_once_with(command)
+    mock_command_interface.handle_load_instrument.assert_called_once_with(
+        command)
 
     assert result.result.data == expected_response
     assert result.content == CommandContent(
@@ -100,11 +99,12 @@ async def test_load_instrument(command_executor, mock_command_interface):
             data=command)
 
 
-@pytest.mark.parametrize(argnames=['handler_name', 'command_type'],
-                         argvalues=[
-                             ['handle_aspirate', models.PipetteCommand.aspirate],
-                             ['handle_dispense', models.PipetteCommand.dispense]
-                         ])
+@pytest.mark.parametrize(
+    argnames=['handler_name', 'command_type'],
+    argvalues=[
+        ['handle_aspirate', models.PipetteCommand.aspirate],
+        ['handle_dispense', models.PipetteCommand.dispense]
+    ])
 async def test_liquid_commands(command_executor, mock_command_interface,
                                handler_name, command_type):
     async def handler(command):
@@ -123,7 +123,8 @@ async def test_liquid_commands(command_executor, mock_command_interface,
             data=command_data))
     )
 
-    getattr(mock_command_interface, handler_name).assert_called_once_with(command_data)
+    getattr(mock_command_interface, handler_name).assert_called_once_with(
+        command_data)
 
     assert result.result.data is None
     assert result.content == CommandContent(
@@ -131,11 +132,12 @@ async def test_liquid_commands(command_executor, mock_command_interface,
             data=command_data)
 
 
-@pytest.mark.parametrize(argnames=['handler_name', 'command_type'],
-                         argvalues=[
-                             ['handle_pick_up_tip', models.PipetteCommand.pick_up_tip],
-                             ['handle_drop_tip', models.PipetteCommand.drop_tip]
-                         ])
+@pytest.mark.parametrize(
+    argnames=['handler_name', 'command_type'],
+    argvalues=[
+        ['handle_pick_up_tip', models.PipetteCommand.pick_up_tip],
+        ['handle_drop_tip', models.PipetteCommand.drop_tip]
+    ])
 async def test_tip_commands(command_executor, mock_command_interface,
                             handler_name, command_type):
     async def handler(command):
@@ -153,7 +155,8 @@ async def test_tip_commands(command_executor, mock_command_interface,
             data=command_data))
     )
 
-    getattr(mock_command_interface, handler_name).assert_called_once_with(command_data)
+    getattr(mock_command_interface, handler_name).assert_called_once_with(
+        command_data)
 
     assert result.result.data is None
     assert result.content == CommandContent(
@@ -162,7 +165,8 @@ async def test_tip_commands(command_executor, mock_command_interface,
 
 
 @pytest.fixture
-def state_store_command_executor(command_executor) -> LiveProtocolCommandExecutor:
+def state_store_command_executor(command_executor) \
+        -> LiveProtocolCommandExecutor:
     """A fixture for use with testing state store calls"""
     async def handle_command(c):
         return 23

@@ -1,12 +1,12 @@
 import logging
-from robot_server.service.session.command_execution import CommandExecutor, \
-    Command, CompletedCommand, CommandResult
+from typing import Dict, Any
+
+from robot_server.service.session.command_execution import (
+    CommandExecutor, Command, CompletedCommand, CommandResult)
 from robot_server.service.session.errors import UnsupportedCommandException
-from robot_server.service.session.session_types.live_protocol.command_interface import \
-    CommandInterface
-from robot_server.service.session.session_types.live_protocol.state_store import \
-    StateStore
-from robot_server.service.session import models
+from robot_server.service.session.session_types.live_protocol.command_interface import CommandInterface  # noqa: E501
+from robot_server.service.session.session_types.live_protocol.state_store import StateStore  # noqa: E501
+from robot_server.service.session.models import command as models
 from robot_server.util import duration
 
 log = logging.getLogger(__name__)
@@ -14,17 +14,29 @@ log = logging.getLogger(__name__)
 
 class LiveProtocolCommandExecutor(CommandExecutor):
 
-    def __init__(self, command_interface: CommandInterface, state_store: StateStore):
+    def __init__(
+            self,
+            command_interface: CommandInterface,
+            state_store: StateStore):
         self._store = state_store
         self._command_interface = command_interface
 
-        self._handler_map = {
-            models.EquipmentCommand.load_labware: self._command_interface.handle_load_labware,
-            models.EquipmentCommand.load_instrument: self._command_interface.handle_load_instrument,
-            models.PipetteCommand.aspirate: self._command_interface.handle_aspirate,
-            models.PipetteCommand.dispense: self._command_interface.handle_dispense,
-            models.PipetteCommand.pick_up_tip: self._command_interface.handle_pick_up_tip,
-            models.PipetteCommand.drop_tip: self._command_interface.handle_drop_tip,
+        self._handler_map: Dict[
+            models.CommandDefinition,
+            Any
+        ] = {
+            models.EquipmentCommand.load_labware:
+                self._command_interface.handle_load_labware,
+            models.EquipmentCommand.load_instrument:
+                self._command_interface.handle_load_instrument,
+            models.PipetteCommand.aspirate:
+                self._command_interface.handle_aspirate,
+            models.PipetteCommand.dispense:
+                self._command_interface.handle_dispense,
+            models.PipetteCommand.pick_up_tip:
+                self._command_interface.handle_pick_up_tip,
+            models.PipetteCommand.drop_tip:
+                self._command_interface.handle_drop_tip,
         }
 
     async def execute(self, command: Command) -> CompletedCommand:

@@ -33,7 +33,7 @@ class LoadLabwareRequest(BaseModel):
 
 
 class LoadInstrumentRequest(BaseModel):
-    instrumentName: str = Field(
+    instrumentName: PipetteName = Field(
         ...,
         description="The name of the instrument model")
     mount: Mount

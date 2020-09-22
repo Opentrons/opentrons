@@ -1,16 +1,13 @@
-from robot_server.service.session import models
+from robot_server.service.session.models import session as models
 from robot_server.service.session.command_execution import CommandQueue, \
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import EmptyModel
+from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types import BaseSession, \
     SessionMetaData
-from robot_server.service.session.session_types.live_protocol.command_executor import \
-    LiveProtocolCommandExecutor
-from robot_server.service.session.session_types.live_protocol.command_interface import \
-    CommandInterface
-from robot_server.service.session.session_types.live_protocol.state_store import \
-    StateStore
+from robot_server.service.session.session_types.live_protocol.command_executor import LiveProtocolCommandExecutor    # noqa: E501
+from robot_server.service.session.session_types.live_protocol.command_interface import CommandInterface  # noqa: E501
+from robot_server.service.session.session_types.live_protocol.state_store import StateStore  # noqa: E501
 
 
 class LiveProtocolSession(BaseSession):

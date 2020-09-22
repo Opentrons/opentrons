@@ -1,4 +1,4 @@
-from robot_server.service.session import models
+from robot_server.service.session.models import command as models
 from robot_server.service.session.command_execution \
     import create_command, CommandResult
 from robot_server.service.session.session_types.live_protocol.state_store \
