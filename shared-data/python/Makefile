@@ -36,6 +36,8 @@ json_sources = $(filter %.json,$(shell $(SHX) find ..))
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
 
+clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml '*.egg-info' ' **/__pycache__' '**/*.pyc'
+
 .PHONY: setup
 setup: setup-py
 
@@ -47,17 +49,18 @@ setup-py:
 
 .PHONY: clean
 clean:
-	shx rm -rf $(BUILD_DIR)
+	$(clean_cmd)
 
 
 .PHONY: wheel
 wheel: $(wheel_file)
 
 
-$(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: setup.py $(py_sources)
+$(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: setup.py $(py_sources) $(json_sources)
+	$(clean_cmd)
 	$(SHX) mkdir -p build
 	$(python) setup.py $(wheel_opts) bdist_wheel
-	$(SHX) rm -rf build *.egg_info
+	$(SHX) rm -rf build
 	$(SHX) ls $(BUILD_DIR)
 
 
