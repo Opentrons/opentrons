@@ -41,8 +41,8 @@ beforeEach(() => {
     blowoutLocation: null,
     touchTip: false,
 
-    aspirateDelay: null,
-    dispenseDelay: null,
+    aspirateDelaySeconds: null,
+    dispenseDelaySeconds: null,
   }
 
   invariantContext = makeContext()

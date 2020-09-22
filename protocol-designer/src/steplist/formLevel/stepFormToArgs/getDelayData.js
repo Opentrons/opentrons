@@ -12,8 +12,6 @@ export function getMoveLiquidDelayData<F: any>(
   mmFromBottomField:
     | 'aspirate_delay_mmFromBottom'
     | 'dispense_delay_mmFromBottom'
-    | 'mix_aspirate_delay_mmFromBottom'
-    | 'mix_dispense_delay_mmFromBottom'
 ): InnerDelayArgs | null {
   const checkbox = hydratedFormData[checkboxField]
   const seconds = hydratedFormData[secondsField]
@@ -33,12 +31,12 @@ export function getMixDelayData<F: any>(
   hydratedFormData: F,
   checkboxField: DelayCheckboxFields,
   secondsField: DelaySecondFields
-): {| seconds: number |} | null {
+): number | null {
   const checkbox = hydratedFormData[checkboxField]
   const seconds = hydratedFormData[secondsField]
 
   if (checkbox && (typeof seconds === 'number' && seconds > 0)) {
-    return { seconds }
+    return seconds
   }
   return null
 }

@@ -100,10 +100,10 @@ describe('mix step form -> command creator args', () => {
         aspirate_delay_seconds: 15,
       },
       expectedArgsUnchecked: {
-        aspirateDelay: null,
+        aspirateDelaySeconds: null,
       },
       expectedArgsChecked: {
-        aspirateDelay: { seconds: 15 },
+        aspirateDelaySeconds: 15,
       },
     },
     // Dispense delay
@@ -113,10 +113,10 @@ describe('mix step form -> command creator args', () => {
         dispense_delay_seconds: 15,
       },
       expectedArgsUnchecked: {
-        dispenseDelay: null,
+        dispenseDelaySeconds: null,
       },
       expectedArgsChecked: {
-        dispenseDelay: { seconds: 15 },
+        dispenseDelaySeconds: 15,
       },
     },
   ]

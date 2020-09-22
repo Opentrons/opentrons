@@ -167,8 +167,8 @@ export type MixArgs = {|
   aspirateFlowRateUlSec: number,
   dispenseFlowRateUlSec: number,
   /** delays */
-  aspirateDelay: ?{ seconds: number },
-  dispenseDelay: ?{ seconds: number },
+  aspirateDelaySeconds: ?number,
+  dispenseDelaySeconds: ?number,
 |}
 
 export type PauseArgs = {|

@@ -80,6 +80,6 @@ describe('getMixDelayData', () => {
         'checkboxField',
         'secondsField'
       )
-    ).toEqual({ seconds: 10 })
+    ).toEqual(10)
   })
 })
