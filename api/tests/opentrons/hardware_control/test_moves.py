@@ -153,8 +153,7 @@ async def test_mount_offset_applied(
     assert hardware_api._current_position == target_position
 
 
-async def test_critical_point_applied(
-        hardware_api, monkeypatch, is_robot, toggle_new_calibration):
+async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -214,6 +213,72 @@ async def test_critical_point_applied(
     target[Axis.X] = 0
     target_no_offset[Axis.X] = 0
     target_no_offset[Axis.A] = 13
+    target[Axis.A] = 0
+    assert hardware_api._current_position == target_no_offset
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+
+
+async def test_new_critical_point_applied(
+        hardware_api, monkeypatch, is_robot, use_new_calibration):
+    await hardware_api.home()
+    hardware_api._backend._attached_instruments\
+        = {types.Mount.LEFT: {'model': None, 'id': None},
+           types.Mount.RIGHT: {'model': 'p10_single_v1', 'id': 'testyness'}}
+    await hardware_api.cache_instruments()
+    # Our critical point is now the tip of the nozzle
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    target_no_offset = {Axis.X: 0,
+                        Axis.Y: 0,
+                        Axis.Z: 218,
+                        Axis.A: -12,  # from pipette-config.json model offset
+                        Axis.B: 19,
+                        Axis.C: 19}
+    assert hardware_api._current_position == target_no_offset
+    target = {Axis.X: 0,
+              Axis.Y: 0,
+              Axis.A: 0,
+              Axis.C: 19}
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+    p10_tip_length = 33
+    # Specifiying critical point overrides as mount should not use model offset
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
+                               critical_point=CriticalPoint.MOUNT)
+    assert hardware_api._current_position == {Axis.X: 0.0, Axis.Y: 0.0,
+                                              Axis.Z: 218,
+                                              Axis.A: 0,
+                                              Axis.B: 19, Axis.C: 19}
+    assert await hardware_api.current_position(
+        types.Mount.RIGHT, critical_point=CriticalPoint.MOUNT)\
+        == {Axis.X: 0.0, Axis.Y: 0.0, Axis.A: 0, Axis.C: 19}
+    # Specifying the critical point as nozzle should have the same behavior
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
+                               critical_point=CriticalPoint.NOZZLE)
+    assert hardware_api._current_position == target_no_offset
+    await hardware_api.pick_up_tip(types.Mount.RIGHT, p10_tip_length)
+    # Now the current position (with offset applied) should change
+    # pos_after_pickup + model_offset + critical point
+    target[Axis.A] = 218 + (12) + (-1 * p10_tip_length)
+    target_no_offset[Axis.C] = target[Axis.C] = 2
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+    # This move should take the new critical point into account
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    target_no_offset[Axis.A] = 21
+    assert hardware_api._current_position == target_no_offset
+    # But the position with offset should be back to the original
+    target[Axis.A] = 0
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+    # And removing the tip should move us back to the original
+    await hardware_api.move_rel(types.Mount.RIGHT, types.Point(2.5, 0, 0))
+    await hardware_api.drop_tip(types.Mount.RIGHT)
+    await hardware_api.home_plunger(types.Mount.RIGHT)
+    target[Axis.A] = 33 + hc.DROP_TIP_RELEASE_DISTANCE
+    target_no_offset[Axis.X] = 2.5
+    target[Axis.X] = 2.5
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    target[Axis.X] = 0
+    target_no_offset[Axis.X] = 0
+    target_no_offset[Axis.A] = -12
     target[Axis.A] = 0
     assert hardware_api._current_position == target_no_offset
     assert await hardware_api.current_position(types.Mount.RIGHT) == target

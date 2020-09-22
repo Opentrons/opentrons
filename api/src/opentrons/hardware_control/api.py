@@ -910,10 +910,7 @@ class API(HardwareAPILike):
                  (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
                  (primary_z, abs_position.z - primary_offset.z - primary_cp.z)
                  ))
-        mod_log.info(f"********** => target position: {target_position}")
-        mod_log.info(f"********** => absolute position: {abs_position}")
-        mod_log.info(f"********** => primary offset: {primary_offset}")
-        mod_log.info(f"********** => primary cp: {primary_cp}")
+
         await self._cache_and_maybe_retract_mount(primary_mount)
         await self._move(
             target_position, speed=speed,

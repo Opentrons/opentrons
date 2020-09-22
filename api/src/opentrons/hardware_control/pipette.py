@@ -3,7 +3,6 @@ from __future__ import annotations
 """
 from dataclasses import asdict, replace
 import logging
-import operator
 from typing import Any, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING
 
 from opentrons.types import Point
@@ -144,16 +143,11 @@ class Pipette:
         critical point will be used.
         """
         if enable_calibration_overhaul():
-            instr = self._instrument_offset
-            offsets = list(map(
-                operator.add,
-                self.nozzle_offset, self._pipette_offset.offset))
-            mod_log.info(f'#####========> Nozzle offset: {self.nozzle_offset}')
-            mod_log.info(f'#####========> Pipette offset: {self._pipette_offset.offset}')
+            instr = Point(*self._pipette_offset.offset)
+            offsets = self.nozzle_offset
         else:
             instr = self._instrument_offset._replace(z=0)
             offsets = self.model_offset
-            mod_log.info(f'#####========> Model offset: {self.model_offset}')
 
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
