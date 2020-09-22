@@ -67,9 +67,7 @@ jobs:
           script: |
             const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
             const tag = context.ref.startsWith('refs/tags/') ? branch : ''
-            console.log('build num: ', context.run_number)
-            const buildNumber = parseInt(context.run_number) + 10000
-            console.log('buildNumber', buildNumber)
+            const buildNumber = context.runNumber + 10000
             core.exportVariable('OT_BRANCH', branch)
             core.exportVariable('OT_TAG', tag)
             core.exportVariable('OT_BUILD', buildNumber)
