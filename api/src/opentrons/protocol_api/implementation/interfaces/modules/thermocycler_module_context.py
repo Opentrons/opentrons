@@ -1,10 +1,14 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import List
 
 from opentrons.hardware_control.modules import ThermocyclerStep
+from opentrons.protocol_api.implementation.interfaces.modules.module_context \
+    import AbstractModuleContextImplementation
 
 
-class AbstractThermocyclerContextImplementation(ABC):
+class AbstractThermocyclerContextImplementation(
+    AbstractModuleContextImplementation
+):
 
     @abstractmethod
     def open_lid(self) -> None:

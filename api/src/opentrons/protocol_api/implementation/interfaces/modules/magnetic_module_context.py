@@ -1,7 +1,12 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+
+from opentrons.protocol_api.implementation.interfaces.modules.module_context \
+    import AbstractModuleContextImplementation
 
 
-class AbstractMagneticModuleContextImplementation(ABC):
+class AbstractMagneticModuleContextImplementation(
+    AbstractModuleContextImplementation
+):
 
     @abstractmethod
     def calibrate(self) -> None:

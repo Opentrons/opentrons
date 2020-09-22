@@ -1,7 +1,12 @@
-from abc import abstractmethod, ABC
+from abc import abstractmethod
+
+from opentrons.protocol_api.implementation.interfaces.modules.module_context \
+    import AbstractModuleContextImplementation
 
 
-class AbstractTemperatureModuleContextImplementation(ABC):
+class AbstractTemperatureModuleContextImplementation(
+    AbstractModuleContextImplementation
+):
 
     @abstractmethod
     def set_temperature(self, celsius: float) -> None:
