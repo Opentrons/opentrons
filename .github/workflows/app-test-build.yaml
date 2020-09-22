@@ -63,9 +63,12 @@ jobs:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - name: 'set complex environment variables'
         run: |
-          echo ::set-env name=OT_BRANCH::$(echo ${{ github.ref }} | sed -E -e "s/^\/?refs\/(heads|pull)\///")
-          echo ::set-env name=OT_TAG::$(echo ${{ github.ref }} | sed -E -e "s/^\/?refs\/:tags\///" | grep ^v)
-          echo ::set-env name=OT_BUILD::$(expr 10000 + ${{ github.run_number }})
+          const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
+          const tag = context.ref.startsWith('refs/tags/') ? branch : ''
+          const buildNumber = parseInt(context.run_number) + 10000
+          core.exportVariable('OT_BRANCH', branch)
+          core.exportVariable('OT_TAG', tag)
+          core.exportVariable('OT_BUILD', buildNumber)
       - name: 'setup-js'
         run: 'make setup-js'
       - name: 'test relevant packages'
