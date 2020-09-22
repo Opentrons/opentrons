@@ -128,3 +128,9 @@ jobs:
           AWS_DEFAULT_REGION: us-east-2
         name: 'deploy'
         run: aws s3 sync --acl=public-read app-shell/dist/publish s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}
+      - if: github.event_name != 'pull_request'
+        name: 'upload github artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'opentrons app for ${{ matrix.os }}'
+          path: app-shell/dist/publish
