@@ -108,6 +108,7 @@ async def test_save_default_pick_up_current(mock_hw):
     # modified during tip pick up
     pip = pipette.Pipette(load("p20_multi_v2.1", 'testId'),
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          PIP_OFFSET,
                           'testid')
     mock_hw._attached_instruments[Mount.LEFT] = pip
     uf = DeckCalibrationUserFlow(hardware=mock_hw)
