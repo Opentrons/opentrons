@@ -9,16 +9,16 @@ from opentrons.hardware_control import API
 from opentrons.protocol_api.implementation.interfaces.versioned import \
     ApiVersioned
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.module_geometry import ModuleGeometry
-from opentrons.protocol_api.geometry import Deck
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api.instrument_context import InstrumentContext
 from opentrons.protocol_api.protocol_context import ModuleTypes
 from opentrons.protocol_api.module_contexts import ModuleContext
-from opentrons.protocol_api.util import AxisMaxSpeeds
+from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-class AbstractProtocolContext(ApiVersioned):
+class AbstractProtocolContextImplementation(ApiVersioned):
 
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:

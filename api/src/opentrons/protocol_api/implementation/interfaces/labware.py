@@ -6,16 +6,16 @@ from typing import (List, Dict, Optional, Union, TYPE_CHECKING)
 
 from opentrons.protocol_api.implementation.interfaces.versioned import \
     ApiVersioned
-from opentrons.protocol_api.definitions import DeckItem
+from opentrons.protocols.geometry.deck import DeckItem
 from opentrons.protocol_api.labware import Labware, Well
-from opentrons.protocol_api.module_geometry import ModuleGeometry
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
 from opentrons.types import Location, Point
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareParameters
 
 
-class AbstractWell(ApiVersioned):
+class AbstractWellImplementation(ApiVersioned):
 
     @abstractmethod
     def get_parent(self) -> Labware:
@@ -50,7 +50,7 @@ class AbstractWell(ApiVersioned):
         ...
 
 
-class AbstractLabware(ApiVersioned, DeckItem):
+class AbstractLabwareImplementation(ApiVersioned, DeckItem):
 
     @abstractmethod
     def __getitem__(self, key: str) -> Well:
