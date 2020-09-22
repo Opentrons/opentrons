@@ -143,10 +143,8 @@
           "mix_touchTip_mmFromBottom": 30.5,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         },
         "2e622080-92a6-11e9-ac62-1b173f839d9e": {
           "pauseAction": "untilTime",

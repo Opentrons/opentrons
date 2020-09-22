@@ -1227,10 +1227,8 @@
           "times": 4,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         },
         "984e26c0-1811-11e9-9608-8bed9be8868f": {
           "pipette": "01217421-180a-11e9-9608-8bed9be8868f",
@@ -1482,10 +1480,8 @@
           "times": 4,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         },
         "07c41640-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "never",
@@ -1509,10 +1505,8 @@
           "dispense_flowRate": 5,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         },
         "63a2ea90-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "always",
@@ -1533,10 +1527,8 @@
           "times": 2,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         },
         "7cd40b20-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "once",
@@ -1557,10 +1549,8 @@
           "times": 2,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         },
         "9cafddc0-1812-11e9-9608-8bed9be8868f": {
           "pauseAction": "untilTime",
@@ -1608,10 +1598,8 @@
           "times": 4,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         },
         "b9afe0a0-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "never",
@@ -1635,10 +1623,8 @@
           "dispense_flowRate": null,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         },
         "c495a450-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "always",
@@ -1659,10 +1645,8 @@
           "times": 2,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         },
         "d7451ea0-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "once",
@@ -1683,10 +1667,8 @@
           "times": 2,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": null,
-          "mix_aspirate_delay_mmFromBottom": null,
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null,
-          "mix_dispense_delay_mmFromBottom": null
+          "dispense_delay_seconds": null
         }
       },
       "orderedStepIds": [
