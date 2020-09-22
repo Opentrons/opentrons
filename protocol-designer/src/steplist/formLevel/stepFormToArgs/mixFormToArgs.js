@@ -76,13 +76,13 @@ export const mixFormToArgs = (
   const aspirateDelay = getMixDelayData<HydratedMixFormDataLegacy>(
     hydratedFormData,
     'aspirate_delay_checkbox',
-    'aspirate_delay_seconds',
+    'aspirate_delay_seconds'
   )
 
   const dispenseDelay = getMixDelayData<HydratedMixFormDataLegacy>(
     hydratedFormData,
     'dispense_delay_checkbox',
-    'dispense_delay_seconds',
+    'dispense_delay_seconds'
   )
 
   return {
