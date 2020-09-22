@@ -57,10 +57,9 @@ wheel: $(wheel_file)
 
 
 $(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: setup.py $(py_sources) $(json_sources)
-	$(clean_cmd)
+	$(clean)
 	$(SHX) mkdir -p build
 	$(python) setup.py $(wheel_opts) bdist_wheel
-	$(SHX) rm -rf build
 	$(SHX) ls $(BUILD_DIR)
 
 
