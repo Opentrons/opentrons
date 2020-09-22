@@ -101,7 +101,7 @@ jobs:
             core.exportVariable('OT_BRANCH', branch)
             core.exportVariable('OT_TAG', tag)
             core.exportVariable('OT_BUILD', buildNumber)
-            core.setOutput('yarnCacheDir', execSync('yarn cache dir'))
+            core.setOutput('yarnCacheDir', execSync('yarn cache dir').toString())
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
