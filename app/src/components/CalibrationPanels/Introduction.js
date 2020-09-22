@@ -8,13 +8,14 @@ import {
   SPACING_3,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
+  ALIGN_CENTER,
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   POSITION_RELATIVE,
   FONT_HEADER_DARK,
   FONT_BODY_2_DARK,
   TEXT_TRANSFORM_UPPERCASE,
-  TEXT_ALIGN_LEFT,
+  TEXT_ALIGN_CENTER,
   Link,
   PrimaryBtn,
   Text,
@@ -197,7 +198,7 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
       border={BORDER_SOLID_MEDIUM}
       paddingX={SPACING_3}
       flexDirection={DIRECTION_COLUMN}
-      alignItems={ALIGN_FLEX_START}
+      alignItems={ALIGN_CENTER}
     >
       <Flex
         paddingY={SPACING_3}
@@ -219,10 +220,10 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
       {linkToMeasurements && (
         <Link
           external
-          padding={`${SPACING_3} 0`}
+          padding={`${SPACING_3} ${SPACING_2}`}
           flex="0.6"
           textTransform={TEXT_TRANSFORM_UPPERCASE}
-          textAlign={TEXT_ALIGN_LEFT}
+          textAlign={TEXT_ALIGN_CENTER}
           fontSize={FONT_SIZE_BODY_1}
           color="inherit"
           css={linkStyles}
