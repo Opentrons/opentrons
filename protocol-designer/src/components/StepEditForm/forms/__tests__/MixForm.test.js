@@ -44,9 +44,8 @@ describe('MixForm', () => {
       expect(aspirateDelayFields.prop('secondsFieldName')).toBe(
         'aspirate_delay_seconds'
       )
-      expect(aspirateDelayFields.prop('tipPositionFieldName')).toBe(
-        'mix_aspirate_delay_mmFromBottom'
-      )
+      // no tip position field
+      expect(aspirateDelayFields.prop('tipPositionFieldName')).toBe(undefined)
     })
     it('should render the dispense delay fields', () => {
       const wrapper = render(props)
@@ -59,9 +58,8 @@ describe('MixForm', () => {
       expect(aspirateDelayFields.prop('secondsFieldName')).toBe(
         'dispense_delay_seconds'
       )
-      expect(aspirateDelayFields.prop('tipPositionFieldName')).toBe(
-        'mix_dispense_delay_mmFromBottom'
-      )
+      // no tip position field
+      expect(aspirateDelayFields.prop('tipPositionFieldName')).toBe(undefined)
     })
   })
 })

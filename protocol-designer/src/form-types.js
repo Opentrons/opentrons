@@ -46,8 +46,6 @@ export type StepFieldName = any
 // | 'labwareLocationUpdate'
 // | 'mix_mmFromBottom'
 // | 'mix_touchTip_mmFromBottom'
-// | 'mix_aspirate_delay_mmFromBottom
-// | 'mix_dispense_delay_mmFromBottom
 // | 'path'
 // | 'pauseAction'
 // | 'pauseHour'
@@ -298,8 +296,6 @@ export type TipOffsetFields =
   | 'aspirate_delay_mmFromBottom'
   | 'dispense_delay_mmFromBottom'
   | 'mix_touchTip_mmFromBottom'
-  | 'mix_aspirate_delay_mmFromBottom'
-  | 'mix_dispense_delay_mmFromBottom'
 
 export type DelayCheckboxFields =
   | 'aspirate_delay_checkbox'
@@ -314,8 +310,6 @@ export function getIsTouchTipField(fieldName: string): boolean {
     'aspirate_touchTip_mmFromBottom',
     'dispense_touchTip_mmFromBottom',
     'mix_touchTip_mmFromBottom',
-    'mix_aspirate_delay_mmFromBottom',
-    'mix_dispense_delay_mmFromBottom',
   ]
   return touchTipFields.includes(fieldName)
 }

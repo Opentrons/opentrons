@@ -16,7 +16,7 @@ import type {
 type DelayFieldProps = {
   checkboxFieldName: DelayCheckboxFields,
   secondsFieldName: DelaySecondFields,
-  tipPositionFieldName: TipOffsetFields,
+  tipPositionFieldName?: TipOffsetFields,
   focusHandlers: FocusHandlers,
 }
 
@@ -42,7 +42,9 @@ export const DelayFields = (props: DelayFieldProps): React.Node => {
         className={styles.small_field}
         {...focusHandlers}
       />
-      <TipPositionField fieldName={tipPositionFieldName} />
+      {tipPositionFieldName && (
+        <TipPositionField fieldName={tipPositionFieldName} />
+      )}
     </CheckboxRowField>
   )
 }

@@ -9,7 +9,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
-import { getDelayData } from './getDelayData'
+import { getMixDelayData } from './getDelayData'
 import type { HydratedMixFormDataLegacy } from '../../../form-types'
 import type { MixArgs } from '../../../step-generation'
 
@@ -73,18 +73,16 @@ export const mixFormToArgs = (
     : 0
 
   // Delay settings
-  const aspirateDelay = getDelayData<HydratedMixFormDataLegacy>(
+  const aspirateDelaySeconds = getMixDelayData<HydratedMixFormDataLegacy>(
     hydratedFormData,
     'aspirate_delay_checkbox',
-    'aspirate_delay_seconds',
-    'mix_aspirate_delay_mmFromBottom'
+    'aspirate_delay_seconds'
   )
 
-  const dispenseDelay = getDelayData<HydratedMixFormDataLegacy>(
+  const dispenseDelaySeconds = getMixDelayData<HydratedMixFormDataLegacy>(
     hydratedFormData,
     'dispense_delay_checkbox',
-    'dispense_delay_seconds',
-    'mix_dispense_delay_mmFromBottom'
+    'dispense_delay_seconds'
   )
 
   return {
@@ -106,7 +104,7 @@ export const mixFormToArgs = (
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
     blowoutOffsetFromTopMm,
-    aspirateDelay,
-    dispenseDelay,
+    aspirateDelaySeconds,
+    dispenseDelaySeconds,
   }
 }

@@ -12,7 +12,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
-import { getDelayData } from './getDelayData'
+import { getMoveLiquidDelayData } from './getDelayData'
 
 import type { HydratedMoveLiquidFormData } from '../../../form-types'
 import type {
@@ -157,14 +157,14 @@ export const moveLiquidFormToArgs = (
     'dispense_mix_volume',
     'dispense_mix_times'
   )
-  const aspirateDelay = getDelayData<MoveLiquidFields>(
+  const aspirateDelay = getMoveLiquidDelayData<MoveLiquidFields>(
     fields,
     'aspirate_delay_checkbox',
     'aspirate_delay_seconds',
     'aspirate_delay_mmFromBottom'
   )
 
-  const dispenseDelay = getDelayData<MoveLiquidFields>(
+  const dispenseDelay = getMoveLiquidDelayData<MoveLiquidFields>(
     fields,
     'dispense_delay_checkbox',
     'dispense_delay_seconds',
