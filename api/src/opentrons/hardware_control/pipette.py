@@ -107,11 +107,11 @@ class Pipette:
         return self._config
 
     @property
-    def model_offset(self):
+    def model_offset(self) -> Tuple[float, float, float]:
         return self._model_offset
 
     @property
-    def nozzle_offset(self):
+    def nozzle_offset(self) -> Tuple[float, float, float]:
         return self._nozzle_offset
 
     def update_config_item(self, elem_name: str, elem_val: Any):
@@ -163,7 +163,7 @@ class Pipette:
                 0, -offsets[1], offsets[2]]
             cp_type = CriticalPoint.FRONT_NOZZLE
         else:
-            mod_offset_xy = offsets
+            mod_offset_xy = list(offsets)
         mod_and_tip = Point(mod_offset_xy[0],
                             mod_offset_xy[1],
                             mod_offset_xy[2] - tip_length)
