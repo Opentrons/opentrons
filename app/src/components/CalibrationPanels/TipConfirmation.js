@@ -60,10 +60,20 @@ export function TipConfirmation(props: CalibrationPanelProps): React.Node {
       justifyContent={JUSTIFY_CENTER}
     >
       <Text marginBottom={SPACING_3}>{CONFIRM_TIP_BODY}</Text>
-      <PrimaryBtn marginTop={SPACING_3} width="80%" onClick={invalidateTip}>
+      <PrimaryBtn
+        title="invalidateTipButton"
+        marginTop={SPACING_3}
+        width="80%"
+        onClick={invalidateTip}
+      >
         {NO_TRY_AGAIN}
       </PrimaryBtn>
-      <PrimaryBtn marginTop={SPACING_3} width="80%" onClick={confirmTip}>
+      <PrimaryBtn
+        title="confirmTipAttachedButton"
+        marginTop={SPACING_3}
+        width="80%"
+        onClick={confirmTip}
+      >
         {yesButtonText}
       </PrimaryBtn>
     </Flex>
