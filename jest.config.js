@@ -1,7 +1,5 @@
 'use strict'
 
-console.log("what in the world")
-
 module.exports = {
   setupFilesAfterEnv: [
     '<rootDir>/scripts/setup-enzyme.js',
