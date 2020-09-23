@@ -65,7 +65,7 @@ jobs:
           python-version: '3.7'
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         with:
           script: |
             const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
