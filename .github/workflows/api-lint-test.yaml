@@ -81,7 +81,7 @@ jobs:
         run: make -C api test
 
       # creds and repository configuration for deploying python wheels
-      - if: contains(runner.os, 'ubuntu') && (github.event_name == 'push') && (! startsWith(env.OT_TAG, 'v'))
+      - if: contains(runner.os, 'ubuntu') && (github.event_name == 'push') && (!startsWith(env.OT_TAG, 'v'))
         name: 'set test pypi creds'
         run: |
           echo "::set-env pypi_username:secrets.OT_TEST_PYPI_USERNAME"
