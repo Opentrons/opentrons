@@ -19,9 +19,9 @@ import {
 import * as Sessions from '../../sessions'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import styles from './styles.css'
-import type { CalibrateTipLengthChildProps } from './types'
-import { formatJogVector } from './utils'
+import { formatJogVector } from '../CalibrationPanels/utils'
 import leftMultiBlockAsset from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
 import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
 import leftSingleBlockAsset from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
@@ -64,8 +64,8 @@ const OF_THE_TRASH_BIN = 'of the trash bin'
 const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
 const SLOT = 'slot'
 
-export function MeasureTip(props: CalibrateTipLengthChildProps): React.Node {
-  const { sendSessionCommand, calBlock, isMulti, mount } = props
+export function MeasureTip(props: CalibrationPanelProps): React.Node {
+  const { sendCommands, calBlock, isMulti, mount } = props
 
   const referencePointStr = calBlock ? (
     BLOCK
@@ -88,18 +88,19 @@ export function MeasureTip(props: CalibrateTipLengthChildProps): React.Node {
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(
-      Sessions.tipCalCommands.JOG,
-      {
+    sendCommands({
+      command: Sessions.tipCalCommands.JOG,
+      data: {
         vector: formatJogVector(axis, dir, step),
       },
-      false
-    )
+    })
   }
 
   const proceed = () => {
-    sendSessionCommand(Sessions.tipCalCommands.SAVE_OFFSET)
-    sendSessionCommand(Sessions.tipCalCommands.MOVE_TO_TIP_RACK)
+    sendCommands(
+      { command: Sessions.tipCalCommands.SAVE_OFFSET },
+      { command: Sessions.tipCalCommands.MOVE_TO_TIP_RACK }
+    )
   }
 
   return (

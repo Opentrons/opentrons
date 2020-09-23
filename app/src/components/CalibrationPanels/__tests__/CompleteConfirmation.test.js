@@ -60,13 +60,20 @@ describe('CompleteConfirmation', () => {
     const wrapper = render({
       sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
     })
-    expect(wrapper.text()).toContain('Pipette offset calibration complete')
+    expect(wrapper.text()).toContain('Pipette Offset Calibration complete')
   })
 
   it('deck cal session type shows correct text', () => {
     const wrapper = render({
       sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
     })
-    expect(wrapper.text()).toContain('Deck calibration complete')
+    expect(wrapper.text()).toContain('Deck Calibration complete')
+  })
+
+  it('tip length cal session type shows correct text', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+    })
+    expect(wrapper.text()).toContain('Tip Length Calibration complete')
   })
 })

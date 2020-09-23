@@ -61,7 +61,7 @@ describe('Introduction', () => {
     getConfirmDeckClearButton(wrapper).invoke('onClick')()
 
     expect(mockSendCommands).toHaveBeenCalledWith({
-      command: Sessions.deckCalCommands.LOAD_LABWARE,
+      command: Sessions.sharedCalCommands.LOAD_LABWARE,
     })
   })
 
@@ -77,7 +77,7 @@ describe('Introduction', () => {
 
     expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(false)
     expect(mockSendCommands).not.toHaveBeenCalledWith({
-      command: Sessions.deckCalCommands.LOAD_LABWARE,
+      command: Sessions.sharedCalCommands.LOAD_LABWARE,
     })
   })
 
@@ -109,5 +109,23 @@ describe('Introduction', () => {
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
     expect(wrapper.text()).toContain('Before continuing to calibrate deck')
+  })
+
+  it('tip length cal session type shows correct text', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+    })
+    const allText = wrapper.text()
+    expect(allText).toContain('tip length calibration')
+    expect(allText).toContain(
+      'Tip length calibration measures the length of the pipette'
+    )
+    expect(allText).toContain('continue to tip length calibration')
+
+    getContinueButton(wrapper).invoke('onClick')()
+    wrapper.update()
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.LOAD_LABWARE,
+    })
   })
 })
