@@ -17,11 +17,8 @@ on:
       - 'Makefile'
       - 'shared-data/*/**'
       - '!shared-data/js/**'
-      - '.github/workflows/api-push.yaml'
+      - '.github/workflows/api-lint-test.yaml'
       - '.github/actions/python/**'
-    branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'master'
-      - 'chore_release-*'
     tags:
       - 'v*'
   workflow_dispatch:
