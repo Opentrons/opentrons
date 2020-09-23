@@ -8,10 +8,20 @@ import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_DELAY_SECONDS,
 } from '../../../constants'
-
+import { getPrereleaseFeatureFlag } from '../../../persist'
 import { getDefaultsForStepType } from '..'
 
+jest.mock('../../../persist')
+
+const getPrereleaseFeatureFlagMock: JestMockFn<
+  any,
+  any
+> = getPrereleaseFeatureFlag
+
 describe('getDefaultsForStepType', () => {
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   describe('moveLiquid step', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('moveLiquid')).toEqual({
@@ -62,20 +72,48 @@ describe('getDefaultsForStepType', () => {
     })
   })
   describe('mix step', () => {
-    it('should get the correct defaults', () => {
-      expect(getDefaultsForStepType('mix')).toEqual({
-        changeTip: DEFAULT_CHANGE_TIP_OPTION,
-        labware: null,
-        aspirate_delay_checkbox: false,
-        aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-        mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-        blowout_checkbox: false,
-        blowout_location: FIXED_TRASH_ID,
-        mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`, // NOTE: mix uses dispense for both asp + disp, for now
-        pipette: null,
-        volume: undefined,
-        wells: [],
+    describe('when mix delay FF is enabled', () => {
+      it('should get the correct defaults', () => {
+        getPrereleaseFeatureFlagMock.mockImplementation(FF => {
+          expect(FF).toBe('OT_PD_ENABLE_MIX_DELAY')
+          return true
+        })
+
+        expect(getDefaultsForStepType('mix')).toEqual({
+          changeTip: DEFAULT_CHANGE_TIP_OPTION,
+          labware: null,
+          aspirate_delay_checkbox: false,
+          aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+          mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+          mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+          blowout_checkbox: false,
+          blowout_location: FIXED_TRASH_ID,
+          mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`, // NOTE: mix uses dispense for both asp + disp, for now
+          pipette: null,
+          volume: undefined,
+          wells: [],
+        })
+      })
+    })
+    describe('when mix delay FF is disabled', () => {
+      it('should get the correct defaults', () => {
+        getPrereleaseFeatureFlagMock.mockImplementation(FF => {
+          expect(FF).toBe('OT_PD_ENABLE_MIX_DELAY')
+          return false
+        })
+
+        expect(getDefaultsForStepType('mix')).toEqual({
+          changeTip: DEFAULT_CHANGE_TIP_OPTION,
+          labware: null,
+          mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+          mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+          blowout_checkbox: false,
+          blowout_location: FIXED_TRASH_ID,
+          mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`, // NOTE: mix uses dispense for both asp + disp, for now
+          pipette: null,
+          volume: undefined,
+          wells: [],
+        })
       })
     })
   })

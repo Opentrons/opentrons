@@ -9,11 +9,19 @@ import {
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
+import { getPrereleaseFeatureFlag } from '../../persist'
 import { getStateAndContextTempTCModules } from '../../step-generation/__fixtures__'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
 } from '../utils/createPresavedStepForm'
+
+jest.mock('../../persist')
+
+const getPrereleaseFeatureFlagMock: JestMockFn<
+  any,
+  any
+> = getPrereleaseFeatureFlag
 
 const stepId = 'stepId123'
 const EXAMPLE_ENGAGE_HEIGHT = '18'
@@ -174,30 +182,70 @@ describe('createPresavedStepForm', () => {
     })
   })
 
-  it('should call handleFormChange with a default pipette for mix step', () => {
-    const args = {
-      ...defaultArgs,
-      stepType: 'mix',
-    }
+  describe('mix step', () => {
+    describe('when mix delay FF is enabled', () => {
+      it('should call handleFormChange with a default pipette for mix step', () => {
+        getPrereleaseFeatureFlagMock.mockImplementation(FF => {
+          expect(FF).toBe('OT_PD_ENABLE_MIX_DELAY')
+          return true
+        })
 
-    expect(createPresavedStepForm(args)).toEqual({
-      id: stepId,
-      pipette: 'leftPipetteId',
-      stepType: 'mix',
-      // default fields
-      labware: null,
-      wells: [],
-      aspirate_delay_checkbox: false,
-      aspirate_delay_seconds: '1',
-      mix_mmFromBottom: '0.5',
-      mix_wellOrder_first: 't2b',
-      mix_wellOrder_second: 'l2r',
-      blowout_checkbox: false,
-      blowout_location: 'trashId',
-      changeTip: 'always',
-      stepDetails: '',
-      stepName: 'mix',
-      // TODO(IL, 2020-04-27): mix defaults are missing volume, etc!!! Investigate in #3161
+        const args = {
+          ...defaultArgs,
+          stepType: 'mix',
+        }
+
+        expect(createPresavedStepForm(args)).toEqual({
+          id: stepId,
+          pipette: 'leftPipetteId',
+          stepType: 'mix',
+          // default fields
+          labware: null,
+          wells: [],
+          aspirate_delay_checkbox: false,
+          aspirate_delay_seconds: '1',
+          mix_mmFromBottom: '0.5',
+          mix_wellOrder_first: 't2b',
+          mix_wellOrder_second: 'l2r',
+          blowout_checkbox: false,
+          blowout_location: 'trashId',
+          changeTip: 'always',
+          stepDetails: '',
+          stepName: 'mix',
+          // TODO(IL, 2020-04-27): mix defaults are missing volume, etc!!! Investigate in #3161
+        })
+      })
+    })
+    describe('when mix delay FF is disabled', () => {
+      it('should call handleFormChange with a default pipette for mix step', () => {
+        getPrereleaseFeatureFlagMock.mockImplementation(FF => {
+          expect(FF).toBe('OT_PD_ENABLE_MIX_DELAY')
+          return false
+        })
+
+        const args = {
+          ...defaultArgs,
+          stepType: 'mix',
+        }
+
+        expect(createPresavedStepForm(args)).toEqual({
+          id: stepId,
+          pipette: 'leftPipetteId',
+          stepType: 'mix',
+          // default fields
+          labware: null,
+          wells: [],
+          mix_mmFromBottom: '0.5',
+          mix_wellOrder_first: 't2b',
+          mix_wellOrder_second: 'l2r',
+          blowout_checkbox: false,
+          blowout_location: 'trashId',
+          changeTip: 'always',
+          stepDetails: '',
+          stepName: 'mix',
+          // TODO(IL, 2020-04-27): mix defaults are missing volume, etc!!! Investigate in #3161
+        })
+      })
     })
   })
 
