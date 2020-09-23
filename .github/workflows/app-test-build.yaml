@@ -119,26 +119,18 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true --testPathPattern '(app-shell|discovery-client)'
 
-      # signing keys are dependent on OS
-      - if: github.event_name != 'pull_request' && contains(runner.os, 'windows')
-        name: 'set windows signing keys'
-        run: |
-          echo "::set-env CSC_LINK='${{ secrets.OT_APP_CSC_WINDOWS }}'"
-          echo "::set-env CSC_KEY_PASSWORD=${{ secrets.OT_APP_CSC_KEY_WINDOWS }}"
-      - if: github.event_name != 'pull_request' && contains(runner.os, 'macos')
-        name: 'set osx signing keys and notarization creds'
-        run: |
-          echo "::set-env CSC_LINK='${{ secrets.OT_APP_CSC_MACOS }}'"
-          echo "::set-env CSC_KEY_PASSWORD='${{ secrets.OT_APP_CSC_KEY_MACOS }}'"
-          echo "::set-env APPLE_ID='${{ secrets.OT_APP_APPLE_ID }}'"
-          echo "::set-env APPLE_ID_PASSWORD='${{ secrets.OT_APP_APPLE_ID_PASSWORD }}'"
-
       # build the app and deploy it
       - if: github.event_name != 'pull_request'
         name: 'build app for ${{ matrix.os }}'
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
           OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
+          WIN_CSC_LINK: ${{ secrets.OT_APP_CSC_WINDOWS }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_WINDOWS }}
+          CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS }}
+          CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
+          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
         run: |
            make -C app-shell dist-${{ matrix.os }}
       - if: github.event_name != 'pull_request'
