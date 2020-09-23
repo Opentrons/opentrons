@@ -87,13 +87,14 @@ jobs:
           echo "::set-env pypi_username:secrets.OT_TEST_PYPI_USERNAME"
           echo "::set-env pypi_password:secrets.OT_TEST_PYPI_PASSWORD"
           echo "::set-env twine_repository_url:'https://test.pypi.org/legacy/'"
-      - if: contains(runner.os, 'ubuntu') && github.event_name == 'tag'
+      - if: contains(runner.os, 'ubuntu') && github.event_name == 'push' && startswith(env.OT_TAG, 'v')
         name: 'set pypi creds'
         run: |
           echo "::set-env pypi_username:secrets.OT_PYPI_USERNAME"
           echo "::set-env pypi_password:secrets.OT_PYPI_PASSWORD"
           echo "::set-env twine_repository_url:'https://upload.pypi.org/legacy/"
 
-        name: Deploy to test pypi
+      - if: contains(runner.os, 'ubuntu') && github.event_name == 'push'
+        name: Deploy to pypi
         run: |
           QUIET=1 BUILD_NUMBER=${OT_BUILD} make clean-py deploy-py
