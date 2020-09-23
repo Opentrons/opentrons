@@ -1004,3 +1004,189 @@ def test_multichannel_transfer_locs(loop):
             instr_multi,
             max_volume=instr_multi.hw_pipette['working_volume'],
             api_version=ctx.api_version)
+
+
+def test_zero_volume_results_in_no_transfer(_instr_labware):
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+    API_VERSION = _instr_labware['ctx'].api_version
+
+    exp_no_vol = [{'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+                  {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+
+    # ========== Transfer ===========
+    xfer_plan = tx.TransferPlan(
+        0, lw1.columns()[0], lw2.columns()[0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION)
+    for step, expected in zip(xfer_plan, exp_no_vol):
+        assert step == expected
+
+    xfer_plan = tx.TransferPlan(
+        [100, 0, 200], lw1.wells()[0:3], lw2.wells()[0:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION)
+    exp2 = [{'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [100, lw1['A1'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [100, lw2['A1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw1['C1'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw2['C1'], 1.0], 'kwargs': {}},
+            {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(xfer_plan, exp2):
+        assert step == expected
+
+    # ========== Distribute ===========
+    dist_plan = tx.TransferPlan(
+        0, lw1.columns()[0][0], lw2.rows()[0][1:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION)
+    for step, expected in zip(dist_plan, exp_no_vol):
+        assert step == expected
+
+    dist_plan = tx.TransferPlan(
+        [100, 0], lw1.columns()[0][0], lw2.rows()[0][1:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION)
+    exp3 = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [100, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [100, lw2['A2'], 1.0], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(dist_plan, exp3):
+        assert step == expected
+
+    # ========== Consolidate ===========
+    consd_plan = tx.TransferPlan(
+        0, lw1.columns()[0], lw2.columns()[0][0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION)
+    for step, expected in zip(consd_plan, exp_no_vol):
+        assert step == expected
+
+    cons_list = [100, 200, 300, 200, 0, 0, 100, 200]
+    consd_plan = tx.TransferPlan(
+        cons_list, lw1.columns()[0], lw2.columns()[0][0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION)
+    exp4 = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [100, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [200, lw1['B1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [300, lw2['A1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [300, lw1['C1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [300, lw2['A1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [200, lw1['D1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [100, lw1['G1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [300, lw2['A1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [200, lw1['H1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [200, lw2['A1'], 1.0], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(consd_plan, exp4):
+        assert step == expected
+
+
+def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
+    # This test checks the old behavior of distribute and consolidate
+    # with zero volumes in which case the volume aspirated/dispensed
+    # was the min volume + disposal volume if a zero volume was
+    # specified.
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+    API_VERSION = APIVersion(2, 6)
+    blow_out = _instr_labware['instr'].trash_container.wells()[0]
+
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            disposal_volume=_instr_labware['instr'].min_volume))
+
+    # ========== Distribute ===========
+    dist_plan = tx.TransferPlan(
+        0, lw1.columns()[0][0], lw2.rows()[0][1:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION,
+        options=options)
+
+    exp_no_vol = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [30, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [0, lw2['A2'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [0, lw2['A3'], 1.0], 'kwargs': {}},
+        {'method': 'blow_out', 'args': [blow_out], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(dist_plan, exp_no_vol):
+        assert step == expected
+
+    dist_plan = tx.TransferPlan(
+        [100, 0], lw1.columns()[0][0], lw2.rows()[0][1:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION,
+        options=options)
+    exp = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [130, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [100, lw2['A2'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [0, lw2['A3'], 1.0], 'kwargs': {}},
+        {'method': 'blow_out', 'args': [blow_out], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(dist_plan, exp):
+        assert step == expected
+
+    # ========== Consolidate ===========
+    consd_plan = tx.TransferPlan(
+        0, lw1.columns()[0], lw2.columns()[0][0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION)
+    exp_no_vol = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['B1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['C1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['D1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['E1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['F1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['G1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['H1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [0, lw2['A1'], 1.0], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(consd_plan, exp_no_vol):
+        assert step == expected
+
+    cons_list = [100, 200, 300, 200, 0, 0, 100, 200]
+    consd_plan = tx.TransferPlan(
+        cons_list, lw1.columns()[0], lw2.columns()[0][0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION)
+    exp2 = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [100, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [200, lw1['B1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [300, lw2['A1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [300, lw1['C1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [300, lw2['A1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [200, lw1['D1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['E1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [0, lw1['F1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [100, lw1['G1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [300, lw2['A1'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [200, lw1['H1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [200, lw2['A1'], 1.0], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(consd_plan, exp2):
+        assert step == expected

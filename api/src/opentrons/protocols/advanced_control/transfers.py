@@ -565,10 +565,15 @@ class TransferPlan:
                        self._strategy.disposal_volume +
                        self._strategy.air_gap +
                        current_xfer[0]) <= self._max_volume:
-                    asp_grouped.append(current_xfer)
+                    append_xfer = self._check_volume_not_zero(current_xfer[0])
+                    if append_xfer:
+                        asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
             except StopIteration:
                 done = True
+            if not asp_grouped:
+                break
+
             yield from self._aspirate_actions(sum(a[0] for a in asp_grouped) +
                                               self._strategy.disposal_volume,
                                               self._sources[0])
@@ -647,7 +652,9 @@ class TransferPlan:
                        self._strategy.disposal_volume +
                        self._strategy.air_gap * len(asp_grouped) +
                        current_xfer[0]) <= self._max_volume:
-                    asp_grouped.append(current_xfer)
+                    append_xfer = self._check_volume_not_zero(current_xfer[0])
+                    if append_xfer:
+                        asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
             except StopIteration:
                 done = True
@@ -784,6 +791,15 @@ class TransferPlan:
         if self._api_version >= APIVersion(2, 2) and len(well_list) < 1:
             raise RuntimeError(
                 f"Invalid {id} for multichannel transfer: {old_well_list}")
+
+    def _check_volume_not_zero(self, volume: float) -> bool:
+        # We should only be adding volumes to transfer plans if it is
+        # greater than zero to prevent extraneous robot movements.
+        if self._api_version < APIVersion(2, 7):
+            return True
+        elif volume > 0:
+            return True
+        return False
 
     def _multichannel_transfer(self, s, d):
         # TODO: add a check for container being multi-channel compatible?
