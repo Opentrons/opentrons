@@ -81,9 +81,9 @@ jobs:
         run: make -C api test
 
       # creds and repository configuration for deploying python wheels
-      - if: contains(runner.os, 'ubuntu')
-        name: 'set test pypi creds'
+      - name: 'set test pypi creds'
         run: |
+          echo "${{ runner.os }}"
           echo "::set-env pypi_username:secrets.OT_TEST_PYPI_USERNAME"
           echo "::set-env pypi_password:secrets.OT_TEST_PYPI_PASSWORD"
           echo "::set-env twine_repository_url:'https://test.pypi.org/legacy/'"
