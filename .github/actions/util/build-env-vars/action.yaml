@@ -1,0 +1,5 @@
+name: 'Set complex environment variables'
+description: 'Set the OT_BUILD, OT_TAG, and OT_BRANCH environment variables from the various contexts.'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

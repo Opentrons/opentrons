@@ -60,18 +60,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'shared-data/python'
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v3
-        with:
-          script: |
-            const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
-            const tag = context.ref.startsWith('refs/tags/') ? branch : ''
-            console.log('run number is', context.runNumber)
-            const buildNumber = context.runNumber + 10000
-            core.exportVariable('OT_BRANCH', branch)
-            core.exportVariable('OT_TAG', tag)
-            core.exportVariable('OT_BUILD', buildNumber)
+      - uses: './.github/actions/util/build-env-vars'
       - name: Test
         run: make -C shared-data/python test
         # creds and repository configuration for deploying python wheels
