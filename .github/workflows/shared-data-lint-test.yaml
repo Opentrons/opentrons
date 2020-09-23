@@ -8,13 +8,12 @@ on:
     paths:
       - 'Makefile'
       - 'shared-data/*/**'
-      - '.github/workflows/shared-data-pull-request-target.yaml'
+      - '.github/workflows/shared-data-lint-test.yaml'
       - '.github/actions/python/**'
-    branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'master'
-      - 'chore_release-**'
-    tags-ignore:
+    branches:
       - '*'
+    tags:
+      - 'v*'
   pull_request:
     paths:
       - 'Makefile'
@@ -63,3 +62,23 @@ jobs:
           project: 'shared-data/python'
       - name: Test
         run: make -C shared-data/python test
+        # creds and repository configuration for deploying python wheels
+      - if: contains(matrix.os, 'ubuntu') && (github.event_name == 'push') && !startsWith(env.OT_TAG, 'v')
+        name: 'set test pypi creds'
+        run: |
+          echo "::set-env name=PYPI_PASSWORD::${{ secrets.OT_TEST_PYPI_PASSWORD }}"
+          echo "::set-env name=PYPI_URL::'https://test.pypi.org/legacy/'"
+      - if: contains(matrix.os, 'ubuntu') && (github.event_name == 'push') && startsWith(env.OT_TAG, 'v')
+        name: 'set pypi creds'
+        run: |
+          echo "::set-env name=pypi_password::${{ secrets.OT_PYPI_PASSWORD }}"
+          echo "::set-env name=twine_repository_url::'https://upload.pypi.org/legacy/'"
+
+      - if: contains(matrix.os, 'ubuntu') && (github.event_name == 'push')
+        uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+      - if: contains(matrix.os, 'ubuntu') && (github.event_name == 'push')
+        name: Deploy shared-data wheel to pypi
+        run: |
+          QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C shared-data deploy-py twine_repository_url=${PYPI_URL} pypi_username=opentrons pypi_password=${PYPI_PASSWORD}
