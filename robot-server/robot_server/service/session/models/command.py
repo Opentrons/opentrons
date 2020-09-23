@@ -12,6 +12,7 @@ from robot_server.service.legacy.models.control import Mount
 from robot_server.service.json_api import (
     ResponseModel, RequestModel)
 from opentrons.util.helpers import utc_now
+from robot_server.service.labware.models import LabwareCalibration
 
 
 class LoadLabwareRequest(BaseModel):
@@ -67,7 +68,9 @@ class LiquidRequest(PipetteRequestBase):
 
 
 class LoadLabwareResponse(BaseModel):
-    labwareId: str
+    labwareId: IdentifierType
+    definition: typing.Dict[str, typing.Any]
+    calibration: LabwareCalibration
 
 
 class LoadInstrumentResponse(BaseModel):
