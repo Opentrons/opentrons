@@ -1,6 +1,10 @@
 import pytest
 from unittest.mock import MagicMock, patch
+
+from opentrons.calibration_storage.get import get_labware_calibration
 from opentrons.protocol_api.labware import get_labware_definition
+from opentrons.types import Point
+
 from robot_server.service.session.session_types.live_protocol import command_interface
 from robot_server.service.session.session_types.live_protocol.state_store \
     import StateStore
@@ -16,19 +20,61 @@ def get_labware(get_labware_fixture):
         yield p
 
 
-async def test_handle_load_labware(get_labware_fixture, get_labware, hardware):
-    # Test that get_labware_def is called & responds correctly
+@pytest.fixture
+def labware_calibration_mock():
+    with patch.object(command_interface.get, "get_labware_calibration",
+                      return_value=Point(1, 2, 3)) as p:
+        yield p
+
+
+@pytest.fixture
+def load_labware_cmd():
+    return models.LoadLabwareRequest(
+        location=1,
+        loadName="labware-load-name",
+        displayName="labware display name",
+        namespace="opentrons test",
+        version=1,
+    )
+
+
+@pytest.fixture
+def command_handler(hardware):
     state_store = StateStore()
     ci = command_interface.CommandInterface(hardware, state_store)
-    command = models.LoadLabwareRequest(
-            location=1,
-            loadName="labware-load-name",
-            displayName="labware display name",
-            namespace="opentrons test",
-            version=1,
-        )
-    response = await ci.handle_load_labware(command)
-    get_labware.assert_called_once_with(load_name=command.loadName,
-                                        namespace=command.namespace,
-                                        version=command.version)
-    assert response.definition == get_labware_fixture("fixture_12_trough")
+    return ci
+
+
+async def test_handle_load_labware(get_labware, hardware,
+                                   command_handler, load_labware_cmd):
+
+    await command_handler.handle_load_labware(load_labware_cmd)
+    get_labware.assert_called_once_with(load_name=load_labware_cmd.loadName,
+                                        namespace=load_labware_cmd.namespace,
+                                        version=load_labware_cmd.version)
+
+
+async def test_labware_path_and_def(get_labware, hardware, command_handler,
+                                    load_labware_cmd, get_labware_fixture,
+                                    labware_calibration_mock):
+    with patch.object(command_interface.helpers, "hash_labware_def",
+                      return_value="abcd1234") as hash_mock:
+        await command_handler.handle_load_labware(load_labware_cmd)
+        hash_mock.assert_called_once_with(get_labware())
+        labware_calibration_mock.assert_called_once_with(
+            f'{hash_mock()}.json', get_labware(), '')
+
+
+async def test_handle_load_labware_response(get_labware, hardware,
+                                            command_handler, load_labware_cmd,
+                                            get_labware_fixture,
+                                            labware_calibration_mock):
+    with patch.object(command_interface.models, "create_identifier",
+                      return_value="1234") as mock_id:
+        response = await command_handler.handle_load_labware(
+                            load_labware_cmd)
+        assert response.definition == get_labware_fixture(
+                                        "fixture_12_trough")
+        assert response.labwareId == mock_id()
+        assert response.calibration == labware_calibration_mock()
+

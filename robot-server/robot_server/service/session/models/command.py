@@ -4,15 +4,15 @@ import typing
 from functools import lru_cache
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import Point
 from pydantic import BaseModel, Field, validator
 
 from robot_server.service.session.models.common import (
-    EmptyModel, JogPosition)
+    EmptyModel, JogPosition, IdentifierType)
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.json_api import (
     ResponseModel, RequestModel)
 from opentrons.util.helpers import utc_now
-from robot_server.service.labware.models import LabwareCalibration
 
 
 class LoadLabwareRequest(BaseModel):
@@ -70,7 +70,7 @@ class LiquidRequest(PipetteRequestBase):
 class LoadLabwareResponse(BaseModel):
     labwareId: IdentifierType
     definition: typing.Dict[str, typing.Any]
-    calibration: LabwareCalibration
+    calibration: Point
 
 
 class LoadInstrumentResponse(BaseModel):
