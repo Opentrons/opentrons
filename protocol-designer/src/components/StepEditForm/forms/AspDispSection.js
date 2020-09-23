@@ -7,7 +7,7 @@ import styles from '../StepEditForm.css'
 type Props = {
   className?: ?string,
   collapsed?: ?boolean,
-  toggleCollapsed: () => mixed,
+  toggleCollapsed: () => void,
   prefix: 'aspirate' | 'dispense',
   children?: React.Node,
 }
