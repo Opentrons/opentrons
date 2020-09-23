@@ -2,6 +2,7 @@ import typing
 
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from os import PathLike
 
 
@@ -9,6 +10,13 @@ CalibrationID = typing.NewType('CalibrationID', str)
 StrPath = typing.Union[str, PathLike]
 AttitudeMatrix = typing.List[typing.List[float]]
 PipetteOffset = typing.List[float]
+
+
+class SourceType(str, Enum):
+    """Calibration source type"""
+    default = "default"
+    factory = "factory"
+    user = "user"
 
 
 class TipLengthCalNotFound(Exception):
@@ -89,3 +97,4 @@ class PipetteOffsetCalibration:
     tiprack: str
     uri: str
     last_modified: datetime
+    source: SourceType

@@ -193,5 +193,6 @@ def get_all_pipette_offset_calibrations() \
                         offset=data['offset'],
                         tiprack=data['tiprack'],
                         uri=data['uri'],
-                        last_modified=data['last_modified']))
+                        last_modified=data['last_modified'],
+                        source=local_types.SourceType[data['source']]))
     return all_calibrations
