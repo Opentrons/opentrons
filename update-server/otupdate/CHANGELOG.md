@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
+# [3.21.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-alpha.3) (2020-09-23)
 
 **Note:** Version bump only for package @opentrons/update-server
 
