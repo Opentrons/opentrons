@@ -780,7 +780,10 @@ class API(HardwareAPILike):
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
-                offset = top_types.Point(*self._config.mount_offset)
+                if ff.enable_calibration_overhaul():
+                    offset = top_types.Point(*self._config.left_mount_offset)
+                else:
+                    offset = top_types.Point(*self._config.mount_offset)
             z_ax = Axis.by_mount(mount)
             plunger_ax = Axis.of_plunger(mount)
             cp = self._critical_point_for(mount, critical_point)
@@ -880,12 +883,16 @@ class API(HardwareAPILike):
         if len(mounts) > 1:
             secondary_mount = mounts[1]  # type: ignore
 
+        if ff.enable_calibration_overhaul():
+            mount_offset = self._config.left_mount_offset
+        else:
+            mount_offset = self._config.mount_offset
         if primary_mount == top_types.Mount.LEFT:
-            primary_offset = top_types.Point(*self._config.mount_offset)
+            primary_offset = top_types.Point(*mount_offset)
             s_offset = top_types.Point(0, 0, 0)
         else:
             primary_offset = top_types.Point(0, 0, 0)
-            s_offset = top_types.Point(*self._config.mount_offset)
+            s_offset = top_types.Point(*mount_offset)
 
         if secondary_mount:
             primary_z = Axis.by_mount(primary_mount)
