@@ -14,19 +14,19 @@ jest.mock('../../fields/', () => {
 
   return {
     ...actualFields,
-    LabwareField: () => <div>hello</div>,
-    PipetteField: () => <div>hello</div>,
-    FlowRateField: () => <div>hello</div>,
-    VolumeField: () => <div>hello</div>,
-    ChangeTipField: () => <div>hello</div>,
-    TipPositionField: () => <div>hello</div>,
-    WellOrderField: () => <div>hello</div>,
-    WellSelectionField: () => <div>hello</div>,
+    LabwareField: () => <div></div>,
+    PipetteField: () => <div></div>,
+    FlowRateField: () => <div></div>,
+    VolumeField: () => <div></div>,
+    ChangeTipField: () => <div></div>,
+    TipPositionField: () => <div></div>,
+    WellOrderField: () => <div></div>,
+    WellSelectionField: () => <div></div>,
   }
 })
 
 jest.mock('../../fields/FieldConnector', () => ({
-  FieldConnector: () => <div>hello</div>,
+  FieldConnector: () => <div></div>,
 }))
 
 const getEnabledMixDelayMock: JestMockFn<any, any> =
