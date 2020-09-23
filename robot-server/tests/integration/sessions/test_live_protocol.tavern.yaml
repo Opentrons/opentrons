@@ -29,15 +29,31 @@ stages:
           type: SessionCommand
           attributes:
             command: equipment.loadLabware
-            data:
+            data: &labware_data
               location: 2
               loadName: corning_96_wellplate_360ul_flat
               displayName: my well plate
               namespace: Opentrons
               version: 1
     response:
-      status_code: 403
-  - name: Load well plate tip rack command
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: !anystr
+          type: SessionCommand
+          attributes:
+            data: *labware_data
+            command: equipment.loadLabware
+            status: executed
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            result:
+              labwareId: !anystr
+              definition: !anydict
+              calibration: !anylist
+  - name: Load tip rack command
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
       method: POST
@@ -46,15 +62,30 @@ stages:
           type: SessionCommand
           attributes:
             command: equipment.loadLabware
-            data:
+            data: &tiprack_data
               location: 1
               loadName: opentrons_96_tiprack_300ul
               displayName: my tip rack
               namespace: Opentrons
               version: 1
     response:
-      status_code: 403
-      json: { }
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: !anystr
+          type: SessionCommand
+          attributes:
+            data: *tiprack_data
+            command: equipment.loadLabware
+            status: executed
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            result:
+              labwareId: !anystr
+              definition: !anydict
+              calibration: !anylist
   - name: Load instrument command
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"

@@ -154,8 +154,10 @@ async def session_command_execute_handler(
     command = create_command(command_request.data.attributes.command,
                              command_request.data.attributes.data)
     command_result = await session_obj.command_executor.execute(command)
-    log.info(f"Command completed {command}")
 
+    log.info(f"Command completed: {command}")
+    log.debug(f"Command result: {command_result}")
+    
     return CommandResponse(
         data=ResponseDataModel.create(
             attributes=SessionCommand(
@@ -164,7 +166,8 @@ async def session_command_execute_handler(
                 status=command_result.result.status,
                 createdAt=command_result.meta.created_at,
                 startedAt=command_result.result.started_at,
-                completedAt=command_result.result.completed_at
+                completedAt=command_result.result.completed_at,
+                result=command_result.result.data,
             ),
             resource_id=command_result.meta.identifier
         ),

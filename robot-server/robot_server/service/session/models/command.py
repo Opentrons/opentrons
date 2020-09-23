@@ -70,7 +70,7 @@ class LiquidRequest(PipetteRequestBase):
 class LoadLabwareResponse(BaseModel):
     labwareId: IdentifierType
     definition: typing.Dict[str, typing.Any]
-    calibration: Point
+    calibration: OffsetVector
 
 
 class LoadInstrumentResponse(BaseModel):
