@@ -15,16 +15,6 @@ class AbstractModuleContextImplementation(ApiVersioned):
         ...
 
     @abstractmethod
-    def load_labware(
-            self,
-            name: str,
-            label: str = None,
-            namespace: str = None,
-            version: int = 1,
-    ) -> Labware:
-        ...
-
-    @abstractmethod
     def load_labware_from_definition(
             self,
             definition: LabwareDefinition,
