@@ -123,15 +123,15 @@ jobs:
       - if: github.event_name != 'pull_request' && contains(runner.os, 'windows')
         name: 'set windows signing keys'
         run: |
-          echo "::set-env CSC_LINK=${{ secrets.OT_APP_CSC_WINDOWS }}"
+          echo "::set-env CSC_LINK='${{ secrets.OT_APP_CSC_WINDOWS }}'"
           echo "::set-env CSC_KEY_PASSWORD=${{ secrets.OT_APP_CSC_KEY_WINDOWS }}"
       - if: github.event_name != 'pull_request' && contains(runner.os, 'macos')
         name: 'set osx signing keys and notarization creds'
         run: |
-          echo "::set-env CSC_LINK=${{ secrets.OT_APP_CSC_MACOS }}"
-          echo "::set-env CSC_KEY_PASSWORD=${{ secrets.OT_APP_CSC_KEY_MACOS }}"
-          echo "::set-env APPLE_ID=${{ secrets.OT_APP_APPLE_ID }}"
-          echo "::set-env APPLE_ID_PASSWORD=${{ secrets.OT_APP_APPLE_ID_PASSWORD }}"
+          echo "::set-env CSC_LINK='${{ secrets.OT_APP_CSC_MACOS }}'"
+          echo "::set-env CSC_KEY_PASSWORD='${{ secrets.OT_APP_CSC_KEY_MACOS }}'"
+          echo "::set-env APPLE_ID='${{ secrets.OT_APP_APPLE_ID }}'"
+          echo "::set-env APPLE_ID_PASSWORD='${{ secrets.OT_APP_APPLE_ID_PASSWORD }}'"
 
       # build the app and deploy it
       - if: github.event_name != 'pull_request'
