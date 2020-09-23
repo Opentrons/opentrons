@@ -9,7 +9,8 @@ on:
       - 'Makefile'
       - 'shared-data/*/**'
       - '.github/workflows/shared-data-lint-test.yaml'
-      - '.github/actions/python/**'
+      - '.github/actions/python/**/*'
+      - '.github/actions/util/**/*'
     branches:
       - '*'
     tags:
