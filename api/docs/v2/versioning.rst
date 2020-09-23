@@ -181,3 +181,4 @@ Version 2.7
 
 - Calling :py:meth:`.InstrumentContext.has_tip` will return whether a particular instrument
   has a tip attached or not.
+- Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense
