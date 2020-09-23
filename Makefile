@@ -155,7 +155,6 @@ test-js:
 		--updateSnapshot=$(updateSnapshot) \
 		--ci=$(if $(CI),true,false)
 
-
 # lints and typechecks
 .PHONY: lint
 lint: lint-py lint-js lint-json lint-css check-js circular-dependencies-js
