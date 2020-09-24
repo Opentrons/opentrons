@@ -1,6 +1,7 @@
 import asyncio
 import time
 from unittest import mock
+from numpy import isclose
 from opentrons.hardware_control import modules, ExecutionManager
 
 
@@ -150,7 +151,7 @@ async def test_set_temperature(monkeypatch, loop):
     start = time.time()
     await hw_tc.set_temperature(40, hold_time_seconds=2)
     time_taken = time.time() - start
-    assert 1.9 < time_taken < 2.1
+    assert isclose(time_taken, 2, atol=0.5)
     set_temp_driver_mock.assert_called_once_with(temp=40,
                                                  hold_time=2,
                                                  volume=None,
