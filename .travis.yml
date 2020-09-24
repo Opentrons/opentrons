@@ -6,9 +6,6 @@ addons:
 
 stages:
   - test
-  - name: app
-    # don't build the app on pull requests
-    if: type != pull_request
 
 # base configs
 _deploy_s3: &deploy_s3
@@ -22,74 +19,9 @@ _deploy_s3: &deploy_s3
     repo: Opentrons/opentrons
     all_branches: true
 
-_app_stage_build: &app_stage_build
-  stage: app
-  language: node_js
-  install:
-    - pip install --user awscli
-    - make setup-js
-  before_script:
-    # pull API wheel from S3
-    - mkdir -p ./api/dist
-    - aws s3 sync $OT_CI_TEMP_S3_PATH/api/dist ./api/dist
-  deploy:
-    - # deploy Opentrons App to S3
-      <<: *deploy_s3
-      region: us-east-1
-      local-dir: app-shell/dist/publish
-      bucket: $OT_APP_DEPLOY_BUCKET
-      upload-dir: $OT_APP_DEPLOY_FOLDER
 
 jobs:
   include:
-    # test, build, and upload wheels for Python projects
-    - stage: test
-      name: 'Python API unit tests, build API docs'
-      language: python
-      python: 3.7
-      before_install:
-        - sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
-      install:
-        - pip install awscli
-        - nvm install
-        - yarn global add shx@0.2.2 codecov@3.1.0
-        - make setup-py
-      script:
-        - make test-py
-        - make lint-py
-        - make -C api docs
-      after_success:
-        - make coverage
-        - aws s3 sync ./api/dist $OT_CI_TEMP_S3_PATH/api/dist
-      deploy:
-        - # push docs
-          <<: *deploy_s3
-          local-dir: api/docs/dist
-          bucket: $OT_DOCS_DEPLOY_BUCKET
-          upload-dir: $TRAVIS_BRANCH
-
-        # push to real pypi on tag
-        - provider: script
-          skip_cleanup: true
-          script: make deploy-py pypi_username=${PYPI_USER} pypi_password=${PYPI_PASSWORD} twine_repository_url="https://upload.pypi.org/legacy/"
-          on:
-            all_branches: true
-            condition: $TRAVIS_TAG =~ ^v
-            repo: Opentrons/opentrons
-
-        # push to test pypi on pr
-        - provider: script
-          skip_cleanup: true
-          script:
-            # we have to set the build number here and clean because we only
-            # want to add the build number in the test deploys - having a dev
-            # tag means python infrastructure considers this a "dev version",
-            # which is prerelease
-            QUIET=1 BUILD_NUMBER=${TRAVIS_BUILD_NUMBER} make clean-py deploy-py pypi_username=${TEST_PYPI_USER} pypi_password=${TEST_PYPI_PASSWORD} twine_repository_url="https://test.pypi.org/legacy/"
-          on:
-            repo: Opentrons/opentrons
-            branch: edge
-
     # test, build, and upload for JavaScript projects
     - stage: test
       name: 'JS unit tests; build Protocol Designer, Labware Library, Components Library'
@@ -147,34 +79,9 @@ jobs:
       script:
         - make check-js
 
-    - # build the Opentrons App for POSIX (dev branch builds)
-      <<: *app_stage_build
-      name: 'Build/deploy Opentrons App for POSIX (unsigned dev builds)'
-      os: linux
-      script: make -C app-shell dist-posix
-      # skip app builds entirely if tag is present but does not match ^v
-      if: tag IS blank
-
-    - # build the Opentrons App for Linux (tagged / edge / RC builds)
-      <<: *app_stage_build
-      name: 'Build/deploy Opentrons App for Linux'
-      os: linux
-      script: make -C app-shell dist-linux
-      if: tag =~ ^v
-
-    - # build the Opentrons App for macOS (tagged / edge / RC builds)
-      <<: *app_stage_build
-      name: 'Build/deploy Opentrons App for macOS'
-      os: osx
-      osx_image: xcode10.3
-      script: make -C app-shell dist-osx
-      if: tag =~ ^v
-
 env:
   global:
     # include $HOME/.local/bin for `aws`
-    - PYTHONUSERBASE: $HOME/.local
-    - PATH: $PYTHONUSERBASE/bin:$PATH
 
     - OT_BUILD: $TRAVIS_BUILD_NUMBER
     - OT_BRANCH: $TRAVIS_BRANCH
@@ -184,21 +91,9 @@ env:
     # TODO(mc, 2019-03-13): move to Travis settings
     - OT_CI_TEMP_S3_PATH: s3://opentrons-ci/temp/$OT_BUILD
 
-    # TODO(mc, 2019-03-13): move to Travis settings
-    - OT_APP_DEPLOY_BUCKET: opentrons-app
-    - OT_APP_DEPLOY_FOLDER: builds
-
     # GITHUB_TOKEN
     # TODO(mc, 2019-03-13): move to Travis settings
     - secure: f/W7kN4gOvVpIanTQh9QtCwiXOk5UrRnUPo2ZU1Qk8zaFVbNj2za2A1xGKMqSyfZKw7guqIwTjWgc/aF9lxRtfU+5fkedJQdxDi5r7jZFxpqmpZOlhyXVY8WAWNqavEkefQInPlpHVAL8M2eV+Pi1cO9FsMhdyy/Wk7qA2nOiA8//9pFRB+0jgSbe1yqIF5DPyL0kbibd3EwmQvuQtnn25qqJXjneenhL6spflLCrnUjq1N/iOlcGd94eBUtk8RaBtMEjOb2D0Mb0DWKMsppoXg4/mZDus6s/PlmBwUJKNCuRtDiEUn5brE14q3OQh/FkDoXMRl69VND2mYp1LOeh5fgLSu6P+YToyHrh4lhXaRAul6l3JmXuoDC3k8hOAr8rPbtiwH7wGY2eRNv59vUejdXof4KHbAN6FTIH934tTe4uvBH79hRMoFY51pHRe6UiC39e/3hwl0pVKLjkV/40wfdEeYA7xhTZQVux+FAfk2krmggokxGEhbAQhWoyRX/wlH2XfEgassGskJ9SbuumNPNOLmEV9OOISFaXoYqVn+SPXy8mN1Pl2sLfaPFtnmmiY20t6yWsHsmfwi+41lv8n0vwCOGq521suDeNyiFhOH2AqG7xm6nHbIv+CiWt2ntKXgV233J17usvfr1zSK07PMDMlV2lvJx3CXj3hA4Yb4=
-
-    # OT_APP_MIXPANEL_ID
-    # TODO(mc, 2019-03-13): move to Travis settings
-    - secure: 'T0h/KyXFRS4jsaor2sRLlKaUFxVmIH5LXArVLYi6I3Wz45SXvQuiH+gUic775rBLdpI8d+TgxCWyUPm1AJTCvCdaMr5PW/xyHeTT4qz0MKT1nThrO2Vi5cKWAUbZV6P8d8m9EBsJlvhgp7egLymS4K5zaotV07v6OK0qVJWiFo+Zj/ufQhQikIUaKOdNafKAqN4bSO/yqD6i9av/EOzkOJwIk2hnEMlCphZ/X2T81IXjw7toV0jjGL60tkL6lcULwDosrvJkb5+dr4AcUjwpb6tzexde2OfA7EyMN4BdIHXsAzKcqcxP0LVXoRqC2C2OyNITVHPci/r/kbqJOka9iGPn7BmUddjbhHb97nBygNDBZIS+U/W5nalO4ZLWe4RzgN85y5lFOdY9X0n8ZwkNwGKBxqueAdfmbPtkpYd5n0g9GMohRWO2wAb4ttY8Uw3x+OG75tmru37i6qO5Gl5VCo8ERIH8bAdEtzTB2Nna413Hm1ld4NmZFMGHfBL7scgyugAKoxgBebEIrTgtKQ6hBuVXWznS0E1bCoas9anR72UsXQol7MWxAmngv+We0ywBOG2qHRnKWwgUEp91R3OEIkH0ain9coPvX0e1mchvhuxiRvMlDZ9DU/narUpMol+/CslyHAMlRr8scNk2MAgNfRIhgEsrbbOrszVbgHtoFPE='
-
-    # OT_APP_INTERCOM_ID
-    # TODO(mc, 2019-03-13): move to Travis settings
-    - secure: 'B+OLp0ZNWX6T9BFFGdNYA6vmXYJH0KXFGdyrEKHh0bFC4BnbPbbhN1SFp50Au+uMY1lzIhnihrkLpabie89N8HfHVuvTf27KDGP2vUrs7Vnnf+goSb2PrtcFcRNDjOM5bKQAWNfrjDVUBYkDWWL+zkS9ms6+mF+E8keCDGeMacPSus6NNK1v8+i9yK1/lJHYHxA353BkU73iP2SdrZ3IFuysEG8DVj9wBl7fXYOHrP2Dzw/ZQYzQOiagPYGAPoyMDcbr0Pnq1wu9sPADbPAA+UFOq0LfNTLDd8iP6EZuahwVIhldKBFOuT15YmbHG2c00Hepjl9V72d2FwnkXWcbKf/tgOrgCO+mDgYXtwE7rVfBQdhCZGgfxY7w8MTmNNm/WRrFhLBVvLpRGmVprIrA0fTJVUUo5O+YUHXuSAWwE2OPM3MfXj4Qdy656mTg6A/FWRuE1IZffhr/YhfcHiW6VG/W5t5wF5dzR1so4QILcL+aU2wfoHaFQ+c25ejoo7aPaY4D1bbQl0AtpQMJLtMSUH8X7xJGkVgc3mbwFdpvHNAhh2rhtOJtftwhTXSZ0WLfcJLl4Hj2F/6IqZj/DvTO5xMjuqdTigFVJzUSFdG6C61Af5C49v+ag9hqTHyQ59kOIFoKeyW4SPmqQIm7ZSVs1h3wCkmtZVOHWSV+n41JJ/I='
 
     # OT_PD_FULLSTORY_ORG
     # TODO(mc, 2019-03-13): move to Travis settings
