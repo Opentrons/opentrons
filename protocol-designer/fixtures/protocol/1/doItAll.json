@@ -10,6 +10,12 @@
     "subcategory": null,
     "tags": []
   },
+  "default-values": {
+    "aspirate-flow-rate": {},
+    "dispense-flow-rate": {},
+    "aspirate-mm-from-bottom": 1,
+    "dispense-mm-from-bottom": 0.5
+  },
   "designer-application": {
     "application-name": "opentrons/protocol-designer",
     "application-version": "1.0.0",
