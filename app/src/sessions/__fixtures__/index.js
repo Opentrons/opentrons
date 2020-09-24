@@ -77,6 +77,30 @@ export const mockSessionResponse: Types.SessionResponse = {
   },
 }
 
+export const mockTipLengthCalibrationSessionResponse: Types.SessionResponse = {
+  data: {
+    id: mockSessionId,
+    type: 'Session',
+    attributes: mockTipLengthCalibrationSessionAttributes,
+  },
+}
+
+export const mockPipetteOffsetCalibrationSessionResponse: Types.SessionResponse = {
+  data: {
+    id: mockSessionId,
+    type: 'Session',
+    attributes: mockPipetteOffsetCalibrationSessionAttributes,
+  },
+}
+
+export const mockDeckCalibrationSessionResponse: Types.SessionResponse = {
+  data: {
+    id: mockSessionId,
+    type: 'Session',
+    attributes: mockDeckCalibrationSessionAttributes,
+  },
+}
+
 export const mockMultiSessionResponse: Types.MultiSessionResponse = {
   data: [
     {
@@ -130,6 +154,57 @@ export const {
   path: `${Constants.SESSIONS_PATH}/${mockSessionId}`,
   successStatus: 200,
   successBody: mockSessionResponse,
+  failureStatus: 500,
+  failureBody: mockV2ErrorResponse,
+})
+
+export const {
+  successMeta: mockDeleteTipLengthCalibrationSessionSuccessMeta,
+  failureMeta: mockDeleteTipLengthCalibrationSessionFailureMeta,
+  success: mockDeleteTipLengthCalibrationSessionSuccess,
+  failure: mockDeleteTipLengthCalibrationSessionFailure,
+}: ResponseFixtures<
+  Types.SessionResponse,
+  RobotApiV2ErrorResponseBody
+> = makeResponseFixtures({
+  method: DELETE,
+  path: `${Constants.SESSIONS_PATH}/${mockSessionId}`,
+  successStatus: 200,
+  successBody: mockTipLengthCalibrationSessionResponse,
+  failureStatus: 500,
+  failureBody: mockV2ErrorResponse,
+})
+
+export const {
+  successMeta: mockDeletePipetteOffsetCalibrationSessionSuccessMeta,
+  failureMeta: mockDeletePipetteOffsetCalibrationSessionFailureMeta,
+  success: mockDeletePipetteOffsetCalibrationSessionSuccess,
+  failure: mockDeletePipetteOffsetCalibrationSessionFailure,
+}: ResponseFixtures<
+  Types.SessionResponse,
+  RobotApiV2ErrorResponseBody
+> = makeResponseFixtures({
+  method: DELETE,
+  path: `${Constants.SESSIONS_PATH}/${mockSessionId}`,
+  successStatus: 200,
+  successBody: mockPipetteOffsetCalibrationSessionResponse,
+  failureStatus: 500,
+  failureBody: mockV2ErrorResponse,
+})
+
+export const {
+  successMeta: mockDeleteDeckCalibrationSessionSuccessMeta,
+  failureMeta: mockDeleteDeckCalibrationSessionFailureMeta,
+  success: mockDeleteDeckCalibrationSessionSuccess,
+  failure: mockDeleteDeckCalibrationSessionFailure,
+}: ResponseFixtures<
+  Types.SessionResponse,
+  RobotApiV2ErrorResponseBody
+> = makeResponseFixtures({
+  method: DELETE,
+  path: `${Constants.SESSIONS_PATH}/${mockSessionId}`,
+  successStatus: 200,
+  successBody: mockDeckCalibrationSessionResponse,
   failureStatus: 500,
   failureBody: mockV2ErrorResponse,
 })
