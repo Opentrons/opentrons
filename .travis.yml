@@ -19,7 +19,6 @@ _deploy_s3: &deploy_s3
     repo: Opentrons/opentrons
     all_branches: true
 
-
 jobs:
   include:
     # test, build, and upload for JavaScript projects
