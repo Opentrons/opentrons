@@ -3,3 +3,10 @@ description: 'Set the OT_BUILD, OT_TAG, and OT_BRANCH environment variables from
 runs:
   using: 'node12'
   main: 'dist/index.js'
+outputs:
+  OT_BRANCH:
+    description: "The human branch name as in git show (e.g. chore_my-branch, not refs/heads/chore_my-branch)"
+  OT_TAG:
+    description: "If the branch is a tagname (starts with refs/:tags/) then the human tagname (e.g. v3.2.1-alpha.0 not refs/:tags/v3.2.1-alpha.0). If the branch is not a tagname, empty string."
+  OT_BUILD:
+    description: 'The build number, suitable for use in dev version tags or baking into other parts of the version.'

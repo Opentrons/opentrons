@@ -7,12 +7,12 @@ inputs:
   distPath:
     description: 'The path to the compiled distribution to upload'
     required: true
+  destPrefix:
+    description: 'The path prefix to deploy to (usually the current branch)'
+    required: true
 runs:
   using: 'composite'
   steps:
     - shell: bash
       run: |
-        echo "Finding ref from ${{ github.ref }}"
-        SHORTSLUG=`echo ${{ github.ref }} | sed -E -e "s/^\/?refs/(?:tags|heads)\///"`
-        echo "Found ref slug ${SHORTSLUG} from ref ${{ github.ref }}"
-        aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${SHORTSLUG} --acl=public-read
+        aws s3 sync ${{ inputs.distPath }} s3://sandbox.${{ inputs.domain }}/${{ inputs.destPrefix }} --acl=public-read
