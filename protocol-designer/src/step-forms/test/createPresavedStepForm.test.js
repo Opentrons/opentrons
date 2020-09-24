@@ -11,6 +11,7 @@ import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
 import { getPrereleaseFeatureFlag } from '../../persist'
 import { getStateAndContextTempTCModules } from '../../step-generation/__fixtures__'
+import { DEFAULT_DELAY_SECONDS } from '../../constants'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
@@ -203,7 +204,9 @@ describe('createPresavedStepForm', () => {
           labware: null,
           wells: [],
           aspirate_delay_checkbox: false,
-          aspirate_delay_seconds: '1',
+          aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+          dispense_delay_checkbox: false,
+          dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
           mix_mmFromBottom: '0.5',
           mix_wellOrder_first: 't2b',
           mix_wellOrder_second: 'l2r',

@@ -84,6 +84,8 @@ describe('getDefaultsForStepType', () => {
           labware: null,
           aspirate_delay_checkbox: false,
           aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+          dispense_delay_checkbox: false,
+          dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
           mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
           mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
           blowout_checkbox: false,

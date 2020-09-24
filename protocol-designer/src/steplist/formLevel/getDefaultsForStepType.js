@@ -35,6 +35,8 @@ export function getDefaultsForStepType(
           ? {
               aspirate_delay_checkbox: false,
               aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+              dispense_delay_checkbox: false,
+              dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
             }
           : {}),
       }
