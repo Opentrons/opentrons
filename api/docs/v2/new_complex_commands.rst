@@ -439,6 +439,8 @@ will have the steps...
 .. versionadded:: 2.0
 
 
+.. _distribute-consolidate-volume-list:
+
 List of Volumes
 ---------------
 
@@ -518,6 +520,9 @@ will have the steps...
     Blowing out in well A1 in "12"
     Dropping tip well A1 in "12"
 
+.. warning::
+
+    This functionality is only available in Python API Version 2.8 or later.
 
 
 .. versionadded:: 2.8
