@@ -1,7 +1,11 @@
 import pytest
 from opentrons.types import Point
-from opentrons.hardware_control import pipette, types
+from opentrons.hardware_control import \
+    pipette, types, robot_calibration as rb_cal
 from opentrons.config import pipette_config
+
+PIP_CAL = rb_cal.PipetteCalibration(
+    offset=[0, 0, 0])
 
 
 def test_tip_tracking():
@@ -28,6 +32,7 @@ def test_critical_points(model):
     loaded = pipette_config.load(model)
     pip = pipette.Pipette(loaded,
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          PIP_CAL,
                           'testID')
     mod_offset = Point(*loaded.model_offset)
     assert pip.critical_point() == mod_offset
@@ -47,29 +52,56 @@ def test_critical_points(model):
 
 
 @pytest.mark.parametrize('model', pipette_config.config_models)
-def test_critical_point_tiplength(use_new_calibration, model):
+def test_critical_points_nozzle_offset(model, use_new_calibration):
     loaded = pipette_config.load(model)
-    instr_z = 25
-    pip = pipette.Pipette(
-        loaded,
-        {'single': [0, 0, instr_z], 'multi': [0, 0, instr_z]},
-        'testID')
-    mod_plus_instr = Point(*loaded.model_offset) + Point(0, 0, instr_z)
-    assert pip.critical_point() == mod_plus_instr
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_plus_instr
-    assert pip.critical_point(types.CriticalPoint.TIP) == mod_plus_instr
+    pip = pipette.Pipette(loaded,
+                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          PIP_CAL,
+                          'testID')
+    # default pipette offset is[0, 0, 0], only nozzle offset would be used
+    # to determine critical point
+    nozzle_offset = Point(*loaded.nozzle_offset)
+    assert pip.critical_point() == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.TIP) == nozzle_offset
     tip_length = 25.0
     pip.add_tip(tip_length)
-    # unlike the above case, mod offset should not change
-    assert pip.critical_point() == mod_plus_instr - Point(0, 0, tip_length)
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_plus_instr
-    # if there is a tip, we should see it here added
-    assert pip.critical_point(types.CriticalPoint.TIP)\
-        == mod_plus_instr - Point(0, 0, tip_length)
+    new = nozzle_offset._replace(
+        z=nozzle_offset.z - tip_length)
+    assert pip.critical_point() == new
+    assert pip.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.TIP) == new
     pip.remove_tip()
-    assert pip.critical_point() == mod_plus_instr
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_plus_instr
-    assert pip.critical_point(types.CriticalPoint.TIP) == mod_plus_instr
+    assert pip.critical_point() == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.NOZZLE) == nozzle_offset
+    assert pip.critical_point(types.CriticalPoint.TIP) == nozzle_offset
+
+
+@pytest.mark.parametrize('model', pipette_config.config_models)
+def test_critical_points_pipette_offset(model, use_new_calibration):
+    loaded = pipette_config.load(model)
+    # set pipette offset calibration
+    pip_cal = rb_cal.PipetteCalibration(offset=[10, 10, 10])
+    pip = pipette.Pipette(loaded,
+                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          pip_cal,
+                          'testID')
+    # pipette offset + nozzle offset to determine critical point
+    offsets = Point(*pip_cal.offset) + Point(*pip.nozzle_offset)
+    assert pip.critical_point() == offsets
+    assert pip.critical_point(types.CriticalPoint.NOZZLE) == offsets
+    assert pip.critical_point(types.CriticalPoint.TIP) == offsets
+    tip_length = 25.0
+    pip.add_tip(tip_length)
+    new = offsets._replace(
+        z=offsets.z - tip_length)
+    assert pip.critical_point() == new
+    assert pip.critical_point(types.CriticalPoint.NOZZLE) == offsets
+    assert pip.critical_point(types.CriticalPoint.TIP) == new
+    pip.remove_tip()
+    assert pip.critical_point() == offsets
+    assert pip.critical_point(types.CriticalPoint.NOZZLE) == offsets
+    assert pip.critical_point(types.CriticalPoint.TIP) == offsets
 
 
 @pytest.mark.parametrize('config_model', pipette_config.config_models)
@@ -77,6 +109,7 @@ def test_volume_tracking(config_model):
     loaded = pipette_config.load(config_model)
     pip = pipette.Pipette(loaded,
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          PIP_CAL,
                           'testID')
     assert pip.current_volume == 0.0
     assert pip.available_volume == loaded.max_volume
@@ -103,6 +136,7 @@ def test_config_update(config_model):
     loaded = pipette_config.load(config_model)
     pip = pipette.Pipette(loaded,
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          PIP_CAL,
                           'testID')
     sample_plunger_pos = {'top': 19.5}
     pip.update_config_item('top', sample_plunger_pos.get('top'))
@@ -119,6 +153,7 @@ def test_tip_overlap(config_model):
     loaded = pipette_config.load(config_model)
     pip = pipette.Pipette(loaded,
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          PIP_CAL,
                           'testId')
     assert pip.config.tip_overlap\
         == pipette_config.configs[config_model]['tipOverlap']
@@ -127,6 +162,7 @@ def test_tip_overlap(config_model):
 def test_flow_rate_setting():
     pip = pipette.Pipette(pipette_config.load('p300_single_v2.0'),
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          PIP_CAL,
                           'testId')
     # pipettes should load settings from config at init time
     assert pip.aspirate_flow_rate\

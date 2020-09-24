@@ -73,6 +73,11 @@ Object {
     -25.8,
   ],
   "name": "p10_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -289,6 +294,11 @@ Object {
     -25.8,
   ],
   "name": "p10_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -505,6 +515,11 @@ Object {
     -25.8,
   ],
   "name": "p10_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -721,6 +736,11 @@ Object {
     -25.8,
   ],
   "name": "p10_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -907,6 +927,11 @@ Object {
     -13,
   ],
   "name": "p10_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    12,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1128,6 +1153,11 @@ Object {
     -13,
   ],
   "name": "p10_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    12,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1349,6 +1379,11 @@ Object {
     -13,
   ],
   "name": "p10_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    12,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1570,6 +1605,11 @@ Object {
     -13,
   ],
   "name": "p10_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    12,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1755,6 +1795,11 @@ Object {
     -25.8,
   ],
   "name": "p50_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1960,6 +2005,11 @@ Object {
     -25.8,
   ],
   "name": "p50_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2165,6 +2215,11 @@ Object {
     -25.8,
   ],
   "name": "p50_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2370,6 +2425,11 @@ Object {
     -25.8,
   ],
   "name": "p50_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2555,6 +2615,11 @@ Object {
     0,
   ],
   "name": "p50_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2760,6 +2825,11 @@ Object {
     0,
   ],
   "name": "p50_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2965,6 +3035,11 @@ Object {
     0,
   ],
   "name": "p50_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3170,6 +3245,11 @@ Object {
     -25.8,
   ],
   "name": "p300_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3339,6 +3419,11 @@ Object {
     -25.8,
   ],
   "name": "p300_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3508,6 +3593,11 @@ Object {
     -25.8,
   ],
   "name": "p300_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3677,6 +3767,11 @@ Object {
     -25.8,
   ],
   "name": "p300_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3847,6 +3942,11 @@ Object {
     0,
   ],
   "name": "p300_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4072,6 +4172,11 @@ Object {
     0,
   ],
   "name": "p300_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4297,6 +4402,11 @@ Object {
     0,
   ],
   "name": "p300_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4522,6 +4632,11 @@ Object {
     0,
   ],
   "name": "p300_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4711,6 +4826,11 @@ Object {
     20,
   ],
   "name": "p1000_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    45,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4902,6 +5022,11 @@ Object {
     20,
   ],
   "name": "p1000_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    45,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -5093,6 +5218,11 @@ Object {
     20,
   ],
   "name": "p1000_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    45,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -5284,6 +5414,11 @@ Object {
     20,
   ],
   "name": "p1000_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    45,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,

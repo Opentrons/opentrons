@@ -10,7 +10,9 @@ from opentrons.config import pipette_config
 from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.drivers.types import MoveSplit
 from opentrons.config.robot_configs import robot_config
+from . import robot_calibration as rb_cal
 from .types import CriticalPoint
+
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
@@ -41,12 +43,15 @@ class Pipette:
             self,
             config: pipette_config.PipetteConfig,
             inst_offset_config: Union[InstrumentOffsetConfig, Point],
+            pipette_offset_cal: rb_cal.PipetteCalibration,
             pipette_id: str = None) -> None:
         self._config = config
+        self._pipette_offset = pipette_offset_cal
         self._acting_as = self._config.name
         self._name = self._config.name
         self._model = self._config.model
         self._model_offset = self._config.model_offset
+        self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
         self._working_volume = self._config.max_volume
         self._current_tip_length = 0.0
@@ -102,8 +107,12 @@ class Pipette:
         return self._config
 
     @property
-    def model_offset(self):
+    def model_offset(self) -> Tuple[float, float, float]:
         return self._model_offset
+
+    @property
+    def nozzle_offset(self) -> Tuple[float, float, float]:
+        return self._nozzle_offset
 
     def update_config_item(self, elem_name: str, elem_val: Any):
         self._log.info("updated config: {}={}".format(elem_name, elem_val))
@@ -133,6 +142,13 @@ class Pipette:
         we have a tip, or :py:attr:`CriticalPoint.XY_CENTER` - the specified
         critical point will be used.
         """
+        if enable_calibration_overhaul():
+            instr = Point(*self._pipette_offset.offset)
+            offsets = self.nozzle_offset
+        else:
+            instr = self._instrument_offset._replace(z=0)
+            offsets = self.model_offset
+
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
             tip_length = 0.0
@@ -140,22 +156,17 @@ class Pipette:
             cp_type = CriticalPoint.TIP
             tip_length = self.current_tip_length
         if cp_override == CriticalPoint.XY_CENTER:
-            mod_offset_xy = [0, 0, self.model_offset[2]]
+            mod_offset_xy = [0, 0, offsets[2]]
             cp_type = CriticalPoint.XY_CENTER
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
             mod_offset_xy = [
-                0, -self.model_offset[1], self.model_offset[2]]
+                0, -offsets[1], offsets[2]]
             cp_type = CriticalPoint.FRONT_NOZZLE
         else:
-            mod_offset_xy = self.model_offset
+            mod_offset_xy = list(offsets)
         mod_and_tip = Point(mod_offset_xy[0],
                             mod_offset_xy[1],
                             mod_offset_xy[2] - tip_length)
-
-        if enable_calibration_overhaul():
-            instr = self._instrument_offset
-        else:
-            instr = self._instrument_offset._replace(z=0)
 
         cp = mod_and_tip + instr
 
@@ -317,7 +328,8 @@ class Pipette:
 
 def _reload_and_check_skip(
         new_config: pipette_config.PipetteConfig,
-        attached_instr: Pipette) -> Tuple[Pipette, bool]:
+        attached_instr: Pipette,
+        pipette_offset: rb_cal.PipetteCalibration) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
     # match closely enough.
@@ -336,6 +348,7 @@ def _reload_and_check_skip(
             # Something has changed that requires reconfig
             p = Pipette(new_config,
                         attached_instr._instrument_offset,
+                        pipette_offset,
                         attached_instr._pipette_id)
             p.act_as(attached_instr.acting_as)
             return p, False
@@ -348,7 +361,8 @@ def load_from_config_and_check_skip(
         attached: Optional[Pipette],
         requested: Optional[PipetteName],
         serial: Optional[str],
-        instrument_offset: InstrumentOffsetConfig)\
+        instrument_offset: InstrumentOffsetConfig,
+        pipette_offset: rb_cal.PipetteCalibration)\
         -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read
@@ -376,16 +390,19 @@ def load_from_config_and_check_skip(
                 # configured to the request
                 if requested == attached.acting_as:
                     # similar enough to check
-                    return _reload_and_check_skip(config, attached)
+                    return _reload_and_check_skip(
+                        config, attached, pipette_offset)
             else:
                 # if there is no request, make sure that the old pipette
                 # did not have backcompat applied
                 if attached.acting_as == attached.name:
                     # similar enough to check
-                    return _reload_and_check_skip(config, attached)
+                    return _reload_and_check_skip(
+                        config, attached, pipette_offset)
 
     if config:
-        return Pipette(config, instrument_offset, serial), False
+        return \
+            Pipette(config, instrument_offset, pipette_offset, serial), False
     else:
         return None, False
 

@@ -135,3 +135,4 @@ def test_update_instrument_config(fixture):
     # pprint(actual)
     # print()
     assert actual == expected
+    filename.unlink()

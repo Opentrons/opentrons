@@ -96,6 +96,10 @@ stages:
         - !anyint
         - !anyint
         - !anyint
+        left_mount_offset:
+        - -34
+        - 0
+        - 0
         log_level: !re_match "DEBUG|INFO|WARNING|ERROR"
         tip_probe: !anylist
         default_pipette_configs:

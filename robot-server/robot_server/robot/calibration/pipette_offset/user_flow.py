@@ -215,3 +215,5 @@ class PipetteOffsetCalibrationUserFlow:
     async def exit_session(self):
         await self.move_to_tip_rack()
         await self._return_tip()
+        # reload new pipette offset data by resetting instrument
+        self._hardware.reset_instrument(self._mount)
