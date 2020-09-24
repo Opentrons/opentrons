@@ -1,5 +1,5 @@
 name: 'Deploy wheel to pypi'
-description: 'Deploy a python wheel to pypi or test pypi, depending on configuration. Manages own secrets. The python environment for the subproject must be set up already, and the complex environment variables must be defined.'
+description: 'Deploy a python wheel to pypi or test pypi, depending on configuration. The python environment for the subproject must be set up already, and the complex environment variables must be defined.'
 inputs:
   project:
     description: 'Which project to run make deploy in'
@@ -7,11 +7,14 @@ inputs:
   repository_url:
     description: 'The repository url to upload to. Creds will be determined based on this'
     required: true
+  password:
+    description: 'The repository password'
 runs:
   using: 'composite'
   steps:
     - shell: bash
       run: |
+        echo "::add-mask::${{ inputs.password }}"
         if [[ ${{ inputs.repository_url }} =~ "test" ]]; then
           echo "::set-env name=PYPI_PASSWORD::${{ secrets.OT_TEST_PYPI_PASSWORD }}"
           echo "::set-env name=SWALLOW_FAILURE::"|| echo \"Duplicate upload allowed on test\""
@@ -23,4 +26,4 @@ runs:
         fi
 
     - shell: bash
-      run: 'QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C ${{ inputs.project }} clean deploy twine_repository_url=${{ inputs.repository_url }} pypi_username=opentrons pypi_password=${PYPI_PASSWORD} ${SWALLOW_FAILURE}'
+      run: 'QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C ${{ inputs.project }} clean deploy twine_repository_url=${{ inputs.repository_url }} pypi_username=opentrons pypi_password=${{ inputs.password }} ${SWALLOW_FAILURE}'
