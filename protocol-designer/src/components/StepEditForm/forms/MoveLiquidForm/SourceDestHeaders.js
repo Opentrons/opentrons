@@ -13,7 +13,7 @@ import styles from '../../StepEditForm.css'
 type Props = {
   className?: ?string,
   collapsed?: ?boolean,
-  toggleCollapsed: () => mixed,
+  toggleCollapsed: () => void,
   focusHandlers: FocusHandlers,
   prefix: 'aspirate' | 'dispense',
 }
