@@ -7,7 +7,7 @@ import type {
 
 import type { CalibrationStatus, AllLabwareCalibrations } from './types'
 
-import type { LawareCalibrationAction } from './labware/types'
+import type { LabwareCalibrationAction } from './labware/types'
 
 import typeof {
   FETCH_CALIBRATION_STATUS,
@@ -43,7 +43,7 @@ export type CalibrationAction =
   | FetchCalibrationStatusAction
   | FetchCalibrationStatusSuccessAction
   | FetchCalibrationStatusFailureAction
-  | LawareCalibrationAction
+  | LabwareCalibrationAction
 
 export type PerRobotCalibrationState = $ReadOnly<{|
   calibrationStatus: CalibrationStatus | null,
