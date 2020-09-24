@@ -1,15 +1,11 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-from opentrons.calibration_storage.get import get_labware_calibration
-from opentrons.protocol_api.labware import get_labware_definition
-from opentrons.types import Point
-
-from robot_server.service.session.session_types.live_protocol import command_interface
+from robot_server.service.session.session_types.live_protocol \
+    import command_interface
 from robot_server.service.session.session_types.live_protocol.state_store \
     import StateStore
 from robot_server.service.session import models
-from opentrons_shared_data.labware import load_definition
 
 
 @pytest.fixture
@@ -23,7 +19,7 @@ def get_labware(get_labware_fixture):
 @pytest.fixture
 def labware_calibration_mock():
     with patch.object(command_interface.get, "get_labware_calibration",
-                      return_value=Point(1, 2, 3)) as p:
+                      return_value=(1, 2, 3)) as p:
         yield p
 
 
@@ -77,4 +73,3 @@ async def test_handle_load_labware_response(get_labware, hardware,
                                         "fixture_12_trough")
         assert response.labwareId == mock_id()
         assert response.calibration == labware_calibration_mock()
-

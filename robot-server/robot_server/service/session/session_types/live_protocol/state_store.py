@@ -1,12 +1,31 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Callable, Any, cast
+from dataclasses import dataclass
+from robot_server.service.session import models
 from robot_server.service.session.command_execution import (
     Command, CommandResult)
+
+
+@dataclass
+class LabwareEntry:
+    definition: Dict[str, Any]
+    calibration: models.OffsetVector
+    deckLocation: int
 
 
 class StateStore:
     def __init__(self):
         self._commands: List[Command] = []
         self._command_results_map: Dict[str, CommandResult] = dict()
+        self._handler_map: Dict[
+            models.CommandDefinition,
+            Callable[[Command, CommandResult], None]
+        ] = {
+            # TODO AL 2020-09-22. mypy is mysteriously complaining about the
+            #  types of these keys.
+            models.EquipmentCommand.load_labware:  # type: ignore
+                self.handle_load_labware,  # noqa: E131
+        }
+        self._labware: Dict[models.IdentifierType, LabwareEntry] = {}
 
     def handle_command_request(self, command: Command) -> None:
         """
@@ -21,6 +40,21 @@ class StateStore:
         Update the state upon completion of a handled command.
         """
         self._command_results_map[command.meta.identifier] = result
+        handler = self._handler_map.get(command.content.name)
+        if handler:
+            handler(command, result)
+
+    def handle_load_labware(self, command: Command,
+                            result: CommandResult) -> None:
+        """
+        Update state according to load_labware() command result.
+        """
+        result_data = cast(models.LoadLabwareResponse, result.data)
+        command_data = cast(models.LoadLabwareRequest, command.content.data)
+        self._labware[result_data.labwareId] = LabwareEntry(
+            definition=result_data.definition,
+            calibration=result_data.calibration,
+            deckLocation=command_data.location)
 
     def get_commands(self) -> List[Command]:
         """

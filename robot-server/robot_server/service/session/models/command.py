@@ -4,11 +4,9 @@ import typing
 from functools import lru_cache
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons.types import Point
-from pydantic import BaseModel, Field, validator
-
 from robot_server.service.session.models.common import (
-    EmptyModel, JogPosition, IdentifierType)
+    EmptyModel, JogPosition, IdentifierType, OffsetVector)
+from pydantic import BaseModel, Field, validator
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.json_api import (
     ResponseModel, RequestModel)

@@ -134,6 +134,7 @@ async def get_sessions_handler(
 @router.post(f"{PATH_SESSION_BY_ID}/commands/execute",
              description="Create and execute a command immediately",
              response_model_exclude_unset=True,
+             response_model_exclude_defaults=True,
              response_model=CommandResponse)
 async def session_command_execute_handler(
         sessionId: IdentifierType,
@@ -157,7 +158,7 @@ async def session_command_execute_handler(
 
     log.info(f"Command completed: {command}")
     log.debug(f"Command result: {command_result}")
-    
+
     return CommandResponse(
         data=ResponseDataModel.create(
             attributes=SessionCommand(
