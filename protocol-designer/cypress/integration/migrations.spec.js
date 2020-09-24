@@ -32,7 +32,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     },
     {
       title: 'doItAllV3 -> PD 5.0.x, schema 3',
-      importFixture: '../../fixtures/protocol/3/doItAllV3.json',
+      importFixture: '../../fixtures/protocol/4/doItAllV3.json',
       expectedExportFixture: '../../fixtures/protocol/5/doItAllV3.json',
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,

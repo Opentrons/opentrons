@@ -75,13 +75,34 @@ describe('Protocol fixtures should validate under their JSON schemas', () => {
   const fixturePaths = glob.sync(fixtureDirsGlobPath)
 
   fixturePaths.forEach(protocolPath => {
-    it(path.basename(protocolPath), () => {
-      const protocol = require(protocolPath)
+    const protocol = require(protocolPath)
+    const relativeName = path.relative(__dirname, protocolPath)
+    it(`${relativeName} should validate under its schema`, () => {
       expectResultToMatchSchema(
         protocolPath,
         protocol,
         getSchemaDefForProtocol(protocol)
       )
+    })
+
+    // eg for a file 'protocol-designer/fixtures/protocol/N/foo.json'
+    // we should expect that file to be PD version N.x.x
+    const expectedVersion = last(path.dirname(protocolPath).split(path.sep))
+    it(`${relativeName} should be in a folder matching its PD major version, ${expectedVersion}`, () => {
+      const designerApplication =
+        protocol.designerApplication || protocol['designer-application']
+
+      // NOTE: default '1' exists because any protocol that doesn't include the application version
+      // key will be treated as the oldest migrateable version ('1.0.0')
+      // (Mimicking same pattern from protocol-designer/src/load-file/migration/index.js)
+      const pdVersion: string =
+        designerApplication?.applicationVersion ||
+        designerApplication?.version ||
+        '1'
+
+      const pdMajorVersion = pdVersion && pdVersion.split('.')[0]
+
+      expect(pdMajorVersion).toEqual(expectedVersion)
     })
   })
 })
