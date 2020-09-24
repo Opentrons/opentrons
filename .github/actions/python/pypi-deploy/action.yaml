@@ -20,6 +20,8 @@ runs:
           echo "Uploading to test pypi"
         else if [[ ${{ inputs.repository_url }} =~ "upload.pypi.org" ]]; then
                  echo "Uploading to prod pypi"
+                 # this needs to be cleared otherwise the makefiles append a dev tag
+                 echo ::set-env name=OT_BUILD::""
              else
                  echo "::error ::Invalid repository url ${{ inputs.repository_url }}"
                  exit 1
