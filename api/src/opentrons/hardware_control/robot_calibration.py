@@ -18,19 +18,19 @@ log = logging.getLogger(__name__)
 @dataclass
 class DeckCalibration:
     attitude: types.AttitudeMatrix
-    source: types.SourceType
     last_modified: Optional[datetime] = None
     pipette_calibrated_with: Optional[str] = None
     tiprack: Optional[str] = None
+    source: Optional[types.SourceType] = None
 
 
 @dataclass
 class PipetteCalibration:
     offset: types.PipetteOffset
-    source: types.SourceType
     tiprack: Optional[str] = None
     uri: Optional[str] = None
     last_modified: Optional[datetime] = None
+    source: Optional[types.SourceType] = None
 
 
 @dataclass
@@ -129,18 +129,18 @@ def load_attitude_matrix() -> DeckCalibration:
     if calibration_data:
         deck_cal_obj = DeckCalibration(**calibration_data)
     else:
+        # load default if deck calibration data do not exist
         deck_cal_obj = DeckCalibration(
-            attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2,
-            source=types.SourceType.default)
+            attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2)
     return deck_cal_obj
 
 
 def load_pipette_offset(
         pip_id: Optional[str],
         mount: Mount) -> PipetteCalibration:
+    # load default if pipette offset data do not exist
     pip_cal_obj = PipetteCalibration(
-        offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
-        source=types.SourceType.default)
+        offset=robot_configs.DEFAULT_PIPETTE_OFFSET)
     if pip_id:
         pip_offset_data = get.get_pipette_offset(pip_id, mount)
         if pip_offset_data:

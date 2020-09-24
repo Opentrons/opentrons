@@ -1,7 +1,7 @@
 import numpy as np
 
 from opentrons import config
-from opentrons.calibration_storage import file_operators as io
+from opentrons.calibration_storage import file_operators as io, types
 from opentrons.hardware_control import robot_calibration
 from opentrons.util.helpers import utc_now
 from opentrons.types import Mount
@@ -33,7 +33,8 @@ def test_save_calibration(ot_config_tempdir):
         'attitude': transform,
         'pipette_calibrated_with': pip_id,
         'last_modified': None,
-        'tiprack': lw_hash
+        'tiprack': lw_hash,
+        'source': 'user'
     }
     robot_calibration.save_attitude_matrix(e, a, pip_id, lw_hash)
     data = io.read_cal_file(pathway)
