@@ -1,7 +1,7 @@
 import numpy as np
 
 from opentrons import config
-from opentrons.calibration_storage import file_operators as io, types
+from opentrons.calibration_storage import file_operators as io
 from opentrons.hardware_control import robot_calibration
 from opentrons.util.helpers import utc_now
 from opentrons.types import Mount
