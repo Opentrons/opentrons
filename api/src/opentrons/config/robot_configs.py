@@ -313,7 +313,8 @@ def build_config(deck_cal: List[List[float]],
             'default_pipette_configs', DEFAULT_PIPETTE_CONFIGS),
         z_retract_distance=robot_settings.get(
             'z_retract_distance', Z_RETRACT_DISTANCE),
-        left_mount_offset=DEFAULT_MOUNT_OFFSET,
+        left_mount_offset=robot_settings.get(
+            'left_mount_offset', DEFAULT_MOUNT_OFFSET),
     )
     return cfg
 
