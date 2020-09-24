@@ -52,4 +52,4 @@ jobs:
         with:
           domain: 'docs.opentrons.com'
           distPath: './api/docs/dist'
-          destPrefix: env.OT_BRANCH
+          destPrefix: ${{ env.OT_BRANCH }}
