@@ -45,12 +45,12 @@ describe('labware calibration selectors', () => {
         calibration: {
           robotName: {
             calibrationStatus: StatusFixtures.mockCalibrationStatus,
-            labwareCalibrations: Fixtures.mockAllLabwareCalibraton,
+            labwareCalibrations: Fixtures.mockAllLabwareCalibration,
           },
         },
       }
       expect(Selectors.getLabwareCalibrations(state, robotName)).toEqual(
-        Fixtures.mockAllLabwareCalibraton.data
+        Fixtures.mockAllLabwareCalibration.data
       )
     })
   })
