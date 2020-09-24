@@ -16,12 +16,13 @@ import type { CommandCreatorArgs } from '../../../step-generation'
 
 type StepArgs = CommandCreatorArgs | null
 
+// cast all fields that have 'castValue' in stepFieldHelperMap
+export const _castForm = (hydratedForm: FormData): any =>
+  mapValues(hydratedForm, (value, name) => castField(name, value))
+
 // TODO: Ian 2019-01-29 use hydrated form type
 export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
-  // cast all fields that have 'fieldCaster' in stepFieldHelperMap
-  const castForm = mapValues(hydratedForm, (value, name) =>
-    castField(name, value)
-  )
+  const castForm = _castForm(hydratedForm)
 
   switch (castForm.stepType) {
     case 'moveLiquid':

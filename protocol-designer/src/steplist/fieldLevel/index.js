@@ -226,6 +226,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
+  mix_mmFromBottom: { castValue: Number },
 }
 
 const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
