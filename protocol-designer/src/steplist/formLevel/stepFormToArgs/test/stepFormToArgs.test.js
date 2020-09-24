@@ -90,6 +90,10 @@ describe('form casting', () => {
       wells: ['A1', 'A2'],
       times: '2',
       meta: {},
+      aspirate_delay_checkbox: true,
+      dispense_delay_checkbox: false,
+      aspirate_delay_seconds: '2',
+      dispense_delay_seconds: '1',
     }
 
     expect(_castForm(input)).toEqual({
@@ -97,6 +101,8 @@ describe('form casting', () => {
       mix_mmFromBottom: 0.5,
       volume: 5,
       times: 2,
+      aspirate_delay_seconds: 2,
+      dispense_delay_seconds: 1,
     })
   })
 
