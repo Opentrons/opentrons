@@ -14,7 +14,6 @@ PipetteOffset = typing.List[float]
 
 class SourceType(str, Enum):
     """Calibration source type"""
-    default = "default"
     factory = "factory"
     user = "user"
 
