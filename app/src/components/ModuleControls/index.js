@@ -13,6 +13,10 @@ type Props = {|
   controlDisabledReason: string | null,
 |}
 
+const BLOCK_TEMPERATURE = 'Block Temperature:'
+const LID_TEMPERATURE = 'Lid Temperature:'
+const TEMPERATURE = 'Temperature:'
+
 export function ModuleControls(props: Props): React.Node {
   const { module: mod, controlDisabledReason } = props
   const sendModuleCommand = useSendModuleCommand()
@@ -27,8 +31,8 @@ export function ModuleControls(props: Props): React.Node {
           target={mod.data.targetTemp}
           title={
             mod.type === THERMOCYCLER_MODULE_TYPE
-              ? 'Base Temperature:'
-              : 'Temperature:'
+              ? BLOCK_TEMPERATURE
+              : TEMPERATURE
           }
         />
         {mod.type === THERMOCYCLER_MODULE_TYPE && (
@@ -36,7 +40,7 @@ export function ModuleControls(props: Props): React.Node {
             className={styles.temp_data_item}
             current={mod.data.lidTemp}
             target={mod.data.lidTarget}
-            title="Lid Temperature:"
+            title={LID_TEMPERATURE}
           />
         )}
       </div>

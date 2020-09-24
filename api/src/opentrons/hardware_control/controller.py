@@ -249,9 +249,9 @@ class Controller:
         await self.update_fw_version()
 
     @property
-    def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
+    def axis_bounds(self) -> Dict[Axis, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {ax: (0, pos + .05) for ax, pos
+        return {Axis[ax]: (0, pos) for ax, pos
                 in self._smoothie_driver.homed_position.items()
                 if ax not in 'BC'}
 

@@ -121,7 +121,7 @@ const contentsBySessionTypeByCurrentStep: {
 }
 
 export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
-  const { isMulti, mount, sendSessionCommand, currentStep, sessionType } = props
+  const { isMulti, mount, sendCommands, currentStep, sessionType } = props
 
   const {
     slotNumber,
@@ -136,21 +136,21 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
-    sendSessionCommand(
-      Sessions.deckCalCommands.JOG,
-      {
+    sendCommands({
+      command: Sessions.sharedCalCommands.JOG,
+      data: {
         vector: formatJogVector(axis, dir, step),
       },
-      false
-    )
+    })
   }
 
   const savePoint = () => {
-    sendSessionCommand(Sessions.sharedCalCommands.SAVE_OFFSET)
-    // TODO: IMMEDIATELY use actualy epic for managing chained dependent commands
-    setTimeout(() => {
-      moveCommandString && sendSessionCommand(moveCommandString)
-    }, 300)
+    let commands = [{ command: Sessions.sharedCalCommands.SAVE_OFFSET }]
+
+    if (moveCommandString) {
+      commands = [...commands, { command: moveCommandString }]
+    }
+    sendCommands(...commands)
   }
 
   return (

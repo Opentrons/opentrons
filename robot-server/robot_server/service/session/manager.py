@@ -10,7 +10,8 @@ from robot_server.service.session.errors import SessionCreationException, \
     SessionException
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import IdentifierType, SessionType
+from robot_server.service.session.models.session import SessionType
+from robot_server.service.session.models.common import IdentifierType
 from robot_server.service.session.session_types import (
     NullSession, CheckSession, SessionMetaData, TipLengthCalibration,
     DeckCalibrationSession, PipetteOffsetCalibrationSession, DefaultSession)

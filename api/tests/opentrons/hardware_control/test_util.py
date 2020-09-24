@@ -1,8 +1,10 @@
 from typing import List
 
-from opentrons.hardware_control.util import plan_arc
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.util import plan_arc, check_motion_bounds
+from opentrons.hardware_control.types import (
+    CriticalPoint, MotionChecks, OutOfBoundsMove, Axis)
 from opentrons.types import Point
+
 
 import pytest
 
@@ -68,3 +70,30 @@ def test_cp_blending():
     assert arc2[0][1] == CriticalPoint.TIP
     assert arc2[1][1] is None
     assert arc2[2][1] is None
+
+
+@pytest.mark.parametrize(
+    'xformed,deck,bounds,check,catch,phrase',
+    [
+        # acceptable moves, iterating through checks
+        ({Axis.X: 2}, {Axis.X: -15}, {Axis.X: (1, 4)}, MotionChecks.NONE, False, ''),  # noqa(E501)
+        ({Axis.X: 2}, {Axis.X: -10}, {Axis.X: (1, 4)}, MotionChecks.LOW, False, ''),  # noqa(E501)
+        ({Axis.X: 2}, {Axis.X: 0}, {Axis.X: (1, 4)}, MotionChecks.HIGH, False, ''),  # noqa(E501)
+        ({Axis.X: 2}, {Axis.X: 10}, {Axis.X: (1, 4)}, MotionChecks.BOTH, False, ''),  # noqa(E501)
+        # unacceptable low, with and without checking
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ''),  # noqa(E501)
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, True, 'low'),  # noqa(E501)
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, False, ''),  # noqa(E501)
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, 'low'),  # noqa(E501)
+        # unacceptable high, with and without checking
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ''),  # noqa(E501)
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, False, ''),  # noqa(E501)
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, True, 'high'),  # noqa(E501)
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, 'high')  # noqa(E501)
+    ])
+def test_check_motion_bounds(xformed, deck, bounds, check, catch, phrase):
+    if catch:
+        with pytest.raises(OutOfBoundsMove, match=phrase):
+            check_motion_bounds(xformed, deck, bounds, check)
+    else:
+        check_motion_bounds(xformed, deck, bounds, check)

@@ -10,8 +10,9 @@ from robot_server.robot.calibration.check.util import StateMachineError
 
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import (EmptyModel, JogPosition,
-                                                 CalibrationCommand)
+from robot_server.service.session.models.common import (
+    EmptyModel, JogPosition)
+from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.service.session.session_types import CheckSession, \
     SessionMetaData, BaseSession
 

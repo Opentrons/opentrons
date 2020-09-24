@@ -60,7 +60,7 @@ export const mockSession: Types.Session = {
 
 export const mockSessionCommand: Types.SessionCommandAttributes = {
   command: 'calibration.jog',
-  data: { someData: 32 },
+  data: { vector: [32, 0, 0] },
 }
 
 export const mockSessionCommandAttributes: Types.SessionCommandAttributes = {

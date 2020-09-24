@@ -10,7 +10,7 @@ from robot_server.service.session.command_execution import \
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
-from ..models import SessionType, SessionDetails
+from ..models.session import SessionType, SessionDetails
 from ..errors import UnsupportedFeature
 
 
@@ -75,8 +75,10 @@ class DeckCalibrationSession(BaseSession):
         return SessionType.deck_calibration
 
     def _get_response_details(self) -> SessionDetails:
+        # TODO(mc, 2020-09-17): get_pipette() returns an Optional value but
+        # DeckCalibrationSessionStatus has an exact type for instrument
         return DeckCalibrationSessionStatus(
-            instrument=self._deck_cal_user_flow.get_pipette(),
+            instrument=self._deck_cal_user_flow.get_pipette(),  # type: ignore[arg-type] # noqa: e501
             currentStep=self._deck_cal_user_flow.current_state,
             labware=self._deck_cal_user_flow.get_required_labware())
 

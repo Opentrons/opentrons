@@ -76,3 +76,16 @@ class CalibrationInformation:
     parent: ParentOptions
     labware_id: str
     uri: str
+
+
+@dataclass
+class PipetteOffsetCalibration:
+    """
+    Class to store pipette offset calibration
+    """
+    pipette: str
+    mount: str
+    offset: PipetteOffset
+    tiprack: str
+    uri: str
+    last_modified: datetime

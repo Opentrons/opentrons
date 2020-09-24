@@ -7,7 +7,7 @@ import {
   getSuccessResult,
   getErrorResult,
   replaceTipCommands,
-  getFlowRateAndOffsetParams,
+  getFlowRateAndOffsetParamsMix,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
@@ -15,6 +15,7 @@ import {
   makeDispenseHelper,
   blowoutHelper,
   makeTouchTipHelper,
+  delayCommand,
 } from '../__fixtures__'
 import type { MixArgs } from '../types'
 
@@ -30,6 +31,7 @@ let mixinArgs
 
 beforeEach(() => {
   mixinArgs = {
+    ...getFlowRateAndOffsetParamsMix(),
     commandCreatorFnName: 'mix',
     name: 'mix test',
     description: 'test blah blah',
@@ -39,7 +41,9 @@ beforeEach(() => {
 
     blowoutLocation: null,
     touchTip: false,
-    ...getFlowRateAndOffsetParams(),
+
+    aspirateDelaySeconds: null,
+    dispenseDelaySeconds: null,
   }
 
   invariantContext = makeContext()
@@ -117,7 +121,6 @@ describe('mix: advanced options', () => {
       times,
       wells: ['A1'],
       changeTip: 'once',
-      ...getFlowRateAndOffsetParams(),
     }
 
     const result = mix(args, invariantContext, robotStateWithTip)
@@ -213,6 +216,92 @@ describe('mix: advanced options', () => {
         touchTipHelper(well),
       ])
     )
+  })
+  it('should delay after aspirating', () => {
+    const args: MixArgs = {
+      ...mixinArgs,
+      aspirateDelaySeconds: 12,
+      volume,
+      times,
+      changeTip: 'always',
+      wells: ['A1', 'B1', 'C1'],
+    }
+
+    const result = mix(args, invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual(
+      flatMap(args.wells, (well, idx) => [
+        ...replaceTipCommands(idx),
+        aspirateHelper(well, volume),
+        delayCommand(12),
+        dispenseHelper(well, volume),
+        aspirateHelper(well, volume),
+        delayCommand(12),
+        dispenseHelper(well, volume),
+      ])
+    )
+  })
+  it('should delay after dispensing', () => {
+    const args: MixArgs = {
+      ...mixinArgs,
+      dispenseDelaySeconds: 12,
+      volume,
+      times,
+      changeTip: 'always',
+      wells: ['A1', 'B1', 'C1'],
+    }
+
+    const result = mix(args, invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual(
+      flatMap(args.wells, (well, idx) => [
+        ...replaceTipCommands(idx),
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+        delayCommand(12),
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+        delayCommand(12),
+      ])
+    )
+  })
+  describe('all advanced settings enabled', () => {
+    it('should create commands in the expected order with expected params', () => {
+      const args: MixArgs = {
+        ...mixinArgs,
+        touchTip: true,
+        aspirateDelaySeconds: 10,
+        dispenseDelaySeconds: 12,
+        blowoutLocation: blowoutLabwareId,
+        volume,
+        times,
+        changeTip: 'always',
+        wells: ['A1', 'B1', 'C1'],
+      }
+
+      const result = mix(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+
+      expect(res.commands).toEqual(
+        flatMap(args.wells, (well, idx) => [
+          ...replaceTipCommands(idx),
+          aspirateHelper(well, volume),
+          delayCommand(10),
+          dispenseHelper(well, volume),
+          delayCommand(12),
+          aspirateHelper(well, volume),
+          delayCommand(10),
+          dispenseHelper(well, volume),
+          delayCommand(12),
+          blowoutHelper(blowoutLabwareId, {
+            offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+          }),
+          touchTipHelper(well),
+        ])
+      )
+    })
   })
 })
 

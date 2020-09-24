@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
-from robot_server.service.json_api.request import json_api_request
+from robot_server.service.json_api.request import (
+    RequestModel, RequestDataModel)
 
 
 class ItemModel(BaseModel):
@@ -9,4 +10,4 @@ class ItemModel(BaseModel):
     price: float
 
 
-ItemRequest = json_api_request(ItemModel)
+ItemRequest = RequestModel[RequestDataModel[ItemModel]]

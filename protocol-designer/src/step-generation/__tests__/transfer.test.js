@@ -8,7 +8,7 @@ import {
   DISPENSE_OFFSET_FROM_BOTTOM_MM,
   dropTipHelper,
   getErrorResult,
-  getFlowRateAndOffsetParams,
+  getFlowRateAndOffsetParamsTransferLike,
   getRobotStateWithTipStandard,
   getSuccessResult,
   makeAirGapHelper,
@@ -21,6 +21,7 @@ import {
   makeDispenseAirGapHelper,
 } from '../__fixtures__'
 import { transfer } from '../commandCreators/compound/transfer'
+import type { TransferArgs } from '../types'
 
 // well depth for 96 plate is 10.54, so need to add 1mm to top of well
 const airGapHelper = makeAirGapHelper({ offsetFromBottomMm: 11.54 })
@@ -33,11 +34,11 @@ const touchTipHelper = makeTouchTipHelper()
 
 let invariantContext
 let robotStateWithTip
-let mixinArgs
+let mixinArgs: $Shape<TransferArgs>
 
 beforeEach(() => {
   mixinArgs = {
-    ...getFlowRateAndOffsetParams(),
+    ...getFlowRateAndOffsetParamsTransferLike(),
     commandCreatorFnName: 'transfer',
     name: 'Transfer Test',
     description: 'test blah blah',

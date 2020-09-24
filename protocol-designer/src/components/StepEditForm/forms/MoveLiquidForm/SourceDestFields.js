@@ -13,6 +13,7 @@ import {
   TipPositionField,
   FlowRateField,
   WellOrderField,
+  DelayFields,
 } from '../../fields'
 
 import styles from '../../StepEditForm.css'
@@ -53,22 +54,12 @@ export const SourceDestFields = (props: Props): React.Node => {
   )
 
   const getDelayFields = () => (
-    <CheckboxRowField
-      name={addFieldNamePrefix('delay_checkbox')}
-      label={i18n.t('form.step_edit_form.field.delay.label')}
-      className={styles.small_field}
-      tooltipComponent={i18n.t(
-        `tooltip.step_fields.defaults.${addFieldNamePrefix('delay_checkbox')}`
-      )}
-    >
-      <TextField
-        name={addFieldNamePrefix('delay_seconds')}
-        units={i18n.t('application.units.seconds')}
-        className={styles.small_field}
-        {...focusHandlers}
-      />
-      <TipPositionField fieldName={addFieldNamePrefix('delay_mmFromBottom')} />
-    </CheckboxRowField>
+    <DelayFields
+      checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
+      secondsFieldName={addFieldNamePrefix('delay_seconds')}
+      tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
+      focusHandlers={focusHandlers}
+    />
   )
 
   return (

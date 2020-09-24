@@ -1,5 +1,5 @@
 // @flow
-import { uuid } from '../../../utils'
+import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { resetScrollElements } from '../utils'
 import type { StepIdType, StepType } from '../../../form-types'
@@ -26,12 +26,11 @@ export const addStep = (args: {
   stepType: StepType,
   robotStateTimeline: Timeline,
 }): AddStepAction => {
-  const stepId = uuid()
   return {
     type: 'ADD_STEP',
     payload: {
       stepType: args.stepType,
-      id: stepId,
+      id: PRESAVED_STEP_ID,
     },
     meta: {
       robotStateTimeline: args.robotStateTimeline,

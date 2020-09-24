@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
 import produce from 'immer'
+import { stripNoOpCommands } from '../utils/stripNoOpCommands'
 import { forAspirate } from './forAspirate'
 import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
@@ -193,8 +194,9 @@ export function getNextRobotStateAndWarnings(
     warnings: [],
     robotState: initialRobotState,
   }
+  const strippedCommands = stripNoOpCommands(commands)
   return produce(prevState, draft => {
-    commands.forEach(command => {
+    strippedCommands.forEach(command => {
       _getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,

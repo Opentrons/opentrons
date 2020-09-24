@@ -65,4 +65,11 @@ describe('ConfirmExitModal', () => {
     })
     expect(wrapper.text()).toContain('pipette offset calibration')
   })
+
+  it('tip length cal session type shows correct text', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+    })
+    expect(wrapper.text()).toContain('tip length calibration')
+  })
 })

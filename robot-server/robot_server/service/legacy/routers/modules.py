@@ -62,7 +62,13 @@ async def get_module_serial(
     if not res:
         raise V1HandlerError(status_code=status.HTTP_404_NOT_FOUND,
                              message="Module not found")
-    return ModuleSerial(status=res.get('status'), data=res.get('data'))
+
+    # TODO(mc, 2020-09-17): types of res.get(...) do not match what
+    # ModuleSerial expects
+    return ModuleSerial(
+        status=res.get('status'),  # type: ignore[arg-type]
+        data=res.get('data')  # type: ignore[arg-type]
+    )
 
 
 @router.post("/modules/{serial}",

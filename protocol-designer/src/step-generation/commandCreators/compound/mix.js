@@ -25,8 +25,8 @@ export function mixUtil(args: {|
   dispenseOffsetFromBottomMm: number,
   aspirateFlowRateUlSec: number,
   dispenseFlowRateUlSec: number,
-  aspirateDelaySeconds?: number,
-  dispenseDelaySeconds?: number,
+  aspirateDelaySeconds?: ?number,
+  dispenseDelaySeconds?: ?number,
 |}): Array<CurriedCommandCreator> {
   const {
     pipette,
@@ -104,6 +104,8 @@ export const mix: CommandCreator<MixArgs> = (
     volume,
     times,
     changeTip,
+    aspirateDelaySeconds,
+    dispenseDelaySeconds,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
     aspirateFlowRateUlSec,
@@ -172,6 +174,8 @@ export const mix: CommandCreator<MixArgs> = (
         dispenseOffsetFromBottomMm,
         aspirateFlowRateUlSec,
         dispenseFlowRateUlSec,
+        aspirateDelaySeconds,
+        dispenseDelaySeconds,
       })
 
       return [

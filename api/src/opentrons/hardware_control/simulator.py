@@ -259,9 +259,9 @@ class Simulator:
             sim_model=sim_model)
 
     @property
-    def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
+    def axis_bounds(self) -> Dict[Axis, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {ax: (0, pos + 0.5) for ax, pos in _HOME_POSITION.items()
+        return {Axis[ax]: (0, pos) for ax, pos in _HOME_POSITION.items()
                 if ax not in 'BC'}
 
     @property

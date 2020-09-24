@@ -1,7 +1,7 @@
 from typing import Dict
 
-from robot_server.service.session.models import \
-    CommandDefinition, CalibrationCommand
+from robot_server.service.session.models.command import (
+    CommandDefinition, CalibrationCommand)
 from robot_server.robot.calibration.util import (
     SimpleStateMachine, StateTransitionError)
 from .constants import PipetteOffsetCalibrationState as State

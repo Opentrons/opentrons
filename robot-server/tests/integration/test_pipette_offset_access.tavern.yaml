@@ -1,0 +1,143 @@
+---
+test_name: GET Pipette Offset Calibration, No Calibrations
+marks:
+  - usefixtures:
+    - run_server
+stages:
+  - name: GET request returns an empty list
+    request: &get_offsets
+      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      method: GET
+    response: &no_offset_response
+      status_code: 200
+      json:
+        meta: null
+        links: null
+        data: []
+
+---
+test_name: GET Pipette Offset Calibration, Wtih Calibrations
+marks: &cal_marks
+  - usefixtures:
+    - run_server
+    - set_up_pipette_offset_temp_directory
+stages:
+  - name: GET request returns all calibrations from fixture
+    request: *get_offsets
+    response:
+      status_code: 200
+      strict: false
+      json:
+        meta: null
+        links: null
+        data:
+          - attributes:
+              pipette: 'pip_1'
+              mount: 'left'
+              offset: [0.0, 0.0, 0.0]
+              tiprack: !anystr
+              lastModified: !anystr
+            id: !anystr
+            type: 'PipetteOffsetCalibration'
+          - attributes:
+              pipette: 'pip_2'
+              mount: 'right'
+              offset: [0.0, 0.0, 0.0]
+              tiprack: !anystr
+              lastModified: !anystr
+            id: !anystr
+            type: 'PipetteOffsetCalibration'
+
+  - name: GET request returns filter with pipette id
+    request:
+      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      method: GET
+      params:
+        pipette: 'pip_1'
+    response:
+      status_code: 200
+      strict: false
+      json:
+        meta: null
+        links: null
+        data:
+          - attributes:
+              pipette: 'pip_1'
+              mount: 'left'
+              offset: [0.0, 0.0, 0.0]
+              tiprack: !anystr
+              lastModified: !anystr
+            id: !anystr
+            type: 'PipetteOffsetCalibration'
+
+  - name: GET request returns filter with mount
+    request:
+      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      method: GET
+      params:
+        mount: 'left'
+    response:
+      status_code: 200
+      strict: false
+      json:
+        meta: null
+        links: null
+        data:
+          - attributes:
+              pipette: 'pip_1'
+              mount: 'left'
+              offset: [0.0, 0.0, 0.0]
+              tiprack: !anystr
+              lastModified: !anystr
+            id: !anystr
+            type: 'PipetteOffsetCalibration'
+
+  - name: GET request returns filter with pipette AND mount
+    request:
+      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      method: GET
+      params:
+        pipette: 'pip_1'
+        mount: 'left'
+    response:
+      status_code: 200
+      strict: false
+      json:
+        meta: null
+        links: null
+        data:
+          - attributes:
+              pipette: 'pip_1'
+              mount: 'left'
+              offset: [0.0, 0.0, 0.0]
+              tiprack: !anystr
+              lastModified: !anystr
+            id: !anystr
+            type: 'PipetteOffsetCalibration'
+
+  - name: GET request returns filter with wrong pipette AND mount
+    request:
+      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      method: GET
+      params:
+        pipette: 'pip_2'
+        mount: 'left'
+    response: *no_offset_response
+
+---
+test_name: DELETE Pipette Calibrations
+marks: *cal_marks
+stages:
+  - name: DELETE request with correct pipette AND mount
+    request:
+      url: "{host:s}:{port:d}/calibration/pipette_offset?pipette_id=pip_2&mount=right"
+      method: DELETE
+    response:
+        status_code: 200
+
+  - name: DELETE request with incorrect pipette AND MOUNT
+    request:
+      url: "{host:s}:{port:d}/calibration/pipette_offset?pipette_id=pip_1&mount=right"
+      method: DELETE
+    response:
+        status_code: 404

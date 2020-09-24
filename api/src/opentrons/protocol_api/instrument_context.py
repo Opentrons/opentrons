@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union
 
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, PipettePair
 from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
@@ -329,7 +329,7 @@ class InstrumentContext(CommandPublisher):
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
 
-        c_vol = self.hw_pipette['current_volume'] if not volume else volume
+        c_vol = self.current_volume if not volume else volume
 
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'before', None, None, self, c_vol, loc, rate)
@@ -380,7 +380,7 @@ class InstrumentContext(CommandPublisher):
             'mixing {}uL with {} repetitions in {} at rate={}'.format(
                 volume, repetitions,
                 location if location else 'current position', rate))
-        if not self.hw_pipette['has_tip']:
+        if not self._has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
 
         c_vol = self.hw_pipette['available_volume'] if not volume else volume
@@ -499,7 +499,7 @@ class InstrumentContext(CommandPublisher):
             :py:class:`.Placeable` as the ``location`` parameter)
 
         """
-        if not self.hw_pipette['has_tip']:
+        if not self._has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
 
         checked_speed = self._determine_speed(speed)
@@ -532,8 +532,8 @@ class InstrumentContext(CommandPublisher):
                 'location should be a Well, but it is {}'.format(location))
 
         edges = build_edges(
-            location, v_offset, self._api_version,
-            self._mount, self._ctx._deck_layout, radius)
+            location, v_offset, self._mount,
+            self._ctx._deck_layout, radius, self._api_version)
         for edge in edges:
             self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
         return self
@@ -574,7 +574,7 @@ class InstrumentContext(CommandPublisher):
 
 
         """
-        if not self.hw_pipette['has_tip']:
+        if not self._has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
 
         if height is None:
@@ -598,7 +598,7 @@ class InstrumentContext(CommandPublisher):
 
         :returns: This instance
         """
-        if not self.hw_pipette['has_tip']:
+        if not self._has_tip:
             self._log.warning('Pipette has no tip to return')
         loc = self._last_tip_picked_up_from
         if not isinstance(loc, Well):
@@ -1293,6 +1293,23 @@ class InstrumentContext(CommandPublisher):
         return self.hw_pipette['current_volume']
 
     @property  # type: ignore
+    @requires_version(2, 7)
+    def has_tip(self) -> bool:
+        """
+        :returns: Whether this instrument has a tip attached or not.
+        :type: bool
+        """
+        return self.hw_pipette['has_tip']
+
+    @property  # type: ignore
+    def _has_tip(self) -> bool:
+        """
+        Internal function used to check whether this instrument has a
+        tip attached or not.
+        """
+        return self.hw_pipette['has_tip']
+
+    @property  # type: ignore
     @requires_version(2, 0)
     def hw_pipette(self) -> Dict[str, Any]:
         """ View the information returned by the hardware API directly.
@@ -1424,7 +1441,9 @@ class InstrumentContext(CommandPublisher):
 
         return PairedInstrumentContext(
             primary_instrument=self, secondary_instrument=instrument,
-            api_version=self.api_version, trash=self.trash_container)
+            ctx=self._ctx, pair_policy=PipettePair.of_mount(self._mount),
+            api_version=self.api_version, hardware_manager=self._hw_manager,
+            trash=self.trash_container, log_parent=self._log)
 
     @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:

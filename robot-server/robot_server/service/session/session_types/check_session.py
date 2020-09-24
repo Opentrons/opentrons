@@ -3,10 +3,11 @@ from robot_server.robot.calibration.check.session import\
 from robot_server.robot.calibration.check import models as calibration_models
 from robot_server.robot.calibration.check.util import StateMachineError
 
-from robot_server.service.session import models
 from robot_server.service.session.command_execution import \
     CommandQueue, CallableExecutor, Command, CompletedCommand
 from robot_server.service.session.configuration import SessionConfiguration
+from robot_server.service.session.models.session import SessionType, \
+    SessionDetails
 from robot_server.service.session.session_types.base_session \
     import BaseSession, SessionMetaData
 from robot_server.service.session.errors import SessionCreationException, \
@@ -55,7 +56,7 @@ class CheckSession(BaseSession):
         await super().clean_up()
         await self._calibration_check.delete_session()
 
-    def _get_response_details(self) -> models.SessionDetails:
+    def _get_response_details(self) -> SessionDetails:
         instruments = {
             str(k): calibration_models.AttachedPipette(
                 model=v.model,
@@ -80,10 +81,12 @@ class CheckSession(BaseSession):
             self._calibration_check.labware_status.values()
         ]
 
+        # TODO(mc, 2020-09-17): type of get_comparisons_by_step doesn't quite
+        # match what CalibrationSessionStatus expects for comparisonsByStep
         return calibration_models.CalibrationSessionStatus(
             instruments=instruments,
             currentStep=self._calibration_check.current_state_name,
-            comparisonsByStep=self._calibration_check.get_comparisons_by_step(),  # noqa: e501
+            comparisonsByStep=self._calibration_check.get_comparisons_by_step(),  # type: ignore[arg-type] # noqa: e501
             labware=labware,
         )
 
@@ -96,5 +99,5 @@ class CheckSession(BaseSession):
         raise UnsupportedFeature()
 
     @property
-    def session_type(self) -> models.SessionType:
-        return models.SessionType.calibration_check
+    def session_type(self) -> SessionType:
+        return SessionType.calibration_check

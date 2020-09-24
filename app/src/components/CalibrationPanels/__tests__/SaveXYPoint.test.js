@@ -15,7 +15,7 @@ const currentStepBySlot = {
 describe('SaveXYPoint', () => {
   let render
 
-  const mockSendCommand = jest.fn()
+  const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   const getSaveButton = (wrapper, direction) =>
@@ -27,14 +27,13 @@ describe('SaveXYPoint', () => {
   const getVideo = wrapper => wrapper.find(`source`)
 
   beforeEach(() => {
-    jest.useFakeTimers()
     render = (props = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
-        sendSessionCommand = mockSendCommand,
-        deleteSession = mockDeleteSession,
+        sendCommands = mockSendCommands,
+        cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_SAVING_POINT_ONE,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
@@ -43,8 +42,8 @@ describe('SaveXYPoint', () => {
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
-          sendSessionCommand={sendSessionCommand}
-          deleteSession={deleteSession}
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
         />
@@ -53,8 +52,6 @@ describe('SaveXYPoint', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
-    jest.clearAllTimers()
-    jest.useRealTimers()
   })
 
   it('displays proper asset', () => {
@@ -133,13 +130,12 @@ describe('SaveXYPoint', () => {
       getJogButton(wrapper, direction).invoke('onClick')()
       wrapper.update()
 
-      expect(mockSendCommand).toHaveBeenCalledWith(
-        Sessions.sharedCalCommands.JOG,
-        {
+      expect(mockSendCommands).toHaveBeenCalledWith({
+        command: Sessions.sharedCalCommands.JOG,
+        data: {
           vector: jogVectorByDirection[direction],
         },
-        false
-      )
+      })
     })
 
     const unavailableJogDirections = ['up', 'down']
@@ -158,13 +154,14 @@ describe('SaveXYPoint', () => {
     getSaveButton(wrapper).invoke('onClick')()
 
     wrapper.update()
-    jest.runAllTimers()
 
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.SAVE_OFFSET
-    )
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.MOVE_TO_POINT_TWO
+    expect(mockSendCommands).toHaveBeenCalledWith(
+      {
+        command: Sessions.sharedCalCommands.SAVE_OFFSET,
+      },
+      {
+        command: Sessions.deckCalCommands.MOVE_TO_POINT_TWO,
+      }
     )
   })
 
@@ -177,13 +174,14 @@ describe('SaveXYPoint', () => {
     expect(wrapper.text()).toContain('slot 3')
     getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
-    jest.runAllTimers()
 
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.SAVE_OFFSET
-    )
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.MOVE_TO_POINT_THREE
+    expect(mockSendCommands).toHaveBeenCalledWith(
+      {
+        command: Sessions.sharedCalCommands.SAVE_OFFSET,
+      },
+      {
+        command: Sessions.deckCalCommands.MOVE_TO_POINT_THREE,
+      }
     )
   })
 
@@ -196,13 +194,14 @@ describe('SaveXYPoint', () => {
     expect(wrapper.text()).toContain('slot 7')
     getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
-    jest.runAllTimers()
 
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.SAVE_OFFSET
-    )
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.MOVE_TO_TIP_RACK
+    expect(mockSendCommands).toHaveBeenCalledWith(
+      {
+        command: Sessions.sharedCalCommands.SAVE_OFFSET,
+      },
+      {
+        command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+      }
     )
   })
 
@@ -217,9 +216,9 @@ describe('SaveXYPoint', () => {
 
     getSaveButton(wrapper).invoke('onClick')()
     wrapper.update()
-    jest.runAllTimers()
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.SAVE_OFFSET
-    )
+
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.SAVE_OFFSET,
+    })
   })
 })

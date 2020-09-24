@@ -248,6 +248,9 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
         hasTwoPipettes
       )
       const comparison = comparisonsByStep[currentStep]
+      if (comparison?.exceedsThreshold) {
+        shouldDisplayTitleBarExit = false
+      }
       stepContents = (
         <CheckXYPoint
           slotNumber={slotNumber}
@@ -280,6 +283,9 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
         hasTwoPipettes
       )
       const comparison = comparisonsByStep[currentStep]
+      if (comparison?.exceedsThreshold) {
+        shouldDisplayTitleBarExit = false
+      }
       stepContents = (
         <CheckHeight
           isMulti={isActiveInstrumentMultiChannel}

@@ -1,8 +1,9 @@
 from datetime import datetime
 from pydantic import BaseModel
 
-from robot_server.service.json_api import ResponseModel, ResponseDataModel, \
-    RequestDataModel, RequestModel
+from robot_server.service.json_api import (
+    ResponseModel, ResponseDataModel, RequestModel
+)
 
 
 class SystemTimeAttributes(BaseModel):
@@ -11,6 +12,6 @@ class SystemTimeAttributes(BaseModel):
 
 SystemTimeResponseDataModel = ResponseDataModel[SystemTimeAttributes]
 
-SystemTimeResponse = ResponseModel[SystemTimeResponseDataModel, dict]
+SystemTimeResponse = ResponseModel[SystemTimeAttributes, dict]
 
-SystemTimeRequest = RequestModel[RequestDataModel[SystemTimeAttributes]]
+SystemTimeRequest = RequestModel[SystemTimeAttributes]

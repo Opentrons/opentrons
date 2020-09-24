@@ -5,9 +5,10 @@ from opentrons.config.feature_flags import enable_http_protocol_sessions
 
 from robot_server.service.session.errors import UnsupportedFeature, \
     SessionCreationException
+from robot_server.service.session.models.session import SessionType, \
+    SessionDetails
 from robot_server.service.session.session_types import BaseSession, \
     SessionMetaData
-from robot_server.service.session import models
 from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
@@ -15,7 +16,7 @@ from robot_server.service.protocol.protocol import UploadedProtocol
 from robot_server.service.session.session_types.protocol.execution.\
     command_executor import ProtocolCommandExecutor
 from robot_server.service.session.session_types.protocol.models import \
-    ProtocolSessionDetails
+    ProtocolSessionDetails, ProtocolCreateParams
 
 log = logging.getLogger(__name__)
 
@@ -43,12 +44,13 @@ class ProtocolSession(BaseSession):
                 "HTTP Protocol Session feature is disabled")
 
         protocol = configuration.protocol_manager.get(
-            cast(models.ProtocolCreateParams,
-                 instance_meta.create_params).protocolId
+            cast(
+                ProtocolCreateParams,
+                instance_meta.create_params).protocolId
         )
         return cls(configuration, instance_meta, protocol)
 
-    def _get_response_details(self) -> models.SessionDetails:
+    def _get_response_details(self) -> SessionDetails:
         return ProtocolSessionDetails(
             protocolId=self._uploaded_protocol.meta.identifier,
             currentState=self._command_executor.current_state,
@@ -64,8 +66,8 @@ class ProtocolSession(BaseSession):
         raise UnsupportedFeature()
 
     @property
-    def session_type(self) -> models.SessionType:
-        return models.SessionType.protocol
+    def session_type(self) -> SessionType:
+        return SessionType.protocol
 
     async def clean_up(self):
         return await self._command_executor.clean_up()

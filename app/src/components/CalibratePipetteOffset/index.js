@@ -1,25 +1,23 @@
 // @flow
 // Pipette Offset Calibration Orchestration Component
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import last from 'lodash/last'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ModalPage,
   SpinnerModalPage,
   useConditionalConfirm,
+  DISPLAY_FLEX,
+  DIRECTION_COLUMN,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  SPACING_3,
+  C_TRANSPARENT,
+  ALIGN_FLEX_START,
+  C_WHITE,
 } from '@opentrons/components'
 
-import type { State } from '../../types'
-import type {
-  SessionCommandString,
-  SessionCommandData,
-  DeckCalibrationLabware,
-} from '../../sessions/types'
 import * as Sessions from '../../sessions'
-import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
-import type { RequestState } from '../../robot-api/types'
 import {
   Introduction,
   DeckSetup,
@@ -30,13 +28,41 @@ import {
   CompleteConfirmation,
   ConfirmExitModal,
 } from '../CalibrationPanels'
-import styles from '../CalibrateDeck/styles.css'
 
+import type { StyleProps } from '@opentrons/components'
+import type {
+  DeckCalibrationLabware,
+  SessionCommandParams,
+} from '../../sessions/types'
 import type { CalibratePipetteOffsetParentProps } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
 const EXIT = 'exit'
+
+const darkContentsStyleProps = {
+  display: DISPLAY_FLEX,
+  flexDirection: DIRECTION_COLUMN,
+  alignItems: ALIGN_CENTER,
+  padding: SPACING_3,
+  backgroundColor: C_TRANSPARENT,
+  height: '100%',
+}
+const contentsStyleProps = {
+  display: DISPLAY_FLEX,
+  backgroundColor: C_WHITE,
+  flexDirection: DIRECTION_COLUMN,
+  justifyContent: JUSTIFY_CENTER,
+  alignItems: ALIGN_FLEX_START,
+  padding: SPACING_3,
+  maxWidth: '48rem',
+  minHeight: '14rem',
+}
+
+const terminalContentsStyleProps = {
+  ...contentsStyleProps,
+  paddingX: '1.5rem',
+}
 
 const PANEL_BY_STEP: {
   [string]: React.ComponentType<CalibrationPanelProps>,
@@ -49,67 +75,67 @@ const PANEL_BY_STEP: {
   [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: SaveXYPoint,
   [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
-const PANEL_STYLE_BY_STEP: {
-  [string]: string,
+
+const PANEL_STYLE_PROPS_BY_STEP: {
+  [string]: StyleProps,
 } = {
-  [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: styles.terminal_modal_contents,
-  [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: styles.page_content_dark,
-  [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: styles.modal_contents,
-  [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: styles.modal_contents,
-  [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: styles.modal_contents,
-  [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: styles.modal_contents,
-  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]:
-    styles.terminal_modal_contents,
+  [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: terminalContentsStyleProps,
+  [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: darkContentsStyleProps,
+  [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: contentsStyleProps,
+  [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: contentsStyleProps,
+  [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: contentsStyleProps,
+  [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: contentsStyleProps,
+  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
 ): React.Node {
-  const { session, robotName, closeWizard } = props
+  const {
+    session,
+    robotName,
+    closeWizard,
+    dispatchRequests,
+    showSpinner,
+  } = props
   const { currentStep, instrument, labware } = session?.details || {}
-  const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const dispatch = useDispatch()
-
-  const requestStatus = useSelector<State, RequestState | null>(state =>
-    getRequestById(state, last(requestIds))
-  )?.status
-
-  function sendCommand(
-    command: SessionCommandString,
-    data: SessionCommandData = {},
-    loadingSpinner: boolean = true
-  ) {
-    if (session === null) return
-    const sessionCommand = Sessions.createSessionCommand(
-      robotName,
-      session.id,
-      { command, data }
-    )
-    if (loadingSpinner) {
-      dispatchRequest(sessionCommand)
-    } else {
-      dispatch(sessionCommand)
-    }
-  }
-
-  function deleteSession() {
-    session?.id &&
-      dispatchRequest(Sessions.deleteSession(robotName, session.id))
-    closeWizard()
-  }
 
   const {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {
-    sendCommand(Sessions.deckCalCommands.EXIT)
-    deleteSession()
+    cleanUpAndExit()
   }, true)
 
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)
     return spec ? spec.channels > 1 : false
   }, [instrument])
+
+  function sendCommands(...commands: Array<SessionCommandParams>) {
+    if (session?.id) {
+      const sessionCommandActions = commands.map(c =>
+        Sessions.createSessionCommand(robotName, session.id, {
+          command: c.command,
+          data: c.data || {},
+        })
+      )
+      dispatchRequests(...sessionCommandActions)
+    }
+  }
+
+  function cleanUpAndExit() {
+    if (session?.id) {
+      dispatchRequests(
+        Sessions.createSessionCommand(robotName, session.id, {
+          command: Sessions.sharedCalCommands.EXIT,
+          data: {},
+        }),
+        Sessions.deleteSession(robotName, session.id)
+      )
+    }
+    closeWizard()
+  }
 
   const tipRack: DeckCalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
@@ -123,7 +149,7 @@ export function CalibratePipetteOffset(
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
-  if (requestStatus === PENDING) {
+  if (showSpinner) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
@@ -132,11 +158,11 @@ export function CalibratePipetteOffset(
     <>
       <ModalPage
         titleBar={titleBarProps}
-        contentsClassName={PANEL_STYLE_BY_STEP[currentStep]}
+        innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
         <Panel
-          sendSessionCommand={sendCommand}
-          deleteSession={deleteSession}
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
           tipRack={tipRack}
           isMulti={isMulti}
           mount={instrument?.mount.toLowerCase()}

@@ -9,7 +9,7 @@ import {
   dropTipHelper,
   FIXED_TRASH_ID,
   getErrorResult,
-  getFlowRateAndOffsetParams,
+  getFlowRateAndOffsetParamsTransferLike,
   getRobotInitialStateNoTipsRemain,
   getRobotStateWithTipStandard,
   getSuccessResult,
@@ -36,7 +36,7 @@ const touchTipHelper = makeTouchTipHelper()
 // TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
 const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
 
-let mixinArgs
+let mixinArgs: $Shape<DistributeArgs>
 let invariantContext
 let robotStateWithTip
 let robotInitialStateNoTipsRemain
@@ -45,7 +45,7 @@ let blowoutSingleToSourceA1
 
 beforeEach(() => {
   mixinArgs = {
-    ...getFlowRateAndOffsetParams(),
+    ...getFlowRateAndOffsetParamsTransferLike(),
     commandCreatorFnName: 'distribute',
     name: 'distribute test',
     description: 'test blah blah',
@@ -725,7 +725,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
 
   describe('all advanced settings enabled', () => {
     it('should create commands in the expected order with expected params', () => {
-      const args = {
+      const args: $Shape<DistributeArgs> = {
         ...mixinArgs,
         sourceWell: 'A1',
         destWells: ['B1', 'B2'],
@@ -744,7 +744,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // dispense column
         dispenseDelay: { seconds: 12, mmFromBottom: 14 },
         touchTipAfterDispense: true,
-        blowoutLocation: 'trashId',
         blowoutFlowRateUlSec: 2.3,
         blowoutOffsetFromTopMm: 3.3,
       }

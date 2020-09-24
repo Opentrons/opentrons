@@ -10,10 +10,10 @@ from opentrons.calibration_storage import modify
 from opentrons.types import Point, Location, Mount
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import CommandDefinition
+from robot_server.service.session.models.command import (
+    CommandDefinition)
 from .constants import STATE_WILDCARD, CAL_BLOCK_SETUP_BY_MOUNT, \
-    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET, \
-    TIP_RACK_SLOT
+    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET
 from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
 from .pipette_offset.constants import PipetteOffsetCalibrationState

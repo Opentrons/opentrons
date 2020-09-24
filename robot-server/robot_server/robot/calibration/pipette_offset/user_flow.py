@@ -9,8 +9,16 @@ from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import CalibrationCommand
+from robot_server.service.session.models.command import \
+    CalibrationCommand
 from robot_server.robot.calibration import util
+from robot_server.robot.calibration.constants import (
+    TIP_RACK_LOOKUP_BY_MAX_VOL,
+    SHORT_TRASH_DECK,
+    STANDARD_DECK,
+    POINT_ONE_ID,
+    MOVE_TO_DECK_SAFETY_BUFFER,
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER)
 from ..errors import CalibrationError
 from ..helper_classes import (RequiredLabware, AttachedPipette)
 from ..constants import TIP_RACK_LOOKUP_BY_MAX_VOL, SHORT_TRASH_DECK, \
@@ -54,6 +62,10 @@ class PipetteOffsetCalibrationUserFlow:
         self._current_state = State.sessionStarted
         self._state_machine = PipetteOffsetCalibrationStateMachine()
 
+        point_one_pos = \
+            self._deck.get_calibration_position(POINT_ONE_ID).position
+        self._cal_ref_point = Point(*point_one_pos)
+
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
         self._has_calibrated_tip_length: bool =\
@@ -87,7 +99,8 @@ class PipetteOffsetCalibrationUserFlow:
         return self._has_calibrated_tip_length
 
     def get_pipette(self) -> AttachedPipette:
-        return AttachedPipette(
+        # TODO(mc, 2020-09-17): s/tip_length/tipLength
+        return AttachedPipette(  # type: ignore[call-arg]
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
             tip_length=self._hw_pipette.config.tip_length,
@@ -220,20 +233,24 @@ class PipetteOffsetCalibrationUserFlow:
     async def move_to_point_one(self):
         assert self._z_height_reference is not None, \
             "saveOffset has not been called yet"
-        coords = self._deck.get_calibration_position(POINT_ONE_ID).position
-        point_loc = Location(Point(*coords), None)
-        await self._move(
-            point_loc.move(point=Point(0, 0, self._z_height_reference)))
+        target_loc = Location(self._cal_ref_point, None)
+        target = target_loc.move(
+                point=Point(0, 0, self._z_height_reference))
+        await self._move(target)
 
     async def save_offset(self):
         cur_pt = await self._get_current_point(critical_point=None)
         if self.current_state == State.joggingToDeck:
             self._z_height_reference = cur_pt.z
         elif self._current_state == State.savingPointOne:
+            if self._hw_pipette.config.channels > 1:
+                cur_pt = await self._get_current_point(
+                    critical_point=CriticalPoint.FRONT_NOZZLE)
             tiprack_hash = helpers.hash_labware_def(
                 self._tip_rack._definition)
+            offset = self._cal_ref_point - cur_pt
             modify.save_pipette_calibration(
-                offset=cur_pt,
+                offset=offset,
                 mount=self._mount,
                 pip_id=self._hw_pipette.pipette_id,
                 tiprack_hash=tiprack_hash,

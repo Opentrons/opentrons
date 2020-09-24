@@ -6,7 +6,6 @@ import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
-import { getRequestById } from '../../../robot-api'
 import * as Sessions from '../../../sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
 
@@ -21,7 +20,6 @@ import {
   CompleteConfirmation,
 } from '../../CalibrationPanels'
 
-import type { State } from '../../../types'
 import type { PipetteOffsetCalibrationStep } from '../../../sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
@@ -39,11 +37,6 @@ const mockGetDeckDefinitions: JestMockFn<
   [],
   $Call<typeof getDeckDefinitions, any>
 > = getDeckDefinitions
-
-const mockGetRequestById: JestMockFn<
-  [State, string],
-  $Call<typeof getRequestById, State, string>
-> = getRequestById
 
 describe('CalibratePipetteOffset', () => {
   let mockStore
@@ -93,12 +86,15 @@ describe('CalibratePipetteOffset', () => {
       ...mockPipetteOffsetCalibrationSessionAttributes,
     }
 
-    render = () => {
+    render = (props = {}) => {
+      const { showSpinner = false } = props
       return mount(
         <CalibratePipetteOffset
           robotName="robot-name"
           session={mockPipOffsetCalSession}
-          closeWizard={() => {}}
+          closeWizard={jest.fn()}
+          dispatchRequests={jest.fn()}
+          showSpinner={showSpinner}
         />,
         {
           wrappingComponent: Provider,
@@ -142,12 +138,13 @@ describe('CalibratePipetteOffset', () => {
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
 
-  it('renders spinner when last tracked request is pending, and not present otherwise', () => {
-    const wrapper = render()
+  it('does not render spinner when showSpinner is false', () => {
+    const wrapper = render({ showSpinner: false })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(false)
+  })
 
-    mockGetRequestById.mockReturnValue({ status: 'pending' })
-    wrapper.setProps({})
+  it('renders spinner when showSpinner is true', () => {
+    const wrapper = render({ showSpinner: true })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
   })
 })

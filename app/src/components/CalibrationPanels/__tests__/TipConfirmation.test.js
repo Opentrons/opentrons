@@ -9,14 +9,14 @@ import { TipConfirmation } from '../TipConfirmation'
 describe('TipConfirmation', () => {
   let render
 
-  const mockSendCommand = jest.fn()
+  const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   const getConfirmTipButton = wrapper =>
-    wrapper.find('button[children="Yes, move to slot 5"]')
+    wrapper.find('button[title="confirmTipAttachedButton"]')
 
   const getInvalidateTipButton = wrapper =>
-    wrapper.find('button[children="No, try again"]')
+    wrapper.find('button[title="invalidateTipButton"]')
 
   beforeEach(() => {
     render = (
@@ -26,8 +26,8 @@ describe('TipConfirmation', () => {
         pipMount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
-        sendSessionCommand = mockSendCommand,
-        deleteSession = mockDeleteSession,
+        sendCommands = mockSendCommands,
+        cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_INSPECTING_TIP,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
@@ -36,8 +36,8 @@ describe('TipConfirmation', () => {
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
-          sendSessionCommand={sendSessionCommand}
-          deleteSession={deleteSession}
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
         />
@@ -49,23 +49,49 @@ describe('TipConfirmation', () => {
     jest.resetAllMocks()
   })
 
-  it('clicking confirm tip attached sends pick up tip command', () => {
-    const wrapper = render()
-
-    getConfirmTipButton(wrapper).invoke('onClick')()
-    wrapper.update()
-
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.MOVE_TO_DECK
-    )
-  })
   it('clicking invalidate tip send invalidate tip command', () => {
     const wrapper = render()
 
     getInvalidateTipButton(wrapper).invoke('onClick')()
     wrapper.update()
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.sharedCalCommands.INVALIDATE_TIP
-    )
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.INVALIDATE_TIP,
+    })
+  })
+  it('contents are correct for pipette offset calibration ', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+    })
+    expect(wrapper.text()).toContain('Yes, move to slot 5')
+    getConfirmTipButton(wrapper).invoke('onClick')()
+    wrapper.update()
+
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.MOVE_TO_DECK,
+    })
+  })
+  it('contents are correct for deck calibration ', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
+    })
+    expect(wrapper.text()).toContain('Yes, move to slot 5')
+    getConfirmTipButton(wrapper).invoke('onClick')()
+    wrapper.update()
+
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.MOVE_TO_DECK,
+    })
+  })
+  it('contents are correct for tip length calibration ', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+    })
+    expect(wrapper.text()).toContain('Yes, move to measure tip length')
+    getConfirmTipButton(wrapper).invoke('onClick')()
+    wrapper.update()
+
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT,
+    })
   })
 })

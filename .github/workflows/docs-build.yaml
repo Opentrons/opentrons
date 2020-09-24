@@ -9,8 +9,9 @@ on:
     paths:
       - 'api/src/opentrons/protocol_api/**'
       - 'api/docs/**'
-      - '.github/workflows/docs-push.yaml'
+      - '.github/workflows/docs-build.yaml'
       - '.github/actions/python/**'
+      - '.github/actions/webstack/deploy-to-sandbox/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
       - 'chore_release-**'
@@ -42,3 +43,11 @@ jobs:
       - name: 'Build docs'
         run: |
           make -C api docs
+      - name: 'Deploy docs to sandbox'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
+        uses: './.github/actions/webstack/deploy-to-sandbox'
+        with:
+          domain: 'docs.opentrons.com'
+          distPath: './api/docs/dist'

@@ -297,6 +297,14 @@ export type TipOffsetFields =
   | 'dispense_delay_mmFromBottom'
   | 'mix_touchTip_mmFromBottom'
 
+export type DelayCheckboxFields =
+  | 'aspirate_delay_checkbox'
+  | 'dispense_delay_checkbox'
+
+export type DelaySecondFields =
+  | 'aspirate_delay_seconds'
+  | 'dispense_delay_seconds'
+
 export function getIsTouchTipField(fieldName: string): boolean {
   const touchTipFields = [
     'aspirate_touchTip_mmFromBottom',

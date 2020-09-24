@@ -15,9 +15,9 @@ from robot_server.service.dependencies import get_hardware, verify_hardware
 from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock
 from opentrons import config
 
-from opentrons.calibration_storage import delete
+from opentrons.calibration_storage import delete, modify
 from opentrons.protocol_api import labware
-from opentrons.types import Point
+from opentrons.types import Point, Mount
 from opentrons.protocols.geometry.deck import Deck
 
 from robot_server.service.protocol.manager import ProtocolManager
@@ -135,6 +135,19 @@ def set_up_index_file_temporary_directory(server_temp_directory):
         definition = labware.get_labware_definition(name)
         lw = labware.Labware(definition, parent)
         labware.save_calibration(lw, Point(0, 0, 0))
+
+
+@pytest.fixture
+def set_up_pipette_offset_temp_directory(server_temp_directory):
+    pip_list = ['pip_1', 'pip_2']
+    mount_list = [Mount.LEFT, Mount.RIGHT]
+    for pip, mount in zip(pip_list, mount_list):
+        modify.save_pipette_calibration(
+            offset=Point(0, 0, 0),
+            pip_id=pip,
+            mount=mount,
+            tiprack_hash='hash',
+            tiprack_uri='uri')
 
 
 @pytest.fixture

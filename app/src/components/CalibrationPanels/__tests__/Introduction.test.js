@@ -9,7 +9,7 @@ import { Introduction } from '../Introduction'
 describe('Introduction', () => {
   let render
 
-  const mockSendCommand = jest.fn()
+  const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   const getContinueButton = wrapper =>
@@ -27,8 +27,8 @@ describe('Introduction', () => {
         pipMount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
-        sendSessionCommand = mockSendCommand,
-        deleteSession = mockDeleteSession,
+        sendCommands = mockSendCommands,
+        cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_SESSION_STARTED,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
@@ -37,8 +37,8 @@ describe('Introduction', () => {
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
-          sendSessionCommand={sendSessionCommand}
-          deleteSession={deleteSession}
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
         />
@@ -60,9 +60,9 @@ describe('Introduction', () => {
 
     getConfirmDeckClearButton(wrapper).invoke('onClick')()
 
-    expect(mockSendCommand).toHaveBeenCalledWith(
-      Sessions.deckCalCommands.LOAD_LABWARE
-    )
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.LOAD_LABWARE,
+    })
   })
 
   it('clicking continue launches clear deck warning then cancel closes modal', () => {
@@ -76,9 +76,9 @@ describe('Introduction', () => {
     getCancelDeckClearButton(wrapper).invoke('onClick')()
 
     expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(false)
-    expect(mockSendCommand).not.toHaveBeenCalledWith(
-      Sessions.deckCalCommands.LOAD_LABWARE
-    )
+    expect(mockSendCommands).not.toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.LOAD_LABWARE,
+    })
   })
 
   it('pip offset cal session type shows correct text', () => {
@@ -109,5 +109,23 @@ describe('Introduction', () => {
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
     expect(wrapper.text()).toContain('Before continuing to calibrate deck')
+  })
+
+  it('tip length cal session type shows correct text', () => {
+    const wrapper = render({
+      sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+    })
+    const allText = wrapper.text()
+    expect(allText).toContain('tip length calibration')
+    expect(allText).toContain(
+      'Tip length calibration measures the length of the pipette'
+    )
+    expect(allText).toContain('continue to tip length calibration')
+
+    getContinueButton(wrapper).invoke('onClick')()
+    wrapper.update()
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.LOAD_LABWARE,
+    })
   })
 })

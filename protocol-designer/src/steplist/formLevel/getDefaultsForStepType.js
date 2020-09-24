@@ -8,7 +8,12 @@ import {
   DEFAULT_DELAY_SECONDS,
   FIXED_TRASH_ID,
 } from '../../constants'
+import { getPrereleaseFeatureFlag } from '../../persist'
+
 import type { StepType, StepFieldName } from '../../form-types'
+
+const isMixDelayEnabled = () =>
+  getPrereleaseFeatureFlag('OT_PD_ENABLE_MIX_DELAY')
 
 export function getDefaultsForStepType(
   stepType: StepType
@@ -26,6 +31,14 @@ export function getDefaultsForStepType(
         pipette: null,
         volume: undefined,
         wells: [],
+        ...(isMixDelayEnabled()
+          ? {
+              aspirate_delay_checkbox: false,
+              aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+              dispense_delay_checkbox: false,
+              dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+            }
+          : {}),
       }
     case 'moveLiquid':
       return {

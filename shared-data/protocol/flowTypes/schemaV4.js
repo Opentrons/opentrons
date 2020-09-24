@@ -2,7 +2,7 @@
 import type { DeckSlotId, ModuleModel } from '@opentrons/shared-data'
 import type {
   ProtocolFile as V3ProtocolFile,
-  _AspDispAirgapParams,
+  AspDispAirgapParams,
   BlowoutParams,
   TouchTipParams,
   PipetteAccessParams,
@@ -41,7 +41,7 @@ export type ThermocyclerSetTargetBlockTemperatureArgs = {|
 export type Command =
   | {|
       command: 'aspirate' | 'dispense' | 'airGap',
-      params: _AspDispAirgapParams,
+      params: AspDispAirgapParams,
     |}
   | {|
       command: 'blowout',

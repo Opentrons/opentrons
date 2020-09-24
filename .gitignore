@@ -110,4 +110,5 @@ calibrations/
 *.ipynb
 
 # local IDE configs
-**/.vscode
+.vscode
+*.code-workspace

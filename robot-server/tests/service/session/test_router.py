@@ -13,8 +13,9 @@ from robot_server.service.session.command_execution.command import \
     CommandResult, CompletedCommand, CommandContent, CommandMeta, CommandStatus
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
-from robot_server.service.session.models import CalibrationCommand, \
-    EmptyModel, SessionType, JogPosition
+from robot_server.service.session.models.common import EmptyModel, JogPosition
+from robot_server.service.session.models.command import CalibrationCommand
+from robot_server.service.session.models.session import SessionType
 from robot_server.service.session.session_types import NullSession, \
     SessionMetaData
 

@@ -21,7 +21,7 @@ from robot_server.robot.calibration.constants import \
 from robot_server.service.errors import RobotServerError
 from opentrons.util import linal
 
-from robot_server.service.session.models import (
+from robot_server.service.session.models.command import (
     CalibrationCommand, DeckCalibrationCommand)
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
@@ -110,12 +110,15 @@ class DeckCalibrationUserFlow:
         return self._current_state
 
     def get_pipette(self) -> Optional[AttachedPipette]:
-        return AttachedPipette(
+        # TODO(mc, 2020-09-17): s/tip_length/tipLength
+        # TODO(mc, 2020-09-17): type of pipette_id does not match expected
+        # type of AttachedPipette.serial
+        return AttachedPipette(  # type: ignore[call-arg]
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
             tip_length=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id)
+            serial=self._hw_pipette.pipette_id)  # type: ignore[arg-type]
 
     def get_required_labware(self) -> List[RequiredLabware]:
         lw = self._get_tip_rack_lw()

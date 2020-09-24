@@ -9,6 +9,7 @@ from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
 from opentrons.hardware_control import CriticalPoint, ThreadedAsyncLock
+from opentrons.hardware_control.types import OutOfBoundsMove, MotionChecks
 
 from .models import Container
 from .util import robot_is_busy, RobotBusy
@@ -236,8 +237,12 @@ class CalibrationManager(RobotBusy):
             instrument.name, distance, axis))
         self._set_state('moving')
         if instrument._context:
-            self._hardware.move_rel(
-                Mount[inst.mount.upper()], Point(**{axis: distance}))
+            try:
+                self._hardware.move_rel(
+                    Mount[inst.mount.upper()], Point(**{axis: distance}),
+                    check_bounds=MotionChecks.HIGH)
+            except OutOfBoundsMove:
+                log.exception('Out of bounds jog')
         else:
             calibration_functions.jog_instrument(
                 instrument=inst,

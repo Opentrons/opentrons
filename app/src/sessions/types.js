@@ -37,6 +37,7 @@ import * as CalCheckConstants from './calibration-check/constants'
 import * as TipCalConstants from './tip-length-calibration/constants'
 import * as DeckCalConstants from './deck-calibration/constants'
 import * as PipOffsetCalConstants from './pipette-offset-calibration/constants'
+import * as CommonCalConstants from './common-calibration/constants'
 
 export type * from './calibration-check/types'
 export type * from './tip-length-calibration/types'
@@ -60,6 +61,7 @@ export type SessionCommandString =
   | $Values<typeof TipCalConstants.tipCalCommands>
   | $Values<typeof DeckCalConstants.deckCalCommands>
   | $Values<typeof PipOffsetCalConstants.pipOffsetCalCommands>
+  | $Values<typeof CommonCalConstants.sharedCalCommands>
 
 export type CalibrationSessionStep =
   | CalCheckTypes.RobotCalibrationCheckStep
@@ -67,9 +69,13 @@ export type CalibrationSessionStep =
   | DeckCalTypes.DeckCalibrationStep
   | PipOffsetCalTypes.PipetteOffsetCalibrationStep
 
-// TODO(al, 2020-05-11): data should be properly typed with all
-// known command types
-export type SessionCommandData = { ... }
+export type VectorTuple = [number, number, number]
+
+export type SessionCommandData = {| vector: VectorTuple |} | {||}
+export type SessionCommandParams = {
+  command: SessionCommandString,
+  data?: SessionCommandData,
+}
 
 export type CalibrationCheckSessionResponseAttributes = {|
   sessionType: SESSION_TYPE_CALIBRATION_CHECK,
@@ -341,7 +347,6 @@ export type CalibrationCheckIntercomData = {|
   succeeded: boolean,
 |}
 
-type VectorTuple = [number, number, number]
 export type CalibrationCheckAnalyticsData = {|
   ...CalibrationCheckCommonEventData,
   comparingFirstPipetteHeightDifferenceVector?: VectorTuple,

@@ -163,3 +163,35 @@ def get_pipette_offset(
         return data  # type: ignore
     else:
         return None
+
+
+def get_all_pipette_offset_calibrations() \
+            -> typing.List[local_types.PipetteOffsetCalibration]:
+    """
+    A helper function that will list all of the pipette offset
+    calibrations.
+
+    :return: A list of dictionary objects representing all of the
+    pipette offset calibration files found on the robot.
+    """
+    all_calibrations: typing.List[local_types.PipetteOffsetCalibration] = []
+    pip_dir = config.get_opentrons_path('pipette_calibration_dir')
+    index_path = pip_dir / 'index.json'
+    if not index_path.exists():
+        return all_calibrations
+
+    index_file = io.read_cal_file(str(index_path))
+    for mount_key, pips in index_file.items():
+        for pip in pips:
+            cal_path = pip_dir / mount_key / f'{pip}.json'
+            if cal_path.exists():
+                data = io.read_cal_file(str(cal_path))
+                all_calibrations.append(
+                    local_types.PipetteOffsetCalibration(
+                        pipette=pip,
+                        mount=mount_key,
+                        offset=data['offset'],
+                        tiprack=data['tiprack'],
+                        uri=data['uri'],
+                        last_modified=data['last_modified']))
+    return all_calibrations

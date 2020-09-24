@@ -3,6 +3,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
+import { Box } from '../primitives'
 import { TitleBar } from '../structure'
 import { Overlay } from './Overlay'
 import styles from './modals.css'
@@ -15,19 +16,23 @@ export type ModalPageProps = {|
   contentsClassName?: string,
   heading?: React.Node,
   children?: React.Node,
+  innerProps?: React.ElementProps<typeof Box>,
 |}
 
 export function ModalPage(props: ModalPageProps): React.Node {
-  const { titleBar, heading } = props
+  const { titleBar, heading, innerProps = {} } = props
 
   return (
     <div className={styles.modal_page}>
       <Overlay />
       <TitleBar {...titleBar} className={styles.title_bar} />
-      <div className={cx(styles.modal_page_contents, props.contentsClassName)}>
+      <Box
+        className={cx(styles.modal_page_contents, props.contentsClassName)}
+        {...innerProps}
+      >
         {heading && <h3 className={styles.modal_heading}>{heading}</h3>}
         {props.children}
-      </div>
+      </Box>
     </div>
   )
 }

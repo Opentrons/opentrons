@@ -14,11 +14,12 @@ from robot_server.robot.calibration.helper_classes import (
     CheckMove, DeckCalibrationError, PipetteRank, PipetteInfo, PipetteStatus
 )
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import OffsetVector,\
-    CalibrationCommand, CalibrationCheckCommand
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware
 
+from robot_server.service.session.models.command import \
+    CalibrationCommand, CalibrationCheckCommand
+from robot_server.service.session.models.common import OffsetVector
 from .constants import (PIPETTE_TOLERANCES,
                         P1000_OK_TIP_PICK_UP_VECTOR,
                         DEFAULT_OK_TIP_PICK_UP_VECTOR,

@@ -6,20 +6,20 @@ import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
-import { getRequestById } from '../../../robot-api'
 import * as Sessions from '../../../sessions'
 import { mockDeckCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
 
 import { CalibrateDeck } from '../index'
-import { Introduction } from '../Introduction'
-import { DeckSetup } from '../../CalibrationPanels/DeckSetup'
-import { TipPickUp } from '../TipPickUp'
-import { TipConfirmation } from '../TipConfirmation'
-import { SaveZPoint } from '../SaveZPoint'
-import { SaveXYPoint } from '../SaveXYPoint'
-import { CompleteConfirmation } from '../CompleteConfirmation'
+import {
+  Introduction,
+  DeckSetup,
+  TipPickUp,
+  TipConfirmation,
+  SaveZPoint,
+  SaveXYPoint,
+  CompleteConfirmation,
+} from '../../CalibrationPanels'
 
-import type { State } from '../../../types'
 import type { DeckCalibrationStep } from '../../../sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
@@ -37,11 +37,6 @@ const mockGetDeckDefinitions: JestMockFn<
   [],
   $Call<typeof getDeckDefinitions, any>
 > = getDeckDefinitions
-
-const mockGetRequestById: JestMockFn<
-  [State, string],
-  $Call<typeof getRequestById, State, string>
-> = getRequestById
 
 describe('CalibrateDeck', () => {
   let mockStore
@@ -93,12 +88,15 @@ describe('CalibrateDeck', () => {
       ...mockDeckCalibrationSessionAttributes,
     }
 
-    render = () => {
+    render = (props = {}) => {
+      const { showSpinner = false } = props
       return mount(
         <CalibrateDeck
           robotName="robot-name"
           session={mockDeckCalSession}
           closeWizard={() => {}}
+          dispatchRequests={jest.fn()}
+          showSpinner={showSpinner}
         />,
         {
           wrappingComponent: Provider,
@@ -142,12 +140,13 @@ describe('CalibrateDeck', () => {
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
 
-  it('renders spinner when last tracked request is pending, and not present otherwise', () => {
-    const wrapper = render()
+  it('does not render spinner when showSpinner is false', () => {
+    const wrapper = render({ showSpinner: false })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(false)
+  })
 
-    mockGetRequestById.mockReturnValue({ status: 'pending' })
-    wrapper.setProps({})
+  it('renders spinner when showSpinner is true', () => {
+    const wrapper = render({ showSpinner: true })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
   })
 })

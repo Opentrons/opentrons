@@ -5,6 +5,7 @@ import {
   getUnsavedFormIsPristineSetTempForm,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
+import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 
 import { PAUSE_UNTIL_TEMP } from '../../../../constants'
 import { uuid } from '../../../../utils'
@@ -108,10 +109,14 @@ export type SaveStepFormAction = {|
   payload: FormData,
 |}
 
-export const _saveStepForm = (form: FormData): SaveStepFormAction => ({
-  type: SAVE_STEP_FORM,
-  payload: form,
-})
+export const _saveStepForm = (form: FormData): SaveStepFormAction => {
+  // if presaved, transform pseudo ID to real UUID upon save
+  const payload = form.id === PRESAVED_STEP_ID ? { ...form, id: uuid() } : form
+  return {
+    type: SAVE_STEP_FORM,
+    payload,
+  }
+}
 
 /** take unsavedForm state and put it into the payload */
 export const saveStepForm: () => ThunkAction<any> = () => (
@@ -158,6 +163,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
     )
     return
   }
+
   const { id } = unsavedSetTemperatureForm
 
   if (!isPristineSetTempForm) {

@@ -7,7 +7,7 @@ from opentrons.hardware_control import pipette
 from opentrons.config.pipette_config import load
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models import CalibrationCommand
+from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
 
@@ -215,9 +215,9 @@ async def test_save_pipette_calibration(mock_user_flow):
 
     await uf.save_offset()
     tiprack_hash = helpers.hash_labware_def(uf._tip_rack._definition)
-
+    offset = uf._cal_ref_point - Point(x=10, y=10, z=40)
     modify.save_pipette_calibration.assert_called_with(
-        offset=Point(x=10, y=10, z=40),
+        offset=offset,
         mount=uf._mount,
         pip_id=uf._hw_pipette.pipette_id,
         tiprack_hash=tiprack_hash,
