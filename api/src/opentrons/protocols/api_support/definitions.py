@@ -1,6 +1,6 @@
 from opentrons.protocols import types
 
-MAX_SUPPORTED_VERSION = types.APIVersion(2, 7)
+MAX_SUPPORTED_VERSION = types.APIVersion(2, 8)
 #: The maximum supported protocol API version in this release
 
 V2_MODULE_DEF_VERSION = types.APIVersion(2, 3)

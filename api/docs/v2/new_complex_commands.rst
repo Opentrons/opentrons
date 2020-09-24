@@ -270,6 +270,29 @@ will have the steps...
     Dispensing 60.0 uL into well B3 in "1"
     Dropping tip well A1 in "12"
 
+Skipping Wells
+++++++++++++++
+If you only wish to transfer to certain wells from a column, you
+can use a list of volumes to skip over certain wells by setting the volume to zero.
+
+.. code-block:: python
+
+    pipette.transfer(
+        [20, 0, 60],
+        plate['A1'],
+        [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']])
+
+will have the steps...
+
+.. code-block:: python
+
+    Transferring [20, 40, 60] from well A1 in "1" to wells B1...B3 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 20.0 uL from well A1 in "1" at 1 speed
+    Dispensing 20.0 uL into well B1 in "1"
+    Aspirating 60.0 uL from well A1 in "1" at 1 speed
+    Dispensing 60.0 uL into well B3 in "1"
+    Dropping tip well A1 in "12"
 
 
 .. versionadded:: 2.0
@@ -414,6 +437,90 @@ will have the steps...
     Dropping tip well A1 in "12"
 
 .. versionadded:: 2.0
+
+
+List of Volumes
+---------------
+
+Instead of applying a single volume amount to all source/destination wells, you can instead pass a list of volumes to either
+consolidate or distribute.
+
+For example, this distribute command
+
+.. code-block:: python
+
+    pipette.distribute(
+        [20, 40, 60],
+        plate['A1'],
+        [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']])
+
+
+will have the steps...
+
+.. code-block:: python
+
+    Distributing [20, 40, 60] from well A1 in "1" to wells B1...B3 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 150.0 uL from well A1 in "1" at 1 speed
+    Dispensing 20.0 uL into well B1 in "1"
+    Dispensing 40.0 uL into well B2 in "1"
+    Dispensing 60.0 uL into well B3 in "1"
+    Blowing out in well A1 in "12"
+    Dropping tip well A1 in "12"
+
+and this consolidate command
+
+.. code-block:: python
+
+    pipette.consolidate(
+        [20, 40, 60],
+        [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
+        plate['A1'])
+
+will have the steps...
+
+.. code-block:: python
+
+    Consolidating [20, 40, 60] from wells B1...B3 in "1" to well A1 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 20.0 uL from well B1 in "1"
+    Aspirating 40.0 uL into well B2 in "1"
+    Aspirating 60.0 uL into well B3 in "1"
+    Dispensing 120.0 uL into well A1 in "1"
+    Dropping tip well A1 in "12"
+
+
+Skipping Wells
+++++++++++++++
+
+If you only wish to distribute or consolidate certain wells from a column, you
+can use a list of volumes to skip over certain wells by setting the volume to zero.
+
+.. code-block:: python
+
+    pipette.distribute(
+        [20, 40, 60, 0, 0, 0, 50, 100],
+        plate['A1'],
+        plate.columns_by_name()['2'])
+
+will have the steps...
+
+.. code-block:: python
+
+    Distributing [20, 40, 60] from well A1 in "1" to column 2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 300.0 uL from well A1 in "1" at 1 speed
+    Dispensing 20.0 uL into well A2 in "1"
+    Dispensing 40.0 uL into well B2 in "1"
+    Dispensing 60.0 uL into well C2 in "1"
+    Dispensing 50.0 uL into well G2 in "1"
+    Dispensing 100.0 uL into well H2 in "1"
+    Blowing out in well A1 in "12"
+    Dropping tip well A1 in "12"
+
+
+
+.. versionadded:: 2.8
 
 Order of Operations In Complex Commands
 =======================================

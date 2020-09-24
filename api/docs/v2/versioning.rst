@@ -108,6 +108,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.7     |          3.21.0             |
 +-------------+-----------------------------+
+|     2.8     |          4.0.0              |
++-------------+-----------------------------+
 
 Changes in API Versions
 -----------------------
@@ -181,4 +183,9 @@ Version 2.7
 
 - Calling :py:meth:`.InstrumentContext.has_tip` will return whether a particular instrument
   has a tip attached or not.
-- Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense
+
+
+Version 2.8
++++++++++++
+- You can now pass in a list of volumes to distribute and consolidate. See 
+    - Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense

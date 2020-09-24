@@ -565,7 +565,8 @@ class TransferPlan:
                        self._strategy.disposal_volume +
                        self._strategy.air_gap +
                        current_xfer[0]) <= self._max_volume:
-                    append_xfer = self._check_volume_not_zero(current_xfer[0])
+                    append_xfer = self._check_volume_not_zero(
+                        self._api_version, current_xfer[0])
                     if append_xfer:
                         asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
@@ -652,7 +653,8 @@ class TransferPlan:
                        self._strategy.disposal_volume +
                        self._strategy.air_gap * len(asp_grouped) +
                        current_xfer[0]) <= self._max_volume:
-                    append_xfer = self._check_volume_not_zero(current_xfer[0])
+                    append_xfer = self._check_volume_not_zero(
+                        self._api_version, current_xfer[0])
                     if append_xfer:
                         asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
@@ -792,10 +794,11 @@ class TransferPlan:
             raise RuntimeError(
                 f"Invalid {id} for multichannel transfer: {old_well_list}")
 
-    def _check_volume_not_zero(self, volume: float) -> bool:
+    @staticmethod
+    def _check_volume_not_zero(api_version: APIVersion, volume: float) -> bool:
         # We should only be adding volumes to transfer plans if it is
         # greater than zero to prevent extraneous robot movements.
-        if self._api_version < APIVersion(2, 7):
+        if api_version < APIVersion(2, 8):
             return True
         elif volume > 0:
             return True

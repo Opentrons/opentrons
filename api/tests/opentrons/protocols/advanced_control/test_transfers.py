@@ -22,6 +22,16 @@ def _instr_labware(loop):
             'tiprack': tiprack, 'instr_multi': instr_multi}
 
 
+# +++++++ Test Helper Functions ++++++++++
+def test_check_if_zero():
+    tclass = tx.TransferPlan
+    assert tclass._check_volume_not_zero(APIVersion(2, 6), 0)
+    assert tclass._check_volume_not_zero(APIVersion(2, 6), 15)
+    assert not tclass._check_volume_not_zero(APIVersion(2, 8), 0)
+    assert tclass._check_volume_not_zero(APIVersion(2, 8), 15)
+
+
+# +++++++ Test transfer types ++++++++++++
 def test_default_transfers(_instr_labware):
     # Transfer 100ml from row1 of labware1 to row1 of labware2: first with
     #  new_tip = ONCE, then with new_tip = NEVER
