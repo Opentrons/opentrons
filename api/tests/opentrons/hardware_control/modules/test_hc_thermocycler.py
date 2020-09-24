@@ -1,7 +1,5 @@
 import asyncio
-import time
 from unittest import mock
-from numpy import isclose
 from opentrons.hardware_control import modules, ExecutionManager
 
 
@@ -147,11 +145,14 @@ async def test_set_temperature(monkeypatch, loop):
                                                  ramp_rate=None)
     set_temp_driver_mock.reset_mock()
 
-    # Test hold_time < HOLD_TIME_FUZZY_SECONDS
-    start = time.time()
+    # Test hold_time < HOLD_TIME_FUZZY_SECONDS. Here we know
+    # that asyncio.sleep will be called with the direct hold
+    # time rather than increments of 0.1
+    sleep_mock = mock.Mock()
+    async_sleep_mock = mock.Mock(side_effect=asyncio.coroutine(sleep_mock))
+    monkeypatch.setattr(asyncio, 'sleep', async_sleep_mock)
     await hw_tc.set_temperature(40, hold_time_seconds=2)
-    time_taken = time.time() - start
-    assert isclose(time_taken, 2, atol=0.5)
+    async_sleep_mock.assert_called_once_with(2)
     set_temp_driver_mock.assert_called_once_with(temp=40,
                                                  hold_time=2,
                                                  volume=None,
