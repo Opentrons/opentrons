@@ -70,6 +70,10 @@ jobs:
           project: 'api'
       - name: Test
         run: make -C api test
+      - if: contains(matrix.os, 'ubuntu')
+        uses: 'codecov/codecov-action@v1'
+        with:
+          file: ./api/coverage.xml
 
       # creds and repository configuration for deploying python wheels
       - if: contains(matrix.os, 'ubuntu') && (github.event_name == 'push') && !env.OT_TAG
