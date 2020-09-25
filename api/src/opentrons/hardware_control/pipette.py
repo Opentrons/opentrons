@@ -6,11 +6,11 @@ import logging
 from typing import Any, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING
 
 from opentrons.types import Point
+from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount
 from opentrons.config import pipette_config
 from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.drivers.types import MoveSplit
 from opentrons.config.robot_configs import robot_config
-from . import robot_calibration as rb_cal
 from .types import CriticalPoint
 
 
@@ -43,7 +43,7 @@ class Pipette:
             self,
             config: pipette_config.PipetteConfig,
             inst_offset_config: Union[InstrumentOffsetConfig, Point],
-            pipette_offset_cal: rb_cal.PipetteCalibration,
+            pipette_offset_cal: PipetteOffsetByPipetteMount,
             pipette_id: str = None) -> None:
         self._config = config
         self._pipette_offset = pipette_offset_cal
@@ -329,7 +329,7 @@ class Pipette:
 def _reload_and_check_skip(
         new_config: pipette_config.PipetteConfig,
         attached_instr: Pipette,
-        pipette_offset: rb_cal.PipetteCalibration) -> Tuple[Pipette, bool]:
+        pipette_offset: PipetteOffsetByPipetteMount) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
     # match closely enough.
@@ -362,7 +362,7 @@ def load_from_config_and_check_skip(
         requested: Optional[PipetteName],
         serial: Optional[str],
         instrument_offset: InstrumentOffsetConfig,
-        pipette_offset: rb_cal.PipetteCalibration)\
+        pipette_offset: PipetteOffsetByPipetteMount)\
         -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read
