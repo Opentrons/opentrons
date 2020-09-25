@@ -3,7 +3,6 @@
   --c-font-icon: #6f6f6f;
   --c-font-light: white;
   --c-font-disabled: #9c9c9c;
-  --c-font-warning: var(--c-warning);
   --fs-huge: 3rem;
   --fs-header: 1.125rem;
   --fs-default: 1rem;
@@ -107,17 +106,10 @@
     color: var(--c-font-dark);
   };
 
-  --font-body-warning-2: {
-    font-size: var(--fs-body-2);
-    font-weight: var(--fw-semibold);
-    color: var(--c-font-warning)
-  };
-
   --truncate: {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
   };
-
 }
