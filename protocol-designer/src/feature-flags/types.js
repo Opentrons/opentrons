@@ -12,6 +12,7 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_CUSTOM_TIPRACKS',
   'OT_PD_ENABLE_THERMOCYCLER',
   'OT_PD_ENABLE_AIR_GAP_AND_DELAY',
+  'OT_PD_ENABLE_MIX_DELAY',
 ]
 
 // union of feature flag string constant IDs
