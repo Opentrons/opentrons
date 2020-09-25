@@ -27,7 +27,7 @@ module.exports = {
      * param core: The github core package instance made available by actions/github-script
      * param context: The github context instance made available by actions/github-script
      */
-    findYarnCacheDir(core, context) => {
+    findYarnCacheDir: (core, context) => {
         const cacheDir = execSync('yarn cache dir')
         console.log(`yarnCacheDir: ${cacheDir}\n`)
         core.setOutput('yarnCacheDir', cacheDir)

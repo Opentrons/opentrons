@@ -10,7 +10,7 @@ on:
       - 'shared-data/*/**'
       - '.github/workflows/shared-data-lint-test.yaml'
       - '.github/actions/python/**/*'
-      - '.github/actions/util/**/*'
+      - '.github/workflows/utils.js'
     branches:
       - '*'
     tags:

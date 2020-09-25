@@ -12,6 +12,7 @@ on:
       - '.github/workflows/docs-build.yaml'
       - '.github/actions/python/**'
       - '.github/actions/webstack/deploy-to-sandbox/**'
+      - '.github/workflows/utils.js'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
       - 'chore_release-**'

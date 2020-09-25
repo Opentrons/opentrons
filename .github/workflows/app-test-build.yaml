@@ -16,7 +16,7 @@ on:
       - '*.json'
       - 'yarn.lock'
       - '.github/workflows/app-test-build.yaml'
-      - '.github/actions/util/**/*'
+      - '.github/workflows/utils.js'
     branches:
       - '*'
     tags:

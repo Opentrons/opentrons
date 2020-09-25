@@ -19,7 +19,7 @@ on:
       - '!shared-data/js/**'
       - '.github/workflows/api-lint-test.yaml'
       - '.github/actions/python/**/*'
-      - '.github/actions/util/**/*'
+      - '.github/workflows/utils.js'
     branches:
       - '*'
     tags:
