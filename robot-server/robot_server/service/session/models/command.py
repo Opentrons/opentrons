@@ -14,7 +14,7 @@ from robot_server.service.json_api import (
 from opentrons.util.helpers import utc_now
 
 
-class LoadLabware(BaseModel):
+class LoadLabwareRequest(BaseModel):
     location: int = Field(
         ...,
         description="Deck slot", ge=1, lt=12)
@@ -32,20 +32,20 @@ class LoadLabware(BaseModel):
         description="The labware definition version")
 
 
-class LoadInstrument(BaseModel):
+class LoadInstrumentRequest(BaseModel):
     instrumentName: PipetteName = Field(
         ...,
         description="The name of the instrument model")
     mount: Mount
 
 
-class PipetteCommandBase(BaseModel):
+class PipetteRequestBase(BaseModel):
     pipetteId: str
     labwareId: str
     wellId: str
 
 
-class LiquidCommand(PipetteCommandBase):
+class LiquidRequest(PipetteRequestBase):
     volume: float = Field(
         ...,
         description="Amount of liquid in uL. Must be greater than 0 and less "
@@ -64,6 +64,14 @@ class LiquidCommand(PipetteCommandBase):
                     "rate.",
         gt=0
     )
+
+
+class LoadLabwareResponse(BaseModel):
+    labwareId: str
+
+
+class LoadInstrumentResponse(BaseModel):
+    instrumentId: str
 
 
 class CommandStatus(str, Enum):
@@ -135,8 +143,8 @@ class ProtocolCommand(CommandDefinition):
 
 
 class EquipmentCommand(CommandDefinition):
-    load_labware = ("loadLabware", LoadLabware)
-    load_instrument = ("loadInstrument", LoadInstrument)
+    load_labware = ("loadLabware", LoadLabwareRequest)
+    load_instrument = ("loadInstrument", LoadInstrumentRequest)
 
     @staticmethod
     def namespace():
@@ -144,10 +152,10 @@ class EquipmentCommand(CommandDefinition):
 
 
 class PipetteCommand(CommandDefinition):
-    aspirate = ("aspirate", LiquidCommand)
-    dispense = ("dispense", LiquidCommand)
-    drop_tip = ("dropTip", PipetteCommandBase)
-    pick_up_tip = ("pickUpTip", PipetteCommandBase)
+    aspirate = ("aspirate", LiquidRequest)
+    dispense = ("dispense", LiquidRequest)
+    drop_tip = ("dropTip", PipetteRequestBase)
+    pick_up_tip = ("pickUpTip", PipetteRequestBase)
 
     @staticmethod
     def namespace():
@@ -211,10 +219,10 @@ Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
 """
 CommandDataType = typing.Union[
     JogPosition,
-    LoadLabware,
-    LoadInstrument,
-    LiquidCommand,
-    PipetteCommandBase,
+    LiquidRequest,
+    PipetteRequestBase,
+    LoadLabwareRequest,
+    LoadInstrumentRequest,
     EmptyModel
 ]
 
@@ -229,6 +237,12 @@ CommandDefinitionType = typing.Union[
     ProtocolCommand,
     PipetteCommand,
     EquipmentCommand,
+]
+
+# A Union of all command result types
+CommandResultType = typing.Union[
+    LoadLabwareResponse,
+    LoadInstrumentResponse,
 ]
 
 
@@ -274,6 +288,7 @@ class SessionCommand(BasicSessionCommand):
     createdAt: datetime = Field(..., default_factory=utc_now)
     startedAt: typing.Optional[datetime]
     completedAt: typing.Optional[datetime]
+    result: typing.Optional[CommandResultType] = None
 
 
 # Session command requests/responses
