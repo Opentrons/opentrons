@@ -59,7 +59,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       genericMigrationModal: false,
     },
     {
-      title: 'mix 5.0.x -> should migrate to 5.1.0x',
+      title: 'mix 5.0.x -> should migrate to 5.1.x',
       importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
       expectedExportFixture: '../../fixtures/protocol/5/mix_5_1_0.json',
       newLabwareDefsMigrationModal: false,
