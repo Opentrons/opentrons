@@ -69,5 +69,5 @@
 .calibration_alert_icon {
   width: 2rem;
   padding: 0;
-  color: var(--c-warning)
+  color: var(--c-warning);
 }
