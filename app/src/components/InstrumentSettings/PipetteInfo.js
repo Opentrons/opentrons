@@ -15,6 +15,7 @@ import {
   SPACING_1,
   SPACING_2,
   SPACING_3,
+  SIZE_2,
   SIZE_4,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_START,
@@ -121,15 +122,18 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
       {serialNumber && (
         <PipetteOffsetCalibrationControl robotName={robotName} mount={mount} />
       )}
-      {pipetteOffsetCalibration ? (
-        <React.Fragment />
-      ) : (
+      {!pipetteOffsetCalibration && (
         <Flex
           marginTop={SPACING_2}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_START}
         >
-          <Icon name="alert-circle" className={styles.calibration_alert_icon} />
+          <Icon
+            name="alert-circle"
+            width={SIZE_2}
+            padding="0"
+            color={COLOR_WARNING}
+          />
           <Flex
             marginLeft={SPACING_2}
             flexDirection={DIRECTION_COLUMN}
