@@ -246,11 +246,14 @@ class PipetteOffsetCalibrationUserFlow:
             self._flag_unmet_transition_req(
                 command_handler="move_to_deck",
                 unmet_condition="tip length calibration data exists")
-        if self._current_state == State.calibrationComplete and \
-                self._saved_offset_this_session:
-            self._flag_unmet_transition_req(
-                command_handler="move_to_deck",
-                unmet_condition="offset not saved this session")
+        if self._current_state == State.calibrationComplete:
+            # recache tip length cal which has just been saved
+            self._has_calibrated_tip_length: bool =\
+                self._get_stored_tip_length_cal() is not None
+            if self._saved_offset_this_session:
+                self._flag_unmet_transition_req(
+                    command_handler="move_to_deck",
+                    unmet_condition="offset not saved this session")
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
         ydim = self._deck.get_slot_definition(
             JOG_TO_DECK_SLOT)['boundingBox']['yDimension']

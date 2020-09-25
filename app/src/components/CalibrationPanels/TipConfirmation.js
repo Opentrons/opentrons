@@ -39,17 +39,27 @@ const contentsBySessionType: {
   },
 }
 export function TipConfirmation(props: CalibrationPanelProps): React.Node {
-  const { sendCommands, sessionType } = props
+  const { sendCommands, sessionType, hasCalibratedTipLength } = props
 
   const { yesButtonText, moveCommandString } = contentsBySessionType[
     sessionType
   ]
 
+  const isExtendedPipOffset =
+    sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
+    hasCalibratedTipLength === false
+  const confirmTipCommand = isExtendedPipOffset
+    ? Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT
+    : moveCommandString
+  const confirmButtonText = isExtendedPipOffset
+    ? YES_AND_MOVE_TO_MEASURE_TIP
+    : YES_AND_MOVE_TO_DECK
+
   const invalidateTip = () => {
     sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_TIP })
   }
   const confirmTip = () => {
-    sendCommands({ command: moveCommandString })
+    sendCommands({ command: confirmTipCommand })
   }
 
   return (
@@ -74,7 +84,7 @@ export function TipConfirmation(props: CalibrationPanelProps): React.Node {
         width="80%"
         onClick={confirmTip}
       >
-        {yesButtonText}
+        {confirmButtonText}
       </PrimaryBtn>
     </Flex>
   )

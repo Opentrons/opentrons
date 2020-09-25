@@ -27,6 +27,8 @@ import {
   SaveXYPoint,
   CompleteConfirmation,
   ConfirmExitModal,
+  MeasureNozzle,
+  MeasureTip,
 } from '../CalibrationPanels'
 
 import type { StyleProps } from '@opentrons/components'
@@ -69,6 +71,8 @@ const PANEL_BY_STEP: {
 } = {
   [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: Introduction,
   [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: DeckSetup,
+  [Sessions.PIP_OFFSET_STEP_MEASURING_NOZZLE_OFFSET]: MeasureNozzle,
+  [Sessions.PIP_OFFSET_STEP_MEASURING_TIP_OFFSET]: MeasureTip,
   [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: TipPickUp,
   [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: TipConfirmation,
   [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: SaveZPoint,
@@ -168,6 +172,7 @@ export function CalibratePipetteOffset(
           mount={instrument?.mount.toLowerCase()}
           currentStep={currentStep}
           sessionType={session.sessionType}
+          hasCalibratedTipLength={session.details.hasCalibratedTipLength}
         />
       </ModalPage>
       {showConfirmExit && (

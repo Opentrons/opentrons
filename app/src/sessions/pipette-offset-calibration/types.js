@@ -48,4 +48,5 @@ export type PipetteOffsetCalibrationSessionDetails = {|
   instrument: PipetteOffsetCalibrationInstrument,
   currentStep: PipetteOffsetCalibrationStep,
   labware: Array<PipetteOffsetCalibrationLabware>,
+  hasCalibratedTipLength: boolean,
 |}

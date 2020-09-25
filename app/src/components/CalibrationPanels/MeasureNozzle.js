@@ -25,9 +25,9 @@ import {
 import { JogControls } from '../JogControls'
 import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
-import type { CalibrationPanelProps } from '../CalibrationPanels/types'
+import type { CalibrationPanelProps } from './types'
 
-import { formatJogVector } from '../CalibrationPanels/utils'
+import { formatJogVector } from './utils'
 import leftMultiBlockAsset from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
 import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_NO_TIP_(330x260)REV1.webm'
 import leftSingleBlockAsset from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_NO_TIP_(330x260)REV1.webm'

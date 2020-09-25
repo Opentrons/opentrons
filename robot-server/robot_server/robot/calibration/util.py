@@ -153,7 +153,7 @@ async def move(user_flow: CalibrationUserFlow, to_loc: Location):
                                           critical_point=move[1])
 
 
-async def get_reference_location(mount: Mount,
+def get_reference_location(mount: Mount,
                                  deck: Deck,
                                  has_calibration_block: bool) -> Location:
     """

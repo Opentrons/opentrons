@@ -15,6 +15,7 @@ import {
   SPACING_4,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
+  SPACING_2,
 } from '@opentrons/components'
 import type { CalibrationPanelProps } from './types'
 import type { SessionType } from '../../sessions/types'
@@ -32,6 +33,8 @@ const PIP_OFFSET_CAL_HEADER = 'Pipette Offset Calibration complete'
 const TIP_CAL_HEADER = 'Tip Length Calibration complete'
 const REMOVE_BLOCK = 'Remove Calibration Block from the deck.'
 const RETURN_TIP = 'Return tip to tip rack and exit'
+const EXIT = 'exit'
+const PROCEED_TO_PIP_OFFSET = 'continue to Pipette Offset Calibration'
 
 const contentsBySessionType: { [SessionType]: { headerText: string } } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: { headerText: DECK_CAL_HEADER },
@@ -44,12 +47,19 @@ const contentsBySessionType: { [SessionType]: { headerText: string } } = {
 }
 
 export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
-  const { sessionType, calBlock } = props
+  const {
+    sessionType,
+    calBlock,
+    hasCalibratedTipLength,
+    cleanUpAndExit,
+    sendCommands,
+  } = props
   const { headerText } = contentsBySessionType[sessionType]
 
-  const exitSession = () => {
-    props.cleanUpAndExit()
+  const proceed = () => {
+    sendCommands({ command: Sessions.sharedCalCommands.MOVE_TO_DECK })
   }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -88,9 +98,24 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
         </>
       )}
 
-      <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
-        <PrimaryBtn title={RETURN_TIP} flex="1" onClick={exitSession}>
-          {RETURN_TIP}
+      <Flex
+        width="100%"
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_CENTER}
+        marginY={SPACING_3}
+      >
+        {hasCalibratedTipLength === false && (
+          <PrimaryBtn
+            title={RETURN_TIP}
+            flex="1"
+            marginY={SPACING_3}
+            onClick={proceed}
+          >
+            {PROCEED_TO_PIP_OFFSET}
+          </PrimaryBtn>
+        )}
+        <PrimaryBtn title={RETURN_TIP} flex="1" onClick={cleanUpAndExit}>
+          {hasCalibratedTipLength === false ? EXIT : RETURN_TIP}
         </PrimaryBtn>
       </Flex>
     </Flex>

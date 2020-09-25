@@ -42,7 +42,7 @@ const contentsBySessionType: {
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
   },
   [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
-    moveCommandString: Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT,
+    moveCommandString: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
   },
 }
 
@@ -65,9 +65,11 @@ export function DeckSetup(props: CalibrationPanelProps): React.Node {
       sendCommands({
         command: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
       })
+    } else {
+      sendCommands({
+        command: contentsBySessionType[sessionType].moveCommandString,
+      })
     }
-    const { moveCommandString } = contentsBySessionType[sessionType]
-    sendCommands({ command: moveCommandString })
   }
 
   return (

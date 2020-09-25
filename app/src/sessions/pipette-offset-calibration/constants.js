@@ -5,6 +5,11 @@ import { sharedCalCommands } from '../common-calibration/constants'
 export const PIP_OFFSET_STEP_SESSION_STARTED: 'sessionStarted' =
   'sessionStarted'
 export const PIP_OFFSET_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
+
+export const PIP_OFFSET_STEP_MEASURING_NOZZLE_OFFSET: 'measuringNozzleOffset' =
+  'measuringNozzleOffset'
+export const PIP_OFFSET_STEP_MEASURING_TIP_OFFSET: 'measuringTipOffset' =
+  'measuringTipOffset'
 export const PIP_OFFSET_STEP_PREPARING_PIPETTE: 'preparingPipette' =
   'preparingPipette'
 export const PIP_OFFSET_STEP_INSPECTING_TIP: 'inspectingTip' = 'inspectingTip'
