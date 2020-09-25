@@ -38,7 +38,7 @@ class PipetteOffsetCalibration(BaseModel):
     lastModified: datetime = \
         Field(...,
               description="When this calibration was last modified")
-    source: typing.Optional[SourceType] = \
+    source: SourceType = \
         Field(..., description="The calibration source")
 
 

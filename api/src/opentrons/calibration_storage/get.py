@@ -13,8 +13,7 @@ from . import (
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from .dev_types import (
-        TipLengthCalibration, CalibrationIndexDict,
-        CalibrationDict, DeckCalibrationData, PipetteCalibrationData)
+        TipLengthCalibration, CalibrationIndexDict, CalibrationDict)
 
 
 def _format_calibration_type(
@@ -141,26 +140,45 @@ def load_tip_length_calibration(
         labware_load_name=load_name)
 
 
-def get_robot_deck_attitude() -> typing.Optional['DeckCalibrationData']:
+def _get_calibration_source(data: typing.Dict) -> local_types.SourceType:
+    if 'source' not in data.keys():
+        return local_types.SourceType.unknown
+    else:
+        return local_types.SourceType[data['source']]
+
+
+def get_robot_deck_attitude() \
+            -> typing.Optional[local_types.DeckCalibration]:
     robot_dir = config.get_opentrons_path('robot_calibration_dir')
     gantry_path = robot_dir / 'deck_calibration.json'
     if gantry_path.exists():
         data = io.read_cal_file(gantry_path)
         assert 'attitude' in data.keys(), 'Not valid deck calibration data'
-        return data  # type: ignore
+        return local_types.DeckCalibration(
+            attitude=data['attitude'],
+            source=_get_calibration_source(data),
+            pipette_calibrated_with=data['pipette_calibrated_with'],
+            tiprack=data['tiprack'],
+            last_modified=data['last_modified'])
     else:
         return None
 
 
 def get_pipette_offset(
         pip_id: str,
-        mount: Mount) -> typing.Optional['PipetteCalibrationData']:
+        mount: Mount
+) -> typing.Optional[local_types.PipetteOffsetByPipetteMount]:
     pip_dir = config.get_opentrons_path('pipette_calibration_dir')
     offset_path = pip_dir / mount.name.lower() / f'{pip_id}.json'
     if offset_path.exists():
         data = io.read_cal_file(offset_path)
         assert 'offset' in data.keys(), 'Not valid pipette calibration data'
-        return data  # type: ignore
+        return local_types.PipetteOffsetByPipetteMount(
+            offset=data['offset'],
+            source=_get_calibration_source(data),
+            tiprack=data['tiprack'],
+            uri=data['uri'],
+            last_modified=data['last_modified'])
     else:
         return None
 
@@ -194,5 +212,5 @@ def get_all_pipette_offset_calibrations() \
                         tiprack=data['tiprack'],
                         uri=data['uri'],
                         last_modified=data['last_modified'],
-                        source=local_types.SourceType[data['source']]))
+                        source=_get_calibration_source(data)))
     return all_calibrations

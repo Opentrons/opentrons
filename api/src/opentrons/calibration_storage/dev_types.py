@@ -55,9 +55,9 @@ class PipetteCalibrationData(TypedDict):
 class DeckCalibrationData(TypedDict):
     attitude: AttitudeMatrix
     last_modified: datetime
+    source: SourceType
     pipette_calibrated_with: typing.Optional[str]
     tiprack: typing.Optional[str]
-    source: typing.Optional[SourceType]
 
 
 PipTipLengthCalibration = typing.Dict[str, TipLengthCalibration]

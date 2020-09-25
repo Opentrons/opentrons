@@ -198,7 +198,7 @@ class DeckCalibrationData(BaseModel):
         Field(None,
               description="The sha256 hash of the tiprack used in this"
                           "calibration")
-    source: typing.Optional[SourceType] = \
+    source: SourceType = \
         Field(None,
               description="The calibration source")
 
