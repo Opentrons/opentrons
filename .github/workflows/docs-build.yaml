@@ -38,7 +38,12 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - uses: './.github/actions/util/build-env-vars'
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v2
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
       - name: 'Setup Docs'
         run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
       - name: 'Build docs'

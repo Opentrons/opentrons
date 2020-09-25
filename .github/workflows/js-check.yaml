@@ -42,14 +42,9 @@ jobs:
         uses: actions/github-script@v2
         with:
           script: |
-            const {execSync} = require('child_process')
-            const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
-            const tag = context.ref.startsWith('refs/tags/') ? branch : ''
-            const buildNumber = context.runNumber + 10000
-            core.exportVariable('OT_BRANCH', branch)
-            core.exportVariable('OT_TAG', tag)
-            core.exportVariable('OT_BUILD', buildNumber)
-            core.setOutput('yarnCacheDir', execSync('yarn cache dir'))
+            const { buildComplexEnvVars, findYarnCacheDir } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+            findYarnCacheDir(core, context)
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
