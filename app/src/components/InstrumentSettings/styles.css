@@ -65,3 +65,9 @@
     margin-bottom: 1rem;
   }
 }
+
+.calibration_alert_icon {
+  width: 2rem;
+  padding: 0;
+  color: var(--c-warning)
+}
