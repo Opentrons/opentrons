@@ -1,9 +1,11 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.session_types.live_protocol \
     import command_interface
+from robot_server.service.session.session_types.\
+    live_protocol.command_interface import ProtocolErrorInstrument
 from robot_server.service.session.session_types.live_protocol.state_store \
     import StateStore
 from robot_server.service.session.models import command as models
@@ -44,8 +46,12 @@ def load_instrument_cmd():
 
 
 @pytest.fixture
-def command_handler(hardware):
-    state_store = StateStore()
+def state_store() -> StateStore:
+    return StateStore()
+
+
+@pytest.fixture
+def command_handler(hardware, state_store):
     ci = command_interface.CommandInterface(hardware, state_store)
     return ci
 
@@ -84,12 +90,88 @@ async def test_handle_load_labware_response(get_labware, hardware,
         assert response.calibration == labware_calibration_mock()
 
 
-async def test_handle_load_instrumente(hardware,
-                                       command_handler,
-                                       load_instrument_cmd):
+async def test_handle_load_instrument(
+        hardware,
+        command_handler,
+        load_instrument_cmd):
     with patch.object(command_interface, "create_identifier",
                       return_value="1234") as mock_id:
         response = await command_handler.handle_load_instrument(
             load_instrument_cmd
         )
-        assert response.instrumentId == "1234"
+        assert response.instrumentId == mock_id()
+
+
+@pytest.mark.parametrize(argnames="mount",
+                         argvalues=[
+                             Mount.left,
+                             Mount.right
+                         ])
+async def test_handle_load_instrument_success(
+        hardware,
+        command_handler,
+        load_instrument_cmd,
+        mount,
+        state_store):
+    """Test that hardware controller accepts new instrument"""
+    load_instrument_cmd.mount = mount
+    await command_handler.handle_load_instrument(
+            load_instrument_cmd
+    )
+    hardware.cache_instruments.assert_called_once_with({
+        load_instrument_cmd.mount.to_hw_mount():
+            load_instrument_cmd.instrumentName,
+        load_instrument_cmd.mount.other_mount().to_hw_mount(): None
+    })
+
+
+@pytest.mark.parametrize(argnames="mount",
+                         argvalues=[
+                             Mount.left,
+                             Mount.right
+                         ])
+async def test_handle_load_another_instrument_success(
+        hardware,
+        command_handler,
+        load_instrument_cmd,
+        mount,
+        state_store):
+    """
+    Test that hardware controller accepts new instrument when instruement
+    is already attached to other mount.
+    """
+    load_instrument_cmd.mount = mount
+    expected_other_name = 'p1000_single'
+
+    def mock_get_instrument_by_mount(m):
+        return expected_other_name if m is mount.other_mount().to_hw_mount() \
+            else None
+
+    mock = MagicMock(side_effect=mock_get_instrument_by_mount)
+    state_store.get_instrument_by_mount = mock
+
+    await command_handler.handle_load_instrument(
+            load_instrument_cmd
+    )
+    hardware.cache_instruments.assert_called_once_with({
+        load_instrument_cmd.mount.to_hw_mount():
+            load_instrument_cmd.instrumentName,
+        load_instrument_cmd.mount.other_mount().to_hw_mount():
+            expected_other_name
+    })
+
+
+async def test_handle_load_instrument_failure(
+        hardware,
+        command_handler,
+        load_instrument_cmd,
+        state_store):
+    """Test that hardware controller rejects new instrument"""
+    def raiser(*args, **kwargs):
+        raise RuntimeError("Failed")
+    hardware.cache_instruments.side_effect = raiser
+
+    with pytest.raises(ProtocolErrorInstrument, match='Failed'):
+        await command_handler.handle_load_instrument(
+            load_instrument_cmd
+        )

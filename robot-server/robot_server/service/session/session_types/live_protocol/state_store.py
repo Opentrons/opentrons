@@ -86,6 +86,13 @@ class StateStore:
             Optional[InstrumentEntry]:
         return self._instruments.get(instrument_id)
 
+    def get_instrument_by_mount(
+            self, mount: Mount) -> Optional[InstrumentEntry]:
+        for entry in self._instruments.values():
+            if entry.mount == mount:
+                return entry
+        return None
+
     def get_commands(self) -> List[Command]:
         """
         Selector method to return the current state of all commands

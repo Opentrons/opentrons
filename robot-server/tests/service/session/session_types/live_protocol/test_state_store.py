@@ -108,6 +108,16 @@ def test_load_instrument_update():
         data=models.LoadInstrumentResponse(instrumentId="1234"))
 
     assert store.get_instrument_by_id(command_result.data.instrumentId) is None
+    assert store.get_instrument_by_mount(
+        command.content.data.mount.to_hw_mount()
+    ) is None
     store.handle_command_result(command, command_result)
+
+    expected_instrument = InstrumentEntry(mount=types.Mount.LEFT,
+                                          name='p10_single')
+
     assert store.get_instrument_by_id(command_result.data.instrumentId) == \
-        InstrumentEntry(mount=types.Mount.LEFT, name='p10_single')
+           expected_instrument
+    assert store.get_instrument_by_mount(
+        command.content.data.mount.to_hw_mount()
+    ) == expected_instrument

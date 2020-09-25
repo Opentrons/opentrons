@@ -73,6 +73,12 @@ class Mount(str, Enum):
         else:
             return types.Mount.LEFT
 
+    def other_mount(self) -> 'Mount':
+        if self is Mount.right:
+            return Mount.left
+        else:
+            return Mount.right
+
 
 class RobotMoveTarget(BaseModel):
     target: MotionTarget
