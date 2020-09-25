@@ -1,9 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { i18n } from '../../../localization'
 import {
   TextField,
@@ -30,8 +28,6 @@ export const MixForm = (props: Props): React.Node => {
   const { focusHandlers } = props
 
   const [collapsed, setCollapsed] = React.useState(true)
-
-  const mixDelayEnabled = useSelector(featureFlagSelectors.getEnabledMixDelay)
 
   const toggleCollapsed = (): void =>
     setCollapsed(prevCollapsed => !prevCollapsed)
@@ -110,13 +106,11 @@ export const MixForm = (props: Props): React.Node => {
                 label={i18n.t('form.step_edit_form.field.well_order.label')}
               />
             </div>
-            {mixDelayEnabled && (
-              <DelayFields
-                checkboxFieldName={'aspirate_delay_checkbox'}
-                secondsFieldName={'aspirate_delay_seconds'}
-                focusHandlers={focusHandlers}
-              />
-            )}
+            <DelayFields
+              checkboxFieldName={'aspirate_delay_checkbox'}
+              secondsFieldName={'aspirate_delay_seconds'}
+              focusHandlers={focusHandlers}
+            />
           </div>
 
           <div className={styles.section_column}>
@@ -128,13 +122,11 @@ export const MixForm = (props: Props): React.Node => {
               />
             </div>
             <div className={styles.checkbox_column}>
-              {mixDelayEnabled && (
-                <DelayFields
-                  checkboxFieldName={'dispense_delay_checkbox'}
-                  secondsFieldName={'dispense_delay_seconds'}
-                  focusHandlers={focusHandlers}
-                />
-              )}
+              <DelayFields
+                checkboxFieldName={'dispense_delay_checkbox'}
+                secondsFieldName={'dispense_delay_seconds'}
+                focusHandlers={focusHandlers}
+              />
               <CheckboxRowField
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.touchTip.label')}
