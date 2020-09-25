@@ -34,7 +34,11 @@ describe('labware calibration selectors', () => {
     it('should return empty array if robot in state but no calibrations yet', () => {
       const state: $Shape<State> = {
         calibration: {
-          robotName: { calibrationStatus: null, labwareCalibrations: null },
+          robotName: {
+            calibrationStatus: null,
+            labwareCalibrations: null,
+            pipetteOffsetCalibrations: null,
+          },
         },
       }
       expect(Selectors.getLabwareCalibrations(state, robotName)).toEqual([])
@@ -45,12 +49,13 @@ describe('labware calibration selectors', () => {
         calibration: {
           robotName: {
             calibrationStatus: StatusFixtures.mockCalibrationStatus,
-            labwareCalibrations: Fixtures.mockAllLabwareCalibraton,
+            labwareCalibrations: Fixtures.mockAllLabwareCalibration,
+            pipetteOffsetCalibrations: null,
           },
         },
       }
       expect(Selectors.getLabwareCalibrations(state, robotName)).toEqual(
-        Fixtures.mockAllLabwareCalibraton.data
+        Fixtures.mockAllLabwareCalibration.data
       )
     })
   })
@@ -111,6 +116,7 @@ describe('labware calibration selectors', () => {
         calibration: {
           robotName: {
             calibrationStatus: null,
+            pipetteOffsetCalibrations: null,
             labwareCalibrations: {
               meta: {},
               data: [
@@ -202,6 +208,7 @@ describe('labware calibration selectors', () => {
         calibration: {
           robotName: {
             calibrationStatus: null,
+            pipetteOffsetCalibrations: null,
             labwareCalibrations: {
               meta: {},
               data: [calNotOnModule, calOnModule],
@@ -282,6 +289,7 @@ describe('labware calibration selectors', () => {
         calibration: {
           robotName: {
             calibrationStatus: null,
+            pipetteOffsetCalibrations: null,
             labwareCalibrations: {
               meta: {},
               data: [calOnModule, calNotOnModule],
@@ -344,6 +352,7 @@ describe('labware calibration selectors', () => {
         calibration: {
           robotName: {
             calibrationStatus: null,
+            pipetteOffsetCalibrations: null,
             labwareCalibrations: {
               meta: {},
               data: [oldLwCal],
