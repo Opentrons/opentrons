@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional, Callable, cast
 from dataclasses import dataclass
 
+from opentrons.types import Mount
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.service.session.models.common import OffsetVector
@@ -16,6 +17,12 @@ class LabwareEntry:
     deckLocation: int
 
 
+@dataclass
+class InstrumentEntry:
+    mount: Mount
+    name: str
+
+
 class StateStore:
     def __init__(self):
         self._commands: List[Command] = []
@@ -24,12 +31,13 @@ class StateStore:
             models.CommandDefinition,
             Callable[[Command, CommandResult], None]
         ] = {
-            # TODO AL 2020-09-22. mypy is mysteriously complaining about the
-            #  types of these keys.
-            models.EquipmentCommand.load_labware:  # type: ignore
-                self.handle_load_labware,  # noqa: E131
+            models.EquipmentCommand.load_labware:
+                self.handle_load_labware,
+            models.EquipmentCommand.load_instrument:
+                self.handle_load_instrument,
         }
         self._labware: Dict[models.IdentifierType, LabwareEntry] = {}
+        self._instruments: Dict[models.IdentifierType, InstrumentEntry] = {}
 
     def handle_command_request(self, command: Command) -> None:
         """
@@ -48,11 +56,10 @@ class StateStore:
         if handler:
             handler(command, result)
 
-    def handle_load_labware(self, command: Command,
+    def handle_load_labware(self,
+                            command: Command,
                             result: CommandResult) -> None:
-        """
-        Update state according to load_labware() command result.
-        """
+        """Update state according to load_labware() command result."""
         result_data = cast(models.LoadLabwareResponse, result.data)
         command_data = cast(models.LoadLabwareRequest, command.content.data)
         self._labware[result_data.labwareId] = LabwareEntry(
@@ -60,9 +67,24 @@ class StateStore:
             calibration=result_data.calibration,
             deckLocation=command_data.location)
 
+    def handle_load_instrument(self,
+                               command: Command,
+                               result: CommandResult) -> None:
+        """Store result of load instrument"""
+        result_data = cast(models.LoadInstrumentResponse, result.data)
+        command_data = cast(models.LoadInstrumentRequest, command.content.data)
+        self._instruments[result_data.instrumentId] = InstrumentEntry(
+            mount=command_data.mount.to_hw_mount(),
+            name=command_data.instrumentName
+        )
+
     def get_labware_by_id(self, labware_id: models.IdentifierType) -> \
             Optional[LabwareEntry]:
         return self._labware.get(labware_id)
+
+    def get_instrument_by_id(self, instrument_id: models.IdentifierType) -> \
+            Optional[InstrumentEntry]:
+        return self._instruments.get(instrument_id)
 
     def get_commands(self) -> List[Command]:
         """

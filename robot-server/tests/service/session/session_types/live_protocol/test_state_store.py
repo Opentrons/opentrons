@@ -1,10 +1,13 @@
 import pytest
 from unittest.mock import patch
+
+from opentrons import types
+from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.models import command as models
 from robot_server.service.session.command_execution \
     import create_command, CommandResult
 from robot_server.service.session.session_types.live_protocol.state_store \
-    import StateStore, LabwareEntry
+    import StateStore, LabwareEntry, InstrumentEntry
 
 
 def test_handle_command_request():
@@ -50,7 +53,10 @@ def test_store_has_handle_command_response_method():
 
 @pytest.mark.parametrize(
     argnames="command_name, handler",
-    argvalues=[[models.EquipmentCommand.load_labware, "handle_load_labware"]]
+    argvalues=[[models.EquipmentCommand.load_labware,
+                "handle_load_labware"],
+               [models.EquipmentCommand.load_instrument,
+                "handle_load_instrument"]]
 )
 def test_command_result_state_handler(command_name, handler):
 
@@ -65,7 +71,7 @@ def test_command_result_state_handler(command_name, handler):
         handler_mock.assert_called_once_with(command, command_result)
 
 
-def test_store_property_update():
+def test_load_labware_update():
     store = StateStore()
     command = create_command(name=models.EquipmentCommand.load_labware,
                              data=models.LoadLabwareRequest(
@@ -87,3 +93,21 @@ def test_store_property_update():
         LabwareEntry(definition={"myLabware": "definition"},
                      calibration=(1, 2, 3),
                      deckLocation=1)
+
+
+def test_load_instrument_update():
+    store = StateStore()
+    command = create_command(name=models.EquipmentCommand.load_instrument,
+                             data=models.LoadInstrumentRequest(
+                                 instrumentName='p10_single',
+                                 mount=Mount.left)
+                             )
+    command_result = CommandResult(
+        started_at=command.meta.created_at,
+        completed_at=command.meta.created_at,
+        data=models.LoadInstrumentResponse(instrumentId="1234"))
+
+    assert store.get_instrument_by_id(command_result.data.instrumentId) is None
+    store.handle_command_result(command, command_result)
+    assert store.get_instrument_by_id(command_result.data.instrumentId) == \
+        InstrumentEntry(mount=types.Mount.LEFT, name='p10_single')

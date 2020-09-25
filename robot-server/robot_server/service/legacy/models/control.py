@@ -2,6 +2,7 @@ import typing
 from functools import partial
 from enum import Enum
 
+from opentrons import types
 from pydantic import BaseModel, Field, root_validator
 
 
@@ -65,6 +66,12 @@ class RobotPositionsResponse(BaseModel):
 class Mount(str, Enum):
     right = "right"
     left = "left"
+
+    def to_hw_mount(self) -> types.Mount:
+        if self is Mount.right:
+            return types.Mount.RIGHT
+        else:
+            return types.Mount.LEFT
 
 
 class RobotMoveTarget(BaseModel):
