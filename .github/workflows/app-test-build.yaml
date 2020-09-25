@@ -89,18 +89,18 @@ jobs:
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '12'
-      - uses: './.github/actions/util/build-env-vars'
-      - name: 'get yarn cache'
-        id: 'get-cache'
-        uses: actions/github-script@v3
+      - name: 'set complex environment variables and get yarn cache'
+        id: 'set-vars-get-cache'
+        uses: actions/github-script@v2
         with:
           script: |
-            const {execSync} = require('child_process')
-            core.setOutput('yarnCacheDir', execSync('yarn cache dir').toString())
+            const { buildComplexEnvVars, findYarnCacheDir } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+            findYarnCacheDir(core, context)
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
-          path: ${{ steps.get-cache.outputs.yarnCacheDir }}
+          path: ${{ steps.set-vars-get-cache.outputs.yarnCacheDir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
