@@ -7,8 +7,7 @@ from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models.command import (
-    CalibrationCommand, TipLengthCalibrationCommand)
+from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 
@@ -141,9 +140,9 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
     (CalibrationCommand.jog, 'measuringNozzleOffset',
      stub_jog_data, 'move_rel'),
     (CalibrationCommand.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
-    (TipLengthCalibrationCommand.move_to_reference_point, 'labwareLoaded',
+    (CalibrationCommand.move_to_reference_point, 'labwareLoaded',
      {}, 'move_to'),
-    (TipLengthCalibrationCommand.move_to_reference_point, 'inspectingTip',
+    (CalibrationCommand.move_to_reference_point, 'inspectingTip',
      {}, 'move_to'),
     (CalibrationCommand.move_to_tip_rack, 'measuringNozzleOffset',
      {}, 'move_to'),

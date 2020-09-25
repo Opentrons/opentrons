@@ -49,10 +49,24 @@ const contentsBySessionType: {
 export function DeckSetup(props: CalibrationPanelProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
-  const { tipRack, calBlock, sendCommands, sessionType } = props
-  const { moveCommandString } = contentsBySessionType[sessionType]
+  const {
+    tipRack,
+    calBlock,
+    sendCommands,
+    sessionType,
+    hasCalibratedTipLength,
+  } = props
 
   const proceed = () => {
+    if (
+      sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
+      hasCalibratedTipLength === false
+    ) {
+      sendCommands({
+        command: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
+      })
+    }
+    const { moveCommandString } = contentsBySessionType[sessionType]
     sendCommands({ command: moveCommandString })
   }
 

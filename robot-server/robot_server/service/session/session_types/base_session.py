@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -11,6 +12,8 @@ from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import session as models
 from opentrons.util.helpers import utc_now
 
+
+MODULE_LOG = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class SessionMetaData:
@@ -55,10 +58,15 @@ class BaseSession(ABC):
 
     def get_response_model(self) -> models.Session:
         """Get the response model"""
-        return models.Session(sessionType=self.session_type,
+        MODULE_LOG.info(f'\nBASE SESH BEFORE {self._get_response_details}\n')
+        MODULE_LOG.info(f'\nBASE SESH called {self._get_response_details()}\n')
+        MODULE_LOG.info(f'\nBASE SESH called {self.session_type}\n')
+        m = models.Session(sessionType=self.session_type,
                               details=self._get_response_details(),
                               createdAt=self.meta.created_at,
                               createParams=self.meta.create_params)
+        MODULE_LOG.info(f'\nBASE SESH {m}\n')
+        return m
 
     @abstractmethod
     def _get_response_details(self) -> models.SessionDetails:

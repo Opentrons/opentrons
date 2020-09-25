@@ -1,7 +1,6 @@
 from typing import Dict
 from robot_server.service.session.models.command import (
-    CommandDefinition, TipLengthCalibrationCommand as TipCalCommand,
-    CalibrationCommand)
+    CommandDefinition, CalibrationCommand)
 from robot_server.robot.calibration.util import (
     SimpleStateMachine,
     StateTransitionError
@@ -16,7 +15,7 @@ TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
         CalibrationCommand.load_labware: State.labwareLoaded
     },
     State.labwareLoaded: {
-        TipCalCommand.move_to_reference_point: State.measuringNozzleOffset
+        CalibrationCommand.move_to_reference_point: State.measuringNozzleOffset
     },
     State.measuringNozzleOffset: {
         CalibrationCommand.save_offset: State.measuringNozzleOffset,
@@ -29,7 +28,7 @@ TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     },
     State.inspectingTip: {
         CalibrationCommand.invalidate_tip: State.preparingPipette,
-        TipCalCommand.move_to_reference_point: State.measuringTipOffset,
+        CalibrationCommand.move_to_reference_point: State.measuringTipOffset,
     },
     State.measuringTipOffset: {
         CalibrationCommand.save_offset: State.measuringTipOffset,

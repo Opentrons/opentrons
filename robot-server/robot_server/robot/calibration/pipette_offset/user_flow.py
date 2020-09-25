@@ -1,5 +1,6 @@
 import logging
-from typing import Any, Awaitable, Callable, Dict, List, Optional
+from typing import (
+    Any, Awaitable, Callable, Dict, List, Optional, TYPE_CHECKING)
 
 from opentrons.calibration_storage import get, modify, helpers
 from opentrons.calibration_storage.types import TipLengthCalNotFound
@@ -28,6 +29,9 @@ from .constants import (PipetteOffsetCalibrationState as State,
                         TIP_RACK_SLOT, JOG_TO_DECK_SLOT)
 from .state_machine import PipetteOffsetCalibrationStateMachine
 
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware import LabwareDefinition
+
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -44,7 +48,10 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
 
 class PipetteOffsetCalibrationUserFlow:
-    def __init__(self, hardware: ThreadManager, mount: Mount = Mount.RIGHT):
+    def __init__(self,
+                 hardware: ThreadManager,
+                 mount: Mount = Mount.RIGHT,
+                 tip_rack_def: Optional['LabwareDefinition'] = None):
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block: Optional[bool] = None
@@ -68,6 +75,8 @@ class PipetteOffsetCalibrationUserFlow:
 
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
+
+        self._load_tiprack(tip_rack_def)
         self._has_calibrated_tip_length: bool =\
             self._get_stored_tip_length_cal() is not None
 
@@ -95,7 +104,8 @@ class PipetteOffsetCalibrationUserFlow:
         return self._current_state
 
     @property
-    def has_calibrated_tip_length(self) -> State:
+    def has_calibrated_tip_length(self) -> bool:
+        MODULE_LOG.debug(f'\nHAS CALIBRATED: {self._has_calibrated_tip_length}\n')
         return self._has_calibrated_tip_length
 
     def get_pipette(self) -> AttachedPipette:
@@ -151,10 +161,14 @@ class PipetteOffsetCalibrationUserFlow:
                                                     critical_point)
 
     async def load_labware(self):
-        self._initialize_deck()
+        pass
 
     async def set_has_calibration_block(self, has_calibration_block: bool):
         self._has_calibration_block = has_calibration_block
+        if self._has_calibration_block:
+            self._load_calibration_block()
+        else:
+            self._deck[CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['slot']] = None
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
@@ -193,15 +207,30 @@ class PipetteOffsetCalibrationUserFlow:
             self._has_calibrated_tip_length = True
             return stored_tip_length_cal
 
-    def _initialize_deck(self):
-        self._tip_rack = self._get_tip_rack_lw()
+    def _load_tiprack(self,
+                      tip_rack_def: Optional['LabwareDefinition'] = None):
+        """
+        load onto the deck the default opentrons tip rack labware for this
+        pipette and return the tip rack labware. If tip_rack_def is supplied,
+        load specific tip rack from def onto the deck and return the labware.
+        """
+        if tip_rack_def:
+            tr_lw = labware.load_from_definition(
+                tip_rack_def,
+                self._deck.position_for(TIP_RACK_SLOT))
+        else:
+            pip_vol = self._hw_pipette.config.max_volume
+            tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
+            tr_lw = labware.load(tr_load_name,
+                                 self._deck.position_for(TIP_RACK_SLOT))
+        self._tip_rack = tr_lw
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
-        if not self._has_calibrated_tip_length and self._has_calibration_block:
-            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
-            self._deck[cb_setup['slot']] = labware.load(
-                cb_setup['load_name'],
-                self._deck.position_for(cb_setup['slot']))
+    def _load_calibration_block(self):
+        cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
+        self._deck[cb_setup['slot']] = labware.load(
+            cb_setup['load_name'],
+            self._deck.position_for(cb_setup['slot']))
 
     def _flag_unmet_transition_req(self, command_handler: str,
                                    unmet_condition: str):

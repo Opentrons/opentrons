@@ -112,15 +112,6 @@ class CalibrationCheckCommand(CommandDefinition):
         return "calibration.check"
 
 
-class TipLengthCalibrationCommand(CommandDefinition):
-    """Tip Length Calibration Specific"""
-    move_to_reference_point = "moveToReferencePoint"
-
-    @staticmethod
-    def namespace():
-        return "calibration.tipLength"
-
-
 class DeckCalibrationCommand(CommandDefinition):
     """Deck Calibration Specific"""
     move_to_point_two = "moveToPointTwo"
@@ -147,7 +138,6 @@ CommandDefinitionType = typing.Union[
     RobotCommand,
     CalibrationCommand,
     CalibrationCheckCommand,
-    TipLengthCalibrationCommand,
     DeckCalibrationCommand,
     ProtocolCommand
 ]

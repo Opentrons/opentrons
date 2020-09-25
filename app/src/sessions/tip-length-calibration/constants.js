@@ -15,10 +15,4 @@ export const TIP_LENGTH_STEP_MEASURING_TIP_OFFSET: 'measuringTipOffset' =
 export const TIP_LENGTH_STEP_CALIBRATION_COMPLETE: 'calibrationComplete' =
   'calibrationComplete'
 
-const MOVE_TO_REFERENCE_POINT: 'calibration.tipLength.moveToReferencePoint' =
-  'calibration.tipLength.moveToReferencePoint'
-
-export const tipCalCommands = {
-  ...sharedCalCommands,
-  MOVE_TO_REFERENCE_POINT,
-}
+export const tipCalCommands = sharedCalCommands
