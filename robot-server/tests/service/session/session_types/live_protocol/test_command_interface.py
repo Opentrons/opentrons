@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch
 
+from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.session_types.live_protocol \
     import command_interface
 from robot_server.service.session.session_types.live_protocol.state_store \
@@ -31,6 +32,14 @@ def load_labware_cmd():
         displayName="labware display name",
         namespace="opentrons test",
         version=1,
+    )
+
+
+@pytest.fixture
+def load_instrument_cmd():
+    return models.LoadInstrumentRequest(
+        instrumentName='p50_single',
+        mount=Mount.left
     )
 
 
@@ -73,3 +82,14 @@ async def test_handle_load_labware_response(get_labware, hardware,
                                         "fixture_12_trough")
         assert response.labwareId == mock_id()
         assert response.calibration == labware_calibration_mock()
+
+
+async def test_handle_load_instrumente(hardware,
+                                       command_handler,
+                                       load_instrument_cmd):
+    with patch.object(command_interface, "create_identifier",
+                      return_value="1234") as mock_id:
+        response = await command_handler.handle_load_instrument(
+            load_instrument_cmd
+        )
+        assert response.instrumentId == "1234"

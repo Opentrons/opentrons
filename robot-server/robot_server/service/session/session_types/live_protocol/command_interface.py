@@ -33,8 +33,8 @@ class CommandInterface:
     async def handle_load_instrument(
             self,
             command: models.LoadInstrumentRequest) \
-            -> models.LoadLabwareResponse:
-        raise UnsupportedCommandException("")
+            -> models.LoadInstrumentResponse:
+        return models.LoadInstrumentResponse(instrumentId=create_identifier())
 
     async def handle_aspirate(self, command: models.PipetteRequestBase):
         raise UnsupportedCommandException("")
