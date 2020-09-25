@@ -3,6 +3,7 @@ from enum import Enum
 import typing
 from functools import lru_cache
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from robot_server.service.session.models.common import (
     EmptyModel, JogPosition, IdentifierType, OffsetVector)
@@ -67,7 +68,7 @@ class LiquidRequest(PipetteRequestBase):
 
 class LoadLabwareResponse(BaseModel):
     labwareId: IdentifierType
-    definition: typing.Dict[str, typing.Any]
+    definition: LabwareDefinition
     calibration: OffsetVector
 
 

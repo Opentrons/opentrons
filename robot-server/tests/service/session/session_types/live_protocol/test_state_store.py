@@ -1,6 +1,5 @@
 import pytest
 from unittest.mock import patch
-from robot_server.service.session import models
 from robot_server.service.session.models import command as models
 from robot_server.service.session.command_execution \
     import create_command, CommandResult
@@ -82,10 +81,9 @@ def test_store_property_update():
         data=models.LoadLabwareResponse(labwareId="1234",
                                         definition={"myLabware": "definition"},
                                         calibration=(1, 2, 3)))
-    assert command_result.data.labwareId not in store._labware.keys()
+    assert store.get_labware_by_id(command_result.data.labwareId) is None
     store.handle_command_result(command, command_result)
-    assert command_result.data.labwareId in store._labware.keys()
-    assert store._labware.get(command_result.data.labwareId) == \
+    assert store.get_labware_by_id(command_result.data.labwareId) == \
         LabwareEntry(definition={"myLabware": "definition"},
                      calibration=(1, 2, 3),
                      deckLocation=1)

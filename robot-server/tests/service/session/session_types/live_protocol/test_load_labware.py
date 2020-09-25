@@ -5,7 +5,7 @@ from robot_server.service.session.session_types.live_protocol \
     import command_interface
 from robot_server.service.session.session_types.live_protocol.state_store \
     import StateStore
-from robot_server.service.session import models
+from robot_server.service.session.models import command as models
 
 
 @pytest.fixture
@@ -65,7 +65,7 @@ async def test_handle_load_labware_response(get_labware, hardware,
                                             command_handler, load_labware_cmd,
                                             get_labware_fixture,
                                             labware_calibration_mock):
-    with patch.object(command_interface.models, "create_identifier",
+    with patch.object(command_interface, "create_identifier",
                       return_value="1234") as mock_id:
         response = await command_handler.handle_load_labware(
                             load_labware_cmd)

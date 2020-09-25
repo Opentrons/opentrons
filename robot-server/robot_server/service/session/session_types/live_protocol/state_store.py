@@ -1,14 +1,18 @@
-from typing import Dict, List, Optional, Callable, Any, cast
+from typing import Dict, List, Optional, Callable, cast
 from dataclasses import dataclass
-from robot_server.service.session import models
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+from robot_server.service.session.models.common import OffsetVector
+from robot_server.service.session.models import command as models
 from robot_server.service.session.command_execution import (
     Command, CommandResult)
 
 
 @dataclass
 class LabwareEntry:
-    definition: Dict[str, Any]
-    calibration: models.OffsetVector
+    definition: LabwareDefinition
+    calibration: OffsetVector
     deckLocation: int
 
 
@@ -55,6 +59,10 @@ class StateStore:
             definition=result_data.definition,
             calibration=result_data.calibration,
             deckLocation=command_data.location)
+
+    def get_labware_by_id(self, labware_id: models.IdentifierType) -> \
+            Optional[LabwareEntry]:
+        return self._labware.get(labware_id)
 
     def get_commands(self) -> List[Command]:
         """

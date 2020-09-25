@@ -2,6 +2,7 @@ from opentrons import ThreadManager
 
 from robot_server.service.session.models import command as models
 from robot_server.service.session.errors import UnsupportedCommandException
+from robot_server.service.session.models.common import create_identifier
 from robot_server.service.session.session_types.live_protocol.state_store\
     import StateStore
 from opentrons.protocol_api.labware import get_labware_definition
@@ -25,7 +26,7 @@ class CommandInterface:
         labware_path = f'{helpers.hash_labware_def(labware_def)}.json'
         calibration = get.get_labware_calibration(labware_path, labware_def,
                                                   '')
-        return models.LoadLabwareResponse(labwareId=models.create_identifier(),
+        return models.LoadLabwareResponse(labwareId=create_identifier(),
                                           definition=labware_def,
                                           calibration=calibration)
 
