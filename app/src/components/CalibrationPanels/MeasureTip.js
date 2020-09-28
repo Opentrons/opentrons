@@ -93,7 +93,7 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
     sendCommands({
-      command: Sessions.tipCalCommands.JOG,
+      command: Sessions.sharedCalCommands.JOG,
       data: {
         vector: formatJogVector(axis, dir, step),
       },
@@ -102,8 +102,8 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
 
   const proceed = () => {
     sendCommands(
-      { command: Sessions.tipCalCommands.SAVE_OFFSET },
-      { command: Sessions.tipCalCommands.MOVE_TO_TIP_RACK }
+      { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+      { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
     )
   }
 
@@ -159,7 +159,7 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
           <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
         </div>
         <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
-          <PrimaryBtn onClick={proceed} flex="1">
+          <PrimaryBtn title="saveTipLengthButton" onClick={proceed} flex="1">
             {SAVE_NOZZLE_Z_AXIS}
           </PrimaryBtn>
         </Flex>

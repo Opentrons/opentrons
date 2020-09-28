@@ -15,7 +15,6 @@ import {
   SPACING_4,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
-  SPACING_2,
 } from '@opentrons/components'
 import type { CalibrationPanelProps } from './types'
 import type { SessionType } from '../../sessions/types'

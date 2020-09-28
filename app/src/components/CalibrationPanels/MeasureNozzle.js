@@ -95,7 +95,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
     sendCommands({
-      command: Sessions.tipCalCommands.JOG,
+      command: Sessions.sharedCalCommands.JOG,
       data: {
         vector: formatJogVector(axis, dir, step),
       },
@@ -104,8 +104,8 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
 
   const proceed = () => {
     sendCommands(
-      { command: Sessions.tipCalCommands.SAVE_OFFSET },
-      { command: Sessions.tipCalCommands.MOVE_TO_TIP_RACK }
+      { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+      { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
     )
   }
 

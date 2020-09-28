@@ -8,22 +8,22 @@ import {
 } from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
 
-import { MeasureNozzle } from '../MeasureNozzle'
+import { MeasureTip } from '../MeasureTip'
 
-describe('MeasureNozzle', () => {
+describe('MeasureTip', () => {
   let render
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   const getContinueButton = wrapper =>
-    wrapper.find('button[children="Save nozzle z-axis"]').find('button')
+    wrapper.find('button[title="saveTipLengthButton"]').find('button')
 
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
   beforeEach(() => {
-    render = (props: $Shape<React.ElementProps<typeof MeasureNozzle>> = {}) => {
+    render = (props: $Shape<React.ElementProps<typeof MeasureTip>> = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,
@@ -35,7 +35,7 @@ describe('MeasureNozzle', () => {
         sessionType = Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
       } = props
       return mount(
-        <MeasureNozzle
+        <MeasureTip
           isMulti={isMulti}
           mount={pipMount}
           tipRack={tipRack}
@@ -66,7 +66,7 @@ describe('MeasureNozzle', () => {
       wrapper.update()
 
       expect(mockSendCommands).toHaveBeenCalledWith({
-        command: Sessions.tipCalCommands.JOG,
+        command: Sessions.sharedCalCommands.JOG,
         data: { vector: jogParamsByDirection[direction] },
       })
     })
@@ -83,8 +83,12 @@ describe('MeasureNozzle', () => {
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith(
-      { command: Sessions.tipCalCommands.SAVE_OFFSET },
-      { command: Sessions.tipCalCommands.MOVE_TO_TIP_RACK }
+      {
+        command: Sessions.sharedCalCommands.SAVE_OFFSET,
+      },
+      {
+        command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+      }
     )
   })
 })
