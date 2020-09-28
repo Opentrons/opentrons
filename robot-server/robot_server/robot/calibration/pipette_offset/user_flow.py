@@ -78,13 +78,13 @@ class PipetteOffsetCalibrationUserFlow:
 
         self._load_tiprack(tip_rack_def)
         self._has_calibrated_tip_length: bool =\
-            self._get_stored_tip_length_cal() is not None
+            (self._get_stored_tip_length_cal() is not None)
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
             CalibrationCommand.set_has_calibration_block:
                 self.set_has_calibration_block,
-            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
+            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,
             CalibrationCommand.jog: self.jog,
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
@@ -105,7 +105,6 @@ class PipetteOffsetCalibrationUserFlow:
 
     @property
     def has_calibrated_tip_length(self) -> bool:
-        MODULE_LOG.debug(f'\nHAS CALIBRATED: {self._has_calibrated_tip_length}\n')
         return self._has_calibrated_tip_length
 
     def get_pipette(self) -> AttachedPipette:
@@ -168,7 +167,7 @@ class PipetteOffsetCalibrationUserFlow:
         if self._has_calibration_block:
             self._load_calibration_block()
         else:
-            self._deck[CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['slot']] = None
+            self._deck[CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['slot']] = None  # noqa: E501
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
@@ -248,8 +247,8 @@ class PipetteOffsetCalibrationUserFlow:
                 unmet_condition="tip length calibration data exists")
         if self._current_state == State.calibrationComplete:
             # recache tip length cal which has just been saved
-            self._has_calibrated_tip_length: bool =\
-                self._get_stored_tip_length_cal() is not None
+            self._has_calibrated_tip_length =\
+                (self._get_stored_tip_length_cal() is not None)
             if self._saved_offset_this_session:
                 self._flag_unmet_transition_req(
                     command_handler="move_to_deck",
