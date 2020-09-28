@@ -13,10 +13,10 @@ export const migrateSavedStepForms = (savedStepForms: {
       return {
         ...stepForm,
         aspirate_delay_checkbox: false,
-        aspirate_delay_seconds: null,
+        aspirate_delay_seconds: '1',
 
         dispense_delay_checkbox: false,
-        dispense_delay_seconds: null,
+        dispense_delay_seconds: '1',
       }
     }
     return stepForm

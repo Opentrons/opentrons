@@ -1226,9 +1226,9 @@
           "stepDetails": "",
           "times": 4,
           "aspirate_delay_checkbox": false,
-          "aspirate_delay_seconds": null,
+          "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null
+          "dispense_delay_seconds": "1"
         },
         "984e26c0-1811-11e9-9608-8bed9be8868f": {
           "pipette": "01217421-180a-11e9-9608-8bed9be8868f",
@@ -1479,9 +1479,9 @@
           "stepDetails": "Blow out, touch tip",
           "times": 4,
           "aspirate_delay_checkbox": false,
-          "aspirate_delay_seconds": null,
+          "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null
+          "dispense_delay_seconds": "1"
         },
         "07c41640-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "never",
@@ -1504,9 +1504,9 @@
           "aspirate_flowRate": 10,
           "dispense_flowRate": 5,
           "aspirate_delay_checkbox": false,
-          "aspirate_delay_seconds": null,
+          "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null
+          "dispense_delay_seconds": "1"
         },
         "63a2ea90-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "always",
@@ -1526,9 +1526,9 @@
           "stepDetails": "",
           "times": 2,
           "aspirate_delay_checkbox": false,
-          "aspirate_delay_seconds": null,
+          "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null
+          "dispense_delay_seconds": "1"
         },
         "7cd40b20-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "once",
@@ -1548,9 +1548,9 @@
           "stepDetails": "",
           "times": 2,
           "aspirate_delay_checkbox": false,
-          "aspirate_delay_seconds": null,
+          "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null
+          "dispense_delay_seconds": "1"
         },
         "9cafddc0-1812-11e9-9608-8bed9be8868f": {
           "pauseAction": "untilTime",
@@ -1597,9 +1597,9 @@
           "stepDetails": "Blow out, touch tip",
           "times": 4,
           "aspirate_delay_checkbox": false,
-          "aspirate_delay_seconds": null,
+          "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null
+          "dispense_delay_seconds": "1"
         },
         "b9afe0a0-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "never",
@@ -1622,9 +1622,9 @@
           "aspirate_flowRate": null,
           "dispense_flowRate": null,
           "aspirate_delay_checkbox": false,
-          "aspirate_delay_seconds": null,
+          "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null
+          "dispense_delay_seconds": "1"
         },
         "c495a450-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "always",
@@ -1644,9 +1644,9 @@
           "stepDetails": "",
           "times": 2,
           "aspirate_delay_checkbox": false,
-          "aspirate_delay_seconds": null,
+          "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null
+          "dispense_delay_seconds": "1"
         },
         "d7451ea0-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "once",
@@ -1666,9 +1666,9 @@
           "stepDetails": "",
           "times": 2,
           "aspirate_delay_checkbox": false,
-          "aspirate_delay_seconds": null,
+          "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": null
+          "dispense_delay_seconds": "1"
         }
       },
       "orderedStepIds": [
