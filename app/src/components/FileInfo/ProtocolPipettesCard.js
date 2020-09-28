@@ -9,6 +9,7 @@ import {
   fetchPipettes,
   getProtocolPipettesInfo,
   getProtocolPipettesMatching,
+  getProtocolPipettesCalibrated,
   getSomeProtocolPipettesInexact,
 } from '../../pipettes'
 import { InstrumentItem } from './InstrumentItem'
@@ -37,6 +38,9 @@ export function ProtocolPipettesCard(
   const allPipettesMatching = useSelector((state: State) =>
     getProtocolPipettesMatching(state, robotName)
   )
+  const allPipettesCalibrated = useSelector((state: State) =>
+    getProtocolPipettesCalibrated(state, robotName)
+  )
   const someInexactMatches = useSelector((state: State) =>
     getSomeProtocolPipettesInexact(state, robotName)
   )
@@ -56,6 +60,7 @@ export function ProtocolPipettesCard(
           mount: info.protocol.mount,
           hidden: !info.protocol.name,
           displayName: info.protocol.displayName,
+          hasOffsetCalibration: info.hasOffsetCalibration,
         }
       : null
   }).filter(Boolean)
@@ -71,6 +76,7 @@ export function ProtocolPipettesCard(
             compatibility={itemProps.compatibility}
             mount={itemProps.mount}
             hidden={itemProps.hidden}
+            hasOffsetCalibration={itemProps.hasOffsetCalibration}
           >
             {itemProps.displayName}
           </InstrumentItem>
@@ -79,7 +85,16 @@ export function ProtocolPipettesCard(
       {!allPipettesMatching && (
         <MissingItemWarning
           isBlocking
-          instrumentType="pipette"
+          missingItem="Required pipette"
+          urlLabel="go to pipette setup"
+          url={changePipetteUrl}
+        />
+      )}
+      {allPipettesMatching && !allPipettesCalibrated && (
+        <MissingItemWarning
+          isBlocking
+          urlLabel="go to pipette setup"
+          missingItem="Pipette offset calibration"
           url={changePipetteUrl}
         />
       )}

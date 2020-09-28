@@ -41,22 +41,12 @@
   font-weight: var(--fw-semibold);
 }
 
-.instrument_warning {
-  margin-top: 0.5rem;
-  font-size: var(--fs-caption);
-  color: var(--c-warning);
-}
-
-.instrument_warning.blocking {
-  color: var(--c-error);
-}
-
 .status_icon {
   width: 1.5rem;
   margin-right: 1rem;
 }
 
-.instrument_button {
+.width_auto {
   width: auto;
 }
 

@@ -75,13 +75,21 @@ function ProtocolModulesCardComponent(props: Props) {
     <InfoSection title={TITLE}>
       <SectionContentHalf>
         {moduleInfo.map(m => (
-          <InstrumentItem key={m.slot} compatibility={m.modulesMatch}>
+          <InstrumentItem
+            key={m.slot}
+            compatibility={m.modulesMatch}
+            hasOffsetCalibration={true}
+          >
             {m.displayName}{' '}
           </InstrumentItem>
         ))}
       </SectionContentHalf>
       {!modulesMatch && (
-        <MissingItemWarning instrumentType="module" url={attachModulesUrl} />
+        <MissingItemWarning
+          missingItem="Required module"
+          urlLabel="go to module setup"
+          url={attachModulesUrl}
+        />
       )}
       {modulesMatch && someInexact && (
         <SectionContentHalf className={styles.soft_warning}>
