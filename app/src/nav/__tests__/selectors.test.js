@@ -35,10 +35,10 @@ const mockGetConnectedRobot: JestMockFn<
   $Call<typeof DiscoverySelectors.getConnectedRobot, State>
 > = DiscoverySelectors.getConnectedRobot
 
-const mockGetProtocolPipettesMatch: JestMockFn<
+const mockGetProtocolPipettesReady: JestMockFn<
   [State, string],
-  $Call<typeof PipetteSelectors.getProtocolPipettesMatch, State, string>
-> = PipetteSelectors.getProtocolPipettesMatch
+  $Call<typeof PipetteSelectors.getProtocolPipettesReady, State, string>
+> = PipetteSelectors.getProtocolPipettesReady
 
 const mockGetAvailableShellUpdate: JestMockFn<
   [State],
@@ -125,7 +125,7 @@ describe('nav selectors', () => {
 
   beforeEach(() => {
     mockGetConnectedRobot.mockReturnValue(null)
-    mockGetProtocolPipettesMatch.mockReturnValue(false)
+    mockGetProtocolPipettesReady.mockReturnValue(false)
     mockGetAvailableShellUpdate.mockReturnValue(null)
     mockGetBuildrootUpdateAvailable.mockReturnValue(null)
     mockGetIsRunning.mockReturnValue(false)
@@ -256,10 +256,10 @@ describe('nav selectors', () => {
         mockGetCommands.mockReturnValue([
           { id: 0, description: 'Foo', handledAt: null, children: [] },
         ])
-        mockGetProtocolPipettesMatch.mockReturnValue(true)
+        mockGetProtocolPipettesReady.mockReturnValue(true)
       },
       after: () => {
-        expect(mockGetProtocolPipettesMatch).toHaveBeenCalledWith(
+        expect(mockGetProtocolPipettesReady).toHaveBeenCalledWith(
           mockState,
           mockRobot.name
         )

@@ -7,8 +7,11 @@ import type { PipetteOffsetCalibration } from '../api-types'
 
 export const getPipetteOffsetCalibrations: (
   state: State,
-  robotName: string
+  robotName: string | null
 ) => Array<PipetteOffsetCalibration> = (state, robotName) => {
+  if (!robotName) {
+    return []
+  }
   const calibrations =
     state.calibration[robotName]?.pipetteOffsetCalibrations?.data || []
   return calibrations.map(calibration => calibration.attributes)

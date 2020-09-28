@@ -2,7 +2,7 @@
 import { createSelector } from 'reselect'
 
 import { getConnectedRobot } from '../discovery'
-import { getProtocolPipettesMatch } from '../pipettes'
+import { getProtocolPipettesReady } from '../pipettes'
 import { selectors as RobotSelectors } from '../robot'
 import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
@@ -40,7 +40,7 @@ const getConnectedRobotPipettesMatch = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
 
   return connectedRobot
-    ? getProtocolPipettesMatch(state, connectedRobot.name)
+    ? getProtocolPipettesReady(state, connectedRobot.name)
     : false
 }
 
