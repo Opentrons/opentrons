@@ -10,7 +10,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
   const testCases = [
     {
-      title: 'preFlexGrandfatheredProtocol 1.0.0 -> PD 5.0.x, schema 3',
+      title: 'preFlexGrandfatheredProtocol 1.0.0 -> PD 5.1.x, schema 3',
       importFixture:
         '../../fixtures/protocol/1/preFlexGrandfatheredProtocol.json',
       expectedExportFixture:
@@ -21,7 +21,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       genericMigrationModal: false,
     },
     {
-      title: 'example_1_1_0 -> PD 5.0.x, schema 3',
+      title: 'example_1_1_0 -> PD 5.1.x, schema 3',
       importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:
         '../../fixtures/protocol/5/example_1_1_0MigratedFromV1_0_0.json',
@@ -31,7 +31,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       genericMigrationModal: false,
     },
     {
-      title: 'doItAllV3 -> PD 5.0.x, schema 3',
+      title: 'doItAllV3 -> PD 5.1.x, schema 3',
       importFixture: '../../fixtures/protocol/3/doItAllV3.json',
       expectedExportFixture: '../../fixtures/protocol/5/doItAllV3.json',
       newLabwareDefsMigrationModal: false,
@@ -40,7 +40,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       genericMigrationModal: false,
     },
     {
-      title: 'doItAllV4 -> PD 5.0.x, schema 4',
+      title: 'doItAllV4 -> PD 5.1.x, schema 4',
       importFixture: '../../fixtures/protocol/4/doItAllV4.json',
       expectedExportFixture: '../../fixtures/protocol/5/doItAllV4.json',
       newLabwareDefsMigrationModal: false,
@@ -57,6 +57,15 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       unusedPipettes: false,
       exportModalCopy: 'server version 3.20 or higher',
       genericMigrationModal: false,
+    },
+    {
+      title: 'mix 5.0.x -> should migrate to 5.1.x',
+      importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
+      expectedExportFixture: '../../fixtures/protocol/5/mix_5_1_0.json',
+      newLabwareDefsMigrationModal: false,
+      unusedPipettes: false,
+      exportModalCopy: null,
+      genericMigrationModal: true,
     },
   ]
 
@@ -144,8 +153,8 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
               assert.match(
                 savedFile.designerApplication.version,
-                /^5\.0\.\d+$/,
-                'designerApplication.version is 5.0.x'
+                /^5\.1\.\d+$/,
+                'designerApplication.version is 5.1.x'
               )
               ;[savedFile, expectedFile].forEach(f => {
                 // Homogenize fields we don't want to compare
