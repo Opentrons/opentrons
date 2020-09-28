@@ -47,7 +47,9 @@ def command_executor(mock_command_interface, mock_state_store)\
 
 
 async def test_load_labware(command_executor, mock_command_interface):
-    expected_response = models.LoadLabwareResponse(labwareId="your labware")
+    expected_response = models.LoadLabwareResponse(labwareId="your labware",
+                                                   definition={},
+                                                   calibration=(1, 2, 3))
 
     async def handler(command):
         return expected_response

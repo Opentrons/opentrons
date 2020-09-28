@@ -3,11 +3,11 @@ from enum import Enum
 import typing
 from functools import lru_cache
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from pydantic import BaseModel, Field, validator
-
 from robot_server.service.session.models.common import (
-    EmptyModel, JogPosition)
+    EmptyModel, JogPosition, IdentifierType, OffsetVector)
+from pydantic import BaseModel, Field, validator
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.json_api import (
     ResponseModel, RequestModel)
@@ -67,7 +67,9 @@ class LiquidRequest(PipetteRequestBase):
 
 
 class LoadLabwareResponse(BaseModel):
-    labwareId: str
+    labwareId: IdentifierType
+    definition: LabwareDefinition
+    calibration: OffsetVector
 
 
 class LoadInstrumentResponse(BaseModel):
