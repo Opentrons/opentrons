@@ -192,15 +192,6 @@ export const getProtocolPipettesCalibrated: (
   }
 )
 
-export const getProtocolPipettesReady: (
-  state: State,
-  robotName: string
-) => boolean = createSelector<State, string, boolean, _, _>(
-  getProtocolPipettesMatching,
-  getProtocolPipettesCalibrated,
-  (matching, calibrated) => matching && calibrated
-)
-
 export const getSomeProtocolPipettesInexact: (
   state: State,
   robotName: string

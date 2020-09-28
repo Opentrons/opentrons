@@ -2,7 +2,10 @@
 import { createSelector } from 'reselect'
 
 import { getConnectedRobot } from '../discovery'
-import { getProtocolPipettesReady } from '../pipettes'
+import {
+  getProtocolPipettesMatching,
+  getProtocolPipettesCalibrated,
+} from '../pipettes'
 import { selectors as RobotSelectors } from '../robot'
 import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
@@ -25,6 +28,8 @@ const PLEASE_LOAD_A_RUNNABLE_PROTOCOL =
   'Please load a protocol with runnable steps to proceed'
 const ATTACHED_PIPETTES_DO_NOT_MATCH =
   'Attached pipettes do not match pipettes specified in loaded protocol'
+const PIPETTES_NOT_CALIBRATED =
+  'Please calibrate all pipettes specified in loaded protocol to proceed'
 const CANNOT_UPLOAD_A_NEW_PROTOCOL_WHILE_RUNNING =
   'Cannot upload a new protocol while a run is in progress'
 const CANNOT_CALIBRATE_WHILE_RUNNING =
@@ -40,7 +45,15 @@ const getConnectedRobotPipettesMatch = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
 
   return connectedRobot
-    ? getProtocolPipettesReady(state, connectedRobot.name)
+    ? getProtocolPipettesMatching(state, connectedRobot.name)
+    : false
+}
+
+const getConnectedRobotPipettesCalibrated = (state: State): boolean => {
+  const connectedRobot = getConnectedRobot(state)
+
+  return connectedRobot
+    ? getProtocolPipettesCalibrated(state, connectedRobot.name)
     : false
 }
 
@@ -58,11 +71,13 @@ const getRunDisabledReason: State => string | null = createSelector(
   RobotSelectors.getSessionIsLoaded,
   RobotSelectors.getCommands,
   getConnectedRobotPipettesMatch,
-  (robot, loaded, commands, pipettesMatch) => {
+  getConnectedRobotPipettesCalibrated,
+  (robot, loaded, commands, pipettesMatch, pipettesCalibrated) => {
     if (!robot) return PLEASE_CONNECT_TO_A_ROBOT
     if (!loaded) return PLEASE_LOAD_A_PROTOCOL
     if (commands.length === 0) return PLEASE_LOAD_A_RUNNABLE_PROTOCOL
     if (!pipettesMatch) return ATTACHED_PIPETTES_DO_NOT_MATCH
+    if (!pipettesCalibrated) return PIPETTES_NOT_CALIBRATED
     return null
   }
 )

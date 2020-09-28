@@ -18,7 +18,6 @@ type SelectorSpec = {|
   name: string,
   state: $Shape<State>,
   expected: mixed,
-  ready: boolean,
   matching: boolean,
   calibrated: boolean,
   before?: () => mixed,
@@ -130,7 +129,6 @@ const SPECS: Array<SelectorSpec> = [
         hasOffsetCalibration: true,
       },
     },
-    ready: true,
     matching: true,
     calibrated: true,
     before: () => {
@@ -173,7 +171,6 @@ const SPECS: Array<SelectorSpec> = [
         hasOffsetCalibration: true,
       },
     },
-    ready: true,
     matching: true,
     calibrated: true,
     before: () => {
@@ -236,7 +233,6 @@ const SPECS: Array<SelectorSpec> = [
         hasOffsetCalibration: true,
       },
     },
-    ready: true,
     matching: true,
     calibrated: true,
   },
@@ -263,7 +259,6 @@ const SPECS: Array<SelectorSpec> = [
       ])
       mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: false })
     },
-    ready: true,
     matching: true,
     calibrated: true,
     expected: {
@@ -302,7 +297,6 @@ const SPECS: Array<SelectorSpec> = [
         },
       },
     },
-    ready: true,
     matching: true,
     calibrated: true,
     before: () => {
@@ -351,7 +345,6 @@ const SPECS: Array<SelectorSpec> = [
         },
       },
     },
-    ready: true,
     matching: true,
     calibrated: true,
     expected: {
@@ -425,7 +418,6 @@ const SPECS: Array<SelectorSpec> = [
         hasOffsetCalibration: false,
       },
     },
-    ready: false,
     matching: true,
     calibrated: false,
     before: () => {
@@ -440,7 +432,7 @@ const SPECS: Array<SelectorSpec> = [
     },
   },
   {
-    name: 'allows pass if ff on and all pipettes ready and calibrated',
+    name: 'allows pass if ff on and all pipettes matching and calibrated',
     state: {
       pipettes: {
         robotName: {
@@ -481,7 +473,6 @@ const SPECS: Array<SelectorSpec> = [
         hasOffsetCalibration: true,
       },
     },
-    ready: true,
     matching: true,
     calibrated: true,
     before: () => {
@@ -519,7 +510,6 @@ describe('protocol pipettes comparison selectors', () => {
       name,
       state,
       expected,
-      ready,
       matching,
       calibrated,
       before = noop,
@@ -537,9 +527,6 @@ describe('protocol pipettes comparison selectors', () => {
       expect(
         Selectors.getProtocolPipettesCalibrated(state, 'robotName')
       ).toEqual(calibrated)
-      expect(Selectors.getProtocolPipettesReady(state, 'robotName')).toEqual(
-        ready
-      )
       after()
     })
   })
