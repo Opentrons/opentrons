@@ -66,7 +66,7 @@
           "mix_wellOrder_second": "l2r",
           "blowout_checkbox": false,
           "blowout_location": "trashId",
-          "mix_mmFromBottom": "0.5",
+          "mix_mmFromBottom": 0.5,
           "pipette": "pipetteId",
           "volume": "5",
           "wells": ["A1"],
@@ -2228,7 +2228,7 @@
         "volume": 5,
         "labware": "trashId",
         "well": "A1",
-        "offsetFromBottomMm": "0.5",
+        "offsetFromBottomMm": 0.5,
         "flowRate": 3.78
       }
     },
@@ -2239,7 +2239,7 @@
         "volume": 5,
         "labware": "trashId",
         "well": "A1",
-        "offsetFromBottomMm": "0.5",
+        "offsetFromBottomMm": 0.5,
         "flowRate": 3.78
       }
     },
@@ -2250,7 +2250,7 @@
         "volume": 5,
         "labware": "trashId",
         "well": "A1",
-        "offsetFromBottomMm": "0.5",
+        "offsetFromBottomMm": 0.5,
         "flowRate": 3.78
       }
     },
@@ -2261,7 +2261,7 @@
         "volume": 5,
         "labware": "trashId",
         "well": "A1",
-        "offsetFromBottomMm": "0.5",
+        "offsetFromBottomMm": 0.5,
         "flowRate": 3.78
       }
     },
