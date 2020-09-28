@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { Link } from 'react-router-dom'
 import cx from 'classnames'
@@ -9,17 +10,26 @@ import {
   InstrumentDiagram,
   Box,
   Flex,
+  Text,
   DIRECTION_COLUMN,
   SPACING_1,
   SPACING_2,
   SPACING_3,
+  SIZE_2,
   SIZE_4,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_START,
   BORDER_SOLID_LIGHT,
+  Icon,
+  COLOR_WARNING,
+  FONT_SIZE_BODY_1,
+  JUSTIFY_START,
 } from '@opentrons/components'
 import styles from './styles.css'
 import { PipetteOffsetCalibrationControl } from './PipetteOffsetCalibrationControl'
+import type { State } from '../../types'
+
+import { getCalibrationForPipette } from '../../calibration'
 
 import type { Mount, AttachedPipette } from '../../pipettes/types'
 
@@ -37,6 +47,8 @@ const LABEL_BY_MOUNT = {
 }
 
 const SERIAL_NUMBER = 'Serial number'
+const PIPETTE_OFFSET_MISSING = 'Pipette offset calibration missing.'
+const CALIBRATE_NOW = 'Please calibrate offset now.'
 
 export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const { robotName, mount, pipette, changeUrl, settingsUrl } = props
@@ -45,7 +57,11 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const serialNumber = pipette ? pipette.id : null
   const channels = pipette ? pipette.modelSpecs.channels : null
   const direction = pipette ? 'change' : 'attach'
-
+  const pipetteOffsetCalibration = useSelector((state: State) =>
+    serialNumber
+      ? getCalibrationForPipette(state, robotName, serialNumber)
+      : null
+  )
   const pipImage = (
     <Box
       key={`pipetteImage${mount}`}
@@ -105,6 +121,32 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
       )}
       {serialNumber && (
         <PipetteOffsetCalibrationControl robotName={robotName} mount={mount} />
+      )}
+      {!pipetteOffsetCalibration && (
+        <Flex
+          marginTop={SPACING_2}
+          alignItems={ALIGN_FLEX_START}
+          justifyContent={JUSTIFY_START}
+        >
+          <Icon
+            name="alert-circle"
+            width={SIZE_2}
+            padding="0"
+            color={COLOR_WARNING}
+          />
+          <Flex
+            marginLeft={SPACING_2}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_START}
+          >
+            <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_WARNING}>
+              {PIPETTE_OFFSET_MISSING}
+            </Text>
+            <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_WARNING}>
+              {CALIBRATE_NOW}
+            </Text>
+          </Flex>
+        </Flex>
       )}
     </Flex>
   )

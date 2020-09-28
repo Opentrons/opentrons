@@ -56,7 +56,7 @@ export const mockLabwareCalibration2: LabwareCalibrationModel = {
   type: 'Labware Calibration',
 }
 
-export const mockAllLabwareCalibraton: AllLabwareCalibrations = {
+export const mockAllLabwareCalibration: AllLabwareCalibrations = {
   data: [mockLabwareCalibration1, mockLabwareCalibration2],
   meta: {},
 }
@@ -73,7 +73,7 @@ export const {
   method: GET,
   path: LABWARE_CALIBRATION_PATH,
   successStatus: 200,
-  successBody: mockAllLabwareCalibraton,
+  successBody: mockAllLabwareCalibration,
   failureStatus: 500,
   failureBody: mockFailureBody,
 })

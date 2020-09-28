@@ -3,6 +3,7 @@ from datetime import datetime
 from enum import Enum
 from uuid import UUID
 
+from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control.util import DeckTransformState
 from pydantic import BaseModel, Field
 from opentrons.deck_calibration.endpoints import CalibrationCommand, \
@@ -197,6 +198,9 @@ class DeckCalibrationData(BaseModel):
         Field(None,
               description="The sha256 hash of the tiprack used in this"
                           "calibration")
+    source: SourceType = \
+        Field(None,
+              description="The calibration source")
 
 
 class DeckCalibrationStatus(BaseModel):

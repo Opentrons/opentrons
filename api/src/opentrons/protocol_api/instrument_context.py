@@ -832,7 +832,7 @@ class InstrumentContext(CommandPublisher):
     @cmds.publish.both(command=cmds.distribute)
     @requires_version(2, 0)
     def distribute(self,
-                   volume: float,
+                   volume: Union[float, Sequence[float]],
                    source: Well,
                    dest: List[Well],
                    *args, **kwargs) -> InstrumentContext:
@@ -841,6 +841,7 @@ class InstrumentContext(CommandPublisher):
 
         :param volume: The amount of volume to distribute to each destination
                        well.
+        :type volume: float or sequence of floats
         :param source: A single well from where liquid will be aspirated.
         :param dest: List of Wells where liquid will be dispensed to.
         :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
@@ -860,7 +861,7 @@ class InstrumentContext(CommandPublisher):
     @cmds.publish.both(command=cmds.consolidate)
     @requires_version(2, 0)
     def consolidate(self,
-                    volume: float,
+                    volume: Union[float, Sequence[float]],
                     source: List[Well],
                     dest: Well,
                     *args, **kwargs) -> InstrumentContext:
@@ -869,6 +870,7 @@ class InstrumentContext(CommandPublisher):
 
         :param volume: The amount of volume to consolidate from each source
                        well.
+        :type volume: float or sequence of floats
         :param source: List of wells from where liquid will be aspirated.
         :param dest: The single well into which liquid will be dispensed.
         :param kwargs: See :py:meth:`transfer`. Some arguments are changed.

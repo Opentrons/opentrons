@@ -1,7 +1,6 @@
 import logging
 import numpy as np  # type: ignore
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Optional, List
 
 from opentrons import config
@@ -16,27 +15,11 @@ log = logging.getLogger(__name__)
 
 
 @dataclass
-class DeckCalibration:
-    attitude: types.AttitudeMatrix
-    last_modified: Optional[datetime] = None
-    pipette_calibrated_with: Optional[str] = None
-    tiprack: Optional[str] = None
-
-
-@dataclass
-class PipetteCalibration:
-    offset: types.PipetteOffset
-    tiprack: Optional[str] = None
-    uri: Optional[str] = None
-    last_modified: Optional[datetime] = None
-
-
-@dataclass
 class RobotCalibration:
-    deck_calibration: DeckCalibration
+    deck_calibration: types.DeckCalibration
 
 
-def validate_attitude_deck_calibration(deck_cal: DeckCalibration):
+def validate_attitude_deck_calibration(deck_cal: types.DeckCalibration):
     """
     This function determines whether the deck calibration is valid
     or not based on the following use-cases:
@@ -109,7 +92,7 @@ def save_attitude_matrix(
     modify.save_robot_deck_attitude(attitude, pipette_id, tiprack_hash)
 
 
-def load_attitude_matrix() -> DeckCalibration:
+def load_attitude_matrix() -> types.DeckCalibration:
     calibration_data = get.get_robot_deck_attitude()
     if not calibration_data and ff.enable_calibration_overhaul():
         gantry_cal = robot_configs.load().gantry_calibration
@@ -125,22 +108,25 @@ def load_attitude_matrix() -> DeckCalibration:
             calibration_data = get.get_robot_deck_attitude()
 
     if calibration_data:
-        deck_cal_obj = DeckCalibration(**calibration_data)
+        return calibration_data
     else:
-        deck_cal_obj = DeckCalibration(
-            attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2)
-    return deck_cal_obj
+        # load default if deck calibration data do not exist
+        return types.DeckCalibration(
+            attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2,
+            source=types.SourceType.default)
 
 
 def load_pipette_offset(
         pip_id: Optional[str],
-        mount: Mount) -> PipetteCalibration:
-    pip_cal_obj = PipetteCalibration(
-        offset=robot_configs.DEFAULT_PIPETTE_OFFSET)
+        mount: Mount) -> types.PipetteOffsetByPipetteMount:
+    # load default if pipette offset data do not exist
+    pip_cal_obj = types.PipetteOffsetByPipetteMount(
+        offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
+        source=types.SourceType.default)
     if pip_id:
         pip_offset_data = get.get_pipette_offset(pip_id, mount)
         if pip_offset_data:
-            pip_cal_obj = PipetteCalibration(**pip_offset_data)
+            return pip_offset_data
     return pip_cal_obj
 
 

@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import MagicMock, call
 from typing import List, Tuple
+from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Mount, Point
-from opentrons.hardware_control import \
-    pipette, robot_calibration as rb_cal
+from opentrons.hardware_control import pipette
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 from robot_server.robot.calibration.deck.user_flow import \
@@ -12,8 +12,9 @@ from robot_server.robot.calibration.deck.constants import \
     POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID, DeckCalibrationState
 
 
-PIP_OFFSET = rb_cal.PipetteCalibration(
-        offset=robot_configs.DEFAULT_PIPETTE_OFFSET)
+PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(
+        offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
+        source=cal_types.SourceType.user)
 
 
 @pytest.fixture
