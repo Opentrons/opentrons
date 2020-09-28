@@ -1,4 +1,3 @@
-import logging
 from typing import Awaitable
 from opentrons.types import Mount
 from robot_server.robot.calibration.pipette_offset.user_flow import \
@@ -16,7 +15,6 @@ from ..models.session import SessionType, SessionDetails
 from ..errors import UnsupportedFeature
 
 
-MODULE_LOG = logging.getLogger(__name__)
 class PipetteOffsetCalibrationCommandExecutor(CallableExecutor):
 
     async def execute(self, command: Command) -> CompletedCommand:
@@ -81,15 +79,12 @@ class PipetteOffsetCalibrationSession(BaseSession):
 
     def _get_response_details(self) -> SessionDetails:
         uf = self._pip_offset_cal_user_flow
-        MODULE_LOG.debug(f'\nget response deets: {uf.has_calibrated_tip_length}\n')
-        ss = PipetteOffsetCalibrationSessionStatus(
+        return PipetteOffsetCalibrationSessionStatus(
             instrument=uf.get_pipette(),
             currentStep=uf.current_state,
             labware=uf.get_required_labware(),
             hasCalibratedTipLength=uf.has_calibrated_tip_length,
         )
-        MODULE_LOG.debug(f'\nget response deets ss: {ss}\n')
-        return ss
 
     async def clean_up(self):
         if self._shutdown_coroutine:
