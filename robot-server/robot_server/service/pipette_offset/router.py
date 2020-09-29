@@ -23,7 +23,8 @@ def _format_calibration(
         offset=calibration.offset,
         tiprack=calibration.tiprack,
         lastModified=calibration.last_modified,
-        source=calibration.source)
+        source=calibration.source,
+        status=calibration.status)
 
     return ResponseDataModel.create(
         attributes=formatted_cal,

@@ -3,7 +3,8 @@ import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
 from opentrons.config import robot_configs
-from opentrons.calibration_storage.types import DeckCalibration, SourceType
+from opentrons.calibration_storage.types import (
+    DeckCalibration, SourceType, CalibrationStatus)
 from opentrons.hardware_control.types import (
     Axis, CriticalPoint, OutOfBoundsMove, MotionChecks)
 from opentrons.hardware_control.robot_calibration import RobotCalibration
@@ -330,7 +331,9 @@ async def test_attitude_deck_cal_applied(
     monkeypatch.setattr(hardware_api._backend, 'move', mock_move)
     deck_cal = RobotCalibration(
         deck_calibration=DeckCalibration(
-            attitude=new_gantry_cal, source=SourceType.user))
+            attitude=new_gantry_cal,
+            source=SourceType.user,
+            status=CalibrationStatus()))
     hardware_api.set_robot_calibration(deck_cal)
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))

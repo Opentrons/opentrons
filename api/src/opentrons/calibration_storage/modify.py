@@ -124,7 +124,8 @@ def create_tip_length_data(
 
     tip_length_data: 'TipLengthCalibration' = {
         'tipLength': length,
-        'lastModified': utc_now()
+        'lastModified': utc_now(),
+        'status': local_types.CalibrationStatus()
     }
 
     data = {labware_hash + parent: tip_length_data}
@@ -201,6 +202,7 @@ def save_robot_deck_attitude(
         'last_modified': utc_now(),
         'tiprack': lw_hash,
         'source': local_types.SourceType.user,
+        'status': local_types.CalibrationStatus()
     }
     io.save_to_file(gantry_path, gantry_dict)
 
@@ -236,6 +238,7 @@ def save_pipette_calibration(
         'uri': tiprack_uri,
         'last_modified': utc_now(),
         'source': local_types.SourceType.user,
+        'status': local_types.CalibrationStatus()
     }
     io.save_to_file(offset_path, offset_dict)
     _add_to_pipette_offset_index_file(pip_id, mount)

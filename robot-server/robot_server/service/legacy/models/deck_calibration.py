@@ -201,6 +201,8 @@ class DeckCalibrationData(BaseModel):
     source: SourceType = \
         Field(None,
               description="The calibration source")
+    status: CalibrationStatus = \
+        Field(None, description="The status of this calibration")
 
 
 class DeckCalibrationStatus(BaseModel):

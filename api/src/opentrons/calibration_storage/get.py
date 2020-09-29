@@ -28,8 +28,7 @@ def _format_calibration_type(
     # based on the loaded pips + labware
     return local_types.CalibrationTypes(
             offset=offset,
-            tip_length=local_types.TipLengthData()
-        )
+            tip_length=local_types.TipLengthData())
 
 
 def _format_parent(
@@ -147,6 +146,14 @@ def _get_calibration_source(data: typing.Dict) -> local_types.SourceType:
         return local_types.SourceType[data['source']]
 
 
+def _get_calibration_status(
+        data: typing.Dict) -> local_types.CalibrationStatus:
+    if 'status' not in data.keys():
+        return local_types.CalibrationStatus()
+    else:
+        return local_types.CalibrationStatus(**data['status'])
+
+
 def get_robot_deck_attitude() \
             -> typing.Optional[local_types.DeckCalibration]:
     robot_dir = config.get_opentrons_path('robot_calibration_dir')
@@ -159,7 +166,8 @@ def get_robot_deck_attitude() \
             source=_get_calibration_source(data),
             pipette_calibrated_with=data['pipette_calibrated_with'],
             tiprack=data['tiprack'],
-            last_modified=data['last_modified'])
+            last_modified=data['last_modified'],
+            status=_get_calibration_status(data))
     else:
         return None
 
@@ -178,7 +186,8 @@ def get_pipette_offset(
             source=_get_calibration_source(data),
             tiprack=data['tiprack'],
             uri=data['uri'],
-            last_modified=data['last_modified'])
+            last_modified=data['last_modified'],
+            status=_get_calibration_status(data))
     else:
         return None
 
@@ -212,5 +221,6 @@ def get_all_pipette_offset_calibrations() \
                         tiprack=data['tiprack'],
                         uri=data['uri'],
                         last_modified=data['last_modified'],
-                        source=_get_calibration_source(data)))
+                        source=_get_calibration_source(data),
+                        status=_get_calibration_status(data)))
     return all_calibrations
