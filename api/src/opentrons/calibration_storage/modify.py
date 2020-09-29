@@ -199,7 +199,8 @@ def save_robot_deck_attitude(
         'attitude': transform,
         'pipette_calibrated_with': pip_id,
         'last_modified': utc_now(),
-        'tiprack': lw_hash
+        'tiprack': lw_hash,
+        'source': local_types.SourceType.user,
     }
     io.save_to_file(gantry_path, gantry_dict)
 
@@ -234,6 +235,7 @@ def save_pipette_calibration(
         'tiprack': tiprack_hash,
         'uri': tiprack_uri,
         'last_modified': utc_now(),
+        'source': local_types.SourceType.user,
     }
     io.save_to_file(offset_path, offset_dict)
     _add_to_pipette_offset_index_file(pip_id, mount)

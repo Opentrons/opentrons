@@ -7,6 +7,8 @@ import typeof {
   DECK_CAL_STATUS_SINGULARITY,
 } from './constants'
 
+import type { Mount } from '@opentrons/components'
+
 export type DeckCalibrationStatus =
   | DECK_CAL_STATUS_OK
   | DECK_CAL_STATUS_IDENTITY
@@ -85,5 +87,24 @@ export type LabwareCalibrationModel = {|
 
 export type AllLabwareCalibrations = {|
   data: Array<LabwareCalibrationModel>,
+  meta: { ... },
+|}
+
+export type PipetteOffsetCalibration = {|
+  pipette: string,
+  mount: Mount,
+  offset: [number, number, number],
+  tiprack: string,
+  lastModified: string,
+|}
+
+export type PipetteOffsetCalibrationModel = {|
+  attributes: PipetteOffsetCalibration,
+  type: string,
+  id: string,
+|}
+
+export type AllPipetteOffsetCalibrations = {|
+  data: Array<PipetteOffsetCalibrationModel>,
   meta: { ... },
 |}

@@ -359,6 +359,7 @@ class API(HardwareAPILike):
             new_p = Pipette(
                 p._config,
                 self._config.instrument_offset[m.name.lower()],
+                rb_cal.load_pipette_offset(p.pipette_id, m),
                 p.pipette_id)
             new_p.act_as(p.acting_as)
             self._attached_instruments[m] = new_p
@@ -405,12 +406,15 @@ class API(HardwareAPILike):
         for mount, instrument_data in found.items():
             config = instrument_data.get('config')
             req_instr = checked_require.get(mount, None)
+            pip_id = instrument_data.get('id')
+            pip_offset_cal = rb_cal.load_pipette_offset(pip_id, mount)
             p, may_skip = load_from_config_and_check_skip(
                 config,
                 self._attached_instruments[mount],
                 req_instr,
-                instrument_data.get('id'),
-                self._config.instrument_offset[mount.name.lower()])
+                pip_id,
+                self._config.instrument_offset[mount.name.lower()],
+                pip_offset_cal)
             self._attached_instruments[mount] = p
             if req_instr and p:
                 p.act_as(req_instr)
@@ -776,7 +780,10 @@ class API(HardwareAPILike):
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
-                offset = top_types.Point(*self._config.mount_offset)
+                if ff.enable_calibration_overhaul():
+                    offset = top_types.Point(*self._config.left_mount_offset)
+                else:
+                    offset = top_types.Point(*self._config.mount_offset)
             z_ax = Axis.by_mount(mount)
             plunger_ax = Axis.of_plunger(mount)
             cp = self._critical_point_for(mount, critical_point)
@@ -876,12 +883,16 @@ class API(HardwareAPILike):
         if len(mounts) > 1:
             secondary_mount = mounts[1]  # type: ignore
 
+        if ff.enable_calibration_overhaul():
+            mount_offset = self._config.left_mount_offset
+        else:
+            mount_offset = self._config.mount_offset
         if primary_mount == top_types.Mount.LEFT:
-            primary_offset = top_types.Point(*self._config.mount_offset)
+            primary_offset = top_types.Point(*mount_offset)
             s_offset = top_types.Point(0, 0, 0)
         else:
             primary_offset = top_types.Point(0, 0, 0)
-            s_offset = top_types.Point(*self._config.mount_offset)
+            s_offset = top_types.Point(*mount_offset)
 
         if secondary_mount:
             primary_z = Axis.by_mount(primary_mount)

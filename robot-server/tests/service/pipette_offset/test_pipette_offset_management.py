@@ -11,7 +11,8 @@ def test_access_pipette_offset_calibration(
         'pipette': 'pip_1',
         'mount': 'left',
         'tiprack': 'hash',
-        'lastModified': None
+        'lastModified': None,
+        'source': 'user'
     }
 
     resp = api_client.get(

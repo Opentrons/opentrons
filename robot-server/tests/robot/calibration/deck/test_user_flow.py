@@ -1,13 +1,20 @@
 import pytest
 from unittest.mock import MagicMock, call
 from typing import List, Tuple
+from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
+from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 from robot_server.robot.calibration.deck.user_flow import \
     DeckCalibrationUserFlow, tuplefy_cal_point_dicts
 from robot_server.robot.calibration.deck.constants import \
     POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID, DeckCalibrationState
+
+
+PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(
+        offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
+        source=cal_types.SourceType.user)
 
 
 @pytest.fixture
@@ -17,6 +24,7 @@ def mock_hw(hardware):
                               'single': [0, 0, 0],
                               'multi': [0, 0, 0]
                           },
+                          PIP_OFFSET,
                           'testId')
     hardware._attached_instruments = {Mount.RIGHT: pip, Mount.LEFT: pip}
     hardware._current_pos = Point(0, 0, 0)
@@ -60,10 +68,12 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
     if pipettes[0]:
         pip = pipette.Pipette(load(pipettes[0], 'testId'),
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                              PIP_OFFSET,
                               'testId')
     if pipettes[1]:
         pip2 = pipette.Pipette(load(pipettes[1], 'testId'),
                                {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                               PIP_OFFSET,
                                'testId2')
     hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
 
@@ -99,6 +109,7 @@ async def test_save_default_pick_up_current(mock_hw):
     # modified during tip pick up
     pip = pipette.Pipette(load("p20_multi_v2.1", 'testId'),
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          PIP_OFFSET,
                           'testid')
     mock_hw._attached_instruments[Mount.LEFT] = pip
     uf = DeckCalibrationUserFlow(hardware=mock_hw)

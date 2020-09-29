@@ -91,7 +91,8 @@ async def get_calibration_status(
             matrix=deck_cal.attitude,
             lastModified=deck_cal.last_modified,
             pipetteCalibratedWith=deck_cal.pipette_calibrated_with,
-            tiprack=deck_cal.tiprack)
+            tiprack=deck_cal.tiprack,
+            source=deck_cal.source)
     else:
         deck_cal_data = DeckCalibrationData(
             type=MatrixType.affine,

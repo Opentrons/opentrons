@@ -15,6 +15,8 @@ from robot_server.service.session.models.common import IdentifierType
 from robot_server.service.session.session_types import (
     NullSession, CheckSession, SessionMetaData, TipLengthCalibration,
     DeckCalibrationSession, PipetteOffsetCalibrationSession, DefaultSession)
+from robot_server.service.session.session_types.live_protocol.session import \
+    LiveProtocolSession
 from robot_server.service.session.session_types.protocol.session import \
     ProtocolSession
 
@@ -28,6 +30,7 @@ SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
     SessionType.pipette_offset_calibration: PipetteOffsetCalibrationSession,
     SessionType.default: DefaultSession,
     SessionType.protocol: ProtocolSession,
+    SessionType.live_protocol: LiveProtocolSession,
 }
 
 

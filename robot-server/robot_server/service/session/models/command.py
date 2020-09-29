@@ -3,12 +3,77 @@ from enum import Enum
 import typing
 from functools import lru_cache
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from robot_server.service.session.models.common import (
+    EmptyModel, JogPosition, IdentifierType, OffsetVector)
 from pydantic import BaseModel, Field, validator
-from robot_server.service.json_api import ResponseModel, RequestModel
+from robot_server.service.legacy.models.control import Mount
+from robot_server.service.json_api import (
+    ResponseModel, RequestModel)
 from opentrons.util.helpers import utc_now
 
-from robot_server.service.session.models.common import EmptyModel, \
-    JogPosition
+
+class LoadLabwareRequest(BaseModel):
+    location: int = Field(
+        ...,
+        description="Deck slot", ge=1, lt=12)
+    loadName: str = Field(
+        ...,
+        description="Name used to reference a labware definition")
+    displayName: typing.Optional[str] = Field(
+        ...,
+        description="User-readable name for labware")
+    namespace: str = Field(
+        ...,
+        description="The namespace the labware definition belongs to")
+    version: int = Field(
+        ...,
+        description="The labware definition version")
+
+
+class LoadInstrumentRequest(BaseModel):
+    instrumentName: PipetteName = Field(
+        ...,
+        description="The name of the instrument model")
+    mount: Mount
+
+
+class PipetteRequestBase(BaseModel):
+    pipetteId: str
+    labwareId: str
+    wellId: str
+
+
+class LiquidRequest(PipetteRequestBase):
+    volume: float = Field(
+        ...,
+        description="Amount of liquid in uL. Must be greater than 0 and less "
+                    "than a pipette-specific maximum volume.",
+        gt=0,
+    )
+    offsetFromBottom: float = Field(
+        ...,
+        description="Offset from the bottom of the well in mm",
+        gt=0,
+    )
+    flowRate: float = Field(
+        ...,
+        description="The absolute flow rate in uL/second. Must be greater "
+                    "than 0 and less than a pipette-specific maximum flow "
+                    "rate.",
+        gt=0
+    )
+
+
+class LoadLabwareResponse(BaseModel):
+    labwareId: IdentifierType
+    definition: LabwareDefinition
+    calibration: OffsetVector
+
+
+class LoadInstrumentResponse(BaseModel):
+    instrumentId: str
 
 
 class CommandStatus(str, Enum):
@@ -79,6 +144,26 @@ class ProtocolCommand(CommandDefinition):
         return "protocol"
 
 
+class EquipmentCommand(CommandDefinition):
+    load_labware = ("loadLabware", LoadLabwareRequest)
+    load_instrument = ("loadInstrument", LoadInstrumentRequest)
+
+    @staticmethod
+    def namespace():
+        return "equipment"
+
+
+class PipetteCommand(CommandDefinition):
+    aspirate = ("aspirate", LiquidRequest)
+    dispense = ("dispense", LiquidRequest)
+    drop_tip = ("dropTip", PipetteRequestBase)
+    pick_up_tip = ("pickUpTip", PipetteRequestBase)
+
+    @staticmethod
+    def namespace():
+        return "pipette"
+
+
 class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
     load_labware = "loadLabware"
@@ -136,6 +221,10 @@ Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
 """
 CommandDataType = typing.Union[
     JogPosition,
+    LiquidRequest,
+    PipetteRequestBase,
+    LoadLabwareRequest,
+    LoadInstrumentRequest,
     EmptyModel
 ]
 
@@ -147,7 +236,15 @@ CommandDefinitionType = typing.Union[
     CalibrationCheckCommand,
     TipLengthCalibrationCommand,
     DeckCalibrationCommand,
-    ProtocolCommand
+    ProtocolCommand,
+    PipetteCommand,
+    EquipmentCommand,
+]
+
+# A Union of all command result types
+CommandResultType = typing.Union[
+    LoadLabwareResponse,
+    LoadInstrumentResponse,
 ]
 
 
@@ -193,6 +290,7 @@ class SessionCommand(BasicSessionCommand):
     createdAt: datetime = Field(..., default_factory=utc_now)
     startedAt: typing.Optional[datetime]
     completedAt: typing.Optional[datetime]
+    result: typing.Optional[CommandResultType] = None
 
 
 # Session command requests/responses

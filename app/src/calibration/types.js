@@ -5,9 +5,14 @@ import type {
   RobotApiErrorResponse,
 } from '../robot-api/types'
 
-import type { CalibrationStatus, AllLabwareCalibrations } from './types'
+import type {
+  CalibrationStatus,
+  AllLabwareCalibrations,
+  AllPipetteOffsetCalibrations,
+} from './api-types'
 
-import type { LawareCalibrationAction } from './labware/types'
+import type { LabwareCalibrationAction } from './labware/types'
+import type { PipetteOffsetCalibrationsAction } from './pipette-offset/types'
 
 import typeof {
   FETCH_CALIBRATION_STATUS,
@@ -17,6 +22,7 @@ import typeof {
 
 export type * from './api-types'
 export type * from './labware/types'
+export type * from './pipette-offset/types'
 
 export type FetchCalibrationStatusAction = {|
   type: FETCH_CALIBRATION_STATUS,
@@ -43,11 +49,13 @@ export type CalibrationAction =
   | FetchCalibrationStatusAction
   | FetchCalibrationStatusSuccessAction
   | FetchCalibrationStatusFailureAction
-  | LawareCalibrationAction
+  | LabwareCalibrationAction
+  | PipetteOffsetCalibrationsAction
 
 export type PerRobotCalibrationState = $ReadOnly<{|
   calibrationStatus: CalibrationStatus | null,
   labwareCalibrations: AllLabwareCalibrations | null,
+  pipetteOffsetCalibrations: AllPipetteOffsetCalibrations | null,
 |}>
 
 export type CalibrationState = $ReadOnly<{

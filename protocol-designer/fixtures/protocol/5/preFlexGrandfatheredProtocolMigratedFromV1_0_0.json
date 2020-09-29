@@ -11,7 +11,7 @@
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "5.0.0",
+    "version": "5.1.0",
     "data": {
       "_internalAppBuildDate": "Thu, 13 Aug 2020 15:05:39 GMT",
       "defaultValues": {
@@ -1224,7 +1224,11 @@
           "stepType": "mix",
           "stepName": "Basic Mix",
           "stepDetails": "",
-          "times": 4
+          "times": 4,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_seconds": "1",
+          "dispense_delay_checkbox": false,
+          "dispense_delay_seconds": "1"
         },
         "984e26c0-1811-11e9-9608-8bed9be8868f": {
           "pipette": "01217421-180a-11e9-9608-8bed9be8868f",
@@ -1473,7 +1477,11 @@
           "stepType": "mix",
           "stepName": "M misc settings",
           "stepDetails": "Blow out, touch tip",
-          "times": 4
+          "times": 4,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_seconds": "1",
+          "dispense_delay_checkbox": false,
+          "dispense_delay_seconds": "1"
         },
         "07c41640-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "never",
@@ -1494,7 +1502,11 @@
           "stepDetails": "Asp at half height, slow. Touch tip half height. Disp fast. Blow out destination wells. ",
           "times": 4,
           "aspirate_flowRate": 10,
-          "dispense_flowRate": 5
+          "dispense_flowRate": 5,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_seconds": "1",
+          "dispense_delay_checkbox": false,
+          "dispense_delay_seconds": "1"
         },
         "63a2ea90-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "always",
@@ -1512,7 +1524,11 @@
           "stepType": "mix",
           "stepName": "M Change tip always",
           "stepDetails": "",
-          "times": 2
+          "times": 2,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_seconds": "1",
+          "dispense_delay_checkbox": false,
+          "dispense_delay_seconds": "1"
         },
         "7cd40b20-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "once",
@@ -1530,7 +1546,11 @@
           "stepType": "mix",
           "stepName": "M Change tip once",
           "stepDetails": "",
-          "times": 2
+          "times": 2,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_seconds": "1",
+          "dispense_delay_checkbox": false,
+          "dispense_delay_seconds": "1"
         },
         "9cafddc0-1812-11e9-9608-8bed9be8868f": {
           "pauseAction": "untilTime",
@@ -1575,7 +1595,11 @@
           "stepType": "mix",
           "stepName": "M misc settings",
           "stepDetails": "Blow out, touch tip",
-          "times": 4
+          "times": 4,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_seconds": "1",
+          "dispense_delay_checkbox": false,
+          "dispense_delay_seconds": "1"
         },
         "b9afe0a0-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "never",
@@ -1596,7 +1620,11 @@
           "stepDetails": "Asp at half height, slow. Touch tip half height. Disp fast. Blow out destination wells. ",
           "times": 4,
           "aspirate_flowRate": null,
-          "dispense_flowRate": null
+          "dispense_flowRate": null,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_seconds": "1",
+          "dispense_delay_checkbox": false,
+          "dispense_delay_seconds": "1"
         },
         "c495a450-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "always",
@@ -1614,7 +1642,11 @@
           "stepType": "mix",
           "stepName": "M Change tip always",
           "stepDetails": "",
-          "times": 2
+          "times": 2,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_seconds": "1",
+          "dispense_delay_checkbox": false,
+          "dispense_delay_seconds": "1"
         },
         "d7451ea0-1812-11e9-9608-8bed9be8868f": {
           "changeTip": "once",
@@ -1632,7 +1664,11 @@
           "stepType": "mix",
           "stepName": "M Change tip once",
           "stepDetails": "",
-          "times": 2
+          "times": 2,
+          "aspirate_delay_checkbox": false,
+          "aspirate_delay_seconds": "1",
+          "dispense_delay_checkbox": false,
+          "dispense_delay_seconds": "1"
         }
       },
       "orderedStepIds": [

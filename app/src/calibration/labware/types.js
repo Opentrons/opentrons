@@ -47,7 +47,7 @@ export type LabwareSummary = {|
   calDataAvailable: boolean,
 |}
 
-export type LawareCalibrationAction =
+export type LabwareCalibrationAction =
   | FetchLabwareCalibrationsAction
   | FetchLabwareCalibrationsSuccessAction
   | FetchLabwareCalibrationsFailureAction

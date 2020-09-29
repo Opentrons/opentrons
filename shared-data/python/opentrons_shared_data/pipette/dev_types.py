@@ -104,6 +104,7 @@ class PipetteModelSpec(TypedDict, total=False):
     dropTipCurrent: PipetteCustomizableConfigElementFloat
     dropTipSpeed: PipetteCustomizableConfigElementFloat
     modelOffset: List[float]
+    nozzleOffset: List[float]
     ulPerMm: List[UlPerMm]
     tipOverlap: Dict[str, float]
     tipLength: PipetteCustomizableConfigElementFloat

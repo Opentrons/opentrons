@@ -38,6 +38,7 @@ dummy_settings = {
     'z_retract_distance': 2,
     'tip_length': 999,
     'mount_offset': [-3, -2, -1],
+    'left_mount_offset': [-34, 0, 0],
     'serial_speed': 888,
     'default_current': {'X': 1, 'Y': 2, 'Z': 3, 'A': 4, 'B': 5, 'C': 6},
     'low_current': {'X': 1, 'Y': 2, 'Z': 3, 'A': 4, 'B': 5, 'C': 6},
