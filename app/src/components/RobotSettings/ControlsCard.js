@@ -24,6 +24,12 @@ import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
 import { getFeatureFlags } from '../../config'
+import {
+  DECK_CAL_STATUS_POLL_INTERVAL,
+  DISABLED_CANNOT_CONNECT,
+  DISABLED_CONNECT_TO_ROBOT,
+  DISABLED_PROTOCOL_IS_RUNNING,
+} from './constants'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -38,14 +44,9 @@ type Props = {|
 
 const TITLE = 'Robot Controls'
 
-const CANNOT_CONNECT = 'Cannot connect to robot'
-const CONNECT_TO_ROBOT = 'Connect to robot to control'
-const PROTOCOL_IS_RUNNING = 'Protocol is running'
 const BAD_DECK_CALIBRATION =
   'Bad deck calibration detected. Please perform a full deck calibration.'
 const NO_DECK_CALIBRATION = 'Please perform a full deck calibration.'
-
-const DECK_CAL_STATUS_POLL_INTERVAL = 10000
 
 export function ControlsCard(props: Props): React.Node {
   const dispatch = useDispatch<Dispatch>()
@@ -73,18 +74,20 @@ export function ControlsCard(props: Props): React.Node {
   }, [dispatch, robotName])
 
   useInterval(
-    () => dispatch(Calibration.fetchCalibrationStatus(robotName)),
+    () =>
+      !ff.enableCalibrationOverhaul &&
+      dispatch(Calibration.fetchCalibrationStatus(robotName)),
     DECK_CAL_STATUS_POLL_INTERVAL,
     true
   )
 
   let buttonDisabledReason = null
   if (notConnectable) {
-    buttonDisabledReason = CANNOT_CONNECT
+    buttonDisabledReason = DISABLED_CANNOT_CONNECT
   } else if (!robot.connected) {
-    buttonDisabledReason = CONNECT_TO_ROBOT
+    buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
   } else if (isRunning) {
-    buttonDisabledReason = PROTOCOL_IS_RUNNING
+    buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
   }
 
   let calCheckDisabledReason = buttonDisabledReason

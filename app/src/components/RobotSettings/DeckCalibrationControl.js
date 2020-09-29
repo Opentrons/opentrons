@@ -168,12 +168,14 @@ export function DeckCalibrationControl(props: Props): React.Node {
           deckCalibrationStatus={deckCalStatus}
           marginTop={SPACING_2}
         />
-        <DeckCalibrationDownload
-          deckCalibrationStatus={deckCalStatus}
-          deckCalibrationData={deckCalData}
-          robotName={robotName}
-          marginTop={SPACING_2}
-        />
+        {!ff.enableCalibrationOverhaul && (
+          <DeckCalibrationDownload
+            deckCalibrationStatus={deckCalStatus}
+            deckCalibrationData={deckCalData}
+            robotName={robotName}
+            marginTop={SPACING_2}
+          />
+        )}
       </TitledControl>
       {showConfirmStart && (
         <Portal>
