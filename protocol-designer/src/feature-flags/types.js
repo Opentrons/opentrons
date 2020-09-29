@@ -16,7 +16,10 @@ export const DEPRECATED_FLAGS = [
 ]
 
 // union of feature flag string constant IDs
-export type FlagTypes = 'PRERELEASE_MODE' | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
+export type FlagTypes =
+  | 'PRERELEASE_MODE'
+  | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
+  | 'OT_PD_ENABLE_AIR_GAP_DISPENSE'
 
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: Array<FlagTypes> = [
