@@ -3,6 +3,7 @@
 This module has functions that you can import to load robot or
 labware calibration from its designated file location.
 """
+import itertools
 import typing
 from opentrons import config
 from opentrons.types import Point, Mount
@@ -137,6 +138,36 @@ def load_tip_length_calibration(
         pip_id=pip_id,
         labware_hash=labware_hash + parent,
         labware_load_name=load_name)
+
+
+def get_all_tip_length_calibrations() \
+            -> typing.List[local_types.TipLengthCalibration]:
+    """
+    A helper function that will list all of the tip length calibrations.
+
+    :return: A list of dictionary objects representing all of the
+    tip length calibration files found on the robot.
+    """
+    all_calibrations: typing.List[local_types.TipLengthCalibration] = []
+    tip_length_dir = config.get_opentrons_path('tip_length_calibration_dir')
+    index_path = tip_length_dir / 'index.json'
+    if not index_path.exists():
+        return all_calibrations
+
+    index_file = io.read_cal_file(str(index_path))
+    unique_pips = set(itertools.chain(*index_file.values()))
+    for pip in unique_pips:
+        cal_path = tip_length_dir / f'{pip}.json'
+        if cal_path.exists():
+            data = io.read_cal_file(str(cal_path))
+            for tiprack, info in data.items():
+                all_calibrations.append(
+                    local_types.TipLengthCalibration(
+                        tip_length=info['tipLength'],
+                        pipette=pip,
+                        tiprack=tiprack,
+                        last_modified=info['lastModified']))
+    return all_calibrations
 
 
 def _get_calibration_source(data: typing.Dict) -> local_types.SourceType:

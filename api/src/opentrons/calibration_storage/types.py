@@ -96,6 +96,14 @@ class CalibrationInformation:
 
 
 @dataclass
+class TipLengthCalibration:
+    tip_length: float
+    pipette: str
+    tiprack: str
+    last_modified: datetime
+
+
+@dataclass
 class DeckCalibration:
     attitude: AttitudeMatrix
     source: SourceType
