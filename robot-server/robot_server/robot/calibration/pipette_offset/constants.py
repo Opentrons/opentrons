@@ -11,6 +11,18 @@ if TYPE_CHECKING:
 class PipetteOffsetCalibrationState(str, Enum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
+    preparingPipette = "preparingPipette"
+    inspectingTip = "inspectingTip"
+    joggingToDeck = "joggingToDeck"
+    savingPointOne = "savingPointOne"
+    calibrationComplete = "calibrationComplete"
+    sessionExited = "sessionExited"
+    WILDCARD = STATE_WILDCARD
+
+
+class PipetteOffsetWithTipLengthCalibrationState(str, Enum):
+    sessionStarted = "sessionStarted"
+    labwareLoaded = "labwareLoaded"
     measuringNozzleOffset = "measuringNozzleOffset"
     preparingPipette = "preparingPipette"
     inspectingTip = "inspectingTip"
@@ -19,6 +31,7 @@ class PipetteOffsetCalibrationState(str, Enum):
     savingPointOne = "savingPointOne"
     calibrationComplete = "calibrationComplete"
     sessionExited = "sessionExited"
+    tipLengthComplete = "tipLengthComplete"
     WILDCARD = STATE_WILDCARD
 
 

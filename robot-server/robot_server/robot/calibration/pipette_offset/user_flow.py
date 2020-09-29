@@ -19,15 +19,15 @@ from robot_server.robot.calibration.constants import (
     STANDARD_DECK,
     POINT_ONE_ID,
     MOVE_TO_DECK_SAFETY_BUFFER,
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER)
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER,
+    CAL_BLOCK_SETUP_BY_MOUNT)
 from ..errors import CalibrationError
 from ..helper_classes import (RequiredLabware, AttachedPipette)
-from ..constants import TIP_RACK_LOOKUP_BY_MAX_VOL, SHORT_TRASH_DECK, \
-    STANDARD_DECK, POINT_ONE_ID, MOVE_TO_DECK_SAFETY_BUFFER, \
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER, CAL_BLOCK_SETUP_BY_MOUNT
 from .constants import (PipetteOffsetCalibrationState as State,
                         TIP_RACK_SLOT, JOG_TO_DECK_SLOT)
-from .state_machine import PipetteOffsetCalibrationStateMachine
+from .state_machine import (
+    PipetteOffsetCalibrationStateMachine,
+    PipetteOffsetWithTipLengthStateMachine)
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware import LabwareDefinition
@@ -52,6 +52,7 @@ class PipetteOffsetCalibrationUserFlow:
                  hardware: ThreadManager,
                  mount: Mount = Mount.RIGHT,
                  tip_rack_def: Optional['LabwareDefinition'] = None):
+
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block: Optional[bool] = None
