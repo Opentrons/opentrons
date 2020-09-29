@@ -2,12 +2,16 @@
 import { createSelector } from 'reselect'
 import every from 'lodash/every'
 import some from 'lodash/some'
+import head from 'lodash/head'
 import {
   getPipetteModelSpecs,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 
 import { getPipettes as getProtocolPipettes } from '../robot/selectors'
+import { getPipetteOffsetCalibrations } from '../calibration/pipette-offset'
+import { getFeatureFlags } from '../config'
+import type { PipetteOffsetCalibration } from '../calibration/types'
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -66,6 +70,7 @@ const EMPTY_INFO = {
   actual: null,
   protocol: null,
   compatibility: Constants.MATCH,
+  needsOffsetCalibration: false,
 }
 
 const pipettesAreInexactMatch = (
@@ -85,11 +90,24 @@ export const getProtocolPipettesInfo: (
   string | null,
   Types.ProtocolPipetteInfoByMount,
   _,
+  _,
+  _,
   _
 >(
   getAttachedPipettes,
   getProtocolPipettes,
-  (attachedByMount, protocolPipettes) => {
+  getPipetteOffsetCalibrations,
+  getFeatureFlags,
+  (
+    attachedByMount,
+    protocolPipettes,
+    pipetteOffsetCalibrations,
+    featureFlags
+  ) => {
+    const pipetteHasOffset = (
+      calibrations: Array<PipetteOffsetCalibration>,
+      serial: string
+    ) => Boolean(head(calibrations.filter(cal => cal.pipette === serial)))
     return Constants.PIPETTE_MOUNTS.reduce(
       (result, mount) => {
         const protocolPipette = protocolPipettes.find(i => i.mount === mount)
@@ -131,6 +149,14 @@ export const getProtocolPipettesInfo: (
                   displayName: actualModelSpecs.displayName,
                 }
               : null,
+          needsOffsetCalibration: !featureFlags.enableCalibrationOverhaul
+            ? false
+            : actualPipette &&
+              protocolPipette &&
+              actualModelSpecs &&
+              compatibility !== Constants.INCOMPATIBLE
+            ? !pipetteHasOffset(pipetteOffsetCalibrations, actualPipette.id)
+            : false,
         }
 
         return result
@@ -140,7 +166,7 @@ export const getProtocolPipettesInfo: (
   }
 )
 
-export const getProtocolPipettesMatch: (
+export const getProtocolPipettesMatching: (
   state: State,
   robotName: string
 ) => boolean = createSelector<State, string, boolean, _>(
@@ -150,6 +176,19 @@ export const getProtocolPipettesMatch: (
       infoByMount,
       (info: Types.ProtocolPipetteInfo) =>
         info.compatibility !== Constants.INCOMPATIBLE
+    )
+  }
+)
+
+export const getProtocolPipettesCalibrated: (
+  state: State,
+  robotName: string
+) => boolean = createSelector<State, string, boolean, _>(
+  getProtocolPipettesInfo,
+  infoByMount => {
+    return every(
+      infoByMount,
+      (info: Types.ProtocolPipetteInfo) => !info.needsOffsetCalibration
     )
   }
 )

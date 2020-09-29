@@ -35,10 +35,15 @@ const mockGetConnectedRobot: JestMockFn<
   $Call<typeof DiscoverySelectors.getConnectedRobot, State>
 > = DiscoverySelectors.getConnectedRobot
 
-const mockGetProtocolPipettesMatch: JestMockFn<
+const mockGetProtocolPipettesMatching: JestMockFn<
   [State, string],
-  $Call<typeof PipetteSelectors.getProtocolPipettesMatch, State, string>
-> = PipetteSelectors.getProtocolPipettesMatch
+  $Call<typeof PipetteSelectors.getProtocolPipettesMatching, State, string>
+> = PipetteSelectors.getProtocolPipettesMatching
+
+const mockGetProtocolPipettesCalibrated: JestMockFn<
+  [State, string],
+  $Call<typeof PipetteSelectors.getProtocolPipettesCalibrated, State, string>
+> = PipetteSelectors.getProtocolPipettesCalibrated
 
 const mockGetAvailableShellUpdate: JestMockFn<
   [State],
@@ -125,7 +130,8 @@ describe('nav selectors', () => {
 
   beforeEach(() => {
     mockGetConnectedRobot.mockReturnValue(null)
-    mockGetProtocolPipettesMatch.mockReturnValue(false)
+    mockGetProtocolPipettesMatching.mockReturnValue(false)
+    mockGetProtocolPipettesCalibrated.mockReturnValue(false)
     mockGetAvailableShellUpdate.mockReturnValue(null)
     mockGetBuildrootUpdateAvailable.mockReturnValue(null)
     mockGetIsRunning.mockReturnValue(false)
@@ -248,7 +254,8 @@ describe('nav selectors', () => {
       ],
     },
     {
-      name: 'getNavbarLocations with runnable protocol and pipettes compatible',
+      name:
+        'getNavbarLocations with runnable protocol and matching but uncalibrated pipettes',
       selector: Selectors.getNavbarLocations,
       before: () => {
         mockGetConnectedRobot.mockReturnValue(mockRobot)
@@ -256,10 +263,41 @@ describe('nav selectors', () => {
         mockGetCommands.mockReturnValue([
           { id: 0, description: 'Foo', handledAt: null, children: [] },
         ])
-        mockGetProtocolPipettesMatch.mockReturnValue(true)
+        mockGetProtocolPipettesMatching.mockReturnValue(true)
+      },
+      expected: [
+        EXPECTED_ROBOTS,
+        { ...EXPECTED_UPLOAD, disabledReason: null },
+        {
+          ...EXPECTED_CALIBRATE,
+          disabledReason: expect.stringMatching(/calibrate all pipettes/),
+        },
+        {
+          ...EXPECTED_RUN,
+          disabledReason: expect.stringMatching(/calibrate all pipettes/),
+        },
+        EXPECTED_MORE,
+      ],
+    },
+    {
+      name:
+        'getNavbarLocations with runnable protocol and pipettes compatible and calibrated',
+      selector: Selectors.getNavbarLocations,
+      before: () => {
+        mockGetConnectedRobot.mockReturnValue(mockRobot)
+        mockGetSessionIsLoaded.mockReturnValue(true)
+        mockGetCommands.mockReturnValue([
+          { id: 0, description: 'Foo', handledAt: null, children: [] },
+        ])
+        mockGetProtocolPipettesMatching.mockReturnValue(true)
+        mockGetProtocolPipettesCalibrated.mockReturnValue(true)
       },
       after: () => {
-        expect(mockGetProtocolPipettesMatch).toHaveBeenCalledWith(
+        expect(mockGetProtocolPipettesMatching).toHaveBeenCalledWith(
+          mockState,
+          mockRobot.name
+        )
+        expect(mockGetProtocolPipettesCalibrated).toHaveBeenCalledWith(
           mockState,
           mockRobot.name
         )

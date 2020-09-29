@@ -8,7 +8,8 @@ import {
   PIPETTE_MOUNTS,
   fetchPipettes,
   getProtocolPipettesInfo,
-  getProtocolPipettesMatch,
+  getProtocolPipettesMatching,
+  getProtocolPipettesCalibrated,
   getSomeProtocolPipettesInexact,
 } from '../../pipettes'
 import { InstrumentItem } from './InstrumentItem'
@@ -34,8 +35,11 @@ export function ProtocolPipettesCard(
   const infoByMount = useSelector((state: State) =>
     getProtocolPipettesInfo(state, robotName)
   )
-  const allPipettesMatch = useSelector((state: State) =>
-    getProtocolPipettesMatch(state, robotName)
+  const allPipettesMatching = useSelector((state: State) =>
+    getProtocolPipettesMatching(state, robotName)
+  )
+  const allPipettesCalibrated = useSelector((state: State) =>
+    getProtocolPipettesCalibrated(state, robotName)
   )
   const someInexactMatches = useSelector((state: State) =>
     getSomeProtocolPipettesInexact(state, robotName)
@@ -56,6 +60,7 @@ export function ProtocolPipettesCard(
           mount: info.protocol.mount,
           hidden: !info.protocol.name,
           displayName: info.protocol.displayName,
+          needsOffsetCalibration: info.needsOffsetCalibration,
         }
       : null
   }).filter(Boolean)
@@ -71,19 +76,29 @@ export function ProtocolPipettesCard(
             compatibility={itemProps.compatibility}
             mount={itemProps.mount}
             hidden={itemProps.hidden}
+            needsOffsetCalibration={itemProps.needsOffsetCalibration}
           >
             {itemProps.displayName}
           </InstrumentItem>
         ))}
       </SectionContentHalf>
-      {!allPipettesMatch && (
+      {!allPipettesMatching && (
         <MissingItemWarning
           isBlocking
-          instrumentType="pipette"
+          missingItem="Required pipette"
+          urlLabel="go to pipette setup"
           url={changePipetteUrl}
         />
       )}
-      {allPipettesMatch && someInexactMatches && (
+      {allPipettesMatching && !allPipettesCalibrated && (
+        <MissingItemWarning
+          isBlocking
+          urlLabel="go to pipette setup"
+          missingItem="Pipette offset calibration"
+          url={changePipetteUrl}
+        />
+      )}
+      {allPipettesMatching && someInexactMatches && (
         <SectionContentHalf className={styles.soft_warning}>
           <div className={styles.warning_info_wrapper}>
             <Icon name="information" className={styles.info_icon} />
