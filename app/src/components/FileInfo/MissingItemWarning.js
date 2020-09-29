@@ -2,9 +2,8 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import {
-  OutlineButton,
+  SecondaryBtn,
   Text,
-  TEXT_TRANSFORM_UPPERCASE,
   SPACING_2,
   COLOR_WARNING,
   COLOR_ERROR,
@@ -25,17 +24,9 @@ export function MissingItemWarning(props: MissingItemWarningProps): React.Node {
   const { missingItem, urlLabel, url, isBlocking = false } = props
   return (
     <SectionContentHalf className={styles.align_center}>
-      <OutlineButton
-        texttransform={TEXT_TRANSFORM_UPPERCASE}
-        Component={Link}
-        to={url}
-        // this needs to be as a class because something about making a button
-        // pretending to be a Link means that stuff specified in the css that's
-        // passed to the link can't be overridden with props
-        className={styles.width_auto}
-      >
+      <SecondaryBtn as={Link} to={url}>
         {urlLabel}
-      </OutlineButton>
+      </SecondaryBtn>
       <Text
         marginTop={SPACING_2}
         fontSize={FONT_SIZE_CAPTION}

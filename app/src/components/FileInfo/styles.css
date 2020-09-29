@@ -46,10 +46,6 @@
   margin-right: 1rem;
 }
 
-.width_auto {
-  width: auto;
-}
-
 .labware_table {
   @apply --font-body-1-dark;
 
