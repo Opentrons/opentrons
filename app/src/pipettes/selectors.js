@@ -70,7 +70,7 @@ const EMPTY_INFO = {
   actual: null,
   protocol: null,
   compatibility: Constants.MATCH,
-  hasOffsetCalibration: false,
+  needsOffsetCalibration: false,
 }
 
 const pipettesAreInexactMatch = (
@@ -149,12 +149,13 @@ export const getProtocolPipettesInfo: (
                   displayName: actualModelSpecs.displayName,
                 }
               : null,
-          hasOffsetCalibration: !featureFlags.enableCalibrationOverhaul
-            ? true
+          needsOffsetCalibration: !featureFlags.enableCalibrationOverhaul
+            ? false
             : actualPipette &&
+              protocolPipette &&
               actualModelSpecs &&
               compatibility !== Constants.INCOMPATIBLE
-            ? pipetteHasOffset(pipetteOffsetCalibrations, actualPipette.id)
+            ? !pipetteHasOffset(pipetteOffsetCalibrations, actualPipette.id)
             : false,
         }
 
@@ -187,7 +188,7 @@ export const getProtocolPipettesCalibrated: (
   infoByMount => {
     return every(
       infoByMount,
-      (info: Types.ProtocolPipetteInfo) => info.hasOffsetCalibration
+      (info: Types.ProtocolPipetteInfo) => !info.needsOffsetCalibration
     )
   }
 )

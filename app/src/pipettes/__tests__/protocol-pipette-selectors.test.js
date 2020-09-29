@@ -120,13 +120,13 @@ const SPECS: Array<SelectorSpec> = [
         compatibility: 'match',
         protocol: null,
         actual: null,
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
       right: {
         compatibility: 'match',
         protocol: null,
         actual: null,
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
     },
     matching: true,
@@ -158,7 +158,7 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockLeftSpecs,
           displayName: 'Left Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
       right: {
         compatibility: 'match',
@@ -168,7 +168,7 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockRightSpecs,
           displayName: 'Right Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
     },
     matching: true,
@@ -217,7 +217,7 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockLeftSpecs,
           displayName: 'Left Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
       right: {
         compatibility: 'match',
@@ -230,7 +230,7 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockRightSpecs,
           displayName: 'Right Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
     },
     matching: true,
@@ -274,13 +274,13 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockLeftSpecs,
           displayName: 'Left Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
       right: {
         compatibility: 'match',
         protocol: null,
         actual: null,
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
     },
   },
@@ -322,13 +322,13 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockLeftSpecs,
           displayName: 'Left Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
       right: {
         compatibility: 'match',
         protocol: null,
         actual: null,
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
     },
   },
@@ -359,13 +359,13 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockLeftSpecs,
           displayName: 'Left Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
       right: {
         compatibility: 'match',
         protocol: null,
         actual: null,
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
     },
     before: () => {
@@ -402,7 +402,7 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockLeftSpecs,
           displayName: 'Left Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
       right: {
         compatibility: 'match',
@@ -415,7 +415,7 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockRightSpecs,
           displayName: 'Right Pipette',
         },
-        hasOffsetCalibration: false,
+        needsOffsetCalibration: true,
       },
     },
     matching: true,
@@ -457,7 +457,7 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockLeftSpecs,
           displayName: 'Left Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
       right: {
         compatibility: 'match',
@@ -470,7 +470,7 @@ const SPECS: Array<SelectorSpec> = [
           modelSpecs: mockRightSpecs,
           displayName: 'Right Pipette',
         },
-        hasOffsetCalibration: true,
+        needsOffsetCalibration: false,
       },
     },
     matching: true,
@@ -483,6 +483,55 @@ const SPECS: Array<SelectorSpec> = [
       mockGetPipetteOffsetCalibrations.mockReturnValue([
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
+      ])
+      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+    },
+  },
+  {
+    name:
+      'allows pass if ff on and an unused but attached pipette is not calibrated',
+    state: {
+      pipettes: {
+        robotName: {
+          attachedByMount: {
+            left: mockLeftPipette,
+            right: mockRightPipette,
+          },
+          settingsById: null,
+        },
+      },
+    },
+    expected: {
+      left: {
+        compatibility: 'match',
+        protocol: {
+          ...mockLeftProtoPipette,
+          displayName: 'Left Pipette',
+        },
+        actual: {
+          ...mockLeftPipette,
+          modelSpecs: mockLeftSpecs,
+          displayName: 'Left Pipette',
+        },
+        needsOffsetCalibration: false,
+      },
+      right: {
+        compatibility: 'match',
+        protocol: null,
+        actual: {
+          ...mockRightPipette,
+          modelSpecs: mockRightSpecs,
+          displayName: 'Right Pipette',
+        },
+        needsOffsetCalibration: false,
+      },
+    },
+    matching: true,
+    calibrated: true,
+    before: () => {
+      mockGetProtocolPipettes.mockReturnValue([mockLeftProtoPipette])
+      mockGetPipetteOffsetCalibrations.mockReturnValue([
+        mockLeftPipetteCalibration,
       ])
       mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
     },

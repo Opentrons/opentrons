@@ -60,7 +60,7 @@ export function ProtocolPipettesCard(
           mount: info.protocol.mount,
           hidden: !info.protocol.name,
           displayName: info.protocol.displayName,
-          hasOffsetCalibration: info.hasOffsetCalibration,
+          needsOffsetCalibration: info.needsOffsetCalibration,
         }
       : null
   }).filter(Boolean)
@@ -76,7 +76,7 @@ export function ProtocolPipettesCard(
             compatibility={itemProps.compatibility}
             mount={itemProps.mount}
             hidden={itemProps.hidden}
-            hasOffsetCalibration={itemProps.hasOffsetCalibration}
+            needsOffsetCalibration={itemProps.needsOffsetCalibration}
           >
             {itemProps.displayName}
           </InstrumentItem>

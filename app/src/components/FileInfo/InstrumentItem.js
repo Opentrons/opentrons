@@ -10,7 +10,7 @@ export type InstrumentItemProps = {|
   mount?: string,
   children: React.Node,
   hidden?: boolean,
-  hasOffsetCalibration: boolean,
+  needsOffsetCalibration: boolean,
 |}
 
 export function InstrumentItem(props: InstrumentItemProps): React.Node {
@@ -20,7 +20,7 @@ export function InstrumentItem(props: InstrumentItemProps): React.Node {
       <StatusIcon
         match={
           ['match', 'inexact_match'].includes(props.compatibility) &&
-          props.hasOffsetCalibration
+          !props.needsOffsetCalibration
         }
       />
       {props.mount && (

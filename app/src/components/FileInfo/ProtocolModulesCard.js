@@ -78,7 +78,7 @@ function ProtocolModulesCardComponent(props: Props) {
           <InstrumentItem
             key={m.slot}
             compatibility={m.modulesMatch}
-            hasOffsetCalibration={true}
+            needsOffsetCalibration={false}
           >
             {m.displayName}{' '}
           </InstrumentItem>

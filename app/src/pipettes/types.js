@@ -70,7 +70,7 @@ export type ProtocolPipetteInfo = {|
     displayName: string,
   |},
   compatibility: PipetteCompatibility,
-  hasOffsetCalibration: boolean,
+  needsOffsetCalibration: boolean,
 |}
 
 export type ProtocolPipetteInfoByMount = {|
