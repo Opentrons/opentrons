@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import typing
+from concurrent.futures.thread import ThreadPoolExecutor
 from enum import Enum, auto
 
 from robot_server.service.session.session_types.protocol.\
@@ -38,6 +39,7 @@ class _Worker:
         self._async_command_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
         # Protocol running WorkerDirective handling task
         self._async_command_task = self._loop.create_task(self._runner_task())
+        self._executor = ThreadPoolExecutor(max_workers=1)
 
     async def handle_run(self):
         """Begin running the protocol"""
@@ -108,7 +110,7 @@ class _Worker:
 
     async def _call_in_executor(self, func: typing.Callable[[], None]):
         try:
-            await self._loop.run_in_executor(None, func)
+            await self._loop.run_in_executor(self._executor, func)
         except Exception as e:
             log.exception("Protocol running error:")
             await self._listener.on_error(str(e))
