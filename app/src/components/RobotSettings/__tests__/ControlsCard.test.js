@@ -96,7 +96,11 @@ describe('ControlsCard', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     getDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
-    getFeatureFlags.mockReturnValue({})
+    getFeatureFlags.mockReturnValue({
+      enableCalibrationOverhaul: false,
+      allPipetteConfig: false,
+      enableBundleUpload: false,
+    })
   })
 
   afterEach(() => {

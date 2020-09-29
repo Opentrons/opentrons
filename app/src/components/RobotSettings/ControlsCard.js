@@ -23,6 +23,7 @@ import * as Calibration from '../../calibration'
 import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
+import { getFeatureFlags } from '../../config'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -65,6 +66,7 @@ export function ControlsCard(props: Props): React.Node {
       dispatch(push(calibrateDeckUrl))
     )
   }
+  const ff = useSelector(getFeatureFlags)
 
   React.useEffect(() => {
     dispatch(fetchLights(robotName))
@@ -99,13 +101,15 @@ export function ControlsCard(props: Props): React.Node {
 
   return (
     <Card title={TITLE}>
-      <DeckCalibrationControl
-        robotName={robotName}
-        buttonDisabled={buttonDisabled}
-        deckCalStatus={deckCalStatus}
-        deckCalData={deckCalData}
-        startLegacyDeckCalibration={startLegacyDeckCalibration}
-      />
+      {!ff.enableCalibrationOverhaul && (
+        <DeckCalibrationControl
+          robotName={robotName}
+          buttonDisabled={buttonDisabled}
+          deckCalStatus={deckCalStatus}
+          deckCalData={deckCalData}
+          startLegacyDeckCalibration={startLegacyDeckCalibration}
+        />
+      )}
       <LabeledButton
         label="Home all axes"
         buttonProps={{
@@ -135,7 +139,7 @@ export function ControlsCard(props: Props): React.Node {
         <p>Control lights on deck.</p>
       </LabeledToggle>
 
-      {deckCalStatus !== null && (
+      {!ff.enableCalibrationOverhaul && deckCalStatus !== null && (
         <CheckCalibrationControl
           robotName={robotName}
           disabledReason={calCheckDisabledReason}
