@@ -166,7 +166,8 @@ def get_all_tip_length_calibrations() \
                         tip_length=info['tipLength'],
                         pipette=pip,
                         tiprack=tiprack,
-                        last_modified=info['lastModified']))
+                        last_modified=info['lastModified'],
+                        status=_get_calibration_status(info)))
     return all_calibrations
 
 

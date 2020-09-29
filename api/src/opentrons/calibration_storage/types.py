@@ -98,6 +98,7 @@ class CalibrationInformation:
 @dataclass
 class TipLengthCalibration:
     tip_length: float
+    source: CalibrationStatus
     pipette: str
     tiprack: str
     last_modified: datetime
