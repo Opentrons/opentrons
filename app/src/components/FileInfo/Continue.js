@@ -17,6 +17,7 @@ import {
   SIZE_5,
   TEXT_ALIGN_RIGHT,
   TOOLTIP_LEFT,
+  TOOLTIP_FIXED,
 } from '@opentrons/components'
 
 // TODO(mc, 2020-07-27): i18n
@@ -27,6 +28,7 @@ export function Continue(): React.Node {
   const { path, disabledReason } = useSelector(getCalibrateLocation)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
+    strategy: TOOLTIP_FIXED,
   })
 
   return (
