@@ -4,15 +4,37 @@ functions
 This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
-import typing
 import json
+from typing import Union, List, Dict, TYPE_CHECKING
+from dataclasses import is_dataclass, asdict
+
 
 from hashlib import sha256
 
 from . import types as local_types
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+
+DictionaryFactoryType = Union[List, Dict]
+
+
+def dict_filter_none(data: DictionaryFactoryType) -> Dict:
+    """
+    Helper function to filter out None keys from a dataclass
+    before saving to file.
+    """
+    return dict(item for item in data if item[1] is not None)
+
+
+def convert_to_dict(obj) -> Dict:
+    # The correct way to type this is described here:
+    # https://github.com/python/mypy/issues/6568
+    # Unfortnately, since it's not currently supported I have an
+    # assert check instead.
+    assert is_dataclass(obj), 'This function is intended for dataclasses only'
+    return asdict(obj, dict_factory=dict_filter_none)
 
 
 def hash_labware_def(labware_def: 'LabwareDefinition') -> str:
@@ -49,7 +71,7 @@ def details_from_uri(uri: str, delimiter='/') -> local_types.UriDetails:
 
 
 def uri_from_details(namespace: str, load_name: str,
-                     version: typing.Union[str, int],
+                     version: Union[str, int],
                      delimiter='/') -> str:
     """ Build a labware URI from its details.
 

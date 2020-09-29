@@ -20,7 +20,7 @@ from . import (
 if typing.TYPE_CHECKING:
     from .dev_types import (
         TipLengthCalibration, PipTipLengthCalibration,
-        DeckCalibrationData, PipetteCalibrationData)
+        DeckCalibrationData, PipetteCalibrationData, CalibrationStatusDict)
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons.types import Point
 
@@ -121,11 +121,14 @@ def create_tip_length_data(
     # assert labware._is_tiprack, \
     #     'cannot save tip length for non-tiprack labware'
     labware_hash = helpers.hash_labware_def(definition)
+    status: 'CalibrationStatusDict' =\
+        helpers.convert_to_dict(  # type: ignore
+            local_types.CalibrationStatus())
 
     tip_length_data: 'TipLengthCalibration' = {
         'tipLength': length,
         'lastModified': utc_now(),
-        'status': local_types.CalibrationStatus()
+        'status': status
     }
 
     data = {labware_hash + parent: tip_length_data}
@@ -196,13 +199,16 @@ def save_robot_deck_attitude(
     robot_dir = config.get_opentrons_path('robot_calibration_dir')
     robot_dir.mkdir(parents=True, exist_ok=True)
     gantry_path = robot_dir/'deck_calibration.json'
+    status: 'CalibrationStatusDict' = \
+        helpers.convert_to_dict(  # type: ignore
+            local_types.CalibrationStatus())
     gantry_dict: 'DeckCalibrationData' = {
         'attitude': transform,
         'pipette_calibrated_with': pip_id,
         'last_modified': utc_now(),
         'tiprack': lw_hash,
         'source': local_types.SourceType.user,
-        'status': local_types.CalibrationStatus()
+        'status': status
     }
     io.save_to_file(gantry_path, gantry_dict)
 
@@ -231,6 +237,9 @@ def save_pipette_calibration(
     pip_dir = config.get_opentrons_path(
         'pipette_calibration_dir') / mount.name.lower()
     pip_dir.mkdir(parents=True, exist_ok=True)
+    status: 'CalibrationStatusDict' =\
+        helpers.convert_to_dict(  # type: ignore
+            local_types.CalibrationStatus())
     offset_path = pip_dir/f'{pip_id}.json'
     offset_dict: 'PipetteCalibrationData' = {
         'offset': [offset.x, offset.y, offset.z],
@@ -238,7 +247,7 @@ def save_pipette_calibration(
         'uri': tiprack_uri,
         'last_modified': utc_now(),
         'source': local_types.SourceType.user,
-        'status': local_types.CalibrationStatus()
+        'status': status
     }
     io.save_to_file(offset_path, offset_dict)
     _add_to_pipette_offset_index_file(pip_id, mount)

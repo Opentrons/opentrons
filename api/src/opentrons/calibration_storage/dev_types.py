@@ -2,13 +2,19 @@ import typing
 from typing_extensions import TypedDict
 from datetime import datetime
 
-from .types import AttitudeMatrix, PipetteOffset, SourceType, CalibrationStatus
+from .types import AttitudeMatrix, PipetteOffset, SourceType
+
+
+class CalibrationStatusDict(TypedDict):
+    markedBad: bool
+    source: typing.Optional[str]
+    markedAt: typing.Optional[datetime]
 
 
 class TipLengthCalibration(TypedDict):
     tipLength: float
     lastModified: datetime
-    status: CalibrationStatus
+    status: CalibrationStatusDict
 
 
 class ModuleDict(TypedDict):
@@ -51,7 +57,7 @@ class PipetteCalibrationData(TypedDict):
     uri: str
     last_modified: datetime
     source: SourceType
-    status: CalibrationStatus
+    status: CalibrationStatusDict
 
 
 class DeckCalibrationData(TypedDict):
@@ -60,7 +66,7 @@ class DeckCalibrationData(TypedDict):
     source: SourceType
     pipette_calibrated_with: typing.Optional[str]
     tiprack: typing.Optional[str]
-    status: CalibrationStatus
+    status: CalibrationStatusDict
 
 
 PipTipLengthCalibration = typing.Dict[str, TipLengthCalibration]

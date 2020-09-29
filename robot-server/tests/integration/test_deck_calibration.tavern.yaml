@@ -228,6 +228,7 @@ stages:
             pipetteCalibratedWith: null
             tiprack: null
             source: null
+            status: null
         instrumentCalibration:
           right: &inst
             single: &vector
