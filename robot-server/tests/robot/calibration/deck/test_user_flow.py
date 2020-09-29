@@ -14,7 +14,8 @@ from robot_server.robot.calibration.deck.constants import \
 
 PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(
         offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
-        source=cal_types.SourceType.user)
+        source=cal_types.SourceType.user,
+        status=cal_types.CalibrationStatus())
 
 
 @pytest.fixture

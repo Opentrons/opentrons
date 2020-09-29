@@ -17,11 +17,19 @@ class SourceType(str, Enum):
     default = "default"
     factory = "factory"
     user = "user"
+    calibration_check = "calibration_check"
     unknown = "unknown"
 
 
 class TipLengthCalNotFound(Exception):
     pass
+
+
+@dataclass
+class CalibrationStatus:
+    markedBad: bool = False
+    source: typing.Optional[SourceType] = None
+    markedAt: typing.Optional[datetime] = None
 
 
 @dataclass
@@ -91,6 +99,7 @@ class CalibrationInformation:
 class DeckCalibration:
     attitude: AttitudeMatrix
     source: SourceType
+    status: CalibrationStatus
     last_modified: typing.Optional[datetime] = None
     pipette_calibrated_with: typing.Optional[str] = None
     tiprack: typing.Optional[str] = None
@@ -103,6 +112,7 @@ class PipetteOffsetByPipetteMount:
     """
     offset: PipetteOffset
     source: SourceType
+    status: CalibrationStatus
     tiprack: typing.Optional[str] = None
     uri: typing.Optional[str] = None
     last_modified: typing.Optional[datetime] = None
@@ -120,3 +130,4 @@ class PipetteOffsetCalibration:
     uri: str
     last_modified: datetime
     source: SourceType
+    status: CalibrationStatus

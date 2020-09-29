@@ -12,8 +12,13 @@ def test_access_pipette_offset_calibration(
         'mount': 'left',
         'tiprack': 'hash',
         'lastModified': None,
-        'source': 'user'
+        'source': 'user',
+        'status': {
+            'markedAt': None, 'markedBad': False, 'source': None}
     }
+    # Note, status should only have markedBad key, but according
+    # to this thread https://github.com/samuelcolvin/pydantic/issues/1223
+    # it's not easy to specify in the model itself
 
     resp = api_client.get(
         f'/calibration/pipette_offset?mount={MOUNT}&pipette_id={PIPETTE_ID}')

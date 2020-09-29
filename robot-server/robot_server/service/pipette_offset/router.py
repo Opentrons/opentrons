@@ -5,11 +5,13 @@ from opentrons import types as ot_types
 from opentrons.calibration_storage import (
     types as cal_types,
     get as get_cal,
+    helpers,
     delete)
 
 from robot_server.service.pipette_offset import models as pip_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.json_api import ErrorResponse, ResponseDataModel
+from robot_server.service.shared_models import calibration as cal_model
 
 router = APIRouter()
 
@@ -17,13 +19,16 @@ router = APIRouter()
 def _format_calibration(
     calibration: cal_types.PipetteOffsetCalibration
 ) -> ResponseDataModel[pip_models.PipetteOffsetCalibration]:
+    status = cal_model.CalibrationStatus(
+        **helpers.convert_to_dict(calibration.status))
     formatted_cal = pip_models.PipetteOffsetCalibration(
         pipette=calibration.pipette,
         mount=calibration.mount,
         offset=calibration.offset,
         tiprack=calibration.tiprack,
         lastModified=calibration.last_modified,
-        source=calibration.source)
+        source=calibration.source,
+        status=status)
 
     return ResponseDataModel.create(
         attributes=formatted_cal,

@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from opentrons.deck_calibration.endpoints import CalibrationCommand, \
     DeckCalibrationPoint
 from robot_server.service.legacy.models.control import Mount
+from robot_server.service.shared_models import calibration as cal_model
 
 
 class DeckStart(BaseModel):
@@ -201,6 +202,9 @@ class DeckCalibrationData(BaseModel):
     source: SourceType = \
         Field(None,
               description="The calibration source")
+    status: cal_model.CalibrationStatus = \
+        Field(None, description="The status of this calibration as determined"
+                                "by a user performing calibration check.")
 
 
 class DeckCalibrationStatus(BaseModel):

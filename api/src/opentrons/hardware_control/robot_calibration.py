@@ -113,7 +113,8 @@ def load_attitude_matrix() -> types.DeckCalibration:
         # load default if deck calibration data do not exist
         return types.DeckCalibration(
             attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2,
-            source=types.SourceType.default)
+            source=types.SourceType.default,
+            status=types.CalibrationStatus())
 
 
 def load_pipette_offset(
@@ -122,7 +123,8 @@ def load_pipette_offset(
     # load default if pipette offset data do not exist
     pip_cal_obj = types.PipetteOffsetByPipetteMount(
         offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
-        source=types.SourceType.default)
+        source=types.SourceType.default,
+        status=types.CalibrationStatus())
     if pip_id:
         pip_offset_data = get.get_pipette_offset(pip_id, mount)
         if pip_offset_data:

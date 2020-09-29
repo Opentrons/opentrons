@@ -6,7 +6,8 @@ from opentrons.config import pipette_config
 
 PIP_CAL = cal_types.PipetteOffsetByPipetteMount(
     offset=[0, 0, 0],
-    source=cal_types.SourceType.user)
+    source=cal_types.SourceType.user,
+    status=cal_types.CalibrationStatus())
 
 
 def test_tip_tracking():
@@ -84,7 +85,8 @@ def test_critical_points_pipette_offset(model, use_new_calibration):
     # set pipette offset calibration
     pip_cal = cal_types.PipetteOffsetByPipetteMount(
         offset=[10, 10, 10],
-        source=cal_types.SourceType.user)
+        source=cal_types.SourceType.user,
+        status=cal_types.CalibrationStatus())
     pip = pipette.Pipette(loaded,
                           {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           pip_cal,
