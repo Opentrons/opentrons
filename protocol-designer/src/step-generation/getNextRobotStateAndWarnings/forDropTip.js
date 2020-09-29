@@ -9,7 +9,7 @@ export function forDropTip(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { pipette, labware, well } = params
-  const { robotState } = robotStateAndWarnings
+  const { robotState, warnings } = robotStateAndWarnings
 
   dispenseUpdateLiquidState({
     invariantContext,
@@ -17,6 +17,7 @@ export function forDropTip(
     pipette,
     labware,
     useFullVolume: true,
+    warnings,
     well,
   })
 

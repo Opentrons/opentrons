@@ -10,7 +10,23 @@ import { createEmptyLiquidState, createTipLiquidState } from '../utils'
 import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../__fixtures__'
 
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import { _getOverflowWarnings } from '../getNextRobotStateAndWarnings/_getOverflowWarnings'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LocationLiquidState } from '../types'
+
+jest.mock('../getNextRobotStateAndWarnings/_getOverflowWarnings')
+
+const getOverflowWarningsMock: JestMockFn<
+  [
+    { [well: string]: LocationLiquidState, ... },
+    Array<string>,
+    LabwareDefinition2
+  ],
+  any
+> = _getOverflowWarnings
+
+const existingFakeWarning: any = 'existing fake warning'
 let dispenseSingleCh150ToA1Args
 let invariantContext
 
@@ -22,8 +38,16 @@ beforeEach(() => {
     volume: 150,
     useFullVolume: false,
     labware: SOURCE_LABWARE,
+    warnings: [],
     well: 'A1',
   }
+
+  // unless otherwise specified, mock shall return empty array
+  getOverflowWarningsMock.mockReturnValue([])
+})
+
+afterEach(() => {
+  jest.resetAllMocks()
 })
 
 function getUpdatedLiquidState(params, initialLiquidState) {
@@ -268,8 +292,46 @@ describe('...single-channel pipette', () => {
     })
   })
 
-  describe('handle air in pipette tips', () => {
-    it.todo('TODO(IL 2018-03-16): deal with air (especially regarding air gap)')
+  it('should push the result of _getOverflowWarnings to the warnings array (single-channel case)', () => {
+    const initialLiquidState = merge(
+      {},
+      createEmptyLiquidState(invariantContext),
+      {
+        pipettes: {
+          p300SingleId: {
+            '0': {
+              ingred1: { volume: 150 },
+            },
+          },
+        },
+      }
+    )
+
+    // ensure called with expected args
+    getOverflowWarningsMock.mockImplementation(
+      (liquidState, wells, labwareDef) => {
+        // liquid state after the update
+        expect(liquidState).toEqual({
+          ...initialLiquidState.labware[SOURCE_LABWARE],
+          A1: { ingred1: { volume: 150 } },
+        })
+
+        expect(wells).toEqual(['A1'])
+
+        expect(labwareDef).toBe(fixture_96_plate)
+        return ['fake overflow warning here']
+      }
+    )
+
+    dispenseSingleCh150ToA1Args.warnings = [existingFakeWarning]
+
+    getUpdatedLiquidState(dispenseSingleCh150ToA1Args, initialLiquidState)
+
+    // ensure result is added to warnings array
+    expect(dispenseSingleCh150ToA1Args.warnings).toEqual([
+      existingFakeWarning,
+      'fake overflow warning here',
+    ])
   })
 })
 
@@ -378,6 +440,7 @@ describe('...8-channel pipette', () => {
             pipette: 'p300MultiId',
             useFullVolume: false,
             volume: 150,
+            warnings: [],
             well: 'A1',
           },
           initialLiquidState
@@ -397,5 +460,55 @@ describe('...8-channel pipette', () => {
         })
       })
     )
+  })
+
+  it('should push the result of _getOverflowWarnings to the warnings array (multi-channel case)', () => {
+    const initialLiquidState = merge(
+      {},
+      createEmptyLiquidState(invariantContext),
+      {
+        pipettes: {
+          p300MultiId: {
+            ...createTipLiquidState(8, { ingred1: { volume: 150 } }),
+          },
+        },
+      }
+    )
+
+    // ensure called with expected args
+    getOverflowWarningsMock.mockImplementation(
+      (liquidState, wells, labwareDef) => {
+        // liquid state after the update
+        expect(liquidState).toEqual({
+          ...initialLiquidState.labware[SOURCE_LABWARE],
+          A1: { ingred1: { volume: 150 } },
+          B1: { ingred1: { volume: 150 } },
+          C1: { ingred1: { volume: 150 } },
+          D1: { ingred1: { volume: 150 } },
+          E1: { ingred1: { volume: 150 } },
+          F1: { ingred1: { volume: 150 } },
+          G1: { ingred1: { volume: 150 } },
+          H1: { ingred1: { volume: 150 } },
+        })
+
+        expect(wells).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
+
+        expect(labwareDef).toBe(fixture_96_plate)
+        return ['fake overflow warning here']
+      }
+    )
+
+    dispenseSingleCh150ToA1Args.warnings = [existingFakeWarning]
+
+    getUpdatedLiquidState(
+      { ...dispenseSingleCh150ToA1Args, pipette: 'p300MultiId' },
+      initialLiquidState
+    )
+
+    // ensure result is added to warnings array
+    expect(dispenseSingleCh150ToA1Args.warnings).toEqual([
+      existingFakeWarning,
+      'fake overflow warning here',
+    ])
   })
 })

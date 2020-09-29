@@ -9,7 +9,7 @@ export function forDispense(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { labware, pipette, volume, well } = params
-  const { robotState } = robotStateAndWarnings
+  const { robotState, warnings } = robotStateAndWarnings
 
   dispenseUpdateLiquidState({
     invariantContext,
@@ -18,6 +18,7 @@ export function forDispense(
     prevLiquidState: robotState.liquidState,
     useFullVolume: false,
     volume,
+    warnings,
     well,
   })
 }

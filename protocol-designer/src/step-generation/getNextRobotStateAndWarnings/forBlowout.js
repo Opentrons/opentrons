@@ -9,11 +9,12 @@ export function forBlowout(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { pipette, labware, well } = params
-  const { robotState } = robotStateAndWarnings
+  const { robotState, warnings } = robotStateAndWarnings
   dispenseUpdateLiquidState({
     pipette,
     labware,
     useFullVolume: true,
+    warnings,
     well,
     prevLiquidState: robotState.liquidState,
     invariantContext,

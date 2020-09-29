@@ -3,12 +3,14 @@ import assert from 'assert'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import {
-  splitLiquid,
-  mergeLiquid,
-  getWellsForTips,
   getLocationTotalVolume,
+  getWellsForTips,
+  mergeLiquid,
+  splitLiquid,
 } from '../utils/misc'
+import { _getOverflowWarnings } from './_getOverflowWarnings'
 import type {
+  CommandCreatorWarning,
   RobotState,
   InvariantContext,
   LocationLiquidState,
@@ -23,6 +25,7 @@ type DispenseUpdateLiquidStateArgs = {|
   pipette: string,
   well: string,
   volume?: number, // volume value is required when useFullVolume is false
+  warnings: Array<CommandCreatorWarning>,
   useFullVolume: boolean,
 |}
 
@@ -37,6 +40,7 @@ export function dispenseUpdateLiquidState(
     prevLiquidState,
     useFullVolume,
     volume,
+    warnings,
     well,
   } = args
 
@@ -108,5 +112,14 @@ export function dispenseUpdateLiquidState(
   prevLiquidState.labware[labware] = Object.assign(
     liquidLabware,
     labwareLiquidState
+  )
+
+  // add overflow warnings if applicable
+  warnings.push(
+    ..._getOverflowWarnings(
+      prevLiquidState.labware[labware],
+      wellsForTips,
+      invariantContext.labwareEntities[labware].def
+    )
   )
 }

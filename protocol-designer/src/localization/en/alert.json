@@ -89,6 +89,10 @@
       "ASPIRATE_FROM_PRISTINE_WELL": {
         "title": "Source well is empty",
         "body": "The well(s) you're trying to aspirate from are empty. To add liquids, hover over labware in "
+      },
+      "WELL_OVERFLOW": {
+        "title": "Added liquid may overflow the well(s)",
+        "body": "This well(s) you're trying to dispense/blowout into are now above their capacity."
       }
     }
   },

@@ -340,6 +340,7 @@ export type CommandCreatorError = {|
 export type WarningType =
   | 'ASPIRATE_MORE_THAN_WELL_CONTENTS'
   | 'ASPIRATE_FROM_PRISTINE_WELL'
+  | 'WELL_OVERFLOW'
 
 export type CommandCreatorWarning = {|
   message: string,

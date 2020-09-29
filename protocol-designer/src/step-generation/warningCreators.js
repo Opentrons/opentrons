@@ -15,3 +15,9 @@ export function aspirateFromPristineWell(): CommandCreatorWarning {
       'Aspirating from a pristine well. No liquids were ever added to this well',
   }
 }
+export function wellOverflow(): CommandCreatorWarning {
+  return {
+    type: 'WELL_OVERFLOW',
+    message: 'Added liquid may overflow the well(s)',
+  }
+}
