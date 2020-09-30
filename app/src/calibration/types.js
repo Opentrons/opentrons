@@ -9,10 +9,12 @@ import type {
   CalibrationStatus,
   AllLabwareCalibrations,
   AllPipetteOffsetCalibrations,
+  AllTipLengthCalibrations,
 } from './api-types'
 
 import type { LabwareCalibrationAction } from './labware/types'
 import type { PipetteOffsetCalibrationsAction } from './pipette-offset/types'
+import type { TipLengthCalibrationsAction } from './tip-length/types'
 
 import typeof {
   FETCH_CALIBRATION_STATUS,
@@ -23,6 +25,7 @@ import typeof {
 export type * from './api-types'
 export type * from './labware/types'
 export type * from './pipette-offset/types'
+export type * from './tip-length/types'
 
 export type FetchCalibrationStatusAction = {|
   type: FETCH_CALIBRATION_STATUS,
@@ -51,11 +54,13 @@ export type CalibrationAction =
   | FetchCalibrationStatusFailureAction
   | LabwareCalibrationAction
   | PipetteOffsetCalibrationsAction
+  | TipLengthCalibrationsAction
 
 export type PerRobotCalibrationState = $ReadOnly<{|
   calibrationStatus: CalibrationStatus | null,
   labwareCalibrations: AllLabwareCalibrations | null,
   pipetteOffsetCalibrations: AllPipetteOffsetCalibrations | null,
+  tipLengthCalibrations: AllTipLengthCalibrations | null,
 |}>
 
 export type CalibrationState = $ReadOnly<{

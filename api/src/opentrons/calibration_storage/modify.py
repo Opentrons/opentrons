@@ -128,6 +128,7 @@ def create_tip_length_data(
     tip_length_data: 'TipLengthCalibration' = {
         'tipLength': length,
         'lastModified': utc_now(),
+        'source': local_types.SourceType.user,
         'status': status
     }
 

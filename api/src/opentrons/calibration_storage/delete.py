@@ -59,6 +59,40 @@ def delete_offset_file(calibration_id: local_types.CalibrationID):
         pass
 
 
+def _remove_tip_length_from_index(tiprack: str, pipette: str):
+    """
+    Remove tip length data from the index file
+    """
+    tip_length_dir = config.get_tip_length_cal_path()
+    index_path = tip_length_dir / 'index.json'
+    blob = io.read_cal_file(str(index_path))
+
+    if tiprack in blob and pipette in blob[tiprack]:
+        blob[tiprack].remove(pipette)
+        io.save_to_file(index_path, blob)
+
+
+def delete_tip_length_calibration(tiprack: str, pipette: str):
+    """
+    Delete tip length calibration based on tiprack hash and
+    pipette serial number
+
+    :param tiprack: tiprack hash
+    :param pipette: pipette serial number
+    """
+    tip_length_dir = config.get_tip_length_cal_path()
+    tip_length_path = tip_length_dir / f'{pipette}.json'
+    blob = io.read_cal_file(str(tip_length_path))
+
+    if tiprack in blob:
+        del blob[tiprack]
+        if blob:
+            io.save_to_file(tip_length_path, blob)
+        else:
+            tip_length_path.unlink()
+        _remove_tip_length_from_index(tiprack, pipette)
+
+
 def clear_tip_length_calibration():
     """
     Delete all tip length calibration files.
