@@ -11,6 +11,7 @@ def test_access_tip_length_calibration(
         'pipette': PIPETTE_ID,
         'tiprack': LW_HASH,
         'lastModified': None,
+        'source': 'unknown',
         'status': {
             'markedAt': None, 'markedBad': False, 'source': None}
     }

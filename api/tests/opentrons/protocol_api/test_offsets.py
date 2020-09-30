@@ -158,6 +158,7 @@ def test_create_tip_length_calibration_data(monkeypatch):
         MOCK_HASH: {
             'tipLength': tip_length,
             'lastModified': fake_time,
+            'source': cs_types.SourceType.user,
             'status': {'markedBad': False},
         }
     }

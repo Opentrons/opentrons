@@ -11,6 +11,7 @@ const mockState: $Shape<State> = {
       pipetteOffsetCalibrations: Fixtures.mockAllPipetteOffsetsCalibration,
       labwareCalibrations: null,
       calibrationStatus: null,
+      tipLengthCalibrations: null,
     },
   },
 }

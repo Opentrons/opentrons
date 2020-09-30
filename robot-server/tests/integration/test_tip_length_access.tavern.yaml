@@ -36,6 +36,11 @@ stages:
               tiprack: !anystr
               tipLength: !anyfloat
               lastModified: !anystr
+              source: 'unknown'
+              status:
+                markedAt: null
+                markedBad: false
+                source: null
             id: !anystr
             type: 'TipLengthCalibration'
           - attributes:
@@ -43,6 +48,11 @@ stages:
               tiprack: !anystr
               tipLength: !anyfloat
               lastModified: !anystr
+              source: 'unknown'
+              status:
+                markedAt: null
+                markedBad: false
+                source: null
             id: !anystr
             type: 'TipLengthCalibration'
 
@@ -64,6 +74,12 @@ stages:
               tiprack: 'fakehash'
               tipLength: 30.5
               lastModified: !anystr
+              source: 'unknown'
+              status:
+                markedAt: null
+                markedBad: false
+                source: null
+
             id: 'fakehash&pip_1'
             type: 'TipLengthCalibration'
 
@@ -85,6 +101,11 @@ stages:
               tiprack: !anystr
               tipLength: !anyfloat
               lastModified: !anystr
+              source: 'unknown'
+              status:
+                markedAt: null
+                markedBad: false
+                source: null
             id: !anystr
             type: 'TipLengthCalibration'
           - attributes:
@@ -92,6 +113,11 @@ stages:
               tiprack: !anystr
               tipLength: !anyfloat
               lastModified: !anystr
+              source: 'unknown'
+              status:
+                markedAt: null
+                markedBad: false
+                source: null
             id: !anystr
             type: 'TipLengthCalibration'
 
@@ -114,6 +140,11 @@ stages:
               tiprack: 'fakehash'
               tipLength: 30.5
               lastModified: !anystr
+              source: 'unknown'
+              status:
+                markedAt: null
+                markedBad: false
+                source: null
             id: 'fakehash&pip_1'
             type: 'TipLengthCalibration'
 

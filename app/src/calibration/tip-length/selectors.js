@@ -32,7 +32,7 @@ export const getTipLengthForPipetteAndTiprack: (
   return (
     head(
       allCalibrations.filter(
-        cal => (cal.pipette === pipetteSerial) & (cal.tiprack === tiprackHash)
+        cal => cal.pipette === pipetteSerial && cal.tiprack === tiprackHash
       )
     ) || null
   )

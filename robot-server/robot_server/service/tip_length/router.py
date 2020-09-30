@@ -26,6 +26,7 @@ def _format_calibration(
         tiprack=calibration.tiprack,
         pipette=calibration.pipette,
         lastModified=calibration.last_modified,
+        source=calibration.source,
         status=status)
 
     return ResponseDataModel.create(

@@ -30,10 +30,6 @@ const SPECS: Array<{|
     response: SessionFixtures.mockDeleteSessionSuccess.body,
   },
   {
-    describe: 'deck calibration',
-    response: SessionFixtures.mockDeleteDeckCalibrationSessionSuccess.body,
-  },
-  {
     describe: 'pipette offset calibration',
     response:
       SessionFixtures.mockDeletePipetteOffsetCalibrationSessionSuccess.body,
