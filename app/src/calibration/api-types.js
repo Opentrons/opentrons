@@ -108,3 +108,21 @@ export type AllPipetteOffsetCalibrations = {|
   data: Array<PipetteOffsetCalibrationModel>,
   meta: { ... },
 |}
+
+export type TipLengthCalibration = {|
+  tipLength: number,
+  tiprack: string,
+  pipette: string,
+  lastModified: string,
+|}
+
+export type TipLengthCalibrationModel = {|
+  attributes: TipLengthCalibration,
+  type: string,
+  id: string,
+|}
+
+export type AllTipLengthCalibrations = {|
+  data: Array<TipLengthCalibrationModel>,
+  meta: { ... },
+|}
