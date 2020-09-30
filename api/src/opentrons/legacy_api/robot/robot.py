@@ -7,11 +7,15 @@ from typing import Dict, Any
 
 from numpy import add, subtract, array  # type: ignore
 
+from opentrons_shared_data.pipette import name_for_model
+
 from opentrons import commands, drivers
 from opentrons.commands import CommandPublisher
 
 from opentrons.data_storage import database, old_container_loading,\
     database_migration
+from opentrons.drivers.rpi_drivers import build_gpio_chardev
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.types import MoveSplit
 from opentrons.trackers import pose_tracker
@@ -131,8 +135,9 @@ class Robot(CommandPublisher):
         only once instance of a robot.
         """
         super().__init__(broker)
-        self.config = config or load()
-        self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
+        self.config = config or load(api_v1=True)
+        self._driver = driver_3_0.SmoothieDriver_3_0_0(
+            config=self.config)
         self._attached_modules: Dict[str, Any] = {}  # key is port + model
         self.fw_version = self._driver.get_fw_version()
 
@@ -293,14 +298,15 @@ class Robot(CommandPublisher):
             model_value = self._driver.read_pipette_model(mount)
             splits = {plunger_axis: None}
             if model_value:
-                name_value = pipette_config.name_for_model(model_value)
+                name_value = name_for_model(model_value)
                 pc = pipette_config.load(model_value)
                 home_current = pc.plunger_current
                 if 'needsUnstick' in pc.quirks:
                     splits[plunger_axis] = MoveSplit(split_distance=1,
                                                      split_current=1.5,
                                                      split_speed=1,
-                                                     after_time=1800)
+                                                     after_time=1800,
+                                                     fullstep=True)
             else:
                 name_value = None
                 home_current = self.config.high_current[plunger_axis]
@@ -310,15 +316,18 @@ class Robot(CommandPublisher):
                 home_pos = cfg.home_position
                 max_travel = cfg.max_travel
                 steps_mm = cfg.steps_per_mm
+                idle_current = cfg.idle_current
             else:
                 home_pos = self.config.default_pipette_configs['homePosition']
                 max_travel = self.config.default_pipette_configs['maxTravel']
                 steps_mm = self.config.default_pipette_configs['stepsPerMM']
+                idle_current = self.config.low_current[plunger_axis]
 
             self._driver.update_steps_per_mm({plunger_axis: steps_mm})
             self._driver.update_pipette_config(mount_axis, {'home': home_pos})
             self._driver.update_pipette_config(
                 plunger_axis, {'max_travel': max_travel})
+            self._driver.set_dwelling_current({plunger_axis: idle_current})
             self._driver.configure_splits_for(splits)
 
             if model_value:
@@ -523,7 +532,17 @@ class Robot(CommandPublisher):
         >>> from opentrons import robot # doctest: +SKIP
         >>> robot.connect() # doctest: +SKIP
         """
-
+        log.info(
+            'Setting up GPIOs for APIv1, expected to fail if opentrons-'
+            'robot-server is already running. This should not affect the '
+            'robot lights behavior in the protocol if it is running using '
+            'the Opentrons App.')
+        gpio_chardev = build_gpio_chardev('gpiochip0')
+        # setup gpio chardev if built successfully
+        if not isinstance(gpio_chardev, SimulatingGPIOCharDev):
+            gpio_chardev.config_by_board_rev()
+            gpio_chardev.setup_v1()
+            self._driver.gpio_chardev = gpio_chardev
         self._driver.connect(port=port)
         self.fw_version = self._driver.get_fw_version()
 
@@ -1090,7 +1109,10 @@ class Robot(CommandPublisher):
             entry._coordinates = entry._coordinates + delta
 
         if save and container.properties.get('labware_hash'):
-            save_new_offsets(container.properties['labware_hash'], delta)
+            save_new_offsets(
+                container.properties['labware_hash'],
+                delta,
+                container.properties['definition'])
         elif save and new_container_name:
             database.save_new_container(container, new_container_name)
         elif save:

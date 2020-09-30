@@ -1,5 +1,5 @@
 // @flow
-import React, { useMemo, type ElementProps } from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import some from 'lodash/some'
@@ -35,7 +35,7 @@ type DP = {| dispatch: Dispatch |}
 
 type DisplayModule = {|
   ...$Exact<SessionModule>,
-  mode?: $PropertyType<ElementProps<typeof ModuleItem>, 'mode'>,
+  mode?: $PropertyType<React.ElementProps<typeof ModuleItem>, 'mode'>,
 |}
 
 type SP = {|
@@ -49,7 +49,7 @@ type SP = {|
 
 type Props = {| ...OP, ...SP, ...DP |}
 
-const deckSetupLayerBlacklist = [
+const deckSetupLayerBlocklist = [
   'calibrationMarkings',
   'fixedBase',
   'doorStops',
@@ -60,7 +60,7 @@ const deckSetupLayerBlacklist = [
 ]
 
 function DeckMapComponent(props: Props) {
-  const deckDef = useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+  const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
   const {
     modulesBySlot,
     labwareBySlot,
@@ -70,7 +70,7 @@ function DeckMapComponent(props: Props) {
   } = props
   return (
     <RobotWorkSpace
-      deckLayerBlacklist={deckSetupLayerBlacklist}
+      deckLayerBlocklist={deckSetupLayerBlocklist}
       deckDef={deckDef}
       viewBox={`-46 -10 ${488} ${390}`} // TODO: put these in variables
       className={className}
@@ -92,6 +92,7 @@ function DeckMapComponent(props: Props) {
                   <ModuleItem
                     model={moduleInSlot.model}
                     mode={moduleInSlot.mode || 'default'}
+                    slot={slot}
                   />
                 </g>
               )}
@@ -167,6 +168,8 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   }
 }
 
-export const DeckMap = withRouter<_, _>(
+export const DeckMap: React.AbstractComponent<
+  $Diff<OP, ContextRouter>
+> = withRouter(
   connect<Props, OP, SP, DP, State, Dispatch>(mapStateToProps)(DeckMapComponent)
 )

@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
@@ -22,7 +22,7 @@ type DP = {|
 type Props = { ...OP, ...DP }
 
 const NameThisLabwareComponent = (props: Props) => {
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = React.useState('')
 
   const saveNickname = () => {
     props.setLabwareName(inputValue || null)
@@ -75,7 +75,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
   }
 }
 
-export const NameThisLabware = connect<
+export const NameThisLabware: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   _,

@@ -22,7 +22,7 @@ export type CollapsibleItemProps = {|
 /**
  * A list item with title, and collapsible children.
  */
-export function CollapsibleItem(props: CollapsibleItemProps) {
+export function CollapsibleItem(props: CollapsibleItemProps): React.Node {
   const { onCollapseToggle } = props
   const collapsible = onCollapseToggle != null
 

@@ -68,11 +68,16 @@ module.exports = {
       name: 'Tooltips',
       components: 'src/tooltips/[A-Z]*.js',
     },
+    {
+      name: 'Primitives',
+      content: 'src/primitives/README.md',
+      components: 'src/primitives/[A-Z]*.js',
+    },
   ],
   getComponentPathLine(componentPath) {
     const name = path.basename(componentPath, '.js')
 
-    return `import {${name}} from '@opentrons/components'`
+    return `import { ${name} } from '@opentrons/components'`
   },
   getExampleFilename(componentPath) {
     return componentPath.replace(/\.js$/, '.md')

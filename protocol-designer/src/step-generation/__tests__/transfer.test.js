@@ -1,34 +1,44 @@
 // @flow
 import {
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
-  getFlowRateAndOffsetParams,
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
+  delayCommand,
+  delayWithOffset,
   DEST_LABWARE,
+  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  dropTipHelper,
+  getErrorResult,
+  getFlowRateAndOffsetParamsTransferLike,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeAirGapHelper,
   makeAspirateHelper,
+  makeContext,
   makeDispenseHelper,
   makeTouchTipHelper,
   pickUpTipHelper,
-  dropTipHelper,
-  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-  DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  SOURCE_LABWARE,
+  makeDispenseAirGapHelper,
 } from '../__fixtures__'
 import { transfer } from '../commandCreators/compound/transfer'
+import type { TransferArgs } from '../types'
 
+// well depth for 96 plate is 10.54, so need to add 1mm to top of well
+const airGapHelper = makeAirGapHelper({ offsetFromBottomMm: 11.54 })
+const dispenseAirGapHelper = makeDispenseAirGapHelper({
+  offsetFromBottomMm: 11.54,
+})
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
 
 let invariantContext
 let robotStateWithTip
-let mixinArgs
+let mixinArgs: $Shape<TransferArgs>
 
 beforeEach(() => {
   mixinArgs = {
-    ...getFlowRateAndOffsetParams(),
+    ...getFlowRateAndOffsetParamsTransferLike(),
     commandCreatorFnName: 'transfer',
     name: 'Transfer Test',
     description: 'test blah blah',
@@ -40,7 +50,9 @@ beforeEach(() => {
     preWetTip: false,
     touchTipAfterAspirate: false,
     mixBeforeAspirate: null,
-
+    aspirateDelay: null,
+    dispenseDelay: null,
+    aspirateAirGapVolume: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
@@ -405,7 +417,7 @@ describe('advanced options', () => {
     }
   })
   describe('...aspirate options', () => {
-    it('pre-wet tip should aspirate and dispense transfer volume from source well of each subtransfer', () => {
+    it('pre-wet tip should aspirate and dispense the transfer volume from source well of each subtransfer', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -431,7 +443,67 @@ describe('advanced options', () => {
       ])
     })
 
-    it('touchTip after aspirate should touchTip on each source well, for every aspirate', () => {
+    it('pre-wet tip should use the aspirate delay when specified', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        preWetTip: true,
+        aspirateDelay: { mmFromBottom: 14, seconds: 12 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // pre-wet aspirate/dispense
+        aspirateHelper('A1', 300),
+        delayCommand(12),
+        dispenseHelper('A1', 300, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+
+        // "real" aspirate/dispenses
+        aspirateHelper('A1', 300),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 300),
+
+        aspirateHelper('A1', 50),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 50),
+      ])
+    })
+
+    it('pre-wet tip should use the dispense delay when specified', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        preWetTip: true,
+        dispenseDelay: { mmFromBottom: 14, seconds: 12 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // pre-wet aspirate/dispense
+        aspirateHelper('A1', 300),
+        dispenseHelper('A1', 300, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+
+        // "real" aspirate/dispenses
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
+        ...delayWithOffset('B1', DEST_LABWARE),
+
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
+        ...delayWithOffset('B1', DEST_LABWARE),
+      ])
+    })
+
+    it('should touchTip after aspirate on each source well, for every aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -451,7 +523,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('touchTip after dispense should touchTip on each dest well, for every dispense', () => {
+    it('should touchTip after dispense on each dest well, for every dispense', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -471,7 +543,7 @@ describe('advanced options', () => {
       ])
     })
 
-    it('mix before aspirate', () => {
+    it('should mix before aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -509,12 +581,175 @@ describe('advanced options', () => {
         dispenseHelper('B1', 50),
       ])
     })
+    it('should delay after mix aspirate and regular aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        mixBeforeAspirate: {
+          volume: 250,
+          times: 2,
+        },
+        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      }
 
-    it.todo('air gap => ???') // TODO determine behavior
+      // mixes will include the delays after aspirating
+      const mixCommandsWithDelays = [
+        // mix 1
+        aspirateHelper('A1', 250),
+        delayCommand(12),
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        // mix 2
+        aspirateHelper('A1', 250),
+        delayCommand(12),
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+      ]
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        ...mixCommandsWithDelays,
+        aspirateHelper('A1', 300),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 300),
+
+        ...mixCommandsWithDelays,
+        aspirateHelper('A1', 50),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 50),
+      ])
+    })
+
+    it('should delay after aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 300),
+
+        aspirateHelper('A1', 50),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+        dispenseHelper('B1', 50),
+      ])
+    })
+
+    it('should air gap after aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateAirGapVolume: 5,
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 295),
+        airGapHelper('A1', 5),
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 295),
+
+        aspirateHelper('A1', 55),
+        airGapHelper('A1', 5),
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 55),
+      ])
+    })
+    it('should air gap after aspirate and break into two chunks', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 300,
+        aspirateAirGapVolume: 5,
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 150),
+        airGapHelper('A1', 5),
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 150),
+
+        aspirateHelper('A1', 150),
+        airGapHelper('A1', 5),
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 150),
+      ])
+    })
+    it('should delay after air gap aspirate and regular aspirate', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateAirGapVolume: 5,
+        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 295),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+
+        airGapHelper('A1', 5),
+        delayCommand(12),
+
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 295),
+
+        aspirateHelper('A1', 55),
+        ...delayWithOffset('A1', SOURCE_LABWARE),
+
+        airGapHelper('A1', 5),
+        delayCommand(12),
+
+        dispenseAirGapHelper('B1', 5),
+        dispenseHelper('B1', 55),
+      ])
+    })
+    it('should delay after air gap dispense and regular dispense', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        aspirateAirGapVolume: 5,
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 295),
+        airGapHelper('A1', 5),
+
+        dispenseAirGapHelper('B1', 5),
+        delayCommand(12),
+
+        dispenseHelper('B1', 295),
+        ...delayWithOffset('B1', DEST_LABWARE),
+
+        aspirateHelper('A1', 55),
+        airGapHelper('A1', 5),
+
+        dispenseAirGapHelper('B1', 5),
+        delayCommand(12),
+        dispenseHelper('B1', 55),
+        ...delayWithOffset('B1', DEST_LABWARE),
+      ])
+    })
   })
 
   describe('...dispense options', () => {
-    it('mix after dispense', () => {
+    it('should mix after dispense', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -550,6 +785,546 @@ describe('advanced options', () => {
         aspirateHelper('A1', 50),
         dispenseHelper('B1', 50),
         ...mixCommands,
+      ])
+    })
+    it('should delay after mix dispense and after dispense', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        mixInDestination: {
+          volume: 250,
+          times: 2,
+        },
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      // mixes will include the delays after aspirating
+      const mixCommandsWithDelays = [
+        // mix 1
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        dispenseHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+        // mix 2
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        dispenseHelper('B1', 250, {
+          labware: DEST_LABWARE,
+        }),
+        delayCommand(12),
+      ]
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
+        // delay after dispense
+        ...delayWithOffset('B1', DEST_LABWARE),
+        ...mixCommandsWithDelays,
+
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
+        // delay after dispense
+        ...delayWithOffset('B1', DEST_LABWARE),
+        ...mixCommandsWithDelays,
+      ])
+    })
+
+    it('should delay after dispense', () => {
+      advArgs = {
+        ...advArgs,
+        volume: 350,
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+      }
+
+      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
+        ...delayWithOffset('B1', DEST_LABWARE),
+
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
+        ...delayWithOffset('B1', DEST_LABWARE),
+      ])
+    })
+  })
+
+  describe('all advanced settings enabled', () => {
+    it('should create commands in the expected order with expected params', () => {
+      const args = {
+        ...mixinArgs,
+        sourceWells: ['A1'],
+        destWells: ['B1'],
+        changeTip: 'never',
+        volume: 350,
+        // aspirate column
+        preWetTip: true,
+        mixBeforeAspirate: {
+          volume: 35,
+          times: 1,
+        },
+        aspirateDelay: { seconds: 11, mmFromBottom: 15 },
+        touchTipAfterAspirate: true,
+        touchTipAfterAspirateOffsetMmFromBottom: 14.5,
+        aspirateAirGapVolume: 31,
+        // dispense column
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        mixInDestination: {
+          volume: 36,
+          times: 1,
+        },
+        touchTipAfterDispense: true,
+        blowoutLocation: 'trashId',
+        blowoutFlowRateUlSec: 2.3,
+        blowoutOffsetFromTopMm: 3.3,
+      }
+
+      const result = transfer(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // Pre-wet
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 269,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 269,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // mix (asp)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 35,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 35,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // aspirate
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 269,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 15,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // touch tip (asp)
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 14.5,
+          },
+        },
+        // air gap
+        {
+          command: 'airGap',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 31,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 11.54,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // dispense
+        {
+          command: 'dispenseAirGap',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 31,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 11.54,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 269,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 14,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // mix (disp)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // touch tip (disp)
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.4,
+          },
+        },
+        // blowout
+        {
+          command: 'blowout',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'trashId',
+            well: 'A1',
+            flowRate: 2.3,
+            offsetFromBottomMm: 80.3,
+          },
+        },
+        // next chunk from A1: remaining volume
+        // do not pre-wet
+        // mix (asp)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 35,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 35,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // aspirate 81 (= total vol 350 - prev transfer's 269)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 81,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 15,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // touch tip (asp)
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 14.5,
+          },
+        },
+        // air gap
+        {
+          command: 'airGap',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 31,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            offsetFromBottomMm: 11.54,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // dispense air gap then liquid
+        {
+          command: 'dispenseAirGap',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 31,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 11.54,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 81,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 14,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // mix (disp)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // touch tip (disp)
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.4,
+          },
+        },
+        // blowout
+        {
+          command: 'blowout',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'trashId',
+            well: 'A1',
+            flowRate: 2.3,
+            offsetFromBottomMm: 80.3,
+          },
+        },
       ])
     })
   })

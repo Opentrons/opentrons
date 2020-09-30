@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
 import {
@@ -130,7 +130,14 @@ function mergeProps(
   }
 }
 
-export const SettingsApp = connect<Props, {||}, SP, {||}, BaseState, _>(
+export const SettingsApp: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  BaseState,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

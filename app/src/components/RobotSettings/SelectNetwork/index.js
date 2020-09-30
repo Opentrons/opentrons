@@ -22,7 +22,9 @@ type SelectNetworkProps = {| robotName: string |}
 
 const LIST_REFRESH_MS = 10000
 
-export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
+export const SelectNetwork = ({
+  robotName,
+}: SelectNetworkProps): React.Node => {
   const list = useSelector((state: State) =>
     Networking.getWifiList(state, robotName)
   )
@@ -123,7 +125,11 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
               type={changeState.type}
               ssid={changeState.ssid}
               isPending={requestState.status === RobotApi.PENDING}
-              error={requestState.error ? requestState.error : null}
+              error={
+                requestState.error && requestState.error.message
+                  ? requestState.error
+                  : null
+              }
               onClose={handleDone}
             />
           ) : changeState.type === DISCONNECT ? (

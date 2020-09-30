@@ -150,7 +150,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.duplicateStep(stepId)),
 })
 
-export const ContextMenu = connect<Props, OP, {||}, DP, _, _>(
+export const ContextMenu: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  {||},
+  DP,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(ContextMenuComponent)

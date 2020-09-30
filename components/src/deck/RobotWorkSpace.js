@@ -1,5 +1,5 @@
 // @flow
-import React, { useRef, type Node, type ElementRef } from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 import { DeckFromData } from './Deck'
 import type { DeckDefinition } from '@opentrons/shared-data'
@@ -10,8 +10,8 @@ export type RobotWorkSpaceProps = {|
   deckDef?: DeckDefinition,
   viewBox?: string,
   className?: string,
-  children?: RobotWorkSpaceRenderProps => Node,
-  deckLayerBlacklist?: Array<string>,
+  children?: RobotWorkSpaceRenderProps => React.Node,
+  deckLayerBlocklist?: Array<string>,
 |}
 
 type GetRobotCoordsFromDOMCoords = $PropertyType<
@@ -19,9 +19,9 @@ type GetRobotCoordsFromDOMCoords = $PropertyType<
   'getRobotCoordsFromDOMCoords'
 >
 
-export function RobotWorkSpace(props: RobotWorkSpaceProps) {
-  const { children, deckDef, deckLayerBlacklist = [], viewBox } = props
-  const wrapperRef: ElementRef<*> = useRef(null)
+export function RobotWorkSpace(props: RobotWorkSpaceProps): React.Node {
+  const { children, deckDef, deckLayerBlocklist = [], viewBox } = props
+  const wrapperRef: {| current: Element | null |} = React.useRef(null)
 
   // NOTE: getScreenCTM in Chrome a DOMMatrix type,
   // in Firefox the same fn returns a deprecated SVGMatrix.
@@ -29,12 +29,15 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps) {
   // it will suffer from inverted y behavior (ignores css transform)
   const getRobotCoordsFromDOMCoords: GetRobotCoordsFromDOMCoords = (x, y) => {
     if (!wrapperRef.current) return { x: 0, y: 0 }
+
+    // $FlowFixMe(mc, 2020-06-01): Flow has no SVGElement
     const cursorPoint = wrapperRef.current.createSVGPoint()
 
     cursorPoint.x = x
     cursorPoint.y = y
 
     return cursorPoint.matrixTransform(
+      // $FlowFixMe(mc, 2020-06-01): Flow has no SVGElement
       wrapperRef.current.getScreenCTM().inverse()
     )
   }
@@ -60,7 +63,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps) {
       ref={wrapperRef}
     >
       {deckDef && (
-        <DeckFromData def={deckDef} layerBlacklist={deckLayerBlacklist} />
+        <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
       )}
       {children && children({ deckSlotsById, getRobotCoordsFromDOMCoords })}
     </svg>

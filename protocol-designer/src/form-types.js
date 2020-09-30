@@ -47,7 +47,7 @@ export type StepFieldName = any
 // | 'mix_mmFromBottom'
 // | 'mix_touchTip_mmFromBottom'
 // | 'path'
-// | 'pauseForAmountOfTime'
+// | 'pauseAction'
 // | 'pauseHour'
 // | 'pauseMessage'
 // | 'pauseMinute'
@@ -121,7 +121,7 @@ export type PauseForm = {|
   stepType: 'pause',
   id: StepIdType,
 
-  pauseForAmountOfTime?:
+  pauseAction?:
     | typeof PAUSE_UNTIL_RESUME
     | typeof PAUSE_UNTIL_TIME
     | typeof PAUSE_UNTIL_TEMP,
@@ -139,6 +139,28 @@ export type FormData = {
   id: StepIdType,
   [StepFieldName]: any, // TODO: form value processing to ensure type
 }
+
+export const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
+export const PROFILE_STEP: 'profileStep' = 'profileStep'
+
+export type ProfileStepItem = {|
+  type: typeof PROFILE_STEP,
+  id: string,
+  title: string,
+  temperature: string,
+  durationMinutes: string,
+  durationSeconds: string,
+|}
+
+export type ProfileCycleItem = {|
+  type: typeof PROFILE_CYCLE,
+  id: string,
+  steps: Array<ProfileStepItem>,
+  repetitions: string,
+|}
+
+// TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
+export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 
@@ -178,6 +200,16 @@ export type HydratedMoveLiquidFormData = {
     aspirate_mix_checkbox: ?boolean,
     aspirate_mix_volume: ?number,
     aspirate_mix_times: ?number,
+    aspirate_airGap_checkbox: ?boolean,
+    aspirate_airGap_volume: ?number,
+
+    aspirate_delay_checkbox: boolean,
+    aspirate_delay_seconds: ?number,
+    aspirate_delay_mmFromBottom: ?number,
+
+    dispense_delay_checkbox: boolean,
+    dispense_delay_seconds: ?number,
+    dispense_delay_mmFromBottom: ?number,
 
     dispense_labware: LabwareEntity,
     dispense_wells: Array<string>,
@@ -261,7 +293,17 @@ export type TipOffsetFields =
   | 'mix_mmFromBottom'
   | 'aspirate_touchTip_mmFromBottom'
   | 'dispense_touchTip_mmFromBottom'
+  | 'aspirate_delay_mmFromBottom'
+  | 'dispense_delay_mmFromBottom'
   | 'mix_touchTip_mmFromBottom'
+
+export type DelayCheckboxFields =
+  | 'aspirate_delay_checkbox'
+  | 'dispense_delay_checkbox'
+
+export type DelaySecondFields =
+  | 'aspirate_delay_seconds'
+  | 'dispense_delay_seconds'
 
 export function getIsTouchTipField(fieldName: string): boolean {
   const touchTipFields = [
@@ -270,4 +312,12 @@ export function getIsTouchTipField(fieldName: string): boolean {
     'mix_touchTip_mmFromBottom',
   ]
   return touchTipFields.includes(fieldName)
+}
+
+export function getIsDelayPositionField(fieldName: string): boolean {
+  const delayPositionFields = [
+    'aspirate_delay_mmFromBottom',
+    'dispense_delay_mmFromBottom',
+  ]
+  return delayPositionFields.includes(fieldName)
 }

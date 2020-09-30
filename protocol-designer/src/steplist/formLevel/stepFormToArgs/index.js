@@ -5,6 +5,7 @@ import { mixFormToArgs } from './mixFormToArgs'
 import { pauseFormToArgs } from './pauseFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
+import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
 import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
 import type { FormData } from '../../../form-types'
 import type { CommandCreatorArgs } from '../../../step-generation'
@@ -15,12 +16,13 @@ import type { CommandCreatorArgs } from '../../../step-generation'
 
 type StepArgs = CommandCreatorArgs | null
 
+// cast all fields that have 'castValue' in stepFieldHelperMap
+export const _castForm = (hydratedForm: FormData): any =>
+  mapValues(hydratedForm, (value, name) => castField(name, value))
+
 // TODO: Ian 2019-01-29 use hydrated form type
 export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
-  // cast all fields that have 'fieldCaster' in stepFieldHelperMap
-  const castForm = mapValues(hydratedForm, (value, name) =>
-    castField(name, value)
-  )
+  const castForm = _castForm(hydratedForm)
 
   switch (castForm.stepType) {
     case 'moveLiquid':
@@ -33,6 +35,8 @@ export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
       return magnetFormToArgs(castForm)
     case 'temperature':
       return temperatureFormToArgs(castForm)
+    case 'thermocycler':
+      return thermocyclerFormToArgs(castForm)
     default:
       console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
       return null

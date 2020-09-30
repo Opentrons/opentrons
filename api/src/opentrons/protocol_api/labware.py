@@ -10,54 +10,45 @@ tiprack") to points in deck coordinates.
 import logging
 import json
 import re
-import time
 import os
 import shutil
 
 from pathlib import Path
 from collections import defaultdict
-from enum import Enum, auto
-from hashlib import sha256
 from itertools import takewhile, dropwhile
 from typing import (
-    Any, AnyStr, List, Dict, Optional, Union, Sequence, Tuple, TYPE_CHECKING)
+    Any, AnyStr, List, Dict,
+    Optional, Union, Sequence, Tuple,
+    TYPE_CHECKING)
 
 import jsonschema  # type: ignore
 
-from .util import ModifiedList, requires_version
+from opentrons.protocols.api_support.util import (
+    ModifiedList, requires_version, labware_column_shift)
+from opentrons.calibration_storage import get, helpers, modify
 from opentrons.types import Location, Point
-from opentrons.config import CONFIG
 from opentrons.protocols.types import APIVersion
-from opentrons.system.shared_data import load_shared_data, get_shared_data_root
-from .definitions import MAX_SUPPORTED_VERSION, DeckItem
+from opentrons_shared_data import load_shared_data, get_shared_data_root
+from opentrons.protocols.api_support.definitions import (
+    MAX_SUPPORTED_VERSION)
+from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.protocols.api_support.constants import (
+    OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE, STANDARD_DEFS_PATH, USER_DEFS_PATH)
 if TYPE_CHECKING:
-    from .module_geometry import ModuleGeometry  # noqa(F401)
+    from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa(F401)
+    from opentrons_shared_data.labware.dev_types import (
+        LabwareDefinition, LabwareParameters, WellDefinition)
 
 
 MODULE_LOG = logging.getLogger(__name__)
 
-# TODO: Ian 2019-05-23 where to store these constants?
-OPENTRONS_NAMESPACE = 'opentrons'
-CUSTOM_NAMESPACE = 'custom_beta'
-STANDARD_DEFS_PATH = Path("labware/definitions/2")
 
-
-LabwareDefinition = Dict[str, Any]
+class TipSelectionError(Exception):
+    pass
 
 
 class OutOfTipsError(Exception):
     pass
-
-
-class WellShape(Enum):
-    RECTANGULAR = auto()
-    CIRCULAR = auto()
-
-
-well_shapes = {
-    'rectangular': WellShape.RECTANGULAR,
-    'circular': WellShape.CIRCULAR
-}
 
 
 class Well:
@@ -67,11 +58,12 @@ class Well:
     It provides functions to return positions used in operations on the well
     such as :py:meth:`top`, :py:meth:`bottom`
     """
-    def __init__(self, well_props: dict,
+    def __init__(self, well_props: 'WellDefinition',
                  parent: Location,
                  display_name: str,
                  has_tip: bool,
-                 api_level: APIVersion) -> None:
+                 api_level: APIVersion,
+                 name: str = None) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -98,12 +90,12 @@ class Well:
             raise ValueError("Wells must have a parent")
         self._parent = parent.labware
         self._has_tip = has_tip
-        self._shape = well_shapes.get(well_props['shape'])
-        if self._shape is WellShape.RECTANGULAR:
-            self._length = well_props['xDimension']
-            self._width = well_props['yDimension']
-            self._diameter = None
-        elif self._shape is WellShape.CIRCULAR:
+        self._shape = well_props['shape']
+        if well_props['shape'] == 'rectangular':
+            self._length: Optional[float] = well_props['xDimension']
+            self._width: Optional[float] = well_props['yDimension']
+            self._diameter: Optional[float] = None
+        elif well_props['shape'] == 'circular':
             self._length = None
             self._width = None
             self._diameter = well_props['diameter']
@@ -113,6 +105,10 @@ class Well:
                     well_props['shape']))
         self.max_volume = well_props['totalLiquidVolume']
         self._depth = well_props['depth']
+        if name:
+            self._name = name
+        else:
+            self._name = display_name
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -141,6 +137,11 @@ class Well:
     @property
     def display_name(self):
         return self._display_name
+
+    @property  # type: ignore
+    @requires_version(2, 7)
+    def well_name(self) -> str:
+        return self._name
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
@@ -211,12 +212,12 @@ class Well:
         coordinates
         """
         center = self._center()
-        if self._shape is WellShape.RECTANGULAR:
-            x_size = self._length
-            y_size = self._width
+        if self._shape == 'rectangular':
+            x_size: float = self._length  # type: ignore
+            y_size: float = self._width  # type: ignore
         else:
-            x_size = self._diameter
-            y_size = self._diameter
+            x_size = self._diameter  # type: ignore
+            y_size = self._diameter  # type: ignore
         z_size = self._depth
 
         return Point(
@@ -268,7 +269,7 @@ class Labware(DeckItem):
 
     """
     def __init__(
-            self, definition: dict,
+            self, definition: 'LabwareDefinition',
             parent: Location, label: str = None,
             api_level: APIVersion = None) -> None:
         """
@@ -346,7 +347,7 @@ class Labware(DeckItem):
 
         :returns: The uri, ``"namespace/loadname/version"``
         """
-        return uri_from_definition(self._definition)
+        return helpers.uri_from_definition(self._definition)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -375,7 +376,7 @@ class Labware(DeckItem):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def parameters(self) -> Dict[str, Any]:
+    def parameters(self) -> 'LabwareParameters':
         """Internal properties of a labware including type and quirks"""
         return self._parameters
 
@@ -405,10 +406,11 @@ class Labware(DeckItem):
                 Location(self._calibrated_offset, self),
                 "{} of {}".format(well, self._display_name),
                 self._is_tiprack,
-                self._api_version)
+                self._api_version,
+                well)
             for well in self._ordering]
 
-    def _create_indexed_dictionary(self, group=0):
+    def _create_indexed_dictionary(self, group=0) -> Dict[str, List['Well']]:
         """
         Creates a dict of lists of Wells. Which way the labware is segmented
         determines whether this is a dict of rows or dict of columns. If group
@@ -422,7 +424,8 @@ class Labware(DeckItem):
             match = self._pattern.match(index)
             assert match, 'could not match well name pattern'
             dict_list[match.group(group)].append(well_obj)
-        return dict_list
+        # copy to a non-default-dict
+        return {k: v for k, v in dict_list.items()}
 
     def set_calibration(self, delta: Point):
         """
@@ -810,115 +813,6 @@ class Labware(DeckItem):
                 well.has_tip = True
 
 
-def _get_parent_identifier(
-        parent: Union[Well, str, DeckItem, None]):
-    if isinstance(parent, DeckItem) and parent.separate_calibration:
-        # treat a given labware on a given module type as same
-        return parent.load_name
-    else:
-        return ''  # treat all slots as same
-
-
-def _hash_labware_def(labware_def: LabwareDefinition) -> str:
-    # remove keys that do not affect run
-    blacklist = ['metadata', 'brand', 'groups']
-    def_no_metadata = {
-        k: v for k, v in labware_def.items() if k not in blacklist}
-    sorted_def_str = json.dumps(
-        def_no_metadata, sort_keys=True, separators=(',', ':'))
-    return sha256(sorted_def_str.encode('utf-8')).hexdigest()
-
-
-def _get_labware_offset_path(labware: Labware):
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
-    calibration_path.mkdir(parents=True, exist_ok=True)
-
-    parent_id = _get_parent_identifier(labware.parent)
-    labware_hash = _hash_labware_def(labware._definition)
-    return calibration_path/f'{labware_hash}{parent_id}.json'
-
-
-def save_calibration(labware: Labware, delta: Point):
-    """
-    Function to be used whenever an updated delta is found for the first well
-    of a given labware. If an offset file does not exist, create the file
-    using labware id as the filename. If the file does exist, load it and
-    modify the delta and the lastModified fields under the "default" key.
-    """
-    labware_offset_path = _get_labware_offset_path(labware)
-    calibration_data = _helper_offset_data_format(
-        str(labware_offset_path), delta)
-    with labware_offset_path.open('w') as f:
-        json.dump(calibration_data, f)
-    labware.set_calibration(delta)
-
-
-def save_tip_length(labware: Labware, length: float):
-    """
-    Function to be used whenever an updated tip length is found for
-    of a given tip rack. If an offset file does not exist, create the file
-    using labware id as the filename. If the file does exist, load it and
-    modify the length and the lastModified fields under the "tipLength" key.
-    """
-    labware_offset_path = _get_labware_offset_path(labware)
-    calibration_data = _helper_tip_length_data_format(
-        str(labware_offset_path), length)
-    with labware_offset_path.open('w') as f:
-        json.dump(calibration_data, f)
-    labware.tip_length = length
-
-
-def load_calibration(labware: Labware):
-    """
-    Look up a calibration if it exists and apply it to the given labware.
-    """
-    labware_offset_path = _get_labware_offset_path(labware)
-    if labware_offset_path.exists():
-        calibration_data = _read_file(str(labware_offset_path))
-        offset_array = calibration_data['default']['offset']
-        offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
-        labware.set_calibration(offset)
-        if 'tipLength' in calibration_data.keys():
-            tip_length = calibration_data['tipLength']['length']
-            labware.tip_length = tip_length
-
-
-def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
-    if not Path(filepath).is_file():
-        calibration_data = {
-            "default": {
-                "offset": [delta.x, delta.y, delta.z],
-                "lastModified": time.time()
-            }
-        }
-    else:
-        calibration_data = _read_file(filepath)
-        calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
-        calibration_data['default']['lastModified'] = time.time()
-    return calibration_data
-
-
-def _helper_tip_length_data_format(filepath: str, length: float) -> dict:
-    try:
-        calibration_data = _read_file(filepath)
-    except FileNotFoundError:
-        # This should generally not occur, as labware calibration has to happen
-        # prior to tip length calibration
-        calibration_data = {}
-
-    calibration_data['tipLength'] = {
-        'length': length,
-        'lastModified': time.time()}
-
-    return calibration_data
-
-
-def _read_file(filepath: str) -> dict:
-    with open(filepath, 'r') as f:
-        calibration_data = json.load(f)
-    return calibration_data
-
-
 def _get_path_to_labware(
         load_name: str, namespace: str, version: int, base_path: Path = None
         ) -> Path:
@@ -927,13 +821,13 @@ def _get_path_to_labware(
         return get_shared_data_root() / STANDARD_DEFS_PATH \
                / load_name / f'{version}.json'
     if not base_path:
-        base_path = CONFIG['labware_user_definitions_dir_v2']
+        base_path = USER_DEFS_PATH
     def_path = base_path / namespace / load_name / f'{version}.json'
     return def_path
 
 
 def save_definition(
-    labware_def: LabwareDefinition,
+    labware_def: 'LabwareDefinition',
     force: bool = False,
     location: Path = None
 ) -> None:
@@ -973,17 +867,16 @@ def save_definition(
 
 
 def delete_all_custom_labware() -> None:
-    custom_def_dir = CONFIG['labware_user_definitions_dir_v2']
-    if custom_def_dir.is_dir():
-        shutil.rmtree(custom_def_dir)
+    if USER_DEFS_PATH.is_dir():
+        shutil.rmtree(USER_DEFS_PATH)
 
 
 def _get_labware_definition_from_bundle(
-    bundled_labware: Dict[str, LabwareDefinition],
+    bundled_labware: Dict[str, 'LabwareDefinition'],
     load_name: str,
     namespace: str = None,
     version: int = None,
-) -> LabwareDefinition:
+) -> 'LabwareDefinition':
     """
     Look up and return a bundled definition by ``load_name`` + ``namespace``
     + ``version`` and return it or raise an exception. The``namespace`` and
@@ -1024,7 +917,7 @@ def _get_labware_definition_from_bundle(
 
 def _get_standard_labware_definition(
         load_name: str, namespace: str = None, version: int = None)\
-        -> LabwareDefinition:
+        -> 'LabwareDefinition':
 
     if version is None:
         checked_version = 1
@@ -1069,8 +962,9 @@ def _get_standard_labware_definition(
     return labware_def
 
 
-def verify_definition(contents: Union[AnyStr, LabwareDefinition])\
-        -> LabwareDefinition:
+def verify_definition(contents: Union[
+        AnyStr, 'LabwareDefinition', Dict[str, Any]])\
+        -> 'LabwareDefinition':
     """ Verify that an input string is a labware definition and return it.
 
     If the definition is invalid, an exception is raised; otherwise parse the
@@ -1085,21 +979,21 @@ def verify_definition(contents: Union[AnyStr, LabwareDefinition])\
 
     if isinstance(contents, dict):
         to_return = contents
-        jsonschema.validate(to_return, labware_schema_v2)
-
     else:
         to_return = json.loads(contents)
-        jsonschema.validate(to_return, labware_schema_v2)
-    return to_return
+    jsonschema.validate(to_return, labware_schema_v2)
+    # we can type ignore this because if it passes the jsonschema it has
+    # the correct structure
+    return to_return  # type: ignore
 
 
 def get_labware_definition(
     load_name: str,
     namespace: str = None,
     version: int = None,
-    bundled_defs: Dict[str, LabwareDefinition] = None,
-    extra_defs: Dict[str, LabwareDefinition] = None
-) -> Dict[str, Any]:
+    bundled_defs: Dict[str, 'LabwareDefinition'] = None,
+    extra_defs: Dict[str, 'LabwareDefinition'] = None
+) -> 'LabwareDefinition':
     """
     Look up and return a definition by load_name + namespace + version and
         return it or raise an exception
@@ -1149,25 +1043,10 @@ def get_all_labware_definitions() -> List[str]:
     _check_for_subdirectories(get_shared_data_root() / STANDARD_DEFS_PATH)
 
     # check for custom labware
-    for namespace in os.scandir(CONFIG['labware_user_definitions_dir_v2']):
+    for namespace in os.scandir(USER_DEFS_PATH):
         _check_for_subdirectories(namespace)
 
     return labware_list
-
-
-def clear_calibrations():
-    """
-    Delete all calibration files for labware. This includes deleting tip-length
-    data for tipracks.
-    """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
-    try:
-        targets = [
-            f for f in calibration_path.iterdir() if f.suffix == '.json']
-        for target in targets:
-            target.unlink()
-    except FileNotFoundError:
-        pass
 
 
 def quirks_from_any_parent(
@@ -1201,16 +1080,69 @@ def select_tiprack_from_list(
     except IndexError:
         raise OutOfTipsError
 
-    if starting_point:
-        assert starting_point.parent is first
+    if starting_point and starting_point.parent is not first:
+        raise TipSelectionError(
+            'The starting tip you selected '
+            f'does not exist in {first}')
+    elif starting_point:
+        first_well = starting_point
     else:
-        starting_point = first.wells()[0]
+        first_well = first.wells()[0]
 
-    next_tip = first.next_tip(num_channels, starting_point)
+    next_tip = first.next_tip(num_channels, first_well)
     if next_tip:
         return first, next_tip
     else:
         return select_tiprack_from_list(rest, num_channels)
+
+
+def select_tiprack_from_list_paired_pipettes(
+        tip_racks: List[Labware],
+        p_channels: int,
+        s_channels: int,
+        starting_point: Well = None) -> Tuple[Labware, Well]:
+    """
+    Helper function utilized in :py:attr:`PairedInstrumentContext`
+    to determine which pipette tiprack to pick up from.
+
+    If a starting point is specified, this method with check
+    that the parent of that tip was correctly filtered.
+
+    If a starting point is not specified, this method will filter
+    tipracks until it finds a well that is not empty.
+
+    :return: A Tuple of the tiprack and well to move to. In this
+    instance the starting well is specific to the primary pipette.
+    :raises TipSelectionError: if the starting tip specified
+    does not exist in the filtered tipracks.
+    """
+    try:
+        first, rest = split_tipracks(tip_racks)
+    except IndexError:
+        raise OutOfTipsError
+
+    if starting_point and starting_point.parent is not first:
+        raise TipSelectionError(
+            'The starting tip you selected '
+            f'does not exist in {first}')
+    elif starting_point:
+        primary_well = starting_point
+    else:
+        primary_well = first.wells()[0]
+
+    try:
+        secondary_point = labware_column_shift(primary_well, first)
+    except IndexError:
+        return select_tiprack_from_list_paired_pipettes(
+            rest, p_channels, s_channels)
+
+    primary_next_tip = first.next_tip(p_channels, starting_point)
+    secondary_next_tip = first.next_tip(s_channels, secondary_point)
+    if primary_next_tip and secondary_next_tip:
+        return first, primary_next_tip
+    else:
+        return select_tiprack_from_list_paired_pipettes(
+            rest, p_channels, s_channels)
 
 
 def filter_tipracks_to_start(
@@ -1220,31 +1152,45 @@ def filter_tipracks_to_start(
         lambda tr: starting_point.parent is not tr, tipracks))
 
 
-def uri_from_details(namespace: str, load_name: str, version: str,
-                     delimiter='/') -> str:
-    """ Build a labware URI from its details.
-
-    A labware URI is a string that uniquely specifies a labware definition.
-
-    :returns str: The URI.
+def _get_parent_identifier(labware: 'Labware') -> str:
     """
-    return f'{namespace}{delimiter}{load_name}{delimiter}{version}'
-
-
-def uri_from_definition(definition: LabwareDefinition, delimiter='/') -> str:
-    """ Build a labware URI from its definition.
-
-    A labware URI is a string that uniquely specifies a labware definition.
-
-    :returns str: The URI.
+    Helper function to return whether a labware is on top of a
+    module or not.
     """
-    return uri_from_details(definition['namespace'],
-                            definition['parameters']['loadName'],
-                            definition['version'])
+    parent = labware.parent
+    # TODO (lc, 07-14-2020): Once we implement calibrations per slot,
+    # this function should either return a slot using `first_parent` or
+    # the module it is attached to.
+    if isinstance(parent, DeckItem) and parent.separate_calibration:
+        # treat a given labware on a given module type as same
+        return parent.load_name
+    else:
+        return ''  # treat all slots as same
+
+
+def get_labware_hash(labware: 'Labware') -> str:
+    return helpers.hash_labware_def(labware._definition)
+
+
+def get_labware_hash_with_parent(labware: 'Labware') -> str:
+    return helpers.hash_labware_def(labware._definition)\
+        + _get_parent_identifier(labware)
+
+
+def _get_labware_path(labware: 'Labware') -> str:
+    return f'{get_labware_hash_with_parent(labware)}.json'
+
+
+def _get_index_file_information(
+        labware: 'Labware') -> Tuple[str, 'LabwareDefinition', str]:
+    definition = labware._definition
+    labware_path = _get_labware_path(labware)
+    parent = _get_parent_identifier(labware)
+    return labware_path, definition, parent
 
 
 def load_from_definition(
-        definition: Dict[str, Any],
+        definition: 'LabwareDefinition',
         parent: Location,
         label: str = None,
         api_level: APIVersion = None) -> Labware:
@@ -1268,8 +1214,18 @@ def load_from_definition(
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
     labware = Labware(definition, parent, label, api_level)
-    load_calibration(labware)
+    index_info = _get_index_file_information(labware)
+    offset = get.get_labware_calibration(
+        index_info[0], index_info[1], parent=index_info[2])
+    labware.set_calibration(offset)
     return labware
+
+
+def save_calibration(labware: 'Labware', delta: Point):
+    index_info = _get_index_file_information(labware)
+    modify.save_labware_calibration(
+        index_info[0], index_info[1], delta, parent=index_info[2])
+    labware.set_calibration(delta)
 
 
 def load(
@@ -1278,8 +1234,8 @@ def load(
     label: str = None,
     namespace: str = None,
     version: int = 1,
-    bundled_defs: Dict[str, LabwareDefinition] = None,
-    extra_defs: Dict[str, LabwareDefinition] = None,
+    bundled_defs: Dict[str, 'LabwareDefinition'] = None,
+    extra_defs: Dict[str, 'LabwareDefinition'] = None,
     api_level: APIVersion = None
 ) -> Labware:
     """

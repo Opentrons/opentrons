@@ -28,7 +28,7 @@ export const TempDeckCard = ({
   controlDisabledReason,
   isCardExpanded,
   toggleCard,
-}: Props) => (
+}: Props): React.Node => (
   <StatusCard
     title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}

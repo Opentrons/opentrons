@@ -13,7 +13,9 @@ export type DownloadUpdateModalProps = {|
   progress: number | null,
 |}
 
-export function DownloadUpdateModal(props: DownloadUpdateModalProps) {
+export function DownloadUpdateModal(
+  props: DownloadUpdateModalProps
+): React.Node {
   const { notNowButton, error, progress } = props
   const heading = error !== null ? 'Downloading Update' : 'Download Error'
 

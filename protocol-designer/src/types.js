@@ -36,21 +36,28 @@ export type ThunkDispatch<A> = (action: A | ThunkAction<A>) => A
 export type ThunkAction<A> = (
   dispatch: ThunkDispatch<A>,
   getState: GetState
-) => A
+) => A | void
 
 // TODO(mc, 2018-04-18): make actual Action union type for PD
-export type Action = { type: string, payload?: mixed, metadata?: mixed }
+export type Action = { type: string, payload?: mixed, metadata?: mixed, ... }
 
-export type WellVolumes = { [wellName: string]: number }
+export type WellVolumes = { [wellName: string]: number, ... }
+
 // TODO LATER Ian 2018-02-19 type for containers.json
+// TODO(mc, 2020-06-04): this type is unused, can it be deleted?
 export type JsonWellData = {
   'total-liquid-volume': number,
   // missing rest of fields, todo later
+  ...
 }
+
+// TODO(mc, 2020-06-04): this type is unused, can it be deleted?
 export type VolumeJson = {
   locations: {
     [wellName: string]: JsonWellData,
+    ...,
   },
+  ...
 }
 
 // NOTE: string expected to be '1', '2', ... '12' for normal deck slots,

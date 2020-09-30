@@ -24,7 +24,7 @@ export type DimensionsProps = {|
   insertCategory?: string,
 |}
 
-export function Dimensions(props: DimensionsProps) {
+export function Dimensions(props: DimensionsProps): React.Node {
   const { definition, className, irregular, insertCategory } = props
   const { displayCategory } = definition.metadata
   const { xDimension, yDimension, zDimension } = definition.dimensions

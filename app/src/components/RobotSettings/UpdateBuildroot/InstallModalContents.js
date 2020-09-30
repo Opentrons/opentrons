@@ -15,7 +15,9 @@ export type InstallModalContentsProps = {|
   session: BuildrootUpdateSession,
 |}
 
-export function InstallModalContents(props: InstallModalContentsProps) {
+export function InstallModalContents(
+  props: InstallModalContentsProps
+): React.Node {
   const { robotSystemType, session } = props
   const { step: updateStep, progress, error } = session
   const prevStep = usePrevious(updateStep)

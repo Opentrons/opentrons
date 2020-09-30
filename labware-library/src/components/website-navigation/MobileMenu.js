@@ -11,7 +11,7 @@ type Props = {|
   onClick: () => mixed,
 |}
 
-export function MobileMenu(props: Props) {
+export function MobileMenu(props: Props): React.Node {
   const { name, active, onClick } = props
   return (
     <>

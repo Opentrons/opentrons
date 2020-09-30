@@ -26,7 +26,7 @@ export const VALID_LABWARE_FILE: 'VALID_LABWARE_FILE' = 'VALID_LABWARE_FILE'
 
 export const getCustomLabwareDirectory: State => string = createSelector(
   getConfig,
-  config => config.labware.directory
+  config => config?.labware.directory ?? ''
 )
 
 export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelector(
@@ -39,9 +39,9 @@ export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelect
     ])
 )
 
+// $FlowFixMe: flow unable to do type refinements via filter
 export const getValidCustomLabware: State => Array<ValidLabwareFile> = createSelector(
   getCustomLabware,
-  // $FlowFixMe: flow unable to do type refinements via filter
   labware => labware.filter(f => f.type === VALID_LABWARE_FILE)
 )
 
@@ -54,7 +54,7 @@ export const getAddLabwareFailure: State => {|
   (file, errorMessage) => ({ file, errorMessage })
 )
 
-export const getListLabwareErrorMessage = (state: State) =>
+export const getListLabwareErrorMessage = (state: State): null | string =>
   state.labware.listFailureMessage
 
 export const getCustomLabwareDefinitions: State => Array<LabwareDefinition2> = createSelector(

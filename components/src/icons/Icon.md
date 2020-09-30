@@ -1,14 +1,14 @@
 All available icons:
 
 ```js
-const iconData = require('./icon-data').default
-
+import { SIZE_3 } from '@opentrons/components'
+import { ICON_DATA_BY_NAME } from './icon-data'
 ;<div className="icon-showcase">
-  {Object.keys(iconData)
+  {Object.keys(ICON_DATA_BY_NAME)
     .sort()
     .map(iconName => (
       <span key={iconName}>
-        <Icon width="64px" name={iconName} />
+        <Icon name={iconName} width={SIZE_3} />
         <span>{iconName}</span>
       </span>
     ))}
@@ -18,8 +18,9 @@ const iconData = require('./icon-data').default
 Spin any icon!
 
 ```js
+import { SIZE_3 } from '@opentrons/components'
 ;<div>
-  <Icon width="64px" name="ot-spinner" spin />
-  <Icon width="64px" name="refresh" spin />
+  <Icon width={SIZE_3} name="ot-spinner" spin />
+  <Icon width={SIZE_3} name="refresh" spin />
 </div>
 ```

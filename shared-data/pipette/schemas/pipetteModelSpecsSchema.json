@@ -11,6 +11,11 @@
       "minimum": 0.25,
       "maximum": 1.25
     },
+    "idleCurrentRange": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 1.0
+    },
     "xyzArray": {
       "type": "array",
       "description": "Array of 3 numbers, [x, y, z]",
@@ -79,7 +84,8 @@
             "dropTipCurrent",
             "dropTipSpeed",
             "ulPerMm",
-            "tipLength"
+            "tipLength",
+            "nozzleOffset"
           ],
           "additionalProperties": false,
           "properties": {
@@ -101,6 +107,7 @@
             "pickUpIncrement": { "$ref": "#/definitions/editConfigurations" },
             "pickUpSpeed": { "$ref": "#/definitions/editConfigurations" },
             "modelOffset": { "$ref": "#/definitions/xyzArray" },
+            "nozzleOffset": { "$ref": "#/definitions/xyzArray" },
             "plungerCurrent": { "$ref": "#/definitions/editConfigurations" },
             "dropTipCurrent": { "$ref": "#/definitions/editConfigurations" },
             "dropTipSpeed": { "$ref": "#/definitions/editConfigurations" },
@@ -118,6 +125,7 @@
               "type": "object",
               "value": { "$ref": "#/definitions/positiveNumber" }
             },
+            "idleCurrent": { "$ref": "#/definitions/idleCurrentRange" },
             "returnTipHeight": { "$ref": "#/definitions/returnTipHeightRange" },
             "tipOverlap": {
               "type": "object",

@@ -1,4 +1,4 @@
-// This build script is run by `make install`
+// This build script is run by `make setup`
 
 // Merge all v1 labware files into a single JSON file, build/labware.json,
 // with each filename as a key in the final JSON file.
@@ -14,7 +14,7 @@ if (!buildDir) {
   )
 }
 
-let output = {}
+const output = {}
 
 const files = glob.sync(
   path.join(__dirname, '../../labware/definitions/1/*.json')

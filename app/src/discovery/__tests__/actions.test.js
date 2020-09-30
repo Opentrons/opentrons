@@ -39,6 +39,12 @@ describe('discovery actions', () => {
         meta: { shell: true },
       },
     },
+    {
+      name: 'clearDiscoveryCache',
+      creator: actions.clearDiscoveryCache,
+      args: [],
+      expected: { type: 'discovery:CLEAR_CACHE', meta: { shell: true } },
+    },
   ]
 
   SPECS.forEach(spec => {

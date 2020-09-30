@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState } from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 import { Modal, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../../localization'
@@ -13,7 +13,7 @@ import modalStyles from '../modal.css'
 import { announcements } from './announcements'
 import styles from './AnnouncementModal.css'
 
-export const AnnouncementModal = () => {
+export const AnnouncementModal = (): React.Node => {
   const { announcementKey, message, heading, image } = announcements[
     announcements.length - 1
   ]
@@ -21,9 +21,10 @@ export const AnnouncementModal = () => {
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey
 
-  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
-    userHasNotSeenAnnouncement
-  )
+  const [
+    showAnnouncementModal,
+    setShowAnnouncementModal,
+  ] = React.useState<boolean>(userHasNotSeenAnnouncement)
 
   const handleClick = () => {
     setLocalStorageItem(localStorageAnnouncementKey, announcementKey)

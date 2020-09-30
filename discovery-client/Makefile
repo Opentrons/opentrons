@@ -12,8 +12,8 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 .PHONY: all
 all: clean lib
 
-.PHONY: install
-install:
+.PHONY: setup
+setup:
 	yarn
 
 .PHONY: clean

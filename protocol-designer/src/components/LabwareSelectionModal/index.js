@@ -70,7 +70,14 @@ function mergeProps(
   }
 }
 
-export const LabwareSelectionModal = connect<Props, {||}, SP, {||}, _, _>(
+export const LabwareSelectionModal: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

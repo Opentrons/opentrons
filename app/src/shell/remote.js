@@ -4,7 +4,7 @@ import assert from 'assert'
 
 import type { Remote } from './types'
 
-export const remote = new Proxy((({}: any): Remote), {
+export const remote: Remote = new Proxy((({}: any): Remote), {
   get(target, propName) {
     assert(
       global.APP_SHELL_REMOTE,

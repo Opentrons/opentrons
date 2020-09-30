@@ -14,7 +14,7 @@ export type LabwareOutlineProps = {|
 
 const OUTLINE_THICKNESS_MM = 1
 
-export function LabwareOutline(props: LabwareOutlineProps) {
+export function LabwareOutline(props: LabwareOutlineProps): React.Node {
   const {
     definition,
     width = SLOT_RENDER_WIDTH,

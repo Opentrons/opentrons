@@ -1,19 +1,21 @@
 // @flow
-import type { CommandCreatorArgs, PauseArgs } from '../step-generation'
+import typeof { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 import type {
-  FormData,
-  StepIdType,
-  StepFieldName,
-  StepType,
-} from '../form-types'
+  CommandCreatorArgs,
+  PauseArgs,
+  ThermocyclerProfileStepArgs,
+} from '../step-generation'
+import type { StepIdType } from '../form-types'
 import type { FormError } from './formLevel/errors'
 
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
+export const PRESAVED_STEP_ID: '__presaved_step__' = '__presaved_step__'
 export type TerminalItemId =
   | typeof START_TERMINAL_ITEM_ID
   | typeof END_TERMINAL_ITEM_ID
+  | typeof PRESAVED_STEP_ID
 
 export type WellIngredientNames = { [ingredId: string]: string }
 
@@ -105,7 +107,6 @@ export type SourceDestSubstepItem =
 export type MagnetSubstepItem = {|
   substepType: 'magnet',
   engage: boolean,
-  labwareDisplayName: ?string,
   labwareNickname: ?string,
   message?: string,
 |}
@@ -113,7 +114,6 @@ export type MagnetSubstepItem = {|
 export type TemperatureSubstepItem = {|
   substepType: 'temperature',
   temperature: number | null,
-  labwareDisplayName: ?string,
   labwareNickname: ?string,
   message?: string,
 |}
@@ -126,8 +126,29 @@ export type PauseSubstepItem = {|
 export type AwaitTemperatureSubstepItem = {|
   substepType: 'awaitTemperature',
   temperature: number,
-  labwareDisplayName: ?string,
   labwareNickname: ?string,
+  message?: string,
+|}
+
+export type ThermocyclerProfileSubstepItem = {|
+  substepType: THERMOCYCLER_PROFILE,
+  blockTargetTempHold: number | null,
+  labwareNickname: ?string,
+  lidOpenHold: boolean,
+  lidTargetTempHold: number | null,
+  message?: string,
+  meta: $PropertyType<ThermocyclerProfileStepArgs, 'meta'>,
+  profileSteps: $PropertyType<ThermocyclerProfileStepArgs, 'profileSteps'>,
+  profileTargetLidTemp: number | null,
+  profileVolume: number,
+|}
+
+export type ThermocyclerStateSubstepItem = {|
+  substepType: THERMOCYCLER_STATE,
+  labwareNickname: ?string,
+  blockTargetTemp: number | null,
+  lidTargetTemp: number | null,
+  lidOpen: boolean,
   message?: string,
 |}
 
@@ -137,23 +158,20 @@ export type SubstepItemData =
   | MagnetSubstepItem
   | TemperatureSubstepItem
   | AwaitTemperatureSubstepItem
+  | ThermocyclerProfileSubstepItem
+  | ThermocyclerStateSubstepItem
 
-export type StepItemData = {
-  id: StepIdType,
-  title: string,
-  stepType: StepType,
-  description?: ?string,
-  formData: ?FormData,
-}
+export type Substeps = { [StepIdType]: ?SubstepItemData }
 
-export type SubSteps = { [StepIdType]: ?SubstepItemData }
-
-export type StepFormAndFieldErrors = {
-  field?: { [StepFieldName]: Array<string> },
-  form?: Array<FormError>,
-}
+export type StepFormErrors = Array<FormError>
 
 export type StepArgsAndErrors = {
-  errors: StepFormAndFieldErrors,
+  errors: boolean,
   stepArgs: CommandCreatorArgs | null, // TODO: incompleteData field when this is null?
+}
+
+export type StepArgsAndErrorsById = { [stepId: string]: StepArgsAndErrors, ... }
+
+export type LabwareNamesByModuleId = {
+  [moduleId: string]: ?{ nickname: string },
 }

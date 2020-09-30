@@ -311,4 +311,5 @@ export type PipetteModelSpecs = {
   model: string,
   backCompatNames?: Array<string>,
   tipLength: { value: number },
+  ...
 }

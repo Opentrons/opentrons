@@ -14,7 +14,7 @@ const updatePatchOnPauseTemperatureChange = (
   patch: FormPatch,
   rawForm: FormData
 ) => {
-  if (fieldHasChanged(rawForm, patch, 'pauseForAmountOfTime')) {
+  if (fieldHasChanged(rawForm, patch, 'pauseAction')) {
     return {
       ...patch,
       ...getDefaultFields(

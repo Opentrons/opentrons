@@ -14,7 +14,7 @@ export type StepFormDropdownProps = {
   className?: string,
 }
 
-export const StepFormDropdown = (props: StepFormDropdownProps) => {
+export const StepFormDropdown = (props: StepFormDropdownProps): React.Node => {
   const {
     options,
     name,

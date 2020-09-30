@@ -83,6 +83,10 @@ class ThreadManager:
     is stored as a member of the class, and a synchronous interface to
     the managed object's members is also exposed for convenience.
 
+    If you want to wait for the managed object's creation separately
+    (with managed_thread_ready_blocking or managed_thread_ready_async)
+    then pass threadmanager_nonblocking=True as a kwarg
+
     Example
     -------
     .. code-block::
@@ -104,15 +108,36 @@ class ThreadManager:
         self._sync_managed_obj = None
         is_running = threading.Event()
         self._is_running = is_running
+
+        # TODO: remove this if we switch to python 3.8
+        # https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads  # noqa
+        # On windows, the event loop and system interface is different and
+        # this won't work.
+        try:
+            asyncio.get_child_watcher()
+        except NotImplementedError:
+            pass
+        blocking = not kwargs.pop('threadmanager_nonblocking', False)
         target = object.__getattribute__(self, '_build_and_start_loop')
         thread = threading.Thread(target=target, name='ManagedThread',
                                   args=(builder, *args), kwargs=kwargs,
                                   daemon=True)
         self._thread = thread
         thread.start()
-        is_running.wait()
+        if blocking:
+            object.__getattribute__(self, 'managed_thread_ready_blocking')()
+
+    def managed_thread_ready_blocking(self):
+        object.__getattribute__(self, '_is_running').wait()
+        if not object.__getattribute__(self, 'managed_obj'):
+            raise ThreadManagerException("Failed to create Managed Object")
+
+    async def managed_thread_ready_async(self):
+        is_running = object.__getattribute__(self, '_is_running')
+        while not is_running.is_set():
+            await asyncio.sleep(0.1)
         # Thread initialization is done.
-        if not self.managed_obj:
+        if not object.__getattribute__(self, 'managed_obj'):
             raise ThreadManagerException("Failed to create Managed Object")
 
     def _build_and_start_loop(self, builder, *args, **kwargs):
@@ -149,9 +174,6 @@ class ThreadManager:
         object.__getattribute__(self, 'wrap_module').cache_clear()
         object.__getattribute__(self, '_thread').join()
 
-    def __del__(self):
-        self.clean_up()
-
     @functools.lru_cache(8)
     def wrap_module(
             self, module: AbstractModule) -> CallBridger[AbstractModule]:
@@ -168,6 +190,39 @@ class ThreadManager:
             managed = object.__getattribute__(self, 'managed_obj')
             attr = getattr(managed, attr_name)
             return [wrap(mod) for mod in attr]
+        elif attr_name == 'clean_up':
+            # the wrapped object probably has this attr as well as us, and we
+            # want to call both, with the wrapped one first
+
+            # we only want to call cleanup once, and then only if the loop
+            # is running
+            wrapped_loop = object.__getattribute__(self, '_loop')
+            if not wrapped_loop.is_running():
+                return lambda: None
+
+            wrapped_cleanup = getattr(
+                    object.__getattribute__(self, 'bridged_obj'), 'clean_up')
+            our_cleanup = object.__getattribute__(self, 'clean_up')
+
+            def call_both():
+                # the wrapped cleanup wants to happen in the managed thread,
+                # started from the managed loop. our cleanup wants to happen
+                # in the current thread, _after_ the wrapped cleanup is done
+                # so cancelled tasks can have a chance to complete.
+                async def clean_and_notify():
+                    wrapped_cleanup()
+                    # this sleep allows the wrapped loop to spin a couple
+                    # times to clean up the tasks we just cancelled. My kingdom
+                    # for an asyncio.spin_once()
+                    await asyncio.sleep(0.1)
+
+                fut = asyncio.run_coroutine_threadsafe(
+                    clean_and_notify(), wrapped_loop)
+                fut.result()
+                our_cleanup()
+
+            return call_both
+
         else:
             try:
                 return getattr(

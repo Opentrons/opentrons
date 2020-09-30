@@ -1,22 +1,31 @@
-import logging
-from typing import (Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union)
+from __future__ import annotations
 
+from functools import lru_cache
+import logging
+from typing import Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union
 
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
-from opentrons.hardware_control.types import CriticalPoint
-from .util import (
-    FlowRates, PlungerSpeeds, Clearances, clamp_value, requires_version)
+from opentrons.hardware_control.types import CriticalPoint, PipettePair
+from opentrons.config.feature_flags import enable_calibration_overhaul
+from opentrons.calibration_storage import get
+from opentrons.calibration_storage.types import TipLengthCalNotFound
+from opentrons.protocols.api_support.util import (
+    FlowRates, PlungerSpeeds, Clearances,
+    clamp_value, requires_version, build_edges, first_parent)
 from opentrons.protocols.types import APIVersion
 from .labware import (
     filter_tipracks_to_start, Labware, OutOfTipsError, quirks_from_any_parent,
     select_tiprack_from_list, Well)
-from . import transfers, geometry
+from opentrons.protocols.geometry import planning
+from opentrons.protocols.advanced_control import transfers
 from .module_contexts import ThermocyclerContext
+from .paired_instrument_context import (
+    PairedInstrumentContext, UnsupportedInstrumentPairingError)
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
-    from .util import HardwareManager
+    from opentrons.protocols.api_support.util import HardwareManager
 
 
 AdvancedLiquidHandling = Union[
@@ -24,6 +33,15 @@ AdvancedLiquidHandling = Union[
     types.Location,
     List[Union[Well, types.Location]],
     List[List[Well]]]
+
+
+VALID_PIP_TIPRACK_VOL = {
+    'p10': [10, 20],
+    'p20': [10, 20],
+    'p50': [200, 300],
+    'p300': [200, 300],
+    'p1000': [1000]
+}
 
 
 class InstrumentContext(CommandPublisher):
@@ -45,8 +63,8 @@ class InstrumentContext(CommandPublisher):
     """
 
     def __init__(self,
-                 ctx: 'ProtocolContext',
-                 hardware_mgr: 'HardwareManager',
+                 ctx: ProtocolContext,
+                 hardware_mgr: HardwareManager,
                  mount: types.Mount,
                  log_parent: logging.Logger,
                  at_version: APIVersion,
@@ -61,10 +79,12 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager = hardware_mgr
         self._ctx = ctx
         self._mount = mount
+        self._log = log_parent.getChild(repr(self))
 
         self._tip_racks = tip_racks or list()
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
+            self._validate_tiprack(tip_rack)
         if trash is None:
             self.trash_container = self._ctx.fixed_trash
         else:
@@ -74,13 +94,13 @@ class InstrumentContext(CommandPublisher):
 
         self._last_location: Union[Labware, Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
-        self._log = log_parent.getChild(repr(self))
         self._well_bottom_clearance = Clearances(
             default_aspirate=1.0, default_dispense=1.0)
         self._flow_rates = FlowRates(self)
         self._speeds = PlungerSpeeds(self)
         self._starting_tip: Union[Well, None] = None
         self.requested_as = requested_as
+        self._flow_rates.set_defaults(self._api_version)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -122,11 +142,24 @@ class InstrumentContext(CommandPublisher):
     def default_speed(self, speed: float):
         self._default_speed = speed
 
+    def _validate_tiprack(self, tiprack: Labware):
+        # TODO AA 2020-06-24 - we should instead add the acceptable Opentrons
+        # tipracks to the pipette as a refactor
+        if tiprack._definition['namespace'] == 'opentrons':
+            tiprack_vol = tiprack.wells()[0].max_volume
+            valid_vols = VALID_PIP_TIPRACK_VOL[self.name.split('_')[0]]
+            if tiprack_vol not in valid_vols:
+                self._log.warning(
+                    f'The pipette {self.name} and its tiprack '
+                    f'{tiprack.load_name} in slot {tiprack.parent} appear to '
+                    'be mismatched. Please check your protocol before running '
+                    'on the robot.')
+
     @requires_version(2, 0)
     def aspirate(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> 'InstrumentContext':
+                 rate: float = 1.0) -> InstrumentContext:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
         from the specified location
@@ -141,7 +174,7 @@ class InstrumentContext(CommandPublisher):
         :type volume: int or float
         :param location: Where to aspirate from. If `location` is a
                          :py:class:`.Well`, the robot will aspirate from
-                         :py:attr:`well_bottom_clearance```.aspirate`` mm
+                         :py:obj:`well_bottom_clearance.aspirate` mm
                          above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
@@ -225,7 +258,7 @@ class InstrumentContext(CommandPublisher):
     def dispense(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> 'InstrumentContext':
+                 rate: float = 1.0) -> InstrumentContext:
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location.
@@ -242,7 +275,7 @@ class InstrumentContext(CommandPublisher):
 
         :param location: Where to dispense into. If `location` is a
                          :py:class:`.Well`, the robot will dispense into
-                         :py:attr:`well_bottom_clearance```.dispense`` mm
+                         :py:obj:`well_bottom_clearance.dispense` mm
                          above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
@@ -296,7 +329,7 @@ class InstrumentContext(CommandPublisher):
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
 
-        c_vol = self.hw_pipette['current_volume'] if not volume else volume
+        c_vol = self.current_volume if not volume else volume
 
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'before', None, None, self, c_vol, loc, rate)
@@ -310,7 +343,7 @@ class InstrumentContext(CommandPublisher):
             repetitions: int = 1,
             volume: float = None,
             location: Union[types.Location, Well] = None,
-            rate: float = 1.0) -> 'InstrumentContext':
+            rate: float = 1.0) -> InstrumentContext:
         """
         Mix a volume of liquid (uL) using this pipette.
         If no location is specified, the pipette will mix from its current
@@ -347,7 +380,7 @@ class InstrumentContext(CommandPublisher):
             'mixing {}uL with {} repetitions in {} at rate={}'.format(
                 volume, repetitions,
                 location if location else 'current position', rate))
-        if not self.hw_pipette['has_tip']:
+        if not self._has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
 
         c_vol = self.hw_pipette['available_volume'] if not volume else volume
@@ -370,7 +403,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def blow_out(self,
                  location: Union[types.Location, Well] = None
-                 ) -> 'InstrumentContext':
+                 ) -> InstrumentContext:
         """
         Blow liquid out of the tip.
 
@@ -419,13 +452,19 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.blow_out(self._mount)
         return self
 
+    def _determine_speed(self, speed: float):
+        if self._api_version < APIVersion(2, 4):
+            return clamp_value(speed, 80, 20, 'touch_tip:')
+        else:
+            return clamp_value(speed, 80, 1, 'touch_tip:')
+
     @cmds.publish.both(command=cmds.touch_tip)
     @requires_version(2, 0)
     def touch_tip(self,
                   location: Well = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
-                  speed: float = 60.0) -> 'InstrumentContext':
+                  speed: float = 60.0) -> InstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of
         removing left-over droplets
@@ -460,24 +499,10 @@ class InstrumentContext(CommandPublisher):
             :py:class:`.Placeable` as the ``location`` parameter)
 
         """
-        if not self.hw_pipette['has_tip']:
+        if not self._has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
 
-        def _build_edges(where: Well, offset: float) -> List[types.Point]:
-            # Determine the touch_tip edges/points
-            offset_pt = types.Point(0, 0, offset)
-            return [
-                # right edge
-                where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
-                # left edge
-                where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
-                # back edge
-                where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
-                # front edge
-                where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
-            ]
-
-        checked_speed = clamp_value(speed, 80, 20, 'touch_tip:')
+        checked_speed = self._determine_speed(speed)
 
         # If location is a valid well, move to the well first
         if location is None:
@@ -494,12 +519,22 @@ class InstrumentContext(CommandPublisher):
             if location.parent.is_tiprack:
                 self._log.warning('Touch_tip being performed on a tiprack. '
                                   'Please re-check your code')
-            self.move_to(location.top())
+
+            if self._api_version < APIVersion(2, 4):
+                to_loc = location.top()
+            else:
+                move_with_z_offset =\
+                    location.top().point + types.Point(0, 0, v_offset)
+                to_loc = types.Location(move_with_z_offset, location)
+            self.move_to(to_loc)
         else:
             raise TypeError(
                 'location should be a Well, but it is {}'.format(location))
 
-        for edge in _build_edges(location, v_offset):
+        edges = build_edges(
+            location, v_offset, self._mount,
+            self._ctx._deck_layout, radius, self._api_version)
+        for edge in edges:
             self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
         return self
 
@@ -507,7 +542,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def air_gap(self,
                 volume: float = None,
-                height: float = None) -> 'InstrumentContext':
+                height: float = None) -> InstrumentContext:
         """
         Pull air into the pipette current tip at the current location
 
@@ -539,7 +574,7 @@ class InstrumentContext(CommandPublisher):
 
 
         """
-        if not self.hw_pipette['has_tip']:
+        if not self._has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
 
         if height is None:
@@ -554,7 +589,7 @@ class InstrumentContext(CommandPublisher):
 
     @cmds.publish.both(command=cmds.return_tip)
     @requires_version(2, 0)
-    def return_tip(self, home_after: bool = True) -> 'InstrumentContext':
+    def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
         If a tip is currently attached to the pipette, then it will return the
         tip to it's location in the tiprack.
@@ -563,7 +598,7 @@ class InstrumentContext(CommandPublisher):
 
         :returns: This instance
         """
-        if not self.hw_pipette['has_tip']:
+        if not self._has_tip:
             self._log.warning('Pipette has no tip to return')
         loc = self._last_tip_picked_up_from
         if not isinstance(loc, Well):
@@ -588,7 +623,7 @@ class InstrumentContext(CommandPublisher):
     def pick_up_tip(  # noqa(C901)
             self, location: Union[types.Location, Well] = None,
             presses: int = None,
-            increment: float = None) -> 'InstrumentContext':
+            increment: float = None) -> InstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands with
 
@@ -651,6 +686,7 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location))
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
+        self._validate_tiprack(tiprack)
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                         'before', None, None, self, location=target)
         self.move_to(target.top())
@@ -686,7 +722,7 @@ class InstrumentContext(CommandPublisher):
             self,
             location: Union[types.Location, Well] = None,
             home_after: bool = True)\
-            -> 'InstrumentContext':
+            -> InstrumentContext:
         """
         Drop the current tip.
 
@@ -711,16 +747,15 @@ class InstrumentContext(CommandPublisher):
               can be a :py:class:`.types.Location`; for instance, you can call
               `instr.drop_tip(tiprack.wells()[0].top())`.
 
-        .. note::
-
-            OT1 required homing the plunger after dropping tips, so the prior
-            version of `drop_tip` automatically homed the plunger. This is no
-            longer needed in OT2. If you need to home the plunger, use
-            :py:meth:`home_plunger`.
-
         :param location: The location to drop the tip
         :type location: :py:class:`.types.Location` or :py:class:`.Well` or
                         None
+        :param home_after: Whether to home the plunger after dropping the tip
+                           (defaults to ``True``). The plungeer must home after
+                           dropping tips because the ejector shroud that pops
+                           the tip off the end of the pipette is driven by the
+                           plunger motor, and may skip steps when dropping the
+                           tip.
 
         :returns: This instance
         """
@@ -771,7 +806,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def home(self) -> 'InstrumentContext':
+    def home(self) -> InstrumentContext:
         """ Home the robot.
 
         :returns: This instance.
@@ -786,26 +821,27 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def home_plunger(self) -> 'InstrumentContext':
+    def home_plunger(self) -> InstrumentContext:
         """ Home the plunger associated with this mount
 
         :returns: This instance.
         """
-        self._hw_manager.hardware.home_plunger(self.mount)
+        self._hw_manager.hardware.home_plunger(self._mount)
         return self
 
     @cmds.publish.both(command=cmds.distribute)
     @requires_version(2, 0)
     def distribute(self,
-                   volume: float,
+                   volume: Union[float, Sequence[float]],
                    source: Well,
                    dest: List[Well],
-                   *args, **kwargs) -> 'InstrumentContext':
+                   *args, **kwargs) -> InstrumentContext:
         """
         Move a volume of liquid from one source to multiple destinations.
 
         :param volume: The amount of volume to distribute to each destination
                        well.
+        :type volume: float or sequence of floats
         :param source: A single well from where liquid will be aspirated.
         :param dest: List of Wells where liquid will be dispensed to.
         :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
@@ -825,15 +861,16 @@ class InstrumentContext(CommandPublisher):
     @cmds.publish.both(command=cmds.consolidate)
     @requires_version(2, 0)
     def consolidate(self,
-                    volume: float,
+                    volume: Union[float, Sequence[float]],
                     source: List[Well],
                     dest: Well,
-                    *args, **kwargs) -> 'InstrumentContext':
+                    *args, **kwargs) -> InstrumentContext:
         """
         Move liquid from multiple wells (sources) to a single well(destination)
 
         :param volume: The amount of volume to consolidate from each source
                        well.
+        :type volume: float or sequence of floats
         :param source: List of wells from where liquid will be aspirated.
         :param dest: The single well into which liquid will be dispensed.
         :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
@@ -855,7 +892,7 @@ class InstrumentContext(CommandPublisher):
                  source: AdvancedLiquidHandling,
                  dest: AdvancedLiquidHandling,
                  trash=True,
-                 **kwargs) -> 'InstrumentContext':
+                 **kwargs) -> InstrumentContext:
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
         # TODO: Reach consensus on kwargs
@@ -1061,7 +1098,7 @@ class InstrumentContext(CommandPublisher):
     def move_to(self, location: types.Location, force_direct: bool = False,
                 minimum_z_height: float = None,
                 speed: float = None
-                ) -> 'InstrumentContext':
+                ) -> InstrumentContext:
         """ Move the instrument.
 
         :param location: The location to move to.
@@ -1098,7 +1135,7 @@ class InstrumentContext(CommandPublisher):
 
         instr_max_height = \
             self._hw_manager.hardware.get_instrument_max_height(self._mount)
-        moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
+        moves = planning.plan_moves(from_loc, location, self._ctx.deck,
                                     instr_max_height,
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height
@@ -1258,6 +1295,23 @@ class InstrumentContext(CommandPublisher):
         return self.hw_pipette['current_volume']
 
     @property  # type: ignore
+    @requires_version(2, 7)
+    def has_tip(self) -> bool:
+        """
+        :returns: Whether this instrument has a tip attached or not.
+        :type: bool
+        """
+        return self.hw_pipette['has_tip']
+
+    @property  # type: ignore
+    def _has_tip(self) -> bool:
+        """
+        Internal function used to check whether this instrument has a
+        tip attached or not.
+        """
+        return self.hw_pipette['has_tip']
+
+    @property  # type: ignore
     @requires_version(2, 0)
     def hw_pipette(self) -> Dict[str, Any]:
         """ View the information returned by the hardware API directly.
@@ -1314,10 +1368,104 @@ class InstrumentContext(CommandPublisher):
         return '{} on {} mount'.format(self.hw_pipette['display_name'],
                                        self._mount.name.lower())
 
+    @requires_version(2, 7)
+    def pair_with(
+            self, instrument: InstrumentContext) -> PairedInstrumentContext:
+        """ This function allows you to pair both of your pipettes and use
+        them simultaneously. The function implicitly decides a primary
+        and secondary pipette based on which instrument you call this
+        function on.
+
+        :param instrument: The secondary instrument you wish to use
+
+        :raises UnsupportedInstrumentPairingError: If you try to pair
+        pipettes that are not currently supported together.
+        :returns: PairedInstrumentContext: This is the object you
+        will call commands on.
+
+        This function returns a :py:class:`PairedInstrumentContext`.
+        The building block commands are the same as an individual pipette's
+        building block commands found at :ref:`v2-atomic-commands`,
+        and when you want to move pipettes simultaneously you need to use the
+        :py:class:`PairedInstrumentContext`.
+
+
+        Limitations:
+        1. This function utilizes a "primary" and "secondary" pipette to make
+        positional decisions. The consequence of doing this is that all X & Y
+        positions are based on the primary pipette only.
+        2. At this time, only pipettes of the same type are supported for
+        pipette pairing. This means that you cannot utilize a P1000 Single
+        channel and a P300 Single channel at the same time.
+
+        .. code-block :: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            # metadata
+            metadata = {
+                'protocolName': 'My Protocol',
+                'author': 'Name <email@address.com>',
+                'description': 'Simple paired pipette protocol,
+                'apiLevel': '|apiLevel|'
+            }
+
+            def run(ctx: protocol_api.ProtocolContext):
+                right_pipette = ctx.load_instrument(
+                    'p300_single_gen2', 'right')
+                left_pipette = ctx.load_instrument('p300_single_gen2', 'left')
+
+                # In this scenario, the right pipette is the primary pipette
+                # while the left pipette is the secondary pipette. All XY
+                # locations will be based on the right pipette.
+                right_paired_with_left = right_pipette.pair_with(left_pipette)
+                right_paired_with_left.pick_up_tip()
+                right_paired_with_left.drop_tip()
+
+                # In this scenario, the left pipette is the primary pipette
+                # while the right pipette is the secondary pipette. All XY
+                # locations will be based on the left pipette.
+                left_paired_with_right = left_pipette.pair_with(right_pipette)
+                left_paired_with_right.pick_up_tip()
+                left_paired_with_right.drop_tip()
+
+        .. note::
+
+            Before using this method, you should seriously consider whether
+            this is the best fit for your use-case especially given the
+            limitations listed above.
+        """
+        if instrument.name != self.name:
+            raise UnsupportedInstrumentPairingError(
+                'At this time, you cannot pair'
+                f'{instrument.name} with {self.name}')
+
+        return PairedInstrumentContext(
+            primary_instrument=self, secondary_instrument=instrument,
+            ctx=self._ctx, pair_policy=PipettePair.of_mount(self._mount),
+            api_version=self.api_version, hardware_manager=self._hw_manager,
+            trash=self.trash_container, log_parent=self._log)
+
+    @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:
         """ Get the tip length, including overlap, for a tip from this rack """
-        tip_overlap = self.hw_pipette['tip_overlap'].get(
-            tiprack.uri,
-            self.hw_pipette['tip_overlap']['default'])
-        tip_length = tiprack.tip_length
-        return tip_length - tip_overlap
+
+        def _build_length_from_overlap() -> float:
+            tip_overlap = self.hw_pipette['tip_overlap'].get(
+                tiprack.uri,
+                self.hw_pipette['tip_overlap']['default'])
+            tip_length = tiprack.tip_length
+            return tip_length - tip_overlap
+
+        if not enable_calibration_overhaul():
+            return _build_length_from_overlap()
+        else:
+            try:
+                parent = first_parent(tiprack) or ''
+                return get.load_tip_length_calibration(
+                    self.hw_pipette['pipette_id'],
+                    tiprack._definition,
+                    parent)['tipLength']
+            except TipLengthCalNotFound:
+                return _build_length_from_overlap()

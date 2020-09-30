@@ -1,143 +1,103 @@
 // @flow
 // app info card with version and updated
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { withRouter, Route, Link } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import startCase from 'lodash/startCase'
-
-import {
-  getConfig,
-  getUpdateChannelOptions,
-  updateConfig,
-  toggleDevTools,
-  toggleDevInternalFlag,
-  DEV_INTERNAL_FLAGS,
-} from '../../config'
-
-import {
-  Card,
-  LabeledToggle,
-  LabeledSelect,
-  LabeledButton,
-} from '@opentrons/components'
-
-import { AddManualIp } from './AddManualIp'
-
-import type { ContextRouter } from 'react-router-dom'
+import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
 import type { DropdownOption } from '@opentrons/components'
-import type { State, Dispatch } from '../../types'
-import type { Config, DevInternalFlag, UpdateChannel } from '../../config/types'
-
-type OP = {|
-  ...ContextRouter,
-  checkUpdate: () => mixed,
-|}
-
-type SP = {|
-  devToolsOn: boolean,
-  devInternal: $PropertyType<Config, 'devInternal'>,
-  channel: UpdateChannel,
-  channelOptions: Array<DropdownOption>,
-|}
-
-type DP = {|
-  toggleDevTools: () => mixed,
-  toggleDevInternalFlag: DevInternalFlag => mixed,
-  handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
-|}
-
-type Props = {| ...OP, ...SP, ...DP |}
+import type { DevInternalFlag } from '../../config/types'
+import type { Dispatch } from '../../types'
+import * as Config from '../../config'
+import * as Calibration from '../../calibration'
 
 const TITLE = 'Advanced Settings'
 
-export const AdvancedSettingsCard = withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(AdvancedSettingsCardComponent)
-)
+const USE_TRASH_SURFACE_TIP_CAL_LABEL =
+  'Use Trash Bin surface for tip calibration'
+const USE_TRASH_SURFACE_TIP_CAL_BODY =
+  "Tip length calibration should be performed using a Calibration Block. If you don't have one, use this option"
 
-function AdvancedSettingsCardComponent(props: Props) {
+const UPDATE_CHANNEL_LABEL = 'Update Channel'
+const UPDATE_CHANNEL_BODY =
+  'Sets the update channel of your app. "Stable" receives the latest stable releases. "Beta" is updated more frequently so you can try out new features, but the releases may be less well tested than "Stable".'
+
+const ENABLE_DEV_TOOLS_LABEL = 'Enable Developer Tools'
+const ENABLE_DEV_TOOLS_BODY =
+  "Requires restart. Turns on the app's developer tools, which provide access to the inner workings of the app and additional logging."
+
+const DEV_TITLE = 'Developer Only (unstable)'
+
+type Props = {|
+  checkUpdate: () => void,
+|}
+
+export function AdvancedSettingsCard(props: Props): React.Node {
+  const useTrashSurfaceForTipCal = useSelector(
+    Config.getUseTrashSurfaceForTipCal
+  )
+  const devToolsOn = useSelector(Config.getDevtoolsEnabled)
+  const devInternalFlags = useSelector(Config.getFeatureFlags)
+  const channel = useSelector(Config.getUpdateChannel)
+  const channelOptions: Array<DropdownOption> = useSelector(
+    Config.getUpdateChannelOptions
+  )
+  const dispatch = useDispatch<Dispatch>()
+
+  const toggleUseTrashForTipCal = () =>
+    dispatch(Calibration.toggleUseTrashSurfaceForTipCal())
+  const toggleDevtools = () => dispatch(Config.toggleDevtools())
+  const toggleDevInternalFlag = (flag: DevInternalFlag) =>
+    dispatch(Config.toggleDevInternalFlag(flag))
+  const handleChannel = event =>
+    dispatch(Config.updateConfigValue('update.channel', event.target.value))
+
+  React.useEffect(props.checkUpdate, [channel])
+
   return (
     <>
       <Card title={TITLE}>
+        {devInternalFlags?.enableCalibrationOverhaul &&
+          useTrashSurfaceForTipCal != null && (
+            <LabeledToggle
+              data-test="useTrashSurfaceForTipCalToggle"
+              label={USE_TRASH_SURFACE_TIP_CAL_LABEL}
+              toggledOn={useTrashSurfaceForTipCal}
+              onClick={toggleUseTrashForTipCal}
+            >
+              <p>{USE_TRASH_SURFACE_TIP_CAL_BODY}</p>
+            </LabeledToggle>
+          )}
         <LabeledSelect
-          label="Update Channel"
-          value={props.channel}
-          options={props.channelOptions}
-          onChange={props.handleChannel}
+          data-test="updateChannelSetting"
+          label={UPDATE_CHANNEL_LABEL}
+          value={channel}
+          options={channelOptions}
+          onChange={handleChannel}
         >
-          <p>
-            Sets the update channel of your app. &quot;Stable&quot; receives the
-            latest stable releases. &quot;Beta&quot; is updated more frequently
-            so you can try out new features, but the releases may be less well
-            tested than &quot;Stable&quot;.
-          </p>
+          <p>{UPDATE_CHANNEL_BODY}</p>
         </LabeledSelect>
         <LabeledToggle
-          label="Enable Developer Tools"
-          toggledOn={props.devToolsOn}
-          onClick={props.toggleDevTools}
+          data-test="enableDevToolsToggle"
+          label={ENABLE_DEV_TOOLS_LABEL}
+          toggledOn={devToolsOn}
+          onClick={toggleDevtools}
         >
-          <p>
-            Requires restart. Turns on the app&#39;s developer tools, which
-            provide access to the inner workings of the app and additional
-            logging.
-          </p>
+          <p>{ENABLE_DEV_TOOLS_BODY}</p>
         </LabeledToggle>
-        <LabeledButton
-          label="Manually Add Robot Network Addresses"
-          buttonProps={{
-            Component: Link,
-            children: 'manage',
-            to: `${props.match.url}/add-ip`,
-          }}
-        >
-          <p>
-            If your app is unable to automatically discover your robot, you can
-            manually add its IP address or hostname here
-          </p>
-        </LabeledButton>
-        {props.devToolsOn &&
-          DEV_INTERNAL_FLAGS.map(flag => (
+      </Card>
+      {devToolsOn && (
+        <Card title={DEV_TITLE}>
+          {Config.DEV_INTERNAL_FLAGS.map(flag => (
             <LabeledToggle
               key={flag}
+              data-test={`devInternalToggle${flag}`}
               label={`__DEV__ ${startCase(flag)}`}
-              toggledOn={Boolean(props.devInternal?.[flag])}
-              onClick={() => props.toggleDevInternalFlag(flag)}
+              toggledOn={Boolean(devInternalFlags?.[flag])}
+              onClick={() => toggleDevInternalFlag(flag)}
             />
           ))}
-      </Card>
-      <Route
-        path={`${props.match.path}/add-ip`}
-        render={() => <AddManualIp backUrl={props.match.url} />}
-      />
+        </Card>
+      )}
     </>
   )
-}
-
-function mapStateToProps(state: State): SP {
-  const config = getConfig(state)
-
-  return {
-    devToolsOn: config.devtools,
-    devInternal: config.devInternal,
-    channel: config.update.channel,
-    channelOptions: getUpdateChannelOptions(state),
-  }
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  return {
-    toggleDevTools: () => dispatch(toggleDevTools()),
-    toggleDevInternalFlag: (flag: DevInternalFlag) =>
-      dispatch(toggleDevInternalFlag(flag)),
-    handleChannel: event => {
-      dispatch(updateConfig('update.channel', event.target.value))
-
-      // TODO(mc, 2018-08-03): refactor app update interface to be more
-      // reactive and teach it to re-check on release channel change
-      setTimeout(ownProps.checkUpdate, 500)
-    },
-  }
 }

@@ -1,13 +1,14 @@
 // @flow
 import { combineReducers } from 'redux'
-import { handleActions, type ActionType } from 'redux-actions'
+import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 
-import * as actions from '../actions'
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
+
+import type { Reducer } from 'redux'
 import type { Action, DeckSlot } from '../../types'
 import type {
   SingleLabwareLiquidState,
@@ -17,26 +18,31 @@ import type {
 import type { LiquidGroupsById, DisplayLabware } from '../types'
 import type { LoadFileAction } from '../../load-file'
 import type {
-  RemoveWellsContents,
+  RemoveWellsContentsAction,
   CreateContainerAction,
-  DeleteLiquidGroup,
+  DeleteLiquidGroupAction,
   DuplicateLabwareAction,
   EditLiquidGroupAction,
   SelectLiquidAction,
   SetWellContentsAction,
   RenameLabwareAction,
+  DeleteContainerAction,
+  OpenAddLabwareModalAction,
+  OpenIngredientSelectorAction,
+  CloseIngredientSelectorAction,
+  DrillDownOnLabwareAction,
+  DrillUpFromLabwareAction,
 } from '../actions'
 
 // REDUCERS
 
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
-const modeLabwareSelection = handleActions(
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+const modeLabwareSelection: Reducer<DeckSlot | false, any> = handleActions(
   {
-    OPEN_ADD_LABWARE_MODAL: (
-      state,
-      action: ActionType<typeof actions.openAddLabwareModal>
-    ) => action.payload.slot,
+    OPEN_ADD_LABWARE_MODAL: (state, action: OpenAddLabwareModalAction) =>
+      action.payload.slot,
     CLOSE_LABWARE_SELECTOR: () => false,
     CREATE_CONTAINER: () => false,
   },
@@ -44,30 +50,33 @@ const modeLabwareSelection = handleActions(
 )
 
 export type SelectedContainerId = ?string
-const selectedContainerId = handleActions(
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   {
     OPEN_INGREDIENT_SELECTOR: (
       state,
-      action: ActionType<typeof actions.openIngredientSelector>
+      action: OpenIngredientSelectorAction
     ): SelectedContainerId => action.payload,
     CLOSE_INGREDIENT_SELECTOR: (
       state,
-      action: ActionType<typeof actions.closeIngredientSelector>
+      action: CloseIngredientSelectorAction
     ): SelectedContainerId => null,
   },
   null
 )
 
 export type DrillDownLabwareId = ?string
-const drillDownLabwareId = handleActions(
+
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+const drillDownLabwareId: Reducer<DrillDownLabwareId, any> = handleActions(
   {
     DRILL_DOWN_ON_LABWARE: (
       state,
-      action: ActionType<typeof actions.drillDownOnLabware>
+      action: DrillDownOnLabwareAction
     ): DrillDownLabwareId => action.payload,
     DRILL_UP_FROM_LABWARE: (
       state,
-      action: ActionType<typeof actions.drillUpFromLabware>
+      action: DrillUpFromLabwareAction
     ): DrillDownLabwareId => null,
   },
   null
@@ -107,7 +116,8 @@ const initialLabwareState: ContainersState = {
   },
 }
 
-export const containers = handleActions<ContainersState, *>(
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+export const containers: Reducer<ContainersState, any> = handleActions(
   {
     CREATE_CONTAINER: (
       state: ContainersState,
@@ -123,7 +133,7 @@ export const containers = handleActions<ContainersState, *>(
     },
     DELETE_CONTAINER: (
       state: ContainersState,
-      action: ActionType<typeof actions.deleteContainer>
+      action: DeleteContainerAction
     ): ContainersState =>
       pickBy(
         state,
@@ -192,13 +202,14 @@ export const containers = handleActions<ContainersState, *>(
   initialLabwareState
 )
 
-type SavedLabwareState = { [labwareId: string]: boolean }
+type SavedLabwareState = { [labwareId: string]: boolean, ... }
 /** Keeps track of which labware have saved nicknames */
-export const savedLabware = handleActions<SavedLabwareState, *>(
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
   {
     DELETE_CONTAINER: (
       state: SavedLabwareState,
-      action: ActionType<typeof actions.deleteContainer>
+      action: DeleteContainerAction
     ) => ({
       ...state,
       [action.payload.labwareId]: false,
@@ -226,7 +237,9 @@ export const savedLabware = handleActions<SavedLabwareState, *>(
 )
 
 export type IngredientsState = LiquidGroupsById
-export const ingredients = handleActions<IngredientsState, *>(
+
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+export const ingredients: Reducer<IngredientsState, any> = handleActions(
   {
     EDIT_LIQUID_GROUP: (
       state: IngredientsState,
@@ -240,7 +253,7 @@ export const ingredients = handleActions<IngredientsState, *>(
     },
     DELETE_LIQUID_GROUP: (
       state: IngredientsState,
-      action: DeleteLiquidGroup
+      action: DeleteLiquidGroupAction
     ): IngredientsState => {
       const liquidGroupId = action.payload
       return omit(state, liquidGroupId)
@@ -255,7 +268,7 @@ export const ingredients = handleActions<IngredientsState, *>(
 
 type LocationsState = LabwareLiquidState
 
-export const ingredLocations = handleActions<LocationsState, *>(
+export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   {
     SET_WELL_CONTENTS: (
       state: LocationsState,
@@ -295,7 +308,7 @@ export const ingredLocations = handleActions<LocationsState, *>(
     },
     REMOVE_WELLS_CONTENTS: (
       state: LocationsState,
-      action: RemoveWellsContents
+      action: RemoveWellsContentsAction
     ): LocationsState => {
       const { wells, labwareId } = action.payload
       return {
@@ -307,7 +320,7 @@ export const ingredLocations = handleActions<LocationsState, *>(
     },
     DELETE_LIQUID_GROUP: (
       state: LocationsState,
-      action: DeleteLiquidGroup
+      action: DeleteLiquidGroupAction
     ): LocationsState => {
       const liquidGroupId = action.payload
       return mapValues(state, labwareContents =>
@@ -316,7 +329,7 @@ export const ingredLocations = handleActions<LocationsState, *>(
     },
     DELETE_CONTAINER: (
       state: LocationsState,
-      action: ActionType<typeof actions.deleteContainer>
+      action: DeleteContainerAction
     ): LocationsState => omit(state, action.payload.labwareId),
     LOAD_FILE: (
       state: LocationsState,
@@ -327,7 +340,7 @@ export const ingredLocations = handleActions<LocationsState, *>(
 )
 
 export type RootState = {|
-  modeLabwareSelection: ?DeckSlot,
+  modeLabwareSelection: DeckSlot | false,
   selectedContainerId: SelectedContainerId,
   drillDownLabwareId: DrillDownLabwareId,
   containers: ContainersState,
@@ -338,7 +351,7 @@ export type RootState = {|
 |}
 
 // TODO Ian 2018-01-15 factor into separate files
-export const rootReducer = combineReducers<_, Action>({
+export const rootReducer: Reducer<RootState, Action> = combineReducers({
   modeLabwareSelection,
   selectedContainerId,
   selectedLiquidGroup,

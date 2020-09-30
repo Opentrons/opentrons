@@ -13,7 +13,7 @@ export type TagsProps = {|
   className?: string,
 |}
 
-export function Tags(props: TagsProps) {
+export function Tags(props: TagsProps): React.Node {
   const { definition, className } = props
   const tags = definition.metadata.tags || []
 

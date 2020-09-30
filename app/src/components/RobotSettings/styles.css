@@ -59,8 +59,7 @@
 }
 
 .connection_label {
-  @apply --font-body-1-dark;
-
+  font-size: var(--fs-body-1);
   font-weight: var(--fw-semibold);
   padding-bottom: 0.25rem;
 }
@@ -81,11 +80,6 @@
   color: var(--c-font-disabled);
 }
 
-.file_input {
-  position: fixed;
-  clip: rect(1px 1px 1px 1px);
-}
-
 .restart_banner_message {
   display: flex;
 
@@ -93,4 +87,8 @@
     max-width: 24rem;
     margin-right: auto;
   }
+}
+
+.confirm_start_deck_cal_modal {
+  padding: 4rem 2rem;
 }

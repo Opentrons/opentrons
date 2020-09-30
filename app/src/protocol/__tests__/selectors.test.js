@@ -66,7 +66,7 @@ const SPECS = [
     expected: 'proto',
   },
   {
-    name: 'getProtocolName from metadata',
+    name: 'getProtocolName from Python metadata',
     selector: protocol.getProtocolName,
     state: {
       protocol: {
@@ -78,16 +78,46 @@ const SPECS = [
     expected: 'A Protocol',
   },
   {
+    name: 'getProtocolName from empty JSON',
+    selector: protocol.getProtocolName,
+    state: {
+      protocol: {
+        file: { name: 'proto.json' },
+        contents: 'fizzbuzz',
+        data: {},
+      },
+    },
+    expected: 'proto',
+  },
+  {
+    name: 'getProtocolName from JSON Protocol >=v3 metadata',
+    selector: protocol.getProtocolName,
+    state: {
+      protocol: {
+        file: { name: 'proto.json' },
+        contents: 'fizzbuzz',
+        data: { metadata: { protocolName: 'A Protocol' } },
+      },
+    },
+    expected: 'A Protocol',
+  },
+  {
     name: 'getProtocolAuthor if no data',
     selector: protocol.getProtocolAuthor,
     state: { protocol: { data: null } },
-    expected: undefined,
+    expected: null,
+  },
+  {
+    name: 'getProtocolAuthor if no metadata',
+    selector: protocol.getProtocolAuthor,
+    state: { protocol: { data: {} } },
+    expected: null,
   },
   {
     name: 'getProtocolAuthor if author not in metadata',
     selector: protocol.getProtocolAuthor,
     state: { protocol: { data: { metadata: {} } } },
-    expected: undefined,
+    expected: null,
   },
   {
     name: 'getProtocolAuthor if author in metadata',
@@ -99,13 +129,19 @@ const SPECS = [
     name: 'getProtocolDescription if no data',
     selector: protocol.getProtocolDescription,
     state: { protocol: { data: null } },
-    expected: undefined,
+    expected: null,
+  },
+  {
+    name: 'getProtocolDescription if no metaddata',
+    selector: protocol.getProtocolDescription,
+    state: { protocol: { data: {} } },
+    expected: null,
   },
   {
     name: 'getProtocolDescription if description not in metadata',
     selector: protocol.getProtocolDescription,
     state: { protocol: { data: { metadata: {} } } },
-    expected: undefined,
+    expected: null,
   },
   {
     name: 'getProtocolDescription if description in metadata',
@@ -116,16 +152,10 @@ const SPECS = [
     expected: 'Fizzes buzzes',
   },
   {
-    name: 'getProtocolLastUpdated falls back to file if no data',
-    selector: protocol.getProtocolDescription,
-    state: { protocol: { file: { lastModifieddata: null } } },
-    expected: undefined,
-  },
-  {
     name: 'getProtocolDescription if description not in metadata',
     selector: protocol.getProtocolDescription,
     state: { protocol: { data: { metadata: {} } } },
-    expected: undefined,
+    expected: null,
   },
   {
     name: 'getProtocolDescription if description in metadata',
@@ -145,6 +175,17 @@ const SPECS = [
     name: 'getProtocolLastUpdated from file.lastModified',
     selector: protocol.getProtocolLastUpdated,
     state: { protocol: { file: { lastModified: 1 } } },
+    expected: 1,
+  },
+  {
+    name: 'getProtocolLastUpdated with data but no metadata',
+    selector: protocol.getProtocolLastUpdated,
+    state: {
+      protocol: {
+        file: { lastModified: 1 },
+        data: {},
+      },
+    },
     expected: 1,
   },
   {
@@ -168,6 +209,17 @@ const SPECS = [
       },
     },
     expected: 3,
+  },
+  {
+    name: 'getProtocolLastUpdated from >= v3 JSON protocol',
+    selector: protocol.getProtocolLastUpdated,
+    state: {
+      protocol: {
+        file: { lastModified: 1 },
+        data: { metadata: { created: 2, lastModified: 4 } },
+      },
+    },
+    expected: 4,
   },
   {
     name: 'getProtocolApiVersion returns null if null in state',
@@ -278,6 +330,142 @@ const SPECS = [
       },
     },
     expected: 'Protocol Designer v1.2.3',
+  },
+  {
+    name:
+      'getProtocolMethod if >= v3 JSON file read with name and version in data',
+    selector: protocol.getProtocolMethod,
+    state: {
+      robot: { session: { apiLevel: [1, 0] } },
+      protocol: {
+        file: { name: 'proto.json', type: 'json' },
+        contents: 'fizzbuzz',
+        data: {
+          metadata: {},
+          designerApplication: {
+            name: 'opentrons/protocol-designer',
+            version: '4.5.6',
+          },
+        },
+      },
+    },
+    expected: 'Protocol Designer v4.5.6',
+  },
+  {
+    name: 'getLabwareDefBySlot returns empty object by default',
+    selector: protocol.getLabwareDefBySlot,
+    state: {
+      robot: { session: { apiLevel: [1, 0] } },
+      protocol: {
+        file: { name: 'proto.json', type: 'json' },
+        contents: 'fizzbuzz',
+        data: null,
+      },
+    },
+    expected: {},
+  },
+  {
+    name: 'getLabwareDefBySlot returns empty object with invalid data',
+    selector: protocol.getLabwareDefBySlot,
+    state: {
+      robot: { session: { apiLevel: [1, 0] } },
+      protocol: {
+        file: { name: 'proto.json', type: 'json' },
+        contents: 'fizzbuzz',
+        data: { labwareDefinitions: {} },
+      },
+    },
+    expected: {},
+  },
+  {
+    name: 'getLabwareDefBySlot with JSON protocol without modules (v3)',
+    selector: protocol.getLabwareDefBySlot,
+    state: {
+      robot: { session: { apiLevel: [1, 0] } },
+      protocol: {
+        file: { name: 'proto.json', type: 'json' },
+        contents: 'fizzbuzz',
+        data: {
+          metadata: {},
+          labware: {
+            'labware-id-1': { slot: '1', definitionId: 'labware-def-1' },
+            'labware-id-2': { slot: '2', definitionId: 'labware-def-2' },
+          },
+          labwareDefinitions: {
+            'labware-def-1': { mockDefinition1: true },
+            'labware-def-2': { mockDefinition2: true },
+          },
+        },
+      },
+    },
+    expected: {
+      '1': { mockDefinition1: true },
+      '2': { mockDefinition2: true },
+    },
+  },
+  {
+    name: 'getLabwareDefBySlot with JSON protocol that includes modules (>=v4)',
+    selector: protocol.getLabwareDefBySlot,
+    state: {
+      robot: { session: { apiLevel: [1, 0] } },
+      protocol: {
+        file: { name: 'proto.json', type: 'json' },
+        contents: 'fizzbuzz',
+        data: {
+          metadata: {},
+          labware: {
+            'labware-id-1': { slot: '1', definitionId: 'labware-def-1' },
+            'labware-id-2': {
+              slot: 'module-id-1',
+              definitionId: 'labware-def-2',
+            },
+          },
+          modules: {
+            'module-id-1': { slot: '2' },
+          },
+          labwareDefinitions: {
+            'labware-def-1': { mockDefinition1: true },
+            'labware-def-2': { mockDefinition2: true },
+          },
+        },
+      },
+    },
+    expected: {
+      '1': { mockDefinition1: true },
+      '2': { mockDefinition2: true },
+    },
+  },
+  {
+    name: 'getLabwareDefBySlot with JSON protocol that includes thermocycler',
+    selector: protocol.getLabwareDefBySlot,
+    state: {
+      robot: { session: { apiLevel: [1, 0] } },
+      protocol: {
+        file: { name: 'proto.json', type: 'json' },
+        contents: 'fizzbuzz',
+        data: {
+          metadata: {},
+          labware: {
+            'labware-id-1': { slot: '1', definitionId: 'labware-def-1' },
+            'labware-id-2': {
+              slot: 'thermocycler-id-1',
+              definitionId: 'labware-def-2',
+            },
+          },
+          modules: {
+            'thermocycler-id-1': { slot: 'span7_8_10_11' },
+          },
+          labwareDefinitions: {
+            'labware-def-1': { mockDefinition1: true },
+            'labware-def-2': { mockDefinition2: true },
+          },
+        },
+      },
+    },
+    expected: {
+      '1': { mockDefinition1: true },
+      '7': { mockDefinition2: true },
+    },
   },
 ]
 

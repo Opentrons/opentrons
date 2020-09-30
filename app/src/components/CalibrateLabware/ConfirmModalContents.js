@@ -18,9 +18,14 @@ type SP = {| calibrator: ?Pipette, useCenteredTroughs: boolean |}
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export const ConfirmModalContents = connect<Props, OP, SP, {||}, _, _>(
-  mapStateToProps
-)(ConfirmModalContentsComponent)
+export const ConfirmModalContents: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  {||},
+  _,
+  _
+>(mapStateToProps)(ConfirmModalContentsComponent)
 
 function ConfirmModalContentsComponent(props: Props) {
   const { labware, calibrator, calibrateToBottom, useCenteredTroughs } = props
@@ -47,7 +52,7 @@ function ConfirmModalContentsComponent(props: Props) {
     case 'picking-up':
     case 'dropping-tip':
     case 'confirming':
-      return <InProgressContents {...props} />
+      return <InProgressContents />
 
     default:
       return null

@@ -6,9 +6,7 @@ describe('Desktop Navigation', () => {
 
   describe('the setup form', () => {
     it('displays the announcement modal and clicks "GOT IT!" to close it', () => {
-      cy.get('button')
-        .contains('Got It!')
-        .click()
+      cy.closeAnnouncementModal()
     })
 
     it('clicks the "CREATE NEW" button', () => {
@@ -100,15 +98,6 @@ describe('Desktop Navigation', () => {
       cy.get("select[name*='right.tiprack']").select(
         'Opentrons 96 Filter Tip Rack 20 µL'
       )
-      // Diagrams of the tip racks are displayed
-      cy.get("div[class*='FilePipettesModal__tiprack_labware__']")
-        .first()
-        .get('svg')
-        .should('exist')
-      cy.get("div[class*='FilePipettesModal__tiprack_labware__']")
-        .last()
-        .get('svg')
-        .should('exist')
       // The save button is now available...
       cy.get('button')
         .contains('save')
@@ -159,15 +148,9 @@ describe('Desktop Navigation', () => {
         .next()
         .contains('Opentrons 96 Filter Tip Rack 20 µL')
         .should('exist')
-      cy.get('button')
-        .contains('edit')
-        .should('exist')
-      cy.get('button')
-        .contains('swap')
-        .should('exist')
-      cy.get('button')
-        .contains('Continue to Liquids')
-        .should('exist')
+      cy.get("button[name='editPipettes']").should('exist')
+      cy.get("button[name='swapPipettes']").should('exist')
+      cy.get("button[name='continueToLiquids']").should('exist')
     })
 
     it('fills out the file details form', () => {
@@ -197,7 +180,7 @@ describe('Desktop Navigation', () => {
           .should('have.prop', 'href')
           .and(
             'equal',
-            'https://intercom.help/opentrons-protocol-designer/en/collections/1606688-building-a-protocol#steps'
+            'https://support.opentrons.com/en/collections/493886-protocol-designer#building-a-protocol-steps'
           )
         // And buttons to get out
         cy.get('button')
@@ -237,9 +220,7 @@ describe('Desktop Navigation', () => {
   describe('editing the pipettes', () => {
     // Use the edit button to make changes to our pipettes
     it('edits the pipettes', () => {
-      cy.get('button')
-        .contains('edit')
-        .click()
+      cy.get("button[name='editPipettes']").click()
       cy.contains('Right Pipette')
         .next()
         .contains('P300')
@@ -284,9 +265,7 @@ describe('Desktop Navigation', () => {
 
     it('edits the pipettes again', () => {
       // Same edits as above
-      cy.get('button')
-        .contains('edit')
-        .click()
+      cy.get("button[name='editPipettes']").click()
       cy.contains('Right Pipette')
         .next()
         .contains('P300')
@@ -365,9 +344,7 @@ describe('Desktop Navigation', () => {
   describe('pipette swapping', () => {
     it('swaps the pipettes', () => {
       // Click the swap button
-      cy.get('button')
-        .contains('swap')
-        .click()
+      cy.get("button[name='swapPipettes']").click()
       // What was left is now right and vice versa
       cy.contains('left pipette')
         .next()
@@ -397,9 +374,7 @@ describe('Desktop Navigation', () => {
   describe('the new liquid form', () => {
     it('displays the new liquid form', () => {
       // Check to make sure all the form elements are present
-      cy.get('button')
-        .contains('Continue to Liquids')
-        .click()
+      cy.get("button[name='continueToLiquids']").click()
       cy.get('button')
         .contains('New Liquid')
         .should('exist')
@@ -434,6 +409,7 @@ describe('Desktop Navigation', () => {
       cy.contains('Liquid name is required').should('not.exist')
       // Fill out the rest of the form
       cy.get("input[name='description']").type('It is just water')
+      // force option used because checkbox is hidden
       cy.get("input[name='serialize']").check({ force: true })
       cy.get('button')
         .contains('save')

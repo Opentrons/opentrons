@@ -1,108 +1,67 @@
 // @flow
-import type { LogLevel } from '../logger'
+import typeof {
+  INITIALIZED,
+  VALUE_UPDATED,
+  UPDATE_VALUE,
+  RESET_VALUE,
+  TOGGLE_VALUE,
+  ADD_UNIQUE_VALUE,
+  SUBTRACT_VALUE,
+} from './constants'
 
-export type UrlProtocol = 'file:' | 'http:'
+import type { Config } from './schema-types'
+export type * from './schema-types'
 
-export type UpdateChannel = 'latest' | 'beta' | 'alpha'
+export type ConfigState = Config | null
 
-export type DiscoveryCandidates = string | Array<string>
+export type ConfigInitializedAction = {|
+  type: INITIALIZED,
+  payload: {| config: Config |},
+|}
 
-export type DevInternalFlag =
-  | 'allPipetteConfig'
-  | 'enableBundleUpload'
-  | 'enableRobotCalCheck'
-
-export type FeatureFlags = $Shape<{|
-  [DevInternalFlag]: boolean | void,
-|}>
-
-export type Config = {
-  devtools: boolean,
-  reinstallDevtools: boolean,
-
-  // app update config
-  update: {
-    channel: UpdateChannel,
-  },
-
-  // robot update config
-  buildroot: {
-    manifestUrl: string,
-  },
-
-  // logging config
-  log: {
-    level: {
-      file: LogLevel,
-      console: LogLevel,
-    },
-  },
-
-  // ui and browser config
-  ui: {
-    width: number,
-    height: number,
-    url: {
-      protocol: UrlProtocol,
-      path: string,
-    },
-    webPreferences: {
-      webSecurity: boolean,
-    },
-  },
-
-  analytics: {
-    appId: string,
-    optedIn: boolean,
-    seenOptIn: boolean,
-  },
-
-  // deprecated; remove with first migration
-  p10WarningSeen: {
-    [id: string]: ?boolean,
-  },
-
-  support: {
-    userId: string,
-    createdAt: number,
-    name: string,
-    email: ?string,
-  },
-
-  discovery: {
-    candidates: DiscoveryCandidates,
-  },
-
-  // custom labware files
-  labware: {
-    directory: string,
-  },
-
-  // internal development flags
-  devInternal?: FeatureFlags,
-}
-
-export type UpdateConfigAction = {|
-  type: 'config:UPDATE',
+export type ConfigValueUpdatedAction = {|
+  type: VALUE_UPDATED,
   payload: {| path: string, value: any |},
+|}
+
+export type UpdateConfigValueAction = {|
+  type: UPDATE_VALUE,
+  payload: {| path: string, value: mixed |},
   meta: {| shell: true |},
 |}
 
-export type ResetConfigAction = {|
-  type: 'config:RESET',
+export type ResetConfigValueAction = {|
+  type: RESET_VALUE,
   payload: {| path: string |},
   meta: {| shell: true |},
 |}
 
-export type SetConfigAction = {|
-  type: 'config:SET',
-  payload: {|
-    path: string,
-    value: any,
-  |},
+export type ToggleConfigValueAction = {|
+  type: TOGGLE_VALUE,
+  payload: {| path: string |},
+  meta: {| shell: true |},
 |}
 
+export type AddUniqueConfigValueAction = {|
+  type: ADD_UNIQUE_VALUE,
+  payload: {| path: string, value: mixed |},
+  meta: {| shell: true |},
+|}
+
+export type SubtractConfigValueAction = {|
+  type: SUBTRACT_VALUE,
+  payload: {| path: string, value: mixed |},
+  meta: {| shell: true |},
+|}
+
+export type ConfigValueChangeAction =
+  | UpdateConfigValueAction
+  | ResetConfigValueAction
+  | ToggleConfigValueAction
+  | AddUniqueConfigValueAction
+  | SubtractConfigValueAction
+
 export type ConfigAction =
-  | UpdateConfigAction
-  | ResetConfigAction
-  | SetConfigAction
+  | ConfigValueChangeAction
+  | ConfigValueUpdatedAction
+  | ConfigInitializedAction

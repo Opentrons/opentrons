@@ -1,6 +1,5 @@
 // @flow
 import mapValues from 'lodash/mapValues'
-import * as componentLib from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -20,18 +19,6 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
-// TODO Ian 2018-11-27: import these from components lib, not from this constants file
-export const {
-  // OT2 DECK CONSTANTS
-  SLOTNAME_MATRIX,
-  sortedSlotnames,
-  TRASH_SLOTNAME,
-  SLOT_SPACING_MM,
-  // STYLE CONSTANTS
-  swatchColors,
-  // SPECIAL SELECTORS
-  SELECTABLE_WELL_CLASS,
-} = componentLib
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
@@ -85,6 +72,10 @@ export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
 export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
 export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
 
+export const AIR_GAP_OFFSET_FROM_TOP = 1
+
+export const DEFAULT_DELAY_SECONDS = 1
+
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
 
@@ -93,8 +84,17 @@ export const MAX_ENGAGE_HEIGHT_V1 = 40
 export const MIN_ENGAGE_HEIGHT_V2 = -4
 export const MAX_ENGAGE_HEIGHT_V2 = 19
 
-export const MIN_TEMP_MODULE_TEMP = 0
+export const MIN_TEMP_MODULE_TEMP = 4
 export const MAX_TEMP_MODULE_TEMP = 95
+
+export const MIN_TC_BLOCK_TEMP = 4
+export const MAX_TC_BLOCK_TEMP = 99
+
+export const MIN_TC_LID_TEMP = 37
+export const MAX_TC_LID_TEMP = 110
+
+export const MIN_TC_DURATION_SECONDS = 0
+export const MAX_TC_DURATION_SECONDS = 60
 
 // Temperature statuses
 export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =
@@ -155,6 +155,16 @@ export const MODULES_WITH_COLLISION_ISSUES = [
   TEMPERATURE_MODULE_V1,
 ]
 
+// Values for pauseAction field
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'
 export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
 export const PAUSE_UNTIL_TEMP: 'untilTemperature' = 'untilTemperature'
+
+export const DND_TYPES = {
+  LABWARE: 'LABWARE',
+  STEP_ITEM: 'STEP_ITEM',
+}
+
+// Values for TC fields
+export const THERMOCYCLER_STATE: 'thermocyclerState' = 'thermocyclerState'
+export const THERMOCYCLER_PROFILE: 'thermocyclerProfile' = 'thermocyclerProfile'

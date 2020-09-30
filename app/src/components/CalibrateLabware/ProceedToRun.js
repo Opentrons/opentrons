@@ -1,6 +1,6 @@
 // @flow
 // info panel for labware calibration page
-import React, { useState, useEffect } from 'react'
+import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { push } from 'connected-react-router'
 import { PrimaryButton, AlertModal, SpinnerModal } from '@opentrons/components'
@@ -8,7 +8,7 @@ import some from 'lodash/some'
 
 import { selectors as robotSelectors } from '../../robot'
 import type { Dispatch } from '../../types'
-import pcrSealSrc from '../../img/place_pcr_seal.png'
+import pcrSealSrc from '../../assets/images/place_pcr_seal.png'
 import { Portal } from '../portal'
 import styles from './styles.css'
 import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
@@ -19,15 +19,15 @@ export type ProceedToRunProps = {|
   returnTip: () => mixed,
 |}
 
-export function ProceedToRun(props: ProceedToRunProps) {
+export function ProceedToRun(props: ProceedToRunProps): React.Node {
   const { returnTip } = props
   const dispatch = useDispatch<Dispatch>()
   const sessionModules = useSelector(robotSelectors.getModules)
   const inProgress = useSelector(robotSelectors.getReturnTipInProgress)
-  const [mustPrepForRun, setMustPrepForRun] = useState(false)
-  const [runPrepModalOpen, setRunPrepModalOpen] = useState(false)
+  const [mustPrepForRun, setMustPrepForRun] = React.useState(false)
+  const [runPrepModalOpen, setRunPrepModalOpen] = React.useState(false)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (
       some(
         sessionModules,

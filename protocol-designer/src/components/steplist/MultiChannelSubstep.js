@@ -25,21 +25,21 @@ type MultiChannelSubstepProps = {|
   selectSubstep: SubstepIdentifier => mixed,
 |}
 
-type MultiChannelSubstepState = {
+type MultiChannelSubstepState = {|
   collapsed: boolean,
-}
+|}
 
 export class MultiChannelSubstep extends React.PureComponent<
   MultiChannelSubstepProps,
   MultiChannelSubstepState
 > {
-  state = { collapsed: DEFAULT_COLLAPSED_STATE }
+  state: MultiChannelSubstepState = { collapsed: DEFAULT_COLLAPSED_STATE }
 
-  handleToggleCollapsed = () => {
+  handleToggleCollapsed: () => void = () => {
     this.setState({ collapsed: !this.state.collapsed })
   }
 
-  render() {
+  render(): React.Node {
     const {
       rowGroup,
       highlighted,
@@ -87,7 +87,7 @@ export class MultiChannelSubstep extends React.PureComponent<
             className={styles.inner_carat}
             onClick={this.handleToggleCollapsed}
           >
-            <Icon name={collapsed ? 'chevron-up' : 'chevron-down'} />
+            <Icon name={collapsed ? 'chevron-down' : 'chevron-up'} />
           </span>
         </PDListItem>
 

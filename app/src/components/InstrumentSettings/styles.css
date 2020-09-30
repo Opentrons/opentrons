@@ -21,7 +21,14 @@
   }
 }
 
-.pipette_display_name {
+.pipette_info_block {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pipette_info_element {
   width: min-content;
 }
 
@@ -34,6 +41,10 @@
 .right {
   & > div {
     order: 2;
+  }
+
+  & > .pipette_info_block {
+    margin-left: 0.5rem;
   }
 
   & > .image {

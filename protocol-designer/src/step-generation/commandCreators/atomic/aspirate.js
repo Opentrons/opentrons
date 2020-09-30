@@ -1,7 +1,10 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { modulePipetteCollision } from '../../utils'
+import {
+  modulePipetteCollision,
+  thermocyclerPipetteCollision,
+} from '../../utils'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
@@ -14,7 +17,7 @@ export const aspirate: CommandCreator<AspirateParams> = (
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
 
   const actionName = 'aspirate'
-  let errors: Array<CommandCreatorError> = []
+  const errors: Array<CommandCreatorError> = []
 
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
 
@@ -45,6 +48,16 @@ export const aspirate: CommandCreator<AspirateParams> = (
         well,
       })
     )
+  }
+
+  if (
+    thermocyclerPipetteCollision(
+      prevRobotState.modules,
+      prevRobotState.labware,
+      labware
+    )
+  ) {
+    errors.push(errorCreators.thermocyclerLidClosed())
   }
 
   if (errors.length === 0 && pipetteSpec && pipetteSpec.maxVolume < volume) {

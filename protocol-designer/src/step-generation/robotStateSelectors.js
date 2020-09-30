@@ -4,13 +4,19 @@ import assert from 'assert'
 import { orderWells } from '../steplist/utils/orderWells.js'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
-import { getTiprackVolume } from '@opentrons/shared-data'
+import {
+  getTiprackVolume,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from './'
-import type { ModuleTemporalProperties } from '../step-forms'
+import type {
+  ModuleTemporalProperties,
+  ThermocyclerModuleState,
+} from '../step-forms'
 
 export function sortLabwareBySlot(
   labwareState: $PropertyType<RobotState, 'labware'>
-) {
+): Array<string> {
   return sortBy<string>(Object.keys(labwareState), (id: string) =>
     parseInt(labwareState[id].slot)
   )
@@ -139,10 +145,21 @@ export function getModuleState(
   robotState: RobotState,
   module: string
 ): $PropertyType<ModuleTemporalProperties, 'moduleState'> {
-  console.warn(
-    module in robotState.modules,
-    `getModuleState expected module id "${module}"`
-  )
+  if (!(module in robotState.modules)) {
+    console.warn(
+      `getModuleState expected module id "${module}" to be in robot state`
+    )
+  }
 
   return robotState.modules[module]?.moduleState
+}
+
+export const thermocyclerStateGetter = (
+  robotState: RobotState,
+  moduleId: string
+): ThermocyclerModuleState | null => {
+  const hardwareModule = robotState.modules[moduleId]?.moduleState
+  return hardwareModule && hardwareModule.type === THERMOCYCLER_MODULE_TYPE
+    ? hardwareModule
+    : null
 }

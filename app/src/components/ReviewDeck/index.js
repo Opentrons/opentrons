@@ -1,6 +1,6 @@
 // @flow
 // deck review modal for labware calibration page
-import React, { useState } from 'react'
+import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import some from 'lodash/some'
 import { PrimaryButton, AlertModal } from '@opentrons/components'
@@ -10,7 +10,7 @@ import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import secureTCLatchSrc from '../../img/secure_tc_latch.png'
+import secureTCLatchSrc from '../../assets/images/secure_tc_latch.png'
 import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
 
 import { Portal } from '../portal'
@@ -20,7 +20,7 @@ import styles from './styles.css'
 
 export type ReviewDeckProps = {| slot: ?string |}
 
-export function ReviewDeck(props: ReviewDeckProps) {
+export function ReviewDeck(props: ReviewDeckProps): React.Node {
   const { slot } = props
 
   const dispatch = useDispatch<Dispatch>()
@@ -28,7 +28,9 @@ export function ReviewDeck(props: ReviewDeckProps) {
   const calibratorMount = useSelector(robotSelectors.getCalibratorMount)
   const sessionModules = useSelector(robotSelectors.getModules)
 
-  const [isPrepNestedLabwareOpen, setIsPrepNestedLabwareOpen] = useState(false)
+  const [isPrepNestedLabwareOpen, setIsPrepNestedLabwareOpen] = React.useState(
+    false
+  )
 
   const mustPrepNestedLabware = some(
     sessionModules,

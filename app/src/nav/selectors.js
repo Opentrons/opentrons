@@ -2,10 +2,15 @@
 import { createSelector } from 'reselect'
 
 import { getConnectedRobot } from '../discovery'
-import { getProtocolPipettesMatch } from '../pipettes'
+import {
+  getProtocolPipettesMatching,
+  getProtocolPipettesCalibrated,
+} from '../pipettes'
 import { selectors as RobotSelectors } from '../robot'
-import { getBuildrootUpdateAvailable } from '../buildroot'
+import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
+import { getU2EWindowsDriverStatus, OUTDATED } from '../system-info'
+import { getFeatureFlags } from '../config'
 
 import type { State } from '../types'
 import type { NavLocation } from './types'
@@ -15,7 +20,7 @@ const ROBOT = 'Robot'
 const PROTOCOL = 'Protocol'
 const CALIBRATE = 'Calibrate'
 const RUN = 'Run'
-const MORE = 'More'
+export const MORE = 'More'
 
 const PLEASE_CONNECT_TO_A_ROBOT = 'Please connect to a robot to proceed'
 const PLEASE_LOAD_A_PROTOCOL = 'Please load a protocol to proceed'
@@ -23,6 +28,8 @@ const PLEASE_LOAD_A_RUNNABLE_PROTOCOL =
   'Please load a protocol with runnable steps to proceed'
 const ATTACHED_PIPETTES_DO_NOT_MATCH =
   'Attached pipettes do not match pipettes specified in loaded protocol'
+const PIPETTES_NOT_CALIBRATED =
+  'Please calibrate all pipettes specified in loaded protocol to proceed'
 const CANNOT_UPLOAD_A_NEW_PROTOCOL_WHILE_RUNNING =
   'Cannot upload a new protocol while a run is in progress'
 const CANNOT_CALIBRATE_WHILE_RUNNING =
@@ -31,38 +38,46 @@ const PLEASE_RESET_PROTOCOL =
   'Please reset your protocol run before re-calibrating'
 
 const APP_UPDATE_AVAILABLE = 'An app update is available'
+const DRIVER_UPDATE_AVAILABLE = 'A driver update is available'
 const ROBOT_UPDATE_AVAILABLE = 'A robot software update is available'
 
-const getConnectedRobotPipettesMatch: State => boolean = createSelector(
-  state => state,
-  getConnectedRobot,
-  (state, connectedRobot) =>
-    connectedRobot
-      ? getProtocolPipettesMatch(state, connectedRobot.name)
-      : false
-)
+const getConnectedRobotPipettesMatch = (state: State): boolean => {
+  const connectedRobot = getConnectedRobot(state)
 
-const getConnectedRobotUpdateAvailable: State => boolean = createSelector(
-  state => state,
-  getConnectedRobot,
-  (state, connectedRobot) => {
-    const robotUpdateType = connectedRobot
-      ? getBuildrootUpdateAvailable(state, connectedRobot)
-      : null
-    return robotUpdateType === 'upgrade'
-  }
-)
+  return connectedRobot
+    ? getProtocolPipettesMatching(state, connectedRobot.name)
+    : false
+}
+
+const getConnectedRobotPipettesCalibrated = (state: State): boolean => {
+  const connectedRobot = getConnectedRobot(state)
+
+  return connectedRobot
+    ? getProtocolPipettesCalibrated(state, connectedRobot.name)
+    : false
+}
+
+const getConnectedRobotUpdateAvailable = (state: State): boolean => {
+  const connectedRobot = getConnectedRobot(state)
+  const robotUpdateType = connectedRobot
+    ? getBuildrootUpdateAvailable(state, connectedRobot)
+    : null
+
+  return robotUpdateType === UPGRADE
+}
 
 const getRunDisabledReason: State => string | null = createSelector(
   getConnectedRobot,
   RobotSelectors.getSessionIsLoaded,
   RobotSelectors.getCommands,
   getConnectedRobotPipettesMatch,
-  (robot, loaded, commands, pipettesMatch) => {
+  getConnectedRobotPipettesCalibrated,
+  (robot, loaded, commands, pipettesMatch, pipettesCalibrated) => {
     if (!robot) return PLEASE_CONNECT_TO_A_ROBOT
     if (!loaded) return PLEASE_LOAD_A_PROTOCOL
     if (commands.length === 0) return PLEASE_LOAD_A_RUNNABLE_PROTOCOL
     if (!pipettesMatch) return ATTACHED_PIPETTES_DO_NOT_MATCH
+    if (!pipettesCalibrated) return PIPETTES_NOT_CALIBRATED
     return null
   }
 )
@@ -138,13 +153,24 @@ export const getRunLocation: State => NavLocation = createSelector(
 
 export const getMoreLocation: State => NavLocation = createSelector(
   getAvailableShellUpdate,
-  update => ({
-    id: 'more',
-    path: '/menu',
-    title: MORE,
-    iconName: 'dots-horizontal',
-    notificationReason: update ? APP_UPDATE_AVAILABLE : null,
-  })
+  getU2EWindowsDriverStatus,
+  getFeatureFlags,
+  (appUpdate, driverStatus, flags) => {
+    let notificationReason = null
+    if (appUpdate) {
+      notificationReason = APP_UPDATE_AVAILABLE
+    } else if (driverStatus === OUTDATED) {
+      notificationReason = DRIVER_UPDATE_AVAILABLE
+    }
+
+    return {
+      id: 'more',
+      path: '/more',
+      title: MORE,
+      iconName: 'dots-horizontal',
+      notificationReason,
+    }
+  }
 )
 
 export const getNavbarLocations: State => Array<NavLocation> = createSelector(

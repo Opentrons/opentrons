@@ -33,7 +33,9 @@ const RETIRED_LABWARE = [
   'eppendorf_96_tiprack_10ul_eptips',
 ]
 
-export const getLabwareDisplayName = (labwareDef: LabwareDefinition2) => {
+export const getLabwareDisplayName = (
+  labwareDef: LabwareDefinition2
+): string => {
   const { displayName } = labwareDef.metadata
 
   if (
@@ -69,17 +71,19 @@ export function getLabwareHasQuirk(
   return quirks ? quirks.includes(quirk) : false
 }
 
-export const intToAlphabetLetter = (i: number, lowerCase: boolean = false) =>
-  String.fromCharCode((lowerCase ? 96 : 65) + i)
+export const intToAlphabetLetter = (
+  i: number,
+  lowerCase: boolean = false
+): string => String.fromCharCode((lowerCase ? 96 : 65) + i)
 
 // These utils are great candidates for unit tests
 export const toWellName = ({
   rowNum,
   colNum,
-}: {
+}: {|
   rowNum: number,
   colNum: number,
-}) => String.fromCharCode(rowNum + 65) + (colNum + 1)
+|}): string => String.fromCharCode(rowNum + 65) + (colNum + 1)
 
 function _parseWell(well: string): [string, number] {
   const res = well.match(/([A-Z]+)(\d+)/)
@@ -134,6 +138,11 @@ export function splitWellsOnColumn(
   }, [])
 }
 
+export const getWellDepth = (
+  labwareDef: LabwareDefinition2,
+  well: string
+): number => labwareDef.wells[well].depth
+
 // NOTE: this is used in PD for converting "offset from top" to "mm from bottom".
 // Assumes all wells have same offset because multi-offset not yet supported.
 // TODO: Ian 2019-07-13 return {[string: well]: offset} to support multi-offset
@@ -141,7 +150,7 @@ export const getWellsDepth = (
   labwareDef: LabwareDefinition2,
   wells: Array<string>
 ): number => {
-  const offsets = wells.map(well => labwareDef.wells[well].depth)
+  const offsets = wells.map(well => getWellDepth(labwareDef, well))
   if (uniq(offsets).length !== 1) {
     console.warn(
       `expected wells ${JSON.stringify(

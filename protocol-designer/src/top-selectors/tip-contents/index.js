@@ -5,8 +5,11 @@ import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import { getWellSetForMultichannel } from '../../utils'
 import * as StepGeneration from '../../step-generation'
-import { allSubsteps as getAllSubsteps } from '../substeps'
-import { START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID } from '../../steplist'
+import {
+  START_TERMINAL_ITEM_ID,
+  END_TERMINAL_ITEM_ID,
+  PRESAVED_STEP_ID,
+} from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getActiveItem,
@@ -16,7 +19,7 @@ import {
 import { selectors as fileDataSelectors } from '../../file-data'
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { OutputSelector } from 'reselect'
 import type { BaseState, Selector } from '../../types'
 
@@ -118,7 +121,10 @@ export const getMissingTipsByLabwareId: Selector<{
       const terminalId = activeItem.id
       if (terminalId === START_TERMINAL_ITEM_ID) {
         robotState = initialRobotState
-      } else if (terminalId === END_TERMINAL_ITEM_ID) {
+      } else if (
+        terminalId === END_TERMINAL_ITEM_ID ||
+        terminalId === PRESAVED_STEP_ID
+      ) {
         robotState = lastValidRobotState
       } else {
         console.error(
@@ -167,7 +173,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
   getLastValidTips,
   getLabwareIdProp,
   getHoveredSubstep,
-  getAllSubsteps,
+  fileDataSelectors.getSubsteps,
   (
     orderedStepIds,
     invariantContext,
@@ -178,14 +184,17 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
     lastValidTips,
     labwareId,
     hoveredSubstepIdentifier,
-    allSubsteps
+    substepsById
   ) => {
     const labwareDef = invariantContext.labwareEntities[labwareId].def
     if (!activeItem.isStep) {
       const terminalId = activeItem.id
       if (terminalId === START_TERMINAL_ITEM_ID) {
         return initialTips
-      } else if (terminalId === END_TERMINAL_ITEM_ID) {
+      } else if (
+        terminalId === END_TERMINAL_ITEM_ID ||
+        terminalId === PRESAVED_STEP_ID
+      ) {
         return lastValidTips
       } else {
         console.error(
@@ -220,7 +229,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
       let highlighted = false
       if (hoveredSubstepIdentifier && currentFrame) {
         const { substepIndex } = hoveredSubstepIdentifier
-        const substepsForStep = allSubsteps[hoveredSubstepIdentifier.stepId]
+        const substepsForStep = substepsById[hoveredSubstepIdentifier.stepId]
 
         if (substepsForStep && substepsForStep.substepType === 'sourceDest') {
           if (substepsForStep.multichannel) {

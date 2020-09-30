@@ -20,7 +20,7 @@ const UPDATE_APP = (
   </>
 )
 
-export function UpdateAppMessage(props: VersionProps) {
+export function UpdateAppMessage(props: VersionProps): React.Node {
   const { appVersion, availableUpdate } = props
   const versionsMatch: boolean =
     semver.valid(appVersion) && semver.valid(availableUpdate)

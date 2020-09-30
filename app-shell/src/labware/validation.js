@@ -33,16 +33,16 @@ export function validateLabwareFiles(
   files: Array<UncheckedLabwareFile>
 ): Array<CheckedLabwareFile> {
   const validated = files.map<CheckedLabwareFile>(file => {
-    const { filename, data, created } = file
+    const { filename, data, modified } = file
 
     // check file against the schema
     const definition = data && validateLabwareDefinition(data)
 
     if (definition === null) {
-      return { filename, created, type: INVALID_LABWARE_FILE }
+      return { filename, modified, type: INVALID_LABWARE_FILE }
     }
 
-    const props = { filename, created, definition }
+    const props = { filename, modified, definition }
 
     return definition.namespace !== 'opentrons'
       ? ({ ...props, type: VALID_LABWARE_FILE }: ValidLabwareFile)
@@ -58,7 +58,7 @@ export function validateLabwareFiles(
 
       // if there are duplicates and this labware isn't the oldest one
       // mark it as a duplicate
-      if (duplicates.length > 1 && sortBy(duplicates, 'created')[0] !== v) {
+      if (duplicates.length > 1 && sortBy(duplicates, 'modified')[0] !== v) {
         return { type: DUPLICATE_LABWARE_FILE, ...props }
       }
     }

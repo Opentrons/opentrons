@@ -30,7 +30,7 @@ export type NavTabProps = {|
   selected?: boolean,
 |}
 
-export function NavTab(props: NavTabProps) {
+export function NavTab(props: NavTabProps): React.Node {
   const { url } = props
   const className = classnames(props.className, styles.tab, {
     [styles.disabled]: props.disabled,
@@ -59,7 +59,6 @@ export function NavTab(props: NavTabProps) {
         name={props.iconName}
         childName={props.notification ? 'circle' : null}
         className={styles.icon}
-        childClassName={styles.notification}
       />
       {props.title && <span className={styles.title}>{props.title}</span>}
     </Button>

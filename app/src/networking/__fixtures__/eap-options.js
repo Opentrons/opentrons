@@ -14,6 +14,7 @@ import {
   AUTH_TYPE_FILE,
 } from '../constants'
 
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type {
   WifiAuthField,
   EapOption,
@@ -47,10 +48,15 @@ export const mockEapOption: EapOption = {
   options: [mockEapStringField, mockEapPasswordField, mockEapFileField],
 }
 
-const { successMeta, failureMeta, success, failure } = makeResponseFixtures<
+const {
+  successMeta,
+  failureMeta,
+  success,
+  failure,
+}: ResponseFixtures<
   FetchEapOptionsResponse,
   {| message: string |}
->({
+> = makeResponseFixtures({
   method: GET,
   path: EAP_OPTIONS_PATH,
   successStatus: 200,

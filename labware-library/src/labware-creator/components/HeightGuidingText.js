@@ -2,7 +2,9 @@
 import * as React from 'react'
 import type { LabwareType } from '../fields'
 
-export const HeightGuidingText = (props: {| labwareType: ?LabwareType |}) => {
+export const HeightGuidingText = (props: {|
+  labwareType: ?LabwareType,
+|}): React.Node => {
   const { labwareType } = props
   const footer = (
     <p>

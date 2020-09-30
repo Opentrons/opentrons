@@ -30,7 +30,7 @@ export type RadioGroupProps = {|
   name?: string,
 |}
 
-export function RadioGroup(props: RadioGroupProps) {
+export function RadioGroup(props: RadioGroupProps): React.Node {
   const error = props.error != null
 
   const outerClassName = cx({

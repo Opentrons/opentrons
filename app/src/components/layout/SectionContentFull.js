@@ -8,7 +8,7 @@ export type SectionContentFullProps = {|
   className?: string,
 |}
 
-export function SectionContentFull(props: SectionContentFullProps) {
+export function SectionContentFull(props: SectionContentFullProps): React.Node {
   return (
     <div className={cx(styles.section_content_full, props.className)}>
       {props.children}

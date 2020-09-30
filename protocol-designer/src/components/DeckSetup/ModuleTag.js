@@ -6,6 +6,8 @@ import { RobotCoordsForeignDiv } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  type ModuleRealType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
@@ -19,6 +21,7 @@ import {
 } from '../../constants'
 import * as uiSelectors from '../../ui/steps'
 import { getLabwareOnModule } from '../../ui/modules/utils'
+import { makeTemperatureText } from '../../utils'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
 import type { ModuleOrientation } from '../../types'
@@ -35,8 +38,11 @@ type Props = {|
 |}
 
 // eyeballed width/height to match designs
-const TAG_HEIGHT = 45
-const TAG_WIDTH = 70
+const STANDARD_TAG_HEIGHT = 50
+const STANDARD_TAG_WIDTH = 65
+// thermocycler has its slot farther right = more width, and it has more lines of content = more height
+const THERMOCYCLER_TAG_HEIGHT = 70
+const THERMOCYCLER_TAG_WIDTH = 75
 
 function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
   const { targetTemperature, status } = temperatureModuleState
@@ -63,7 +69,7 @@ export const ModuleStatus = ({
   moduleState,
 }: {|
   moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>,
-|}) => {
+|}): React.Node => {
   switch (moduleState.type) {
     case MAGNETIC_MODULE_TYPE:
       return (
@@ -78,6 +84,34 @@ export const ModuleStatus = ({
       const tempStatus = getTempStatus(moduleState)
       return <div className={styles.module_status_line}>{tempStatus}</div>
 
+    case THERMOCYCLER_MODULE_TYPE:
+      let lidStatus = null
+      switch (moduleState.lidOpen) {
+        case true:
+          lidStatus = i18n.t('modules.lid_open')
+          break
+        case false:
+          lidStatus = i18n.t('modules.lid_closed')
+          break
+        default:
+          lidStatus = i18n.t('modules.lid_undefined')
+      }
+      const lidText = `${i18n.t('modules.lid_label', { lidStatus })}:`
+
+      return (
+        <>
+          <div className={cx(styles.module_status_line)}>
+            <div>{lidText}</div>
+            <div>{makeTemperatureText(moduleState.lidTargetTemp)}</div>
+          </div>
+          <div className={styles.module_status_line}>
+            <div>{i18n.t('modules.block_label')}:</div>
+            <div>{makeTemperatureText(moduleState.blockTargetTemp)}</div>
+          </div>
+          <div />
+        </>
+      )
+
     default:
       console.warn(
         `ModuleStatus doesn't support module type ${moduleState.type}`
@@ -91,9 +125,9 @@ const ModuleTagComponent = (props: Props) => {
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id
   ]
-  const moduleState: ?* =
+  const moduleState: ?$PropertyType<ModuleTemporalProperties, 'moduleState'> =
     timelineFrame.robotState.modules[props.id]?.moduleState
-  const moduleType: ?* = moduleEntity?.type
+  const moduleType: ?ModuleRealType = moduleEntity?.type
 
   const hoveredLabwares = useSelector(uiSelectors.getHoveredStepLabware)
   const initialDeck = useSelector(stepFormSelectors.getInitialDeckSetup)
@@ -112,6 +146,14 @@ const ModuleTagComponent = (props: Props) => {
     return null
   }
 
+  let tagHeight = STANDARD_TAG_HEIGHT
+  let tagWidth = STANDARD_TAG_WIDTH
+
+  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+    tagHeight = THERMOCYCLER_TAG_HEIGHT
+    tagWidth = THERMOCYCLER_TAG_WIDTH
+  }
+
   const { childXOffset, childYOffset } = getModuleVizDims(
     props.orientation,
     moduleType
@@ -121,14 +163,15 @@ const ModuleTagComponent = (props: Props) => {
       x={
         props.x +
         (props.orientation === 'left'
-          ? childXOffset - TAG_WIDTH
+          ? childXOffset - tagWidth
           : STD_SLOT_X_DIM + childXOffset)
       }
-      y={props.y + childYOffset + (STD_SLOT_Y_DIM - TAG_HEIGHT) / 2}
-      height={TAG_HEIGHT}
-      width={TAG_WIDTH}
+      y={props.y + childYOffset + (STD_SLOT_Y_DIM - tagHeight) / 2}
+      height={tagHeight}
+      width={tagWidth}
       innerDivProps={{
-        className: cx(styles.module_info_tag, {
+        'data-test': `ModuleTag_${moduleType}`,
+        className: cx(styles.module_tag, {
           [styles.highlighted_border_right_none]:
             isHoveredModuleStep && props.orientation === 'left',
           [styles.highlighted_border_left_none]:
@@ -136,14 +179,16 @@ const ModuleTagComponent = (props: Props) => {
         }),
       }}
     >
-      <div className={cx(styles.module_info_type, styles.module_info_line)}>
+      <div className={styles.module_type}>
         {i18n.t(`modules.module_display_names.${moduleType}`)}
       </div>
-      <div className={styles.module_info_line}>
+      <div className={styles.module_status}>
         <ModuleStatus moduleState={moduleState} />
       </div>
     </RobotCoordsForeignDiv>
   )
 }
 
-export const ModuleTag = React.memo<Props>(ModuleTagComponent)
+export const ModuleTag: React.AbstractComponent<Props> = React.memo(
+  ModuleTagComponent
+)

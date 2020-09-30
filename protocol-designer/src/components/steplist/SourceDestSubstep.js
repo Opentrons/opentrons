@@ -23,7 +23,7 @@ type SourceDestSubstepProps = {|
   hoveredSubstep: ?SubstepIdentifier,
 |}
 
-export function SourceDestSubstep(props: SourceDestSubstepProps) {
+export function SourceDestSubstep(props: SourceDestSubstepProps): React.Node {
   const { substeps, selectSubstep, hoveredSubstep } = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)

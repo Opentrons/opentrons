@@ -15,7 +15,7 @@ export class MobileNav extends React.Component<Props, State> {
     this.state = { isOpen: false }
   }
 
-  toggle = () => {
+  toggle: () => void = () => {
     this.setState({ isOpen: !this.state.isOpen })
     document.body && document.body.classList.toggle('no_scroll')
   }
@@ -24,7 +24,7 @@ export class MobileNav extends React.Component<Props, State> {
     document.body && document.body.classList.remove('no_scroll')
   }
 
-  render() {
+  render(): React.Node {
     return (
       <>
         <MenuButton

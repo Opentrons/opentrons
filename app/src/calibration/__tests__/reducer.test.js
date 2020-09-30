@@ -1,64 +1,60 @@
 // @flow
+
 import * as Fixtures from '../__fixtures__'
+import * as LabwareFixtures from '../labware/__fixtures__'
+import * as Labware from '../labware'
+import * as PipetteOffset from '../pipette-offset'
+import * as PipetteOffsetFixtures from '../pipette-offset/__fixtures__'
+import * as Actions from '../actions'
 import { calibrationReducer } from '../reducer'
 
-import type { Action } from '../../types'
-import type { CalibrationState } from '../types'
+describe('calibration reducer', () => {
+  it('should handle a FETCH_CALIBRATION_STATUS_SUCCESS', () => {
+    const action = Actions.fetchCalibrationStatusSuccess(
+      'robot-name',
+      Fixtures.mockCalibrationStatus,
+      {}
+    )
 
-type ReducerSpec = {|
-  name: string,
-  state: CalibrationState,
-  action: Action,
-  expected: CalibrationState,
-|}
+    expect(calibrationReducer({}, action)).toEqual({
+      'robot-name': {
+        calibrationStatus: Fixtures.mockCalibrationStatus,
+        labwareCalibrations: null,
+        pipetteOffsetCalibrations: null,
+      },
+    })
+  })
 
-const SPECS: Array<ReducerSpec> = [
-  {
-    name: 'handles calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
-    action: {
-      type: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
-      payload: {
-        robotName: 'terpentine-martini',
-        ...Fixtures.mockRobotCalibrationCheckSessionData,
-      },
-      meta: {},
-    },
-    state: {
-      'terpentine-martini': {
-        robotCalibrationCheck: null,
-      },
-    },
-    expected: {
-      'terpentine-martini': {
-        robotCalibrationCheck: Fixtures.mockRobotCalibrationCheckSessionData,
-      },
-    },
-  },
-  {
-    name: 'handles calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
-    action: {
-      type: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
-      payload: {
-        robotName: 'terpentine-martini',
-      },
-      meta: {},
-    },
-    state: {
-      'terpentine-martini': {
-        robotCalibrationCheck: Fixtures.mockRobotCalibrationCheckSessionData,
-      },
-    },
-    expected: {
-      'terpentine-martini': {
-        robotCalibrationCheck: null,
-      },
-    },
-  },
-]
+  it('should handle a FETCH_LABWARE_CALIBRATIONS_SUCCESS', () => {
+    const action = Labware.fetchLabwareCalibrationsSuccess(
+      'robot-name',
+      LabwareFixtures.mockAllLabwareCalibration,
+      {}
+    )
 
-describe('calibrationReducer', () => {
-  SPECS.forEach(spec => {
-    const { name, state, action, expected } = spec
-    it(name, () => expect(calibrationReducer(state, action)).toEqual(expected))
+    expect(calibrationReducer({}, action)).toEqual({
+      'robot-name': {
+        calibrationStatus: null,
+        labwareCalibrations: LabwareFixtures.mockAllLabwareCalibration,
+        pipetteOffsetCalibrations: null,
+      },
+    })
+  })
+
+  it('should handle a FETCH_PIPETTE_OFFSET_CALIBRATIONS_SUCCESS', () => {
+    const action = PipetteOffset.fetchPipetteOffsetCalibrationsSuccess(
+      'robot-name',
+      PipetteOffsetFixtures.mockAllPipetteOffsetsCalibration,
+      {}
+    )
+
+    expect(calibrationReducer({}, action)).toEqual({
+      'robot-name': {
+        calibrationStatus: null,
+        labwareCalibrations: null,
+        pipetteOffsetCalibrations:
+          PipetteOffsetFixtures.mockAllPipetteOffsetsCalibration,
+      },
+    })
   })
 })

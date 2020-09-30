@@ -1,5 +1,6 @@
 // @flow
 // pickup confirmation contents container for ConfirmModal
+import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { actions as robotActions } from '../../robot'
@@ -20,7 +21,14 @@ type DP = {|
 
 type Props = {| ...OP, ...DP |}
 
-export const ConfirmPickupContents = connect<Props, OP, _, _, _, _>(
+export const ConfirmPickupContents: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  _,
+  _,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(ConfirmPickupPrompt)

@@ -2,7 +2,7 @@
 // images by labware load name
 // TODO(mc, 2019-05-29): shared-data? components-library?
 
-export const labwareImages = {
+export const labwareImages: { [loadName: string]: Array<string>, ... } = {
   agilent_1_reservoir_290ml: [
     require('../../images/agilent_1_reservoir_290ml_side_view.jpg'),
   ],

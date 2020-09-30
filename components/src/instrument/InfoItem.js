@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 
 import styles from './instrument.css'
 
@@ -13,7 +13,7 @@ export type InfoItemProps = {|
  * Used by `InstrumentInfo` for its titled values.
  * But if you're using this, you probably want `LabeledValue` instead.
  */
-export function InfoItem(props: InfoItemProps) {
+export function InfoItem(props: InfoItemProps): React.Node {
   const { title, value, className } = props
 
   return (

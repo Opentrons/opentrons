@@ -46,6 +46,7 @@ updated component library cards after redesign/refactor
   max-width: 7rem;
 }
 
+.cycle_data_item,
 .temp_data_item {
   flex: 1 1 0;
 }
@@ -71,4 +72,15 @@ updated component library cards after redesign/refactor
 
 .status_item_wrapper {
   flex: 1 1 0;
+}
+
+.cycle_info_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.cycle_info_counts {
+  display: flex;
+  flex-direction: row;
 }

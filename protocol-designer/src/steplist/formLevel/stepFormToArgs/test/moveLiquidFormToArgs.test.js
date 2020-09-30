@@ -5,6 +5,7 @@ import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import {
   moveLiquidFormToArgs,
+  getAirGapData,
   getMixData,
   type HydratedMoveLiquidFormData,
 } from '../moveLiquidFormToArgs'
@@ -59,6 +60,9 @@ describe('move liquid step form -> command creator args', () => {
         aspirate_mix_checkbox: false,
         aspirate_mix_volume: null,
         aspirate_mix_times: null,
+        aspirate_delay_checkbox: false,
+        aspirate_delay_seconds: null,
+        aspirate_delay_mmFromBottom: null,
 
         dispense_labware: {
           id: 'destLabwareId',
@@ -75,6 +79,9 @@ describe('move liquid step form -> command creator args', () => {
         dispense_mix_checkbox: false,
         dispense_mix_volume: null,
         dispense_mix_times: null,
+        dispense_delay_checkbox: false,
+        dispense_delay_seconds: null,
+        dispense_delay_mmFromBottom: null,
 
         aspirate_wells_grouped: false,
         preWetTip: false,
@@ -126,6 +133,7 @@ describe('move liquid step form -> command creator args', () => {
   })
 
   const checkboxFieldCases = [
+    // TOUCH TIPS
     {
       checkboxField: 'aspirate_touchTip_checkbox',
       formFields: { aspirate_touchTip_mmFromBottom: 101 },
@@ -138,7 +146,6 @@ describe('move liquid step form -> command creator args', () => {
         touchTipAfterAspirateOffsetMmFromBottom: 101,
       },
     },
-
     {
       checkboxField: 'dispense_touchTip_checkbox',
       formFields: { dispense_touchTip_mmFromBottom: 42 },
@@ -150,6 +157,53 @@ describe('move liquid step form -> command creator args', () => {
         touchTipAfterDispense: true,
         touchTipAfterDispenseOffsetMmFromBottom: 42,
       },
+    },
+    // MIXES
+    {
+      checkboxField: 'aspirate_mix_checkbox',
+      formFields: {
+        aspirate_mix_volume: 5,
+        aspirate_mix_times: 3,
+      },
+      expectedArgsUnchecked: { mixBeforeAspirate: null },
+      expectedArgsChecked: { mixBeforeAspirate: { volume: 5, times: 3 } },
+    },
+    {
+      checkboxField: 'dispense_mix_checkbox',
+      formFields: {
+        dispense_mix_volume: 5,
+        dispense_mix_times: 3,
+      },
+      expectedArgsUnchecked: { mixInDestination: null },
+      expectedArgsChecked: { mixInDestination: { volume: 5, times: 3 } },
+    },
+    // DELAYS
+    {
+      checkboxField: 'aspirate_delay_checkbox',
+      formFields: {
+        aspirate_delay_seconds: 11,
+        aspirate_delay_mmFromBottom: 12,
+      },
+      expectedArgsUnchecked: { aspirateDelay: null },
+      expectedArgsChecked: { aspirateDelay: { seconds: 11, mmFromBottom: 12 } },
+    },
+    {
+      checkboxField: 'dispense_delay_checkbox',
+      formFields: {
+        dispense_delay_seconds: 11,
+        dispense_delay_mmFromBottom: 12,
+      },
+      expectedArgsUnchecked: { dispenseDelay: null },
+      expectedArgsChecked: { dispenseDelay: { seconds: 11, mmFromBottom: 12 } },
+    },
+    // AIRGAP
+    {
+      checkboxField: 'aspirate_airGap_checkbox',
+      formFields: {
+        aspirate_airGap_volume: 20,
+      },
+      expectedArgsUnchecked: { aspirateAirGapVolume: null },
+      expectedArgsChecked: { aspirateAirGapVolume: 20 },
     },
   ]
 
@@ -317,7 +371,7 @@ describe('getMixData', () => {
   })
 
   it('return null if either number fields <= 0 / null', () => {
-    const cases = [[0, 5], [null, 5], [10, 0], [10, null]]
+    const cases = [[0, 5], [null, 5], [10, 0], [10, null], [-1, 2], [2, -1]]
 
     cases.forEach(testCase => {
       const [volumeValue, timesValue] = testCase
@@ -345,5 +399,26 @@ describe('getMixData', () => {
         'timesField'
       )
     ).toEqual({ volume: 30, times: 2 })
+  })
+})
+
+describe('getAirGapData', () => {
+  it('should return null when the checkbox field is false', () => {
+    expect(
+      getAirGapData(
+        { aspirate_airGap_checkbox: false, aspirate_airGap_volume: 20 },
+        'aspirate_airGap_checkbox',
+        'aspirate_airGap_volume'
+      )
+    ).toBe(null)
+  })
+  it('should return the air gap volume when the air gap checkbox is true', () => {
+    expect(
+      getAirGapData(
+        { aspirate_airGap_checkbox: true, aspirate_airGap_volume: 20 },
+        'aspirate_airGap_checkbox',
+        'aspirate_airGap_volume'
+      )
+    ).toBe(20)
   })
 })

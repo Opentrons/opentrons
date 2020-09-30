@@ -25,7 +25,7 @@ import type { LabwareDefinition } from '../../types'
 
 export type LabwareCardProps = {| definition: LabwareDefinition |}
 
-export function LabwareCard(props: LabwareCardProps) {
+export function LabwareCard(props: LabwareCardProps): React.Node {
   const { definition } = props
   const wellLabel = getWellLabel(definition)
 

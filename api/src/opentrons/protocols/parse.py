@@ -3,25 +3,55 @@ opentrons.protocols.parse: functions and state for parsing protocols
 """
 
 import ast
+import functools
 import itertools
 import json
 import logging
 import re
 from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
 from opentrons.config import feature_flags as ff
-from opentrons.system.shared_data import load_shared_data
-from .types import Protocol, PythonProtocol, JsonProtocol, Metadata, APIVersion
+from opentrons_shared_data import load_shared_data, protocol
+from .types import (Protocol, PythonProtocol, JsonProtocol,
+                    Metadata, APIVersion, MalformedProtocolError)
 from .bundle import extract_bundle
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.protocol.dev_types import (
+        JsonProtocol as JsonProtocolDef
+    )
 
 MODULE_LOG = logging.getLogger(__name__)
 
 # match e.g. "2.0" but not "hi", "2", "2.0.1"
 API_VERSION_RE = re.compile(r'^(\d+)\.(\d+)$')
+MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
+
+
+def _validate_v2_ast(protocol_ast: ast.Module):
+    defs = [fdef for fdef in protocol_ast.body
+            if isinstance(fdef, ast.FunctionDef)]
+    rundefs = [fdef for fdef in defs
+               if fdef.name == 'run']
+    # There must be precisely 1 one run function
+    if len(rundefs) > 1:
+        lines = [str(d.lineno) for d in rundefs]
+        linestr = ', '.join(lines)
+        raise MalformedProtocolError(
+            f'More than one run function is defined (lines {linestr})')
+    if not rundefs:
+        raise MalformedProtocolError(
+            "No function 'run(ctx)' defined")
+    if infer_version_from_imports(protocol_ast):
+        raise MalformedProtocolError(
+            'Protocol API v1 modules such as robot, instruments, and labware '
+            'may not be imported in Protocol API V2 protocols'
+        )
 
 
 def version_from_string(vstr: str) -> APIVersion:
@@ -44,19 +74,19 @@ def _parse_json(
         protocol_contents: str, filename: str = None) -> JsonProtocol:
     """ Parse a protocol known or at least suspected to be json """
     protocol_json = json.loads(protocol_contents)
-    version = validate_json(protocol_json)
+    version, validated = validate_json(protocol_json)
     return JsonProtocol(
-        text=protocol_contents, filename=filename, contents=protocol_json,
+        text=protocol_contents, filename=filename, contents=validated,
         schema_version=version)
 
 
 def _parse_python(
     protocol_contents: str,
     filename: str = None,
-    bundled_labware: Dict[str, Dict[str, Any]] = None,
+    bundled_labware: Dict[str, 'LabwareDefinition'] = None,
     bundled_data: Dict[str, bytes] = None,
     bundled_python: Dict[str, str] = None,
-    extra_labware: Dict[str, Dict[str, Any]] = None,
+    extra_labware: Dict[str, 'LabwareDefinition'] = None,
 ) -> PythonProtocol:
     """ Parse a protocol known or at least suspected to be python """
     filename_checked = filename or '<protocol>'
@@ -71,6 +101,9 @@ def _parse_python(
     metadata = extract_metadata(parsed)
     protocol = compile(parsed, filename=ast_filename, mode='exec')
     version = get_version(metadata, parsed)
+
+    if version >= APIVersion(2, 0):
+        _validate_v2_ast(parsed)
 
     result = PythonProtocol(
         text=protocol_contents,
@@ -112,7 +145,7 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
 def parse(
     protocol_file: Union[str, bytes],
     filename: str = None,
-    extra_labware: Dict[str, Dict[str, Any]] = None,
+    extra_labware: Dict[str, 'LabwareDefinition'] = None,
     extra_data: Dict[str, bytes] = None
 ) -> Protocol:
     """ Parse a protocol from text.
@@ -179,7 +212,8 @@ def extract_metadata(parsed: ast.Module) -> Metadata:
     return metadata
 
 
-def infer_version_from_imports(parsed: ast.Module) -> APIVersion:
+@functools.lru_cache(1)
+def infer_version_from_imports(parsed: ast.Module) -> Optional[APIVersion]:
     # Imports in the form of `import opentrons.robot` will have an entry in
     # parsed.body[i].names[j].name in the form "opentrons.robot". Find those
     # imports and transform them to strip away the 'opentrons.' part.
@@ -208,7 +242,7 @@ def infer_version_from_imports(parsed: ast.Module) -> APIVersion:
     if v1evidence:
         return APIVersion(1, 0)
     else:
-        raise RuntimeError('Cannot infer API level')
+        return None
 
 
 def version_from_metadata(metadata: Metadata) -> APIVersion:
@@ -246,13 +280,13 @@ def get_version(metadata: Metadata, parsed: ast.Module) -> APIVersion:
         return version_from_metadata(metadata)
     except KeyError:  # No apiLevel key, may be apiv1
         pass
-    try:
-        return infer_version_from_imports(parsed)
-    except RuntimeError:
+    inferred = infer_version_from_imports(parsed)
+    if not inferred:
         raise RuntimeError(
             'If this is not an API v1 protocol, you must specify the target '
             'api level in the apiLevel key of the metadata. For instance, '
             'metadata={"apiLevel": "2.0"}')
+    return inferred
 
 
 def _get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
@@ -278,12 +312,12 @@ def _get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
         'Make sure there is a version number under "schemaVersion"')
 
 
-def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
+def _get_schema_for_protocol(version_num: int) -> protocol.Schema:
     """ Retrieve the json schema for a protocol schema version
     """
     # TODO(IL, 2020/03/05): use $otSharedSchema, but maybe wait until
     # deprecating v1/v2 JSON protocols?
-    if version_num > 4:
+    if version_num > MAX_SUPPORTED_JSON_SCHEMA_VERSION:
         raise RuntimeError(
             f'JSON Protocol version {version_num} is not yet ' +
             'supported in this version of the API')
@@ -298,7 +332,8 @@ def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
     return json.loads(schema.decode('utf-8'))
 
 
-def validate_json(protocol_json: Dict[Any, Any]) -> int:
+def validate_json(
+        protocol_json: Dict[Any, Any]) -> Tuple[int, 'JsonProtocolDef']:
     """ Validates a json protocol and returns its schema version """
     # Check if this is actually a labware
     labware_schema_v2 = json.loads(load_shared_data(
@@ -323,7 +358,7 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
             'Designer and save it to migrate the protocol to a later '
             'version. This error might mean a labware '
             'definition was specified instead of a protocol.')
-    if version_num > 4:
+    if version_num > MAX_SUPPORTED_JSON_SCHEMA_VERSION:
         raise RuntimeError(
             f'The protocol you are trying to open is a JSONv{version_num} '
             'protocol and is not supported by your current robot server '
@@ -349,4 +384,4 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
             'This may be a corrupted file or a JSON file that is not an '
             'Opentrons JSON protocol.')
     else:
-        return version_num
+        return version_num, protocol_json  # type: ignore

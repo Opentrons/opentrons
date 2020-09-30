@@ -512,6 +512,9 @@ class CLITool:
     def exit(self):
         self.hardware.remove_tip(self._current_mount)
         self.hardware.set_lights(rails=False)
+        msg = ('Please calibrate your pipettes'
+               'before running a protocol')
+        self._update_text_box(msg)
         raise urwid.ExitMainLoop
 
     # Private methods for URWID

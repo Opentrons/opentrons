@@ -1061,7 +1061,7 @@ def test_move_splitting(smoothie, robot, monkeypatch):
         == ['M55 M92 C100.0 G4P0.01 '
             'G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005',
             'G0C1',
-            ' M54 M92 C3200 G4P0.01',
+            'M54 M92 C3200 G4P0.01',
             'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
             'G0C20.3 G0C20',
             'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005']  # noqa(E501)
@@ -1083,7 +1083,7 @@ def test_move_splitting(smoothie, robot, monkeypatch):
         == ['M55 M92 C100.0 G4P0.01 '
             'G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005',
             'G0C20.3',
-            ' M54 M92 C3200 G4P0.01',
+            'M54 M92 C3200 G4P0.01',
             'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
             'G0C20.3 G0C20',
             'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005']  # noqa(E501)
@@ -1115,7 +1115,7 @@ def test_move_splitting(smoothie, robot, monkeypatch):
         'M53 M92 B100.0 G4P0.01 G0F30 '
         'M907 A0.1 B1.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
         'G0B51',
-        ' M52 M92 B3200 G4P0.01',
+        'M52 M92 B3200 G4P0.01',
         'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
         'G0B100.3 G0B100',
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005']

@@ -10,7 +10,7 @@ export type CenteredTextSvgProps = {|
 /**
  * @deprecated Use {@link RobotCoordsText}
  */
-export function CenteredTextSvg(props: CenteredTextSvgProps) {
+export function CenteredTextSvg(props: CenteredTextSvgProps): React.Node {
   const { text, className } = props
 
   // TODO(mc, 2018-07-23): add `fill='currentColor'`

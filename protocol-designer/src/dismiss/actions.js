@@ -5,7 +5,7 @@ export type DismissAction<ActionType> = {
   type: ActionType,
   payload: {
     type: string,
-    stepId: ?StepIdType,
+    stepId: StepIdType,
   },
 }
 

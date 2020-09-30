@@ -3,6 +3,123 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
+
+### Bug Fixes
+
+* **app:** flip modules on deck map when in slots 3, 6, or 9 ([#6383](https://github.com/Opentrons/opentrons/issues/6383)) ([d0347da](https://github.com/Opentrons/opentrons/commit/d0347da)), closes [#4422](https://github.com/Opentrons/opentrons/issues/4422)
+
+
+### Features
+
+* **app:** add Jupyter Notebook button to robot's Advanced Settings ([#6474](https://github.com/Opentrons/opentrons/issues/6474)) ([d615d2d](https://github.com/Opentrons/opentrons/commit/d615d2d)), closes [#6102](https://github.com/Opentrons/opentrons/issues/6102)
+* **robot-server,app:** add download deck calibration button ([#6453](https://github.com/Opentrons/opentrons/issues/6453)) ([b3b365d](https://github.com/Opentrons/opentrons/commit/b3b365d)), closes [#6055](https://github.com/Opentrons/opentrons/issues/6055)
+
+
+
+
+
+## [3.20.1](https://github.com/Opentrons/opentrons/compare/v3.20.0...v3.20.1) (2020-08-25)
+
+**Note:** Version bump only for package @opentrons/components
+
+
+
+
+
+# [3.20.0](https://github.com/Opentrons/opentrons/compare/v3.19.0...v3.20.0) (2020-08-13)
+
+### Bug Fixes
+
+* **comp-lib:** Update SlotMap prop names ([#6124](https://github.com/Opentrons/opentrons/issues/6124)) ([392e35c](https://github.com/Opentrons/opentrons/commit/392e35c))
+
+
+### Features
+
+* **app:** Expose Labware Calibration Status on the FileInfo Page ([#6100](https://github.com/Opentrons/opentrons/issues/6100)) ([2a22f59](https://github.com/Opentrons/opentrons/commit/2a22f59))
+* **components:** add primitive btns and fix useHover on disabled buttons ([#5972](https://github.com/Opentrons/opentrons/issues/5972)) ([57cc219](https://github.com/Opentrons/opentrons/commit/57cc219))
+
+
+
+
+
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
+
+
+### Features
+
+* **api, app:** Check Robot Deck Transform ([#5845](https://github.com/Opentrons/opentrons/issues/5845)) ([ed67383](https://github.com/Opentrons/opentrons/commit/ed67383))
+* **components:** add position props to primitive components ([#5926](https://github.com/Opentrons/opentrons/issues/5926)) ([9b0a666](https://github.com/Opentrons/opentrons/commit/9b0a666))
+* **components:** add useConditionalConfirm hook to shared components ([#5735](https://github.com/Opentrons/opentrons/issues/5735)) ([8e5248f](https://github.com/Opentrons/opentrons/commit/8e5248f))
+* **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
+* **test:** add test id to Pipette Select component ([#5791](https://github.com/Opentrons/opentrons/issues/5791)) ([845b508](https://github.com/Opentrons/opentrons/commit/845b508)), closes [#5724](https://github.com/Opentrons/opentrons/issues/5724)
+
+
+
+## [3.18.1](https://github.com/Opentrons/opentrons/compare/v3.18.0...v3.18.1) (2020-05-26)
+
+**Note:** Version bump only for package @opentrons/components
+
+
+
+
+
+# [3.18.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0) (2020-05-20)
+
+
+### Features
+
+* **components:** add Box primitive to components library ([#5665](https://github.com/Opentrons/opentrons/issues/5665)) ([73614d0](https://github.com/Opentrons/opentrons/commit/73614d0))
+* **components:** add Flex and Text primitives to components library ([#5637](https://github.com/Opentrons/opentrons/issues/5637)) ([b1b318e](https://github.com/Opentrons/opentrons/commit/b1b318e))
+* **components:** Add ToggleField form component and tests ([#5579](https://github.com/Opentrons/opentrons/issues/5579)) ([4272cc6](https://github.com/Opentrons/opentrons/commit/4272cc6))
+* **protocol-designer:** Add thermocycler state form ([#5615](https://github.com/Opentrons/opentrons/issues/5615)) ([51b04e0](https://github.com/Opentrons/opentrons/commit/51b04e0)), closes [#5568](https://github.com/Opentrons/opentrons/issues/5568)
+
+
+
+
+
+## [3.17.1](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1) (2020-05-06)
+
+### Features
+
+* **components:** add hooks-based tooltip component to library ([#5362](https://github.com/Opentrons/opentrons/issues/5362)) ([7ef3ca9](https://github.com/Opentrons/opentrons/commit/7ef3ca9)), closes [#5120](https://github.com/Opentrons/opentrons/issues/5120)
+* **components:** add useHover and useHoverTooltip hooks ([#5364](https://github.com/Opentrons/opentrons/issues/5364)) ([874d749](https://github.com/Opentrons/opentrons/commit/874d749))
+
+
+
+
+
+# [3.17.0](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
+
+**Note:** Version bump only for package @opentrons/components
+
+
+
+
+
+# [3.17.0-beta.1](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.0...v3.17.0-beta.1) (2020-04-14)
+
+**Note:** Version bump only for package @opentrons/components
+
+
+
+
+
+# [3.17.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-beta.0) (2020-04-01)
+
+### Bug Fixes
+
+* **protocol-designer:** Update SlotMap and CrashInfoBox styles ([#4996](https://github.com/Opentrons/opentrons/issues/4996)) ([845b465](https://github.com/Opentrons/opentrons/commit/845b465)), closes [#4989](https://github.com/Opentrons/opentrons/issues/4989)
+
+
+### Features
+
+* **app, components:** Support gen2 modules ([#5177](https://github.com/Opentrons/opentrons/issues/5177)) ([3a938ff](https://github.com/Opentrons/opentrons/commit/3a938ff)), closes [#4960](https://github.com/Opentrons/opentrons/issues/4960)
+
+
+
+
+
 ## [3.16.1](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1) (2020-02-25)
 
 **Note:** Version bump only for package @opentrons/components

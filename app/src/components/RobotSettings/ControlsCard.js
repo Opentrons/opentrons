@@ -3,10 +3,14 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
-import { Card, LabeledToggle, LabeledButton } from '@opentrons/components'
+import {
+  useInterval,
+  Card,
+  LabeledToggle,
+  LabeledButton,
+} from '@opentrons/components'
 
 import { startDeckCalibration } from '../../http-api-client'
-import { getFeatureFlags } from '../../config'
 
 import {
   home,
@@ -15,14 +19,23 @@ import {
   getLightsOn,
   ROBOT,
 } from '../../robot-controls'
+import * as Calibration from '../../calibration'
 import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
+import { getFeatureFlags } from '../../config'
+import {
+  DECK_CAL_STATUS_POLL_INTERVAL,
+  DISABLED_CANNOT_CONNECT,
+  DISABLED_CONNECT_TO_ROBOT,
+  DISABLED_PROTOCOL_IS_RUNNING,
+} from './constants'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
-import { Portal } from '../portal'
-import { CheckCalibration } from '../CheckCalibration'
+
+import { CheckCalibrationControl } from './CheckCalibrationControl'
+import { DeckCalibrationControl } from './DeckCalibrationControl'
 
 type Props = {|
   robot: ViewableRobot,
@@ -31,63 +44,75 @@ type Props = {|
 
 const TITLE = 'Robot Controls'
 
-const CALIBRATE_DECK_DESCRIPTION =
-  "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
+const BAD_DECK_CALIBRATION =
+  'Bad deck calibration detected. Please perform a full deck calibration.'
+const NO_DECK_CALIBRATION = 'Please perform a full deck calibration.'
 
-const CHECK_ROBOT_CAL_DESCRIPTION = "Check the robot's deck calibration"
-
-export function ControlsCard(props: Props) {
+export function ControlsCard(props: Props): React.Node {
   const dispatch = useDispatch<Dispatch>()
   const { robot, calibrateDeckUrl } = props
   const { name: robotName, status } = robot
-  const ff = useSelector(getFeatureFlags)
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
-
-  // TODO: next BC 2020-03-31 derive this initial robot cal check state from
-  // GET request response to /calibration/check/session
-  const [isCheckingRobotCal, setIsCheckingRobotCal] = React.useState(false)
-
+  const deckCalStatus = useSelector((state: State) => {
+    return Calibration.getDeckCalibrationStatus(state, robotName)
+  })
+  const deckCalData = useSelector((state: State) => {
+    return Calibration.getDeckCalibrationData(state, robotName)
+  })
   const notConnectable = status !== CONNECTABLE
   const toggleLights = () => dispatch(updateLights(robotName, !lightsOn))
-  const canControl = robot.connected && !isRunning
-
-  const startCalibration = () => {
+  const startLegacyDeckCalibration = () => {
     dispatch(startDeckCalibration(robot)).then(() =>
       dispatch(push(calibrateDeckUrl))
     )
   }
+  const ff = useSelector(getFeatureFlags)
 
   React.useEffect(() => {
     dispatch(fetchLights(robotName))
   }, [dispatch, robotName])
 
-  const buttonDisabled = notConnectable || !canControl
+  useInterval(
+    () =>
+      !ff.enableCalibrationOverhaul &&
+      dispatch(Calibration.fetchCalibrationStatus(robotName)),
+    DECK_CAL_STATUS_POLL_INTERVAL,
+    true
+  )
+
+  let buttonDisabledReason = null
+  if (notConnectable) {
+    buttonDisabledReason = DISABLED_CANNOT_CONNECT
+  } else if (!robot.connected) {
+    buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
+  } else if (isRunning) {
+    buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
+  }
+
+  let calCheckDisabledReason = buttonDisabledReason
+  if (
+    deckCalStatus === Calibration.DECK_CAL_STATUS_BAD_CALIBRATION ||
+    deckCalStatus === Calibration.DECK_CAL_STATUS_SINGULARITY
+  ) {
+    calCheckDisabledReason = BAD_DECK_CALIBRATION
+  } else if (deckCalStatus === Calibration.DECK_CAL_STATUS_IDENTITY) {
+    calCheckDisabledReason = NO_DECK_CALIBRATION
+  }
+
+  const buttonDisabled = Boolean(buttonDisabledReason)
 
   return (
-    <Card title={TITLE} disabled={notConnectable}>
-      {ff.enableRobotCalCheck && (
-        <LabeledButton
-          label="Check deck calibration"
-          buttonProps={{
-            onClick: () => setIsCheckingRobotCal(true),
-            disabled: buttonDisabled,
-            children: 'Check',
-          }}
-        >
-          <p>{CHECK_ROBOT_CAL_DESCRIPTION}</p>
-        </LabeledButton>
+    <Card title={TITLE}>
+      {!ff.enableCalibrationOverhaul && (
+        <DeckCalibrationControl
+          robotName={robotName}
+          buttonDisabled={buttonDisabled}
+          deckCalStatus={deckCalStatus}
+          deckCalData={deckCalData}
+          startLegacyDeckCalibration={startLegacyDeckCalibration}
+        />
       )}
-      <LabeledButton
-        label="Calibrate deck"
-        buttonProps={{
-          onClick: startCalibration,
-          disabled: buttonDisabled,
-          children: 'Calibrate',
-        }}
-      >
-        <p>{CALIBRATE_DECK_DESCRIPTION}</p>
-      </LabeledButton>
       <LabeledButton
         label="Home all axes"
         buttonProps={{
@@ -112,16 +137,16 @@ export function ControlsCard(props: Props) {
         label="Lights"
         toggledOn={Boolean(lightsOn)}
         onClick={toggleLights}
+        disabled={buttonDisabled}
       >
         <p>Control lights on deck.</p>
       </LabeledToggle>
-      {isCheckingRobotCal && (
-        <Portal>
-          <CheckCalibration
-            robotName={robotName}
-            closeCalibrationCheck={() => setIsCheckingRobotCal(false)}
-          />
-        </Portal>
+
+      {!ff.enableCalibrationOverhaul && deckCalStatus !== null && (
+        <CheckCalibrationControl
+          robotName={robotName}
+          disabledReason={calCheckDisabledReason}
+        />
       )}
     </Card>
   )

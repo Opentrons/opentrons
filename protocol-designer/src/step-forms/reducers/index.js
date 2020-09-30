@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
+import omitBy from 'lodash/omitBy'
 import reduce from 'lodash/reduce'
 import {
   getLabwareDefaultEngageHeight,
@@ -12,11 +13,13 @@ import {
   getModuleType,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   rootReducer as labwareDefsRootReducer,
   type RootState as LabwareDefsRootState,
 } from '../../labware-defs'
+import { uuid } from '../../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
@@ -27,16 +30,25 @@ import {
   getDefaultsForStepType,
   handleFormChange,
 } from '../../steplist/formLevel'
-import { cancelStepForm } from '../../steplist/actions'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
 import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
 } from '../selectors'
-import { getIdsInRange, getDeckItemIdInSlot } from '../utils'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import {
+  createPresavedStepForm,
+  getDeckItemIdInSlot,
+  getIdsInRange,
+} from '../utils'
+import {
+  createInitialProfileCycle,
+  createInitialProfileStep,
+} from '../utils/createInitialProfileItems'
 import { getLabwareOnModule } from '../../ui/modules/utils'
-
-import type { ActionType } from 'redux-actions'
+import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
+import type { Reducer } from 'redux'
 import type { LoadFileAction } from '../../load-file'
 import type {
   CreateContainerAction,
@@ -45,26 +57,41 @@ import type {
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type { FormData, StepIdType } from '../../form-types'
+import type {
+  FormData,
+  StepIdType,
+  StepType,
+  ProfileItem,
+  ProfileCycleItem,
+  ProfileStepItem,
+} from '../../form-types'
 import type {
   FileLabware,
   FilePipette,
   FileModule,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
-  AddStepAction,
+  CancelStepFormAction,
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
   DeleteStepAction,
   PopulateFormAction,
   ReorderStepsAction,
+  AddProfileCycleAction,
+  AddProfileStepAction,
+  DeleteProfileCycleAction,
+  DeleteProfileStepAction,
+  EditProfileCycleAction,
+  EditProfileStepAction,
 } from '../../steplist/actions'
 import type {
+  AddStepAction,
   DuplicateStepAction,
   ReorderSelectedStepAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
 } from '../../ui/steps/actions/types'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import type { StepItemData } from '../../steplist/types'
 import type {
   NormalizedPipetteById,
   NormalizedLabware,
@@ -72,12 +99,12 @@ import type {
   ModuleEntities,
 } from '../types'
 import type {
-  CreatePipettesAction,
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
   CreateModuleAction,
-  EditModuleAction,
+  CreatePipettesAction,
   DeleteModuleAction,
+  DeletePipettesAction,
+  EditModuleAction,
+  SubstituteStepFormPipettesAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -85,11 +112,23 @@ type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 type UnsavedFormActions =
+  | AddProfileCycleAction
+  | AddStepAction
   | ChangeFormInputAction
   | PopulateFormAction
-  | ActionType<typeof cancelStepForm>
+  | CancelStepFormAction
   | SaveStepFormAction
   | DeleteStepAction
+  | CreateModuleAction
+  | DeleteModuleAction
+  | SelectTerminalItemAction
+  | EditModuleAction
+  | SubstituteStepFormPipettesAction
+  | AddProfileStepAction
+  | DeleteProfileStepAction
+  | DeleteProfileCycleAction
+  | EditProfileCycleAction
+  | EditProfileStepAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -98,6 +137,37 @@ export const unsavedForm = (
     ? rootState.unsavedForm
     : unsavedFormInitialState
   switch (action.type) {
+    case 'ADD_PROFILE_CYCLE': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'ADD_PROFILE_CYCLE should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+      const cycleId = uuid()
+      const profileStepId = uuid()
+
+      return {
+        ...unsavedFormState,
+        orderedProfileItems: [...unsavedFormState.orderedProfileItems, cycleId],
+        profileItemsById: {
+          ...unsavedFormState.profileItemsById,
+          [cycleId]: createInitialProfileCycle(cycleId, profileStepId),
+        },
+      }
+    }
+    case 'ADD_STEP': {
+      return createPresavedStepForm({
+        stepType: action.payload.stepType,
+        stepId: action.payload.id,
+        pipetteEntities: _getPipetteEntitiesRootState(rootState),
+        labwareEntities: _getLabwareEntitiesRootState(rootState),
+        savedStepForms: rootState.savedStepForms,
+        orderedStepIds: rootState.orderedStepIds,
+        initialDeckSetup: _getInitialDeckSetupRootState(rootState),
+        robotStateTimeline: action.meta.robotStateTimeline,
+      })
+    }
     case 'CHANGE_FORM_INPUT': {
       const fieldUpdate = handleFormChange(
         action.payload.update,
@@ -105,19 +175,21 @@ export const unsavedForm = (
         _getPipetteEntitiesRootState(rootState),
         _getLabwareEntitiesRootState(rootState)
       )
+      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return {
         ...unsavedFormState,
-        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         ...fieldUpdate,
       }
     }
     case 'POPULATE_FORM':
       return action.payload
     case 'CANCEL_STEP_FORM':
-    case 'SELECT_TERMINAL_ITEM':
-    case 'SAVE_STEP_FORM':
+    case 'CREATE_MODULE':
+    case 'DELETE_MODULE':
     case 'DELETE_STEP':
     case 'EDIT_MODULE':
+    case 'SAVE_STEP_FORM':
+    case 'SELECT_TERMINAL_ITEM':
       return unsavedFormInitialState
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       // only substitute unsaved step form if its ID is in the start-end range
@@ -130,7 +202,7 @@ export const unsavedForm = (
 
       if (
         unsavedFormState &&
-        unsavedFormState.pipette &&
+        unsavedFormState?.pipette && // TODO(IL, 2020-06-02): Flow should know unsavedFormState is not null here (so keys are safe to access), but it's being dumb
         unsavedFormState.pipette in substitutionMap &&
         unsavedFormState.id &&
         stepIdsToUpdate.includes(unsavedFormState.id)
@@ -147,6 +219,221 @@ export const unsavedForm = (
         }
       }
       return unsavedFormState
+    }
+    case 'ADD_PROFILE_STEP': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'ADD_PROFILE_STEP should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+      const id = uuid()
+
+      const newStep = createInitialProfileStep(id)
+
+      if (action.payload !== null) {
+        const { cycleId } = action.payload
+        const targetCycle = unsavedFormState.profileItemsById[cycleId]
+        // add to cycle
+        return {
+          ...unsavedFormState,
+          profileItemsById: {
+            ...unsavedFormState.profileItemsById,
+            [cycleId]: {
+              ...targetCycle,
+              steps: [...targetCycle.steps, newStep],
+            },
+          },
+        }
+      }
+      // TODO factor this createInitialProfileStep out somewhere
+
+      return {
+        ...unsavedFormState,
+        orderedProfileItems: [...unsavedFormState.orderedProfileItems, id],
+        profileItemsById: {
+          ...unsavedFormState.profileItemsById,
+          [id]: newStep,
+        },
+      }
+    }
+    case 'DELETE_PROFILE_CYCLE': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'DELETE_PROFILE_CYCLE should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+
+      const { id } = action.payload
+      const isCycle =
+        unsavedFormState.profileItemsById[id].type === PROFILE_CYCLE
+      if (!isCycle) {
+        return unsavedFormState
+      }
+      return {
+        ...unsavedFormState,
+        orderedProfileItems: unsavedFormState.orderedProfileItems.filter(
+          itemId => itemId !== id
+        ),
+        profileItemsById: omit(unsavedFormState.profileItemsById, id),
+      }
+    }
+    case 'DELETE_PROFILE_STEP': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'DELETE_PROFILE_STEP should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+
+      const { id } = action.payload
+
+      const omitTopLevelSteps = (profileItemsById: {
+        [string]: ProfileItem,
+        ...,
+      }) =>
+        omitBy(
+          profileItemsById,
+          (item: ProfileItem, itemId: string): boolean => {
+            return item.type === PROFILE_STEP && itemId === id
+          }
+        )
+
+      // not top-level, must be nested inside a cycle
+      const omitCycleSteps = (profileItemsById: {
+        [string]: ProfileItem,
+        ...,
+      }) =>
+        mapValues(profileItemsById, (item: ProfileItem): ProfileItem => {
+          if (item.type === PROFILE_CYCLE) {
+            return {
+              ...item,
+              steps: item.steps.filter(
+                (stepItem: ProfileStepItem) => stepItem.id !== id
+              ),
+            }
+          }
+          return item
+        })
+
+      const isTopLevelProfileStep =
+        unsavedFormState.orderedProfileItems.includes(id) &&
+        unsavedFormState.profileItemsById[id].type === PROFILE_STEP
+
+      const filteredItemsById = isTopLevelProfileStep
+        ? omitTopLevelSteps(unsavedFormState.profileItemsById)
+        : omitCycleSteps(unsavedFormState.profileItemsById)
+
+      const filteredOrderedProfileItems = isTopLevelProfileStep
+        ? unsavedFormState.orderedProfileItems.filter(itemId => itemId !== id)
+        : unsavedFormState.orderedProfileItems
+
+      return {
+        ...unsavedFormState,
+        orderedProfileItems: filteredOrderedProfileItems,
+        profileItemsById: filteredItemsById,
+      }
+    }
+    case 'EDIT_PROFILE_CYCLE': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'EDIT_PROFILE_CYCLE should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+
+      const { id, fields } = action.payload
+
+      const cycle = unsavedFormState.profileItemsById[id]
+
+      if (cycle.type !== PROFILE_CYCLE) {
+        console.warn(
+          `EDIT_PROFILE_CYCLE got non-cycle profile item ${cycle.id}`
+        )
+        return unsavedFormState
+      }
+
+      return {
+        ...unsavedFormState,
+        profileItemsById: {
+          ...unsavedFormState.profileItemsById,
+          [id]: {
+            ...cycle,
+            ...fields,
+          },
+        },
+      }
+    }
+    case 'EDIT_PROFILE_STEP': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'EDIT_PROFILE_STEP should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+
+      const { id, fields } = action.payload
+
+      const isTopLevelStep =
+        unsavedFormState.orderedProfileItems.includes(id) &&
+        unsavedFormState.profileItemsById[id].type === PROFILE_STEP
+
+      if (isTopLevelStep) {
+        return {
+          ...unsavedFormState,
+          profileItemsById: {
+            ...unsavedFormState.profileItemsById,
+            [id]: { ...unsavedFormState.profileItemsById[id], ...fields },
+          },
+        }
+      } else {
+        // it's a step in a cycle. Get the cycle id, and the index of our edited step in that cycle's `steps` array
+        let editedStepIndex = -1
+        const cycleId: string | void = Object.keys(
+          unsavedFormState.profileItemsById
+        ).find((itemId: string): boolean => {
+          const item: ProfileItem = unsavedFormState.profileItemsById[itemId]
+          if (item.type === PROFILE_CYCLE) {
+            const stepIndex = item.steps.findIndex(step => step.id === id)
+            if (stepIndex !== -1) {
+              editedStepIndex = stepIndex
+              return true
+            }
+          }
+          return false
+        })
+
+        if (cycleId == null || editedStepIndex === -1) {
+          console.warn(`EDIT_PROFILE_STEP: step does not exist ${id}`)
+          return unsavedFormState
+        }
+
+        let newCycle: ProfileCycleItem = {
+          ...unsavedFormState.profileItemsById[cycleId],
+        }
+
+        const newSteps = [...newCycle.steps]
+
+        newSteps[editedStepIndex] = {
+          ...newCycle.steps[editedStepIndex],
+          ...fields,
+        }
+
+        newCycle = {
+          ...newCycle,
+          steps: newSteps,
+        }
+
+        const newProfileItems = {
+          ...unsavedFormState.profileItemsById,
+          [cycleId]: newCycle,
+        }
+        return {
+          ...unsavedFormState,
+          profileItemsById: newProfileItems,
+        }
+      }
     }
     default:
       return unsavedFormState
@@ -346,6 +633,13 @@ export const savedStepForms = (
         ) {
           return { ...savedForm, moduleId }
         }
+        // same logic applies to Thermocycler
+        if (
+          savedForm.stepType === 'thermocycler' &&
+          action.payload.type === THERMOCYCLER_MODULE_TYPE
+        ) {
+          return { ...savedForm, moduleId }
+        }
 
         return savedForm
       })
@@ -366,7 +660,8 @@ export const savedStepForms = (
       const { sourceSlot, destSlot } = action.payload
       return mapValues(savedStepForms, (savedForm: FormData): FormData => {
         if (savedForm.stepType === 'manualIntervention') {
-          // swap labware slots from all manualIntervention steps
+          // swap labware/module slots from all manualIntervention steps
+          // (or place compatible labware in dest slot onto module)
           const sourceLabwareId = getDeckItemIdInSlot(
             savedForm.labwareLocationUpdate,
             sourceSlot
@@ -384,6 +679,40 @@ export const savedStepForms = (
             savedForm.moduleLocationUpdate,
             destSlot
           )
+
+          if (sourceModuleId && destLabwareId) {
+            // moving module to a destination slot with labware
+            const prevInitialDeckSetup = _getInitialDeckSetupRootState(
+              rootState
+            )
+            const moduleEntity = prevInitialDeckSetup.modules[sourceModuleId]
+            const labwareEntity = prevInitialDeckSetup.labware[destLabwareId]
+
+            const isCompat = getLabwareIsCompatible(
+              labwareEntity.def,
+              moduleEntity.type
+            )
+            const moduleIsOccupied =
+              getDeckItemIdInSlot(
+                savedForm.labwareLocationUpdate,
+                sourceModuleId
+              ) != null
+
+            if (isCompat && !moduleIsOccupied) {
+              // only in this special case, we put module under the labware
+              return {
+                ...savedForm,
+                labwareLocationUpdate: {
+                  ...savedForm.labwareLocationUpdate,
+                  [destLabwareId]: sourceModuleId,
+                },
+                moduleLocationUpdate: {
+                  ...savedForm.moduleLocationUpdate,
+                  [sourceModuleId]: destSlot,
+                },
+              }
+            }
+          }
 
           const labwareLocationUpdate: { [labwareId: string]: string } = {
             ...savedForm.labwareLocationUpdate,
@@ -447,9 +776,9 @@ export const savedStepForms = (
           },
           savedForm
         )
+        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         return {
           ...savedForm,
-          // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
           ...deleteLabwareUpdate,
         }
       })
@@ -542,9 +871,9 @@ export const savedStepForms = (
 
         return {
           ...acc,
+          // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
           [stepId]: {
             ...prevStepForm,
-            // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
             ...updatedFields,
           },
         }
@@ -658,16 +987,15 @@ export const savedStepForms = (
 
           return {
             ...acc,
+            // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
             [stepId]: {
               ...prevStepForm,
-              // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
               ...updatedFields,
             },
           }
         },
         {}
       )
-      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return { ...savedStepForms, ...savedStepsUpdate }
     }
 
@@ -683,10 +1011,10 @@ const initialLabwareState: NormalizedLabwareById = {
 }
 
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
-export const labwareInvariantProperties = handleActions<
+export const labwareInvariantProperties: Reducer<
   NormalizedLabwareById,
-  *
->(
+  any
+> = handleActions(
   {
     CREATE_CONTAINER: (
       state: NormalizedLabwareById,
@@ -742,7 +1070,10 @@ export const labwareInvariantProperties = handleActions<
   initialLabwareState
 )
 
-export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
+export const moduleInvariantProperties: Reducer<
+  ModuleEntities,
+  any
+> = handleActions(
   {
     CREATE_MODULE: (
       state: ModuleEntities,
@@ -789,10 +1120,10 @@ export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
 
 const initialPipetteState = {}
 
-export const pipetteInvariantProperties = handleActions<
+export const pipetteInvariantProperties: Reducer<
   NormalizedPipetteById,
-  *
->(
+  any
+> = handleActions(
   {
     LOAD_FILE: (
       state: NormalizedPipetteById,
@@ -838,14 +1169,20 @@ export const pipetteInvariantProperties = handleActions<
   initialPipetteState
 )
 
-type OrderedStepIdsState = Array<StepIdType>
+export type OrderedStepIdsState = Array<StepIdType>
 const initialOrderedStepIdsState = []
-export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
+export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
   {
-    ADD_STEP: (state: OrderedStepIdsState, action: AddStepAction) => [
-      ...state,
-      action.payload.id,
-    ],
+    SAVE_STEP_FORM: (
+      state: OrderedStepIdsState,
+      action: SaveStepFormAction
+    ) => {
+      const id = action.payload.id
+      if (!state.includes(id)) {
+        return [...state, id]
+      }
+      return state
+    },
     DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
       state.filter(stepId => stepId !== action.payload),
     LOAD_FILE: (
@@ -891,58 +1228,34 @@ export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
   initialOrderedStepIdsState
 )
 
-// TODO: Ian 2018-12-19 DEPRECATED. This should be removed soon, but we need it until we
-// move to not having "pristine" steps
-type LegacyStepsState = { [StepIdType]: StepItemData }
-const initialLegacyStepState: LegacyStepsState = {}
-export const legacySteps = handleActions<LegacyStepsState, *>(
-  {
-    ADD_STEP: (state, action: AddStepAction): LegacyStepsState => ({
-      ...state,
-      [action.payload.id]: action.payload,
-    }),
-    DELETE_STEP: (state, action: DeleteStepAction) =>
-      omit(state, action.payload.toString()),
-    LOAD_FILE: (
-      state: LegacyStepsState,
-      action: LoadFileAction
-    ): LegacyStepsState => {
-      const { savedStepForms, orderedStepIds } = getPDMetadata(
-        action.payload.file
-      )
-      return orderedStepIds.reduce(
-        (acc: LegacyStepsState, stepId) => {
-          const stepForm = savedStepForms[stepId]
-          if (!stepForm) {
-            console.warn(
-              `Step id ${stepId} found in orderedStepIds but not in savedStepForms`
-            )
-            return acc
-          }
-          return {
-            ...acc,
-            [stepId]: {
-              id: stepId,
-              stepType: stepForm.stepType,
-            },
-          }
-        },
-        { ...initialLegacyStepState }
-      )
-    },
-    DUPLICATE_STEP: (
-      state: LegacyStepsState,
-      action: DuplicateStepAction
-    ): LegacyStepsState => ({
-      ...state,
-      [action.payload.duplicateStepId]: {
-        ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
-        id: action.payload.duplicateStepId,
-      },
-    }),
-  },
-  initialLegacyStepState
-)
+export type PresavedStepFormState = {|
+  stepType: StepType,
+|} | null
+type PresavedStepFormAction =
+  | AddStepAction
+  | CancelStepFormAction
+  | DeleteStepAction
+  | SaveStepFormAction
+  | SelectTerminalItemAction
+  | SelectStepAction
+export const presavedStepForm = (
+  state: PresavedStepFormState = null,
+  action: PresavedStepFormAction
+): PresavedStepFormState => {
+  switch (action.type) {
+    case 'ADD_STEP':
+      return { stepType: action.payload.stepType }
+    case 'SELECT_TERMINAL_ITEM':
+      return action.payload === PRESAVED_STEP_ID ? state : null
+    case 'CANCEL_STEP_FORM':
+    case 'DELETE_STEP':
+    case 'SAVE_STEP_FORM':
+    case 'SELECT_STEP':
+      return null
+    default:
+      return state
+  }
+}
 
 export type RootState = {
   orderedStepIds: OrderedStepIdsState,
@@ -950,7 +1263,7 @@ export type RootState = {
   labwareInvariantProperties: NormalizedLabwareById,
   pipetteInvariantProperties: NormalizedPipetteById,
   moduleInvariantProperties: ModuleEntities,
-  legacySteps: LegacyStepsState,
+  presavedStepForm: PresavedStepFormState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
 }
@@ -958,7 +1271,7 @@ export type RootState = {
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
 // TODO: Ian 2018-12-13 remove this 'action: any' type
-export const rootReducer = (state: RootState, action: any) => {
+export const rootReducer: Reducer<RootState, any> = (state, action) => {
   const prevStateFallback = state || {}
   const nextState = {
     orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
@@ -975,10 +1288,15 @@ export const rootReducer = (state: RootState, action: any) => {
       action
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
-    legacySteps: legacySteps(prevStateFallback.legacySteps, action),
     // 'forms' reducers get full rootReducer state
+    // $FlowFixMe TODO(IL, 2020-06-08): savedStepForms should be typed as `Reducer` (which makes state: RootState | void)
     savedStepForms: savedStepForms(state, action),
+    // $FlowFixMe TODO(IL, 2020-06-08): unsavedForm should be typed as `Reducer` (which makes state: RootState | void)
     unsavedForm: unsavedForm(state, action),
+    presavedStepForm: presavedStepForm(
+      prevStateFallback.presavedStepForm,
+      action
+    ),
   }
   if (
     state &&

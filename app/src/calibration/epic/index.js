@@ -1,11 +1,14 @@
 // @flow
+
 import { combineEpics } from 'redux-observable'
-import { createRobotCalibrationCheckSessionEpic } from './createRobotCalibrationCheckSessionEpic'
-import { deleteRobotCalibrationCheckSessionEpic } from './deleteRobotCalibrationCheckSessionEpic'
+import { fetchCalibrationStatusEpic } from './fetchCalibrationStatusEpic'
+import { labwareCalibrationEpic } from '../labware/epic'
+import { pipetteOffsetCalibrationsEpic } from '../pipette-offset/epic'
 
 import type { Epic } from '../../types'
 
 export const calibrationEpic: Epic = combineEpics(
-  createRobotCalibrationCheckSessionEpic,
-  deleteRobotCalibrationCheckSessionEpic
+  fetchCalibrationStatusEpic,
+  labwareCalibrationEpic,
+  pipetteOffsetCalibrationsEpic
 )

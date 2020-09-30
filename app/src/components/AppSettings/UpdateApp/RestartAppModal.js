@@ -11,7 +11,7 @@ export type RestartAppModalProps = {|
   closeModal: () => mixed,
 |}
 
-export function RestartAppModal(props: RestartAppModalProps) {
+export function RestartAppModal(props: RestartAppModalProps): React.Node {
   const { availableVersion, applyUpdate, closeModal } = props
   return (
     <Portal>

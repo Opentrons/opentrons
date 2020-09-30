@@ -1,6 +1,4 @@
 // @flow
-import { swatchColors, MIXED_WELL_COLOR, AIR } from '@opentrons/components'
-
 export const humanizeLabwareType = (labwareType: string): string => {
   return labwareType.replace(/-|_/g, ' ')
 }
@@ -27,12 +25,4 @@ export const wellNameSplit = (wellName: string): [string, string] => {
   const numbers = raw[2]
 
   return [letters, numbers]
-}
-
-export const ingredIdsToColor = (groupIds: Array<string>): ?string => {
-  const filteredIngredIds = groupIds.filter(id => id !== AIR)
-  if (filteredIngredIds.length === 0) return null
-  if (filteredIngredIds.length === 1)
-    return swatchColors(Number(filteredIngredIds[0]))
-  return MIXED_WELL_COLOR
 }

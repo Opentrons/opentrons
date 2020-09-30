@@ -4,6 +4,12 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import {
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '../../../step-generation/utils'
+import { getWellRatio } from '../../utils'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
@@ -15,18 +21,16 @@ import {
   volumeInCapacityForMulti,
   DISPOSAL_VOL_DIGITS,
 } from './utils'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
-import { getWellRatio } from '../../utils'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../../step-generation/utils'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
+import {
+  getMinPipetteVolume,
+  getPipetteCapacity,
+} from '../../../pipettes/pipetteData'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
@@ -185,8 +189,16 @@ const updatePatchOnPipetteChange = (
   pipetteEntities: PipetteEntities
 ) => {
   // when pipette ID is changed (to another ID, or to null),
-  // set any flow rates, mix volumes, air gaps, or disposal volumes to null
+  // set any flow rates, mix volumes, or disposal volumes to null
+  // and set air gap volume to default (= pipette minimum)
   if (fieldHasChanged(rawForm, patch, 'pipette')) {
+    const newPipette = patch.pipette
+    let airGapVolume: string | null = null
+    if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
+      const pipetteSpec = pipetteEntities[newPipette].spec
+      airGapVolume = `${pipetteSpec.minVolume}`
+    }
+
     return {
       ...patch,
       ...getDefaultFields(
@@ -198,16 +210,51 @@ const updatePatchOnPipetteChange = (
         'aspirate_mmFromBottom',
         'dispense_mmFromBottom'
       ),
+      aspirate_airGap_volume: airGapVolume,
     }
   }
 
   return patch
 }
 
-const clearedDisposalVolumeFields = getDefaultFields(
-  'disposalVolume_volume',
-  'disposalVolume_checkbox'
-)
+const getClearedDisposalVolumeFields = () =>
+  getDefaultFields('disposalVolume_volume', 'disposalVolume_checkbox')
+
+const clampAirGapVolume = (
+  patch: FormPatch,
+  rawForm: FormData,
+  pipetteEntities: PipetteEntities
+): FormPatch => {
+  const patchedAspirateAirgapVolume =
+    patch.aspirate_airGap_volume ?? rawForm?.aspirate_airGap_volume
+
+  const pipetteId = patch.pipette ?? rawForm.pipette
+
+  if (
+    patchedAspirateAirgapVolume &&
+    typeof pipetteId === 'string' &&
+    pipetteId in pipetteEntities
+  ) {
+    const pipetteEntity = pipetteEntities[pipetteId]
+    const minPipetteVolume = getMinPipetteVolume(pipetteEntity)
+    const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
+    const maxAirGapVolume = getPipetteCapacity(pipetteEntity) - minPipetteVolume
+    const clampedAirGapVolume = clamp(
+      Number(patchedAspirateAirgapVolume),
+      minAirGapVolume,
+      maxAirGapVolume
+    )
+
+    if (clampedAirGapVolume === Number(patchedAspirateAirgapVolume))
+      return patch
+
+    return {
+      ...patch,
+      aspirate_airGap_volume: String(clampedAirGapVolume),
+    }
+  }
+  return patch
+}
 
 const updatePatchDisposalVolumeFields = (
   patch: FormPatch,
@@ -226,7 +273,7 @@ const updatePatchDisposalVolumeFields = (
     // or whenever disposalVolume_checkbox is cleared
     return {
       ...patch,
-      ...clearedDisposalVolumeFields,
+      ...getClearedDisposalVolumeFields(),
     }
   }
 
@@ -306,7 +353,7 @@ const clampDisposalVolume = (
       }
     : {
         ...patch,
-        ...clearedDisposalVolumeFields,
+        ...getClearedDisposalVolumeFields(),
       }
 }
 
@@ -366,11 +413,13 @@ const updatePatchOnPipetteChannelChange = (
       aspirate_wells: getAllWellsFromPrimaryWells(
         // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_wells is type ?mixed. Address in #3161
         appliedPatch.aspirate_wells,
+        // $FlowFixMe(mc, 2020-04-29): sourceLabwareDef is not typed properly. Address in #3161
         sourceLabwareDef
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
         // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_wells is type ?mixed. Address in #3161
         appliedPatch.dispense_wells,
+        // $FlowFixMe(mc, 2020-04-29): destLabwareDef is not typed properly. Address in #3161
         destLabwareDef
       ),
     }
@@ -495,6 +544,7 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
+    chainPatch => clampAirGapVolume(chainPatch, rawForm, pipetteEntities),
     chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchMixFields(chainPatch, rawForm),
     chainPatch => updatePatchBlowoutFields(chainPatch, rawForm),

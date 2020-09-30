@@ -2,7 +2,7 @@
 import type { DeckSlotId, ModuleModel } from '@opentrons/shared-data'
 import type {
   ProtocolFile as V3ProtocolFile,
-  _AspDispAirgapParams,
+  AspDispAirgapParams,
   BlowoutParams,
   TouchTipParams,
   PipetteAccessParams,
@@ -23,12 +23,25 @@ export type EngageMagnetParams = {|
 
 export type TemperatureParams = {| module: string, temperature: number |}
 
+export type AtomicProfileStep = {| holdTime: number, temperature: number |}
+export type TCProfileParams = {|
+  module: string,
+  profile: Array<AtomicProfileStep>,
+  volume: number,
+|}
+
 export type ModuleOnlyParams = {| module: string |}
+
+export type ThermocyclerSetTargetBlockTemperatureArgs = {|
+  module: string,
+  temperature: number,
+  volume?: number,
+|}
 
 export type Command =
   | {|
       command: 'aspirate' | 'dispense' | 'airGap',
-      params: _AspDispAirgapParams,
+      params: AspDispAirgapParams,
     |}
   | {|
       command: 'blowout',
@@ -66,7 +79,7 @@ export type Command =
     |}
   | {|
       command: 'thermocycler/setTargetBlockTemperature',
-      params: {| module: string, temperature: number, volume: number |},
+      params: ThermocyclerSetTargetBlockTemperatureArgs,
     |}
   | {|
       command: 'thermocycler/setTargetLidTemperature',
@@ -86,11 +99,7 @@ export type Command =
   | {| command: 'thermocycler/deactivateLid', params: ModuleOnlyParams |}
   | {|
       command: 'thermocycler/runProfile',
-      params: {|
-        module: string,
-        profile: Array<{| temperature: number, holdTime: number |}>,
-        volume: number,
-      |},
+      params: TCProfileParams,
     |}
   | {| command: 'thermocycler/awaitProfileComplete', params: ModuleOnlyParams |}
 

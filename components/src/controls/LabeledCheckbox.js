@@ -15,7 +15,7 @@ export type LabeledCheckboxProps = {|
   onChange: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
 |}
 
-export function LabeledCheckbox(props: LabeledCheckboxProps) {
+export function LabeledCheckbox(props: LabeledCheckboxProps): React.Node {
   const { label, value, name, onChange } = props
   const checkboxClass = cx(styles.labeled_checkbox, props.className)
   return (

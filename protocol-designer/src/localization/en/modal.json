@@ -24,7 +24,9 @@
       "mix_mmFromBottom": "Change from where in the well the robot aspirates and dispenses during the mix",
       "aspirate_touchTip_mmFromBottom": "Change from where in the well the robot performs touch tip",
       "dispense_touchTip_mmFromBottom": "Change from where in the well the robot performs touch tip",
-      "mix_touchTip_mmFromBottom": "Change from where in the well the robot performs touch tip"
+      "mix_touchTip_mmFromBottom": "Change from where in the well the robot performs touch tip",
+      "aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating",
+      "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing"
     },
     "field_label": "Distance from bottom of well"
   },
@@ -35,7 +37,24 @@
       "EXACT_LABWARE_MATCH": "Duplicate labware definition",
       "LABWARE_NAME_CONFLICT": "Duplicate labware name",
       "ASK_FOR_LABWARE_OVERWRITE": "Duplicate labware name",
-      "USES_STANDARD_NAMESPACE": "Standard (non-custom) Opentrons labware"
+      "USES_STANDARD_NAMESPACE": "Standard (non-custom) Opentrons labware",
+      "ONLY_TIPRACK": "Incompatible file type"
+    },
+    "message": {
+      "EXACT_LABWARE_MATCH": "This labware is identical to one you have already uploaded.",
+      "INVALID_JSON_FILE": "The Protocol Designer only accepts custom JSON labware definitions made with our Labware Creator",
+      "NOT_JSON": "The Protocol Designer only accepts custom JSON labware definitions made with our Labware Creator. This is not a .json file!",
+      "ONLY_TIPRACK": "This labware definition is not a Tip Rack.",
+      "USES_STANDARD_NAMESPACE": "This labware definition appears to be an Opentrons standard labware. Please upload only custom labware."
+    },
+    "name_conflict": {
+      "shared_display_name": "Shared display name: ",
+      "shared_load_name": "Shared load name: ",
+      "shares_name": "This labware shares an API Load name and/or a display name with {{customOrStandard}} labware that has already been uploaded.",
+      "re_export": "If you wish to add this labware then please return to the Labware Creator and export it again with a unique load name and display name.",
+      "overwrite": "If you intended to replace your previous labware with this new version then proceed with the Overwrite button below.",
+      "mismatched": "the new labware has a different arrangement of wells than the definition it is replacing. Clicking the Overwrite button will deselect all wells in any existing steps that use the overwritten definition. You will have to edit each of those steps and re-select the wells.",
+      "warning": "WARNING:"
     }
   },
   "new_protocol": {
@@ -62,8 +81,27 @@
     "title": "Change Pipette Selection",
     "body": "Update your pipette and tiprack selection. Please note, this may affect your existing protocol steps."
   },
-  "delete_step": {
-    "body": "Are you sure you want to delete this step?"
+  "confirm_delete_modal": {
+    "closeUnsavedStepForm": {
+      "title": "Unsaved step form",
+      "body": "You have not saved this step form. If you navigate away without saving, this step will be deleted.",
+      "confirm_button": "delete step"
+    },
+    "closeStepFormWithChanges": {
+      "title": "Unsaved changes to step",
+      "body": "You have unsaved changes in this step. If you navigate away without saving you will lose these changes.",
+      "confirm_button": "discard changes"
+    },
+    "deleteStepForm": {
+      "title": "Delete step",
+      "body": "Are you sure you want to delete this step?",
+      "confirm_button": "delete step"
+    },
+    "deleteProfileCycle": {
+      "title": "Delete cycle",
+      "body": "This will delete the cycle and all profile steps inside.",
+      "confirm_button": "delete cycle"
+    }
   },
   "global_step_changes": {
     "heading": "Are you sure you want to make this change?",
@@ -102,8 +140,9 @@
     }
   },
   "auto_add_pause_until_temp_step": {
-    "title": "Pause until module is {{temperature}}°C?",
-    "body": "Should your protocol pause until the module is {{temperature}}°C? Or should the protocol continue while the module changes temperature?",
+    "title": "Pause protocol until temperature module is at {{temperature}}°C?",
+    "body1": "Pause protocol now to wait until module reaches {{temperature}}°C before continuing on to the next step.",
+    "body2": "Build a pause later if you want your protocol to proceed to the next steps while the temperature module ramps up to {{temperature}}°C.",
     "now_button": "Pause protocol now",
     "later_button": "I will build a pause later"
   }

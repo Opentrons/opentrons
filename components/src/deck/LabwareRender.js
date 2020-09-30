@@ -32,7 +32,7 @@ export type LabwareRenderProps = {|
   selectableWellClass?: string,
 |}
 
-export function LabwareRender(props: LabwareRenderProps) {
+export function LabwareRender(props: LabwareRenderProps): React.Node {
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
   return (
     <g

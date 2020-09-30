@@ -4,18 +4,18 @@ import * as React from 'react'
 import styles from './SelectionRect.css'
 import type { DragRect, GenericRect } from '../collision-types'
 
-type Props = {
+type Props = {|
   onSelectionMove?: (e: MouseEvent, GenericRect) => mixed,
   onSelectionDone?: (e: MouseEvent, GenericRect) => mixed,
   svg?: boolean, // set true if this is an embedded SVG
   children?: React.Node,
   originXOffset?: number,
   originYOffset?: number,
-}
+|}
 
-type State = {
+type State = {|
   positions: DragRect | null,
-}
+|}
 
 export class SelectionRect extends React.Component<Props, State> {
   // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
@@ -27,7 +27,7 @@ export class SelectionRect extends React.Component<Props, State> {
     this.state = { positions: null }
   }
 
-  renderRect(args: DragRect) {
+  renderRect(args: DragRect): React.Node {
     const { xStart, yStart, xDynamic, yDynamic } = args
     const left = Math.min(xStart, xDynamic)
     const top = Math.min(yStart, yDynamic)
@@ -79,7 +79,7 @@ export class SelectionRect extends React.Component<Props, State> {
     )
   }
 
-  getRect(args: DragRect) {
+  getRect(args: DragRect): GenericRect {
     const { xStart, yStart, xDynamic, yDynamic } = args
     // convert internal rect position to more generic form
     // TODO should this be used in renderRect?
@@ -91,7 +91,7 @@ export class SelectionRect extends React.Component<Props, State> {
     }
   }
 
-  handleMouseDown = (e: MouseEvent) => {
+  handleMouseDown: (e: MouseEvent) => void = e => {
     document.addEventListener('mousemove', this.handleDrag)
     document.addEventListener('mouseup', this.handleMouseUp)
     this.setState({
@@ -104,19 +104,21 @@ export class SelectionRect extends React.Component<Props, State> {
     })
   }
 
-  handleDrag = (e: MouseEvent) => {
-    const nextRect = {
-      ...this.state.positions,
-      xDynamic: e.clientX,
-      yDynamic: e.clientY,
-    }
-    this.setState({ positions: nextRect })
+  handleDrag: (e: MouseEvent) => void = e => {
+    if (this.state.positions) {
+      const nextRect = {
+        ...this.state.positions,
+        xDynamic: e.clientX,
+        yDynamic: e.clientY,
+      }
+      this.setState({ positions: nextRect })
 
-    const rect = this.getRect(nextRect)
-    this.props.onSelectionMove && this.props.onSelectionMove(e, rect)
+      const rect = this.getRect(nextRect)
+      this.props.onSelectionMove && this.props.onSelectionMove(e, rect)
+    }
   }
 
-  handleMouseUp = (e: MouseEvent) => {
+  handleMouseUp: (e: MouseEvent) => void = e => {
     if (!(e instanceof MouseEvent)) {
       return
     }
@@ -134,7 +136,7 @@ export class SelectionRect extends React.Component<Props, State> {
       this.props.onSelectionDone(e, finalRect)
   }
 
-  render() {
+  render(): React.Node {
     const { svg, children } = this.props
 
     return svg ? (

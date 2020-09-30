@@ -8,14 +8,18 @@ import opentrons.protocol_api.labware as new_labware
 from opentrons.legacy_api.containers import (
     load as containers_load,
     list as containers_list,
-    load_new_labware as new_load
+    load_new_labware as new_load,
+    load_tip_length_calibration
 )
+from opentrons.calibration_storage import delete, modify
 from opentrons.legacy_api.containers.placeable import (
     Container,
     Well,
     Deck,
     Slot,
     unpack_location)
+from opentrons.util.helpers import utc_now
+
 from tests.opentrons import generate_plate
 # TODO: Modify all calls to get a Well to use the `wells` method
 # TODO: remove `unpack_location` calls
@@ -237,3 +241,22 @@ def test_well_from_center():
     assert plate['B2'].from_center(x=0.0, y=0.0, z=0.0) == (5, 5, 0)
     assert plate['B2'].from_center(r=1.0, theta=math.pi / 2, h=0.0)\
         == (5.0, 10.0, 0.0)
+
+
+def test_load_tip_length_calibration_v1(robot):
+    lw = containers_load(robot, 'opentrons_96_tiprack_10ul', '1')
+    hash = lw.properties['labware_hash']
+
+    tip_length_data = {
+            'tipLength': 19.99,
+            'lastModified': utc_now()}
+    tip_length_cal = {hash: tip_length_data}
+    pip_id = 'fake_id'
+    modify.save_tip_length_calibration(
+        pip_id=pip_id, tip_length_cal=tip_length_cal)
+
+    result = load_tip_length_calibration(pip_id, lw.wells('A1'))
+
+    assert result == tip_length_data
+
+    delete.clear_tip_length_calibration()  # clean up

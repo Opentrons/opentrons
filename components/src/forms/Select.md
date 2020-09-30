@@ -56,7 +56,7 @@ You can control the renders of individual options with the `formatOptionLabel` p
     { value: 'baz', label: 'Baz?!' },
   ]}
   formatOptionLabel={(option, { context }) =>
-    context === 'menu' && option?.value === 'bar' ? (
+    context === 'menu' && option.value === 'bar' ? (
       <span style={{ color: 'green' }}>{option.label}</span>
     ) : (
       option.label

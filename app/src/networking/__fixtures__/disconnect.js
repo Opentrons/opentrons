@@ -7,16 +7,22 @@ import {
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
 
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { NetworkingDisconnectResponse } from '../types'
 
 export const mockNetworkingDisconnect: NetworkingDisconnectResponse = {
   ssid: 'network-name',
 }
 
-const { successMeta, failureMeta, success, failure } = makeResponseFixtures<
+const {
+  successMeta,
+  failureMeta,
+  success,
+  failure,
+}: ResponseFixtures<
   NetworkingDisconnectResponse,
   {| message: string |}
->({
+> = makeResponseFixtures({
   method: POST,
   path: '/wifi/disconnect',
   successStatus: 200,

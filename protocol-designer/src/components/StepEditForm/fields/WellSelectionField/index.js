@@ -10,7 +10,7 @@ import type { StepFieldName } from '../../../../form-types'
 import type { FocusHandlers } from '../../types'
 import { showFieldErrors } from '../FieldConnector'
 
-type Props = React.ElementProps<typeof WellSelectionInput>
+type Props = React.ElementConfig<typeof WellSelectionInput>
 
 type OP = {|
   name: StepFieldName,
@@ -81,7 +81,14 @@ function mergeProps(
   }
 }
 
-export const WellSelectionField = connect<Props, OP, SP, {||}, _, _>(
+export const WellSelectionField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

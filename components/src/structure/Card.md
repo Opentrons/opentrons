@@ -1,7 +1,8 @@
 Basic usage:
 
 ```js
-<Card title="Hello Title Card">
+import { LabeledValue } from '@opentrons/components'
+;<Card title="Hello Title Card">
   <div
     style={{
       display: 'inline-block',
@@ -28,7 +29,8 @@ Basic usage:
 Disable the card:
 
 ```js
-<Card title="Hello Title Card" disabled>
+import { LabeledValue } from '@opentrons/components'
+;<Card title="Hello Title Card" disabled>
   <div
     style={{
       display: 'inline-block',

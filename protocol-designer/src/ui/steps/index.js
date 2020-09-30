@@ -5,7 +5,7 @@ import * as _thunks from './actions/thunks'
 export { rootReducer } from './reducers'
 export {
   rootSelector,
-  getSelectedStep,
+  getSelectedStepTitleInfo,
   getSelectedStepId,
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
@@ -16,7 +16,6 @@ export {
   getWellSelectionLabwareKey,
   getCollapsedSteps,
 } from './selectors'
-export * from './constants'
 export type * from './actions/types'
 
 export const actions = { ..._actions, ..._thunks }

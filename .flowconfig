@@ -37,6 +37,9 @@ esproposal.optional_chaining=enable
 ; default value of 19 (16 * 2^19 bytes > 8ish MB) isn't quite enough and can
 ; result in flow crashing with `Unhandled exception: SharedMem.Hash_table_full`
 sharedmemory.hash_table_pow=20
+; enable types-first mode for speed and explicitness
+; https://flow.org/en/docs/lang/types-first/
+types_first=true
 
 [strict]
 deprecated-type

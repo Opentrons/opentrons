@@ -15,6 +15,7 @@ import { downloadLogs } from '../../shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
 import { Portal } from '../portal'
 import {
+  BORDER_SOLID_LIGHT,
   AlertModal,
   Card,
   LabeledButton,
@@ -22,7 +23,8 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { UploadRobotUpdate } from './UploadRobotUpdate'
+import { UpdateFromFileControl } from './UpdateFromFileControl'
+import { OpenJupyterControl } from './OpenJupyterControl'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -50,15 +52,17 @@ const ROBOT_LOGS_OPTOUT_MESSAGE = (
   </>
 )
 
-export function AdvancedSettingsCard(props: AdvancedSettingsCardProps) {
+export function AdvancedSettingsCard(
+  props: AdvancedSettingsCardProps
+): React.Node {
   const { robot, resetUrl } = props
-  const { name, health, status } = robot
+  const { name, ip, health, status } = robot
   const settings = useSelector<State, RobotSettings>(state =>
     getRobotSettings(state, name)
   )
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
   const dispatch = useDispatch<Dispatch>()
-  const disabled = status !== CONNECTABLE
+  const controlsDisabled = status !== CONNECTABLE
   const logsAvailable = health && health.logs
 
   const showLogOptoutModal = settings.some(
@@ -72,7 +76,7 @@ export function AdvancedSettingsCard(props: AdvancedSettingsCardProps) {
   }, [dispatch, name])
 
   return (
-    <Card title={TITLE} disabled={disabled}>
+    <Card title={TITLE}>
       <LabeledButton
         label="Download Logs"
         buttonProps={{
@@ -81,7 +85,7 @@ export function AdvancedSettingsCard(props: AdvancedSettingsCardProps) {
           ) : (
             'Download'
           ),
-          disabled: disabled || !logsAvailable || robotLogsDownloading,
+          disabled: controlsDisabled || !logsAvailable || robotLogsDownloading,
           onClick: () => dispatch(downloadLogs(robot)),
         }}
       >
@@ -90,7 +94,7 @@ export function AdvancedSettingsCard(props: AdvancedSettingsCardProps) {
       <LabeledButton
         label="Factory Reset"
         buttonProps={{
-          disabled,
+          disabled: controlsDisabled,
           Component: Link,
           to: resetUrl,
           children: 'Reset',
@@ -98,17 +102,22 @@ export function AdvancedSettingsCard(props: AdvancedSettingsCardProps) {
       >
         <p>Restore robot to factory configuration</p>
       </LabeledButton>
+      <UpdateFromFileControl
+        robotName={name}
+        borderBottom={BORDER_SOLID_LIGHT}
+      />
+      <OpenJupyterControl robotIp={ip} borderBottom={BORDER_SOLID_LIGHT} />
       {settings.map(({ id, title, description, value }) => (
         <LabeledToggle
           key={id}
           label={title}
           toggledOn={value === true}
+          disabled={controlsDisabled}
           onClick={() => dispatch(updateSetting(name, id, !value))}
         >
           <p>{description}</p>
         </LabeledToggle>
       ))}
-      <UploadRobotUpdate robotName={name} />
       {showLogOptoutModal && (
         <Portal>
           <AlertModal

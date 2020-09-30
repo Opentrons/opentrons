@@ -11,7 +11,7 @@ const LINK_CUSTOM_LABWARE_GUIDE =
 
 const LINK_LABWARE_LIBRARY = getPublicPath()
 
-export const IntroCopy = () => (
+export const IntroCopy = (): React.Node => (
   <>
     <LinkOut
       href={LINK_CUSTOM_LABWARE_GUIDE}

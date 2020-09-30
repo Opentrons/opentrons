@@ -2,8 +2,9 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
-import { PrimaryButton, SidePanel, swatchColors } from '@opentrons/components'
+import { PrimaryButton, SidePanel } from '@opentrons/components'
 import { PDTitledList } from '../lists'
+import { swatchColors } from '../swatchColors'
 import listButtonStyles from '../listButtons.css'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
@@ -65,7 +66,14 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const LiquidsSidebar = connect<Props, {||}, SP, DP, _, _>(
+export const LiquidsSidebar: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(LiquidsSidebarComponent)

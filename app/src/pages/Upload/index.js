@@ -29,7 +29,9 @@ type SP = {|
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export const Upload = withRouter<_, _>(
+export const Upload: React.AbstractComponent<
+  $Diff<OP, ContextRouter>
+> = withRouter(
   connect<Props, OP, SP, _, _, _>(mapStateToProps)(UploadComponent)
 )
 

@@ -1,39 +1,39 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { push } from 'connected-react-router'
-import find from 'lodash/find'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
-import {
-  actions as robotActions,
-  selectors as robotSelectors,
-} from '../../robot'
-import { getAllRobots } from '../../discovery'
+import { actions as robotActions, selectors as robotSel } from '../../robot'
+import { getConnectedRobot, CONNECTABLE } from '../../discovery'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 import { ModalCopy } from './ModalCopy'
 
-import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 
-type OP = ContextRouter
-type SP = {| ok: ?boolean |}
-type DP = {| disconnect: () => mixed |}
-type Props = {| ...OP, ...SP, ...DP |}
+export function LostConnectionAlert(): React.Node {
+  const history = useHistory()
+  const dispatch = useDispatch<Dispatch>()
 
-export const LostConnectionAlert = withRouter<_, _>(
-  connect<Props, OP, SP, DP, State, Dispatch>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(LostConnectionAlertComponent)
-)
+  // TODO(mc, 2020-05-07): move LostConnectionAlert into `state.alerts`
+  const showAlert = useSelector((state: State) => {
+    const connectedName = robotSel.getConnectedRobotName(state)
+    const connectedRobot = getConnectedRobot(state)
+    const robotDown = connectedRobot?.status !== CONNECTABLE
+    const unexpectedDisconnect = state.robot.connection.unexpectedDisconnect
 
-function LostConnectionAlertComponent(props: Props) {
-  const { ok, disconnect } = props
+    // trigger an alert if we're supposed to be connected but the robot is down
+    // or if the WebSocket closed unexpectedly
+    return Boolean((connectedName && robotDown) || unexpectedDisconnect)
+  })
+
+  const disconnect = () => {
+    history.push('/robots')
+    dispatch(robotActions.disconnect())
+  }
 
   return (
-    ok === false && (
+    showAlert && (
       <Portal>
         <AlertModal
           onCloseClick={disconnect}
@@ -46,24 +46,4 @@ function LostConnectionAlertComponent(props: Props) {
       </Portal>
     )
   )
-}
-
-function mapStateToProps(state: State): SP {
-  // search _all_ robots, not just connectable ones, in case we were connected
-  // and then robot became not connectable
-  const robot = find(getAllRobots(state), {
-    name: robotSelectors.getConnectedRobotName(state),
-  })
-  const unexpectedDisconnect = state.robot.connection.unexpectedDisconnect
-
-  return { ok: robot && robot.ok && !unexpectedDisconnect }
-}
-
-function mapDispatchToProps(dispatch: Dispatch): DP {
-  return {
-    disconnect: () => {
-      dispatch(push('/robots'))
-      dispatch(robotActions.disconnect())
-    },
-  }
 }

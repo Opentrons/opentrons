@@ -55,7 +55,7 @@ export const SUBDOMAIN_NAV_LINKS: Links = [
   },
 ]
 
-export function SubdomainNav() {
+export function SubdomainNav(): React.Node {
   return (
     <ul className={styles.subdomain_nav_contents}>
       {SUBDOMAIN_NAV_LINKS.map((link, index) => {

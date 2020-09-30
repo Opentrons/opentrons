@@ -15,7 +15,7 @@ type CheckboxRowProps = {
   disabled?: boolean,
   tooltipComponent?: React.Node,
 }
-export const CheckboxRowField = (props: CheckboxRowProps) => (
+export const CheckboxRowField = (props: CheckboxRowProps): React.Node => (
   <FieldConnector
     name={props.name}
     tooltipComponent={props.tooltipComponent}

@@ -9,10 +9,10 @@ import { CardContainer, CardRow } from '../layout'
 
 export type AppSettingsProps = {|
   availableVersion: ?string,
-  checkUpdate: () => mixed,
+  checkUpdate: () => void,
 |}
 
-export function AppSettings(props: AppSettingsProps) {
+export function AppSettings(props: AppSettingsProps): React.Node {
   return (
     <CardContainer>
       <CardRow>

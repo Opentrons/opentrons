@@ -9,6 +9,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
+import { getMixDelayData } from './getDelayData'
 import type { HydratedMixFormDataLegacy } from '../../../form-types'
 import type { MixArgs } from '../../../step-generation'
 
@@ -19,7 +20,7 @@ export const mixFormToArgs = (
 ): MixStepArgs => {
   const { labware, pipette } = hydratedFormData
 
-  let unorderedWells = hydratedFormData.wells || []
+  const unorderedWells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.mix_wellOrder_first
   const orderSecond = hydratedFormData.mix_wellOrder_second
 
@@ -71,6 +72,19 @@ export const mixFormToArgs = (
     ? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
     : 0
 
+  // Delay settings
+  const aspirateDelaySeconds = getMixDelayData<HydratedMixFormDataLegacy>(
+    hydratedFormData,
+    'aspirate_delay_checkbox',
+    'aspirate_delay_seconds'
+  )
+
+  const dispenseDelaySeconds = getMixDelayData<HydratedMixFormDataLegacy>(
+    hydratedFormData,
+    'dispense_delay_checkbox',
+    'dispense_delay_seconds'
+  )
+
   return {
     commandCreatorFnName: 'mix',
     name: `Mix ${hydratedFormData.id}`, // TODO real name for steps
@@ -90,5 +104,7 @@ export const mixFormToArgs = (
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
     blowoutOffsetFromTopMm,
+    aspirateDelaySeconds,
+    dispenseDelaySeconds,
   }
 }

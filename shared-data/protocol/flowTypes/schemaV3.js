@@ -28,16 +28,16 @@ type VolumeParams = {| volume: number |}
 
 type OffsetParams = {| offsetFromBottomMm: number |}
 
-export type _AspDispAirgapParams = {|
+export type AspDispAirgapParams = {|
   ...FlowRateParams,
   ...PipetteAccessParams,
   ...VolumeParams,
   ...OffsetParams,
 |}
 
-export type AspirateParams = _AspDispAirgapParams
-export type DispenseParams = _AspDispAirgapParams
-export type AirGapParams = _AspDispAirgapParams
+export type AspirateParams = AspDispAirgapParams
+export type DispenseParams = AspDispAirgapParams
+export type AirGapParams = AspDispAirgapParams
 
 export type BlowoutParams = {|
   ...FlowRateParams,
@@ -61,7 +61,8 @@ export type MoveToSlotParams = {|
     y: number,
     z: number,
   |},
-  minimumZHeight: number,
+  minimumZHeight?: number,
+  forceDirect?: boolean,
 |}
 
 export type DelayParams = {|
@@ -72,7 +73,7 @@ export type DelayParams = {|
 export type Command =
   | {|
       command: 'aspirate' | 'dispense' | 'airGap',
-      params: _AspDispAirgapParams,
+      params: AspDispAirgapParams,
     |}
   | {|
       command: 'blowout',

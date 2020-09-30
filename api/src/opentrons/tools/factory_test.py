@@ -4,13 +4,13 @@ import functools
 import logging
 import os
 import subprocess
-from typing import Dict
+from typing import Dict, TYPE_CHECKING
 
 from opentrons.config import infer_config_base_dir
-from opentrons.drivers.rpi_drivers import gpio
 from opentrons.drivers import serial_communication
-from opentrons.drivers.smoothie_drivers.driver_3_0\
-    import SmoothieDriver_3_0_0
+if TYPE_CHECKING:
+    from opentrons.drivers.smoothie_drivers.driver_3_0\
+        import SmoothieDriver_3_0_0
 from opentrons.system import nmcli
 from . import args_handler
 
@@ -32,7 +32,7 @@ def _find_storage_device():
     if os.path.ismount(USB_MOUNT_FILEPATH) is False:
         sdn1_devices = [
             '/dev/sd{}1'.format(l)
-            for l in 'abcdefgh'
+            for l in 'abcdefgh'  # noqa(E741)
             if os.path.exists('/dev/sd{}1'.format(l))
         ]
         if len(sdn1_devices) == 0:
@@ -60,12 +60,12 @@ def _erase_data(filepath):
         os.remove(filepath)
 
 
-def _reset_lights(driver: SmoothieDriver_3_0_0):
+def _reset_lights(driver: 'SmoothieDriver_3_0_0'):
     driver.turn_off_rail_lights()
-    gpio.set_button_light(blue=True)
+    driver.turn_on_blue_button_light()
 
 
-def _get_state_of_inputs(driver: SmoothieDriver_3_0_0):
+def _get_state_of_inputs(driver: 'SmoothieDriver_3_0_0'):
     smoothie_switches = driver.switch_state
     probe = smoothie_switches['Probe']
     endstops = {
@@ -82,7 +82,7 @@ def _get_state_of_inputs(driver: SmoothieDriver_3_0_0):
 
 
 def _set_lights(state: Dict[str, Dict[str, bool]],
-                driver: SmoothieDriver_3_0_0):
+                driver: 'SmoothieDriver_3_0_0'):
     if state['windows']:
         driver.turn_off_rail_lights()
     else:
@@ -94,7 +94,7 @@ def _set_lights(state: Dict[str, Dict[str, bool]],
         green = True
     if state['button']:
         blue = True
-    gpio.set_button_light(red=red, green=green, blue=blue)
+    driver._gpio_chardev.set_button_light(red=red, green=green, blue=blue)
 
 
 def run_quiet_process(command):
@@ -129,7 +129,7 @@ def _get_unique_smoothie_responses(responses):
     return true_uniques
 
 
-def test_smoothie_gpio(driver: SmoothieDriver_3_0_0):
+def test_smoothie_gpio(driver: 'SmoothieDriver_3_0_0'):
     assert driver._connection, 'must be connected'
 
     def _write_and_return(msg):
@@ -194,7 +194,7 @@ def test_smoothie_gpio(driver: SmoothieDriver_3_0_0):
         print(RESULT_SPACE.format(FAIL))
 
 
-def test_switches_and_lights(driver: SmoothieDriver_3_0_0):
+def test_switches_and_lights(driver: 'SmoothieDriver_3_0_0'):
     print('\n')
     print('* BUTTON\t--> BLUE')
     print('* PROBE\t\t--> GREEN')

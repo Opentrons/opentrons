@@ -1,24 +1,34 @@
 import asyncio
 import base64
 from copy import copy
-from functools import reduce, wraps
+from functools import reduce
 import logging
 from time import time, sleep
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
 from uuid import uuid4
+
+from opentrons.api.util import (RobotBusy, robot_is_busy,
+                                requires_http_protocols_disabled)
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons import robot
 from opentrons.broker import Broker
+from opentrons.config import feature_flags as ff
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
 from opentrons.protocols.types import PythonProtocol, APIVersion
 from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
+from opentrons.calibration_storage import helpers
 from opentrons.protocol_api import (ProtocolContext,
-                                    labware, module_geometry)
-from opentrons.protocol_api.execute import run_protocol
+                                    labware)
+from opentrons.protocols.geometry import module_geometry
+from opentrons.protocols.execution.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
-                                        ExecutionCancelledError)
+                                        ExecutionCancelledError,
+                                        ThreadedAsyncLock)
+from opentrons.hardware_control.types import (DoorState, HardwareEventType,
+                                              HardwareEvent)
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -26,26 +36,16 @@ from opentrons.legacy_api.containers.placeable import (
 
 from opentrons.legacy_api.containers import get_container, location_to_list
 
+if TYPE_CHECKING:
+    from .dev_types import State, StateInfo
+
 log = logging.getLogger(__name__)
 
-VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
+VALID_STATES: Set['State'] = {
+    'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
-def _motion_lock(func):
-    """ Decorator to make a function require a lock. Only works for instance
-    methods of Session (or SessionManager) """
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        self = args[0]
-        if self._motion_lock:
-            with self._motion_lock:
-                return func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
-    return decorated
-
-
-class SessionManager(object):
+class SessionManager:
     def __init__(
             self, hardware, loop=None, broker=None, lock=None):
         self._broker = broker or Broker()
@@ -58,6 +58,7 @@ class SessionManager(object):
         self._broker.set_logger(self._command_logger)
         self._motion_lock = lock
 
+    @requires_http_protocols_disabled
     def create(
             self,
             name: str,
@@ -96,6 +97,7 @@ class SessionManager(object):
             raise Exception(
                 'Cannot create session while simulation in progress')
 
+        self.clear()
         self._session_lock = True
         try:
             _contents = base64.b64decode(contents) if is_binary else contents
@@ -114,6 +116,7 @@ class SessionManager(object):
         finally:
             self._session_lock = False
 
+    @requires_http_protocols_disabled
     def create_from_bundle(self, name: str, contents: str) -> 'Session':
         """ Create a protocol session from a base64'd zip file.
 
@@ -131,6 +134,7 @@ class SessionManager(object):
             raise Exception(
                 'Cannot create session while simulation in progress')
 
+        self.clear()
         self._session_lock = True
         try:
             _contents = base64.b64decode(contents)
@@ -149,6 +153,7 @@ class SessionManager(object):
         finally:
             self._session_lock = False
 
+    @requires_http_protocols_disabled
     def create_with_extra_labware(
             self,
             name: str,
@@ -174,6 +179,7 @@ class SessionManager(object):
             raise Exception(
                 "Cannot create session while simulation in progress")
 
+        self.clear()
         self._session_lock = True
         try:
             session_short_id = hex(uuid4().fields[0])
@@ -197,6 +203,7 @@ class SessionManager(object):
                 'Cannot clear session while simulation in progress')
 
         if self.session:
+            self.session._remove_hardware_event_watcher()
             self._hardware.reset()
         self.session = None
         self._broker.set_logger(self._command_logger)
@@ -205,7 +212,7 @@ class SessionManager(object):
         return self.session
 
 
-class Session(object):
+class Session(RobotBusy):
     TOPIC = 'session'
 
     @classmethod
@@ -213,7 +220,7 @@ class Session(object):
         cls, name, contents, hardware, loop, broker, motion_lock, extra_labware
     ):
         protocol = parse(contents, filename=name,
-                         extra_labware={labware.uri_from_definition(defn): defn
+                         extra_labware={helpers.uri_from_definition(defn): defn
                                         for defn in extra_labware})
         sess = cls(name, protocol, hardware, loop, broker, motion_lock)
         sess.prepare()
@@ -240,7 +247,10 @@ class Session(object):
         self._simulating_ctx = ProtocolContext.build_using(
             self._protocol, loop=self._loop, broker=self._broker)
 
-        self.state = None
+        self.state: 'State' = None
+        #: The current state
+        self.stateInfo: 'StateInfo' = {}
+        #: A message associated with the current state
         self.commands = []
         self.command_log = {}
         self.errors = []
@@ -255,8 +265,15 @@ class Session(object):
         self.modules = None
         self.protocol_text = protocol.text
 
-        self.startTime = None
+        self.startTime: Optional[float] = None
         self._motion_lock = motion_lock
+        self._event_watcher = None
+        self.door_state: Optional[str] = None
+        self.blocked: Optional[bool] = None
+
+    @property
+    def busy_lock(self) -> ThreadedAsyncLock:
+        return self._motion_lock
 
     def _hw_iface(self):
         if self._use_v2:
@@ -267,6 +284,7 @@ class Session(object):
     def prepare(self):
         if not self._use_v2:
             robot.discover_modules()
+
         self.refresh()
 
     def get_instruments(self):
@@ -308,7 +326,7 @@ class Session(object):
         self.command_log.clear()
         self.errors.clear()
 
-    @_motion_lock
+    @robot_is_busy
     def _simulate(self):
         self._reset()
 
@@ -372,6 +390,7 @@ class Session(object):
                 robot.broker = self._broker
                 # we don't rely on being connected anymore so make sure we are
                 robot.connect()
+                robot._driver.gpio_chardev = SimulatingGPIOCharDev('sim_chip')
                 robot.cache_instrument_models()
                 robot.disconnect()
 
@@ -433,11 +452,12 @@ class Session(object):
         self.modules = self.get_modules()
         self.startTime = None
         self.set_state('loaded')
+
         return self
 
     def stop(self):
         self._hw_iface().halt()
-        with self._motion_lock:
+        with self._motion_lock.lock():
             try:
                 self._hw_iface().stop()
             except asyncio.CancelledError:
@@ -445,7 +465,10 @@ class Session(object):
         self.set_state('stopped')
         return self
 
-    def pause(self):
+    def pause(self,
+              reason: str = None,
+              user_message: str = None,
+              duration: float = None):
         if self._use_v2:
             self._hardware.pause()
         # robot.pause in the legacy API will publish commands to the broker
@@ -453,27 +476,66 @@ class Session(object):
         else:
             robot.execute_pause()
 
-        self.set_state('paused')
+        self.set_state(
+            'paused', reason=reason,
+            user_message=user_message, duration=duration)
         return self
 
     def resume(self):
-        if self._use_v2:
-            self._hardware.resume()
-        # robot.resume in the legacy API will publish commands to the broker
-        # use the broker-less execute_resume instead
+        if not self.blocked:
+            if self._use_v2:
+                self._hardware.resume()
+            # robot.resume in the legacy API will publish commands to the
+            # broker use the broker-less execute_resume instead
+            else:
+                robot.execute_resume()
+
+            self.set_state('running')
+            return self
+
+    def _start_hardware_event_watcher(self):
+        if not callable(self._event_watcher):
+            # initialize and update window switch state
+            self._update_window_state(self._hardware.door_state)
+            log.info('Starting hardware event watcher')
+            self._event_watcher = self._hardware.register_callback(
+                self._handle_hardware_event)
         else:
-            robot.execute_resume()
+            log.warning("Cannot start new hardware event watcher "
+                        "when one already exists")
 
-        self.set_state('running')
-        return self
+    def _remove_hardware_event_watcher(self):
+        if callable(self._event_watcher):
+            self._event_watcher()
+            self._event_watcher = None
 
-    @_motion_lock  # noqa(C901)
+    def _handle_hardware_event(self, hw_event: 'HardwareEvent'):
+        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+            self._update_window_state(hw_event.new_state)
+            if ff.enable_door_safety_switch() and \
+                    hw_event.new_state == DoorState.OPEN and \
+                    self.state == 'running':
+                self.pause('Robot door is open')
+            else:
+                self._on_state_changed()
+
+    def _update_window_state(self, state: DoorState):
+        self.door_state = str(state)
+        if ff.enable_door_safety_switch() and \
+                state == DoorState.OPEN:
+            self.blocked = True
+        else:
+            self.blocked = False
+
+    @robot_is_busy  # noqa(C901)
     def _run(self):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
             if message['name'] == command_types.PAUSE:
-                self.set_state('paused')
+                self.set_state('paused',
+                               reason='The protocol paused execution',
+                               user_message=message['payload']['userMessage'])
             if message['name'] == command_types.RESUME:
                 self.set_state('running')
 
@@ -490,6 +552,7 @@ class Session(object):
                 self.resume()
                 self._pre_run_hooks()
                 self._hardware.cache_instruments()
+                self._hardware.reset_instrument()
                 ctx = ProtocolContext.build_using(
                     self._protocol,
                     loop=self._loop,
@@ -504,6 +567,11 @@ class Session(object):
                     'Internal error: v1 should only be used for python'
                 if not robot.is_connected():
                     robot.connect()
+                # backcompat patch: gpiod can only be used from one place so
+                # we have to give the instance of the smoothie driver used by
+                # the apiv1 singletons a reference to the main gpio driver
+                robot._driver.gpio_chardev\
+                    = self._hardware._backend.gpio_chardev
                 self.resume()
                 self._pre_run_hooks()
                 robot.cache_instrument_models()
@@ -536,22 +604,45 @@ class Session(object):
             _unsubscribe()
 
     def run(self):
-        try:
-            self._broker.set_logger(self._run_logger)
-            self._run()
-        except Exception:
-            raise
-        finally:
-            self._broker.set_logger(self._default_logger)
-        return self
+        if not self.blocked:
+            try:
+                self._broker.set_logger(self._run_logger)
+                self._run()
+            except Exception:
+                raise
+            finally:
+                self._broker.set_logger(self._default_logger)
+            return self
+        else:
+            raise RuntimeError(
+                'Protocol is blocked and cannot run. Make sure robot door '
+                'is closed before running.')
 
-    def set_state(self, state):
-        log.debug("State set to {}".format(state))
+    def set_state(self, state: 'State',
+                  reason: str = None,
+                  user_message: str = None,
+                  duration: float = None):
         if state not in VALID_STATES:
             raise ValueError(
                 'Invalid state: {0}. Valid states are: {1}'
                 .format(state, VALID_STATES))
         self.state = state
+        if user_message:
+            self.stateInfo['userMessage'] = user_message
+        else:
+            self.stateInfo.pop('userMessage', None)
+        if reason:
+            self.stateInfo['message'] = reason
+        else:
+            self.stateInfo.pop('message', None)
+        if duration:
+            self.stateInfo['estimatedDuration'] = duration
+        else:
+            self.stateInfo.pop('estimatedDuration', None)
+        if self.startTime:
+            self.stateInfo['changedAt'] = now()-self.startTime
+        else:
+            self.stateInfo.pop('changedAt', None)
         self._on_state_changed()
 
     def log_append(self):
@@ -570,6 +661,9 @@ class Session(object):
     def _reset(self):
         self._hw_iface().reset()
         self.clear_logs()
+        # unregister existing event watcher
+        self._remove_hardware_event_watcher()
+        self._start_hardware_event_watcher()
 
     def _snapshot(self):
         if self.state == 'loaded':
@@ -585,7 +679,10 @@ class Session(object):
 
             payload = {
                 'state': self.state,
+                'stateInfo': self.stateInfo,
                 'startTime': self.startTime,
+                'doorState': self.door_state,
+                'blocked': self.blocked,
                 'errors': self.errors,
                 'lastCommand': last_command
             }
@@ -665,6 +762,7 @@ def _get_labware(command):  # noqa(C901)
     modules.append(maybe_module)
 
     locations = command.get('locations')
+    multiple_instruments = command.get('instruments')
 
     if location:
         if isinstance(location, (Placeable)) or type(location) == tuple:
@@ -694,5 +792,10 @@ def _get_labware(command):  # noqa(C901)
         instruments.append(instrument)
         interactions.extend(
             [(instrument, container) for container in containers])
+    if multiple_instruments:
+        for instr in multiple_instruments:
+            instruments.append(instr)
+            interactions.extend(
+                [(instr, container) for container in containers])
 
     return instruments, containers, modules, interactions

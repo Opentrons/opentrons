@@ -1,6 +1,7 @@
 import { TestScheduler } from 'rxjs/testing'
 
-import * as actions from '../actions'
+import * as Shell from '../../shell'
+import * as Actions from '../actions'
 import { discoveryEpic } from '../epic'
 
 describe('discovery actions', () => {
@@ -14,22 +15,33 @@ describe('discovery actions', () => {
 
   it('startDiscoveryEpic with default timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: actions.startDiscovery() })
+      const action$ = hot('-a', { a: Actions.startDiscovery() })
       const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('- 30000ms a ', {
-        a: actions.finishDiscovery(),
+        a: Actions.finishDiscovery(),
       })
     })
   })
 
   it('startDiscoveryEpic with specified timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: actions.startDiscovery(42) })
+      const action$ = hot('-a', { a: Actions.startDiscovery(42) })
       const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('- 42ms a ', {
-        a: actions.finishDiscovery(),
+        a: Actions.finishDiscovery(),
+      })
+    })
+  })
+
+  it('startDiscoveryEpic with shell:UI_INITIALIZED', () => {
+    testScheduler.run(({ hot, expectObservable }) => {
+      const action$ = hot('-a', { a: Shell.uiInitialized() })
+      const output$ = discoveryEpic(action$)
+
+      expectObservable(output$).toBe('- 30000ms a ', {
+        a: Actions.finishDiscovery(),
       })
     })
   })
@@ -45,7 +57,7 @@ describe('discovery actions', () => {
       const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('-a ', {
-        a: actions.startDiscovery(60000),
+        a: Actions.startDiscovery(60000),
       })
     })
   })

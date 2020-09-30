@@ -1,5 +1,8 @@
 ```js
-initialState = { isChecked1: false, isChecked2: true }
+const [state, setState] = React.useState({
+  isChecked1: false,
+  isChecked2: true,
+})
 ;<div>
   <CheckboxField
     label="Check Box 1"

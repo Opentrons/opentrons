@@ -36,6 +36,11 @@ function mapStateToProps(state: BaseState): SP {
   return { showHint: noLabware }
 }
 
-export const StartingDeckStateTerminalItem = connect<Props, {||}, SP, _, _, _>(
-  mapStateToProps
-)(StartingDeckStateTerminalItemComponent)
+export const StartingDeckStateTerminalItem: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  _,
+  _,
+  _
+>(mapStateToProps)(StartingDeckStateTerminalItemComponent)

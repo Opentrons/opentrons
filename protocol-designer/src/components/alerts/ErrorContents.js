@@ -10,7 +10,7 @@ type ErrorContentsProps = {
   errorType: string,
   level: AlertLevel,
 }
-export const ErrorContents = (props: ErrorContentsProps) => {
+export const ErrorContents = (props: ErrorContentsProps): React.Node => {
   if (props.level === 'timeline') {
     const bodyText = i18n.t(`alert.timeline.error.${props.errorType}.body`, {
       defaultValue: '',

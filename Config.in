@@ -2,3 +2,4 @@
 source "$BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH/api/Config.in"
 source "$BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH/update-server/Config.in"
 source "$BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH/robot-server/Config.in"
+source "$BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH/shared-data/python/Config.in"

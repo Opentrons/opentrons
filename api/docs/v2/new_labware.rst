@@ -22,8 +22,9 @@ which informed the protocol context that the deck contains a 300 µL tiprack in 
 A third optional argument can be used to give the labware a nickname to be displayed in the Opentrons App.
 
 .. code-block:: python
+
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat',
-                                  slot='2',
+                                  location='2',
                                   label='any-name-you-want')
 
 Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns
@@ -44,9 +45,9 @@ The OT-2 has a set of labware well-supported by Opentrons defined internally. Th
 Custom Labware
 ^^^^^^^^^^^^^^
 
-If you have a piece of labware that is not in the Labware Library, you can create your own definition using the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. Before using the Labware Creator, you should read the introduction article `here <https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions>`_.
+If you have a piece of labware that is not in the Labware Library, you can create your own definition using the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. Before using the Labware Creator, you should read the introduction article `here <https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions>`__.
 
-Once you have created your labware and saved it as a ``.json`` file, you can add it to the Opentrons App by clicking "More" and then "Labware". Once you have added your labware to the Opentrons App, it will be available to all Python Protocol API version 2 protocols uploaded to your robot through that Opentrons App. If other people will be using this custom labware definition, they must also add it to their Opentrons App. You can find a support article about this custom labware process `here <https://support.opentrons.com/en/articles/3136506-using-labware-in-your-protocols>`_.
+Once you have created your labware and saved it as a ``.json`` file, you can add it to the Opentrons App by clicking "More" and then "Labware". Once you have added your labware to the Opentrons App, it will be available to all Python Protocol API version 2 protocols uploaded to your robot through that Opentrons App. If other people will be using this custom labware definition, they must also add it to their Opentrons App. You can find a support article about this custom labware process `here <https://support.opentrons.com/en/articles/3136506-using-labware-in-your-protocols>`__.
 
 
 .. _new-well-access:
@@ -73,11 +74,12 @@ The ending well will be in the bottom right, see the diagram below for further e
 .. image:: ../img/well_iteration/Well_Iteration.png
 
 .. code-block:: python
+    :substitutions:
 
     '''
     Examples in this section expect the following
     '''
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
 
@@ -268,7 +270,7 @@ numbers move down):
    If you are using this to change the position at which the robot does
    :ref:`new-aspirate` or :ref:`new-dispense` throughout the protocol, consider
    setting the default aspirate or dispense offset with
-   :py:attr:`.InstrumentContext.well_bottom_clearance`
+   :py:obj:`.InstrumentContext.well_bottom_clearance`
    (see :ref:`new-default-op-positions`).
 
 .. versionadded:: 2.0
@@ -296,25 +298,30 @@ representing the combination of a point in space (another named tuple) and
 a reference to the associated :py:class:`.Well` (or :py:class:`.Labware`, or
 slot name, depending on context).
 
-To further change positions, you can use :py:meth:`.Location.move`, which
-lets you move the Location. This function takes a single argument, ``point``,
-which should be a :py:class:`opentrons.types.Point`. This is a named tuple
-with elements ``x``, ``y``, and ``z``, representing a 3 dimensional point.
+To adjust the position within a well, you can use :py:meth:`.Location.move`.
+Pass it a :py:class:`opentrons.types.Point` representing a 3-dimensional offset.
+It will return a new location, representing the original location with that offset applied.
 
-To move a location, you create a :py:class:`.types.Point` representing a
-3d offset and give it to :py:meth:`.Location.move`:
+For example:
 
 .. code-block:: python
+    :substitutions:
 
-   from opentrons import types
+    from opentrons import types
 
-   metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
-   def run(protocol):
+    def run(protocol):
         plate = protocol.load_labware(
-           'corning_24_wellplate_3.4ml_flat', slot='1')
-        plate['A1'].center().move(
-           types.Point(x=1, y=1, z=1)) # 1mm up, to the right, and towards the
-                                       # back of the robot
+        'corning_24_wellplate_3.4ml_flat', slot='1')
+
+        # Get the center of well A1.
+        center_location = plate['A1'].center()
+
+        # Get a location 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
+        adjusted_location = center_location.move(types.Point(x=1, y=1, z=1))
+
+        # Move to 1 mm right, 1 mm back, and 1 mm up from the center of well A1.
+        pipette.move_to(adjusted_location)
 
 .. versionadded:: 2.0

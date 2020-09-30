@@ -1,7 +1,8 @@
 Basic usage:
 
 ```js
-<HoverTooltip tooltipComponent={<div>Something Explanatory!</div>}>
+import { FlatButton } from '@opentrons/components'
+;<HoverTooltip tooltipComponent={<div>Something Explanatory!</div>}>
   {hoverTooltipHandlers => (
     <FlatButton
       hoverTooltipHandlers={hoverTooltipHandlers}
@@ -16,7 +17,8 @@ Basic usage:
 Specify Placement:
 
 ```js
-<HoverTooltip
+import { FlatButton } from '@opentrons/components'
+;<HoverTooltip
   placement="right"
   tooltipComponent={<div>Something Explanatory, but over here this time!</div>}
 >
@@ -34,7 +36,8 @@ Specify Placement:
 Specify Placement (with override):
 
 ```js
-<HoverTooltip
+import { FlatButton } from '@opentrons/components'
+;<HoverTooltip
   placement="left"
   tooltipComponent={
     <div>

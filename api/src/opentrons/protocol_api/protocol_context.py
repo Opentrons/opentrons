@@ -2,29 +2,33 @@ import asyncio
 import contextlib
 import logging
 from typing import (Dict, Iterator, List,
-                    Optional, Set, Tuple, Union)
+                    Optional, Set, Tuple, Union, TYPE_CHECKING)
 
 from opentrons import types, commands as cmds
 from opentrons.hardware_control import (SynchronousAdapter, modules,
                                         API, ExecutionManager)
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
+from opentrons.protocols.api_support.constants import SHORT_TRASH_DECK, \
+    STANDARD_DECK
 from opentrons.protocols.types import APIVersion, Protocol
 from .labware import (
-    LabwareDefinition, Labware, get_labware_definition, load_from_definition)
-from .module_geometry import (
+    Labware, get_labware_definition, load_from_definition)
+from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, load_module, resolve_module_model,
     resolve_module_type, models_compatible, ModuleType,
     module_model_from_string)
-from .definitions import MAX_SUPPORTED_VERSION
-from . import geometry
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from .instrument_context import InstrumentContext
 from .module_contexts import (
     ModuleContext, MagneticModuleContext, TemperatureModuleContext,
     ThermocyclerContext)
-from .util import (AxisMaxSpeeds, HardwareManager,
-                   requires_version, HardwareToManage)
-
+from opentrons.protocols.api_support.util import (
+    AxisMaxSpeeds, HardwareManager, requires_version, HardwareToManage,
+    APIVersionError, convert_door_state_to_bool)
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -56,9 +60,9 @@ class ProtocolContext(CommandPublisher):
                  loop: asyncio.AbstractEventLoop = None,
                  hardware: HardwareToManage = None,
                  broker=None,
-                 bundled_labware: Dict[str, LabwareDefinition] = None,
+                 bundled_labware: Dict[str, 'LabwareDefinition'] = None,
                  bundled_data: Dict[str, bytes] = None,
-                 extra_labware: Dict[str, LabwareDefinition] = None,
+                 extra_labware: Dict[str, 'LabwareDefinition'] = None,
                  api_version: APIVersion = None,
                  ) -> None:
         """ Build a :py:class:`.ProtocolContext`.
@@ -96,7 +100,9 @@ class ProtocolContext(CommandPublisher):
                 f'robot software. Please either reduce your requested API '
                 f'version or update your robot.')
         self._loop = loop or asyncio.get_event_loop()
-        self._deck_layout = geometry.Deck()
+        deck_load_name = SHORT_TRASH_DECK if fflags.short_fixed_trash() \
+            else STANDARD_DECK
+        self._deck_layout = Deck(load_name=deck_load_name)
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
         self._modules: Set[ModuleContext] = set()
@@ -114,13 +120,6 @@ class ProtocolContext(CommandPublisher):
 
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
-        if fflags.short_fixed_trash():
-            trash_name = 'opentrons_1_trash_850ml_fixed'
-        else:
-            trash_name = 'opentrons_1_trash_1100ml_fixed'
-        if self._deck_layout['12']:
-            del self._deck_layout['12']
-        self.load_labware(trash_name, '12')
 
     @classmethod
     def build_using(cls,
@@ -140,7 +139,7 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
-        """ Return the API version supported by this protoocl context.
+        """ Return the API version supported by this protocol context.
 
         The supported API version was specified when the protocol context
         was initialized. It may be lower than the highest version supported
@@ -288,7 +287,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def load_labware_from_definition(
             self,
-            labware_def: LabwareDefinition,
+            labware_def: 'LabwareDefinition',
             location: types.DeckLocation,
             label: str = None,
     ) -> Labware:
@@ -398,7 +397,8 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def load_module(
             self, module_name: str,
-            location: Optional[types.DeckLocation] = None) -> ModuleTypes:
+            location: Optional[types.DeckLocation] = None,
+            configuration: str = None) -> ModuleTypes:
         """ Load a module onto the deck given its name.
 
         This is the function to call to use a module in your protocol, like
@@ -418,6 +418,11 @@ class ProtocolContext(CommandPublisher):
                          location. You do not have to specify a location
                          when loading a Thermocycler - it will always be
                          in Slot 7.
+        :param configuration: Used to specify the slot configuration of
+                              the Thermocycler. Only Valid in Python API
+                              Version 2.4 and later. If you wish to use
+                              the non-full plate configuration, you must
+                              pass in the key word value `semi`
         :type location: str or int or None
         :returns ModuleContext: The loaded and initialized
                                 :py:class:`ModuleContext`.
@@ -426,11 +431,17 @@ class ProtocolContext(CommandPublisher):
         resolved_type = resolve_module_type(resolved_model)
         resolved_location = self._deck_layout.resolve_module_location(
             resolved_type, location)
+        if self._api_version < APIVersion(2, 4) and configuration:
+            raise APIVersionError(
+                f'You have specified API {self._api_version}, but you are'
+                'using thermocycler parameters only available in 2.4')
+
         geometry = load_module(
             resolved_model,
             self._deck_layout.position_for(
                 resolved_location),
-            self._api_version)
+            self._api_version, configuration)
+
         hc_mod_instance = None
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,
@@ -542,9 +553,10 @@ class ProtocolContext(CommandPublisher):
             raise RuntimeError("Instrument already present in {} mount: {}"
                                .format(checked_mount.name.lower(),
                                        instr.name))
-        attached = {att_mount: instr.get('model', None)
+        attached = {att_mount: instr.get('name', None)
                     for att_mount, instr
-                    in self._hw_manager.hardware.attached_instruments.items()}
+                    in self._hw_manager.hardware.attached_instruments.items()
+                    if instr}
         attached[checked_mount] = instrument_name
         self._log.debug("cache instruments expectation: {}"
                         .format(attached))
@@ -607,6 +619,10 @@ class ProtocolContext(CommandPublisher):
         """
         Add a user-readable comment string that will be echoed to the Opentrons
         app.
+
+        The value of the message is computed during protocol simulation,
+        so cannot be used to communicate real-time information from the robot's
+        actual run.
         """
         pass
 
@@ -643,7 +659,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def deck(self) -> geometry.Deck:
+    def deck(self) -> Deck:
         """ The object holding the deck layout of the robot.
 
         This object behaves like a dictionary with keys for both numeric
@@ -653,15 +669,49 @@ class ProtocolContext(CommandPublisher):
         is useful for determining if a slot in the deck is free. Rather than
         filtering the objects in the deck map yourself, you can also use
         :py:attr:`loaded_labwares` to see a dict of labwares and
-        :py:attr:`loaded_modules` to see a dict of modules.
+        :py:attr:`loaded_modules` to see a dict of modules. For advanced
+        control you can delete an item of labware from the deck with
+        e.g. ``del protocol.deck['1']`` to free a slot for new labware.
+        (Note that for each slot only the last labware used in a command will
+        be available for calibration in the OpenTrons UI, and that the
+        tallest labware on the deck will be calculated using only currently
+        loaded labware, meaning that the labware loaded should always
+        reflect the labware physically on the deck (or be higher than the
+        labware on the deck).
         """
         return self._deck_layout
 
     @property  # type: ignore
     @requires_version(2, 0)
     def fixed_trash(self) -> Labware:
-        """ The trash fixed to slot 12 of the robot deck. """
+        """ The trash fixed to slot 12 of the robot deck.
+
+        It has one well and should be accessed like labware in your protocol.
+        e.g. ``protocol.fixed_trash['A1']``
+        """
         trash = self._deck_layout['12']
         if not trash:
             raise RuntimeError("Robot must have a trash container in 12")
         return trash  # type: ignore
+
+    @requires_version(2, 5)
+    def set_rail_lights(self, on: bool):
+        """
+        Controls the robot rail lights
+
+        :param bool on: If true, turn on rail lights; otherwise, turn off.
+        """
+        self._hw_manager.hardware.set_lights(rails=on)
+
+    @property  # type: ignore
+    @requires_version(2, 5)
+    def rail_lights_on(self) -> bool:
+        """ Returns True if the rail lights are on """
+        return self._hw_manager.hardware.get_lights()['rails']
+
+    @property  # type: ignore
+    @requires_version(2, 5)
+    def door_closed(self) -> bool:
+        """ Returns True if the robot door is closed """
+        return convert_door_state_to_bool(
+            self._hw_manager.hardware.door_state)

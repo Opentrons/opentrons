@@ -1,5 +1,8 @@
 # opentrons api makefile
 
+include ../scripts/push.mk
+include ../scripts/python.mk
+
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
@@ -13,21 +16,13 @@ SHX := npx shx
 firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
-pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
-python := $(pipenv_envvars) pipenv run python
-pip := $(pipenv_envvars) pipenv run pip
-pytest := $(pipenv_envvars) pipenv run py.test
-sphinx_build := $(pipenv_envvars) pipenv run sphinx-build
-pipenv_opts := --dev
-pipenv_opts += $(and $(CI),--keep-outdated --clear)
-wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
+sphinx_build := $(pipenv) run sphinx-build
 
 
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/opentrons-$(shell $(python) ../scripts/python_build_utils.py api normalize_version)-py2.py3-none-any.whl
-wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
+wheel_file = dist/$(call python_get_wheelname,api,opentrons,$(BUILD_NUMBER))
 
 # These variables are for simulating python protocols
 sim_log_level ?= info
@@ -46,13 +41,12 @@ pypi_username ?=
 pypi_password ?=
 
 # Host key location for buildroot robot
-br_ssh_key ?= ~/.ssh/robot_key
-# Pubkey location for buildroot robot to install with install-key
-br_ssh_pubkey ?= $(br_ssh_key).pub
+br_ssh_key ?= $(default_ssh_key)
 # Other SSH args for buildroot robots
-ssh_opts ?= -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
+ssh_opts ?= $(default_ssh_opts)
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
+twine_repository_url ?= $(pypi_test_upload_url)
 
 # Source discovery
 # For the python sources
@@ -61,31 +55,31 @@ ot_py_sources := $(filter %.py,$(shell $(SHX) find src/opentrons/))
 ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 # And the arbitrary stuff in resources
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
-# and the openapi spec
-ot_openapi := src/opentrons/server/openapi.json
-ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources) $(ot_openapi)
+ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
 
+plot_type ?=
+
 .PHONY: all
 all: clean wheel
 
-.PHONY: install
-install:
-	$(pipenv_envvars) pipenv sync $(pipenv_opts)
-	$(pipenv_envvars) pipenv run pip freeze
+.PHONY: setup
+setup:
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean: docs-clean
 	$(clean_cmd)
 
-.PHONY: uninstall
-uninstall:
-	$(pipenv_envvars)	pipenv --rm
+.PHONY: teardown
+teardown:
+	$(pipenv) --rm
 
-$(wheel_pattern): setup.py $(ot_sources)
+dist/opentrons-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
@@ -101,7 +95,6 @@ test:
 lint: $(ot_py_sources)
 	$(python) -m mypy src/opentrons
 	$(python) -m pylama src/opentrons tests
-	$(python) -m openapi_spec_validator src/opentrons/server/openapi.json
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
@@ -132,45 +125,35 @@ docs-clean:
 	$(SHX) rm -rf docs/dist docs/build
 
 .PHONY: dev
-dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
 	echo "Command will be deprecated. Use \"make -C robot-server dev\""
 	$(MAKE) -C ../robot-server dev
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv_envvars) pipenv shell
+	$(pipenv) shell
 
 .PHONY: push-no-restart
 push-no-restart: wheel
-	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
-	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / ; } ;\
-mount -o remount,rw / &&\
-cd /usr/lib/python3.7/site-packages &&\
-unzip -o /data/opentrons-*.whl && cleanup || cleanup"
+	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push
 push: push-no-restart
-	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"systemctl restart jupyter-notebook && systemctl restart opentrons-robot-server"
+	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: simulate
 simulate:
 	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
 
-.PHONY: deploy-staging
-deploy-staging: wheel
-	-$(python) -m twine upload --repository-url "https://test.pypi.org/legacy/"\
-                             $(twine_auth_args)\
-                             $(wheel_file)
-
 .PHONY: deploy
 deploy: wheel
-	$(python) -m twine upload $(twine_auth_args)\
-                            $(wheel_file)
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
 
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+
+.PHONY: plot-session
+plot-session:
+	$(python) util/plot_session.py $(plot_type) $(plot_type).pdf

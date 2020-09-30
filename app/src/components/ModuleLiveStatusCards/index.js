@@ -15,7 +15,7 @@ import { TempDeckCard } from './TempDeckCard'
 import { MagDeckCard } from './MagDeckCard'
 import { ThermocyclerCard } from './ThermocyclerCard'
 
-export const ModuleLiveStatusCards = () => {
+export const ModuleLiveStatusCards = (): React.Node => {
   const modules = useSelector(getAttachedModulesForConnectedRobot)
   const sendModuleCommand = useSendModuleCommand()
   const controlDisabledReason = useSelector(getModuleControlsDisabled)

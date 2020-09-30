@@ -2,8 +2,12 @@ from collections import namedtuple
 import json
 import logging
 import os
+
+from numpy import array, array_equal  # type: ignore
+from opentrons.util import linal
 from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
+from opentrons import config
 from opentrons.config import CONFIG, feature_flags as fflags
 
 log = logging.getLogger(__name__)
@@ -95,6 +99,18 @@ DEFAULT_DECK_CALIBRATION: List[List[float]] = [
     [0.00, 0.00, 1.00, 0.00],
     [0.00, 0.00, 0.00, 1.00]]
 
+DEFAULT_DECK_CALIBRATION_V2: List[List[float]] = [
+    [1.00, 0.00, 0.00],
+    [0.00, 1.00, 0.00],
+    [0.00, 0.00, 1.00]]
+
+DEFAULT_SIMULATION_CALIBRATION: List[List[float]] = [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0],
+    [0.0, 0.0, 1.0, -25.0],
+    [0.0, 0.0, 0.0, 1.0]
+]
+
 X_ACCELERATION = 3000
 Y_ACCELERATION = 2000
 Z_ACCELERATION = 1500
@@ -133,6 +149,7 @@ DEFAULT_STEPS_PER_MM = 'M92 X80.00 Y80.00 Z400 A400 B768 C768'
 DEFAULT_PROBE_HEIGHT = 74.3
 DEFAULT_MOUNT_OFFSET = [-34, 0, 0]
 DEFAULT_INST_OFFSET = [0.0, 0.0, 0.0]
+DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 SERIAL_SPEED = 115200
 DEFAULT_TIP_LENGTH_DICT = {'Pipette': 51.7}
 DEFAULT_LOG_LEVEL = 'INFO'
@@ -179,7 +196,8 @@ robot_config = namedtuple(
         'log_level',
         'tip_probe',
         'default_pipette_configs',
-        'z_retract_distance'
+        'z_retract_distance',
+        'left_mount_offset'
     ]
 )
 
@@ -295,6 +313,8 @@ def build_config(deck_cal: List[List[float]],
             'default_pipette_configs', DEFAULT_PIPETTE_CONFIGS),
         z_retract_distance=robot_settings.get(
             'z_retract_distance', Z_RETRACT_DISTANCE),
+        left_mount_offset=robot_settings.get(
+            'left_mount_offset', DEFAULT_MOUNT_OFFSET),
     )
     return cfg
 
@@ -309,10 +329,30 @@ def config_to_save(
     return gc, top
 
 
-def load(deck_cal_file=None):
+def _determine_calibration_to_use(deck_cal_to_check, api_v1):
+    """
+    The default calibration loaded in simulation is not
+    a valid way to check whether labware exceeds a given
+    height. As a workaround, we should load the identity
+    matrix with a Z offset if we are not running on a
+    robot.
+    """
+    id_matrix = linal.identity_deck_transform()
+    deck_cal_to_use = deck_cal_to_check
+    if not config.IS_ROBOT and not api_v1:
+        if not deck_cal_to_check:
+            deck_cal_to_use = DEFAULT_SIMULATION_CALIBRATION
+        elif deck_cal_to_check and\
+                array_equal(array(deck_cal_to_check), id_matrix):
+            deck_cal_to_use = deck_cal_to_check
+    return deck_cal_to_use
+
+
+def load(deck_cal_file=None, api_v1=False):
     deck_cal_file = deck_cal_file or CONFIG['deck_calibration_file']
     log.debug("Loading deck calibration from {}".format(deck_cal_file))
-    deck_cal = _load_json(deck_cal_file).get('gantry_calibration', {})
+    current_deck_cal = _load_json(deck_cal_file).get('gantry_calibration', {})
+    deck_cal = _determine_calibration_to_use(current_deck_cal, api_v1)
     settings_file = CONFIG['robot_settings_file']
     log.debug("Loading robot settings from {}".format(settings_file))
     robot_settings = _load_json(settings_file) or {}

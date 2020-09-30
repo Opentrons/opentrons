@@ -7,20 +7,23 @@
     "pause": "Enable pause within protocol.",
     "moveLiquid": "Move liquid to and from wells/tubes.",
     "magnet": "Engage or disengage the Magnetic module.",
-    "temperature": "Set temperature command for Temperature and Thermocycler modules.",
-    "thermocycler": "Program a profile for the Thermocycler module."
+    "temperature": "Set temperature command for Temperature module.",
+    "thermocycler": "Change Thermocycler state or program a profile."
   },
 
   "disabled_module_step": "Add a relevant module to use this step",
 
   "step_fields": {
     "defaults": {
+      "aspirate_airGap_checkbox": "Aspirate air before moving to next well",
       "aspirate_flowRate": "The speed at which the pipette aspirates",
       "dispense_flowRate": "The speed at which the pipette dispenses",
       "aspirate_mix_checkbox": "Pipette up and down before aspirating",
       "dispense_mix_checkbox": "Pipette up and down after dispensing",
       "aspirate_tipPosition": "Where in the well the pipette aspirates from",
       "dispense_tipPosition": "Where in the well the pipette dispenses to",
+      "aspirate_delay_checkbox": "Delay pipette movement after each aspirate in this step, including any Air Gap",
+      "dispense_delay_checkbox": "Delay pipette movement after each dispense in this step",
 
       "blowout_checkbox": "Where to dispose of remaining volume in tip",
       "blowout_location": "Where to dispose of remaining volume in tip",
@@ -42,9 +45,9 @@
         "blowout_checkbox": "Redundant with disposal volume"
       }
     },
-    "pauseForAmountOfTime": {
+    "pauseAction": {
       "disabled": {
-        "wait_until_temp": "There are no temperature or thermocycler modules on the deck"
+        "wait_until_temp": "There is no temperature module on the deck"
       }
     }
   },
@@ -54,5 +57,12 @@
   },
   "edit_module_modal": {
     "slot_selection": "To enable non-default/unrestricted positioning, go to Settings > App > Experimental settings."
+  },
+  "profile": {
+    "add_cycle": "Add a series of steps that cycle",
+    "add_step": "Add a single non-cycling step",
+    "add_step_to_cycle": "Add a step to the cycle",
+    "delete_step": "Delete profile step",
+    "delete_cycle": "Delete cycle and steps"
   }
 }

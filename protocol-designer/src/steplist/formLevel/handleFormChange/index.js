@@ -4,6 +4,7 @@ import { dependentFieldsUpdateMix } from './dependentFieldsUpdateMix'
 import { dependentFieldsUpdateMagnet } from './dependentFieldsUpdateMagnet'
 import { dependentFieldsUpdatePause } from './dependentFieldsUpdatePause'
 import { dependentFieldsUpdateTemperature } from './dependentFieldsUpdateTemperature'
+import { dependentFieldsUpdateThermocycler } from './dependentFieldsUpdateThermocycler'
 
 import type { FormData } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
@@ -46,6 +47,13 @@ export function handleFormChange(
   }
   if (rawForm.stepType === 'temperature') {
     const dependentFieldsPatch = dependentFieldsUpdateTemperature(
+      patch,
+      rawForm
+    )
+    return { ...patch, ...dependentFieldsPatch }
+  }
+  if (rawForm.stepType === 'thermocycler') {
+    const dependentFieldsPatch = dependentFieldsUpdateThermocycler(
       patch,
       rawForm
     )

@@ -23,7 +23,7 @@ import type { AttachedModule } from '../../modules/types'
 const LID_OPEN_DELAY_MS = 30 * 1000
 type Props = {| robotName: string, modules: Array<AttachedModule> |}
 
-export function PrepareModules(props: Props) {
+export function PrepareModules(props: Props): React.Node {
   const { modules, robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const [isHandling, setIsHandling] = React.useState(false)

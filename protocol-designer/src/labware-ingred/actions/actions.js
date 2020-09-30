@@ -1,42 +1,71 @@
 // @flow
 import { createAction } from 'redux-actions'
-import type { Dispatch } from 'redux'
 
 import { selectors } from '../selectors'
-import type { DeckSlot, GetState } from '../../types'
+
+import type { DeckSlot, ThunkAction } from '../../types'
 import type { IngredInputs } from '../types'
 
 // ===== Labware selector actions =====
 
-export const openAddLabwareModal = createAction<
-  'OPEN_ADD_LABWARE_MODAL',
-  { slot: DeckSlot }
->('OPEN_ADD_LABWARE_MODAL')
+export type OpenAddLabwareModalAction = {|
+  type: 'OPEN_ADD_LABWARE_MODAL',
+  payload: {| slot: DeckSlot |},
+|}
 
-export const closeLabwareSelector = createAction<
-  'CLOSE_LABWARE_SELECTOR',
-  void
->('CLOSE_LABWARE_SELECTOR')
+export const openAddLabwareModal: (payload: {|
+  slot: DeckSlot,
+  // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
+|}) => OpenAddLabwareModalAction = createAction('OPEN_ADD_LABWARE_MODAL')
+
+export type CloseLabwareSelectorAction = {|
+  type: 'CLOSE_LABWARE_SELECTOR',
+|}
+
+// $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
+export const closeLabwareSelector: () => CloseLabwareSelectorAction = createAction(
+  'CLOSE_LABWARE_SELECTOR'
+)
 
 // ===== Open and close Ingredient Selector modal ====
 
-export const openIngredientSelector = createAction<
-  'OPEN_INGREDIENT_SELECTOR',
-  string
->('OPEN_INGREDIENT_SELECTOR')
+export type OpenIngredientSelectorAction = {|
+  type: 'OPEN_INGREDIENT_SELECTOR',
+  payload: string,
+|}
 
-export const closeIngredientSelector = createAction<
-  'CLOSE_INGREDIENT_SELECTOR',
-  void
->('CLOSE_INGREDIENT_SELECTOR')
+export const openIngredientSelector: (
+  payload: string
+  // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
+) => OpenIngredientSelectorAction = createAction('OPEN_INGREDIENT_SELECTOR')
+
+export type CloseIngredientSelectorAction = {|
+  type: 'CLOSE_INGREDIENT_SELECTOR',
+|}
+
+// $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
+export const closeIngredientSelector: () => CloseIngredientSelectorAction = createAction(
+  'CLOSE_INGREDIENT_SELECTOR'
+)
 
 // ===== Drill Down on Labware ====
 
-export const drillDownOnLabware = createAction<'DRILL_DOWN_ON_LABWARE', string>(
-  'DRILL_DOWN_ON_LABWARE'
-)
+export type DrillDownOnLabwareAction = {|
+  type: 'DRILL_DOWN_ON_LABWARE',
+  payload: string,
+|}
 
-export const drillUpFromLabware = createAction<'DRILL_UP_FROM_LABWARE', void>(
+export const drillDownOnLabware: (
+  payload: string
+  // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
+) => DrillDownOnLabwareAction = createAction('DRILL_DOWN_ON_LABWARE')
+
+export type DrillUpFromLabwareAction = {|
+  type: 'DRILL_UP_FROM_LABWARE',
+|}
+
+// $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
+export const drillUpFromLabware: () => DrillUpFromLabwareAction = createAction(
   'DRILL_UP_FROM_LABWARE'
 )
 
@@ -47,36 +76,34 @@ export type CreateContainerArgs = {|
   labwareDefURI: string,
 |}
 
-export type CreateContainerAction = {
+export type CreateContainerAction = {|
   type: 'CREATE_CONTAINER',
-  payload: {
+  payload: {|
     ...CreateContainerArgs,
     slot: DeckSlot,
     id: string,
-  },
-}
+  |},
+|}
 
-export type DeleteContainerAction = {
+export type DeleteContainerAction = {|
   type: 'DELETE_CONTAINER',
-  payload: {
-    labwareId: string,
-  },
-}
+  payload: {| labwareId: string |},
+|}
 
-export const deleteContainer = createAction<
-  'DELETE_CONTAINER',
-  $PropertyType<DeleteContainerAction, 'payload'>
->('DELETE_CONTAINER')
+export const deleteContainer: (payload: {|
+  labwareId: string,
+  // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
+|}) => DeleteContainerAction = createAction('DELETE_CONTAINER')
 
 // ===========
 
-export type SwapSlotContentsAction = {
+export type SwapSlotContentsAction = {|
   type: 'MOVE_DECK_ITEM',
-  payload: {
+  payload: {|
     sourceSlot: DeckSlot,
     destSlot: DeckSlot,
-  },
-}
+  |},
+|}
 
 // TODO: Ian 2019-01-24 later, this should work on stepId or a range of steps.
 // We could follow the pattern of SubstituteStepFormPipettesAction.
@@ -88,39 +115,42 @@ export const moveDeckItem = (
   payload: { sourceSlot, destSlot },
 })
 
-export type DuplicateLabwareAction = {
+export type DuplicateLabwareAction = {|
   type: 'DUPLICATE_LABWARE',
-  payload: {
+  payload: {|
     templateLabwareId: string,
     duplicateLabwareId: string,
     duplicateLabwareNickname: string,
     slot: DeckSlot,
-  },
-}
+  |},
+|}
 
-export type RemoveWellsContents = {
+export type RemoveWellsContentsAction = {|
   type: 'REMOVE_WELLS_CONTENTS',
-  payload: {
+  payload: {|
     labwareId: string,
+    liquidGroupId?: string,
     wells: Array<string>,
-  },
-}
+  |},
+|}
 
-export const removeWellsContents = (
-  payload: $PropertyType<RemoveWellsContents, 'payload'>
-) => ({
+export const removeWellsContents: (
+  payload: $PropertyType<RemoveWellsContentsAction, 'payload'>
+) => RemoveWellsContentsAction = payload => ({
   type: 'REMOVE_WELLS_CONTENTS',
   payload,
 })
 
-export type DeleteLiquidGroup = {
+export type DeleteLiquidGroupAction = {|
   type: 'DELETE_LIQUID_GROUP',
   payload: string, // liquid group id
-}
+|}
 
-export const deleteLiquidGroup = (liquidGroupId: string) => (
-  dispatch: Dispatch<DeleteLiquidGroup>,
-  getState: GetState
+export const deleteLiquidGroup: (
+  liquidGroupId: string
+) => ThunkAction<DeleteLiquidGroupAction> = liquidGroupId => (
+  dispatch,
+  getState
 ) => {
   const allLiquidGroupsOnDeck = selectors.getLiquidGroupsOnDeck(getState())
   const liquidIsOnDeck = allLiquidGroupsOnDeck.includes(liquidGroupId)
@@ -140,17 +170,17 @@ export const deleteLiquidGroup = (liquidGroupId: string) => (
 }
 
 // NOTE: assumes you want to set a uniform volume of the same liquid in one labware
-export type SetWellContentsPayload = {
+export type SetWellContentsPayload = {|
   liquidGroupId: string,
   labwareId: string,
   wells: Array<string>, // NOTE: order should not be meaningful
   volume: number,
-}
+|}
 
-export type SetWellContentsAction = {
+export type SetWellContentsAction = {|
   type: 'SET_WELL_CONTENTS',
   payload: SetWellContentsPayload,
-}
+|}
 
 export const setWellContents = (
   payload: SetWellContentsPayload
@@ -159,10 +189,10 @@ export const setWellContents = (
   payload,
 })
 
-export type SelectLiquidAction = {
+export type SelectLiquidAction = {|
   type: 'SELECT_LIQUID_GROUP',
   payload: string,
-}
+|}
 
 export function selectLiquidGroup(liquidGroupId: string): SelectLiquidAction {
   return {
@@ -171,11 +201,17 @@ export function selectLiquidGroup(liquidGroupId: string): SelectLiquidAction {
   }
 }
 
-export function deselectLiquidGroup() {
+export type DeselectLiquidGroupAction = {| type: 'DESELECT_LIQUID_GROUP' |}
+
+export function deselectLiquidGroup(): DeselectLiquidGroupAction {
   return { type: 'DESELECT_LIQUID_GROUP' }
 }
 
-export function createNewLiquidGroup() {
+export type CreateNewLiquidGroupAction = {|
+  type: 'CREATE_NEW_LIQUID_GROUP_FORM',
+|}
+
+export function createNewLiquidGroup(): CreateNewLiquidGroupAction {
   return { type: 'CREATE_NEW_LIQUID_GROUP_FORM' }
 }
 
@@ -188,10 +224,10 @@ export type EditLiquidGroupAction = {|
 |}
 
 // NOTE: with no ID, a new one is assigned
-export const editLiquidGroup = (args: {|
+export const editLiquidGroup: (args: {|
   liquidGroupId: ?string,
   ...IngredInputs,
-|}) => (dispatch: Dispatch<EditLiquidGroupAction>, getState: GetState) => {
+|}) => ThunkAction<EditLiquidGroupAction> = args => (dispatch, getState) => {
   const { liquidGroupId, ...payloadArgs } = args // NOTE: separate liquidGroupId for flow to understand unpacking :/
   dispatch({
     type: 'EDIT_LIQUID_GROUP',

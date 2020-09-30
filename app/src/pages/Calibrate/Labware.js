@@ -34,7 +34,9 @@ type SP = {|
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export const Labware = withRouter<_, _>(
+export const Labware: React.AbstractComponent<
+  $Diff<OP, ContextRouter>
+> = withRouter(
   connect<Props, OP, SP, _, _, _>(mapStateToProps)(LabwareComponent)
 )
 

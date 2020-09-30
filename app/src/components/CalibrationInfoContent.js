@@ -7,7 +7,9 @@ export type CalibrationInfoContentProps = {|
   rightChildren?: React.Node,
 |}
 
-export function CalibrationInfoContent(props: CalibrationInfoContentProps) {
+export function CalibrationInfoContent(
+  props: CalibrationInfoContentProps
+): React.Node {
   const { leftChildren, rightChildren } = props
 
   return (

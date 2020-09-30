@@ -27,9 +27,6 @@ export const TemperatureForm = (
   const temperatureModuleId = useSelector(
     uiModuleSelectors.getSingleTemperatureModuleId
   )
-  const thermocyclerModuleId = useSelector(
-    uiModuleSelectors.getSingleThermocyclerModuleId
-  )
 
   return (
     <div className={styles.form_wrapper}>
@@ -104,13 +101,6 @@ export const TemperatureForm = (
               {...focusHandlers}
             />
           </div>
-        </ConditionalOnField>
-        {/* TODO (ka 2019-12-20): Implement thermocycler set temp form */}
-        <ConditionalOnField
-          name={'moduleId'}
-          condition={value => value === thermocyclerModuleId && value != null}
-        >
-          TODO: Thermocycler set temperature form not implemented
         </ConditionalOnField>
       </div>
     </div>

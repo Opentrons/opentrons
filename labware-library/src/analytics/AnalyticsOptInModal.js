@@ -8,7 +8,7 @@ type Props = {|
   children: React.Node,
 |}
 
-export const AnalyticsOptInModal = (props: Props) => {
+export const AnalyticsOptInModal = (props: Props): React.Node => {
   const { setAnalyticsOptIn, analyticsState } = useAnalyticsOptInOrOut()
 
   return (

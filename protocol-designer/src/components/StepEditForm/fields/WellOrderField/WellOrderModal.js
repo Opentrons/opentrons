@@ -226,7 +226,14 @@ const mapDTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   },
 })
 
-export const WellOrderModal = connect<Props, OP, SP, DP, _, _>(
+export const WellOrderModal: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  _,
+  _
+>(
   mapSTP,
   mapDTP
 )(WellOrderModalComponent)

@@ -1,8 +1,9 @@
 // @flow
-import type { ElementProps } from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
+import filter from 'lodash/filter'
 import mapValues from 'lodash/mapValues'
 
 import { uuid } from '../../../utils'
@@ -22,13 +23,12 @@ import type {
 } from '../../../step-forms'
 import type { StepIdType } from '../../../form-types'
 
-type Props = ElementProps<typeof FilePipettesModal>
+type Props = React.ElementProps<typeof FilePipettesModal>
 
 type SP = {|
   initialPipetteValues: FormPipettesByMount,
   _prevPipettes: { [pipetteId: string]: PipetteOnDeck },
   _orderedStepIds: Array<StepIdType>,
-  thermocyclerEnabled: ?boolean,
   moduleRestrictionsDisabled: ?boolean,
 |}
 
@@ -43,7 +43,6 @@ const mapSTP = (state: BaseState): SP => {
     initialPipetteValues: initialPipettes,
     _prevPipettes: stepFormSelectors.getInitialDeckSetup(state).pipettes, // TODO: Ian 2019-01-02 when multi-step editing is supported, don't use initial deck state. Instead, show the pipettes available for the selected step range
     _orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
-    thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
     moduleRestrictionsDisabled: featureFlagSelectors.getDisableModuleRestrictions(
       state
     ),
@@ -69,8 +68,8 @@ const makeUpdatePipettes = (
   closeModal
 ) => ({ pipettes: newPipetteArray }) => {
   const prevPipetteIds = Object.keys(prevPipettes)
-  let usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
-  let nextPipettes: {
+  const usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
+  const nextPipettes: {
     [pipetteId: string]: {
       mount: string,
       name: string,
@@ -88,7 +87,7 @@ const makeUpdatePipettes = (
         const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
         return !alreadyUsed && prevPipette.name === newPipette.name
       })
-      let pipetteId: ?string = candidatePipetteIds[0]
+      const pipetteId: ?string = candidatePipetteIds[0]
       if (pipetteId) {
         // update used pipette list
         usedPrevPipettes.push(pipetteId)
@@ -129,8 +128,13 @@ const makeUpdatePipettes = (
   const pipetteIdsToDelete: Array<string> = Object.keys(prevPipettes).filter(
     id => !(id in nextPipettes)
   )
-  const substitutionMap = pipetteIdsToDelete.reduce(
-    (acc: { [string]: string }, deletedId: string): { [string]: string } => {
+
+  // SubstitutionMap represents a map of oldPipetteId => newPipetteId
+  // When a pipette's tiprack changes, the ids will be the same
+  type SubstitutionMap = { [pipetteId: string]: string }
+
+  const pipetteReplacementMap: SubstitutionMap = pipetteIdsToDelete.reduce(
+    (acc: SubstitutionMap, deletedId: string): SubstitutionMap => {
       const deletedPipette = prevPipettes[deletedId]
       const replacementId = Object.keys(nextPipettes).find(
         newId => nextPipettes[newId].mount === deletedPipette.mount
@@ -141,6 +145,36 @@ const makeUpdatePipettes = (
     },
     {}
   )
+
+  const pipettesWithNewTipracks: Array<string> = filter(
+    nextPipettes,
+    (nextPipette: $Values<typeof nextPipettes>) => {
+      const newPipetteId = nextPipette.id
+      const tiprackChanged =
+        newPipetteId in prevPipettes &&
+        nextPipette.tiprackDefURI !== prevPipettes[newPipetteId].tiprackDefURI
+      return tiprackChanged
+    }
+  ).map(pipette => pipette.id)
+
+  // this creates an identity map with all pipette ids that have new tipracks
+  // this will be used so that handleFormChange gets called even though the
+  // pipette id itself has not changed (only it's tiprack)
+
+  const pipettesWithNewTiprackIdentityMap: SubstitutionMap = pipettesWithNewTipracks.reduce(
+    (acc: SubstitutionMap, id: string): SubstitutionMap => {
+      return {
+        ...acc,
+        ...{ [id]: id },
+      }
+    },
+    {}
+  )
+
+  const substitutionMap = {
+    ...pipetteReplacementMap,
+    ...pipettesWithNewTiprackIdentityMap,
+  }
 
   // substitute deleted pipettes with new pipettes on the same mount, if any
   if (!isEmpty(substitutionMap) && orderedStepIds.length > 0) {
@@ -186,7 +220,14 @@ const mergeProps = (
   }
 }
 
-export const EditPipettesModal = connect<Props, OP, SP, {||}, _, _>(
+export const EditPipettesModal: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  {||},
+  _,
+  _
+>(
   mapSTP,
   null,
   mergeProps

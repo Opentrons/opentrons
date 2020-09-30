@@ -49,9 +49,11 @@ electron := electron . \
 .PHONY: all
 all: package
 
-.PHONY: install
-install:
-	yarn
+.PHONY: setup
+# must be wrapped in yarn run otherwise `prebuild-install` will fail silently
+# due to how `electron-rebuild` calls `prebuild-install`
+setup:
+	yarn electron-rebuild
 
 .PHONY: clean
 clean:

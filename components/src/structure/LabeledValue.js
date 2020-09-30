@@ -17,7 +17,7 @@ export type LabeledValueProps = {|
   valueClassName?: string,
 |}
 
-export function LabeledValue(props: LabeledValueProps) {
+export function LabeledValue(props: LabeledValueProps): React.Node {
   const { label, value } = props
   const className = cx(styles.labeled_value, props.className)
 

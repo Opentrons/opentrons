@@ -20,7 +20,7 @@ type Props = {|
 // NOTE(Ian 2019-07-23): per-field hide-when-autofilled is not yet necessary,
 // because sections are laid out to contain groups of autofilled fields.
 // This functionality in TextField may be removed if we clearly don't need it.
-export const TextField = (props: Props) => {
+export const TextField = (props: Props): React.Node => {
   const { caption, name, placeholder, units } = props
   const inputMasks = props.inputMasks || []
   const makeHandleChange = ({ field, form }) => (

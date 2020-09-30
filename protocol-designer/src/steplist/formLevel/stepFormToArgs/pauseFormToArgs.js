@@ -18,7 +18,7 @@ export const pauseFormToArgs = (
   const temperature = parseFloat(formData['pauseTemperature'])
   const message = formData['pauseMessage'] || ''
 
-  switch (formData.pauseForAmountOfTime) {
+  switch (formData.pauseAction) {
     case PAUSE_UNTIL_TEMP:
       return {
         commandCreatorFnName: 'awaitTemperature',

@@ -37,7 +37,7 @@ export type SelectFieldProps = {|
   onLoseFocus?: (name: string) => mixed,
 |}
 
-export function SelectField(props: SelectFieldProps) {
+export function SelectField(props: SelectFieldProps): React.Node {
   const {
     id,
     name,

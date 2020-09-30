@@ -1,7 +1,9 @@
 // @flow
 
+export * from './borders'
 export * from './colors'
-export * from './font-size'
-export * from './font-weight'
+export * from './flexbox'
+export * from './layout'
+export * from './position'
 export * from './spacing'
 export * from './typography'

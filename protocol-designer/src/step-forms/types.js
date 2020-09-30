@@ -85,7 +85,12 @@ export type TemperatureModuleState = {|
   status: TemperatureStatus,
   targetTemperature: number | null,
 |}
-export type ThermocyclerModuleState = {| type: THERMOCYCLER_MODULE_TYPE |} // TODO IL 2019-11-18 create this state
+export type ThermocyclerModuleState = {|
+  type: THERMOCYCLER_MODULE_TYPE,
+  blockTargetTemp: number | null, // null means block is deactivated
+  lidTargetTemp: number | null, // null means lid is deactivated
+  lidOpen: boolean | null, // if false, closed. If null, unknown
+|}
 
 export type ModuleTemporalProperties = {|
   slot: DeckSlot,

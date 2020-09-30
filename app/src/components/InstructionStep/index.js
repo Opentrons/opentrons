@@ -8,7 +8,7 @@ export type InstructionStepProps = {|
   diagram: string,
 |}
 
-export function InstructionStep(props: InstructionStepProps) {
+export function InstructionStep(props: InstructionStepProps): React.Node {
   return (
     <fieldset className={styles.step}>
       <legend className={styles.step_legend}>Step {props.step}</legend>

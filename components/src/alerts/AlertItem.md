@@ -1,7 +1,7 @@
 Basic usage:
 
 ```js
-initialState = { alert: 'success' }
+const [state, setState] = React.useState({ alert: 'success' })
 ;<div
   style={{
     width: '50%',
@@ -21,7 +21,7 @@ initialState = { alert: 'success' }
 ```
 
 ```js
-initialState = { alert: 'warning' }
+const [state, setState] = React.useState({ alert: 'warning' })
 ;<div
   style={{
     width: '50%',
@@ -54,7 +54,7 @@ initialState = { alert: 'warning' }
 ```
 
 ```js
-initialState = { alert: 'info' }
+const [state, setState] = React.useState({ alert: 'info' })
 ;<div
   style={{
     width: '50%',
@@ -76,7 +76,7 @@ initialState = { alert: 'info' }
 Override the default icon with iconName:
 
 ```js
-initialState = { alert: 'info' }
+const [state, setState] = React.useState({ alert: 'info' })
 ;<div
   style={{
     width: '50%',
@@ -99,7 +99,7 @@ initialState = { alert: 'info' }
 Add additional information with children:
 
 ```js
-initialState = { alert: 'warning' }
+const [state, setState] = React.useState({ alert: 'warning' })
 ;<div
   style={{
     width: '50%',

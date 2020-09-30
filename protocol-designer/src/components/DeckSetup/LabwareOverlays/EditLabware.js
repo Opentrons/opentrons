@@ -1,5 +1,5 @@
 // @flow
-import React, { type Node } from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
@@ -7,7 +7,7 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { DragSource, DropTarget } from 'react-dnd'
 import { i18n } from '../../../localization'
 import { NameThisLabware } from './NameThisLabware'
-import { DND_TYPES } from './constants'
+import { DND_TYPES } from '../../../constants'
 import {
   openIngredientSelector,
   deleteContainer,
@@ -38,8 +38,8 @@ type DP = {|
 type DNDP = {|
   draggedLabware: ?LabwareOnDeck,
   isOver: boolean,
-  connectDragSource: Node => Node,
-  connectDropTarget: Node => Node,
+  connectDragSource: React.Node => React.Node,
+  connectDropTarget: React.Node => React.Node,
 |}
 
 type Props = {| ...OP, ...SP, ...DP, ...DNDP |}
@@ -69,7 +69,7 @@ const EditLabwareComponent = (props: Props) => {
   } else {
     const isBeingDragged = draggedLabware?.slot === labwareOnDeck.slot
 
-    let contents: ?Node = null
+    let contents: React.Node = null
 
     if (swapBlocked) {
       contents = null
@@ -205,7 +205,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
     dispatch(moveDeckItem(sourceSlot, destSlot)),
 })
 
-export const EditLabware = connect<
+export const EditLabware: React.AbstractComponent<OP> = connect<
   {| ...OP, ...SP, ...DP |},
   OP,
   SP,

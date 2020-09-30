@@ -76,3 +76,4 @@ def test_pipette_contructors(factory, monkeypatch,
     assert blow_out_flow_rate == 25
     assert pipette.min_volume == 7
     assert pipette.max_volume == 8
+    assert pipette.pipette_id == 'FakePip'

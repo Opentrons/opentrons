@@ -3,10 +3,17 @@ import json
 import pytest
 
 from opentrons.protocol_api import (
-    labware, MAX_SUPPORTED_VERSION, module_geometry)
-from opentrons.system.shared_data import load_shared_data
+    labware, MAX_SUPPORTED_VERSION)
+from opentrons.protocols.geometry import module_geometry
+
+from opentrons_shared_data import load_shared_data
+from opentrons.calibration_storage import (
+    helpers, get, delete, file_operators)
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.geometry.module_geometry import (
+    ModuleGeometry, MagneticModuleModel, ModuleType)
 
 test_data = {
     'circular_well_json': {
@@ -29,6 +36,23 @@ test_data = {
         'z': 22
     }
 }
+
+
+@pytest.fixture
+def set_up_index_file(labware_offset_tempdir):
+    deck = Deck()
+    labware_list = [
+        'nest_96_wellplate_2ml_deep',
+        'corning_384_wellplate_112ul_flat',
+        'geb_96_tiprack_1000ul',
+        'nest_12_reservoir_15ml']
+    for idx, name in enumerate(labware_list):
+        parent = deck.position_for(idx+1)
+        definition = labware.get_labware_definition(name)
+        lw = labware.Labware(definition, parent)
+        labware.save_calibration(lw, Point(0, 0, 0))
+
+    return labware_list
 
 
 def test_well_init():
@@ -370,7 +394,9 @@ def test_module_load_v1(v1_module_name):
     assert mod.highest_z == high_z + 3
     assert mod.location.point == (offset + Point(1, 2, 3))
     mod2 = module_geometry.load_module_from_definition(
-        module_defs[v1_module_name], Location(Point(3, 2, 1), 'test2'))
+        module_defs[v1_module_name],
+        Location(Point(3, 2, 1), 'test2'),
+        module_geometry.ThermocyclerConfiguration.FULL)
     assert mod2.highest_z == high_z + 1
     assert mod2.location.point == (offset + Point(3, 2, 1))
 
@@ -458,8 +484,87 @@ def test_tiprack_list():
 def test_uris():
     details = ('opentrons', 'opentrons_96_tiprack_300ul', '1')
     uri = 'opentrons/opentrons_96_tiprack_300ul/1'
-    assert labware.uri_from_details(*details) == uri
+    assert helpers.uri_from_details(*details) == uri
     defn = labware.get_labware_definition(details[1], details[0], details[2])
-    assert labware.uri_from_definition(defn) == uri
+    assert helpers.uri_from_definition(defn) == uri
     lw = labware.Labware(defn, Location(Point(0, 0, 0), 'Test Slot'))
     assert lw.uri == uri
+
+
+@pytest.mark.parametrize(
+    'labware_name', [
+        'nest_96_wellplate_2ml_deep',
+        'corning_384_wellplate_112ul_flat',
+        'geb_96_tiprack_1000ul',
+        'nest_12_reservoir_15ml'])
+def test_add_index_file(labware_name, labware_offset_tempdir):
+    deck = Deck()
+    parent = deck.position_for(1)
+    definition = labware.get_labware_definition(labware_name)
+    lw = labware.Labware(definition, parent)
+    labware_hash = helpers.hash_labware_def(definition)
+    labware.save_calibration(lw, Point(0, 0, 0))
+
+    lw_uri = helpers.uri_from_definition(definition)
+
+    str_parent = labware._get_parent_identifier(lw)
+    slot = '1'
+    if str_parent:
+        mod_dict = {str_parent: f'{slot}-{str_parent}'}
+    else:
+        mod_dict = {}
+    full_id = f'{labware_hash}{str_parent}'
+    blob = {
+            "uri": f'{lw_uri}',
+            "slot": full_id,
+            "module": mod_dict
+        }
+
+    lw_path = labware_offset_tempdir / 'index.json'
+    info = file_operators.read_cal_file(lw_path)
+    assert info['data'][full_id] == blob
+
+
+def test_delete_one_calibration(set_up_index_file):
+    lw_to_delete = 'nest_96_wellplate_2ml_deep'
+    all_cals = get.get_all_calibrations()
+    id_saved = ''
+
+    def get_load_names(all_cals):
+        nonlocal id_saved
+        load_names = []
+        for cal in all_cals:
+            uri = cal.uri
+            dets = helpers.details_from_uri(uri)
+            if dets.load_name == lw_to_delete:
+                id_saved = cal.labware_id
+            load_names.append(dets.load_name)
+        return load_names
+
+    load_names = get_load_names(all_cals)
+
+    assert lw_to_delete in load_names
+
+    delete.delete_offset_file(id_saved)
+
+    all_cals = get.get_all_calibrations()
+    load_names = get_load_names(all_cals)
+
+    assert lw_to_delete not in load_names
+
+
+def test_get_parent_identifier():
+    labware_name = 'corning_96_wellplate_360ul_flat'
+    labware_def = labware.get_labware_definition(labware_name)
+    lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
+    # slots have no parent identifier
+    assert labware._get_parent_identifier(lw) == ''
+    # modules do
+    mmg = ModuleGeometry('my magdeck',
+                         MagneticModuleModel.MAGNETIC_V1,
+                         ModuleType.MAGNETIC,
+                         Point(0, 0, 0), 10, 10, Location(Point(1, 2, 3), '3'),
+                         APIVersion(2, 4))
+    lw = labware.Labware(labware_def, mmg.location)
+    assert labware._get_parent_identifier(lw)\
+        == MagneticModuleModel.MAGNETIC_V1.value

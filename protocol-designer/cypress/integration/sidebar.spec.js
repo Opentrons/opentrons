@@ -1,7 +1,8 @@
 describe('Desktop Navigation', () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit('/')
     cy.viewport('macbook-15')
+    cy.closeAnnouncementModal()
   })
 
   it('contains a working file button', () => {
@@ -31,7 +32,10 @@ describe('Desktop Navigation', () => {
       .contains('HELP')
       .parent()
       .should('have.prop', 'href')
-      .and('equal', 'https://intercom.help/opentrons-protocol-designer')
+      .and(
+        'equal',
+        'https://support.opentrons.com/en/collections/493886-protocol-designer'
+      )
   })
 
   it('contains a settings button', () => {

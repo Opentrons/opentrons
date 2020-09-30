@@ -12,7 +12,7 @@ Protocol Designer Beta is optimized for [Chrome][chrome] browser. Other browsers
 # from the repo root
 
 # install all dependencies
-make install
+make setup
 
 cd protocol-designer/
 
@@ -56,6 +56,10 @@ Used for analytics segmentation. In Travis CI, this is fed by `$TRAVIS_COMMIT`.
 ### `OT_PD_FULLSTORY_ORG`
 
 Used for FullStory. Should be provided in the Travis build.
+
+### `OT_PD_MIXPANEL_ID`
+
+Used for Mixpanel. Should be provided in the Travis build.
 
 ### `OT_PD_SHOW_GATE`
 

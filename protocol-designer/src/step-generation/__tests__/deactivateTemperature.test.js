@@ -1,5 +1,5 @@
 // @flow
-import { getStateAndContextTempMagModules } from '../__fixtures__'
+import { getStateAndContextTempTCModules } from '../__fixtures__'
 import { deactivateTemperature } from '../commandCreators/atomic/deactivateTemperature'
 
 const temperatureModuleId = 'temperatureModuleId'
@@ -10,7 +10,7 @@ let invariantContext
 let robotState
 
 beforeEach(() => {
-  const stateAndContext = getStateAndContextTempMagModules({
+  const stateAndContext = getStateAndContextTempTCModules({
     temperatureModuleId,
     thermocyclerId,
   })

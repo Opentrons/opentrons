@@ -5,16 +5,23 @@ import { push } from 'connected-react-router'
 
 import { client } from '../api-client/client'
 import { Client as RpcClient } from '../../rpc/client'
-import { NAME, actions, constants } from '../'
+import { actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
 
-import { MockSession } from './__fixtures__/session'
+import {
+  MockSession,
+  MockSessionNoStateInfo,
+  MockSessionNoDoorInfo,
+} from './__fixtures__/session'
 import { MockCalibrationManager } from './__fixtures__/calibration-manager'
+import { mockConnectableRobot } from '../../discovery/__fixtures__'
 
+import { getConnectableRobots } from '../../discovery/selectors'
 import { getLabwareDefBySlot } from '../../protocol/selectors'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 
 jest.mock('../../rpc/client')
+jest.mock('../../discovery/selectors')
 jest.mock('../../protocol/selectors')
 jest.mock('../../custom-labware/selectors')
 
@@ -54,9 +61,6 @@ describe('api client', () => {
       create_from_bundle: jest.fn(),
     }
     rpcClient = {
-      // TODO(mc, 2017-09-22): these jest promise mocks are causing promise
-      // rejection warnings. These warnings are Jest's fault for nextTick stuff
-      // http://clarkdave.net/2016/09/node-v6-6-and-asynchronously-handled-promise-rejections/
       on: jest.fn(() => rpcClient),
       removeAllListeners: jest.fn(() => rpcClient),
       close: jest.fn(),
@@ -71,6 +75,7 @@ describe('api client', () => {
 
     getLabwareDefBySlot.mockReturnValue({})
     getCustomLabwareDefinitions.mockReturnValue([])
+    getConnectableRobots.mockReturnValue([mockConnectableRobot])
 
     const _receive = client(dispatch)
 
@@ -85,28 +90,13 @@ describe('api client', () => {
     jest.resetAllMocks()
   })
 
-  const ROBOT_NAME = 'ot'
-  const ROBOT_IP = '127.0.0.1'
+  const ROBOT_NAME = mockConnectableRobot.name
+  const ROBOT_IP = mockConnectableRobot.ip
   const STATE = {
-    [NAME]: {
+    robot: {
       connection: {
         connectedTo: '',
-      },
-    },
-    discovery: {
-      robotsByName: {
-        [ROBOT_NAME]: [
-          {
-            name: ROBOT_NAME,
-            ip: ROBOT_IP,
-            local: true,
-            port: 31950,
-            ok: true,
-            serverOk: true,
-            health: {},
-            serverHealth: {},
-          },
-        ],
+        connectRequest: { inProgress: false },
       },
     },
   }
@@ -213,6 +203,20 @@ describe('api client', () => {
       return sendConnect().then(() =>
         expect(dispatch).toHaveBeenCalledWith(expected)
       )
+    })
+
+    it('will not try to connect multiple RpcClients at one time', () => {
+      const state = {
+        ...STATE,
+        robot: {
+          ...STATE.robot,
+          connection: { connectRequest: { inProgress: true } },
+        },
+      }
+
+      return sendToClient(state, actions.connect(ROBOT_NAME)).then(() => {
+        expect(RpcClient).toHaveBeenCalledTimes(0)
+      })
     })
   })
 
@@ -338,6 +342,14 @@ describe('api client', () => {
         {
           name: session.name,
           state: session.state,
+          statusInfo: {
+            message: null,
+            userMessage: null,
+            changedAt: null,
+            estimatedDuration: null,
+          },
+          doorState: null,
+          blocked: false,
           protocolText: session.protocol_text,
           protocolCommands: [],
           protocolCommandsById: {},
@@ -363,6 +375,96 @@ describe('api client', () => {
           sendNotification('session', session)
         })
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+    })
+
+    it('handles sessionResponses without status info', () => {
+      session = MockSessionNoStateInfo()
+      sessionManager.session = session
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+    })
+
+    it('handles sessionResponses with some status info set', () => {
+      session.stateInfo.changedAt = 2
+      session.stateInfo.message = 'test message'
+      const expected = actions.sessionResponse(
+        null,
+        {
+          name: session.name,
+          state: session.state,
+          statusInfo: {
+            message: 'test message',
+            userMessage: null,
+            changedAt: 2,
+            estimatedDuration: null,
+          },
+          doorState: null,
+          blocked: false,
+          protocolText: session.protocol_text,
+          protocolCommands: [],
+          protocolCommandsById: {},
+          pipettesByMount: {},
+          labwareBySlot: {},
+          modulesBySlot: {},
+          apiLevel: [1, 0],
+        },
+        false
+      )
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    it('handles sessionResponses without door state and blocked info', () => {
+      session = MockSessionNoDoorInfo()
+      sessionManager.session = session
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+    })
+
+    it('handles sessionResponses with door and blocked info', () => {
+      session.blocked = true
+      session.door_state = 'open'
+      const expected = actions.sessionResponse(
+        null,
+        {
+          name: session.name,
+          state: session.state,
+          statusInfo: {
+            message: null,
+            userMessage: null,
+            changedAt: null,
+            estimatedDuration: null,
+          },
+          doorState: 'open',
+          blocked: true,
+          protocolText: session.protocol_text,
+          protocolCommands: [],
+          protocolCommandsById: {},
+          pipettesByMount: {},
+          labwareBySlot: {},
+          modulesBySlot: {},
+          apiLevel: [1, 0],
+        },
+        false
+      )
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
     it('handles connnect without session', () => {
@@ -468,6 +570,8 @@ describe('api client', () => {
         },
       ]
 
+      session.containers = [{ _id: 3 }, { _id: 4 }, { _id: 5 }]
+
       return sendConnect().then(() =>
         expect(dispatch).toHaveBeenCalledWith(expected)
       )
@@ -485,9 +589,24 @@ describe('api client', () => {
               type: 'tiprack',
               isTiprack: true,
               calibratorMount: 'right',
+              definitionHash: null,
             },
-            5: { _id: 2, slot: '5', name: 'b', type: 'B', isTiprack: false },
-            9: { _id: 3, slot: '9', name: 'c', type: 'C', isTiprack: false },
+            5: {
+              _id: 2,
+              slot: '5',
+              name: 'b',
+              type: 'B',
+              isTiprack: false,
+              definitionHash: null,
+            },
+            9: {
+              _id: 3,
+              slot: '9',
+              name: 'c',
+              type: 'C',
+              isTiprack: false,
+              definitionHash: null,
+            },
           },
         }),
         false
@@ -543,6 +662,7 @@ describe('api client', () => {
               type: 'tiprack',
               isTiprack: true,
               calibratorMount: 'left',
+              definitionHash: null,
             },
           },
         }),
@@ -555,7 +675,9 @@ describe('api client', () => {
           mount: 'right',
           name: 'p50',
           channels: 8,
-          tip_racks: [],
+          // guard against bogus tipracks in this array, which RPC API has been
+          // observed doing as of 3.16
+          tip_racks: [{ _id: 888 }],
           requested_as: 'foo',
         },
         {
@@ -563,7 +685,7 @@ describe('api client', () => {
           mount: 'left',
           name: 'p200',
           channels: 1,
-          tip_racks: [],
+          tip_racks: [{ _id: 999 }],
           requested_as: 'bar',
         },
       ]
@@ -581,9 +703,9 @@ describe('api client', () => {
         },
       ]
 
-      return sendConnect().then(() =>
+      return sendConnect().then(() => {
         expect(dispatch).toHaveBeenCalledWith(expected)
-      )
+      })
     })
 
     it('maps api modules to modules by slot', () => {
@@ -667,11 +789,135 @@ describe('api client', () => {
     })
 
     it('sends SESSION_UPDATE if session notification has lastCommand', () => {
-      const update = { state: 'running', startTime: 1, lastCommand: null }
-      const expected = actions.sessionUpdate(update, expect.any(Number))
+      const update = {
+        state: 'running',
+        startTime: 1,
+        lastCommand: null,
+        stateInfo: {},
+        door_state: null,
+        blocked: false,
+      }
+
+      const actionInput = {
+        state: 'running',
+        startTime: 1,
+        lastCommand: null,
+        statusInfo: {
+          message: null,
+          userMessage: null,
+          changedAt: null,
+          estimatedDuration: null,
+        },
+        doorState: null,
+        blocked: false,
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
-        .then(() => sendNotification('session', update))
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', update)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    it('handles SESSION_UPDATEs with no stateInfo', () => {
+      const update = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+        door_state: 'closed',
+        blocked: false,
+      }
+
+      const actionInput = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+        doorState: 'closed',
+        blocked: false,
+        statusInfo: {
+          message: null,
+          userMessage: null,
+          changedAt: null,
+          estimatedDuration: null,
+        },
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
+
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', update)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    it('handles SESSION_UPDATEs with values in stateInfo', () => {
+      const update = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+        blocked: false,
+        door_state: 'closed',
+        stateInfo: {
+          message: 'hi and hello football fans',
+          userMessage: 'whos ready for some FOOTBALL',
+          changedAt: 2,
+        },
+      }
+
+      const actionInput = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+        blocked: false,
+        doorState: 'closed',
+        statusInfo: {
+          message: 'hi and hello football fans',
+          userMessage: 'whos ready for some FOOTBALL',
+          changedAt: 2,
+          estimatedDuration: null,
+        },
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
+
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', update)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    it('handles SESSION_UPDATEs with no door or blocked info', () => {
+      const update = {
+        state: 'paused',
+        startTime: 2,
+        lastCommand: null,
+        stateInfo: {},
+      }
+
+      const actionInput = {
+        state: 'paused',
+        startTime: 2,
+        lastCommand: null,
+        blocked: false,
+        doorState: null,
+        statusInfo: {
+          message: null,
+          userMessage: null,
+          changedAt: null,
+          estimatedDuration: null,
+        },
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
+
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', update)
+        })
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
   })
@@ -680,7 +926,7 @@ describe('api client', () => {
     let state
     beforeEach(() => {
       state = {
-        [NAME]: {
+        robot: {
           calibration: {
             calibrationRequest: {},
             confirmedBySlot: {},
@@ -917,7 +1163,7 @@ describe('api client', () => {
     })
 
     it('CONFIRM_TIPRACK noops and keeps tip if last tiprack', () => {
-      state[NAME].calibration.confirmedBySlot[5] = true
+      state.robot.calibration.confirmedBySlot[5] = true
 
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse(null, true)

@@ -6,6 +6,6 @@ export type CardColumnProps = {|
   children: React.Node,
 |}
 
-export function CardColumn(props: CardColumnProps) {
+export function CardColumn(props: CardColumnProps): React.Node {
   return <div className={styles.column_50}>{props.children}</div>
 }

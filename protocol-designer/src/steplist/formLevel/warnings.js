@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
-import { MIN_TEMP_MODULE_TEMP, MAX_TEMP_MODULE_TEMP } from '../../constants'
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
 /*******************
@@ -12,10 +11,7 @@ export type FormWarningType =
   | 'BELOW_PIPETTE_MINIMUM_VOLUME'
   | 'OVER_MAX_WELL_VOLUME'
   | 'BELOW_MIN_DISPOSAL_VOLUME'
-  | 'TEMPERATURE_MIN_EXCEEDED'
-  | 'TEMPERATURE_MAX_EXCEEDED'
-  | 'PAUSE_TEMPERATURE_MIN_EXCEEDED'
-  | 'PAUSE_TEMPERATURE_MAX_EXCEEDED'
+  | 'BELOW_MIN_AIR_GAP_VOLUME'
 
 export type FormWarning = {
   ...$Exact<FormError>,
@@ -23,6 +19,17 @@ export type FormWarning = {
 }
 // TODO: Ian 2018-12-06 use i18n for title/body text
 const FORM_WARNINGS: { [FormWarningType]: FormWarning } = {
+  BELOW_MIN_AIR_GAP_VOLUME: {
+    type: 'BELOW_MIN_AIR_GAP_VOLUME',
+    title: 'Below recommended air gap',
+    body: (
+      <React.Fragment>
+        For accuracy while using air gap we recommend you use a volume of at
+        least the pipette&apos;s minimum.
+      </React.Fragment>
+    ),
+    dependentFields: ['disposalVolume_volume', 'pipette'],
+  },
   BELOW_PIPETTE_MINIMUM_VOLUME: {
     type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
     title: 'Specified volume is below pipette minimum',
@@ -44,26 +51,6 @@ const FORM_WARNINGS: { [FormWarningType]: FormWarning } = {
       </React.Fragment>
     ),
     dependentFields: ['disposalVolume_volume', 'pipette'],
-  },
-  TEMPERATURE_MIN_EXCEEDED: {
-    type: 'TEMPERATURE_MIN_EXCEEDED',
-    title: 'Specified temperature is below module minimum',
-    dependentFields: ['setTemperature', 'targetTemperature'],
-  },
-  TEMPERATURE_MAX_EXCEEDED: {
-    type: 'TEMPERATURE_MAX_EXCEEDED',
-    title: 'Specified temperature is above module maximum',
-    dependentFields: ['setTemperature', 'targetTemperature'],
-  },
-  PAUSE_TEMPERATURE_MIN_EXCEEDED: {
-    type: 'TEMPERATURE_MIN_EXCEEDED',
-    title: 'Specified temperature is below module minimum',
-    dependentFields: ['pauseForAmountOfTime', 'pauseTemperature'],
-  },
-  PAUSE_TEMPERATURE_MAX_EXCEEDED: {
-    type: 'TEMPERATURE_MAX_EXCEEDED',
-    title: 'Specified temperature is above module maximum',
-    dependentFields: ['pauseForAmountOfTime', 'pauseTemperature'],
   },
 }
 
@@ -112,41 +99,30 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
 }
 
-export const temperatureRangeExceeded = (
-  fields: HydratedFormData
-): ?FormWarning => {
-  const { setTemperature, targetTemperature } = fields
-  if (setTemperature === 'true' && targetTemperature < MIN_TEMP_MODULE_TEMP) {
-    return FORM_WARNINGS.TEMPERATURE_MIN_EXCEEDED
-  } else if (
-    setTemperature === 'true' &&
-    targetTemperature > MAX_TEMP_MODULE_TEMP
-  ) {
-    return FORM_WARNINGS.TEMPERATURE_MAX_EXCEEDED
-  }
-  return null
-}
+export const minAirGapVolume = (fields: HydratedFormData): ?FormWarning => {
+  const { aspirate_airGap_checkbox, aspirate_airGap_volume, pipette } = fields
+  if (
+    !aspirate_airGap_checkbox ||
+    !aspirate_airGap_volume ||
+    !pipette ||
+    !pipette.spec
+  )
+    return null
 
-export const pauseTemperatureRangeExceeded = (
-  fields: HydratedFormData
-): ?FormWarning => {
-  const { pauseForAmountOfTime, pauseTemperature } = fields
-  const setTemperature = pauseForAmountOfTime === 'untilTemperature'
-  if (setTemperature && pauseTemperature < MIN_TEMP_MODULE_TEMP) {
-    return FORM_WARNINGS.PAUSE_TEMPERATURE_MIN_EXCEEDED
-  } else if (setTemperature && pauseTemperature > MAX_TEMP_MODULE_TEMP) {
-    return FORM_WARNINGS.PAUSE_TEMPERATURE_MAX_EXCEEDED
-  }
-  return null
+  const isBelowMin = Number(aspirate_airGap_volume) < pipette.spec.minVolume
+  return isBelowMin ? FORM_WARNINGS.BELOW_MIN_AIR_GAP_VOLUME : null
 }
 
 /*******************
  **     Helpers    **
  ********************/
 
-export const composeWarnings = (...warningCheckers: Array<WarningChecker>) => (
-  formData: mixed
-): Array<FormWarning> =>
+type ComposeWarnings = (
+  ...warningCheckers: Array<WarningChecker>
+) => (formData: mixed) => Array<FormWarning>
+export const composeWarnings: ComposeWarnings = (
+  ...warningCheckers: Array<WarningChecker>
+) => formData =>
   warningCheckers.reduce((acc, checker) => {
     const possibleWarning = checker(formData)
     return possibleWarning ? [...acc, possibleWarning] : acc

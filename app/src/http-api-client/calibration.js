@@ -3,7 +3,6 @@
 // DEPRECATED(mc, 2020-01-13)
 import { createSelector } from 'reselect'
 
-import type { OutputSelector } from 'reselect'
 import type { State, Action, ThunkPromiseAction } from '../types'
 import type { BaseRobot, RobotService, Mount } from '../robot'
 import type { ApiCall, ApiRequestError } from './types'
@@ -38,6 +37,7 @@ type DeckStartResponse = {
     mount: Mount,
     model: string,
   },
+  ...
 }
 
 type DeckCalRequest =
@@ -52,6 +52,7 @@ type DeckCalRequest =
 
 type DeckCalResponse = {
   message: string,
+  ...
 }
 
 type CalPath = 'calibration/deck/start' | 'calibration/deck'
@@ -72,10 +73,12 @@ export type DeckCalCommandState = ApiCall<DeckCalRequest, DeckCalResponse>
 
 type RobotCalState = {
   [string]: any,
+  ...,
 }
 
-type CalState = {
+export type CalState = {
   [robotName: string]: ?RobotCalState,
+  ...,
 }
 
 const DECK: 'calibration/deck' = 'calibration/deck'
@@ -118,7 +121,6 @@ export function deckCalibrationCommand(
     const token = startState.response && startState.response.token
 
     if (request.command === 'release') {
-      // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
       dispatch(clearApiResponse(robot, DECK_START))
     }
 
@@ -137,7 +139,6 @@ export function clearDeckCalibration(robot: RobotService): ThunkPromiseAction {
   const clearDeck = clearApiResponse(robot, DECK)
   const clearDeckStart = clearApiResponse(robot, DECK_START)
 
-  // $FlowFixMe: (mc, 2019-04-23) http-api-client types need to be redone
   return dispatch => dispatch(chainActions(clearDeck, clearDeckStart))
 }
 
@@ -237,12 +238,11 @@ export function calibrationReducer(state: ?CalState, action: Action): CalState {
   return state
 }
 
-export function makeGetDeckCalibrationStartState() {
-  const sel: OutputSelector<
-    State,
-    BaseRobot,
-    DeckCalStartState
-  > = createSelector(
+export function makeGetDeckCalibrationStartState(): (
+  State,
+  BaseRobot
+) => DeckCalStartState {
+  const sel = createSelector(
     getRobotCalState,
     getStartStateFromCalState
   )
@@ -250,12 +250,11 @@ export function makeGetDeckCalibrationStartState() {
   return sel
 }
 
-export function makeGetDeckCalibrationCommandState() {
-  const sel: OutputSelector<
-    State,
-    BaseRobot,
-    DeckCalCommandState
-  > = createSelector(
+export function makeGetDeckCalibrationCommandState(): (
+  State,
+  BaseRobot
+) => DeckCalCommandState {
+  const sel = createSelector(
     getRobotCalState,
     getDeckStateFromCalState
   )

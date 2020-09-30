@@ -8,7 +8,7 @@ import {
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
-  HoverTooltip,
+  Tooltip,
   SlotMap,
   LabeledValue,
   OutlineButton,
@@ -57,7 +57,7 @@ describe('ModuleRow', () => {
 
     const wrapper = render(props)
 
-    expect(wrapper.find(HoverTooltip).prop('tooltipComponent')).toBeTruthy()
+    expect(wrapper.find(Tooltip)).toBeTruthy()
     expect(wrapper.find(SlotMap).prop('collisionSlots')).toEqual(['4'])
   })
 
@@ -72,7 +72,7 @@ describe('ModuleRow', () => {
 
     const wrapper = render(props)
 
-    expect(wrapper.find(HoverTooltip).prop('tooltipComponent')).toBeTruthy()
+    expect(wrapper.find(Tooltip)).toBeTruthy()
     expect(wrapper.find(SlotMap).prop('collisionSlots')).toEqual(['6'])
   })
 
@@ -87,7 +87,7 @@ describe('ModuleRow', () => {
 
     const wrapper = render(props)
 
-    expect(wrapper.find(HoverTooltip).prop('tooltipComponent')).toBeNull()
+    expect(wrapper.find(Tooltip)).toHaveLength(0)
     expect(wrapper.find(SlotMap).prop('collisionSlots')).toHaveLength(0)
   })
 
@@ -101,7 +101,7 @@ describe('ModuleRow', () => {
 
     const wrapper = render(props)
 
-    expect(wrapper.find(HoverTooltip).prop('tooltipComponent')).toBeNull()
+    expect(wrapper.find(Tooltip)).toHaveLength(0)
     expect(wrapper.find(SlotMap).prop('collisionSlots')).toHaveLength(0)
   })
 

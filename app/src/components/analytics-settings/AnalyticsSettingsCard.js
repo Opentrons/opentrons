@@ -7,7 +7,7 @@ import { AnalyticsToggle } from './AnalyticsToggle'
 
 const TITLE = 'Privacy Settings'
 
-export function AnalyticsSettingsCard() {
+export function AnalyticsSettingsCard(): React.Node {
   return (
     <Card title={TITLE}>
       <AnalyticsToggle />

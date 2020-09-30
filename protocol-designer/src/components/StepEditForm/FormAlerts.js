@@ -1,13 +1,18 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { Alerts, type Props } from '../alerts/Alerts'
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../dismiss'
-import { getVisibleAlerts } from './utils'
-import { getSelectedStepId } from '../../ui/steps'
+import { getSelectedItem } from '../../ui/steps/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  getVisibleFormErrors,
+  getVisibleFormWarnings,
+  getVisibleProfileFormLevelErrors,
+} from './utils'
 import type { Dispatch } from 'redux'
 import type { StepIdType } from '../../form-types'
 import type { StepFieldName } from '../../steplist/fieldLevel'
@@ -20,7 +25,7 @@ import type { BaseState } from '../../types'
 type SP = {|
   errors: $PropertyType<Props, 'errors'>,
   warnings: $PropertyType<Props, 'warnings'>,
-  stepId: ?(StepIdType | string),
+  stepId: StepIdType,
 |}
 
 type OP = {|
@@ -30,31 +35,53 @@ type OP = {|
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { focusedField, dirtyFields } = ownProps
-  const visibleWarnings = getVisibleAlerts({
+  const visibleWarnings = getVisibleFormWarnings({
     focusedField,
     dirtyFields,
-    alerts: dismissSelectors.getFormWarningsForSelectedStep(state),
+    errors: dismissSelectors.getFormWarningsForSelectedStep(state),
   })
 
-  const unsavedFormErrors = stepFormSelectors.getUnsavedFormErrors(state)
-  const formLevelErrors = (unsavedFormErrors && unsavedFormErrors.form) || []
-  const filteredErrors = getVisibleAlerts({
+  const formLevelErrors = stepFormSelectors.getFormLevelErrorsForUnsavedForm(
+    state
+  )
+  const visibleErrors = getVisibleFormErrors({
     focusedField,
     dirtyFields,
-    alerts: formLevelErrors,
+    errors: formLevelErrors,
   })
+
+  // deal with special-case dynamic field form-level errors
+  const { profileItemsById } = stepFormSelectors.getHydratedUnsavedForm(state)
+  let visibleDynamicFieldFormErrors = []
+  if (profileItemsById != null) {
+    const dynamicFieldFormErrors = stepFormSelectors.getDynamicFieldFormErrorsForUnsavedForm(
+      state
+    )
+    visibleDynamicFieldFormErrors = getVisibleProfileFormLevelErrors({
+      focusedField,
+      dirtyFields,
+      errors: dynamicFieldFormErrors,
+      profileItemsById,
+    })
+  }
 
   return {
-    errors: filteredErrors.map(error => ({
-      title: error.title,
-      description: error.body || null,
-    })),
+    errors: [
+      ...visibleErrors.map(error => ({
+        title: error.title,
+        description: error.body || null,
+      })),
+      ...visibleDynamicFieldFormErrors.map(error => ({
+        title: error.title,
+        description: error.body || null,
+      })),
+    ],
     warnings: visibleWarnings.map(warning => ({
       title: warning.title,
       description: warning.body || null,
       dismissId: warning.type,
     })),
-    stepId: getSelectedStepId(state),
+    stepId: getSelectedItem(state)?.id,
   }
 }
 
@@ -72,7 +99,14 @@ const mergeProps = (
   }
 }
 
-export const FormAlerts = connect<Props, OP, SP, {||}, _, _>(
+export const FormAlerts: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

@@ -5,7 +5,9 @@ import type {
   Method,
   RobotHost,
   RobotApiRequestMeta,
-  RequestState,
+  RobotApiResponseMeta,
+  RobotApiV2Error,
+  RobotApiV2ErrorResponseBody,
 } from '../types'
 
 export type ResponseFixturesOptions<SuccessBody, FailureBody> = {|
@@ -48,7 +50,11 @@ export const mockRequestMeta: RobotApiRequestMeta = { requestId: 'abc' }
 
 export const mockFailureBody = { message: 'AH' }
 
-export const mockFailedRequestState: RequestState = {
+export const mockFailedRequestState: {|
+  status: 'failure',
+  response: RobotApiResponseMeta,
+  error: {| message?: string |},
+|} = {
   response: {
     path: '/modules/abc123/update',
     method: 'POST',
@@ -77,4 +83,12 @@ export const makeResponseFixtures = <SuccessBody, FailureBody>(
   const failure = { ...failureMeta, host: mockRobot, body: failureBody }
 
   return { successMeta, success, failureMeta, failure }
+}
+
+export const mockV2Error: RobotApiV2Error = {
+  status: 'went bad',
+}
+
+export const mockV2ErrorResponse: RobotApiV2ErrorResponseBody = {
+  errors: [mockV2Error],
 }

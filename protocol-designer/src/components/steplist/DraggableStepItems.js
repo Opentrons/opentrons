@@ -4,8 +4,9 @@ import { connect } from 'react-redux'
 import { DragSource, DropTarget, DragLayer } from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
-import { PDTitledList } from '../lists'
+import { DND_TYPES } from '../../constants'
 import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
+import { PDTitledList } from '../lists'
 import {
   stepIconsByType,
   type StepIdType,
@@ -15,10 +16,6 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import type { BaseState } from '../../types'
 import { ContextMenu } from './ContextMenu'
 import styles from './StepItem.css'
-
-const DND_TYPES: { STEP_ITEM: 'STEP_ITEM' } = {
-  STEP_ITEM: 'STEP_ITEM',
-}
 
 type DragDropStepItemProps = {|
   ...$Exact<React.ElementProps<typeof ConnectedStepItem>>,
@@ -81,13 +78,13 @@ const DragDropStepItem = DropTarget(
   collectStepTarget
 )(DraggableStepItem)
 
-type StepItemsProps = {
+type StepItemsProps = {|
   orderedStepIds: Array<StepIdType>,
   reorderSteps: (Array<StepIdType>) => mixed,
   isOver: boolean,
   connectDropTarget: mixed => React.Element<any>,
-}
-type StepItemsState = { stepIds: Array<StepIdType> }
+|}
+type StepItemsState = {| stepIds: Array<StepIdType> |}
 class StepItems extends React.Component<StepItemsProps, StepItemsState> {
   constructor(props) {
     super(props)
@@ -201,12 +198,14 @@ const mapSTPForPreview = (
   return { stepType, stepName }
 }
 
-export const StepDragPreviewLayer = DragLayer(monitor => ({
-  currentOffset: monitor.getSourceClientOffset(),
-  isDragging: monitor.isDragging(),
-  itemType: monitor.getItemType(),
-  item: monitor.getItem(),
-}))(connect(mapSTPForPreview)(StepDragPreview))
+export const StepDragPreviewLayer: React.AbstractComponent<{||}> = DragLayer(
+  monitor => ({
+    currentOffset: monitor.getSourceClientOffset(),
+    isDragging: monitor.isDragging(),
+    itemType: monitor.getItemType(),
+    item: monitor.getItem(),
+  })
+)(connect(mapSTPForPreview)(StepDragPreview))
 
 const listTarget = {
   drop: (props, monitor, component) => {
@@ -220,8 +219,6 @@ const collectListTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
 })
 
-export const DraggableStepItems = DropTarget(
-  DND_TYPES.STEP_ITEM,
-  listTarget,
-  collectListTarget
-)(StepItems)
+export const DraggableStepItems: React.AbstractComponent<
+  $Diff<StepItemsProps, {| isOver: mixed, connectDropTarget: mixed |}>
+> = DropTarget(DND_TYPES.STEP_ITEM, listTarget, collectListTarget)(StepItems)

@@ -13,7 +13,7 @@ export type ClickableIconProps = {|
   onClick?: (SyntheticMouseEvent<>) => mixed,
 |}
 
-export function ClickableIcon(props: ClickableIconProps) {
+export function ClickableIcon(props: ClickableIconProps): React.Node {
   const { name, className, ...buttonProps } = props
   const buttonCx = cx(styles.clickable_icon, className)
 

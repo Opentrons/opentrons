@@ -62,7 +62,7 @@ describe('PipetteSelect', () => {
     ])
   })
 
-  it('can blacklist pipettes by name', () => {
+  it('can omit pipettes by name', () => {
     const pipetteSpecs: Array<PipetteNameSpecs> = getAllPipetteNames(
       'maxVolume',
       'channels'
@@ -71,14 +71,14 @@ describe('PipetteSelect', () => {
       .filter(Boolean)
 
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
-    const nameBlacklist = pipetteSpecs
+    const nameBlocklist = pipetteSpecs
       .filter(s => s.displayCategory === GEN1)
       .map(s => s.name)
 
     const wrapper = shallow(
       <PipetteSelect
         onPipetteChange={jest.fn()}
-        nameBlacklist={nameBlacklist}
+        nameBlocklist={nameBlocklist}
       />
     )
 

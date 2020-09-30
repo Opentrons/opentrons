@@ -1,5 +1,5 @@
-// flow-typed signature: 359ff33af7cf8ed32157f0421593c7bd
-// flow-typed version: c6154227d1/react-router-dom_v5.x.x/flow_>=v0.104.x
+// flow-typed signature: 33bc320ebb5343629e228a9caa367310
+// flow-typed version: c4f47bdda4/react-router-dom_v5.x.x/flow_>=v0.104.x
 
 declare module "react-router-dom" {
   declare export var BrowserRouter: React$ComponentType<{|
@@ -18,23 +18,23 @@ declare module "react-router-dom" {
   |}>
 
   declare export var Link: React$ComponentType<{
-    className?: string,
-    to: string | LocationShape,
-    replace?: boolean,
-    children?: React$Node,
+    +className?: string,
+    +to: string | LocationShape,
+    +replace?: boolean,
+    +children?: React$Node,
     ...
   }>
 
   declare export var NavLink: React$ComponentType<{
-    to: string | LocationShape,
-    activeClassName?: string,
-    className?: string,
-    activeStyle?: { +[string]: mixed, ... },
-    style?: { +[string]: mixed, ... },
-    isActive?: (match: Match, location: Location) => boolean,
-    children?: React$Node,
-    exact?: boolean,
-    strict?: boolean,
+    +to: string | LocationShape,
+    +activeClassName?: string,
+    +className?: string,
+    +activeStyle?: { +[string]: mixed, ... },
+    +style?: { +[string]: mixed, ... },
+    +isActive?: (match: Match, location: Location) => boolean,
+    +children?: React$Node,
+    +exact?: boolean,
+    +strict?: boolean,
     ...
   }>
 
@@ -44,8 +44,6 @@ declare module "react-router-dom" {
     pathname: string,
     search: string,
     hash: string,
-    state?: any,
-    key?: string,
     ...
   };
 
@@ -53,7 +51,6 @@ declare module "react-router-dom" {
     pathname?: string,
     search?: string,
     hash?: string,
-    state?: any,
     ...
   };
 
@@ -75,9 +72,6 @@ declare module "react-router-dom" {
     block(
       callback: string | (location: Location, action: HistoryAction) => ?string
     ): () => void,
-    // createMemoryHistory
-    index?: number,
-    entries?: Array<Location>,
     ...
   };
 
@@ -165,7 +159,7 @@ declare module "react-router-dom" {
   ): React$ComponentType<$Diff<React$ElementConfig<Component>, ContextRouterVoid>>;
 
   declare type MatchPathOptions = {
-    path?: string,
+    path?: string | string[],
     exact?: boolean,
     sensitive?: boolean,
     strict?: boolean,
@@ -174,9 +168,14 @@ declare module "react-router-dom" {
 
   declare export function matchPath(
     pathname: string,
-    options?: MatchPathOptions | string,
+    options?: MatchPathOptions | string | string[],
     parent?: Match
   ): null | Match;
+
+  declare export function useHistory(): $PropertyType<ContextRouter, 'history'>;
+  declare export function useLocation(): $PropertyType<ContextRouter, 'location'>;
+  declare export function useParams(): $PropertyType<$PropertyType<ContextRouter, 'match'>, 'params'>;
+  declare export function useRouteMatch(path?: MatchPathOptions | string | string[]): $PropertyType<ContextRouter, 'match'>;
 
   declare export function generatePath(pattern?: string, params?: { +[string]: mixed, ... }): string;
 }

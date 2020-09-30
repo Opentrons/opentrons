@@ -5,14 +5,14 @@ import * as React from 'react'
 import { ResourceCard } from './ResourceCard'
 import { CardContainer, CardRow } from '../layout'
 
-export function Resources() {
+export function Resources(): React.Node {
   return (
     <CardContainer>
       <CardRow>
         <ResourceCard
           title="Support Articles"
           description="Visit our walkthroughs and FAQs"
-          url={'https://support.opentrons.com/ot-2'}
+          url={'https://support.opentrons.com/'}
         />
       </CardRow>
       <CardRow>

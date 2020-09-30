@@ -1,9 +1,10 @@
 // @flow
-import { generateSubsteps } from '../generateSubsteps'
+import { generateSubstepItem } from '../generateSubstepItem'
 import { makeInitialRobotState } from '../../step-generation/utils'
 import { makeContext } from '../../step-generation/__fixtures__'
+import { THERMOCYCLER_STATE } from '../../constants'
 
-describe('generateSubsteps', () => {
+describe('generateSubstepItem', () => {
   const stepId = 'step123'
   const tiprackId = 'tiprack1Id'
   const pipetteId = 'p300SingleId'
@@ -16,12 +17,13 @@ describe('generateSubsteps', () => {
 
     labwareNamesByModuleId = {
       magnet123: {
-        displayName: 'magnet module',
-        nickname: null,
+        nickname: 'mag nickname',
       },
       tempId: {
-        displayName: 'temperature module',
-        nickname: null,
+        nickname: 'temp nickname',
+      },
+      thermocyclerModuleId: {
+        nickname: 'tc nickname',
       },
     }
     robotState = makeInitialRobotState({
@@ -47,7 +49,7 @@ describe('generateSubsteps', () => {
       errors: {},
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -82,7 +84,7 @@ describe('generateSubsteps', () => {
     },
   ].forEach(({ testName, args }) => {
     it(testName, () => {
-      const result = generateSubsteps(
+      const result = generateSubstepItem(
         args,
         invariantContext,
         robotState,
@@ -105,7 +107,7 @@ describe('generateSubsteps', () => {
     }
     const robotState = makeInitialRobotState({ invariantContext })
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -316,7 +318,7 @@ describe('generateSubsteps', () => {
           stepArgs: { ...sharedArgs, ...stepArgs },
         }
 
-        const result = generateSubsteps(
+        const result = generateSubstepItem(
           stepArgsAndErrors,
           invariantContext,
           robotState,
@@ -353,7 +355,7 @@ describe('generateSubsteps', () => {
       errors: {},
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -494,7 +496,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -505,8 +507,7 @@ describe('generateSubsteps', () => {
     expect(result).toEqual({
       substepType: 'magnet',
       engage: true,
-      labwareDisplayName: 'magnet module',
-      labwareNickname: null,
+      labwareNickname: 'mag nickname',
       message: null,
     })
   })
@@ -521,7 +522,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -532,8 +533,7 @@ describe('generateSubsteps', () => {
     expect(result).toEqual({
       substepType: 'magnet',
       engage: false,
-      labwareDisplayName: 'magnet module',
-      labwareNickname: null,
+      labwareNickname: 'mag nickname',
       message: null,
     })
   })
@@ -549,7 +549,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -560,8 +560,7 @@ describe('generateSubsteps', () => {
     expect(result).toEqual({
       substepType: 'temperature',
       temperature: 45,
-      labwareDisplayName: 'temperature module',
-      labwareNickname: null,
+      labwareNickname: 'temp nickname',
       message: null,
     })
   })
@@ -577,7 +576,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -588,8 +587,7 @@ describe('generateSubsteps', () => {
     expect(result).toEqual({
       substepType: 'temperature',
       temperature: 0,
-      labwareDisplayName: 'temperature module',
-      labwareNickname: null,
+      labwareNickname: 'temp nickname',
       message: null,
     })
   })
@@ -604,7 +602,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -615,9 +613,37 @@ describe('generateSubsteps', () => {
     expect(result).toEqual({
       substepType: 'temperature',
       temperature: null,
-      labwareDisplayName: 'temperature module',
-      labwareNickname: null,
+      labwareNickname: 'temp nickname',
       message: null,
+    })
+  })
+
+  it('thermocyclerState returns substep data', () => {
+    const stepArgsAndErrors = {
+      errors: {},
+      stepArgs: {
+        module: 'thermocyclerModuleId',
+        commandCreatorFnName: THERMOCYCLER_STATE,
+        message: 'a message',
+        blockTargetTemp: 44,
+        lidTargetTemp: 66,
+        lidOpen: false,
+      },
+    }
+    const result = generateSubstepItem(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      labwareNamesByModuleId
+    )
+    expect(result).toEqual({
+      substepType: THERMOCYCLER_STATE,
+      labwareNickname: 'tc nickname',
+      blockTargetTemp: 44,
+      lidTargetTemp: 66,
+      lidOpen: false,
+      message: 'a message',
     })
   })
 
@@ -629,7 +655,7 @@ describe('generateSubsteps', () => {
       },
     }
 
-    const result = generateSubsteps(
+    const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
       robotState,

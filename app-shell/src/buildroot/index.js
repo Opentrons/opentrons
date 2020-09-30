@@ -4,11 +4,16 @@ import path from 'path'
 import { readFile, ensureDir } from 'fs-extra'
 import { app } from 'electron'
 
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import { createLogger } from '../log'
 import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
-import { getReleaseFiles, readUserFileInfo } from './release-files'
+import {
+  getReleaseFiles,
+  readUserFileInfo,
+  cleanupReleaseFiles,
+} from './release-files'
 import { startPremigration, uploadSystemFile } from './update'
 
 import type { Action, Dispatch } from '../types'
@@ -21,13 +26,15 @@ import type {
 const log = createLogger('buildroot/index')
 
 const DIRECTORY = path.join(app.getPath('userData'), '__ot_buildroot__')
+const MANIFEST_CACHE = path.join(DIRECTORY, 'releases.json')
 
 let checkingForUpdates = false
 let updateSet: ReleaseSetFilepaths | null = null
 
-export function registerBuildrootUpdate(dispatch: Dispatch) {
+export function registerBuildrootUpdate(dispatch: Dispatch): Action => void {
   return function handleAction(action: Action) {
     switch (action.type) {
+      case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
         if (!checkingForUpdates) {
           checkingForUpdates = true
@@ -113,18 +120,27 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
 export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
   const manifestUrl: string = getConfig('buildroot').manifestUrl
 
-  return downloadManifest(manifestUrl).then(manifest => {
-    const urls = getReleaseSet(manifest, CURRENT_VERSION)
+  return downloadManifest(manifestUrl, MANIFEST_CACHE)
+    .then(manifest => {
+      const urls = getReleaseSet(manifest, CURRENT_VERSION)
 
-    if (urls === null) {
-      log.debug('No release files in manifest', {
+      if (urls === null) {
+        log.warn('No release files in manifest', {
+          version: CURRENT_VERSION,
+          manifest,
+        })
+      }
+
+      return urls
+    })
+    .catch((error: Error) => {
+      log.warn('Error retrieving release manifest', {
         version: CURRENT_VERSION,
-        manifest,
+        error,
       })
-    }
 
-    return urls
-  })
+      return null
+    })
 }
 
 // check for a buildroot update matching the current app version
@@ -170,6 +186,10 @@ export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<mixed> {
       .catch((error: Error) =>
         dispatch({ type: 'buildroot:DOWNLOAD_ERROR', payload: error.message })
       )
+      .then(() => cleanupReleaseFiles(DIRECTORY, CURRENT_VERSION))
+      .catch((error: Error) => {
+        log.warn('Unable to cleanup old release files', { error })
+      })
   })
 }
 

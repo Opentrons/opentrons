@@ -8,10 +8,10 @@ import type {
   LoadFileAction,
   NewProtocolFields,
 } from './types'
-export type FileUploadMessageAction = {
+export type FileUploadMessageAction = {|
   type: 'FILE_UPLOAD_MESSAGE',
   payload: FileUploadMessage,
-}
+|}
 
 export const fileUploadMessage = (
   payload: FileUploadMessage
@@ -20,7 +20,10 @@ export const fileUploadMessage = (
   payload,
 })
 
-export const dismissFileUploadMessage = () => ({
+export type DismissFileUploadMessageAction = {|
+  type: 'DISMISS_FILE_UPLOAD_MESSAGE',
+|}
+export const dismissFileUploadMessage = (): DismissFileUploadMessageAction => ({
   type: 'DISMISS_FILE_UPLOAD_MESSAGE',
 })
 
@@ -74,10 +77,10 @@ export const undoLoadFile = (): UndoLoadFile => ({
   type: 'UNDO_LOAD_FILE',
 })
 
-export type CreateNewProtocolAction = {
+export type CreateNewProtocolAction = {|
   type: 'CREATE_NEW_PROTOCOL',
   payload: NewProtocolFields,
-}
+|}
 
 export const createNewProtocol = (
   payload: $PropertyType<CreateNewProtocolAction, 'payload'>
@@ -86,6 +89,7 @@ export const createNewProtocol = (
   payload,
 })
 
-export const saveProtocolFile = () => ({
+export type SaveProtocolFileAction = {| type: 'SAVE_PROTOCOL_FILE' |}
+export const saveProtocolFile = (): SaveProtocolFileAction => ({
   type: 'SAVE_PROTOCOL_FILE',
 })

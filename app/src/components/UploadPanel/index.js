@@ -21,7 +21,14 @@ type DP = {|
 
 type Props = {| ...SP, ...DP |}
 
-export const UploadPanel = connect<Props, {||}, _, _, _, _>(
+export const UploadPanel: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(UploadPanelComponent)

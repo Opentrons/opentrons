@@ -15,7 +15,7 @@ export type InsertDetailsProps = {|
   definition: LabwareDefinition,
 |}
 
-export function InsertDetails(props: InsertDetailsProps) {
+export function InsertDetails(props: InsertDetailsProps): React.Node {
   const { definition } = props
   const { metadata, parameters } = definition
   const { displayVolumeUnits, displayCategory } = metadata

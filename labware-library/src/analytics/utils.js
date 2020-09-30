@@ -44,7 +44,7 @@ export const initializeAnalytics = (state: AnalyticsState) => {
 }
 
 export const getAnalyticsState = (): AnalyticsState => {
-  let state = getAnalyticsCookie()
+  const state = getAnalyticsCookie()
 
   if (
     // verify cookie properties

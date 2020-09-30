@@ -1,19 +1,15 @@
 // @flow
 // robot discovery state
-import groupBy from 'lodash/groupBy'
-import { remote } from '../shell/remote'
+import keyBy from 'lodash/keyBy'
+import { UI_INITIALIZED } from '../shell'
 import * as actions from './actions'
 
 import type { Action } from '../types'
-import type { Service, RobotsMap, DiscoveryState } from './types'
-
-export const normalizeRobots = (robots: Array<Service> = []): RobotsMap => {
-  return groupBy(robots, 'name')
-}
+import type { DiscoveryState } from './types'
 
 export const INITIAL_STATE: DiscoveryState = {
   scanning: false,
-  robotsByName: normalizeRobots(remote.INITIAL_ROBOTS),
+  robotsByName: {},
 }
 
 export function discoveryReducer(
@@ -21,6 +17,7 @@ export function discoveryReducer(
   action: Action
 ): DiscoveryState {
   switch (action.type) {
+    case UI_INITIALIZED:
     case actions.DISCOVERY_START:
       return { ...state, scanning: true }
 
@@ -28,7 +25,7 @@ export function discoveryReducer(
       return { ...state, scanning: false }
 
     case actions.DISCOVERY_UPDATE_LIST: {
-      return { ...state, robotsByName: normalizeRobots(action.payload.robots) }
+      return { ...state, robotsByName: keyBy(action.payload.robots, 'name') }
     }
   }
 

@@ -13,6 +13,6 @@ if (location.hostname.startsWith('sandbox')) {
 // $FlowFixMe
 __webpack_public_path__ = _publicPath // eslint-disable-line no-undef
 
-export function getPublicPath() {
+export function getPublicPath(): string {
   return _publicPath
 }

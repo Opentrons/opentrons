@@ -34,6 +34,6 @@ serve: all
 # end to end tests
 .PHONY: test-e2e
 test-e2e:
-	concurrently --no-color --kill-others --success "first" --names "labware-library,labware-library-tests" \
-		"$(MAKE) dev" \
-		"cypress run --browser chrome"
+	concurrently --no-color --kill-others --success first --names "labware-library-server,labware-library-tests" \
+	"$(MAKE) dev CYPRESS=1 GTM_ID=''" \
+	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"

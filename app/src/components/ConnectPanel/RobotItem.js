@@ -1,43 +1,65 @@
 // @flow
-// item in a RobotList
-import { connect } from 'react-redux'
+// connected component for an item in a RobotList
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { withRouter, type ContextRouter } from 'react-router-dom'
 
-import { actions as robotActions } from '../../robot'
-import { getBuildrootUpdateAvailable } from '../../buildroot'
+import {
+  actions as RobotActions,
+  selectors as RobotSelectors,
+} from '../../robot'
+import { getBuildrootUpdateAvailable, UPGRADE } from '../../buildroot'
+import { CONNECTABLE } from '../../discovery'
 import { RobotListItem } from './RobotListItem.js'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 
-type OP = {| ...ContextRouter, robot: ViewableRobot |}
+export type RobotItemProps = {|
+  ...ContextRouter,
+  robot: ViewableRobot,
+|}
 
-type SP = {| upgradable: boolean, selected: boolean |}
+export const RobotItem: React.AbstractComponent<
+  $Diff<RobotItemProps, ContextRouter>
+> = withRouter(RobotItemComponent)
 
-type DP = {| connect: () => mixed, disconnect: () => mixed |}
+export function RobotItemComponent(props: RobotItemProps): React.Node {
+  const { robot, match } = props
+  const { name, displayName, status, local: isLocal } = robot
+  const isUpgradable = useSelector((state: State) => {
+    return getBuildrootUpdateAvailable(state, robot) === UPGRADE
+  })
+  const isConnectable = status === CONNECTABLE
+  const isConnected = robot.connected
+  const isSelected = robot.name === match.params.name
+  const connectInProgress = useSelector(
+    (state: State) => RobotSelectors.getConnectRequest(state).inProgress
+  )
+  const dispatch = useDispatch<Dispatch>()
 
-export type RobotItemProps = {| ...OP, ...SP, ...DP |}
+  const handleToggleConnect = () => {
+    if (!connectInProgress) {
+      const action = isConnected
+        ? RobotActions.disconnect()
+        : RobotActions.connect(name)
 
-export const RobotItem = withRouter<_, _>(
-  connect<RobotItemProps, OP, SP, DP, State, Dispatch>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(RobotListItem)
-)
-
-function mapStateToProps(state: State, ownProps: OP): SP {
-  const { robot } = ownProps
-  const updateType = getBuildrootUpdateAvailable(state, robot)
-
-  return {
-    upgradable: updateType === 'upgrade',
-    selected: ownProps.match.params.name === robot.name,
+      dispatch(action)
+    }
   }
-}
 
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  return {
-    connect: () => dispatch(robotActions.connect(ownProps.robot.name)),
-    disconnect: () => dispatch(robotActions.disconnect()),
-  }
+  return (
+    <RobotListItem
+      {...{
+        name,
+        displayName,
+        isConnectable,
+        isUpgradable,
+        isSelected,
+        isLocal: Boolean(isLocal),
+        isConnected,
+        onToggleConnect: handleToggleConnect,
+      }}
+    />
+  )
 }

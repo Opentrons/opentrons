@@ -1,5 +1,8 @@
 # opentrons robot server makefile
 
+include ../scripts/push.mk
+include ../scripts/python.mk
+
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
@@ -12,20 +15,10 @@ SHX := npx shx
 # Path of source package
 SRC_PATH = robot_server
 
-# python and pipenv config
-pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
-python := $(pipenv_envvars) pipenv run python
-pip := $(pipenv_envvars) pipenv run pip
-pytest := $(pipenv_envvars) pipenv run py.test
-pipenv_opts := --dev
-pipenv_opts += $(and $(CI),--keep-outdated --clear)
-wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
-
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/robotserver-$(shell $(python) ../scripts/python_build_utils.py robot-server normalize_version)-py2.py3-none-any.whl
-wheel_pattern := dist/robotserver-%-py2.py3-none-any.whl
+wheel_file = dist/$(call python_get_wheelname,robot-server,robotserver,$(BUILD_NUMBER))
 
 
 # These variables can be overriden when make is invoked to customize the
@@ -36,11 +29,11 @@ tests ?= tests
 test_opts ?=  --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # Host key location for buildroot robot
-br_ssh_key ?= ~/.ssh/robot_key
+br_ssh_key ?= $(default_ssh_key)
 # Pubkey location for buildroot robot to install with install-key
 br_ssh_pubkey ?= $(br_ssh_key).pub
 # Other SSH args for buildroot robots
-ssh_opts ?= -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
+ssh_opts ?= $(default_ssh_opts)
 
 # Source discovery
 # For the python sources
@@ -54,20 +47,20 @@ clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__p
 .PHONY: all
 all: clean wheel
 
-.PHONY: install
-install:
-	$(pipenv_envvars) pipenv sync $(pipenv_opts)
-	$(pipenv_envvars) pipenv run pip freeze
+.PHONY: setup
+setup:
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean:
 	$(clean_cmd)
 
-.PHONY: uninstall
-uninstall:
-	$(pipenv_envvars)	pipenv --rm
+.PHONY: teardown
+teardown:
+	$(pipenv) --rm
 
-$(wheel_pattern): setup.py $(ot_sources)
+dist/robotserver-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
@@ -85,23 +78,19 @@ lint: $(ot_py_sources)
 	$(python) -m pylama $(SRC_PATH) tests
 
 .PHONY: dev
-dev: export ENABLE_VIRTUAL_SMOOTHIE := true
+dev: export OT_ROBOT_SERVER_DOT_ENV_PATH := dev.env
 dev:
-	$(python) -m robot_server.main -P 31950
+	$(pipenv) run uvicorn "robot_server.service.app:app" --host localhost --port 31950 --ws wsproto --reload
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv_envvars) pipenv shell
+	$(pipenv) shell
 
 .PHONY: push
 push: wheel
-	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
-	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/robotserver*.whl && mount -o remount,ro / && systemctl start opentrons-robot-server; } ;\
-systemctl stop opentrons-robot-server &&\
-mount -o remount,rw / &&\
-cd /usr/lib/python3.7/site-packages &&\
-unzip -o /data/robotserver*.whl && cleanup || cleanup"
+	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-systemd-unit,$(host),$(br_ssh_key),$(ssh_opts),./opentrons-robot-server.service)
+	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: install-key
 install-key:
@@ -140,3 +129,9 @@ change-left:
 .PHONY: term
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+
+.PHONY: docs
+docs: settings_schema.json
+
+settings_schema.json: robot_server/settings.py
+	$(python) -m scripts.settings_schema $@

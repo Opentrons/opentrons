@@ -21,14 +21,16 @@ export type ModalProps = {|
   alertOverlay?: boolean,
   /** restricts scroll outside of Modal when open, true by default */
   restrictOuterScroll?: boolean,
-  innerRef?: React.Ref<*>,
+  innerRef?:
+    | {| current: HTMLElement | null |}
+    | ((current: HTMLElement | null) => mixed),
 |}
 
 /**
  * Base modal component that fills its nearest `display:relative` ancestor
  * with a dark overlay and displays `children` as its contents in a white box
  */
-export function Modal(props: ModalProps) {
+export function Modal(props: ModalProps): React.Node {
   const {
     contentsClassName,
     alertOverlay,

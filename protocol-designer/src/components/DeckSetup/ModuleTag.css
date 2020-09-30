@@ -1,6 +1,6 @@
 @import '@opentrons/components';
 
-.module_info_tag {
+.module_tag {
   width: 100%;
   background-color: var(--c-plate-bg);
   color: var(--c-font-dark);
@@ -8,18 +8,24 @@
   border: 3px solid transparent;
 }
 
-.module_info_line {
+.module_status {
+  /* NOTE(IL, 2020-05-20): font size 0.5rem isn't the same as 0.5rem outside of SVG + foreignObject world */
   font-size: 0.5rem;
   font-weight: var(--fw-semibold);
   padding-bottom: 0.3rem;
 }
 
-.module_info_type {
+.module_type {
   text-transform: uppercase;
+
+  /* NOTE(IL, 2020-05-20): font size 0.5rem isn't the same as 0.5rem outside of SVG + foreignObject world */
+  font-size: 0.5rem;
+  font-weight: var(--fw-semibold);
 }
 
 .module_status_line {
   text-transform: capitalize;
+  padding-top: 0.3rem;
 }
 
 .highlighted_border_left_none {

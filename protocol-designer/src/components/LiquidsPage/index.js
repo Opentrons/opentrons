@@ -90,7 +90,14 @@ function mergeProps(
   }
 }
 
-export const LiquidsPage = connect<WrapperProps, {||}, SP, {||}, _, _>(
+export const LiquidsPage: React.AbstractComponent<{||}> = connect<
+  WrapperProps,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

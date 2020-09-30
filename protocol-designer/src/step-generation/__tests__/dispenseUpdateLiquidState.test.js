@@ -343,7 +343,7 @@ describe('...8-channel pipette', () => {
     tests.forEach(({ labwareType, def, expectedLabwareMatch }) =>
       // make sourcePlateId a different labware def each time
       it(labwareType, () => {
-        let customInvariantContext = makeContext()
+        const customInvariantContext = makeContext()
         customInvariantContext.labwareEntities.sourcePlateId = {
           id: SOURCE_LABWARE,
           labwareDefURI: labwareType,

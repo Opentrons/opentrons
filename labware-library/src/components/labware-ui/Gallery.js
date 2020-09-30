@@ -12,7 +12,7 @@ export type GalleryProps = {|
   className?: string,
 |}
 
-export function Gallery(props: GalleryProps) {
+export function Gallery(props: GalleryProps): React.Node {
   const { definition, className } = props
   const { parameters: params, dimensions: dims } = definition
   const [currentImage, setCurrentImage] = React.useState(0)

@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 
 import type { BaseState } from '../../types'
@@ -23,6 +23,11 @@ const STP = (state: BaseState): $Exact<Props> => ({
   currentPage: selectors.getCurrentPage(state),
 })
 
-export const SettingsPage = connect<Props, {||}, $Exact<Props>, _, _, _>(STP)(
-  SettingsPageComponent
-)
+export const SettingsPage: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  $Exact<Props>,
+  _,
+  _,
+  _
+>(STP)(SettingsPageComponent)

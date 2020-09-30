@@ -1,7 +1,6 @@
 // @flow
 import assert from 'assert'
 import reduce from 'lodash/reduce'
-import omit from 'lodash/omit'
 import * as React from 'react'
 import cx from 'classnames'
 import { Formik } from 'formik'
@@ -17,6 +16,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -38,12 +38,12 @@ import type {
 } from '../../../step-forms'
 import type { FormikProps } from 'formik/@flow-typed'
 
-type PipetteFieldsData = $Diff<
+export type PipetteFieldsData = $Diff<
   PipetteOnDeck,
   {| id: mixed, spec: mixed, tiprackLabwareDef: mixed |}
 >
 
-type ModuleCreationArgs = {|
+export type ModuleCreationArgs = {|
   type: ModuleRealType,
   model: string,
   slot: DeckSlot,
@@ -71,7 +71,6 @@ export type Props = {|
     pipettes: Array<PipetteFieldsData>,
     modules: Array<ModuleCreationArgs>,
   |}) => mixed,
-  thermocyclerEnabled: ?boolean,
   moduleRestrictionsDisabled: ?boolean,
 |}
 
@@ -94,7 +93,7 @@ const initialFormState: FormState = {
     },
     [THERMOCYCLER_MODULE_TYPE]: {
       onDeck: false,
-      model: null,
+      model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
       slot: SPAN7_8_10_11_SLOT,
     },
   },
@@ -104,8 +103,9 @@ const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
   tiprackDefURI: Yup.string()
     .nullable()
+    // $FlowFixMe(mc, 2020-06-02): is `otherwise: null` valid?
     .when('pipetteName', {
-      is: val => Boolean(val),
+      is: (val: string | null): boolean => Boolean(val),
       then: Yup.string().required('Required'),
       otherwise: null,
     }),
@@ -114,6 +114,7 @@ const moduleValidationShape = Yup.object().shape({
   onDeck: Yup.boolean().default(false),
   model: Yup.string()
     .nullable()
+    // $FlowFixMe(mc, 2020-06-02): is `otherwise: null` valid?
     .when('onDeck', {
       is: true,
       then: Yup.string().required('Required'),
@@ -132,7 +133,8 @@ const validationSchema = Yup.object().shape({
       right: pipetteValidationShape,
     })
     .test('pipette-is-required', 'a pipette is required', value =>
-      Object.keys(value).some(val => value[val].pipetteName)
+      // $FlowFixMe(mc, 2020-06-02): Flow isn't extracting `value` type properly
+      Object.keys(value).some((val: string) => value[val].pipetteName)
     ),
   modulesByType: Yup.object().shape({
     [MAGNETIC_MODULE_TYPE]: moduleValidationShape,
@@ -156,10 +158,10 @@ export class FilePipettesModal extends React.Component<Props, State> {
       this.setState({ showEditPipetteConfirmation: false })
   }
 
-  getCrashableModuleSelected = (
+  getCrashableModuleSelected: (
     modules: FormModulesByType,
     moduleType: ModuleRealType
-  ) => {
+  ) => boolean = (modules, moduleType) => {
     const formModule = modules[moduleType]
     const crashableModuleOnDeck =
       formModule.onDeck && formModule.model
@@ -169,7 +171,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     return crashableModuleOnDeck
   }
 
-  handleSubmit = (values: FormState) => {
+  handleSubmit: (values: FormState) => void = values => {
     const { showProtocolFields } = this.props
     const { showEditPipetteConfirmation } = this.state
 
@@ -221,15 +223,15 @@ export class FilePipettesModal extends React.Component<Props, State> {
     this.props.onSave({ modules, newProtocolFields, pipettes })
   }
 
-  showEditPipetteConfirmationModal = () => {
+  showEditPipetteConfirmationModal: () => void = () => {
     this.setState({ showEditPipetteConfirmation: true })
   }
 
-  handleCancel = () => {
+  handleCancel: () => void = () => {
     this.setState({ showEditPipetteConfirmation: false })
   }
 
-  getInitialValues = () => {
+  getInitialValues: () => FormState = () => {
     return {
       ...initialFormState,
       pipettesByMount: {
@@ -243,7 +245,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): React.Node {
     if (this.props.hideModal) return null
     const { showProtocolFields, moduleRestrictionsDisabled } = this.props
 
@@ -293,10 +295,6 @@ export class FilePipettesModal extends React.Component<Props, State> {
                     getIsCrashablePipetteSelected(values.pipettesByMount) &&
                     (hasCrashableMagnetModuleSelected ||
                       hasCrashableTemperatureModuleSelected)
-
-                  const visibleModules = this.props.thermocyclerEnabled
-                    ? values.modulesByType
-                    : omit(values.modulesByType, THERMOCYCLER_MODULE_TYPE)
 
                   return (
                     <>
@@ -353,10 +351,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                             </h2>
                             <ModuleFields
                               errors={errors.modulesByType ?? null}
-                              values={visibleModules}
-                              thermocyclerEnabled={
-                                this.props.thermocyclerEnabled
-                              }
+                              values={values.modulesByType}
                               onFieldChange={handleChange}
                               onSetFieldValue={setFieldValue}
                               onBlur={handleBlur}

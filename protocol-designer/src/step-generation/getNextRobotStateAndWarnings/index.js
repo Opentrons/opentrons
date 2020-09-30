@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
 import produce from 'immer'
+import { stripNoOpCommands } from '../utils/stripNoOpCommands'
 import { forAspirate } from './forAspirate'
 import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
@@ -8,11 +9,24 @@ import { forDropTip } from './forDropTip'
 import { forPickUpTip } from './forPickUpTip'
 import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
 import {
+  forThermocyclerAwaitBlockTemperature,
+  forThermocyclerAwaitLidTemperature,
+  forThermocyclerAwaitProfileComplete,
+  forThermocyclerCloseLid,
+  forThermocyclerDeactivateBlock,
+  forThermocyclerDeactivateLid,
+  forThermocyclerOpenLid,
+  forThermocyclerRunProfile,
+  forThermocyclerSetTargetBlockTemperature,
+  forThermocyclerSetTargetLidTemperature,
+} from './thermocyclerUpdates'
+
+import {
   forAwaitTemperature,
   forSetTemperature,
   forDeactivateTemperature,
 } from './temperatureUpdates'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type {
   InvariantContext,
   RobotState,
@@ -43,9 +57,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'pickUpTip':
       forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
       break
-    case 'airGap':
-      // TODO: IL 2019-11-19 implement air gap (eventually)
-      break
     case 'magneticModule/engageMagnet':
       forEngageMagnet(command.params, invariantContext, robotStateAndWarnings)
       break
@@ -58,6 +69,9 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'touchTip':
     case 'delay':
+    case 'airGap':
+    case 'dispenseAirGap':
+    case 'moveToWell':
       // these commands don't have any effects on the state
       break
     case 'temperatureModule/setTargetTemperature':
@@ -78,16 +92,74 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     case 'thermocycler/setTargetBlockTemperature':
+      forThermocyclerSetTargetBlockTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/setTargetLidTemperature':
+      forThermocyclerSetTargetLidTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/awaitBlockTemperature':
+      forThermocyclerAwaitBlockTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/awaitLidTemperature':
+      forThermocyclerAwaitLidTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/deactivateBlock':
+      forThermocyclerDeactivateBlock(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/deactivateLid':
+      forThermocyclerDeactivateLid(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/closeLid':
+      forThermocyclerCloseLid(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/openLid':
+      forThermocyclerOpenLid(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/runProfile':
+      forThermocyclerRunProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/awaitProfileComplete':
-      console.warn(`NOT IMPLEMENTED: ${command.command}`)
+      forThermocyclerAwaitProfileComplete(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     default:
@@ -122,8 +194,9 @@ export function getNextRobotStateAndWarnings(
     warnings: [],
     robotState: initialRobotState,
   }
+  const strippedCommands = stripNoOpCommands(commands)
   return produce(prevState, draft => {
-    commands.forEach(command => {
+    strippedCommands.forEach(command => {
       _getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,

@@ -18,15 +18,15 @@ import type { FocusHandlers } from '../../types'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
 
-type Props = {
+type Props = {|
   focusHandlers: FocusHandlers,
   stepType: StepType,
   formData: HydratedMoveLiquidFormDataLegacy,
-}
+|}
 
-type State = {
+type State = {|
   collapsed: boolean,
-}
+|}
 
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
@@ -37,9 +37,10 @@ export class MoveLiquidForm extends React.Component<Props, State> {
     this.state = { collapsed: true }
   }
 
-  toggleCollapsed = () => this.setState({ collapsed: !this.state.collapsed })
+  toggleCollapsed: () => void = () =>
+    this.setState({ collapsed: !this.state.collapsed })
 
-  render() {
+  render(): React.Node {
     const { focusHandlers, stepType } = this.props
     const { collapsed } = this.state
     const { path } = this.props.formData

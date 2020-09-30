@@ -6,6 +6,8 @@ import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
 import * as Definitions from './definitions'
 import { validateLabwareFiles, validateNewLabwareFile } from './validation'
 import { sameIdentity } from './compare'
+
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import * as CustomLabware from '@opentrons/app/src/custom-labware'
 import * as ConfigActions from '@opentrons/app/src/config'
 
@@ -86,7 +88,10 @@ const copyLabware = (
   })
 }
 
-export function registerLabware(dispatch: Dispatch, mainWindow: {}) {
+export function registerLabware(
+  dispatch: Dispatch,
+  mainWindow: { ... }
+): Action => void {
   handleConfigChange(CustomLabware.LABWARE_DIRECTORY_CONFIG_PATH, () => {
     fetchAndValidateCustomLabware(dispatch, CustomLabware.CHANGE_DIRECTORY)
   })
@@ -94,7 +99,7 @@ export function registerLabware(dispatch: Dispatch, mainWindow: {}) {
   return function handleActionForLabware(action: Action) {
     switch (action.type) {
       case CustomLabware.FETCH_CUSTOM_LABWARE:
-      case 'shell:CHECK_UPDATE': {
+      case UI_INITIALIZED: {
         const source =
           action.type === CustomLabware.FETCH_CUSTOM_LABWARE
             ? CustomLabware.POLL
@@ -110,7 +115,7 @@ export function registerLabware(dispatch: Dispatch, mainWindow: {}) {
         showOpenDirectoryDialog(mainWindow, dialogOptions).then(filePaths => {
           if (filePaths.length > 0) {
             const dir = filePaths[0]
-            dispatch(ConfigActions.updateConfig('labware.directory', dir))
+            dispatch(ConfigActions.updateConfigValue('labware.directory', dir))
           }
         })
         break

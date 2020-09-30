@@ -6,15 +6,20 @@ import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
-
 import { WIFI_CONFIGURE_PATH } from '../constants'
 
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { WifiConfigureResponse } from '../types'
 
-const { successMeta, failureMeta, success, failure } = makeResponseFixtures<
+const {
+  successMeta,
+  failureMeta,
+  success,
+  failure,
+}: ResponseFixtures<
   WifiConfigureResponse,
   {| message: string |}
->({
+> = makeResponseFixtures({
   method: POST,
   path: WIFI_CONFIGURE_PATH,
   successStatus: 200,

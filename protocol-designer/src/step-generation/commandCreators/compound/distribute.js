@@ -1,16 +1,28 @@
 // @flow
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import { getWellsDepth } from '@opentrons/shared-data'
+import { getWellsDepth, getWellDepth } from '@opentrons/shared-data'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { aspirate, dispense, blowout, replaceTip, touchTip } from '../atomic'
+import {
+  airGap,
+  aspirate,
+  blowout,
+  delay,
+  dispense,
+  dispenseAirGap,
+  moveToWell,
+  replaceTip,
+  touchTip,
+} from '../atomic'
 import { mixUtil } from './mix'
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import type {
   DistributeArgs,
   CommandCreator,
   CurriedCommandCreator,
+  CommandCreatorError,
 } from '../../types'
 
 export const distribute: CommandCreator<DistributeArgs> = (
@@ -36,22 +48,31 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
+  const errors: Array<CommandCreatorError> = []
 
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
     !prevRobotState.pipettes[args.pipette] ||
     !invariantContext.pipetteEntities[args.pipette]
   ) {
-    // bail out before doing anything else
-    return {
-      errors: [
-        errorCreators.pipetteDoesNotExist({
-          actionName,
-          pipette: args.pipette,
-        }),
-      ],
-    }
+    errors.push(
+      errorCreators.pipetteDoesNotExist({
+        actionName,
+        pipette: args.pipette,
+      })
+    )
   }
+
+  if (!args.sourceLabware || !prevRobotState.labware[args.sourceLabware]) {
+    errors.push(
+      errorCreators.labwareDoesNotExist({
+        actionName,
+        labware: args.sourceLabware,
+      })
+    )
+  }
+
+  if (errors.length) return { errors }
 
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
   // to the action of aspiration of dispensing in a given command, they are actually values bound
@@ -59,17 +80,24 @@ export const distribute: CommandCreator<DistributeArgs> = (
   // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
   // when we decide to rename these fields/args... probably all the way up to the UI level.
   const {
+    aspirateDelay,
     aspirateFlowRateUlSec,
-    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
+    dispenseDelay,
+    dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
   } = args
+
+  const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
 
   // TODO error on negative args.disposalVolume?
   const disposalVolume =
     args.disposalVolume && args.disposalVolume > 0 ? args.disposalVolume : 0
 
-  const maxVolume = getPipetteWithTipMaxVol(args.pipette, invariantContext)
+  const maxVolume =
+    getPipetteWithTipMaxVol(args.pipette, invariantContext) -
+    aspirateAirGapVolume
+
   const maxWellsPerChunk = Math.floor(
     (maxVolume - disposalVolume) / args.volume
   )
@@ -96,9 +124,86 @@ export const distribute: CommandCreator<DistributeArgs> = (
       destWellChunk: Array<string>,
       chunkIndex: number
     ): Array<CurriedCommandCreator> => {
+      const firstDestWell = destWellChunk[0]
+      const sourceLabwareDef =
+        invariantContext.labwareEntities[args.sourceLabware].def
+      const destLabwareDef =
+        invariantContext.labwareEntities[args.destLabware].def
+
+      const airGapOffsetSourceWell =
+        getWellDepth(sourceLabwareDef, args.sourceWell) +
+        AIR_GAP_OFFSET_FROM_TOP
+      const airGapOffsetDestWell =
+        getWellDepth(destLabwareDef, firstDestWell) + AIR_GAP_OFFSET_FROM_TOP
+      const airGapAfterAspirateCommands = aspirateAirGapVolume
+        ? [
+            curryCommandCreator(airGap, {
+              pipette: args.pipette,
+              volume: aspirateAirGapVolume,
+              labware: args.sourceLabware,
+              well: args.sourceWell,
+              flowRate: aspirateFlowRateUlSec,
+              offsetFromBottomMm: airGapOffsetSourceWell,
+            }),
+            ...(aspirateDelay
+              ? [
+                  curryCommandCreator(delay, {
+                    commandCreatorFnName: 'delay',
+                    description: null,
+                    name: null,
+                    meta: null,
+                    wait: aspirateDelay.seconds,
+                  }),
+                ]
+              : []),
+            curryCommandCreator(dispenseAirGap, {
+              pipette: args.pipette,
+              volume: aspirateAirGapVolume,
+              labware: args.destLabware,
+              well: firstDestWell,
+              flowRate: dispenseFlowRateUlSec,
+              offsetFromBottomMm: airGapOffsetDestWell,
+            }),
+            ...(dispenseDelay
+              ? [
+                  curryCommandCreator(delay, {
+                    commandCreatorFnName: 'delay',
+                    description: null,
+                    name: null,
+                    meta: null,
+                    wait: dispenseDelay.seconds,
+                  }),
+                ]
+              : []),
+          ]
+        : []
+
       const dispenseCommands = flatMap(
         destWellChunk,
         (destWell: string, wellIndex: number): Array<CurriedCommandCreator> => {
+          const delayAfterDispenseCommands =
+            dispenseDelay != null
+              ? [
+                  curryCommandCreator(moveToWell, {
+                    pipette: args.pipette,
+                    labware: args.destLabware,
+                    well: destWell,
+                    offset: {
+                      x: 0,
+                      y: 0,
+                      z: dispenseDelay.mmFromBottom,
+                    },
+                  }),
+                  curryCommandCreator(delay, {
+                    commandCreatorFnName: 'delay',
+                    description: null,
+                    name: null,
+                    meta: null,
+                    wait: dispenseDelay.seconds,
+                  }),
+                ]
+              : []
+
           const touchTipAfterDispenseCommand = args.touchTipAfterDispense
             ? [
                 curryCommandCreator(touchTip, {
@@ -120,6 +225,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
+            ...delayAfterDispenseCommands,
             ...touchTipAfterDispenseCommand,
           ]
         }
@@ -157,6 +263,29 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ]
       }
 
+      const delayAfterAspirateCommands =
+        aspirateDelay != null
+          ? [
+              curryCommandCreator(moveToWell, {
+                pipette: args.pipette,
+                labware: args.sourceLabware,
+                well: args.sourceWell,
+                offset: {
+                  x: 0,
+                  y: 0,
+                  z: aspirateDelay.mmFromBottom,
+                },
+              }),
+              curryCommandCreator(delay, {
+                commandCreatorFnName: 'delay',
+                description: null,
+                name: null,
+                meta: null,
+                wait: aspirateDelay.seconds,
+              }),
+            ]
+          : []
+
       const touchTipAfterAspirateCommand = args.touchTipAfterAspirate
         ? [
             curryCommandCreator(touchTip, {
@@ -179,6 +308,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
             dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,
+            aspirateDelaySeconds: aspirateDelay?.seconds,
+            dispenseDelaySeconds: dispenseDelay?.seconds,
           })
         : []
 
@@ -193,7 +324,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
           flowRate: aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
         }),
+        ...delayAfterAspirateCommands,
         ...touchTipAfterAspirateCommand,
+        ...airGapAfterAspirateCommands,
 
         ...dispenseCommands,
         ...blowoutCommands,

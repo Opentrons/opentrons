@@ -5,14 +5,14 @@ import warnings
 import logging
 import time
 from opentrons import commands
-from ..containers import unpack_location
+from ..containers import unpack_location, load_tip_length_calibration
 from ..containers.placeable import (
     Container, Placeable, WellSeries
 )
 from opentrons.commands import CommandPublisher, do_publish
 from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
-from opentrons.config import pipette_config
+from opentrons.config import pipette_config, feature_flags as ff
 
 log = logging.getLogger(__name__)
 
@@ -66,17 +66,19 @@ class Pipette(CommandPublisher):
 
     All model-specific instrument constructors are inheritors of this class.
     With any of those instances you can can:
-        * Handle liquids with :meth:`aspirate`, :meth:`dispense`,
-          :meth:`mix`, and :meth:`blow_out`
-        * Handle tips with :meth:`pick_up_tip`, :meth:`drop_tip`,
-          and :meth:`return_tip`
-        * Calibrate this pipette's plunger positions
-        * Calibrate the position of each :any:`Container` on deck
+
+    * Handle liquids with :meth:`aspirate`, :meth:`dispense`,
+      :meth:`mix`, and :meth:`blow_out`
+    * Handle tips with :meth:`pick_up_tip`, :meth:`drop_tip`,
+      and :meth:`return_tip`
+    * Calibrate this pipette's plunger positions
+    * Calibrate the position of each :any:`Container` on deck
 
     Here are the typical steps of using the Pipette:
-        * Instantiate a pipette with a maximum volume (uL)
-        and a mount (`left` or `right`)
-        * Design your protocol through the pipette's liquid-handling commands
+
+    * Instantiate a pipette with a maximum volume (uL)
+      and a mount (`left` or `right`)
+    * Design your protocol through the pipette's liquid-handling commands
 
     Methods in this class include assertions where needed to ensure that any
     action that requires a tip must be preceeded by `pick_up_tip`. For example:
@@ -148,7 +150,8 @@ class Pipette(CommandPublisher):
             quirks=[],
             fallback_tip_length=51.7,
             blow_out_flow_rate=None,
-            requested_as=None):
+            requested_as=None,
+            pipette_id=None):
 
         super().__init__(robot.broker)
         self.robot = robot
@@ -252,6 +255,7 @@ class Pipette(CommandPublisher):
 
         self.quirks = quirks if isinstance(quirks, list) else []
         self.requested_as = requested_as or self.name
+        self.pipette_id = pipette_id
 
     def reset(self):
         """
@@ -420,7 +424,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '2') # doctest: +SKIP
@@ -522,7 +526,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '3') # doctest: +SKIP
@@ -684,7 +688,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '4') # doctest: +SKIP
@@ -744,7 +748,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
@@ -808,7 +812,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '8') # doctest: +SKIP
@@ -891,7 +895,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
@@ -937,7 +941,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> tiprack = labware.load('GEB-tiprack-300', '2') # doctest: +SKIP
@@ -992,7 +996,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> tiprack = labware.load('GEB-tiprack-300', '2') # doctest: +SKIP
@@ -1048,9 +1052,11 @@ class Pipette(CommandPublisher):
                 self.move_to(
                     self.current_tip().top(0),
                     strategy='direct')
-            self._add_tip(
-                length=self._tip_length
-            )
+            if ff.enable_calibration_overhaul() and self.pipette_id:
+                tip_length_cal = load_tip_length_calibration(
+                    self.pipette_id, location)
+                self._tip_length = tip_length_cal['tipLength']
+            self._add_tip(length=self._tip_length)
             # neighboring tips tend to get stuck in the space between
             # the volume chamber and the drop-tip sleeve on p1000.
             # This extra shake ensures those tips are removed
@@ -1100,7 +1106,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> tiprack = labware.load('opentrons_96_tiprack_300ul', 'C2') # doctest: +SKIP  # noqa E501
@@ -1276,7 +1282,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
@@ -1304,7 +1310,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '3') # doctest: +SKIP
@@ -1336,7 +1342,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', 'A3') # doctest: +SKIP
@@ -1371,12 +1377,12 @@ class Pipette(CommandPublisher):
             a linear gradient between the two volumes in the tuple.
 
         source : Placeable or list
-            Single :any:`Placeable` or list of :any:`Placeable`s, from where
-            liquid will be :any:`aspirate`ed from.
+            Single :any:`Placeable` or list of :any:`Placeable`\\ s, from where
+            liquid will be :any:`aspirate`\\ d from.
 
         dest : Placeable or list
-            Single :any:`Placeable` or list of :any:`Placeable`s, where
-            liquid will be :any:`dispense`ed to.
+            Single :any:`Placeable` or list of :any:`Placeable`\\ s, where
+            liquid will be :any:`dispense`\\ ed to.
 
         new_tip : str
             The number of clean tips this transfer command will use. If
@@ -1436,7 +1442,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ...
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '5') # doctest: +SKIP
@@ -1802,6 +1808,10 @@ class Pipette(CommandPublisher):
         # definition, unblocking ability to use multiple types of tips
         return self.robot.config.tip_length[self.model]
 
+    @_tip_length.setter
+    def _tip_length(self, tip_length: float):
+        self._tip_length = tip_length
+
     def set_speed(self, aspirate=None, dispense=None, blow_out=None):
         """
         Set the speed (mm/second) the :any:`Pipette` plunger will move
@@ -1830,6 +1840,7 @@ class Pipette(CommandPublisher):
         Set the speed (uL/second) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`. The speed is set using
         nominal max volumes for any given pipette model.
+
         Parameters
         ----------
         aspirate: int

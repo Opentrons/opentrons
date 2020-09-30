@@ -13,7 +13,7 @@ export type LabwareDetailsProps = {|
   definition: LabwareDefinition,
 |}
 
-export function LabwareDetails(props: LabwareDetailsProps) {
+export function LabwareDetails(props: LabwareDetailsProps): React.Node {
   const { definition } = props
   const { loadName } = definition.parameters
 

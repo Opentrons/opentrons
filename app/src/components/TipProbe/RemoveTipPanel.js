@@ -6,8 +6,8 @@ import { PrimaryButton } from '@opentrons/components'
 import { CalibrationInfoContent } from '../CalibrationInfoContent'
 
 import { actions as robotActions } from '../../robot'
-import removeSingle from '../../img/remove_tip_single.png'
-import removeMulti from '../../img/remove_tip_multi.png'
+import removeSingle from '../../assets/images/remove_tip_single.png'
+import removeMulti from '../../assets/images/remove_tip_multi.png'
 
 import type { Dispatch } from '../../types'
 import type { TipProbeProps } from './types'
@@ -18,7 +18,14 @@ type DP = {| onConfirmClick: () => void |}
 
 type Props = {| ...OP, ...DP |}
 
-export const RemoveTipPanel = connect<Props, OP, {||}, DP, _, _>(
+export const RemoveTipPanel: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  {||},
+  DP,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(RemoveTipPanelComponent)

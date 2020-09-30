@@ -31,7 +31,14 @@ const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const TerminalItemLink = connect<Props, OP, {||}, DP, _, _>(
+export const TerminalItemLink: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  {||},
+  DP,
+  _,
+  _
+>(
   null,
   mapDTP
 )(TerminalItemLinkComponent)

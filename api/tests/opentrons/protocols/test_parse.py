@@ -3,14 +3,17 @@ import json
 
 import pytest
 
-from opentrons.protocols.parse import (extract_metadata,
-                                       _get_protocol_schema_version,
-                                       validate_json,
-                                       parse,
-                                       version_from_metadata)
+from opentrons.protocols.parse import (
+    extract_metadata,
+    _get_protocol_schema_version,
+    validate_json,
+    parse,
+    MAX_SUPPORTED_JSON_SCHEMA_VERSION,
+    version_from_metadata)
 from opentrons.protocols.types import (JsonProtocol,
                                        PythonProtocol,
-                                       APIVersion)
+                                       APIVersion,
+                                       MalformedProtocolError)
 
 
 def test_extract_metadata():
@@ -65,15 +68,6 @@ metadata = {
 
 p = instruments.P10_Single(mount='right')
 """, APIVersion(1, 0)),
-    ("""
-from opentrons import instruments
-
-metadata = {
-  'apiLevel': '2.0'
-  }
-
-p = instruments.P10_Single(mount='right')
-""", APIVersion(2, 0)),
     ("""
 from opentrons import types
 
@@ -186,7 +180,8 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
     with pytest.raises(RuntimeError, match='Please update your OT-2 App' +
                        ' ' +
                        'and robot server to the latest version and try again'):
-        validate_json({'schemaVersion': '5'})
+        validate_json({'schemaVersion': str(
+            MAX_SUPPORTED_JSON_SCHEMA_VERSION + 1)})
     labware = get_labware_fixture('fixture_12_trough_v2')
     with pytest.raises(RuntimeError, match='labware'):
         validate_json(labware)
@@ -194,10 +189,10 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
         validate_json({'schemaVersion': '3'})
 
     v3 = get_json_protocol_fixture('3', 'testAllAtomicSingleV3')
-    assert validate_json(v3) == 3
+    assert validate_json(v3)[0] == 3
 
     v4 = get_json_protocol_fixture('4', 'testModulesProtocol')
-    assert validate_json(v4) == 4
+    assert validate_json(v4)[0] == 4
 
 
 @pytest.mark.parametrize('protocol_file',
@@ -295,3 +290,29 @@ def test_extra_contents(
                    extra_data=extra_data)
     assert parsed.extra_labware == bundled_labware
     assert parsed.bundled_data == extra_data
+
+
+# noqa(E122)
+@pytest.mark.parametrize('bad_protocol', [
+    '''
+from opentrons import robot
+metadata={"apiLevel": "2.0"}
+def run(ctx): pass
+''',
+    '''
+metadata = {"apiLevel": "2.0"}
+
+print('hi')
+''',
+    '''
+metadata = {"apiLevel": "2.0"}
+def run(ctx):
+  pass
+
+def run(blahblah):
+  pass
+'''
+])
+def test_bad_structure(bad_protocol):
+    with pytest.raises(MalformedProtocolError):
+        parse(bad_protocol)

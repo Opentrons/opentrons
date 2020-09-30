@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import groupBy from 'lodash/groupBy'
-
+import { Flex } from '../primitives'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
@@ -20,13 +20,15 @@ export type PipetteSelectProps = {|
   /** react-select change handler */
   onPipetteChange: (pipetteName: string | null) => mixed,
   /** list of pipette names to omit */
-  nameBlacklist?: Array<string>,
+  nameBlocklist?: Array<string>,
   /** whether or not "None" shows up as the default option */
   enableNoneOption?: boolean,
   /** input tabIndex */
   tabIndex?: number,
   /** classes to apply to the top-level component */
   className?: string,
+  /** custom id to be applied. likely to be used as a data test id for e2e testing */
+  id?: string,
 |}
 
 // TODO(mc, 2019-10-14): i18n
@@ -47,13 +49,19 @@ const specToOption = ({ name, displayName }: PipetteNameSpecs) => ({
   label: displayName,
 })
 
-export const PipetteSelect = (props: PipetteSelectProps) => {
-  const { tabIndex, className, enableNoneOption, nameBlacklist = [] } = props
-  const whitelist = ({ value }: SelectOption) => {
-    return !nameBlacklist.some(n => n === value)
+export const PipetteSelect = (props: PipetteSelectProps): React.Node => {
+  const {
+    tabIndex,
+    className,
+    enableNoneOption,
+    id,
+    nameBlocklist = [],
+  } = props
+  const allowlist = ({ value }: SelectOption) => {
+    return !nameBlocklist.some(n => n === value)
   }
-  const gen2Options = specsByCategory[GEN2].map(specToOption).filter(whitelist)
-  const gen1Options = specsByCategory[GEN1].map(specToOption).filter(whitelist)
+  const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
+  const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
   const groupedOptions = [
     ...(enableNoneOption ? [OPTION_NONE] : []),
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
@@ -75,6 +83,7 @@ export const PipetteSelect = (props: PipetteSelectProps) => {
       value={value}
       defaultValue={defaultValue}
       tabIndex={tabIndex}
+      id={id}
       onChange={option => {
         // TODO(mc, 2020-02-03):  change to `option?.value ?? null`
         // when we enable that babel functionality
@@ -109,10 +118,31 @@ const PipetteNameItem = (props: PipetteNameSpecs) => {
   }
 
   return (
-    <>
+    <Flex
+      data-test={dataIdFormat(
+        'PipetteNameItem',
+        volumeClass,
+        channels,
+        displayCategory
+      )}
+    >
       <div className={styles.pipette_volume_class}>{volumeClass}</div>
       <div className={styles.pipette_channels}>{displayChannels}</div>
       <div className={styles.pipette_category}>{displayCategory}</div>
-    </>
+    </Flex>
   )
+}
+
+const dataIdFormat = (
+  componentName: string,
+  volumeClass: string,
+  channels: number,
+  displayCategory: string
+): string => {
+  const dataIdFormatVolumeClass = volumeClass.toLowerCase()
+  const dataIdFormatChannels = channels === 1 ? 'SingleChannel' : 'MultiChannel'
+  const dataIdFormatDisplayCategory =
+    displayCategory.charAt(0) + displayCategory.slice(1).toLowerCase()
+
+  return `${componentName}_${dataIdFormatVolumeClass}${dataIdFormatChannels}${dataIdFormatDisplayCategory}`
 }

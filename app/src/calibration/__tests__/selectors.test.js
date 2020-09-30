@@ -1,53 +1,65 @@
 // @flow
-import noop from 'lodash/noop'
+
 import * as Fixtures from '../__fixtures__'
 import * as Selectors from '../selectors'
 
 import type { State } from '../../types'
 
-jest.mock('../../robot/selectors')
-
-type SelectorSpec = {|
-  name: string,
-  selector: (State, ...Array<any>) => mixed,
-  state: $Shape<State>,
-  args?: Array<any>,
-  before?: () => mixed,
-  expected: mixed,
-|}
-
-const SPECS: Array<SelectorSpec> = [
-  {
-    name:
-      'getRobotCalibrationCheckSuccess returns null if no deck cal check session',
-    selector: Selectors.getRobotCalibrationCheckSession,
-    state: {
-      calibration: {},
-    },
-    args: ['germanium-cobweb'],
-    expected: null,
-  },
-  {
-    name: 'getRobotCalibrationCheckSuccess returns ',
-    selector: Selectors.getRobotCalibrationCheckSession,
-    state: {
-      calibration: {
-        'germanium-cobweb': {
-          robotCalibrationCheck: Fixtures.mockRobotCalibrationCheckSessionData,
-        },
-      },
-    },
-    args: ['germanium-cobweb'],
-    expected: Fixtures.mockRobotCalibrationCheckSessionData,
-  },
-]
-
 describe('calibration selectors', () => {
-  SPECS.forEach(spec => {
-    const { name, selector, state, args = [], before = noop, expected } = spec
-    it(name, () => {
-      before()
-      expect(selector(state, ...args)).toEqual(expected)
+  describe('getCalibrationStatus', () => {
+    it('should return null if no robot in state', () => {
+      const state: $Shape<State> = { calibration: {} }
+      expect(Selectors.getCalibrationStatus(state, 'robotName')).toBe(null)
+    })
+
+    it('should return null if robot in state but no status', () => {
+      const state: $Shape<State> = {
+        calibration: {
+          robotName: {
+            calibrationStatus: null,
+            labwareCalibrations: null,
+            pipetteOffsetCalibrations: null,
+          },
+        },
+      }
+      expect(Selectors.getCalibrationStatus(state, 'robotName')).toBe(null)
+    })
+
+    it('should return status if in state', () => {
+      const state: $Shape<State> = {
+        calibration: {
+          robotName: {
+            calibrationStatus: Fixtures.mockCalibrationStatus,
+            labwareCalibrations: null,
+            pipetteOffsetCalibrations: null,
+          },
+        },
+      }
+      expect(Selectors.getCalibrationStatus(state, 'robotName')).toEqual(
+        Fixtures.mockCalibrationStatus
+      )
+    })
+  })
+
+  describe('getDeckCalibrationStatus', () => {
+    it('should return null if no robot in state', () => {
+      const state: $Shape<State> = { calibration: {} }
+      expect(Selectors.getDeckCalibrationStatus(state, 'robotName')).toBe(null)
+    })
+
+    it('should return status if in state', () => {
+      const state: $Shape<State> = {
+        calibration: {
+          robotName: {
+            calibrationStatus: Fixtures.mockCalibrationStatus,
+            labwareCalibrations: null,
+            pipetteOffsetCalibrations: null,
+          },
+        },
+      }
+      expect(Selectors.getDeckCalibrationStatus(state, 'robotName')).toEqual(
+        Fixtures.mockCalibrationStatus.deckCalibration.status
+      )
     })
   })
 })

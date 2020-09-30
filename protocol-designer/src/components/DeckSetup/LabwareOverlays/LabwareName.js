@@ -30,7 +30,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const LabwareName = connect<
+export const LabwareName: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,

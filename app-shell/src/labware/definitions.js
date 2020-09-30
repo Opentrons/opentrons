@@ -26,7 +26,6 @@ export function readLabwareDirectory(dir: string): Promise<Array<string>> {
       )
 
       return getNestedFiles.then(nested => {
-        // $FlowFixMe: https://github.com/facebook/flow/issues/7397
         const nestedFiles: Array<string> = nested.flat()
         return [...jsonFiles, ...nestedFiles]
       })
@@ -42,7 +41,7 @@ export function parseLabwareFiles(
 
     return Promise.all([readTask, statTask]).then(([data, stats]) => ({
       filename: f,
-      created: stats.birthtimeMs,
+      modified: stats.mtimeMs,
       data,
     }))
   })

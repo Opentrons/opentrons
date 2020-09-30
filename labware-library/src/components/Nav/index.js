@@ -6,7 +6,7 @@ import styles from './styles.css'
 
 export { Breadcrumbs } from './Breadcrumbs'
 
-export function Nav() {
+export function Nav(): React.Node {
   return (
     <>
       <nav className={styles.nav}>

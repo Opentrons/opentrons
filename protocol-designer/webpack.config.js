@@ -16,7 +16,7 @@ const PROTOCOL_DESIGNER_ENV_VAR_PREFIX = 'OT_PD_'
 // Also remove all OT_PD_VERSION env vars, the version should always
 // be gleaned from the package.json
 
-const OT_PD_VERSION = '3.0.8'
+const OT_PD_VERSION = '5.1.0'
 const OT_PD_BUILD_DATE = new Date().toUTCString()
 
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
@@ -25,7 +25,7 @@ const ERROR_HTML = path.join(__dirname, 'src/error.html')
 
 const passThruEnvVars = Object.keys(process.env)
   .filter(v => v.startsWith(PROTOCOL_DESIGNER_ENV_VAR_PREFIX))
-  .concat(['NODE_ENV'])
+  .concat(['NODE_ENV', 'CYPRESS'])
 
 const envVarsWithDefaults = {
   OT_PD_VERSION,
@@ -36,6 +36,13 @@ const envVars = passThruEnvVars.reduce(
   (acc, envVar) => ({ [envVar]: '', ...acc }),
   { ...envVarsWithDefaults }
 )
+
+const testAliases =
+  process.env.CYPRESS === '1'
+    ? {
+        'file-saver': path.resolve(__dirname, 'cypress/mocks/file-saver.js'),
+      }
+    : {}
 
 console.log(`PD version: ${OT_PD_VERSION || 'UNKNOWN!'}`)
 
@@ -78,4 +85,8 @@ module.exports = merge(baseConfig, {
     }),
     new ScriptExtHtmlWebpackPlugin({ defaultAttribute: 'defer' }),
   ],
+
+  resolve: {
+    alias: testAliases,
+  },
 })

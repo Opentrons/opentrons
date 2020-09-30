@@ -1,5 +1,5 @@
 // @flow
-import React, { Fragment, type Node } from 'react'
+import * as React from 'react'
 import styles from './URLDeck.css'
 
 import {
@@ -29,7 +29,7 @@ type UrlData = {
 
 const DECK_DEF = getDeckDefinitions()['ot2_standard']
 
-const DECK_LAYER_BLACKLIST = [
+const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
   'doorStops',
@@ -63,19 +63,19 @@ export class URLDeck extends React.Component<{||}> {
     this.urlData = getDataFromUrl()
   }
 
-  render() {
+  render(): React.Node {
     const labwareBySlot = this.urlData?.labware
     const modulesBySlot = this.urlData?.modules
 
     return (
       <RobotWorkSpace
         deckDef={DECK_DEF}
-        deckLayerBlacklist={DECK_LAYER_BLACKLIST}
+        deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
         viewBox={`-35 -35 ${488} ${390}`} // TODO: put these in variables
         className={styles.url_deck}
       >
-        {({ deckSlotsById }): Array<Node> =>
-          Object.keys(deckSlotsById).map((slotId): Node => {
+        {({ deckSlotsById }): Array<React.Node> =>
+          Object.keys(deckSlotsById).map((slotId): React.Node => {
             const slot = deckSlotsById[slotId]
             if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
             const moduleModel = modulesBySlot && modulesBySlot[slotId]
@@ -97,14 +97,14 @@ export class URLDeck extends React.Component<{||}> {
             }
 
             return (
-              <Fragment key={slotId}>
+              <React.Fragment key={slotId}>
                 {moduleModel && (
                   <g
                     transform={`translate(${slot.position[0]}, ${
                       slot.position[1]
                     })`}
                   >
-                    <Module model={moduleModel} mode={'default'} />
+                    <Module model={moduleModel} mode={'default'} slot={slot} />
                   </g>
                 )}
                 {labware && (
@@ -138,7 +138,7 @@ export class URLDeck extends React.Component<{||}> {
                     />
                   </RobotCoordsForeignDiv>
                 )}
-              </Fragment>
+              </React.Fragment>
             )
           })
         }

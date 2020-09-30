@@ -80,7 +80,6 @@ describe('EditModulesCard', () => {
 
     props = {
       modules: {},
-      thermocyclerEnabled: false,
       openEditModuleModal: jest.fn(),
     }
   })
@@ -187,8 +186,6 @@ describe('EditModulesCard', () => {
   })
 
   it('displays module row with module to add when no moduleData', () => {
-    props.thermocyclerEnabled = true
-
     const wrapper = render(props)
 
     expect(wrapper.find(ModuleRow)).toHaveLength(3)

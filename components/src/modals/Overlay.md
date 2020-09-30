@@ -11,7 +11,8 @@ _Note_: the CSS rules on the parent in the below example are necessary and can b
 ```
 
 ```js
-initialState = { covered: false }
+import { FlatButton } from '@opentrons/components'
+const [state, setState] = React.useState({ covered: false })
 ;<div style={{ width: '16rem', height: '16rem', position: 'relative' }}>
   <FlatButton onClick={() => setState({ covered: true })}>
     Take cover

@@ -1,6 +1,7 @@
 describe('The Home Page', () => {
   beforeEach(() => {
     cy.visit('/')
+    cy.closeAnnouncementModal()
   })
 
   it('successfully loads', () => {

@@ -1,5 +1,5 @@
 ```js
-initialState = { inputValue: '' }
+const [state, setState] = React.useState({ inputValue: '' })
 
 function handleChange(e) {
   setState({ inputValue: e.target.value })
@@ -24,7 +24,7 @@ function getError(state) {
 Without units
 
 ```js
-initialState = { inputValue: null }
+const [state, setState] = React.useState({ inputValue: null })
 
 function handleChange(e) {
   setState({ inputValue: e.target.value })
@@ -41,7 +41,7 @@ function handleChange(e) {
 No label
 
 ```js
-initialState = { inputValue: null }
+const [state, setState] = React.useState({ inputValue: null })
 
 function handleChange(e) {
   setState({ inputValue: e.target.value })

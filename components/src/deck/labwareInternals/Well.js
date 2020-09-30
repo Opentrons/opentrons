@@ -76,4 +76,6 @@ function WellComponent(props: WellProps) {
   return null
 }
 
-export const Well = React.memo<WellProps>(WellComponent)
+export const Well: React.AbstractComponent<WellProps> = React.memo(
+  WellComponent
+)

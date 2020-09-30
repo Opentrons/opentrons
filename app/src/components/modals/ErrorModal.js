@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 
-import type { Error } from '../../types'
-
 import styles from './styles.css'
 
 type Props = {|
@@ -13,13 +11,13 @@ type Props = {|
   description: string,
   close?: () => mixed,
   closeUrl?: string,
-  error: Error | { message?: string, ... },
+  error: { message?: string, ... },
 |}
 
 const DEFAULT_HEADING = 'Unexpected Error'
 const AN_UNKNOWN_ERROR_OCCURRED = 'An unknown error occurred'
 
-export function ErrorModal(props: Props) {
+export function ErrorModal(props: Props): React.Node {
   const { description, error } = props
   const heading = props.heading || DEFAULT_HEADING
   let closeButtonProps = { children: 'close', onClick: props.close }

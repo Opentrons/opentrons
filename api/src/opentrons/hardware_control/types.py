@@ -2,10 +2,33 @@ import abc
 import asyncio
 import enum
 import logging
-from typing import Tuple
+from dataclasses import dataclass
+from typing import Tuple, Union, TYPE_CHECKING
 from opentrons import types as top_types
 
+if TYPE_CHECKING:
+    from .dev_types import DoorStateNotificationType
+
 MODULE_LOG = logging.getLogger(__name__)
+
+
+class OutOfBoundsMove(RuntimeError):
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__()
+
+    def __str__(self) -> str:
+        return f'OutOfBoundsMove: {self.message}'
+
+    def __repr__(self) -> str:
+        return f'<{str(self.__class__)}: {self.message}>'
+
+
+class MotionChecks(enum.Enum):
+    NONE = 0
+    LOW = 1
+    HIGH = 2
+    BOTH = 3
 
 
 class Axis(enum.Enum):
@@ -48,12 +71,72 @@ class Axis(enum.Enum):
         return self.name
 
 
+class DoorState(enum.Enum):
+    OPEN = False
+    CLOSED = True
+
+    def __str__(self):
+        return self.name.lower()
+
+
+class HardwareEventType(enum.Enum):
+    DOOR_SWITCH_CHANGE = enum.auto()
+
+
+@dataclass
+class DoorStateNotification:
+    event: 'DoorStateNotificationType' = \
+        HardwareEventType.DOOR_SWITCH_CHANGE
+    new_state: DoorState = DoorState.CLOSED
+
+
+# new event types get new dataclasses
+# when we add more event types we add them here
+HardwareEvent = Union[DoorStateNotification]
+
+
 class HardwareAPILike(abc.ABC):
     """ A dummy class useful in isinstance checks to accept an API or adapter
     """
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         ...
+
+    @property
+    def board_revision(self) -> str:
+        ...
+
+    @property
+    def door_state(self) -> DoorState:
+        ...
+
+    @door_state.setter
+    def door_state(self, door_state: DoorState) -> DoorState:
+        ...
+
+    def validate_calibration(self):
+        ...
+
+
+class BoardRevision(enum.Enum):
+    UNKNOWN = enum.auto()
+    OG = enum.auto()
+    A = enum.auto()
+    B = enum.auto()
+    C = enum.auto()
+
+    @classmethod
+    def by_bits(cls, rev_bits: Tuple[bool, bool]):
+        br = {
+            (True, True): cls.OG,
+            (False, True): cls.A,
+            (True, False): cls.B,
+            (False, False): cls.C
+        }
+        return br[rev_bits]
+
+    def __str__(self):
+        return '2.1' if self.name == 'OG' else self.name
 
 
 class CriticalPoint(enum.Enum):
@@ -108,6 +191,42 @@ class ExecutionState(enum.Enum):
         return self.name
 
 
+class PipettePair(enum.Enum):
+    PRIMARY_LEFT = enum.auto()
+    PRIMARY_RIGHT = enum.auto()
+
+    @property
+    def primary(self) -> top_types.Mount:
+        if self.name == 'PRIMARY_RIGHT':
+            return top_types.Mount.RIGHT
+        else:
+            return top_types.Mount.LEFT
+
+    @property
+    def secondary(self) -> top_types.Mount:
+        if self.name == 'PRIMARY_RIGHT':
+            return top_types.Mount.LEFT
+        else:
+            return top_types.Mount.RIGHT
+
+    @classmethod
+    def of_mount(cls, mount: top_types.Mount) -> 'PipettePair':
+        pair = {top_types.Mount.LEFT: cls.PRIMARY_LEFT,
+                top_types.Mount.RIGHT: cls.PRIMARY_RIGHT}
+        return pair[mount]
+
+
+class HardwareAction(enum.Enum):
+    DROPTIP = enum.auto()
+    ASPIRATE = enum.auto()
+    DISPENSE = enum.auto()
+    BLOWOUT = enum.auto()
+    PREPARE_ASPIRATE = enum.auto()
+
+    def __str__(self):
+        return self.name
+
+
 class ExecutionCancelledError(RuntimeError):
     pass
 
@@ -117,4 +236,12 @@ class MustHomeError(RuntimeError):
 
 
 class NoTipAttachedError(RuntimeError):
+    pass
+
+
+class TipAttachedError(RuntimeError):
+    pass
+
+
+class PairedPipetteConfigValueError(RuntimeError):
     pass

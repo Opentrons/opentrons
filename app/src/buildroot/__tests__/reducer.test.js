@@ -238,10 +238,10 @@ describe('buildroot reducer', () => {
         type: 'buildroot:UNEXPECTED_ERROR',
         payload: { message: 'AH!' },
       },
-      initialState: { ...INITIAL_STATE, info: null },
+      initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: {
         ...INITIAL_STATE,
-        session: { ...INITIAL_STATE.session, error: 'AH!' },
+        session: { ...BASE_SESSION, error: 'AH!' },
       },
     },
     {
@@ -250,10 +250,10 @@ describe('buildroot reducer', () => {
         type: 'buildroot:PREMIGRATION_ERROR',
         payload: { message: 'AH!' },
       },
-      initialState: { ...INITIAL_STATE, info: null },
+      initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: {
         ...INITIAL_STATE,
-        session: { ...INITIAL_STATE.session, error: 'AH!' },
+        session: { ...BASE_SESSION, error: 'AH!' },
       },
     },
   ]

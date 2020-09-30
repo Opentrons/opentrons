@@ -65,7 +65,7 @@ const UploadKeyInputComponent = (props: UploadKeyInputProps, ref) => {
   )
 }
 
-export const UploadKeyInput = React.forwardRef<
+export const UploadKeyInput: React.AbstractComponent<
   UploadKeyInputProps,
   HTMLInputElement
->(UploadKeyInputComponent)
+> = React.forwardRef(UploadKeyInputComponent)

@@ -12,6 +12,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
+import { getMoveLiquidDelayData } from './getDelayData'
 
 import type { HydratedMoveLiquidFormData } from '../../../form-types'
 import type {
@@ -20,6 +21,23 @@ import type {
   TransferArgs,
   InnerMixArgs,
 } from '../../../step-generation'
+
+type MoveLiquidFields = $PropertyType<HydratedMoveLiquidFormData, 'fields'>
+
+// NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
+export function getAirGapData(
+  hydratedFormData: MoveLiquidFields,
+  checkboxField: 'aspirate_airGap_checkbox', // | 'dispense_airGap_checkbox'
+  volumeField: 'aspirate_airGap_volume' // | 'dispense_airGap_volume'
+): number | null {
+  const checkbox = hydratedFormData[checkboxField]
+  const volume = hydratedFormData[volumeField]
+
+  if (checkbox && typeof volume === 'number' && volume > 0) {
+    return volume
+  }
+  return null
+}
 
 export function getMixData(
   hydratedFormData: *,
@@ -139,11 +157,30 @@ export const moveLiquidFormToArgs = (
     'dispense_mix_volume',
     'dispense_mix_times'
   )
+  const aspirateDelay = getMoveLiquidDelayData<MoveLiquidFields>(
+    fields,
+    'aspirate_delay_checkbox',
+    'aspirate_delay_seconds',
+    'aspirate_delay_mmFromBottom'
+  )
+
+  const dispenseDelay = getMoveLiquidDelayData<MoveLiquidFields>(
+    fields,
+    'dispense_delay_checkbox',
+    'dispense_delay_seconds',
+    'dispense_delay_mmFromBottom'
+  )
 
   const blowoutLocation =
     (fields.blowout_checkbox && fields.blowout_location) || null
 
   const blowoutOffsetFromTopMm = DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+
+  const aspirateAirGapVolume = getAirGapData(
+    fields,
+    'aspirate_airGap_checkbox',
+    'aspirate_airGap_volume'
+  )
 
   const commonFields = {
     pipette: pipetteId,
@@ -166,7 +203,9 @@ export const moveLiquidFormToArgs = (
 
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),
-    mixInDestination,
+    aspirateDelay,
+    dispenseDelay,
+    aspirateAirGapVolume,
     touchTipAfterAspirate,
     touchTipAfterAspirateOffsetMmFromBottom,
     touchTipAfterDispense,
@@ -197,6 +236,7 @@ export const moveLiquidFormToArgs = (
         sourceWells,
         destWells,
         mixBeforeAspirate,
+        mixInDestination,
       }
       return transferStepArguments
     }
@@ -206,6 +246,7 @@ export const moveLiquidFormToArgs = (
         commandCreatorFnName: 'consolidate',
         blowoutLocation,
         mixFirstAspirate: mixBeforeAspirate,
+        mixInDestination,
         sourceWells,
         destWell: destWells[0],
       }

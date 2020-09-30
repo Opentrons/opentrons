@@ -1,12 +1,13 @@
 // @flow
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
-import React from 'react'
+import * as React from 'react'
 
-import { IconButton, SidePanel, swatchColors } from '@opentrons/components'
+import { IconButton, SidePanel } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { PDTitledList, PDListItem } from '../lists'
 import { StepDescription } from '../StepDescription'
+import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
 import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
@@ -73,9 +74,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
         onClick={() =>
           console.log('TODO: do something with ', { groupId, wellName: null })
         } // TODO: Ian 2018-10-19
-        description={
-          <StepDescription description={description} header="Description:" />
-        }
+        description={<StepDescription description={description} />}
       >
         <PDListItem className={styles.ingredient_row_header}>
           <span>Well</span>
@@ -162,7 +161,7 @@ type Props = {
   selectedIngredientGroupId: ?string,
 }
 
-export function IngredientsList(props: Props) {
+export function IngredientsList(props: Props): React.Node {
   const {
     labwareWellContents,
     liquidGroupsById,

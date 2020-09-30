@@ -18,7 +18,7 @@ const LABWARE_LIBRARY_ENV_VAR_PREFIX = 'OT_LL'
 
 const passThruEnvVars = Object.keys(process.env)
   .filter(v => v.startsWith(LABWARE_LIBRARY_ENV_VAR_PREFIX))
-  .concat(['NODE_ENV'])
+  .concat(['NODE_ENV', 'CYPRESS'])
 
 const envVarsWithDefaults = {
   OT_LL_VERSION: pkg.version,
@@ -29,6 +29,13 @@ const envVars = passThruEnvVars.reduce(
   (acc, envVar) => ({ [envVar]: '', ...acc }),
   { ...envVarsWithDefaults }
 )
+
+const testAliases =
+  process.env.CYPRESS === '1'
+    ? {
+        'file-saver': path.resolve(__dirname, 'cypress/mocks/file-saver.js'),
+      }
+    : {}
 
 module.exports = merge(baseConfig, {
   entry: JS_ENTRY,
@@ -66,4 +73,8 @@ module.exports = merge(baseConfig, {
       },
     }),
   ],
+
+  resolve: {
+    alias: testAliases,
+  },
 })

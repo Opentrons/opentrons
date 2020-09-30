@@ -1,12 +1,13 @@
 // @flow
 import { tiprackWellNamesFlat } from './data'
 import type {
+  AirGapParams,
   AspirateParams,
   BlowoutParams,
   DispenseParams,
   TouchTipParams,
-  Command,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results
@@ -51,7 +52,17 @@ export const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
 export const BLOWOUT_OFFSET_FROM_TOP_MM = 3.3
 const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
 
-export const getFlowRateAndOffsetParams = () => ({
+type FlowRateAndOffsetParamsTransferlike = {|
+  aspirateFlowRateUlSec: number,
+  dispenseFlowRateUlSec: number,
+  blowoutFlowRateUlSec: number,
+  aspirateOffsetFromBottomMm: number,
+  dispenseOffsetFromBottomMm: number,
+  blowoutOffsetFromTopMm: number,
+  touchTipAfterAspirateOffsetMmFromBottom: number,
+  touchTipAfterDispenseOffsetMmFromBottom: number,
+|}
+export const getFlowRateAndOffsetParamsTransferLike = (): FlowRateAndOffsetParamsTransferlike => ({
   aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
   dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
   blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
@@ -62,6 +73,24 @@ export const getFlowRateAndOffsetParams = () => ({
   // for consolidate/distribute/transfer only
   touchTipAfterAspirateOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
   touchTipAfterDispenseOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+})
+
+type FlowRateAndOffsetParamsMix = {|
+  aspirateFlowRateUlSec: number,
+  dispenseFlowRateUlSec: number,
+  blowoutFlowRateUlSec: number,
+  aspirateOffsetFromBottomMm: number,
+  dispenseOffsetFromBottomMm: number,
+  blowoutOffsetFromTopMm: number,
+  touchTipMmFromBottom: number,
+|}
+export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => ({
+  aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
+  dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
+  blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
+  aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  blowoutOffsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
 
   // for mix only
   touchTipMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
@@ -79,15 +108,25 @@ export const DEFAULT_BLOWOUT_WELL = 'A1'
 
 // =================
 
+type MakeAspDispHelper<P> = (
+  bakedParams?: $Shape<P>
+) => (well: string, volume: number, params?: $Shape<P>) => Command
+
+type MakeAirGapHelper<P> = (
+  bakedParams: $Shape<P> & { offsetFromBottomMm: number }
+) => (well: string, volume: number, params?: $Shape<P>) => Command
+
+type MakeDispenseAirGapHelper<P> = MakeAirGapHelper<P>
+
 const _defaultAspirateParams = {
   pipette: DEFAULT_PIPETTE,
   labware: SOURCE_LABWARE,
 }
-export const makeAspirateHelper = (bakedParams?: $Shape<AspirateParams>) => (
-  well: string,
-  volume: number,
-  params?: $Shape<AspirateParams>
-): Command => ({
+export const makeAspirateHelper: MakeAspDispHelper<AspirateParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
   command: 'aspirate',
   params: {
     ..._defaultAspirateParams,
@@ -95,6 +134,22 @@ export const makeAspirateHelper = (bakedParams?: $Shape<AspirateParams>) => (
     well,
     volume,
     offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    flowRate: ASPIRATE_FLOW_RATE,
+    ...params,
+  },
+})
+
+export const makeAirGapHelper: MakeAirGapHelper<AirGapParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
+  command: 'airGap',
+  params: {
+    ..._defaultAspirateParams,
+    ...bakedParams,
+    well,
+    volume,
     flowRate: ASPIRATE_FLOW_RATE,
     ...params,
   },
@@ -121,12 +176,27 @@ const _defaultDispenseParams = {
   offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
   flowRate: DISPENSE_FLOW_RATE,
 }
-export const makeDispenseHelper = (bakedParams?: $Shape<DispenseParams>) => (
-  well: string,
-  volume: number,
-  params?: $Shape<DispenseParams>
-): Command => ({
+export const makeDispenseHelper: MakeAspDispHelper<DispenseParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
   command: 'dispense',
+  params: {
+    ..._defaultDispenseParams,
+    ...bakedParams,
+    well,
+    volume,
+    ...params,
+  },
+})
+
+export const makeDispenseAirGapHelper: MakeDispenseAirGapHelper<AirGapParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
+  command: 'dispenseAirGap',
   params: {
     ..._defaultDispenseParams,
     ...bakedParams,
@@ -141,10 +211,13 @@ const _defaultTouchTipParams = {
   labware: SOURCE_LABWARE,
   offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
 }
-export const makeTouchTipHelper = (bakedParams?: $Shape<TouchTipParams>) => (
-  well: string,
-  params?: $Shape<TouchTipParams>
-): Command => ({
+type MakeTouchTipHelper = (
+  bakedParams?: $Shape<TouchTipParams>
+) => (well: string, params?: $Shape<TouchTipParams>) => Command
+export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
+  well,
+  params
+) => ({
   command: 'touchTip',
   params: {
     ..._defaultTouchTipParams,
@@ -153,6 +226,34 @@ export const makeTouchTipHelper = (bakedParams?: $Shape<TouchTipParams>) => (
     ...params,
   },
 })
+
+export const delayCommand = (seconds: number): Command => ({
+  command: 'delay',
+  params: { wait: seconds },
+})
+
+export const delayWithOffset = (
+  well: string,
+  labware: string
+): Array<Command> => [
+  {
+    command: 'moveToWell',
+    params: {
+      pipette: DEFAULT_PIPETTE,
+      labware,
+      well,
+      offset: {
+        x: 0,
+        y: 0,
+        z: 14,
+      },
+    },
+  },
+  {
+    command: 'delay',
+    params: { wait: 12 },
+  },
+]
 
 // =================
 

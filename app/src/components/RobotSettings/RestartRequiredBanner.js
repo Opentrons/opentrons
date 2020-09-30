@@ -18,7 +18,9 @@ const MESSAGE =
   'You must restart your robot for your settings changes to take effect'
 const RESTART_NOW = 'Restart Now'
 
-export function RestartRequiredBanner(props: RestartRequiredBannerProps) {
+export function RestartRequiredBanner(
+  props: RestartRequiredBannerProps
+): React.Node {
   const { robotName } = props
   const [dismissed, setDismissed] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()

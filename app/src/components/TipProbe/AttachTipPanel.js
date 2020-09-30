@@ -10,8 +10,8 @@ import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import attachSingle from '../../img/attach_tip_single.png'
-import attachMulti from '../../img/attach_tip_multi.png'
+import attachSingle from '../../assets/images/attach_tip_single.png'
+import attachMulti from '../../assets/images/attach_tip_multi.png'
 import styles from './tip-probe.css'
 
 import type { Dispatch } from '../../types'
@@ -19,7 +19,7 @@ import type { TipProbeProps } from './types'
 
 type Props = TipProbeProps
 
-export function AttachTipPanel(props: Props) {
+export function AttachTipPanel(props: Props): React.Node {
   const { mount, channels } = props
   const dispatch = useDispatch<Dispatch>()
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
@@ -27,7 +27,6 @@ export function AttachTipPanel(props: Props) {
   const tiprackName =
     tiprack?.definition?.metadata.displayName || tiprack?.name || null
 
-  // $FlowFixMe: robotActions.probeTip is not typed
   const handleTipProbe = () => dispatch(robotActions.probeTip(mount))
   const isMulti = channels > 1
 

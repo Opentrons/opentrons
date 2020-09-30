@@ -3,10 +3,14 @@ import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
 from opentrons.config import robot_configs
-from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.calibration_storage.types import (
+    DeckCalibration, SourceType, CalibrationStatus)
+from opentrons.hardware_control.types import (
+    Axis, CriticalPoint, OutOfBoundsMove, MotionChecks)
+from opentrons.hardware_control.robot_calibration import RobotCalibration
 
 
-async def test_controller_home(loop):
+async def test_controller_home(loop, is_robot):
     c = await hc.API.build_hardware_simulator(
         loop=loop,
         config=robot_configs.build_config({}, {}))
@@ -56,7 +60,7 @@ async def test_controller_musthome(hardware_api):
     assert home.called_once()
 
 
-async def test_home_specific_sim(hardware_api, monkeypatch):
+async def test_home_specific_sim(hardware_api, monkeypatch, is_robot):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     # Avoid the autoretract when moving two difference instruments
@@ -71,7 +75,7 @@ async def test_home_specific_sim(hardware_api, monkeypatch):
                                               Axis.C: 19}
 
 
-async def test_retract(hardware_api):
+async def test_retract(hardware_api, toggle_new_calibration):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     await hardware_api.retract(types.Mount.RIGHT, 10)
@@ -83,7 +87,7 @@ async def test_retract(hardware_api):
                                               Axis.C: 19}
 
 
-async def test_move(hardware_api):
+async def test_move(hardware_api, is_robot, toggle_new_calibration):
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
     target_position1 = {Axis.X: 30,
@@ -135,7 +139,8 @@ async def test_move_extras_passed_through(hardware_api, monkeypatch):
     assert mock_be_move.call_args_list[0][1]['axis_max_speeds'] == {'Y': 20}
 
 
-async def test_mount_offset_applied(hardware_api):
+async def test_mount_offset_applied(
+        hardware_api, is_robot, toggle_new_calibration):
     await hardware_api.home()
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.LEFT
@@ -149,7 +154,7 @@ async def test_mount_offset_applied(hardware_api):
     assert hardware_api._current_position == target_position
 
 
-async def test_critical_point_applied(hardware_api, monkeypatch):
+async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -214,6 +219,72 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
 
 
+async def test_new_critical_point_applied(
+        hardware_api, monkeypatch, is_robot, use_new_calibration):
+    await hardware_api.home()
+    hardware_api._backend._attached_instruments\
+        = {types.Mount.LEFT: {'model': None, 'id': None},
+           types.Mount.RIGHT: {'model': 'p10_single_v1', 'id': 'testyness'}}
+    await hardware_api.cache_instruments()
+    # Our critical point is now the tip of the nozzle
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    target_no_offset = {Axis.X: 0,
+                        Axis.Y: 0,
+                        Axis.Z: 218,
+                        Axis.A: -12,  # from pipette-config.json model offset
+                        Axis.B: 19,
+                        Axis.C: 19}
+    assert hardware_api._current_position == target_no_offset
+    target = {Axis.X: 0,
+              Axis.Y: 0,
+              Axis.A: 0,
+              Axis.C: 19}
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+    p10_tip_length = 33
+    # Specifiying critical point overrides as mount should not use model offset
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
+                               critical_point=CriticalPoint.MOUNT)
+    assert hardware_api._current_position == {Axis.X: 0.0, Axis.Y: 0.0,
+                                              Axis.Z: 218,
+                                              Axis.A: 0,
+                                              Axis.B: 19, Axis.C: 19}
+    assert await hardware_api.current_position(
+        types.Mount.RIGHT, critical_point=CriticalPoint.MOUNT)\
+        == {Axis.X: 0.0, Axis.Y: 0.0, Axis.A: 0, Axis.C: 19}
+    # Specifying the critical point as nozzle should have the same behavior
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
+                               critical_point=CriticalPoint.NOZZLE)
+    assert hardware_api._current_position == target_no_offset
+    await hardware_api.pick_up_tip(types.Mount.RIGHT, p10_tip_length)
+    # Now the current position (with offset applied) should change
+    # pos_after_pickup + model_offset + critical point
+    target[Axis.A] = 218 + (12) + (-1 * p10_tip_length)
+    target_no_offset[Axis.C] = target[Axis.C] = 2
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+    # This move should take the new critical point into account
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    target_no_offset[Axis.A] = 21
+    assert hardware_api._current_position == target_no_offset
+    # But the position with offset should be back to the original
+    target[Axis.A] = 0
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+    # And removing the tip should move us back to the original
+    await hardware_api.move_rel(types.Mount.RIGHT, types.Point(2.5, 0, 0))
+    await hardware_api.drop_tip(types.Mount.RIGHT)
+    await hardware_api.home_plunger(types.Mount.RIGHT)
+    target[Axis.A] = 33 + hc.DROP_TIP_RELEASE_DISTANCE
+    target_no_offset[Axis.X] = 2.5
+    target[Axis.X] = 2.5
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    target[Axis.X] = 0
+    target_no_offset[Axis.X] = 0
+    target_no_offset[Axis.A] = -12
+    target[Axis.A] = 0
+    assert hardware_api._current_position == target_no_offset
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
+
+
 async def test_deck_cal_applied(monkeypatch, loop):
     new_gantry_cal = [[1, 0, 0, 10],
                       [0, 1, 0, 20],
@@ -243,7 +314,41 @@ async def test_deck_cal_applied(monkeypatch, loop):
     assert called_with['Z'] == 30
 
 
-async def test_other_mount_retracted(hardware_api):
+async def test_attitude_deck_cal_applied(
+        monkeypatch, loop, use_new_calibration):
+    new_gantry_cal = [
+        [1.0047, -0.0046, 0.0],
+        [0.0011, 1.0038, 0.0],
+        [0.0, 0.0, 1.0]]
+    called_with = None
+
+    def mock_move(position, speed=None, home_flagged_axes=True,
+                  axis_max_speeds=None):
+        nonlocal called_with
+        called_with = position
+
+    hardware_api = await hc.API.build_hardware_simulator(loop=loop)
+    monkeypatch.setattr(hardware_api._backend, 'move', mock_move)
+    deck_cal = RobotCalibration(
+        deck_calibration=DeckCalibration(
+            attitude=new_gantry_cal,
+            source=SourceType.user,
+            status=CalibrationStatus()))
+    hardware_api.set_robot_calibration(deck_cal)
+    await hardware_api.home()
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    assert called_with['X'] == 0.0
+    assert called_with['Y'] == 0.0
+    assert called_with['A'] == 0.0
+    # Check that mount offset is also applied
+    await hardware_api.move_to(types.Mount.LEFT, types.Point(0, 0, 0))
+    assert round(called_with['X'], 2) == 34.16
+    assert round(called_with['Y'], 2) == 0.04
+    assert round(called_with['Z'], 2) == 0.0
+
+
+async def test_other_mount_retracted(
+        hardware_api, is_robot, toggle_new_calibration):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     assert await hardware_api.gantry_position(types.Mount.RIGHT)\
@@ -253,63 +358,8 @@ async def test_other_mount_retracted(hardware_api):
         == types.Point(54, 20, 218)
 
 
-async def catch_oob_moves(hardware_api):
-    await hardware_api.home()
-    # Check axis max checking for move and move rel
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(1, 0, 0))
-    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
-        == types.Point(418, 353, 218)
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 1, 0))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 0, 1))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(419, 353, 218))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(418, 354, 218))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(418, 353, 219))
-    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
-        == types.Point(418, 353, 218)
-    # Axis min checking for move and move rel
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(-1, 353, 218))
-    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
-        == types.Point(418, 353, 218)
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(418, -1, 218))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.RIGHT,
-                                   types.Point(418, 353, -1))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(-419, 0, 0))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, -354, 0))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 0, -219))
-    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
-        == types.Point(418, 353, 218)
-    # Make sure we are checking after mount offset and critical points
-    # are applied
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.LEFT, types.Point(33, 0, 0))
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_to(types.Mount.LEFT, types.Point(385, 0, 0))
-    await hardware_api.move_to(types.Mount.RIGHT, types.Point(50, 50, 100))
-    await hardware_api.cache_instruments({types.Mount.LEFT: 'p10_single'})
-    with pytest.raises(RuntimeError):
-        await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, 12))
-    await hardware_api.pick_up_tip(types.Mount.LEFT)
-    await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, 0))
-
-
-async def test_shake_during_pick_up(hardware_api, monkeypatch):
+async def test_shake_during_pick_up(
+        hardware_api, monkeypatch, toggle_new_calibration):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -345,7 +395,8 @@ async def test_shake_during_pick_up(hardware_api, monkeypatch):
     move_rel.assert_has_calls(move_rel_calls)
 
 
-async def test_shake_during_drop(hardware_api, monkeypatch):
+async def test_shake_during_drop(
+        hardware_api, monkeypatch, toggle_new_calibration):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -399,3 +450,11 @@ async def test_shake_during_drop(hardware_api, monkeypatch):
         mock.call(types.Mount.RIGHT, types.Point(-1, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(0, 0, 20))]
     move_rel.assert_has_calls(move_rel_calls)
+
+
+async def test_move_rel_bounds(
+        hardware_api, toggle_new_calibration):
+    with pytest.raises(OutOfBoundsMove):
+        await hardware_api.move_rel(
+            types.Mount.RIGHT, types.Point(0, 0, 2000),
+            check_bounds=MotionChecks.HIGH)

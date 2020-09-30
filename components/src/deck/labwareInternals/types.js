@@ -1,7 +1,7 @@
 // @flow
 export type WellMouseEvent = {|
   wellName: string,
-  event: SyntheticMouseEvent<*>,
+  event: SyntheticMouseEvent<Element>,
 |}
 
 // wellName to CSS color, eg {'A1': '#123456'}

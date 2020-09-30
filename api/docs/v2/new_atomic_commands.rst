@@ -10,10 +10,11 @@ For example, the complex command ``transfer`` (see :ref:`v2-complex-commands`) e
 The examples in this section would be added to the following:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -116,10 +117,11 @@ Iterating Through Tips
 For this section, instead of using the protocol defined above, consider this setup:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -155,9 +157,10 @@ If you try to :py:meth:`.InstrumentContext.pick_up_tip()` again when all the tip
     # this will raise an exception if run after the previous code block
     pipette.pick_up_tip()
 
-To change the location of the first tip used by the pipette, you can use :py:attr:`.InstrumentContext.starting_tip`:
+To change the location of the first tip used by the pipette, you can use :py:obj:`.InstrumentContext.starting_tip`:
 
 .. code-block:: python
+
     pipette.starting_tip = tip_rack_1.well('C3')
     pipette.pick_up_tip()  # pick up C3 from "tip_rack_1"
     pipette.return_tip()
@@ -180,6 +183,20 @@ To reset the tip tracking, you can call :py:meth:`.InstrumentContext.reset_tipra
 
 .. versionadded:: 2.0
 
+To check whether you should pick up a tip or not, you can utilize :py:meth:`.InstrumentContext.has_tip`:
+
+.. code-block:: python
+
+    for block in range(3):
+        if block == 0 and not pipette.has_tip:
+            pipette.pick_up_tip()
+        else:
+            m300.mix(mix_repetitions, 250, d)
+            m300.blow_out(s.bottom(10))
+            m300.return_tip()
+
+.. versionadded:: 2.7
+
 **********************
 
 ****************
@@ -191,8 +208,9 @@ This section describes the :py:class:`.InstrumentContext` 's liquid-handling com
 The examples in this section should be inserted in the following:
 
 .. code-block:: python
+    :substitutions:
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -240,7 +258,7 @@ Now our pipette's tip is holding 100 µL.
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``aspirate``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
-    :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
+    :py:obj:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
 .. versionadded:: 2.0
 
@@ -267,7 +285,7 @@ The ``rate`` parameter is a multiplication factor of the pipette's default dispe
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``dispense``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
-    :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
+    :py:obj:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
 .. note::
 
@@ -318,6 +336,15 @@ When calling :py:meth:`.InstrumentContext.touch_tip` on a pipette, you have the 
 
 .. versionadded:: 2.0
 
+.. note:
+
+    It is recommended that you change your API version to 2.4 to take advantage of new
+    features added into `touch_tip` such as:
+        - A lower minimum speed (1 mm/s)
+        - Better handling around near by geometry considerations
+        - Removed certain extraneous behaviors such as a diagonal move from X -> Y and
+        moving directly to the height offset specified.
+
 .. _mix:
 
 Mix
@@ -338,8 +365,7 @@ The ``mix`` command takes up to three arguments: ``mix(repetitions, volume, loca
 
 .. note::
 
-    Mixes consist of aspirates and then immediate dispenses. In between these actions, the pipette moves up and out of the target well. This is normal, and is done to avoid incorrect aspirate and dispense actions.
-
+    In API Versions 2.2 and earlier, mixes consist of aspirates and then immediate dispenses. In between these actions, the pipette moves up and out of the target well. In API Version 2.3 and later, the pipette will not move between actions. 
 
 .. versionadded:: 2.0
 
@@ -359,6 +385,8 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 .. versionadded:: 2.0
 
 **********************
+
+.. _new-utility-commands:
 
 ****************
 Utility Commands
@@ -431,10 +459,11 @@ You can resume by pressing 'resume' in your Opentrons App. You can optionally sp
 will be displayed in the Opentrons App when protocol execution pauses.
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # The start of your protocol goes here...
@@ -462,10 +491,11 @@ To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentCon
 None of these functions take any arguments:
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
@@ -483,12 +513,76 @@ The method :py:meth:`.ProtocolContext.comment` lets you display messages in the 
 
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         protocol.comment('Hello, world!')
 
 .. versionadded:: 2.0
+
+
+Control and Monitor Robot Rail Lights
+=====================================
+
+You can turn the robot rail lights on or off in the protocol using :py:meth:`.ProtocolContext.set_rail_lights`:
+
+
+.. code-block:: python
+    :substitutions:
+
+    from opentrons import protocol_api
+
+    metadata = {'apiLevel': '|apiLevel|'}
+
+    def run(protocol: protocol_api.ProtocolContext):
+        # turn on robot rail lights
+        protocol.set_rail_lights(True)
+
+        # turn off robot rail lights
+        protocol.set_rail_lights(False)
+
+.. versionadded:: 2.5
+
+
+You can also check whether the rail lights are on or off in the protocol using :py:obj:`.ProtocolContext.rail_lights_on`:
+
+
+.. code-block:: python
+
+    protocol.rail_lights_on  # returns True when the lights are on,
+                             # False when the lights are off
+
+.. versionadded:: 2.5
+
+
+Monitor Robot Door
+==================
+
+The door safety switch feature flag has been added to the OT-2 software since the 3.19.0 release. Enabling the feature flag allows your robot to pause a running protocol and prohibit the protocol from running when the robot door is open.
+
+.. image:: ../img/feature_flags/door_safety_switch.png
+
+You can also check whether or not the robot door is closed at a specific point in time in the protocol using :py:obj:`.ProtocolContext.door_closed`:
+
+
+.. code-block:: python
+
+    protocol.door_closed  # return True when the door is closed,
+                          # False when the door is open
+
+
+.. note::
+
+    Both the top window and the front door must be closed in order for the robot to report the door is closed.
+
+
+.. warning::
+
+    If you chose to enable the door safety switch feature flag, you should only use :py:obj:`.ProtocolContext.door_closed` as a form of status check, and should not use it to control robot behavior. If you wish to implement custom method to pause or resume protocol using :py:obj:`.ProtocolContext.door_closed`, make sure you have first disabled the feature flag.
+
+.. versionadded:: 2.5
+

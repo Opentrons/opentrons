@@ -271,7 +271,7 @@ const getXYDimensionAlerts = (
   ) : null
 }
 
-export const LabwareCreator = () => {
+export const LabwareCreator = (): React.Node => {
   const [
     showExportErrorModal,
     _setShowExportErrorModal,
@@ -485,16 +485,17 @@ export const LabwareCreator = () => {
           const { pipetteName } = castValues
           const def = fieldsToLabware(castValues)
           const { displayName } = def.metadata
+          const { loadName } = def.parameters
 
           const zip = new JSZip()
-          zip.file(`${displayName}.json`, JSON.stringify(def, null, 4))
+          zip.file(`${loadName}.json`, JSON.stringify(def, null, 4))
           zip.file(
-            `test_${displayName}.py`,
+            `test_${loadName}.py`,
             labwareTestProtocol({ pipetteName, definition: def })
           )
-          zip
-            .generateAsync({ type: 'blob' })
-            .then(blob => saveAs(blob, `${displayName}.zip`))
+          zip.generateAsync({ type: 'blob' }).then(blob => {
+            saveAs(blob, `${loadName}.zip`)
+          })
 
           reportEvent({
             name: 'labwareCreatorFileExport',

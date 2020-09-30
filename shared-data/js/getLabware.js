@@ -33,6 +33,15 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_1_trash_1100ml_fixed',
   'eppendorf_96_tiprack_1000ul_eptips',
   'eppendorf_96_tiprack_10ul_eptips',
+  'opentrons_calibrationblock_short_side_left',
+  'opentrons_calibrationblock_short_side_right',
+]
+// NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
+// but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST
+// because of legacy protocols that might use them
+export const PD_DO_NOT_LIST = [
+  'opentrons_calibrationblock_short_side_left',
+  'opentrons_calibrationblock_short_side_right',
 ]
 
 export function getLabwareV1Def(labwareName: string): ?LabwareDefinition1 {
@@ -51,10 +60,10 @@ export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
 // NOTE: these labware definitions in _SHORT_MM_LABWARE_DEF_LOADNAMES
 // were written in "short mm" = 0.5mm, but
 // we will write all future definitions in actual mm.
-// These whitelisted labware also have engage heights measured from home switch
+// These allowed labware also have engage heights measured from home switch
 // instead of from labware bottom, which is why we add ENGAGE_HEIGHT_OFFSET.
 //
-// Ideally instead of using this whitelist, we would publish a new version
+// Ideally instead of using this allow-list, we would publish a new version
 // of these definitions with corrected labware heights. However, we don't
 // support labware versioning well enough yet.
 const _SHORT_MM_LABWARE_DEF_LOADNAMES = [
@@ -106,7 +115,9 @@ const _getSvgYValueForWell = (
 }
 
 /** For display. Flips Y axis to match SVG, applies offset to wells */
-export function getWellPropsForSVGLabwareV1(def: LabwareDefinition1) {
+export function getWellPropsForSVGLabwareV1(
+  def: LabwareDefinition1
+): { [well: string]: WellDefinition, ... } {
   const wellDefs = def && def.wells
 
   // Most labware defs have a weird offset,

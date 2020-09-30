@@ -8,7 +8,7 @@ export type CardContentQuarterProps = {|
   className?: string,
 |}
 
-export function CardContentQuarter(props: CardContentQuarterProps) {
+export function CardContentQuarter(props: CardContentQuarterProps): React.Node {
   return (
     <div className={cx(styles.card_content_25, props.className)}>
       {props.children}

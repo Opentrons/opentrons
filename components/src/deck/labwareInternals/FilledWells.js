@@ -13,7 +13,7 @@ function FilledWellsComponent(props: FilledWellsProps) {
   const { definition, fillByWell } = props
   return (
     <>
-      {map<*, *, React.Node>(
+      {map<string, { [wellName: string]: string, ... }, React.Node>(
         fillByWell,
         (color: $Values<typeof fillByWell>, wellName) => {
           return (
@@ -30,4 +30,6 @@ function FilledWellsComponent(props: FilledWellsProps) {
   )
 }
 
-export const FilledWells = React.memo<FilledWellsProps>(FilledWellsComponent)
+export const FilledWells: React.AbstractComponent<FilledWellsProps> = React.memo(
+  FilledWellsComponent
+)

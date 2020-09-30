@@ -83,7 +83,7 @@ describe('well selection should update', () => {
     expect(handleFormHelper(patch, form)).toEqual({
       ...patch,
       wells: ['A1'],
-      mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+      mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
     })
   })
 
@@ -93,7 +93,7 @@ describe('well selection should update', () => {
     expect(handleFormHelper(patch, trashLabwareForm)).toEqual({
       ...patch,
       wells: [],
-      mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+      mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
     })
   })
 })

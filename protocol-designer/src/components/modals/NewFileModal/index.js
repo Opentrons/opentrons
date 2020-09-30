@@ -1,5 +1,5 @@
 // @flow
-import type { ElementProps } from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
@@ -13,32 +13,54 @@ import {
   actions as fileActions,
   selectors as loadFileSelectors,
 } from '../../../load-file'
+import * as labwareDefSelectors from '../../../labware-defs/selectors'
+import * as labwareDefActions from '../../../labware-defs/actions'
+
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as stepFormActions } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
-import { FilePipettesModal as FilePipettesModalComponent } from '../FilePipettesModal'
+import {
+  FilePipettesModal as FilePipettesModalComponent,
+  type ModuleCreationArgs,
+  type PipetteFieldsData,
+} from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
+import type { NewProtocolFields } from '../../../load-file'
 import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
+import type { LabwareDefByDefURI } from '../../../labware-defs/types'
 
-type Props = ElementProps<typeof FilePipettesModalComponent>
+type Props = React.ElementProps<typeof FilePipettesModalComponent>
 
 type OP = {|
   showProtocolFields: $PropertyType<Props, 'showProtocolFields'>,
 |}
 
 type SP = {|
-  hideModal: $PropertyType<Props, 'hideModal'>,
+  _customLabware: LabwareDefByDefURI,
   _hasUnsavedChanges: ?boolean,
-  thermocyclerEnabled: ?boolean,
+  hideModal: $PropertyType<Props, 'hideModal'>,
   moduleRestrictionsDisabled: ?boolean,
 |}
 
+type CreateNewProtocolArgs = {|
+  customLabware: LabwareDefByDefURI,
+  newProtocolFields: NewProtocolFields,
+  pipettes: Array<PipetteFieldsData>,
+  modules: Array<ModuleCreationArgs>,
+|}
 type DP = {|
   onCancel: () => mixed,
-  _createNewProtocol: $PropertyType<Props, 'onSave'>,
+  _createNewProtocol: CreateNewProtocolArgs => void,
 |}
 
-export const NewFileModal = connect<Props, OP, SP, DP, _, _>(
+export const NewFileModal: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps
@@ -46,9 +68,9 @@ export const NewFileModal = connect<Props, OP, SP, DP, _, _>(
 
 function mapStateToProps(state: BaseState): SP {
   return {
-    hideModal: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
-    thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
+    _customLabware: labwareDefSelectors.getCustomLabwareDefsByURI(state),
+    hideModal: !selectors.getNewProtocolModal(state),
     moduleRestrictionsDisabled: featureFlagSelectors.getDisableModuleRestrictions(
       state
     ),
@@ -58,12 +80,20 @@ function mapStateToProps(state: BaseState): SP {
 function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
-    _createNewProtocol: ({ modules, newProtocolFields, pipettes }) => {
+    _createNewProtocol: (args: CreateNewProtocolArgs) => {
+      const { modules, newProtocolFields, pipettes, customLabware } = args
       dispatch(fileActions.createNewProtocol(newProtocolFields))
 
       const pipettesById: {
         [pipetteId: string]: PipetteOnDeck,
       } = pipettes.reduce((acc, pipette) => ({ ...acc, [uuid()]: pipette }), {})
+
+      // create custom labware
+      mapValues(customLabware, labwareDef =>
+        dispatch(
+          labwareDefActions.createCustomLabwareDefAction({ def: labwareDef })
+        )
+      )
 
       // create new pipette entities
       dispatch(
@@ -113,7 +143,6 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
 function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   return {
     ...ownProps,
-    thermocyclerEnabled: stateProps.thermocyclerEnabled,
     moduleRestrictionsDisabled: stateProps.moduleRestrictionsDisabled,
     showModulesFields: true,
     hideModal: stateProps.hideModal,
@@ -123,7 +152,10 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
         !stateProps._hasUnsavedChanges ||
         window.confirm(i18n.t('alert.window.confirm_create_new'))
       ) {
-        dispatchProps._createNewProtocol(fields)
+        dispatchProps._createNewProtocol({
+          ...fields,
+          customLabware: stateProps._customLabware,
+        })
       }
     },
   }

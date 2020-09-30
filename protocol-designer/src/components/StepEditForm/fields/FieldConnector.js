@@ -77,7 +77,7 @@ export const showFieldErrors = ({
   name,
   focusedField,
   dirtyFields,
-}: ShowFieldErrorParams) =>
+}: ShowFieldErrorParams): boolean | void | Array<StepFieldName> =>
   !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
 
 const STP = (state: BaseState, ownProps: OP): SP => {
@@ -98,7 +98,14 @@ const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   },
 })
 
-export const FieldConnector = connect<StepFieldProps, $Exact<OP>, SP, DP, _, _>(
+export const FieldConnector: React.AbstractComponent<$Exact<OP>> = connect<
+  StepFieldProps,
+  $Exact<OP>,
+  SP,
+  DP,
+  _,
+  _
+>(
   STP,
   DTP
 )(FieldConnectorComponent)

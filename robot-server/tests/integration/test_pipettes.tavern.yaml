@@ -1,0 +1,27 @@
+---
+test_name: Get pipettes
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Get all the attached pipettes
+    request:
+      url: "{host:s}:{port:d}/pipettes"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        left:
+          model: !anystr
+          name: !anystr
+          tip_length: !anyfloat
+          mount_axis: !anystr
+          plunger_axis: !anystr
+          id: !anystr
+        right:
+          model: !anystr
+          name: !anystr
+          tip_length: !anyfloat
+          mount_axis: !anystr
+          plunger_axis: !anystr
+          id: !anystr

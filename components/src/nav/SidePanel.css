@@ -13,11 +13,6 @@
   padding: 0 4px;
 }
 
-.closed {
-  width: 0;
-  border-right-width: 0;
-}
-
 .title_bar {
   display: flex;
   align-items: center;
@@ -35,12 +30,4 @@
   height: calc(100vh - 3.5rem);
   overflow-x: hidden;
   overflow-y: auto;
-}
-
-/*
- * TODO(mc, 2018-01-16): need a little extra specificity here to survive
- * hot reloads. Try to figure out why that's the case.
- */
-button.button_close {
-  width: 2.5rem;
 }

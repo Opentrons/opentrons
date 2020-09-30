@@ -10,10 +10,11 @@ import {
   getLabwareDefURI,
   OPENTRONS_LABWARE_NAMESPACE,
 } from '@opentrons/shared-data'
+import { getIsTiprack } from '../../../shared-data/js/getLabware'
 import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { GetState, ThunkAction, ThunkDispatch } from '../types'
+import type { ThunkAction } from '../types'
 import type { LabwareUploadMessage } from './types'
 
 export type LabwareUploadMessageAction = {|
@@ -35,7 +36,7 @@ export type CreateCustomLabwareDef = {|
   |},
 |}
 
-const createCustomLabwareDefAction = (
+export const createCustomLabwareDefAction = (
   payload: $PropertyType<CreateCustomLabwareDef, 'payload'>
 ): CreateCustomLabwareDef => ({
   type: 'CREATE_CUSTOM_LABWARE_DEF',
@@ -90,9 +91,11 @@ const getIsOverwriteMismatched = (
   return !(matchedWellOrdering && matchedMultiUse)
 }
 
-export const createCustomLabwareDef = (
+const _createCustomLabwareDef: (
+  onlyTiprack: boolean
+) => (
   event: SyntheticInputEvent<HTMLInputElement>
-): ThunkAction<*> => (dispatch: ThunkDispatch<*>, getState: GetState) => {
+) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
   const allLabwareDefs: Array<LabwareDefinition2> = values(
     labwareDefSelectors.getLabwareDefsByURI(getState())
   )
@@ -141,10 +144,15 @@ export const createCustomLabwareDef = (
       console.warn('uploaded labware conforms to schema, but has no well A1!')
     }
     if (!valid || !hasWellA1) {
-      console.debug('validation errors:', validate.errors)
       return dispatch(
         labwareUploadMessage({
           messageType: 'INVALID_JSON_FILE',
+        })
+      )
+    } else if (onlyTiprack && !getIsTiprack(parsedLabwareDef)) {
+      return dispatch(
+        labwareUploadMessage({
+          messageType: 'ONLY_TIPRACK',
         })
       )
     } else if (parsedLabwareDef?.namespace === OPENTRONS_LABWARE_NAMESPACE) {
@@ -226,6 +234,14 @@ export const createCustomLabwareDef = (
   }
   reader.readAsText(file)
 }
+
+export const createCustomLabwareDef: (
+  event: SyntheticInputEvent<HTMLInputElement>
+) => ThunkAction<any> = _createCustomLabwareDef(false)
+
+export const createCustomTiprackDef: (
+  event: SyntheticInputEvent<HTMLInputElement>
+) => ThunkAction<any> = _createCustomLabwareDef(true)
 
 type DismissLabwareUploadMessage = {|
   type: 'DISMISS_LABWARE_UPLOAD_MESSAGE',

@@ -28,7 +28,7 @@ export type LabwareListProps = {|
   errorMessage: string | null,
 |}
 
-export function LabwareList(props: LabwareListProps) {
+export function LabwareList(props: LabwareListProps): React.Node {
   const { labware, errorMessage } = props
   let children = null
 

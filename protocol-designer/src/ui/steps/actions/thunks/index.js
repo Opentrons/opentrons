@@ -5,24 +5,31 @@ import {
   getUnsavedFormIsPristineSetTempForm,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
+import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 
+import { PAUSE_UNTIL_TEMP } from '../../../../constants'
 import { uuid } from '../../../../utils'
 import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
 import { getSelectedStepId } from '../../selectors'
-import { addStep } from './addStep'
-import { actions as tutorialActions } from '../../../../tutorial'
+import { addStep } from '../actions'
+import {
+  actions as tutorialActions,
+  selectors as tutorialSelectors,
+} from '../../../../tutorial'
 
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
+import * as fileDataSelectors from '../../../../file-data/selectors'
 import type { DuplicateStepAction } from '../types'
 
 import type { StepType, StepIdType, FormData } from '../../../../form-types'
-import type { GetState, ThunkDispatch } from '../../../../types'
+import type { ThunkAction } from '../../../../types'
 
-export const addAndSelectStepWithHints = (payload: { stepType: StepType }) => (
-  dispatch: ThunkDispatch<*>,
-  getState: GetState
-) => {
-  dispatch(addStep(payload))
+export const addAndSelectStepWithHints: ({
+  stepType: StepType,
+}) => ThunkAction<any> = payload => (dispatch, getState) => {
+  const robotStateTimeline = fileDataSelectors.getRobotStateTimeline(getState())
+  dispatch(addStep({ stepType: payload.stepType, robotStateTimeline }))
+
   const state = getState()
   const deckHasLiquid = labwareIngredsSelectors.getDeckHasLiquid(state)
   const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
@@ -66,10 +73,9 @@ export type ReorderSelectedStepAction = {
   },
 }
 
-export const reorderSelectedStep = (delta: number) => (
-  dispatch: ThunkDispatch<ReorderSelectedStepAction>,
-  getState: GetState
-) => {
+export const reorderSelectedStep: (
+  delta: number
+) => ThunkAction<ReorderSelectedStepAction> = delta => (dispatch, getState) => {
   const stepId = getSelectedStepId(getState())
 
   if (stepId != null) {
@@ -83,10 +89,9 @@ export const reorderSelectedStep = (delta: number) => (
   }
 }
 
-export const duplicateStep = (stepId: StepIdType) => (
-  dispatch: ThunkDispatch<DuplicateStepAction>,
-  getState: GetState
-) => {
+export const duplicateStep: (
+  stepId: StepIdType
+) => ThunkAction<DuplicateStepAction> = stepId => (dispatch, getState) => {
   const duplicateStepId = uuid()
 
   if (stepId != null) {
@@ -104,16 +109,20 @@ export type SaveStepFormAction = {|
   payload: FormData,
 |}
 
-export const _saveStepForm = (form: FormData): SaveStepFormAction => ({
-  type: SAVE_STEP_FORM,
-  payload: form,
-})
+export const _saveStepForm = (form: FormData): SaveStepFormAction => {
+  // if presaved, transform pseudo ID to real UUID upon save
+  const payload = form.id === PRESAVED_STEP_ID ? { ...form, id: uuid() } : form
+  return {
+    type: SAVE_STEP_FORM,
+    payload,
+  }
+}
 
 /** take unsavedForm state and put it into the payload */
-export const saveStepForm = () => (
-  dispatch: ThunkDispatch<*>,
-  getState: GetState
-): void => {
+export const saveStepForm: () => ThunkAction<any> = () => (
+  dispatch,
+  getState
+) => {
   const initialState = getState()
   const unsavedForm = getUnsavedForm(initialState)
 
@@ -126,16 +135,20 @@ export const saveStepForm = () => (
     return
   }
 
+  if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
+    dispatch(tutorialActions.addHint('thermocycler_lid_passive_cooling'))
+  }
+
   // save the form
   dispatch(_saveStepForm(unsavedForm))
 }
 
 /** "power action", mimicking saving the never-saved "set temperature X" step,
  ** then creating and saving a "pause until temp X" step */
-export const saveSetTempFormWithAddedPauseUntilTemp = () => (
-  dispatch: ThunkDispatch<*>,
-  getState: GetState
-): void => {
+export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = () => (
+  dispatch,
+  getState
+) => {
   const initialState = getState()
   const unsavedSetTemperatureForm = getUnsavedForm(initialState)
   const isPristineSetTempForm = getUnsavedFormIsPristineSetTempForm(
@@ -150,6 +163,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp = () => (
     )
     return
   }
+
   const { id } = unsavedSetTemperatureForm
 
   if (!isPristineSetTempForm) {
@@ -170,14 +184,19 @@ export const saveSetTempFormWithAddedPauseUntilTemp = () => (
   dispatch(_saveStepForm(unsavedSetTemperatureForm))
 
   // add a new pause step form
-  addStep({ stepType: 'pause' })(dispatch, getState)
+  dispatch(
+    addStep({
+      stepType: 'pause',
+      robotStateTimeline: fileDataSelectors.getRobotStateTimeline(getState()),
+    })
+  )
 
   // NOTE: fields should be set one at a time b/c dependentFieldsUpdate fns can filter out inputs
-  // contingent on other inputs (eg changing the pauseForAmountOfTime radio button may clear the pauseTemperature).
+  // contingent on other inputs (eg changing the pauseAction radio button may clear the pauseTemperature).
   dispatch(
     changeFormInput({
       update: {
-        pauseForAmountOfTime: 'untilTemperature',
+        pauseAction: PAUSE_UNTIL_TEMP,
       },
     })
   )

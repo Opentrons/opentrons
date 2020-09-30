@@ -7,6 +7,6 @@ import styles from './styles.css'
 // TODO(mc, 2019-04-05): i18n
 const EN_NO_RESULTS = 'No results found'
 
-export function NoResults() {
+export function NoResults(): React.Node {
   return <p className={styles.no_results}>{EN_NO_RESULTS}</p>
 }

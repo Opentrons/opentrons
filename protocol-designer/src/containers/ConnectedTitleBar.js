@@ -12,7 +12,7 @@ import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors
 import { selectors as uiLabwareSelectors } from '../ui/labware'
 import { selectors as stepFormSelectors } from '../step-forms'
 import {
-  getSelectedStep,
+  getSelectedStepTitleInfo,
   getSelectedTerminalItemId,
   getWellSelectionLabwareKey,
   actions as stepsActions,
@@ -65,7 +65,7 @@ function mapStateToProps(state: BaseState): SP {
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const _page = selectors.getCurrentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
-  const selectedStep = getSelectedStep(state)
+  const selectedStepInfo = getSelectedStepTitleInfo(state)
   const selectedTerminalId = getSelectedTerminalItemId(state)
   const labwareNames = uiLabwareSelectors.getLabwareNicknamesById(state)
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(
@@ -141,7 +141,10 @@ function mapStateToProps(state: BaseState): SP {
           subtitle =
             labwareDef && getLabwareDisplayName(labwareDef).replace('µL', 'uL')
         }
-      } else if (selectedStep) {
+      } else if (selectedStepInfo) {
+        const stepTitle =
+          selectedStepInfo.stepName ||
+          i18n.t(`application.stepType.${selectedStepInfo.stepType}`)
         if (wellSelectionLabwareKey) {
           // well selection modal
           return {
@@ -149,17 +152,15 @@ function mapStateToProps(state: BaseState): SP {
             _wellSelectionMode: true,
             title: (
               <TitleWithIcon
-                iconName={
-                  selectedStep && stepIconsByType[selectedStep.stepType]
-                }
-                text={selectedStep && selectedStep.title}
+                iconName={stepIconsByType[selectedStepInfo.stepType]}
+                text={stepTitle}
               />
             ),
             subtitle: labwareNames[wellSelectionLabwareKey],
             backButtonLabel: 'Back',
           }
         } else {
-          subtitle = selectedStep.title
+          subtitle = stepTitle
         }
       }
       return {
@@ -206,7 +207,14 @@ const StickyTitleBar = (props: TitleBarProps) => (
   <TitleBar {...props} className={styles.sticky_bar} />
 )
 
-export const ConnectedTitleBar = connect<Props, {||}, SP, {||}, _, _>(
+export const ConnectedTitleBar: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

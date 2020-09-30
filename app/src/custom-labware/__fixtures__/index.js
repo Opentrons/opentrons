@@ -29,7 +29,7 @@ export const mockDefinition: LabwareDefinition2 = {
 export const mockValidLabware: Types.ValidLabwareFile = {
   type: 'VALID_LABWARE_FILE',
   filename: 'a.json',
-  created: 1,
+  modified: 1,
   definition: {
     ...mockDefinition,
     metadata: {
@@ -43,13 +43,13 @@ export const mockValidLabware: Types.ValidLabwareFile = {
 export const mockInvalidLabware: Types.InvalidLabwareFile = {
   type: 'INVALID_LABWARE_FILE',
   filename: 'b.json',
-  created: 2,
+  modified: 2,
 }
 
 export const mockOpentronsLabware: Types.OpentronsLabwareFile = {
   type: 'OPENTRONS_LABWARE_FILE',
   filename: 'c.json',
-  created: 3,
+  modified: 3,
   definition: {
     ...mockDefinition,
     namespace: 'opentrons',
@@ -64,7 +64,7 @@ export const mockOpentronsLabware: Types.OpentronsLabwareFile = {
 export const mockDuplicateLabware: Types.DuplicateLabwareFile = {
   type: 'DUPLICATE_LABWARE_FILE',
   filename: 'd.json',
-  created: 4,
+  modified: 4,
   definition: {
     ...mockDefinition,
     metadata: {

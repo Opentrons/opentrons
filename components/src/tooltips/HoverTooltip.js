@@ -2,9 +2,12 @@
 
 import * as React from 'react'
 
-import { Tooltip } from './Tooltip'
+import { DeprecatedTooltip } from './DeprecatedTooltip'
 
-import type { TooltipChildProps, TooltipProps } from './Tooltip'
+import type {
+  TooltipChildProps,
+  DeprecatedTooltipProps,
+} from './DeprecatedTooltip'
 
 const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 0
@@ -14,7 +17,7 @@ export type HoverTooltipHandlers = TooltipChildProps<{
   onMouseLeave: (SyntheticMouseEvent<*>) => void,
 }>
 
-export type HoverTooltipProps = TooltipProps<HoverTooltipHandlers>
+export type HoverTooltipProps = DeprecatedTooltipProps<HoverTooltipHandlers>
 
 type HoverTooltipState = {| isOpen: boolean |}
 
@@ -30,6 +33,8 @@ type HoverTooltipState = {| isOpen: boolean |}
  *   onMouseLeave: (SyntheticMouseEvent<*>) => void,
  * |}
  * ```
+ *
+ * @deprecated Use `Tooltip` and `useHoverTooltip` instead
  */
 export class HoverTooltip extends React.Component<
   HoverTooltipProps,
@@ -50,14 +55,15 @@ export class HoverTooltip extends React.Component<
     if (this.openTimeout) clearTimeout(this.openTimeout)
   }
 
-  delayedOpen = () => {
+  delayedOpen: () => void = () => {
     if (this.closeTimeout) clearTimeout(this.closeTimeout)
     this.openTimeout = setTimeout(
       () => this.setState({ isOpen: true }),
       OPEN_DELAY_MS
     )
   }
-  delayedClose = () => {
+
+  delayedClose: () => void = () => {
     if (this.openTimeout) clearTimeout(this.openTimeout)
     this.closeTimeout = setTimeout(
       () => this.setState({ isOpen: false }),
@@ -65,9 +71,9 @@ export class HoverTooltip extends React.Component<
     )
   }
 
-  render() {
+  render(): React.Node {
     return (
-      <Tooltip
+      <DeprecatedTooltip
         open={this.state.isOpen}
         childProps={{
           onMouseEnter: this.delayedOpen,

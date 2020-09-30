@@ -3,14 +3,9 @@
 exports[`getUniqueWellProperties fixture_96_plate 1`] = `
 Array [
   Object {
-    "brand": Object {
-      "brand": "generic",
-      "brandId": Array [],
-    },
+    "brand": null,
     "depth": 10.54,
     "metadata": Object {
-      "displayCategory": "wellPlate",
-      "displayName": "ANSI 96 Standard Microplate",
       "wellBottomShape": "flat",
     },
     "shape": Object {

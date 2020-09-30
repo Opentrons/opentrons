@@ -9,6 +9,7 @@ import * as selectors from '../selectors'
 
 jest.mock('../selectors')
 jest.mock('../../robot/selectors')
+jest.mock('../../sessions')
 jest.mock('../../discovery/selectors')
 
 describe('analytics events map', () => {
@@ -74,7 +75,7 @@ describe('analytics events map', () => {
   })
 
   describe('events with protocol data', () => {
-    var protocolData = { foo: 'bar' }
+    const protocolData = { foo: 'bar' }
 
     beforeEach(() => {
       selectors.getProtocolAnalyticsData.mockResolvedValue(protocolData)

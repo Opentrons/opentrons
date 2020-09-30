@@ -161,13 +161,7 @@
   "groups": [
     {
       "metadata": {
-        "displayName": "TestPro 15 Well Plate 5 µL",
-        "displayCategory": "wellPlate",
         "wellBottomShape": "flat"
-      },
-      "brand": {
-        "brand": "TestPro",
-        "brandId": ["001"]
       },
       "wells": [
         "A1",

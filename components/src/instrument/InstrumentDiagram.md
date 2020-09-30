@@ -1,10 +1,11 @@
 Single channel GEN1:
 
-````js
+```js
 <InstrumentDiagram
   mount="left"
   pipetteSpecs={{ channels: 1, displayCategory: 'GEN1' }}
-/>```
+/>
+```
 
 Multi channel GEN1:
 
@@ -12,7 +13,8 @@ Multi channel GEN1:
 <InstrumentDiagram
   mount="right"
   pipetteSpecs={{ channels: 8, displayCategory: 'GEN1' }}
-/>```
+/>
+```
 
 Single channel GEN2:
 
@@ -20,7 +22,8 @@ Single channel GEN2:
 <InstrumentDiagram
   mount="left"
   pipetteSpecs={{ channels: 1, displayCategory: 'GEN2' }}
-/>```
+/>
+```
 
 Multi channel GEN2:
 
@@ -28,5 +31,5 @@ Multi channel GEN2:
 <InstrumentDiagram
   mount="right"
   pipetteSpecs={{ channels: 8, displayCategory: 'GEN2' }}
-/>```
-````
+/>
+```

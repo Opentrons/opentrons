@@ -43,7 +43,7 @@ type BlowoutLocationDropdownProps = {
   ...BlowoutLocationDropdownSP,
 }
 
-export const BlowoutLocationField = connect<
+export const BlowoutLocationField: React.AbstractComponent<BlowoutLocationDropdownOP> = connect<
   BlowoutLocationDropdownProps,
   BlowoutLocationDropdownOP,
   BlowoutLocationDropdownSP,

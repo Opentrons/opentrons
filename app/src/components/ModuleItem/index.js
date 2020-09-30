@@ -18,7 +18,7 @@ type Props = {|
   availableUpdate?: ?string,
 |}
 
-export function ModuleItem(props: Props) {
+export function ModuleItem(props: Props): React.Node {
   const { module, controlDisabledReason } = props
 
   return (

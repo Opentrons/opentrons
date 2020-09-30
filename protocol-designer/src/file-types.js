@@ -4,6 +4,7 @@ import type { RootState as StepformRoot } from './step-forms'
 import type { RootState as DismissRoot } from './dismiss'
 import type { ProtocolFile as ProtocolFileV3 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { ProtocolFile as ProtocolFileV4 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { ProtocolFile as ProtocolFileV5 } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
 
 export type PDMetadata = {
   // pipetteId to tiprackModel
@@ -29,6 +30,7 @@ export type PDMetadata = {
 export type PDProtocolFile =
   | ProtocolFileV3<PDMetadata>
   | ProtocolFileV4<PDMetadata>
+  | ProtocolFileV5<PDMetadata>
 
 export function getPDMetadata(file: PDProtocolFile): PDMetadata {
   const metadata = file.designerApplication?.data

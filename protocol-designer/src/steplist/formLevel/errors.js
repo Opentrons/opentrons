@@ -11,6 +11,7 @@ import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
+  THERMOCYCLER_PROFILE,
 } from '../../constants'
 import type { StepFieldName } from '../../form-types'
 
@@ -31,6 +32,12 @@ export type FormErrorKey =
   | 'ENGAGE_HEIGHT_REQUIRED'
   | 'MODULE_ID_REQUIRED'
   | 'TARGET_TEMPERATURE_REQUIRED'
+  | 'BLOCK_TEMPERATURE_REQUIRED'
+  | 'LID_TEMPERATURE_REQUIRED'
+  | 'PROFILE_VOLUME_REQUIRED'
+  | 'PROFILE_LID_TEMPERATURE_REQUIRED'
+  | 'BLOCK_TEMPERATURE_HOLD_REQUIRED'
+  | 'LID_TEMPERATURE_HOLD_REQUIRED'
 
 export type FormError = {
   title: string,
@@ -54,20 +61,15 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
   PAUSE_TYPE_REQUIRED: {
     title:
       'Must either pause for amount of time, until told to resume, or until temperature reached',
-    dependentFields: ['pauseForAmountOfTime'],
+    dependentFields: ['pauseAction'],
   },
   TIME_PARAM_REQUIRED: {
     title: 'Must include hours, minutes, or seconds',
-    dependentFields: [
-      'pauseForAmountOfTime',
-      'pauseHour',
-      'pauseMinute',
-      'pauseSecond',
-    ],
+    dependentFields: ['pauseAction', 'pauseHour', 'pauseMinute', 'pauseSecond'],
   },
   PAUSE_TEMP_PARAM_REQUIRED: {
     title: 'Temperature is required',
-    dependentFields: ['pauseForAmountOfTime', 'pauseTemperature'],
+    dependentFields: ['pauseAction', 'pauseTemperature'],
   },
   WELL_RATIO_MOVE_LIQUID: {
     title: 'Well selection must be 1 to many, many to 1, or N to N',
@@ -98,7 +100,32 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
     title: 'Temperature is required',
     dependentFields: ['setTemperature', 'targetTemperature'],
   },
+  PROFILE_VOLUME_REQUIRED: {
+    title: 'Volume is required',
+    dependentFields: ['thermocyclerFormType', 'profileVolume'],
+  },
+  PROFILE_LID_TEMPERATURE_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['thermocyclerFormType', 'profileTargetLidTemp'],
+  },
+  LID_TEMPERATURE_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['lidIsActive', 'lidTargetTemp'],
+  },
+  BLOCK_TEMPERATURE_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['blockIsActive', 'blockTargetTemp'],
+  },
+  BLOCK_TEMPERATURE_HOLD_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['blockIsActiveHold', 'blockTargetTempHold'],
+  },
+  LID_TEMPERATURE_HOLD_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
+  },
 }
+
 export type FormErrorChecker = mixed => ?FormError
 
 // TODO: test these
@@ -141,21 +168,21 @@ export const pauseForTimeOrUntilTold = (
   fields: HydratedFormData
 ): ?FormError => {
   const {
-    pauseForAmountOfTime,
+    pauseAction,
     pauseHour,
     pauseMinute,
     pauseSecond,
     moduleId,
     pauseTemperature,
   } = fields
-  if (pauseForAmountOfTime === PAUSE_UNTIL_TIME) {
+  if (pauseAction === PAUSE_UNTIL_TIME) {
     // user selected pause for amount of time
     const hours = parseFloat(pauseHour) || 0
     const minutes = parseFloat(pauseMinute) || 0
     const seconds = parseFloat(pauseSecond) || 0
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
     return totalSeconds <= 0 ? FORM_ERRORS.TIME_PARAM_REQUIRED : null
-  } else if (pauseForAmountOfTime === PAUSE_UNTIL_TEMP) {
+  } else if (pauseAction === PAUSE_UNTIL_TEMP) {
     // user selected pause until temperature reached
     if (moduleId == null) {
       // missing module field (reached by deleting a module from deck)
@@ -166,7 +193,7 @@ export const pauseForTimeOrUntilTold = (
       return FORM_ERRORS.PAUSE_TEMP_PARAM_REQUIRED
     }
     return null
-  } else if (pauseForAmountOfTime === PAUSE_UNTIL_RESUME) {
+  } else if (pauseAction === PAUSE_UNTIL_RESUME) {
     // user selected pause until resume
     return null
   } else {
@@ -219,6 +246,60 @@ export const targetTemperatureRequired = (
     : null
 }
 
+export const profileVolumeRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { thermocyclerFormType, profileVolume } = fields
+  return thermocyclerFormType === THERMOCYCLER_PROFILE && !profileVolume
+    ? FORM_ERRORS.PROFILE_VOLUME_REQUIRED
+    : null
+}
+
+export const profileTargetLidTempRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { thermocyclerFormType, profileTargetLidTemp } = fields
+  return thermocyclerFormType === THERMOCYCLER_PROFILE && !profileTargetLidTemp
+    ? FORM_ERRORS.PROFILE_LID_TEMPERATURE_REQUIRED
+    : null
+}
+
+export const blockTemperatureRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { blockIsActive, blockTargetTemp } = fields
+  return blockIsActive === true && !blockTargetTemp
+    ? FORM_ERRORS.BLOCK_TEMPERATURE_REQUIRED
+    : null
+}
+
+export const lidTemperatureRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { lidIsActive, lidTargetTemp } = fields
+  return lidIsActive === true && !lidTargetTemp
+    ? FORM_ERRORS.LID_TEMPERATURE_REQUIRED
+    : null
+}
+
+export const blockTemperatureHoldRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { blockIsActiveHold, blockTargetTempHold } = fields
+  return blockIsActiveHold === true && !blockTargetTempHold
+    ? FORM_ERRORS.BLOCK_TEMPERATURE_HOLD_REQUIRED
+    : null
+}
+
+export const lidTemperatureHoldRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { lidIsActiveHold, lidTargetTempHold } = fields
+  return lidIsActiveHold === true && !lidTargetTempHold
+    ? FORM_ERRORS.LID_TEMPERATURE_HOLD_REQUIRED
+    : null
+}
+
 export const engageHeightRangeExceeded = (
   fields: HydratedFormData
 ): FormError | null => {
@@ -250,9 +331,12 @@ export const engageHeightRangeExceeded = (
  **     Helpers    **
  ********************/
 
-export const composeErrors = (...errorCheckers: Array<FormErrorChecker>) => (
-  value: mixed
-): Array<FormError> =>
+type ComposeErrors = (
+  ...errorCheckers: Array<FormErrorChecker>
+) => mixed => Array<FormError>
+export const composeErrors: ComposeErrors = (
+  ...errorCheckers: Array<FormErrorChecker>
+) => value =>
   errorCheckers.reduce((acc, errorChecker) => {
     const possibleError = errorChecker(value)
     return possibleError ? [...acc, possibleError] : acc

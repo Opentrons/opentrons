@@ -10,7 +10,7 @@ type Props = {|
   controlDisabledReason: string | null,
 |}
 
-export function ModulesCardContents(props: Props) {
+export function ModulesCardContents(props: Props): React.Node {
   const { modules, controlDisabledReason } = props
   if (modules.length === 0) return <NoModulesMessage />
 

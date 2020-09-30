@@ -1,6 +1,5 @@
 // @flow
 import { createSelector } from 'reselect'
-
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import min from 'lodash/min'
@@ -10,7 +9,6 @@ import omitBy from 'lodash/omitBy'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import * as StepGeneration from '../../step-generation'
-import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { timelineFrameBeforeActiveItem } from '../timelineFrames'
@@ -69,57 +67,6 @@ export function _wellContentsForLabware(
     {}
   )
 }
-
-export const getAllWellContentsForSteps: Selector<
-  Array<WellContentsByLabware>
-> = createSelector(
-  fileDataSelectors.getInitialRobotState,
-  fileDataSelectors.getRobotStateTimeline,
-  stepFormSelectors.getLabwareEntities,
-  (initialRobotState, robotStateTimeline, labwareEntities) => {
-    // Add initial robot state frame, offsetting the timeline.
-    // This is because liquids state for a step shows the
-    // robot state just BEFORE the given step has occurred
-    const timeline = [
-      { robotState: initialRobotState },
-      ...robotStateTimeline.timeline,
-    ]
-
-    return timeline.map((timelineStep, timelineIndex) => {
-      const liquidState = timelineStep.robotState.liquidState.labware
-      return mapValues(
-        liquidState,
-        (
-          labwareLiquids: StepGeneration.SingleLabwareLiquidState,
-          labwareId: string
-        ) =>
-          _wellContentsForLabware(
-            labwareLiquids,
-            labwareEntities[labwareId].def
-          )
-      )
-    })
-  }
-)
-
-export const getLastValidWellContents: Selector<WellContentsByLabware> = createSelector(
-  fileDataSelectors.lastValidRobotState,
-  stepFormSelectors.getLabwareEntities,
-  (robotState, labwareEntities) => {
-    return mapValues(
-      robotState.labware,
-      (
-        labwareLiquids: StepGeneration.SingleLabwareLiquidState,
-        labwareId: string
-      ) => {
-        return _wellContentsForLabware(
-          robotState.liquidState.labware[labwareId],
-          labwareEntities[labwareId].def
-        )
-      }
-    )
-  }
-)
 
 export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = createSelector(
   stepFormSelectors.getLabwareEntities,

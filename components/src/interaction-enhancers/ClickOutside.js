@@ -3,7 +3,9 @@ import * as React from 'react'
 
 export type ClickOutsideProps = {|
   onClickOutside: ?(MouseEvent) => mixed,
-  children: ({ ref: React.Ref<*> }) => React.Element<*>,
+  children: ({
+    ref: {| current: Element | null |} | ((current: Element | null) => mixed),
+  }) => React.Node,
 |}
 
 // TODO: BC: 2019-05-10 this would be much cleaner as a custom hook
@@ -22,11 +24,11 @@ export class ClickOutside extends React.Component<ClickOutsideProps> {
   componentWillUnmount() {
     document.removeEventListener('mousedown', this.handleClickOutside)
   }
-  setWrapperRef = (el: ?Element) => {
+  setWrapperRef: (el: ?Element) => void = el => {
     this.wrapperRef = el
   }
 
-  handleClickOutside = (event: MouseEvent) => {
+  handleClickOutside: (event: MouseEvent) => void = event => {
     const clickedElem = event.target
 
     if (!(clickedElem instanceof Node)) {
@@ -47,7 +49,7 @@ export class ClickOutside extends React.Component<ClickOutsideProps> {
     }
   }
 
-  render() {
+  render(): React.Node {
     return this.props.children({ ref: this.setWrapperRef })
   }
 }

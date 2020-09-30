@@ -13,6 +13,8 @@ export type ProtocolAnalyticsData = {|
   protocolName: string,
   protocolAuthor: string,
   protocolText: string,
+  pipettes: string,
+  modules: string,
 |}
 
 export type RobotAnalyticsData = {|
@@ -36,9 +38,9 @@ export type BuildrootAnalyticsData = {|
 export type AnalyticsEvent =
   | {|
       name: string,
-      properties: {},
-      superProperties?: {},
+      properties: { ... },
+      superProperties?: { ... },
     |}
-  | {| superProperties: {} |}
+  | {| superProperties: { ... } |}
 
-export type TrackEventArgs = [AnalyticsEvent, AnalyticsConfig]
+export type TrackEventArgs = [AnalyticsEvent | null, AnalyticsConfig | null]

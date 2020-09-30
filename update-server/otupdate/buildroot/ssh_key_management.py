@@ -133,9 +133,9 @@ async def add(request: web.Request) -> web.Response:
                   'message': f'Key starts with invalid algorithm {alg}'},
             status=400)
     if '\n' in pubkey[:-1]:
-        LOG.warning(f"Newlines in keyfile that shouldn't be there")
+        LOG.warning("Newlines in keyfile that shouldn't be there")
         return web.json_response(
-            data={'error': 'bad-key', 'message': f'Key has a newline'},
+            data={'error': 'bad-key', 'message': 'Key has a newline'},
             status=400)
 
     if '\n' == pubkey[-1]:
@@ -167,7 +167,7 @@ async def clear(request: web.Request) -> web.Response:
 
     return web.json_response(
         data={
-            'message': f'Keys cleared. '
+            'message': 'Keys cleared. '
             'Restart robot to take effect',
             'restart_url': '/server/restart'},
         status=200)

@@ -22,11 +22,12 @@ Expressing Versions
 You must specify the API version you are targeting at the top of your Python protocol. This is done in the ``metadata`` block, using the key ``'apiLevel'``:
 
 .. code-block:: python
+  :substitutions:
 
    from opentrons import protocol_api
 
    metadata = {
-       'apiLevel': '2.2',
+       'apiLevel': '|apiLevel|',
        'author': 'A. Biologist'}
 
    def run(protocol: protocol_api.ProtocolContext):
@@ -99,6 +100,16 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.3     |          3.17.0             |
 +-------------+-----------------------------+
+|     2.4     |          3.17.1             |
++-------------+-----------------------------+
+|     2.5     |          3.19.0             |
++-------------+-----------------------------+
+|     2.6     |          3.20.0             |
++-------------+-----------------------------+
+|     2.7     |          3.21.0             |
++-------------+-----------------------------+
+|     2.8     |          4.0.0              |
++-------------+-----------------------------+
 
 Changes in API Versions
 -----------------------
@@ -124,10 +135,57 @@ Version 2.2
 Version 2.3
 +++++++++++
 
-- GEN2 Magnetic Modules and GEN2 Temperature Modules are now supported; you can load them with the names ``"magnetic
+- Magnetic Modules GEN2 and Temperature Modules GEN2 are now supported; you can load them with the names ``"magnetic
   module gen2"`` and ``"temperature module gen2"``, respectively
 - All pipettes will return tips to tipracks from a higher position to avoid
   possible collisions
 - During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
   between every dispense and following aspirate
 - You can now access the temperature module's status via the ``status`` property of ```ModuleContext.TemperatureModuleContext```
+
+
+Version 2.4
++++++++++++
+
+- The following improvements were made to the `touch_tip` command:
+    - The speed for `touch_tip` can now be lowered down to 1 mm/s
+    - `touch_tip` no longer moves diagonally from the X direction -> Y direction
+    - Takes into account geometry of the deck and modules
+
+
+Version 2.5
++++++++++++
+
+- New :ref:`new-utility-commands` were added:
+    - :py:meth:`.ProtocolContext.set_rail_lights`: turns robot rail lights on or off
+    - :py:obj:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
+    - :py:obj:`.ProtocolContext.door_closed`: describes whether the robot door is closed
+
+
+Version 2.6
++++++++++++
+
+- GEN2 Single pipettes now default to flow rates equivalent to 10 mm/s plunger
+  speeds
+    - Protocols that manually configure pipette flow rates will be unaffected
+    - For a comparison between API Versions, see :ref:`defaults`
+
+
+Version 2.7
++++++++++++
+
+- You can now move both pipettes simultaneously on the robot! See :py:meth:`.InstrumentContext.pair_with` for
+  further information on how to use this new feature.
+
+  .. note::
+
+  This feature is still under development.
+
+- Calling :py:meth:`.InstrumentContext.has_tip` will return whether a particular instrument
+  has a tip attached or not.
+
+
+Version 2.8
++++++++++++
+- You can now pass in a list of volumes to distribute and consolidate. See :ref:`distribute-consolidate-volume-list` for more information.
+    - Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense

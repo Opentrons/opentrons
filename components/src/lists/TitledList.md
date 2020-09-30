@@ -1,7 +1,8 @@
 Basic usage:
 
 ```js
-<TitledList title="Titled List With Icon" iconName="flask-outline">
+import { ListItem } from '@opentrons/components'
+;<TitledList title="Titled List With Icon" iconName="flask-outline">
   <ListItem>Something 1</ListItem>
   <ListItem>Something 2</ListItem>
 </TitledList>
@@ -10,7 +11,8 @@ Basic usage:
 Using the onClick and selected props:
 
 ```js
-initialState = { selected: false }
+import { ListItem } from '@opentrons/components'
+const [state, setState] = React.useState({ selected: false })
 ;<TitledList
   title="Selectable Titled List"
   onClick={() => setState({ selected: !state.selected })}
@@ -24,7 +26,8 @@ initialState = { selected: false }
 If `onCollapseToggle` prop is given a function, the TitledList will be collapsible, dictated by the `collapsed` prop. `onCollapseToggle` will only fire on caret clicks, not title clicks:
 
 ```js
-initialState = { selected: false, collapsed: false }
+import { ListItem } from '@opentrons/components'
+const [state, setState] = React.useState({ selected: false, collapsed: false })
 ;<TitledList
   title="Collapsible Titled List"
   onClick={() => setState({ selected: !state.selected })}
@@ -39,8 +42,11 @@ initialState = { selected: false, collapsed: false }
 
 The entire TitledList may be disabled with the `disabled` prop. The `selected` prop will be ignored while the `collapsed` prop will be respected. `onClick` and `onCollapseToggle` will not fire:
 
+import { ListItem } from '@opentrons/components'
+
 ```js
-<TitledList
+import { ListItem } from '@opentrons/components'
+;<TitledList
   title="Disabled Titled List"
   onClick={() => alert("this won't happen")}
   onCollapseToggle={() => alert("this won't happen")}

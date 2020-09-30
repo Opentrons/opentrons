@@ -33,7 +33,7 @@ const PANEL_BY_CALIBRATION: {
   done: ContinuePanel,
 }
 
-export function TipProbe(props: TipProbeProps) {
+export function TipProbe(props: TipProbeProps): React.Node {
   const { mount, probed } = props
   const dispatch = useDispatch<Dispatch>()
   const [probeState, setProbeState] = React.useState<TipProbeState>('unprobed')

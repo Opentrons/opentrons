@@ -12,7 +12,9 @@ import { PipetteListItem } from './PipetteListItem'
 // TODO(mc, 2019-12-10): i18n
 const PIPETTE_CALIBRATION = 'Pipette Calibration'
 
-export const PipetteList = withRouter(PipetteListComponent)
+export const PipetteList: React.AbstractComponent<{||}> = withRouter(
+  PipetteListComponent
+)
 
 function PipetteListComponent() {
   const pipettes = useSelector(robotSelectors.getPipettes)

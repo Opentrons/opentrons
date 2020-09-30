@@ -19,7 +19,7 @@ export type LabelTextProps = {|
 /**
  * LabelText - all-caps text, usually used to label a <Value> or <Table>
  */
-export function LabelText(props: LabelTextProps) {
+export function LabelText(props: LabelTextProps): React.Node {
   const { children } = props
   const position = props.position || LABEL_TOP
   const classes = cx(

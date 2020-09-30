@@ -10,6 +10,7 @@
   "edit": "edit",
   "new_liquid": "New Liquid",
   "no": "no",
+  "notes": "notes",
   "ok": "ok",
   "reset": "reset",
   "restore": "restore",
@@ -18,5 +19,6 @@
   "swap": "swap",
   "yes": "yes",
   "upload_custom_labware": "Upload custom labware",
+  "upload_custom_tip_rack": "Upload custom tip rack",
   "got_it": "Got It!"
 }

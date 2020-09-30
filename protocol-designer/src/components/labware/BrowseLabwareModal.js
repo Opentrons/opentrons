@@ -81,7 +81,14 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return { drillUp: () => dispatch(labwareIngredsActions.drillUpFromLabware()) }
 }
 
-export const BrowseLabwareModal = connect<Props, {||}, SP, DP, _, _>(
+export const BrowseLabwareModal: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(BrowseLabwareModalComponent)

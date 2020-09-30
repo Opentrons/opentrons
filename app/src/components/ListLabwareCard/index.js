@@ -17,7 +17,7 @@ const LABWARE_REFRESH_INTERVAL_MS = 5000
 // TODO(mc, 2019-11-21): i18n
 const CUSTOM_LABWARE_LIST = 'Custom Labware List'
 
-export function ListLabwareCard() {
+export function ListLabwareCard(): React.Node {
   const dispatch = useDispatch<Dispatch>()
   const labware = useSelector(getCustomLabware)
   const listLabwareError = useSelector(getListLabwareErrorMessage)

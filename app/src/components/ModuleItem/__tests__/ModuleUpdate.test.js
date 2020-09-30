@@ -26,51 +26,6 @@ describe('ModuleUpdate', () => {
     jest.resetAllMocks()
   })
 
-  // TODO(mc, 2020-03-16): these shallow snapshots don't test anything
-  // remove commented out tests when actual tests have been written
-  // it('component renders', () => {
-  //   const treeAvailableCanControl = shallow(
-  //     <Provider store={store}>
-  //       <ModuleUpdate
-  //         controlDisabledReason={null}
-  //         moduleId="FAKEMODULE1234"
-  //         hasAvailableUpdate={true}
-  //       />
-  //     </Provider>,
-  //   )
-  //   const treeAvailableNoControl = shallow(
-  //     <Provider store={store}>
-  //       <ModuleUpdate
-  //         controlDisabledReason={"Can't touch this"}
-  //         moduleId="FAKEMODULE1234"
-  //         hasAvailableUpdate={true}
-  //       />
-  //     </Provider>
-  //   )
-  //   const treeNotAvailableCanControl = shallow(
-  //     <Provider store={store}>
-  //       <ModuleUpdate
-  //         controlDisabledReason={null}
-  //         moduleId="FAKEMODULE1234"
-  //         hasAvailableUpdate={false}
-  //       />
-  //     </Provider>
-  //   )
-  //   const treeNotAvailableNoControl = shallow(
-  //     <Provider store={store}>
-  //       <ModuleUpdate
-  //         controlDisabledReason={"Can't touch this"}
-  //         moduleId="FAKEMODULE1234"
-  //         hasAvailableUpdate={false}
-  //       />
-  //     </Provider>
-  //   )
-  //   expect(treeAvailableCanControl).toMatchSnapshot()
-  //   expect(treeNotAvailableCanControl).toMatchSnapshot()
-  //   expect(treeAvailableNoControl).toMatchSnapshot()
-  //   expect(treeNotAvailableNoControl).toMatchSnapshot()
-  // })
-
   it('displays a Warning for invalid files', () => {
     const SPECS = [
       {
@@ -110,4 +65,9 @@ describe('ModuleUpdate', () => {
       }
     )
   })
+
+  it.todo('is available and can control')
+  it.todo('is available and cannot control')
+  it.todo('is not available and can control')
+  it.todo('is not available and cannot control')
 })

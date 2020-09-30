@@ -12,7 +12,7 @@ type Props = {
 }
 
 /** Light wrapper around li for PD-specific styles */
-export function PDListItem(props: Props) {
+export function PDListItem(props: Props): React.Node {
   const { className, border, hoverable, ...passThruProps } = props
   const _className = cx(
     {

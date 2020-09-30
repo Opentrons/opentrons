@@ -3,13 +3,14 @@ import * as React from 'react'
 import cx from 'classnames'
 import omit from 'lodash/omit'
 
-import type { HoverTooltipHandlers } from '../tooltips'
 import { Icon, type IconName } from '../icons'
 import styles from './buttons.css'
 
-export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
-export const BUTTON_TYPE_RESET: 'reset' = 'reset'
-export const BUTTON_TYPE_BUTTON: 'button' = 'button'
+import {
+  BUTTON_TYPE_SUBMIT,
+  BUTTON_TYPE_RESET,
+  BUTTON_TYPE_BUTTON,
+} from '../primitives'
 
 export type ButtonProps = {
   /** click handler */
@@ -40,9 +41,18 @@ export type ButtonProps = {
   /** custom element or component to use instead of `<button>` */
   Component?: string | React.AbstractComponent<any>,
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  hoverTooltipHandlers?: ?$Shape<{
+    ref: (Element | null) => mixed,
+    'aria-describedby': string,
+    onMouseEnter: () => mixed,
+    onMouseLeave: () => mixed,
+    onPointerEnter: () => mixed,
+    onPointerLeave: () => mixed,
+    ...
+  }>,
   /** html tabindex property */
   tabIndex?: number,
+  ...
 }
 
 // props to strip if using a custom component
@@ -63,7 +73,7 @@ const STRIP_PROPS = [
  * import {type ButtonProps} from '@opentrons/components'
  * ```
  */
-export function Button(props: ButtonProps) {
+export function Button(props: ButtonProps): React.Node {
   const { name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
   const onClick = !disabled ? props.onClick : undefined

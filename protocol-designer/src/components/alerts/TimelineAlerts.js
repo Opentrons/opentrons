@@ -7,16 +7,16 @@ import { ErrorContents } from './ErrorContents'
 import { WarningContents } from './WarningContents'
 import { actions as dismissActions } from '../../dismiss'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
-import { getSelectedStepId } from '../../ui/steps'
+import { getSelectedItem } from '../../ui/steps/selectors'
 import { selectors as fileDataSelectors } from '../../file-data'
-import type { BaseState } from '../../types'
-import type { StepIdType } from '../../form-types'
 import { Alerts, type Props } from './Alerts'
+import type { CommandCreatorError } from '../../step-generation/types'
+import type { BaseState } from '../../types'
 
 type SP = {|
   errors: $PropertyType<Props, 'errors'>,
   warnings: $PropertyType<Props, 'warnings'>,
-  _stepId: ?StepIdType,
+  _stepId: string,
 |}
 
 /** Errors and Warnings from step-generation are written for developers
@@ -30,10 +30,12 @@ type SP = {|
 
 function mapStateToProps(state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
-  const errors = (timeline.errors || []).map(error => ({
-    title: i18n.t(`alert.timeline.error.${error.type}.title`),
-    description: <ErrorContents level="timeline" errorType={error.type} />,
-  }))
+  const errors = (timeline.errors || []: Array<CommandCreatorError>).map(
+    error => ({
+      title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
+      description: <ErrorContents level="timeline" errorType={error.type} />,
+    })
+  )
   const warnings = timelineWarningSelectors
     .getTimelineWarningsForSelectedStep(state)
     .map(warning => ({
@@ -43,7 +45,7 @@ function mapStateToProps(state: BaseState): SP {
       ),
       dismissId: warning.type,
     }))
-  const _stepId = getSelectedStepId(state)
+  const _stepId = getSelectedItem(state)?.id
 
   return {
     errors,
@@ -57,20 +59,28 @@ function mergeProps(
   dispatchProps: { dispatch: Dispatch<*> }
 ): Props {
   const { dispatch } = dispatchProps
+  const stepId = stateProps._stepId
   return {
     ...stateProps,
     dismissWarning: (dismissId: string) => {
       dispatch(
         dismissActions.dismissTimelineWarning({
           type: dismissId,
-          stepId: stateProps._stepId,
+          stepId,
         })
       )
     },
   }
 }
 
-export const TimelineAlerts = connect<Props, {||}, SP, {||}, _, _>(
+export const TimelineAlerts: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

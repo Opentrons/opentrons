@@ -48,9 +48,8 @@ class Poller(Thread):
         while not self._stop_event.wait(TEMP_POLL_INTERVAL_SECS):
             self._driver_ref.update_temperature()
 
-    def join(self):
+    def stop(self):
         self._stop_event.set()
-        super().join()
 
 
 class TempDeck(mod_abc.AbstractModule):
@@ -128,9 +127,9 @@ class TempDeck(mod_abc.AbstractModule):
         to the nearest limit
         """
         await self.wait_for_is_running()
-        return await self.make_cancellable(
-            self._loop.create_task(self._driver.set_temperature(celsius))
-        )
+        task = self._loop.create_task(self._driver.set_temperature(celsius))
+        await self.make_cancellable(task)
+        return await task
 
     async def start_set_temperature(self, celsius):
         """
@@ -156,11 +155,11 @@ class TempDeck(mod_abc.AbstractModule):
 
             if status == 'heating':
                 while self.temperature < awaiting_temperature:
-                    asyncio.sleep(0.2)
+                    await asyncio.sleep(0.2)
 
             elif status == 'cooling':
                 while self.temperature > awaiting_temperature:
-                    asyncio.sleep(0.2)
+                    await asyncio.sleep(0.2)
 
         t = self._loop.create_task(_await_temperature(awaiting_temperature))
         await self.make_cancellable(t)
@@ -223,6 +222,7 @@ class TempDeck(mod_abc.AbstractModule):
         TempDecks
         """
         if self._poller:
+            self._poller.stop()
             self._poller.join()
         if not self._driver.is_connected():
             self._driver.connect(self._port)
@@ -232,7 +232,7 @@ class TempDeck(mod_abc.AbstractModule):
 
     def __del__(self):
         if hasattr(self, '_poller') and self._poller:
-            self._poller.join()
+            self._poller.stop()
 
     async def prep_for_update(self) -> str:
         model = self._device_info and self._device_info.get('model')
@@ -241,6 +241,7 @@ class TempDeck(mod_abc.AbstractModule):
                                     "Please contact Opentrons Support.")
 
         if self._poller:
+            self._poller.stop()
             self._poller.join()
         del self._poller
         self._poller = None

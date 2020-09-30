@@ -1,72 +1,64 @@
 // @flow
-import type { RobotApiRequestMeta } from '../robot-api/types'
+
+import type {
+  RobotApiRequestMeta,
+  RobotApiErrorResponse,
+} from '../robot-api/types'
+
+import type {
+  CalibrationStatus,
+  AllLabwareCalibrations,
+  AllPipetteOffsetCalibrations,
+} from './api-types'
+
+import type { LabwareCalibrationAction } from './labware/types'
+import type { PipetteOffsetCalibrationsAction } from './pipette-offset/types'
+
 import typeof {
-  CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
-  CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
-  CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
-  DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
-  DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
-  DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
-  COMPLETE_ROBOT_CALIBRATION_CHECK,
+  FETCH_CALIBRATION_STATUS,
+  FETCH_CALIBRATION_STATUS_SUCCESS,
+  FETCH_CALIBRATION_STATUS_FAILURE,
 } from './constants'
-import type { RobotCalibrationCheckSessionData } from './api-types'
 
-export type CreateRobotCalibrationCheckSessionAction = {|
-  type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
+export type * from './api-types'
+export type * from './labware/types'
+export type * from './pipette-offset/types'
+
+export type FetchCalibrationStatusAction = {|
+  type: FETCH_CALIBRATION_STATUS,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
-export type CreateRobotCalibrationCheckSessionSuccessAction = {|
-  type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
-  payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
+export type FetchCalibrationStatusSuccessAction = {|
+  type: FETCH_CALIBRATION_STATUS_SUCCESS,
+  payload: {|
+    robotName: string,
+    calibrationStatus: CalibrationStatus,
+  |},
   meta: RobotApiRequestMeta,
 |}
 
-export type CreateRobotCalibrationCheckSessionFailureAction = {|
-  type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
-  payload: {| robotName: string, error: {} |},
+export type FetchCalibrationStatusFailureAction = {|
+  type: FETCH_CALIBRATION_STATUS_FAILURE,
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
   meta: RobotApiRequestMeta,
-|}
-
-export type DeleteRobotCalibrationCheckSessionAction = {|
-  type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
-  payload: {| robotName: string, recreate: boolean |},
-  meta: RobotApiRequestMeta,
-|}
-
-export type DeleteRobotCalibrationCheckSessionSuccessAction = {|
-  type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
-  payload: {| robotName: string |},
-  meta: RobotApiRequestMeta,
-|}
-
-export type DeleteRobotCalibrationCheckSessionFailureAction = {|
-  type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
-  payload: {| robotName: string, error: {} |},
-  meta: RobotApiRequestMeta,
-|}
-
-export type CompleteRobotCalibrationCheckAction = {|
-  type: COMPLETE_ROBOT_CALIBRATION_CHECK,
-  payload: {| robotName: string |},
 |}
 
 export type CalibrationAction =
-  | CreateRobotCalibrationCheckSessionAction
-  | CreateRobotCalibrationCheckSessionSuccessAction
-  | CreateRobotCalibrationCheckSessionFailureAction
-  | DeleteRobotCalibrationCheckSessionAction
-  | DeleteRobotCalibrationCheckSessionSuccessAction
-  | DeleteRobotCalibrationCheckSessionFailureAction
-  | CompleteRobotCalibrationCheckAction
+  | FetchCalibrationStatusAction
+  | FetchCalibrationStatusSuccessAction
+  | FetchCalibrationStatusFailureAction
+  | LabwareCalibrationAction
+  | PipetteOffsetCalibrationsAction
 
 export type PerRobotCalibrationState = $ReadOnly<{|
-  robotCalibrationCheck: RobotCalibrationCheckSessionData | null,
+  calibrationStatus: CalibrationStatus | null,
+  labwareCalibrations: AllLabwareCalibrations | null,
+  pipetteOffsetCalibrations: AllPipetteOffsetCalibrations | null,
 |}>
 
-export type CalibrationState = $Shape<
-  $ReadOnly<{|
-    [robotName: string]: void | PerRobotCalibrationState,
-  |}>
->
+export type CalibrationState = $ReadOnly<{
+  [robotName: string]: PerRobotCalibrationState,
+  ...,
+}>

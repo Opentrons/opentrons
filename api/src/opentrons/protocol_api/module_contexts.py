@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Any, Dict, Generic, List, Optional, TYPE_CHECKING, TypeVar
+from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar
 
 from opentrons import types, commands as cmds
 from opentrons.hardware_control import modules
@@ -10,12 +10,14 @@ from opentrons.protocols.types import APIVersion
 
 from .labware import (
     Labware, load, load_from_definition)
-from .module_geometry import ModuleGeometry, ThermocyclerGeometry
-from . import geometry
-from .util import requires_version
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry,\
+    ThermocyclerGeometry
+from opentrons.protocols.geometry import planning
+from opentrons.protocols.api_support.util import requires_version
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
+    from opentrons_shared_data.labware.dev_types import (LabwareDefinition)
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
 STANDARD_MAGDECK_LABWARE = [
@@ -83,17 +85,17 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
 
         :param name: The name of the labware object.
         :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons app.
-        .. versionadded:: 2.1
+            specified, this is the name the labware will appear as in the run
+            log and the calibration view in the Opentrons app.
         :param str namespace: The namespace the labware definition belongs to.
             If unspecified, will search 'opentrons' then 'custom_beta'
-        .. versionadded:: 2.1
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
-        .. versionadded:: 2.1
+
         :returns: The initialized and loaded labware object.
+
+        .. versionadded:: 2.1
+            The *label,* *namespace,* and *version* parameters.
         """
         if self.api_version < APIVersion(2, 1) and\
                 (label or namespace or version):
@@ -109,7 +111,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
     @requires_version(2, 0)
     def load_labware_from_definition(
             self,
-            definition: Dict[str, Any],
+            definition: 'LabwareDefinition',
             label: str = None) -> Labware:
         """
         Specify the presence of a labware on the module, using an
@@ -332,15 +334,19 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
         :param height_from_base: The height to raise the magnets to, in mm from
                                  the base of the labware
-        .. versionadded:: 2.1
         :param height: The height to raise the magnets to, in mm from home.
         :param offset: An offset relative to the default height for the labware
                        in mm
+
+        .. versionadded:: 2.1
+            The *height_from_base* parameter.
         """
-        if height:
+        if height is not None:
             dist = height
-        elif height_from_base and self._ctx._api_version >= APIVersion(2, 2):
-            dist = height_from_base + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM
+        elif height_from_base is not None and\
+                self._ctx._api_version >= APIVersion(2, 2):
+            dist = height_from_base +\
+                modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
         elif self.labware and self.labware.magdeck_engage_height is not None:
             dist = self._determine_lw_engage_height()
             if offset:
@@ -430,8 +436,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def flag_unsafe_move(self,
                          to_loc: types.Location,
                          from_loc: types.Location):
-        to_lw, to_well = geometry.split_loc_labware(to_loc)
-        from_lw, from_well = geometry.split_loc_labware(from_loc)
+        to_lw, to_well = planning.split_loc_labware(to_loc)
+        from_lw, from_well = planning.split_loc_labware(from_loc)
         if self.labware is not None and \
                 (self.labware is to_lw or self.labware is from_lw) and \
                 self.lid_position != 'open':
@@ -484,6 +490,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         :param block_max_volume: The maximum volume of any individual well
                                  of the loaded labware. If not supplied,
                                  the thermocycler will default to 25µL/well.
+
         .. note:
 
             If ``hold_time_minutes`` and ``hold_time_seconds`` are not

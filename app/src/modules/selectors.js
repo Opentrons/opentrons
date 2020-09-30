@@ -84,7 +84,10 @@ export const getMissingModules: (
 // selector to return a reason for module control being disabled if they
 // should be disabled. Omit `robotName` arg to refer to currently connected
 // RPC robot
-export const getModuleControlsDisabled = (state: State, robotName?: string) => {
+export const getModuleControlsDisabled = (
+  state: State,
+  robotName?: string
+): null | string => {
   const connectedRobotName = RobotSelectors.getConnectedRobotName(state)
   const protocolIsRunning = RobotSelectors.getIsRunning(state)
 

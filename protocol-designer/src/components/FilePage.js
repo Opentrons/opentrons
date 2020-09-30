@@ -13,14 +13,14 @@ import {
 } from '@opentrons/components'
 import cx from 'classnames'
 import { i18n } from '../localization'
+import { resetScrollElements } from '../ui/steps/utils'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditPipettesModal } from './modals/EditPipettesModal'
-import { EditModulesModal } from './modals/EditModulesModal'
 import { EditModulesCard } from './modules'
+import { EditModules } from './EditModules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
-
 import type { FormikProps } from 'formik/@flow-typed'
 import type { ModuleRealType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
@@ -32,17 +32,15 @@ export type Props = {|
   goToNextPage: () => mixed,
   saveFileMetadata: FileMetadataFields => mixed,
   swapPipettes: () => mixed,
-  thermocyclerEnabled: ?boolean,
   modules: ModulesForEditModulesCard,
 |}
 
 type State = {|
   isEditPipetteModalOpen: boolean,
-  isEditModulesModalOpen: boolean,
-  currentModule: {|
-    moduleType: ?ModuleRealType,
+  moduleToEdit: {|
+    moduleType: ModuleRealType,
     moduleId: ?string,
-  |},
+  |} | null,
 |}
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
@@ -51,45 +49,36 @@ const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 
 // TODO: Ian 2019-03-15 use i18n for labels
 export class FilePage extends React.Component<Props, State> {
-  state = {
+  state: State = {
     isEditPipetteModalOpen: false,
-    isEditModulesModalOpen: false,
-    currentModule: {
-      moduleType: null,
-      moduleId: null,
-    },
+    moduleToEdit: null,
   }
 
-  // TODO (ka 2019-10-28): This is a workaround, see #4446
-  // but it solves the modal positioning problem caused by main page wrapper
-  // being positioned absolute until we can figure out something better
-  scrollToTop = () => {
-    const editPage = document.getElementById('main-page')
-    if (editPage) editPage.scrollTop = 0
-  }
-
-  openEditPipetteModal = () => {
-    this.scrollToTop()
+  openEditPipetteModal: () => void = () => {
+    resetScrollElements()
     this.setState({ isEditPipetteModalOpen: true })
   }
-  closeEditPipetteModal = () => this.setState({ isEditPipetteModalOpen: false })
 
-  handleEditModule = (moduleType: ModuleRealType, moduleId?: string) => {
-    this.scrollToTop()
+  closeEditPipetteModal: () => void = () =>
+    this.setState({ isEditPipetteModalOpen: false })
+
+  handleEditModule: (moduleType: ModuleRealType, moduleId?: string) => void = (
+    moduleType,
+    moduleId
+  ) => {
+    resetScrollElements()
     this.setState({
-      isEditModulesModalOpen: true,
-      currentModule: { moduleType: moduleType, moduleId: moduleId },
+      moduleToEdit: { moduleType: moduleType, moduleId: moduleId },
     })
   }
 
-  closeEditModulesModal = () => {
+  closeEditModulesModal: () => void = () => {
     this.setState({
-      isEditModulesModalOpen: false,
-      currentModule: { moduleType: null, moduleId: null },
+      moduleToEdit: null,
     })
   }
 
-  render() {
+  render(): React.Node {
     const {
       formValues,
       instruments,
@@ -192,6 +181,7 @@ export class FilePage extends React.Component<Props, State> {
               <PrimaryButton
                 onClick={this.openEditPipetteModal}
                 className={styles.edit_button}
+                name={'editPipettes'}
               >
                 {i18n.t('button.edit')}
               </PrimaryButton>
@@ -199,6 +189,7 @@ export class FilePage extends React.Component<Props, State> {
                 onClick={swapPipettes}
                 className={styles.swap_button}
                 iconName="swap-horizontal"
+                name={'swapPipettes'}
               >
                 {i18n.t('button.swap')}
               </OutlineButton>
@@ -208,7 +199,6 @@ export class FilePage extends React.Component<Props, State> {
 
         <EditModulesCard
           modules={modules}
-          thermocyclerEnabled={this.props.thermocyclerEnabled}
           openEditModuleModal={this.handleEditModule}
         />
 
@@ -217,6 +207,7 @@ export class FilePage extends React.Component<Props, State> {
             onClick={goToNextPage}
             className={styles.continue_button}
             iconName="arrow-right"
+            name={'continueToLiquids'}
           >
             {i18n.t('button.continue_to_liquids')}
           </PrimaryButton>
@@ -226,15 +217,12 @@ export class FilePage extends React.Component<Props, State> {
           {this.state.isEditPipetteModalOpen && (
             <EditPipettesModal closeModal={this.closeEditPipetteModal} />
           )}
-
-          {this.state.isEditModulesModalOpen &&
-            this.state.currentModule.moduleType && (
-              <EditModulesModal
-                moduleType={this.state.currentModule.moduleType}
-                moduleId={this.state.currentModule.moduleId}
-                onCloseClick={this.closeEditModulesModal}
-              />
-            )}
+          {this.state.moduleToEdit && (
+            <EditModules
+              moduleToEdit={this.state.moduleToEdit}
+              onCloseClick={this.closeEditModulesModal}
+            />
+          )}
         </Portal>
       </div>
     )

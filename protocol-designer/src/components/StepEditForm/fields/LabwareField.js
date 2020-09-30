@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
@@ -21,6 +22,11 @@ const mapSTP = (state: BaseState): SP => ({
   options: uiLabwareSelectors.getLabwareOptions(state),
 })
 
-export const LabwareField = connect<StepFormDropdownProps, OP, SP, _, _, _>(
-  mapSTP
-)(StepFormDropdown)
+export const LabwareField: React.AbstractComponent<OP> = connect<
+  StepFormDropdownProps,
+  OP,
+  SP,
+  _,
+  _,
+  _
+>(mapSTP)(StepFormDropdown)

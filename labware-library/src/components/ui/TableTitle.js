@@ -14,7 +14,7 @@ type TableTitleProps = {|
   diagram?: React.Node,
 |}
 
-export function TableTitle(props: TableTitleProps) {
+export function TableTitle(props: TableTitleProps): React.Node {
   const [guideVisible, setGuideVisible] = React.useState<boolean>(false)
   const toggleGuide = () => setGuideVisible(!guideVisible)
   const { label, diagram } = props

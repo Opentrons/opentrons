@@ -1,43 +1,83 @@
-Basic usage:
+Basic usage with the `useTooltip` hook:
 
 ```js
-<Tooltip open={true} tooltipComponent={<div>Something Explanatory!</div>}>
-  {props => <span ref={props.ref}>Look at my tooltip!</span>}
-</Tooltip>
+import { useTooltip } from '@opentrons/components'
+const [targetProps, tooltipProps] = useTooltip()
+
+;<>
+  <span {...targetProps}>Target!</span>
+  <Tooltip visible={true} {...tooltipProps}>
+    Something Explanatory!
+  </Tooltip>
+</>
 ```
 
-Component is controlled by the `open` prop:
+Getting a little fancier and overriding the placement:
 
 ```js
-<Tooltip open={false} tooltipComponent={<div>Something Explanatory!</div>}>
-  {props => <span ref={props.ref}>My tooltip is closed!</span>}
-</Tooltip>
+import {
+  useTooltip,
+  TOOLTIP_TOP,
+  TOOLTIP_RIGHT,
+  TOOLTIP_BOTTOM,
+  TOOLTIP_LEFT,
+} from '@opentrons/components'
+
+const [placement, setPlacement] = React.useState(TOOLTIP_RIGHT)
+const [targetProps, tooltipProps] = useTooltip({ placement })
+
+;<>
+  <span {...targetProps}>Target!</span>
+  <Tooltip visible={true} {...tooltipProps}>
+    Something Explanatory!
+  </Tooltip>
+  <div style={{ float: 'left', marginRight: '8rem' }}>
+    {[TOOLTIP_TOP, TOOLTIP_RIGHT, TOOLTIP_BOTTOM, TOOLTIP_LEFT].map(p => (
+      <label style={{ display: 'block' }}>
+        <input
+          type="radio"
+          name="place"
+          value={p}
+          onChange={() => setPlacement(p)}
+          checked={placement === p}
+        />
+        {p}
+      </label>
+    ))}
+  </div>
+</>
 ```
 
-Specify Placement:
+Basic usage with the `useHoverTooltip` hook:
 
 ```js
-<Tooltip
-  open={true}
-  placement="right"
-  tooltipComponent={<div>Something Explanatory, but over here this time!</div>}
->
-  {props => <span ref={props.ref}>Look at my tooltip!</span>}
-</Tooltip>
+import { useHoverTooltip } from '@opentrons/components'
+const [targetProps, tooltipProps] = useHoverTooltip()
+
+;<>
+  <span {...targetProps}>Hover me!</span>
+  <Tooltip {...tooltipProps}>Something Explanatory!</Tooltip>
+</>
 ```
 
-Specify Placement (with override):
+`useHoverTooltip` can take `useTooltip` and `useHover` options:
 
 ```js
-<Tooltip
-  open={true}
-  placement="left"
-  tooltipComponent={
-    <div>
-      Something explanatory that cannot go left so it defaults to right!
-    </div>
-  }
->
-  {props => <span ref={props.ref}>Look at my tooltip!</span>}
-</Tooltip>
+import {
+  useHoverTooltip,
+  TOOLTIP_RIGHT,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
+
+const [targetProps, tooltipProps] = useHoverTooltip({
+  placement: TOOLTIP_RIGHT,
+  strategy: TOOLTIP_FIXED,
+  enterDelay: 2000,
+  leaveDelay: 1000,
+})
+
+;<>
+  <span {...targetProps}>Hover me!</span>
+  <Tooltip {...tooltipProps}>Something Explanatory!</Tooltip>
+</>
 ```

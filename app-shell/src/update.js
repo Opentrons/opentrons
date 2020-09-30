@@ -1,9 +1,8 @@
 // @flow
 // app updater
-import path from 'path'
-import fs from 'fs'
 import { autoUpdater as updater } from 'electron-updater'
 
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import { createLogger } from './log'
 import { getConfig } from './config'
 
@@ -14,15 +13,11 @@ updater.logger = createLogger('update')
 updater.autoDownload = false
 
 export const CURRENT_VERSION: string = updater.currentVersion.version
-export const CURRENT_RELEASE_NOTES: string = fs.readFileSync(
-  // NOTE: __dirname refers to output directory
-  path.join(__dirname, '../build/release-notes.md'),
-  'utf8'
-)
 
-export function registerUpdate(dispatch: Dispatch) {
+export function registerUpdate(dispatch: Dispatch): Action => mixed {
   return function handleAction(action: Action) {
     switch (action.type) {
+      case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
         return checkUpdate(dispatch)
 
@@ -47,7 +42,7 @@ function checkUpdate(dispatch: Dispatch) {
   updater.channel = getConfig('update.channel')
   updater.checkForUpdates()
 
-  function done(payload: *) {
+  function done(payload) {
     updater.removeListener('update-available', onAvailable)
     updater.removeListener('update-not-available', onNotAvailable)
     updater.removeListener('error', onError)
@@ -63,7 +58,7 @@ function downloadUpdate(dispatch: Dispatch) {
   updater.once('error', onError)
   updater.downloadUpdate()
 
-  function done(payload: *) {
+  function done(payload) {
     updater.removeListener('update-downloaded', onDownloaded)
     updater.removeListener('error', onError)
     dispatch({ type: 'shell:DOWNLOAD_UPDATE_RESULT', payload })

@@ -65,7 +65,7 @@
     },
 
     "slot": {
-      "description": "Slot on the deck of an OT-2 robot if 1-12. Else, a module ID",
+      "description": "string '1'-'12', or special string 'span7_8_10_11' signify it's a slot on the OT-2 deck. If it's a UUID, it's the slot on the module referenced by that ID.",
       "type": "string"
     }
   },
@@ -473,7 +473,7 @@
           },
 
           {
-            "description": "Themocycler set target block temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "description": "Thermocycler set target block temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
@@ -494,7 +494,7 @@
           },
 
           {
-            "description": "Themocycler set target lid temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "description": "Thermocycler set target lid temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
@@ -512,7 +512,7 @@
           },
 
           {
-            "description": "Themocycler await block temperature command. Delay further protocol execution until the specified temperature is reached.",
+            "description": "Thermocycler await block temperature command. Delay further protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
@@ -530,7 +530,7 @@
           },
 
           {
-            "description": "Themocycler await lid temperature command. Delay further protocol execution until the specified temperature is reached.",
+            "description": "Thermocycler await lid temperature command. Delay further protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,

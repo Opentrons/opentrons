@@ -1,7 +1,7 @@
 // robot selectors test
 import { format } from 'date-fns'
 import { setIn } from '@thi.ng/paths'
-import { NAME, selectors, constants } from '../'
+import { selectors, constants } from '../'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
@@ -9,7 +9,7 @@ import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 jest.mock('../../protocol/selectors')
 jest.mock('../../custom-labware/selectors')
 
-const makeState = state => ({ [NAME]: state })
+const makeState = robotState => ({ robot: robotState })
 
 const {
   getConnectedRobotName,
@@ -216,7 +216,7 @@ describe('robot selectors', () => {
 
   it('getRunTime with no startTime', () => {
     const state = {
-      [NAME]: {
+      robot: {
         session: {
           startTime: null,
           runTime: 42,
@@ -229,7 +229,7 @@ describe('robot selectors', () => {
 
   it('getRunTime with no remoteTimeCompensation', () => {
     const state = {
-      [NAME]: {
+      robot: {
         session: {
           remoteTimeCompensation: null,
           startTime: 40,
@@ -244,7 +244,7 @@ describe('robot selectors', () => {
   it('getRunTime', () => {
     const testGetRunTime = (seconds, expected) => {
       const stateWithRunTime = {
-        [NAME]: {
+        robot: {
           session: {
             remoteTimeCompensation: 0,
             startTime: 42,
@@ -718,12 +718,12 @@ describe('robot selectors', () => {
       })
 
       const nextState = {
-        [NAME]: {
-          ...state[NAME],
+        robot: {
+          ...state.robot,
           calibration: {
-            ...state[NAME].calibration,
+            ...state.robot.calibration,
             confirmedBySlot: {
-              ...state[NAME].calibration.confirmedBySlot,
+              ...state.robot.calibration.confirmedBySlot,
               1: true,
               2: true,
             },
@@ -742,7 +742,7 @@ describe('robot selectors', () => {
       })
     })
 
-    it('getTipracksByMount', () => {
+    it('returns tipracks by calibratorMount with getTipracksByMount', () => {
       expect(getTipracksByMount(state)).toEqual({
         left: {
           slot: '2',
@@ -760,6 +760,65 @@ describe('robot selectors', () => {
           isTiprack: true,
           isMoving: true,
           calibration: 'moving-to-slot',
+          confirmed: false,
+          calibratorMount: 'right',
+          definition: null,
+        },
+      })
+    })
+
+    it('uses tiprack lists from pipettes in getTipracksByMount if no calibratorMount', () => {
+      state = makeState({
+        session: {
+          labwareBySlot: {
+            1: {
+              _id: 1,
+              slot: '1',
+              type: 's',
+              isTiprack: true,
+              calibratorMount: 'right',
+            },
+            2: {
+              _id: 2,
+              slot: '2',
+              type: 'm',
+              isTiprack: true,
+              calibratorMount: 'right',
+            },
+          },
+          pipettesByMount: {
+            left: { name: 'p200', mount: 'left', tipRacks: [2] },
+            right: { name: 'p50', mount: 'right', tipRacks: [1, 2] },
+          },
+        },
+        calibration: {
+          labwareBySlot: {},
+          confirmedBySlot: {},
+          calibrationRequest: { type: '', inProgress: false, error: null },
+          probedByMount: {},
+          tipOnByMount: {},
+        },
+      })
+
+      expect(getTipracksByMount(state)).toEqual({
+        left: {
+          _id: 2,
+          slot: '2',
+          type: 'm',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
+          confirmed: false,
+          calibratorMount: 'right',
+          definition: null,
+        },
+        right: {
+          _id: 1,
+          slot: '1',
+          type: 's',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
           confirmed: false,
           calibratorMount: 'right',
           definition: null,

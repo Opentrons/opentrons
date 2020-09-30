@@ -23,7 +23,7 @@ const MIXPANEL_OPTS = {
 
 export function initializeMixpanel(config: AnalyticsConfig) {
   if (MIXPANEL_ID) {
-    log.debug('Initializing Mixpanel')
+    log.debug('Initializing Mixpanel', { config })
 
     mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
     setMixpanelTracking(config)

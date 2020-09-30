@@ -25,7 +25,10 @@ export type LabwareUploadMessage =
       errorText?: string,
     |}
   | {|
-      messageType: 'EXACT_LABWARE_MATCH' | 'USES_STANDARD_NAMESPACE',
+      messageType:
+        | 'EXACT_LABWARE_MATCH'
+        | 'USES_STANDARD_NAMESPACE'
+        | 'ONLY_TIPRACK',
     |}
   | {|
       ...NameConflictFields,

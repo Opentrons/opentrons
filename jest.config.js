@@ -13,9 +13,15 @@ module.exports = {
   },
   transform: {
     '^.+\\.js$': 'babel-jest',
-    '\\.(jpg|png|gif|svg|woff|woff2)$':
+    '\\.(jpg|png|gif|svg|woff|woff2|webm)$':
       '@opentrons/components/src/__mocks__/file.js',
   },
+  modulePathIgnorePatterns: [
+    '/shared-data/python/.*',
+    '/api/.*',
+    '/robot-server/.*',
+    '/update-server/.*',
+  ],
   transformIgnorePatterns: ['/node_modules/(?!@opentrons/)'],
   collectCoverageFrom: [
     'app/src/**/*.js',
@@ -35,4 +41,5 @@ module.exports = {
   testPathIgnorePatterns: ['cypress/', '/node_modules/'],
   coverageReporters: ['lcov', 'text-summary'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
+  watchPathIgnorePatterns: ['/node_modules/'],
 }

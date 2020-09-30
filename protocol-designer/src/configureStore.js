@@ -1,10 +1,14 @@
 // @flow
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
+import { trackEventMiddleware } from './analytics/middleware'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
-
+import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
+import type { Store } from 'redux'
 import type { BaseState, Action, ThunkDispatch } from './types'
+
+const timelineMiddleware = makeTimelineMiddleware()
 
 const ReselectTools =
   process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
@@ -58,7 +62,11 @@ function getRootReducer() {
   }
 }
 
-export function configureStore() {
+export function configureStore(): Store<
+  BaseState,
+  Action,
+  ThunkDispatch<Action>
+> {
   const reducer = getRootReducer()
 
   const composeEnhancers: any =
@@ -67,7 +75,9 @@ export function configureStore() {
   const store = createStore<BaseState, Action, ThunkDispatch<*>>(
     reducer,
     /* preloadedState, */
-    composeEnhancers(applyMiddleware(thunk))
+    composeEnhancers(
+      applyMiddleware(trackEventMiddleware, timelineMiddleware, thunk)
+    )
   )
 
   // give reselect tools access to state if in dev env
@@ -111,5 +121,6 @@ export function configureStore() {
     )
   }
 
+  // $FlowFixMe(mc, 2020-06-09): Flow doesn't like mixture of exact and inexact action types
   return store
 }

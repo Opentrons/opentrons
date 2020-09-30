@@ -12,25 +12,33 @@ import {
   type FormError,
   moduleIdRequired,
   targetTemperatureRequired,
+  blockTemperatureRequired,
+  lidTemperatureRequired,
+  profileVolumeRequired,
+  profileTargetLidTempRequired,
+  blockTemperatureHoldRequired,
+  lidTemperatureHoldRequired,
 } from './errors'
 import {
   composeWarnings,
   belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
-  temperatureRangeExceeded,
   type FormWarning,
   type FormWarningType,
-  pauseTemperatureRangeExceeded,
+  minAirGapVolume,
 } from './warnings'
 import type { StepType } from '../../form-types'
 
 export { handleFormChange } from './handleFormChange'
-export { generateNewForm } from './generateNewForm'
+export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
 export { getDisabledFields } from './getDisabledFields'
 export { getNextDefaultPipetteId } from './getNextDefaultPipetteId'
-export { getNextDefaultTemperatureModuleId } from './getNextDefaultModuleId'
+export {
+  getNextDefaultTemperatureModuleId,
+  getNextDefaultThermocyclerModuleId,
+} from './getNextDefaultModuleId'
 export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
@@ -48,7 +56,6 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
   },
   pause: {
     getErrors: composeErrors(pauseForTimeOrUntilTold),
-    getWarnings: composeWarnings(pauseTemperatureRangeExceeded),
   },
   moveLiquid: {
     getErrors: composeErrors(
@@ -59,7 +66,8 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
       maxDispenseWellVolume,
-      minDisposalVolume
+      minDisposalVolume,
+      minAirGapVolume
     ),
   },
   magnet: {
@@ -72,7 +80,16 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
   },
   temperature: {
     getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
-    getWarnings: composeWarnings(temperatureRangeExceeded),
+  },
+  thermocycler: {
+    getErrors: composeErrors(
+      blockTemperatureRequired,
+      lidTemperatureRequired,
+      profileVolumeRequired,
+      profileTargetLidTempRequired,
+      blockTemperatureHoldRequired,
+      lidTemperatureHoldRequired
+    ),
   },
 }
 

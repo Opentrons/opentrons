@@ -122,6 +122,11 @@ const mapSTP = (state: BaseState): SP => {
   }
 }
 
-export const DisposalVolumeField = connect<Props, OP, SP, _, _, _>(mapSTP)(
-  DisposalVolumeFieldComponent
-)
+export const DisposalVolumeField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _
+>(mapSTP)(DisposalVolumeFieldComponent)

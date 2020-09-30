@@ -18,7 +18,7 @@ export type PageTabProps = {|
   pages: Array<TabProps>,
 |}
 
-export function PageTabs(props: PageTabProps) {
+export function PageTabs(props: PageTabProps): React.Node {
   return (
     <nav className={styles.page_tabs}>
       {props.pages.map(page => (

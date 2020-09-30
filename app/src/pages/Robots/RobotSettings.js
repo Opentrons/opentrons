@@ -10,8 +10,9 @@ import {
 } from '../../robot'
 import { CONNECTABLE, REACHABLE } from '../../discovery'
 import {
+  UPGRADE,
   getBuildrootUpdateSeen,
-  getBuildrootRobot,
+  getBuildrootUpdateDisplayInfo,
   getBuildrootUpdateInProgress,
   getBuildrootUpdateAvailable,
 } from '../../buildroot'
@@ -33,7 +34,7 @@ import {
   ConnectAlertModal,
 } from '../../components/RobotSettings'
 import { UpdateBuildroot } from '../../components/RobotSettings/UpdateBuildroot'
-import { CalibrateDeck } from '../../components/CalibrateDeck'
+import { CalibrateDeck } from '../../components/LegacyCalibrateDeck'
 import { ConnectBanner } from '../../components/RobotSettings/ConnectBanner'
 import { ReachableRobotBanner } from '../../components/RobotSettings/ReachableRobotBanner'
 import { RestartRequiredBanner } from '../../components/RobotSettings/RestartRequiredBanner'
@@ -67,7 +68,9 @@ type DP = {|
 
 type Props = {| ...OP, ...DP, ...SP |}
 
-export const RobotSettings = withRouter<_, _>(
+export const RobotSettings: React.AbstractComponent<
+  $Diff<OP, ContextRouter>
+> = withRouter(
   connect<Props, OP, SP, DP, State, Dispatch>(
     mapStateToProps,
     mapDispatchToProps
@@ -205,13 +208,16 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
   const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot)
   const updateInProgress = getBuildrootUpdateInProgress(state, robot)
-  const currentBrRobot = getBuildrootRobot(state)
+  const { autoUpdateDisabledReason } = getBuildrootUpdateDisplayInfo(
+    state,
+    robot.name
+  )
 
   const showUpdateModal =
     updateInProgress ||
     (!buildrootUpdateSeen &&
-      buildrootUpdateType === 'upgrade' &&
-      currentBrRobot === null)
+      buildrootUpdateType === UPGRADE &&
+      autoUpdateDisabledReason === null)
 
   return {
     updateInProgress,

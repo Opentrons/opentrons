@@ -2,7 +2,7 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-export function ProgressSpinner() {
+export function ProgressSpinner(): React.Node {
   return (
     <div className={styles.progress_spinner}>
       <span />
@@ -21,7 +21,7 @@ export type ProgressBarProps = {|
   progress: number | null,
 |}
 
-export function ProgressBar(props: ProgressBarProps) {
+export function ProgressBar(props: ProgressBarProps): React.Node {
   const progress = props.progress || 0
   const width = `${progress}%`
 

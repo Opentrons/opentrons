@@ -1,0 +1,55 @@
+---
+test_name: Get engaged motors
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Get status of all motors
+    request:
+      url: "{host:s}:{port:d}/motors/engaged"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        x:
+          enabled: !anybool 
+        y:
+          enabled: !anybool 
+        z:
+          enabled: !anybool 
+        a:
+          enabled: !anybool 
+        b:
+          enabled: !anybool 
+        c:
+          enabled: !anybool 
+---
+test_name: Disengage motors
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Disengae motors
+    request:
+      url: "{host:s}:{port:d}/motors/disengage"
+      method: POST
+      json:
+        axes:
+          - x
+          - a
+    response:
+      status_code: 200
+      json:
+        message: !re_search "Disengaged axes"
+  - name: Verify disengaged motors
+    request:
+      url: "{host:s}:{port:d}/motors/engaged"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        x:
+          enabled: false
+        a:
+          enabled: false
+      strict: false

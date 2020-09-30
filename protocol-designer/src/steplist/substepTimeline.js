@@ -4,7 +4,7 @@ import pick from 'lodash/pick'
 import { getWellsForTips } from '../step-generation/utils'
 import { getNextRobotStateAndWarningsSingleCommand } from '../step-generation/getNextRobotStateAndWarnings'
 
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { Channels } from '@opentrons/components'
 import type {
   CommandCreatorError,
@@ -193,7 +193,7 @@ export const substepTimeline = (
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels
-) => {
+): Array<SubstepTimelineFrame> => {
   if (channels === 1) {
     return substepTimelineSingleChannel(
       commandCreator,

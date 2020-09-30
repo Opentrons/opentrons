@@ -8,6 +8,7 @@ import * as Defs from '../definitions'
 import * as Val from '../validation'
 import { registerLabware } from '..'
 
+import { uiInitialized } from '@opentrons/app/src/shell/actions'
 import * as CustomLabware from '@opentrons/app/src/custom-labware'
 import * as CustomLabwareFixtures from '@opentrons/app/src/custom-labware/__fixtures__'
 
@@ -114,9 +115,8 @@ describe('labware module dispatches', () => {
     )
   })
 
-  // TODO(mc, 2019-11-25): refactor this action to be shell:INITIALIZE
-  it('reads labware directory on shell:CHECK_UPDATE', () => {
-    handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
+  it('reads labware directory on shell:UI_INITIALIZED', () => {
+    handleAction(uiInitialized())
 
     return flush().then(() =>
       expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
@@ -126,10 +126,10 @@ describe('labware module dispatches', () => {
   it('reads and parses definition files', () => {
     const mockDirectoryListing = ['a.json', 'b.json', 'c.json', 'd.json']
     const mockParsedFiles = [
-      { filename: 'a.json', created: 0, data: {} },
-      { filename: 'b.json', created: 1, data: {} },
-      { filename: 'c.json', created: 2, data: {} },
-      { filename: 'd.json', created: 3, data: {} },
+      { filename: 'a.json', modified: 0, data: {} },
+      { filename: 'b.json', modified: 1, data: {} },
+      { filename: 'c.json', modified: 2, data: {} },
+      { filename: 'd.json', modified: 3, data: {} },
     ]
 
     readLabwareDirectory.mockResolvedValueOnce(mockDirectoryListing)
@@ -191,7 +191,7 @@ describe('labware module dispatches', () => {
 
     return flush().then(() => {
       expect(dispatch).toHaveBeenCalledWith({
-        type: 'config:UPDATE',
+        type: 'config:UPDATE_VALUE',
         payload: { path: 'labware.directory', value: '/path/to/labware' },
         meta: { shell: true },
       })
@@ -246,7 +246,7 @@ describe('labware module dispatches', () => {
 
     const mockNewUncheckedFile = {
       filename: '/path/to/labware.json',
-      created: 0,
+      modified: 0,
       data: {},
     }
 

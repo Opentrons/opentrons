@@ -11,9 +11,9 @@ function _getDisabledFields(rawForm: FormData): Set<string> {
     case 'mix':
       return getDisabledFieldsMixForm(rawForm)
     case 'pause':
-      return new Set() // nothing to disabled
     case 'magnet':
-      return new Set()
+    case 'thermocycler':
+      return new Set() // nothing to disabled
     default: {
       console.warn(
         `disabled fields for step type ${rawForm.stepType} not yet implemented!`
@@ -25,4 +25,6 @@ function _getDisabledFields(rawForm: FormData): Set<string> {
 
 // shallow-memoized because every disable-able field in the form calls this function once
 // WARNING: do not mutate the same rawForm obj or this memoization will break
-export const getDisabledFields = defaultMemoize(_getDisabledFields)
+export const getDisabledFields: (
+  rawForm: FormData
+) => Set<string> = defaultMemoize(_getDisabledFields)

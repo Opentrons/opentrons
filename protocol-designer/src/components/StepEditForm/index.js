@@ -1,25 +1,26 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, connect } from 'react-redux'
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
 import cx from 'classnames'
 
+import { useConditionalConfirm } from '@opentrons/components'
 import { actions } from '../../steplist'
+import { actions as stepsActions } from '../../ui/steps'
+import { resetScrollElements } from '../../ui/steps/utils'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import type {
-  FormData,
-  StepType,
-  StepFieldName,
-  StepIdType,
-} from '../../form-types'
-import type { BaseState, ThunkDispatch } from '../../types'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
 import formStyles from '../forms/forms.css'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
-import { ConfirmDeleteStepModal } from '../modals/ConfirmDeleteStepModal'
-import styles from './StepEditForm.css'
+import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
+import {
+  ConfirmDeleteModal,
+  DELETE_STEP_FORM,
+  CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_UNSAVED_STEP_FORM,
+} from '../modals/ConfirmDeleteModal'
 
 import {
   MixForm,
@@ -27,51 +28,112 @@ import {
   PauseForm,
   MagnetForm,
   TemperatureForm,
+  ThermocyclerForm,
 } from './forms'
-
 import { FormAlerts } from './FormAlerts'
 import { ButtonRow } from './ButtonRow'
+import styles from './StepEditForm.css'
 
-const STEP_FORM_MAP: { [StepType]: * } = {
+import type { BaseState } from '../../types'
+import type { FormData, StepType, StepFieldName } from '../../form-types'
+
+const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<any> } = {
   mix: MixForm,
   pause: PauseForm,
   moveLiquid: MoveLiquidForm,
   magnet: MagnetForm,
   temperature: TemperatureForm,
+  thermocycler: ThermocyclerForm,
 }
 
-type SP = {|
-  formData?: ?FormData,
-  isNewStep?: boolean,
+type Props = {|
+  formData: FormData,
+  handleClose: () => mixed,
+  canSave: boolean,
+  handleDelete: () => mixed,
+  handleSave: () => mixed,
+  showMoreOptionsModal: boolean,
+  focusedField: string | null,
+  onFieldBlur: StepFieldName => mixed,
+  onFieldFocus: StepFieldName => mixed,
+  toggleMoreOptionsModal: () => mixed,
+  dirtyFields: Array<string>,
 |}
 
-type DP = {| deleteStep: StepIdType => mixed |}
+export const StepEditFormComponent = (props: Props): React.Node => {
+  const {
+    formData,
+    canSave,
+    handleClose,
+    handleDelete,
+    dirtyFields,
+    handleSave,
+    showMoreOptionsModal,
+    toggleMoreOptionsModal,
+    focusedField,
+    onFieldFocus,
+    onFieldBlur,
+  } = props
 
-type StepEditFormState = {
-  showConfirmDeleteModal: boolean,
-  showMoreOptionsModal: boolean,
-  focusedField: StepFieldName | null,
-  dirtyFields: Array<StepFieldName>,
+  const FormComponent: $Values<typeof STEP_FORM_MAP> = get(
+    STEP_FORM_MAP,
+    formData.stepType
+  )
+  if (!FormComponent) {
+    // early-exit if step form doesn't exist
+    return (
+      <div className={formStyles.form}>
+        <div>Todo: support {formData && formData.stepType} step</div>
+      </div>
+    )
+  }
+  return (
+    <>
+      {showMoreOptionsModal && (
+        <MoreOptionsModal formData={formData} close={toggleMoreOptionsModal} />
+      )}
+      <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
+      <div className={cx(formStyles.form, styles[formData.stepType])}>
+        <FormComponent
+          stepType={formData.stepType} // TODO: Ian 2019-01-17 deprecate passing this during #2916, it's in formData
+          formData={formData}
+          focusHandlers={{
+            focusedField,
+            dirtyFields,
+            onFieldFocus,
+            onFieldBlur,
+          }}
+        />
+        <ButtonRow
+          handleClickMoreOptions={toggleMoreOptionsModal}
+          handleClose={handleClose}
+          handleSave={handleSave}
+          handleDelete={handleDelete}
+          canSave={canSave}
+        />
+      </div>
+    </>
+  )
 }
 
-type Props = { ...SP, ...DP }
-
-// TODO: type fieldNames, don't use `any`
+// TODO: type fieldNames, don't use `string`
 const getDirtyFields = (
-  isNewStep: ?boolean,
+  isNewStep: boolean,
   formData: ?FormData
-): Array<any> => {
+): Array<string> => {
   let dirtyFields = []
-  if (!isNewStep && formData) {
+  if (formData == null) {
+    return []
+  }
+  if (!isNewStep) {
     dirtyFields = Object.keys(formData)
-  } else if (formData && formData.stepType) {
+  } else {
     const data = formData
     // new step, but may have auto-populated fields.
     // "Dirty" any fields that differ from default new form values
     const defaultFormData = getDefaultsForStepType(formData.stepType)
     dirtyFields = Object.keys(defaultFormData).reduce(
       (acc, fieldName: StepFieldName) => {
-        // formData is no longer a Maybe type b/c of the `if` above, but flow forgets
         const currentValue = data[fieldName]
         const initialValue = defaultFormData[fieldName]
 
@@ -84,121 +146,168 @@ const getDirtyFields = (
   return without(dirtyFields, 'stepType', 'id')
 }
 
-class StepEditFormComponent extends React.Component<Props, StepEditFormState> {
-  constructor(props: Props) {
-    super(props)
-    const { isNewStep, formData } = props
-    this.state = {
-      showConfirmDeleteModal: false,
-      showMoreOptionsModal: false,
-      focusedField: null,
-      dirtyFields: getDirtyFields(isNewStep, formData),
+type StepEditFormManagerProps = {|
+  // TODO(IL, 2020-04-22): use HydratedFormData type see #3161
+  canSave: boolean,
+  formData: ?FormData,
+  formHasChanges: boolean,
+  isNewStep: boolean,
+  isPristineSetTempForm: boolean,
+|}
+
+const StepEditFormManager = (props: StepEditFormManagerProps) => {
+  const {
+    canSave,
+    formData,
+    isNewStep,
+    formHasChanges,
+    isPristineSetTempForm,
+  } = props
+
+  const [
+    showMoreOptionsModal,
+    setShowMoreOptionsModal,
+  ] = React.useState<boolean>(false)
+  const [focusedField, setFocusedField] = React.useState<string | null>(null)
+  const [dirtyFields, setDirtyFields] = React.useState<Array<StepFieldName>>(
+    getDirtyFields(isNewStep, formData)
+  )
+
+  const toggleMoreOptionsModal = () => {
+    resetScrollElements()
+    setShowMoreOptionsModal(!showMoreOptionsModal)
+  }
+
+  const onFieldFocus = (fieldName: StepFieldName) => {
+    setFocusedField(fieldName)
+  }
+
+  const onFieldBlur = (fieldName: StepFieldName) => {
+    if (fieldName === focusedField) {
+      setFocusedField(null)
+    }
+    if (!dirtyFields.includes(fieldName)) {
+      setDirtyFields([...dirtyFields, fieldName])
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
-    // NOTE: formData is sometimes undefined between steps
-    if (get(this.props, 'formData.id') !== get(prevProps, 'formData.id')) {
-      const { isNewStep, formData } = this.props
-      this.setState({
-        focusedField: null,
-        dirtyFields: getDirtyFields(isNewStep, formData),
-      })
-    }
-  }
-
-  onFieldFocus = (fieldName: StepFieldName) => {
-    this.setState({ focusedField: fieldName })
-  }
-
-  onFieldBlur = (fieldName: StepFieldName) => {
-    this.setState(prevState => ({
-      ...prevState,
-      focusedField:
-        fieldName === prevState.focusedField ? null : prevState.focusedField,
-      dirtyFields: prevState.dirtyFields.includes(fieldName)
-        ? prevState.dirtyFields
-        : [...prevState.dirtyFields, fieldName],
-    }))
-  }
-
-  toggleConfirmDeleteModal = () => {
-    this.setState({
-      showConfirmDeleteModal: !this.state.showConfirmDeleteModal,
-    })
-  }
-
-  toggleMoreOptionsModal = () => {
-    this.setState({
-      showMoreOptionsModal: !this.state.showMoreOptionsModal,
-    })
-  }
-
-  render() {
-    if (!this.props.formData) return null // early-exit if connected formData is absent
-    const { formData, deleteStep } = this.props
-    // TODO: FormComponent should be type ?StepForm. That also requires making focusedField prop consistently allow null
-    const FormComponent: any = get(STEP_FORM_MAP, formData.stepType)
-    if (!FormComponent) {
-      // early-exit if step form doesn't exist
-      return (
-        <div className={formStyles.form}>
-          <div>Todo: support {formData && formData.stepType} step</div>
-        </div>
+  const dispatch = useDispatch()
+  const stepId = formData?.id
+  const handleDelete = () => {
+    if (stepId != null) {
+      dispatch(actions.deleteStep(stepId))
+    } else {
+      console.error(
+        `StepEditForm: tried to delete step with no step id, this should not happen`
       )
     }
-    return (
-      <React.Fragment>
-        {this.state.showConfirmDeleteModal && (
-          <ConfirmDeleteStepModal
-            onCancelClick={this.toggleConfirmDeleteModal}
-            onContinueClick={() => {
-              this.toggleConfirmDeleteModal()
-              this.props.formData && deleteStep(this.props.formData.id)
-            }}
-          />
-        )}
-        {this.state.showMoreOptionsModal && (
-          <MoreOptionsModal
-            formData={formData}
-            close={this.toggleMoreOptionsModal}
-          />
-        )}
-        <FormAlerts
-          focusedField={this.state.focusedField}
-          dirtyFields={this.state.dirtyFields}
+  }
+  const handleClose = () => dispatch(actions.cancelStepForm())
+  const saveSetTempFormWithAddedPauseUntilTemp = () =>
+    dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
+  const saveStepForm = () => dispatch(stepsActions.saveStepForm())
+
+  const {
+    confirm: confirmDelete,
+    showConfirmation: showConfirmDeleteModal,
+    cancel: cancelDelete,
+  } = useConditionalConfirm(handleDelete, true)
+
+  const {
+    confirm: confirmClose,
+    showConfirmation: showConfirmCancelModal,
+    cancel: cancelClose,
+  } = useConditionalConfirm(handleClose, isNewStep || formHasChanges)
+
+  const {
+    confirm: confirmAddPauseUntilTempStep,
+    showConfirmation: showAddPauseUntilTempStepModal,
+  } = useConditionalConfirm(
+    saveSetTempFormWithAddedPauseUntilTemp,
+    isPristineSetTempForm
+  )
+
+  // no form selected
+  if (formData == null) {
+    return null
+  }
+
+  return (
+    <>
+      {showConfirmDeleteModal && (
+        <ConfirmDeleteModal
+          modalType={DELETE_STEP_FORM}
+          onCancelClick={cancelDelete}
+          onContinueClick={confirmDelete}
         />
-        <div className={cx(formStyles.form, styles[formData.stepType])}>
-          <FormComponent
-            stepType={formData.stepType} // TODO: Ian 2019-01-17 deprecate passing this during #2916, it's in formData
-            formData={formData}
-            focusHandlers={{
-              focusedField: this.state.focusedField,
-              dirtyFields: this.state.dirtyFields,
-              onFieldFocus: this.onFieldFocus,
-              onFieldBlur: this.onFieldBlur,
-            }}
-          />
-          <ButtonRow
-            onClickMoreOptions={this.toggleMoreOptionsModal}
-            onDelete={this.toggleConfirmDeleteModal}
-          />
-        </div>
-      </React.Fragment>
-    )
+      )}
+      {showConfirmCancelModal && (
+        <ConfirmDeleteModal
+          modalType={
+            isNewStep ? CLOSE_UNSAVED_STEP_FORM : CLOSE_STEP_FORM_WITH_CHANGES
+          }
+          onCancelClick={cancelClose}
+          onContinueClick={confirmClose}
+        />
+      )}
+      {showAddPauseUntilTempStepModal && (
+        <AutoAddPauseUntilTempStepModal
+          displayTemperature={formData?.targetTemperature ?? '?'}
+          handleCancelClick={saveStepForm}
+          handleContinueClick={confirmAddPauseUntilTempStep}
+        />
+      )}
+      <StepEditFormComponent
+        {...{
+          canSave,
+          formData,
+          dirtyFields,
+          handleClose: confirmClose,
+          handleDelete: confirmDelete,
+          handleSave: isPristineSetTempForm
+            ? confirmAddPauseUntilTempStep
+            : saveStepForm,
+          focusedField,
+          onFieldBlur,
+          onFieldFocus,
+          showMoreOptionsModal,
+          toggleMoreOptionsModal,
+        }}
+      />
+    </>
+  )
+}
+
+const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
+  return {
+    canSave: stepFormSelectors.getCurrentFormCanBeSaved(state),
+    formData: stepFormSelectors.getHydratedUnsavedForm(state),
+    formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
+    isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
+    isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
+      state
+    ),
   }
 }
 
-const mapStateToProps = (state: BaseState): SP => ({
-  formData: stepFormSelectors.getHydratedUnsavedForm(state),
-  isNewStep: stepFormSelectors.getIsNewStepForm(state),
-})
-
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
-  deleteStep: (stepId: StepIdType) => dispatch(actions.deleteStep(stepId)),
-})
-
-export const StepEditForm = connect<Props, {||}, SP, DP, _, _>(
+// NOTE(IL, 2020-04-22): This is using connect instead of useSelector in order to
+// avoid zombie children in the many connected field components.
+// (Children of a useSelector parent must always be written to use selectors defensively
+// if their parent (StepEditForm) is NOT using connect.
+// It doesn't matter if the children are using connect or useSelector,
+// only the parent matters.)
+// https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
+export const StepEditForm: React.AbstractComponent<{||}> = connect<
+  StepEditFormManagerProps,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(
   mapStateToProps,
-  mapDispatchToProps
-)(StepEditFormComponent)
+  () => ({}) // no `dispatch` prop
+)((props: StepEditFormManagerProps) => (
+  // key by ID so manager state doesn't persist across different forms
+  <StepEditFormManager key={props.formData?.id ?? 'empty'} {...props} />
+))

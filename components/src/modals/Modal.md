@@ -1,7 +1,7 @@
 Basic usage (click overlay to close):
 
 ```js
-initialState = { isOpen: true }
+const [state, setState] = React.useState({ isOpen: true })
 ;<div style={{ position: 'relative', width: '32em', height: '16rem' }}>
   {state.isOpen && (
     <Modal
@@ -18,7 +18,7 @@ initialState = { isOpen: true }
 Optional heading (click overlay to close):
 
 ```js
-initialState = { isOpen: true }
+const [state, setState] = React.useState({ isOpen: true })
 ;<div style={{ position: 'relative', width: '32em', height: '16rem' }}>
   {state.isOpen && (
     <Modal

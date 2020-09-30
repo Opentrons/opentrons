@@ -11,7 +11,7 @@ export const delay: CommandCreator<PauseArgs> = (
       {
         command: 'delay',
         params: {
-          message: args.message,
+          ...(args.message != null ? { message: args.message } : null),
           wait: args.wait,
         },
       },

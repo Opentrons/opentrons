@@ -9,7 +9,7 @@ type WarningContentsProps = {
   warningType: string,
   level: AlertLevel,
 }
-export const WarningContents = (props: WarningContentsProps) => {
+export const WarningContents = (props: WarningContentsProps): React.Node => {
   if (props.level === 'timeline') {
     switch (props.warningType) {
       case 'ASPIRATE_FROM_PRISTINE_WELL':

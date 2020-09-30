@@ -1,0 +1,3 @@
+from opentrons.data_storage import database_migration
+
+database_migration.check_version_and_perform_full_migration()

@@ -13,13 +13,11 @@ import type { State } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
 
 jest.mock('../../../networking/selectors')
-jest.mock('../../../components/RobotSettings/SelectNetwork', () => {
-  return {
-    SelectNetwork: () => {
-      return <></>
-    },
-  }
-})
+jest.mock('../../../components/RobotSettings/SelectNetwork', () => ({
+  SelectNetwork: () => {
+    return <></>
+  },
+}))
 
 const mockRobot: ViewableRobot = ({
   name: 'robot-name',
@@ -84,13 +82,15 @@ describe('ConnectionCard', () => {
     expect(dispatch).toHaveBeenNthCalledWith(3, expected)
   })
 
-  it('passes internet status to ConnectionStatusMessage', () => {
+  it('passes robot and internet status to ConnectionStatusMessage', () => {
     mockGetInternetStatus.mockReturnValue(Networking.STATUS_FULL)
 
     const wrapper = render()
     const status = wrapper.find(ConnectionStatusMessage)
 
-    expect(status.prop('status')).toEqual(Networking.STATUS_FULL)
+    expect(status.prop('status')).toEqual(mockRobot.status)
+    expect(status.prop('ipAdress')).toEqual(mockRobot.ip)
+    expect(status.prop('internetStatus')).toEqual(Networking.STATUS_FULL)
   })
 
   it('passes type ConnectionStatusMessage based on robot.local', () => {

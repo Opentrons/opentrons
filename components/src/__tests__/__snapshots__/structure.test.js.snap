@@ -102,49 +102,25 @@ exports[`Pill renders Pill correctly with inverted text 1`] = `
 </span>
 `;
 
-exports[`RefreshCard renders correctly 1`] = `
-.c0 {
-  font-size: 0.875rem;
-  position: relative;
-  overflow: visible;
-  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.33);
+exports[`Splash renders correctly with custom props 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
 }
 
-<section
-  className="c0"
->
-  <button
-    className="button_flat button_icon refresh_card_icon"
-    disabled={true}
-    type="button"
-  >
-    <svg
-      aria-hidden="true"
-      className="button_only_icon spin"
-      fill="currentColor"
-      version="1.1"
-      viewBox="0 0 512 512"
-    >
-      <path
-        d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
-        fillRule="evenodd"
-      />
-    </svg>
-  </button>
-  child1 child2 child3
-</section>
-`;
-
-exports[`Splash renders correctly with custom props 1`] = `
 <div
   className="splash swag"
 >
   <svg
     aria-hidden="true"
-    className=""
+    className="sc-AxmLO c0"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M2.44444444,20.4 C2.44444444,21.0627417 2.99165197,21.6 3.66666667,21.6 L18.3333333,21.6 C19.008348,21.6 19.5555556,21.0627417 19.5555556,20.4 C19.5555556,20.148 19.47,19.908 19.3355556,19.716 L12.2222222,7.62 L12.2222222,2.4 L9.77777778,2.4 L9.77777778,7.62 L2.66444444,19.716 C2.53,19.908 2.44444444,20.148 2.44444444,20.4 Z M3.66666667,24 C1.64162258,24 0,22.3882251 0,20.4 C0,19.68 0.22,19.008 0.611111111,18.444 L7.33333333,6.972 L7.33333333,4.8 C6.65831864,4.8 6.11111111,4.2627417 6.11111111,3.6 L6.11111111,2.4 C6.11111111,1.0745166 7.20552617,0 8.55555556,0 L13.4444444,0 C14.7944738,0 15.8888889,1.0745166 15.8888889,2.4 L15.8888889,3.6 C15.8888889,4.2627417 15.3416814,4.8 14.6666667,4.8 L14.6666667,6.972 L21.3888889,18.444 C21.78,19.008 22,19.68 22,20.4 C22,22.3882251 20.3583774,24 18.3333333,24 L3.66666667,24 Z M12.2222222,16.8 L13.86,15.192 L16.2188889,19.2 L5.78111111,19.2 L9.03222222,13.668 L12.2222222,16.8 Z M11.6111111,12 C11.9486185,12 12.2222222,12.2686292 12.2222222,12.6 C12.2222222,12.9313708 11.9486185,13.2 11.6111111,13.2 C11.2736038,13.2 11,12.9313708 11,12.6 C11,12.2686292 11.2736038,12 11.6111111,12 Z"
@@ -155,15 +131,24 @@ exports[`Splash renders correctly with custom props 1`] = `
 `;
 
 exports[`Splash renders correctly with no props 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className="splash"
 >
   <svg
     aria-hidden="true"
-    className=""
+    className="sc-AxmLO c0"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 50 50"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M46.79 24.83A21.79 21.79 0 1 1 21.23 3.38l.83 5.31a16.42 16.42 0 1 0 5.87 0l.83-5.31a21.82 21.82 0 0 1 18.03 21.45zm-28.14-3.14c3-4.52 6.34-9.23 6.35-9.23s3.37 4.72 6.35 9.23c2.56 3.9 3.31 8.71.15 12.13a8.76 8.76 0 0 1-6.5 2.83 8.76 8.76 0 0 1-6.46-2.82c-3.19-3.43-2.45-8.24.11-12.14zm0 6.62a5.8 5.8 0 0 0 1.42 3.88 6.29 6.29 0 0 0 4.35 2.16h.45a6.38 6.38 0 0 0 6.59-6.17c.05-1.54-.66-4.47-2.41-5a1.65 1.65 0 0 0-.31-.06 2.93 2.93 0 0 0-2.09.91c-2.17 2.08-4.73 4.46-7.96 4.28z"
@@ -174,6 +159,14 @@ exports[`Splash renders correctly with no props 1`] = `
 `;
 
 exports[`TitleBar renders TitleBar with back button correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <header
   className="title_bar"
 >
@@ -185,10 +178,11 @@ exports[`TitleBar renders TitleBar with back button correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="icon"
+      className="sc-AxmLO c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <path
         d="M15.429 17.019l-4.242-4.59 4.242-4.59-1.312-1.41-5.545 6 5.545 6z"

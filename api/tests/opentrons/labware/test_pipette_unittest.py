@@ -65,7 +65,7 @@ def test_aspirate_zero_volume(local_test_pipette, robot):
     assert robot.commands() == []
     p200.tip_attached = True
     p200.aspirate(0)
-    assert robot.commands() == ['Aspirating 0.0 uL from ? at 1.0 speed']  # noqa
+    assert robot.commands() == ['Aspirating 0.0 uL from ? at 92.5 uL/sec']  # noqa
 
 
 @pytest.mark.api1_only

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { CardContentFull } from '../layout'
 import styles from './styles.css'
 
-export function NoModulesMessage() {
+export function NoModulesMessage(): React.Node {
   return (
     <CardContentFull>
       <p className={styles.modules_description}>No modules detected.</p>

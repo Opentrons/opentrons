@@ -7,6 +7,7 @@ from opentrons.protocol_api import labware
 from opentrons.api import models
 from opentrons.types import Point, Location, Mount
 from opentrons.hardware_control import CriticalPoint, API
+from opentrons.hardware_control.types import MotionChecks
 
 state = partial(state, 'calibration')
 
@@ -27,7 +28,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
 
     monkeypatch.setattr(API, 'update_instrument_offset', fake_update)
     monkeypatch.setattr(main_router.calibration_manager,
-                        'move_to_front', fake_move)
+                        '_move_to_front', fake_move)
 
     tr = labware.load('opentrons_96_tiprack_300ul', Location(Point(), 'test'))
 
@@ -220,6 +221,30 @@ async def test_home_api1(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api2_only
+async def test_home_all_api2(main_router, model):
+    with mock.patch.object(model.instrument._context, 'home') as home:
+        main_router.calibration_manager.home_all(
+            model.instrument)
+
+        home.assert_called_once()
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
+@pytest.mark.api1_only
+async def test_home_all_api1(main_router, model):
+    with mock.patch.object(main_router.calibration_manager, '_hardware') as hardware:  # noqa: e501
+        main_router.calibration_manager.home_all(
+            model.instrument)
+
+        hardware.home.assert_called_with()
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
 @pytest.mark.api1_only
 @pytest.mark.parametrize('labware_name', ['trough-1row-25ml'])
 async def test_move_to_top_api1_1well(main_router, model, labware_name):
@@ -258,7 +283,7 @@ async def test_jog_api2(main_router, model):
             )
 
         expected = [
-            mock.call(Mount.RIGHT, point)
+            mock.call(Mount.RIGHT, point, check_bounds=MotionChecks.HIGH)
             for point in [Point(x=1), Point(y=2), Point(z=3)]]
 
         assert jog.mock_calls == expected
@@ -295,7 +320,7 @@ async def test_jog_api1(main_router, model):
 @pytest.mark.api2_only
 async def test_update_container_offset_v2(main_router, model):
     with mock.patch(
-            'opentrons.protocol_api.labware.save_calibration') as call,\
+        'opentrons.protocol_api.labware.save_calibration') as call,\
             mock.patch.object(API,
                               'gantry_position') as gp:
         gp.return_value = Point(0, 0, 0)

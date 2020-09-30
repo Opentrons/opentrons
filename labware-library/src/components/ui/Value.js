@@ -12,6 +12,6 @@ export type ValueProps = {|
  * Value - display a value, sometimes in a <Table> and usually labeled by a
  * <LabelText>
  */
-export function Value(props: ValueProps) {
+export function Value(props: ValueProps): React.Node {
   return <p className={styles.value}>{props.children}</p>
 }

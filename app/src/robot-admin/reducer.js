@@ -1,6 +1,7 @@
 // @flow
+import fromPairs from 'lodash/fromPairs'
 import mapValues from 'lodash/mapValues'
-import { DISCOVERY_UPDATE_LIST } from '../discovery/actions'
+import { DISCOVERY_UPDATE_LIST, HEALTH_STATUS_OK } from '../discovery'
 import * as Constants from './constants'
 
 import type { Action } from '../types'
@@ -51,17 +52,19 @@ export function robotAdminReducer(
 
     case DISCOVERY_UPDATE_LIST: {
       const { robots } = action.payload
-      const upByName = robots.reduce<$Shape<{| [string]: boolean | void |}>>(
-        (result, service) => ({
-          ...result,
-          [service.name]: result[service.name] || service.ok,
-        }),
-        {}
+      const upByName = fromPairs(
+        robots.map(robot => [
+          robot.name,
+          robot.addresses.some(a => a.healthStatus === HEALTH_STATUS_OK),
+        ])
       )
 
       return mapValues(
         state,
-        (robotState: PerRobotAdminState, robotName: string) => {
+        (
+          robotState: PerRobotAdminState,
+          robotName: string
+        ): PerRobotAdminState => {
           let { status } = robotState
           const up = upByName[robotName]
 

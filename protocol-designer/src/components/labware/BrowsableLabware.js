@@ -18,7 +18,7 @@ type Props = {|
   wellContents: ContentsByWell,
 |}
 
-export function BrowsableLabware(props: Props) {
+export function BrowsableLabware(props: Props): React.Node {
   const { definition, ingredNames, wellContents } = props
   if (!definition) {
     assert(definition, 'BrowseLabwareModal expected definition')

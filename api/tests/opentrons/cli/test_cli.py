@@ -8,7 +8,8 @@ except OSError:
     aionotify = None  # type: ignore
 from opentrons.config import (CONFIG,
                               robot_configs,
-                              advanced_settings as advs)
+                              advanced_settings as advs,
+                              pipette_config as pc)
 from opentrons.types import Mount
 from opentrons.deck_calibration import dc_main
 from opentrons.deck_calibration.dc_main import get_calibration_points
@@ -31,10 +32,10 @@ def hw_with_pipettes(monkeypatch, sync_hardware, model1, model2):
         def fake_gai(expected):
             return {
                 Mount.LEFT: {
-                    'model': model1[0],
+                    'config': pc.load(model1[0]),
                     'id': 'fakeid'},
                 Mount.RIGHT: {
-                    'model': model1[0],
+                    'config': pc.load(model1[0]),
                     'id': 'fakeid2'}}
         monkeypatch.setattr(
             sync_hardware._obj_to_adapt._backend,
@@ -44,8 +45,8 @@ def hw_with_pipettes(monkeypatch, sync_hardware, model1, model2):
 
         def fake_gai(expected):
             return {
-                Mount.LEFT: {'model': model2[0], 'id': 'fakeid'},
-                Mount.RIGHT: {'model': model2[0], 'id': 'fakeid2'}}
+                Mount.LEFT: {'config': pc.load(model2[0]), 'id': 'fakeid'},
+                Mount.RIGHT: {'config': pc.load(model2[0]), 'id': 'fakeid2'}}
 
         monkeypatch.setattr(
             sync_hardware._obj_to_adapt._backend,
@@ -62,7 +63,8 @@ async def test_clear_config(mock_config, sync_hardware):
     dc_main.clear_configuration_and_reload(sync_hardware)
 
     config = sync_hardware.config
-    assert config == robot_configs.build_config({}, {})
+    assert config == robot_configs.build_config(
+        robot_configs.DEFAULT_DECK_CALIBRATION, {})
 
 
 @pytest.mark.skipif(aionotify is None,
@@ -97,11 +99,11 @@ def test_save_and_clear_config(mock_config, sync_hardware, loop):
     hardware.config.gantry_calibration[0][3] = 0
 
 
-def test_new_deck_points():
+async def test_new_deck_points():
     # Checks that the correct deck calibration points are being used
     # if feature_flag is set (or not)
 
-    advs.set_adv_setting('deckCalibrationDots', True)
+    await advs.set_adv_setting('deckCalibrationDots', True)
     calibration_points = get_calibration_points()
     expected_points1 = expected_points()
     # Check that old calibration points are used in cli
@@ -113,7 +115,7 @@ def test_new_deck_points():
     assert expected_points1['2'] == (380.87, 6.0)
     assert expected_points1['3'] == (12.13, 261.0)
 
-    advs.set_adv_setting('deckCalibrationDots', False)
+    await advs.set_adv_setting('deckCalibrationDots', False)
     calibration_points2 = get_calibration_points()
     expected_points2 = expected_points()
     # Check that new calibration points are used

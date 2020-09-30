@@ -3,6 +3,7 @@ import pytest
 from numpy import isclose
 from unittest import mock
 
+from opentrons.protocol_api.labware import _get_standard_labware_definition
 from opentrons.legacy_api.containers import load as containers_load
 from opentrons.legacy_api.containers import _look_up_offsets
 from opentrons.trackers import pose_tracker
@@ -235,7 +236,7 @@ def test_calibrate_labware(robot, instruments, labware, monkeypatch):
 def test_calibrate_multiple(robot, instruments, labware, offsets_tempdir):
     # Note: labware_name must be a v2 labware definition
     labware_name = 'agilent_1_reservoir_290ml'
-
+    definition = _get_standard_labware_definition(labware_name)
     reservoir1 = labware.load(labware_name, '1')
     reservoir2 = labware.load(labware_name, '2')
 
@@ -261,7 +262,7 @@ def test_calibrate_multiple(robot, instruments, labware, offsets_tempdir):
         old_x2 + delta_x1, old_y2 + delta_y1, old_z2 + delta_z1)).all()
 
     lw_hash = reservoir1.properties.get('labware_hash')
-    new_offset1 = _look_up_offsets(lw_hash)
+    new_offset1 = _look_up_offsets(lw_hash, definition)
     expected1 = Point(delta_x1, delta_y1, delta_z1)
     assert isclose(new_offset1, expected1).all()
 
@@ -281,7 +282,7 @@ def test_calibrate_multiple(robot, instruments, labware, offsets_tempdir):
         old_x2, old_y2, old_z2)).all()
 
     lw_hash = reservoir1.properties.get('labware_hash')
-    new_offset2 = _look_up_offsets(lw_hash)
+    new_offset2 = _look_up_offsets(lw_hash, definition)
     expected2 = Point(0, 0, 0)
     assert isclose(new_offset2, expected2).all()
 

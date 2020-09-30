@@ -72,7 +72,10 @@ class RpcContext extends EventEmitter {
     const failureEvent = makeFailureEventName(token)
 
     return new Promise((resolve, reject) => {
-      let timeout
+      const timeout = setTimeout(
+        () => handleError('ACK timeout'),
+        CALL_ACK_TIMEOUT
+      )
 
       const handleError = (reason, traceback) => {
         cleanup()
@@ -121,7 +124,6 @@ class RpcContext extends EventEmitter {
       this.once(ackEvent, handleAck)
       this.once(nackEvent, handleNack)
       this._send({ $: { token }, id, name, args })
-      timeout = setTimeout(() => handleError('ACK timeout'), CALL_ACK_TIMEOUT)
     })
   }
 

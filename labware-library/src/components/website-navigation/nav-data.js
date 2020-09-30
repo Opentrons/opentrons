@@ -203,7 +203,7 @@ export const supportLinkProps: SupportLinks = {
   labware: {
     name: 'Labware Library',
     url:
-      'https://intercom.help/opentrons-protocol-designer/intro/opentrons-standard-labware',
+      'https://support.opentrons.com/en/articles/4168651-opentrons-standard-labware',
     description: 'Understand what labware is compatible with the OT-2',
     gtm: { action: 'click', category: 'l-header', label: 'labware-library' },
   },

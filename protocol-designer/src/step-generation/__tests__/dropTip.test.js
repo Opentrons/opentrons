@@ -21,7 +21,7 @@ describe('dropTip', () => {
     singleHasTips: boolean,
     multiHasTips: boolean,
   }) {
-    let _robotState = makeState({
+    const _robotState = makeState({
       ...makeStateArgsStandard(),
       invariantContext,
       tiprackSetting: { tiprack1Id: true },

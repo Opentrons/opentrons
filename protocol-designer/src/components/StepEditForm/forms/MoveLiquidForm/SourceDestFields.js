@@ -13,6 +13,7 @@ import {
   TipPositionField,
   FlowRateField,
   WellOrderField,
+  DelayFields,
 } from '../../fields'
 
 import styles from '../../StepEditForm.css'
@@ -27,11 +28,11 @@ const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
-export const SourceDestFields = (props: Props) => {
+export const SourceDestFields = (props: Props): React.Node => {
   const { className, focusHandlers, prefix } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
-  const mixFields = (
+  const getMixFields = () => (
     <CheckboxRowField
       name={addFieldNamePrefix('mix_checkbox')}
       label={i18n.t('form.step_edit_form.field.mix.label')}
@@ -50,6 +51,15 @@ export const SourceDestFields = (props: Props) => {
         {...focusHandlers}
       />
     </CheckboxRowField>
+  )
+
+  const getDelayFields = () => (
+    <DelayFields
+      checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
+      secondsFieldName={addFieldNamePrefix('delay_seconds')}
+      tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
+      focusHandlers={focusHandlers}
+    />
   )
 
   return (
@@ -75,26 +85,16 @@ export const SourceDestFields = (props: Props) => {
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
               className={styles.small_field}
             />
-            {mixFields}
-            <CheckboxRowField
-              disabled
-              tooltipComponent={i18n.t('tooltip.not_in_beta')}
-              name="aspirate_airGap_checkbox"
-              label={i18n.t('form.step_edit_form.field.airGap.label')}
-              className={styles.small_field}
-            >
-              <TextField
-                disabled
-                name="aspirate_airGap_volume"
-                units={i18n.t('application.units.microliter')}
-                {...focusHandlers}
-              />
-            </CheckboxRowField>
+            {getMixFields()}
+            {getDelayFields()}
           </React.Fragment>
         )}
-
-        {prefix === 'dispense' && mixFields}
-
+        {prefix === 'dispense' && (
+          <React.Fragment>
+            {getDelayFields()}
+            {getMixFields()}
+          </React.Fragment>
+        )}
         <CheckboxRowField
           name={addFieldNamePrefix('touchTip_checkbox')}
           tooltipComponent={i18n.t(
@@ -119,6 +119,26 @@ export const SourceDestFields = (props: Props) => {
             <BlowoutLocationField
               name="blowout_location"
               className={styles.full_width}
+              {...focusHandlers}
+            />
+          </CheckboxRowField>
+        )}
+
+        {prefix === 'aspirate' && (
+          <CheckboxRowField
+            tooltipComponent={i18n.t(
+              `tooltip.step_fields.defaults.${addFieldNamePrefix(
+                'airGap_checkbox'
+              )}`
+            )}
+            name={addFieldNamePrefix('airGap_checkbox')}
+            label={i18n.t('form.step_edit_form.field.airGap.label')}
+            className={styles.small_field}
+          >
+            <TextField
+              className={styles.small_field}
+              name={addFieldNamePrefix('airGap_volume')}
+              units={i18n.t('application.units.microliter')}
               {...focusHandlers}
             />
           </CheckboxRowField>

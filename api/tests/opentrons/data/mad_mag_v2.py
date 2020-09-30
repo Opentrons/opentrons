@@ -13,7 +13,7 @@ def run(ctx):
     ctx.home()
     tr = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
     mm = ctx.load_module('magnetic module', 4)
-    lw = mm.load_labware('nest_96_wellplate_100ul_pcr_fullskirt')
+    lw = mm.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
     right = ctx.load_instrument('p300_single_gen2', types.Mount.RIGHT, [tr])
 
     mm.disengage()
@@ -24,7 +24,7 @@ def run(ctx):
     mm.disengage()
 
     mm.engage(height=30)
-    mm.disenage()
+    mm.disengage()
 
     mm.engage(offset=-10)
     mm.disengage()

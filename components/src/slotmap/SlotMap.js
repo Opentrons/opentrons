@@ -4,14 +4,14 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './styles.css'
 
-export type SlotMapProps = {
+export type SlotMapProps = {|
   /** Slot(s) to highlight */
   occupiedSlots: Array<string>,
   /** Optional collision warning */
   collisionSlots?: Array<string>,
   /** Optional error styling */
   isError?: boolean,
-}
+|}
 
 const SLOT_MAP_SLOTS = [
   ['10', '11'],
@@ -26,7 +26,7 @@ const iconSize = 20
 const numRows = 4
 const numCols = 3
 
-export function SlotMap(props: SlotMapProps) {
+export function SlotMap(props: SlotMapProps): React.Node {
   const { collisionSlots, occupiedSlots, isError } = props
   return (
     <svg
@@ -55,8 +55,8 @@ export function SlotMap(props: SlotMapProps) {
                 <Icon
                   className={styles.collision_icon}
                   name="information"
-                  width={iconSize}
-                  height={iconSize}
+                  svgWidth={iconSize}
+                  svgHeight={iconSize}
                   x={slotWidth / 2 - iconSize / 2}
                   y={slotHeight / 2 - iconSize / 2}
                 />

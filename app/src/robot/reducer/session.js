@@ -11,7 +11,9 @@ import type {
   SessionModule,
   Mount,
   Slot,
+  DoorState,
   SessionStatus,
+  SessionStatusInfo,
 } from '../types'
 
 import type { InvalidProtocolFileAction } from '../../protocol/types'
@@ -25,6 +27,10 @@ type Request = {
 export type SessionState = {
   sessionRequest: Request,
   state: SessionStatus,
+  statusInfo: SessionStatusInfo,
+  // TODO(aa, 2020-06-01): DoorState is not currently used anywhere yet
+  doorState: DoorState,
+  blocked: boolean,
   errors: Array<{|
     timestamp: number,
     line: number,
@@ -72,6 +78,14 @@ const INITIAL_STATE: SessionState = {
   // loading a protocol
   sessionRequest: { inProgress: false, error: null },
   state: '',
+  statusInfo: {
+    message: null,
+    changedAt: null,
+    estimatedDuration: null,
+    userMessage: null,
+  },
+  doorState: null,
+  blocked: false,
   errors: [],
   protocolCommands: [],
   protocolCommandsById: {},
@@ -196,6 +210,9 @@ function handleSessionUpdate(
   return {
     ...state,
     state: sessionState,
+    statusInfo: action.payload.statusInfo,
+    doorState: action.payload.doorState,
+    blocked: action.payload.blocked,
     remoteTimeCompensation,
     startTime,
     protocolCommandsById,

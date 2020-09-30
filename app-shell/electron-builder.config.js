@@ -6,7 +6,7 @@ const DEV_MODE = process.env.NODE_ENV !== 'production'
 
 module.exports = {
   appId: 'com.opentrons.app',
-  electronVersion: '6.0.7',
+  electronVersion: '6.1.10',
   files: [
     '**/*',
     {
@@ -14,14 +14,11 @@ module.exports = {
       to: './ui',
       filter: ['**/*'],
     },
-    'build/release-notes.md',
     'build/br-premigration-wheels',
     '!Makefile',
   ],
   /* eslint-disable no-template-curly-in-string */
-  artifactName: DEV_MODE
-    ? '${productName}-v${version}-${os}-${dev}.${ext}'
-    : '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
+  artifactName: '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
   /* eslint-enable no-template-curly-in-string */
   asar: true,
   mac: {

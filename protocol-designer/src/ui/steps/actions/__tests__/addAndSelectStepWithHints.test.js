@@ -1,35 +1,35 @@
 // @flow
 import { addAndSelectStepWithHints } from '../thunks'
-import { addStep } from '../thunks/addStep'
+import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import { addHint } from '../../../../tutorial/actions'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
-jest.mock('../thunks/addStep')
+import * as fileDataSelectors from '../../../../file-data/selectors'
+
 jest.mock('../../../../tutorial/actions')
 jest.mock('../../../../ui/modules/selectors')
 jest.mock('../../../../labware-ingred/selectors')
-
+jest.mock('../../../../file-data/selectors')
 const dispatch = jest.fn()
 const getState = jest.fn()
-const addStepMock: JestMockFn<[{ stepType: string }, string], *> = addStep
-const addHintMock: JestMockFn<[any, string], *> = addHint
-const mockGetDeckHasLiquid: JestMockFn<[Object], *> =
+const addHintMock: JestMockFn<[any, string], any> = addHint
+const mockGetDeckHasLiquid: JestMockFn<[Object], any> =
   labwareIngredSelectors.getDeckHasLiquid
-const mockGetMagnetModuleHasLabware: JestMockFn<[Object], *> =
+const mockGetMagnetModuleHasLabware: JestMockFn<[Object], any> =
   uiModuleSelectors.getMagnetModuleHasLabware
-const mockGetTemperatureModuleHasLabware: JestMockFn<[Object], *> =
+const mockGetTemperatureModuleHasLabware: JestMockFn<[Object], any> =
   uiModuleSelectors.getTemperatureModuleHasLabware
-const mockGetThermocyclerModuleHasLabware: JestMockFn<[Object], *> =
+const mockGetThermocyclerModuleHasLabware: JestMockFn<[Object], any> =
   uiModuleSelectors.getThermocyclerModuleHasLabware
-const mockGetSingleTemperatureModuleId: JestMockFn<[Object], *> =
+const mockGetSingleTemperatureModuleId: JestMockFn<[Object], any> =
   uiModuleSelectors.getSingleTemperatureModuleId
-const mockGetSingleThermocyclerModuleId: JestMockFn<[Object], *> =
+const mockGetSingleThermocyclerModuleId: JestMockFn<[Object], any> =
   uiModuleSelectors.getSingleThermocyclerModuleId
-
+const mockGetRobotStateTimeline: JestMockFn<[Object], any> =
+  fileDataSelectors.getRobotStateTimeline
 beforeEach(() => {
   jest.clearAllMocks()
 
-  addStepMock.mockReturnValue('addStepMockReturnValue')
   addHintMock.mockReturnValue('addHintReturnValue')
 
   mockGetDeckHasLiquid.mockReturnValue(true)
@@ -38,6 +38,7 @@ beforeEach(() => {
   mockGetThermocyclerModuleHasLabware.mockReturnValue(false)
   mockGetSingleTemperatureModuleId.mockReturnValue(null)
   mockGetSingleThermocyclerModuleId.mockReturnValue(null)
+  mockGetRobotStateTimeline.mockReturnValue('mockGetRobotStateTimelineValue')
 })
 
 describe('addAndSelectStepWithHints', () => {
@@ -46,8 +47,15 @@ describe('addAndSelectStepWithHints', () => {
     const payload = { stepType }
     addAndSelectStepWithHints(payload)(dispatch, getState)
 
-    expect(addStepMock.mock.calls).toEqual([[payload]])
-    expect(dispatch.mock.calls).toEqual([['addStepMockReturnValue']])
+    expect(dispatch.mock.calls).toEqual([
+      [
+        {
+          type: 'ADD_STEP',
+          payload: { id: PRESAVED_STEP_ID, stepType: 'pause' },
+          meta: { robotStateTimeline: 'mockGetRobotStateTimelineValue' },
+        },
+      ],
+    ])
   })
 
   it('should dispatch addStep thunk, and also ADD_HINT "add_liquids_and_labware" if we\'re adding a step that uses liquid but have no liquids on the deck', () => {
@@ -56,10 +64,18 @@ describe('addAndSelectStepWithHints', () => {
     mockGetDeckHasLiquid.mockReturnValue(false) // no liquid!
     addAndSelectStepWithHints(payload)(dispatch, getState)
 
-    expect(addStepMock.mock.calls).toEqual([[payload]])
     expect(addHintMock.mock.calls).toEqual([['add_liquids_and_labware']])
     expect(dispatch.mock.calls).toEqual([
-      ['addStepMockReturnValue'],
+      [
+        {
+          type: 'ADD_STEP',
+          payload: {
+            id: PRESAVED_STEP_ID,
+            stepType: 'moveLiquid',
+          },
+          meta: { robotStateTimeline: 'mockGetRobotStateTimelineValue' },
+        },
+      ],
       ['addHintReturnValue'],
     ])
   })
@@ -119,10 +135,15 @@ describe('addAndSelectStepWithHints', () => {
         const payload = { stepType }
         addAndSelectStepWithHints(payload)(dispatch, getState)
 
-        expect(addStepMock.mock.calls).toEqual([[payload]])
         expect(addHintMock.mock.calls).toEqual([['module_without_labware']])
         expect(dispatch.mock.calls).toEqual([
-          ['addStepMockReturnValue'],
+          [
+            {
+              type: 'ADD_STEP',
+              payload: { id: PRESAVED_STEP_ID, stepType },
+              meta: { robotStateTimeline: 'mockGetRobotStateTimelineValue' },
+            },
+          ],
           ['addHintReturnValue'],
         ])
       })

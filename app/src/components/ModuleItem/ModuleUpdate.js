@@ -13,6 +13,7 @@ import { getConnectedRobotName } from '../../robot/selectors'
 import {
   useDispatchApiRequest,
   getRequestById,
+  getErrorResponseMessage,
   PENDING,
   FAILURE,
   dismissRequest,
@@ -39,7 +40,7 @@ type Props = {|
   moduleId: string,
 |}
 
-export function ModuleUpdate(props: Props) {
+export function ModuleUpdate(props: Props): React.Node {
   const { hasAvailableUpdate, moduleId, controlDisabledReason } = props
   const dispatch = useDispatch<Dispatch>()
   const robotName = useSelector(getConnectedRobotName)
@@ -98,7 +99,7 @@ export function ModuleUpdate(props: Props) {
             buttons={[{ children: OK_TEXT, onClick: handleCloseErrorModal }]}
           >
             <p>{FAILED_UPDATE_BODY}</p>
-            <p>{latestRequest.error.message}</p>
+            <p>{getErrorResponseMessage(latestRequest.error)}</p>
           </AlertModal>
         </Portal>
       )}

@@ -21,7 +21,7 @@ export type SpinnerModalPageProps = {|
 /**
  * Spinner Modal variant with TitleBar
  */
-export function SpinnerModalPage(props: SpinnerModalPageProps) {
+export function SpinnerModalPage(props: SpinnerModalPageProps): React.Node {
   const { titleBar, ...spinnerModalProps } = props
 
   return (

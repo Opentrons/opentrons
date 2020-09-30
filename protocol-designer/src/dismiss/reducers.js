@@ -2,34 +2,39 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
-import type { DismissFormWarning, DismissTimelineWarning } from './actions'
+
 import { getPDMetadata } from '../file-types'
+import { PRESAVED_STEP_ID } from '../steplist/types'
+import type { Reducer } from 'redux'
+import type { DismissFormWarning, DismissTimelineWarning } from './actions'
 import type { BaseState, Action } from '../types'
 import type { LoadFileAction } from '../load-file'
-import type { DeleteStepAction } from '../steplist/actions'
+import type {
+  CancelStepFormAction,
+  DeleteStepAction,
+} from '../steplist/actions'
 import type { StepIdType } from '../form-types'
 
 export type WarningType = string
 
 export type DismissedWarningsAllSteps = {
   [stepId: StepIdType]: ?Array<WarningType>,
+  ...,
 }
-export type DismissedWarningState = {
+export type DismissedWarningState = {|
   form: DismissedWarningsAllSteps,
   timeline: DismissedWarningsAllSteps,
-}
-const dismissedWarnings = handleActions<DismissedWarningState, *>(
+|}
+
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
   {
     DISMISS_FORM_WARNING: (
       state: DismissedWarningState,
       action: DismissFormWarning
     ): DismissedWarningState => {
-      const { stepId, type } = action.payload
-      if (stepId == null) {
-        console.warn('Tried to dismiss form warning with no stepId')
-        return state
-      }
-
+      const { type } = action.payload
+      const stepId = action.payload.stepId
       return {
         ...state,
         form: {
@@ -42,11 +47,8 @@ const dismissedWarnings = handleActions<DismissedWarningState, *>(
       state: DismissedWarningState,
       action: DismissTimelineWarning
     ): DismissedWarningState => {
-      const { stepId, type } = action.payload
-      if (stepId == null) {
-        console.warn('Tried to dismiss timeline warning with no stepId')
-        return state
-      }
+      const { type } = action.payload
+      const stepId = action.payload.stepId
       return {
         ...state,
         timeline: {
@@ -71,6 +73,13 @@ const dismissedWarnings = handleActions<DismissedWarningState, *>(
       action: LoadFileAction
     ): DismissedWarningState =>
       getPDMetadata(action.payload.file).dismissedWarnings,
+    CANCEL_STEP_FORM: (
+      state: DismissedWarningState,
+      action: CancelStepFormAction
+    ): DismissedWarningState => ({
+      form: omit(state.form, PRESAVED_STEP_ID),
+      timeline: omit(state.timeline, PRESAVED_STEP_ID),
+    }),
   },
   { form: {}, timeline: {} }
 )
@@ -79,10 +88,12 @@ export const _allReducers = {
   dismissedWarnings,
 }
 
-export type RootState = {
+export type RootState = {|
   dismissedWarnings: DismissedWarningState,
-}
+|}
 
-export const rootReducer = combineReducers<_, Action>(_allReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _allReducers
+)
 
-export const rootSelector = (state: BaseState) => state.dismiss
+export const rootSelector = (state: BaseState): RootState => state.dismiss

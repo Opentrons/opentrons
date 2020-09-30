@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
@@ -45,7 +44,6 @@ type Props = {|
         },
       },
   values: FormModulesByType,
-  thermocyclerEnabled: ?boolean,
   onFieldChange: (
     event: SyntheticInputEvent<HTMLSelectElement | HTMLInputElement>
   ) => mixed,
@@ -54,14 +52,13 @@ type Props = {|
   onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
 |}
 
-export function ModuleFields(props: Props) {
+export function ModuleFields(props: Props): React.Node {
   const {
     onFieldChange,
     onSetFieldValue,
     onSetFieldTouched,
     onBlur,
     values,
-    thermocyclerEnabled,
     errors,
     touched,
   } = props
@@ -72,16 +69,16 @@ export function ModuleFields(props: Props) {
     const targetToClear = `modulesByType.${type}.model`
 
     onFieldChange(e)
-    onSetFieldValue(targetToClear, null)
+
+    // only clear model dropdown if not TC
+    if (targetToClear !== 'modulesByType.thermocyclerModuleType.model') {
+      onSetFieldValue(targetToClear, null)
+    }
     onSetFieldTouched(targetToClear, false)
   }
 
-  const className = cx(styles.modules_row, {
-    [styles.hide_thermo]: !thermocyclerEnabled,
-  })
-
   return (
-    <div className={className}>
+    <div className={styles.modules_row}>
       {modules.map((moduleType, i) => {
         const moduleTypeAccessor = `modulesByType.${moduleType}`
         const label = i18n.t(`modules.module_display_names.${moduleType}`)

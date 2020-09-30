@@ -45,7 +45,7 @@ const writeIdentityCookie = (payload: {| name: string, email: string |}) => {
 }
 
 // bypass gating Typeform modal by writing fake cookie
-export const writeFakeIdentityCookie = () =>
+export const writeFakeIdentityCookie = (): void =>
   writeIdentityCookie({
     name: '_skipped_signup',
     email: 'nobody@email.com',

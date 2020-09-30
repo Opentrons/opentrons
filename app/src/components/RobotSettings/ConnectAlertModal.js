@@ -16,7 +16,7 @@ const TRY_AGAIN_MESSAGE =
 const CONTACT_SUPPORT_MESSAGE =
   "If you're still unable to connect, please contact our support team"
 
-export function ConnectAlertModal(props: ConnectAlertModalProps) {
+export function ConnectAlertModal(props: ConnectAlertModalProps): React.Node {
   const { onCloseClick } = props
 
   return (

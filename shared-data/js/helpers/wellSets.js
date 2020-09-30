@@ -20,7 +20,7 @@ import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
 type WellSetByPrimaryWell = Array<Array<string>>
 
 // Compute all well sets for a labware def (non-memoized)
-export function _getAllWellSetsForLabware(
+function _getAllWellSetsForLabware(
   labwareDef: LabwareDefinition2
 ): WellSetByPrimaryWell {
   const allWells: Array<string> = Object.keys(labwareDef.wells)
@@ -34,12 +34,26 @@ export function _getAllWellSetsForLabware(
 }
 
 // creates memoized getAllWellSetsForLabware + getWellSetForMultichannel fns.
-export const makeWellSetHelpers = () => {
-  let cache: {
+export type WellSetHelpers = {|
+  getAllWellSetsForLabware: (
+    labwareDef: LabwareDefinition2
+  ) => WellSetByPrimaryWell,
+  getWellSetForMultichannel: (
+    labwareDef: LabwareDefinition2,
+    well: string
+  ) => ?Array<string>,
+  canPipetteUseLabware: (
+    pipetteSpec: PipetteNameSpecs,
+    labwareDef: LabwareDefinition2
+  ) => boolean,
+|}
+export const makeWellSetHelpers = (): WellSetHelpers => {
+  const cache: {
     [labwareDefURI: string]: ?{|
       labwareDef: LabwareDefinition2,
       wellSetByPrimaryWell: WellSetByPrimaryWell,
     |},
+    ...,
   } = {}
 
   const getAllWellSetsForLabware = (
@@ -73,7 +87,7 @@ export const makeWellSetHelpers = () => {
   const canPipetteUseLabware = (
     pipetteSpec: PipetteNameSpecs,
     labwareDef: LabwareDefinition2
-  ): ?boolean => {
+  ): boolean => {
     if (pipetteSpec.channels === 1) {
       // assume all labware can be used by single-channel
       return true

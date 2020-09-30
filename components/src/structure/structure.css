@@ -81,15 +81,6 @@
   font-weight: var(--fw-bold);
 }
 
-/* Card and card content styles */
-.refresh_card_icon {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 2.25rem;
-  color: var(--c-font-dark);
-}
-
 .disabled {
   pointer-events: none;
   background-color: transparent;

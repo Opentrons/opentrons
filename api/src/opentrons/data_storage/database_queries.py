@@ -1,6 +1,9 @@
-
+import typing
 
 # ------------- Configuration Functions -------------#
+from collections import namedtuple
+
+
 def get_user_version(db_conn):
     with db_conn:
         cursor = db_conn.cursor()
@@ -69,22 +72,35 @@ def delete_container(db_conn, container_name):
 
 
 # ------------- Well Functions -------------#
-def insert_well_into_db(db_conn, container_name, location, x, y, z,
-                        depth, volume, diameter, length, width):
+
+
+WellRow = namedtuple("WellRow", [
+    'container_name',
+    'location',
+    'x',
+    'y',
+    'z',
+    'depth',
+    'volume',
+    'diameter',
+    'length',
+    'width'
+])
+
+
+def insert_well_into_db(db_conn, well: WellRow):
     with db_conn:
         db_conn.execute(
             'INSERT INTO ContainerWells VALUES (?,?,?,?,?,?,?,?,?,?)',
-            (
-                container_name,
-                location,
-                x,
-                y,
-                z,
-                depth,
-                volume,
-                diameter,
-                length,
-                width,)
+            well
+        )
+
+
+def insert_wells_into_db(db_conn, wells: typing.Iterable[WellRow]):
+    with db_conn:
+        db_conn.executemany(
+            'INSERT INTO ContainerWells VALUES (?,?,?,?,?,?,?,?,?,?)',
+            wells
         )
 
 

@@ -12,7 +12,7 @@ export const blowout: CommandCreator<BlowoutParams> = (
   const { pipette, labware, well, offsetFromBottomMm, flowRate } = args
 
   const actionName = 'blowout'
-  let errors: Array<CommandCreatorError> = []
+  const errors: Array<CommandCreatorError> = []
 
   const pipetteData = prevRobotState.pipettes[pipette]
 

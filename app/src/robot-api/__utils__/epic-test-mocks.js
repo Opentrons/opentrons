@@ -43,16 +43,18 @@ export type EpicTestMocks<A, R> = {|
  * @returns {EpicTestMocks}
  */
 export const setupEpicTestMocks = <
-  A: { meta: { requestId: string } },
+  A: { meta: { requestId: string, ... }, ... },
   R: RobotApiResponse
 >(
   makeTriggerAction: (robotName: string) => A,
   mockResponse?: R
 ): EpicTestMocks<A, R> => {
   const mockState: State = ({ state: true, mock: true }: any)
+  const triggerAction = makeTriggerAction(mockRobot.name)
+
   const mockAction = {
-    ...makeTriggerAction(mockRobot.name),
-    meta: mockRequestMeta,
+    ...triggerAction,
+    meta: { ...(triggerAction.meta || {}), ...mockRequestMeta },
   }
 
   mockGetRobotByName.mockImplementation((state, robotName) => {

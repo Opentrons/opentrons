@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -69,7 +70,14 @@ function mergeProps(
   }
 }
 
-export const LabwareDetailsCard = connect<Props, {||}, SP, {||}, _, _>(
+export const LabwareDetailsCard: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

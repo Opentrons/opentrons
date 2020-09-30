@@ -1,5 +1,5 @@
 ```js
-initialState = { selectedValue: 'chocolate' }
+const [state, setState] = React.useState({ selectedValue: 'chocolate' })
 ;<RadioGroup
   value={state.selectedValue}
   options={[
@@ -14,7 +14,7 @@ initialState = { selectedValue: 'chocolate' }
 Inline
 
 ```js
-initialState = { selectedValue: 'chocolate' }
+const [state, setState] = React.useState({ selectedValue: 'chocolate' })
 ;<RadioGroup
   value={state.selectedValue}
   options={[

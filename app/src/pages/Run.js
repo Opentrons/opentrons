@@ -6,7 +6,7 @@ import { Page } from '../components/Page'
 import { SessionHeader } from '../components/SessionHeader'
 import { RunLog, ConfirmCancelModal } from '../components/RunLog'
 
-export function Run() {
+export function Run(): React.Node {
   return (
     <>
       <Page titleBarProps={{ title: <SessionHeader /> }}>

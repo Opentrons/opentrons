@@ -16,7 +16,7 @@ export type LabwareListProps = {|
 
 export { NoResults } from './NoResults'
 
-export function LabwareList(props: LabwareListProps) {
+export function LabwareList(props: LabwareListProps): React.Node {
   const definitions = getFilteredDefinitions(props.filters)
 
   return definitions.length === 0 ? (

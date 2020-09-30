@@ -3,6 +3,110 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
+
+### Bug Fixes
+
+* **labware-library:** fix test protocol well order bug ([#6393](https://github.com/Opentrons/opentrons/issues/6393)) ([d6c42bf](https://github.com/Opentrons/opentrons/commit/d6c42bf))
+
+
+
+
+
+## [3.20.1](https://github.com/Opentrons/opentrons/compare/v3.20.0...v3.20.1) (2020-08-25)
+
+**Note:** Version bump only for package @opentrons/labware-library
+
+
+
+
+
+# [3.20.0](https://github.com/Opentrons/opentrons/compare/v3.19.0...v3.20.0) (2020-08-13)
+
+### Features
+
+* **labware-library:** avoid adding info to 'group' field in LC ([#5975](https://github.com/Opentrons/opentrons/issues/5975)) ([c6f1fa9](https://github.com/Opentrons/opentrons/commit/c6f1fa9)), closes [#5801](https://github.com/Opentrons/opentrons/issues/5801)
+* **labware-library:** make LC test protocol go to bottom last ([#5958](https://github.com/Opentrons/opentrons/issues/5958)) ([b1bc683](https://github.com/Opentrons/opentrons/commit/b1bc683)), closes [#4625](https://github.com/Opentrons/opentrons/issues/4625)
+
+
+
+
+
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
+
+
+### Features
+
+* **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
+* **labware-library:** use loadname not displayname for LC file ([#5945](https://github.com/Opentrons/opentrons/issues/5945)) ([3869c63](https://github.com/Opentrons/opentrons/commit/3869c63)), closes [#5722](https://github.com/Opentrons/opentrons/issues/5722)
+* **labware-library:** use slot 2 instead of 3 in LC test protocol ([#5950](https://github.com/Opentrons/opentrons/issues/5950)) ([fbd1506](https://github.com/Opentrons/opentrons/commit/fbd1506)), closes [#5019](https://github.com/Opentrons/opentrons/issues/5019)
+
+
+
+
+
+## [3.18.1](https://github.com/Opentrons/opentrons/compare/v3.18.0...v3.18.1) (2020-05-26)
+
+**Note:** Version bump only for package @opentrons/labware-library
+
+
+
+
+
+# [3.18.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0) (2020-05-20)
+
+
+### Bug Fixes
+
+* **protocol-designer:** fix multichannel well selection bug ([#5607](https://github.com/Opentrons/opentrons/issues/5607)) ([e20d645](https://github.com/Opentrons/opentrons/commit/e20d645))
+
+
+
+
+
+## [3.17.1](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1) (2020-05-06)
+
+**Note:** Version bump only for package @opentrons/labware-library
+
+
+
+
+
+### Features
+
+* **components:** add hooks-based tooltip component to library ([#5362](https://github.com/Opentrons/opentrons/issues/5362)) ([7ef3ca9](https://github.com/Opentrons/opentrons/commit/7ef3ca9)), closes [#5120](https://github.com/Opentrons/opentrons/issues/5120)
+
+
+
+
+
+# [3.17.0](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
+
+**Note:** Version bump only for package @opentrons/labware-library
+
+
+
+
+
+# [3.17.0-beta.1](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.0...v3.17.0-beta.1) (2020-04-14)
+
+**Note:** Version bump only for package @opentrons/labware-library
+
+
+
+
+
+# [3.17.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-beta.0) (2020-04-01)
+
+### Features
+
+* **js:** update Formik to v2 ([#5190](https://github.com/Opentrons/opentrons/issues/5190)) ([b15d360](https://github.com/Opentrons/opentrons/commit/b15d360))
+* **labware-library:** Support more pipettes in custom labware test protocol ([#5084](https://github.com/Opentrons/opentrons/issues/5084)), and use opentrons_96_tiprack_20ul instead of 10ul ([19dce65](https://github.com/Opentrons/opentrons/commit/19dce65))
+
+
+
+
+
 ## [3.16.1](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1) (2020-02-25)
 
 **Note:** Version bump only for package @opentrons/labware-library

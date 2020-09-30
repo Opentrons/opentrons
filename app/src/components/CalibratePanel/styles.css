@@ -6,10 +6,15 @@
   }
 }
 
+.labware_item {
+  display: flex;
+  align-items: flex-start;
+}
+
 .item_info {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   overflow: hidden;
 }
 
@@ -27,7 +32,7 @@
 .tiprack_item_mount {
   flex: none;
   font-weight: var(--fw-semibold);
-  margin-right: 1.5rem;
+  margin-right: 1rem;
 }
 
 .labware_item_name {

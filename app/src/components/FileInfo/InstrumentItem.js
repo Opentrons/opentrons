@@ -10,14 +10,18 @@ export type InstrumentItemProps = {|
   mount?: string,
   children: React.Node,
   hidden?: boolean,
+  needsOffsetCalibration: boolean,
 |}
 
-export function InstrumentItem(props: InstrumentItemProps) {
+export function InstrumentItem(props: InstrumentItemProps): React.Node {
   if (props.hidden) return null
   return (
     <div className={styles.instrument_item}>
       <StatusIcon
-        match={['match', 'inexact_match'].includes(props.compatibility)}
+        match={
+          ['match', 'inexact_match'].includes(props.compatibility) &&
+          !props.needsOffsetCalibration
+        }
       />
       {props.mount && (
         <span className={styles.mount_label}>{props.mount.toUpperCase()}</span>

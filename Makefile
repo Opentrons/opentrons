@@ -1,6 +1,9 @@
 # opentrons platform makefile
 # https://github.com/Opentrons/opentrons
 
+# make OT_PYTHON available
+include ./scripts/python.mk
+
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
@@ -14,11 +17,13 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
+APP_SHELL_DIR := app-shell
 
-# this may be set as an environment variable to select the version of
-# python to run if pyenv is not available. it should always be set to
-# point to a python3.6.
-OT_PYTHON ?= python
+# This may be set as an environment variable (and is by CI tasks that upload
+# to test pypi) to add a .dev extension to the python package versions. If
+# empty, no .dev extension is appended, so this definition is here only as
+# documentation
+BUILD_NUMBER ?=
 
 # watch, coverage, and update snapshot variables for tests
 watch ?= false
@@ -32,33 +37,51 @@ ifeq ($(watch), true)
 endif
 
 # run at usage (=), not on makefile parse (:=)
-usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
+usb_host=$(shell yarn run -s discovery find -i 169.254")
 
 
 # install all project dependencies
-.PHONY: install
-install: install-js install-py
+.PHONY: setup
+setup: setup-js setup-py
 
-.PHONY: install-py
-install-py:
-	$(OT_PYTHON) -m pip install pipenv==2018.10.9
-	$(MAKE) -C $(API_DIR) install
-	$(MAKE) -C $(UPDATE_SERVER_DIR) install
-	$(MAKE) -C $(ROBOT_SERVER_DIR) install
+.PHONY: clean-py
+clean-py:
+	$(MAKE) -C $(API_DIR) clean
+	$(MAKE) -C $(UPDATE_SERVER_DIR) clean
+	$(MAKE) -C $(ROBOT_SERVER_DIR) clean
+	$(MAKE) -C $(SHARED_DATA_DIR) clean
+
+.PHONY: setup-py
+setup-py:
+	$(OT_PYTHON) -m pip install pipenv==2020.8.13
+	$(MAKE) -C $(API_DIR) setup
+	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
+	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
+	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
+
 
 # front-end dependecies handled by yarn
-.PHONY: install-js
-install-js:
+.PHONY: setup-js
+setup-js:
 	yarn
-	$(MAKE) -j 1 -C $(SHARED_DATA_DIR)
-	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR)
+	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
+	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
+	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) setup
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
-.PHONY: uninstall
-uninstall:
-	$(MAKE) -C $(API_DIR) clean uninstall
+.PHONY: teardown
+teardown:
+	$(MAKE) -C $(API_DIR) clean teardown
 	shx rm -rf '**/node_modules'
+
+.PHONY: deploy-py
+deploy-py: export twine_repository_url = $(twine_repository_url)
+deploy-py: export pypi_username = $(pypi_username)
+deploy-py: export pypi_password = $(pypi_password)
+deploy-py:
+	$(MAKE) -C $(API_DIR) deploy
+	$(MAKE) -C $(SHARED_DATA_DIR) deploy-py
 
 .PHONY: push-api-balena
 push-api-balena: export host = $(usb_host)
@@ -88,6 +111,8 @@ push:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(API_DIR) push-no-restart
 	sleep 1
+	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart
+	sleep 1
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push
 	sleep 1
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push
@@ -103,17 +128,24 @@ term:
 .PHONY: test
 test: test-py test-js
 
+# tests that may be run on windows
+.PHONY: test-windows
+test-windows: test-js test-py-windows
+
 .PHONY: test-e2e
 test-e2e:
 	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
 
+.PHONY: test-py-windows
+test-py-windows:
+	$(MAKE) -C $(API_DIR) test
+	$(MAKE) -C $(SHARED_DATA_DIR) test-py
+
 .PHONY: test-py
-test-py:
-	$(MAKE) -C api test
-	$(MAKE) -C robot-server test
-	$(MAKE) -C update-server test tests=tests/buildroot/
-	$(MAKE) -C update-server test tests=tests/migration/
+test-py: test-py-windows
+	$(MAKE) -C $(UPDATE_SERVER_DIR) test
+	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 
 .PHONY: test-js
 test-js:
@@ -140,6 +172,7 @@ lint-py:
 	$(MAKE) -C $(API_DIR) lint
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 	$(MAKE) -C $(ROBOT_SERVER_DIR) lint
+	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
 lint-js:

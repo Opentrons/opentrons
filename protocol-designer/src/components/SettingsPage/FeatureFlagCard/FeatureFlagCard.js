@@ -1,8 +1,9 @@
 // @flow
 import sortBy from 'lodash/sortBy'
-import React, { type Node, useState } from 'react'
-import { i18n } from '../../../localization'
+import * as React from 'react'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
+import { i18n } from '../../../localization'
+import { resetScrollElements } from '../../../ui/steps/utils'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
 import modalStyles from '../../modals/modal.css'
@@ -17,16 +18,10 @@ type Props = {|
   setFeatureFlags: (flags: Flags) => mixed,
 |}
 
-// TODO (ka 2019-10-28): This is a workaround, see #4446
-// but it solves the modal positioning problem caused by main page wrapper
-// being positioned absolute until we can figure out something better
-const scrollToTop = () => {
-  const editPage = document.getElementById('main-page')
-  if (editPage) editPage.scrollTop = 0
-}
-
-export const FeatureFlagCard = (props: Props) => {
-  const [modalFlagName, setModalFlagName] = useState<FlagTypes | null>(null)
+export const FeatureFlagCard = (props: Props): React.Node => {
+  const [modalFlagName, setModalFlagName] = React.useState<FlagTypes | null>(
+    null
+  )
 
   const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
 
@@ -40,8 +35,8 @@ export const FeatureFlagCard = (props: Props) => {
     flagName => !userFacingFlags.includes(flagName)
   )
 
-  const getDescription = (flag: FlagTypes): Node => {
-    const RICH_DESCRIPTIONS: { [FlagTypes]: Node } = {
+  const getDescription = (flag: FlagTypes): React.Node => {
+    const RICH_DESCRIPTIONS: { [FlagTypes]: React.Node } = {
       OT_PD_DISABLE_MODULE_RESTRICTIONS: (
         <>
           <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>
@@ -66,7 +61,7 @@ export const FeatureFlagCard = (props: Props) => {
           className={styles.toggle_button}
           toggledOn={Boolean(props.flags[flagName])}
           onClick={() => {
-            scrollToTop()
+            resetScrollElements()
             setModalFlagName(flagName)
           }}
         />

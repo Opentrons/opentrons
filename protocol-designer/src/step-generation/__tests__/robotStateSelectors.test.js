@@ -57,13 +57,13 @@ describe('_getNextTip', () => {
   ) => {
     const pipetteId = channel === 1 ? DEFAULT_PIPETTE : 'p300MultiId'
     const tiprackId = 'testTiprack'
-    let _invariantContext = makeContext()
+    const _invariantContext = makeContext()
     _invariantContext.labwareEntities[tiprackId] = {
       id: tiprackId,
       labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
       def: fixture_tiprack_300_ul,
     }
-    let robotState = makeState({
+    const robotState = makeState({
       invariantContext: _invariantContext,
       labwareLocations: { [tiprackId]: { slot: '8' } },
       pipetteLocations: {
@@ -178,7 +178,7 @@ describe('getNextTiprack - single-channel', () => {
   })
 
   it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
-    let robotState = makeState({
+    const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
@@ -197,7 +197,7 @@ describe('getNextTiprack - single-channel', () => {
   })
 
   it('multiple tipracks, all empty, should return null', () => {
-    let robotState = makeState({
+    const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
@@ -214,7 +214,7 @@ describe('getNextTiprack - single-channel', () => {
 
 describe('getNextTiprack - 8-channel', () => {
   it('single tiprack, totally full', () => {
-    let robotState = makeState({
+    const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
@@ -230,7 +230,7 @@ describe('getNextTiprack - 8-channel', () => {
   })
 
   it('single tiprack, partially full', () => {
-    let robotState = makeState({
+    const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
@@ -251,7 +251,7 @@ describe('getNextTiprack - 8-channel', () => {
   })
 
   it('single tiprack, empty, should return null', () => {
-    let robotState = makeState({
+    const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
@@ -265,7 +265,7 @@ describe('getNextTiprack - 8-channel', () => {
   })
 
   it('single tiprack, a well missing from each column, should return null', () => {
-    let robotState = makeState({
+    const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
@@ -312,7 +312,7 @@ describe('getNextTiprack - 8-channel', () => {
   })
 
   it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
-    let robotState = makeState({
+    const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {

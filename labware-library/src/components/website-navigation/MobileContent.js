@@ -9,7 +9,7 @@ type Props = {|
   ...Submenu,
 |}
 
-export function MobileContent(props: Props) {
+export function MobileContent(props: Props): React.Node {
   const { links } = props
   return (
     <ul className={styles.mobile_content}>

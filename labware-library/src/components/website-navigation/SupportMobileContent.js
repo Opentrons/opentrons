@@ -8,7 +8,7 @@ import { supportLinkProps, salesLinkProps } from './nav-data'
 
 type Props = {||}
 
-export function SupportMobileContent(props: Props) {
+export function SupportMobileContent(props: Props): React.Node {
   const supportLinks = map(supportLinkProps)
   const salesLinks = map(salesLinkProps)
   return (

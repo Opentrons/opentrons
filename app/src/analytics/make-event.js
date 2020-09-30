@@ -3,10 +3,10 @@
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
-import { getRobotCalibrationCheckSession } from '../calibration'
 import * as CustomLabware from '../custom-labware'
+import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
-import * as calibrationActions from '../calibration/constants'
+import * as Sessions from '../sessions'
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,
@@ -73,7 +73,6 @@ export function makeEvent(
       }))
     }
 
-    // $FlowFixMe(mc, 2018-05-28): flow type robot:RUN
     case 'robot:RUN': {
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'runStart',
@@ -87,11 +86,10 @@ export function makeEvent(
     // TODO(mc, 2019-01-22): we only get this event if the user keeps their app
     // open for the entire run. Fixing this is blocked until we can fix
     // session.stop from triggering a run error
-    // $FlowFixMe(mc, 2018-05-28): flow type robot:RUN_RESPONSE
     case 'robot:RUN_RESPONSE': {
       const runTime = robotSelectors.getRunSeconds(state)
       const success = !action.error
-      const error = action.error ? action.payload.message || '' : ''
+      const error = action.error ? action.payload?.message || '' : ''
 
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'runFinish',
@@ -105,7 +103,6 @@ export function makeEvent(
       }))
     }
 
-    // $FlowFixMe(ka, 2018-06-5): flow type robot:PAUSE
     case 'robot:PAUSE': {
       const runTime = robotSelectors.getRunSeconds(state)
 
@@ -115,7 +112,6 @@ export function makeEvent(
       }))
     }
 
-    // $FlowFixMe(ka, 2018-06-5): flow type robot:RESUME
     case 'robot:RESUME': {
       const runTime = robotSelectors.getRunSeconds(state)
 
@@ -125,7 +121,6 @@ export function makeEvent(
       }))
     }
 
-    // $FlowFixMe(ka, 2018-06-5): flow type robot:CANCEL
     case 'robot:CANCEL':
       const runTime = robotSelectors.getRunSeconds(state)
 
@@ -255,24 +250,42 @@ export function makeEvent(
       })
     }
 
-    case calibrationActions.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
-      const { robotName } = action.payload
-      const sessionData = getRobotCalibrationCheckSession(state, robotName)
+    case SystemInfo.INITIALIZED:
+    case SystemInfo.USB_DEVICE_ADDED:
+    case SystemInfo.NETWORK_INTERFACES_CHANGED: {
+      const systemInfoProps = SystemInfo.getU2EDeviceAnalyticsProps(state)
 
-      return Promise.resolve({
-        name: 'calibrationCheckStart',
-        properties: { ...sessionData },
-      })
+      return Promise.resolve(
+        systemInfoProps
+          ? {
+              superProperties: {
+                ...systemInfoProps,
+                // anonymize IP address so analytics profile can't be mapped to more
+                // specific Intercom support profile
+                'U2E IPv4 Address': Boolean(
+                  systemInfoProps['U2E IPv4 Address']
+                ),
+              },
+            }
+          : null
+      )
     }
 
-    case calibrationActions.COMPLETE_ROBOT_CALIBRATION_CHECK: {
-      const { robotName } = action.payload
-      const sessionData = getRobotCalibrationCheckSession(state, robotName)
-
-      return Promise.resolve({
-        name: 'calibrationCheckPass',
-        properties: { ...sessionData },
-      })
+    case Sessions.DELETE_SESSION: {
+      const { robotName, sessionId } = action.payload
+      const analyticsProps = Sessions.getAnalyticsPropsForRobotSessionById(
+        state,
+        robotName,
+        sessionId
+      )
+      if (analyticsProps) {
+        return Promise.resolve({
+          name: `${analyticsProps.sessionType}SessionExit`,
+          properties: analyticsProps,
+        })
+      } else {
+        return Promise.resolve(null)
+      }
     }
   }
 

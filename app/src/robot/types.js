@@ -1,13 +1,40 @@
 // @flow
 // common robot types
-import {
-  type PipetteModelSpecs,
-  type PipetteChannels,
-  type LabwareDefinition2,
+
+import type {
+  PipetteModelSpecs,
+  PipetteChannels,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
+
 import type { Mount } from '@opentrons/components'
 
+import typeof {
+  DISCONNECTED,
+  CONNECTING,
+  CONNECTED,
+  DISCONNECTING,
+  LOADED,
+  RUNNING,
+  FINISHED,
+  STOPPED,
+  PAUSED,
+  ERROR,
+  UNCONFIRMED,
+  MOVING_TO_SLOT,
+  JOGGING,
+  DROPPING_TIP,
+  OVER_SLOT,
+  PICKING_UP,
+  PICKED_UP,
+  CONFIRMING,
+  CONFIRMED,
+  DOOR_OPEN,
+  DOOR_CLOSED,
+} from './constants'
+
 import * as ApiTypes from './api-types'
+
 export * from './api-types'
 
 // TODO Ian 2018-02-27 files that import from here should just import from @opentrons/components directly
@@ -34,17 +61,16 @@ export type RobotService = {
   port: number,
 }
 
-// TODO(mc, 2018-01-11): collapse a bunch of these into something like MOVING
 export type LabwareCalibrationStatus =
-  | 'unconfirmed'
-  | 'moving-to-slot'
-  | 'jogging'
-  | 'dropping-tip'
-  | 'over-slot'
-  | 'picking-up'
-  | 'picked-up'
-  | 'confirming'
-  | 'confirmed'
+  | UNCONFIRMED
+  | MOVING_TO_SLOT
+  | JOGGING
+  | DROPPING_TIP
+  | OVER_SLOT
+  | PICKING_UP
+  | PICKED_UP
+  | CONFIRMING
+  | CONFIRMED
 
 // protocol command as returned by the API
 export type Command = {
@@ -56,7 +82,19 @@ export type Command = {
   handledAt: ?number,
   // subcommands
   children: number[],
+  ...
 }
+
+// protocol command graph node
+// contructed from Command
+export type CommandNode = {|
+  id: number,
+  description: string,
+  handledAt: ?number,
+  isCurrent: boolean,
+  isLast: boolean,
+  children: Array<CommandNode>,
+|}
 
 // instrument as stored in redux state
 export type StatePipette = {|
@@ -104,6 +142,9 @@ export type StateLabware = {|
   isLegacy: boolean,
   // instrument mount to use as the calibrator if isTiprack is true
   calibratorMount: ?Mount,
+  // string identity of a labware; combines all definition properties that would effect a run
+  // will be null if old RPC version or old labware version
+  definitionHash: string | null,
 |}
 
 export type Labware = {|
@@ -120,16 +161,34 @@ export type SessionModule = $Diff<ApiTypes.ApiSessionModule, {| name: mixed |}>
 
 export type SessionStatus =
   | ''
-  | 'loaded'
-  | 'running'
-  | 'paused'
-  | 'error'
-  | 'finished'
-  | 'stopped'
+  | LOADED
+  | RUNNING
+  | FINISHED
+  | STOPPED
+  | PAUSED
+  | ERROR
+
+export type ConnectionStatus =
+  | DISCONNECTED
+  | CONNECTING
+  | CONNECTED
+  | DISCONNECTING
+
+export type SessionStatusInfo = {|
+  message: string | null,
+  changedAt: number | null,
+  estimatedDuration: number | null,
+  userMessage: string | null,
+|}
+
+export type DoorState = null | DOOR_OPEN | DOOR_CLOSED
 
 export type SessionUpdate = {|
   state: SessionStatus,
+  statusInfo: SessionStatusInfo,
   startTime: ?number,
+  doorState: DoorState,
+  blocked: boolean,
   lastCommand: ?{|
     id: number,
     handledAt: number,

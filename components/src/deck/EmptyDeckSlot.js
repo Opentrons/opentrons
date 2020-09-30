@@ -16,7 +16,7 @@ export type EmptyDeckSlotProps = {|
 /**
  * @deprecated Use {@link RobotWorkSpace}
  */
-export function EmptyDeckSlot(props: EmptyDeckSlotProps) {
+export function EmptyDeckSlot(props: EmptyDeckSlotProps): React.Node {
   const { slot, ...labwareWrapperProps } = props
 
   return (

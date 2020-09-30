@@ -8,7 +8,7 @@ export type CardContentFullProps = {|
   className?: string,
 |}
 
-export function CardContentFull(props: CardContentFullProps) {
+export function CardContentFull(props: CardContentFullProps): React.Node {
   return (
     <div className={cx(styles.card_content_full, props.className)}>
       {props.children}

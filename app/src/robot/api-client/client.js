@@ -99,6 +99,7 @@ export function client(dispatch) {
   }
 
   function connect(state, action) {
+    if (selectors.getConnectRequest(state).inProgress) return
     if (rpcClient) disconnect()
 
     const name = action.payload.name
@@ -452,6 +453,16 @@ export function client(dispatch) {
       clearRunTimerInterval()
     }
 
+    update.statusInfo = {
+      message: apiSession.stateInfo?.message ?? null,
+      userMessage: apiSession.stateInfo?.userMessage ?? null,
+      changedAt: apiSession.stateInfo?.changedAt ?? null,
+      estimatedDuration: apiSession.stateInfo?.estimatedDuration ?? null,
+    }
+
+    update.blocked = apiSession.blocked ?? false
+    update.doorState = apiSession.door_state ?? null
+
     // both light and full updates may have the errors list
     if (apiSession.errors) {
       update.errors = apiSession.errors.map(e => ({
@@ -584,12 +595,19 @@ export function client(dispatch) {
         })
         .map(t => t._id)
 
+      // ensure IDs are actually present in containers list
+      // RPC API as of 3.16 may return bogus tipracks in pipette tipracks list
+      const tipRacks = union(
+        tipRacksFromInstrument,
+        tipRacksFromContainers
+      ).filter(id => containers.some(c => c._id === id))
+
       update.pipettesByMount[mount] = {
         _id,
         mount,
         name,
         channels,
-        tipRacks: union(tipRacksFromInstrument, tipRacksFromContainers),
+        tipRacks,
         requestedAs: requested_as,
       }
     }
@@ -602,9 +620,19 @@ export function client(dispatch) {
         slot,
         position,
         is_legacy: isLegacy,
+        definition_hash: definitionHash,
       } = apiContainer
       const isTiprack = containerIsTiprack(apiContainer)
-      const labware = { _id, name, slot, position, type, isTiprack, isLegacy }
+      const labware = {
+        _id,
+        name,
+        slot,
+        position,
+        type,
+        isTiprack,
+        isLegacy,
+        definitionHash: definitionHash ?? null,
+      }
 
       if (isTiprack && apiContainer.instruments.length > 0) {
         // if tiprack used by both pipettes, prefer single for calibration

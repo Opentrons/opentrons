@@ -1,8 +1,11 @@
 // @flow
 import { createSelector } from 'reselect'
-import type { BaseState, Selector } from '../types'
 
-export const getFeatureFlagData = (state: BaseState) => state.featureFlags.flags
+import type { BaseState, Selector } from '../types'
+import type { Flags } from './types'
+
+export const getFeatureFlagData = (state: BaseState): Flags =>
+  state.featureFlags.flags
 
 export const getEnabledPrereleaseMode: Selector<?boolean> = createSelector(
   getFeatureFlagData,
@@ -14,12 +17,7 @@ export const getDisableModuleRestrictions: Selector<?boolean> = createSelector(
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
 
-export const getEnableThermocycler: Selector<?boolean> = createSelector(
+export const getEnabledAirGapDispense: Selector<?boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_THERMOCYCLER
-)
-
-export const getEnableMultiGEN2Pipettes: Selector<?boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_MULTI_GEN2_PIPETTES
+  flags => flags.OT_PD_ENABLE_AIR_GAP_DISPENSE
 )

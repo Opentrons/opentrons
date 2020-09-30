@@ -7,10 +7,56 @@ export function MockSession() {
     commands: [],
     command_log: {},
     state: 'loaded',
+    stateInfo: {},
+    door_state: null,
+    blocked: null,
     instruments: [],
     containers: [],
 
     // TODO(mc, 2018-07-16): THIS IS A MOCK
+    modules: [],
+
+    run: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+    stop: jest.fn(),
+    refresh: jest.fn(),
+  }
+}
+
+export function MockSessionNoStateInfo() {
+  return {
+    name: 'MOCK SESSION',
+    protocol_text: '# mock protocol text',
+    commands: [],
+    command_log: {},
+    door_state: null,
+    blocked: null,
+    state: 'loaded',
+    instruments: [],
+    containers: [],
+
+    modules: [],
+
+    run: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+    stop: jest.fn(),
+    refresh: jest.fn(),
+  }
+}
+
+export function MockSessionNoDoorInfo() {
+  return {
+    name: 'MOCK SESSION',
+    protocol_text: '# mock protocol text',
+    commands: [],
+    command_log: {},
+    state: 'loaded',
+    stateInfo: {},
+    instruments: [],
+    containers: [],
+
     modules: [],
 
     run: jest.fn(),

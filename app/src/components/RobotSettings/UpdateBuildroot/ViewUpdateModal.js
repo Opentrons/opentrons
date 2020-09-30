@@ -3,6 +3,8 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import {
+  BALENA,
+  UPGRADE,
   getBuildrootUpdateInfo,
   getBuildrootDownloadProgress,
   getBuildrootDownloadError,
@@ -25,7 +27,7 @@ export type ViewUpdateModalProps = {|
   proceed: () => mixed,
 |}
 
-export function ViewUpdateModal(props: ViewUpdateModalProps) {
+export function ViewUpdateModal(props: ViewUpdateModalProps): React.Node {
   const { robotName, robotUpdateType, robotSystemType, close, proceed } = props
   const updateInfo = useSelector(getBuildrootUpdateInfo)
   const downloadProgress = useSelector(getBuildrootDownloadProgress)
@@ -34,13 +36,13 @@ export function ViewUpdateModal(props: ViewUpdateModalProps) {
   const [
     showMigrationWarning,
     setShowMigrationWarning,
-  ] = React.useState<boolean>(robotSystemType === 'balena')
+  ] = React.useState<boolean>(robotSystemType === BALENA)
 
   const notNowButton = {
     onClick: close,
     children: downloadError !== null ? 'close' : 'not now',
   }
-  const showReleaseNotes = robotUpdateType === 'upgrade'
+  const showReleaseNotes = robotUpdateType === UPGRADE
 
   React.useLayoutEffect(() => {
     if (updateInfo && !showReleaseNotes && !showMigrationWarning) {

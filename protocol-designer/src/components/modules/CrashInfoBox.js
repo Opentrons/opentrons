@@ -10,7 +10,7 @@ type Props = {|
   temperatureOnDeck: ?boolean,
 |}
 
-export function CrashInfoBox(props: Props) {
+export function CrashInfoBox(props: Props): React.Node {
   const moduleMessage = getCrashableModulesCopy(props) || ''
   return (
     <div className={styles.crash_info_container}>
@@ -50,7 +50,7 @@ function getCrashableModulesCopy(props: Props): string | null {
 }
 function getCrashDiagramSrc(props: Props): string | null {
   const { magnetOnDeck, temperatureOnDeck } = props
-  let CRASH_DIAGRAM_SRC: string | null = null
+  const CRASH_DIAGRAM_SRC: string | null = null
   if (magnetOnDeck && temperatureOnDeck) {
     return require('../../images/modules/crash_warning_mag_temp.png')
   } else if (magnetOnDeck) {

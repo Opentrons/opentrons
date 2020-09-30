@@ -1,5 +1,5 @@
 // @flow
-import React, { useCallback, useState } from 'react'
+import * as React from 'react'
 import { useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
@@ -48,7 +48,7 @@ import type { LabwareDefByDefURI } from '../../labware-defs'
 
 import styles from './DeckSetup.css'
 
-const DECK_LAYER_BLACKLIST = [
+const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
   'doorStops',
@@ -172,8 +172,14 @@ const DeckSetupContents = (props: ContentsProps) => {
   // hovered over**. The intrinsic state of `react-dnd` is not designed to handle that.
   // So we need to use our own state here to determine
   // whether swapping will be blocked due to labware<>module compat:
-  const [hoveredLabware, setHoveredLabware] = useState<?LabwareOnDeckType>(null)
-  const [draggedLabware, setDraggedLabware] = useState<?LabwareOnDeckType>(null)
+  const [
+    hoveredLabware,
+    setHoveredLabware,
+  ] = React.useState<?LabwareOnDeckType>(null)
+  const [
+    draggedLabware,
+    setDraggedLabware,
+  ] = React.useState<?LabwareOnDeckType>(null)
 
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
@@ -185,7 +191,10 @@ const DeckSetupContents = (props: ContentsProps) => {
     customLabwareDefs,
   })
 
-  const handleHoverEmptySlot = useCallback(() => setHoveredLabware(null), [])
+  const handleHoverEmptySlot = React.useCallback(
+    () => setHoveredLabware(null),
+    []
+  )
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
     props.initialDeckSetup
@@ -210,7 +219,7 @@ const DeckSetupContents = (props: ContentsProps) => {
   const allModules: Array<ModuleOnDeck> = values(initialDeckSetup.modules)
 
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
-  let multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
+  const multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
     ? compact([
         (allModules.some(
           moduleOnDeck =>
@@ -344,7 +353,7 @@ const getHasGen1MultiChannelPipette = (
   )
 }
 
-export const DeckSetup = (props: Props) => {
+export const DeckSetup = (props: Props): React.Node => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
@@ -366,7 +375,7 @@ export const DeckSetup = (props: Props) => {
         {props.drilledDown && <BrowseLabwareModal />}
         <div ref={wrapperRef} className={styles.deck_wrapper}>
           <RobotWorkSpace
-            deckLayerBlacklist={DECK_LAYER_BLACKLIST}
+            deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
             viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
             className={styles.robot_workspace}

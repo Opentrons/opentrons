@@ -2,7 +2,8 @@ import json
 from unittest import mock
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 import opentrons.protocol_api as papi
-from opentrons.system.shared_data import load_shared_data
+import opentrons.protocols.geometry as papi_geometry
+from opentrons_shared_data import load_shared_data
 from opentrons.types import Point
 
 import pytest
@@ -387,8 +388,11 @@ def test_magdeck_gen1_labware_props(loop):
         mod.engage(offset=1)
     mod.engage(height=2)
     assert mod._module._driver.plate_height == 2
+    mod.engage(height=0)
+    assert mod._module._driver.plate_height == 0
     mod.engage(height_from_base=2)
-    assert mod._module._driver.plate_height == 2 + OFFSET_TO_LABWARE_BOTTOM
+    assert mod._module._driver.plate_height == 2 +\
+        OFFSET_TO_LABWARE_BOTTOM[mod._module.model()]
 
 
 def test_magdeck_gen2_labware_props(loop):
@@ -398,15 +402,17 @@ def test_magdeck_gen2_labware_props(loop):
     assert mod._module.current_height == 25
     with pytest.raises(ValueError):
         mod.engage(height=25.1)  # max engage height for gen2 is 25 mm
+    mod.engage(height=0)
+    assert mod._module.current_height == 0
 
 
 def test_module_compatibility(get_module_fixture, monkeypatch):
 
-    def load_fixtures(version, model):
+    def load_fixtures(model):
         return get_module_fixture(model.value)
 
     monkeypatch.setattr(
-        papi.module_geometry, '_load_module_definition', load_fixtures)
+        papi_geometry.module_geometry, '_load_v2_module_def', load_fixtures)
 
     class DummyEnum:
         def __init__(self, value: str):
@@ -415,16 +421,32 @@ def test_module_compatibility(get_module_fixture, monkeypatch):
         def __eq__(self, other: 'DummyEnum') -> bool:
             return self.value == other.value
 
-    assert not papi.module_geometry.models_compatible(
+    assert not papi_geometry.module_geometry.models_compatible(
         DummyEnum('incompatibleGenerationV1'),
         DummyEnum('incompatibleGenerationV2'))
-    assert papi.module_geometry.models_compatible(
+    assert papi_geometry.module_geometry.models_compatible(
         DummyEnum('incompatibleGenerationV2'),
         DummyEnum('incompatibleGenerationV2'))
-    assert papi.module_geometry.models_compatible(
+    assert papi_geometry.module_geometry.models_compatible(
         DummyEnum('compatibleGenerationV1'),
         DummyEnum('compatibleGenerationV1'))
-    assert not papi.module_geometry.models_compatible(
+    assert not papi_geometry.module_geometry.models_compatible(
         DummyEnum('compatibleGenerationV1'),
         DummyEnum('incompatibleGenerationV1')
     )
+
+
+def test_thermocycler_semi_plate_configuration(loop):
+    ctx = papi.ProtocolContext(loop)
+    labware_name = 'nest_96_wellplate_100ul_pcr_full_skirt'
+    mod = ctx.load_module('thermocycler', configuration='semi')
+    assert mod._geometry.labware_offset == Point(-23.28, 82.56, 97.8)
+
+    tc_labware = mod.load_labware(labware_name)
+
+    other_labware = ctx.load_labware(labware_name, 2)
+    without_first_two_cols = other_labware.wells()[16::]
+    for tc_well, other_well in zip(tc_labware.wells(), without_first_two_cols):
+        tc_well_name = tc_well.display_name.split()[0]
+        other_well_name = other_well.display_name.split()[0]
+        assert tc_well_name == other_well_name

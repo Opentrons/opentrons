@@ -45,7 +45,7 @@ function MainPanelComponent(props: Props) {
             <TimelineAlerts />
             <Hints />
             {startTerminalItemSelected && <LabwareSelectionModal />}
-            {!startTerminalItemSelected && <StepEditForm />}
+            <StepEditForm />
             {startTerminalItemSelected && ingredSelectionMode && (
               <LiquidPlacementModal />
             )}
@@ -66,6 +66,11 @@ function mapStateToProps(state: BaseState): $Exact<Props> {
   }
 }
 
-export const ConnectedMainPanel = connect<Props, {||}, _, _, _, _>(
-  mapStateToProps
-)(MainPanelComponent)
+export const ConnectedMainPanel: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(mapStateToProps)(MainPanelComponent)

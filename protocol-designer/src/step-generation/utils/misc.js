@@ -24,8 +24,7 @@ import type {
 import { curryCommandCreator } from './curryCommandCreator'
 import { blowout } from '../commandCreators/atomic/blowout'
 
-import { AIR } from '@opentrons/components'
-export { AIR }
+export const AIR: '__air__' = '__air__'
 
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -238,7 +237,9 @@ export const blowoutUtil = (args: {
   ]
 }
 
-export function createEmptyLiquidState(invariantContext: InvariantContext) {
+export function createEmptyLiquidState(
+  invariantContext: InvariantContext
+): $PropertyType<RobotState, 'liquidState'> {
   const { labwareEntities, pipetteEntities } = invariantContext
 
   return {

@@ -1,99 +1,44 @@
-import typing
 import logging
-from argparse import ArgumentParser
+import typing
 
-from opentrons.hardware_control import ThreadManager
-from opentrons.main import initialize as initialize_api
-from opentrons.config import feature_flags as ff
+import uvicorn  # type: ignore
 
+from robot_server.settings import get_settings
 
 log = logging.getLogger(__name__)
 
 
-def build_arg_parser():
-    arg_parser = ArgumentParser(
-            description="Robot Server"
-    )
-    arg_parser.add_argument(
-        "-H", "--hostname",
-        help="TCP/IP hostname to serve on (default: %(default)r)",
-        default="localhost"
-    )
-    arg_parser.add_argument(
-        "-P", "--port",
-        help="TCP/IP port to serve on (default: %(default)r)",
-        type=int,
-        default="31950"
-    )
-    arg_parser.add_argument(
-        "-U", "--path",
-        help="Unix file system path to serve on. Specifying a path will cause "
-             "hostname and port arguments to be ignored.",
-    )
-    arg_parser.add_argument(
-        '--hardware-server', action='store_true',
-        help="Run a jsonrpc server allowing rpc to the "
-             "hardware controller. Only works on buildroot "
-             "because extra dependencies are required.")
-    arg_parser.add_argument(
-        '--hardware-server-socket', action='store',
-        default='/var/run/opentrons-hardware.sock',
-        help='Override for the hardware server socket')
-    return arg_parser
-
-
-def run(hardware: ThreadManager,
-        hostname: typing.Optional[str],
+def run(hostname: typing.Optional[str],
         port: typing.Optional[int],
-        path: str = None):
-    """
-    The arguments are not all optional. Either a path or hostname+port should
-    be specified; you have to specify one.
-    """
+        path: typing.Optional[str]):
+    """Start the uvicorn service."""
     if path:
-        log.debug("Starting Opentrons application on {}".format(
-            path))
+        log.debug(f"Starting Opentrons application on {path}")
         hostname, port = None, None
     else:
-        log.debug("Starting Opentrons application on {}:{}".format(
-            hostname, port))
+        log.debug(f"Starting Opentrons application on {hostname}:{port}")
         path = None
 
-    if ff.use_fast_api():
-        from robot_server.service import run as fastapi_run
-        fastapi_run(hardware, hostname, port, path)
-    else:
-        from opentrons.server import run as aiohttp_run
-        aiohttp_run(hardware, hostname, port, path)
+    from robot_server.service.app import app
+    uvicorn.run(app, host=hostname, port=port, uds=path, access_log=False)
 
 
 def main():
     """ The main entrypoint for the Opentrons robot API server stack.
 
-    This function
-    - creates and starts the server for both the RPC routes
-      handled by :py:mod:`opentrons.server.rpc` and the HTTP routes handled
-      by :py:mod:`opentrons.server.http`
-    - initializes the hardware interaction handled by either
-      :py:mod:`opentrons.legacy_api` or :py:mod:`opentrons.hardware_control`
-
     This function does not return until the server is brought down.
     """
-    arg_parser = build_arg_parser()
-    args = arg_parser.parse_args()
 
-    # Create the hardware
-    checked_hardware = initialize_api(
-            hardware_server=args.hardware_server,
-            hardware_server_socket=args.hardware_server_socket
-    )
+    # TODO Amit 7/14/2020
+    #  Now that aiohttp is goine, we can start the robot-server using uvicorn
+    #  command line.
+    #  This function is just here for backwards compatibility.
 
-    run(hardware=checked_hardware,
-        hostname=args.hostname,
-        port=args.port,
-        path=args.path)
+    app_settings = get_settings()
 
-    arg_parser.exit(message="Stopped\n")
+    run(hostname=app_settings.ws_host_name,
+        port=app_settings.ws_port,
+        path=app_settings.ws_domain_socket)
 
 
 if __name__ == "__main__":

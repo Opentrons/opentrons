@@ -14,7 +14,7 @@ Follow the top-level [contributing guide][contributing] to set your repository u
 
 ```shell
 cd opentrons
-make install
+make setup
 ```
 
 ### common tasks

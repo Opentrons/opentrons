@@ -21,16 +21,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
@@ -64,6 +73,11 @@ Object {
     -25.8,
   ],
   "name": "p10_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -228,16 +242,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
@@ -271,6 +294,11 @@ Object {
     -25.8,
   ],
   "name": "p10_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -435,16 +463,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
@@ -478,6 +515,11 @@ Object {
     -25.8,
   ],
   "name": "p10_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -642,16 +684,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
@@ -685,6 +736,11 @@ Object {
     -25.8,
   ],
   "name": "p10_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -819,16 +875,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
@@ -862,6 +927,11 @@ Object {
     -13,
   ],
   "name": "p10_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    12,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1031,16 +1101,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
@@ -1074,6 +1153,11 @@ Object {
     -13,
   ],
   "name": "p10_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    12,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1243,16 +1327,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
@@ -1286,6 +1379,11 @@ Object {
     -13,
   ],
   "name": "p10_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    12,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1455,16 +1553,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
@@ -1498,6 +1605,11 @@ Object {
     -13,
   ],
   "name": "p10_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    12,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1631,16 +1743,25 @@ Object {
     "max": 100,
     "min": 0.001,
     "value": 25,
+    "valuesByApiLevel": Object {
+      "2.0": 25,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
+    "valuesByApiLevel": Object {
+      "2.0": 50,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
@@ -1674,6 +1795,11 @@ Object {
     -25.8,
   ],
   "name": "p50_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -1827,16 +1953,25 @@ Object {
     "max": 100,
     "min": 0.001,
     "value": 25,
+    "valuesByApiLevel": Object {
+      "2.0": 25,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
+    "valuesByApiLevel": Object {
+      "2.0": 50,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
@@ -1870,6 +2005,11 @@ Object {
     -25.8,
   ],
   "name": "p50_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2023,16 +2163,25 @@ Object {
     "max": 100,
     "min": 0.001,
     "value": 25,
+    "valuesByApiLevel": Object {
+      "2.0": 25,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
+    "valuesByApiLevel": Object {
+      "2.0": 50,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
@@ -2066,6 +2215,11 @@ Object {
     -25.8,
   ],
   "name": "p50_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2219,16 +2373,25 @@ Object {
     "max": 100,
     "min": 0.001,
     "value": 25,
+    "valuesByApiLevel": Object {
+      "2.0": 25,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
+    "valuesByApiLevel": Object {
+      "2.0": 50,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
@@ -2262,6 +2425,11 @@ Object {
     -25.8,
   ],
   "name": "p50_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2395,16 +2563,25 @@ Object {
     "max": 100,
     "min": 0.001,
     "value": 25,
+    "valuesByApiLevel": Object {
+      "2.0": 25,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
+    "valuesByApiLevel": Object {
+      "2.0": 50,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel GEN1",
@@ -2438,6 +2615,11 @@ Object {
     0,
   ],
   "name": "p50_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2591,16 +2773,25 @@ Object {
     "max": 100,
     "min": 0.001,
     "value": 25,
+    "valuesByApiLevel": Object {
+      "2.0": 25,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
+    "valuesByApiLevel": Object {
+      "2.0": 50,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel GEN1",
@@ -2634,6 +2825,11 @@ Object {
     0,
   ],
   "name": "p50_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2787,16 +2983,25 @@ Object {
     "max": 100,
     "min": 0.001,
     "value": 25,
+    "valuesByApiLevel": Object {
+      "2.0": 25,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
+    "valuesByApiLevel": Object {
+      "2.0": 50,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel GEN1",
@@ -2830,6 +3035,11 @@ Object {
     0,
   ],
   "name": "p50_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -2983,16 +3193,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
@@ -3026,6 +3245,11 @@ Object {
     -25.8,
   ],
   "name": "p300_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3143,16 +3367,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
@@ -3186,6 +3419,11 @@ Object {
     -25.8,
   ],
   "name": "p300_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3303,16 +3541,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
@@ -3346,6 +3593,11 @@ Object {
     -25.8,
   ],
   "name": "p300_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3463,16 +3715,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
@@ -3506,6 +3767,11 @@ Object {
     -25.8,
   ],
   "name": "p300_multi",
+  "nozzleOffset": Array [
+    0,
+    31.5,
+    0.8,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3624,16 +3890,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
@@ -3667,6 +3942,11 @@ Object {
     0,
   ],
   "name": "p300_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -3840,16 +4120,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
@@ -3883,6 +4172,11 @@ Object {
     0,
   ],
   "name": "p300_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4056,16 +4350,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
@@ -4099,6 +4402,11 @@ Object {
     0,
   ],
   "name": "p300_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4272,16 +4580,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
@@ -4315,6 +4632,11 @@ Object {
     0,
   ],
   "name": "p300_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    25,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4452,16 +4774,25 @@ Object {
     "max": 2000,
     "min": 50,
     "value": 500,
+    "valuesByApiLevel": Object {
+      "2.0": 500,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",
@@ -4495,6 +4826,11 @@ Object {
     20,
   ],
   "name": "p1000_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    45,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4634,16 +4970,25 @@ Object {
     "max": 2000,
     "min": 50,
     "value": 500,
+    "valuesByApiLevel": Object {
+      "2.0": 500,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",
@@ -4677,6 +5022,11 @@ Object {
     20,
   ],
   "name": "p1000_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    45,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4816,16 +5166,25 @@ Object {
     "max": 2000,
     "min": 50,
     "value": 500,
+    "valuesByApiLevel": Object {
+      "2.0": 500,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",
@@ -4859,6 +5218,11 @@ Object {
     20,
   ],
   "name": "p1000_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    45,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -4998,16 +5362,25 @@ Object {
     "max": 2000,
     "min": 50,
     "value": 500,
+    "valuesByApiLevel": Object {
+      "2.0": 500,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",
@@ -5041,6 +5414,11 @@ Object {
     20,
   ],
   "name": "p1000_single",
+  "nozzleOffset": Array [
+    0,
+    0,
+    45,
+  ],
   "pickUpCurrent": Object {
     "max": 2,
     "min": 0.05,
@@ -5166,16 +5544,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
@@ -5197,16 +5584,25 @@ Object {
     "max": 50,
     "min": 0.001,
     "value": 5,
+    "valuesByApiLevel": Object {
+      "2.0": 5,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
+    "valuesByApiLevel": Object {
+      "2.0": 10,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
@@ -5228,16 +5624,25 @@ Object {
     "max": 100,
     "min": 0.001,
     "value": 25,
+    "valuesByApiLevel": Object {
+      "2.0": 25,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
+    "valuesByApiLevel": Object {
+      "2.0": 50,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
@@ -5259,16 +5664,25 @@ Object {
     "max": 100,
     "min": 0.001,
     "value": 25,
+    "valuesByApiLevel": Object {
+      "2.0": 25,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
+    "valuesByApiLevel": Object {
+      "2.0": 50,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel GEN1",
@@ -5290,16 +5704,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
@@ -5321,16 +5744,25 @@ Object {
     "max": 600,
     "min": 0.001,
     "value": 150,
+    "valuesByApiLevel": Object {
+      "2.0": 150,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
+    "valuesByApiLevel": Object {
+      "2.0": 300,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
@@ -5352,16 +5784,25 @@ Object {
     "max": 2000,
     "min": 50,
     "value": 500,
+    "valuesByApiLevel": Object {
+      "2.0": 500,
+    },
   },
   "defaultBlowOutFlowRate": Object {
     "max": 1000,
     "min": 5,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
+    "valuesByApiLevel": Object {
+      "2.0": 1000,
+    },
   },
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",

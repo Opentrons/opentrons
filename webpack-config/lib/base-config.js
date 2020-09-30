@@ -31,6 +31,7 @@ module.exports = {
       rules.handlebars,
       rules.fonts,
       rules.images,
+      rules.videos,
     ],
   },
 

@@ -21,7 +21,7 @@ LOG = logging.getLogger('opentrons.hardware_control.__main__')
 def exception_handler(loop, context):
     message = ''
     if 'exception' in context:
-        message += f'exception: repr(context["exception"])'
+        message += f'exception: {repr(context["exception"])}'
     if 'future' in context:
         message += f' while running future {repr(context["future"])}'
     if 'protocol' in context:

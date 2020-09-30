@@ -5,7 +5,7 @@ import { Icon } from '@opentrons/components'
 import { i18n } from '../localization'
 import styles from './WellSelectionInstructions.css'
 
-export function WellSelectionInstructions() {
+export function WellSelectionInstructions(): React.Node {
   return (
     <div className={styles.wrapper}>
       <Icon className={styles.click_drag_icon} name="ot-click-and-drag" />

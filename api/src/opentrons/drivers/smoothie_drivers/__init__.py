@@ -75,3 +75,9 @@ class SimulatingDriver:
 
     def configure_splits_for(self, config):
         pass
+
+    def set_dwelling_current(self, settings):
+        pass
+
+    def set_acceleration(self, settings):
+        pass

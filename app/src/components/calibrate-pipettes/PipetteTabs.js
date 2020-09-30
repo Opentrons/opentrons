@@ -12,7 +12,7 @@ export type PipetteTabsProps = {|
   currentMount: ?string,
 |}
 
-export function PipetteTabs(props: PipetteTabsProps) {
+export function PipetteTabs(props: PipetteTabsProps): React.Node {
   const { currentMount } = props
   const pagesByMount = useSelector(getCalibratePipettesLocations)
 

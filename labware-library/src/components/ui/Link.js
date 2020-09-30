@@ -5,12 +5,13 @@ import { withRouter, Link as BaseLink } from 'react-router-dom'
 import type { ContextRouter } from 'react-router-dom'
 
 export type LinkProps = {|
+  ...ContextRouter,
   to: string,
   children?: React.Node,
   className?: string,
 |}
 
-export function WrappedLink(props: {| ...ContextRouter, ...LinkProps |}) {
+export function WrappedLink(props: LinkProps): React.Node {
   const { to, children, className, location } = props
 
   return (
@@ -23,4 +24,6 @@ export function WrappedLink(props: {| ...ContextRouter, ...LinkProps |}) {
   )
 }
 
-export const Link = withRouter(WrappedLink)
+export const Link: React.AbstractComponent<
+  $Diff<LinkProps, ContextRouter>
+> = withRouter(WrappedLink)

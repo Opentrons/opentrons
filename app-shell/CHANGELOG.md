@@ -3,6 +3,102 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
+
+### Bug Fixes
+
+* **app:** do not set the user's Intercom name to "Unknown User" ([#6468](https://github.com/Opentrons/opentrons/issues/6468)) ([66662a4](https://github.com/Opentrons/opentrons/commit/66662a4)), closes [#6461](https://github.com/Opentrons/opentrons/issues/6461)
+* **app, app-shell:** use mtime for custom labware date display ([#6396](https://github.com/Opentrons/opentrons/issues/6396)) ([45f7ec8](https://github.com/Opentrons/opentrons/commit/45f7ec8)), closes [#6381](https://github.com/Opentrons/opentrons/issues/6381)
+
+
+
+
+
+## [3.20.1](https://github.com/Opentrons/opentrons/compare/v3.20.0...v3.20.1) (2020-08-25)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [3.20.0](https://github.com/Opentrons/opentrons/compare/v3.19.0...v3.20.0) (2020-08-13)
+
+### Bug Fixes
+
+* **app:** simplify discovery state to avoid stale IPs and health data ([#6193](https://github.com/Opentrons/opentrons/issues/6193)) ([0e089a7](https://github.com/Opentrons/opentrons/commit/0e089a7)), closes [#5985](https://github.com/Opentrons/opentrons/issues/5985) [#5250](https://github.com/Opentrons/opentrons/issues/5250)
+
+
+
+
+
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
+
+
+### Bug Fixes
+
+* **app:** restart MDNS browser when network interfaces change ([#5933](https://github.com/Opentrons/opentrons/issues/5933)) ([c9c6dc8](https://github.com/Opentrons/opentrons/commit/c9c6dc8)), closes [#5343](https://github.com/Opentrons/opentrons/issues/5343)
+* **app-shell:** clean up old robot update files ([#5892](https://github.com/Opentrons/opentrons/issues/5892)) ([1e2b815](https://github.com/Opentrons/opentrons/commit/1e2b815)), closes [#4667](https://github.com/Opentrons/opentrons/issues/4667)
+
+
+### Features
+
+* **app:** add network interface collection to system-info ([#5764](https://github.com/Opentrons/opentrons/issues/5764)) ([7d64efa](https://github.com/Opentrons/opentrons/commit/7d64efa)), closes [#5397](https://github.com/Opentrons/opentrons/issues/5397)
+* **app, app-shell:** add ability to disable discovery cache ([#5759](https://github.com/Opentrons/opentrons/issues/5759)) ([5ad57d9](https://github.com/Opentrons/opentrons/commit/5ad57d9))
+
+
+
+
+## [3.18.1](https://github.com/Opentrons/opentrons/compare/v3.18.0...v3.18.1) (2020-05-26)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [3.18.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0) (2020-05-20)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+## [3.17.1](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1) (2020-05-06)
+
+* **app-shell:** upgrade Electron, avoid hoisting dependencies, and fix devtools ([#5545](https://github.com/Opentrons/opentrons/issues/5545)) ([f993925](https://github.com/Opentrons/opentrons/commit/f993925)), closes [#5537](https://github.com/Opentrons/opentrons/issues/5537) [#5541](https://github.com/Opentrons/opentrons/issues/5541)
+
+
+
+
+
+# [3.17.0](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [3.17.0-beta.1](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.0...v3.17.0-beta.1) (2020-04-14)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [3.17.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-beta.0) (2020-04-01)
+
+### Bug Fixes
+
+* **app:** accept mixed-case extensions for protocols and custom labware ([#5153](https://github.com/Opentrons/opentrons/issues/5153)) ([12cce54](https://github.com/Opentrons/opentrons/commit/12cce54)), closes [#5151](https://github.com/Opentrons/opentrons/issues/5151)
+
+
+
+
+
 ## [3.16.1](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1) (2020-02-25)
 
 **Note:** Version bump only for package @opentrons/app-shell

@@ -3,7 +3,7 @@
 The `ref` parameter in the `children` function must be passed into the wrapped child component.
 
 ```js
-initialState = { timesClickedOutside: 0 }
+const [state, setState] = React.useState({ timesClickedOutside: 0 })
 
 function handleClickOutside() {
   setState({ timesClickedOutside: state.timesClickedOutside + 1 })

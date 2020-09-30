@@ -27,6 +27,7 @@ import {
 
 import { getRobotSettings } from '../robot-settings'
 import { getAttachedPipettes } from '../pipettes'
+import { getPipettes, getModules } from '../robot/selectors'
 
 import { hash } from './hash'
 
@@ -34,6 +35,7 @@ import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
 
 import type {
+  AnalyticsConfig,
   ProtocolAnalyticsData,
   RobotAnalyticsData,
   BuildrootAnalyticsData,
@@ -51,7 +53,19 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
   getProtocolSource,
   getProtocolAuthor,
   getProtocolContents,
-  (type, app, apiVersion, name, source, author, contents) => ({
+  getPipettes,
+  getModules,
+  (
+    type,
+    app,
+    apiVersion,
+    name,
+    source,
+    author,
+    contents,
+    pipettes,
+    modules
+  ) => ({
     protocolType: type || '',
     protocolAppName: app.name || '',
     protocolAppVersion: app.version || '',
@@ -60,6 +74,8 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
     protocolSource: source || '',
     protocolAuthor: author || '',
     protocolText: contents || '',
+    pipettes: pipettes.map(p => p.requestedAs ?? p.name).join(','),
+    modules: modules.map(m => m.model).join(','),
   })
 )
 
@@ -122,4 +138,16 @@ export function getBuildrootAnalyticsData(
     updateVersion,
     error: session?.error || null,
   }
+}
+
+export function getAnalyticsConfig(state: State): AnalyticsConfig | null {
+  return state.config?.analytics ?? null
+}
+
+export function getAnalyticsOptedIn(state: State): boolean {
+  return state.config?.analytics.optedIn ?? false
+}
+
+export function getAnalyticsOptInSeen(state: State): boolean {
+  return state.config?.analytics.seenOptIn ?? true
 }

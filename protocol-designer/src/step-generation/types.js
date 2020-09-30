@@ -1,10 +1,12 @@
 // @flow
 import type {
-  Command,
+  AtomicProfileStep,
   EngageMagnetParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
+import typeof { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../constants'
+import type { ProfileItem } from '../form-types'
 import type {
   LabwareTemporalProperties,
   ModuleTemporalProperties,
@@ -28,6 +30,8 @@ export type InnerMixArgs = {|
   times: number,
 |}
 
+export type InnerDelayArgs = {| seconds: number, mmFromBottom: number |}
+
 type CommonArgs = {|
   /** Optional user-readable name for this step */
   name: ?string,
@@ -37,7 +41,7 @@ type CommonArgs = {|
 
 // ===== Processed form types. Used as args to call command creator fns =====
 
-export type SharedTransferLikeArgs = {
+export type SharedTransferLikeArgs = {|
   ...CommonArgs,
 
   pipette: string, // PipetteId
@@ -56,12 +60,18 @@ export type SharedTransferLikeArgs = {
   touchTipAfterAspirateOffsetMmFromBottom: number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
+  /** Delay after every aspirate */
+  aspirateDelay: ?InnerDelayArgs,
+  /** Air gap after every aspirate */
+  aspirateAirGapVolume: number | null,
   /** Flow rate in uL/sec for all aspirates */
   aspirateFlowRateUlSec: number,
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm: number,
 
   // ===== DISPENSE SETTINGS =====
+  /** Delay after every dispense */
+  dispenseDelay: ?InnerDelayArgs,
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean,
   /** Optional offset for touch tip after dispense (if null, use PD default) */
@@ -70,9 +80,10 @@ export type SharedTransferLikeArgs = {
   dispenseFlowRateUlSec: number,
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm: number,
-}
+|}
 
-export type ConsolidateArgs = {
+export type ConsolidateArgs = {|
+  ...SharedTransferLikeArgs,
   commandCreatorFnName: 'consolidate',
 
   sourceWells: Array<string>,
@@ -87,9 +98,10 @@ export type ConsolidateArgs = {
   mixFirstAspirate: ?InnerMixArgs,
   /** Mix in destination well after dispense */
   mixInDestination: ?InnerMixArgs,
-} & SharedTransferLikeArgs
+|}
 
-export type TransferArgs = {
+export type TransferArgs = {|
+  ...SharedTransferLikeArgs,
   commandCreatorFnName: 'transfer',
 
   sourceWells: Array<string>,
@@ -104,9 +116,10 @@ export type TransferArgs = {
   mixBeforeAspirate: ?InnerMixArgs,
   /** Mix in destination well after dispense */
   mixInDestination: ?InnerMixArgs,
-} & SharedTransferLikeArgs
+|}
 
-export type DistributeArgs = {
+export type DistributeArgs = {|
+  ...SharedTransferLikeArgs,
   commandCreatorFnName: 'distribute',
 
   sourceWell: string,
@@ -124,9 +137,9 @@ export type DistributeArgs = {
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?InnerMixArgs,
-} & SharedTransferLikeArgs
+|}
 
-export type MixArgs = {
+export type MixArgs = {|
   ...$Exact<CommonArgs>,
   commandCreatorFnName: 'mix',
   labware: string,
@@ -153,7 +166,10 @@ export type MixArgs = {
   /** flow rates in uL/sec */
   aspirateFlowRateUlSec: number,
   dispenseFlowRateUlSec: number,
-}
+  /** delays */
+  aspirateDelaySeconds: ?number,
+  dispenseDelaySeconds: ?number,
+|}
 
 export type PauseArgs = {|
   ...$Exact<CommonArgs>,
@@ -202,6 +218,30 @@ export type DeactivateTemperatureArgs = {|
   message?: string,
 |}
 
+export type ThermocyclerProfileStepArgs = {|
+  module: string,
+  commandCreatorFnName: THERMOCYCLER_PROFILE,
+  blockTargetTempHold: number | null,
+  lidOpenHold: boolean,
+  lidTargetTempHold: number | null,
+  message?: string,
+  profileSteps: Array<AtomicProfileStep>,
+  profileTargetLidTemp: number,
+  profileVolume: number,
+  meta?: {|
+    rawProfileItems: Array<ProfileItem>,
+  |},
+|}
+
+export type ThermocyclerStateStepArgs = {|
+  module: string,
+  commandCreatorFnName: THERMOCYCLER_STATE,
+  blockTargetTemp: number | null,
+  lidTargetTemp: number | null,
+  lidOpen: boolean,
+  message?: string,
+|}
+
 export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -213,6 +253,8 @@ export type CommandCreatorArgs =
   | SetTemperatureArgs
   | AwaitTemperatureArgs
   | DeactivateTemperatureArgs
+  | ThermocyclerProfileStepArgs
+  | ThermocyclerStateStepArgs
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
  * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.
@@ -287,6 +329,8 @@ export type ErrorType =
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'TIP_VOLUME_EXCEEDED'
   | 'MISSING_TEMPERATURE_STEP'
+  | 'THERMOCYCLER_LID_CLOSED'
+  | 'INVALID_SLOT'
 
 export type CommandCreatorError = {|
   message: string,
@@ -335,7 +379,7 @@ export type Timeline = {|
   errors?: ?Array<CommandCreatorError>,
 |}
 
-export type RobotStateAndWarnings = {
+export type RobotStateAndWarnings = {|
   robotState: RobotState,
   warnings: Array<CommandCreatorWarning>,
-}
+|}

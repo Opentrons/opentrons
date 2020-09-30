@@ -44,7 +44,7 @@ export type DropdownFieldProps = {|
 
 const BLANK_OPTION: DropdownOption = { name: '', value: '' }
 
-export function DropdownField(props: DropdownFieldProps) {
+export function DropdownField(props: DropdownFieldProps): React.Node {
   // add in "blank" option if there is no `value`, unless `options` already has a blank option
   const options =
     props.value || props.options.some(opt => opt.value === '')

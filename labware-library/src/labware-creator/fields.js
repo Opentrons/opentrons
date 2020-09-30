@@ -122,7 +122,7 @@ export type ProcessedLabwareFields = {|
   labwareType: LabwareType,
   tubeRackInsertLoadName: string,
   aluminumBlockType: string,
-  aluminumBlockChildType: string,
+  aluminumBlockChildType: string | null,
 
   // tubeRackSides: Array<string>, // eg, []
   footprintXDimension: number,
@@ -294,7 +294,7 @@ export const aluminumBlockChildTypeOptions: Options = [
 export const getImplicitAutofillValues = (
   preAutofilledValues: LabwareFields
 ): $Shape<LabwareFields> => {
-  let result: $Shape<LabwareFields> = {}
+  const result: $Shape<LabwareFields> = {}
   if ('gridRows' in preAutofilledValues) {
     result.regularRowSpacing = 'true'
   }

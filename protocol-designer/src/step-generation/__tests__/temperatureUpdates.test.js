@@ -11,7 +11,7 @@ import {
 } from '../getNextRobotStateAndWarnings/temperatureUpdates'
 import { makeImmutableStateUpdater } from '../__utils__/makeImmutableStateUpdater'
 import {
-  getStateAndContextTempMagModules,
+  getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../__fixtures__/robotStateFixtures'
 
@@ -27,7 +27,7 @@ const temperature = 45
 let invariantContext, deactivatedRobot, robotWithTemp, robotState
 
 beforeEach(() => {
-  const stateAndContext = getStateAndContextTempMagModules({
+  const stateAndContext = getStateAndContextTempTCModules({
     temperatureModuleId,
     thermocyclerId,
   })

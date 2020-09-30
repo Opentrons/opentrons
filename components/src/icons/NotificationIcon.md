@@ -1,14 +1,11 @@
 Basic orange notification dot:
 
 ```js
-;<div>
-  <div style={{ width: '3rem' }}>
-    <NotificationIcon
-      name="flask-outline"
-      className={'dark_gray'}
-      childName="circle"
-      childClassName={'orange'}
-    />
-  </div>
-</div>
+import { SIZE_3, C_DARK_GRAY } from '@opentrons/components'
+;<NotificationIcon
+  name="flask-outline"
+  childName="circle"
+  color={C_DARK_GRAY}
+  width={SIZE_3}
+/>
 ```

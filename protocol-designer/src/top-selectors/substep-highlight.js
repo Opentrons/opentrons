@@ -2,11 +2,10 @@
 import { createSelector } from 'reselect'
 import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 import { getWellSetForMultichannel } from '../utils'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 
 import mapValues from 'lodash/mapValues'
 
-import { allSubsteps } from './substeps'
 import * as StepGeneration from '../step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
@@ -60,7 +59,7 @@ function _getSelectedWellsForStep(
   const getWells = (wells: Array<string>) =>
     _wellsForPipette(pipetteEntity, labwareEntity, wells)
 
-  let wells = []
+  const wells = []
 
   // If we're moving liquids within a single labware,
   // both the source and dest wells together need to be selected.
@@ -153,7 +152,7 @@ function _getSelectedWellsForSubstep(
     return []
   }
 
-  let wells: Array<string> = []
+  const wells: Array<string> = []
 
   // single-labware steps
   if (
@@ -206,7 +205,7 @@ export const wellHighlightsByLabwareId: Selector<{
   stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
   getHoveredSubstep,
-  allSubsteps,
+  fileDataSelectors.getSubsteps,
   stepFormSelectors.getOrderedStepIds,
   (
     robotStateTimeline,
@@ -214,7 +213,7 @@ export const wellHighlightsByLabwareId: Selector<{
     allStepArgsAndErrors,
     hoveredStepId,
     hoveredSubstep,
-    allSubsteps,
+    substepsById,
     orderedStepIds
   ) => {
     const timeline = robotStateTimeline.timeline
@@ -245,7 +244,7 @@ export const wellHighlightsByLabwareId: Selector<{
           selectedWells = _getSelectedWellsForSubstep(
             stepArgs,
             labwareId,
-            allSubsteps[stepId],
+            substepsById[stepId],
             hoveredSubstep.substepIndex,
             invariantContext
           )

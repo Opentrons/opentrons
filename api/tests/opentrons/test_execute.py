@@ -7,8 +7,9 @@ from unittest import mock
 import pytest
 
 from opentrons import execute, types
-from opentrons.hardware_control import controller
-from opentrons.protocol_api.execute import ExceptionInProtocolError
+from opentrons.hardware_control import controller, api
+from opentrons.protocols.execution.errors import ExceptionInProtocolError
+from opentrons.config.pipette_config import load
 
 HERE = Path(__file__).parent
 
@@ -23,7 +24,7 @@ def mock_get_attached_instr(monkeypatch, virtual_smoothie_env):
     monkeypatch.setattr(controller.Controller,
                         'get_attached_instruments',
                         gai_mock)
-    monkeypatch.setattr(controller.Controller, 'delay', dummy_delay)
+    monkeypatch.setattr(api.API, 'delay', dummy_delay)
     gai_mock.return_value = {types.Mount.RIGHT: {'model': None, 'id': None},
                              types.Mount.LEFT: {'model': None, 'id': None}}
     return gai_mock
@@ -37,9 +38,9 @@ def test_execute_function_apiv2(protocol,
                                 mock_get_attached_instr):
 
     mock_get_attached_instr.return_value[types.Mount.LEFT]\
-        = {'model': 'p10_single_v1.5', 'id': 'testid'}
+        = {'config': load('p10_single_v1.5'), 'id': 'testid'}
     mock_get_attached_instr.return_value[types.Mount.RIGHT]\
-        = {'model': 'p300_single_v1.5', 'id': 'testid2'}
+        = {'config': load('p300_single_v1.5'), 'id': 'testid2'}
     entries = []
 
     def emit_runlog(entry):
@@ -51,8 +52,8 @@ def test_execute_function_apiv2(protocol,
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1',
-        'Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 1.0 speed',  # noqa(E501),
-        'Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1.0 speed',  # noqa(E501),
+        'Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 150.0 uL/sec',  # noqa(E501),
+        'Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 300.0 uL/sec',  # noqa(E501),
         'Dropping tip into H12 of Opentrons 96 Tip Rack 300 µL on 1'
         ]
 
@@ -69,14 +70,14 @@ def test_execute_function_json_v3_apiv2(get_json_protocol_fixture,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        'model': 'p10_single_v1.5', 'id': 'testid'}
+        'config': load('p10_single_v1.5'), 'id': 'testid'}
     execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
         'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1',
-        'Aspirating 5.0 uL from A1 of Source Plate on 2 at 1.0 speed',
+        'Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec',
         'Delaying for 0 minutes and 42 seconds',
-        'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 1.0 speed',
+        'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
         'Dropping tip into A1 of Trash on 12'
@@ -95,14 +96,40 @@ def test_execute_function_json_v4_apiv2(get_json_protocol_fixture,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        'model': 'p10_single_v1.5', 'id': 'testid'}
+        'config': load('p10_single_v1.5'), 'id': 'testid'}
     execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
         'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1',
-        'Aspirating 5.0 uL from A1 of Source Plate on 2 at 1.0 speed',
+        'Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec',
         'Delaying for 0 minutes and 42 seconds',
-        'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 1.0 speed',
+        'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
+        'Touching tip',
+        'Blowing out at B1 of Dest Plate on 3',
+        'Dropping tip into A1 of Trash on 12'
+    ]
+
+
+def test_execute_function_json_v5_apiv2(get_json_protocol_fixture,
+                                        virtual_smoothie_env,
+                                        mock_get_attached_instr):
+    jp = get_json_protocol_fixture('5', 'simpleV5', False)
+    filelike = io.StringIO(jp)
+    entries = []
+
+    def emit_runlog(entry):
+        nonlocal entries
+        entries.append(entry)
+
+    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
+        'config': load('p10_single_v1.5'), 'id': 'testid'}
+    execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
+    assert [item['payload']['text'] for item in entries
+            if item['$'] == 'before'] == [
+        'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1',
+        'Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec',
+        'Delaying for 0 minutes and 42 seconds',
+        'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
         'Dropping tip into A1 of Trash on 12'
@@ -120,25 +147,29 @@ def test_execute_function_bundle_apiv2(get_bundle_fixture,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        'model': 'p10_single_v1.5', 'id': 'testid'}
+        'config': load('p10_single_v1.5'), 'id': 'testid'}
     execute.execute(
         bundle['filelike'], 'simple_bundle.zip', emit_runlog=emit_runlog)
     assert [item['payload']['text']
             for item in entries if item['$'] == 'before'] == [
         'Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
         'Picking up tip from A1 of Opentrons 96 Tip Rack 10 µL on 3',
-        'Aspirating 1.0 uL from A1 of FAKE example labware on 1 at 1.0 speed',
-        'Dispensing 1.0 uL into A4 of FAKE example labware on 1 at 1.0 speed',
+        "Aspirating 1.0 uL from A1 of FAKE example labware on 1 at" \
+        " 5.0 uL/sec",
+        "Dispensing 1.0 uL into A4 of FAKE example labware on 1 at" \
+        " 10.0 uL/sec",
         'Dropping tip into A1 of Opentrons Fixed Trash on 12',
         'Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
         'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 3',
-        'Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 1.0 speed',
-        'Dispensing 2.0 uL into A4 of FAKE example labware on 1 at 1.0 speed',
+        'Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec',
+        "Dispensing 2.0 uL into A4 of FAKE example labware on 1 at" \
+        " 10.0 uL/sec",
         'Dropping tip into A1 of Opentrons Fixed Trash on 12',
         'Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
         'Picking up tip from C1 of Opentrons 96 Tip Rack 10 µL on 3',
-        'Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 1.0 speed',
-        'Dispensing 3.0 uL into A4 of FAKE example labware on 1 at 1.0 speed',
+        'Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec',
+        "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at" \
+        " 10.0 uL/sec",
         'Dropping tip into A1 of Opentrons Fixed Trash on 12'
         ]
 
@@ -154,15 +185,15 @@ def test_execute_function_v1(protocol, protocol_file,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        'model': 'p300_single_v1.5', 'id': 'testid'}
+        'config': load('p300_single_v1.5'), 'id': 'testid'}
     execute.execute(protocol.filelike, 'testosaur.py', emit_runlog=emit_runlog)
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
         'Picking up tip from well A1 in "5"',
-        'Aspirating 10.0 uL from well A1 in "8" at 1.0 speed',
-        'Dispensing 10.0 uL into well H12 in "8" at 1.0 speed',
-        'Aspirating 10.0 uL from well A1 in "11" at 1.0 speed',
-        'Dispensing 10.0 uL into well H12 in "11" at 1.0 speed',
+        'Aspirating 10.0 uL from well A1 in "8" at 150.0 uL/sec',
+        'Dispensing 10.0 uL into well H12 in "8" at 300.0 uL/sec',
+        'Aspirating 10.0 uL from well A1 in "11" at 150.0 uL/sec',
+        'Dispensing 10.0 uL into well H12 in "11" at 300.0 uL/sec',
         'Dropping tip into well A1 in "12"'
     ]
 
@@ -179,7 +210,7 @@ def test_execute_extra_labware(protocol, protocol_file, monkeypatch,
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        'model': 'p300_single_v2.0', 'id': 'testid'}
+        'config': load('p300_single_v2.0'), 'id': 'testid'}
     # make sure we can load labware explicitly
     # make sure we don't have an exception from not finding the labware
     execute.execute(protocol.filelike, 'custom_labware.py',

@@ -7,6 +7,7 @@ import {
   mockFailureBody,
 } from '../../robot-api/__fixtures__'
 
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { NetworkingStatusResponse } from '../types'
 
 export const mockWifiInterface = {
@@ -33,10 +34,15 @@ export const mockNetworkingStatus: NetworkingStatusResponse = {
   },
 }
 
-const { successMeta, failureMeta, success, failure } = makeResponseFixtures<
+const {
+  successMeta,
+  failureMeta,
+  success,
+  failure,
+}: ResponseFixtures<
   NetworkingStatusResponse,
   {| message: string |}
->({
+> = makeResponseFixtures({
   method: GET,
   path: '/networking/status',
   successStatus: 200,

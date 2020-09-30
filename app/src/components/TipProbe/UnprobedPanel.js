@@ -13,14 +13,13 @@ import { getDeckPopulated } from '../../robot/selectors'
 import type { Dispatch } from '../../types'
 import type { TipProbeProps } from './types'
 
-export function UnprobedPanel(props: TipProbeProps) {
+export function UnprobedPanel(props: TipProbeProps): React.Node {
   const { mount, probed } = props
   const [showClearDeck, setShowClearDeck] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()
   const deckPopulated = useSelector(getDeckPopulated)
 
   const moveToFront = () => {
-    // $FlowFixMe: robotActions.moveToFront is not typed
     dispatch(robotActions.moveToFront(mount))
     setShowClearDeck(false)
   }

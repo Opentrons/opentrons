@@ -14,7 +14,11 @@ type Props = {|
   toggleCard: boolean => mixed,
 |}
 
-export const MagDeckCard = ({ module, isCardExpanded, toggleCard }: Props) => (
+export const MagDeckCard = ({
+  module,
+  isCardExpanded,
+  toggleCard,
+}: Props): React.Node => (
   <StatusCard
     title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}

@@ -731,7 +731,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  it('handles RETURN_TIP_RESPONSE action', () => {
+  it('handles RETURN_TIP_RESPONSE success', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -754,6 +754,39 @@ describe('robot reducer - calibration', () => {
         type: 'RETURN_TIP',
         inProgress: false,
         error: null,
+        mount: 'left',
+      },
+      tipOnByMount: {
+        left: false,
+      },
+    })
+  })
+
+  it('handles RETURN_TIP_RESPONSE failure', () => {
+    const state = {
+      calibration: {
+        calibrationRequest: {
+          type: 'RETURN_TIP',
+          inProgress: true,
+          error: null,
+          mount: 'left',
+        },
+        tipOnByMount: {
+          left: true,
+        },
+      },
+    }
+    const action = {
+      type: actionTypes.RETURN_TIP_RESPONSE,
+      error: true,
+      payload: { message: 'AH' },
+    }
+
+    expect(reducer(state, action).calibration).toEqual({
+      calibrationRequest: {
+        type: 'RETURN_TIP',
+        inProgress: false,
+        error: { message: 'AH' },
         mount: 'left',
       },
       tipOnByMount: {

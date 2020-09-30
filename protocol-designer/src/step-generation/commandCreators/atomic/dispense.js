@@ -1,6 +1,9 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
-import { modulePipetteCollision } from '../../utils'
+import {
+  modulePipetteCollision,
+  thermocyclerPipetteCollision,
+} from '../../utils'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
@@ -13,7 +16,7 @@ export const dispense: CommandCreator<DispenseParams> = (
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
 
   const actionName = 'dispense'
-  let errors: Array<CommandCreatorError> = []
+  const errors: Array<CommandCreatorError> = []
 
   if (
     modulePipetteCollision({
@@ -34,6 +37,16 @@ export const dispense: CommandCreator<DispenseParams> = (
 
   if (!labware || !prevRobotState.labware[labware]) {
     errors.push(errorCreators.labwareDoesNotExist({ actionName, labware }))
+  }
+
+  if (
+    thermocyclerPipetteCollision(
+      prevRobotState.modules,
+      prevRobotState.labware,
+      labware
+    )
+  ) {
+    errors.push(errorCreators.thermocyclerLidClosed())
   }
 
   if (errors.length > 0) {

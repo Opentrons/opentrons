@@ -1,7 +1,7 @@
 // @flow
 import type { BrowserService, MdnsServiceType } from 'mdns-js'
 
-export const MOCK_BROWSER_SERVICE: BrowserService = {
+export const mockBrowserService: BrowserService = {
   addresses: ['192.168.1.42'],
   query: ['_http._tcp.local'],
   type: [

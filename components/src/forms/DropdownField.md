@@ -3,7 +3,7 @@
 When `value` prop is truthy, the "blank" option isn't shown:
 
 ```js
-initialState = { selectedValue: 'rna' }
+const [state, setState] = React.useState({ selectedValue: 'rna' })
 ;<DropdownField
   onChange={e => setState({ selectedValue: e.target.value })}
   value={state.selectedValue}
@@ -18,7 +18,8 @@ initialState = { selectedValue: 'rna' }
 When `value` is falsey, the "blank" option appears and is selected. You can't get back to blank state once you're selected something without external state manipulation. This is similar to how `RadioGroup` works.
 
 ```js
-initialState = { selectedValue: null }
+import { FlatButton } from '@opentrons/components'
+const [state, setState] = React.useState({ selectedValue: null })
 ;<div>
   <DropdownField
     onChange={e => setState({ selectedValue: e.target.value })}
@@ -38,7 +39,7 @@ initialState = { selectedValue: null }
 To make a `DropdownField` always allow the user to select a blank value, add an option object to the `options` prop with a blank (empty string) value:
 
 ```js
-initialState = { selectedValue: '' }
+const [state, setState] = React.useState({ selectedValue: '' })
 ;<DropdownField
   onChange={e => setState({ selectedValue: e.target.value })}
   value={state.selectedValue}

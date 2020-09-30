@@ -1,72 +1,92 @@
 // @flow
-// Card for displaying/initiating factory calibration
+// calibration panel with various calibration-related controls and info
+
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import { useDispatch, useSelector } from 'react-redux'
 
+import type { Dispatch, State } from '../../types'
+import * as Calibration from '../../calibration'
 import { CONNECTABLE } from '../../discovery'
-import { startDeckCalibration } from '../../http-api-client'
-import { Card, OutlineButton } from '@opentrons/components'
-import { CardContentFlex, CardContentFull } from '../layout'
-
-import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
+import { selectors as robotSelectors } from '../../robot'
 
-type OP = {|
+import { useInterval, Card } from '@opentrons/components'
+
+import {
+  DECK_CAL_STATUS_POLL_INTERVAL,
+  DISABLED_CANNOT_CONNECT,
+  DISABLED_CONNECT_TO_ROBOT,
+  DISABLED_PROTOCOL_IS_RUNNING,
+} from './constants'
+import { DeckCalibrationControl } from './DeckCalibrationControl'
+import { CheckCalibrationControl } from './CheckCalibrationControl'
+
+type Props = {|
   robot: ViewableRobot,
-  calibrateDeckUrl: string,
-  disabled: boolean,
 |}
 
-type DP = {|
-  start: () => mixed,
-|}
+const TITLE = 'Robot Calibration'
 
-type Props = { ...OP, ...DP }
+// TODO: Change these two
+const BAD_DECK_CALIBRATION =
+  'Bad deck calibration detected. Please perform a full deck calibration.'
+const NO_DECK_CALIBRATION = 'Please perform a full deck calibration.'
 
-const TITLE = 'Deck Calibration'
-// const LAST_RUN_LABEL = 'Last Run'
-const CALIBRATION_MESSAGE =
-  'Calibrate your robot to initial factory settings to ensure accuracy.'
+export function CalibrationCard(props: Props): React.Node {
+  const { robot } = props
+  const { name: robotName, status } = robot
+  const notConnectable = status !== CONNECTABLE
 
-export const CalibrationCard = connect<Props, OP, _, _, _, _>(
-  null,
-  mapDispatchToProps
-)(CalibrationCardComponent)
+  const dispatch = useDispatch<Dispatch>()
+  useInterval(
+    () => dispatch(Calibration.fetchCalibrationStatus(robotName)),
+    DECK_CAL_STATUS_POLL_INTERVAL,
+    true
+  )
 
-function CalibrationCardComponent(props: Props) {
-  const { start, robot } = props
-  const disabled = robot.status !== CONNECTABLE
+  const isRunning = useSelector(robotSelectors.getIsRunning)
+  const deckCalStatus = useSelector((state: State) => {
+    return Calibration.getDeckCalibrationStatus(state, robotName)
+  })
+  const deckCalData = useSelector((state: State) => {
+    return Calibration.getDeckCalibrationData(state, robotName)
+  })
 
+  let buttonDisabledReason = null
+  if (notConnectable) {
+    buttonDisabledReason = DISABLED_CANNOT_CONNECT
+  } else if (!robot.connected) {
+    buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
+  } else if (isRunning) {
+    buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
+  }
+
+  let calCheckDisabledReason = buttonDisabledReason
+  if (
+    deckCalStatus === Calibration.DECK_CAL_STATUS_BAD_CALIBRATION ||
+    deckCalStatus === Calibration.DECK_CAL_STATUS_SINGULARITY
+  ) {
+    calCheckDisabledReason = BAD_DECK_CALIBRATION
+  } else if (deckCalStatus === Calibration.DECK_CAL_STATUS_IDENTITY) {
+    calCheckDisabledReason = NO_DECK_CALIBRATION
+  }
+
+  const buttonDisabled = Boolean(buttonDisabledReason)
   return (
-    <Card title={TITLE} disabled={disabled}>
-      <CardContentFull>
-        <p>{CALIBRATION_MESSAGE}</p>
-      </CardContentFull>
-      <CardContentFlex>
-        <div>
-          {/*
-          <LabeledValue
-            label={LAST_RUN_LABEL}
-            value='Never'
-          />
-        */}
-        </div>
-        <OutlineButton onClick={start} disabled={disabled}>
-          Calibrate
-        </OutlineButton>
-      </CardContentFlex>
+    <Card title={TITLE}>
+      <DeckCalibrationControl
+        robotName={robotName}
+        buttonDisabled={buttonDisabled}
+        deckCalStatus={deckCalStatus}
+        deckCalData={deckCalData}
+        startLegacyDeckCalibration={() => {}}
+      />
+      {deckCalStatus !== null && (
+        <CheckCalibrationControl
+          robotName={robotName}
+          disabledReason={calCheckDisabledReason}
+        />
+      )}
     </Card>
   )
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const { robot, calibrateDeckUrl } = ownProps
-
-  return {
-    start: () =>
-      dispatch(startDeckCalibration(robot)).then(() =>
-        dispatch(push(calibrateDeckUrl))
-      ),
-  }
 }

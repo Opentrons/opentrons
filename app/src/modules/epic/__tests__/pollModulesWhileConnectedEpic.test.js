@@ -36,7 +36,7 @@ describe('pollModulesWhileConnectedEpic', () => {
 
   it('does nothing if connect fails', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const action = RobotActions.connectResponse(new Error('AH'))
+      const action = RobotActions.connectResponse({ message: 'AH' })
 
       const action$ = hot('--a', { a: action })
       const state$ = hot('--a', { a: mockState })

@@ -29,8 +29,13 @@ type LiquidEditFormValues = {
   name: string,
   description?: ?string,
   serialize?: boolean,
+  ...
 }
-export const liquidEditFormSchema = Yup.object().shape({
+
+export const liquidEditFormSchema: Yup.Schema<
+  {| name: string, description: string, serialize: boolean |},
+  any
+> = Yup.object().shape({
   name: Yup.string().required(
     i18n.t('form.generic.error.required', {
       name: i18n.t('form.liquid_edit.name'),
@@ -40,7 +45,7 @@ export const liquidEditFormSchema = Yup.object().shape({
   serialize: Yup.boolean(),
 })
 
-export function LiquidEditForm(props: Props) {
+export function LiquidEditForm(props: Props): React.Node {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
 
   const initialValues: LiquidEditFormValues = {

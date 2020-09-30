@@ -83,7 +83,7 @@ Jupyter Installation
 
 You must make sure that you install the `opentrons` package for whichever kernel and virtual environment the notebook is using. A generally good way to do this is
 
-.. code-block:: python
+.. code-block::
 
    import sys
    !{sys.executable} -m pip install opentrons

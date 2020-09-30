@@ -5,11 +5,12 @@ import {
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
+  DEFAULT_DELAY_SECONDS,
   FIXED_TRASH_ID,
 } from '../../constants'
+
 import type { StepType, StepFieldName } from '../../form-types'
 
-// TODO: Ian 2019-01-17 move this somewhere more central - see #2926
 export function getDefaultsForStepType(
   stepType: StepType
 ): { [StepFieldName]: any } {
@@ -22,10 +23,14 @@ export function getDefaultsForStepType(
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
-        mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE, // NOTE: mix uses dispense for both asp + disp, for now
+        mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`, // NOTE: mix uses dispense for both asp + disp, for now
         pipette: null,
         volume: undefined,
         wells: [],
+        aspirate_delay_checkbox: false,
+        aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+        dispense_delay_checkbox: false,
+        dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
       }
     case 'moveLiquid':
       return {
@@ -43,7 +48,7 @@ export function getDefaultsForStepType(
         aspirate_mix_checkbox: false,
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
-        aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+        aspirate_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
         aspirate_touchTip_checkbox: false,
 
         dispense_flowRate: null,
@@ -54,7 +59,7 @@ export function getDefaultsForStepType(
         dispense_mix_checkbox: false,
         dispense_mix_times: null,
         dispense_mix_volume: null,
-        dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+        dispense_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
         dispense_touchTip_checkbox: false,
 
         disposalVolume_checkbox: false,
@@ -63,10 +68,19 @@ export function getDefaultsForStepType(
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
         preWetTip: false,
+
+        aspirate_airGap_checkbox: false,
+        aspirate_airGap_volume: null,
+        aspirate_delay_checkbox: false,
+        aspirate_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
+        aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+        dispense_delay_checkbox: false,
+        dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+        dispense_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
       }
     case 'pause':
       return {
-        pauseForAmountOfTime: null,
+        pauseAction: null,
         pauseHour: null,
         pauseMinute: null,
         pauseSecond: null,
@@ -91,6 +105,25 @@ export function getDefaultsForStepType(
         moduleId: null,
         setTemperature: null,
         targetTemperature: null,
+      }
+    case 'thermocycler':
+      return {
+        thermocyclerFormType: null,
+        moduleId: null,
+        blockIsActive: false,
+        blockTargetTemp: null,
+        lidIsActive: false,
+        lidTargetTemp: null,
+        lidOpen: false,
+        profileVolume: null,
+        profileTargetLidTemp: null,
+        orderedProfileItems: [],
+        profileItemsById: {},
+        blockIsActiveHold: false,
+        blockTargetTempHold: null,
+        lidIsActiveHold: false,
+        lidTargetTempHold: null,
+        lidOpenHold: null,
       }
     default:
       return {}

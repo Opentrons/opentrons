@@ -20,9 +20,9 @@ export class Upload extends React.Component<UploadProps, UploadState> {
     this.state = { uploadedFile: null }
   }
 
-  onUpload = (
-    event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>
-  ) => {
+  onUpload: (
+    event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<>
+  ) => void = event => {
     let files: Array<File> = []
     if (event.dataTransfer && event.dataTransfer.files) {
       files = (event.dataTransfer.files: any)
@@ -36,10 +36,11 @@ export class Upload extends React.Component<UploadProps, UploadState> {
       this.props.createSession(files[0])
     }
 
+    // $FlowFixMe(mc, 2020-05-31): only clear value for file input, not drag and drop
     event.currentTarget.value = ''
   }
 
-  confirmUpload = () => {
+  confirmUpload: () => void = () => {
     const { uploadedFile } = this.state
 
     if (uploadedFile) {
@@ -48,11 +49,11 @@ export class Upload extends React.Component<UploadProps, UploadState> {
     }
   }
 
-  forgetUpload = () => {
+  forgetUpload: () => void = () => {
     this.setState({ uploadedFile: null })
   }
 
-  render() {
+  render(): React.Node {
     const { uploadedFile } = this.state
     const { filename } = this.props
 

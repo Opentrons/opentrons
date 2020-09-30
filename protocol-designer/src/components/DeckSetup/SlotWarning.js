@@ -16,7 +16,7 @@ type Props = {|
 
 const OVERHANG = 60
 
-export const SlotWarning = (props: Props) => {
+export const SlotWarning = (props: Props): React.Node => {
   const { x, y, xDimension, yDimension, orientation, warningType } = props
   const rectXOffset = orientation === 'left' ? -OVERHANG : 0
   const textXOffset = orientation === 'left' ? -1 * OVERHANG : xDimension

@@ -43,7 +43,7 @@ export class FlowRateInput extends React.Component<Props, State> {
     this.state = this.getStateFromProps(props)
   }
 
-  getStateFromProps = (props: Props): State => {
+  getStateFromProps: (props: Props) => State = props => {
     const { formFlowRate } = props
     return {
       showModal: false,
@@ -53,15 +53,15 @@ export class FlowRateInput extends React.Component<Props, State> {
     }
   }
 
-  cancelModal = () => {
+  cancelModal: () => void = () => {
     this.setState(this.getStateFromProps(this.props))
   }
 
-  openModal = () => {
+  openModal: () => void = () => {
     this.setState({ showModal: true })
   }
 
-  makeSaveModal = (allowSave: boolean) => () => {
+  makeSaveModal: (allowSave: boolean) => () => void = allowSave => () => {
     const { modalUseDefault, modalFlowRate } = this.state
 
     const newFlowRate = modalUseDefault ? null : Number(modalFlowRate)
@@ -75,13 +75,13 @@ export class FlowRateInput extends React.Component<Props, State> {
     this.props.updateValue(newFlowRate)
   }
 
-  handleChangeRadio = (e: SyntheticInputEvent<*>) => {
+  handleChangeRadio: (e: SyntheticInputEvent<>) => void = e => {
     this.setState({
       modalUseDefault: e.target.value !== 'custom',
     })
   }
 
-  handleChangeNumber = (e: SyntheticInputEvent<*>) => {
+  handleChangeNumber: (e: SyntheticInputEvent<>) => void = e => {
     const value = e.target.value
     if (value === '' || value === '.' || !Number.isNaN(Number(value))) {
       this.setState({
@@ -91,7 +91,7 @@ export class FlowRateInput extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): React.Node {
     const { showModal, modalUseDefault, pristine } = this.state
 
     const {

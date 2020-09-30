@@ -4,12 +4,13 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
-  legacySteps as steps,
   orderedStepIds,
   labwareInvariantProperties,
   moduleInvariantProperties,
+  presavedStepForm,
   savedStepForms,
   unsavedForm,
 } from '../reducers'
@@ -20,17 +21,43 @@ import {
 } from '../selectors'
 import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
 import { moveDeckItem } from '../../labware-ingred/actions'
-import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
+import {
+  INITIAL_DECK_SETUP_STEP_ID,
+  SPAN7_8_10_11_SLOT,
+  PAUSE_UNTIL_TEMP,
+} from '../../constants'
+import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import {
+  createPresavedStepForm,
+  type CreatePresavedStepFormArgs,
+} from '../utils/createPresavedStepForm'
+import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import { uuid } from '../../utils'
 import type { DeckSlot } from '../../types'
-
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')
 jest.mock('../../steplist/formLevel/handleFormChange')
+jest.mock('../utils/createPresavedStepForm')
+jest.mock('../../utils/labwareModuleCompatibility')
+jest.mock('../../utils')
 
+const mockUuid: JestMockFn<[], string> = uuid
+
+const mockCreatePresavedStepForm: JestMockFn<
+  [CreatePresavedStepFormArgs],
+  any
+> = createPresavedStepForm
 const handleFormChangeMock: JestMockFn<
   [{ [string]: any }, { [string]: any }, any, any],
   { [string]: any }
 > = handleFormChange
+
+const getLabwareIsCompatibleMock: JestMockFn<
+  [any],
+  boolean
+> = getLabwareIsCompatible
 
 const mock_getPipetteEntitiesRootState: JestMockFn<
   [any],
@@ -45,68 +72,27 @@ const mock_getInitialDeckSetupRootState: JestMockFn<
   any
 > = _getInitialDeckSetupRootState
 
-beforeEach(() => {
+afterEach(() => {
   jest.clearAllMocks()
 })
 
-describe('steps reducer', () => {
-  it('initial add step', () => {
-    const state = {}
-    const action = {
-      type: 'ADD_STEP',
-      payload: { id: '123', stepType: 'moveLiquid' },
-    }
-
-    expect(steps(state, action)).toEqual({
-      '123': {
-        id: '123',
-        stepType: 'moveLiquid',
-      },
-    })
-  })
-
-  it('second add step', () => {
-    const state = {
-      '333': {
-        id: '333',
-        stepType: 'mix',
-      },
-    }
-    const action = {
-      type: 'ADD_STEP',
-      payload: { id: '123', stepType: 'moveLiquid' },
-    }
-
-    expect(steps(state, action)).toEqual({
-      '333': {
-        id: '333',
-        stepType: 'mix',
-      },
-      '123': {
-        id: '123',
-        stepType: 'moveLiquid',
-      },
-    })
-  })
-})
-
 describe('orderedStepIds reducer', () => {
-  it('initial add step', () => {
-    const state = []
+  it('should add a saved step when that step is new', () => {
+    const state = ['99']
     const action = {
-      type: 'ADD_STEP',
+      type: 'SAVE_STEP_FORM',
       payload: { id: '123', stepType: 'moveLiquid' },
     }
-    expect(orderedStepIds(state, action)).toEqual(['123'])
+    expect(orderedStepIds(state, action)).toEqual(['99', '123'])
   })
 
-  it('second add step', () => {
-    const state = ['123']
+  it('should not update when an existing step is saved', () => {
+    const state = ['99', '123', '11']
     const action = {
-      type: 'ADD_STEP',
-      payload: { id: '22', stepType: 'moveLiquid' },
+      type: 'SAVE_STEP_FORM',
+      payload: { id: '123', stepType: 'moveLiquid' },
     }
-    expect(orderedStepIds(state, action)).toEqual(['123', '22'])
+    expect(orderedStepIds(state, action)).toBe(state)
   })
 
   describe('reorder steps', () => {
@@ -441,19 +427,69 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       },
       {
         testName:
-          'move empty module to slot with labware -> swap slots, do not add labware to module',
+          'move empty module to slot with incompatible labware -> swap slots, do not add labware to module',
         sourceSlot: '1',
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: { [existingLabwareId]: '3' },
           moduleLocationUpdate: { [moduleId]: '1' },
         },
+        deckSetup: {
+          labware: {
+            [existingLabwareId]: {
+              id: existingLabwareId,
+              slot: '3',
+              def: { foo: 'fake def' },
+            },
+          },
+          pipettes: {},
+          modules: {
+            [moduleId]: {
+              id: moduleId,
+              type: MAGNETIC_MODULE_TYPE,
+              model: MAGNETIC_MODULE_V2,
+              slot: '1',
+            },
+          },
+        },
+        labwareIsCompatible: false,
         expectedLabwareLocations: { [existingLabwareId]: '1' },
         expectedModuleLocations: { [moduleId]: '3' },
       },
       {
         testName:
-          'move occupied module to slot with labware -> swap slots, do not change labware on module',
+          'move empty module to slot with compatible labware -> put module under labware',
+        sourceSlot: '1',
+        destSlot: '3',
+        makeStateArgs: {
+          labwareLocationUpdate: { [existingLabwareId]: '3' },
+          moduleLocationUpdate: { [moduleId]: '1' },
+        },
+        deckSetup: {
+          labware: {
+            [existingLabwareId]: {
+              id: existingLabwareId,
+              slot: '3',
+              def: { foo: 'fake def' },
+            },
+          },
+          pipettes: {},
+          modules: {
+            [moduleId]: {
+              id: moduleId,
+              type: MAGNETIC_MODULE_TYPE,
+              model: MAGNETIC_MODULE_V2,
+              slot: '1',
+            },
+          },
+        },
+        labwareIsCompatible: true,
+        expectedLabwareLocations: { [existingLabwareId]: moduleId },
+        expectedModuleLocations: { [moduleId]: '3' },
+      },
+      {
+        testName:
+          'move occupied module to slot with labware -> swap slots, do not change labware on module (even if compatible)',
         sourceSlot: '1',
         destSlot: '3',
         makeStateArgs: {
@@ -463,6 +499,30 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           },
           moduleLocationUpdate: { [moduleId]: '1' },
         },
+        deckSetup: {
+          labware: {
+            [existingLabwareId]: {
+              id: existingLabwareId,
+              slot: '3',
+              def: { foo: 'fake def' },
+            },
+            [labwareOnModuleId]: {
+              id: labwareOnModuleId,
+              slot: moduleId,
+              def: { foo: 'fake def' },
+            },
+          },
+          pipettes: {},
+          modules: {
+            [moduleId]: {
+              id: moduleId,
+              type: MAGNETIC_MODULE_TYPE,
+              model: MAGNETIC_MODULE_V2,
+              slot: '1',
+            },
+          },
+        },
+        labwareIsCompatible: true,
         expectedLabwareLocations: {
           [existingLabwareId]: '1',
           [labwareOnModuleId]: moduleId,
@@ -571,10 +631,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         sourceSlot,
         destSlot,
         makeStateArgs,
+        deckSetup,
+        labwareIsCompatible,
         expectedLabwareLocations,
         expectedModuleLocations,
       }) => {
         it(testName, () => {
+          mock_getInitialDeckSetupRootState.mockReturnValue(deckSetup)
+          getLabwareIsCompatibleMock.mockReturnValue(labwareIsCompatible)
           const prevRootState = makePrevRootState(makeStateArgs)
           const action = moveDeckItem(sourceSlot, destSlot)
           const result = savedStepForms(prevRootState, action)
@@ -693,9 +757,9 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       )
     })
     describe('existing steps', () => {
-      let prevRootStateWithMagStep
+      let prevRootStateWithMagAndTCSteps
       beforeEach(() => {
-        prevRootStateWithMagStep = {
+        prevRootStateWithMagAndTCSteps = {
           savedStepForms: {
             ...makePrevRootState().savedStepForms,
             ...{
@@ -704,10 +768,16 @@ describe('savedStepForms reducer: initial deck setup step', () => {
                 moduleId: 'magdeckId',
               },
             },
+            ...{
+              TC_step_form_id: {
+                stepType: 'thermocycler',
+                moduleId: 'TCId',
+              },
+            },
           },
         }
       })
-      let testCases = [
+      const magneticStepCases = [
         {
           testName: 'create mag mod -> override mag step module id',
           action: {
@@ -749,10 +819,61 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
       ]
 
-      testCases.forEach(({ testName, action, expectedModuleId }) => {
+      const TCStepCases = [
+        {
+          testName: 'create TC -> override TC step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'NewTCId',
+              slot: SPAN7_8_10_11_SLOT,
+              type: THERMOCYCLER_MODULE_TYPE,
+              model: 'someTCModel',
+            },
+          },
+          expectedModuleId: 'NewTCId',
+        },
+        {
+          testName: 'create temp mod -> DO NOT override TC step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'tempdeckId',
+              slot: '1',
+              type: TEMPERATURE_MODULE_TYPE,
+              model: 'someTempModel',
+            },
+          },
+          expectedModuleId: 'TCId',
+        },
+        {
+          testName: 'create magnetic mod -> DO NOT override TC step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'newMagdeckId',
+              slot: '1',
+              type: MAGNETIC_MODULE_TYPE,
+              model: 'someMagModel',
+            },
+          },
+          expectedModuleId: 'TCId',
+        },
+      ]
+
+      magneticStepCases.forEach(({ testName, action, expectedModuleId }) => {
         it(testName, () => {
-          const result = savedStepForms(prevRootStateWithMagStep, action)
-          expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
+          const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
+          if (action.payload.type)
+            expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
+        })
+      })
+
+      TCStepCases.forEach(({ testName, action, expectedModuleId }) => {
+        it(testName, () => {
+          const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
+          if (action.payload.type)
+            expect(result.TC_step_form_id.moduleId).toBe(expectedModuleId)
         })
       })
     })
@@ -842,7 +963,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           stepType: 'pause',
           stepName: 'pause until 4C',
           stepDetails: 'some details',
-          pauseForAmountOfTime: 'untilTemperature',
+          pauseAction: PAUSE_UNTIL_TEMP,
           pauseHour: null,
           pauseMinute: null,
           pauseSecond: null,
@@ -1045,15 +1166,402 @@ describe('unsavedForm reducer', () => {
 
   const actionTypes = [
     'CANCEL_STEP_FORM',
-    'SELECT_TERMINAL_ITEM',
-    'SAVE_STEP_FORM',
+    'CREATE_MODULE',
+    'DELETE_MODULE',
     'DELETE_STEP',
     'EDIT_MODULE',
+    'SAVE_STEP_FORM',
+    'SELECT_TERMINAL_ITEM',
   ]
   actionTypes.forEach(actionType => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {
       const result = unsavedForm(someState, { type: actionType })
       expect(result).toEqual(null)
+    })
+  })
+
+  it('should return the result createPresavedStepForm util upon ADD_STEP action', () => {
+    mockCreatePresavedStepForm.mockReturnValue(
+      'createPresavedStepFormMockResult'
+    )
+    mock_getInitialDeckSetupRootState.mockReturnValue('initalDeckSetupValue')
+    const stateMock = {
+      savedStepForms: 'savedStepFormsValue',
+      orderedStepIds: 'orderedStepIdsValue',
+    }
+    const result = unsavedForm(stateMock, {
+      type: 'ADD_STEP',
+      payload: { id: 'stepId123', stepType: 'moveLiquid' },
+      meta: { robotStateTimeline: 'robotStateTimelineValue' },
+    })
+    expect(result).toEqual('createPresavedStepFormMockResult')
+    expect(mockCreatePresavedStepForm.mock.calls).toEqual([
+      [
+        {
+          stepId: 'stepId123',
+          stepType: 'moveLiquid',
+          pipetteEntities: 'pipetteEntitiesPlaceholder',
+          labwareEntities: 'labwareEntitiesPlaceholder',
+          savedStepForms: 'savedStepFormsValue',
+          orderedStepIds: 'orderedStepIdsValue',
+          initialDeckSetup: 'initalDeckSetupValue',
+          robotStateTimeline: 'robotStateTimelineValue',
+        },
+      ],
+    ])
+  })
+
+  it('should add a profile cycle item upon ADD_PROFILE_CYCLE action', () => {
+    const action = { type: 'ADD_PROFILE_CYCLE', payload: null }
+
+    const id = 'newCycleId'
+    const profileStepId = 'newProfileStepId'
+    // NOTE: because we're using uuid() to create multiple different ids,
+    // this test is sensitive to the order that uuid is called in and
+    // assumes it's first for cycle id, then next for profile step id
+    mockUuid.mockReturnValueOnce(id)
+    mockUuid.mockReturnValueOnce(profileStepId)
+
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [],
+        profileItemsById: {},
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [id],
+      profileItemsById: {
+        [id]: createInitialProfileCycle(id, profileStepId),
+      },
+    })
+  })
+
+  it('should add a profile step item to the specified cycle upon ADD_PROFILE_STEP action with cycleId payload', () => {
+    const cycleId = 'someCycleId'
+    const stepId = 'newStepId'
+    const action = { type: 'ADD_PROFILE_STEP', payload: { cycleId } }
+
+    mockUuid.mockReturnValue(stepId)
+
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            repetitions: '1',
+            steps: [],
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          ...state.unsavedForm.profileItemsById[cycleId],
+          steps: [
+            {
+              id: stepId,
+              type: PROFILE_STEP,
+              title: '',
+              temperature: '',
+              durationMinutes: '',
+              durationSeconds: '',
+            },
+          ],
+        },
+      },
+    })
+  })
+
+  it('should remove a profile step item on DELETE_PROFILE_STEP', () => {
+    const id = 'stepItemId'
+    const action = { type: 'DELETE_PROFILE_STEP', payload: { id } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [id],
+        profileItemsById: {
+          [id]: {
+            type: PROFILE_STEP,
+            id,
+            title: '',
+            temperature: '',
+            durationMinutes: '',
+            durationSeconds: '',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [],
+      profileItemsById: {},
+    })
+  })
+
+  it('should remove a step item inside a cycle on DELETE_PROFILE_STEP', () => {
+    const stepId = 'stepItemId'
+    const cycleId = 'cycleId'
+    const action = { type: 'DELETE_PROFILE_STEP', payload: { id: stepId } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            steps: [
+              {
+                type: PROFILE_STEP,
+                id: stepId,
+                title: '',
+                temperature: '',
+                durationMinutes: '',
+                durationSeconds: '',
+              },
+            ],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          type: PROFILE_CYCLE,
+          id: cycleId,
+          steps: [],
+          repetitions: '1',
+        },
+      },
+    })
+  })
+
+  it('should do nothing on DELETE_PROFILE_STEP when the id is a cycle', () => {
+    const id = 'cycleItemId'
+    const action = { type: 'DELETE_PROFILE_STEP', payload: { id } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [id],
+        profileItemsById: {
+          [id]: {
+            type: PROFILE_CYCLE,
+            id,
+            steps: [],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual(state.unsavedForm)
+  })
+
+  it('should delete cycle on DELETE_PROFILE_CYCLE', () => {
+    const id = 'cycleItemId'
+    const action = { type: 'DELETE_PROFILE_CYCLE', payload: { id } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [id],
+        profileItemsById: {
+          [id]: {
+            type: PROFILE_CYCLE,
+            id,
+            steps: [],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [],
+      profileItemsById: {},
+    })
+  })
+
+  it('should edit a profile step on the top level with EDIT_PROFILE_STEP', () => {
+    const stepId = 'profileStepId'
+    const action = {
+      type: 'EDIT_PROFILE_STEP',
+      payload: { id: stepId, fields: { title: 'x' } },
+    }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [stepId],
+        profileItemsById: {
+          [stepId]: {
+            type: PROFILE_STEP,
+            id: stepId,
+            title: '',
+            temperature: '',
+            durationMinutes: '',
+            durationSeconds: '',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [stepId],
+      profileItemsById: {
+        [stepId]: {
+          type: PROFILE_STEP,
+          id: stepId,
+          title: 'x',
+          temperature: '',
+          durationMinutes: '',
+          durationSeconds: '',
+        },
+      },
+    })
+  })
+
+  it('should edit a profile step that is inside a cycle with EDIT_PROFILE_STEP', () => {
+    const cycleId = 'cycleId'
+    const stepId = 'profileStepId'
+    const action = {
+      type: 'EDIT_PROFILE_STEP',
+      payload: { id: stepId, fields: { title: 'x' } },
+    }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            steps: [
+              {
+                type: PROFILE_STEP,
+                id: stepId,
+                title: '',
+                temperature: '',
+                durationMinutes: '',
+                durationSeconds: '',
+              },
+            ],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          type: PROFILE_CYCLE,
+          id: cycleId,
+          steps: [
+            {
+              type: PROFILE_STEP,
+              id: stepId,
+              title: 'x',
+              temperature: '',
+              durationMinutes: '',
+              durationSeconds: '',
+            },
+          ],
+          repetitions: '1',
+        },
+      },
+    })
+  })
+
+  it('should edit a profile cycle on EDIT_PROFILE_CYCLE', () => {
+    const cycleId = 'cycleId'
+    const action = {
+      type: 'EDIT_PROFILE_CYCLE',
+      payload: { id: cycleId, fields: { repetitions: '5' } },
+    }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            steps: [],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          type: PROFILE_CYCLE,
+          id: cycleId,
+          steps: [],
+          repetitions: '5',
+        },
+      },
+    })
+  })
+})
+
+describe('presavedStepForm reducer', () => {
+  it('should populate when a new step is added', () => {
+    const addStepAction: AddStepAction = {
+      type: 'ADD_STEP',
+      payload: { id: 'someId', stepType: 'transfer' },
+    }
+    const result = presavedStepForm(null, addStepAction)
+    expect(result).toEqual({ stepType: 'transfer' })
+  })
+
+  it('should not update when the PRESAVED_STEP_ID terminal item is selected', () => {
+    const prevState = { stepType: 'transfer' }
+    const action = { type: 'SELECT_TERMINAL_ITEM', payload: PRESAVED_STEP_ID }
+    expect(presavedStepForm(prevState, action)).toBe(prevState)
+  })
+
+  it('should clear when a different terminal item is selected', () => {
+    const prevState = { stepType: 'transfer' }
+    const action = { type: 'SELECT_TERMINAL_ITEM', payload: 'otherId' }
+    expect(presavedStepForm(prevState, action)).toEqual(null)
+  })
+
+  const clearingActions = [
+    'CANCEL_STEP_FORM',
+    'DELETE_STEP',
+    'SAVE_STEP_FORM',
+    'SELECT_STEP',
+  ]
+  clearingActions.forEach(actionType => {
+    it(`should clear upon ${actionType}`, () => {
+      const prevState = { id: 'someId', stepType: 'transfer' }
+      expect(presavedStepForm(prevState, { type: actionType })).toEqual(null)
     })
   })
 })

@@ -33,7 +33,7 @@ type Props = {|
   exit: () => mixed,
 |}
 
-export function ConfirmPipette(props: Props) {
+export function ConfirmPipette(props: Props): React.Node {
   const { title, subtitle, success, attachedWrong, actualPipette, back } = props
 
   return (

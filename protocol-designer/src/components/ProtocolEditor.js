@@ -3,12 +3,13 @@ import * as React from 'react'
 import cx from 'classnames'
 import { DragDropContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
+import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
 import { ConnectedSidebar } from '../containers/ConnectedSidebar'
 import { ConnectedTitleBar } from '../containers/ConnectedTitleBar'
 import { ConnectedMainPanel } from '../containers/ConnectedMainPanel'
 import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
-import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps'
+import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps/utils'
 import { PrereleaseModeIndicator } from './PrereleaseModeIndicator'
 import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
 import { NewFileModal } from './modals/NewFileModal'
@@ -24,6 +25,7 @@ const showGateModal =
 function ProtocolEditorComponent() {
   return (
     <div>
+      <ComputingSpinner />
       <TopPortalRoot />
       {showGateModal ? <GateModal /> : null}
       <PrereleaseModeIndicator />
@@ -43,10 +45,9 @@ function ProtocolEditorComponent() {
             <AnnouncementModal />
             <NewFileModal showProtocolFields />
             <FileUploadMessageModal />
-            <LabwareUploadMessageModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
             <MainPageModalPortalRoot />
-
+            <LabwareUploadMessageModal />
             <ConnectedMainPanel />
           </div>
         </div>
@@ -55,6 +56,6 @@ function ProtocolEditorComponent() {
   )
 }
 
-export const ProtocolEditor = DragDropContext(MouseBackEnd)(
-  ProtocolEditorComponent
-)
+export const ProtocolEditor: React.AbstractComponent<{||}> = DragDropContext(
+  MouseBackEnd
+)(ProtocolEditorComponent)

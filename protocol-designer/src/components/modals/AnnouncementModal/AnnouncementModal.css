@@ -28,6 +28,14 @@
   padding-right: 19.294%;
 }
 
+.thermocycler_diagram_row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem;
+  padding: 0 25%;
+}
+
 .modules_diagram {
   width: 100%;
   height: 100%;

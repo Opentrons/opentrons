@@ -10,7 +10,7 @@ type Props = {|
   className?: string,
 |}
 
-export function NavLink(props: Props) {
+export function NavLink(props: Props): React.Node {
   const {
     gtm: { category, label, action },
   } = props
@@ -34,7 +34,7 @@ export function NavLink(props: Props) {
   )
 }
 
-export function NavButton(props: Link) {
+export function NavButton(props: Link): React.Node {
   return (
     <a
       href={props.url}

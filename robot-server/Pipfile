@@ -7,17 +7,23 @@ name = "pypi"
 python_version = "3.7"
 
 [dev-packages]
-"c445fee" = {editable = true, path = "./../api"}
-pytest = "*"
-pytest-aiohttp = "*"
+c445fee = {editable = true,path = "./../api"}
+pytest = "==5.4.3"
 pytest-cov = "*"
 mypy = "==0.740"
-atomicwrites = {version="*", sys_platform="== 'win32'"}
+atomicwrites = {version = "*",sys_platform = "== 'win32'"}
 pylama = "*"
 requests = "*"
+tavern = "==1.0.0"
+"289f143" = {editable = true, path = "./../shared-data/python"}
+pytest-aiohttp = "*"
+graphviz = "*"
 
 [packages]
 uvicorn = "==0.11.3"
-fastapi = "==0.49.0"
+fastapi = "==0.54.1"
 python-multipart = "==0.0.5"
-aiohttp = "==3.4.4"
+python-dotenv = "*"
+pydantic = "==1.4"
+wsproto = "==0.15.0"
+typing-extensions = "==3.7.4.3"

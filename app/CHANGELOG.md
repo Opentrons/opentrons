@@ -3,6 +3,184 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
+
+### Bug Fixes
+
+* **app:** temporary fix for chained command race conditions in cal flows to unblock user testing ([#6530](https://github.com/Opentrons/opentrons/issues/6530)) ([3c17d9e](https://github.com/Opentrons/opentrons/commit/3c17d9e))
+* **app:** do not set the user's Intercom name to "Unknown User" ([#6468](https://github.com/Opentrons/opentrons/issues/6468)) ([66662a4](https://github.com/Opentrons/opentrons/commit/66662a4)), closes [#6461](https://github.com/Opentrons/opentrons/issues/6461)
+* **app:** fix layout of calibration panel complete confirmation button ([#6509](https://github.com/Opentrons/opentrons/issues/6509)) ([093bddb](https://github.com/Opentrons/opentrons/commit/093bddb))
+* **app:** flip modules on deck map when in slots 3, 6, or 9 ([#6383](https://github.com/Opentrons/opentrons/issues/6383)) ([d0347da](https://github.com/Opentrons/opentrons/commit/d0347da)), closes [#4422](https://github.com/Opentrons/opentrons/issues/4422)
+* **app:** make tip length calibration use generic calibration move to tiprack command ([#6489](https://github.com/Opentrons/opentrons/issues/6489)) ([b5a59e0](https://github.com/Opentrons/opentrons/commit/b5a59e0))
+* **app, app-shell:** use mtime for custom labware date display ([#6396](https://github.com/Opentrons/opentrons/issues/6396)) ([45f7ec8](https://github.com/Opentrons/opentrons/commit/45f7ec8)), closes [#6381](https://github.com/Opentrons/opentrons/issues/6381)
+
+
+### Features
+
+* **app:** add Jupyter Notebook button to robot's Advanced Settings ([#6474](https://github.com/Opentrons/opentrons/issues/6474)) ([d615d2d](https://github.com/Opentrons/opentrons/commit/d615d2d)), closes [#6102](https://github.com/Opentrons/opentrons/issues/6102)
+* **robot-server,app:** add download deck calibration button ([#6453](https://github.com/Opentrons/opentrons/issues/6453)) ([b3b365d](https://github.com/Opentrons/opentrons/commit/b3b365d)), closes [#6055](https://github.com/Opentrons/opentrons/issues/6055)
+
+
+
+
+
+## [3.20.1](https://github.com/Opentrons/opentrons/compare/v3.20.0...v3.20.1) (2020-08-25)
+
+### Bug Fixes
+
+* **api, app:** Ensure index file exists before reading from it ([#6410](https://github.com/Opentrons/opentrons/issues/6410)) ([d616d0b](https://github.com/Opentrons/opentrons/commit/d616d0b)), closes [#6394](https://github.com/Opentrons/opentrons/issues/6394)
+
+
+
+
+
+# [3.20.0](https://github.com/Opentrons/opentrons/compare/v3.19.0...v3.20.0) (2020-08-13)
+
+### Bug Fixes
+
+* **app:** fix tip probe button in apiV1 protocols ([#6318](https://github.com/Opentrons/opentrons/issues/6318)) ([3b75f5d](https://github.com/Opentrons/opentrons/commit/3b75f5d))
+* **app:** fix labware list uniqueing logic for file info page ([#6309](https://github.com/Opentrons/opentrons/issues/6309)) ([ca85b7e](https://github.com/Opentrons/opentrons/commit/ca85b7e))
+* **api, app:** Clear instrument offset before performing deck calibration, don't restart ([#6208](https://github.com/Opentrons/opentrons/issues/6208)) ([cefa633](https://github.com/Opentrons/opentrons/commit/cefa633)), closes [#5022](https://github.com/Opentrons/opentrons/issues/5022)
+* **app:** correctly namespace calibration check command ([#6127](https://github.com/Opentrons/opentrons/issues/6127)) ([59faac6](https://github.com/Opentrons/opentrons/commit/59faac6))
+* **app:** don't doublecount labware on modules ([#6246](https://github.com/Opentrons/opentrons/issues/6246)) ([837f153](https://github.com/Opentrons/opentrons/commit/837f153))
+* **app:** fix calibrate to trough bottom image for multi pipettes ([#5974](https://github.com/Opentrons/opentrons/issues/5974)) ([dac535f](https://github.com/Opentrons/opentrons/commit/dac535f)), closes [#4734](https://github.com/Opentrons/opentrons/issues/4734)
+* **app:** fix data reads from JSON Protocols later than v3 ([#6284](https://github.com/Opentrons/opentrons/issues/6284)) ([f0f7109](https://github.com/Opentrons/opentrons/commit/f0f7109)), closes [#6235](https://github.com/Opentrons/opentrons/issues/6235)
+* **app:** show alert if WS closes **or** robot becomes unhealthy ([#6233](https://github.com/Opentrons/opentrons/issues/6233)) ([2cd4fd1](https://github.com/Opentrons/opentrons/commit/2cd4fd1))
+* **app:** simplify discovery state to avoid stale IPs and health data ([#6193](https://github.com/Opentrons/opentrons/issues/6193)) ([0e089a7](https://github.com/Opentrons/opentrons/commit/0e089a7)), closes [#5985](https://github.com/Opentrons/opentrons/issues/5985) [#5250](https://github.com/Opentrons/opentrons/issues/5250)
+* **app:** update link to support center ([#6087](https://github.com/Opentrons/opentrons/issues/6087)) ([be05ef9](https://github.com/Opentrons/opentrons/commit/be05ef9))
+* **robot-server, app:** fix broken chained commands in tip length cal ([#6212](https://github.com/Opentrons/opentrons/issues/6212)) ([727ba64](https://github.com/Opentrons/opentrons/commit/727ba64))
+
+
+### Features
+
+* **app:** Expose Labware Calibration Status on the FileInfo Page ([#6100](https://github.com/Opentrons/opentrons/issues/6100)) ([2a22f59](https://github.com/Opentrons/opentrons/commit/2a22f59))
+* **components:** add primitive btns and fix useHover on disabled buttons ([#5972](https://github.com/Opentrons/opentrons/issues/5972)) ([57cc219](https://github.com/Opentrons/opentrons/commit/57cc219))
+* **robot-server:** Robot server command namespaces ([#6098](https://github.com/Opentrons/opentrons/issues/6098)) ([73152e3](https://github.com/Opentrons/opentrons/commit/73152e3)), closes [#6089](https://github.com/Opentrons/opentrons/issues/6089)
+
+
+
+
+
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
+
+
+### Bug Fixes
+
+* **app:** fix clunky text wrapping for multi tip pick up in cal check ([#6026](https://github.com/Opentrons/opentrons/issues/6026)) ([76edd1d](https://github.com/Opentrons/opentrons/commit/76edd1d))
+* **app:** calcheck: content fixups ([#5989](https://github.com/Opentrons/opentrons/issues/5989)) ([21b5e4e](https://github.com/Opentrons/opentrons/commit/21b5e4e))
+* **app:** calcheck: fix display of bad deck transform ([#5988](https://github.com/Opentrons/opentrons/issues/5988)) ([22b15ff](https://github.com/Opentrons/opentrons/commit/22b15ff))
+* **app:** replace wrong assets for xy multi cal check ([#5996](https://github.com/Opentrons/opentrons/issues/5996)) ([072062d](https://github.com/Opentrons/opentrons/commit/072062d))
+* **app:** clear <input> value after robot update file select ([#5789](https://github.com/Opentrons/opentrons/issues/5789)) ([62372b0](https://github.com/Opentrons/opentrons/commit/62372b0)), closes [#5781](https://github.com/Opentrons/opentrons/issues/5781)
+* **app:** delete local records of session if id not found  ([#5863](https://github.com/Opentrons/opentrons/issues/5863)) ([9f8adfb](https://github.com/Opentrons/opentrons/commit/9f8adfb))
+* **app:** fix cal check tiprack images at large window sizes ([#5841](https://github.com/Opentrons/opentrons/issues/5841)) ([065ce49](https://github.com/Opentrons/opentrons/commit/065ce49))
+* **app:** fix up calibration check copy ([#5779](https://github.com/Opentrons/opentrons/issues/5779)) ([57b9ca8](https://github.com/Opentrons/opentrons/commit/57b9ca8))
+* **app:** interpolate session type into session exit event name ([#5804](https://github.com/Opentrons/opentrons/issues/5804)) ([bee8cb0](https://github.com/Opentrons/opentrons/commit/bee8cb0))
+* **app:** restart MDNS browser when network interfaces change ([#5933](https://github.com/Opentrons/opentrons/issues/5933)) ([c9c6dc8](https://github.com/Opentrons/opentrons/commit/c9c6dc8)), closes [#5343](https://github.com/Opentrons/opentrons/issues/5343)
+* **app:** use troubleshooting link when calcheck fails at tip pickup ([#5952](https://github.com/Opentrons/opentrons/issues/5952)) ([474c98f](https://github.com/Opentrons/opentrons/commit/474c98f))
+
+
+### Features
+
+* **api, app:** Check Robot Deck Transform ([#5845](https://github.com/Opentrons/opentrons/issues/5845)) ([ed67383](https://github.com/Opentrons/opentrons/commit/ed67383))
+* **api, app:** implement automatic door safety stop feature ([#5706](https://github.com/Opentrons/opentrons/issues/5706)) ([ad94d07](https://github.com/Opentrons/opentrons/commit/ad94d07)), closes [#2820](https://github.com/Opentrons/opentrons/issues/2820) [#2752](https://github.com/Opentrons/opentrons/issues/2752)
+* **app:** add network interface collection to system-info ([#5764](https://github.com/Opentrons/opentrons/issues/5764)) ([7d64efa](https://github.com/Opentrons/opentrons/commit/7d64efa)), closes [#5397](https://github.com/Opentrons/opentrons/issues/5397)
+* **app:** introduce Robot Calibration Check tool ([#5960](https://github.com/Opentrons/opentrons/issues/5960)) ([bc7d5d5](https://github.com/Opentrons/opentrons/commit/bc7d5d5))
+* **app, app-shell:** add ability to disable discovery cache ([#5759](https://github.com/Opentrons/opentrons/issues/5759)) ([5ad57d9](https://github.com/Opentrons/opentrons/commit/5ad57d9))
+* **components:** add position props to primitive components ([#5926](https://github.com/Opentrons/opentrons/issues/5926)) ([9b0a666](https://github.com/Opentrons/opentrons/commit/9b0a666))
+* **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
+
+
+
+
+## [3.18.1](https://github.com/Opentrons/opentrons/compare/v3.18.0...v3.18.1) (2020-05-26)
+
+
+### Bug Fixes
+
+* **app:** workaround issues with Realtek's website and driver versions ([67d6d89](https://github.com/Opentrons/opentrons/commit/67d6d89))
+
+
+
+
+
+# [3.18.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0) (2020-05-20)
+
+
+### Bug Fixes
+
+* **app:** tighten filter logic that identifies Realtek U2E adapters ([#5707](https://github.com/Opentrons/opentrons/issues/5707)) ([ea9a6c4](https://github.com/Opentrons/opentrons/commit/ea9a6c4))
+
+
+### Features
+
+* **api, app:** add state change information to rpc ([#5512](https://github.com/Opentrons/opentrons/issues/5512)) ([ca3ef95](https://github.com/Opentrons/opentrons/commit/ca3ef95)), closes [#5502](https://github.com/Opentrons/opentrons/issues/5502)
+* **app:** add UI to clear cached robots ([#5629](https://github.com/Opentrons/opentrons/issues/5629)) ([330acc0](https://github.com/Opentrons/opentrons/commit/330acc0)), closes [#2435](https://github.com/Opentrons/opentrons/issues/2435)
+* **app:** alert user if Windows U2E driver is out of date ([#5656](https://github.com/Opentrons/opentrons/issues/5656)) ([02cd054](https://github.com/Opentrons/opentrons/commit/02cd054)), closes [#5493](https://github.com/Opentrons/opentrons/issues/5493)
+* **app:** collect pipette and module load analytics from protocol runs' ([#5675](https://github.com/Opentrons/opentrons/issues/5675)) ([11feca3](https://github.com/Opentrons/opentrons/commit/11feca3)), closes [#5540](https://github.com/Opentrons/opentrons/issues/5540)
+* **app,robot-server:** add support for sessions API ([#5628](https://github.com/Opentrons/opentrons/issues/5628)) ([441d682](https://github.com/Opentrons/opentrons/commit/441d682))
+* **components:** add Box primitive to components library ([#5665](https://github.com/Opentrons/opentrons/issues/5665)) ([73614d0](https://github.com/Opentrons/opentrons/commit/73614d0))
+* **components:** add Flex and Text primitives to components library ([#5637](https://github.com/Opentrons/opentrons/issues/5637)) ([b1b318e](https://github.com/Opentrons/opentrons/commit/b1b318e))
+
+
+
+
+
+## [3.17.1](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1) (2020-05-06)
+
+### Bug Fixes
+
+* **app:** ensure only one RPC connect request can go out at once ([#5322](https://github.com/Opentrons/opentrons/issues/5322)) ([9465cef](https://github.com/Opentrons/opentrons/commit/9465cef)), closes [#5241](https://github.com/Opentrons/opentrons/issues/5241) [#5307](https://github.com/Opentrons/opentrons/issues/5307)
+
+
+### Features
+
+* **app:** guide the user through leveling gen2 multis ([#5348](https://github.com/Opentrons/opentrons/issues/5348)) ([185d0ad](https://github.com/Opentrons/opentrons/commit/185d0ad)), closes [#5344](https://github.com/Opentrons/opentrons/issues/5344)
+
+
+
+
+
+# [3.17.0](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
+
+**Note:** Version bump only for package @opentrons/app
+
+
+
+
+
+# [3.17.0-beta.1](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.0...v3.17.0-beta.1) (2020-04-14)
+
+**Note:** Version bump only for package @opentrons/app
+
+
+
+
+
+# [3.17.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-beta.0) (2020-04-01)
+
+### Bug Fixes
+
+* **app:** alignment and time formatting in thermocycler card ([#5320](https://github.com/Opentrons/opentrons/issues/5320)) ([3c7fcc8](https://github.com/Opentrons/opentrons/commit/3c7fcc8))
+* **app:** fix tiprack in tip probe instructions when tipracks are shared ([#5319](https://github.com/Opentrons/opentrons/issues/5319)) ([7d5f4ab](https://github.com/Opentrons/opentrons/commit/7d5f4ab)), closes [#5311](https://github.com/Opentrons/opentrons/issues/5311)
+* **app:** accept mixed-case extensions for protocols and custom labware ([#5153](https://github.com/Opentrons/opentrons/issues/5153)) ([12cce54](https://github.com/Opentrons/opentrons/commit/12cce54)), closes [#5151](https://github.com/Opentrons/opentrons/issues/5151)
+* **app:** build RPC pipette tip rack list from both containers and instruments ([#5147](https://github.com/Opentrons/opentrons/issues/5147)) ([2c5fc9f](https://github.com/Opentrons/opentrons/commit/2c5fc9f))
+* **app:** Deck cal: Tell users to attach an Opentrons tip, not a GEB tip. ([#5048](https://github.com/Opentrons/opentrons/issues/5048)) ([336bb17](https://github.com/Opentrons/opentrons/commit/336bb17))
+* **app:** disable module commands when protocol paused ([#5209](https://github.com/Opentrons/opentrons/issues/5209)) ([b313c95](https://github.com/Opentrons/opentrons/commit/b313c95))
+
+
+### Features
+
+* **api:** updated images for all modules ([#5210](https://github.com/Opentrons/opentrons/issues/5210)) ([7e80a5b](https://github.com/Opentrons/opentrons/commit/7e80a5b)), closes [#4224](https://github.com/Opentrons/opentrons/issues/4224)
+* **app:** add Wi-Fi disconnect to app ([#5296](https://github.com/Opentrons/opentrons/issues/5296)) ([f6620ee](https://github.com/Opentrons/opentrons/commit/f6620ee))
+* **app:** enable gen2 multi pipettes ([#5297](https://github.com/Opentrons/opentrons/issues/5297)) ([707f0ab](https://github.com/Opentrons/opentrons/commit/707f0ab)), closes [#4698](https://github.com/Opentrons/opentrons/issues/4698)
+* **app:** report PAPI version during protocol analytics events ([#5053](https://github.com/Opentrons/opentrons/issues/5053)) ([493a2ea](https://github.com/Opentrons/opentrons/commit/493a2ea)), closes [#4971](https://github.com/Opentrons/opentrons/issues/4971)
+* **app, components:** Support gen2 modules ([#5177](https://github.com/Opentrons/opentrons/issues/5177)) ([3a938ff](https://github.com/Opentrons/opentrons/commit/3a938ff)), closes [#4960](https://github.com/Opentrons/opentrons/issues/4960)
+* **js:** update Formik to v2 ([#5190](https://github.com/Opentrons/opentrons/issues/5190)) ([b15d360](https://github.com/Opentrons/opentrons/commit/b15d360))
+
+
+
+
+
 ## [3.16.1](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1) (2020-02-25)
 
 **Note:** Version bump only for package @opentrons/app

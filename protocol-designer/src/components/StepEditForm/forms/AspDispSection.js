@@ -7,12 +7,12 @@ import styles from '../StepEditForm.css'
 type Props = {
   className?: ?string,
   collapsed?: ?boolean,
-  toggleCollapsed: () => mixed,
+  toggleCollapsed: () => void,
   prefix: 'aspirate' | 'dispense',
   children?: React.Node,
 }
 
-export const AspDispSection = (props: Props) => {
+export const AspDispSection = (props: Props): React.Node => {
   const { children, className, collapsed, toggleCollapsed, prefix } = props
 
   return (

@@ -24,38 +24,38 @@ export class EditableTextField extends React.Component<Props, State> {
     }
   }
 
-  enterEditMode = () =>
+  enterEditMode: () => void = () =>
     this.setState({ editing: true, transientValue: this.props.value })
 
-  handleCancel = () => {
+  handleCancel: () => void = () => {
     this.setState({
       editing: false,
       transientValue: this.props.value,
     })
   }
 
-  handleKeyUp = (e: SyntheticKeyboardEvent<*>) => {
+  handleKeyUp: (e: SyntheticKeyboardEvent<>) => void = e => {
     if (e.key === 'Escape') {
       this.handleCancel()
     }
   }
 
-  handleFormSubmit = (e: SyntheticEvent<*>) => {
+  handleFormSubmit: (e: SyntheticEvent<>) => void = e => {
     e.preventDefault() // avoid 'form is not connected' warning
     this.handleSubmit()
   }
 
-  handleSubmit = () => {
+  handleSubmit: () => void = () => {
     this.setState({ editing: false }, () =>
       this.props.saveEdit(this.state.transientValue || '')
     )
   }
 
-  updateValue = (e: SyntheticInputEvent<*>) => {
+  updateValue: (e: SyntheticInputEvent<HTMLInputElement>) => void = e => {
     this.setState({ transientValue: e.currentTarget.value })
   }
 
-  render() {
+  render(): React.Node {
     const { className, value } = this.props
     if (this.state.editing) {
       return (

@@ -1,16 +1,23 @@
 // @flow
 import * as React from 'react'
-import { addSeconds, format } from 'date-fns'
 import cx from 'classnames'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import type { ThermocyclerModule, ModuleCommand } from '../../modules/types'
+import { formatSeconds } from '../../robot/selectors' // TODO: move helper from robot selector to helper file
 import { TemperatureControl, TemperatureData } from '../ModuleControls'
+
 import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'
 import styles from './styles.css'
 
-import type { ThermocyclerModule, ModuleCommand } from '../../modules/types'
+const BLOCK_TEMP_ABBREV = 'Block Temp'
+const CYCLE_NUMBER = 'Cycle #'
+const HOLD_TIME_REMAINING = 'Hold time remaining:'
+const LID_TEMP_ABBREV = 'Lid Temp'
+const STEP_NUMBER = 'Step #'
+const TIME_REMAINING_FOR_STEP = 'Time remaining for step:'
 
 const TimeRemaining = ({
   holdTime,
@@ -22,11 +29,8 @@ const TimeRemaining = ({
   <span
     className={cx(styles.inline_labeled_value, styles.time_remaining_wrapper)}
   >
-    <p className={styles.time_remaining_label}>Time remaining for step:</p>
-    <p>
-      {// convert duration to seconds from epoch (midnight), then format
-      format(addSeconds(0, holdTime ?? 0), 'HH:mm:ss')}
-    </p>
+    <p className={styles.time_remaining_label}>{TIME_REMAINING_FOR_STEP}</p>
+    <p>{formatSeconds(holdTime ?? 0)}</p>
   </span>
 )
 
@@ -53,19 +57,31 @@ const CycleInfo = ({
     return null
   }
   return (
-    <div className={styles.card_row}>
-      <LabeledValue
-        label="Cycle #"
-        className={styles.compact_labeled_value}
-        value={`${currentCycleIndex} / ${totalCycleCount}`}
-      />
-      <LabeledValue
-        label="Step #"
-        className={styles.compact_labeled_value}
-        value={`${currentStepIndex} / ${totalStepCount}`}
-      />
-      <TimeRemaining holdTime={holdTime} title="Time remaining for step:" />
-    </div>
+    <>
+      <div className={styles.card_row}>
+        <div className={styles.cycle_info_wrapper}>
+          <div className={styles.cycle_info_counts}>
+            <LabeledValue
+              label={CYCLE_NUMBER}
+              className={cx(
+                styles.compact_labeled_value,
+                styles.cycle_data_item
+              )}
+              value={`${currentCycleIndex} / ${totalCycleCount}`}
+            />
+            <LabeledValue
+              label={STEP_NUMBER}
+              className={cx(
+                styles.compact_labeled_value,
+                styles.cycle_data_item
+              )}
+              value={`${currentStepIndex} / ${totalStepCount}`}
+            />
+          </div>
+          <TimeRemaining holdTime={holdTime} title={TIME_REMAINING_FOR_STEP} />
+        </div>
+      </div>
+    </>
   )
 }
 
@@ -87,7 +103,7 @@ export const ThermocyclerCard = ({
   controlDisabledReason,
   isCardExpanded,
   toggleCard,
-}: Props) => {
+}: Props): React.Node => {
   const {
     currentTemp,
     targetTemp,
@@ -122,13 +138,13 @@ export const ThermocyclerCard = ({
       <div className={styles.card_row}>
         <TemperatureData
           className={styles.temp_data_item}
-          title="Base Temp"
+          title={BLOCK_TEMP_ABBREV}
           current={currentTemp}
           target={targetTemp}
         />
         <TemperatureData
           className={styles.temp_data_item}
-          title="Lid Temp"
+          title={LID_TEMP_ABBREV}
           current={lidTemp}
           target={lidTarget}
         />
@@ -144,7 +160,7 @@ export const ThermocyclerCard = ({
       )}
       {holdTime != null && holdTime > 0 && !executingProfile && (
         <div className={styles.card_row}>
-          <TimeRemaining holdTime={holdTime} title="Hold time remaining:" />
+          <TimeRemaining holdTime={holdTime} title={HOLD_TIME_REMAINING} />
         </div>
       )}
     </StatusCard>

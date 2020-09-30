@@ -6,7 +6,10 @@ import * as PipetteSelectors from '../../pipettes/selectors'
 import * as RobotSelectors from '../../robot/selectors'
 import * as BuildrootSelectors from '../../buildroot/selectors'
 import * as ShellSelectors from '../../shell'
+import * as SystemInfoSelectors from '../../system-info/selectors'
 import * as Selectors from '../selectors'
+
+import { NOT_APPLICABLE, OUTDATED } from '../../system-info'
 
 import type { State } from '../../types'
 import type { Robot, ViewableRobot } from '../../discovery/types'
@@ -22,23 +25,35 @@ type SelectorSpec = {|
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
 jest.mock('../../buildroot/selectors')
+jest.mock('../../system-info/selectors')
 jest.mock('../../shell')
 jest.mock('../../robot/selectors')
+jest.mock('../../config/selectors')
 
 const mockGetConnectedRobot: JestMockFn<
   [State],
   $Call<typeof DiscoverySelectors.getConnectedRobot, State>
 > = DiscoverySelectors.getConnectedRobot
 
-const mockGetProtocolPipettesMatch: JestMockFn<
+const mockGetProtocolPipettesMatching: JestMockFn<
   [State, string],
-  $Call<typeof PipetteSelectors.getProtocolPipettesMatch, State, string>
-> = PipetteSelectors.getProtocolPipettesMatch
+  $Call<typeof PipetteSelectors.getProtocolPipettesMatching, State, string>
+> = PipetteSelectors.getProtocolPipettesMatching
+
+const mockGetProtocolPipettesCalibrated: JestMockFn<
+  [State, string],
+  $Call<typeof PipetteSelectors.getProtocolPipettesCalibrated, State, string>
+> = PipetteSelectors.getProtocolPipettesCalibrated
 
 const mockGetAvailableShellUpdate: JestMockFn<
   [State],
   $Call<typeof ShellSelectors.getAvailableShellUpdate, State>
 > = ShellSelectors.getAvailableShellUpdate
+
+const mockGetU2EWindowsDriverStatus: JestMockFn<
+  [State],
+  $Call<typeof SystemInfoSelectors.getU2EWindowsDriverStatus, State>
+> = SystemInfoSelectors.getU2EWindowsDriverStatus
 
 const mockGetBuildrootUpdateAvailable: JestMockFn<
   [State, ViewableRobot],
@@ -103,7 +118,7 @@ const EXPECTED_RUN = {
 
 const EXPECTED_MORE = {
   id: 'more',
-  path: '/menu',
+  path: '/more',
   title: 'More',
   iconName: 'dots-horizontal',
   notificationReason: null,
@@ -115,13 +130,15 @@ describe('nav selectors', () => {
 
   beforeEach(() => {
     mockGetConnectedRobot.mockReturnValue(null)
-    mockGetProtocolPipettesMatch.mockReturnValue(false)
+    mockGetProtocolPipettesMatching.mockReturnValue(false)
+    mockGetProtocolPipettesCalibrated.mockReturnValue(false)
     mockGetAvailableShellUpdate.mockReturnValue(null)
     mockGetBuildrootUpdateAvailable.mockReturnValue(null)
     mockGetIsRunning.mockReturnValue(false)
     mockGetIsDone.mockReturnValue(false)
     mockGetSessionIsLoaded.mockReturnValue(false)
     mockGetCommands.mockReturnValue([])
+    mockGetU2EWindowsDriverStatus.mockReturnValue(NOT_APPLICABLE)
   })
 
   afterEach(() => {
@@ -237,7 +254,8 @@ describe('nav selectors', () => {
       ],
     },
     {
-      name: 'getNavbarLocations with runnable protocol and pipettes compatible',
+      name:
+        'getNavbarLocations with runnable protocol and matching but uncalibrated pipettes',
       selector: Selectors.getNavbarLocations,
       before: () => {
         mockGetConnectedRobot.mockReturnValue(mockRobot)
@@ -245,10 +263,41 @@ describe('nav selectors', () => {
         mockGetCommands.mockReturnValue([
           { id: 0, description: 'Foo', handledAt: null, children: [] },
         ])
-        mockGetProtocolPipettesMatch.mockReturnValue(true)
+        mockGetProtocolPipettesMatching.mockReturnValue(true)
+      },
+      expected: [
+        EXPECTED_ROBOTS,
+        { ...EXPECTED_UPLOAD, disabledReason: null },
+        {
+          ...EXPECTED_CALIBRATE,
+          disabledReason: expect.stringMatching(/calibrate all pipettes/),
+        },
+        {
+          ...EXPECTED_RUN,
+          disabledReason: expect.stringMatching(/calibrate all pipettes/),
+        },
+        EXPECTED_MORE,
+      ],
+    },
+    {
+      name:
+        'getNavbarLocations with runnable protocol and pipettes compatible and calibrated',
+      selector: Selectors.getNavbarLocations,
+      before: () => {
+        mockGetConnectedRobot.mockReturnValue(mockRobot)
+        mockGetSessionIsLoaded.mockReturnValue(true)
+        mockGetCommands.mockReturnValue([
+          { id: 0, description: 'Foo', handledAt: null, children: [] },
+        ])
+        mockGetProtocolPipettesMatching.mockReturnValue(true)
+        mockGetProtocolPipettesCalibrated.mockReturnValue(true)
       },
       after: () => {
-        expect(mockGetProtocolPipettesMatch).toHaveBeenCalledWith(
+        expect(mockGetProtocolPipettesMatching).toHaveBeenCalledWith(
+          mockState,
+          mockRobot.name
+        )
+        expect(mockGetProtocolPipettesCalibrated).toHaveBeenCalledWith(
           mockState,
           mockRobot.name
         )
@@ -292,7 +341,26 @@ describe('nav selectors', () => {
         EXPECTED_RUN,
         {
           ...EXPECTED_MORE,
-          notificationReason: expect.stringMatching(/update is available/),
+          notificationReason: expect.stringMatching(/app update is available/),
+        },
+      ],
+    },
+    {
+      name: 'getNavbarLocations with notification for driver update',
+      selector: Selectors.getNavbarLocations,
+      before: () => {
+        mockGetU2EWindowsDriverStatus.mockReturnValue(OUTDATED)
+      },
+      expected: [
+        EXPECTED_ROBOTS,
+        EXPECTED_UPLOAD,
+        EXPECTED_CALIBRATE,
+        EXPECTED_RUN,
+        {
+          ...EXPECTED_MORE,
+          notificationReason: expect.stringMatching(
+            /driver update is available/
+          ),
         },
       ],
     },

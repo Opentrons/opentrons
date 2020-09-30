@@ -15,7 +15,7 @@ export type SlotOverlayProps = {|
 /**
  * @deprecated No longer necessary, do not use
  */
-export function SlotOverlay(props: SlotOverlayProps) {
+export function SlotOverlay(props: SlotOverlayProps): React.Node {
   const { icon, text, className } = props
   const leftRightPadding = 3 // LR padding as %
   const topPadding = 33 // as %
@@ -40,8 +40,8 @@ export function SlotOverlay(props: SlotOverlayProps) {
         <Icon
           x={leftRightPadding + 6 + '%'}
           y={topPadding + 6 + '%'}
-          height={iconSize}
-          width={iconSize}
+          svgHeight={iconSize}
+          svgWidth={iconSize}
           name={icon}
           className={styles.icon}
         />

@@ -16,7 +16,7 @@ export type ManufacturerStatsProps = {|
   brand: LabwareBrand,
 |}
 
-export function ManufacturerStats(props: ManufacturerStatsProps) {
+export function ManufacturerStats(props: ManufacturerStatsProps): React.Node {
   const { brand } = props
   const { brand: brandName, brandId, links } = brand
   const manfacturerValue = MANUFACTURER_VALUES[brandName] || brandName

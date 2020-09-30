@@ -9,7 +9,7 @@ export type RobotCoordsTextProps = {
 
 /** SVG text reflected to use take robot coordinates as props */
 // TODO: Ian 2019-05-07 reconcile this with Brian's version
-export function RobotCoordsText(props: RobotCoordsTextProps) {
+export function RobotCoordsText(props: RobotCoordsTextProps): React.Node {
   const { x, y, children, ...additionalProps } = props
   return (
     <text {...additionalProps} x={x} y={-1 * y} transform="scale(1, -1)">

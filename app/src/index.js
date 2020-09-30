@@ -9,13 +9,8 @@ import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 
 import { createLogger } from './logger'
-import { checkShellUpdate } from './shell'
-
-import { apiClientMiddleware as robotApiMiddleware } from './robot'
-import { initializeAnalytics } from './analytics'
-import { initializeSupport, supportMiddleware } from './support'
-import { startDiscovery } from './discovery'
-
+import { uiInitialized } from './shell'
+import { apiClientMiddleware as robotApiMiddleware } from './robot/api-client'
 import { rootReducer, history } from './reducer'
 import { rootEpic } from './epic'
 
@@ -30,7 +25,6 @@ const middleware = applyMiddleware(
   thunk,
   epicMiddleware,
   robotApiMiddleware(),
-  supportMiddleware,
   routerMiddleware(history)
 )
 
@@ -43,20 +37,17 @@ const store = createStore(rootReducer, composeEnhancers(middleware))
 
 epicMiddleware.run(rootEpic)
 
-const { config } = store.getState()
+// attach store to window if devtools are on once config initializes
+const unsubscribe = store.subscribe(() => {
+  const { config } = store.getState()
+  if (config !== null) {
+    if (config.devtools) window.store = store
+    unsubscribe()
+  }
+})
 
-// attach store to window if devtools are on
-if (config.devtools) window.store = store
-
-// initialize analytics and support after first render
-store.dispatch(initializeAnalytics())
-store.dispatch(initializeSupport())
-
-// kickoff an initial update check at launch
-store.dispatch(checkShellUpdate())
-
-// kickoff a discovery run immediately
-store.dispatch(startDiscovery())
+// kickoff app-shell initializations
+store.dispatch(uiInitialized())
 
 log.info('Rendering app UI')
 

@@ -3,30 +3,35 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { PipetteSelect, DropdownField } from '@opentrons/components'
+import {
+  PipetteSelect,
+  DropdownField,
+  OutlineButton,
+} from '@opentrons/components'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import { getEnableMultiGEN2Pipettes } from '../../../../feature-flags/selectors'
+import { actions as labwareDefActions } from '../../../../labware-defs'
 import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
 import { PipetteFields } from '../PipetteFields'
-import { TiprackDiagram } from '../TiprackDiagram'
 import { PipetteDiagram } from '../PipetteDiagram'
 
 import type { LabwareDefByDefURI } from '../../../../labware-defs'
-import type { BaseState } from '../../../../types'
+import type { ThunkAction } from '../../../../types'
 
 jest.mock('../../../../feature-flags/selectors')
+jest.mock('../../../../labware-defs/selectors')
 jest.mock('../../../../labware-defs/utils.js')
-jest.mock('../TiprackDiagram')
+jest.mock('../../../../labware-defs/actions')
 
-const getEnableMultiGEN2PipettesMock: JestMockFn<
-  [BaseState],
-  ?boolean
-> = getEnableMultiGEN2Pipettes
 const getOnlyLatestDefsMock: JestMockFn<
   [],
   LabwareDefByDefURI
 > = getOnlyLatestDefs
+
+const createCustomTiprackDefMock: JestMockFn<
+  [SyntheticInputEvent<HTMLInputElement>],
+  ThunkAction<*>
+> = labwareDefActions.createCustomTiprackDef
 
 describe('PipetteFields', () => {
   const leftPipetteKey = 'pipettesByMount.left'
@@ -69,7 +74,6 @@ describe('PipetteFields', () => {
       touched: null,
     }
 
-    getEnableMultiGEN2PipettesMock.mockReturnValue(true)
     getOnlyLatestDefsMock.mockReturnValue({
       tiprack_300: fixture_tiprack_300_ul,
       tiprack_1000: fixture_tiprack_1000_ul,
@@ -150,22 +154,6 @@ describe('PipetteFields', () => {
 
     expect(props.onFieldChange).toHaveBeenCalledWith(event)
   })
-
-  it('renders tiprack diagrams for selected tipracks', () => {
-    props.values.left = unselectedPipette
-
-    const wrapper = render(props)
-    const tiprackDiagrams = wrapper.find(TiprackDiagram)
-
-    expect(tiprackDiagrams).toHaveLength(2)
-    expect(tiprackDiagrams.at(0).props()).toEqual({
-      definitionURI: '',
-    })
-    expect(tiprackDiagrams.at(1).props()).toEqual({
-      definitionURI: 'tiprack_1000',
-    })
-  })
-
   it('displays pipette diagrams for selected pipettes', () => {
     const wrapper = render(props)
     const pipetteDiagram = wrapper.find(PipetteDiagram)
@@ -175,5 +163,17 @@ describe('PipetteFields', () => {
       leftPipette: leftPipette.pipetteName,
       rightPipette: rightPipette.pipetteName,
     })
+  })
+
+  it('allows the user to upload custom tip racks', () => {
+    const wrapper = render(props)
+    const uploadButton = wrapper.find(OutlineButton).at(0)
+    expect(uploadButton.text()).toMatch('Upload custom tip rack')
+
+    uploadButton
+      .find('input')
+      .at(0)
+      .simulate('change')
+    expect(createCustomTiprackDefMock).toHaveBeenCalled()
   })
 })

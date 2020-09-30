@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import itertools
 import logging
-import json
+from typing import TYPE_CHECKING
 from opentrons.config import CONFIG
 from opentrons.data_storage import database
 from opentrons.util.vector import Vector
@@ -19,6 +19,15 @@ from .placeable import (
 from opentrons.helpers import helpers
 
 from opentrons.protocol_api import labware as new_labware
+from opentrons.calibration_storage import (
+    get,
+    helpers as cal_helpers,
+    file_operators as io,
+    modify)
+
+if TYPE_CHECKING:
+    from opentrons.calibration_storage.dev_types import TipLengthCalibration
+
 
 __all__ = [
     'Deck',
@@ -203,22 +212,21 @@ def _load_new_well(well_data, saved_offset, lw_quirks):
     return (well, well_tuple)
 
 
-def _look_up_offsets(labware_hash):
+def _look_up_offsets(labware_hash, definition):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     if labware_offset_path.exists():
-        calibration_data = new_labware._read_file(str(labware_offset_path))
-        offset_array = calibration_data['default']['offset']
-        return Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
+        return get.get_labware_calibration(labware_offset_path, definition)
     else:
         return Point(x=0, y=0, z=0)
 
 
-def save_new_offsets(labware_hash, delta):
+def save_new_offsets(labware_hash, delta, definition):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
-    old_delta = _look_up_offsets(labware_hash)
+    old_delta = _look_up_offsets(labware_hash, definition)
+    uri = cal_helpers.uri_from_definition(definition)
 
     # Note that the next line looks incorrect (like it's letting the prior
     # value leak into the new one). That's sort of correct, but this actually
@@ -236,10 +244,10 @@ def save_new_offsets(labware_hash, delta):
     new_delta = old_delta + Point(x=delta[0], y=delta[1], z=delta[2])
 
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
-    calibration_data = new_labware._helper_offset_data_format(
+    calibration_data = modify._helper_offset_data_format(
         str(labware_offset_path), new_delta)
-    with labware_offset_path.open('w') as f:
-        json.dump(calibration_data, f)
+    modify._add_to_index_offset_file('', '', uri, labware_hash)
+    io.save_to_file(labware_offset_path, calibration_data)
 
 
 def load_new_labware(container_name, version=None):
@@ -258,12 +266,13 @@ def load_new_labware(container_name, version=None):
 def load_new_labware_def(definition):
     """ Load a labware definition in the new schema into a placeable
     """
-    labware_hash = new_labware._hash_labware_def(definition)
-    saved_offset = _look_up_offsets(labware_hash)
+    labware_hash = cal_helpers.hash_labware_def(definition)
+    saved_offset = _look_up_offsets(labware_hash, definition)
     container = Container()
     container_name = definition['parameters']['loadName']
     log.info(f"Container name {container_name}, hash {labware_hash}")
     container.properties['labware_hash'] = labware_hash
+    container.properties['definition'] = definition
     container.properties['type'] = container_name
     lw_quirks = definition['parameters'].get('quirks', [])
     if definition['parameters']['isMagneticModuleCompatible']:
@@ -278,3 +287,12 @@ def load_new_labware_def(definition):
             definition['wells'][well_name], saved_offset, lw_quirks)
         container.add(well_obj, well_name, well_pos)
     return container
+
+
+def load_tip_length_calibration(
+        pip_id: str, location) -> 'TipLengthCalibration':
+    placeable, _ = unpack_location(location)
+    lw = placeable.get_parent()
+    return get._get_tip_length_data(
+        pip_id=pip_id, labware_hash=lw.properties['labware_hash'],
+        labware_load_name=lw.properties['type'])

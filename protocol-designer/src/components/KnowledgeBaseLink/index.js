@@ -2,16 +2,19 @@
 import * as React from 'react'
 
 export const KNOWLEDGEBASE_ROOT_URL =
-  'https://intercom.help/opentrons-protocol-designer'
+  'https://support.opentrons.com/en/collections/493886-protocol-designer'
 
 export const links = {
-  multiDispense: `${KNOWLEDGEBASE_ROOT_URL}/building-a-protocol/steps/paths`,
-  protocolSteps: `${KNOWLEDGEBASE_ROOT_URL}/en/collections/1606688-building-a-protocol#steps`,
+  multiDispense: `https://support.opentrons.com/en/articles/4170341-paths`,
+  protocolSteps: `https://support.opentrons.com/en/collections/493886-protocol-designer#building-a-protocol-steps`,
   customLabware: `https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions`,
   recommendedLabware:
-    'https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules',
+    'https://support.opentrons.com/en/articles/4168748-labware-and-module-compatibility',
   pipetteGen1MultiModuleCollision:
-    'https://docs.google.com/document/d/1kE8qwlx6jVoPmWe0AwNmHVbnDNa4RHnoLCcDTt0SA1s/edit?usp=sharing', // TODO - update before launch with intercom article
+    'https://support.opentrons.com/en/articles/4168741-module-placement',
+  betaReleases: `https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases`,
+  magneticModuleGenerations:
+    'http://support.opentrons.com/en/articles/1820112-magnetic-module',
 }
 
 type Link = $Keys<typeof links>
@@ -23,7 +26,7 @@ type Props = {|
 |}
 
 /** Link which opens a page on the knowledge base to a new tab/window */
-export function KnowledgeBaseLink(props: Props) {
+export function KnowledgeBaseLink(props: Props): React.Node {
   return (
     <a
       target="_blank"

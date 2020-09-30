@@ -34,7 +34,7 @@ import {
 } from './commandFixtures'
 import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
-import type { InvariantContext, RobotState } from '../'
+import type { InvariantContext, RobotState, RobotStateAndWarnings } from '../'
 
 // Eg {A1: true, B1: true, ...}
 type WellTipState = { [wellName: string]: boolean }
@@ -146,7 +146,7 @@ export const makeState = (args: {|
   moduleLocations?: $PropertyType<RobotState, 'modules'>,
   pipetteLocations: $PropertyType<RobotState, 'pipettes'>,
   tiprackSetting: { [labwareId: string]: boolean },
-|}) => {
+|}): RobotState => {
   const {
     invariantContext,
     labwareLocations,
@@ -154,7 +154,7 @@ export const makeState = (args: {|
     pipetteLocations,
     tiprackSetting,
   } = args
-  let robotState = makeInitialRobotState({
+  const robotState = makeInitialRobotState({
     invariantContext,
     labwareLocations,
     moduleLocations: moduleLocations || {},
@@ -168,7 +168,12 @@ export const makeState = (args: {|
 }
 
 // ===== "STANDARDS" for uniformity across tests =====
-export const makeStateArgsStandard = () => ({
+type StandardMakeStateArgs = {|
+  pipetteLocations: $PropertyType<RobotState, 'pipettes'>,
+  labwareLocations: $PropertyType<RobotState, 'labware'>,
+  moduleLocations: $PropertyType<RobotState, 'modules'>,
+|}
+export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
   pipetteLocations: {
     [DEFAULT_PIPETTE]: { mount: 'left' },
     [MULTI_PIPETTE]: { mount: 'right' },
@@ -184,7 +189,7 @@ export const makeStateArgsStandard = () => ({
 })
 export const getInitialRobotStateStandard = (
   invariantContext: InvariantContext
-) => {
+): RobotState => {
   const initialRobotState = makeState({
     ...makeStateArgsStandard(),
     invariantContext,
@@ -195,7 +200,7 @@ export const getInitialRobotStateStandard = (
 
 export const getRobotStateAndWarningsStandard = (
   invariantContext: InvariantContext
-) => {
+): RobotStateAndWarnings => {
   const initialRobotState = getInitialRobotStateStandard(invariantContext)
 
   return {
@@ -206,7 +211,7 @@ export const getRobotStateAndWarningsStandard = (
 
 export const getRobotStateWithTipStandard = (
   invariantContext: InvariantContext
-) => {
+): RobotState => {
   const robotStateWithTip = makeState({
     ...makeStateArgsStandard(),
     invariantContext,
@@ -218,7 +223,7 @@ export const getRobotStateWithTipStandard = (
 
 export const getRobotStatePickedUpTipStandard = (
   invariantContext: InvariantContext
-) => {
+): RobotState => {
   const robotStatePickedUpOneTip = makeState({
     ...makeStateArgsStandard(),
     invariantContext,
@@ -231,7 +236,7 @@ export const getRobotStatePickedUpTipStandard = (
 
 export const getRobotInitialStateNoTipsRemain = (
   invariantContext: InvariantContext
-) => {
+): RobotState => {
   const robotInitialStateNoTipsRemain = makeState({
     ...makeStateArgsStandard(),
     invariantContext,
@@ -240,13 +245,17 @@ export const getRobotInitialStateNoTipsRemain = (
   return robotInitialStateNoTipsRemain
 }
 
-export const getStateAndContextTempMagModules = ({
+type StateAndContext = {|
+  robotState: RobotState,
+  invariantContext: InvariantContext,
+|}
+export const getStateAndContextTempTCModules = ({
   temperatureModuleId,
   thermocyclerId,
 }: {
   temperatureModuleId: string,
   thermocyclerId: string,
-}) => {
+}): StateAndContext => {
   const invariantContext = makeContext()
   invariantContext.moduleEntities = {
     [temperatureModuleId]: {
@@ -280,7 +289,9 @@ export const getStateAndContextTempMagModules = ({
       slot: SPAN7_8_10_11_SLOT,
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        // TODO IL 2020-01-14 create this state when thermocycler state is implemented
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: null,
       },
     },
   }

@@ -6,14 +6,16 @@ SHELL := bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
+benchmark_output := $(shell node -e 'console.log(new Date());')
+
 # standard targets
 #####################################################################
 
 .PHONY: all
 all: clean build
 
-.PHONY: install
-install:
+.PHONY: setup
+setup:
 	yarn
 
 .PHONY: clean
@@ -32,6 +34,13 @@ build:
 # development
 #####################################################################
 
+.PHONY: benchmarks
+benchmarks: export NODE_ENV := test
+benchmarks:
+	shx mkdir -p benchmarks/output
+	node ../scripts/runBenchmarks "./benchmarks/*.js" | \
+	ntee "./benchmarks/output/$(benchmark_output)"
+
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
@@ -45,6 +54,6 @@ serve: all
 # end to end tests
 .PHONY: test-e2e
 test-e2e:
-	concurrently --no-color --kill-others --success "first" --names "protocol-designer,protocol-designer-tests" \
-		"$(MAKE) dev" \
-		"cypress run --browser chrome"
+	concurrently --no-color --kill-others --success first --names "protocol-designer-server,protocol-designer-tests" \
+	"$(MAKE) dev CYPRESS=1" \
+	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"

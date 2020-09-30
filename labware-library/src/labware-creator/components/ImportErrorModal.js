@@ -25,7 +25,7 @@ const ERROR_MAP: { [ImportErrorKey]: React.Node } = {
 export const ImportErrorModal = (props: {|
   onClose: () => mixed,
   importError: ImportError,
-|}) => {
+|}): React.Node => {
   const { importError, onClose } = props
   return (
     <AlertModal

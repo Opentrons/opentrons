@@ -13,7 +13,7 @@ type Props = {|
   slotName: string,
 |}
 
-export const ModuleViz = (props: Props) => {
+export const ModuleViz = (props: Props): React.Node => {
   const moduleType = props.module.type
   const {
     xOffset,
@@ -27,7 +27,7 @@ export const ModuleViz = (props: Props) => {
   } = getModuleVizDims(props.orientation, moduleType)
 
   return (
-    <g>
+    <g data-test={`ModuleViz_${moduleType}`}>
       <rect
         x={props.x + xOffset}
         y={props.y + yOffset}

@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useReducer } from 'react'
+import * as React from 'react'
 
 import { LabeledButton, InputField } from '@opentrons/components'
 import { IconCta } from '../IconCta'
@@ -29,9 +29,9 @@ const handleFocus = (e: SyntheticFocusEvent<HTMLInputElement>) => {
   e.currentTarget.select()
 }
 
-export function ManagePath(props: ManagePathProps) {
+export function ManagePath(props: ManagePathProps): React.Node {
   const { path, onChangePath, onResetPath, onOpenPath } = props
-  const [confirmResetIsOpen, toggleConfirmResetIsOpen] = useReducer(
+  const [confirmResetIsOpen, toggleConfirmResetIsOpen] = React.useReducer(
     open => !open,
     false
   )

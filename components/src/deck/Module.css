@@ -54,3 +54,11 @@
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
 }
+
+.flipped {
+  transform: rotate(180deg);
+}
+
+.right_icon {
+  margin: 0 0 0 1rem;
+}

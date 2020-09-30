@@ -45,7 +45,7 @@ def location_to_list(loc):
         else:
             loc = [
                 unpack_location(l)[0]
-                for l in loc
+                for l in loc  # noqa(E741)
             ]
 
     if isinstance(loc, WellSeries):

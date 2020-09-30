@@ -9,7 +9,8 @@ try:
 except ModuleNotFoundError:
     select = None  # type: ignore
 from time import sleep
-from typing import Callable, Optional, Mapping, Tuple, TYPE_CHECKING
+from collections import deque
+from typing import Callable, Optional, Mapping, Tuple, Deque, TYPE_CHECKING
 from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
@@ -38,12 +39,13 @@ GCODES = {
     'DEACTIVATE_BLOCK': 'M14',
     'DEVICE_INFO': 'M115'
 }
-LID_TARGET_DEFAULT = 105    # Degree celsius
-LID_TARGET_MIN = 37
-LID_TARGET_MAX = 110
-BLOCK_TARGET_MIN = 0
-BLOCK_TARGET_MAX = 99
-TEMP_UPDATE_RETRIES = 15
+LID_TARGET_DEFAULT = 105.0    # Degree celsius (floats)
+LID_TARGET_MIN = 37.0
+LID_TARGET_MAX = 110.0
+BLOCK_TARGET_MIN = 0.0
+BLOCK_TARGET_MAX = 99.0
+TEMP_UPDATE_RETRIES = 50
+TEMP_BUFFER_MAX_LEN = 10
 
 
 def _build_temp_code(temp: float,
@@ -74,7 +76,8 @@ DEFAULT_TC_TIMEOUT = 40
 DEFAULT_COMMAND_RETRIES = 3
 DEFAULT_STABILIZE_DELAY = 0.1
 POLLING_FREQUENCY_MS = 1000
-TEMP_THRESHOLD = 0.5
+HOLD_TIME_FUZZY_SECONDS = POLLING_FREQUENCY_MS / 1000 * 5
+TEMP_THRESHOLD = 0.3
 
 
 class ThermocyclerError(Exception):
@@ -220,7 +223,6 @@ class TCPoller(threading.Thread):
         self._poller.register(self._send_read_file, select.POLLIN)
         self._poller.register(self._halt_read_file, select.POLLIN)
         self._poller.register(self._connection, select.POLLIN)
-
         serial_thread_name = 'tc_serial_poller_{}'.format(hash(self))
         super().__init__(target=self._serial_poller, name=serial_thread_name)
         log.info("Starting TC thread {}".format(serial_thread_name))
@@ -350,6 +352,8 @@ class Thermocycler:
         self._interrupt_cb = interrupt_callback
         self._lid_target = None
         self._lid_temp = None
+        # to store previous _current_temp values:
+        self._block_temp_buffer: Deque = deque(maxlen=TEMP_BUFFER_MAX_LEN)
 
     async def connect(self, port: str) -> 'Thermocycler':
         self.disconnect()
@@ -397,6 +401,22 @@ class Thermocycler:
         self.lid_status = 'closed'
         return self.lid_status
 
+    def hold_time_probably_set(self, new_hold_time: Optional[float]) -> bool:
+        """
+        Since we can only get hold time *remaining* from TC, by the time we
+        read hold_time after a set_temperature, the hold_time in TC could have
+        started counting down. So instead of checking for equality, we will
+        have to check if the hold_time returned from TC is within a few seconds
+        of the new hold time. The number of seconds is determined by status
+        polling frequency.
+        """
+        if new_hold_time is None:
+            return True
+        if self._hold_time is None:
+            return False
+        lower_bound = max(0.0, new_hold_time - HOLD_TIME_FUZZY_SECONDS)
+        return lower_bound <= self._hold_time <= new_hold_time
+
     async def set_temperature(self,
                               temp: float,
                               hold_time: float = None,
@@ -411,26 +431,38 @@ class Thermocycler:
                                           volume=volume)
         await self._write_and_wait(temp_cmd)
         retries = 0
-        while (self._target_temp != temp) or (self._hold_time != hold_time):
+        while self._target_temp != temp or \
+                not self.hold_time_probably_set(hold_time):
             await asyncio.sleep(0.1)    # Wait for the poller to update
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
-                break
+                raise ThermocyclerError(f'Thermocycler driver set the block '
+                                        f'temp to T={temp} & H={hold_time} '
+                                        f'but status reads '
+                                        f'T={self._target_temp} & '
+                                        f'H={self._hold_time}')
 
     async def set_lid_temperature(self, temp: float) -> None:
         if temp is None:
-            self._lid_target = LID_TARGET_DEFAULT
+            _lid_target = LID_TARGET_DEFAULT
         else:
             if temp < LID_TARGET_MIN:
-                self._lid_target = LID_TARGET_MIN
+                _lid_target = LID_TARGET_MIN
             elif temp > LID_TARGET_MAX:
-                self._lid_target = LID_TARGET_MAX
+                _lid_target = LID_TARGET_MAX
             else:
-                self._lid_target = temp
+                _lid_target = temp
 
-        lid_temp_cmd = '{} S{}'.format(GCODES['SET_LID_TEMP'],
-                                       self._lid_target)
+        lid_temp_cmd = '{} S{}'.format(GCODES['SET_LID_TEMP'], _lid_target)
         await self._write_and_wait(lid_temp_cmd)
+        retries = 0
+        while self._lid_target != _lid_target:
+            await asyncio.sleep(0.1)    # Wait for the poller to update
+            retries += 1
+            if retries > TEMP_UPDATE_RETRIES:
+                raise ThermocyclerError(f'Thermocycler driver set lid temp to'
+                                        f' {_lid_target} but self._lid_target'
+                                        f' reads {self._lid_target}')
 
     def _lid_status_update_callback(self, lid_response):
         if lid_response:
@@ -453,6 +485,7 @@ class Thermocycler:
         self._current_temp = val_dict['C']
         self._target_temp = val_dict['T']
         self._hold_time = val_dict['H']
+        self._block_temp_buffer.append(self._current_temp)
 
     def _lid_temp_status_callback(self, lid_temp_res):
         # Payload is shaped like `T:95.0 C:77.4` where T is the
@@ -513,13 +546,26 @@ class Thermocycler:
             _status = 'idle'
         else:
             diff = self.target - self.temperature
-            if abs(diff) < TEMP_THRESHOLD:
+            if self._is_holding_at_target():
                 _status = 'holding at target'
             elif diff < 0:
                 _status = 'cooling'
             else:
                 _status = 'heating'
         return _status
+
+    def _is_holding_at_target(self) -> bool:
+        """
+        Checks block temp history to determine if block temp has stabilized at
+        the target temperature. Returns true only if all values in history are
+        within threshold range of target temperature.
+        """
+        if len(self._block_temp_buffer) < TEMP_BUFFER_MAX_LEN:
+            # Not enough temp history
+            return False
+        else:
+            return all(abs(self.target - t) < TEMP_THRESHOLD
+                       for t in self._block_temp_buffer)
 
     @property
     def port(self) -> Optional[str]:

@@ -12,7 +12,7 @@ export class ConnectBanner extends React.Component<Robot, ConnectBannerState> {
     this.state = { dismissed: false }
   }
 
-  render() {
+  render(): React.Node {
     const { displayName, connected } = this.props
     const isVisible = connected && !this.state.dismissed
     if (!isVisible) return null

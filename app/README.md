@@ -18,7 +18,7 @@ To get started: clone the Opentrons/opentrons repository, set up your computer f
 # change into the cloned directory
 cd opentrons
 # prerequisite: install dependencies as specified in project setup
-make install
+make setup
 # launch the dev server / electron app in dev mode
 make -C app dev
 ```

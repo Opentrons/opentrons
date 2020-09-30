@@ -17,7 +17,7 @@ export type InstallModalProps = {|
   close: () => mixed,
 |}
 
-export function InstallModal(props: InstallModalProps) {
+export function InstallModal(props: InstallModalProps): React.Node {
   const { session, close, robotSystemType } = props
   const buttons = []
 

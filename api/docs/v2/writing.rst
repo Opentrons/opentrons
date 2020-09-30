@@ -72,18 +72,18 @@ Once the installer is done, make sure that Python is properly installed by openi
 
 Once Python is installed, install the `opentrons package <https://pypi.org/project/opentrons/>`_ using ``pip``:
 
-.. code-block:: shell
+.. prompt:: bash
 
    pip install opentrons
 
-You should see some output that ends with ``Successfully installed opentrons-3.13.1`` (the version number may be different).
+You should see some output that ends with :substitution-code:`Successfully installed opentrons-|release|`.
 
 Jupyter Installation
 ^^^^^^^^^^^^^^^^^^^^
 
 You must make sure that you install the ``opentrons`` package for whichever kernel and virtual environment the notebook is using. A generally good way to do this is
 
-.. code-block:: shell
+.. prompt:: python >>>
 
    import sys
    !{sys.executable} -m pip install opentrons
@@ -98,13 +98,13 @@ From the Command Line
 
 Once the Opentrons Python package is installed, you can simulate protocols in your terminal using the ``opentrons_simulate`` command:
 
-.. code-block:: shell
+.. prompt:: bash
 
    opentrons_simulate.exe my_protocol.py
 
 or, on OS X or Linux,
 
-.. code-block:: shell
+.. prompt:: bash
 
    opentrons_simulate my_protocol.py
 
@@ -112,9 +112,30 @@ The simulator will print out a log of the actions the protocol will cause, simil
 
 The simulation script can also be invoked through python:
 
-.. code-block:: shell
+.. prompt:: bash
 
     python -m opentrons.simulate /path/to/protocol
+
+``opentrons_simulate`` has several command line options that might be useful.
+Most options are explained below, but to see all options you can run
+
+.. prompt:: bash
+
+   opentrons_simulate --help
+
+
+Using Custom Labware
+^^^^^^^^^^^^^^^^^^^^
+
+By default, ``opentrons_simulate`` will load custom labware definitions from the
+directory in which you run it. You can change the directory
+``opentrons_simulate`` searches for custom labware with the
+``--custom-labware-path`` option:
+
+.. code-block:: shell
+
+   python.exe -m opentrons.simulate --custom-labware-path="C:\Custom Labware"
+
 
 In the Python Shell
 ^^^^^^^^^^^^^^^^^^^
@@ -140,11 +161,12 @@ Using Jupyter
 In your Jupyter notebook, you can use the Python Protocol API simulator by doing
 
 .. code-block:: python
+    :substitutions:
 
     from opentrons import simulate
-    protocol = simulate.get_protocol_api('2.0')
+    protocol = simulate.get_protocol_api('|apiLevel|')
     p300 = protocol.load_instrument('p300_single', 'right')
-    ...
+    # ...
 
 The ``protocol`` object, which is an instance of :py:class:`.ProtocolContext`, is the same thing that gets passed to your protocol's ``run`` function, but set to simulate rather than control an OT-2. You can call all your protocol's functions on that object.
 

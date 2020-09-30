@@ -1,5 +1,5 @@
 // @flow
-import { combineReducers } from 'redux'
+import { combineReducers, type Reducer } from 'redux'
 import { handleActions } from 'redux-actions'
 import type { Action } from '../types'
 import type { FileUploadMessage, LoadFileAction } from './types'
@@ -7,7 +7,7 @@ import type { FileUploadMessageAction } from './actions'
 
 // Keep track of file upload errors / messages
 type FileUploadMessageState = ?FileUploadMessage
-const fileUploadMessage = handleActions<FileUploadMessageState, *>(
+const fileUploadMessage: Reducer<FileUploadMessageState, any> = handleActions(
   {
     FILE_UPLOAD_MESSAGE: (
       state,
@@ -55,7 +55,6 @@ const unsavedChanges = (
     case 'DELETE_STEP':
     case 'SAVE_STEP_FORM':
     case 'SAVE_FILE_METADATA':
-    case 'CREATE_CUSTOM_LABWARE_DEF':
     case 'REPLACE_CUSTOM_LABWARE_DEF':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
@@ -71,9 +70,11 @@ export const _allReducers = {
   unsavedChanges,
 }
 
-export type RootState = {
+export type RootState = {|
   fileUploadMessage: FileUploadMessageState,
   unsavedChanges: boolean,
-}
+|}
 
-export const rootReducer = combineReducers<_, Action>(_allReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _allReducers
+)

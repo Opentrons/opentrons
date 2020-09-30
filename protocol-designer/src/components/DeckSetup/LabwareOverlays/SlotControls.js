@@ -1,12 +1,13 @@
 // @flow
 import assert from 'assert'
-import React, { type Node } from 'react'
+import * as React from 'react'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import { DropTarget } from 'react-dnd'
 import noop from 'lodash/noop'
 import { i18n } from '../../../localization'
+import { DND_TYPES } from '../../../constants'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
@@ -18,7 +19,6 @@ import {
 } from '../../../labware-ingred/actions'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
-import { DND_TYPES } from './constants'
 
 import type { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
@@ -31,8 +31,9 @@ import styles from './LabwareOverlays.css'
 
 type DNDP = {|
   isOver: boolean,
-  connectDropTarget: Node => Node,
+  connectDropTarget: React.Node => React.Node,
   draggedItem: ?{ labwareOnDeck: LabwareOnDeck },
+  itemType: string,
 |}
 type OP = {|
   slot: {| ...DeckSlotDefinition, id: DeckSlot |}, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
@@ -49,7 +50,7 @@ type SP = {|
 |}
 type Props = {| ...OP, ...DP, ...DNDP, ...SP |}
 
-export const SlotControlsComponent = (props: Props) => {
+export const SlotControlsComponent = (props: Props): React.Node => {
   const {
     slot,
     addLabware,
@@ -58,9 +59,14 @@ export const SlotControlsComponent = (props: Props) => {
     connectDropTarget,
     moduleType,
     draggedItem,
+    itemType,
     customLabwareDefs,
   } = props
-  if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID) return null
+  if (
+    selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
+    (itemType !== DND_TYPES.LABWARE && itemType !== null)
+  )
+    return null
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
   const isCustomLabware = draggedItem
@@ -158,9 +164,17 @@ const collectSlotTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedItem: monitor.getItem(),
+  itemType: monitor.getItemType(),
 })
 
-export const SlotControls = connect<{| ...OP, ...DP, ...SP |}, OP, _, DP, _, _>(
+export const SlotControls: React.AbstractComponent<OP> = connect<
+  {| ...OP, ...DP, ...SP |},
+  OP,
+  _,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(

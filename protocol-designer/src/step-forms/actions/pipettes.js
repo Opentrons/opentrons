@@ -2,10 +2,10 @@
 import type { NormalizedPipetteById } from '../types'
 import type { StepIdType } from '../../form-types'
 
-export type CreatePipettesAction = {
+export type CreatePipettesAction = {|
   type: 'CREATE_PIPETTES',
   payload: NormalizedPipetteById,
-}
+|}
 
 export const createPipettes = (
   payload: $PropertyType<CreatePipettesAction, 'payload'>
@@ -16,10 +16,10 @@ export const createPipettes = (
   }
 }
 
-export type DeletePipettesAction = {
+export type DeletePipettesAction = {|
   type: 'DELETE_PIPETTES',
   payload: Array<string>, // pipette ids to delete, order doesn't matter
-}
+|}
 
 export const deletePipettes = (
   payload: $PropertyType<DeletePipettesAction, 'payload'>
@@ -28,7 +28,7 @@ export const deletePipettes = (
   payload,
 })
 
-export type SubstituteStepFormPipettesAction = {
+export type SubstituteStepFormPipettesAction = {|
   type: 'SUBSTITUTE_STEP_FORM_PIPETTES',
   payload: {
     // step range to modify (inclusive)
@@ -38,7 +38,7 @@ export type SubstituteStepFormPipettesAction = {
     // old pipette id -> new id
     substitutionMap: { [oldPipetteId: string]: string },
   },
-}
+|}
 
 export const substituteStepFormPipettes = (
   payload: $PropertyType<SubstituteStepFormPipettesAction, 'payload'>

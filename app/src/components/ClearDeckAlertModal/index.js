@@ -3,8 +3,8 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import { AlertModal } from '@opentrons/components'
+import removeTrashSrc from '../../assets/images/remove-trash@3x.png'
 import { Portal } from '../portal'
-import removeTrashSrc from './img/trash@3x.png'
 import styles from './styles.css'
 
 export type ClearDeckAlertModalProps = {|
@@ -19,7 +19,9 @@ export type ClearDeckAlertModalProps = {|
 
 const HEADING = 'Before continuing, please remove:'
 
-export function ClearDeckAlertModal(props: ClearDeckAlertModalProps) {
+export function ClearDeckAlertModal(
+  props: ClearDeckAlertModalProps
+): React.Node {
   const {
     onContinueClick,
     onCancelClick,

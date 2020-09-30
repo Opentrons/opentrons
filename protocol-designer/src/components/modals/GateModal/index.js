@@ -164,7 +164,14 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const GateModal = connect<Props, {||}, SP, DP, _, _>(
+export const GateModal: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(GateModalComponent)

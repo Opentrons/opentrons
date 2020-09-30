@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { FeatureFlagCard as FeatureFlagCardComponent } from './FeatureFlagCard'
 import {
@@ -23,7 +24,14 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   setFeatureFlags: flags => dispatch(featureFlagActions.setFeatureFlags(flags)),
 })
 
-export const FeatureFlagCard = connect<Props, {||}, SP, DP, BaseState, _>(
+export const FeatureFlagCard: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  BaseState,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(FeatureFlagCardComponent)

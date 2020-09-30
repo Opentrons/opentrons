@@ -4,11 +4,13 @@ Requires=nginx.service
 After=nginx.service
 
 [Service]
-Type=exec
-ExecStart=python -m robot_server.main -U /run/aiohttp.sock --hardware-server
+Type=notify
+ExecStart=uvicorn robot_server.service.app:app --uds /run/aiohttp.sock --ws wsproto
 # Stop the button blinking
 ExecStartPost=systemctl stop opentrons-gpio-setup.service
 Environment=OT_SMOOTHIE_ID=AMA RUNNING_ON_PI=true
+Restart=on-failure
+TimeoutStartSec=3min
 
 [Install]
 WantedBy=opentrons.target

@@ -4,14 +4,18 @@ import json
 from unittest import mock
 
 import opentrons.protocol_api as papi
-from opentrons.system.shared_data import load_shared_data
+import opentrons.protocols.api_support as papi_support
+import opentrons.protocols.geometry as papi_geometry
+from opentrons_shared_data import load_shared_data
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
-from opentrons.config.pipette_config import config_models, name_for_model
-from opentrons.protocol_api import transfers as tf
+from opentrons.protocol_api import paired_instrument_context as paired
+from opentrons.protocols.advanced_control import transfers as tf
+from opentrons.config.pipette_config import config_names
 from opentrons.protocols.types import APIVersion
+from opentrons.calibration_storage import get, types as cs_types
 
 import pytest
 
@@ -39,7 +43,8 @@ def set_version_added(attr, mp, version):
 
 @pytest.fixture
 def get_labware_def(monkeypatch):
-    def dummy_load(labware_name, namespace=None, version=None):
+    def dummy_load(labware_name, namespace=None, version=None,
+                   bundled_defs=None, extra_defs=None, api_level=None):
         # TODO: Ian 2019-05-30 use fixtures not real defs
         labware_def = json.loads(
             load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
@@ -47,17 +52,16 @@ def get_labware_def(monkeypatch):
     monkeypatch.setattr(papi.labware, 'get_labware_definition', dummy_load)
 
 
-def test_load_instrument(loop):
+@pytest.mark.parametrize('name', config_names)
+def test_load_instrument(loop, name):
     ctx = papi.ProtocolContext(loop=loop)
     assert ctx.loaded_instruments == {}
-    for model in config_models:
-        loaded = ctx.load_instrument(model, Mount.LEFT, replace=True)
-        assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
-        assert loaded.model == model
-        instr_name = name_for_model(model)
-        loaded = ctx.load_instrument(instr_name, Mount.RIGHT, replace=True)
-        assert loaded.name == instr_name
-        assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
+    loaded = ctx.load_instrument(name, Mount.LEFT, replace=True)
+    assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
+    assert loaded.name == name
+    loaded = ctx.load_instrument(name, Mount.RIGHT, replace=True)
+    assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
+    assert loaded.name == name
 
 
 async def test_motion(loop, hardware):
@@ -105,6 +109,12 @@ async def test_max_speeds(loop, monkeypatch, hardware):
 async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
+    # To avoid modifying the hardware fixture, we should change the
+    # gantry calibration inside this test.
+    ctx._hw_manager.hardware.update_config(
+        gantry_calibration=[
+            [1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
     lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
     ctx.home()
@@ -122,7 +132,7 @@ async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
                 (Point(1, 2, 10), None),
                 (Point(1, 2, 3), None)]
 
-    monkeypatch.setattr(papi.geometry, 'plan_moves', fake_plan_move)
+    monkeypatch.setattr(papi_geometry.planning, 'plan_moves', fake_plan_move)
     # When we move without a cache, the from location should be the gantry
     # position
     right.move_to(lw.wells()[0].top())
@@ -172,6 +182,22 @@ def test_pipette_info(loop):
     model = ctx._hw_manager.hardware.attached_instruments[Mount.LEFT]['model']
     assert left.name == name
     assert left.model == model
+
+
+def test_pipette_pairing(loop):
+    ctx = papi.ProtocolContext(loop)
+    right = ctx.load_instrument('p300_multi', Mount.RIGHT)
+    left = ctx.load_instrument('p300_multi', Mount.LEFT)
+
+    paired_object = right.pair_with(left)
+    assert isinstance(paired_object, paired.PairedInstrumentContext)
+
+    ctx = papi.ProtocolContext(loop)
+    right = ctx.load_instrument('p300_multi', Mount.RIGHT)
+    left = ctx.load_instrument('p300_multi_gen2', Mount.LEFT)
+
+    with pytest.raises(paired.UnsupportedInstrumentPairingError):
+        right.pair_with(left)
 
 
 def test_pick_up_and_drop_tip(loop, get_labware_def):
@@ -347,13 +373,16 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
     lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
-    instr = ctx.load_instrument('p10_single', Mount.RIGHT)
+    tiprack = ctx.load_labware('opentrons_96_tiprack_10ul', 2)
+    instr = ctx.load_instrument(
+        'p10_single', Mount.RIGHT, tip_racks=[tiprack])
 
     fake_hw_aspirate = mock.Mock()
     fake_move = mock.Mock()
     monkeypatch.setattr(API, 'aspirate', fake_hw_aspirate)
     monkeypatch.setattr(API, 'move_to', fake_move)
 
+    instr.pick_up_tip()
     instr.aspirate(2.0, lw.wells()[0].bottom())
     assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
 
@@ -533,7 +562,7 @@ def test_mix(loop, monkeypatch):
 
 
 def test_touch_tip_default_args(loop, monkeypatch):
-    ctx = papi.ProtocolContext(loop)
+    ctx = papi.ProtocolContext(loop, api_version=APIVersion(2, 3))
     ctx.home()
     lw = ctx.load_labware(
         'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
@@ -560,6 +589,48 @@ def test_touch_tip_default_args(loop, monkeypatch):
              lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
     for i in range(1, 5):
         assert total_hw_moves[i] == (edges[i - 1], speed)
+    # Check that the old api version initial well move has the same z height
+    # as the calculated edges.
+    total_hw_moves.clear()
+    instr.touch_tip(v_offset=1)
+    assert total_hw_moves[0][0].z != total_hw_moves[1][0].z
+
+
+def test_touch_tip_new_default_args(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    lw = ctx.load_labware(
+        'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
+    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    instr.pick_up_tip()
+    total_hw_moves = []
+
+    async def fake_hw_move(self, mount, abs_position, speed=None,
+                           critical_point=None, max_speeds=None):
+        nonlocal total_hw_moves
+        total_hw_moves.append((abs_position, speed))
+
+    instr.aspirate(10, lw.wells()[0])
+    monkeypatch.setattr(API, 'move_to', fake_hw_move)
+    instr.touch_tip()
+    z_offset = Point(0, 0, 1)   # default z offset of 1mm
+    speed = 60                  # default speed
+    edges = [lw.wells()[0]._from_center_cartesian(1, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(-1, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, 1, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
+    for i in range(1, 5):
+        assert total_hw_moves[i] == (edges[i - 1], speed)
+
+    # Check that the new api version initial well move has the same z height
+    # as the calculated edges.
+    total_hw_moves.clear()
+    instr.touch_tip(v_offset=1)
+    assert total_hw_moves[0][0].z == total_hw_moves[1][0].z
 
 
 def test_touch_tip_disabled(loop, monkeypatch, get_labware_fixture):
@@ -773,28 +844,38 @@ def test_tip_length_for(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     instr = ctx.load_instrument('p20_single_gen2', 'left')
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
+    instr._tip_length_for.cache_clear()
     assert instr._tip_length_for(tiprack)\
         == (tiprack._definition['parameters']['tipLength']
             - instr.hw_pipette['tip_overlap']
             ['opentrons/geb_96_tiprack_10ul/1'])
 
 
+def test_tip_length_for_caldata(loop, monkeypatch, use_new_calibration):
+    ctx = papi.ProtocolContext(loop)
+    instr = ctx.load_instrument('p20_single_gen2', 'left')
+    tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
+    mock_tip_length = mock.Mock()
+    mock_tip_length.return_value = {'tipLength': 2}
+    monkeypatch.setattr(get, 'load_tip_length_calibration', mock_tip_length)
+    instr._tip_length_for.cache_clear()
+    assert instr._tip_length_for(tiprack) == 2
+    instr._tip_length_for.cache_clear()
+    mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
+    assert instr._tip_length_for(tiprack) == (
+        tiprack._definition['parameters']['tipLength']
+        - instr.hw_pipette['tip_overlap']
+        ['opentrons/geb_96_tiprack_10ul/1'])
+
+
 def test_bundled_labware(loop, get_labware_fixture):
-    fake_fixed_trash = get_labware_fixture('fixture_trash')
-    fake_fixed_trash['namespace'] = 'opentrons'
-    fake_fixed_trash['parameters']['loadName'] = \
-        'opentrons_1_trash_1100ml_fixed'
-    fake_fixed_trash['version'] = 1
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
-        'opentrons/opentrons_1_trash_1100ml_fixed/1': fake_fixed_trash,
         'fixture/fixture_96_plate/1': fixture_96_plate
     }
 
     ctx = papi.ProtocolContext(loop, bundled_labware=bundled_labware)
     lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
-    assert ctx.loaded_labwares[12] == ctx.fixed_trash
-    assert ctx.loaded_labwares[12]._definition == fake_fixed_trash
     assert ctx.loaded_labwares[3] == lw1
     assert ctx.loaded_labwares[3]._definition == fixture_96_plate
 
@@ -803,24 +884,22 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
     bundled_labware = {}
     with pytest.raises(
         RuntimeError,
-        match='No labware found in bundle with load name opentrons_1_trash_'
+        match='No labware found in bundle with load name fixture_96_plate'
     ):
-        papi.ProtocolContext(loop, bundled_labware=bundled_labware)
+        ctx = papi.ProtocolContext(loop, bundled_labware=bundled_labware)
+        ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
 
-    fake_fixed_trash = get_labware_fixture('fixture_trash')
-    fake_fixed_trash['namespace'] = 'opentrons'
-    fake_fixed_trash['parameters']['loadName'] = \
-        'opentrons_1_trash_1100ml_fixed'
-    fake_fixed_trash['version'] = 1
+    fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
-        'opentrons/opentrons_1_trash_1100ml_fixed/1': fake_fixed_trash,
+        'fixture/fixture_96_plate/1': fixture_96_plate
     }
     with pytest.raises(
         RuntimeError,
-        match='No labware found in bundle with load name opentrons_1_trash_'
+        match='No labware found in bundle with load name fixture_96_plate'
     ):
-        papi.ProtocolContext(loop, bundled_labware={},
-                             extra_labware=bundled_labware)
+        ctx = papi.ProtocolContext(loop, bundled_labware={},
+                                   extra_labware=bundled_labware)
+        ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
 
 
 def test_bundled_data(loop):
@@ -865,5 +944,12 @@ def test_api_per_call_checking(monkeypatch):
     set_version_added(
         papi.ProtocolContext.disconnect, monkeypatch, APIVersion(2, 1))
     ctx = papi.ProtocolContext(api_version=APIVersion(2, 0))
-    with pytest.raises(papi.util.APIVersionError):
+    with pytest.raises(papi_support.util.APIVersionError):
         ctx.disconnect()
+
+
+def test_home_plunger(monkeypatch):
+    ctx = papi.ProtocolContext(api_version=APIVersion(2, 0))
+    ctx.home()
+    instr = ctx.load_instrument('p1000_single', 'left')
+    instr.home_plunger()

@@ -1,15 +1,19 @@
+from unittest.mock import patch
 import itertools
 import copy
 import pytest
 import base64
 
+from opentrons.api import session
 from opentrons.api.session import (
     _accumulate, _dedupe)
+from opentrons.hardware_control import ThreadedAsyncForbidden
+
 from tests.opentrons.conftest import state
 from functools import partial
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.execute import ExceptionInProtocolError
+from opentrons.protocols.execution.errors import ExceptionInProtocolError
 
 state = partial(state, 'session')
 
@@ -55,12 +59,15 @@ async def test_async_notifications(main_router):
 
 @pytest.mark.parametrize(
     'proto_with_error', [
-        'metadata={"apiLevel": "2.0"}; blah',
+        '''
+metadata={"apiLevel": "2.0"}
+blah
+def run(ctx): pass''',
         'metadata={"apiLevel": "1.0"}; blah',
     ])
 def test_load_protocol_with_error(session_manager, hardware,
                                   proto_with_error):
-    with pytest.raises(Exception) as e:
+    with pytest.raises(NameError) as e:
         session = session_manager.create(
             name='<blank>', contents=proto_with_error)
         assert session is None
@@ -127,6 +134,21 @@ def test_set_state(run_session):
 
     with pytest.raises(ValueError):
         run_session.set_state('impossible-state')
+
+
+def test_set_state_info(run_session, monkeypatch):
+    assert run_session.stateInfo == {}
+    run_session.set_state('paused',
+                          reason='test1',
+                          user_message='cool message',
+                          duration=10)
+    assert run_session.stateInfo == {'message': 'test1',
+                                     'userMessage': 'cool message',
+                                     'estimatedDuration': 10}
+    run_session.startTime = 300
+    monkeypatch.setattr(session, 'now', lambda: 350)
+    run_session.set_state('running')
+    assert run_session.stateInfo == {'changedAt': 50}
 
 
 def test_error_append(run_session):
@@ -401,3 +423,101 @@ robot.connect()
 
     with pytest.raises(RuntimeError, match='.*robot.connect.*'):
         main_router.session_manager.create('calls-connect', proto)
+
+
+async def test_session_run_concurrently(
+        main_router,
+        get_labware_fixture,
+        virtual_smoothie_env):
+    """This test proves that we are not able to start a protocol run while
+    one is active.
+
+    This cross boundaries into the RPC because it emulates how the RPC server
+    handles requests. It uses a thread executor with two threads.
+
+    This test was added to prove that there's a deadlock if a protocol with
+    a pause is started twice.
+    """
+    # Create a protocol that does nothing but pause.
+    proto = '''
+metadata = {"apiLevel": "2.0"}
+
+def run(ctx):
+    ctx.pause()
+'''
+    session = main_router.session_manager.create_with_extra_labware(
+        name='<blank>',
+        contents=proto,
+        extra_labware=[]
+    )
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    from time import sleep
+
+    def run_while_running():
+        """The entry point to threads that try to run while a protocol is
+        running"""
+        with pytest.raises(ThreadedAsyncForbidden):
+            session.run()
+
+    # Do this twice to prove we run again after completion.
+    for _ in range(2):
+        # Use two as the max workers, just like RPC.
+        max_workers = 2
+        with ThreadPoolExecutor(max_workers=max_workers) as m:
+            tasks = list()
+            # Start the run.
+            tasks.append(m.submit(lambda: session.run()))
+            # Try to start running the protocol a whole bunch of times.
+            for _ in range(max_workers * 5):
+                tasks.append(m.submit(run_while_running))
+            # wait to enter pause
+            sleep(0.05)
+            # Now resume
+            tasks.append(m.submit(lambda: session.resume()))
+
+            for future in as_completed(tasks):
+                future.result()
+
+
+@pytest.mark.parametrize(argnames="create_func,extra_kwargs",
+                         argvalues=[
+                             [session.SessionManager.create, {}],
+                             [session.SessionManager.create_from_bundle, {}],
+                             [session.SessionManager.create_with_extra_labware,
+                              {"extra_labware": {}}]
+                         ])
+def test_http_protocol_sessions_disabled(session_manager, protocol,
+                                         create_func, extra_kwargs):
+    """Test that we can create a session if enableHttpProtocolSessions is
+    disabled."""
+    with patch.object(session.Session, "build_and_prep") as mock_build:
+        with patch("opentrons.api.util.enable_http_protocol_sessions") as m:
+            m.return_value = False
+            create_func(session_manager,
+                        name='<blank>',
+                        contents=protocol.text, **extra_kwargs)
+            mock_build.assert_called_once()
+
+
+@pytest.mark.parametrize(argnames="create_func,extra_kwargs",
+                         argvalues=[
+                             [session.SessionManager.create, {}],
+                             [session.SessionManager.create_from_bundle, {}],
+                             [session.SessionManager.create_with_extra_labware,
+                              {"extra_labware": {}}]
+                         ])
+async def test_http_protocol_sessions_enabled(session_manager, protocol,
+                                              create_func, extra_kwargs):
+    """Test that we cannot create a session if enableHttpProtocolSessions is
+    enabled."""
+    with patch.object(session.Session, "build_and_prep"):
+        with patch("opentrons.api.util.enable_http_protocol_sessions") as m:
+            m.return_value = True
+            with pytest.raises(
+                    RuntimeError,
+                    match="Please disable the 'Enable Experimental HTTP "
+                          "Protocol Sessions' advanced setting for this robot "
+                          "if you'd like to upload protocols from the "
+                          "Opentrons App"):
+                session_manager.create(name='<blank>', contents=protocol.text)

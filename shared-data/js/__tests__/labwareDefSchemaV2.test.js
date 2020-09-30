@@ -19,6 +19,30 @@ const ajv = new Ajv({
 
 const validate = ajv.compile(schema)
 
+const expectGroupsFollowConvention = (labwareDef, filename) => {
+  test(`${filename} should not contain "groups.brand.brand" that matches the top-level "brand.brand"`, () => {
+    const topLevelBrand = labwareDef.brand
+    labwareDef.groups.forEach(group => {
+      if (group.brand) {
+        expect(group.brand.brand).not.toEqual(topLevelBrand)
+      }
+    })
+  })
+  test(`${filename} should not specify certain fields in 'groups' if it is a reservoir or wellPlate`, () => {
+    const { displayCategory } = labwareDef.metadata
+    const noGroupsMetadataAllowed =
+      displayCategory === 'reservoir' || displayCategory === 'wellPlate'
+
+    if (noGroupsMetadataAllowed) {
+      labwareDef.groups.forEach(group => {
+        expect(group.brand).toBe(undefined)
+        expect(group.metadata.displayName).toBe(undefined)
+        expect(group.metadata.displayCategory).toBe(undefined)
+      })
+    }
+  })
+}
+
 describe('fail on bad labware', () => {
   const badDef = {
     metadata: { name: 'bad' },
@@ -64,6 +88,11 @@ describe('test schemas of all opentrons definitions', () => {
     it(`namespace is "opentrons": ${labwarePath}`, () => {
       expect(labwareDef.namespace).toEqual('opentrons')
     })
+
+    if (labwareDef.parameters.loadName !== 'nest_96_wellplate_2ml_deep') {
+      // TODO(IL, 2020-06-22): make nest_96_wellplate_2ml_deep confirm to groups convention
+      expectGroupsFollowConvention(labwareDef, labwarePath)
+    }
   })
 })
 
@@ -93,5 +122,7 @@ describe('test schemas of all v2 labware fixtures', () => {
     it(`namespace is "fixture": ${labwarePath}`, () => {
       expect(labwareDef.namespace).toEqual('fixture')
     })
+
+    expectGroupsFollowConvention(labwareDef, filename)
   })
 })

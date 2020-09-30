@@ -2,6 +2,7 @@
 
 export const GET: 'GET' = 'GET'
 export const POST: 'POST' = 'POST'
+export const PUT: 'PUT' = 'PUT'
 export const PATCH: 'PATCH' = 'PATCH'
 export const DELETE: 'DELETE' = 'DELETE'
 

@@ -1,0 +1,8 @@
+config BR2_PACKAGE_PYTHON_OPENTRONS_SHARED_DATA
+  bool "python-opentrons-shared-data"
+  depends on BR2_PACKAGE_PYTHON3
+  select BR2_PACKAGE_PYTHON_JSONSCHEMA # runtime
+  help
+    Opentrons data sources. Used on an OT2 robot.
+
+    https://opentrons.com

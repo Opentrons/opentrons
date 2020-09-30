@@ -84,8 +84,9 @@ def get_persisted_container(container_name: str) -> Container:
     container_data = persisted_containers_dict.get(container_name)
     if not container_data:
         raise ValueError(
-            ('Container type "{}" not found in files: {}')
-            .format(container_name, containers_file_list)
+            'Container type "{}" not found in files: {}'.format(
+                container_name, containers_file_list
+            )
         )
     return create_container_obj_from_dict(container_data)
 
@@ -170,9 +171,10 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
             }
     """
     container_data = copy.deepcopy(container_data)
-    origin_offset_x = container_data.get('origin-offset', {}).get('x') or 0
-    origin_offset_y = container_data.get('origin-offset', {}).get('y') or 0
-    origin_offset_z = container_data.get('origin-offset', {}).get('z') or 0
+    origin_offsets = container_data.get('origin-offset', {})
+    origin_offset_x = origin_offsets.get('x', 0)
+    origin_offset_y = origin_offsets.get('y', 0)
+    origin_offset_z = origin_offsets.get('z', 0)
 
     container = Container()
     locations = container_data['locations']

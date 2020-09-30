@@ -7,7 +7,7 @@ import type { LabwareWellGroupProperties, LabwareDefinition } from '../../types'
 
 export type LabelSpec = LabwareDefinition | LabwareWellGroupProperties
 
-export const getWellLabel = (spec: LabelSpec, fallback?: LabelSpec) =>
+export const getWellLabel = (spec: LabelSpec, fallback?: LabelSpec): string =>
   getLabel(WELL_TYPE_BY_CATEGORY, spec, fallback)
 
 function getLabel(

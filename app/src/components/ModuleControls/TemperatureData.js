@@ -14,7 +14,7 @@ export const TemperatureData = ({
   current,
   target,
   className,
-}: TemperatureDataProps) => (
+}: TemperatureDataProps): React.Node => (
   <div className={className}>
     <p className={styles.label}>{title}</p>
     <div className={styles.data_row}>

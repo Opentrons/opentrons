@@ -13,7 +13,7 @@ import styles from '../../StepEditForm.css'
 type Props = {
   className?: ?string,
   collapsed?: ?boolean,
-  toggleCollapsed: () => mixed,
+  toggleCollapsed: () => void,
   focusHandlers: FocusHandlers,
   prefix: 'aspirate' | 'dispense',
 }
@@ -22,7 +22,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
-export const SourceDestHeaders = (props: Props) => {
+export const SourceDestHeaders = (props: Props): React.Node => {
   const { className, collapsed, toggleCollapsed, focusHandlers, prefix } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)

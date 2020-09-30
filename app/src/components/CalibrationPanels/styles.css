@@ -1,0 +1,11 @@
+.deck_map {
+  flex: 1;
+}
+
+.labware_ui_wrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}

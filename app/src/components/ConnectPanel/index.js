@@ -37,7 +37,14 @@ type DP = {| onScanClick: () => mixed |}
 
 type Props = {| ...SP, ...DP |}
 
-export const ConnectPanel = connect<Props, {||}, SP, DP, State, Dispatch>(
+export const ConnectPanel: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  State,
+  Dispatch
+>(
   mapStateToProps,
   mapDispatchToProps
 )(ConnectPanelComponent)

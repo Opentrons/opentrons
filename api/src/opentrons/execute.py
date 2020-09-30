@@ -10,18 +10,22 @@ import argparse
 import logging
 import os
 import sys
-from typing import Any, Callable, Dict, List, Optional, TextIO, Union
+from typing import (Any, Callable, Dict, List, Optional, TextIO, Union,
+                    TYPE_CHECKING)
 
 import opentrons
 from opentrons import protocol_api, __version__
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
-from opentrons.protocol_api import (execute as execute_apiv2,
-                                    MAX_SUPPORTED_VERSION)
+from opentrons.protocol_api import (MAX_SUPPORTED_VERSION)
+from opentrons.protocols.execution import execute as execute_apiv2
 from opentrons import commands
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import APIVersion, PythonProtocol
 from opentrons.hardware_control import API, ThreadManager
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 _THREAD_MANAGED_HW: Optional[ThreadManager] = None
 #: The background global cache that all protocol contexts created by
@@ -30,9 +34,9 @@ _THREAD_MANAGED_HW: Optional[ThreadManager] = None
 
 def get_protocol_api(
         version: Union[str, APIVersion],
-        bundled_labware: Dict[str, Dict[str, Any]] = None,
+        bundled_labware: Dict[str, 'LabwareDefinition'] = None,
         bundled_data: Dict[str, bytes] = None,
-        extra_labware: Dict[str, Any] = None,
+        extra_labware: Dict[str, 'LabwareDefinition'] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a :py:class:`ProtocolContext` connected to the robot.
@@ -229,6 +233,7 @@ def execute(protocol_file: TextIO,
                               non-recursive contents of specified directories
                               are presented by the protocol context in
                               :py:attr:`.ProtocolContext.bundled_data`.
+
     The format of the runlog entries is as follows:
 
     .. code-block:: python

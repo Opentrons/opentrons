@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { AlertModal, OutlineButton, PrimaryButton } from '@opentrons/components'
 import { i18n } from '../../localization'
 import modalStyles from './modal.css'
@@ -11,7 +11,7 @@ type Props = {|
   handleContinueClick: () => mixed,
 |}
 
-export const AutoAddPauseUntilTempStepModal = (props: Props) => (
+export const AutoAddPauseUntilTempStepModal = (props: Props): React.Node => (
   <AlertModal
     className={modalStyles.modal}
     contentsClassName={modalStyles.modal_contents}
@@ -22,7 +22,12 @@ export const AutoAddPauseUntilTempStepModal = (props: Props) => (
       })}
     </div>
     <p className={styles.body}>
-      {i18n.t('modal.auto_add_pause_until_temp_step.body', {
+      {i18n.t('modal.auto_add_pause_until_temp_step.body1', {
+        temperature: props.displayTemperature,
+      })}
+    </p>
+    <p className={styles.body}>
+      {i18n.t('modal.auto_add_pause_until_temp_step.body2', {
         temperature: props.displayTemperature,
       })}
     </p>

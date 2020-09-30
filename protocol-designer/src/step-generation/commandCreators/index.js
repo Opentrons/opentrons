@@ -1,5 +1,12 @@
 // @flow
-export { transfer, mix, consolidate, distribute } from './compound'
+export {
+  transfer,
+  mix,
+  consolidate,
+  distribute,
+  thermocyclerProfileStep,
+  thermocyclerStateStep,
+} from './compound'
 
 export {
   aspirate,

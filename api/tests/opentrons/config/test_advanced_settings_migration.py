@@ -1,7 +1,7 @@
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
-good_file_version = 3
+good_file_version = 7
 good_file_settings = {
     'shortFixedTrash': None,
     'calibrateToBottom': None,
@@ -11,7 +11,10 @@ good_file_settings = {
     'disableLogAggregation': None,
     'enableApi1BackCompat': None,
     'useProtocolApi2': None,
-    'useFastApi': None,
+    'useV1HttpApi': None,
+    'enableDoorSafetySwitch': None,
+    'enableTipLengthCalibration': None,
+    'enableHttpProtocolSessions': None,
 }
 
 
@@ -41,7 +44,10 @@ def test_migrates_versionless_new_config():
       'disableLogAggregation': None,
       'enableApi1BackCompat': None,
       'useProtocolApi2': None,
-      'useFastApi': None
+      'useV1HttpApi': None,
+      'enableDoorSafetySwitch': None,
+      'enableTipLengthCalibration': None,
+      'enableHttpProtocolSessions': None,
     }
 
 
@@ -63,7 +69,10 @@ def test_migrates_versionless_old_config():
       'disableLogAggregation': None,
       'enableApi1BackCompat': None,
       'useProtocolApi2': None,
-      'useFastApi': None
+      'useV1HttpApi': None,
+      'enableDoorSafetySwitch': None,
+      'enableTipLengthCalibration': None,
+      'enableHttpProtocolSessions': None,
     }
 
 
@@ -97,6 +106,10 @@ def test_migrates_v1_config():
         'disableLogAggregation': None,
         'useProtocolApi2': None,
         'enableApi1BackCompat': None,
+        'useV1HttpApi': None,
+        'enableDoorSafetySwitch': None,
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
     }
 
 
@@ -123,6 +136,10 @@ def test_migrates_v2_config():
         'disableLogAggregation': False,
         'useProtocolApi2': None,
         'enableApi1BackCompat': None,
+        'useV1HttpApi': None,
+        'enableDoorSafetySwitch': None,
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
     }
 
 
@@ -148,6 +165,71 @@ def test_migrates_v3_config():
         'disableLogAggregation': False,
         'useProtocolApi2': None,
         'enableApi1BackCompat': False,
+        'useV1HttpApi': None,
+        'enableDoorSafetySwitch': None,
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
+    }
+
+
+def test_migrates_v4_config():
+    settings, version = _migrate({
+        '_version': 4,
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useProtocolApi2': None,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': False,
+        'enableApi1BackCompat': False,
+        'useV1HttpApi': False
+    })
+    assert version == good_file_version
+    assert settings == {
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': False,
+        'useProtocolApi2': None,
+        'enableApi1BackCompat': False,
+        'useV1HttpApi': False,
+        'enableDoorSafetySwitch': None,
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
+    }
+
+
+def test_migrates_v5_config():
+    settings, version = _migrate({
+        '_version': 5,
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useProtocolApi2': None,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': False,
+        'enableApi1BackCompat': False,
+        'useV1HttpApi': False,
+        'enableDoorSafetySwitch': True,
+    })
+    assert version == good_file_version
+    assert settings == {
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': False,
+        'useProtocolApi2': None,
+        'enableApi1BackCompat': False,
+        'useV1HttpApi': False,
+        'enableDoorSafetySwitch': True,
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
     }
 
 
@@ -165,5 +247,7 @@ def test_ensures_config():
              'useOldAspirationFunctions': None,
              'disableLogAggregation': True,
              'useProtocolApi2': None,
-             'useFastApi': None
+             'enableDoorSafetySwitch': None,
+             'enableTipLengthCalibration': None,
+             'enableHttpProtocolSessions': None,
          }
