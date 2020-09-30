@@ -10,6 +10,7 @@ import * as RobotSelectors from '../../../robot/selectors'
 
 import { ControlsCard } from '../ControlsCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
+import { DeckCalibrationControl } from '../DeckCalibrationControl'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
@@ -96,7 +97,11 @@ describe('ControlsCard', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     getDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
-    getFeatureFlags.mockReturnValue({})
+    getFeatureFlags.mockReturnValue({
+      enableCalibrationOverhaul: false,
+      allPipetteConfig: false,
+      enableBundleUpload: false,
+    })
   })
 
   afterEach(() => {
@@ -130,6 +135,18 @@ describe('ControlsCard', () => {
       2,
       Calibration.fetchCalibrationStatus(mockRobot.name)
     )
+  })
+
+  it('does not call fetchCalibrationStatus if enableCalOverhaul is on', () => {
+    getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+    const { store } = render()
+
+    expect(store.dispatch).not.toHaveBeenCalledWith(
+      Calibration.fetchCalibrationStatus(mockRobot.name)
+    )
+    store.dispatch.mockReset()
+    jest.advanceTimersByTime(20000)
+    expect(store.dispatch).not.toHaveBeenCalled()
   })
 
   it('calls updateLights with toggle on button click', () => {
@@ -266,5 +283,26 @@ describe('ControlsCard', () => {
     // TODO(lc, 2020-06-18): Mock out the new transform status such that
     // this should evaluate to true.
     expect(wrapper.exists(DeckCalibrationWarning)).toBe(true)
+  })
+
+  it('DeckCalibrationWarning component does not render if cal is bad but ff is on', () => {
+    getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+    const { wrapper } = render()
+
+    expect(wrapper.exists(DeckCalibrationWarning)).toBe(false)
+  })
+
+  it('DeckCalibrationControl does not render if ff is on', () => {
+    getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+    const { wrapper } = render()
+
+    expect(wrapper.exists(DeckCalibrationControl)).toBe(false)
+  })
+
+  it('CheckCalibrationControl does not render if ff is on', () => {
+    getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+    const { wrapper } = render()
+
+    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
   })
 })

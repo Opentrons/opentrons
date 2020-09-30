@@ -1,17 +1,21 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { format } from 'date-fns'
 import {
   Text,
   SecondaryBtn,
   BORDER_SOLID_LIGHT,
   SPACING_2,
+  SPACING_4,
   useConditionalConfirm,
+  FONT_STYLE_ITALIC,
 } from '@opentrons/components'
 
 import { getFeatureFlags } from '../../config'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
+import { DECK_CAL_STATUS_IDENTITY } from '../../calibration'
 
 import type { State } from '../../types'
 import type {
@@ -35,6 +39,23 @@ type Props = {|
   deckCalData: DeckCalibrationData | null,
   startLegacyDeckCalibration: () => void,
 |}
+
+const DECK_NEVER_CALIBRATED = "You haven't calibrated the deck yet"
+const LAST_CALIBRATED = 'Last calibrated: '
+
+const buildDeckLastCalibrated: (
+  data: DeckCalibrationData,
+  status: DeckCalibrationStatus
+) => string = (data, status) => {
+  if (status === DECK_CAL_STATUS_IDENTITY) {
+    return DECK_NEVER_CALIBRATED
+  }
+  const datestring =
+    typeof data.lastModified === 'string'
+      ? format(new Date(data.lastModified), 'yyyy-MM-dd HH:mm')
+      : 'unknown'
+  return `${LAST_CALIBRATED} ${datestring}`
+}
 
 // deck calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [
@@ -168,12 +189,21 @@ export function DeckCalibrationControl(props: Props): React.Node {
           deckCalibrationStatus={deckCalStatus}
           marginTop={SPACING_2}
         />
-        <DeckCalibrationDownload
-          deckCalibrationStatus={deckCalStatus}
-          deckCalibrationData={deckCalData}
-          robotName={robotName}
-          marginTop={SPACING_2}
-        />
+        {ff.enableCalibrationOverhaul ? (
+          deckCalData &&
+          deckCalStatus && (
+            <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
+              {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
+            </Text>
+          )
+        ) : (
+          <DeckCalibrationDownload
+            deckCalibrationStatus={deckCalStatus}
+            deckCalibrationData={deckCalData}
+            robotName={robotName}
+            marginTop={SPACING_2}
+          />
+        )}
       </TitledControl>
       {showConfirmStart && (
         <Portal>
