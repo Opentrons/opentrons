@@ -70,6 +70,8 @@ export type SharedTransferLikeArgs = {|
   aspirateOffsetFromBottomMm: number,
 
   // ===== DISPENSE SETTINGS =====
+  /** Air gap after dispense */
+  dispenseAirGapVolume: number | null,
   /** Delay after every dispense */
   dispenseDelay: ?InnerDelayArgs,
   /** Touch tip in destination well after dispense */

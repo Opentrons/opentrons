@@ -205,6 +205,14 @@ describe('move liquid step form -> command creator args', () => {
       expectedArgsUnchecked: { aspirateAirGapVolume: null },
       expectedArgsChecked: { aspirateAirGapVolume: 20 },
     },
+    {
+      checkboxField: 'dispense_airGap_checkbox',
+      formFields: {
+        dispense_airGap_volume: 20,
+      },
+      expectedArgsUnchecked: { dispenseAirGapVolume: null },
+      expectedArgsChecked: { dispenseAirGapVolume: 20 },
+    },
   ]
 
   checkboxFieldCases.forEach(
