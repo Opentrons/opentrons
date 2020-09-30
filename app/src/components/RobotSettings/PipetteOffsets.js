@@ -4,9 +4,11 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link as RRDLink } from 'react-router-dom'
 
+
 import type { State } from '../../types'
 import * as Robot from '../../robot'
 import * as Pipettes from '../../pipettes'
+import * as CustomLabware from '../../custom-labware'
 
 import {
   Box,
@@ -54,6 +56,12 @@ export function PipetteOffsets(props: Props): React.Node {
     return Pipettes.getAttachedPipetteCalibrations(state, robotName)
   })
 
+  const customLabwareDefs = useSelector((state: State) => {
+    return CustomLabware.getCustomLabwareDefinitions(state)
+  })
+
+
+
   return (
     <Box
       padding={SPACING_3}
@@ -82,11 +90,13 @@ export function PipetteOffsets(props: Props): React.Node {
             mount={'left'}
             pipette={attachedPipettes.left}
             calibration={pipetteCalibrations.left}
+            customLabware={customLabwareDefs}
           />
           <PipetteOffsetItem
             mount={'right'}
             pipette={attachedPipettes.right}
             calibration={pipetteCalibrations.right}
+            customLabware={customLabwareDefs}
           />
         </Flex>
       </Flex>
