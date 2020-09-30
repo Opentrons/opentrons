@@ -35,14 +35,11 @@ on:
       - 'scripts/**/*'
   workflow_dispatch:
 
-#defaults:
-#  run:
-#    shell: bash
 
 env:
   CI: true
   OT_APP_DEPLOY_BUCKET: opentrons-app
-  OT_APP_DEPLOY_FOLDER: builds-actions  # Not the actual deploy target - change when we cut over
+  OT_APP_DEPLOY_FOLDER: builds
 
 jobs:
   js-unit-test:
