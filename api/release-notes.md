@@ -26,7 +26,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
   - Using `apiLevel: '2.7'` in your Python protocol will allow you to access the new `has_tip` property of a given pipette
 - Allow the Opentrons App to get and set the OT-2's clock
   - If your OT-2 is not connected to the internet, it can have trouble getting the correct time for its internal clock
-  - The Opentrons App can now set your OT-2's time, which should prevent miscommunication when the App and OT-2 are talking
+  - The Opentrons App can now set your OT-2's time, which should prevent miscommunication between your app and OT-2
 - New packages and libraries for the OT-2's embedded Linux environment
   - `curl`, `wget`, and `git` to retrieve content for complex workflows
   - `grep` and `sl` because no command-line environment is complete without them
