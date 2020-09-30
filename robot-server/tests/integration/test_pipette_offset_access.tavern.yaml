@@ -37,6 +37,7 @@ stages:
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
               lastModified: !anystr
+              tiprackUri: !anystr
             id: !anystr
             type: 'PipetteOffsetCalibration'
           - attributes:
@@ -45,6 +46,7 @@ stages:
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
               lastModified: !anystr
+              tiprackUri: !anystr
             id: !anystr
             type: 'PipetteOffsetCalibration'
 
@@ -67,6 +69,7 @@ stages:
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
               lastModified: !anystr
+              tiprackUri: !anystr
             id: !anystr
             type: 'PipetteOffsetCalibration'
 
@@ -88,6 +91,7 @@ stages:
               mount: 'left'
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
+              tiprackUri: !anystr
               lastModified: !anystr
             id: !anystr
             type: 'PipetteOffsetCalibration'
@@ -112,6 +116,7 @@ stages:
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
               lastModified: !anystr
+              tiprackUri: !anystr
             id: !anystr
             type: 'PipetteOffsetCalibration'
 

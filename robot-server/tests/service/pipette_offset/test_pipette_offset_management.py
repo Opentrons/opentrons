@@ -13,6 +13,7 @@ def test_access_pipette_offset_calibration(
         'tiprack': 'hash',
         'lastModified': None,
         'source': 'user',
+        'tiprackUri': 'uri',
         'status': {
             'markedAt': None, 'markedBad': False, 'source': None}
     }

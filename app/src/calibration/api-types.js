@@ -95,6 +95,7 @@ export type PipetteOffsetCalibration = {|
   mount: Mount,
   offset: [number, number, number],
   tiprack: string,
+  tiprackUri: string,
   lastModified: string,
 |}
 
