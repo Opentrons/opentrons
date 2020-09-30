@@ -23,7 +23,12 @@ export const getCalibrationForPipette: (
   pipetteSerial: string
 ) => PipetteOffsetCalibration | null = (state, robotName, pipetteSerial) => {
   const allCalibrations = getPipetteOffsetCalibrations(state, robotName)
-  return (
-    head(allCalibrations.filter(cal => cal.pipette === pipetteSerial)) || null
-  )
+  return filterCalibrationForPipette(allCalibrations, pipetteSerial)
+}
+
+export const filterCalibrationForPipette: (
+  calibrations: Array<PipetteOffsetCalibration>,
+  pipetteSerial: string
+) => PipetteOffsetCalibration | null = (calibrations, pipetteSerial) => {
+  return head(calibrations.filter(cal => cal.pipette === pipetteSerial)) || null
 }

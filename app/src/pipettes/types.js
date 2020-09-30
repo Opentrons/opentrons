@@ -3,6 +3,7 @@
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { Pipette as ProtocolPipette } from '../robot/types'
 import type { RobotApiRequestMeta } from '../robot-api/types'
+import type { PipetteOffsetCalibration } from '../calibration/types'
 
 // common types
 
@@ -199,3 +200,8 @@ export type PipettesState = $Shape<
     [robotName: string]: void | PerRobotPipettesState,
   |}>
 >
+
+export type PipetteOffsetCalibrationsByMount = {|
+  left: null | PipetteOffsetCalibration,
+  right: null | PipetteOffsetCalibration,
+|}

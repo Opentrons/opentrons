@@ -10,11 +10,14 @@ import * as RobotSelectors from '../../../robot/selectors'
 import { CalibrationCard } from '../CalibrationCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
+import { PipetteOffsets } from '../PipetteOffsets'
 
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 
 import type { State, Action } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
+
+jest.mock('react-router-dom', () => ({ Link: 'a' }))
 
 jest.mock('../../../robot/selectors')
 jest.mock('../../../config/selectors')
@@ -24,6 +27,10 @@ jest.mock('../../../sessions/selectors')
 jest.mock('../CheckCalibrationControl', () => ({
   CheckCalibrationControl: () => <></>,
 }))
+
+jest.mock('../PipetteOffsets', () => ({
+  PipetteOffsets: () => <></>,
+ }))
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 
@@ -64,9 +71,12 @@ const getCheckCalibrationControl = wrapper =>
 
 describe('CalibrationCard', () => {
   const render = (robot: ViewableRobot = mockRobot) => {
-    return mountWithStore<_, State, Action>(<CalibrationCard robot={robot} />, {
-      initialState: MOCK_STATE,
-    })
+    return mountWithStore<_, State, Action>(
+      <CalibrationCard robot={robot} pipettesPageUrl={'fake-url'} />,
+      {
+        initialState: MOCK_STATE,
+      }
+    )
   }
 
   beforeEach(() => {

@@ -20,9 +20,11 @@ import {
 } from './constants'
 import { DeckCalibrationControl } from './DeckCalibrationControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
+import { PipetteOffsets } from './PipetteOffsets'
 
 type Props = {|
   robot: ViewableRobot,
+  pipettesPageUrl: string,
 |}
 
 const TITLE = 'Robot Calibration'
@@ -33,7 +35,7 @@ const BAD_DECK_CALIBRATION =
 const NO_DECK_CALIBRATION = 'Please perform a full deck calibration.'
 
 export function CalibrationCard(props: Props): React.Node {
-  const { robot } = props
+  const { robot, pipettesPageUrl } = props
   const { name: robotName, status } = robot
   const notConnectable = status !== CONNECTABLE
 
@@ -87,6 +89,7 @@ export function CalibrationCard(props: Props): React.Node {
           disabledReason={calCheckDisabledReason}
         />
       )}
+      <PipetteOffsets pipettesPageUrl={pipettesPageUrl} robot={robot} />
     </Card>
   )
 }

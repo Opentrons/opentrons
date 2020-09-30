@@ -80,6 +80,7 @@ export const RobotSettings: React.AbstractComponent<
 const UPDATE_FRAGMENT = 'update'
 const CALIBRATE_DECK_FRAGMENT = 'calibrate-deck'
 const RESET_FRAGMENT = 'reset'
+const INSTRUMENTS_FRAGMENT = 'instruments'
 
 function RobotSettingsComponent(props: Props) {
   const {
@@ -101,6 +102,7 @@ function RobotSettingsComponent(props: Props) {
   const updateUrl = `${url}/${UPDATE_FRAGMENT}`
   const calibrateDeckUrl = `${url}/${CALIBRATE_DECK_FRAGMENT}`
   const resetUrl = `${url}/${RESET_FRAGMENT}`
+  const pipettesPageUrl = `${url}/${INSTRUMENTS_FRAGMENT}`
 
   // TODO(mc, 2018-07-26): these routes are too complicated and mess with the
   // active state of the robot side-panel links. Remove in favor of a component
@@ -125,6 +127,7 @@ function RobotSettingsComponent(props: Props) {
           updateUrl={updateUrl}
           calibrateDeckUrl={calibrateDeckUrl}
           resetUrl={resetUrl}
+          pipettesPageUrl={pipettesPageUrl}
         />
       </Page>
       <Switch>
