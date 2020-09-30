@@ -5,6 +5,8 @@ import * as LabwareFixtures from '../labware/__fixtures__'
 import * as Labware from '../labware'
 import * as PipetteOffset from '../pipette-offset'
 import * as PipetteOffsetFixtures from '../pipette-offset/__fixtures__'
+import * as TipLength from '../tip-length'
+import * as TipLengthFixtures from '../tip-length/__fixtures__'
 import * as Actions from '../actions'
 import { calibrationReducer } from '../reducer'
 
@@ -21,6 +23,7 @@ describe('calibration reducer', () => {
         calibrationStatus: Fixtures.mockCalibrationStatus,
         labwareCalibrations: null,
         pipetteOffsetCalibrations: null,
+        tipLengthCalibrations: null,
       },
     })
   })
@@ -37,6 +40,7 @@ describe('calibration reducer', () => {
         calibrationStatus: null,
         labwareCalibrations: LabwareFixtures.mockAllLabwareCalibration,
         pipetteOffsetCalibrations: null,
+        tipLengthCalibrations: null,
       },
     })
   })
@@ -54,6 +58,24 @@ describe('calibration reducer', () => {
         labwareCalibrations: null,
         pipetteOffsetCalibrations:
           PipetteOffsetFixtures.mockAllPipetteOffsetsCalibration,
+        tipLengthCalibrations: null,
+      },
+    })
+  })
+
+  it('should handle a FETCH_TIP_LENGTH_CALIBRATIONS_SUCCESS', () => {
+    const action = TipLength.fetchTipLengthCalibrationsSuccess(
+      'robot-name',
+      TipLengthFixtures.mockAllTipLengthCalibrations,
+      {}
+    )
+
+    expect(calibrationReducer({}, action)).toEqual({
+      'robot-name': {
+        calibrationStatus: null,
+        labwareCalibrations: null,
+        pipetteOffsetCalibrations: null,
+        tipLengthCalibrations: TipLengthFixtures.mockAllTipLengthCalibrations,
       },
     })
   })
