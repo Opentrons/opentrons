@@ -47,7 +47,7 @@ function getDisplayNameForTiprack(tiprackUri: string, customLabware: Array<Labwa
     : `${UNKNOWN_CUSTOM_LABWARE}`
 }
 
-function buildCalibrationText(calibration: PipetteOffsetCalibration,
+function buildCalibrationText(calibration: PipetteOffsetCalibration | null,
                               customLabware: Array<LabwareDefinition2>): React.Node {
 
   return calibration
