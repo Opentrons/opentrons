@@ -27,8 +27,8 @@ type MoveLiquidFields = $PropertyType<HydratedMoveLiquidFormData, 'fields'>
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(
   hydratedFormData: MoveLiquidFields,
-  checkboxField: 'aspirate_airGap_checkbox', // | 'dispense_airGap_checkbox'
-  volumeField: 'aspirate_airGap_volume' // | 'dispense_airGap_volume'
+  checkboxField: 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox',
+  volumeField: 'aspirate_airGap_volume' | 'dispense_airGap_volume'
 ): number | null {
   const checkbox = hydratedFormData[checkboxField]
   const volume = hydratedFormData[volumeField]
@@ -182,6 +182,12 @@ export const moveLiquidFormToArgs = (
     'aspirate_airGap_volume'
   )
 
+  const dispenseAirGapVolume = getAirGapData(
+    fields,
+    'dispense_airGap_checkbox',
+    'dispense_airGap_volume'
+  )
+
   const commonFields = {
     pipette: pipetteId,
     volume,
@@ -206,6 +212,7 @@ export const moveLiquidFormToArgs = (
     aspirateDelay,
     dispenseDelay,
     aspirateAirGapVolume,
+    dispenseAirGapVolume,
     touchTipAfterAspirate,
     touchTipAfterAspirateOffsetMmFromBottom,
     touchTipAfterDispense,
