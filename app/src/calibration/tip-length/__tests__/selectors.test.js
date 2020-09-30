@@ -18,13 +18,13 @@ const mockState: $Shape<State> = {
 
 describe('getTipLengthCalibrations', () => {
   it('should find all tip length calibrations when they exist', () => {
-    expect(
-      Selectors.getTipLengthCalibrations(mockState, 'robot-name')
-    ).toEqual([
-      Fixtures.mockTipLengthCalibration1.attributes,
-      Fixtures.mockTipLengthCalibration2.attributes,
-      Fixtures.mockTipLengthCalibration3.attributes,
-    ])
+    expect(Selectors.getTipLengthCalibrations(mockState, 'robot-name')).toEqual(
+      [
+        Fixtures.mockTipLengthCalibration1.attributes,
+        Fixtures.mockTipLengthCalibration2.attributes,
+        Fixtures.mockTipLengthCalibration3.attributes,
+      ]
+    )
   })
   it('should not find calibrations from other robots', () => {
     expect(
@@ -34,30 +34,33 @@ describe('getTipLengthCalibrations', () => {
 })
 
 describe('getCalibrationForPipette', () => {
-  it('should get the calibration for a specific pipette if it exists', () => {
+  it('should get the calibration for a specific pipette and tiprack if it exists', () => {
     expect(
-      Selectors.getCalibrationForPipette(
+      Selectors.getTipLengthForPipetteAndTiprack(
         mockState,
         'robot-name',
-        'P1KVS2108052020A02'
+        'P20MV2008052020A02',
+        'opentrons_96_tiprack_20ul_hash'
       )
     ).toEqual(Fixtures.mockTipLengthCalibration3.attributes)
   })
   it('should get no calibration when no matching calibration exists', () => {
     expect(
-      Selectors.getCalibrationForPipette(
+      Selectors.getTipLengthForPipetteAndTiprack(
         mockState,
         'robot-name',
-        'no such pipette'
+        'no such pipette',
+        'opentrons_96_tiprack_20ul_hash'
       )
     ).toBeNull()
   })
   it('should get no calibration from the wrong robot', () => {
     expect(
-      Selectors.getCalibrationForPipette(
+      Selectors.getTipLengthForPipetteAndTiprack(
         mockState,
         'some other robot',
-        'P20MV2008052020A02'
+        'P20MV2008052020A02',
+        'opentrons_96_tiprack_20ul_hash'
       )
     ).toBeNull()
   })

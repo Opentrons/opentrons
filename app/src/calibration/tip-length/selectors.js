@@ -13,17 +13,27 @@ export const getTipLengthCalibrations: (
     return []
   }
   const calibrations =
-    state.calibration[robotName]?.pipetteOffsetCalibrations?.data || []
+    state.calibration[robotName]?.tipLengthCalibrations?.data || []
   return calibrations.map(calibration => calibration.attributes)
 }
 
-export const getCalibrationForPipette: (
+export const getTipLengthForPipetteAndTiprack: (
   state: State,
   robotName: string,
-  pipetteSerial: string
-) => TipLengthCalibration | null = (state, robotName, pipetteSerial) => {
+  pipetteSerial: string,
+  tiprackHash: string
+) => TipLengthCalibration | null = (
+  state,
+  robotName,
+  pipetteSerial,
+  tiprackHash
+) => {
   const allCalibrations = getTipLengthCalibrations(state, robotName)
   return (
-    head(allCalibrations.filter(cal => cal.pipette === pipetteSerial)) || null
+    head(
+      allCalibrations.filter(
+        cal => (cal.pipette === pipetteSerial) & (cal.tiprack === tiprackHash)
+      )
+    ) || null
   )
 }

@@ -14,8 +14,8 @@ import type {
 
 export const mockTipLengthCalibration1: TipLengthCalibrationModel = {
   attributes: {
-    pipetet: 'P3HSV2008052020A02',
-    tiprack: 'opentrons_96_tiprack_300ul',
+    pipette: 'P3HSV2008052020A02',
+    tiprack: 'opentrons_96_tiprack_300ul_hash',
     tipLength: 30.5,
     lastModified: '2020-09-29T10:02',
   },
@@ -25,8 +25,8 @@ export const mockTipLengthCalibration1: TipLengthCalibrationModel = {
 
 export const mockTipLengthCalibration2: TipLengthCalibrationModel = {
   attributes: {
-    pipetet: 'P3HMV2008052020A02',
-    tiprack: 'opentrons_96_tiprack_300ul',
+    pipette: 'P3HMV2008052020A02',
+    tiprack: 'opentrons_96_tiprack_300ul_hash',
     tipLength: 32.5,
     lastModified: '2020-09-29T12:02',
   },
@@ -36,8 +36,8 @@ export const mockTipLengthCalibration2: TipLengthCalibrationModel = {
 
 export const mockTipLengthCalibration3: TipLengthCalibrationModel = {
   attributes: {
-    pipetet: 'P20MV2008052020A02',
-    tiprack: 'opentrons_96_tiprack_20ul',
+    pipette: 'P20MV2008052020A02',
+    tiprack: 'opentrons_96_tiprack_20ul_hash',
     tipLength: 29.0,
     lastModified: '2020-09-29T13:02',
   },
