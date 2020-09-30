@@ -159,7 +159,9 @@ def set_up_tip_length_temp_directory(server_temp_directory):
     tiprack_hash = 'fakehash'
     tip_length_list = [30.5, 31.5]
     for pip, tip_len in zip(pip_list, tip_length_list):
-        cal = {tiprack_hash: {'tipLength': tip_len, 'lastModified': datetime.now()}}
+        cal = {tiprack_hash: {
+                'tipLength': tip_len,
+                'lastModified': datetime.now()}}
         modify.save_tip_length_calibration(pip, cal)
 
 

@@ -4,11 +4,14 @@ from fastapi import APIRouter
 from opentrons.calibration_storage import (
     types as cal_types,
     get as get_cal,
+    helpers,
     delete)
 
 from robot_server.service.tip_length import models as tl_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.json_api import ErrorResponse, ResponseDataModel
+from robot_server.service.shared_models import calibration as cal_model
+
 
 router = APIRouter()
 
@@ -16,11 +19,14 @@ router = APIRouter()
 def _format_calibration(
     calibration: cal_types.TipLengthCalibration
 ) -> ResponseDataModel[tl_models.TipLengthCalibration]:
+    status = cal_model.CalibrationStatus(
+        **helpers.convert_to_dict(calibration.status))
     formatted_cal = tl_models.TipLengthCalibration(
         tipLength=calibration.tip_length,
         tiprack=calibration.tiprack,
         pipette=calibration.pipette,
-        lastModified=calibration.last_modified)
+        lastModified=calibration.last_modified,
+        status=status)
 
     return ResponseDataModel.create(
         attributes=formatted_cal,
