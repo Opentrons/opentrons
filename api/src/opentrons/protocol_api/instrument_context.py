@@ -1094,15 +1094,23 @@ class InstrumentContext(CommandPublisher):
     def delay(self):
         return self._ctx.delay()
 
+    def _get_location_from_point_if_needed(self, location_or_point: Union[types.Location, types.Point]):
+        if isinstance(location_or_point, types.Location):
+            return location_or_point
+        elif isinstance(location_or_point, types.Point):
+            return types.Location(types.Point, "unnamed_point")
+        else:
+            raise ValueError("Argument must be a Location or a Point")
+
     @requires_version(2, 0)
-    def move_to(self, location: types.Location, force_direct: bool = False,
+    def move_to(self, location: Union[types.Location, types.Point], force_direct: bool = False,
                 minimum_z_height: float = None,
                 speed: float = None
                 ) -> InstrumentContext:
         """ Move the instrument.
 
         :param location: The location to move to.
-        :type location: :py:class:`.types.Location`
+        :type location: :py:class:`.types.Location` or :py:class:`.types.Point`
         :param force_direct: If set to true, move directly to destination
                         without arc motion.
         :param minimum_z_height: When specified, this Z margin is able to raise
@@ -1113,6 +1121,7 @@ class InstrumentContext(CommandPublisher):
                       individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
+        location = _get_location_from_point_if_needed(location)
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
         else:
