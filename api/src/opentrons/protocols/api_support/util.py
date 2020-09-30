@@ -399,10 +399,15 @@ def requires_version(
             slf = args[0]
             added_in = decorated_obj.__opentrons_version_added  # type: ignore
             current_version = slf._api_version
+
+            # __qualname__ is *probably* set on every kind of object we care
+            # about, but the docs leave it ambiguous, so fall back to str().
+            name = getattr(decorated_obj, "__qualname__", str(decorated_obj))
+
             if current_version >= APIVersion(2, 0)\
                and current_version < added_in:
                 raise APIVersionError(
-                    f'{decorated_obj} was added in {added_in}, but your '
+                    f'{name} was added in {added_in}, but your '
                     f'protocol requested version {current_version}. You '
                     f'must increase your API version to {added_in} to '
                     'use this functionality.')
