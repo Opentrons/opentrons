@@ -88,21 +88,21 @@ def test_build_edges():
     off = Point(0, 0, 1.0)
     deck = Deck()
     old_correct_edges = [
-        test_lw['A1']._from_center_cartesian(x=1.0, y=0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=-1.0, y=0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=0, y=1.0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=0, y=-1.0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=1.0, y=0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=-1.0, y=0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=0, y=1.0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=0, y=-1.0, z=1) + off,
     ]
     res = build_edges(
         test_lw['A1'], 1.0, Mount.RIGHT, deck, version=APIVersion(2, 2))
     assert res == old_correct_edges
 
     new_correct_edges = [
-        test_lw['A1']._from_center_cartesian(x=1.0, y=0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=-1.0, y=0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=0, y=0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=0, y=1.0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=0, y=-1.0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=1.0, y=0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=-1.0, y=0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=0, y=0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=0, y=1.0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=0, y=-1.0, z=1) + off,
     ]
     res2 = build_edges(
         test_lw['A1'], 1.0, Mount.RIGHT, deck, version=APIVersion(2, 4))
@@ -117,10 +117,10 @@ def test_build_edges_left_pipette(loop):
     mod.load_labware('corning_96_wellplate_360ul_flat')
     off = Point(0, 0, 1.0)
     left_pip_edges = [
-        test_lw['A12']._from_center_cartesian(x=-1.0, y=0, z=1) + off,
-        test_lw['A12']._from_center_cartesian(x=0, y=0, z=1) + off,
-        test_lw['A12']._from_center_cartesian(x=0, y=1.0, z=1) + off,
-        test_lw['A12']._from_center_cartesian(x=0, y=-1.0, z=1) + off,
+        test_lw['A12'].geometry.from_center_cartesian(x=-1.0, y=0, z=1) + off,
+        test_lw['A12'].geometry.from_center_cartesian(x=0, y=0, z=1) + off,
+        test_lw['A12'].geometry.from_center_cartesian(x=0, y=1.0, z=1) + off,
+        test_lw['A12'].geometry.from_center_cartesian(x=0, y=-1.0, z=1) + off,
     ]
     # Test that module in slot 3 results in modified edge list
     res = build_edges(
@@ -129,10 +129,10 @@ def test_build_edges_left_pipette(loop):
     assert res == left_pip_edges
 
     left_pip_edges = [
-        test_lw2['A12']._from_center_cartesian(x=-1.0, y=0, z=1) + off,
-        test_lw2['A12']._from_center_cartesian(x=0, y=0, z=1) + off,
-        test_lw2['A12']._from_center_cartesian(x=0, y=1.0, z=1) + off,
-        test_lw2['A12']._from_center_cartesian(x=0, y=-1.0, z=1) + off,
+        test_lw2['A12'].geometry.from_center_cartesian(x=-1.0, y=0, z=1) + off,
+        test_lw2['A12'].geometry.from_center_cartesian(x=0, y=0, z=1) + off,
+        test_lw2['A12'].geometry.from_center_cartesian(x=0, y=1.0, z=1) + off,
+        test_lw2['A12'].geometry.from_center_cartesian(x=0, y=-1.0, z=1) + off,
     ]
     # Test that labware in slot 6 results in modified edge list
     res2 = build_edges(
@@ -149,10 +149,10 @@ def test_build_edges_right_pipette(loop):
     mod.load_labware('corning_96_wellplate_360ul_flat')
     off = Point(0, 0, 1.0)
     right_pip_edges = [
-        test_lw['A1']._from_center_cartesian(x=1.0, y=0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=0, y=0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=0, y=1.0, z=1) + off,
-        test_lw['A1']._from_center_cartesian(x=0, y=-1.0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=1.0, y=0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=0, y=0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=0, y=1.0, z=1) + off,
+        test_lw['A1'].geometry.from_center_cartesian(x=0, y=-1.0, z=1) + off,
     ]
     # Test that module in slot 1 results in modified edge list
     res = build_edges(
@@ -161,11 +161,11 @@ def test_build_edges_right_pipette(loop):
     assert res == right_pip_edges
 
     right_pip_edges = [
-        test_lw2['A12']._from_center_cartesian(x=1.0, y=0, z=1) + off,
-        test_lw2['A12']._from_center_cartesian(x=-1.0, y=0, z=1) + off,
-        test_lw2['A12']._from_center_cartesian(x=0, y=0, z=1) + off,
-        test_lw2['A12']._from_center_cartesian(x=0, y=1.0, z=1) + off,
-        test_lw2['A12']._from_center_cartesian(x=0, y=-1.0, z=1) + off,
+        test_lw2['A12'].geometry.from_center_cartesian(x=1.0, y=0, z=1) + off,
+        test_lw2['A12'].geometry.from_center_cartesian(x=-1.0, y=0, z=1) + off,
+        test_lw2['A12'].geometry.from_center_cartesian(x=0, y=0, z=1) + off,
+        test_lw2['A12'].geometry.from_center_cartesian(x=0, y=1.0, z=1) + off,
+        test_lw2['A12'].geometry.from_center_cartesian(x=0, y=-1.0, z=1) + off,
     ]
     # Test that labware in slot 6 results in unmodified edge list
     res2 = build_edges(

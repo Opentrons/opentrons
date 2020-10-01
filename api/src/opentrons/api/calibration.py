@@ -296,9 +296,9 @@ class CalibrationManager(RobotBusy):
             container._container.set_calibration(Point(0, 0, 0))
             if ff.calibrate_to_bottom() and not (
                     container._container.is_tiprack):
-                orig = _well0(container._container)._bottom().point
+                orig = _well0(container._container).geometry.bottom()
             else:
-                orig = _well0(container._container)._top().point
+                orig = _well0(container._container).geometry.top()
             delta = here - orig
             labware.save_calibration(container._container, delta)
         else:

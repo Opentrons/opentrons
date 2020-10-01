@@ -162,7 +162,7 @@ def _air_gap(instruments: Dict[str, InstrumentContext],
     volume = params['volume']
     _set_flow_rate(pipette, params)
     well = _get_well(loaded_labware, params)
-    offset_from_top = offset_from_bottom - well._depth
+    offset_from_top = offset_from_bottom - well.geometry._depth
 
     # NOTE(IL, 2020-06-25): air_gap API fn is stateful, uses location
     # cache. The JSON atomic command should be stateless. We'll

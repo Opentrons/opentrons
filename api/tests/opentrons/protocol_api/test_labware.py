@@ -5,6 +5,7 @@ import pytest
 from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION)
 from opentrons.protocols.geometry import module_geometry
+from opentrons.protocols.geometry.well_geometry import WellGeometry
 
 from opentrons_shared_data import load_shared_data
 from opentrons.calibration_storage import (
@@ -59,26 +60,38 @@ def test_well_init():
     slot = Location(Point(1, 2, 3), 1)
     well_name = 'circular_well_json'
     has_tip = False
-    well1 = labware.Well(test_data[well_name], slot, well_name, has_tip,
-                         MAX_SUPPORTED_VERSION)
-    assert well1._diameter == test_data[well_name]['diameter']
-    assert well1._length is None
-    assert well1._width is None
+    well1 = labware.Well(
+        WellGeometry(test_data[well_name], slot),
+        well_name,
+        has_tip,
+        MAX_SUPPORTED_VERSION
+    )
+    assert well1.geometry.diameter == test_data[well_name]['diameter']
+    assert well1.geometry._length is None
+    assert well1.geometry._width is None
 
     well2_name = 'rectangular_well_json'
-    well2 = labware.Well(test_data[well2_name], slot, well2_name, has_tip,
-                         MAX_SUPPORTED_VERSION)
-    assert well2._diameter is None
-    assert well2._length == test_data[well2_name]['xDimension']
-    assert well2._width == test_data[well2_name]['yDimension']
+    well2 = labware.Well(
+        WellGeometry(test_data[well2_name], slot),
+        well2_name,
+        has_tip,
+        MAX_SUPPORTED_VERSION
+    )
+    assert well2.geometry.diameter is None
+    assert well2.geometry._length == test_data[well2_name]['xDimension']
+    assert well2.geometry._width == test_data[well2_name]['yDimension']
 
 
 def test_top():
     slot = Location(Point(4, 5, 6), 1)
     well_name = 'circular_well_json'
     has_tip = False
-    well = labware.Well(test_data[well_name], slot, well_name, has_tip,
-                        MAX_SUPPORTED_VERSION)
+    well = labware.Well(
+        WellGeometry(test_data[well_name], slot),
+        well_name,
+        has_tip,
+        MAX_SUPPORTED_VERSION
+    )
     well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.point.x
     expected_y = well_data['y'] + slot.point.y
@@ -91,8 +104,12 @@ def test_bottom():
     slot = Location(Point(7, 8, 9), 1)
     well_name = 'rectangular_well_json'
     has_tip = False
-    well = labware.Well(test_data[well_name], slot, well_name, has_tip,
-                        MAX_SUPPORTED_VERSION)
+    well = labware.Well(
+        WellGeometry(test_data[well_name], slot),
+        well_name,
+        has_tip,
+        MAX_SUPPORTED_VERSION
+    )
     well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.point.x
     expected_y = well_data['y'] + slot.point.y
@@ -105,13 +122,19 @@ def test_from_center_cartesian():
     slot1 = Location(Point(10, 11, 12), 1)
     well_name = 'circular_well_json'
     has_tip = False
-    well1 = labware.Well(test_data[well_name], slot1, well_name, has_tip,
-                         MAX_SUPPORTED_VERSION)
+    well1 = labware.Well(
+        WellGeometry(test_data[well_name], slot1),
+        well_name,
+        has_tip,
+        MAX_SUPPORTED_VERSION
+    )
 
     percent1_x = 1
     percent1_y = 1
     percent1_z = -0.5
-    point1 = well1._from_center_cartesian(percent1_x, percent1_y, percent1_z)
+    point1 = well1.geometry.from_center_cartesian(percent1_x,
+                                                  percent1_y,
+                                                  percent1_z)
 
     # slot.x + well.x + 1 * well.diamter/2
     expected_x = 10 + 40 + 15
@@ -127,12 +150,16 @@ def test_from_center_cartesian():
     slot2 = Location(Point(13, 14, 15), 1)
     well2_name = 'rectangular_well_json'
     has_tip = False
-    well2 = labware.Well(test_data[well2_name], slot2, well2_name, has_tip,
+    well2 = labware.Well(WellGeometry(test_data[well2_name], slot2),
+                         well2_name,
+                         has_tip,
                          MAX_SUPPORTED_VERSION)
     percent2_x = -0.25
     percent2_y = 0.1
     percent2_z = 0.9
-    point2 = well2._from_center_cartesian(percent2_x, percent2_y, percent2_z)
+    point2 = well2.geometry.from_center_cartesian(percent2_x,
+                                                  percent2_y,
+                                                  percent2_z)
 
     # slot.x + well.x - 0.25 * well.length/2
     expected_x = 13 + 45 - 15
@@ -198,8 +225,9 @@ def test_well_parent():
     parent = Location(Point(7, 8, 9), lw)
     well_name = 'circular_well_json'
     has_tip = True
-    well = labware.Well(test_data[well_name],
-                        parent,
+    well = labware.Well(WellGeometry(
+                            test_data[well_name],
+                            parent),
                         well_name,
                         has_tip,
                         MAX_SUPPORTED_VERSION)

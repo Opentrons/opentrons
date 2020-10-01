@@ -26,6 +26,7 @@ import jsonschema  # type: ignore
 from opentrons.protocols.api_support.util import (
     ModifiedList, requires_version, labware_column_shift)
 from opentrons.calibration_storage import get, helpers, modify
+from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
@@ -37,7 +38,7 @@ from opentrons.protocols.api_support.constants import (
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa(F401)
     from opentrons_shared_data.labware.dev_types import (
-        LabwareDefinition, LabwareParameters, WellDefinition)
+        LabwareDefinition, LabwareParameters)
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -58,8 +59,8 @@ class Well:
     It provides functions to return positions used in operations on the well
     such as :py:meth:`top`, :py:meth:`bottom`
     """
-    def __init__(self, well_props: 'WellDefinition',
-                 parent: Location,
+    def __init__(self,
+                 well_geometry: WellGeometry,
                  display_name: str,
                  has_tip: bool,
                  api_level: APIVersion,
@@ -74,37 +75,13 @@ class Well:
             "Well D1 of Biorad 96 PCR Plate on Magnetic Module in Slot 1".
             This is created by the caller and passed in, so here it is just
             saved and made available.
-        :param well_props: a dict that conforms to the json-schema for a Well
-        :param parent: a :py:class:`.Location` Point representing the absolute
-                       position of the parent of the Well (usually the
-                       front-left corner of a labware)
+        :param well_geometry: The well's geometry
         """
         self._api_version = api_level
         self._display_name = display_name
-        self._position\
-            = Point(well_props['x'],
-                    well_props['y'],
-                    well_props['z'] + well_props['depth']) + parent.point
+        self._geometry = well_geometry
 
-        if not parent.labware:
-            raise ValueError("Wells must have a parent")
-        self._parent = parent.labware
         self._has_tip = has_tip
-        self._shape = well_props['shape']
-        if well_props['shape'] == 'rectangular':
-            self._length: Optional[float] = well_props['xDimension']
-            self._width: Optional[float] = well_props['yDimension']
-            self._diameter: Optional[float] = None
-        elif well_props['shape'] == 'circular':
-            self._length = None
-            self._width = None
-            self._diameter = well_props['diameter']
-        else:
-            raise ValueError(
-                'Shape "{}" is not a supported well shape'.format(
-                    well_props['shape']))
-        self.max_volume = well_props['totalLiquidVolume']
-        self._depth = well_props['depth']
         if name:
             self._name = name
         else:
@@ -118,7 +95,7 @@ class Well:
     @property  # type: ignore
     @requires_version(2, 0)
     def parent(self) -> 'Labware':
-        return self._parent  # type: ignore
+        return self._geometry.parent.labware   # type: ignore
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -129,10 +106,18 @@ class Well:
     def has_tip(self, value: bool):
         self._has_tip = value
 
+    @property
+    def max_volume(self) -> float:
+        return self._geometry.max_volume
+
+    @property
+    def geometry(self) -> WellGeometry:
+        return self._geometry
+
     @property  # type: ignore
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
-        return self._diameter
+        return self._geometry.diameter
 
     @property
     def display_name(self):
@@ -152,11 +137,7 @@ class Well:
                  front-left corner of slot 1 as (0,0,0)). If z is specified,
                  returns a point offset by z mm from top-center
         """
-        return self._top(z)
-
-    def _top(self, z: float = 0.0) -> Location:
-        # fairly hacky workaround for inheritance issues with LegacyWell
-        return Location(self._position + Point(0, 0, z), self)
+        return Location(self._geometry.top(z), self)
 
     @requires_version(2, 0)
     def bottom(self, z: float = 0.0) -> Location:
@@ -167,13 +148,7 @@ class Well:
                  slot 1 as (0,0,0)). If z is specified, returns a point
                  offset by z mm from bottom-center
         """
-        return self._bottom(z)
-
-    def _bottom(self, z: float = 0.0) -> Location:
-        # inheritance and version check workaround
-        top = self._top()
-        bottom_z = top.point.z - self._depth + z
-        return Location(Point(x=top.point.x, y=top.point.y, z=bottom_z), self)
+        return Location(self._geometry.bottom(z), self)
 
     @requires_version(2, 0)
     def center(self) -> Location:
@@ -182,48 +157,7 @@ class Well:
                  of the well relative to the deck (with the front-left corner
                  of slot 1 as (0,0,0))
         """
-        return self._center()
-
-    def _center(self) -> Location:
-        # fairly hacky workaround for inheritance issues with LegacyWell
-        top = self._top()
-        center_z = top.point.z - (self._depth / 2.0)
-        return Location(Point(x=top.point.x, y=top.point.y, z=center_z), self)
-
-    def _from_center_cartesian(
-            self, x: float, y: float, z: float) -> Point:
-        """
-        Specifies an arbitrary point in deck coordinates based
-        on percentages of the radius in each axis. For example, to specify the
-        back-right corner of a well at 1/4 of the well depth from the bottom,
-        the call would be `_from_center_cartesian(1, 1, -0.5)`.
-
-        No checks are performed to ensure that the resulting position will be
-        inside of the well.
-
-        :param x: a float in the range [-1.0, 1.0] for a percentage of half of
-            the radius/length in the X axis
-        :param y: a float in the range [-1.0, 1.0] for a percentage of half of
-            the radius/width in the Y axis
-        :param z: a float in the range [-1.0, 1.0] for a percentage of half of
-            the height above/below the center
-
-        :return: a Point representing the specified location in absolute deck
-        coordinates
-        """
-        center = self._center()
-        if self._shape == 'rectangular':
-            x_size: float = self._length  # type: ignore
-            y_size: float = self._width  # type: ignore
-        else:
-            x_size = self._diameter  # type: ignore
-            y_size = self._diameter  # type: ignore
-        z_size = self._depth
-
-        return Point(
-            x=center.point.x + (x * (x_size / 2.0)),
-            y=center.point.y + (y * (y_size / 2.0)),
-            z=center.point.z + (z * (z_size / 2.0)))
+        return Location(self._geometry.center(), self)
 
     def __repr__(self):
         return self._display_name
@@ -402,8 +336,10 @@ class Labware(DeckItem):
         """
         return [
             Well(
-                self._well_definition[well],
-                Location(self._calibrated_offset, self),
+                WellGeometry(
+                    well_props=self._well_definition[well],
+                    parent=Location(self._calibrated_offset, self)
+                ),
                 "{} of {}".format(well, self._display_name),
                 self._is_tiprack,
                 self._api_version,
