@@ -1,0 +1,37 @@
+# This workflow runs end to end tests in Protocol Designer
+
+name: 'PD E2E Tests'
+
+on:
+  pull_request:
+    paths:
+      - 'protocol-designer/**'
+      - 'shared-data/**'
+      - 'components/**'
+  push:
+    paths:
+      - 'protocol-designer/**'
+      - 'shared-data/**'
+      - 'components/**'
+      - '.github/workflows/pd-e2e-test.yaml'
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: true
+
+jobs:
+  checks:
+    name: 'pd e2e tests'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'setup-js'
+        run: make setup-js
+      - name: 'test-e2e'
+        run: make -C protocol-designer test-e2e
