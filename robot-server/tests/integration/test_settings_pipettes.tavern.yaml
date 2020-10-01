@@ -7,13 +7,13 @@ marks:
 stages:
   - name: GET Pipette Settings request returns correct info
     request:
-      url: "{host:s}:{port:d}/settings/pipettes"
+      url: '{host:s}:{port:d}/settings/pipettes'
       method: GET
     response:
       status_code: 200
-      json: 
-        testpipette01: 
-          fields: 
+      json:
+        testpipette01:
+          fields:
             blowout: !anydict
             bottom: !anydict
             dropTip: !anydict
@@ -31,7 +31,7 @@ stages:
           info:
             model: p300_multi_v1
             name: p300_multi
-      strict: false 
+      strict: false
 ---
 test_name: GET Pipette {pipette_id}
 marks:
@@ -41,12 +41,12 @@ marks:
 stages:
   - name: GET Pipette Settings of specific pipette request returns correct info
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: '{host:s}:{port:d}/settings/pipettes/testpipette01'
       method: GET
     response:
       status_code: 200
-      json: 
-        fields: 
+      json:
+        fields:
           blowout: !anydict
           bottom: !anydict
           dropTip: !anydict
@@ -74,7 +74,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings of a single value
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: '{host:s}:{port:d}/settings/pipettes/testpipette01'
       method: PATCH
       json:
         fields:
@@ -82,8 +82,8 @@ stages:
             value: -3.0
     response:
       status_code: 200
-      json: 
-        fields: 
+      json:
+        fields:
           blowout: !anydict
           bottom: !anydict
           dropTip:
@@ -117,11 +117,11 @@ marks:
 stages:
   - name: PATCH Pipette Settings of multiple values
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: '{host:s}:{port:d}/settings/pipettes/testpipette01'
       method: PATCH
       json:
         fields:
-          blowout: 
+          blowout:
             value: 5.0
           bottom:
             value: 3.0
@@ -129,8 +129,8 @@ stages:
             value: 18.0
     response:
       status_code: 200
-      json: 
-        fields: 
+      json:
+        fields:
           blowout:
             units: mm
             type: float
@@ -176,7 +176,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings with too low of a value
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: '{host:s}:{port:d}/settings/pipettes/testpipette01'
       method: PATCH
       json:
         fields:
@@ -184,8 +184,8 @@ stages:
             value: -10.0
     response:
       status_code: 412
-      json: 
-        message: "dropTip out of range with {tavern.request_vars.json.fields.dropTip.value}"
+      json:
+        message: 'dropTip out of range with {tavern.request_vars.json.fields.dropTip.value}'
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} value too high
@@ -196,7 +196,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings with too high of a value
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: '{host:s}:{port:d}/settings/pipettes/testpipette01'
       method: PATCH
       json:
         fields:
@@ -204,8 +204,8 @@ stages:
             value: 5.0
     response:
       status_code: 412
-      json: 
-        message: "dropTip out of range with {tavern.request_vars.json.fields.dropTip.value}"
+      json:
+        message: 'dropTip out of range with {tavern.request_vars.json.fields.dropTip.value}'
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} no value
@@ -216,7 +216,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings with no value at all (should reset to default)
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: '{host:s}:{port:d}/settings/pipettes/testpipette01'
       method: PATCH
       json:
         fields:
@@ -224,8 +224,8 @@ stages:
             value: Null
     response:
       status_code: 200
-      json: 
-        fields: 
+      json:
+        fields:
           blowout: !anydict
           bottom: !anydict
           dropTip:
