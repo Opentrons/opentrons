@@ -32,6 +32,6 @@ module.exports = {
   findYarnCacheDir: (core, context) => {
     const cacheDir = execSync('yarn cache dir')
     console.log(`yarnCacheDir: ${cacheDir}\n`)
-    core.setOutput('yarnCacheDir', cacheDir)
+    core.setOutput('yarnCacheDir', cacheDir.toString())
   },
 }
