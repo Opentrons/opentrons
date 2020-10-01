@@ -19,6 +19,8 @@ discovery-client/lib/**
 **/package.json
 **/CHANGELOG.md
 lerna.json
+!api/release-notes.md
+!app-shell/build/release-notes.md
 
 # mypy
 **/.mypy_cache/**

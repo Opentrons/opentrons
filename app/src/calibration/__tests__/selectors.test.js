@@ -19,6 +19,7 @@ describe('calibration selectors', () => {
             calibrationStatus: null,
             labwareCalibrations: null,
             pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
           },
         },
       }
@@ -32,6 +33,7 @@ describe('calibration selectors', () => {
             calibrationStatus: Fixtures.mockCalibrationStatus,
             labwareCalibrations: null,
             pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
           },
         },
       }
@@ -54,6 +56,7 @@ describe('calibration selectors', () => {
             calibrationStatus: Fixtures.mockCalibrationStatus,
             labwareCalibrations: null,
             pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
           },
         },
       }

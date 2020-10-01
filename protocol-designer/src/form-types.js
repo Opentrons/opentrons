@@ -195,37 +195,38 @@ export type HydratedMoveLiquidFormData = {
     aspirate_wellOrder_second: WellOrderOption,
     aspirate_flowRate: ?number,
     aspirate_mmFromBottom: ?number,
-    aspirate_touchTip_checkbox: ?boolean,
+    aspirate_touchTip_checkbox: boolean,
     aspirate_touchTip_mmFromBottom: ?number,
-    aspirate_mix_checkbox: ?boolean,
+    aspirate_mix_checkbox: boolean,
     aspirate_mix_volume: ?number,
     aspirate_mix_times: ?number,
-    aspirate_airGap_checkbox: ?boolean,
+    aspirate_airGap_checkbox: boolean,
     aspirate_airGap_volume: ?number,
-
     aspirate_delay_checkbox: boolean,
     aspirate_delay_seconds: ?number,
     aspirate_delay_mmFromBottom: ?number,
 
+    // TODO(IL, 2020-09-30): when FF is removed, change to `dispense_airGap_checkbox: boolean` (no longer Maybe-typed)
+    dispense_airGap_checkbox: ?boolean,
+    dispense_airGap_volume: ?number,
     dispense_delay_checkbox: boolean,
     dispense_delay_seconds: ?number,
     dispense_delay_mmFromBottom: ?number,
-
     dispense_labware: LabwareEntity,
     dispense_wells: Array<string>,
     dispense_wellOrder_first: WellOrderOption,
     dispense_wellOrder_second: WellOrderOption,
     dispense_flowRate: ?number,
     dispense_mmFromBottom: ?number,
-    dispense_touchTip_checkbox: ?boolean,
+    dispense_touchTip_checkbox: boolean,
     dispense_touchTip_mmFromBottom: ?number,
-    dispense_mix_checkbox: ?boolean,
+    dispense_mix_checkbox: boolean,
     dispense_mix_volume: ?number,
     dispense_mix_times: ?number,
 
-    disposalVolume_checkbox: ?boolean,
+    disposalVolume_checkbox: boolean,
     disposalVolume_volume: ?number,
-    blowout_checkbox: ?boolean,
+    blowout_checkbox: boolean,
     blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
   },
 }
@@ -246,13 +247,13 @@ export type HydratedMixFormDataLegacy = {
   mix_wellOrder_second: WellOrderOption,
   aspirate_flowRate: ?number,
   mix_mmFromBottom: ?number,
-  mix_touchTip_checkbox: ?boolean,
+  mix_touchTip_checkbox: boolean,
   mix_touchTip_mmFromBottom: ?number,
   times: ?number,
 
   dispense_flowRate: ?number,
 
-  blowout_checkbox: ?boolean,
+  blowout_checkbox: boolean,
   blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
 }
 

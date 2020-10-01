@@ -14,6 +14,7 @@ class CalibrationStatusDict(TypedDict):
 class TipLengthCalibration(TypedDict):
     tipLength: float
     lastModified: datetime
+    source: SourceType
     status: CalibrationStatusDict
 
 

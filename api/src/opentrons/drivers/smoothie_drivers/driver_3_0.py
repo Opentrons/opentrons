@@ -11,17 +11,18 @@ from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
 from opentrons.drivers.types import MoveSplits
-from opentrons.drivers.utils import AxisMoveTimestamp
+from opentrons.drivers.utils import (
+    AxisMoveTimestamp, parse_key_from_substring, parse_number_from_substring)
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.system import smoothie_update
-'''
+"""
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
   communications
 
 - Driver is NOT responsible interpreting the motions in any way
   or knowing anything about what the axes are used for
-'''
+"""
 
 log = logging.getLogger(__name__)
 
@@ -164,34 +165,22 @@ class ParseError(Exception):
 
 
 def _parse_number_from_substring(smoothie_substring):
-    '''
+    """
     Returns the number in the expected string "N:12.3", where "N" is the
     axis, and "12.3" is a floating point value for the axis' position
-    '''
-    try:
-        return round(
-            float(smoothie_substring.split(':')[1]),
-            GCODE_ROUNDING_PRECISION
-        )
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_number_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_number_from_substring: {}'.format(
-                smoothie_substring))
+    """
+    return parse_number_from_substring(smoothie_substring,
+                                       GCODE_ROUNDING_PRECISION)
 
 
 def _parse_axis_from_substring(smoothie_substring):
-    '''
+    """
     Returns the axis in the expected string "N:12.3", where "N" is the
     axis, and "12.3" is a floating point value for the axis' position
-    '''
-    try:
-        return smoothie_substring.split(':')[0].title()  # upper 1st letter
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_axis_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_axis_from_substring: {}'.format(
-                smoothie_substring))
+    """
+    return parse_key_from_substring(
+        smoothie_substring
+    ).title()  # upper 1st letter
 
 
 def _parse_position_response(raw_axis_values):
@@ -280,7 +269,7 @@ def _parse_switch_values(raw_switch_values: str) -> Dict[str, bool]:
 
 
 def _parse_homing_status_values(raw_homing_status_values):
-    '''
+    """
         Parse the Smoothieware response to a G28.6 command (homing-status)
         A "1" means it has been homed, and "0" means it has not been homed
 
@@ -289,7 +278,7 @@ def _parse_homing_status_values(raw_homing_status_values):
 
         returns: dict
             Key is axis, value is True if the axis needs to be homed
-    '''
+    """
     if not raw_homing_status_values or \
             not isinstance(raw_homing_status_values, str):
         raise ParseError(
@@ -455,13 +444,13 @@ class SmoothieDriver_3_0_0:
         self._axes_moved_at.reset_moved(config.keys())
 
     def read_pipette_id(self, mount) -> Optional[str]:
-        '''
+        """
         Reads in an attached pipette's ID
         The ID is unique to this pipette, and is a string of unktimen length
 
         :param mount: string with value 'left' or 'right'
         :return id string, or None
-        '''
+        """
         res: Optional[str] = None
         if self.simulating:
             res = '1234567890'
@@ -475,13 +464,13 @@ class SmoothieDriver_3_0_0:
         return res
 
     def read_pipette_model(self, mount) -> Optional[str]:
-        '''
+        """
         Reads an attached pipette's MODEL
         The MODEL is a unique string for this model of pipette
 
         :param mount: string with value 'left' or 'right'
         :return model string, or None
-        '''
+        """
         if self.simulating:
             res = None
         else:
@@ -500,7 +489,7 @@ class SmoothieDriver_3_0_0:
         return res
 
     def write_pipette_id(self, mount: str, data_string: str):
-        '''
+        """
         Writes to an attached pipette's ID memory location
         The ID is unique to this pipette, and is a string of unktimen length
 
@@ -511,12 +500,12 @@ class SmoothieDriver_3_0_0:
         data_string:
             String (str) that is of unktimen length, and should be unique to
             this one pipette
-        '''
+        """
         self._write_to_pipette(
             GCODES['WRITE_INSTRUMENT_ID'], mount, data_string)
 
     def write_pipette_model(self, mount: str, data_string: str):
-        '''
+        """
         Writes to an attached pipette's MODEL memory location
         The MODEL is a unique string for this model of pipette
 
@@ -526,14 +515,14 @@ class SmoothieDriver_3_0_0:
             String (str) with value 'left' or 'right'
         data_string:
             String (str) that is unique to this model of pipette
-        '''
+        """
         self._write_to_pipette(
             GCODES['WRITE_INSTRUMENT_MODEL'], mount, data_string)
 
     def update_pipette_config(
             self, axis: str, data: Dict[str, float])\
             -> Dict[str, Dict[str, float]]:
-        '''
+        """
         Updates the following configs for a given pipette mount based on
         the detected pipette type:
         - homing positions M365.0
@@ -544,7 +533,7 @@ class SmoothieDriver_3_0_0:
         Returns the data as the value of a dict with the axis as a key.
         For instance, calling update_pipette_config('B', {'retract': 2})
         would return (if successful) {'B': {'retract': 2}}
-        '''
+        """
         if self.simulating:
             return {axis: data}
 
@@ -615,7 +604,7 @@ class SmoothieDriver_3_0_0:
         return self._connection.port
 
     def get_fw_version(self) -> str:
-        '''
+        """
         Queries Smoothieware for it's build version, and returns
         the parsed response.
 
@@ -628,7 +617,7 @@ class SmoothieDriver_3_0_0:
         Build version: edge-66ec883NOMSD, Build date: Jan 28 2018 15:26:57, MCU: LPC1769, System Clock: 120MHz  # NOQA
           CNC Build   NOMSD Build
         6 axis
-        '''
+        """
         version = 'Virtual Smoothie'
         if not self.simulating:
             version = self._send_command('version')
@@ -651,19 +640,19 @@ class SmoothieDriver_3_0_0:
 
     @property
     def switch_state(self) -> Dict[str, bool]:
-        '''Returns the state of all SmoothieBoard limit switches'''
+        """Returns the state of all SmoothieBoard limit switches"""
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
         return _parse_switch_values(res)
 
     def update_homed_flags(
             self, flags: Dict[str, bool] = None):
-        '''
+        """
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
         still needs to be homed, and it's coordinate cannot be trusted.
         Smoothieware sets it's internal homing flags for all axes to False when
         it has yet to home since booting/restarting, or an endstop/homing error
-        '''
+        """
         if flags and isinstance(flags, dict):
             self.homed_flags.update(flags)
 
@@ -712,7 +701,7 @@ class SmoothieDriver_3_0_0:
         return GCODES['SET_SPEED'] + str(speed_per_min)
 
     def set_speed(self, value: Union[float, str], update: bool = True):
-        ''' set total axes movement speed in mm/second'''
+        """ set total axes movement speed in mm/second"""
         if update:
             self._combined_speed = float(value)
         command = self._build_speed_command(float(value))
@@ -735,7 +724,7 @@ class SmoothieDriver_3_0_0:
 
     def set_axis_max_speed(
             self, settings: Dict[str, float], update: bool = True):
-        '''
+        """
         Sets the maximum speed (mm/sec) that a given axis will move
 
         settings
@@ -743,7 +732,7 @@ class SmoothieDriver_3_0_0:
             and floating point number for millimeters per second (mm/sec)
         update
             bool, True to save the settings for future use
-        '''
+        """
         if update:
             self._max_speed_settings.update(settings)
         values = ['{}{}'.format(axis.upper(), value)
@@ -762,13 +751,13 @@ class SmoothieDriver_3_0_0:
         self.set_axis_max_speed(self._saved_max_speed_settings)
 
     def set_acceleration(self, settings: Dict[str, float]):
-        '''
+        """
         Sets the acceleration (mm/sec^2) that a given axis will move
 
         settings
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for mm-per-second-squared (mm/sec^2)
-        '''
+        """
         self._acceleration.update(settings)
         values = ['{}{}'.format(axis.upper(), value)
                   for axis, value in sorted(settings.items())]
@@ -786,7 +775,7 @@ class SmoothieDriver_3_0_0:
         self.set_acceleration(self._saved_acceleration)
 
     def set_active_current(self, settings: Dict[str, float]):
-        '''
+        """
         Sets the amperage of each motor for when it is activated by driver.
         Values are initialized from the `robot_config.high_current` values,
         and can then be changed through this method by other parts of the API.
@@ -797,7 +786,7 @@ class SmoothieDriver_3_0_0:
         settings
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
-        '''
+        """
         self._active_current_settings['now'].update(settings)
 
         # if an axis specified in the `settings` is currently active,
@@ -819,7 +808,7 @@ class SmoothieDriver_3_0_0:
         self.set_active_current(self._active_current_settings['saved'])
 
     def set_dwelling_current(self, settings: Dict[str, float]):
-        '''
+        """
         Sets the amperage of each motor for when it is dwelling.
         Values are initialized from the `robot_config.log_current` values,
         and can then be changed through this method by other parts of the API.
@@ -830,7 +819,7 @@ class SmoothieDriver_3_0_0:
         settings
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
-        '''
+        """
         self._dwelling_current_settings['now'].update(settings)
 
         # if an axis specified in the `settings` is currently dwelling,
@@ -853,7 +842,7 @@ class SmoothieDriver_3_0_0:
 
     def _save_current(
             self, settings: Dict[str, float], axes_active: bool = True):
-        '''
+        """
         Sets the current in Amperes (A) by axis. Currents are limited to be
         between 0.0-2.0 amps per axis motor.
 
@@ -864,7 +853,7 @@ class SmoothieDriver_3_0_0:
         settings
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
-        '''
+        """
         self._active_axes.update({
             ax: axes_active
             for ax in settings.keys()
@@ -873,19 +862,19 @@ class SmoothieDriver_3_0_0:
         log.debug("_save_current: {}".format(self.current))
 
     def _set_saved_current(self):
-        '''
+        """
         Sends the driver's current settings to the serial port as gcode. Call
         this method to set the axis-current state on the actual Smoothie
         motor-driver.
-        '''
+        """
         self._send_command(self._generate_current_command())
 
     def _generate_current_command(self) -> str:
-        '''
+        """
         Returns a constructed GCode string that contains this driver's
         axis-current settings, plus a small delay to wait for those settings
         to take effect.
-        '''
+        """
         values = ['{}{}'.format(axis, value)
                   for axis, value in sorted(self.current.items())]
         current_cmd = '{} {}'.format(
@@ -901,7 +890,7 @@ class SmoothieDriver_3_0_0:
         return command
 
     def disengage_axis(self, axes: str):
-        '''
+        """
         Disable the stepper-motor-driver's 36v output to motor
         This is a safe GCODE to send to Smoothieware, as it will automatically
         re-engage the motor if it receives a home or move command
@@ -909,7 +898,7 @@ class SmoothieDriver_3_0_0:
         axes
             String containing the axes to be disengaged
             (e.g.: 'XY' or 'ZA' or 'XYZABC')
-        '''
+        """
         axes = ''.join(set(axes.upper()) & set(AXES))
         if axes:
             log.debug("disengage_axis: {}".format(axes))
@@ -918,7 +907,7 @@ class SmoothieDriver_3_0_0:
                 self.engaged_axes[axis] = False
 
     def dwell_axes(self, axes: str):
-        '''
+        """
         Sets motors to low current, for when they are not moving.
 
         Dwell for XYZA axes is only called after HOMING
@@ -926,7 +915,7 @@ class SmoothieDriver_3_0_0:
 
         axes:
             String containing the axes to set to low current (eg: 'XYZABC')
-        '''
+        """
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         dwelling_currents = {
             ax: self._dwelling_current_settings['now'][ax]
@@ -937,7 +926,7 @@ class SmoothieDriver_3_0_0:
             self._save_current(dwelling_currents, axes_active=False)
 
     def activate_axes(self, axes: str):
-        '''
+        """
         Sets motors to a high current, for when they are moving
         and/or must hold position
 
@@ -945,7 +934,7 @@ class SmoothieDriver_3_0_0:
 
         axes:
             String containing the axes to set to high current (eg: 'XYZABC')
-        '''
+        """
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         active_currents = {
             ax: self._active_current_settings['now'][ax]
@@ -958,13 +947,13 @@ class SmoothieDriver_3_0_0:
     # ----------- Private functions --------------- #
 
     def _wait_for_ack(self):
-        '''
+        """
         In the case where smoothieware has just been reset, we want to
         ignore all the garbage it spits out
 
         This methods writes a sequence of newline characters, which will
         guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
-        '''
+        """
         self._send_command('\r\n', timeout=SMOOTHIE_BOOT_TIMEOUT)
 
     def _reset_from_error(self):
@@ -1281,7 +1270,7 @@ class SmoothieDriver_3_0_0:
             self._send_command(cmd)
 
     def _read_from_pipette(self, gcode: str, mount: str) -> Optional[str]:
-        '''
+        """
         Read from an attached pipette's internal memory. The gcode used
         determines which portion of memory is read and returned.
 
@@ -1292,7 +1281,7 @@ class SmoothieDriver_3_0_0:
             either 'READ_INSTRUMENT_ID' or 'READ_INSTRUMENT_MODEL'
         mount:
             String (str) with value 'left' or 'right'
-        '''
+        """
         allowed_mounts = {'left': 'L', 'right': 'R'}
         allowed_mount = allowed_mounts.get(mount)
         if not allowed_mount:
@@ -1317,7 +1306,7 @@ class SmoothieDriver_3_0_0:
         return None
 
     def _write_to_pipette(self, gcode: str, mount: str, data_string: str):
-        '''
+        """
         Write to an attached pipette's internal memory. The gcode used
         determines which portion of memory is written to.
 
@@ -1330,7 +1319,7 @@ class SmoothieDriver_3_0_0:
             String (str) with value 'left' or 'right'
         data_string:
             String (str) that is of unkown length
-        '''
+        """
         allowed_mounts = {'left': 'L', 'right': 'R'}
         allowed_mount = allowed_mounts.get(mount)
         if not allowed_mount:
@@ -1356,7 +1345,7 @@ class SmoothieDriver_3_0_0:
     # ----------- Public interface ---------------- #
     def move(self, target: Dict[str, float], home_flagged_axes: bool = False,  # noqa(C901)
              speed: float = None):
-        '''
+        """
         Move to the `target` Smoothieware coordinate, along any of the size
         axes, XYZABC.
 
@@ -1390,7 +1379,7 @@ class SmoothieDriver_3_0_0:
         - if move splitting is required, the split move
         - the actual move, plus a bit extra to give room to preload backlash
         - if we preload backlash we then issue a third move to preload backlash
-        '''
+        """
         self.run_flag.wait()
 
         def valid_movement(axis: str, coord: float) -> bool:
@@ -1726,11 +1715,11 @@ class SmoothieDriver_3_0_0:
                 self._build_speed_command(self._combined_speed))
 
     def fast_home(self, axis, safety_margin):
-        ''' home after a controlled motor stall
+        """ home after a controlled motor stall
 
         Given a ktimen distance we have just stalled along an axis, move
         that distance away from the homing switch. Then finish with home.
-        '''
+        """
         # move some mm distance away from the target axes endstop switch(es)
         destination = {
             ax: self.homed_position.get(ax) - abs(safety_margin)
@@ -1750,7 +1739,7 @@ class SmoothieDriver_3_0_0:
 
     def unstick_axes(
             self, axes: str, distance: float = None, speed: float = None):
-        '''
+        """
         The plunger axes on OT2 can build up static friction over time and
         when it's cold. To get over this, the robot can move that plunger at
         normal current and a very slow speed to increase the torque, removing
@@ -1764,7 +1753,7 @@ class SmoothieDriver_3_0_0:
 
         speed:
             Millimeters-per-second to travel to travel at (default is 1mm/sec)
-        '''
+        """
         for ax in axes:
             if ax not in AXES:
                 raise ValueError('Unktimen axes: {}'.format(axes))
@@ -1896,10 +1885,10 @@ class SmoothieDriver_3_0_0:
         self._setup()
 
     def home_flagged_axes(self, axes_string: str):
-        '''
+        """
         Given a list of axes to check, this method will home each axis if
         Smoothieware's internal flag sets it as needing to be homed
-        '''
+        """
         axes_that_need_to_home = [
             axis
             for axis, already_homed in self.homed_flags.items()

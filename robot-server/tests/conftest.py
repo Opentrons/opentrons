@@ -11,6 +11,7 @@ from unittest.mock import MagicMock
 import requests
 from fastapi import routing
 import pytest
+from datetime import datetime
 from starlette.testclient import TestClient
 from robot_server.service.app import app
 from robot_server.service.dependencies import get_hardware, verify_hardware
@@ -150,6 +151,18 @@ def set_up_pipette_offset_temp_directory(server_temp_directory):
             mount=mount,
             tiprack_hash='hash',
             tiprack_uri='uri')
+
+
+@pytest.fixture
+def set_up_tip_length_temp_directory(server_temp_directory):
+    pip_list = ['pip_1', 'pip_2']
+    tiprack_hash = 'fakehash'
+    tip_length_list = [30.5, 31.5]
+    for pip, tip_len in zip(pip_list, tip_length_list):
+        cal = {tiprack_hash: {
+                'tipLength': tip_len,
+                'lastModified': datetime.now()}}
+        modify.save_tip_length_calibration(pip, cal)
 
 
 @pytest.fixture

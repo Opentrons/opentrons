@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
+# [3.21.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0) (2020-09-30)
+
 
 ### Bug Fixes
 
@@ -11,6 +12,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api:** Document deck slot deletion ([#6260](https://github.com/Opentrons/opentrons/issues/6260)) ([b37e23a](https://github.com/Opentrons/opentrons/commit/b37e23a)), closes [#6214](https://github.com/Opentrons/opentrons/issues/6214)
 * **api:** fix Deck.get_slot_center z value ([#6435](https://github.com/Opentrons/opentrons/issues/6435)) ([ddc8965](https://github.com/Opentrons/opentrons/commit/ddc8965))
 * **api:** fix InstrumentContext.home_plunger ([#6367](https://github.com/Opentrons/opentrons/issues/6367)) ([120d68a](https://github.com/Opentrons/opentrons/commit/120d68a))
+* **api:** limit calibration jogs when going upward ([#6565](https://github.com/Opentrons/opentrons/issues/6565)) ([5a82384](https://github.com/Opentrons/opentrons/commit/5a82384)), closes [#6562](https://github.com/Opentrons/opentrons/issues/6562)
 * **api:** Prevent extra pipette movement after homing ([#6364](https://github.com/Opentrons/opentrons/issues/6364)) ([1ea97c7](https://github.com/Opentrons/opentrons/commit/1ea97c7))
 * **api:** thermocycler hold_time bug ([#6479](https://github.com/Opentrons/opentrons/issues/6479)) ([b9d6498](https://github.com/Opentrons/opentrons/commit/b9d6498))
 * **api:** typo in should_dodge_thermocycler ([#6458](https://github.com/Opentrons/opentrons/issues/6458)) ([8e446e1](https://github.com/Opentrons/opentrons/commit/8e446e1))
@@ -19,12 +21,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+* **api:** Add all tip handling and tracking functions for the paired instrument context ([#6550](https://github.com/Opentrons/opentrons/issues/6550)) ([d9cf00e](https://github.com/Opentrons/opentrons/commit/d9cf00e))
+* **api:** Add pipette pairing to the command log and support in rpc ([#6577](https://github.com/Opentrons/opentrons/issues/6577)) ([75a7545](https://github.com/Opentrons/opentrons/commit/75a7545))
 * **api:** Add skeleton Pipette pairing context ([#6472](https://github.com/Opentrons/opentrons/issues/6472)) ([eb030d1](https://github.com/Opentrons/opentrons/commit/eb030d1))
 * **api:** adding deep_get utility function ([#6338](https://github.com/Opentrons/opentrons/issues/6338)) ([f83dc3e](https://github.com/Opentrons/opentrons/commit/f83dc3e))
 * **api:** Allow pipette pairing for aspirate and dispense functions ([#6450](https://github.com/Opentrons/opentrons/issues/6450)) ([f1cbe81](https://github.com/Opentrons/opentrons/commit/f1cbe81))
 * **api:** Lay foundation on the backend to support simultaneous axis movement ([#6373](https://github.com/Opentrons/opentrons/issues/6373)) ([82e5edf](https://github.com/Opentrons/opentrons/commit/82e5edf))
 * **api:** Save new robot calibration in a separate location ([#6281](https://github.com/Opentrons/opentrons/issues/6281)) ([03c3051](https://github.com/Opentrons/opentrons/commit/03c3051))
 * **api:** Support pipette pairing for pickup and drop tip ([#6390](https://github.com/Opentrons/opentrons/issues/6390)) ([a3d4d12](https://github.com/Opentrons/opentrons/commit/a3d4d12))
+* **api, robot-server:** expose pipette offset cal via http ([#6563](https://github.com/Opentrons/opentrons/issues/6563)) ([ffd3439](https://github.com/Opentrons/opentrons/commit/ffd3439)), closes [#6429](https://github.com/Opentrons/opentrons/issues/6429)
 * **api,robot-server:** Robot server rpc http ff ([#6310](https://github.com/Opentrons/opentrons/issues/6310)) ([ba0fc92](https://github.com/Opentrons/opentrons/commit/ba0fc92)), closes [#6305](https://github.com/Opentrons/opentrons/issues/6305)
 
 

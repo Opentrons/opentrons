@@ -95,11 +95,25 @@ stages:
           type: SessionCommand
           attributes:
             command: equipment.loadInstrument
-            data:
+            data: &create_instrument_data
               instrumentName: p300_single
               mount: left
     response:
-      status_code: 403
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: !anystr
+          type: SessionCommand
+          attributes:
+            data: *create_instrument_data
+            command: equipment.loadInstrument
+            status: executed
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            result:
+              instrumentId: !anystr
   - name: Delete the session
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}"

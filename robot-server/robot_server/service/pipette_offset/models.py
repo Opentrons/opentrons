@@ -24,7 +24,7 @@ class PipetteOffsetCalibration(BaseModel):
     the pipette's serial number
     """
     pipette: str = \
-        Field(..., descriiption="The pipette ID")
+        Field(..., description="The pipette ID")
     mount: str = \
         Field(..., description="The pipette mount")
     offset: typing.List[float] = \

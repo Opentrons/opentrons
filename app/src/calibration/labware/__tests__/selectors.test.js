@@ -38,6 +38,7 @@ describe('labware calibration selectors', () => {
             calibrationStatus: null,
             labwareCalibrations: null,
             pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
           },
         },
       }
@@ -51,6 +52,7 @@ describe('labware calibration selectors', () => {
             calibrationStatus: StatusFixtures.mockCalibrationStatus,
             labwareCalibrations: Fixtures.mockAllLabwareCalibration,
             pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
           },
         },
       }
@@ -117,6 +119,7 @@ describe('labware calibration selectors', () => {
           robotName: {
             calibrationStatus: null,
             pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
             labwareCalibrations: {
               meta: {},
               data: [
@@ -209,6 +212,7 @@ describe('labware calibration selectors', () => {
           robotName: {
             calibrationStatus: null,
             pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
             labwareCalibrations: {
               meta: {},
               data: [calNotOnModule, calOnModule],
@@ -290,6 +294,7 @@ describe('labware calibration selectors', () => {
           robotName: {
             calibrationStatus: null,
             pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
             labwareCalibrations: {
               meta: {},
               data: [calOnModule, calNotOnModule],
@@ -353,6 +358,7 @@ describe('labware calibration selectors', () => {
           robotName: {
             calibrationStatus: null,
             pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
             labwareCalibrations: {
               meta: {},
               data: [oldLwCal],

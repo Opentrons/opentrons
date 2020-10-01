@@ -3,22 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.21.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0-beta.0) (2020-09-11)
+# [3.21.0](https://github.com/Opentrons/opentrons/compare/v3.20.1...v3.21.0) (2020-09-30)
+
 
 ### Bug Fixes
 
+* **protocol-designer:** fix dismissing warnings for unsaved step forms ([#6503](https://github.com/Opentrons/opentrons/issues/6503)) ([1d37f09](https://github.com/Opentrons/opentrons/commit/1d37f09)), closes [#6263](https://github.com/Opentrons/opentrons/issues/6263)
+* **protocol-designer:** fix scroll position of MoreOptionsModal ([#6515](https://github.com/Opentrons/opentrons/issues/6515)) ([2bf776b](https://github.com/Opentrons/opentrons/commit/2bf776b)), closes [#6156](https://github.com/Opentrons/opentrons/issues/6156)
 * **protocol-designer:** Rename aspirate/dispense delay tip position fields ([#6324](https://github.com/Opentrons/opentrons/issues/6324)) ([bf4a959](https://github.com/Opentrons/opentrons/commit/bf4a959)), closes [#6300](https://github.com/Opentrons/opentrons/issues/6300)
 
 
 ### Features
 
+* **protocol designer:** remove mix tip position fields ([#6590](https://github.com/Opentrons/opentrons/issues/6590)) ([eb058a2](https://github.com/Opentrons/opentrons/commit/eb058a2)), closes [#6589](https://github.com/Opentrons/opentrons/issues/6589)
 * **protocol-designer:** account for two air gaps when bumping down multi aspirate to single path ([#6477](https://github.com/Opentrons/opentrons/issues/6477)) ([897e711](https://github.com/Opentrons/opentrons/commit/897e711)), closes [#6469](https://github.com/Opentrons/opentrons/issues/6469)
 * **protocol-designer:** add 3.20 export warning modal ([#6436](https://github.com/Opentrons/opentrons/issues/6436)) ([70cb5bb](https://github.com/Opentrons/opentrons/commit/70cb5bb)), closes [#6278](https://github.com/Opentrons/opentrons/issues/6278)
 * **protocol-designer:** add air gap commands and export protocols as v5 ([#6401](https://github.com/Opentrons/opentrons/issues/6401)) ([a16351e](https://github.com/Opentrons/opentrons/commit/a16351e))
 * **protocol-designer:** add air gap formToArgs ([#6334](https://github.com/Opentrons/opentrons/issues/6334)) ([16684e4](https://github.com/Opentrons/opentrons/commit/16684e4)), closes [#6219](https://github.com/Opentrons/opentrons/issues/6219) [#6217](https://github.com/Opentrons/opentrons/issues/6217)
 * **protocol-designer:** Add defaults for air gap and delay ([#6341](https://github.com/Opentrons/opentrons/issues/6341)) ([8b9ba81](https://github.com/Opentrons/opentrons/commit/8b9ba81)), closes [#6058](https://github.com/Opentrons/opentrons/issues/6058)
+* **protocol-designer:** add delay field to mix form ([#6574](https://github.com/Opentrons/opentrons/issues/6574)) ([70b5344](https://github.com/Opentrons/opentrons/commit/70b5344)), closes [#6347](https://github.com/Opentrons/opentrons/issues/6347)
 * **protocol-designer:** add migration for new fields; bump to 5.0.0 ([#6357](https://github.com/Opentrons/opentrons/issues/6357)) ([3377ff7](https://github.com/Opentrons/opentrons/commit/3377ff7)), closes [#6183](https://github.com/Opentrons/opentrons/issues/6183) [#6276](https://github.com/Opentrons/opentrons/issues/6276)
 * **protocol-designer:** add new air gap / delay announcement ([#6414](https://github.com/Opentrons/opentrons/issues/6414)) ([2ea012f](https://github.com/Opentrons/opentrons/commit/2ea012f)), closes [#6411](https://github.com/Opentrons/opentrons/issues/6411)
+* **protocol-designer:** add OT_PD_ENABLE_MIX_DELAY feature flag ([#6525](https://github.com/Opentrons/opentrons/issues/6525)) ([862ab14](https://github.com/Opentrons/opentrons/commit/862ab14)), closes [#6523](https://github.com/Opentrons/opentrons/issues/6523)
 * **protocol-designer:** adjust disposal volume and path for air gap ([#6372](https://github.com/Opentrons/opentrons/issues/6372)) ([aa70623](https://github.com/Opentrons/opentrons/commit/aa70623)), closes [#6022](https://github.com/Opentrons/opentrons/issues/6022)
 * **protocol-designer:** apply delays to aspirates/dispenses in a mix  ([#6365](https://github.com/Opentrons/opentrons/issues/6365)) ([a34e3f4](https://github.com/Opentrons/opentrons/commit/a34e3f4)), closes [#6306](https://github.com/Opentrons/opentrons/issues/6306)
 * **protocol-designer:** apply delays to pre-wet ([#6380](https://github.com/Opentrons/opentrons/issues/6380)) ([516783a](https://github.com/Opentrons/opentrons/commit/516783a)), closes [#6021](https://github.com/Opentrons/opentrons/issues/6021)
@@ -27,7 +33,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **protocol-designer:** implement formToArgs for delays ([#6301](https://github.com/Opentrons/opentrons/issues/6301)) ([6681cfb](https://github.com/Opentrons/opentrons/commit/6681cfb)), closes [#6219](https://github.com/Opentrons/opentrons/issues/6219)
 * **protocol-designer:** minor copy change for aspirate delay tooltip ([#6449](https://github.com/Opentrons/opentrons/issues/6449)) ([e00fcc1](https://github.com/Opentrons/opentrons/commit/e00fcc1)), closes [#6448](https://github.com/Opentrons/opentrons/issues/6448)
 * **protocol-designer:** remove air gap + delay FF ([#6434](https://github.com/Opentrons/opentrons/issues/6434)) ([e3906f5](https://github.com/Opentrons/opentrons/commit/e3906f5)), closes [#6277](https://github.com/Opentrons/opentrons/issues/6277)
+* **protocol-designer:** setup Mixpanel and add initial events ([#6511](https://github.com/Opentrons/opentrons/issues/6511)) ([1959639](https://github.com/Opentrons/opentrons/commit/1959639)), closes [#6057](https://github.com/Opentrons/opentrons/issues/6057)
+* **protocol-designer:** update mixFormToArgs with new delay fields ([#6575](https://github.com/Opentrons/opentrons/issues/6575)) ([ff69de7](https://github.com/Opentrons/opentrons/commit/ff69de7)), closes [#6348](https://github.com/Opentrons/opentrons/issues/6348)
 * **protocol-designer:** update tooltips for air gap + delay ([#6404](https://github.com/Opentrons/opentrons/issues/6404)) ([89e63b4](https://github.com/Opentrons/opentrons/commit/89e63b4)), closes [#6402](https://github.com/Opentrons/opentrons/issues/6402)
+
+
+### Performance Improvements
+
+* **protocol-designer:** strip no-op mixes from robot state generation ([#6488](https://github.com/Opentrons/opentrons/issues/6488)) ([4885b50](https://github.com/Opentrons/opentrons/commit/4885b50)), closes [#6176](https://github.com/Opentrons/opentrons/issues/6176)
 
 
 
