@@ -6,23 +6,23 @@ marks:
 stages:
   - name: Get status of all motors
     request:
-      url: '{host:s}:{port:d}/motors/engaged'
+      url: "{host:s}:{port:d}/motors/engaged"
       method: GET
     response:
       status_code: 200
       json:
         x:
-          enabled: !anybool
+          enabled: !anybool 
         y:
-          enabled: !anybool
+          enabled: !anybool 
         z:
-          enabled: !anybool
+          enabled: !anybool 
         a:
-          enabled: !anybool
+          enabled: !anybool 
         b:
-          enabled: !anybool
+          enabled: !anybool 
         c:
-          enabled: !anybool
+          enabled: !anybool 
 ---
 test_name: Disengage motors
 marks:
@@ -31,7 +31,7 @@ marks:
 stages:
   - name: Disengae motors
     request:
-      url: '{host:s}:{port:d}/motors/disengage'
+      url: "{host:s}:{port:d}/motors/disengage"
       method: POST
       json:
         axes:
@@ -40,10 +40,10 @@ stages:
     response:
       status_code: 200
       json:
-        message: !re_search 'Disengaged axes'
+        message: !re_search "Disengaged axes"
   - name: Verify disengaged motors
     request:
-      url: '{host:s}:{port:d}/motors/engaged'
+      url: "{host:s}:{port:d}/motors/engaged"
       method: GET
     response:
       status_code: 200
