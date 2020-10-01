@@ -101,6 +101,7 @@ describe('getAttachedPipetteCalibrations', () => {
             CalibrationFixtures.mockAllPipetteOffsetsCalibration,
           calibrationStatus: null,
           labwareCalibrations: null,
+          tipLengthCalibrations: null,
         },
       },
     }
@@ -128,6 +129,7 @@ describe('getAttachedPipetteCalibrations', () => {
           pipetteOffsetCalibrations: null,
           labwareCalibrations: null,
           calibrationStatus: null,
+          tipLengthCalibrations: null,
         },
       },
     }
@@ -152,6 +154,7 @@ describe('getAttachedPipetteCalibrations', () => {
             CalibrationFixtures.mockAllPipetteOffsetsCalibration,
           calibrationStatus: null,
           labwareCalibrations: null,
+          tipLengthCalibrations: null,
         },
       },
     }
