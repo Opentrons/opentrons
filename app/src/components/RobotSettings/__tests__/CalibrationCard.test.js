@@ -3,7 +3,9 @@
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
+import * as PipetteOffset from '../../../calibration/pipette-offset'
 import * as Calibration from '../../../calibration'
+import * as Pipettes from '../../../pipettes'
 import * as Config from '../../../config'
 import * as RobotSelectors from '../../../robot/selectors'
 
@@ -95,11 +97,20 @@ describe('CalibrationCard', () => {
     jest.useRealTimers()
   })
 
-  it('calls fetchCalibrationStatus on mount and on a 10s interval', () => {
+  it('calls fetches data on mount and on a 10s interval', () => {
     const { store } = render()
 
-    expect(store.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenNthCalledWith(
+      1,
       Calibration.fetchCalibrationStatus(mockRobot.name)
+    )
+    expect(store.dispatch).toHaveBeenNthCalledWith(
+      2,
+      Pipettes.fetchPipettes(mockRobot.name)
+    )
+    expect(store.dispatch).toHaveBeenNthCalledWith(
+      3,
+      PipetteOffset.fetchPipetteOffsetCalibrations(mockRobot.name)
     )
     store.dispatch.mockReset()
     jest.advanceTimersByTime(20000)

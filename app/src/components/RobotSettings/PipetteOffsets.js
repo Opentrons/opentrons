@@ -8,6 +8,7 @@ import { Link as RRDLink } from 'react-router-dom'
 import type { State } from '../../types'
 import * as Robot from '../../robot'
 import * as Pipettes from '../../pipettes'
+import * as Calibration from '../../calibration'
 import * as CustomLabware from '../../custom-labware'
 
 import {
@@ -59,8 +60,6 @@ export function PipetteOffsets(props: Props): React.Node {
   const customLabwareDefs = useSelector((state: State) => {
     return CustomLabware.getCustomLabwareDefinitions(state)
   })
-
-
 
   return (
     <Box
