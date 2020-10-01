@@ -62,7 +62,7 @@ jobs:
         with:
           project: 'shared-data/python'
       - name: 'set complex environment variables'
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
