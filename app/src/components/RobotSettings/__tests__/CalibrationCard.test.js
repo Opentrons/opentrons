@@ -32,7 +32,7 @@ jest.mock('../CheckCalibrationControl', () => ({
 
 jest.mock('../PipetteOffsets', () => ({
   PipetteOffsets: () => <></>,
- }))
+}))
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 
@@ -219,5 +219,9 @@ describe('CalibrationCard', () => {
     // TODO(lc, 2020-06-18): Mock out the new transform status such that
     // this should evaluate to true.
     expect(wrapper.exists(DeckCalibrationWarning)).toBe(true)
+  })
+  it('renders PipetteOffsets', () => {
+    const { wrapper } = render()
+    expect(wrapper.exists(PipetteOffsets)).toBe(true)
   })
 })

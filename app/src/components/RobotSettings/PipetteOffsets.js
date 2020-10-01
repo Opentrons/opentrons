@@ -4,11 +4,8 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link as RRDLink } from 'react-router-dom'
 
-
 import type { State } from '../../types'
-import * as Robot from '../../robot'
 import * as Pipettes from '../../pipettes'
-import * as Calibration from '../../calibration'
 import * as CustomLabware from '../../custom-labware'
 
 import {
@@ -17,10 +14,8 @@ import {
   Link,
   Text,
   ALIGN_START,
-  JUSTIFY_SPACE_BETWEEN,
   BORDER_SOLID_LIGHT,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   SPACING_2,
@@ -47,7 +42,7 @@ type Props = {|
 
 export function PipetteOffsets(props: Props): React.Node {
   const { pipettesPageUrl, robot } = props
-  const { name: robotName, status } = robot
+  const { name: robotName } = robot
 
   const attachedPipettes = useSelector((state: State) => {
     return Pipettes.getAttachedPipettes(state, robotName)

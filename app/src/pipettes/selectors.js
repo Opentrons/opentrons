@@ -69,7 +69,6 @@ export const getAttachedPipetteSettings: (
   }
 )
 
-
 export const getAttachedPipetteCalibrations: (
   state: State,
   robotName: string
@@ -85,7 +84,8 @@ export const getAttachedPipetteCalibrations: (
         ? filterCalibrationForPipette(calibrations, attached.right.id)
         : null,
     }
-  })
+  }
+)
 
 const EMPTY_INFO = {
   actual: null,

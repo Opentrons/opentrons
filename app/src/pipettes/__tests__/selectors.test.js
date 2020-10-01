@@ -81,12 +81,14 @@ describe('getAttachedPipetteCalibrations', () => {
           attachedByMount: {
             left: {
               ...Fixtures.mockAttachedPipette,
-              id: CalibrationFixtures.mockPipetteOffsetCalibration1.attributes
+              id:
+                CalibrationFixtures.mockPipetteOffsetCalibration1.attributes
                   .pipette,
             },
             right: {
               ...Fixtures.mockAttachedPipette,
-              id: CalibrationFixtures.mockPipetteOffsetCalibration2.attributes
+              id:
+                CalibrationFixtures.mockPipetteOffsetCalibration2.attributes
                   .pipette,
             },
           },

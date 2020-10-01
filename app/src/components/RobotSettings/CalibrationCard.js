@@ -54,10 +54,9 @@ export function CalibrationCard(props: Props): React.Node {
   // robot or the robot becomes connectable
   React.useEffect(() => {
     robotName && dispatch(Pipettes.fetchPipettes(robotName))
-    robotName && dispatch(PipetteOffset.fetchPipetteOffsetCalibrations(robotName))
-  },
-                  [dispatch, robotName, status]
-  )
+    robotName &&
+      dispatch(PipetteOffset.fetchPipetteOffsetCalibrations(robotName))
+  }, [dispatch, robotName, status])
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const deckCalStatus = useSelector((state: State) => {
