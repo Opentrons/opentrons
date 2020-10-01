@@ -73,7 +73,7 @@ class LoadLabwareResponse(BaseModel):
 
 
 class LoadInstrumentResponse(BaseModel):
-    instrumentId: str
+    instrumentId: IdentifierType
 
 
 class CommandStatus(str, Enum):

@@ -1,5 +1,6 @@
-from opentrons import ThreadManager
+import logging
 
+from opentrons import ThreadManager
 from robot_server.service.session.models import command as models
 from robot_server.service.session.errors import UnsupportedCommandException
 from robot_server.service.session.models.common import create_identifier
@@ -7,6 +8,13 @@ from robot_server.service.session.session_types.live_protocol.state_store\
     import StateStore
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.calibration_storage import helpers, get
+
+
+log = logging.getLogger(__name__)
+
+
+class ProtocolErrorInstrument(Exception):
+    pass
 
 
 class CommandInterface:
@@ -33,8 +41,29 @@ class CommandInterface:
     async def handle_load_instrument(
             self,
             command: models.LoadInstrumentRequest) \
-            -> models.LoadLabwareResponse:
-        raise UnsupportedCommandException("")
+            -> models.LoadInstrumentResponse:
+        """Load an instrument while checking if it is connected"""
+        mount = command.mount
+        other_mount = mount.other_mount()
+
+        # Retrieve existing instrument on the other mount.
+        other_instrument = self._state_store.get_instrument_by_mount(
+            other_mount.to_hw_mount()
+        )
+
+        # Create the cache instrument request including other mount and mount
+        # requested by command
+        cache_request = {
+            mount.to_hw_mount(): command.instrumentName,
+            other_mount.to_hw_mount(): other_instrument
+        }
+        try:
+            self._hardware.cache_instruments(cache_request)
+        except RuntimeError as e:
+            log.exception("Failed to cache_instruments")
+            raise ProtocolErrorInstrument(str(e))
+
+        return models.LoadInstrumentResponse(instrumentId=create_identifier())
 
     async def handle_aspirate(self, command: models.PipetteRequestBase):
         raise UnsupportedCommandException("")
