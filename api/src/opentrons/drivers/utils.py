@@ -15,10 +15,10 @@ class ParseError(Exception):
 
 
 def parse_string_value_from_substring(substring) -> str:
-    '''
+    """
     Returns the ascii value in the expected string "N:aa11bb22", where "N" is
     the key, and "aa11bb22" is string value to be returned
-    '''
+    """
     try:
         value = substring.split(':')[1]
         return str(value)
@@ -30,13 +30,13 @@ def parse_string_value_from_substring(substring) -> str:
 
 
 def parse_number_from_substring(substring, rounding_val) -> Optional[float]:
-    '''
+    """
     Returns the number in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value
 
     For the temp-deck or thermocycler's temperature response, one expected
     input is something like "T:none", where "none" should return a None value
-    '''
+    """
     try:
         value = substring.split(':')[1]
         if value.strip().lower() == 'none':
@@ -50,10 +50,10 @@ def parse_number_from_substring(substring, rounding_val) -> Optional[float]:
 
 
 def parse_key_from_substring(substring) -> str:
-    '''
+    """
     Returns the axis in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value
-    '''
+    """
     try:
         return substring.split(':')[0]
     except (ValueError, IndexError, TypeError, AttributeError):
@@ -66,9 +66,9 @@ def parse_key_from_substring(substring) -> str:
 def parse_temperature_response(
         temperature_string: str, rounding_val: int
         ) -> Mapping[str, Optional[float]]:
-    '''
+    """
     Example input: "T:none C:25"
-    '''
+    """
     err_msg = 'Unexpected argument to parse_temperature_response: {}'.format(
         temperature_string)
     if not temperature_string or \
@@ -95,11 +95,11 @@ def parse_temperature_response(
 
 def parse_device_information(
         device_info_string: str) -> Mapping[str, str]:
-    '''
+    """
         Parse the modules's device information response.
 
         Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
-    '''
+    """
     error_msg = 'Unexpected argument to parse_device_information: {}'.format(
         device_info_string)
     if not device_info_string or \
