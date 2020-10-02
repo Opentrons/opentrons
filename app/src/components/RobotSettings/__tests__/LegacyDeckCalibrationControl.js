@@ -6,7 +6,7 @@ import { mount } from 'enzyme'
 import * as Sessions from '../../../sessions'
 import * as Config from '../../../config'
 
-import { DeckCalibrationControl } from '../DeckCalibrationControl'
+import { LegacyDeckCalibrationControl } from '../LegacyDeckCalibrationControl'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
 import type { State } from '../../../types'
 
@@ -67,7 +67,7 @@ describe('ControlsCard', () => {
         startLegacyDeckCalibration = () => {},
       } = props
       return mount(
-        <DeckCalibrationControl
+        <LegacyDeckCalibrationControl
           robotName={robotName}
           buttonDisabled={buttonDisabled}
           deckCalStatus={deckCalStatus}

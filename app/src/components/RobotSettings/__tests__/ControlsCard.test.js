@@ -10,7 +10,7 @@ import * as RobotSelectors from '../../../robot/selectors'
 
 import { ControlsCard } from '../ControlsCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
-import { DeckCalibrationControl } from '../DeckCalibrationControl'
+import { LegacyDeckCalibrationControl } from '../LegacyDeckCalibrationControl'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
@@ -296,7 +296,7 @@ describe('ControlsCard', () => {
     getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
     const { wrapper } = render()
 
-    expect(wrapper.exists(DeckCalibrationControl)).toBe(false)
+    expect(wrapper.exists(LegacyDeckCalibrationControl)).toBe(false)
   })
 
   it('CheckCalibrationControl does not render if ff is on', () => {

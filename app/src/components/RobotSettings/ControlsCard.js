@@ -35,7 +35,7 @@ import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 
 import { CheckCalibrationControl } from './CheckCalibrationControl'
-import { DeckCalibrationControl } from './DeckCalibrationControl'
+import { LegacyDeckCalibrationControl } from './LegacyDeckCalibrationControl'
 
 type Props = {|
   robot: ViewableRobot,
@@ -105,7 +105,7 @@ export function ControlsCard(props: Props): React.Node {
   return (
     <Card title={TITLE}>
       {!ff.enableCalibrationOverhaul && (
-        <DeckCalibrationControl
+        <LegacyDeckCalibrationControl
           robotName={robotName}
           buttonDisabled={buttonDisabled}
           deckCalStatus={deckCalStatus}

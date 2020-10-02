@@ -20,7 +20,7 @@ import {
   DISABLED_CONNECT_TO_ROBOT,
   DISABLED_PROTOCOL_IS_RUNNING,
 } from './constants'
-import { DeckCalibrationControl } from './DeckCalibrationControl'
+import { LegacyDeckCalibrationControl } from './LegacyDeckCalibrationControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
 import { PipetteOffsets } from './PipetteOffsets'
 
@@ -88,19 +88,19 @@ export function CalibrationCard(props: Props): React.Node {
   const buttonDisabled = Boolean(buttonDisabledReason)
   return (
     <Card title={TITLE}>
-      <DeckCalibrationControl
-        robotName={robotName}
-        buttonDisabled={buttonDisabled}
-        deckCalStatus={deckCalStatus}
-        deckCalData={deckCalData}
-        startLegacyDeckCalibration={() => {}}
-      />
       {deckCalStatus !== null && (
         <CheckCalibrationControl
           robotName={robotName}
           disabledReason={calCheckDisabledReason}
         />
       )}
+      <LegacyDeckCalibrationControl
+        robotName={robotName}
+        buttonDisabled={buttonDisabled}
+        deckCalStatus={deckCalStatus}
+        deckCalData={deckCalData}
+        startLegacyDeckCalibration={() => {}}
+      />
       <PipetteOffsets pipettesPageUrl={pipettesPageUrl} robot={robot} />
     </Card>
   )

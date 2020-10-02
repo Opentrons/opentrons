@@ -67,7 +67,7 @@ const CALIBRATE_DECK_DESCRIPTION =
 const CALIBRATE_BUTTON_TEXT = 'Calibrate'
 const CALIBRATE_TITLE_TEXT = 'Calibrate deck'
 
-export function DeckCalibrationControl(props: Props): React.Node {
+export function LegacyDeckCalibrationControl(props: Props): React.Node {
   const {
     robotName,
     buttonDisabled,
