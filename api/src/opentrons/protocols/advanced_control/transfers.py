@@ -31,7 +31,8 @@ class TouchTipStrategy(enum.Enum):
 class BlowOutStrategy(enum.Enum):
     NONE = enum.auto()
     TRASH = enum.auto()
-    DEST_IF_EMPTY = enum.auto()
+    DEST = enum.auto()
+    SOURCE = enum.auto()
     CUSTOM_LOCATION = enum.auto()
 
 
@@ -156,9 +157,8 @@ Transfer.blow_out_strategy.__doc__ = """
     :py:attr:`BlowOutStrategy.TRASH`
         Blow out to trash container.
 
-    :py:attr:`BlowOutStrategy.DEST_IF_EMPTY`
-        If the volume in the current tip is 0 (expected), then blow out
-        to the destination well in order to dispense any leftover
+    :py:attr:`BlowOutStrategy.DEST`
+        Blow out into the destination well in order to dispense any leftover
         liquid.
 
     :py:attr:`BlowOutStrategy.CUSTOM_LOCATION`
@@ -451,7 +451,7 @@ class TransferPlan:
                         user-defined location or (default) trash.
                         If no liquid is supposed to be present in the tip after
                         dispense, blow_out will be performed at dispense well
-                        location (if blow out strategy is DEST_IF_EMPTY)
+                        location (if blow out strategy is DEST)
             - Touch_tip: can be performed after each aspirate and/or after
                          each dispense
             - Mix: can be performed before aspirate and/or after dispense
@@ -482,7 +482,7 @@ class TransferPlan:
                 # TODO: ensure last transfer is > min_vol
                 vol = min(max_vol, step_vol - xferred_vol)
                 yield from self._aspirate_actions(vol, src)
-                yield from self._dispense_actions(vol, dest)
+                yield from self._dispense_actions(vol=vol, dest=dest, src=src)
                 xferred_vol += vol
             yield from self._new_tip_action()
 
@@ -525,7 +525,7 @@ class TransferPlan:
                         trash. If no liquid is supposed to be present in the
                         tip at the end of distribute, blow_out will be
                         performed at the last well the liquid was dispensed to
-                        (if strategy is DEST_IF_EMPTY)
+                        (if strategy is DEST)
             - Touch_tip: can be performed after each aspirate and/or after
                          every dispense
             - Mix: can be performed before aspirate and/or after the last
@@ -579,8 +579,10 @@ class TransferPlan:
                                               self._strategy.disposal_volume,
                                               self._sources[0])
             for step in asp_grouped:
-                yield from self._dispense_actions(step[0], step[1],
-                                                  step is not asp_grouped[-1])
+                yield from self._dispense_actions(vol=step[0],
+                                                  src=self._sources[0],
+                                                  dest= step[1],
+                                                  is_disp_next= step is not asp_grouped[-1])
         yield from self._new_tip_action()
 
     Target = TypeVar('Target')
@@ -624,7 +626,7 @@ class TransferPlan:
                         location or (default) trash.
                         If no liquid is supposed to be present in the tip after
                         dispense, blow_out will be performed at dispense well
-                        loc (if blow out strategy is DEST_IF_EMPTY)
+                        loc (if blow out strategy is DEST)
             - Touch_tip: can be performed after each aspirate and/or after
                          dispense
             - Mix: can be performed before the first aspirate and/or after
@@ -668,9 +670,10 @@ class TransferPlan:
             for step in asp_grouped:
                 yield from self._aspirate_actions(step[0], step[1])
             yield from self._dispense_actions(
-                sum([a[0] + self._strategy.air_gap for a in asp_grouped])
+                vol=sum([a[0] + self._strategy.air_gap for a in asp_grouped])
                 - self._strategy.air_gap,
-                self._dests[0])
+                src=None,
+                dest=self._dests[0])
         yield from self._new_tip_action()
 
     def _aspirate_actions(self, vol, loc):
@@ -679,12 +682,12 @@ class TransferPlan:
                                 [vol, loc, self._options.aspirate.rate])
         yield from self._after_aspirate()
 
-    def _dispense_actions(self, vol, loc, is_disp_next=False):
+    def _dispense_actions(self, vol, dest, src=None, is_disp_next=False):
         if self._strategy.air_gap:
             vol += self._strategy.air_gap
         yield self._format_dict('dispense',
-                                [vol, loc, self._options.dispense.rate])
-        yield from self._after_dispense(loc, is_disp_next)
+                                [vol, dest, self._options.dispense.rate])
+        yield from self._after_dispense(dest=dest, src=src, is_disp_next=is_disp_next)
 
     def _before_aspirate(self, loc):
         if self._strategy.mix_strategy == MixStrategy.BEFORE or \
@@ -701,7 +704,7 @@ class TransferPlan:
         if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
             yield self._format_dict('touch_tip', kwargs=self._touch_tip_opts)
 
-    def _after_dispense(self, loc, is_disp_next=False):  # noqa(C901)
+    def _after_dispense(self, dest, src, is_disp_next=False):  # noqa(C901)
         # This sequence of actions is subject to change
         if not is_disp_next:
             # If the next command is an aspirate, we are switching
@@ -711,26 +714,23 @@ class TransferPlan:
                 if self._strategy.mix_strategy == MixStrategy.AFTER or \
                         self._strategy.mix_strategy == MixStrategy.BOTH:
                     mix_after_opts = self._mix_after_opts._asdict()
-                    mix_after_opts['location'] = loc
+                    mix_after_opts['location'] = dest
                     yield self._format_dict('mix', kwargs=mix_after_opts)
-                if self._strategy.blow_out_strategy \
-                   == BlowOutStrategy.DEST_IF_EMPTY:
-                    yield self._format_dict('blow_out', [loc])
-            # If we're not empty but we're about to aspirate, we need a
-            # blowout.
             if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
                 yield self._format_dict('touch_tip',
                                         kwargs=self._touch_tip_opts)
-
             if self._strategy.blow_out_strategy == BlowOutStrategy.TRASH:
                 yield self._format_dict('blow_out', [
                     self._instr.trash_container.wells()[0]])
             elif self._strategy.blow_out_strategy == \
+                    BlowOutStrategy.SOURCE:
+                yield self._format_dict('blow_out', [src])
+            elif self._strategy.blow_out_strategy \
+                   == BlowOutStrategy.DEST:
+                    yield self._format_dict('blow_out', [dest])
+            elif self._strategy.blow_out_strategy == \
                     BlowOutStrategy.CUSTOM_LOCATION:
                 yield self._format_dict('blow_out', kwargs=self._blow_opts)
-            elif self._strategy.disposal_volume:
-                yield self._format_dict('blow_out', [
-                    self._instr.trash_container.wells()[0]])
         else:
             # Used by distribute
             if self._strategy.air_gap:

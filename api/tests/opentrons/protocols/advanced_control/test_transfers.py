@@ -484,7 +484,7 @@ def test_transfer_w_airgap_blowout(_instr_labware):
     options = tx.TransferOptions()
     options = options._replace(
         transfer=options.transfer._replace(
-            air_gap=10, blow_out_strategy=tx.BlowOutStrategy.DEST_IF_EMPTY,
+            air_gap=10, blow_out_strategy=tx.BlowOutStrategy.DEST,
             new_tip=TransferTipPolicy.NEVER))
 
     # ========== Transfer ==========

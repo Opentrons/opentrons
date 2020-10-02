@@ -856,6 +856,9 @@ class InstrumentContext(CommandPublisher):
         kwargs['disposal_volume'] = kwargs.get(
             'disposal_volume', self.min_volume)
         kwargs['mix_after'] = (0, 0)
+        if kwargs.get('blowout_location') == 'destination well':
+            raise ValueError(
+                "blowout location for distribute cannot be destination well")
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.consolidate)
@@ -883,6 +886,9 @@ class InstrumentContext(CommandPublisher):
         kwargs['mode'] = 'consolidate'
         kwargs['mix_before'] = (0, 0)
         kwargs['disposal_volume'] = 0
+        if kwargs.get('blowout_location') == 'source well':
+            raise ValueError(
+                "blowout location for consolidate cannot be source well")
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.transfer)
@@ -991,8 +997,23 @@ class InstrumentContext(CommandPublisher):
             new_tip = types.TransferTipPolicy[new_tip.upper()]
 
         blow_out = None
-        if kwargs.get('blow_out'):
-            blow_out = transfers.BlowOutStrategy.TRASH
+        blowout_location = kwargs.get('blowout_location')
+        if kwargs.get('blow_out') and not blowout_location:
+            if self.current_volume:
+                blow_out = transfers.BlowOutStrategy.SOURCE
+            else:
+                blow_out = transfers.BlowOutStrategy.TRASH
+        elif kwargs.get('blow_out') and blowout_location:
+            if blowout_location == 'source well':
+                blow_out = transfers.BlowOutStrategy.SOURCE
+            elif blowout_location == 'destination well':
+                blow_out = transfers.BlowOutStrategy.DEST
+            elif blowout_location == 'trash':
+                blow_out = transfers.BlowOutStrategy.TRASH
+            else:
+                raise TypeError(
+                'blowout location should be a "source well", "destination well", or "trash", but it is {}'
+                .format(blowout_location))
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = self._next_available_tip()
