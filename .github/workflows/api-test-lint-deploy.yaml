@@ -102,7 +102,7 @@ jobs:
         with:
           project: 'api'
       # creds and repository configuration for deploying python wheels
-      - if: !env.OT_TAG
+      - if: ! env.OT_TAG
         name: 'upload to test pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:

@@ -42,9 +42,8 @@ jobs:
         uses: actions/github-script@v3
         with:
           script: |
-            const { buildComplexEnvVars, findYarnCacheDir } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-            findYarnCacheDir(core, context)
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:

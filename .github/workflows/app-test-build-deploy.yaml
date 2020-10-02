@@ -15,7 +15,7 @@ on:
       - 'scripts/**/*'
       - '*.json'
       - 'yarn.lock'
-      - '.github/workflows/app-test-build.yaml'
+      - '.github/workflows/app-test-build-deploy.yaml'
       - '.github/workflows/utils.js'
     branches:
       - '*'
@@ -57,7 +57,7 @@ jobs:
         uses: actions/github-script@v3
         with:
           script: |
-            const { buildComplexEnvVars, findYarnCacheDir } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'cache yarn cache'
         uses: actions/cache@v2
@@ -95,7 +95,7 @@ jobs:
         uses: actions/github-script@v3
         with:
           script: |
-            const { buildComplexEnvVars, findYarnCacheDir } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'cache yarn cache'
         uses: actions/cache@v2
@@ -146,7 +146,8 @@ jobs:
     steps:
       - name: 'download run app builds'
         uses: 'actions/download-artifact@v2'
-        path: .
+        with:
+          path: .
       - name: 'deploy builds to s3'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
