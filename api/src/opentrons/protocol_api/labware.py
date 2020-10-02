@@ -24,8 +24,8 @@ import jsonschema  # type: ignore
 from opentrons.protocols.api_support.util import (
     ModifiedList, requires_version, labware_column_shift)
 from opentrons.calibration_storage import get, helpers, modify
+from opentrons.protocols.implementations.well_grid import WellGrid
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
@@ -265,7 +265,11 @@ class Labware(DeckItem):
         offset = definition['cornerOffsetFromSlot']
         self._dimensions = definition['dimensions']
         # Inferred from definition
-        self._well_name_grid = WellGrid(definition['ordering'])
+        self._ordering = [well
+                          for col in definition['ordering']
+                          for well in col]
+        self._well_name_grid: WellGrid[Well] = WellGrid(self._ordering,
+                                                        self._wells)
         self._offset\
             = Point(offset['x'], offset['y'], offset['z']) + parent.point
         self._parent = parent.labware
@@ -359,7 +363,7 @@ class Labware(DeckItem):
                     has_tip=self._is_tiprack,
                     name=well)
             )
-            for well in self._well_name_grid.ordered_names()]
+            for well in self._ordering]
 
     def set_calibration(self, delta: Point):
         """
@@ -369,6 +373,7 @@ class Labware(DeckItem):
                                         y=self._offset.y + delta.y,
                                         z=self._offset.z + delta.z)
         self._wells = self._build_wells()
+        self._well_name_grid = WellGrid(self._ordering, self._wells)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -425,8 +430,8 @@ class Labware(DeckItem):
 
         :return: Dictionary of well objects keyed by well name
         """
-        return {well: wellObj for well, wellObj in
-                zip(self._well_name_grid.ordered_names(), self._wells)}
+        return {well: wellObj
+                for well, wellObj in zip(self._ordering, self._wells)}
 
     @requires_version(2, 0)
     def wells_by_index(self) -> Dict[str, Well]:
@@ -456,15 +461,14 @@ class Labware(DeckItem):
         keys = self._well_name_grid.row_headers()
 
         if not args:
-            res = (row_dict[key] for key in keys)
+            res = [row_dict[key] for key in keys]
         elif isinstance(args[0], int):
-            res = (row_dict[keys[idx]] for idx in args)
+            res = [row_dict[keys[idx]] for idx in args]
         elif isinstance(args[0], str):
-            res = (row_dict[idx] for idx in args)
+            res = [row_dict[idx] for idx in args]
         else:
             raise TypeError
-        # Convert from indexes to wells
-        return [[self._wells[x] for x in i] for i in res]
+        return res
 
     @requires_version(2, 0)
     def rows_by_name(self) -> Dict[str, List[Well]]:
@@ -478,8 +482,7 @@ class Labware(DeckItem):
         :return: Dictionary of Well lists keyed by row name
         """
         row_dict = self._well_name_grid.get_rows()
-        # Convert to wells from indexes
-        return {k: [self._wells[x] for x in v] for k, v in row_dict.items()}
+        return row_dict
 
     @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
@@ -510,15 +513,14 @@ class Labware(DeckItem):
         keys = sorted(col_dict, key=lambda x: int(x))
 
         if not args:
-            res = (col_dict[key] for key in keys)
+            res = [col_dict[key] for key in keys]
         elif isinstance(args[0], int):
-            res = (col_dict[keys[idx]] for idx in args)
+            res = [col_dict[keys[idx]] for idx in args]
         elif isinstance(args[0], str):
-            res = (col_dict[idx] for idx in args)
+            res = [col_dict[idx] for idx in args]
         else:
             raise TypeError
-        # Convert from indexes to wells
-        return [[self._wells[x] for x in i] for i in res]
+        return res
 
     @requires_version(2, 0)
     def columns_by_name(self) -> Dict[str, List[Well]]:
@@ -534,7 +536,7 @@ class Labware(DeckItem):
         """
         col_dict = self._well_name_grid.get_columns()
         # Convert to wells from indexes
-        return {k: [self._wells[x] for x in v] for k, v in col_dict.items()}
+        return col_dict
 
     @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:

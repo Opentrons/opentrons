@@ -124,7 +124,7 @@ def test_labware_init():
     deck = Location(Point(0, 0, 0), 'deck')
     fake_labware = labware.Labware(minimalLabwareDef, deck)
     ordering = [well for col in minimalLabwareDef['ordering'] for well in col]
-    assert fake_labware._well_name_grid.ordered_names() == ordering
+    assert fake_labware._ordering == ordering
     assert fake_labware._well_definition == minimalLabwareDef['wells']
     assert fake_labware._offset == Point(x=10, y=10, z=5)
 

@@ -1,33 +1,20 @@
 import pytest
-from opentrons.protocols.api_support.well_grid import WellGrid
+from opentrons.protocols.implementations.well_grid import WellGrid
 
-NONE: list = [[]]
-ONE_VAL = [["A1"]]
+NONE: list = []
+ONE_VAL = ["A1"]
 NORMAL = [
-    ["A1", "B1", "C1"],
-    ["A2", "B2", "C2"],
-    ["A3", "B3", "C3"],
-    ["A4", "B4", "C4"],
+    "A1", "B1", "C1",
+    "A2", "B2", "C2",
+    "A3", "B3", "C3",
+    "A4", "B4", "C4",
   ]
 CRAZY_SHAPE = [
-    ["A1", "B1", "C1"],
-    ["B2", "C2"],
-    ["B3"],
-    ["A4", "C4", "D4"],
+    "A1", "B1", "C1",
+    "B2", "C2",
+    "B3",
+    "A4", "C4", "D4",
   ]
-
-
-@pytest.mark.parametrize(
-    argnames=["names", "expected"],
-    argvalues=[
-        [NONE, []],
-        [ONE_VAL, ["A1"]],
-        [NORMAL, ["A1", "B1", "C1", "A2", "B2", "C2",
-                  "A3", "B3", "C3", "A4", "B4", "C4"]],
-        [CRAZY_SHAPE, ["A1", "B1", "C1", "B2", "C2", "B3", "A4", "C4", "D4"]]
-    ])
-def test_in_order(names, expected):
-    assert WellGrid(names).ordered_names() == expected
 
 
 @pytest.mark.parametrize(
@@ -39,7 +26,7 @@ def test_in_order(names, expected):
         [CRAZY_SHAPE, ['A', 'B', 'C', 'D']]
     ])
 def test_row_headers(names, expected):
-    assert WellGrid(names).row_headers() == expected
+    assert WellGrid(names, list(range(len(names)))).row_headers() == expected
 
 
 @pytest.mark.parametrize(
@@ -59,7 +46,8 @@ def test_row_headers(names, expected):
             "D": [8],
         }]])
 def test_rows(names, expected):
-    assert WellGrid(names).get_rows() == expected
+    grid = WellGrid(names, list(range(len(names))))
+    assert grid.get_rows() == expected
 
 
 @pytest.mark.parametrize(
@@ -71,7 +59,8 @@ def test_rows(names, expected):
         [CRAZY_SHAPE, ['1', '2', '3', '4']]
     ])
 def test_column_headers(names, expected):
-    assert WellGrid(names).column_headers() == expected
+    grid = WellGrid(names, list(range(len(names))))
+    assert grid.column_headers() == expected
 
 
 @pytest.mark.parametrize(
@@ -93,7 +82,8 @@ def test_column_headers(names, expected):
         }]
     ])
 def test_columns(names, expected):
-    assert WellGrid(names).get_columns() == expected
+    grid = WellGrid(names, list(range(len(names))))
+    assert grid.get_columns() == expected
 
 
 def test_well_pattern():
