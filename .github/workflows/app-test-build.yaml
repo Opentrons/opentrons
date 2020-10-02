@@ -106,8 +106,7 @@ jobs:
       - name: 'test native(er) packages'
         run: |
           yarn jest --coverage=true --ci=true --testPathPattern '(app-shell|discovery-client)'
-      - if: contains(matrix.os, 'ubuntu')
-        uses: 'codecov/codecov-action@v1'
+      - uses: 'codecov/codecov-action@v1'
         with:
           file: coverage.xml
       # build the app and deploy it
