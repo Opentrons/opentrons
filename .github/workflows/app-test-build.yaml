@@ -39,7 +39,7 @@ on:
 env:
   CI: true
   OT_APP_DEPLOY_BUCKET: opentrons-app
-  OT_APP_DEPLOY_FOLDER: builds
+  OT_APP_DEPLOY_FOLDER: builds-actions-2
 
 jobs:
   js-unit-test:
@@ -131,16 +131,29 @@ jobs:
           APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
         run: |
            make -C app-shell dist-${{ matrix.os }}
+
       - if: github.event_name != 'pull_request'
+        name: 'upload github artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'opentrons-${{ matrix.os }}'
+          path: app-shell/dist/publish
+  deploy-app:
+    name: 'Deploy built app artifacts to S3'
+    runs-on: 'ubuntu-latest'
+    needs: build-app-test-backend
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: 'download run app builds'
+        uses: 'actions/download-artifact@v2'
+        path: .
+      - name: 'deploy builds to s3'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
         name: 'deploy'
-        run: aws s3 sync --acl=public-read app-shell/dist/publish s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}
-      - if: github.event_name != 'pull_request'
-        name: 'upload github artifact'
-        uses: actions/upload-artifact@v2
-        with:
-          name: 'opentrons app for ${{ matrix.os }}'
-          path: app-shell/dist/publish
+        run: |
+          mkdir to_upload
+          cp ./opentrons-*/* ./to_upload/
+          aws s3 sync --acl=public-read to_upload/ s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}

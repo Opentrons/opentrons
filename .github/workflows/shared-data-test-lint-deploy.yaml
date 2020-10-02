@@ -1,14 +1,14 @@
 # This workflow runs tests and lint on branch pushes that touch the
 # shared-data project or its CI configuration.
 
-name: 'shared-data lint/test'
+name: 'shared-data test/lint/deploy'
 
 on:
   push:
     paths:
       - 'Makefile'
       - 'shared-data/*/**'
-      - '.github/workflows/shared-data-lint-test.yaml'
+      - '.github/workflows/shared-data-test-lint-deploy.yaml'
       - '.github/actions/python/**/*'
       - '.github/workflows/utils.js'
     branches:
@@ -69,15 +69,37 @@ jobs:
             buildComplexEnvVars(core, context)
       - name: Test
         run: make -C shared-data/python test
-        # creds and repository configuration for deploying python wheels
-      - if: contains(matrix.os, 'ubuntu') && (github.event_name == 'push') && !env.OT_TAG
+  deploy:
+    name: 'shared-data package deploy'
+    needs: [python-test]
+    runs-on: 'ubuntu-latest'
+    if: github.event_name == 'push'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      # creds and repository configuration for deploying python wheels
+      - if: !env.OT_TAG
         name: 'upload to test pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
           project: 'shared-data/python'
           repository_url: 'https://test.pypi.org/legacy/'
           password: '${{ secrets.OT_TEST_PYPI_PASSWORD }}'
-      - if: contains(matrix.os, 'ubunut') && (github.event_name == 'push') && startsWith(env.OT_TAG, 'v')
+      - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
