@@ -92,7 +92,7 @@ jobs:
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       # creds and repository configuration for deploying python wheels
-      - if: ! env.OT_TAG
+      - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
