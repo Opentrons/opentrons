@@ -1,0 +1,107 @@
+# This workflow runs tests and lint on branch pushes that touch the
+# shared-data project or its CI configuration.
+
+name: 'shared-data test/lint/deploy'
+
+on:
+  push:
+    paths:
+      - 'Makefile'
+      - 'shared-data/*/**'
+      - '.github/workflows/shared-data-test-lint-deploy.yaml'
+      - '.github/actions/python/**/*'
+      - '.github/workflows/utils.js'
+    branches:
+      - '*'
+    tags:
+      - 'v*'
+  pull_request:
+    paths:
+      - 'Makefile'
+      - 'shared-data/*/**'
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  python-lint:
+    name: 'shared-data package python lint'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+      - name: Lint
+        run: make -C shared-data/python lint
+  python-test:
+    name: 'shared-data package python tests'
+    needs: [python-lint]
+    strategy:
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - name: Test
+        run: make -C shared-data/python test
+  deploy:
+    name: 'shared-data package deploy'
+    needs: [python-test]
+    runs-on: 'ubuntu-latest'
+    if: github.event_name == 'push'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      # creds and repository configuration for deploying python wheels
+      - if: ${{ !env.OT_TAG }}
+        name: 'upload to test pypi'
+        uses: './.github/actions/python/pypi-deploy'
+        with:
+          project: 'shared-data/python'
+          repository_url: 'https://test.pypi.org/legacy/'
+          password: '${{ secrets.OT_TEST_PYPI_PASSWORD }}'
+      - if: startsWith(env.OT_TAG, 'v')
+        name: 'upload to pypi'
+        uses: './.github/actions/python/pypi-deploy'
+        with:
+          proejct: 'shared-data/python'
+          repository_url: 'https://upload.pypi.org/legacy/'

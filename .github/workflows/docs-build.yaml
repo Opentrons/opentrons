@@ -12,6 +12,7 @@ on:
       - '.github/workflows/docs-build.yaml'
       - '.github/actions/python/**'
       - '.github/actions/webstack/deploy-to-sandbox/**'
+      - '.github/workflows/utils.js'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
       - 'chore_release-**'
@@ -38,6 +39,12 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
       - name: 'Setup Docs'
         run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
       - name: 'Build docs'
@@ -51,3 +58,4 @@ jobs:
         with:
           domain: 'docs.opentrons.com'
           distPath: './api/docs/dist'
+          destPrefix: ${{ env.OT_BRANCH }}
