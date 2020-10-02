@@ -153,7 +153,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
-        name: 'deploy'
         run: |
           mkdir to_upload
           cp ./opentrons-*/* ./to_upload/
