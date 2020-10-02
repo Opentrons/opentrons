@@ -26,6 +26,7 @@ from opentrons.protocols.api_support.util import (
 from opentrons.calibration_storage import get, helpers, modify
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.api_support.well_grid import WellGrid
+from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
@@ -59,32 +60,16 @@ class Well:
     such as :py:meth:`top`, :py:meth:`bottom`
     """
     def __init__(self,
-                 well_geometry: WellGeometry,
-                 display_name: str,
-                 has_tip: bool,
-                 api_level: APIVersion,
-                 name: str = None) -> None:
+                 well_implementation: WellImplementation,
+                 api_level: APIVersion):
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
 
-        :param display_name: a string that identifies a well. Used primarily
-            for debug and test purposes. Should be unique and human-readable--
-            something like "Tip C3 of Opentrons 300ul Tiprack on Slot 5" or
-            "Well D1 of Biorad 96 PCR Plate on Magnetic Module in Slot 1".
-            This is created by the caller and passed in, so here it is just
-            saved and made available.
-        :param well_geometry: The well's geometry
         """
         self._api_version = api_level
-        self._display_name = display_name
-        self._geometry = well_geometry
-
-        self._has_tip = has_tip
-        if name:
-            self._name = name
-        else:
-            self._name = display_name
+        self._impl = well_implementation
+        self._geometry = well_implementation.get_geometry()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -99,11 +84,11 @@ class Well:
     @property  # type: ignore
     @requires_version(2, 0)
     def has_tip(self) -> bool:
-        return self._has_tip
+        return self._impl.has_tip()
 
     @has_tip.setter
     def has_tip(self, value: bool):
-        self._has_tip = value
+        self._impl.set_has_tip(value)
 
     @property
     def max_volume(self) -> float:
@@ -120,12 +105,12 @@ class Well:
 
     @property
     def display_name(self):
-        return self._display_name
+        return self._impl.get_display_name()
 
     @property  # type: ignore
     @requires_version(2, 7)
     def well_name(self) -> str:
-        return self._name
+        return self._impl.get_name()
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
@@ -191,7 +176,7 @@ class Well:
         return self.from_center_cartesian(x, y, z)
 
     def __repr__(self):
-        return self._display_name
+        return self._impl.get_display_name()
 
     def __eq__(self, other: object) -> bool:
         """
@@ -364,14 +349,16 @@ class Labware(DeckItem):
         """
         return [
             Well(
-                WellGeometry(
-                    well_props=self._well_definition[well],
-                    parent=Location(self._calibrated_offset, self)
-                ),
-                "{} of {}".format(well, self._display_name),
-                self._is_tiprack,
-                self._api_version,
-                well)
+                api_level=self._api_version,
+                well_implementation=WellImplementation(
+                    well_geometry=WellGeometry(
+                        well_props=self._well_definition[well],
+                        parent=Location(self._calibrated_offset, self)
+                    ),
+                    display_name="{} of {}".format(well, self._display_name),
+                    has_tip=self._is_tiprack,
+                    name=well)
+            )
             for well in self._well_name_grid.ordered_names()]
 
     def set_calibration(self, delta: Point):
