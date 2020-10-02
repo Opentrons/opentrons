@@ -9,12 +9,10 @@ tiprack") to points in deck coordinates.
 """
 import logging
 import json
-import re
 import os
 import shutil
 
 from pathlib import Path
-from collections import defaultdict
 from itertools import takewhile, dropwhile
 from typing import (
     Any, AnyStr, List, Dict,
@@ -27,6 +25,7 @@ from opentrons.protocols.api_support.util import (
     ModifiedList, requires_version, labware_column_shift)
 from opentrons.calibration_storage import get, helpers, modify
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
@@ -281,16 +280,13 @@ class Labware(DeckItem):
         offset = definition['cornerOffsetFromSlot']
         self._dimensions = definition['dimensions']
         # Inferred from definition
-        self._ordering = [well
-                          for col in definition['ordering']
-                          for well in col]
+        self._well_name_grid = WellGrid(definition['ordering'])
         self._offset\
             = Point(offset['x'], offset['y'], offset['z']) + parent.point
         self._parent = parent.labware
         # Applied properties
         self.set_calibration(self._calibrated_offset)
 
-        self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
         self._highest_z = self._dimensions['zDimension']
 
@@ -376,24 +372,7 @@ class Labware(DeckItem):
                 self._is_tiprack,
                 self._api_version,
                 well)
-            for well in self._ordering]
-
-    def _create_indexed_dictionary(self, group=0) -> Dict[str, List['Well']]:
-        """
-        Creates a dict of lists of Wells. Which way the labware is segmented
-        determines whether this is a dict of rows or dict of columns. If group
-        is 1, then it will collect wells that have the same alphabetic prefix
-        and therefore are considered to be in the same row. If group is 2, it
-        will collect wells that have the same numeric postfix and therefore
-        are considered to be in the same column.
-        """
-        dict_list: Dict[str, List['Well']] = defaultdict(list)
-        for index, well_obj in zip(self._ordering, self._wells):
-            match = self._pattern.match(index)
-            assert match, 'could not match well name pattern'
-            dict_list[match.group(group)].append(well_obj)
-        # copy to a non-default-dict
-        return {k: v for k, v in dict_list.items()}
+            for well in self._well_name_grid.ordered_names()]
 
     def set_calibration(self, delta: Point):
         """
@@ -459,8 +438,8 @@ class Labware(DeckItem):
 
         :return: Dictionary of well objects keyed by well name
         """
-        return {well: wellObj
-                for well, wellObj in zip(self._ordering, self._wells)}
+        return {well: wellObj for well, wellObj in
+                zip(self._well_name_grid.ordered_names(), self._wells)}
 
     @requires_version(2, 0)
     def wells_by_index(self) -> Dict[str, Well]:
@@ -486,18 +465,19 @@ class Labware(DeckItem):
 
         :return: A list of row lists
         """
-        row_dict = self._create_indexed_dictionary(group=1)
-        keys = sorted(row_dict)
+        row_dict = self._well_name_grid.get_rows()
+        keys = self._well_name_grid.row_headers()
 
         if not args:
-            res = [row_dict[key] for key in keys]
+            res = (row_dict[key] for key in keys)
         elif isinstance(args[0], int):
-            res = [row_dict[keys[idx]] for idx in args]
+            res = (row_dict[keys[idx]] for idx in args)
         elif isinstance(args[0], str):
-            res = [row_dict[idx] for idx in args]
+            res = (row_dict[idx] for idx in args)
         else:
             raise TypeError
-        return res
+        # Convert from indexes to wells
+        return [[self._wells[x] for x in i] for i in res]
 
     @requires_version(2, 0)
     def rows_by_name(self) -> Dict[str, List[Well]]:
@@ -510,8 +490,9 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by row name
         """
-        row_dict = self._create_indexed_dictionary(group=1)
-        return row_dict
+        row_dict = self._well_name_grid.get_rows()
+        # Convert to wells from indexes
+        return {k: [self._wells[x] for x in v] for k, v in row_dict.items()}
 
     @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
@@ -538,18 +519,19 @@ class Labware(DeckItem):
 
         :return: A list of column lists
         """
-        col_dict = self._create_indexed_dictionary(group=2)
+        col_dict = self._well_name_grid.get_columns()
         keys = sorted(col_dict, key=lambda x: int(x))
 
         if not args:
-            res = [col_dict[key] for key in keys]
+            res = (col_dict[key] for key in keys)
         elif isinstance(args[0], int):
-            res = [col_dict[keys[idx]] for idx in args]
+            res = (col_dict[keys[idx]] for idx in args)
         elif isinstance(args[0], str):
-            res = [col_dict[idx] for idx in args]
+            res = (col_dict[idx] for idx in args)
         else:
             raise TypeError
-        return res
+        # Convert from indexes to wells
+        return [[self._wells[x] for x in i] for i in res]
 
     @requires_version(2, 0)
     def columns_by_name(self) -> Dict[str, List[Well]]:
@@ -563,8 +545,9 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by column name
         """
-        col_dict = self._create_indexed_dictionary(group=2)
-        return col_dict
+        col_dict = self._well_name_grid.get_columns()
+        # Convert to wells from indexes
+        return {k: [self._wells[x] for x in v] for k, v in col_dict.items()}
 
     @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:
