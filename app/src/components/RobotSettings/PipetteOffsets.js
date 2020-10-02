@@ -29,9 +29,9 @@ import type { ViewableRobot } from '../../discovery/types'
 
 import { PipetteOffsetItem } from './PipetteOffsetItem'
 
-const TITLE = 'attached pipette calibration'
+const TITLE = 'pipette offset calibration'
 const DESCRIPTION =
-  'Calibration status for currently attached pipettes. See information about all pipettes and calibration under'
+  'Calibration for the position of each pipette. See information about all pipettes and calibrate under'
 
 const LINK_TEXT = 'Robot > Pipettes and Modules'
 
