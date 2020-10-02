@@ -29,7 +29,7 @@ You may specify three options:
 If the commit matches a tag, then the version written will match the tag.
 Otherwise, the version will be:
 
-"{next_version}-snapshot.{commits_since_tag}-{commit_sha}"
+"{next_version}-dev.{commits_since_tag}+{commit_sha}"
 
 - {next_version} is the current version incremented by:
   - The minor version if the last tag was not a prerelease
