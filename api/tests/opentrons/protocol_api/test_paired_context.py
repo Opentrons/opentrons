@@ -327,11 +327,11 @@ def test_touch_tip_new_default_args(loop, monkeypatch):
     assert 'touching tip' in ','.join([cmd.lower() for cmd in ctx.commands()])
     z_offset = Point(0, 0, 1)   # default z offset of 1mm
     speed = 60                  # default speed
-    edges = [lw.wells()[0].geometry.from_center_cartesian(1, 0, 1) - z_offset,
-             lw.wells()[0].geometry.from_center_cartesian(-1, 0, 1) - z_offset,
-             lw.wells()[0].geometry.from_center_cartesian(0, 0, 1) - z_offset,
-             lw.wells()[0].geometry.from_center_cartesian(0, 1, 1) - z_offset,
-             lw.wells()[0].geometry.from_center_cartesian(0, -1, 1) - z_offset]
+    edges = [lw.wells()[0].from_center_cartesian(1, 0, 1) - z_offset,
+             lw.wells()[0].from_center_cartesian(-1, 0, 1) - z_offset,
+             lw.wells()[0].from_center_cartesian(0, 0, 1) - z_offset,
+             lw.wells()[0].from_center_cartesian(0, 1, 1) - z_offset,
+             lw.wells()[0].from_center_cartesian(0, -1, 1) - z_offset]
     for i in range(1, 5):
         assert total_hw_moves[i] == (edges[i - 1], speed)
 

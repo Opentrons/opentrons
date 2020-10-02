@@ -132,9 +132,9 @@ def test_from_center_cartesian():
     percent1_x = 1
     percent1_y = 1
     percent1_z = -0.5
-    point1 = well1.geometry.from_center_cartesian(percent1_x,
-                                                  percent1_y,
-                                                  percent1_z)
+    point1 = well1.from_center_cartesian(percent1_x,
+                                         percent1_y,
+                                         percent1_z)
 
     # slot.x + well.x + 1 * well.diamter/2
     expected_x = 10 + 40 + 15

@@ -159,6 +159,7 @@ class Well:
         """
         return Location(self._geometry.center(), self)
 
+    @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """
         Specifies an arbitrary point in deck coordinates based
