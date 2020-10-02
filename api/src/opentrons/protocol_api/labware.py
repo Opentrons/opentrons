@@ -159,6 +159,31 @@ class Well:
         """
         return Location(self._geometry.center(), self)
 
+    def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
+        """
+        Specifies an arbitrary point in deck coordinates based
+        on percentages of the radius in each axis. For example, to specify the
+        back-right corner of a well at 1/4 of the well depth from the bottom,
+        the call would be `_from_center_cartesian(1, 1, -0.5)`.
+
+        No checks are performed to ensure that the resulting position will be
+        inside of the well.
+
+        :param x: a float in the range [-1.0, 1.0] for a percentage of half of
+            the radius/length in the X axis
+        :param y: a float in the range [-1.0, 1.0] for a percentage of half of
+            the radius/width in the Y axis
+        :param z: a float in the range [-1.0, 1.0] for a percentage of half of
+            the height above/below the center
+
+        :return: a Point representing the specified location in absolute deck
+        coordinates
+        """
+        return self._from_center_cartesian(x, y, z)
+
+    def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
+        return self._geometry.from_center_cartesian(x, y, z)
+
     def __repr__(self):
         return self._display_name
 
