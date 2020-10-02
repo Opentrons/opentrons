@@ -22,16 +22,4 @@ module.exports = {
     core.exportVariable('OT_TAG', tag)
     core.exportVariable('OT_BUILD', buildNumber)
   },
-
-  /*
-   * Find the yarn cache dir and set it as the output of the currently-running step
-   *
-   * param core: The github core package instance made available by actions/github-script
-   * param context: The github context instance made available by actions/github-script
-   */
-  findYarnCacheDir: (core, context) => {
-    const cacheDir = execSync('yarn cache dir').trim()
-    console.log(`yarnCacheDir: ${cacheDir}\n`)
-    core.setOutput('yarnCacheDir', cacheDir.toString())
-  },
 }

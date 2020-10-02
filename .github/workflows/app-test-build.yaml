@@ -52,23 +52,27 @@ jobs:
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '12'
-      - name: 'set complex environment variables and get yarn cache'
-        id: 'set-vars-get-cache'
+      - name: 'set complex environment variables'
+        id: 'set-vars'
         uses: actions/github-script@v3
         with:
           script: |
             const { buildComplexEnvVars, findYarnCacheDir } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-            findYarnCacheDir(core, context)
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
-          path: ${{ steps.set-vars-get-cache.outputs.yarnCacheDir }}
+          path: |
+            ./.npm-cache/_prebuild
+            ./.yarn-cache
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: 'setup-js'
-        run: 'make setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
       - name: 'test frontend packages'
         run: |
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns 'labware-.*' 'protocol-.*' 'app-shell' 'discovery-client'
@@ -86,23 +90,27 @@ jobs:
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '12'
-      - name: 'set complex environment variables and get yarn cache'
-        id: 'set-vars-get-cache'
+      - name: 'set complex environment variables'
+        id: 'set-vars'
         uses: actions/github-script@v3
         with:
           script: |
             const { buildComplexEnvVars, findYarnCacheDir } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-            findYarnCacheDir(core, context)
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
-          path: ${{ steps.set-vars-get-cache.outputs.yarnCacheDir }}
+          path: |
+            ./.npm-cache/_prebuild
+            ./.yarn-cache
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: 'make setup-js'
+      - name: setup-js
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
       - name: 'test native(er) packages'
         run: |
           yarn jest --coverage=true --ci=true --testPathPattern '(app-shell|discovery-client)'
