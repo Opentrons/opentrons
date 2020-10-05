@@ -16,7 +16,6 @@ runs:
       run: |
         echo "::add-mask::${{ inputs.password }}"
         if [[ ${{ inputs.repository_url }} =~ "test" ]]; then
-          echo 'SWALLOW_FAILURE=|| echo "Duplicate upload allowed on test' >> $GITHUB_ENV
           echo "Uploading to test pypi"
         else if [[ ${{ inputs.repository_url }} =~ "upload.pypi.org" ]]; then
                  echo "Uploading to prod pypi"
