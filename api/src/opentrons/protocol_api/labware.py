@@ -24,7 +24,8 @@ import jsonschema  # type: ignore
 from opentrons.protocols.api_support.util import (
     ModifiedList, requires_version, labware_column_shift)
 from opentrons.calibration_storage import get, helpers, modify
-from opentrons.protocols.implementations.well_grid import WellGrid
+from opentrons.protocols.implementations.interfaces.labware import \
+    AbstractLabwareImplementation
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Location, Point
@@ -219,8 +220,8 @@ class Labware(DeckItem):
 
     """
     def __init__(
-            self, definition: 'LabwareDefinition',
-            parent: Location, label: str = None,
+            self,
+            implementation: AbstractLabwareImplementation,
             api_level: APIVersion = None) -> None:
         """
         :param definition: A dict representing all required data for a labware,
@@ -250,38 +251,11 @@ class Labware(DeckItem):
                 f'robot software. Please either reduce your requested API '
                 f'version or update your robot.')
         self._api_version = api_level
-        if label:
-            dn = label
-            self._name = dn
-        else:
-            dn = definition['metadata']['displayName']
-            self._name = definition['parameters']['loadName']
-        self._display_name = "{} on {}".format(dn, str(parent.labware))
-        self._calibrated_offset: Point = Point(0, 0, 0)
-        self._wells: Sequence[Well] = []
-        # Directly from definition
-        self._well_definition = definition['wells']
-        self._parameters = definition['parameters']
-        offset = definition['cornerOffsetFromSlot']
-        self._dimensions = definition['dimensions']
-        # Inferred from definition
-        self._ordering = [well
-                          for col in definition['ordering']
-                          for well in col]
-        self._well_name_grid: WellGrid[Well] = WellGrid(self._ordering,
-                                                        self._wells)
-        self._offset\
-            = Point(offset['x'], offset['y'], offset['z']) + parent.point
-        self._parent = parent.labware
-        # Applied properties
-        self.set_calibration(self._calibrated_offset)
-
-        self._definition = definition
-        self._highest_z = self._dimensions['zDimension']
+        self._implementation = implementation
 
     @property
     def separate_calibration(self) -> bool:
-        return False
+        return self._implementation.separate_calibration
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -298,87 +272,64 @@ class Labware(DeckItem):
 
         :returns: The uri, ``"namespace/loadname/version"``
         """
-        return helpers.uri_from_definition(self._definition)
+        return self._implementation.get_uri()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def parent(self) -> Union['Labware', 'Well', str, 'ModuleGeometry', None]:
         """ The parent of this labware. Usually a slot name.
         """
-        return self._parent
+        return self._implementation.get_geometry().parent.labware
 
     @property  # type: ignore
     @requires_version(2, 0)
     def name(self) -> str:
         """ Can either be the canonical name of the labware, which is used to
         load it, or the label of the labware specified by a user. """
-        return self._name
+        return self._implementation.get_name()
 
     @name.setter  # type: ignore
     def name(self, new_name):
         """ Set the labware name"""
-        self._name = new_name
+        self._implementation.set_name(new_name)
 
     @property  # type: ignore
     @requires_version(2, 0)
     def load_name(self) -> str:
         """ The API load name of the labware definition """
-        return self._parameters['loadName']
+        return self._implementation.load_name
 
     @property  # type: ignore
     @requires_version(2, 0)
     def parameters(self) -> 'LabwareParameters':
         """Internal properties of a labware including type and quirks"""
-        return self._parameters
+        return self._implementation.get_parameters()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def quirks(self) -> List[str]:
         """ Quirks specific to this labware. """
-        return self.parameters.get('quirks', [])
+        return self._implementation.get_quirks()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
-        if not self._parameters['isMagneticModuleCompatible']:
+        p = self._implementation.get_parameters()
+        if not p['isMagneticModuleCompatible']:
             return None
         else:
-            return self._parameters['magneticModuleEngageHeight']
-
-    def _build_wells(self) -> Sequence[Well]:
-        """
-        This function is used to create one instance of wells to be used by all
-        accessor functions. It is only called again if a new offset needs
-        to be applied.
-        """
-        return [
-            Well(
-                api_level=self._api_version,
-                well_implementation=WellImplementation(
-                    well_geometry=WellGeometry(
-                        well_props=self._well_definition[well],
-                        parent=Location(self._calibrated_offset, self)
-                    ),
-                    display_name="{} of {}".format(well, self._display_name),
-                    has_tip=self._is_tiprack,
-                    name=well)
-            )
-            for well in self._ordering]
+            return p['magneticModuleEngageHeight']
 
     def set_calibration(self, delta: Point):
         """
         Called by save calibration in order to update the offset on the object.
         """
-        self._calibrated_offset = Point(x=self._offset.x + delta.x,
-                                        y=self._offset.y + delta.y,
-                                        z=self._offset.z + delta.z)
-        self._wells = self._build_wells()
-        self._well_name_grid = WellGrid(self._ordering, self._wells)
+        self._implementation.set_calibration(delta)
 
     @property  # type: ignore
     @requires_version(2, 0)
     def calibrated_offset(self) -> Point:
-        return self._calibrated_offset
+        return self._implementation.get_calibrated_offset()
 
     @requires_version(2, 0)
     def well(self, idx) -> Well:
@@ -457,12 +408,13 @@ class Labware(DeckItem):
 
         :return: A list of row lists
         """
+        grid = self._implementation.get_well_grid()
         if not args:
-            res = self._well_name_grid.get_rows()
+            res = grid.get_rows()
         elif isinstance(args[0], int):
-            res = [self._well_name_grid.get_rows()[idx] for idx in args]
+            res = [grid.get_rows()[idx] for idx in args]
         elif isinstance(args[0], str):
-            res = [self._well_name_grid.get_row(idx) for idx in args]
+            res = [grid.get_row(idx) for idx in args]
         else:
             raise TypeError
         return res
@@ -478,7 +430,7 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by row name
         """
-        return self._well_name_grid.get_row_dict()
+        return self._implementation.get_well_grid().get_row_dict()
 
     @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
@@ -505,12 +457,13 @@ class Labware(DeckItem):
 
         :return: A list of column lists
         """
+        grid = self._implementation.get_well_grid()
         if not args:
-            res = self._well_name_grid.get_columns()
+            res = grid.get_columns()
         elif isinstance(args[0], int):
-            res = [self._well_name_grid.get_columns()[idx] for idx in args]
+            res = [grid.get_columns()[idx] for idx in args]
         elif isinstance(args[0], str):
-            res = [self._well_name_grid.get_column(idx) for idx in args]
+            res = [grid.get_column(idx) for idx in args]
         else:
             raise TypeError
         return res
@@ -527,7 +480,7 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by column name
         """
-        return self._well_name_grid.get_column_dict()
+        return self._implementation.get_well_grid().get_column_dict()
 
     @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:
@@ -545,21 +498,21 @@ class Labware(DeckItem):
         This is drawn from the 'dimensions'/'zDimension' elements of the
         labware definition and takes into account the calibration offset.
         """
-        return self._highest_z + self._calibrated_offset.z
+        return self._implementation.highest_z()
 
-    @highest_z.setter
-    def highest_z(self, new_height: float):
-        """
-        The z-coordinate of the tallest single point anywhere on the labware.
-        This is drawn from the 'dimensions'/'zDimension' elements of the
-        labware definition and takes into account the calibration offset.
-        """
-        self._highest_z = new_height
+    # @highest_z.setter
+    # def highest_z(self, new_height: float):
+    #     """
+    #     The z-coordinate of the tallest single point anywhere on the labware.
+    #     This is drawn from the 'dimensions'/'zDimension' elements of the
+    #     labware definition and takes into account the calibration offset.
+    #     """
+    #     self._highest_z = new_height
 
     @property
     def _is_tiprack(self) -> bool:
         """ as is_tiprack but not subject to version checking for speed """
-        return self._parameters['isTiprack']
+        return self._implementation.is_tiprack()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -569,11 +522,11 @@ class Labware(DeckItem):
     @property  # type: ignore
     @requires_version(2, 0)
     def tip_length(self) -> float:
-        return self._parameters['tipLength']
+        return self._implementation.get_tip_length()
 
     @tip_length.setter
     def tip_length(self, length: float):
-        self._parameters['tipLength'] = length
+        self._implementation.set_tip_length(length)
 
     def next_tip(self,
                  num_tips: int = 1,
@@ -587,38 +540,17 @@ class Labware(DeckItem):
 
         :param num_tips: target number of sequential tips in the same column
         :type num_tips: int
+        :param starting_tip: The :py:class:`.Well` from which to start search.
+                for an available tip.
+        :type starting_tip: :py:class:`.Well`
         :return: the :py:class:`.Well` meeting the target criteria, or None
         """
         assert num_tips > 0, 'Bad call to next_tip: num_tips <= 0'
 
-        columns: List[List[Well]] = self.columns()
-
-        if starting_tip:
-            # Remove columns preceding the one with the pipette's starting tip
-            drop_undefined_columns = list(
-                dropwhile(lambda x: starting_tip not in x, columns))
-            # Remove tips preceding the starting tip in the first column
-            drop_undefined_columns[0] = list(
-                dropwhile(lambda w: starting_tip is not w,
-                          drop_undefined_columns[0]))
-            columns = drop_undefined_columns
-
-        drop_leading_empties = [
-            list(dropwhile(lambda x: not x.has_tip, column))
-            for column in columns]
-        drop_at_first_gap = [
-            list(takewhile(lambda x: x.has_tip, column))
-            for column in drop_leading_empties]
-        long_enough = [
-            column for column in drop_at_first_gap if len(column) >= num_tips]
-
-        try:
-            first_long_enough = long_enough[0]
-            result: Optional[Well] = first_long_enough[0]
-        except IndexError:
-            result = None
-
-        return result
+        return self._implementation.get_tip_tracker().next_tip(
+            num_tips=num_tips,
+            starting_tip=starting_tip
+        )
 
     def use_tips(self, start_well: Well, num_channels: int = 1):
         """
@@ -641,36 +573,17 @@ class Labware(DeckItem):
         :type num_channels: int
         """
         assert num_channels > 0, 'Bad call to use_tips: num_channels<=0'
-        # Select the column of the labware that contains the target well
-        target_column: List[Well] = [
-            col for col in self.columns() if start_well in col][0]
 
-        well_idx = target_column.index(start_well)
-        # Number of tips to pick up is the lesser of (1) the number of tips
-        # from the starting well to the end of the column, and (2) the number
-        # of channels of the pipette (so a 4-channel pipette would pick up a
-        # max of 4 tips, and picking up from the 2nd-to-bottom well in a
-        # column would get a maximum of 2 tips)
-        num_tips = min(len(target_column) - well_idx, num_channels)
-        target_wells = target_column[well_idx: well_idx + num_tips]
+        fail_if_full = self._api_version < APIVersion(2, 2)
 
-        # In API version 2.2, we no longer reset the tip tracker when a tip
-        # is dropped back into a tiprack well. This fixes a behavior where
-        # subsequent transfers would reuse the dirty tip. However, sometimes
-        # the user explicitly wants to use a dirty tip, and this check would
-        # raise an exception if they tried to do so.
-        # An extension of work here is to have separate tip trackers for
-        # dirty tips and non-present tips; but until then, we can avoid the
-        # exception.
-        if self._api_version < APIVersion(2, 2):
-            assert all([well.has_tip for well in target_wells]),\
-                '{} is out of tips'.format(str(self))
-
-        for well in target_wells:
-            well.has_tip = False
+        self._implementation.get_tip_tracker().use_tips(
+            start_well=start_well,
+            num_channels=num_channels,
+            fail_if_full=fail_if_full
+        )
 
     def __repr__(self):
-        return self._display_name
+        return self._implementation.get_display_name()
 
     def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
@@ -687,19 +600,7 @@ class Labware(DeckItem):
         # This logic is the inverse of :py:meth:`next_tip`
         assert num_tips > 0, 'Bad call to previous_tip: num_tips <= 0'
 
-        columns = self.columns()
-        drop_leading_filled = [
-            list(dropwhile(lambda x: x.has_tip, column))
-            for column in columns]
-        drop_at_first_gap = [
-            list(takewhile(lambda x: not x.has_tip, column))
-            for column in drop_leading_filled]
-        long_enough = [
-            column for column in drop_at_first_gap if len(column) >= num_tips]
-        try:
-            return long_enough[0][0]
-        except IndexError:
-            return None
+        return self._implementation.get_tip_tracker().previous_tip(num_tips=num_tips)
 
     def return_tips(self, start_well: Well, num_channels: int = 1):
         """
@@ -724,24 +625,18 @@ class Labware(DeckItem):
         """
         # This logic is the inverse of :py:meth:`use_tips`
         assert num_channels > 0, 'Bad call to return_tips: num_channels <= 0'
-        # Select the column that contains the target_well
-        target_column = [col for col in self.columns() if start_well in col][0]
-        well_idx = target_column.index(start_well)
-        end_idx = min(well_idx + num_channels, len(target_column))
-        drop_targets = target_column[well_idx:end_idx]
-        for well in drop_targets:
-            if well.has_tip:
-                raise AssertionError(f'Well {repr(well)} has a tip')
-        for well in drop_targets:
-            well.has_tip = True
+
+        self._implementation.get_tip_tracker().return_tips(
+            start_well=start_well._impl,
+            num_channels=num_channels
+        )
 
     @requires_version(2, 0)
     def reset(self):
         """Reset all tips in a tiprack
         """
         if self._is_tiprack:
-            for well in self.wells():
-                well.has_tip = True
+            self._implementation.reset_tips()
 
 
 def _get_path_to_labware(

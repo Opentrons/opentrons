@@ -14,7 +14,7 @@ class WellImplementation:
                  well_geometry: WellGeometry,
                  display_name: str,
                  has_tip: bool,
-                 name: str = None) -> None:
+                 name: str) -> None:
         """
         Construct a well
 
@@ -26,16 +26,12 @@ class WellImplementation:
             This is created by the caller and passed in, so here it is just
             saved and made available.
         :param has_tip: whether a tip is present
-        :param name: The well name
+        :param name: The well name (ie. A1, B4, C2, etc.)
         """
         self._display_name = display_name
-        self._geometry = well_geometry
-
         self._has_tip = has_tip
-        if name:
-            self._name = name
-        else:
-            self._name = display_name
+        self._name = name
+        self._geometry = well_geometry
 
     def get_parent(self) -> Labware:
         return self._geometry.parent.labware   # type: ignore
