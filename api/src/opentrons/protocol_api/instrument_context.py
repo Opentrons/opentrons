@@ -998,6 +998,14 @@ class InstrumentContext(CommandPublisher):
 
         blow_out = None
         blowout_location = kwargs.get('blowout_location')
+
+        if blowout_location and blowout_location not in [
+                'source well', 'destination well', 'trash']:
+            raise ValueError(
+                    'blowout location should be either "source well",' +
+                    ' "destination well", or "trash", but it is {}'
+                    .format(blowout_location))
+
         if kwargs.get('blow_out') and not blowout_location:
             if self.current_volume:
                 blow_out = transfers.BlowOutStrategy.SOURCE
@@ -1010,11 +1018,6 @@ class InstrumentContext(CommandPublisher):
                 blow_out = transfers.BlowOutStrategy.DEST
             elif blowout_location == 'trash':
                 blow_out = transfers.BlowOutStrategy.TRASH
-            else:
-                raise TypeError(
-                        'blowout location should be a "source well", "' +
-                        'destination well", or "trash", but it is {}'
-                        .format(blowout_location))
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = self._next_available_tip()
