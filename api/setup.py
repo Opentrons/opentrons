@@ -1,5 +1,6 @@
 # Inspired by:
 # https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
+from python_build_utils import normalize_version
 import sys
 import codecs
 import os
@@ -9,8 +10,6 @@ from setuptools import setup, find_packages
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(HERE, '..', 'scripts'))
-
-from python_build_utils import normalize_version
 
 
 # make stdout blocking since Travis sets it to nonblocking
@@ -27,6 +26,7 @@ def get_version():
     else:
         normalize_opts = {}
     return normalize_version('api', **normalize_opts)
+
 
 VERSION = get_version()
 
@@ -59,6 +59,7 @@ INSTALL_REQUIRES = [
     'aionotify==0.2.0',
     f'opentrons_shared_data=={VERSION}',
     'typing-extensions>=3.7.4.3',
+    'pydantic==1.4',
 ]
 
 
