@@ -20,13 +20,20 @@ export type RobotSettingsProps = {|
   updateUrl: string,
   calibrateDeckUrl: string,
   resetUrl: string,
+  pipettesPageUrl: string,
 |}
 
 // TODO BC 2020-03-20 all of the buttons in these settings are disabled for
 // various reasons.  We should surface those reasons to users in hover tooltips
 // on the buttons, this is currently limited by the existing LabeledButton component.
 export function RobotSettings(props: RobotSettingsProps): React.Node {
-  const { robot, updateUrl, calibrateDeckUrl, resetUrl } = props
+  const {
+    robot,
+    updateUrl,
+    calibrateDeckUrl,
+    resetUrl,
+    pipettesPageUrl,
+  } = props
   const ff = useSelector(getFeatureFlags)
   return (
     <CardContainer key={robot.name}>
@@ -38,7 +45,7 @@ export function RobotSettings(props: RobotSettingsProps): React.Node {
       </CardRow>
       {ff.enableCalibrationOverhaul && (
         <CardRow>
-          <CalibrationCard robot={robot} />
+          <CalibrationCard robot={robot} pipettesPageUrl={pipettesPageUrl} />
         </CardRow>
       )}
       <CardRow>

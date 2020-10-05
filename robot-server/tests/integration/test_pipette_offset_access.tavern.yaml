@@ -36,6 +36,7 @@ stages:
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
               lastModified: !anystr
+              tiprackUri: !anystr
               source: 'user'
               status: !anydict
             id: !anystr
@@ -46,6 +47,7 @@ stages:
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
               lastModified: !anystr
+              tiprackUri: !anystr
               source: 'user'
               status: !anydict
             id: !anystr
@@ -69,6 +71,7 @@ stages:
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
               lastModified: !anystr
+              tiprackUri: !anystr
               source: 'user'
               status: !anydict
             id: !anystr
@@ -91,6 +94,7 @@ stages:
               mount: 'left'
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
+              tiprackUri: !anystr
               lastModified: !anystr
               source: 'user'
               status: !anydict
@@ -116,6 +120,7 @@ stages:
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
               lastModified: !anystr
+              tiprackUri: !anystr
               source: 'user'
               status: !anydict
             id: !anystr

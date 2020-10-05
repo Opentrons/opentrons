@@ -36,6 +36,10 @@ class PipetteOffsetCalibration(BaseModel):
         Field(...,
               description="The sha256 hash of the tiprack used "
                           "in this calibration")
+    tiprackUri: str = \
+        Field(...,
+              description="The standard labware uri of the tiprack "
+                          "used in this calibration")
     lastModified: datetime = \
         Field(...,
               description="When this calibration was last modified")

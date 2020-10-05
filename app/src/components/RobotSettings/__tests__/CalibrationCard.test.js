@@ -3,18 +3,23 @@
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
+import * as PipetteOffset from '../../../calibration/pipette-offset'
 import * as Calibration from '../../../calibration'
+import * as Pipettes from '../../../pipettes'
 import * as Config from '../../../config'
 import * as RobotSelectors from '../../../robot/selectors'
 
 import { CalibrationCard } from '../CalibrationCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
+import { PipetteOffsets } from '../PipetteOffsets'
 
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 
 import type { State, Action } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
+
+jest.mock('react-router-dom', () => ({ Link: 'a' }))
 
 jest.mock('../../../robot/selectors')
 jest.mock('../../../config/selectors')
@@ -23,6 +28,10 @@ jest.mock('../../../sessions/selectors')
 
 jest.mock('../CheckCalibrationControl', () => ({
   CheckCalibrationControl: () => <></>,
+}))
+
+jest.mock('../PipetteOffsets', () => ({
+  PipetteOffsets: () => <></>,
 }))
 
 const MOCK_STATE: State = ({ mockState: true }: any)
@@ -64,9 +73,12 @@ const getCheckCalibrationControl = wrapper =>
 
 describe('CalibrationCard', () => {
   const render = (robot: ViewableRobot = mockRobot) => {
-    return mountWithStore<_, State, Action>(<CalibrationCard robot={robot} />, {
-      initialState: MOCK_STATE,
-    })
+    return mountWithStore<_, State, Action>(
+      <CalibrationCard robot={robot} pipettesPageUrl={'fake-url'} />,
+      {
+        initialState: MOCK_STATE,
+      }
+    )
   }
 
   beforeEach(() => {
@@ -85,11 +97,20 @@ describe('CalibrationCard', () => {
     jest.useRealTimers()
   })
 
-  it('calls fetchCalibrationStatus on mount and on a 10s interval', () => {
+  it('calls fetches data on mount and on a 10s interval', () => {
     const { store } = render()
 
-    expect(store.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenNthCalledWith(
+      1,
       Calibration.fetchCalibrationStatus(mockRobot.name)
+    )
+    expect(store.dispatch).toHaveBeenNthCalledWith(
+      2,
+      Pipettes.fetchPipettes(mockRobot.name)
+    )
+    expect(store.dispatch).toHaveBeenNthCalledWith(
+      3,
+      PipetteOffset.fetchPipetteOffsetCalibrations(mockRobot.name)
     )
     store.dispatch.mockReset()
     jest.advanceTimersByTime(20000)
@@ -198,5 +219,9 @@ describe('CalibrationCard', () => {
     // TODO(lc, 2020-06-18): Mock out the new transform status such that
     // this should evaluate to true.
     expect(wrapper.exists(DeckCalibrationWarning)).toBe(true)
+  })
+  it('renders PipetteOffsets', () => {
+    const { wrapper } = render()
+    expect(wrapper.exists(PipetteOffsets)).toBe(true)
   })
 })

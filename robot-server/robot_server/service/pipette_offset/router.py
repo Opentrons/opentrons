@@ -26,6 +26,7 @@ def _format_calibration(
         mount=calibration.mount,
         offset=calibration.offset,
         tiprack=calibration.tiprack,
+        tiprackUri=calibration.uri,
         lastModified=calibration.last_modified,
         source=calibration.source,
         status=status)

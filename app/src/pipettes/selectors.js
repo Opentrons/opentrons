@@ -9,7 +9,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { getPipettes as getProtocolPipettes } from '../robot/selectors'
-import { getPipetteOffsetCalibrations } from '../calibration/pipette-offset'
+import {
+  getPipetteOffsetCalibrations,
+  filterCalibrationForPipette,
+} from '../calibration/pipette-offset'
 import { getFeatureFlags } from '../config'
 import type { PipetteOffsetCalibration } from '../calibration/types'
 import * as Constants from './constants'
@@ -63,6 +66,24 @@ export const getAttachedPipetteSettings: (
       },
       { left: null, right: null }
     )
+  }
+)
+
+export const getAttachedPipetteCalibrations: (
+  state: State,
+  robotName: string
+) => Types.PipetteOffsetCalibrationsByMount = createSelector(
+  getAttachedPipettes,
+  getPipetteOffsetCalibrations,
+  (attached, calibrations) => {
+    return {
+      left: attached.left
+        ? filterCalibrationForPipette(calibrations, attached.left.id)
+        : null,
+      right: attached.right
+        ? filterCalibrationForPipette(calibrations, attached.right.id)
+        : null,
+    }
   }
 )
 
