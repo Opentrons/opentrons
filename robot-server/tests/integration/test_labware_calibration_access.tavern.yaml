@@ -6,7 +6,7 @@ marks:
 stages:
   - name: Labware Calibrations GET request returns an empty list
     request:
-      url: "{host:s}:{port:d}/labware/calibrations"
+      url: '{host:s}:{port:d}/labware/calibrations'
       method: GET
     response:
       status_code: 200
@@ -23,16 +23,15 @@ marks:
 stages:
   - name: GET request returns all calibrations from fixture
     request:
-      url: "{host:s}:{port:d}/labware/calibrations"
+      url: '{host:s}:{port:d}/labware/calibrations'
       method: GET
     response:
       status_code: 200
-      strict: false
       json:
         meta: null
         links: null
-        data: 
-          - attributes: 
+        data:
+          - attributes:
               calibrationData: !anydict
               loadName: !anystr
               parent: !anystr
@@ -87,7 +86,7 @@ marks:
 stages:
   - name: GET request returns the calibration for deep well plate
     request:
-      url: "{host:s}:{port:d}/labware/calibrations"
+      url: '{host:s}:{port:d}/labware/calibrations'
       method: GET
       params:
         loadName: 'nest_96_wellplate_2ml_deep'
@@ -96,7 +95,7 @@ stages:
       json:
         meta: null
         links: null
-        data: 
+        data:
           - attributes:
               calibrationData: !anydict
               loadName: 'nest_96_wellplate_2ml_deep'
@@ -115,18 +114,18 @@ marks:
 stages:
   - name: Labware Calibrations GET request returns an empty list
     request:
-      url: "{host:s}:{port:d}/labware/calibrations"
+      url: '{host:s}:{port:d}/labware/calibrations'
       method: GET
       params:
         version: 1
-        namespace: "opentrons"
+        namespace: 'opentrons'
     response:
       status_code: 200
       json:
         links: null
         meta: null
         data:
-          - attributes: 
+          - attributes:
               calibrationData: !anydict
               loadName: !anystr
               parent: !anystr
@@ -180,7 +179,7 @@ marks:
 stages:
   - name: Labware Calibrations GET request returns an empty list
     request:
-      url: "{host:s}:{port:d}/labware/calibrations"
+      url: '{host:s}:{port:d}/labware/calibrations'
       method: GET
       params:
         version: 2
