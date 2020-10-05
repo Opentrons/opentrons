@@ -8,7 +8,16 @@ if TYPE_CHECKING:
     from typing_extensions import Final
 
 
-class PipetteOffsetCalibrationState(str, Enum):
+class GenericState(str, Enum):
+    def __getattr__(self, name: str):
+        # We need to define this method
+        # to ensure that mypy will
+        # understand the defined attributes
+        # on the subclasses.
+        return getattr(self.__class__, name)
+
+
+class PipetteOffsetCalibrationState(GenericState):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     preparingPipette = "preparingPipette"
@@ -20,7 +29,7 @@ class PipetteOffsetCalibrationState(str, Enum):
     WILDCARD = STATE_WILDCARD
 
 
-class PipetteOffsetWithTipLengthCalibrationState(str, Enum):
+class PipetteOffsetWithTipLengthCalibrationState(GenericState):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     measuringNozzleOffset = "measuringNozzleOffset"

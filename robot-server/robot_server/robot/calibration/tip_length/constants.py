@@ -1,6 +1,4 @@
 from enum import Enum
-from typing import Dict
-from opentrons.types import Point, Mount
 from robot_server.robot.calibration.constants import STATE_WILDCARD
 
 

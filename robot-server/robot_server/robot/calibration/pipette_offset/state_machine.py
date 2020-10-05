@@ -8,8 +8,11 @@ from .constants import (
     PipetteOffsetCalibrationState as POCState,
     PipetteOffsetWithTipLengthCalibrationState as POWTState)
 
-
-PIP_OFFSET_CAL_TRANSITIONS: Dict[POCState, Dict[CommandDefinition, POCState]] = {
+PipetteOffsetTransitions =\
+    Dict[POCState, Dict[CommandDefinition, POCState]]
+PipetteOffsetWithTLTransitions =\
+    Dict[POWTState, Dict[CommandDefinition, POWTState]]
+PIP_OFFSET_CAL_TRANSITIONS: PipetteOffsetTransitions = {
     POCState.sessionStarted: {
         CalibrationCommand.load_labware: POCState.labwareLoaded
     },
@@ -41,13 +44,14 @@ PIP_OFFSET_CAL_TRANSITIONS: Dict[POCState, Dict[CommandDefinition, POCState]] = 
     }
 }
 
-PIP_OFFSET_WITH_TL_TRANSITIONS: Dict[POWTState, Dict[CommandDefinition, POWTState]] = {
+PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
     POWTState.sessionStarted: {
         CalibrationCommand.set_has_calibration_block: POWTState.sessionStarted,
         CalibrationCommand.load_labware: POWTState.labwareLoaded
     },
     POWTState.labwareLoaded: {
-        CalibrationCommand.move_to_reference_point: POWTState.measuringNozzleOffset
+        CalibrationCommand.move_to_reference_point:
+            POWTState.measuringNozzleOffset
     },
     POWTState.measuringNozzleOffset: {
         CalibrationCommand.save_offset: POWTState.measuringNozzleOffset,
@@ -60,7 +64,8 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: Dict[POWTState, Dict[CommandDefinition, POWTStat
     },
     POWTState.inspectingTip: {
         CalibrationCommand.invalidate_tip: POWTState.preparingPipette,
-        CalibrationCommand.move_to_reference_point: POWTState.measuringTipOffset,
+        CalibrationCommand.move_to_reference_point:
+            POWTState.measuringTipOffset,
     },
     POWTState.measuringTipOffset: {
         CalibrationCommand.jog: POWTState.measuringTipOffset,
@@ -101,14 +106,16 @@ class PipetteOffsetCalibrationStateMachine:
         else:
             raise StateTransitionError(command, from_state)
 
+
 class PipetteOffsetWithTipLengthStateMachine:
     def __init__(self):
-        self._state_amchine = SimpleStateMachine(
+        self._state_machine = SimpleStateMachine(
             states=set(s for s in POWTState),
             transitions=PIP_OFFSET_WITH_TL_TRANSITIONS,
         )
 
-    def get_next_state(self, from_state: POWTState, command: CommandDefinition):
+    def get_next_state(
+            self, from_state: POWTState, command: CommandDefinition):
         next_state = self._state_machine.get_next_state(from_state, command)
         if next_state:
             return next_state

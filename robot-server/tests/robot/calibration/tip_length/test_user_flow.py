@@ -6,6 +6,7 @@ from opentrons.hardware_control import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
 
+from robot_server.robot.calibration.util import get_reference_location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.tip_length.user_flow import \
@@ -269,7 +270,9 @@ def test_load_cal_block(mock_user_flow_all_combos):
 
 async def test_get_reference_location(mock_user_flow_all_combos):
     uf = mock_user_flow_all_combos
-    result = uf._get_reference_point()
+    result = get_reference_location(
+        mount=uf._mount, deck=uf._deck,
+        has_calibration_block=uf._has_calibration_block)
     if uf._has_calibration_block:
         if uf._mount == Mount.LEFT:
             exp = uf._deck['3'].wells()[0].top().move(Point(0, 0, 5))

@@ -1,6 +1,7 @@
 import logging
 from typing import (
-    Any, Awaitable, Callable, Dict, List, Optional, TYPE_CHECKING)
+    Any, Awaitable, Callable, Dict,
+    List, Optional, Union, TYPE_CHECKING)
 
 from opentrons.calibration_storage import get, modify, helpers
 from opentrons.calibration_storage.types import TipLengthCalNotFound
@@ -23,8 +24,10 @@ from robot_server.robot.calibration.constants import (
     CAL_BLOCK_SETUP_BY_MOUNT)
 from ..errors import CalibrationError
 from ..helper_classes import (RequiredLabware, AttachedPipette)
-from .constants import (PipetteOffsetCalibrationState as State,
-                        TIP_RACK_SLOT, JOG_TO_DECK_SLOT)
+from .constants import (
+    PipetteOffsetCalibrationState as POCState,
+    PipetteOffsetWithTipLengthCalibrationState as POWTState,
+    GenericState, TIP_RACK_SLOT, JOG_TO_DECK_SLOT)
 from .state_machine import (
     PipetteOffsetCalibrationStateMachine,
     PipetteOffsetWithTipLengthStateMachine)
@@ -45,6 +48,9 @@ pipette attached to the gantry, in relation to the deck
 COMMAND_HANDLER = Callable[..., Awaitable]
 
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
+PipetteOffsetStateMachine = Union[
+    PipetteOffsetCalibrationStateMachine,
+    PipetteOffsetWithTipLengthStateMachine]
 
 
 class PipetteOffsetCalibrationUserFlow:
@@ -55,7 +61,7 @@ class PipetteOffsetCalibrationUserFlow:
 
         self._hardware = hardware
         self._mount = mount
-        self._has_calibration_block: Optional[bool] = None
+        self._has_calibration_block = False
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
             raise RobotServerError(
@@ -67,8 +73,6 @@ class PipetteOffsetCalibrationUserFlow:
         self._deck = deck.Deck(load_name=deck_load_name)
 
         self._saved_offset_this_session = False
-        self._current_state = State.sessionStarted
-        self._state_machine = PipetteOffsetCalibrationStateMachine()
 
         point_one_pos = \
             self._deck.get_calibration_position(POINT_ONE_ID).position
@@ -81,11 +85,22 @@ class PipetteOffsetCalibrationUserFlow:
         self._has_calibrated_tip_length: bool =\
             (self._get_stored_tip_length_cal() is not None)
 
+        if self._has_calibrated_tip_length:
+            self._state_machine: PipetteOffsetStateMachine =\
+                PipetteOffsetCalibrationStateMachine()
+            self._state: GenericState = POCState  # type: ignore
+        else:
+            self._state_machine =\
+                PipetteOffsetWithTipLengthStateMachine()
+            self._state = POWTState  # type: ignore
+        self._current_state = self._state.sessionStarted
+
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
             CalibrationCommand.set_has_calibration_block:
                 self.set_has_calibration_block,
-            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,
+            CalibrationCommand.move_to_reference_point:
+                self.move_to_reference_point,
             CalibrationCommand.jog: self.jog,
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
@@ -101,7 +116,12 @@ class PipetteOffsetCalibrationUserFlow:
         return self._hardware
 
     @property
-    def current_state(self) -> State:
+    def current_state(self) -> GenericState:
+        # Currently, mypy can't interpret enum
+        # values being saved as variables. Although
+        # using python's built-in typing methods
+        # correctly reveals that this is an enum,
+        # mypy believes it is a string.
         return self._current_state
 
     @property
@@ -120,7 +140,7 @@ class PipetteOffsetCalibrationUserFlow:
     def get_required_labware(self) -> List[RequiredLabware]:
         return [RequiredLabware.from_lw(self._tip_rack)]
 
-    def _set_current_state(self, to_state: State):
+    def _set_current_state(self, to_state: GenericState):
         self._current_state = to_state
 
     def _get_tip_rack_lw(self) -> labware.Labware:
@@ -168,14 +188,14 @@ class PipetteOffsetCalibrationUserFlow:
         if self._has_calibration_block:
             self._load_calibration_block()
         else:
-            self._deck[CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['slot']] = None  # noqa: E501
+            self._deck[CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['slot']] = None  # type: ignore  # noqa(E501)
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
                                       delta=Point(*vector))
 
     async def move_to_tip_rack(self):
-        if self._current_state == State.labwareLoaded and \
+        if self._current_state == self._state.labwareLoaded and \
                 not self._has_calibrated_tip_length:
             self._flag_unmet_transition_req(
                 command_handler="move_to_tip_rack",
@@ -242,11 +262,11 @@ class PipetteOffsetCalibrationUserFlow:
 
     async def move_to_deck(self):
         if not self._has_calibrated_tip_length and \
-                self._current_state == State.inspectingTip:
+                self._current_state == self._state.inspectingTip:
             self._flag_unmet_transition_req(
                 command_handler="move_to_deck",
                 unmet_condition="tip length calibration data exists")
-        if self._current_state == State.calibrationComplete:
+        if self._current_state == self._state.calibrationComplete:
             # recache tip length cal which has just been saved
             self._has_calibrated_tip_length =\
                 (self._get_stored_tip_length_cal() is not None)
@@ -272,9 +292,9 @@ class PipetteOffsetCalibrationUserFlow:
 
     async def save_offset(self):
         cur_pt = await self._get_current_point(critical_point=None)
-        if self.current_state == State.joggingToDeck:
+        if self.current_state == self._state.joggingToDeck:
             self._z_height_reference = cur_pt.z
-        elif self._current_state == State.savingPointOne:
+        elif self._current_state == self._state.savingPointOne:
             if self._hw_pipette.config.channels > 1:
                 cur_pt = await self._get_current_point(
                     critical_point=CriticalPoint.FRONT_NOZZLE)
@@ -288,9 +308,11 @@ class PipetteOffsetCalibrationUserFlow:
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri)
             self._saved_offset_this_session = True
-        elif self._current_state == State.measuringNozzleOffset:
+        elif isinstance(self._state, POWTState)\
+                and self._current_state == self._state.measuringNozzleOffset:
             self._nozzle_height_at_reference = cur_pt.z
-        elif self._current_state == State.measuringTipOffset:
+        elif isinstance(self._state, POWTState)\
+                and self._current_state == self._state.measuringTipOffset:
             assert self._hw_pipette.has_tip
             assert self._nozzle_height_at_reference is not None
             # set critical point explicitly to nozzle
@@ -303,8 +325,8 @@ class PipetteOffsetCalibrationUserFlow:
 
     async def move_to_reference_point(self):
         if self._has_calibrated_tip_length and \
-                self._current_state in (State.labwareLoaded,
-                                        State.inspectingTip):
+                self._current_state in (self._state.labwareLoaded,
+                                        self._state.inspectingTip):
             self._flag_unmet_transition_req(
                 command_handler="move_to_reference_point",
                 unmet_condition="missing tip length calibration")

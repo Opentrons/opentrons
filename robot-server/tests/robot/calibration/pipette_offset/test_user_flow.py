@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
 from opentrons.calibration_storage import modify, helpers
 from opentrons.types import Mount, Point
@@ -10,6 +10,8 @@ from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
+from robot_server.robot.calibration.pipette_offset.constants import\
+    PipetteOffsetCalibrationState as POCState
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
 
@@ -100,6 +102,7 @@ def mock_hw(hardware):
     hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
+
     return hardware
 
 
@@ -107,17 +110,27 @@ def mock_hw(hardware):
 def mock_user_flow(mock_hw):
     mount = next(k for k, v in
                  mock_hw._attached_instruments.items() if v)
-    m = PipetteOffsetCalibrationUserFlow(hardware=mock_hw, mount=mount)
 
-    yield m
+    mock_stored_tip_length = MagicMock(return_value=30)
+    with patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            '_get_stored_tip_length_cal',
+            new=mock_stored_tip_length):
+        m = PipetteOffsetCalibrationUserFlow(hardware=mock_hw, mount=mount)
+        yield m
 
 
 hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
-    (CalibrationCommand.jog, 'preparingPipette', stub_jog_data, 'move_rel'),
-    (CalibrationCommand.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
-    (CalibrationCommand.move_to_deck, 'inspectingTip', {}, 'move_to'),
-    (CalibrationCommand.move_to_point_one, 'joggingToDeck', {}, 'move_to'),
-    (CalibrationCommand.move_to_tip_rack, 'labwareLoaded', {}, 'move_to'),
+    (CalibrationCommand.jog, POCState.preparingPipette,
+     stub_jog_data, 'move_rel'),
+    (CalibrationCommand.pick_up_tip, POCState.preparingPipette,
+     {}, 'pick_up_tip'),
+    (CalibrationCommand.move_to_deck, POCState.inspectingTip,
+     {}, 'move_to'),
+    (CalibrationCommand.move_to_point_one, POCState.joggingToDeck,
+     {}, 'move_to'),
+    (CalibrationCommand.move_to_tip_rack, POCState.labwareLoaded,
+     {}, 'move_to'),
 ]
 
 

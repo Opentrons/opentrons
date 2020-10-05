@@ -4,7 +4,6 @@ from typing import (
     TYPE_CHECKING)
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
-from opentrons.calibration_storage import modify
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import deck

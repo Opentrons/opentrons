@@ -16,7 +16,8 @@ from .constants import STATE_WILDCARD, CAL_BLOCK_SETUP_BY_MOUNT, \
     MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET
 from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
-from .pipette_offset.constants import PipetteOffsetCalibrationState
+from .pipette_offset.constants import (
+    PipetteOffsetCalibrationState, PipetteOffsetWithTipLengthCalibrationState)
 from .deck.constants import DeckCalibrationState
 
 if TYPE_CHECKING:
@@ -25,7 +26,8 @@ if TYPE_CHECKING:
     from .pipette_offset.user_flow import PipetteOffsetCalibrationUserFlow
 
 ValidState = Union[TipCalibrationState, DeckCalibrationState,
-                   PipetteOffsetCalibrationState]
+                   PipetteOffsetCalibrationState,
+                   PipetteOffsetWithTipLengthCalibrationState]
 
 
 class StateTransitionError(RobotServerError):
@@ -154,8 +156,8 @@ async def move(user_flow: CalibrationUserFlow, to_loc: Location):
 
 
 def get_reference_location(mount: Mount,
-                                 deck: Deck,
-                                 has_calibration_block: bool) -> Location:
+                           deck: Deck,
+                           has_calibration_block: bool) -> Location:
     """
     Get location of static z reference point.
     Will be on Calibration Block if available, otherwise will be on
