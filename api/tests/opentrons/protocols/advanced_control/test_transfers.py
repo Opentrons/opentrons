@@ -1200,3 +1200,116 @@ def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
         {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
     for step, expected in zip(consd_plan, exp2):
         assert step == expected
+
+
+def test_blowout_to_source(_instr_labware):
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+    API_VERSION = APIVersion(2, 6)
+
+    # ========== Transfer ===========
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            disposal_volume=_instr_labware['instr'].min_volume,
+            blow_out_strategy=tx.BlowOutStrategy.SOURCE))
+
+    dist_plan = tx.TransferPlan(
+        30, [lw1['A1'], lw1['A2']], [lw2['B1'], lw2['B2']],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION,
+        options=options)
+
+    exp = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [30, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [30, lw2['B1'], 1.0], 'kwargs': {}},
+        {'method': 'blow_out', 'args': [lw1['A1']], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [30, lw1['A2'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [30, lw2['B2'], 1.0], 'kwargs': {}},
+        {'method': 'blow_out', 'args': [lw1['A2']], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(dist_plan, exp):
+        assert step == expected
+
+    # ========== Distribute ===========
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            disposal_volume=_instr_labware['instr'].min_volume,
+            blow_out_strategy=tx.BlowOutStrategy.SOURCE))
+
+    dist_plan = tx.TransferPlan(
+        30, lw1.columns()[0][0], lw2.rows()[0][1:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION,
+        options=options)
+
+    exp = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [90, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [30, lw2['A2'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [30, lw2['A3'], 1.0], 'kwargs': {}},
+        {'method': 'blow_out', 'args': [lw1['A1']], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(dist_plan, exp):
+        assert step == expected
+
+
+def test_blowout_to_dest(_instr_labware):
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+    API_VERSION = APIVersion(2, 6)
+
+    # ========== Transfer ===========
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            disposal_volume=_instr_labware['instr'].min_volume,
+            blow_out_strategy=tx.BlowOutStrategy.DEST))
+
+    dist_plan = tx.TransferPlan(
+        30, [lw1['A1'], lw1['A2']], [lw2['B1'], lw2['B2']],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION,
+        options=options)
+
+    exp = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [30, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [30, lw2['B1'], 1.0], 'kwargs': {}},
+        {'method': 'blow_out', 'args': [lw2['B1']], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [30, lw1['A2'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [30, lw2['B2'], 1.0], 'kwargs': {}},
+        {'method': 'blow_out', 'args': [lw2['B2']], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(dist_plan, exp):
+        assert step == expected
+
+    # ========== Consolidate ===========
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            blow_out_strategy=tx.BlowOutStrategy.DEST))
+
+    dist_plan = tx.TransferPlan(
+        30, lw2.rows()[0][1:3], lw1.columns()[0][0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        api_version=API_VERSION,
+        options=options)
+
+    exp = [
+        {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [30, lw2['A2'], 1.0], 'kwargs': {}},
+        {'method': 'aspirate', 'args': [30, lw2['A3'], 1.0], 'kwargs': {}},
+        {'method': 'dispense', 'args': [60, lw1['A1'], 1.0], 'kwargs': {}},
+        {'method': 'blow_out', 'args': [lw1['A1']], 'kwargs': {}},
+        {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    for step, expected in zip(dist_plan, exp):
+        assert step == expected

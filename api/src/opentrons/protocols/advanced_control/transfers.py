@@ -721,11 +721,8 @@ class TransferPlan:
             if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
                 yield self._format_dict('touch_tip',
                                         kwargs=self._touch_tip_opts)
-            if self._strategy.blow_out_strategy == BlowOutStrategy.TRASH or \
-                    self._strategy.disposal_volume:
-                yield self._format_dict('blow_out', [
-                    self._instr.trash_container.wells()[0]])
-            elif self._strategy.blow_out_strategy == \
+
+            if self._strategy.blow_out_strategy == \
                     BlowOutStrategy.SOURCE:
                 yield self._format_dict('blow_out', [src])
             elif self._strategy.blow_out_strategy \
@@ -734,6 +731,10 @@ class TransferPlan:
             elif self._strategy.blow_out_strategy == \
                     BlowOutStrategy.CUSTOM_LOCATION:
                 yield self._format_dict('blow_out', kwargs=self._blow_opts)
+            elif self._strategy.blow_out_strategy == BlowOutStrategy.TRASH or \
+                    self._strategy.disposal_volume:
+                yield self._format_dict('blow_out', [
+                    self._instr.trash_container.wells()[0]])
         else:
             # Used by distribute
             if self._strategy.air_gap:
