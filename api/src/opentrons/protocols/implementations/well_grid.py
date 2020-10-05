@@ -1,13 +1,15 @@
 import re
 from collections import defaultdict
-from typing import List, Dict, NamedTuple, Generic, TypeVar, Sequence
+from dataclasses import dataclass
+from typing import List, Dict, Generic, TypeVar, Sequence
 
 T = TypeVar('T')
 
 HeaderToList = Dict[str, List[T]]
 
 
-class Grid(NamedTuple):
+@dataclass
+class Grid:
     rows: HeaderToList
     columns: HeaderToList
 
@@ -82,7 +84,8 @@ class WellGrid(Generic[T]):
         for index, well in enumerate(wells):
             well_name, well_object = well
             match = WellGrid.pattern.match(well_name)
-            assert match, 'could not match well name pattern'
+            assert match, f"could not match '{well_name}' using " \
+                          f"pattern '{WellGrid.pattern.pattern}'"
             rows[match.group(1)].append(well_object)
             columns[match.group(2)].append(well_object)
         # copy to a non-default-dict
