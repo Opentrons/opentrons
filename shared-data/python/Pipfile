@@ -14,8 +14,9 @@ pylama = "*"
 twine = "==2.0.0"
 wheel = "==0.30.0"
 "e1839a8" = {editable = true, path = "."}
-pytest = "*"
-typeguard = "*"
+pytest = "==6.1.0"
+pytest-watch = "~=4.2.0"
+typeguard = "==2.7.1"
 
 [packages]
 jsonschema = "==3.0.2"

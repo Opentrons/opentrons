@@ -10,7 +10,8 @@ aiohttp = "==3.4.4"
 
 [dev-packages]
 pylama = "*"
-pytest = "*"
+pytest = "==6.1.0"
+pytest-watch = "~=4.2.0"
 pytest-cov = "*"
 pytest-aiohttp = "*"
 twine = ">=1.12.0"
