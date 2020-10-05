@@ -26,6 +26,8 @@ export function FilterManufacturerComponent(
     label: MANUFACTURER_VALUES[value] || value,
   }))
 
+  options.push({ options: [{ label: 'Other', value: 'other' }] })
+
   return (
     <label className={styles.filter_manufacturer}>
       <p className={styles.filter_label}>{MANUFACTURER}</p>

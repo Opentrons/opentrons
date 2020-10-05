@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`NoResults component renders 1`] = `
-<p
-  className="no_results"
->
-  No results found
-</p>
-`;

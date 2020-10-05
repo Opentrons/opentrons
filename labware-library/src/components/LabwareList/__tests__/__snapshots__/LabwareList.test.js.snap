@@ -11743,5 +11743,8 @@ exports[`LabwareList component renders 1`] = `
     }
     key="fixture/fixture_tiprack_300_ul/1"
   />
+  <CustomLabwareCard
+    isResultsEmpty={false}
+  />
 </ul>
 `;

@@ -5,7 +5,6 @@ import { shallow } from 'enzyme'
 
 import { LabwareList } from '..'
 import { LabwareCard } from '../LabwareCard'
-import { NoResults } from '../NoResults'
 import * as definitions from '../../../definitions'
 
 import type { LabwareList as LabwareListType } from '../../../types'
@@ -40,14 +39,5 @@ describe('LabwareList', () => {
     const tree = shallow(<LabwareList filters={filtersOff} />)
 
     expect(tree.find(LabwareCard)).toHaveLength(getAllDefinitions().length)
-  })
-
-  it('renders <NoResults> without <ul> if everything filtered out', () => {
-    getAllDefinitions.mockReturnValueOnce([])
-
-    const tree = shallow(<LabwareList filters={filtersOff} />)
-
-    expect(tree.find('ul')).toHaveLength(0)
-    expect(tree.find(NoResults)).toHaveLength(1)
   })
 })

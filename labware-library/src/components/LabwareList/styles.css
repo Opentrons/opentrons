@@ -4,6 +4,21 @@
 @import '../../styles/shadows.css';
 @import '../../styles/spacing.css';
 
+:root {
+  --link-btn: {
+    display: block;
+    width: 100%;
+    margin: 1.5rem 0 0.5rem;
+    padding: 1rem;
+    border-radius: 3px;
+    font-size: var(--fs-body-2);
+    text-align: center;
+    font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+}
+
 .card {
   display: block;
   width: 100%;
@@ -80,11 +95,44 @@
   border: var(--bd-light);
 }
 
-.no_results {
-  @apply --font-header-dark;
+.custom_labware_card {
+  display: block;
+  width: 100%;
+  margin: 0 auto var(--spacing-7) auto;
+  padding: var(--spacing-5);
+}
 
-  margin-top: var(--spacing-7);
-  text-align: center;
+.custom_labware_text {
+  font-size: var(--fs-header);
+  color: var(--c-blue);
+  font-weight: var(--fw-semibold);
+}
+
+.btn_blue {
+  @apply --link-btn;
+
+  background-color: var(--c-blue);
+  color: white;
+
+  &:visited {
+    color: white;
+  }
+
+  &:hover {
+    background-color: #00f;
+    color: white;
+  }
+}
+
+.btn_white {
+  @apply --link-btn;
+
+  border: 1px solid var(--c-blue);
+  color: var(--c-blue);
+
+  &:visited {
+    color: var(--c-blue);
+  }
 }
 
 @media (--small) {
@@ -109,15 +157,11 @@
   .card {
     margin-top: 0;
   }
-
-  .no_results {
-    /* shift left for perceived centering */
-    transform: translateX(calc(-1 * var(--spacing-7)));
-  }
 }
 
 @media (--large) {
-  .card {
+  .card,
+  .custom_labware_card {
     display: inline-block;
     vertical-align: top;
     width: calc(50% - 0.5 * var(--spacing-7));
@@ -127,10 +171,5 @@
     &:nth-child(even) {
       margin-right: 0;
     }
-  }
-
-  .no_results {
-    /* increase shift on large for better perceived centering */
-    transform: translateX(calc(-2 * var(--spacing-7)));
   }
 }
