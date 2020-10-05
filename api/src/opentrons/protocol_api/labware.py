@@ -457,15 +457,12 @@ class Labware(DeckItem):
 
         :return: A list of row lists
         """
-        row_dict = self._well_name_grid.get_rows()
-        keys = self._well_name_grid.row_headers()
-
         if not args:
-            res = [row_dict[key] for key in keys]
+            res = self._well_name_grid.get_rows()
         elif isinstance(args[0], int):
-            res = [row_dict[keys[idx]] for idx in args]
+            res = [self._well_name_grid.get_rows()[idx] for idx in args]
         elif isinstance(args[0], str):
-            res = [row_dict[idx] for idx in args]
+            res = [self._well_name_grid.get_row(idx) for idx in args]
         else:
             raise TypeError
         return res
@@ -481,8 +478,7 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by row name
         """
-        row_dict = self._well_name_grid.get_rows()
-        return row_dict
+        return self._well_name_grid.get_row_dict()
 
     @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
@@ -509,15 +505,12 @@ class Labware(DeckItem):
 
         :return: A list of column lists
         """
-        col_dict = self._well_name_grid.get_columns()
-        keys = sorted(col_dict, key=lambda x: int(x))
-
         if not args:
-            res = [col_dict[key] for key in keys]
+            res = self._well_name_grid.get_columns()
         elif isinstance(args[0], int):
-            res = [col_dict[keys[idx]] for idx in args]
+            res = [self._well_name_grid.get_columns()[idx] for idx in args]
         elif isinstance(args[0], str):
-            res = [col_dict[idx] for idx in args]
+            res = [self._well_name_grid.get_column(idx) for idx in args]
         else:
             raise TypeError
         return res
@@ -534,9 +527,7 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by column name
         """
-        col_dict = self._well_name_grid.get_columns()
-        # Convert to wells from indexes
-        return col_dict
+        return self._well_name_grid.get_column_dict()
 
     @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:

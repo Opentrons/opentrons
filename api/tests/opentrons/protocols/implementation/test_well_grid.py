@@ -14,7 +14,12 @@ CRAZY_SHAPE = [
     "B2", "C2",
     "B3",
     "A4", "C4", "D4",
-  ]
+]
+TWELVE_BY_TWELVE_GRID = [
+    [f'{c}{r}' for c in [chr(65 + i) for i in range(12)]] for r in range(1, 13)
+]
+# Flatten to a list of well names
+TWELVE_BY_TWELVE = [n for x in TWELVE_BY_TWELVE_GRID for n in x]
 
 
 @pytest.mark.parametrize(
@@ -23,7 +28,9 @@ CRAZY_SHAPE = [
         [NONE, []],
         [ONE_VAL, ['A']],
         [NORMAL, ['A', 'B', 'C']],
-        [CRAZY_SHAPE, ['A', 'B', 'C', 'D']]
+        [CRAZY_SHAPE, ['A', 'B', 'C', 'D']],
+        [TWELVE_BY_TWELVE, ['A', 'B', 'C', 'D', 'E', 'F',
+                            'G', 'H', 'I', 'J', 'K', 'L']]
     ])
 def test_row_headers(names, expected):
     assert WellGrid(names, list(range(len(names)))).row_headers() == expected
@@ -43,8 +50,29 @@ def test_row_headers(names, expected):
             "A": [0, 6],
             "B": [1, 3, 5],
             "C": [2, 4, 7],
-            "D": [8],
-        }]])
+            "D": [8]}],
+    ])
+def test_row_dict(names, expected):
+    grid = WellGrid(names, list(range(len(names))))
+    assert grid.get_row_dict() == expected
+
+
+@pytest.mark.parametrize(
+    argnames=["names", "expected"],
+    argvalues=[
+        [NONE, []],
+        [ONE_VAL, [[0]]],
+        [NORMAL, [
+            [0, 3, 6, 9],
+            [1, 4, 7, 10],
+            [2, 5, 8, 11],
+        ]],
+        [CRAZY_SHAPE, [
+            [0, 6],
+            [1, 3, 5],
+            [2, 4, 7],
+            [8],
+        ]]])
 def test_rows(names, expected):
     grid = WellGrid(names, list(range(len(names))))
     assert grid.get_rows() == expected
@@ -56,8 +84,10 @@ def test_rows(names, expected):
         [NONE, []],
         [ONE_VAL, ['1']],
         [NORMAL, ['1', '2', '3', '4']],
-        [CRAZY_SHAPE, ['1', '2', '3', '4']]
-    ])
+        [CRAZY_SHAPE, ['1', '2', '3', '4']],
+        [TWELVE_BY_TWELVE, ['1', '2', '3', '4', '5', '6',
+                            '7', '8', '9', '10', '11', '12']]
+        ])
 def test_column_headers(names, expected):
     grid = WellGrid(names, list(range(len(names))))
     assert grid.column_headers() == expected
@@ -81,9 +111,54 @@ def test_column_headers(names, expected):
             '4': [6, 7, 8]
         }]
     ])
+def test_column_dict(names, expected):
+    grid = WellGrid(names, list(range(len(names))))
+    assert grid.get_column_dict() == expected
+
+
+@pytest.mark.parametrize(
+    argnames=["names", "expected"],
+    argvalues=[
+        [NONE, []],
+        [ONE_VAL, [[0]]],
+        [NORMAL, [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [9, 10, 11],
+        ]],
+        [CRAZY_SHAPE, [
+            [0, 1, 2],
+            [3, 4],
+            [5],
+            [6, 7, 8]
+        ]]
+    ])
 def test_columns(names, expected):
     grid = WellGrid(names, list(range(len(names))))
     assert grid.get_columns() == expected
+
+
+@pytest.mark.parametrize(argnames=["column", "expected"],
+                         argvalues=[
+                             ["2", [3, 4, 5]],
+                             ["1000", []]
+                         ])
+def test_column(column, expected):
+    names = NORMAL
+    grid = WellGrid(names, list(range(len(names))))
+    assert grid.get_column(column) == expected
+
+
+@pytest.mark.parametrize(argnames=["row", "expected"],
+                         argvalues=[
+                             ["B", [1, 4, 7, 10]],
+                             ["X", []]
+                         ])
+def test_row(row, expected):
+    names = NORMAL
+    grid = WellGrid(names, list(range(len(names))))
+    assert grid.get_row(row) == expected
 
 
 def test_well_pattern():
