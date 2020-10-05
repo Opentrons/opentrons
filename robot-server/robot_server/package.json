@@ -2,6 +2,9 @@
   "name": "@opentrons/robot-server",
   "version": "3.21.0",
   "description": "HTTP server for Opentrons robots",
+  "config": {
+    "versionTagPrefix": "v"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git"

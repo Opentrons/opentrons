@@ -3,6 +3,9 @@
   "version": "3.21.0",
   "description": "Opentrons desktop application UI",
   "main": "src/index.js",
+  "config": {
+    "versionTagPrefix": "v"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git"

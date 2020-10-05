@@ -43,80 +43,18 @@ Examples:
 - 3.0.0-beta.3  ->  3.0.0-beta.4-dev.1+bc625168e
 `
 
-// TODO(mc, 2020-10-02): pull from filesystem somehow? this information
-// is redundant with other sources of truth in the repository
-const PROJECTS = [
-  {
-    name: '@opentrons/api-server',
-    manifestPath: 'api/src/opentrons/package.json',
-    tagPrefix: null,
-  },
-  {
-    name: '@opentrons/app',
-    manifestPath: 'app/package.json',
-    tagPrefix: null,
-  },
-  {
-    name: '@opentrons/app-shell',
-    manifestPath: 'app-shell/package.json',
-    tagPrefix: null,
-  },
-  {
-    name: '@opentrons/components',
-    manifestPath: 'components/package.json',
-    tagPrefix: null,
-  },
-  {
-    name: '@opentrons/discovery-client',
-    manifestPath: 'discovery-client/package.json',
-    tagPrefix: null,
-  },
-  {
-    name: 'labware-designer',
-    manifestPath: 'labware-designer/package.json',
-    tagPrefix: null,
-  },
-  {
-    name: '@opentrons/labware-library',
-    manifestPath: 'labware-library/package.json',
-    tagPrefix: 'labware-library@',
-  },
-  {
-    name: 'protocol-designer',
-    manifestPath: 'protocol-designer/package.json',
-    tagPrefix: 'protocol-designer@',
-  },
-  {
-    name: 'protocol-library-kludge',
-    manifestPath: 'protocol-library-kludge/package.json',
-    tagPrefix: 'protocol-designer@',
-  },
-  {
-    name: '@opentrons/robot-server',
-    manifestPath: 'robot-server/robot_server/package.json',
-    tagPrefix: null,
-  },
-  {
-    name: '@opentrons/shared-data',
-    manifestPath: 'shared-data/package.json',
-    tagPrefix: null,
-  },
-  {
-    name: '@opentrons/update-server',
-    manifestPath: 'update-server/otupdate/package.json',
-    tagPrefix: null,
-  },
-  {
-    name: '@opentrons/webpack-config',
-    manifestPath: 'webpack-config/package.json',
-    tagPrefix: null,
-  },
+// TODO(mc, 2020-10-05): this will require rethinking if/when Python projects
+// stop using package.json for versioning, which will be a good thing to do
+const { workspaces } = require('../package.json')
+
+const DEFAULT_VERSION = '0.0.0-dev'
+const PACKAGE_JSON_DEP_SECTIONS = [
+  'dependencies',
+  'devDependencies',
+  'peerDependencies',
+  'optionalDependencies',
 ]
 
-const DEFAULT_PREFIX = 'v'
-const DEFAULT_VERSION = '0.0.0-dev'
-// TODO(mc, 2020-10-02): support toml
-const RE_CURRENT_VERSION = /"version": "([a-z0-9.-]+)"/
 const RE_DESCRIBE_VERSION = new RegExp(
   [
     // capture major (1), minor (2), and patch (3)
@@ -127,9 +65,6 @@ const RE_DESCRIBE_VERSION = new RegExp(
     `(?:-(\\d+)-g([a-z0-9]+))?`,
   ].join('')
 )
-
-// TODO(mc, 2020-10-02): support toml
-const getDepVersionMatcher = depName => new RegExp(`"${depName}": ".+"`, 'g')
 
 const getFilename = ({ manifestPath }) =>
   path.join(__dirname, '..', manifestPath)
@@ -158,7 +93,7 @@ function writeVersionsFromGit(options = {}) {
     return Promise.resolve(0)
   }
 
-  const parseTasks = PROJECTS.map(readManifest)
+  const parseTasks = workspaces.map(readPackageJson)
 
   return Promise.all(parseTasks)
     .then(manifests => {
@@ -182,25 +117,29 @@ function writeVersionsFromGit(options = {}) {
       return 1
     })
 
-  function readManifest(project) {
-    const { name, manifestPath, tagPrefix } = project
+  function readPackageJson(projectPath) {
+    const manifestPath = path.join(projectPath, './package.json')
+    const packageAbsPath = path.join(__dirname, '..', manifestPath)
 
-    return fs.readFile(getFilename(project), 'utf8').then(contents => {
+    return fs.readFile(packageAbsPath, 'utf8').then(fileContents => {
+      const contents = JSON.parse(fileContents)
+      const { name, config } = contents
+      const tagPrefix = config.versionTagPrefix
+
       return Manifest(name, manifestPath, tagPrefix, contents)
     })
   }
 
   function addNextVersionFromGit(manifest) {
     const { tagPrefix } = manifest
-    const prefix = tagPrefix === null ? DEFAULT_PREFIX : manifest.tagPrefix
-    const match = `${prefix}*`
+    const match = `${tagPrefix}*`
 
     if (reset) {
       return { ...manifest, nextVersion: DEFAULT_VERSION }
     }
 
     return exec(`git describe --match ${match}`).then(({ stdout }) => {
-      const gitVersion = stdout.trim().slice(prefix.length)
+      const gitVersion = stdout.trim().slice(tagPrefix.length)
       const gitVersionParts = gitVersion.match(RE_DESCRIBE_VERSION)
       const [, maj, min, patch, preId, preN, commitN, sha] = gitVersionParts
       let nextVersion = gitVersion
@@ -219,16 +158,18 @@ function writeVersionsFromGit(options = {}) {
 
   function updateManifestVersions(manifest, allManifests) {
     const { contents, nextVersion } = manifest
-    let nextContents = contents.replace(
-      RE_CURRENT_VERSION,
-      `"version": "${nextVersion}"`
-    )
+    let nextContents = { ...contents, version: nextVersion }
 
     allManifests.forEach(({ name: depName, nextVersion: depVersion }) => {
-      nextContents = nextContents.replace(
-        getDepVersionMatcher(depName),
-        `"${depName}": "${depVersion}"`
-      )
+      PACKAGE_JSON_DEP_SECTIONS.forEach(sectionName => {
+        const section = nextContents[sectionName]
+        if (section && depName in section) {
+          nextContents = {
+            ...nextContents,
+            [sectionName]: { ...section, [depName]: depVersion },
+          }
+        }
+      })
     })
 
     return { ...manifest, nextContents }
@@ -236,12 +177,12 @@ function writeVersionsFromGit(options = {}) {
 
   function writeManifest(manifest) {
     const { name, manifestPath, nextVersion, nextContents } = manifest
-
+    const nextFileContents = `${JSON.stringify(nextContents, null, 2)}\n`
     console.log(`Updating ${name} with ${nextVersion}`)
 
     if (!dryrun) {
       return fs
-        .writeFile(getFilename(manifest), nextContents)
+        .writeFile(getFilename(manifest), nextFileContents)
         .then(() => console.log(`Wrote ${manifestPath}`))
     }
 

@@ -3,6 +3,9 @@
   "version": "3.21.0",
   "description": "Shareable pieces of webpack configuration",
   "main": "index.js",
+  "config": {
+    "versionTagPrefix": "v"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Opentrons/opentrons.git"

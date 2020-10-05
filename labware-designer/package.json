@@ -1,4 +1,13 @@
 {
+  "name": "labware-designer",
+  "productName": "Opentrons Labware Designer",
+  "private": true,
+  "version": "3.21.0",
+  "description": "Labware Designer",
+  "main": "src/index.js",
+  "config": {
+    "versionTagPrefix": "v"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git"
@@ -7,12 +16,6 @@
     "name": "Opentrons Labworks",
     "email": "engineering@opentrons.com"
   },
-  "name": "labware-designer",
-  "productName": "Opentrons Labware Designer",
-  "private": true,
-  "version": "3.21.0",
-  "description": "Labware Designer",
-  "main": "src/index.js",
   "bugs": {
     "url": "https://github.com/Opentrons/opentrons/issues"
   },

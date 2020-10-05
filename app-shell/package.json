@@ -5,6 +5,9 @@
   "version": "3.21.0",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
+  "config": {
+    "versionTagPrefix": "v"
+  },
   "scripts": {
     "start": "make dev"
   },

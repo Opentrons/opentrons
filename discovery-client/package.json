@@ -7,6 +7,9 @@
     "discovery": "bin/index.js",
     "discovery-ssh": "bin/discovery-ssh"
   },
+  "config": {
+    "versionTagPrefix": "v"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Opentrons/opentrons.git"

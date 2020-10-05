@@ -4,6 +4,9 @@
   "version": "3.21.0",
   "description": "Opentrons standard labware library",
   "main": "src/index.js",
+  "config": {
+    "versionTagPrefix": "labware-library@"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git",
