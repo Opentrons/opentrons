@@ -189,7 +189,7 @@ class Well:
         """
         MODULE_LOG.warning("This method is deprecated. Please use "
                            "'from_center_cartesian' instead.")
-        return self._geometry.from_center_cartesian(x, y, z)
+        return self.from_center_cartesian(x, y, z)
 
     def __repr__(self):
         return self._display_name
