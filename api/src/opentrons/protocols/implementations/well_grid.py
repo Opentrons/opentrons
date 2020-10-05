@@ -3,6 +3,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import List, Dict, Generic, TypeVar, Sequence
 
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
+
 T = TypeVar('T')
 
 HeaderToList = Dict[str, List[T]]
@@ -18,7 +20,7 @@ class WellGrid(Generic[T]):
     """A helper class to access extract row and column information from
     well names"""
 
-    pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
+    pattern = re.compile(WELL_NAME_PATTERN, re.X)
 
     def __init__(self, well_names: Sequence[str], well_objects: Sequence[T]):
         """
