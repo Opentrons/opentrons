@@ -891,7 +891,7 @@ class InstrumentContext(CommandPublisher):
                 "blowout location for consolidate cannot be source well")
         return self.transfer(volume, source, dest, **kwargs)
 
-    @cmds.publish.both(command=cmds.transfer)
+    @cmds.publish.both(command=cmds.transfer)  # noqa(C901)
     @requires_version(2, 0)
     def transfer(self,
                  volume: Union[float, Sequence[float]],
@@ -1012,8 +1012,9 @@ class InstrumentContext(CommandPublisher):
                 blow_out = transfers.BlowOutStrategy.TRASH
             else:
                 raise TypeError(
-                'blowout location should be a "source well", "destination well", or "trash", but it is {}'
-                .format(blowout_location))
+                        'blowout location should be a "source well", "' +
+                        'destination well", or "trash", but it is {}'
+                        .format(blowout_location))
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = self._next_available_tip()

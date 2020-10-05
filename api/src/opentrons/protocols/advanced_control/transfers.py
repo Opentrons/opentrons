@@ -579,10 +579,11 @@ class TransferPlan:
                                               self._strategy.disposal_volume,
                                               self._sources[0])
             for step in asp_grouped:
-                yield from self._dispense_actions(vol=step[0],
-                                                  src=self._sources[0],
-                                                  dest= step[1],
-                                                  is_disp_next= step is not asp_grouped[-1])
+                yield from self._dispense_actions(
+                    vol=step[0],
+                    src=self._sources[0],
+                    dest=step[1],
+                    is_disp_next=step is not asp_grouped[-1])
         yield from self._new_tip_action()
 
     Target = TypeVar('Target')
@@ -687,7 +688,8 @@ class TransferPlan:
             vol += self._strategy.air_gap
         yield self._format_dict('dispense',
                                 [vol, dest, self._options.dispense.rate])
-        yield from self._after_dispense(dest=dest, src=src, is_disp_next=is_disp_next)
+        yield from self._after_dispense(
+            dest=dest, src=src, is_disp_next=is_disp_next)
 
     def _before_aspirate(self, loc):
         if self._strategy.mix_strategy == MixStrategy.BEFORE or \
@@ -726,8 +728,8 @@ class TransferPlan:
                     BlowOutStrategy.SOURCE:
                 yield self._format_dict('blow_out', [src])
             elif self._strategy.blow_out_strategy \
-                   == BlowOutStrategy.DEST:
-                    yield self._format_dict('blow_out', [dest])
+                    == BlowOutStrategy.DEST:
+                yield self._format_dict('blow_out', [dest])
             elif self._strategy.blow_out_strategy == \
                     BlowOutStrategy.CUSTOM_LOCATION:
                 yield self._format_dict('blow_out', kwargs=self._blow_opts)
