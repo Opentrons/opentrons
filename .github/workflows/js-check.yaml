@@ -37,8 +37,27 @@ jobs:
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '12'
+      - name: 'set complex environment variables'
+        id: 'set-vars'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./.yarn-cache
+            ./.npm-cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
       - name: 'setup-js'
-        run: make setup-js
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
       - name: 'lint js'
         run: make lint-js
       - name: 'typechecks'

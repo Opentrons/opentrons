@@ -122,7 +122,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
       {serialNumber && (
         <PipetteOffsetCalibrationControl robotName={robotName} mount={mount} />
       )}
-      {!pipetteOffsetCalibration && (
+      {serialNumber && !pipetteOffsetCalibration && (
         <Flex
           marginTop={SPACING_2}
           alignItems={ALIGN_FLEX_START}

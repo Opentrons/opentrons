@@ -1,0 +1,118 @@
+# This workflow runs tests and lint on pull requests that touch the api/
+# project or its CI configuration.
+
+name: 'API test/lint/deploy'
+
+on:
+  # Most of the time, we run on pull requests, which lets us handle external PRs
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'Makefile'
+      - 'shared-data/*/**'
+      - '!shared-data/js/**'
+  push:
+    paths:
+      - 'api/**'
+      - 'Makefile'
+      - 'shared-data/*/**'
+      - '!shared-data/js/**'
+      - '.github/workflows/api-test-lint-deploy.yaml'
+      - '.github/actions/python/**/*'
+      - '.github/workflows/utils.js'
+    branches:
+      - '*'
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'opentrons package linting'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'api'
+      - name: Lint
+        run: make -C api lint
+  test:
+    name: 'opentrons package tests'
+    needs: [lint]
+    strategy:
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'api'
+      - name: Test
+        run: make -C api test
+      - uses: 'codecov/codecov-action@v1'
+        with:
+          file: ./api/coverage.xml
+
+  deploy:
+    name: 'deploy opentrons package'
+    needs: [test]
+    runs-on: 'ubuntu-latest'
+    if: github.event_name == 'push'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'api'
+      # creds and repository configuration for deploying python wheels
+      - if: ${{ !env.OT_TAG }}
+        name: 'upload to test pypi'
+        uses: './.github/actions/python/pypi-deploy'
+        with:
+          project: 'api'
+          repository_url: 'https://test.pypi.org/legacy/'
+          password: '${{ secrets.OT_TEST_PYPI_PASSWORD }}'
+      - if: startsWith(env.OT_TAG, 'v')
+        name: 'upload to real pypi'
+        uses: './.github/actions/python/pypi-deploy'
+        with:
+          project: 'api'
+          repository_url: 'https://upload.pypi.org/legacy/'
+          password: '${{ secrets.OT_PYPI_PASSWORD }}'
