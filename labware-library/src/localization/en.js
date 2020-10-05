@@ -76,3 +76,10 @@ export const USING_THE_LABWARE_LIBRARY = 'Using the Labware Library'
 export const CREATING_CUSTOM_LABWARE_DEFINITIONS =
   'Creating custom labware definitions'
 export const LABWARE_CREATOR = 'Custom Labware Creator'
+
+export const CUSTOM_LABWARE_PROMPT_NO_RESULTS = 'No results found'
+export const CUSTOM_LABWARE_PROMPT_W_RESULTS = "Don't see your labware here?"
+
+export const CUSTOM_LABWARE_SUPPORT_BTN =
+  'Learn more about creating custom definitions'
+export const LABWARE_CREATOR_BTN = 'Go to the labware creator'

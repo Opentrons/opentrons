@@ -26,7 +26,6 @@ stages:
     request: *get_offsets
     response:
       status_code: 200
-      strict: false
       json:
         meta: null
         links: null
@@ -38,6 +37,8 @@ stages:
               tiprack: !anystr
               lastModified: !anystr
               tiprackUri: !anystr
+              source: 'user'
+              status: !anydict
             id: !anystr
             type: 'PipetteOffsetCalibration'
           - attributes:
@@ -47,6 +48,8 @@ stages:
               tiprack: !anystr
               lastModified: !anystr
               tiprackUri: !anystr
+              source: 'user'
+              status: !anydict
             id: !anystr
             type: 'PipetteOffsetCalibration'
 
@@ -55,10 +58,9 @@ stages:
       url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: GET
       params:
-        pipette: 'pip_1'
+        pipette_id: 'pip_1'
     response:
       status_code: 200
-      strict: false
       json:
         meta: null
         links: null
@@ -70,6 +72,8 @@ stages:
               tiprack: !anystr
               lastModified: !anystr
               tiprackUri: !anystr
+              source: 'user'
+              status: !anydict
             id: !anystr
             type: 'PipetteOffsetCalibration'
 
@@ -81,7 +85,6 @@ stages:
         mount: 'left'
     response:
       status_code: 200
-      strict: false
       json:
         meta: null
         links: null
@@ -93,6 +96,8 @@ stages:
               tiprack: !anystr
               tiprackUri: !anystr
               lastModified: !anystr
+              source: 'user'
+              status: !anydict
             id: !anystr
             type: 'PipetteOffsetCalibration'
 
@@ -101,11 +106,10 @@ stages:
       url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: GET
       params:
-        pipette: 'pip_1'
+        pipette_id: 'pip_1'
         mount: 'left'
     response:
       status_code: 200
-      strict: false
       json:
         meta: null
         links: null
@@ -117,6 +121,8 @@ stages:
               tiprack: !anystr
               lastModified: !anystr
               tiprackUri: !anystr
+              source: 'user'
+              status: !anydict
             id: !anystr
             type: 'PipetteOffsetCalibration'
 
@@ -125,7 +131,7 @@ stages:
       url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: GET
       params:
-        pipette: 'pip_2'
+        pipette_id: 'pip_2'
         mount: 'left'
     response: *no_offset_response
 
@@ -135,14 +141,20 @@ marks: *cal_marks
 stages:
   - name: DELETE request with correct pipette AND mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset?pipette_id=pip_2&mount=right"
+      url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: DELETE
+      params:
+        pipette_id: 'pip_2'
+        mount: 'right'
     response:
         status_code: 200
 
   - name: DELETE request with incorrect pipette AND MOUNT
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset?pipette_id=pip_1&mount=right"
+      url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: DELETE
+      params:
+        pipette_id: 'pip_1'
+        mount: 'right'
     response:
         status_code: 404

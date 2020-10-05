@@ -31,6 +31,14 @@ exports[`FilterManufacturer component renders 1`] = `
           "label": "baz",
           "value": "baz",
         },
+        Object {
+          "options": Array [
+            Object {
+              "label": "Other",
+              "value": "other",
+            },
+          ],
+        },
       ]
     }
     value="all"

@@ -147,8 +147,8 @@ def test_wells_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.wells()[0]._position == a1
-    assert fake_labware.wells()[1]._position == a2
+    assert fake_labware.wells()[0].geometry._position == a1
+    assert fake_labware.wells()[1].geometry._position == a2
 
 
 def test_wells_name_accessor():
@@ -161,8 +161,8 @@ def test_wells_name_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.wells_by_name()['A1']._position == a1
-    assert fake_labware.wells_by_name()['A2']._position == a2
+    assert fake_labware.wells_by_name()['A1'].geometry._position == a1
+    assert fake_labware.wells_by_name()['A2'].geometry._position == a2
 
 
 def test_deprecated_index_accessors():
@@ -183,8 +183,8 @@ def test_dict_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware['A1']._position == a1
-    assert fake_labware['A2']._position == a2
+    assert fake_labware['A1'].geometry._position == a1
+    assert fake_labware['A2'].geometry._position == a2
 
 
 def test_rows_accessor():
@@ -199,8 +199,8 @@ def test_rows_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0] + x1, y=offset[1] + y1, z=offset[2] + depth1)
     b2 = Point(x=offset[0] + x2, y=offset[1] + y2, z=offset[2] + depth2)
-    assert fake_labware.rows()[0][0]._position == a1
-    assert fake_labware.rows()[1][1]._position == b2
+    assert fake_labware.rows()[0][0].geometry._position == a1
+    assert fake_labware.rows()[1][1].geometry._position == b2
 
 
 def test_row_name_accessor():
@@ -215,8 +215,8 @@ def test_row_name_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0] + x1, y=offset[1] + y1, z=offset[2] + depth1)
     b2 = Point(x=offset[0] + x2, y=offset[1] + y2, z=offset[2] + depth2)
-    assert fake_labware.rows_by_name()['A'][0]._position == a1
-    assert fake_labware.rows_by_name()['B'][1]._position == b2
+    assert fake_labware.rows_by_name()['A'][0].geometry._position == a1
+    assert fake_labware.rows_by_name()['B'][1].geometry._position == b2
 
 
 def test_cols_accessor():
@@ -229,8 +229,8 @@ def test_cols_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.columns()[0][0]._position == a1
-    assert fake_labware.columns()[1][0]._position == a2
+    assert fake_labware.columns()[0][0].geometry._position == a1
+    assert fake_labware.columns()[1][0].geometry._position == a2
 
 
 def test_col_name_accessor():
@@ -243,5 +243,5 @@ def test_col_name_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.columns_by_name()['1'][0]._position == a1
-    assert fake_labware.columns_by_name()['2'][0]._position == a2
+    assert fake_labware.columns_by_name()['1'][0].geometry._position == a1
+    assert fake_labware.columns_by_name()['2'][0].geometry._position == a2

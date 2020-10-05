@@ -5,7 +5,7 @@ import * as React from 'react'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { getFilteredDefinitions } from '../../filters'
 import { LabwareCard } from './LabwareCard'
-import { NoResults } from './NoResults'
+import { CustomLabwareCard } from './CustomLabwareCard'
 import styles from './styles.css'
 
 import type { FilterParams } from '../../types'
@@ -14,18 +14,16 @@ export type LabwareListProps = {|
   filters: FilterParams,
 |}
 
-export { NoResults } from './NoResults'
-
 export function LabwareList(props: LabwareListProps): React.Node {
   const definitions = getFilteredDefinitions(props.filters)
 
-  return definitions.length === 0 ? (
-    <NoResults />
-  ) : (
+  return (
     <ul className={styles.list}>
       {definitions.map(d => (
         <LabwareCard key={getLabwareDefURI(d)} definition={d} />
       ))}
+
+      <CustomLabwareCard isResultsEmpty={definitions.length === 0} />
     </ul>
   )
 }

@@ -1,3 +1,5 @@
+from opentrons.protocols.geometry.well_geometry import WellGeometry
+
 from tests.opentrons.protocol_api.test_accessor_fn import minimalLabwareDef2
 from unittest import mock
 from copy import deepcopy
@@ -264,15 +266,17 @@ def test_dispense():
 
 def test_touch_tip():
     location = Location(Point(1, 2, 3), 'deck')
-    well = labware.Well({
-        'shape': 'circular',
-        'depth': 40,
-        'totalLiquidVolume': 100,
-        'diameter': 30,
-        'x': 40,
-        'y': 50,
-        'z': 3},
-        parent=Location(Point(10, 20, 30), 1),
+    well = labware.Well(
+        WellGeometry({
+            'shape': 'circular',
+            'depth': 40,
+            'totalLiquidVolume': 100,
+            'diameter': 30,
+            'x': 40,
+            'y': 50,
+            'z': 3},
+            parent=Location(Point(10, 20, 30), 1)
+        ),
         has_tip=False,
         display_name='some well',
         api_level=MAX_SUPPORTED_VERSION)
