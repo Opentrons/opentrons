@@ -13,7 +13,7 @@ import {
   Text,
   DISPLAY_INLINE_BLOCK,
   FONT_STYLE_ITALIC,
-  FONT_WEIGHT_BOLD,
+  FONT_WEIGHT_SEMIBOLD,
   SPACING_2,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
@@ -89,14 +89,14 @@ export function PipetteOffsetItem(props: Props): React.Node {
       <Text
         as={'h4'}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
-        fontWeight={FONT_WEIGHT_BOLD}
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_2}
       >
         {mount}
       </Text>
       <Text
         textTransform={TEXT_TRANSFORM_UPPERCASE}
-        fontWeight={FONT_WEIGHT_BOLD}
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_2}
       >
         {pipette && pipette.modelSpecs
