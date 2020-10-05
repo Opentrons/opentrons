@@ -189,3 +189,4 @@ Version 2.8
 +++++++++++
 - You can now pass in a list of volumes to distribute and consolidate. See :ref:`distribute-consolidate-volume-list` for more information.
     - Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense
+- :py:meth:`.Well.from_center_cartesian` can be used to find a point within a well using normalized distance from the center in each axis.

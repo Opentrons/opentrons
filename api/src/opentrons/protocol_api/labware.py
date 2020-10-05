@@ -149,7 +149,7 @@ class Well:
         Specifies an arbitrary point in deck coordinates based
         on percentages of the radius in each axis. For example, to specify the
         back-right corner of a well at 1/4 of the well depth from the bottom,
-        the call would be `_from_center_cartesian(1, 1, -0.5)`.
+        the call would be `from_center_cartesian(1, 1, -0.5)`.
 
         No checks are performed to ensure that the resulting position will be
         inside of the well.
