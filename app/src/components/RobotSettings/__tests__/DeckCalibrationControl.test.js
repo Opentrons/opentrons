@@ -4,22 +4,14 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
 import * as Sessions from '../../../sessions'
-import * as Config from '../../../config'
 
-import { LegacyDeckCalibrationControl } from '../LegacyDeckCalibrationControl'
+import { DeckCalibrationControl } from '../DeckCalibrationControl'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
-import type { State } from '../../../types'
 
 jest.mock('../../../robot-api/selectors')
-jest.mock('../../../config/selectors')
 jest.mock('../../../sessions/selectors')
 
-const getFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof Config.getFeatureFlags, State>
-> = Config.getFeatureFlags
-
-describe('ControlsCard', () => {
+describe('DeckCalibrationControl', () => {
   let mockStore
   let render
 
@@ -45,12 +37,10 @@ describe('ControlsCard', () => {
       dispatch: jest.fn(),
     }
 
-    getFeatureFlags.mockReturnValue({})
-
     render = (props = {}) => {
       const {
         robotName = 'robot-name',
-        buttonDisabled = false,
+        buttonDisabled = null,
         deckCalStatus = 'OK',
         deckCalData = {
           type: 'affine',
@@ -64,15 +54,13 @@ describe('ControlsCard', () => {
           pipetteCalibratedWith: null,
           tiprack: null,
         },
-        startLegacyDeckCalibration = () => {},
       } = props
       return mount(
-        <LegacyDeckCalibrationControl
+        <DeckCalibrationControl
           robotName={robotName}
           buttonDisabled={buttonDisabled}
           deckCalStatus={deckCalStatus}
           deckCalData={deckCalData}
-          startLegacyDeckCalibration={startLegacyDeckCalibration}
         />,
         {
           wrappingComponent: Provider,
@@ -86,20 +74,7 @@ describe('ControlsCard', () => {
     jest.resetAllMocks()
   })
 
-  it('button launches legacy deck calibration if feature flag for calibration overhaul is falsy', () => {
-    const wrapper = render()
-    getDeckCalButton(wrapper).invoke('onClick')()
-
-    expect(mockStore.dispatch).not.toHaveBeenCalledWith(
-      Sessions.ensureSession(
-        'robot-name',
-        Sessions.SESSION_TYPE_DECK_CALIBRATION
-      )
-    )
-  })
-
-  it('button launches new deck calibration after confirm if feature flag for calibration overhaul is truthy', () => {
-    getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+  it('button launches new deck calibration after confirm', () => {
     const wrapper = render()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
     getDeckCalButton(wrapper).invoke('onClick')()
@@ -117,8 +92,7 @@ describe('ControlsCard', () => {
     })
   })
 
-  it('button launches new deck calibration and cancel closes if feature flag for calibration overhaul is truthy', () => {
-    getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+  it('button launches new deck calibration and cancel closes', () => {
     const wrapper = render()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
     getDeckCalButton(wrapper).invoke('onClick')()

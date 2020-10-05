@@ -3,14 +3,16 @@ import * as React from 'react'
 import { mount } from 'enzyme'
 
 import * as Calibration from '../../../calibration'
-import { Flex, Icon, COLOR_ERROR } from '@opentrons/components'
-import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
+import { Flex, Icon, COLOR_WARNING, COLOR_ERROR } from '@opentrons/components'
+import { LegacyDeckCalibrationWarning } from '../LegacyDeckCalibrationWarning'
 
 import type { DeckCalibrationStatus } from '../../../calibration/types'
 
 describe('Calibration Warning Component', () => {
   const render = (status: DeckCalibrationStatus | null) => {
-    return mount(<DeckCalibrationWarning deckCalibrationStatus={status} />)
+    return mount(
+      <LegacyDeckCalibrationWarning deckCalibrationStatus={status} />
+    )
   }
 
   it('renders nothing when calibration is unknown', () => {
@@ -23,14 +25,15 @@ describe('Calibration Warning Component', () => {
     expect(wrapper).toEqual({})
   })
 
-  it('should render an alert icon in COLOR_ERROR if status is IDENTITY', () => {
+  it('should render an alert icon in COLOR_WARNING if status is IDENTITY', () => {
     const wrapper = render(Calibration.DECK_CAL_STATUS_IDENTITY)
     const parent = wrapper.find(Flex).first()
     const icon = wrapper.find(Icon)
 
-    expect(parent.prop('color')).toBe(COLOR_ERROR)
+    expect(parent.prop('color')).toBe(COLOR_WARNING)
     expect(icon.prop('name')).toEqual('alert-circle')
-    expect(wrapper.html()).toMatch(/required/i)
+    expect(wrapper.html()).toMatch(/not yet been calibrated/i)
+    expect(wrapper.html()).toMatch(/please perform a deck calibration/i)
   })
 
   it('should render an alert icon in COLOR_ERROR if status is SINGULARITY', () => {
@@ -40,7 +43,8 @@ describe('Calibration Warning Component', () => {
 
     expect(parent.prop('color')).toBe(COLOR_ERROR)
     expect(icon.prop('name')).toEqual('alert-circle')
-    expect(wrapper.html()).toMatch(/required/i)
+    expect(wrapper.html()).toMatch(/bad deck calibration detected/i)
+    expect(wrapper.html()).toMatch(/please perform a deck calibration/i)
   })
 
   it('should render an alert icon in COLOR_ERROR if status is BAD_CALIBRATION', () => {
@@ -50,6 +54,7 @@ describe('Calibration Warning Component', () => {
 
     expect(parent.prop('color')).toBe(COLOR_ERROR)
     expect(icon.prop('name')).toEqual('alert-circle')
-    expect(wrapper.html()).toMatch(/required/i)
+    expect(wrapper.html()).toMatch(/bad deck calibration detected/i)
+    expect(wrapper.html()).toMatch(/please perform a deck calibration/i)
   })
 })

@@ -130,7 +130,7 @@ describe('CalibrationCard', () => {
 
     const { wrapper } = render()
 
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(false)
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(null)
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       null
     )
@@ -139,7 +139,9 @@ describe('CalibrationCard', () => {
   it('DC and check cal buttons disabled if not connectable', () => {
     const { wrapper } = render(mockUnconnectableRobot)
 
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(
+      'Cannot connect to robot'
+    )
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Cannot connect to robot'
     )
@@ -154,7 +156,9 @@ describe('CalibrationCard', () => {
 
     const { wrapper } = render(mockRobotNotConnected)
 
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(
+      'Connect to robot to control'
+    )
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Connect to robot to control'
     )
@@ -165,7 +169,9 @@ describe('CalibrationCard', () => {
 
     const { wrapper } = render()
 
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(
+      'Protocol is running'
+    )
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Protocol is running'
     )

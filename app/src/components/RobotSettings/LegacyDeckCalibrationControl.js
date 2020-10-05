@@ -1,35 +1,19 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { format } from 'date-fns'
 import {
   Text,
   SecondaryBtn,
   BORDER_SOLID_LIGHT,
   SPACING_2,
-  SPACING_4,
-  useConditionalConfirm,
-  FONT_STYLE_ITALIC,
 } from '@opentrons/components'
 
-import { getFeatureFlags } from '../../config'
-import * as RobotApi from '../../robot-api'
-import * as Sessions from '../../sessions'
-import { DECK_CAL_STATUS_IDENTITY } from '../../calibration'
-
-import type { State } from '../../types'
 import type {
   DeckCalibrationStatus,
   DeckCalibrationData,
 } from '../../calibration/types'
-import type { SessionCommandString } from '../../sessions/types'
-import type { RequestState } from '../../robot-api/types'
 
-import { Portal } from '../portal'
 import { TitledControl } from '../TitledControl'
-import { CalibrateDeck } from '../CalibrateDeck'
-import { DeckCalibrationWarning } from './DeckCalibrationWarning'
-import { ConfirmStartDeckCalModal } from './ConfirmStartDeckCalModal'
+import { LegacyDeckCalibrationWarning } from './LegacyDeckCalibrationWarning'
 import { DeckCalibrationDownload } from './DeckCalibrationDownload'
 
 type Props = {|
@@ -39,28 +23,6 @@ type Props = {|
   deckCalData: DeckCalibrationData | null,
   startLegacyDeckCalibration: () => void,
 |}
-
-const DECK_NEVER_CALIBRATED = "You haven't calibrated the deck yet"
-const LAST_CALIBRATED = 'Last calibrated: '
-
-const buildDeckLastCalibrated: (
-  data: DeckCalibrationData,
-  status: DeckCalibrationStatus
-) => string = (data, status) => {
-  if (status === DECK_CAL_STATUS_IDENTITY) {
-    return DECK_NEVER_CALIBRATED
-  }
-  const datestring =
-    typeof data.lastModified === 'string'
-      ? format(new Date(data.lastModified), 'yyyy-MM-dd HH:mm')
-      : 'unknown'
-  return `${LAST_CALIBRATED} ${datestring}`
-}
-
-// deck calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
-  Sessions.sharedCalCommands.JOG,
-]
 
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
@@ -76,99 +38,6 @@ export function LegacyDeckCalibrationControl(props: Props): React.Node {
     startLegacyDeckCalibration,
   } = props
 
-  const [showWizard, setShowWizard] = React.useState(false)
-
-  const trackedRequestId = React.useRef<string | null>(null)
-  const deleteRequestId = React.useRef<string | null>(null)
-  const createRequestId = React.useRef<string | null>(null)
-
-  const [dispatchRequests] = RobotApi.useDispatchApiRequests(
-    dispatchedAction => {
-      if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
-        createRequestId.current = dispatchedAction.meta.requestId
-      } else if (
-        dispatchedAction.type === Sessions.DELETE_SESSION &&
-        deckCalibrationSession?.id === dispatchedAction.payload.sessionId
-      ) {
-        deleteRequestId.current = dispatchedAction.meta.requestId
-      } else if (
-        dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
-        !spinnerCommandBlockList.includes(
-          dispatchedAction.payload.command.command
-        )
-      ) {
-        trackedRequestId.current = dispatchedAction.meta.requestId
-      }
-    }
-  )
-
-  const showSpinner =
-    useSelector<State, RequestState | null>(state =>
-      trackedRequestId.current
-        ? RobotApi.getRequestById(state, trackedRequestId.current)
-        : null
-    )?.status === RobotApi.PENDING
-
-  const shouldClose =
-    useSelector<State, RequestState | null>(state =>
-      deleteRequestId.current
-        ? RobotApi.getRequestById(state, deleteRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
-
-  const shouldOpen =
-    useSelector((state: State) =>
-      createRequestId.current
-        ? RobotApi.getRequestById(state, createRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
-
-  const ff = useSelector(getFeatureFlags)
-
-  React.useEffect(() => {
-    if (shouldOpen) {
-      setShowWizard(true)
-      createRequestId.current = null
-    }
-    if (shouldClose) {
-      setShowWizard(false)
-      deleteRequestId.current = null
-    }
-  }, [shouldOpen, shouldClose])
-
-  const handleStartDeckCalSession = () => {
-    dispatchRequests(
-      Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_DECK_CALIBRATION)
-    )
-  }
-
-  const deckCalibrationSession = useSelector((state: State) => {
-    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
-      state,
-      robotName,
-      Sessions.SESSION_TYPE_DECK_CALIBRATION
-    )
-    if (
-      session &&
-      session.sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION
-    ) {
-      return session
-    }
-    return null
-  })
-
-  const {
-    showConfirmation: showConfirmStart,
-    confirm: confirmStart,
-    cancel: cancelStart,
-  } = useConditionalConfirm(() => {
-    handleStartDeckCalSession()
-  }, true)
-
-  const handleButtonClick = ff.enableCalibrationOverhaul
-    ? confirmStart
-    : startLegacyDeckCalibration
-
   return (
     <>
       <TitledControl
@@ -178,52 +47,24 @@ export function LegacyDeckCalibrationControl(props: Props): React.Node {
         control={
           <SecondaryBtn
             width="9rem"
-            onClick={handleButtonClick}
+            onClick={startLegacyDeckCalibration}
             disabled={buttonDisabled}
           >
             {CALIBRATE_BUTTON_TEXT}
           </SecondaryBtn>
         }
       >
-        <DeckCalibrationWarning
+        <LegacyDeckCalibrationWarning
           deckCalibrationStatus={deckCalStatus}
           marginTop={SPACING_2}
         />
-        {ff.enableCalibrationOverhaul ? (
-          deckCalData &&
-          deckCalStatus && (
-            <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
-              {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
-            </Text>
-          )
-        ) : (
-          <DeckCalibrationDownload
-            deckCalibrationStatus={deckCalStatus}
-            deckCalibrationData={deckCalData}
-            robotName={robotName}
-            marginTop={SPACING_2}
-          />
-        )}
+        <DeckCalibrationDownload
+          deckCalibrationStatus={deckCalStatus}
+          deckCalibrationData={deckCalData}
+          robotName={robotName}
+          marginTop={SPACING_2}
+        />
       </TitledControl>
-      {showConfirmStart && (
-        <Portal>
-          <ConfirmStartDeckCalModal
-            confirm={confirmStart}
-            cancel={cancelStart}
-          />
-        </Portal>
-      )}
-      {showWizard && (
-        <Portal>
-          <CalibrateDeck
-            session={deckCalibrationSession}
-            robotName={robotName}
-            closeWizard={() => setShowWizard(false)}
-            dispatchRequests={dispatchRequests}
-            showSpinner={showSpinner}
-          />
-        </Portal>
-      )}
     </>
   )
 }
