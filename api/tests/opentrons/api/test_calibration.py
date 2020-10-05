@@ -358,7 +358,7 @@ async def test_jog_calibrate_bottom_v2(
 
     # Check that the feature flag correctly implements calibrate to bottom
     container = model.container._container
-    height = container.wells()[0]._depth
+    height = container.wells()[0].geometry._depth
     old_bottom = container.wells()[0].bottom().point
 
     main_router.calibration_manager.home(model.instrument)
