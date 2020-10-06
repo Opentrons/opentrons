@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
-from typing import List
+from abc import abstractmethod
+from typing import List, Dict
 
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.implementations.tip_tracker import TipTracker
+from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.protocols.implementations.well_grid import WellGrid
 from opentrons.types import Point
 from opentrons_shared_data.labware.dev_types import LabwareParameters
@@ -66,6 +67,14 @@ class AbstractLabwareImplementation(DeckItem):
 
     @abstractmethod
     def get_well_grid(self) -> WellGrid:
+        ...
+
+    @abstractmethod
+    def get_wells(self) -> List[WellImplementation]:
+        ...
+
+    @abstractmethod
+    def get_wells_by_name(self) -> Dict[str, WellImplementation]:
         ...
 
     @abstractmethod

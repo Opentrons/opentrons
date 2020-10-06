@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
@@ -10,11 +12,13 @@ if TYPE_CHECKING:
 
 class WellImplementation:
 
+    pattern = re.compile(WELL_NAME_PATTERN, re.X)
+
     def __init__(self,
                  well_geometry: WellGeometry,
                  display_name: str,
                  has_tip: bool,
-                 name: str) -> None:
+                 name: str):
         """
         Construct a well
 
@@ -31,6 +35,12 @@ class WellImplementation:
         self._display_name = display_name
         self._has_tip = has_tip
         self._name = name
+
+        match = WellImplementation.pattern.match(name)
+        assert match, f"could not match '{name}' using " \
+                      f"pattern '{WellImplementation.pattern.pattern}'"
+        self._row_name = match.group(1)
+        self._column_name = match.group(2)
         self._geometry = well_geometry
 
     def get_parent(self) -> Labware:
@@ -46,7 +56,19 @@ class WellImplementation:
         return self._display_name
 
     def get_name(self) -> str:
+        """The name of the well (ie A1, A2,... B3,...C10"""
         return self._name
+
+    def get_column_name(self) -> str:
+        """The column portion of the well name"""
+        return self._column_name
+
+    def get_row_name(self) -> str:
+        """The row portion of the well name"""
+        return self._row_name
 
     def get_geometry(self) -> WellGeometry:
         return self._geometry
+
+    def __repr__(self):
+        return self.get_display_name()

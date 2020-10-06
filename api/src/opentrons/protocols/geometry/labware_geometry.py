@@ -1,5 +1,5 @@
 from opentrons.types import Location, Point
-from opentrons_shared_data.labware import LabwareDefinition
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 class LabwareGeometry:

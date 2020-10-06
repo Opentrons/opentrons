@@ -28,7 +28,7 @@ from opentrons.protocols.implementations.interfaces.labware import \
     AbstractLabwareImplementation
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.well import WellImplementation
-from opentrons.types import Location, Point
+from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.api_support.definitions import (
@@ -276,7 +276,7 @@ class Labware(DeckItem):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def parent(self) -> Union['Labware', 'Well', str, 'ModuleGeometry', None]:
+    def parent(self) -> LocationLabware:
         """ The parent of this labware. Usually a slot name.
         """
         return self._implementation.get_geometry().parent.labware
@@ -547,10 +547,14 @@ class Labware(DeckItem):
         """
         assert num_tips > 0, 'Bad call to next_tip: num_tips <= 0'
 
-        return self._implementation.get_tip_tracker().next_tip(
+        well = self._implementation.get_tip_tracker().next_tip(
             num_tips=num_tips,
-            starting_tip=starting_tip
+            starting_tip=starting_tip._impl if starting_tip else None
         )
+        return Well(
+            well_implementation=well,
+            api_level=self._api_version
+        ) if well else None
 
     def use_tips(self, start_well: Well, num_channels: int = 1):
         """
@@ -577,7 +581,7 @@ class Labware(DeckItem):
         fail_if_full = self._api_version < APIVersion(2, 2)
 
         self._implementation.get_tip_tracker().use_tips(
-            start_well=start_well,
+            start_well=start_well._impl,
             num_channels=num_channels,
             fail_if_full=fail_if_full
         )
@@ -600,7 +604,13 @@ class Labware(DeckItem):
         # This logic is the inverse of :py:meth:`next_tip`
         assert num_tips > 0, 'Bad call to previous_tip: num_tips <= 0'
 
-        return self._implementation.get_tip_tracker().previous_tip(num_tips=num_tips)
+        well = self._implementation.get_tip_tracker().previous_tip(
+            num_tips=num_tips
+        )
+        return Well(
+            well_implementation=well,
+            api_level=self._api_version
+        ) if well else None
 
     def return_tips(self, start_well: Well, num_channels: int = 1):
         """

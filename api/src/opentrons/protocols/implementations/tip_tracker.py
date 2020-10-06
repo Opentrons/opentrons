@@ -1,11 +1,15 @@
 from itertools import dropwhile, takewhile
-from typing import Optional, List
+from typing import Optional, Sequence
 
 from opentrons.protocols.implementations.well import WellImplementation
 
 
+Wells = Sequence[WellImplementation]
+WellColumns = Sequence[Wells]
+
+
 class TipTracker:
-    def __init__(self, columns: List[List[WellImplementation]]):
+    def __init__(self, columns: WellColumns):
         self._columns = columns
 
     def next_tip(self,
@@ -26,7 +30,7 @@ class TipTracker:
         :type starting_tip: :py:class:`.Well`
         :return: the :py:class:`.Well` meeting the target criteria, or None
         """
-        columns: List[List[WellImplementation]] = self._columns
+        columns: WellColumns = self._columns
         if starting_tip:
             # Remove columns preceding the one with the pipette's starting tip
             drop_undefined_columns = list(
@@ -38,10 +42,10 @@ class TipTracker:
             columns = drop_undefined_columns
 
         drop_leading_empties = [
-            list(dropwhile(lambda x: not x.has_tip, column))
+            list(dropwhile(lambda x: not x.has_tip(), column))
             for column in columns]
         drop_at_first_gap = [
-            list(takewhile(lambda x: x.has_tip, column))
+            list(takewhile(lambda x: x.has_tip(), column))
             for column in drop_leading_empties]
         long_enough = [
             column for column in drop_at_first_gap if len(column) >= num_tips]
@@ -79,7 +83,7 @@ class TipTracker:
         :param fail_if_full: for backwards compatibility
         """
         # Select the column of the labware that contains the target well
-        target_column: List[WellImplementation] = [
+        target_column: Wells = [
             col for col in self._columns if start_well in col][0]
 
         well_idx = target_column.index(start_well)
@@ -100,11 +104,11 @@ class TipTracker:
         # dirty tips and non-present tips; but until then, we can avoid the
         # exception.
         if fail_if_full:
-            assert all(well.has_tip for well in target_wells),\
+            assert all(well.has_tip() for well in target_wells),\
                 '{} is out of tips'.format(str(self))
 
         for well in target_wells:
-            well.has_tip = False
+            well.set_has_tip(False)
 
     def previous_tip(self, num_tips: int = 1) -> Optional[WellImplementation]:
         """
@@ -120,10 +124,10 @@ class TipTracker:
         """
         columns = self._columns
         drop_leading_filled = [
-            list(dropwhile(lambda x: x.has_tip, column))
+            list(dropwhile(lambda x: x.has_tip(), column))
             for column in columns]
         drop_at_first_gap = [
-            list(takewhile(lambda x: not x.has_tip, column))
+            list(takewhile(lambda x: not x.has_tip(), column))
             for column in drop_leading_filled]
         long_enough = [
             column for column in drop_at_first_gap if len(column) >= num_tips]
@@ -161,7 +165,7 @@ class TipTracker:
         end_idx = min(well_idx + num_channels, len(target_column))
         drop_targets = target_column[well_idx:end_idx]
         for well in drop_targets:
-            if well.has_tip:
+            if well.has_tip():
                 raise AssertionError(f'Well {repr(well)} has a tip')
         for well in drop_targets:
-            well.has_tip = True
+            well.set_has_tip(True)

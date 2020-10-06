@@ -1,5 +1,8 @@
+from typing import List
+
 import pytest
 from opentrons.protocols.implementations.well_grid import WellGrid
+from opentrons.protocols.implementations.well import WellImplementation
 
 NONE: list = []
 ONE_VAL = ["A1"]
@@ -22,6 +25,16 @@ TWELVE_BY_TWELVE_GRID = [
 TWELVE_BY_TWELVE = [n for x in TWELVE_BY_TWELVE_GRID for n in x]
 
 
+def wells_from_names(names: List[str]) -> List[WellImplementation]:
+    return [
+        WellImplementation(
+            well_geometry=None,
+            display_name=None,
+            has_tip=None,
+            name=name
+        ) for name in names]
+
+
 @pytest.mark.parametrize(
     argnames=["names", "expected"],
     argvalues=[
@@ -33,7 +46,7 @@ TWELVE_BY_TWELVE = [n for x in TWELVE_BY_TWELVE_GRID for n in x]
                             'G', 'H', 'I', 'J', 'K', 'L']]
     ])
 def test_row_headers(names, expected):
-    assert WellGrid(names, list(range(len(names)))).row_headers() == expected
+    assert WellGrid(wells_from_names(names)).row_headers() == expected
 
 
 @pytest.mark.parametrize(
@@ -53,8 +66,10 @@ def test_row_headers(names, expected):
             "D": [8]}],
     ])
 def test_row_dict(names, expected):
-    grid = WellGrid(names, list(range(len(names))))
-    assert grid.get_row_dict() == expected
+    l = wells_from_names(names)
+    grid = WellGrid(l)
+    assert grid.get_row_dict() == {k: [l[i] for i in v]
+                                   for k, v in expected.items()}
 
 
 @pytest.mark.parametrize(
@@ -74,8 +89,9 @@ def test_row_dict(names, expected):
             [8],
         ]]])
 def test_rows(names, expected):
-    grid = WellGrid(names, list(range(len(names))))
-    assert grid.get_rows() == expected
+    wells = wells_from_names(names)
+    grid = WellGrid(wells)
+    assert grid.get_rows() == [[wells[i] for i in r] for r in expected]
 
 
 @pytest.mark.parametrize(
@@ -89,7 +105,8 @@ def test_rows(names, expected):
                             '7', '8', '9', '10', '11', '12']]
         ])
 def test_column_headers(names, expected):
-    grid = WellGrid(names, list(range(len(names))))
+    wells = wells_from_names(names)
+    grid = WellGrid(wells)
     assert grid.column_headers() == expected
 
 
@@ -112,8 +129,11 @@ def test_column_headers(names, expected):
         }]
     ])
 def test_column_dict(names, expected):
-    grid = WellGrid(names, list(range(len(names))))
-    assert grid.get_column_dict() == expected
+    wells = wells_from_names(names)
+    grid = WellGrid(wells)
+    assert grid.get_column_dict() == {
+        k: [wells[i] for i in v] for k, v in expected.items()
+    }
 
 
 @pytest.mark.parametrize(
@@ -135,8 +155,9 @@ def test_column_dict(names, expected):
         ]]
     ])
 def test_columns(names, expected):
-    grid = WellGrid(names, list(range(len(names))))
-    assert grid.get_columns() == expected
+    wells = wells_from_names(names)
+    grid = WellGrid(wells)
+    assert grid.get_columns() == [[wells[i] for i in r] for r in expected]
 
 
 @pytest.mark.parametrize(argnames=["column", "expected"],
@@ -146,8 +167,9 @@ def test_columns(names, expected):
                          ])
 def test_column(column, expected):
     names = NORMAL
-    grid = WellGrid(names, list(range(len(names))))
-    assert grid.get_column(column) == expected
+    wells = wells_from_names(names)
+    grid = WellGrid(wells)
+    assert grid.get_column(column) == [wells[i] for i in expected]
 
 
 @pytest.mark.parametrize(argnames=["row", "expected"],
@@ -157,11 +179,6 @@ def test_column(column, expected):
                          ])
 def test_row(row, expected):
     names = NORMAL
-    grid = WellGrid(names, list(range(len(names))))
-    assert grid.get_row(row) == expected
-
-
-def test_well_pattern():
-    assert WellGrid.pattern.match('A1')
-    assert WellGrid.pattern.match('A10')
-    assert not WellGrid.pattern.match('A0')
+    wells = wells_from_names(names)
+    grid = WellGrid(wells)
+    assert grid.get_row(row) == [wells[i] for i in expected]
