@@ -12,6 +12,14 @@ class SessionCreateParams(BaseModel):
         ...,
         description='The mount on which the pipette is attached, left or right'
     )
+    tipLengthLoad: bool = Field(
+        True,
+        description='Whether tiplength for this tiprack should be loaded'
+    )
+    tipRackDefinition: Optional[dict] = Field(
+        None,
+        description='The full labware definition of the tip rack to calibrate.'
+    )
 
 
 class PipetteOffsetCalibrationSessionStatus(BaseModel):

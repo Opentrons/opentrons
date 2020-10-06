@@ -1,4 +1,4 @@
-from typing import Awaitable
+from typing import Awaitable, cast, TYPE_CHECKING
 from opentrons.types import Mount
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
@@ -13,6 +13,9 @@ from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
 from ..models.session import SessionType, SessionDetails
 from ..errors import UnsupportedFeature
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware import LabwareDefinition
 
 
 class PipetteOffsetCalibrationCommandExecutor(CallableExecutor):
@@ -42,6 +45,8 @@ class PipetteOffsetCalibrationSession(BaseSession):
                      instance_meta: SessionMetaData) -> 'BaseSession':
         assert isinstance(instance_meta.create_params, SessionCreateParams)
         mount = instance_meta.create_params.mount
+        load_tip_length = instance_meta.create_params.tipLengthLoad
+        tiprack = instance_meta.create_params.tipRackDefinition
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
@@ -50,7 +55,9 @@ class PipetteOffsetCalibrationSession(BaseSession):
         try:
             pip_offset_cal_user_flow = PipetteOffsetCalibrationUserFlow(
                     hardware=configuration.hardware,
-                    mount=Mount[mount.upper()])
+                    mount=Mount[mount.upper()],
+                    load_tip_length=load_tip_length,
+                    tip_rack_def=cast('LabwareDefinition', tiprack))
         except AssertionError as e:
             raise SessionCreationException(str(e))
 

@@ -215,9 +215,9 @@ class TipCalibrationUserFlow:
 
         if self._has_calibration_block:
             cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
-            self._deck[cb_setup['slot']] = labware.load(
-                cb_setup['load_name'],
-                self._deck.position_for(cb_setup['slot']))
+            self._deck[cb_setup.slot] = labware.load(
+                cb_setup.load_name,
+                self._deck.position_for(cb_setup.slot))
 
     async def _return_tip(self):
         await util.return_tip(self, tip_length=self._get_default_tip_length())

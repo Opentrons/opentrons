@@ -57,6 +57,7 @@ class PipetteOffsetCalibrationUserFlow:
     def __init__(self,
                  hardware: ThreadManager,
                  mount: Mount = Mount.RIGHT,
+                 load_tip_length: bool = True,
                  tip_rack_def: Optional['LabwareDefinition'] = None):
 
         self._hardware = hardware
@@ -85,7 +86,7 @@ class PipetteOffsetCalibrationUserFlow:
         self._has_calibrated_tip_length: bool =\
             (self._get_stored_tip_length_cal() is not None)
 
-        if self._has_calibrated_tip_length:
+        if self._has_calibrated_tip_length and load_tip_length:
             self._state_machine: PipetteOffsetStateMachine =\
                 PipetteOffsetCalibrationStateMachine()
             self._state: GenericState = POCState  # type: ignore
@@ -188,7 +189,8 @@ class PipetteOffsetCalibrationUserFlow:
         if self._has_calibration_block:
             self._load_calibration_block()
         else:
-            self._deck[CAL_BLOCK_SETUP_BY_MOUNT[self._mount]['slot']] = None  # type: ignore  # noqa(E501)
+            slot = CAL_BLOCK_SETUP_BY_MOUNT[self._mount].slot
+            self._deck[slot] = None  # type: ignore
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
@@ -248,9 +250,9 @@ class PipetteOffsetCalibrationUserFlow:
 
     def _load_calibration_block(self):
         cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
-        self._deck[cb_setup['slot']] = labware.load(
-            cb_setup['load_name'],
-            self._deck.position_for(cb_setup['slot']))
+        self._deck[cb_setup.slot] = labware.load(
+            cb_setup.load_name,
+            self._deck.position_for(cb_setup.slot))
 
     def _flag_unmet_transition_req(self, command_handler: str,
                                    unmet_condition: str):

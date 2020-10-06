@@ -164,8 +164,8 @@ def get_reference_location(mount: Mount,
     flat surface of fixed trash insert.
     """
     if has_calibration_block:
-        slot = CAL_BLOCK_SETUP_BY_MOUNT[mount]['slot']
-        well = CAL_BLOCK_SETUP_BY_MOUNT[mount]['well']
+        slot = CAL_BLOCK_SETUP_BY_MOUNT[mount].slot
+        well = CAL_BLOCK_SETUP_BY_MOUNT[mount].well
         calblock: labware.Labware = deck[slot]  # type: ignore
         calblock_loc = calblock.wells_by_name()[well].top()
         ref_loc = calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)

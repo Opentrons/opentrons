@@ -29,6 +29,13 @@ ALLOWED_SESSIONS = {'check'}
 
 
 @dataclass
+class LabwareInfo:
+    slot: str
+    load_name: str
+    well: str
+
+
+@dataclass
 class LabwareLookUp:
     load_name: str
     alternatives: Set[str]
@@ -79,15 +86,12 @@ MOVE_TO_REF_POINT_SAFETY_BUFFER = Point(0, 0, 5)
 TRASH_WELL = 'A1'
 TRASH_REF_POINT_OFFSET = Point(-57.84, -55, 0)  # offset from center of trash
 
-CAL_BLOCK_SETUP_BY_MOUNT: Dict[Mount, Dict[str, str]] = {
-    Mount.LEFT: {
-        'load_name': 'opentrons_calibrationblock_short_side_right',
-        'slot': '3',
-        'well': 'A1',
-    },
-    Mount.RIGHT: {
-        'load_name': 'opentrons_calibrationblock_short_side_left',
-        'slot': '1',
-        'well': 'A2',
-    }
-}
+CAL_BLOCK_SETUP_BY_MOUNT: Dict[Mount, LabwareInfo] = {
+    Mount.LEFT: LabwareInfo(
+        load_name='opentrons_calibrationblock_short_side_right',
+        slot='3',
+        well='A1'),
+    Mount.RIGHT: LabwareInfo(
+        load_name='opentrons_calibrationblock_short_side_left',
+        slot='1',
+        well='A2')}
