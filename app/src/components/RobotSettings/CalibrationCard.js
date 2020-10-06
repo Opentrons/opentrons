@@ -22,6 +22,7 @@ import {
 } from './constants'
 import { DeckCalibrationControl } from './DeckCalibrationControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
+import { CalibrationCardWarning } from './CalibrationCardWarning'
 import { PipetteOffsets } from './PipetteOffsets'
 
 type Props = {|
@@ -30,11 +31,6 @@ type Props = {|
 |}
 
 const TITLE = 'Robot Calibration'
-
-// TODO: Change these two
-const BAD_DECK_CALIBRATION =
-  'Bad deck calibration detected. Please perform a full deck calibration.'
-const NO_DECK_CALIBRATION = 'Please perform a full deck calibration.'
 
 export function CalibrationCard(props: Props): React.Node {
   const { robot, pipettesPageUrl } = props
@@ -75,24 +71,23 @@ export function CalibrationCard(props: Props): React.Node {
     buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
   }
 
-  let calCheckDisabledReason = buttonDisabledReason
-  if (
-    deckCalStatus === Calibration.DECK_CAL_STATUS_BAD_CALIBRATION ||
-    deckCalStatus === Calibration.DECK_CAL_STATUS_SINGULARITY
-  ) {
-    calCheckDisabledReason = BAD_DECK_CALIBRATION
-  } else if (deckCalStatus === Calibration.DECK_CAL_STATUS_IDENTITY) {
-    calCheckDisabledReason = NO_DECK_CALIBRATION
-  }
+  const warningInsteadOfCalcheck = [
+    Calibration.DECK_CAL_STATUS_SINGULARITY,
+    Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
+    Calibration.DECK_CAL_STATUS_IDENTITY,
+  ].includes(deckCalStatus)
 
   return (
     <Card title={TITLE}>
-      {deckCalStatus !== null && (
+      {warningInsteadOfCalcheck ? (
+        <CalibrationCardWarning />
+      ) : (
         <CheckCalibrationControl
           robotName={robotName}
-          disabledReason={calCheckDisabledReason}
+          disabledReason={buttonDisabledReason}
         />
       )}
+
       <DeckCalibrationControl
         robotName={robotName}
         buttonDisabled={buttonDisabledReason}

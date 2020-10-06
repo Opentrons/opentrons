@@ -5,6 +5,7 @@ import {
   Box,
   Flex,
   Text,
+  FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_BODY_1,
   COLOR_ERROR,
   SIZE_2,
@@ -40,6 +41,7 @@ export function DeckCalibrationWarning({
             fontSize={FONT_SIZE_BODY_1}
             paddingRight={SPACING_1}
             marginRight={SPACING_AUTO}
+            fontWeight={FONT_WEIGHT_SEMIBOLD}
           >
             <Text>{CALIBRATION_REQUIRED}</Text>
           </Box>
