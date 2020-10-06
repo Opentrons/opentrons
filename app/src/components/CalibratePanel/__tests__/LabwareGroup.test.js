@@ -47,11 +47,6 @@ const mockGetModulesBySlot: JestMockFn<
   $Call<typeof robotSelectors.getModulesBySlot, State>
 > = robotSelectors.getModulesBySlot
 
-const mockGetProtocolLabwareList: JestMockFn<
-  [State, string],
-  $Call<typeof getProtocolLabwareList, State, string>
-> = getProtocolLabwareList
-
 const stubTipRacks = [
   ({
     type: 'some_tiprack',
@@ -121,15 +116,24 @@ describe('LabwareGroup', () => {
     mockGetDeckPopulated.mockReturnValue(true)
     mockGetTipracksConfirmed.mockReturnValue(false)
     mockGetModulesBySlot.mockReturnValue({})
-    mockGetProtocolLabwareList.mockReturnValue([
-      ...stubTipRacks,
-      ...stubOtherLabware,
-    ])
-    render = () => {
-      return mount(<LabwareGroup />, {
-        wrappingComponent: Provider,
-        wrappingComponentProps: { store: mockStore },
-      })
+
+    render = (props = {}) => {
+      const {
+        robotName = 'robotName',
+        tipracks = stubTipRacks,
+        otherLabware = stubOtherLabware,
+      } = props
+      return mount(
+        <LabwareGroup
+          robotName={robotName}
+          tipracks={tipracks}
+          otherLabware={otherLabware}
+        />,
+        {
+          wrappingComponent: Provider,
+          wrappingComponentProps: { store: mockStore },
+        }
+      )
     }
   })
 
