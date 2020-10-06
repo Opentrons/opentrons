@@ -138,7 +138,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           >
             {CALIBRATE_OFFSET}
           </SecondaryBtn>
-          <PipetteOffsetCalibrationWizard />
+          {PipetteOffsetCalibrationWizard}
         </>
       )}
       {serialNumber && !pipetteOffsetCalibration && (
