@@ -17,23 +17,15 @@ import type { RequestState } from '../../robot-api/types'
 import { Portal } from '../portal'
 import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
 
-type Props = {|
-  robotName: string,
-  mount: Mount,
-|}
-
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-const BUTTON_TEXT = 'Calibrate offset'
-
 export function useCalibratePipetteOffset(
-  props: Props
+  robotName: string,
+  mount: Mount
 ): [() => void, React.Node] {
-  const { robotName, mount } = props
-
   const [showWizard, setShowWizard] = React.useState(false)
 
   const trackedRequestId = React.useRef<string | null>(null)
@@ -119,12 +111,16 @@ export function useCalibratePipetteOffset(
 
   return [
     handleStartPipOffsetCalSession,
-    <CalibratePipetteOffset
-      session={pipOffsetCalSession}
-      robotName={robotName}
-      closeWizard={() => setShowWizard(false)}
-      showSpinner={showSpinner}
-      dispatchRequests={dispatchRequests}
-    />,
+    showWizard ? (
+      <Portal>
+        <CalibratePipetteOffset
+          session={pipOffsetCalSession}
+          robotName={robotName}
+          closeWizard={() => setShowWizard(false)}
+          showSpinner={showSpinner}
+          dispatchRequests={dispatchRequests}
+        />
+      </Portal>
+    ) : null,
   ]
 }
