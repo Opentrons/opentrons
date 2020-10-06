@@ -4,6 +4,7 @@ import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
 import * as PipetteOffset from '../../../calibration/pipette-offset'
+import * as TipLength from '../../../calibration/tip-length'
 import * as Calibration from '../../../calibration'
 import * as Pipettes from '../../../pipettes'
 import * as Config from '../../../config'
@@ -24,6 +25,8 @@ jest.mock('react-router-dom', () => ({ Link: 'a' }))
 jest.mock('../../../robot/selectors')
 jest.mock('../../../config/selectors')
 jest.mock('../../../calibration/selectors')
+jest.mock('../../../calibration/tip-length/selectors')
+jest.mock('../../../calibration/pipette-offset/selectors')
 jest.mock('../../../sessions/selectors')
 
 jest.mock('../CheckCalibrationControl', () => ({
@@ -111,6 +114,10 @@ describe('CalibrationCard', () => {
     expect(store.dispatch).toHaveBeenNthCalledWith(
       3,
       PipetteOffset.fetchPipetteOffsetCalibrations(mockRobot.name)
+    )
+    expect(store.dispatch).toHaveBeenNthCalledWith(
+      4,
+      TipLength.fetchTipLengthCalibrations(mockRobot.name)
     )
     store.dispatch.mockReset()
     jest.advanceTimersByTime(20000)

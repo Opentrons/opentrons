@@ -3,16 +3,32 @@
 
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { saveAs } from 'file-saver'
 
 import type { Dispatch, State } from '../../types'
 import * as Calibration from '../../calibration'
 import * as PipetteOffset from '../../calibration/pipette-offset'
 import * as Pipettes from '../../pipettes'
+import * as TipLength from '../../calibration/tip-length'
 import { CONNECTABLE } from '../../discovery'
 import type { ViewableRobot } from '../../discovery/types'
 import { selectors as robotSelectors } from '../../robot'
 
-import { useInterval, Card } from '@opentrons/components'
+import {
+  useInterval,
+  Card,
+  ALIGN_BASELINE,
+  FONT_SIZE_BODY_1,
+  Link,
+  Text,
+  Flex,
+  SPACING_3,
+  JUSTIFY_SPACE_BETWEEN,
+  TEXT_TRANSFORM_CAPITALIZE,
+  FONT_WEIGHT_REGULAR,
+  FONT_SIZE_HEADER,
+  C_DARK_GRAY,
+} from '@opentrons/components'
 
 import {
   DECK_CAL_STATUS_POLL_INTERVAL,
@@ -31,6 +47,8 @@ type Props = {|
 |}
 
 const TITLE = 'Robot Calibration'
+
+const DOWNLOAD_CALIBRATION = 'Download your calibration data'
 
 export function CalibrationCard(props: Props): React.Node {
   const { robot, pipettesPageUrl } = props
@@ -52,6 +70,7 @@ export function CalibrationCard(props: Props): React.Node {
     robotName && dispatch(Pipettes.fetchPipettes(robotName))
     robotName &&
       dispatch(PipetteOffset.fetchPipetteOffsetCalibrations(robotName))
+    robotName && dispatch(TipLength.fetchTipLengthCalibrations(robotName))
   }, [dispatch, robotName, status])
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
@@ -60,6 +79,14 @@ export function CalibrationCard(props: Props): React.Node {
   })
   const deckCalData = useSelector((state: State) => {
     return Calibration.getDeckCalibrationData(state, robotName)
+  })
+
+  const pipetteOffsetCalibrations = useSelector((state: State) => {
+    return Calibration.getPipetteOffsetCalibrations(state, robotName)
+  })
+
+  const tipLengthCalibrations = useSelector((state: State) => {
+    return Calibration.getTipLengthCalibrations(state, robotName)
   })
 
   let buttonDisabledReason = null
@@ -71,6 +98,20 @@ export function CalibrationCard(props: Props): React.Node {
     buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
   }
 
+  const onClickSaveAs = e => {
+    e.preventDefault()
+    saveAs(
+      new Blob([
+        JSON.stringify({
+          deck: deckCalData,
+          pipetteOffset: pipetteOffsetCalibrations,
+          tipLength: tipLengthCalibrations,
+        }),
+      ]),
+      `opentrons-${robotName}-calibration.json`
+    )
+  }
+
   const warningInsteadOfCalcheck = [
     Calibration.DECK_CAL_STATUS_SINGULARITY,
     Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
@@ -78,7 +119,30 @@ export function CalibrationCard(props: Props): React.Node {
   ].includes(deckCalStatus)
 
   return (
-    <Card title={TITLE}>
+    <Card>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_BASELINE}>
+        <Text
+          as="h3"
+          fontSize={FONT_SIZE_HEADER}
+          fontWeight={FONT_WEIGHT_REGULAR}
+          color={C_DARK_GRAY}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          paddingTop={SPACING_3}
+          paddingX={SPACING_3}
+        >
+          {TITLE}
+        </Text>
+        <Link
+          href="#"
+          paddingTop={SPACING_3}
+          paddingX={SPACING_3}
+          fontSize={FONT_SIZE_BODY_1}
+          onClick={onClickSaveAs}
+          textDecoration="underline"
+        >
+          {DOWNLOAD_CALIBRATION}
+        </Link>
+      </Flex>
       {warningInsteadOfCalcheck ? (
         <CalibrationCardWarning />
       ) : (
@@ -87,7 +151,6 @@ export function CalibrationCard(props: Props): React.Node {
           disabledReason={buttonDisabledReason}
         />
       )}
-
       <DeckCalibrationControl
         robotName={robotName}
         disabledReason={buttonDisabledReason}
