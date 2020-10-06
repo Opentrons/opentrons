@@ -15,7 +15,7 @@ import type { Mount } from '../../pipettes/types'
 import type { RequestState } from '../../robot-api/types'
 
 import { Portal } from '../portal'
-import { useCalibratePipetteOffset } from '../CalibratePipetteOffset'
+import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
 
 type Props = {|
   robotName: string,
@@ -29,7 +29,9 @@ const spinnerCommandBlockList: Array<SessionCommandString> = [
 
 const BUTTON_TEXT = 'Calibrate offset'
 
-export function PipetteOffsetCalibrationControl(props: Props): React.Node {
+export function useCalibratePipetteOffset(
+  props: Props
+): [() => void, React.Node] {
   const { robotName, mount } = props
 
   const [showWizard, setShowWizard] = React.useState(false)
@@ -79,9 +81,6 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
         : null
     )?.status === RobotApi.SUCCESS
 
-  const shouldCalibrateTipLength = true
-  const tipRackDefinition = null
-
   React.useEffect(() => {
     if (shouldOpen) {
       setShowWizard(true)
@@ -98,7 +97,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
       Sessions.ensureSession(
         robotName,
         Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-        { mount, shouldCalibrateTipLength, tipRackDefinition }
+        { mount }
       )
     )
   }
@@ -118,32 +117,14 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
       : null
   })
 
-  const [
-    startPipetteOffsetCalibration,
-    PipetteOffsetCalibrationWizard,
-  ] = useCalibratePipetteOffset()
-
-  return (
-    <>
-      <SecondaryBtn
-        width="11rem"
-        marginTop={SPACING_2}
-        padding={SPACING_2}
-        onClick={handleStartPipOffsetCalSession}
-      >
-        {BUTTON_TEXT}
-      </SecondaryBtn>
-      {showWizard && (
-        <Portal>
-          <CalibratePipetteOffset
-            session={pipOffsetCalSession}
-            robotName={robotName}
-            closeWizard={() => setShowWizard(false)}
-            showSpinner={showSpinner}
-            dispatchRequests={dispatchRequests}
-          />
-        </Portal>
-      )}
-    </>
-  )
+  return [
+    handleStartPipOffsetCalSession,
+    <CalibratePipetteOffset
+      session={pipOffsetCalSession}
+      robotName={robotName}
+      closeWizard={() => setShowWizard(false)}
+      showSpinner={showSpinner}
+      dispatchRequests={dispatchRequests}
+    />,
+  ]
 }

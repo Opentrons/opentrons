@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { Icon, PrimaryButton, ModalPage } from '@opentrons/components'
+import { PipetteOffsetCalibrationControl } from '../InstrumentSettings/PipetteOffsetCalibrationControl'
 import { getDiagramsSrc } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
@@ -13,6 +14,7 @@ import type {
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 import type { Mount } from '../../pipettes/types'
+import type { PipetteOffsetCalibration } from '../../calibration/types'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
@@ -26,6 +28,7 @@ type Props = {|
   attachedWrong: boolean,
   wantedPipette: PipetteNameSpecs | null,
   actualPipette: PipetteModelSpecs | null,
+  actualPipetteOffset: PipetteOffsetCalibration | null,
   displayName: string,
   displayCategory: PipetteDisplayCategory | null,
   tryAgain: () => mixed,
@@ -34,7 +37,17 @@ type Props = {|
 |}
 
 export function ConfirmPipette(props: Props): React.Node {
-  const { title, subtitle, success, attachedWrong, actualPipette, back } = props
+  const {
+    title,
+    subtitle,
+    success,
+    attachedWrong,
+    actualPipette,
+    actualPipetteOffset,
+    back,
+    robotName,
+    mount,
+  } = props
 
   return (
     <ModalPage
@@ -48,6 +61,9 @@ export function ConfirmPipette(props: Props): React.Node {
       <StatusDetails {...props} />
       {!success && <TryAgainButton {...props} />}
       {success && !actualPipette && <AttachAnotherButton {...props} />}
+      {success && actualPipette && !actualPipetteOffset && (
+        <PipetteOffsetCalibrationControl robotName={robotName} mount={mount} />
+      )}
       <ExitButton {...props} />
     </ModalPage>
   )

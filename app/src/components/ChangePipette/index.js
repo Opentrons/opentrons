@@ -5,6 +5,7 @@ import last from 'lodash/last'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
 
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
+import { getCalibrationForPipette } from '../../calibration'
 import { getAttachedPipettes } from '../../pipettes'
 import {
   home,
@@ -49,9 +50,15 @@ export function ChangePipette(props: Props): React.Node {
   const [wantedName, setWantedName] = React.useState<string | null>(null)
   const [confirmExit, setConfirmExit] = React.useState(false)
   const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName) : null
-  const actualPipette = useSelector((state: State) => {
-    return getAttachedPipettes(state, robotName)[mount]?.modelSpecs || null
-  })
+  const attachedPipette = useSelector(
+    (state: State) => getAttachedPipettes(state, robotName)[mount]
+  )
+  const actualPipette = attachedPipette?.modelSpecs || null
+  const actualPipetteOffset = useSelector((state: State) =>
+    attachedPipette?.id
+      ? getCalibrationForPipette(state, robotName, attachedPipette.id)
+      : null
+  )
 
   const movementStatus = useSelector((state: State) => {
     return getMovementStatus(state, robotName)
@@ -168,6 +175,7 @@ export function ChangePipette(props: Props): React.Node {
             },
             back: () => setWizardStep(INSTRUCTIONS),
             exit: homeAndExit,
+            actualPipetteOffset: actualPipetteOffset,
           }}
         />
       )

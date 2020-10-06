@@ -39,6 +39,8 @@ import type {
 import type { CalibratePipetteOffsetParentProps } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
+export * from './useCalibratePipetteOffset'
+
 const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
 const EXIT = 'exit'
 
