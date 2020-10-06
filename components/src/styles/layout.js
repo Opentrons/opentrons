@@ -17,6 +17,7 @@ export const SIZE_2 = '2rem'
 export const SIZE_3 = '4rem'
 export const SIZE_4 = '8rem'
 export const SIZE_5 = '16rem'
+export const SIZE_6 = '32rem'
 
 // overflow
 export const OVERFLOW_VISIBLE = 'visible'
