@@ -17,7 +17,7 @@ class Grid:
 
 
 class WellGrid(Generic[T]):
-    """A helper class to access extract row and column information from
+    """A helper class to extract row and column information from
     well names"""
 
     pattern = re.compile(WELL_NAME_PATTERN, re.X)
