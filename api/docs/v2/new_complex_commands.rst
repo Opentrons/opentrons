@@ -104,6 +104,13 @@ Parameters for the complex liquid handling are listed here in order of operation
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
 |         ``blow_out``           |  ``True`` or ``False``, if true blow out at dispense |        ``False``           |              ``False``             |           ``False``                |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
+|         ``blowout_location``   |  ``trash``, ``source well``, ``destination well``    | If pipette empty, blowout  | If pipette empty, blowout          | If pipette empty, blowout          |
+|                                |                                                      | into trash, otherwise      | into trash, otherwise              | into trash, otherwise              |
+|                                |                                                      | blowout into source well   | blowout into source well           | blowout into source well           |
+|                                |                                                      | If ``blow_out`` is false   | If ``blow_out`` is false           | If ``blowout`` is false            |
+|                                |                                                      | ``blowout_location`` will  | ``blowout_location`` will          | ``blowout_location`` will          |
+|                                |                                                      | be ignored                 | be ignored                         | be ignored                         |
++--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
 |          ``trash``             | ``True`` or ``False``, if false return tip to tiprack|         ``True``           |              ``True``              |            ``True``                |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
 |        ``carryover``           | ``True`` or ``False``, if true split volumes that    |         ``True``           |              ``False``             |            ``False``               |
