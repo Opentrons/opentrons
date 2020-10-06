@@ -16,12 +16,11 @@ runs:
       run: |
         echo "::add-mask::${{ inputs.password }}"
         if [[ ${{ inputs.repository_url }} =~ "test" ]]; then
-          echo '::set-env name=SWALLOW_FAILURE::|| echo "Duplicate upload allowed on test"'
           echo "Uploading to test pypi"
         else if [[ ${{ inputs.repository_url }} =~ "upload.pypi.org" ]]; then
                  echo "Uploading to prod pypi"
                  # this needs to be cleared otherwise the makefiles append a dev tag
-                 echo ::set-env name=OT_BUILD::""
+                 echo 'OT_BUILD=' >> $GITHUB_ENV
              else
                  echo "::error ::Invalid repository url ${{ inputs.repository_url }}"
                  exit 1
