@@ -20,15 +20,15 @@ def make_context_and_labware():
 
 
 def test_blowout_location_unsupported_version(make_context_and_labware):
-    # not supported in versions below 2.9
-    context_and_labware = make_context_and_labware(APIVersion(2, 8))
+    # not supported in versions below 2.8
+    context_and_labware = make_context_and_labware(APIVersion(2, 7))
     context_and_labware['ctx'].home()
     lw1 = context_and_labware['lw1']
     instr = context_and_labware['instr']
     with pytest.raises(
             ValueError,
             match='Cannot specify blowout location when using api version ' +
-            'below 2.9, current version is 2.8'):
+            'below 2.8, current version is 2.7'):
         instr.transfer(
             100,
             lw1['A1'],
@@ -37,7 +37,7 @@ def test_blowout_location_unsupported_version(make_context_and_labware):
 
 
 def test_blowout_location_invalid(make_context_and_labware):
-    context_and_labware = make_context_and_labware(APIVersion(2, 9))
+    context_and_labware = make_context_and_labware(APIVersion(2, 8))
     context_and_labware['ctx'].home()
     lw1 = context_and_labware['lw1']
     instr = context_and_labware['instr']
@@ -51,7 +51,7 @@ def test_blowout_location_invalid(make_context_and_labware):
 
 def test_source_blowout_location_invalid_for_consolidate(
         make_context_and_labware):
-    context_and_labware = make_context_and_labware(APIVersion(2, 9))
+    context_and_labware = make_context_and_labware(APIVersion(2, 8))
     context_and_labware['ctx'].home()
     lw1 = context_and_labware['lw1']
     instr = context_and_labware['instr']
@@ -67,7 +67,7 @@ def test_source_blowout_location_invalid_for_consolidate(
 
 def test_dest_blowout_location_invalid_for_distribute(
         make_context_and_labware):
-    context_and_labware = make_context_and_labware(APIVersion(2, 9))
+    context_and_labware = make_context_and_labware(APIVersion(2, 8))
     context_and_labware['ctx'].home()
     lw1 = context_and_labware['lw1']
     instr = context_and_labware['instr']
@@ -82,7 +82,7 @@ def test_dest_blowout_location_invalid_for_distribute(
 
 
 def test_valid_transfer_blowout_location(make_context_and_labware):
-    context_and_labware = make_context_and_labware(APIVersion(2, 9))
+    context_and_labware = make_context_and_labware(APIVersion(2, 8))
     context_and_labware['ctx'].home()
     lw1 = context_and_labware['lw1']
     instr = context_and_labware['instr']
@@ -130,7 +130,7 @@ def test_valid_transfer_blowout_location(make_context_and_labware):
 
 
 def test_valid_consolidate_blowout_location(make_context_and_labware):
-    context_and_labware = make_context_and_labware(APIVersion(2, 9))
+    context_and_labware = make_context_and_labware(APIVersion(2, 8))
     context_and_labware['ctx'].home()
     lw1 = context_and_labware['lw1']
     instr = context_and_labware['instr']
@@ -165,7 +165,7 @@ def test_valid_consolidate_blowout_location(make_context_and_labware):
 
 
 def test_valid_distribute_blowout_location(make_context_and_labware):
-    context_and_labware = make_context_and_labware(APIVersion(2, 9))
+    context_and_labware = make_context_and_labware(APIVersion(2, 8))
     context_and_labware['ctx'].home()
     lw1 = context_and_labware['lw1']
     instr = context_and_labware['instr']

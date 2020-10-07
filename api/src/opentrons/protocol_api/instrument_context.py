@@ -859,10 +859,10 @@ class InstrumentContext(CommandPublisher):
         kwargs['mix_after'] = (0, 0)
         blowout_location = kwargs.get('blowout_location')
 
-        if blowout_location and self._api_version < APIVersion(2, 9):
+        if blowout_location and self._api_version < APIVersion(2, 8):
             raise ValueError(
                 'Cannot specify blowout location when using api' +
-                ' version below 2.9, current version is {api_version}'
+                ' version below 2.8, current version is {api_version}'
                 .format(api_version=self._api_version))
         if blowout_location == 'destination well':
             raise ValueError(
@@ -896,10 +896,10 @@ class InstrumentContext(CommandPublisher):
         kwargs['disposal_volume'] = 0
         blowout_location = kwargs.get('blowout_location')
 
-        if blowout_location and self._api_version < APIVersion(2, 9):
+        if blowout_location and self._api_version < APIVersion(2, 8):
             raise ValueError(
                 'Cannot specify blowout location when using api' +
-                ' version below 2.9, current version is {api_version}'
+                ' version below 2.8, current version is {api_version}'
                 .format(api_version=self._api_version))
         if blowout_location == 'source well':
             raise ValueError(
@@ -1029,10 +1029,10 @@ class InstrumentContext(CommandPublisher):
         blow_out = None
         blowout_location = kwargs.get('blowout_location')
 
-        if blowout_location and self._api_version < APIVersion(2, 9):
+        if blowout_location and self._api_version < APIVersion(2, 8):
             raise ValueError(
                 'Cannot specify blowout location when using api' +
-                ' version below 2.9, current version is {api_version}'
+                ' version below 2.8, current version is {api_version}'
                 .format(api_version=self._api_version))
 
         if blowout_location and blowout_location not in [
