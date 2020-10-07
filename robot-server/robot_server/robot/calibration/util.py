@@ -1,4 +1,5 @@
 import contextlib
+import logging
 from typing import Set, Dict, Any, Union, TYPE_CHECKING
 
 from opentrons.hardware_control import Pipette
@@ -40,7 +41,7 @@ class StateTransitionError(RobotServerError):
 
 
 TransitionMap = Dict[Any, Dict[Any, Any]]
-
+log = logging.getLogger(__name__)
 
 class SimpleStateMachine:
     def __init__(self,
@@ -68,9 +69,11 @@ class SimpleStateMachine:
 
         wc_transitions = self._transitions.get(STATE_WILDCARD, {})
         wc_to_state = wc_transitions.get(command, {})
+        log.info(f"wild card to state {wc_to_state}")
 
         fs_transitions = self._transitions.get(from_state, {})
         fs_to_state = fs_transitions.get(command, {})
+        log.info(f"Desired state to state {fs_to_state}")
 
         if wc_to_state:
             return wc_to_state

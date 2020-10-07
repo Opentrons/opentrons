@@ -12,7 +12,7 @@ class SessionCreateParams(BaseModel):
         ...,
         description='The mount on which the pipette is attached, left or right'
     )
-    tipLengthLoad: bool = Field(
+    shouldCalibrateTipLength: bool = Field(
         True,
         description='Whether tiplength for this tiprack should be loaded'
     )

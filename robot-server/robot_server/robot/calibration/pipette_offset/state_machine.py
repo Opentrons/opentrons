@@ -46,7 +46,6 @@ PIP_OFFSET_CAL_TRANSITIONS: PipetteOffsetTransitions = {
 
 PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
     POWTState.sessionStarted: {
-        CalibrationCommand.set_has_calibration_block: POWTState.sessionStarted,
         CalibrationCommand.load_labware: POWTState.labwareLoaded
     },
     POWTState.labwareLoaded: {

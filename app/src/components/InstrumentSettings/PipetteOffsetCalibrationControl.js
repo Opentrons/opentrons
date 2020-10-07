@@ -79,7 +79,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
         : null
     )?.status === RobotApi.SUCCESS
 
-  const tipLengthLoad = false
+  const shouldCalibrateTipLength = true
   const tipRackDefinition = null
 
   React.useEffect(() => {
@@ -98,7 +98,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
       Sessions.ensureSession(
         robotName,
         Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-        { mount, tipLengthLoad, tipRackDefinition }
+        { mount, shouldCalibrateTipLength, tipRackDefinition }
       )
     )
   }

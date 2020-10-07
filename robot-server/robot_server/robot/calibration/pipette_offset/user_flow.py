@@ -82,24 +82,26 @@ class PipetteOffsetCalibrationUserFlow:
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
+        self._using_default_tiprack = False
         self._load_tiprack(tip_rack_def)
         self._has_calibrated_tip_length: bool =\
-            (self._get_stored_tip_length_cal() is not None)
+            (self._get_stored_tip_length_cal() is not None
+             or self._using_default_tiprack)
 
-        if self._has_calibrated_tip_length and load_tip_length:
-            self._state_machine: PipetteOffsetStateMachine =\
-                PipetteOffsetCalibrationStateMachine()
-            self._state: GenericState = POCState  # type: ignore
-        else:
+        if not load_tip_length:
+            MODULE_LOG.info("Don't load tip length")
             self._state_machine =\
                 PipetteOffsetWithTipLengthStateMachine()
-            self._state = POWTState  # type: ignore
+            self._state: GenericState = POWTState  # type: ignore
+        else:
+            MODULE_LOG.info("Loading tip length")
+            self._state_machine: PipetteOffsetStateMachine =\
+                PipetteOffsetCalibrationStateMachine()
+            self._state= POCState  # type: ignore
         self._current_state = self._state.sessionStarted
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
-            CalibrationCommand.set_has_calibration_block:
-                self.set_has_calibration_block,
             CalibrationCommand.move_to_reference_point:
                 self.move_to_reference_point,
             CalibrationCommand.jog: self.jog,
@@ -160,6 +162,8 @@ class PipetteOffsetCalibrationUserFlow:
         :param data: Data supplied in command
         :return: None
         """
+        MODULE_LOG.info(f"Name of command {name}")
+        MODULE_LOG.info(f"Current state {self._current_state}")
         next_state = self._state_machine.get_next_state(self._current_state,
                                                         name)
 
@@ -223,10 +227,8 @@ class PipetteOffsetCalibrationUserFlow:
                 self._tip_rack.uri,
                 self._hw_pipette.config.tip_overlap['default'])
             tip_length = self._tip_rack.tip_length
-            self._has_calibrated_tip_length = False
             return tip_length - tip_overlap
         else:
-            self._has_calibrated_tip_length = True
             return stored_tip_length_cal
 
     def _load_tiprack(self,
@@ -245,6 +247,7 @@ class PipetteOffsetCalibrationUserFlow:
             tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
             tr_lw = labware.load(tr_load_name,
                                  self._deck.position_for(TIP_RACK_SLOT))
+            self._using_default_tiprack = True
         self._tip_rack = tr_lw
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 

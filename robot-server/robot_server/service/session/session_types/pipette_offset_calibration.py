@@ -45,7 +45,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
                      instance_meta: SessionMetaData) -> 'BaseSession':
         assert isinstance(instance_meta.create_params, SessionCreateParams)
         mount = instance_meta.create_params.mount
-        load_tip_length = instance_meta.create_params.tipLengthLoad
+        load_tip_length = instance_meta.create_params.shouldCalibrateTipLength
         tiprack = instance_meta.create_params.tipRackDefinition
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
