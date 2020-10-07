@@ -27,7 +27,6 @@ import {
   JUSTIFY_START,
 } from '@opentrons/components'
 import styles from './styles.css'
-import { PipetteOffsetCalibrationControl } from './PipetteOffsetCalibrationControl'
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset'
 import type { State } from '../../types'
 

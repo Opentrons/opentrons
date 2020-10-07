@@ -2,7 +2,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { Icon, PrimaryButton, ModalPage } from '@opentrons/components'
+import {
+  Icon,
+  PrimaryButton,
+  PrimaryBtn,
+  ModalPage,
+} from '@opentrons/components'
 import { PipetteOffsetCalibrationControl } from '../InstrumentSettings/PipetteOffsetCalibrationControl'
 import { getDiagramsSrc } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
@@ -18,6 +23,7 @@ import type { PipetteOffsetCalibration } from '../../calibration/types'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
+const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 
 type Props = {|
   robotName: string,
@@ -34,6 +40,7 @@ type Props = {|
   tryAgain: () => mixed,
   back: () => mixed,
   exit: () => mixed,
+  startPipetteOffsetCalibration: () => void,
 |}
 
 export function ConfirmPipette(props: Props): React.Node {
@@ -47,6 +54,7 @@ export function ConfirmPipette(props: Props): React.Node {
     back,
     robotName,
     mount,
+    startPipetteOffsetCalibration,
   } = props
 
   return (
@@ -62,7 +70,9 @@ export function ConfirmPipette(props: Props): React.Node {
       {!success && <TryAgainButton {...props} />}
       {success && !actualPipette && <AttachAnotherButton {...props} />}
       {success && actualPipette && !actualPipetteOffset && (
-        <PipetteOffsetCalibrationControl robotName={robotName} mount={mount} />
+        <PrimaryBtn flex="1" onClick={startPipetteOffsetCalibration}>
+          {CONTINUE_TO_PIP_OFFSET}
+        </PrimaryBtn>
       )}
       <ExitButton {...props} />
     </ModalPage>

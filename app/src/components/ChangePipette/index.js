@@ -17,6 +17,7 @@ import {
   CHANGE_PIPETTE,
 } from '../../robot-controls'
 
+import { useCalibratePipetteOffset } from '../CalibratePipetteOffset'
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
@@ -78,6 +79,11 @@ export function ChangePipette(props: Props): React.Node {
     () => dispatchApiRequest(home(robotName, PIPETTE, mount)),
     [dispatchApiRequest, robotName, mount]
   )
+
+  const [
+    startPipetteOffsetCalibration,
+    PipetteOffsetCalibrationWizard,
+  ] = useCalibratePipetteOffset(robotName, mount)
 
   const baseProps = {
     title: PIPETTE_SETUP,
@@ -164,20 +170,23 @@ export function ChangePipette(props: Props): React.Node {
       )
     } else {
       return (
-        <ConfirmPipette
-          {...{
-            ...basePropsWithPipettes,
-            success,
-            attachedWrong,
-            tryAgain: () => {
-              setWantedName(null)
-              setWizardStep(INSTRUCTIONS)
-            },
-            back: () => setWizardStep(INSTRUCTIONS),
-            exit: homeAndExit,
-            actualPipetteOffset: actualPipetteOffset,
-          }}
-        />
+        PipetteOffsetCalibrationWizard || (
+          <ConfirmPipette
+            {...{
+              ...basePropsWithPipettes,
+              success,
+              attachedWrong,
+              tryAgain: () => {
+                setWantedName(null)
+                setWizardStep(INSTRUCTIONS)
+              },
+              back: () => setWizardStep(INSTRUCTIONS),
+              exit: homeAndExit,
+              actualPipetteOffset: actualPipetteOffset,
+              startPipetteOffsetCalibration,
+            }}
+          />
+        )
       )
     }
   }
