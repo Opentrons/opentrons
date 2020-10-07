@@ -65,15 +65,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${{ env.HOME }}/.npm-cache/_prebuild
-            ${{ env.HOME }}./.yarn-cache
+            ${{ env.GITHUB_WORKSPACE }}/.npm-cache/_prebuild
+            ${{ env.GITHUB_WORKSPACE }}./.yarn-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
-          npm config set cache ${HOME}/.npm-cache
-          yarn config set cache-folder ${HOME}/.yarn-cache
+          npm config set cache ${GITHUB_WORKSPACE}/.npm-cache
+          yarn config set cache-folder ${GITHUB_WORKSPACE}/.yarn-cache
           make setup-js
         shell: bash
       - name: 'test frontend packages'
@@ -104,15 +104,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${{ env.HOME }}/.npm-cache/_prebuild
-            ${{ env.HOME }}/.yarn-cache
+            ${{ env.GITHUB_WORKSPACE }}/.npm-cache/_prebuild
+            ${{ env.GITHUB_WORKSPACE }}/.yarn-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: setup-js
         run: |
-          npm config set cache ${HOME}/.npm-cache
-          yarn config set cache-folder ${HOME}/.yarn-cache
+          npm config set cache ${GITHUB_WORKSPACE}/.npm-cache
+          yarn config set cache-folder ${GITHUB_WORKSPACE}/.yarn-cache
           make setup-js
         shell: bash
       - name: 'test native(er) packages'
