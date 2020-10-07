@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
-import { act } from 'react-dom/test-utils'
 import { saveAs } from 'file-saver'
 
 import * as PipetteOffset from '../../../calibration/pipette-offset'
@@ -22,7 +21,6 @@ import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 import type { State, Action } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { AnalyticsEvent } from '../../../analytics/types'
-
 
 const mockCallTrackEvent: JestMockFn<[AnalyticsEvent], void> = jest.fn()
 
@@ -99,11 +97,10 @@ describe('CalibrationCard', () => {
   }
 
   const realBlob = global.Blob
-  beforeAll(()=> {
+  beforeAll(() => {
     global.Blob = function(content, options) {
       return { content, options }
     }
-
   })
 
   afterAll(() => {
