@@ -38,7 +38,7 @@ export const PipetteList: React.AbstractComponent<PipetteListComponentProps> = w
   PipetteListComponent
 )
 
-function PipetteListComponent(props: PipetteListComponentProps) {
+export function PipetteListComponent(props: PipetteListComponentProps): React.Node {
   const dispatch = useDispatch<Dispatch>()
 
   const { robotName, tipracks } = props
@@ -78,8 +78,9 @@ function PipetteListComponent(props: PipetteListComponentProps) {
           />
         ) : (
           <>
-            <Flex key={mount}>
+            <Flex key={`${mount} box`}>
               <Text
+                key={`${mount} key`}
                 marginLeft={SPACING_3}
                 paddingTop={SPACING_3}
                 color={disabledReason ? C_MED_GRAY : C_DARK_GRAY}
@@ -90,7 +91,7 @@ function PipetteListComponent(props: PipetteListComponentProps) {
                 {mount.charAt(0)}
               </Text>
               <TitledList
-                key={mount}
+                key={`${mount} title`}
                 title={displayName}
                 disabled={!!disabledReason}
               />
@@ -99,11 +100,11 @@ function PipetteListComponent(props: PipetteListComponentProps) {
               ? pip_tipracks?.map(tr => {
                   return (
                     <PipetteTiprackListItem
+                      {...tr}
                       key={tr.name}
                       robotName={robotName}
                       pipette={attachedPipette}
                       calibrateUrl={path}
-                      tiprack={tr}
                     />
                   )
                 })

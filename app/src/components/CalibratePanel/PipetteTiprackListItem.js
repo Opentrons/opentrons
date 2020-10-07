@@ -15,28 +15,33 @@ import { getTipLengthForPipetteAndTiprack } from '../../calibration'
 const MARGIN_LEFT_SIZE = '1.6rem'
 
 export type PipetteTiprackListItemProps = {|
+  ...BaseProtocolLabware,
   robotName: string | null,
   pipette: AttachedPipette | null,
   calibrateUrl: string | null,
-  tiprack: BaseProtocolLabware,
 |}
 
 export function PipetteTiprackListItem(
   props: PipetteTiprackListItemProps
 ): React.Node {
-  const { robotName, pipette, calibrateUrl, tiprack } = props
-  const definition = tiprack.definition
-  const displayName = definition
-    ? getLabwareDisplayName(definition)
-    : tiprack.type
+  const {
+    name,
+    definition,
+    definitionHash,
+    type,
+    robotName,
+    pipette,
+    calibrateUrl,
+  } = props
+  const displayName = definition ? getLabwareDisplayName(definition) : type
   const serialNumber = pipette ? pipette.id : null
   const tipLengthCalibration = useSelector((state: State) =>
-    serialNumber && robotName && tiprack.definitionHash
+    serialNumber && robotName && definitionHash
       ? getTipLengthForPipetteAndTiprack(
           state,
           robotName,
           serialNumber,
-          tiprack.definitionHash
+          definitionHash
         )
       : null
   )
@@ -44,11 +49,12 @@ export function PipetteTiprackListItem(
     <HoverTooltip
       placement="bottom"
       tooltipComponent={
-        <TiprackNameTooltip name={tiprack.name} displayName={displayName} />
+        <TiprackNameTooltip name={name} displayName={displayName} />
       }
     >
       {tooltipHandlers => (
         <ListItem
+          key={name}
           ref={tooltipHandlers?.ref}
           onMouseEnter={tooltipHandlers?.onMouseEnter}
           onMouseLeave={tooltipHandlers?.onMouseLeave}
