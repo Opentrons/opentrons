@@ -48,15 +48,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${{ env.GITHUB_WORKSPACE }}/.yarn-cache
-            ${{ env.GITHUB_WORKSPACE }}/.npm-cache
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
-          npm config set cache ${GITHUB_WORKSPACE}/.npm-cache
-          yarn config set cache-folder ${GITHUB_WORKSPACE}/.yarn-cache
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
         shell: bash
       - name: 'lint js'
