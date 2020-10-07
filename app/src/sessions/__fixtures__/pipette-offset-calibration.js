@@ -30,6 +30,6 @@ export const mockPipetteOffsetCalibrationSessionDetails: PipetteOffsetCalibratio
 
 export const mockPipetteOffsetCalibrationSessionParams: PipetteOffsetCalibrationSessionParams = {
   mount: 'left',
-  hasCalibratedTipLength: true,
+  shouldCalibrateTipLength: true,
   tipRackDefinition: null,
 }
