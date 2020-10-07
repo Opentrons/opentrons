@@ -65,9 +65,9 @@ jobs:
           path: |
             ./.npm-cache/_prebuild
             ./.yarn-cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: js-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            js-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
@@ -103,9 +103,9 @@ jobs:
           path: |
             ./.npm-cache/_prebuild
             ./.yarn-cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: js-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            js-${{ runner.os }}-yarn-
       - name: setup-js
         run: |
           npm config set cache ./.npm-cache
