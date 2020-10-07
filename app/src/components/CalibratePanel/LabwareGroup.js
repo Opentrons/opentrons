@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import partition from 'lodash/partition'
 
 import { SidePanelGroup, TitledList } from '@opentrons/components'
 import { fetchLabwareCalibrations } from '../../calibration'
@@ -9,38 +8,35 @@ import {
   selectors as robotSelectors,
   actions as robotActions,
 } from '../../robot'
-import { getProtocolLabwareList } from '../../calibration/labware'
 import { LabwareListItem } from './LabwareListItem'
 import type { BaseProtocolLabware } from '../../calibration/types'
-import type { State, Dispatch } from '../../types'
+import type { Dispatch } from '../../types'
 
 // TODO(bc, 2019-08-03): i18n
 const TITLE = 'Labware Calibration'
 const TIPRACKS_TITLE = 'tipracks'
 const LABWARE_TITLE = 'labware'
 
-export function LabwareGroup(): React.Node {
+export type LabwareGroupProps = {|
+  robotName: string | null,
+  tipracks: Array<BaseProtocolLabware>,
+  otherLabware: Array<BaseProtocolLabware>,
+|}
+
+export function LabwareGroup(props: LabwareGroupProps): React.Node {
+  const { robotName, tipracks, otherLabware } = props
   const dispatch = useDispatch<Dispatch>()
 
   const calibratorMount = useSelector(robotSelectors.getCalibratorMount)
   const deckPopulated = useSelector(robotSelectors.getDeckPopulated)
   const tipracksConfirmed = useSelector(robotSelectors.getTipracksConfirmed)
 
-  const robotName = useSelector(robotSelectors.getConnectedRobotName)
   const isRunning = useSelector(robotSelectors.getIsRunning)
-
-  const allLabware = useSelector((state: State) => {
-    return robotName ? getProtocolLabwareList(state, robotName) : []
-  })
 
   React.useEffect(() => {
     robotName && dispatch(fetchLabwareCalibrations(robotName))
   }, [dispatch, robotName])
 
-  const [tipracks, otherLabware] = partition(
-    allLabware,
-    lw => lw.type && lw.isTiprack
-  )
   const setLabwareToCalibrate = (lw: BaseProtocolLabware) => {
     const calibrator = lw.calibratorMount || calibratorMount
     if (!!deckPopulated && calibrator) {
