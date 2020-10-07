@@ -9,15 +9,14 @@ import {
   getShellUpdateState,
   getAvailableShellUpdate,
   checkShellUpdate,
-  downloadShellUpdate,
-  applyShellUpdate,
   setShellUpdateSeen,
 } from '../../shell'
 
 import { Page } from '../../components/Page'
-import { AppSettings as AppSettingsContents } from '../../components/AppSettings'
-import { UpdateApp } from '../../components/AppSettings/UpdateApp'
-import { ErrorModal } from '../../components/modals'
+import {
+  AppSettings as AppSettingsContents,
+  UpdateAppModal,
+} from '../../components/AppSettings'
 
 import type { State, Dispatch } from '../../types'
 import type { ShellUpdateState } from '../../shell/types'
@@ -31,8 +30,6 @@ type SP = {|
 
 type DP = {|
   checkUpdate: () => void,
-  downloadUpdate: () => mixed,
-  applyUpdate: () => mixed,
   closeModal: () => mixed,
 |}
 
@@ -51,15 +48,8 @@ export const AppSettings: React.AbstractComponent<OP> = connect<
 )(AppSettingsComponent)
 
 function AppSettingsComponent(props: Props) {
-  const {
-    availableVersion,
-    checkUpdate,
-    downloadUpdate,
-    applyUpdate,
-    closeModal,
-    update,
-  } = props
-  const { available, seen, error } = update
+  const { availableVersion, checkUpdate, closeModal, update } = props
+  const { available, seen } = update
   const { path } = props.match
 
   return (
@@ -73,26 +63,7 @@ function AppSettingsComponent(props: Props) {
       <Switch>
         <Route
           path={`${path}/update`}
-          render={() =>
-            !error ? (
-              <UpdateApp
-                {...{
-                  update,
-                  availableVersion,
-                  downloadUpdate,
-                  applyUpdate,
-                  closeModal,
-                }}
-              />
-            ) : (
-              <ErrorModal
-                heading="Update Error"
-                description="Something went wrong while updating your app"
-                close={closeModal}
-                error={error}
-              />
-            )
-          }
+          render={() => <UpdateAppModal closeModal={closeModal} />}
         />
         <Route
           render={() =>
@@ -116,8 +87,6 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
     checkUpdate: () => {
       dispatch(checkShellUpdate())
     },
-    downloadUpdate: () => dispatch(downloadShellUpdate()),
-    applyUpdate: () => dispatch(applyShellUpdate()),
     closeModal: () => {
       dispatch(setShellUpdateSeen())
       dispatch(push('/more/app'))

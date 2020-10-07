@@ -3,23 +3,25 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { CURRENT_VERSION } from '../../shell'
 import {
+  ALIGN_START,
+  SPACING_3,
+  SPACING_AUTO,
   Card,
+  Flex,
   LabeledValue,
-  OutlineButton,
+  SecondaryBtn,
   useMountEffect,
 } from '@opentrons/components'
-import { CardContentHalf } from '../layout'
 
-import styles from './styles.css'
+import { CURRENT_VERSION } from '../../shell'
 
 export type AppInfoCardProps = {|
   availableVersion: ?string,
   checkUpdate: () => void,
 |}
 
-const TITLE = 'Information'
+const INFORMATION = 'Information'
 const VERSION_LABEL = 'Software Version'
 
 const UPDATE_AVAILABLE = 'view available update'
@@ -31,20 +33,18 @@ export function AppInfoCard(props: AppInfoCardProps): React.Node {
   useMountEffect(checkUpdate)
 
   return (
-    <Card title={TITLE}>
-      <CardContentHalf>
+    <Card title={INFORMATION}>
+      <Flex padding={SPACING_3} alignItems={ALIGN_START}>
         <LabeledValue label={VERSION_LABEL} value={CURRENT_VERSION} />
-      </CardContentHalf>
-      <CardContentHalf>
-        <OutlineButton
-          Component={Link}
+        <SecondaryBtn
+          as={Link}
           to="/more/app/update"
           disabled={!availableVersion}
-          className={styles.show_update_button}
+          marginLeft={SPACING_AUTO}
         >
           {availableVersion ? UPDATE_AVAILABLE : UPDATE_NOT_AVAILABLE}
-        </OutlineButton>
-      </CardContentHalf>
+        </SecondaryBtn>
+      </Flex>
     </Card>
   )
 }
