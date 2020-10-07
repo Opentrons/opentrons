@@ -54,13 +54,15 @@ class LabwareImplementation(AbstractLabwareImplementation):
         self._ordering = [
             well for col in definition['ordering'] for well in col
         ]
-
-        self._calibrated_offset: Point = Point(0, 0, 0)
-        self._wells = self._build_wells()
+        self._wells: List[WellImplementation] = []
         self._well_name_grid = WellGrid(wells=self._wells)
         self._tip_tracker = TipTracker(
             columns=self._well_name_grid.get_columns()
         )
+
+        self._calibrated_offset = Point(0, 0, 0)
+        # Will cause building of the wells
+        self.set_calibration(self._calibrated_offset)
 
     def get_uri(self) -> str:
         return helpers.uri_from_definition(self._definition)
@@ -74,6 +76,9 @@ class LabwareImplementation(AbstractLabwareImplementation):
     def set_name(self, new_name: str) -> None:
         self._name = new_name
 
+    def get_definition(self) -> LabwareDefinition:
+        return self._definition
+
     def get_parameters(self) -> LabwareParameters:
         return self._parameters
 
@@ -82,9 +87,9 @@ class LabwareImplementation(AbstractLabwareImplementation):
 
     def set_calibration(self, delta: Point) -> None:
         self._calibrated_offset = Point(
-            x=self._geometry.x_dimension + delta.x,
-            y=self._geometry.y_dimension + delta.y,
-            z=self._geometry.z_dimension + delta.z
+            x=self._geometry.offset.x + delta.x,
+            y=self._geometry.offset.y + delta.y,
+            z=self._geometry.offset.z + delta.z
         )
         # The wells must be rebuilt
         self._wells = self._build_wells()
@@ -120,7 +125,9 @@ class LabwareImplementation(AbstractLabwareImplementation):
         return self._wells
 
     def get_wells_by_name(self) -> Dict[str, WellImplementation]:
-        pass
+        return {
+            well.get_name(): well for well in self._wells
+        }
 
     def get_geometry(self) -> LabwareGeometry:
         return self._geometry
@@ -142,7 +149,8 @@ class LabwareImplementation(AbstractLabwareImplementation):
             WellImplementation(
                 well_geometry=WellGeometry(
                     well_props=self._well_definition[well],
-                    parent=Location(self._calibrated_offset, self)
+                    parent_point=self._calibrated_offset,
+                    parent_object=self
                 ),
                 display_name="{} of {}".format(well, self._display_name),
                 has_tip=self.is_tiprack(),

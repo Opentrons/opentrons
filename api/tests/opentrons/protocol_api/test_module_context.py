@@ -300,12 +300,12 @@ def test_module_load_labware(loop):
     lw_offset = Point(labware_def['cornerOffsetFromSlot']['x'],
                       labware_def['cornerOffsetFromSlot']['y'],
                       labware_def['cornerOffsetFromSlot']['z'])
-    assert lw._offset == lw_offset + mod._geometry.location.point
+    assert lw._implementation.get_geometry().offset == lw_offset + mod._geometry.location.point
     assert lw.name == labware_name
     # Test load with old name
     mod2 = ctx.load_module('tempdeck', 2)
     lw2 = mod2.load_labware(labware_name)
-    assert lw2._offset == lw_offset + mod2._geometry.location.point
+    assert lw2._implementation.get_geometry().offset == lw_offset + mod2._geometry.location.point
 
 
 def test_module_load_labware_with_label(loop):
@@ -348,12 +348,12 @@ def test_deprecated_module_load_labware(loop):
     lw_offset = Point(labware_def['cornerOffsetFromSlot']['x'],
                       labware_def['cornerOffsetFromSlot']['y'],
                       labware_def['cornerOffsetFromSlot']['z'])
-    assert lw._offset == lw_offset + mod._geometry.location.point
+    assert lw._implementation.get_geometry().offset == lw_offset + mod._geometry.location.point
     assert lw.name == labware_name
     # Test load with old name
     mod2 = ctx.load_module('tempdeck', 2)
     lw2 = mod2.load_labware(labware_name)
-    assert lw2._offset == lw_offset + mod2._geometry.location.point
+    assert lw2._implementation.get_geometry().offset == lw_offset + mod2._geometry.location.point
     assert lw2.name == labware_name
 
 

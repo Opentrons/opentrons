@@ -27,6 +27,7 @@ from opentrons.calibration_storage import get, helpers, modify
 from opentrons.protocols.implementations.interfaces.labware import \
     AbstractLabwareImplementation
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocols.implementations.labware import LabwareImplementation
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.types import APIVersion
@@ -80,7 +81,8 @@ class Well:
     @property  # type: ignore
     @requires_version(2, 0)
     def parent(self) -> 'Labware':
-        return self._geometry.parent.labware   # type: ignore
+        return Labware(implementation=self._geometry.parent,
+                       api_level=self.api_version)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -354,7 +356,8 @@ class Labware(DeckItem):
         elif isinstance(args[0], int):
             res = (self._implementation.get_wells()[idx] for idx in args)
         elif isinstance(args[0], str):
-            res = (self.wells_by_name()[idx] for idx in args)
+            by_name = self._implementation.get_wells_by_name()
+            res = (by_name[idx] for idx in args)
         else:
             raise TypeError
         return [self._well_from_impl(w) for w in res]
@@ -424,7 +427,7 @@ class Labware(DeckItem):
         """
         row_dict = self._implementation.get_well_grid().get_row_dict()
         return {
-            k: [self._well_from_impl(w) for w in v] for k, v in row_dict
+            k: [self._well_from_impl(w) for w in v] for k, v in row_dict.items()
         }
 
     @requires_version(2, 0)
@@ -477,7 +480,7 @@ class Labware(DeckItem):
         """
         column_dict = self._implementation.get_well_grid().get_column_dict()
         return {
-            k: [self._well_from_impl(w) for w in v] for k, v in column_dict
+            k: [self._well_from_impl(w) for w in v] for k, v in column_dict.items()
         }
 
     @requires_version(2, 0)
@@ -496,16 +499,7 @@ class Labware(DeckItem):
         This is drawn from the 'dimensions'/'zDimension' elements of the
         labware definition and takes into account the calibration offset.
         """
-        return self._implementation.highest_z()
-
-    # @highest_z.setter
-    # def highest_z(self, new_height: float):
-    #     """
-    #     The z-coordinate of the tallest single point anywhere on the labware.
-    #     This is drawn from the 'dimensions'/'zDimension' elements of the
-    #     labware definition and takes into account the calibration offset.
-    #     """
-    #     self._highest_z = new_height
+        return self._implementation.highest_z
 
     @property
     def _is_tiprack(self) -> bool:
@@ -583,6 +577,14 @@ class Labware(DeckItem):
 
     def __repr__(self):
         return self._implementation.get_display_name()
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Labware):
+            return NotImplemented
+        return self._implementation == other._implementation
+
+    def __hash__(self):
+        return id(self)
 
     def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
@@ -912,7 +914,7 @@ def select_tiprack_from_list(
     except IndexError:
         raise OutOfTipsError
 
-    if starting_point and starting_point.parent is not first:
+    if starting_point and starting_point.parent != first:
         raise TipSelectionError(
             'The starting tip you selected '
             f'does not exist in {first}')
@@ -953,7 +955,7 @@ def select_tiprack_from_list_paired_pipettes(
     except IndexError:
         raise OutOfTipsError
 
-    if starting_point and starting_point.parent is not first:
+    if starting_point and starting_point.parent != first:
         raise TipSelectionError(
             'The starting tip you selected '
             f'does not exist in {first}')
@@ -981,7 +983,7 @@ def filter_tipracks_to_start(
         starting_point: Well,
         tipracks: List[Labware]) -> List[Labware]:
     return list(dropwhile(
-        lambda tr: starting_point.parent is not tr, tipracks))
+        lambda tr: starting_point.parent != tr, tipracks))
 
 
 def _get_parent_identifier(labware: 'Labware') -> str:
@@ -1001,12 +1003,13 @@ def _get_parent_identifier(labware: 'Labware') -> str:
 
 
 def get_labware_hash(labware: 'Labware') -> str:
-    return helpers.hash_labware_def(labware._definition)
+    return helpers.hash_labware_def(labware._implementation.get_definition())
 
 
 def get_labware_hash_with_parent(labware: 'Labware') -> str:
-    return helpers.hash_labware_def(labware._definition)\
-        + _get_parent_identifier(labware)
+    return helpers.hash_labware_def(
+        labware._implementation.get_definition()
+    ) + _get_parent_identifier(labware)
 
 
 def _get_labware_path(labware: 'Labware') -> str:
@@ -1015,7 +1018,7 @@ def _get_labware_path(labware: 'Labware') -> str:
 
 def _get_index_file_information(
         labware: 'Labware') -> Tuple[str, 'LabwareDefinition', str]:
-    definition = labware._definition
+    definition = labware._implementation.get_definition()
     labware_path = _get_labware_path(labware)
     parent = _get_parent_identifier(labware)
     return labware_path, definition, parent
@@ -1045,7 +1048,12 @@ def load_from_definition(
                                  conform to this level. If not specified,
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
-    labware = Labware(definition, parent, label, api_level)
+    labware = Labware(
+        implementation=LabwareImplementation(
+            definition=definition, parent=parent, label=label
+        ),
+        api_level=api_level
+    )
     index_info = _get_index_file_information(labware)
     offset = get.get_labware_calibration(
         index_info[0], index_info[1], parent=index_info[2])

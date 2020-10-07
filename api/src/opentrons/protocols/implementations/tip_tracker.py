@@ -83,8 +83,7 @@ class TipTracker:
         :param fail_if_full: for backwards compatibility
         """
         # Select the column of the labware that contains the target well
-        target_column: Wells = [
-            col for col in self._columns if start_well in col][0]
+        target_column = [col for col in self._columns if start_well in col][0]
 
         well_idx = target_column.index(start_well)
         # Number of tips to pick up is the lesser of (1) the number of tips

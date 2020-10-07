@@ -501,18 +501,18 @@ def test_starting_tip_and_reset_tipracks(loop, get_labware_def, monkeypatch):
 
     pipL.starting_tip = tr.wells()[2]
     pipL.pick_up_tip()
-    assert pipL._last_tip_picked_up_from is tr.wells()[2]
+    assert pipL._last_tip_picked_up_from == tr.wells()[2]
     pipL.drop_tip()
 
     pipR.starting_tip = tr.wells()[2]
     pipR.pick_up_tip()
-    assert pipR._last_tip_picked_up_from is tr.wells()[3]
+    assert pipR._last_tip_picked_up_from == tr.wells()[3]
     pipR.drop_tip()
 
     tr.wells()[95].has_tip = False
     pipL.starting_tip = tr.wells()[95]
     pipL.pick_up_tip()
-    assert pipL._last_tip_picked_up_from is tr_2.wells()[0]
+    assert pipL._last_tip_picked_up_from == tr_2.wells()[0]
 
     pipL.reset_tipracks()
     assert tr.wells()[2].has_tip
@@ -846,7 +846,7 @@ def test_tip_length_for(loop, monkeypatch):
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
     instr._tip_length_for.cache_clear()
     assert instr._tip_length_for(tiprack)\
-        == (tiprack._definition['parameters']['tipLength']
+        == (tiprack._implementation.get_definition()['parameters']['tipLength']
             - instr.hw_pipette['tip_overlap']
             ['opentrons/geb_96_tiprack_10ul/1'])
 
@@ -863,7 +863,7 @@ def test_tip_length_for_caldata(loop, monkeypatch, use_new_calibration):
     instr._tip_length_for.cache_clear()
     mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
     assert instr._tip_length_for(tiprack) == (
-        tiprack._definition['parameters']['tipLength']
+        tiprack._implementation.get_definition()['parameters']['tipLength']
         - instr.hw_pipette['tip_overlap']
         ['opentrons/geb_96_tiprack_10ul/1'])
 
@@ -877,7 +877,7 @@ def test_bundled_labware(loop, get_labware_fixture):
     ctx = papi.ProtocolContext(loop, bundled_labware=bundled_labware)
     lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
     assert ctx.loaded_labwares[3] == lw1
-    assert ctx.loaded_labwares[3]._definition == fixture_96_plate
+    assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
 def test_bundled_labware_missing(loop, get_labware_fixture):
@@ -916,7 +916,7 @@ def test_extra_labware(loop, get_labware_fixture):
     ctx = papi.ProtocolContext(loop, extra_labware=bundled_labware)
     ls1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
     assert ctx.loaded_labwares[3] == ls1
-    assert ctx.loaded_labwares[3]._definition == fixture_96_plate
+    assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
 def test_api_version_checking():

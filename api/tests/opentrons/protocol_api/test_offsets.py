@@ -125,8 +125,9 @@ def test_save_labware_calibration(monkeypatch, clear_calibration):
         'hash_labware_def', mock_hash_labware
     )
 
-    test_labware = labware.Labware(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck'))
+    test_labware = labware.Labware(
+        labware.LabwareImplementation(minimalLabwareDef,
+                                      Location(Point(0, 0, 0), 'deck')))
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
     assert os.path.exists(path(MOCK_HASH))
@@ -274,8 +275,10 @@ def test_schema_shape(monkeypatch, clear_calibration):
     mock = Mock(spec=fake_datetime)
     mock.__class__ = datetime.datetime
 
-    test_labware = labware.Labware(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck'))
+    test_labware = labware.Labware(
+        labware.LabwareImplementation(minimalLabwareDef,
+                                      Location(Point(0, 0, 0), 'deck'))
+    )
 
     monkeypatch.setattr(
        helpers,
@@ -306,8 +309,9 @@ def test_load_calibration(monkeypatch, clear_calibration):
         'hash_labware_def', mock_hash_labware
     )
 
-    test_labware = labware.Labware(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck'))
+    test_labware = labware.Labware(labware.LabwareImplementation(
+        minimalLabwareDef, Location(Point(0, 0, 0), 'deck')
+    ))
 
     test_offset = Point(1, 1, 1)
 
@@ -318,22 +322,24 @@ def test_load_calibration(monkeypatch, clear_calibration):
     test_labware.set_calibration(Point(0, 0, 0))
     test_labware.tip_length = 46.8
     lookup_path = labware._get_labware_path(test_labware)
-    calibration_point =\
-        get.get_labware_calibration(lookup_path, test_labware._definition)
+    calibration_point = get.get_labware_calibration(
+        lookup_path,
+        test_labware._implementation.get_definition()
+    )
     assert calibration_point == test_offset
 
 
 def test_wells_rebuilt_with_offset():
-    test_labware = labware.Labware(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck'))
-    old_wells = test_labware._wells
-    assert test_labware._offset == Point(10, 10, 5)
-    assert test_labware._calibrated_offset == Point(10, 10, 5)
+    test_labware = labware.Labware(labware.LabwareImplementation(minimalLabwareDef,
+                                   Location(Point(0, 0, 0), 'deck')))
+    old_wells = test_labware.wells()
+    assert test_labware._implementation.get_geometry().offset == Point(10, 10, 5)
+    assert test_labware._implementation.get_calibrated_offset() == Point(10, 10, 5)
     labware.save_calibration(test_labware, Point(2, 2, 2))
-    new_wells = test_labware._wells
+    new_wells = test_labware.wells()
     assert old_wells[0] != new_wells[0]
-    assert test_labware._offset == Point(10, 10, 5)
-    assert test_labware._calibrated_offset == Point(12, 12, 7)
+    assert test_labware._implementation.get_geometry().offset == Point(10, 10, 5)
+    assert test_labware._implementation.get_calibrated_offset() == Point(12, 12, 7)
 
 
 def test_clear_calibrations():

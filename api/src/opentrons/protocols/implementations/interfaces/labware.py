@@ -7,7 +7,8 @@ from opentrons.protocols.implementations.tip_tracker import TipTracker
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.protocols.implementations.well_grid import WellGrid
 from opentrons.types import Point
-from opentrons_shared_data.labware.dev_types import LabwareParameters
+from opentrons_shared_data.labware.dev_types import (
+    LabwareParameters, LabwareDefinition)
 
 
 class AbstractLabwareImplementation(DeckItem):
@@ -27,6 +28,10 @@ class AbstractLabwareImplementation(DeckItem):
 
     @abstractmethod
     def set_name(self, new_name: str) -> None:
+        ...
+
+    @abstractmethod
+    def get_definition(self) -> LabwareDefinition:
         ...
 
     @abstractmethod

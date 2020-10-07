@@ -1,7 +1,8 @@
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocols.implementations.labware import LabwareImplementation
 from opentrons.protocols.implementations.well import WellImplementation
 
-from tests.opentrons.protocol_api.test_accessor_fn import minimalLabwareDef2
+from tests.opentrons.protocol_api.test_accessor_fn import minimal_labware_def2
 from unittest import mock
 from copy import deepcopy
 import pytest
@@ -30,10 +31,12 @@ def test_load_pipettes_from_json():
     assert result == {'aID': ('a', 'left'), 'bID': ('b', 'right')}
 
 
-def test_get_well():
+def test_get_well(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), 'deck')
     well_name = 'A2'
-    some_labware = labware.Labware(minimalLabwareDef2, deck)
+    some_labware = labware.Labware(
+        implementation=LabwareImplementation(minimal_labware_def2, deck)
+    )
     loaded_labware = {'someLabwareId': some_labware}
     params = {'labware': 'someLabwareId', 'well': well_name}
     result = _get_well(loaded_labware, params)
@@ -84,9 +87,9 @@ def test_load_labware_from_json_defs(loop, get_labware_fixture):
             str(loaded_labware['destPlateId']))
 
 
-def test_get_location_with_offset():
+def test_get_location_with_offset(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), 'deck')
-    some_labware = labware.Labware(minimalLabwareDef2, deck)
+    some_labware = labware.Labware(implementation=LabwareImplementation(minimal_labware_def2, deck))
     loaded_labware = {'someLabwareId': some_labware}
     params = {'offsetFromBottomMm': 3,
               'labware': 'someLabwareId', 'well': 'A2'}
@@ -94,11 +97,11 @@ def test_get_location_with_offset():
     assert result == Location(Point(19, 28, 8), some_labware['A2'])
 
 
-def test_get_location_with_offset_fixed_trash():
+def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), 'deck')
-    trash_labware_def = deepcopy(minimalLabwareDef2)
+    trash_labware_def = deepcopy(minimal_labware_def2)
     trash_labware_def['parameters']['quirks'] = ["fixedTrash"]
-    trash_labware = labware.Labware(trash_labware_def, deck)
+    trash_labware = labware.Labware(implementation=LabwareImplementation(trash_labware_def, deck))
 
     loaded_labware = {'someLabwareId': trash_labware}
     params = {'offsetFromBottomMm': 3,
@@ -176,14 +179,14 @@ def test_drop_tip():
     ]
 
 
-def test_air_gap():
+def test_air_gap(minimal_labware_def2):
     m = mock.MagicMock()
     m.pipette_mock = mock.create_autospec(InstrumentContext)
     m.mock_set_flow_rate = mock.MagicMock()
 
     deck = Location(Point(0, 0, 0), 'deck')
     well_name = 'A2'
-    some_labware = labware.Labware(minimalLabwareDef2, deck)
+    some_labware = labware.Labware(implementation=LabwareImplementation(minimal_labware_def2, deck))
     loaded_labware = {'someLabwareId': some_labware}
     params = {'labware': 'someLabwareId', 'well': well_name}
 
@@ -277,10 +280,12 @@ def test_touch_tip():
                 'x': 40,
                 'y': 50,
                 'z': 3},
-                parent=Location(Point(10, 20, 30), 1)
+                parent_point=Point(10, 20, 30),
+                parent_object=1
             ),
             has_tip=False,
-            display_name='some well'
+            display_name='some well',
+            name="A2"
         ),
         api_level=MAX_SUPPORTED_VERSION
     )

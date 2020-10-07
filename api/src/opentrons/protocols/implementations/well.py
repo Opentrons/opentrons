@@ -1,13 +1,9 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
-
-if TYPE_CHECKING:
-    from opentrons.protocol_api.labware import Labware
 
 
 class WellImplementation:
@@ -43,9 +39,6 @@ class WellImplementation:
         self._column_name = match.group(2)
         self._geometry = well_geometry
 
-    def get_parent(self) -> Labware:
-        return self._geometry.parent.labware   # type: ignore
-
     def has_tip(self) -> bool:
         return self._has_tip
 
@@ -72,3 +65,9 @@ class WellImplementation:
 
     def __repr__(self):
         return self.get_display_name()
+
+    def __eq__(self, other) -> bool:
+        """Assume that if name is the same then it's the same well"""
+        return \
+            isinstance(other, WellImplementation) and\
+            self.get_name() == other.get_name()
