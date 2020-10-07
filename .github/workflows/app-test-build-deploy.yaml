@@ -65,16 +65,17 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ./.npm-cache/_prebuild
-            ./.yarn-cache
+            ${{ env.HOME }}/.npm-cache/_prebuild
+            ${{ env.HOME }}./.yarn-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
+          npm config set cache ${HOME}/.npm-cache
+          yarn config set cache-folder ${HOME}/.yarn-cache
           make setup-js
+        shell: bash
       - name: 'test frontend packages'
         run: |
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns 'labware-.*' 'protocol-.*' 'app-shell' 'discovery-client'
@@ -103,16 +104,17 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ./.npm-cache/_prebuild
-            ./.yarn-cache
+            ${{ env.HOME }}/.npm-cache/_prebuild
+            ${{ env.HOME }}/.yarn-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: setup-js
         run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
+          npm config set cache ${HOME}/.npm-cache
+          yarn config set cache-folder ${HOME}/.yarn-cache
           make setup-js
+        shell: bash
       - name: 'test native(er) packages'
         run: |
           yarn jest --coverage=true --ci=true --testPathPattern '(app-shell|discovery-client)'
