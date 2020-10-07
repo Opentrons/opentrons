@@ -13,6 +13,7 @@ import * as TipLength from '../../calibration/tip-length'
 import { CONNECTABLE } from '../../discovery'
 import type { ViewableRobot } from '../../discovery/types'
 import { selectors as robotSelectors } from '../../robot'
+import { useTrackEvent } from '../../analytics'
 
 import {
   useInterval,
@@ -46,6 +47,7 @@ type Props = {|
   pipettesPageUrl: string,
 |}
 
+const EVENT_CALIBRATION_DOWNLOADED = 'calibrationDataDownloaded'
 const TITLE = 'Robot Calibration'
 
 const DOWNLOAD_CALIBRATION = 'Download your calibration data'
@@ -89,6 +91,8 @@ export function CalibrationCard(props: Props): React.Node {
     return Calibration.getTipLengthCalibrations(state, robotName)
   })
 
+  const doTrackEvent = useTrackEvent()
+
   let buttonDisabledReason = null
   if (notConnectable) {
     buttonDisabledReason = DISABLED_CANNOT_CONNECT
@@ -100,6 +104,7 @@ export function CalibrationCard(props: Props): React.Node {
 
   const onClickSaveAs = e => {
     e.preventDefault()
+    doTrackEvent({ name: EVENT_CALIBRATION_DOWNLOADED, properties: {} })
     saveAs(
       new Blob([
         JSON.stringify({
