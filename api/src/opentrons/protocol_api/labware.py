@@ -9,12 +9,10 @@ tiprack") to points in deck coordinates.
 """
 import logging
 import json
-import re
 import os
 import shutil
 
 from pathlib import Path
-from collections import defaultdict
 from itertools import takewhile, dropwhile
 from typing import (
     Any, AnyStr, List, Dict,
@@ -26,7 +24,9 @@ import jsonschema  # type: ignore
 from opentrons.protocols.api_support.util import (
     ModifiedList, requires_version, labware_column_shift)
 from opentrons.calibration_storage import get, helpers, modify
+from opentrons.protocols.implementations.well_grid import WellGrid
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
@@ -60,32 +60,16 @@ class Well:
     such as :py:meth:`top`, :py:meth:`bottom`
     """
     def __init__(self,
-                 well_geometry: WellGeometry,
-                 display_name: str,
-                 has_tip: bool,
-                 api_level: APIVersion,
-                 name: str = None) -> None:
+                 well_implementation: WellImplementation,
+                 api_level: APIVersion):
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
 
-        :param display_name: a string that identifies a well. Used primarily
-            for debug and test purposes. Should be unique and human-readable--
-            something like "Tip C3 of Opentrons 300ul Tiprack on Slot 5" or
-            "Well D1 of Biorad 96 PCR Plate on Magnetic Module in Slot 1".
-            This is created by the caller and passed in, so here it is just
-            saved and made available.
-        :param well_geometry: The well's geometry
         """
         self._api_version = api_level
-        self._display_name = display_name
-        self._geometry = well_geometry
-
-        self._has_tip = has_tip
-        if name:
-            self._name = name
-        else:
-            self._name = display_name
+        self._impl = well_implementation
+        self._geometry = well_implementation.get_geometry()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -100,11 +84,11 @@ class Well:
     @property  # type: ignore
     @requires_version(2, 0)
     def has_tip(self) -> bool:
-        return self._has_tip
+        return self._impl.has_tip()
 
     @has_tip.setter
     def has_tip(self, value: bool):
-        self._has_tip = value
+        self._impl.set_has_tip(value)
 
     @property
     def max_volume(self) -> float:
@@ -121,12 +105,12 @@ class Well:
 
     @property
     def display_name(self):
-        return self._display_name
+        return self._impl.get_display_name()
 
     @property  # type: ignore
     @requires_version(2, 7)
     def well_name(self) -> str:
-        return self._name
+        return self._impl.get_name()
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
@@ -165,7 +149,7 @@ class Well:
         Specifies an arbitrary point in deck coordinates based
         on percentages of the radius in each axis. For example, to specify the
         back-right corner of a well at 1/4 of the well depth from the bottom,
-        the call would be `_from_center_cartesian(1, 1, -0.5)`.
+        the call would be `from_center_cartesian(1, 1, -0.5)`.
 
         No checks are performed to ensure that the resulting position will be
         inside of the well.
@@ -192,7 +176,7 @@ class Well:
         return self.from_center_cartesian(x, y, z)
 
     def __repr__(self):
-        return self._display_name
+        return self._impl.get_display_name()
 
     def __eq__(self, other: object) -> bool:
         """
@@ -284,13 +268,14 @@ class Labware(DeckItem):
         self._ordering = [well
                           for col in definition['ordering']
                           for well in col]
+        self._well_name_grid: WellGrid[Well] = WellGrid(self._ordering,
+                                                        self._wells)
         self._offset\
             = Point(offset['x'], offset['y'], offset['z']) + parent.point
         self._parent = parent.labware
         # Applied properties
         self.set_calibration(self._calibrated_offset)
 
-        self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
         self._highest_z = self._dimensions['zDimension']
 
@@ -368,32 +353,17 @@ class Labware(DeckItem):
         """
         return [
             Well(
-                WellGeometry(
-                    well_props=self._well_definition[well],
-                    parent=Location(self._calibrated_offset, self)
-                ),
-                "{} of {}".format(well, self._display_name),
-                self._is_tiprack,
-                self._api_version,
-                well)
+                api_level=self._api_version,
+                well_implementation=WellImplementation(
+                    well_geometry=WellGeometry(
+                        well_props=self._well_definition[well],
+                        parent=Location(self._calibrated_offset, self)
+                    ),
+                    display_name="{} of {}".format(well, self._display_name),
+                    has_tip=self._is_tiprack,
+                    name=well)
+            )
             for well in self._ordering]
-
-    def _create_indexed_dictionary(self, group=0) -> Dict[str, List['Well']]:
-        """
-        Creates a dict of lists of Wells. Which way the labware is segmented
-        determines whether this is a dict of rows or dict of columns. If group
-        is 1, then it will collect wells that have the same alphabetic prefix
-        and therefore are considered to be in the same row. If group is 2, it
-        will collect wells that have the same numeric postfix and therefore
-        are considered to be in the same column.
-        """
-        dict_list: Dict[str, List['Well']] = defaultdict(list)
-        for index, well_obj in zip(self._ordering, self._wells):
-            match = self._pattern.match(index)
-            assert match, 'could not match well name pattern'
-            dict_list[match.group(group)].append(well_obj)
-        # copy to a non-default-dict
-        return {k: v for k, v in dict_list.items()}
 
     def set_calibration(self, delta: Point):
         """
@@ -403,6 +373,7 @@ class Labware(DeckItem):
                                         y=self._offset.y + delta.y,
                                         z=self._offset.z + delta.z)
         self._wells = self._build_wells()
+        self._well_name_grid = WellGrid(self._ordering, self._wells)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -486,15 +457,12 @@ class Labware(DeckItem):
 
         :return: A list of row lists
         """
-        row_dict = self._create_indexed_dictionary(group=1)
-        keys = sorted(row_dict)
-
         if not args:
-            res = [row_dict[key] for key in keys]
+            res = self._well_name_grid.get_rows()
         elif isinstance(args[0], int):
-            res = [row_dict[keys[idx]] for idx in args]
+            res = [self._well_name_grid.get_rows()[idx] for idx in args]
         elif isinstance(args[0], str):
-            res = [row_dict[idx] for idx in args]
+            res = [self._well_name_grid.get_row(idx) for idx in args]
         else:
             raise TypeError
         return res
@@ -510,8 +478,7 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by row name
         """
-        row_dict = self._create_indexed_dictionary(group=1)
-        return row_dict
+        return self._well_name_grid.get_row_dict()
 
     @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
@@ -538,15 +505,12 @@ class Labware(DeckItem):
 
         :return: A list of column lists
         """
-        col_dict = self._create_indexed_dictionary(group=2)
-        keys = sorted(col_dict, key=lambda x: int(x))
-
         if not args:
-            res = [col_dict[key] for key in keys]
+            res = self._well_name_grid.get_columns()
         elif isinstance(args[0], int):
-            res = [col_dict[keys[idx]] for idx in args]
+            res = [self._well_name_grid.get_columns()[idx] for idx in args]
         elif isinstance(args[0], str):
-            res = [col_dict[idx] for idx in args]
+            res = [self._well_name_grid.get_column(idx) for idx in args]
         else:
             raise TypeError
         return res
@@ -563,8 +527,7 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by column name
         """
-        col_dict = self._create_indexed_dictionary(group=2)
-        return col_dict
+        return self._well_name_grid.get_column_dict()
 
     @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:

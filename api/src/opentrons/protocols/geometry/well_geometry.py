@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, cast
 
 from opentrons.types import Location, Point
-from opentrons_shared_data.labware.dev_types import WellDefinition
+from opentrons_shared_data.labware.dev_types import (
+    WellDefinition, CircularWellDefinition, RectangularWellDefinition)
 
 
 class WellGeometry:
@@ -17,21 +18,28 @@ class WellGeometry:
 
         if not parent.labware:
             raise ValueError("Wells must have a parent")
+
         self._parent = parent
 
-        self._shape = well_props['shape']
-        if well_props['shape'] == 'rectangular':
-            self._length: Optional[float] = well_props['xDimension']
-            self._width: Optional[float] = well_props['yDimension']
-            self._diameter: Optional[float] = None
-        elif well_props['shape'] == 'circular':
-            self._length = None
-            self._width = None
-            self._diameter = well_props['diameter']
+        self._length: Optional[float] = None
+        self._width: Optional[float] = None
+        self._diameter: Optional[float] = None
+
+        shape = well_props['shape']
+        if shape == 'rectangular':
+            rect_props = cast(RectangularWellDefinition, well_props)
+            self._length = rect_props['xDimension']
+            self._width = rect_props['yDimension']
+            self._x_size = self._length
+            self._y_size = self._width
+        elif shape == 'circular':
+            circular_props = cast(CircularWellDefinition, well_props)
+            self._diameter = circular_props['diameter']
+            self._x_size = self._y_size = self._diameter
         else:
             raise ValueError(
-                'Shape "{}" is not a supported well shape'.format(
-                    well_props['shape']))
+                f'Shape "{shape}" is not a supported well shape')
+
         self._max_volume = well_props['totalLiquidVolume']
         self._depth = well_props['depth']
 
@@ -82,12 +90,8 @@ class WellGeometry:
         coordinates
         """
         center = self.center()
-        if self._shape == 'rectangular':
-            x_size: float = self._length  # type: ignore
-            y_size: float = self._width  # type: ignore
-        else:
-            x_size = self._diameter  # type: ignore
-            y_size = self._diameter  # type: ignore
+        x_size = self._x_size
+        y_size = self._y_size
         z_size = self._depth
 
         return Point(

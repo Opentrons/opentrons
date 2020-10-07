@@ -1,6 +1,7 @@
 from unittest import mock
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Location, Point
 from opentrons.protocol_api import InstrumentContext, \
     labware, MAX_SUPPORTED_VERSION
@@ -12,18 +13,20 @@ def test_move_to_well_with_optional_params():
     instruments = {'somePipetteId': pipette_mock}
 
     well = labware.Well(
-        WellGeometry({
-            'shape': 'circular',
-            'depth': 40,
-            'totalLiquidVolume': 100,
-            'diameter': 30,
-            'x': 40,
-            'y': 50,
-            'z': 3},
-            parent=Location(Point(10, 20, 30), 1)
+        well_implementation=WellImplementation(
+            well_geometry=WellGeometry({
+                'shape': 'circular',
+                'depth': 40,
+                'totalLiquidVolume': 100,
+                'diameter': 30,
+                'x': 40,
+                'y': 50,
+                'z': 3},
+                parent=Location(Point(10, 20, 30), 1)
+            ),
+            has_tip=False,
+            display_name='some well'
         ),
-        has_tip=False,
-        display_name='some well',
         api_level=MAX_SUPPORTED_VERSION)
 
     mock_get_well = mock.MagicMock(
@@ -58,18 +61,20 @@ def test_move_to_well_without_optional_params():
     instruments = {'somePipetteId': pipette_mock}
 
     well = labware.Well(
-        WellGeometry({
-            'shape': 'circular',
-            'depth': 40,
-            'totalLiquidVolume': 100,
-            'diameter': 30,
-            'x': 40,
-            'y': 50,
-            'z': 3},
-            parent=Location(Point(10, 20, 30), 1)
+        well_implementation=WellImplementation(
+            well_geometry=WellGeometry({
+                'shape': 'circular',
+                'depth': 40,
+                'totalLiquidVolume': 100,
+                'diameter': 30,
+                'x': 40,
+                'y': 50,
+                'z': 3},
+                parent=Location(Point(10, 20, 30), 1)
+            ),
+            has_tip=False,
+            display_name='some well'
         ),
-        has_tip=False,
-        display_name='some well',
         api_level=MAX_SUPPORTED_VERSION)
 
     mock_get_well = mock.MagicMock(

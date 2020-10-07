@@ -6,6 +6,7 @@ from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION)
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocols.implementations.well import WellImplementation
 
 from opentrons_shared_data import load_shared_data
 from opentrons.calibration_storage import (
@@ -61,10 +62,12 @@ def test_well_init():
     well_name = 'circular_well_json'
     has_tip = False
     well1 = labware.Well(
-        WellGeometry(test_data[well_name], slot),
-        well_name,
-        has_tip,
-        MAX_SUPPORTED_VERSION
+        api_level=MAX_SUPPORTED_VERSION,
+        well_implementation=WellImplementation(
+            well_geometry=WellGeometry(test_data[well_name], slot),
+            display_name=well_name,
+            has_tip=has_tip
+        )
     )
     assert well1.geometry.diameter == test_data[well_name]['diameter']
     assert well1.geometry._length is None
@@ -72,10 +75,12 @@ def test_well_init():
 
     well2_name = 'rectangular_well_json'
     well2 = labware.Well(
-        WellGeometry(test_data[well2_name], slot),
-        well2_name,
-        has_tip,
-        MAX_SUPPORTED_VERSION
+        api_level=MAX_SUPPORTED_VERSION,
+        well_implementation=WellImplementation(
+            well_geometry=WellGeometry(test_data[well2_name], slot),
+            display_name=well2_name,
+            has_tip=has_tip
+        )
     )
     assert well2.geometry.diameter is None
     assert well2.geometry._length == test_data[well2_name]['xDimension']
@@ -87,10 +92,12 @@ def test_top():
     well_name = 'circular_well_json'
     has_tip = False
     well = labware.Well(
-        WellGeometry(test_data[well_name], slot),
-        well_name,
-        has_tip,
-        MAX_SUPPORTED_VERSION
+        api_level=MAX_SUPPORTED_VERSION,
+        well_implementation=WellImplementation(
+            well_geometry=WellGeometry(test_data[well_name], slot),
+            display_name=well_name,
+            has_tip=has_tip
+        )
     )
     well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.point.x
@@ -105,10 +112,12 @@ def test_bottom():
     well_name = 'rectangular_well_json'
     has_tip = False
     well = labware.Well(
-        WellGeometry(test_data[well_name], slot),
-        well_name,
-        has_tip,
-        MAX_SUPPORTED_VERSION
+        api_level=MAX_SUPPORTED_VERSION,
+        well_implementation=WellImplementation(
+            well_geometry=WellGeometry(test_data[well_name], slot),
+            display_name=well_name,
+            has_tip=has_tip
+        )
     )
     well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.point.x
@@ -123,10 +132,12 @@ def test_from_center_cartesian():
     well_name = 'circular_well_json'
     has_tip = False
     well1 = labware.Well(
-        WellGeometry(test_data[well_name], slot1),
-        well_name,
-        has_tip,
-        MAX_SUPPORTED_VERSION
+        api_level=MAX_SUPPORTED_VERSION,
+        well_implementation=WellImplementation(
+            well_geometry=WellGeometry(test_data[well_name], slot1),
+            display_name=well_name,
+            has_tip=has_tip
+        )
     )
 
     percent1_x = 1
@@ -150,10 +161,14 @@ def test_from_center_cartesian():
     slot2 = Location(Point(13, 14, 15), 1)
     well2_name = 'rectangular_well_json'
     has_tip = False
-    well2 = labware.Well(WellGeometry(test_data[well2_name], slot2),
-                         well2_name,
-                         has_tip,
-                         MAX_SUPPORTED_VERSION)
+    well2 = labware.Well(
+        api_level=MAX_SUPPORTED_VERSION,
+        well_implementation=WellImplementation(
+            well_geometry=WellGeometry(test_data[well2_name], slot2),
+            display_name=well2_name,
+            has_tip=has_tip
+        )
+    )
     percent2_x = -0.25
     percent2_y = 0.1
     percent2_z = 0.9
@@ -225,12 +240,14 @@ def test_well_parent():
     parent = Location(Point(7, 8, 9), lw)
     well_name = 'circular_well_json'
     has_tip = True
-    well = labware.Well(WellGeometry(
-                            test_data[well_name],
-                            parent),
-                        well_name,
-                        has_tip,
-                        MAX_SUPPORTED_VERSION)
+    well = labware.Well(
+        api_level=MAX_SUPPORTED_VERSION,
+        well_implementation=WellImplementation(
+            well_geometry=WellGeometry(test_data[well_name], parent),
+            display_name=well_name,
+            has_tip=has_tip
+        )
+    )
     assert well.parent is lw
     assert well.top().labware is well
     assert well.top().labware.parent is lw
