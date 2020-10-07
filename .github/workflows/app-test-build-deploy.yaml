@@ -113,7 +113,6 @@ jobs:
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
-        shell: bash
       - name: 'test native(er) packages'
         run: |
           yarn jest --coverage=true --ci=true --testPathPattern '(app-shell|discovery-client)'
