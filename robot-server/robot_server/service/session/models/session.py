@@ -83,9 +83,9 @@ Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
 """
 SessionDetails = typing.Union[
     CalibrationSessionStatus,
+    PipetteOffsetCalibrationSessionStatus,
     TipCalibrationSessionStatus,
     DeckCalibrationSessionStatus,
-    PipetteOffsetCalibrationSessionStatus,
     ProtocolSessionDetails,
     EmptyModel
 ]

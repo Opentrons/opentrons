@@ -35,15 +35,21 @@ const contentsBySessionType: {
   },
   [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
     yesButtonText: YES_AND_MOVE_TO_MEASURE_TIP,
-    moveCommandString: Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT,
+    moveCommandString: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
   },
 }
 export function TipConfirmation(props: CalibrationPanelProps): React.Node {
-  const { sendCommands, sessionType } = props
+  const { sendCommands, sessionType, hasCalibratedTipLength } = props
 
-  const { yesButtonText, moveCommandString } = contentsBySessionType[
-    sessionType
-  ]
+  const isExtendedPipOffset =
+    sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
+    hasCalibratedTipLength === false
+
+  const lookupType = isExtendedPipOffset
+    ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+    : sessionType
+
+  const { yesButtonText, moveCommandString } = contentsBySessionType[lookupType]
 
   const invalidateTip = () => {
     sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_TIP })

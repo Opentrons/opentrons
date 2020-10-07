@@ -12,6 +12,14 @@ class SessionCreateParams(BaseModel):
         ...,
         description='The mount on which the pipette is attached, left or right'
     )
+    shouldCalibrateTipLength: bool = Field(
+        True,
+        description='Whether tiplength for this tiprack should be loaded'
+    )
+    tipRackDefinition: Optional[dict] = Field(
+        None,
+        description='The full labware definition of the tip rack to calibrate.'
+    )
 
 
 class PipetteOffsetCalibrationSessionStatus(BaseModel):
@@ -20,9 +28,12 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
     currentStep: str = Field(
         ...,
         description="Current step of pipette offset user flow")
+    labware: List[RequiredLabware]
+    hasCalibratedTipLength: bool =\
+        Field(None, description="Does tip length calibration data exist for "
+                                "this pipette and tip rack combination")
     nextSteps: Optional[NextSteps] =\
         Field(None, description="Next Available Steps in Session")
-    labware: List[RequiredLabware]
 
     class Config:
         schema_extra = {
@@ -50,7 +61,8 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
                           "isTiprack": "true",
                           "definition": {"ordering": "the ordering section..."}
                       },
-                    ]
+                    ],
+                    "hasCalibratedTipLength": True,
                 }
             ]
         }

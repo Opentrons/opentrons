@@ -6,9 +6,9 @@ from opentrons.hardware_control import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
 
+from robot_server.robot.calibration.util import get_reference_location
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models.command import (
-    CalibrationCommand, TipLengthCalibrationCommand)
+from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 
@@ -141,9 +141,9 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
     (CalibrationCommand.jog, 'measuringNozzleOffset',
      stub_jog_data, 'move_rel'),
     (CalibrationCommand.pick_up_tip, 'preparingPipette', {}, 'pick_up_tip'),
-    (TipLengthCalibrationCommand.move_to_reference_point, 'labwareLoaded',
+    (CalibrationCommand.move_to_reference_point, 'labwareLoaded',
      {}, 'move_to'),
-    (TipLengthCalibrationCommand.move_to_reference_point, 'inspectingTip',
+    (CalibrationCommand.move_to_reference_point, 'inspectingTip',
      {}, 'move_to'),
     (CalibrationCommand.move_to_tip_rack, 'measuringNozzleOffset',
      {}, 'move_to'),
@@ -270,7 +270,9 @@ def test_load_cal_block(mock_user_flow_all_combos):
 
 async def test_get_reference_location(mock_user_flow_all_combos):
     uf = mock_user_flow_all_combos
-    result = uf._get_reference_point()
+    result = get_reference_location(
+        mount=uf._mount, deck=uf._deck,
+        has_calibration_block=uf._has_calibration_block)
     if uf._has_calibration_block:
         if uf._mount == Mount.LEFT:
             exp = uf._deck['3'].wells()[0].top().move(Point(0, 0, 5))

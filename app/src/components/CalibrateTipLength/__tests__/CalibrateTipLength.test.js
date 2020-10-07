@@ -16,9 +16,9 @@ import {
   TipPickUp,
   TipConfirmation,
   CompleteConfirmation,
+  MeasureNozzle,
+  MeasureTip,
 } from '../../CalibrationPanels'
-import { MeasureNozzle } from '../MeasureNozzle'
-import { MeasureTip } from '../MeasureTip'
 
 import type { TipLengthCalibrationStep } from '../../../sessions/types'
 

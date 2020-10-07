@@ -1,14 +1,13 @@
 import pytest
 from typing import List, Tuple
 
-from robot_server.service.session.models.command import (
-    CalibrationCommand, TipLengthCalibrationCommand)
+from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.tip_length.state_machine import \
     TipCalibrationStateMachine
 
 valid_commands: List[Tuple[str, str, str]] = [
   (CalibrationCommand.load_labware, 'sessionStarted', 'labwareLoaded'),
-  (TipLengthCalibrationCommand.move_to_reference_point, 'labwareLoaded',
+  (CalibrationCommand.move_to_reference_point, 'labwareLoaded',
    'measuringNozzleOffset'),
   (CalibrationCommand.jog, 'measuringNozzleOffset',
    'measuringNozzleOffset'),
@@ -19,7 +18,7 @@ valid_commands: List[Tuple[str, str, str]] = [
   (CalibrationCommand.jog, 'preparingPipette', 'preparingPipette'),
   (CalibrationCommand.pick_up_tip, 'preparingPipette', 'inspectingTip'),
   (CalibrationCommand.invalidate_tip, 'inspectingTip', 'preparingPipette'),
-  (TipLengthCalibrationCommand.move_to_reference_point, 'inspectingTip',
+  (CalibrationCommand.move_to_reference_point, 'inspectingTip',
    'measuringTipOffset'),
   (CalibrationCommand.jog, 'measuringTipOffset', 'measuringTipOffset'),
   (CalibrationCommand.save_offset, 'measuringTipOffset',

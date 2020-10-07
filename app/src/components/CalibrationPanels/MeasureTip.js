@@ -1,4 +1,3 @@
-/* eslint-disable no-return-assign */
 // @flow
 import * as React from 'react'
 import { css } from 'styled-components'
@@ -22,20 +21,19 @@ import {
   SPACING_4,
 } from '@opentrons/components'
 
-import { JogControls } from '../JogControls'
 import * as Sessions from '../../sessions'
+import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
-
 import { formatJogVector } from '../CalibrationPanels/utils'
-import leftMultiBlockAsset from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
-import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_NO_TIP_(330x260)REV1.webm'
-import leftSingleBlockAsset from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
-import leftSingleTrashAsset from '../../assets/videos/tip-length-cal/Left_Single_Trash_NO_TIP_(330x260)REV1.webm'
-import rightMultiBlockAsset from '../../assets/videos/tip-length-cal/Right_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
-import rightMultiTrashAsset from '../../assets/videos/tip-length-cal/Right_Multi_Trash_NO_TIP_(330x260)REV1.webm'
-import rightSingleBlockAsset from '../../assets/videos/tip-length-cal/Right_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
-import rightSingleTrashAsset from '../../assets/videos/tip-length-cal/Right_Single_Trash_NO_TIP_(330x260)REV1.webm'
+import leftMultiBlockAsset from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
+import leftSingleBlockAsset from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import leftSingleTrashAsset from '../../assets/videos/tip-length-cal/Left_Single_Trash_WITH_TIP_(330x260)REV1.webm'
+import rightMultiBlockAsset from '../../assets/videos/tip-length-cal/Right_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import rightMultiTrashAsset from '../../assets/videos/tip-length-cal/Right_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
+import rightSingleBlockAsset from '../../assets/videos/tip-length-cal/Right_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
+import rightSingleTrashAsset from '../../assets/videos/tip-length-cal/Right_Single_Trash_WITH_TIP_(330x260)REV1.webm'
 
 const assetMap = {
   block: {
@@ -60,18 +58,18 @@ const assetMap = {
   },
 }
 
-const HEADER = 'Save the nozzle z-axis'
-const JOG_UNTIL = 'Jog the robot until the nozzle is'
+const HEADER = 'Save the tip length'
+const JOG_UNTIL = 'Jog the robot until the tip is'
 const BARELY_TOUCHING = 'barely touching (less than 0.1 mm)'
 const THE = 'the'
 const BLOCK = 'block in'
 const FLAT_SURFACE = 'flat surface'
 const OF_THE_TRASH_BIN = 'of the trash bin'
-const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis'
+const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
 const SLOT = 'slot'
 
-export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
-  const { sendCommands, calBlock, mount, isMulti } = props
+export function MeasureTip(props: CalibrationPanelProps): React.Node {
+  const { sendCommands, calBlock, isMulti, mount } = props
 
   const referencePointStr = calBlock ? (
     BLOCK
@@ -95,7 +93,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
     sendCommands({
-      command: Sessions.tipCalCommands.JOG,
+      command: Sessions.sharedCalCommands.JOG,
       data: {
         vector: formatJogVector(axis, dir, step),
       },
@@ -104,8 +102,8 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
 
   const proceed = () => {
     sendCommands(
-      { command: Sessions.tipCalCommands.SAVE_OFFSET },
-      { command: Sessions.tipCalCommands.MOVE_TO_TIP_RACK }
+      { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+      { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
     )
   }
 
@@ -161,7 +159,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
           <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
         </div>
         <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
-          <PrimaryBtn onClick={proceed} flex="1">
+          <PrimaryBtn title="saveTipLengthButton" onClick={proceed} flex="1">
             {SAVE_NOZZLE_Z_AXIS}
           </PrimaryBtn>
         </Flex>

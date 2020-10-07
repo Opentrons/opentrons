@@ -3,16 +3,21 @@ from typing import Set, Dict, Any, Union, TYPE_CHECKING
 
 from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
+from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
-from opentrons.types import Point, Location
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.calibration_storage import modify
+from opentrons.types import Point, Location, Mount
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import (
     CommandDefinition)
-from .constants import STATE_WILDCARD
+from .constants import STATE_WILDCARD, CAL_BLOCK_SETUP_BY_MOUNT, \
+    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET
 from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
-from .pipette_offset.constants import PipetteOffsetCalibrationState
+from .pipette_offset.constants import (
+    PipetteOffsetCalibrationState, PipetteOffsetWithTipLengthCalibrationState)
 from .deck.constants import DeckCalibrationState
 
 if TYPE_CHECKING:
@@ -21,7 +26,8 @@ if TYPE_CHECKING:
     from .pipette_offset.user_flow import PipetteOffsetCalibrationUserFlow
 
 ValidState = Union[TipCalibrationState, DeckCalibrationState,
-                   PipetteOffsetCalibrationState]
+                   PipetteOffsetCalibrationState,
+                   PipetteOffsetWithTipLengthCalibrationState]
 
 
 class StateTransitionError(RobotServerError):
@@ -147,3 +153,37 @@ async def move(user_flow: CalibrationUserFlow, to_loc: Location):
         await user_flow._hardware.move_to(mount=user_flow._mount,
                                           abs_position=move[0],
                                           critical_point=move[1])
+
+
+def get_reference_location(mount: Mount,
+                           deck: Deck,
+                           has_calibration_block: bool) -> Location:
+    """
+    Get location of static z reference point.
+    Will be on Calibration Block if available, otherwise will be on
+    flat surface of fixed trash insert.
+    """
+    if has_calibration_block:
+        slot = CAL_BLOCK_SETUP_BY_MOUNT[mount].slot
+        well = CAL_BLOCK_SETUP_BY_MOUNT[mount].well
+        calblock: labware.Labware = deck[slot]  # type: ignore
+        calblock_loc = calblock.wells_by_name()[well].top()
+        ref_loc = calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)
+    else:
+        trash = deck.get_fixed_trash()
+        assert trash
+        trash_loc = trash.wells_by_name()[TRASH_WELL].top()
+        ref_loc = trash_loc.move(TRASH_REF_POINT_OFFSET +
+                                 MOVE_TO_REF_POINT_SAFETY_BUFFER)
+    return ref_loc
+
+
+def save_tip_length_calibration(pipette_id: str,
+                                tip_length_offset: float,
+                                tip_rack: labware.Labware):
+    # TODO: 07-22-2020 parent slot is not important when tracking
+    # tip length data, hence the empty string, we should remove it
+    # from create_tip_length_data in a refactor
+    tip_length_data = modify.create_tip_length_data(tip_rack._definition, '',
+                                                    tip_length_offset)
+    modify.save_tip_length_calibration(pipette_id, tip_length_data)

@@ -91,7 +91,7 @@ describe('TipConfirmation', () => {
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith({
-      command: Sessions.tipCalCommands.MOVE_TO_REFERENCE_POINT,
+      command: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
     })
   })
 })

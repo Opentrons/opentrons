@@ -168,9 +168,11 @@ class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
     load_labware = "loadLabware"
     jog = ("jog", JogPosition)
+    set_has_calibration_block = ("setHasCalibrationBlock", bool)
     move_to_tip_rack = "moveToTipRack"
     move_to_point_one = "moveToPointOne"
     move_to_deck = "moveToDeck"
+    move_to_reference_point = "moveToReferencePoint"
     pick_up_tip = "pickUpTip"
     confirm_tip_attached = "confirmTip"
     invalidate_tip = "invalidateTip"
@@ -193,15 +195,6 @@ class CalibrationCheckCommand(CommandDefinition):
     @staticmethod
     def namespace():
         return "calibration.check"
-
-
-class TipLengthCalibrationCommand(CommandDefinition):
-    """Tip Length Calibration Specific"""
-    move_to_reference_point = "moveToReferencePoint"
-
-    @staticmethod
-    def namespace():
-        return "calibration.tipLength"
 
 
 class DeckCalibrationCommand(CommandDefinition):
@@ -234,7 +227,6 @@ CommandDefinitionType = typing.Union[
     RobotCommand,
     CalibrationCommand,
     CalibrationCheckCommand,
-    TipLengthCalibrationCommand,
     DeckCalibrationCommand,
     ProtocolCommand,
     PipetteCommand,

@@ -32,9 +32,9 @@ import {
   TipConfirmation,
   CompleteConfirmation,
   ConfirmExitModal,
+  MeasureNozzle,
+  MeasureTip,
 } from '../CalibrationPanels'
-import { MeasureNozzle } from './MeasureNozzle'
-import { MeasureTip } from './MeasureTip'
 
 import type { CalibrateTipLengthParentProps } from './types'
 
