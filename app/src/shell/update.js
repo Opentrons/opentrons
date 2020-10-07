@@ -4,7 +4,7 @@
 import { createSelector } from 'reselect'
 
 import type { State } from '../types'
-import type { ShellUpdateAction, ShellUpdateState, UpdateInfo } from './types'
+import type { ShellUpdateAction, ShellUpdateState } from './types'
 
 // command sent to app-shell via meta.shell === true
 export function checkShellUpdate(): ShellUpdateAction {
@@ -25,15 +25,13 @@ export function setShellUpdateSeen(): ShellUpdateAction {
   return { type: 'shell:SET_UPDATE_SEEN' }
 }
 
+type StringSelector = State => ?string
+
 export function getShellUpdateState(state: State): ShellUpdateState {
   return state.shell.update
 }
 
-export function getShellUpdateInfo(state: State): UpdateInfo | null {
-  return state.shell.update.info ?? null
-}
-
-export const getAvailableShellUpdate: State => string | null = createSelector(
+export const getAvailableShellUpdate: StringSelector = createSelector(
   getShellUpdateState,
   state => (state.available && state.info ? state.info.version : null)
 )
