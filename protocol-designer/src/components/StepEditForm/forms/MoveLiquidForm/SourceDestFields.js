@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
-
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
+import { useSelector } from 'react-redux'
+import { selectors as featureFlagSelectors } from '../../../../feature-flags'
 import { i18n } from '../../../../localization'
 
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FocusHandlers } from '../../types'
 
 import {
@@ -30,6 +31,9 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 
 export const SourceDestFields = (props: Props): React.Node => {
   const { className, focusHandlers, prefix } = props
+  const dispenseAirGapEnabled = useSelector(
+    featureFlagSelectors.getEnabledAirGapDispense
+  )
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
   const getMixFields = () => (
@@ -123,8 +127,8 @@ export const SourceDestFields = (props: Props): React.Node => {
             />
           </CheckboxRowField>
         )}
-
-        {prefix === 'aspirate' && (
+        {/* (SA 2020/09/30): Remove both of these checks when dispenseAirGapEnabled FF is removed  */}
+        {(prefix === 'aspirate' || dispenseAirGapEnabled) && (
           <CheckboxRowField
             tooltipComponent={i18n.t(
               `tooltip.step_fields.defaults.${addFieldNamePrefix(
