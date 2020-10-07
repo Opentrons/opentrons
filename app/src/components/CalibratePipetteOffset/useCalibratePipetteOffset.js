@@ -24,7 +24,8 @@ const spinnerCommandBlockList: Array<SessionCommandString> = [
 
 export function useCalibratePipetteOffset(
   robotName: string,
-  mount: Mount
+  mount: Mount,
+  onComplete: () => mixed
 ): [() => void, React.Node | null] {
   const [showWizard, setShowWizard] = React.useState(false)
 
@@ -80,6 +81,7 @@ export function useCalibratePipetteOffset(
     }
     if (shouldClose) {
       setShowWizard(false)
+      onComplete && onComplete()
       deleteRequestId.current = null
     }
   }, [shouldOpen, shouldClose])

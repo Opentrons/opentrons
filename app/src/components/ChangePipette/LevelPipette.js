@@ -3,7 +3,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { Icon, ModalPage, PrimaryButton } from '@opentrons/components'
+import {
+  Icon,
+  ModalPage,
+  PrimaryButton,
+  PrimaryBtn,
+} from '@opentrons/components'
 import styles from './styles.css'
 
 import type {
@@ -13,9 +18,11 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { Mount } from '../../pipettes/types'
+import type { PipetteOffsetCalibration } from '../../calibration/types'
 
 // TODO: i18n
 const EXIT_BUTTON_MESSAGE = 'confirm pipette is leveled'
+const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 const LEVEL_MESSAGE = (displayName: string) => `Next, level the ${displayName}`
 const CONNECTED_MESSAGE = (displayName: string) => `${displayName} connected`
 
@@ -26,11 +33,13 @@ type Props = {|
   subtitle: string,
   wantedPipette: PipetteNameSpecs | null,
   actualPipette: PipetteModelSpecs | null,
+  actualPipetteOffset: PipetteOffsetCalibration | null,
   displayName: string,
   displayCategory: PipetteDisplayCategory | null,
   pipetteModelName: string,
   back: () => mixed,
   exit: () => mixed,
+  startPipetteOffsetCalibration: () => void,
 |}
 
 function Status(props: { displayName: string }) {
@@ -88,9 +97,11 @@ export function LevelPipette(props: Props): React.Node {
     subtitle,
     pipetteModelName,
     displayName,
+    actualPipetteOffset,
     mount,
     back,
     exit,
+    startPipetteOffsetCalibration,
   } = props
   return (
     <ModalPage
@@ -104,6 +115,11 @@ export function LevelPipette(props: Props): React.Node {
       <Status displayName={displayName} />
       <LevelingInstruction displayName={displayName} />
       <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
+      {!actualPipetteOffset && (
+        <PrimaryBtn flex="1" onClick={startPipetteOffsetCalibration}>
+          {CONTINUE_TO_PIP_OFFSET}
+        </PrimaryBtn>
+      )}
       <ExitButton exit={exit} />
     </ModalPage>
   )

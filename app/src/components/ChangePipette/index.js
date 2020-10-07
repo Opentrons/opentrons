@@ -25,7 +25,14 @@ import { ConfirmPipette } from './ConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { LevelPipette } from './LevelPipette'
 
-import { ATTACH, DETACH, CLEAR_DECK, INSTRUCTIONS, CONFIRM } from './constants'
+import {
+  ATTACH,
+  DETACH,
+  CLEAR_DECK,
+  INSTRUCTIONS,
+  CONFIRM,
+  CALIBRATE_PIPETTE,
+} from './constants'
 
 import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../robot/types'
@@ -83,7 +90,7 @@ export function ChangePipette(props: Props): React.Node {
   const [
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
-  ] = useCalibratePipetteOffset(robotName, mount)
+  ] = useCalibratePipetteOffset(robotName, mount, closeModal)
 
   const baseProps = {
     title: PIPETTE_SETUP,
@@ -165,30 +172,40 @@ export function ChangePipette(props: Props): React.Node {
             ...basePropsWithPipettes,
             back: () => setWizardStep(INSTRUCTIONS),
             exit: homeAndExit,
+            actualPipetteOffset: actualPipetteOffset,
+            startPipetteOffsetCalibration: () => {
+              startPipetteOffsetCalibration()
+              setWizardStep(CALIBRATE_PIPETTE)
+            },
           }}
         />
       )
     } else {
       return (
-        PipetteOffsetCalibrationWizard || (
-          <ConfirmPipette
-            {...{
-              ...basePropsWithPipettes,
-              success,
-              attachedWrong,
-              tryAgain: () => {
-                setWantedName(null)
-                setWizardStep(INSTRUCTIONS)
-              },
-              back: () => setWizardStep(INSTRUCTIONS),
-              exit: homeAndExit,
-              actualPipetteOffset: actualPipetteOffset,
-              startPipetteOffsetCalibration,
-            }}
-          />
-        )
+        <ConfirmPipette
+          {...{
+            ...basePropsWithPipettes,
+            success,
+            attachedWrong,
+            tryAgain: () => {
+              setWantedName(null)
+              setWizardStep(INSTRUCTIONS)
+            },
+            back: () => setWizardStep(INSTRUCTIONS),
+            exit: homeAndExit,
+            actualPipetteOffset: actualPipetteOffset,
+            startPipetteOffsetCalibration: () => {
+              startPipetteOffsetCalibration()
+              setWizardStep(CALIBRATE_PIPETTE)
+            },
+          }}
+        />
       )
     }
+  }
+
+  if (wizardStep === CALIBRATE_PIPETTE) {
+    return PipetteOffsetCalibrationWizard
   }
 
   // this will never be reached
