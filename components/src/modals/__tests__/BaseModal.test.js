@@ -46,6 +46,21 @@ describe('BaseModal', () => {
     ).toBe(OVERLAY_BLACK_90)
   })
 
+  it('should have a zIndex that can be overridden', () => {
+    const wrapper = shallow(<BaseModal />)
+    const box = wrapper.find(Flex).first()
+
+    expect(box.prop('zIndex')).toBe(10)
+
+    wrapper.setProps({ zIndex: 5 })
+    expect(
+      wrapper
+        .find(Flex)
+        .first()
+        .prop('zIndex')
+    ).toBe(5)
+  })
+
   it('should have a white content box', () => {
     const wrapper = shallow(<BaseModal />)
     const modal = wrapper.find(Flex).first()

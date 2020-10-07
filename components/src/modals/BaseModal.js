@@ -13,7 +13,6 @@ const BASE_STYLE = {
   right: 0,
   bottom: 0,
   left: 0,
-  zIndex: 10,
   width: '100%',
   height: '100%',
   padding: Styles.SPACING_5,
@@ -71,6 +70,7 @@ export type BaseModalProps = {|
 export function BaseModal(props: BaseModalProps): React.Node {
   const {
     overlayColor = Styles.OVERLAY_GRAY_90,
+    zIndex = 10,
     header,
     footer,
     children,
@@ -78,7 +78,7 @@ export function BaseModal(props: BaseModalProps): React.Node {
   } = props
 
   return (
-    <Flex {...BASE_STYLE} backgroundColor={overlayColor}>
+    <Flex {...BASE_STYLE} backgroundColor={overlayColor} zIndex={zIndex}>
       <Box {...MODAL_STYLE} {...styleProps}>
         {header != null ? <Box {...HEADER_STYLE}>{header}</Box> : null}
         <Box {...CONTENT_STYLE}>{children}</Box>
