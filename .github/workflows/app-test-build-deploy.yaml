@@ -5,6 +5,7 @@ name: 'App test, build, and deploy'
 on:
   push:
     paths:
+      - 'Makefile'
       - 'app/**/*'
       - 'app-shell/**/*'
       - 'components/**/*'
@@ -23,6 +24,7 @@ on:
       - 'v*'
   pull_request:
     paths:
+      - 'Makefile'
       - 'app/**/*'
       - 'app-shell/**/*'
       - 'components/**/*'
