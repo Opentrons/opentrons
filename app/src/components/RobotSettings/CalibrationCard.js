@@ -143,7 +143,6 @@ export function CalibrationCard(props: Props): React.Node {
           paddingX={SPACING_3}
           fontSize={FONT_SIZE_BODY_1}
           onClick={onClickSaveAs}
-          textDecoration="underline"
         >
           {DOWNLOAD_CALIBRATION}
         </Link>

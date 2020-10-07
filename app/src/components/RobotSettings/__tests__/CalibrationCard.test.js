@@ -23,9 +23,6 @@ import type { State, Action } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { AnalyticsEvent } from '../../../analytics/types'
 
-global.Blob = function(content, options) {
-  return { content, options }
-}
 
 const mockCallTrackEvent: JestMockFn<[AnalyticsEvent], void> = jest.fn()
 
@@ -100,6 +97,18 @@ describe('CalibrationCard', () => {
       }
     )
   }
+
+  const realBlob = global.Blob
+  beforeAll(()=> {
+    global.Blob = function(content, options) {
+      return { content, options }
+    }
+
+  })
+
+  afterAll(() => {
+    global.Blob = realBlob
+  })
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -228,9 +237,7 @@ describe('CalibrationCard', () => {
   it('lets you click download to download', () => {
     const { wrapper } = render()
 
-    act(() =>
-      getDownloadButton(wrapper).invoke('onClick')({ preventDefault: () => {} })
-    )
+    getDownloadButton(wrapper).invoke('onClick')({ preventDefault: () => {} })
     expect(saveAs).toHaveBeenCalled()
     expect(mockCallTrackEvent).toHaveBeenCalledWith({
       name: 'calibrationDataDownloaded',
