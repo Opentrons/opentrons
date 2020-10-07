@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
-import { ListItem, HoverTooltip } from '@opentrons/components'
+import { ListItem, HoverTooltip, Box, Text, SPACING_4 } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { AttachedPipette } from '../../pipettes/types'
@@ -11,6 +11,8 @@ import type { State } from '../../types'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { getTipLengthForPipetteAndTiprack } from '../../calibration'
+
+const MARGIN_LEFT_SIZE = '1.6rem'
 
 export type PipetteTiprackListItemProps = {|
   robotName: string | null,
@@ -52,19 +54,14 @@ export function PipetteTiprackListItem(
           onMouseLeave={tooltipHandlers?.onMouseLeave}
           url={calibrateUrl}
           activeClassName={styles.active}
-          className={styles.pipette_tip_length_info}
         >
-          <div>
-            <span>
-              <div>{displayName}</div>
-            </span>
-            <span>
-              {/* TODO: correctly render tip length calibraiton data */}
-              {tipLengthCalibration
-                ? tipLengthCalibration.tipLength
-                : 'not yet calibrated'}
-            </span>
-          </div>
+          <Box marginLeft={MARGIN_LEFT_SIZE}>
+            <Text>{displayName}</Text>
+            {/* TODO: correctly render tip length calibraiton data */}
+            {tipLengthCalibration
+              ? tipLengthCalibration.tipLength
+              : 'not yet calibrated'}
+          </Box>
         </ListItem>
       )}
     </HoverTooltip>

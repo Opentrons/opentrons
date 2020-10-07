@@ -8,7 +8,18 @@ import { getFeatureFlags } from '../../config'
 import { PIPETTE_MOUNTS, getAttachedPipettes } from '../../pipettes'
 import { getCalibratePipettesLocations } from '../../nav'
 import { fetchTipLengthCalibrations } from '../../calibration'
-import { TitledList } from '@opentrons/components'
+import {
+  HoverTooltip,
+  TitledList,
+  Flex,
+  Text,
+  C_DARK_GRAY,
+  C_MED_GRAY,
+  SPACING_3,
+  FONT_SIZE_BODY_2,
+  FONT_WEIGHT_SEMIBOLD,
+  TEXT_TRANSFORM_UPPERCASE,
+} from '@opentrons/components'
 import { PipetteListItem } from './PipetteListItem'
 import { PipetteTiprackListItem } from './PipetteTiprackListItem'
 import styles from './styles.css'
@@ -69,16 +80,23 @@ function PipetteListComponent(props: PipetteListComponentProps) {
           />
         ) : (
           <>
-            <div key={mount} className={styles.item_info}>
-              <span className={styles.pipette_mount}>
-                <h3 className={styles.pipette_mount_title}>
-                  {mount.charAt(0)}
-                </h3>
-              </span>
-              <span>
-                <TitledList key={mount} title={displayName} />
-              </span>
-            </div>
+            <Flex key={mount}>
+              <Text
+                marginLeft={SPACING_3}
+                paddingTop={SPACING_3}
+                color={disabledReason ? C_MED_GRAY : C_DARK_GRAY}
+                fontSize={FONT_SIZE_BODY_2}
+                fontWeight={FONT_WEIGHT_SEMIBOLD}
+                textTransform={TEXT_TRANSFORM_UPPERCASE}
+              >
+                {mount.charAt(0)}
+              </Text>
+              <TitledList
+                key={mount}
+                title={displayName}
+                disabled={!!disabledReason}
+              />
+            </Flex>
             {pip_tipracks?.length
               ? pip_tipracks?.map(tr => {
                   return (

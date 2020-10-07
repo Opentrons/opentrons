@@ -8,10 +8,7 @@ import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tip
 import type { State } from '../../../types'
 import type { BaseProtocolLabware } from '../../../calibration/labware/types'
 import { selectors as robotSelectors } from '../../../robot'
-import {
-  getProtocolLabwareList,
-  fetchLabwareCalibrations,
-} from '../../../calibration/labware'
+import { fetchLabwareCalibrations } from '../../../calibration/labware'
 import { LabwareGroup } from '../LabwareGroup'
 
 jest.mock('../../../robot/selectors')
