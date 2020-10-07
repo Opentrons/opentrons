@@ -1,6 +1,8 @@
 // @flow
 import noop from 'lodash/noop'
 
+import * as ConfigSelectors from '../../config/selectors'
+import * as CalibrationSelectors from '../../calibration/selectors'
 import * as DiscoverySelectors from '../../discovery/selectors'
 import * as PipetteSelectors from '../../pipettes/selectors'
 import * as RobotSelectors from '../../robot/selectors'
@@ -11,6 +13,7 @@ import * as Selectors from '../selectors'
 
 import { NOT_APPLICABLE, OUTDATED } from '../../system-info'
 
+import { DECK_CAL_STATUS_OK, DECK_CAL_STATUS_IDENTITY } from '../../calibration'
 import type { State } from '../../types'
 import type { Robot, ViewableRobot } from '../../discovery/types'
 
@@ -22,6 +25,7 @@ type SelectorSpec = {|
   expected: mixed,
 |}
 
+jest.mock('../../calibration/selectors')
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
 jest.mock('../../buildroot/selectors')
@@ -84,6 +88,16 @@ const mockGetCommands: JestMockFn<
   any
 > = (RobotSelectors.getCommands: any)
 
+const mockGetDeckCalibrationStatus: JestMockFn<
+  [State, string],
+  $Call<typeof CalibrationSelectors.getDeckCalibrationStatus, State, string>
+> = CalibrationSelectors.getDeckCalibrationStatus
+
+const mockGetFeatureFlags: JestMockFn<
+  [State, string],
+  $Call<typeof ConfigSelectors.getFeatureFlags, State>
+> = ConfigSelectors.getFeatureFlags
+
 const EXPECTED_ROBOTS = {
   id: 'robots',
   path: '/robots',
@@ -139,6 +153,8 @@ describe('nav selectors', () => {
     mockGetSessionIsLoaded.mockReturnValue(false)
     mockGetCommands.mockReturnValue([])
     mockGetU2EWindowsDriverStatus.mockReturnValue(NOT_APPLICABLE)
+    mockGetDeckCalibrationStatus.mockReturnValue(DECK_CAL_STATUS_OK)
+    mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: false })
   })
 
   afterEach(() => {
@@ -276,6 +292,46 @@ describe('nav selectors', () => {
           ...EXPECTED_RUN,
           disabledReason: expect.stringMatching(/calibrate all pipettes/),
         },
+        EXPECTED_MORE,
+      ],
+    },
+    {
+      name: 'getNavbarLocations with bad deck calibration and cal overhaul on',
+      selector: Selectors.getNavbarLocations,
+      before: () => {
+        mockGetConnectedRobot.mockReturnValue(mockRobot)
+        mockGetDeckCalibrationStatus.mockReturnValue(DECK_CAL_STATUS_IDENTITY)
+        mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+      },
+      expected: [
+        EXPECTED_ROBOTS,
+        {
+          ...EXPECTED_UPLOAD,
+          disabledReason: expect.stringMatching(/calibrate your deck/i),
+        },
+        {
+          ...EXPECTED_CALIBRATE,
+          disabledReason: expect.stringMatching(/load a protocol/i),
+        },
+        {
+          ...EXPECTED_RUN,
+          disabledReason: expect.stringMatching(/load a protocol/i),
+        },
+        EXPECTED_MORE,
+      ],
+    },
+    {
+      name: 'getNavbarLocations with bad deck calibration and ff off',
+      selector: Selectors.getNavbarLocations,
+      before: () => {
+        mockGetConnectedRobot.mockReturnValue(mockRobot)
+        mockGetDeckCalibrationStatus.mockReturnValue(DECK_CAL_STATUS_IDENTITY)
+      },
+      expected: [
+        EXPECTED_ROBOTS,
+        { ...EXPECTED_UPLOAD, disabledReason: null },
+        EXPECTED_CALIBRATE,
+        EXPECTED_RUN,
         EXPECTED_MORE,
       ],
     },

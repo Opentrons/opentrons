@@ -11,6 +11,7 @@ import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
 import { getU2EWindowsDriverStatus, OUTDATED } from '../system-info'
 import { getFeatureFlags } from '../config'
+import { getDeckCalibrationStatus, DECK_CAL_STATUS_OK } from '../calibration'
 
 import type { State } from '../types'
 import type { NavLocation } from './types'
@@ -36,6 +37,7 @@ const CANNOT_CALIBRATE_WHILE_RUNNING =
   'Cannot calibrate while a run is in progress'
 const PLEASE_RESET_PROTOCOL =
   'Please reset your protocol run before re-calibrating'
+const CALIBRATE_DECK_TO_PROCEED = 'Calibrate your deck to proceed'
 
 const APP_UPDATE_AVAILABLE = 'An app update is available'
 const DRIVER_UPDATE_AVAILABLE = 'A driver update is available'
@@ -66,18 +68,32 @@ const getConnectedRobotUpdateAvailable = (state: State): boolean => {
   return robotUpdateType === UPGRADE
 }
 
+const getDeckCalibrationOk = (state: State): boolean => {
+  const ff = getFeatureFlags(state)
+  if (!ff.enableCalibrationOverhaul) {
+    return true
+  }
+  const connectedRobot = getConnectedRobot(state)
+  const deckCalStatus = connectedRobot
+    ? getDeckCalibrationStatus(state, connectedRobot.name)
+    : null
+  return deckCalStatus === DECK_CAL_STATUS_OK
+}
+
 const getRunDisabledReason: State => string | null = createSelector(
   getConnectedRobot,
   RobotSelectors.getSessionIsLoaded,
   RobotSelectors.getCommands,
   getConnectedRobotPipettesMatch,
   getConnectedRobotPipettesCalibrated,
-  (robot, loaded, commands, pipettesMatch, pipettesCalibrated) => {
+  getDeckCalibrationOk,
+  (robot, loaded, commands, pipettesMatch, pipettesCalibrated, deckCalOk) => {
     if (!robot) return PLEASE_CONNECT_TO_A_ROBOT
     if (!loaded) return PLEASE_LOAD_A_PROTOCOL
     if (commands.length === 0) return PLEASE_LOAD_A_RUNNABLE_PROTOCOL
     if (!pipettesMatch) return ATTACHED_PIPETTES_DO_NOT_MATCH
     if (!pipettesCalibrated) return PIPETTES_NOT_CALIBRATED
+    if (!deckCalOk) return CALIBRATE_DECK_TO_PROCEED
     return null
   }
 )
@@ -96,12 +112,15 @@ export const getRobotsLocation: State => NavLocation = createSelector(
 export const getUploadLocation: State => NavLocation = createSelector(
   getConnectedRobot,
   RobotSelectors.getIsRunning,
-  (robot, running) => {
+  getDeckCalibrationOk,
+  (robot, running, deckCalOk) => {
     let disabledReason = null
     if (robot == null) {
       disabledReason = PLEASE_CONNECT_TO_A_ROBOT
     } else if (running) {
       disabledReason = CANNOT_UPLOAD_A_NEW_PROTOCOL_WHILE_RUNNING
+    } else if (!deckCalOk) {
+      disabledReason = CALIBRATE_DECK_TO_PROCEED
     }
 
     return {

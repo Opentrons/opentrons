@@ -11,7 +11,7 @@ import * as RobotSelectors from '../../../robot/selectors'
 
 import { CalibrationCard } from '../CalibrationCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
-import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
+import { CalibrationCardWarning } from '../CalibrationCardWarning'
 import { PipetteOffsets } from '../PipetteOffsets'
 
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
@@ -130,7 +130,7 @@ describe('CalibrationCard', () => {
 
     const { wrapper } = render()
 
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(false)
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(null)
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       null
     )
@@ -139,7 +139,9 @@ describe('CalibrationCard', () => {
   it('DC and check cal buttons disabled if not connectable', () => {
     const { wrapper } = render(mockUnconnectableRobot)
 
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(
+      'Cannot connect to robot'
+    )
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Cannot connect to robot'
     )
@@ -154,7 +156,9 @@ describe('CalibrationCard', () => {
 
     const { wrapper } = render(mockRobotNotConnected)
 
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(
+      'Connect to robot to control'
+    )
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Connect to robot to control'
     )
@@ -165,61 +169,33 @@ describe('CalibrationCard', () => {
 
     const { wrapper } = render()
 
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(
+      'Protocol is running'
+    )
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Protocol is running'
     )
   })
 
-  it('does not render check cal button if GET /calibration/status has not responded', () => {
-    getDeckCalibrationStatus.mockReturnValue(null)
+  const cals = [
+    Calibration.DECK_CAL_STATUS_SINGULARITY,
+    Calibration.DECK_CAL_STATUS_IDENTITY,
+    Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
+  ]
+  cals.forEach(status => {
+    it(`CalibrationCardWarning component renders instead of check calibration if deck calibration is ${status}`, () => {
+      getDeckCalibrationStatus.mockImplementation((state, rName) => {
+        expect(state).toEqual(MOCK_STATE)
+        expect(rName).toEqual(mockRobot.name)
+        return status
+      })
+      const { wrapper } = render()
 
-    const { wrapper } = render()
-    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
-  })
-
-  it('disables check cal button if deck calibration is bad', () => {
-    getDeckCalibrationStatus.mockImplementation((state, rName) => {
-      expect(state).toEqual(MOCK_STATE)
-      expect(rName).toEqual(mockRobot.name)
-      return Calibration.DECK_CAL_STATUS_BAD_CALIBRATION
+      expect(wrapper.exists(CalibrationCardWarning)).toBe(true)
+      expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
     })
-
-    const { wrapper } = render()
-
-    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
-      'Bad deck calibration detected. Please perform a full deck calibration.'
-    )
-
-    getDeckCalibrationStatus.mockReturnValue(
-      Calibration.DECK_CAL_STATUS_SINGULARITY
-    )
-    wrapper.setProps({})
-    wrapper.update()
-
-    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
-      'Bad deck calibration detected. Please perform a full deck calibration.'
-    )
-
-    getDeckCalibrationStatus.mockReturnValue(
-      Calibration.DECK_CAL_STATUS_IDENTITY
-    )
-    wrapper.setProps({})
-    wrapper.update()
-
-    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
-      'Please perform a full deck calibration.'
-    )
   })
 
-  it('DeckCalibrationWarning component renders if deck calibration is bad', () => {
-    const { wrapper } = render()
-
-    // check that the deck calibration warning component is not null
-    // TODO(lc, 2020-06-18): Mock out the new transform status such that
-    // this should evaluate to true.
-    expect(wrapper.exists(DeckCalibrationWarning)).toBe(true)
-  })
   it('renders PipetteOffsets', () => {
     const { wrapper } = render()
     expect(wrapper.exists(PipetteOffsets)).toBe(true)
