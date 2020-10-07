@@ -34,9 +34,8 @@ const mockGetCalibratePipetteLocations: JestMockFn<
   $Call<typeof calibrateSelectors.getCalibratePipettesLocations, State>
 > = calibrateSelectors.getCalibratePipettesLocations
 
-const mockGetAttachedPipettes: JestMockFn<
-  [any, string], mixed
-> = PipettesSelectors.getAttachedPipettes
+const mockGetAttachedPipettes: JestMockFn<[any, string], mixed> =
+  PipettesSelectors.getAttachedPipettes
 
 const mockGetFeatureFlags: JestMockFn<
   [State],

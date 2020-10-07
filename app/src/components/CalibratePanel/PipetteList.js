@@ -38,7 +38,9 @@ export const PipetteList: React.AbstractComponent<PipetteListComponentProps> = w
   PipetteListComponent
 )
 
-export function PipetteListComponent(props: PipetteListComponentProps): React.Node {
+export function PipetteListComponent(
+  props: PipetteListComponentProps
+): React.Node {
   const dispatch = useDispatch<Dispatch>()
 
   const { robotName, tipracks } = props
