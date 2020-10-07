@@ -1,6 +1,8 @@
 """ Test the InstrumentContext class and its functions """
 import pytest
+from unittest import mock
 import opentrons.protocol_api as papi
+from opentrons.protocols.advanced_control import transfers
 from opentrons.types import Mount
 from opentrons.protocols.types import APIVersion
 
@@ -77,3 +79,120 @@ def test_dest_blowout_location_invalid_for_distribute(
             [lw1['A1'], lw1['B1']],
             blow_out=True,
             blowout_location='destination well')
+
+
+def test_valid_transfer_blowout_location(make_context_and_labware):
+    context_and_labware = make_context_and_labware(APIVersion(2, 9))
+    context_and_labware['ctx'].home()
+    lw1 = context_and_labware['lw1']
+    instr = context_and_labware['instr']
+
+    with mock.patch.object(
+            papi.InstrumentContext, '_execute_transfer') as patch:
+        instr.transfer(
+            100,
+            lw1['A2'],
+            [lw1['A1'], lw1['B1']],
+            blow_out=True,
+            blowout_location='destination well',
+            new_tip='never'
+        )
+        blowout_strat_1 = patch.call_args_list[0][0][0]._options.transfer \
+            .blow_out_strategy
+
+        assert blowout_strat_1 == transfers.BlowOutStrategy.DEST
+
+        instr.transfer(
+            100,
+            lw1['A2'],
+            [lw1['A1'], lw1['B1']],
+            blow_out=True,
+            blowout_location='source well',
+            new_tip='never'
+        )
+        blowout_strat_2 = patch.call_args_list[1][0][0]._options.transfer \
+            .blow_out_strategy
+
+        assert blowout_strat_2 == transfers.BlowOutStrategy.SOURCE
+
+        instr.transfer(
+            100,
+            lw1['A2'],
+            [lw1['A1'], lw1['B1']],
+            blow_out=True,
+            blowout_location='trash',
+            new_tip='never'
+        )
+        blowout_strat_3 = patch.call_args_list[2][0][0]._options.transfer \
+            .blow_out_strategy
+
+        assert blowout_strat_3 == transfers.BlowOutStrategy.TRASH
+
+
+def test_valid_consolidate_blowout_location(make_context_and_labware):
+    context_and_labware = make_context_and_labware(APIVersion(2, 9))
+    context_and_labware['ctx'].home()
+    lw1 = context_and_labware['lw1']
+    instr = context_and_labware['instr']
+
+    with mock.patch.object(
+            papi.InstrumentContext, '_execute_transfer') as patch:
+        instr.consolidate(
+            100,
+            lw1['A2'],
+            [lw1['A1'], lw1['B1']],
+            blow_out=True,
+            blowout_location='destination well',
+            new_tip='never'
+        )
+        blowout_strat_1 = patch.call_args_list[0][0][0]._options.transfer \
+            .blow_out_strategy
+
+        assert blowout_strat_1 == transfers.BlowOutStrategy.DEST
+
+        instr.consolidate(
+            100,
+            lw1['A2'],
+            [lw1['A1'], lw1['B1']],
+            blow_out=True,
+            blowout_location='trash',
+            new_tip='never'
+        )
+        blowout_strat_2 = patch.call_args_list[1][0][0]._options.transfer \
+            .blow_out_strategy
+
+        assert blowout_strat_2 == transfers.BlowOutStrategy.TRASH
+
+
+def test_valid_distribute_blowout_location(make_context_and_labware):
+    context_and_labware = make_context_and_labware(APIVersion(2, 9))
+    context_and_labware['ctx'].home()
+    lw1 = context_and_labware['lw1']
+    instr = context_and_labware['instr']
+
+    with mock.patch.object(
+            papi.InstrumentContext, '_execute_transfer') as patch:
+        instr.distribute(
+            100,
+            lw1['A2'],
+            [lw1['A1'], lw1['B1']],
+            blow_out=True,
+            blowout_location='source well',
+            new_tip='never'
+        )
+        blowout_strat_1 = patch.call_args_list[0][0][0]._options.transfer \
+            .blow_out_strategy
+        assert blowout_strat_1 == transfers.BlowOutStrategy.SOURCE
+
+        instr.distribute(
+            100,
+            lw1['A2'],
+            [lw1['A1'], lw1['B1']],
+            blow_out=True,
+            blowout_location='trash',
+            new_tip='never'
+        )
+
+        blowout_strat_2 = patch.call_args_list[1][0][0]._options.transfer \
+            .blow_out_strategy
+        assert blowout_strat_2 == transfers.BlowOutStrategy.TRASH

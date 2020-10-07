@@ -14,6 +14,7 @@ from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances,
     clamp_value, requires_version, build_edges, first_parent)
 from opentrons.protocols.types import APIVersion
+from opentrons_shared_data.protocol.dev_types import BlowoutLocation
 from .labware import (
     filter_tipracks_to_start, Labware, OutOfTipsError, quirks_from_any_parent,
     select_tiprack_from_list, Well)
@@ -1035,7 +1036,7 @@ class InstrumentContext(CommandPublisher):
                 .format(api_version=self._api_version))
 
         if blowout_location and blowout_location not in [
-                'source well', 'destination well', 'trash']:
+                location.value for location in BlowoutLocation]:
             raise ValueError(
                 'blowout location should be either "source well",' +
                 ' "destination well", or "trash", but it is {}'
