@@ -22,6 +22,12 @@ export const COLOR_SUCCESS = '#60b120'
 export const OVERLAY_WHITE_10 = 'rgba(255, 255, 255, 0.1)'
 export const OVERLAY_WHITE_20 = 'rgba(255, 255, 255, 0.2)'
 
+// used as default BaseModal overlay color
+export const OVERLAY_GRAY_90 = 'rgba(127, 127, 127, 0.9)'
+
+// darkest modal overlay used
+export const OVERLAY_BLACK_90 = 'rgba(0, 0, 0, 0.9)'
+
 // opacities
 export const OPACITY_DISABLED = 0.3
 
