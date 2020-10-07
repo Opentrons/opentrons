@@ -90,7 +90,7 @@ export function CalibrationCard(props: Props): React.Node {
 
       <DeckCalibrationControl
         robotName={robotName}
-        buttonDisabled={buttonDisabledReason}
+        disabledReason={buttonDisabledReason}
         deckCalStatus={deckCalStatus}
         deckCalData={deckCalData}
       />

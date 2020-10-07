@@ -40,7 +40,7 @@ describe('DeckCalibrationControl', () => {
     render = (props = {}) => {
       const {
         robotName = 'robot-name',
-        buttonDisabled = null,
+        disabledReason = null,
         deckCalStatus = 'OK',
         deckCalData = {
           type: 'affine',
@@ -58,7 +58,7 @@ describe('DeckCalibrationControl', () => {
       return mount(
         <DeckCalibrationControl
           robotName={robotName}
-          buttonDisabled={buttonDisabled}
+          disabledReason={disabledReason}
           deckCalStatus={deckCalStatus}
           deckCalData={deckCalData}
         />,

@@ -17,7 +17,6 @@ import {
   Text,
   SecondaryBtn,
   BORDER_SOLID_LIGHT,
-  SPACING_2,
   SPACING_4,
   useConditionalConfirm,
   FONT_STYLE_ITALIC,
@@ -61,13 +60,13 @@ const spinnerCommandBlockList: Array<SessionCommandString> = [
 
 export type Props = {|
   robotName: string,
-  buttonDisabled: string | null,
+  disabledReason: string | null,
   deckCalStatus: DeckCalibrationStatus | null,
   deckCalData: DeckCalibrationData | null,
 |}
 
 export function DeckCalibrationControl(props: Props): React.Node {
-  const { robotName, buttonDisabled, deckCalStatus, deckCalData } = props
+  const { robotName, disabledReason, deckCalStatus, deckCalData } = props
 
   const [showWizard, setShowWizard] = React.useState(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -164,10 +163,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
         title={CALIBRATE_TITLE_TEXT}
         description={
           <>
-            <DeckCalibrationWarning
-              marginTop={SPACING_2}
-              deckCalibrationStatus={deckCalStatus}
-            />
+            <DeckCalibrationWarning deckCalibrationStatus={deckCalStatus} />
             <Text>{CALIBRATE_DECK_DESCRIPTION}</Text>
           </>
         }
@@ -176,14 +172,14 @@ export function DeckCalibrationControl(props: Props): React.Node {
             {...targetProps}
             width="9rem"
             onClick={confirmStart}
-            disabled={buttonDisabled}
+            disabled={disabledReason}
           >
             {CALIBRATE_BUTTON_TEXT}
           </SecondaryBtn>
         }
       >
-        {buttonDisabled !== null && (
-          <Tooltip {...tooltipProps}>{buttonDisabled}</Tooltip>
+        {disabledReason !== null && (
+          <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
         )}
 
         {deckCalData && deckCalStatus && (

@@ -39,32 +39,30 @@ export function LegacyDeckCalibrationControl(props: Props): React.Node {
   } = props
 
   return (
-    <>
-      <TitledControl
-        borderBottom={BORDER_SOLID_LIGHT}
-        title={CALIBRATE_TITLE_TEXT}
-        description={<Text>{CALIBRATE_DECK_DESCRIPTION}</Text>}
-        control={
-          <SecondaryBtn
-            width="9rem"
-            onClick={startLegacyDeckCalibration}
-            disabled={buttonDisabled}
-          >
-            {CALIBRATE_BUTTON_TEXT}
-          </SecondaryBtn>
-        }
-      >
-        <LegacyDeckCalibrationWarning
-          deckCalibrationStatus={deckCalStatus}
-          marginTop={SPACING_2}
-        />
-        <DeckCalibrationDownload
-          deckCalibrationStatus={deckCalStatus}
-          deckCalibrationData={deckCalData}
-          robotName={robotName}
-          marginTop={SPACING_2}
-        />
-      </TitledControl>
-    </>
+    <TitledControl
+      borderBottom={BORDER_SOLID_LIGHT}
+      title={CALIBRATE_TITLE_TEXT}
+      description={<Text>{CALIBRATE_DECK_DESCRIPTION}</Text>}
+      control={
+        <SecondaryBtn
+          width="9rem"
+          onClick={startLegacyDeckCalibration}
+          disabled={buttonDisabled}
+        >
+          {CALIBRATE_BUTTON_TEXT}
+        </SecondaryBtn>
+      }
+    >
+      <LegacyDeckCalibrationWarning
+        deckCalibrationStatus={deckCalStatus}
+        marginTop={SPACING_2}
+      />
+      <DeckCalibrationDownload
+        deckCalibrationStatus={deckCalStatus}
+        deckCalibrationData={deckCalData}
+        robotName={robotName}
+        marginTop={SPACING_2}
+      />
+    </TitledControl>
   )
 }
