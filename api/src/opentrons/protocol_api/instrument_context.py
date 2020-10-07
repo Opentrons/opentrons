@@ -856,7 +856,14 @@ class InstrumentContext(CommandPublisher):
         kwargs['disposal_volume'] = kwargs.get(
             'disposal_volume', self.min_volume)
         kwargs['mix_after'] = (0, 0)
-        if kwargs.get('blowout_location') == 'destination well':
+        blowout_location = kwargs.get('blowout_location')
+
+        if blowout_location and self._api_version < APIVersion(2, 9):
+            raise ValueError(
+                    'Cannot specify blowout location when using api' +
+                    ' version below 2.9, current version is {api_version}'
+                    .format(api_version=self._api_version))
+        if blowout_location == 'destination well':
             raise ValueError(
                 "blowout location for distribute cannot be destination well")
         return self.transfer(volume, source, dest, **kwargs)
@@ -886,7 +893,14 @@ class InstrumentContext(CommandPublisher):
         kwargs['mode'] = 'consolidate'
         kwargs['mix_before'] = (0, 0)
         kwargs['disposal_volume'] = 0
-        if kwargs.get('blowout_location') == 'source well':
+        blowout_location = kwargs.get('blowout_location')
+
+        if blowout_location and self._api_version < APIVersion(2, 9):
+            raise ValueError(
+                    'Cannot specify blowout location when using api' +
+                    ' version below 2.9, current version is {api_version}'
+                    .format(api_version=self._api_version))
+        if blowout_location == 'source well':
             raise ValueError(
                 "blowout location for consolidate cannot be source well")
         return self.transfer(volume, source, dest, **kwargs)
@@ -998,6 +1012,12 @@ class InstrumentContext(CommandPublisher):
 
         blow_out = None
         blowout_location = kwargs.get('blowout_location')
+
+        if blowout_location and self._api_version < APIVersion(2, 9):
+            raise ValueError(
+                    'Cannot specify blowout location when using api' +
+                    ' version below 2.9, current version is {api_version}'
+                    .format(api_version=self._api_version))
 
         if blowout_location and blowout_location not in [
                 'source well', 'destination well', 'trash']:
