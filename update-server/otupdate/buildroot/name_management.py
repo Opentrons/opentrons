@@ -196,7 +196,7 @@ def _rewrite_machine_info(
     """
     current_lines = current_machine_info_contents.splitlines()
     preserved_lines = [
-        l for l in current_lines if not l.startswith('PRETTY_HOSTNAME')]
+        ln for ln in current_lines if not ln.startswith('PRETTY_HOSTNAME')]
     new_lines = preserved_lines + [f'PRETTY_HOSTNAME={new_pretty_hostname}']
     new_contents = '\n'.join(new_lines) + '\n'
     return new_contents

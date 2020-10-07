@@ -112,3 +112,8 @@ calibrations/
 # local IDE configs
 .vscode
 *.code-workspace
+
+# TODO(mc, 2020-10-30): remove this ignore when we need pyproject.toml
+# recent versions of setuptools create pyproject.toml automatically
+# we're ignoring the file for now to avoid confusion
+api/pyproject.toml

@@ -8,16 +8,18 @@ python_version = "3.7"
 
 [dev-packages]
 c445fee = {editable = true,path = "./../api"}
-pytest = "==5.4.3"
+pytest = "==6.1.0"
+pytest-watch = "~=4.2.0"
 pytest-cov = "*"
 mypy = "==0.740"
 atomicwrites = {version = "*",sys_platform = "== 'win32'"}
 pylama = "*"
 requests = "*"
-tavern = "==1.0.0"
+tavern = "==1.6.0"
 "289f143" = {editable = true, path = "./../shared-data/python"}
 pytest-aiohttp = "*"
 graphviz = "*"
+mock = "~=4.0.2"
 
 [packages]
 uvicorn = "==0.11.3"
