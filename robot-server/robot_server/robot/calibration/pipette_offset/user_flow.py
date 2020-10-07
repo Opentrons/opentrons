@@ -89,15 +89,13 @@ class PipetteOffsetCalibrationUserFlow:
              or self._using_default_tiprack)
 
         if not load_tip_length:
-            MODULE_LOG.info("Don't load tip length")
-            self._state_machine =\
+            self._state_machine: PipetteOffsetStateMachine =\
                 PipetteOffsetWithTipLengthStateMachine()
             self._state: GenericState = POWTState  # type: ignore
         else:
-            MODULE_LOG.info("Loading tip length")
-            self._state_machine: PipetteOffsetStateMachine =\
+            self._state_machine =\
                 PipetteOffsetCalibrationStateMachine()
-            self._state= POCState  # type: ignore
+            self._state = POCState  # type: ignore
         self._current_state = self._state.sessionStarted
 
         self._command_map: COMMAND_MAP = {
@@ -162,8 +160,6 @@ class PipetteOffsetCalibrationUserFlow:
         :param data: Data supplied in command
         :return: None
         """
-        MODULE_LOG.info(f"Name of command {name}")
-        MODULE_LOG.info(f"Current state {self._current_state}")
         next_state = self._state_machine.get_next_state(self._current_state,
                                                         name)
 
