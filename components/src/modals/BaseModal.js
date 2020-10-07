@@ -60,7 +60,7 @@ export type BaseModalProps = {|
 |}
 
 /**
- * A BaseModal is a layout component for building more sepcific modals.
+ * A BaseModal is a layout component for building more specific modals.
  *
  * It includes:
  * - An overlay, customizable with the `overlayColor` prop
