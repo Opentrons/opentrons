@@ -324,7 +324,7 @@ class Labware(DeckItem):
     def well(self, idx) -> Well:
         """Deprecated---use result of `wells` or `wells_by_name`"""
         if isinstance(idx, int):
-            res = self._wells[idx]
+            res = self._implementation.get_wells()[idx]
         elif isinstance(idx, str):
             res = self.wells_by_name()[idx]
         else:
@@ -350,14 +350,14 @@ class Labware(DeckItem):
         :return: Ordered list of all wells in a labware
         """
         if not args:
-            res = self._wells
+            res = self._implementation.get_wells()
         elif isinstance(args[0], int):
-            res = [self._wells[idx] for idx in args]
+            res = (self._implementation.get_wells()[idx] for idx in args)
         elif isinstance(args[0], str):
-            res = [self.wells_by_name()[idx] for idx in args]
+            res = (self.wells_by_name()[idx] for idx in args)
         else:
             raise TypeError
-        return list(res)
+        return [self._well_from_impl(w) for w in res]
 
     @requires_version(2, 0)
     def wells_by_name(self) -> Dict[str, Well]:
@@ -370,8 +370,11 @@ class Labware(DeckItem):
 
         :return: Dictionary of well objects keyed by well name
         """
-        return {well: wellObj
-                for well, wellObj in zip(self._ordering, self._wells)}
+        wells = self._implementation.get_wells_by_name()
+        return {
+            k: self._well_from_impl(v)
+            for k, v in wells.items()
+        }
 
     @requires_version(2, 0)
     def wells_by_index(self) -> Dict[str, Well]:
@@ -401,12 +404,12 @@ class Labware(DeckItem):
         if not args:
             res = grid.get_rows()
         elif isinstance(args[0], int):
-            res = [grid.get_rows()[idx] for idx in args]
+            res = (grid.get_rows()[idx] for idx in args)
         elif isinstance(args[0], str):
-            res = [grid.get_row(idx) for idx in args]
+            res = (grid.get_row(idx) for idx in args)
         else:
             raise TypeError
-        return res
+        return [[self._well_from_impl(w) for w in row] for row in res]
 
     @requires_version(2, 0)
     def rows_by_name(self) -> Dict[str, List[Well]]:
@@ -419,7 +422,10 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by row name
         """
-        return self._implementation.get_well_grid().get_row_dict()
+        row_dict = self._implementation.get_well_grid().get_row_dict()
+        return {
+            k: [self._well_from_impl(w) for w in v] for k, v in row_dict
+        }
 
     @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
@@ -450,12 +456,12 @@ class Labware(DeckItem):
         if not args:
             res = grid.get_columns()
         elif isinstance(args[0], int):
-            res = [grid.get_columns()[idx] for idx in args]
+            res = (grid.get_columns()[idx] for idx in args)
         elif isinstance(args[0], str):
-            res = [grid.get_column(idx) for idx in args]
+            res = (grid.get_column(idx) for idx in args)
         else:
             raise TypeError
-        return res
+        return [[self._well_from_impl(w) for w in col] for col in res]
 
     @requires_version(2, 0)
     def columns_by_name(self) -> Dict[str, List[Well]]:
@@ -469,7 +475,10 @@ class Labware(DeckItem):
 
         :return: Dictionary of Well lists keyed by column name
         """
-        return self._implementation.get_well_grid().get_column_dict()
+        column_dict = self._implementation.get_well_grid().get_column_dict()
+        return {
+            k: [self._well_from_impl(w) for w in v] for k, v in column_dict
+        }
 
     @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:
@@ -540,10 +549,7 @@ class Labware(DeckItem):
             num_tips=num_tips,
             starting_tip=starting_tip._impl if starting_tip else None
         )
-        return Well(
-            well_implementation=well,
-            api_level=self._api_version
-        ) if well else None
+        return self._well_from_impl(well) if well else None
 
     def use_tips(self, start_well: Well, num_channels: int = 1):
         """
@@ -596,10 +602,7 @@ class Labware(DeckItem):
         well = self._implementation.get_tip_tracker().previous_tip(
             num_tips=num_tips
         )
-        return Well(
-            well_implementation=well,
-            api_level=self._api_version
-        ) if well else None
+        return self._well_from_impl(well) if well else None
 
     def return_tips(self, start_well: Well, num_channels: int = 1):
         """
@@ -636,6 +639,10 @@ class Labware(DeckItem):
         """
         if self._is_tiprack:
             self._implementation.reset_tips()
+
+    def _well_from_impl(self, well: WellImplementation) -> Well:
+        return Well(well_implementation=well,
+                    api_level=self._api_version)
 
 
 def _get_path_to_labware(

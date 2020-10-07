@@ -86,6 +86,12 @@ class LabwareImplementation(AbstractLabwareImplementation):
             y=self._geometry.y_dimension + delta.y,
             z=self._geometry.z_dimension + delta.z
         )
+        # The wells must be rebuilt
+        self._wells = self._build_wells()
+        self._well_name_grid = WellGrid(wells=self._wells)
+        self._tip_tracker = TipTracker(
+            columns=self._well_name_grid.get_columns()
+        )
 
     def get_calibrated_offset(self) -> Point:
         return self._calibrated_offset
