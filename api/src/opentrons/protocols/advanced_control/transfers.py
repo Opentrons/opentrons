@@ -157,6 +157,10 @@ Transfer.blow_out_strategy.__doc__ = """
     :py:attr:`BlowOutStrategy.TRASH`
         Blow out to trash container.
 
+    :py:attr:`BlowOutStrategy.SOURCE`
+        Blow out into the source well in order to dispense any leftover
+        liquid.
+
     :py:attr:`BlowOutStrategy.DEST`
         Blow out into the destination well in order to dispense any leftover
         liquid.
