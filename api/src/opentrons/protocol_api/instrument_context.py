@@ -860,9 +860,9 @@ class InstrumentContext(CommandPublisher):
 
         if blowout_location and self._api_version < APIVersion(2, 9):
             raise ValueError(
-                    'Cannot specify blowout location when using api' +
-                    ' version below 2.9, current version is {api_version}'
-                    .format(api_version=self._api_version))
+                'Cannot specify blowout location when using api' +
+                ' version below 2.9, current version is {api_version}'
+                .format(api_version=self._api_version))
         if blowout_location == 'destination well':
             raise ValueError(
                 "blowout location for distribute cannot be destination well")
@@ -897,9 +897,9 @@ class InstrumentContext(CommandPublisher):
 
         if blowout_location and self._api_version < APIVersion(2, 9):
             raise ValueError(
-                    'Cannot specify blowout location when using api' +
-                    ' version below 2.9, current version is {api_version}'
-                    .format(api_version=self._api_version))
+                'Cannot specify blowout location when using api' +
+                ' version below 2.9, current version is {api_version}'
+                .format(api_version=self._api_version))
         if blowout_location == 'source well':
             raise ValueError(
                 "blowout location for consolidate cannot be source well")
@@ -1015,16 +1015,16 @@ class InstrumentContext(CommandPublisher):
 
         if blowout_location and self._api_version < APIVersion(2, 9):
             raise ValueError(
-                    'Cannot specify blowout location when using api' +
-                    ' version below 2.9, current version is {api_version}'
-                    .format(api_version=self._api_version))
+                'Cannot specify blowout location when using api' +
+                ' version below 2.9, current version is {api_version}'
+                .format(api_version=self._api_version))
 
         if blowout_location and blowout_location not in [
                 'source well', 'destination well', 'trash']:
             raise ValueError(
-                    'blowout location should be either "source well",' +
-                    ' "destination well", or "trash", but it is {}'
-                    .format(blowout_location))
+                'blowout location should be either "source well",' +
+                ' "destination well", or "trash", but it is {}'
+                .format(blowout_location))
 
         if kwargs.get('blow_out') and not blowout_location:
             if self.current_volume:
