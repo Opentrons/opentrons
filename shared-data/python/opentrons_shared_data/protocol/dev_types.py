@@ -18,6 +18,7 @@ class BlowoutLocation(Enum):
     DEST = 'destination well'
     TRASH = 'trash'
 
+
 class LabwareRequirement(TypedDict):
     slot: str
     definitionId: str
