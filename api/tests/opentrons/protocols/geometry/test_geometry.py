@@ -172,7 +172,7 @@ def test_no_labware_loc(labware_offset_tempdir):
     deck[1] = lw1
     deck[2] = lw2
     # Various flavors of locations without labware should work
-    no_lw = lw1.wells()[0].top()._replace(labware=None)
+    no_lw = Location(point=lw1.wells()[0].top().point, labware=None)
 
     no_from = plan_moves(no_lw, lw2.wells()[0].bottom(), deck,
                          P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
@@ -184,7 +184,7 @@ def test_no_labware_loc(labware_offset_tempdir):
     check_arc_basic(no_to, lw1.wells()[0].bottom(), no_lw)
     assert no_from[0][0].z == deck.highest_z + 15.0
 
-    no_well = lw1.wells()[0].top()._replace(labware=lw1)
+    no_well = Location(point=lw1.wells()[0].top(), labware=lw1)
 
     no_from_well = plan_moves(no_well, lw1.wells()[1].top(), deck,
                               P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)

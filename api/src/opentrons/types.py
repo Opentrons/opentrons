@@ -66,7 +66,7 @@ class Point(NamedTuple):
 LocationLabware = Union['Labware', 'Well', str, 'ModuleGeometry', None]
 
 
-class Location(NamedTuple):
+class Location:
     """ A location to target as a motion.
 
     The location contains a :py:class:`.Point` (in
@@ -92,8 +92,26 @@ class Location(NamedTuple):
        If you only need to compare locations, compare the :py:attr:`point`
        of each item.
     """
-    point: Point
-    labware: LocationLabware
+    def __init__(self, point: Point, labware: LocationLabware):
+        self._point = point
+        self._labware = labware
+
+    @property
+    def point(self) -> Point:
+        return self._point
+
+    @property
+    def labware(self) -> LocationLabware:
+        return self._labware
+
+    def __iter__(self):
+        """Iterable interface to support unpacking. Like a tuple."""
+        return iter((self._point, self._labware,))
+
+    def __eq__(self, other):
+        return isinstance(other, Location) \
+               and other._point == self._point \
+               and other._labware == self._labware
 
     def move(self, point: Point) -> 'Location':
         """
@@ -110,7 +128,7 @@ class Location(NamedTuple):
             >>> assert loc.point == Point(1, 1, 1)  # True
 
         """
-        return self._replace(point=self.point + point)
+        return Location(point=self.point + point, labware=self._labware)
 
 
 # TODO(mc, 2020-10-22): use MountType implementation for Mount

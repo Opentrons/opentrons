@@ -736,7 +736,7 @@ class InstrumentContext(CommandPublisher):
         version_breakpoint = version_breakpoint or APIVersion(2, 2)
         if self.api_version < version_breakpoint:
             bot = location.bottom()
-            return bot._replace(point=bot.point._replace(z=bot.point.z + 10))
+            return bot.move(point=bot.point._replace(z=bot.point.z + 10))
         else:
             tr = location.parent
             assert tr.is_tiprack
