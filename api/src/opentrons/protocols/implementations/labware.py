@@ -19,7 +19,23 @@ class LabwareImplementation(AbstractLabwareImplementation):
                  definition: LabwareDefinition,
                  parent: Location,
                  label: str = None):
-        """Construct an implementation of a labware object"""
+        """
+        Construct an implementation of a labware object.
+
+        :param definition: A dict representing all required data for a labware,
+                           including metadata such as the display name of the
+                           labware, a definition of the order to iterate over
+                           wells, the shape of wells (shape, physical
+                           dimensions, etc), and so on. The correct shape of
+                           this definition is handled by the "labware-designer"
+                           project in the Opentrons/opentrons repo.
+        :param parent: A :py:class:`.Location` representing the location where
+                       the front and left most point of the outside of the
+                       labware is (often the front-left corner of a slot on the
+                       deck).
+        :param str label: An optional label to use instead of the displayName
+                          from the definition's metadata element
+        """
         if label:
             dn = label
             self._name = dn

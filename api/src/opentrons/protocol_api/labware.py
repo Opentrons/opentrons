@@ -224,19 +224,8 @@ class Labware(DeckItem):
             implementation: AbstractLabwareImplementation,
             api_level: APIVersion = None) -> None:
         """
-        :param definition: A dict representing all required data for a labware,
-                           including metadata such as the display name of the
-                           labware, a definition of the order to iterate over
-                           wells, the shape of wells (shape, physical
-                           dimensions, etc), and so on. The correct shape of
-                           this definition is handled by the "labware-designer"
-                           project in the Opentrons/opentrons repo.
-        :param parent: A :py:class:`.Location` representing the location where
-                       the front and left most point of the outside of the
-                       labware is (often the front-left corner of a slot on the
-                       deck).
-        :param str label: An optional label to use instead of the displayName
-                          from the definition's metadata element
+        :param implementation: The class that implements the public interface
+                               of the class.
         :param APIVersion api_level: the API version to set for the instance.
                                      The :py:class:`.Labware` will
                                      conform to this level. If not specified,
