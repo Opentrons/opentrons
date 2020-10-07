@@ -21,32 +21,11 @@ export const COLOR_SUCCESS = '#60b120'
 // overlays
 export const OVERLAY_WHITE_10 = 'rgba(255, 255, 255, 0.1)'
 export const OVERLAY_WHITE_20 = 'rgba(255, 255, 255, 0.2)'
-export const OVERLAY_WHITE_30 = 'rgba(255, 255, 255, 0.3)'
-export const OVERLAY_WHITE_40 = 'rgba(255, 255, 255, 0.4)'
-export const OVERLAY_WHITE_50 = 'rgba(255, 255, 255, 0.5)'
-export const OVERLAY_WHITE_60 = 'rgba(255, 255, 255, 0.6)'
-export const OVERLAY_WHITE_70 = 'rgba(255, 255, 255, 0.7)'
-export const OVERLAY_WHITE_80 = 'rgba(255, 255, 255, 0.8)'
-export const OVERLAY_WHITE_90 = 'rgba(255, 255, 255, 0.9)'
 
-export const OVERLAY_GRAY_10 = 'rgba(127, 127, 127, 0.1)'
-export const OVERLAY_GRAY_20 = 'rgba(127, 127, 127, 0.2)'
-export const OVERLAY_GRAY_30 = 'rgba(127, 127, 127, 0.3)'
-export const OVERLAY_GRAY_40 = 'rgba(127, 127, 127, 0.4)'
-export const OVERLAY_GRAY_50 = 'rgba(127, 127, 127, 0.5)'
-export const OVERLAY_GRAY_60 = 'rgba(127, 127, 127, 0.6)'
-export const OVERLAY_GRAY_70 = 'rgba(127, 127, 127, 0.7)'
-export const OVERLAY_GRAY_80 = 'rgba(127, 127, 127, 0.8)'
+// used as default BaseModal overlay color
 export const OVERLAY_GRAY_90 = 'rgba(127, 127, 127, 0.9)'
 
-export const OVERLAY_BLACK_10 = 'rgba(0, 0, 0, 0.1)'
-export const OVERLAY_BLACK_20 = 'rgba(0, 0, 0, 0.2)'
-export const OVERLAY_BLACK_30 = 'rgba(0, 0, 0, 0.3)'
-export const OVERLAY_BLACK_40 = 'rgba(0, 0, 0, 0.4)'
-export const OVERLAY_BLACK_50 = 'rgba(0, 0, 0, 0.5)'
-export const OVERLAY_BLACK_60 = 'rgba(0, 0, 0, 0.6)'
-export const OVERLAY_BLACK_70 = 'rgba(0, 0, 0, 0.7)'
-export const OVERLAY_BLACK_80 = 'rgba(0, 0, 0, 0.8)'
+// darkest modal overlay used
 export const OVERLAY_BLACK_90 = 'rgba(0, 0, 0, 0.9)'
 
 // opacities

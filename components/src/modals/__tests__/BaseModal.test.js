@@ -4,7 +4,7 @@ import { shallow } from 'enzyme'
 
 import {
   OVERLAY_GRAY_90,
-  OVERLAY_BLACK_50,
+  OVERLAY_BLACK_90,
   C_WHITE,
   C_LIGHT_GRAY,
 } from '../../styles'
@@ -37,13 +37,13 @@ describe('BaseModal', () => {
 
     expect(box.prop('backgroundColor')).toBe(OVERLAY_GRAY_90)
 
-    wrapper.setProps({ overlayColor: OVERLAY_BLACK_50 })
+    wrapper.setProps({ overlayColor: OVERLAY_BLACK_90 })
     expect(
       wrapper
         .find(Flex)
         .first()
         .prop('backgroundColor')
-    ).toBe(OVERLAY_BLACK_50)
+    ).toBe(OVERLAY_BLACK_90)
   })
 
   it('should have a white content box', () => {
