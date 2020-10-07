@@ -9,7 +9,6 @@ import { PIPETTE_MOUNTS, getAttachedPipettes } from '../../pipettes'
 import { getCalibratePipettesLocations } from '../../nav'
 import { fetchTipLengthCalibrations } from '../../calibration'
 import {
-  HoverTooltip,
   TitledList,
   Flex,
   Text,
@@ -22,7 +21,6 @@ import {
 } from '@opentrons/components'
 import { PipetteListItem } from './PipetteListItem'
 import { PipetteTiprackListItem } from './PipetteTiprackListItem'
-import styles from './styles.css'
 
 import type { BaseProtocolLabware } from '../../calibration/types'
 import type { Dispatch, State } from '../../types'

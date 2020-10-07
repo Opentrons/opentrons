@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
-import { ListItem, HoverTooltip, Box, Text, SPACING_4 } from '@opentrons/components'
+import { ListItem, HoverTooltip, Box, Text } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { AttachedPipette } from '../../pipettes/types'
