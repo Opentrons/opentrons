@@ -15,7 +15,7 @@
   flex: 1;
   display: flex;
   align-items: flex-start;
-  overflow: hidcden;
+  overflow: hidden;
 }
 
 .active {
@@ -27,23 +27,6 @@
   flex: none;
   width: 2.5rem;
   margin-right: 1rem;
-}
-
-.pipette_mount {
-  margin-left: 1rem;
-  padding-top: 1rem;
-}
-
-.pipette_mount_title {
-  font-size: var(--fs-body-2);
-  font-weight: var(--fw-semibold);
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.pipette_tip_length_info {
-  flex: none;
-  margin-left: 1.6rem;
 }
 
 .tiprack_item_mount {
