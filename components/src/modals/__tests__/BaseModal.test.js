@@ -61,7 +61,7 @@ describe('BaseModal', () => {
     })
   })
 
-  it('shold apply style props to content box', () => {
+  it('should apply style props to content box', () => {
     const wrapper = shallow(<BaseModal maxWidth="60rem" />)
     const modal = wrapper.find(Flex).first()
     const content = modal.children(Box).first()
