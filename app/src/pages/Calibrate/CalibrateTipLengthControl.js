@@ -11,10 +11,7 @@ import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
 import { getUseTrashSurfaceForTipCal } from '../../config'
-import {
-  setUseTrashSurfaceForTipCal,
-  getCalibrationForPipette,
-} from '../../calibration'
+import { setUseTrashSurfaceForTipCal } from '../../calibration'
 
 import {
   CalibrateTipLength,
@@ -25,6 +22,7 @@ import {
 import { CalibrationInfoBox } from '../../components/CalibrationInfoBox'
 import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
 import { Portal } from '../../components/portal'
+import { CalibratePipetteOffset } from '../../components/CalibratePipetteOffset'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
@@ -36,7 +34,7 @@ export type CalibrateTipLengthControlProps = {|
   hasCalibrated: boolean,
   mount: Mount,
   tipRackDefinition: LabwareDefinition2,
-  serialNumber: string,
+  isExtendedPipOffset: boolean,
 |}
 
 // tip length calibration commands for which the full page spinner should not appear
@@ -54,7 +52,7 @@ export function CalibrateTipLengthControl({
   hasCalibrated,
   mount,
   tipRackDefinition,
-  serialNumber,
+  isExtendedPipOffset,
 }: CalibrateTipLengthControlProps): React.Node {
   const [showWizard, setShowWizard] = React.useState(false)
   const [showCalBlockPrompt, setShowCalBlockPrompt] = React.useState(false)
@@ -97,7 +95,7 @@ export function CalibrateTipLengthControl({
       robotName,
       Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
     )
-    const pipetteCalibrationSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
+    const extendedPipOffsetSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
       state,
       robotName,
       Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
@@ -109,37 +107,25 @@ export function CalibrateTipLengthControl({
     ) {
       return tipLengthSession
     } else if (
-      pipetteCalibrationSession &&
-      pipetteCalibrationSession.sessionType ===
+      extendedPipOffsetSession &&
+      extendedPipOffsetSession.sessionType ===
         Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
     ) {
-      return pipetteCalibrationSession
+      return extendedPipOffsetSession
     }
     return null
   })
 
-  const tipRackURI = getLabwareDefURI(tipRackDefinition)
-  const pipetteOffsetCalibration = useSelector((state: State) =>
-    serialNumber
-      ? getCalibrationForPipette(state, robotName, serialNumber)
-      : null
-  )
-  const shouldCalibrateTipLength = true
-  console.log(pipetteOffsetCalibration)
-
   const handleStart = () => {
-    if (
-      pipetteOffsetCalibration?.tiprackUri === tipRackURI &&
-      useTrashSurface.current !== null
-    ) {
+    if (isExtendedPipOffset && useTrashSurface.current !== null) {
       dispatchRequests(
         Sessions.ensureSession(
           robotName,
           Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
           {
             mount,
-            shouldCalibrateTipLength,
             hasCalibrationBlock: !useTrashSurface.current,
+            shouldCalibrateTipLength: true,
             tipRackDefinition,
           }
         )
@@ -240,14 +226,24 @@ export function CalibrateTipLengthControl({
       )}
       {showWizard && useTrashSurface.current !== null && (
         <Portal>
-          <CalibrateTipLength
-            robotName={robotName}
-            session={calibrationSession}
-            closeWizard={handleCloseWizard}
-            hasBlock={!useTrashSurface.current}
-            showSpinner={showSpinner}
-            dispatchRequests={dispatchRequests}
-          />
+          {isExtendedPipOffset ? (
+            <CalibratePipetteOffset
+              session={calibrationSession}
+              robotName={robotName}
+              closeWizard={() => setShowWizard(false)}
+              showSpinner={showSpinner}
+              dispatchRequests={dispatchRequests}
+            />
+          ) : (
+            <CalibrateTipLength
+              robotName={robotName}
+              session={calibrationSession}
+              closeWizard={handleCloseWizard}
+              hasBlock={!useTrashSurface.current}
+              showSpinner={showSpinner}
+              dispatchRequests={dispatchRequests}
+            />
+          )}
         </Portal>
       )}
     </>

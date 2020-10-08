@@ -47,9 +47,8 @@ class PipetteOffsetCalibrationSession(BaseSession):
     async def create(cls, configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> 'BaseSession':
         assert isinstance(instance_meta.create_params, SessionCreateParams)
-        console.log("IN CREATE METHOD")
         mount = instance_meta.create_params.mount
-        load_tip_length = instance_meta.create_params.shouldCalibrateTipLength
+        perform_tip_length = instance_meta.create_params.shouldCalibrateTipLength
         has_cal_block = instance_meta.create_params.hasCalibrationBlock
         tiprack = instance_meta.create_params.tipRackDefinition
         # if lights are on already it's because the user clicked the button,
@@ -61,7 +60,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
             pip_offset_cal_user_flow = PipetteOffsetCalibrationUserFlow(
                     hardware=configuration.hardware,
                     mount=Mount[mount.upper()],
-                    load_tip_length=load_tip_length,
+                    perform_tip_length=perform_tip_length,
                     has_calibration_block=has_cal_block,
                     tip_rack_def=cast('LabwareDefinition', tiprack))
         except AssertionError as e:
@@ -96,7 +95,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
             instrument=uf.get_pipette(),
             currentStep=uf.current_state,
             labware=uf.get_required_labware(),
-            hasCalibratedTipLength=uf.has_calibrated_tip_length,
+            shouldPerformTipLength=uf.should_perform_tip_length,
         )
 
     async def clean_up(self):

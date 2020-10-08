@@ -69,8 +69,8 @@ When we move to Python 3.8 we can use Literal type as described here
 https://pydantic-docs.helpmanual.io/usage/types/#literal-type
 """
 SessionCreateParamType = typing.Union[
-    TipLengthSessionCreateParams,
     PipetteOffsetSessionCreateParams,
+    TipLengthSessionCreateParams,
     ProtocolCreateParams,
     None,
     EmptyModel

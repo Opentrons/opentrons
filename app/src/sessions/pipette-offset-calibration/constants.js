@@ -18,6 +18,14 @@ export const PIP_OFFSET_STEP_SAVING_POINT_ONE: 'savingPointOne' =
   'savingPointOne'
 export const PIP_OFFSET_STEP_CALIBRATION_COMPLETE: 'calibrationComplete' =
   'calibrationComplete'
+export const PIP_OFFSET_STEP_COMPLETE_TIP_LENGTH: 'tipLengthComplete' =
+  'tipLengthComplete'
 export const PIP_OFFSET_STEP_SESSION_EXITED: 'sessionExited' = 'sessionExited'
 
-export const pipOffsetCalCommands = sharedCalCommands
+const TIP_LENGTH_COMPLETE: 'calibration.pipetteOffset.tipLengthComplete' =
+  'calibration.pipetteOffset.tipLengthComplete'
+
+export const pipOffsetCalCommands = {
+  ...sharedCalCommands,
+  TIP_LENGTH_COMPLETE,
+}

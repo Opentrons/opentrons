@@ -32,6 +32,7 @@ const PIP_OFFSET_CAL_HEADER = 'Pipette Offset Calibration complete'
 const TIP_CAL_HEADER = 'Tip Length Calibration complete'
 const REMOVE_BLOCK = 'Remove Calibration Block from the deck.'
 const RETURN_TIP = 'Return tip to tip rack and exit'
+const PROCEED_TO_DECK = 'Continue to slot 5'
 const EXIT = 'exit'
 const PROCEED_TO_PIP_OFFSET = 'continue to Pipette Offset Calibration'
 
@@ -49,11 +50,22 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
   const {
     sessionType,
     calBlock,
-    hasCalibratedTipLength,
+    shouldPerformTipLength,
     cleanUpAndExit,
     sendCommands,
   } = props
-  const { headerText } = contentsBySessionType[sessionType]
+
+  console.log('in complete')
+  console.log(shouldPerformTipLength)
+  const isExtendedPipOffset =
+    sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
+    shouldPerformTipLength === true
+
+  const lookupType = isExtendedPipOffset
+    ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+    : sessionType
+
+  const { headerText } = contentsBySessionType[lookupType]
 
   const proceed = () => {
     sendCommands({ command: Sessions.sharedCalCommands.MOVE_TO_DECK })
@@ -103,9 +115,9 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
         justifyContent={JUSTIFY_CENTER}
         marginY={SPACING_3}
       >
-        {hasCalibratedTipLength === false && (
+        {shouldPerformTipLength === true && (
           <PrimaryBtn
-            title={RETURN_TIP}
+            title={PROCEED_TO_DECK}
             flex="1"
             marginY={SPACING_3}
             onClick={proceed}
@@ -113,9 +125,11 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
             {PROCEED_TO_PIP_OFFSET}
           </PrimaryBtn>
         )}
-        <PrimaryBtn title={RETURN_TIP} flex="1" onClick={cleanUpAndExit}>
-          {hasCalibratedTipLength === false ? EXIT : RETURN_TIP}
-        </PrimaryBtn>
+        {shouldPerformTipLength !== true && (
+          <PrimaryBtn title={RETURN_TIP} flex="1" onClick={cleanUpAndExit}>
+            {shouldPerformTipLength === true ? EXIT : RETURN_TIP}
+          </PrimaryBtn>
+        )}
       </Flex>
     </Flex>
   )

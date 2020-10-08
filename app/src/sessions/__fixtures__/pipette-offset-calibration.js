@@ -25,7 +25,7 @@ export const mockPipetteOffsetCalibrationSessionDetails: PipetteOffsetCalibratio
   },
   currentStep: 'labwareLoaded',
   labware: [mockPipetteOffsetTipRack],
-  hasCalibratedTipLength: false,
+  shouldPerformTipLength: false,
 }
 
 export const mockPipetteOffsetCalibrationSessionParams: PipetteOffsetCalibrationSessionParams = {

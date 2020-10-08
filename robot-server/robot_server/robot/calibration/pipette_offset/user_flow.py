@@ -57,7 +57,7 @@ class PipetteOffsetCalibrationUserFlow:
     def __init__(self,
                  hardware: ThreadManager,
                  mount: Mount = Mount.RIGHT,
-                 load_tip_length: bool = True,
+                 perform_tip_length: bool = False,
                  has_calibration_block: bool = False,
                  tip_rack_def: Optional['LabwareDefinition'] = None):
 
@@ -89,7 +89,7 @@ class PipetteOffsetCalibrationUserFlow:
             (self._get_stored_tip_length_cal() is not None
              or self._using_default_tiprack)
 
-        if not load_tip_length:
+        if perform_tip_length:
             self._state_machine: PipetteOffsetStateMachine =\
                 PipetteOffsetWithTipLengthStateMachine()
             self._state: GenericState = POWTState  # type: ignore
@@ -98,6 +98,7 @@ class PipetteOffsetCalibrationUserFlow:
                 PipetteOffsetCalibrationStateMachine()
             self._state = POCState  # type: ignore
         self._current_state = self._state.sessionStarted
+        self._should_perform_tip_length = perform_tip_length
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
@@ -129,6 +130,10 @@ class PipetteOffsetCalibrationUserFlow:
     @property
     def has_calibrated_tip_length(self) -> bool:
         return self._has_calibrated_tip_length
+
+    @property
+    def should_perform_tip_length(self) -> bool:
+        return self._should_perform_tip_length
 
     def get_pipette(self) -> AttachedPipette:
         # TODO(mc, 2020-09-17): s/tip_length/tipLength
@@ -199,10 +204,11 @@ class PipetteOffsetCalibrationUserFlow:
 
     async def move_to_tip_rack(self):
         if self._current_state == self._state.labwareLoaded and \
-                not self._has_calibrated_tip_length:
+                not self.has_calibrated_tip_length and\
+                not self.should_perform_tip_length:
             self._flag_unmet_transition_req(
                 command_handler="move_to_tip_rack",
-                unmet_condition="tip length calibration data exists")
+                unmet_condition="tip length calibration data does not exist")
         point = self._tip_rack.wells()[0].top().point + \
             MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
@@ -263,11 +269,11 @@ class PipetteOffsetCalibrationUserFlow:
             condition=unmet_condition)
 
     async def move_to_deck(self):
-        if not self._has_calibrated_tip_length and \
+        if not self.has_calibrated_tip_length and \
                 self._current_state == self._state.inspectingTip:
             self._flag_unmet_transition_req(
                 command_handler="move_to_deck",
-                unmet_condition="tip length calibration data exists")
+                unmet_condition="tip length calibration data does not exist")
         if self._current_state == self._state.calibrationComplete:
             # recache tip length cal which has just been saved
             self._has_calibrated_tip_length =\
@@ -324,14 +330,17 @@ class PipetteOffsetCalibrationUserFlow:
                 pipette_id=self._hw_pipette.pipette_id,
                 tip_length_offset=noz_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack)
+            self._has_calibrated_tip_length =\
+                (self._get_stored_tip_length_cal() is not None)
+            self._should_perform_tip_length = False
 
     async def move_to_reference_point(self):
-        if self._has_calibrated_tip_length and \
+        if not self.should_perform_tip_length and \
                 self._current_state in (self._state.labwareLoaded,
                                         self._state.inspectingTip):
             self._flag_unmet_transition_req(
                 command_handler="move_to_reference_point",
-                unmet_condition="missing tip length calibration")
+                unmet_condition="incorrect state machine loaded")
         ref_loc = util.get_reference_location(
             mount=self._mount,
             deck=self._deck,

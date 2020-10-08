@@ -33,7 +33,7 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
         ...,
         description="Current step of pipette offset user flow")
     labware: List[RequiredLabware]
-    hasCalibratedTipLength: bool =\
+    shouldPerformTipLength: bool =\
         Field(None, description="Does tip length calibration data exist for "
                                 "this pipette and tip rack combination")
     nextSteps: Optional[NextSteps] =\
@@ -66,7 +66,7 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
                           "definition": {"ordering": "the ordering section..."}
                       },
                     ],
-                    "hasCalibratedTipLength": True,
+                    "shouldPerformTipLength": True,
                 }
             ]
         }

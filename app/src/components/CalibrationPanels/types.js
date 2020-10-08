@@ -20,5 +20,5 @@ export type CalibrationPanelProps = {|
   currentStep: CalibrationSessionStep,
   sessionType: SessionType,
   calBlock?: TipLengthCalibrationLabware | null,
-  hasCalibratedTipLength?: boolean | null,
+  shouldPerformTipLength?: boolean | null,
 |}

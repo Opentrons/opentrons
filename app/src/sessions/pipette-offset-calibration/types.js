@@ -8,6 +8,7 @@ import typeof {
   PIP_OFFSET_STEP_JOGGING_TO_DECK,
   PIP_OFFSET_STEP_SAVING_POINT_ONE,
   PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
+  PIP_OFFSET_STEP_COMPLETE_TIP_LENGTH,
   PIP_OFFSET_STEP_SESSION_EXITED,
 } from '../constants'
 
@@ -18,6 +19,7 @@ export type PipetteOffsetCalibrationStep =
   | PIP_OFFSET_STEP_LABWARE_LOADED
   | PIP_OFFSET_STEP_PREPARING_PIPETTE
   | PIP_OFFSET_STEP_INSPECTING_TIP
+  | PIP_OFFSET_STEP_COMPLETE_TIP_LENGTH
   | PIP_OFFSET_STEP_JOGGING_TO_DECK
   | PIP_OFFSET_STEP_SAVING_POINT_ONE
   | PIP_OFFSET_STEP_CALIBRATION_COMPLETE
@@ -51,5 +53,5 @@ export type PipetteOffsetCalibrationSessionDetails = {|
   instrument: PipetteOffsetCalibrationInstrument,
   currentStep: PipetteOffsetCalibrationStep,
   labware: Array<PipetteOffsetCalibrationLabware>,
-  hasCalibratedTipLength: boolean,
+  shouldPerformTipLength: boolean,
 |}
