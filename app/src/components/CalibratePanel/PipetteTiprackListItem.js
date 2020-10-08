@@ -2,13 +2,20 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
-import { ListItem, HoverTooltip, Box, Text } from '@opentrons/components'
+import {
+  ListItem,
+  HoverTooltip,
+  Box,
+  Text,
+  FONT_WEIGHT_SEMIBOLD,
+} from '@opentrons/components'
 import styles from './styles.css'
 
 import type { AttachedPipette } from '../../pipettes/types'
 import type { BaseProtocolLabware } from '../../calibration/types'
 import type { State } from '../../types'
 
+import { TipLengthCalibrationData } from './TipLengthCalibrationData'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { getTipLengthForPipetteAndTiprack } from '../../calibration'
 
@@ -62,11 +69,14 @@ export function PipetteTiprackListItem(
           activeClassName={styles.active}
         >
           <Box marginLeft={MARGIN_LEFT_SIZE}>
-            <Text>{displayName}</Text>
-            {/* TODO: correctly render tip length calibraiton data */}
-            {tipLengthCalibration
-              ? tipLengthCalibration.tipLength
-              : 'not yet calibrated'}
+            <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{displayName}</Text>
+            <TipLengthCalibrationData
+              calibrationData={tipLengthCalibration}
+              calibratedThisSession={false}
+              // the definitionHash will only be absent if old labware
+              // or robot version <= 3.19
+              calDataAvailable={definitionHash != null}
+            />
           </Box>
         </ListItem>
       )}
