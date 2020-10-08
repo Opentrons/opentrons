@@ -1,6 +1,6 @@
 // @flow
 
-// color names
+// grey scale
 export const C_BLACK = '#000000'
 export const C_DARK_GRAY = '#4a4a4a'
 export const C_MED_DARK_GRAY = '#6c6c6c'
@@ -10,6 +10,9 @@ export const C_LIGHT_GRAY = '#e6e6e6'
 export const C_NEAR_WHITE = '#fafafa'
 export const C_WHITE = '#ffffff'
 export const C_TRANSPARENT = 'transparent'
+
+// brand colors
+export const C_BLUE = '#006fff'
 
 // colors by usage
 export const COLOR_DISABLED = '#9c9c9c'

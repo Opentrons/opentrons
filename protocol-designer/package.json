@@ -38,7 +38,7 @@
     "react-dnd-mouse-backend": "0.1.2",
     "react-dom": "16.8.6",
     "react-hot-loader": "4.12.19",
-    "react-redux": "7.1.0",
+    "react-redux": "7.2.1",
     "redux": "4.0.5",
     "redux-actions": "2.2.1",
     "redux-thunk": "2.2.0",

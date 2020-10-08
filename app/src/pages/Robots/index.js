@@ -4,8 +4,6 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useRouteMatch, Redirect } from 'react-router-dom'
 
-import { createLogger } from '../../logger'
-
 import {
   CONNECTABLE,
   getConnectedRobot,
@@ -20,8 +18,6 @@ import { Page } from '../../components/Page'
 import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
 
-const log = createLogger(__filename)
-
 export function Robots(): React.Node {
   const { path, url, params } = useRouteMatch()
   const instrumentsMatch = useRouteMatch(`${path}/instruments`)
@@ -32,11 +28,6 @@ export function Robots(): React.Node {
   const connectedRobot = useSelector(getConnectedRobot)
   const buildrootRobot = useSelector(getBuildrootRobot)
   const robot = viewableRobots.find(r => r.name === name) || null
-
-  if (appUpdate.available && !appUpdate.seen) {
-    log.warn('App update available on load, redirecting to app update.')
-    return <Redirect to={'/more/app/update'} />
-  }
 
   if (!robot) {
     const baseUrl = name != null ? url.replace(`/${name}`, '') : url

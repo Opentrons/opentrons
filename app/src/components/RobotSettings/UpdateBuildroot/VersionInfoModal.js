@@ -1,12 +1,13 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
 
 import { getRobotApiVersion } from '../../../discovery'
-import { CURRENT_VERSION, getShellUpdateState } from '../../../shell'
+import { CURRENT_VERSION, getAvailableShellUpdate } from '../../../shell'
 
 import { AlertModal } from '@opentrons/components'
+import { Portal } from '../../portal'
+import { UpdateAppModal } from '../../app-settings'
 import { UpdateAppMessage } from './UpdateAppMessage'
 import { VersionList } from './VersionList'
 import { SkipAppUpdateMessage } from './SkipAppUpdateMessage'
@@ -29,15 +30,21 @@ const REINSTALL_MESSAGE =
 
 export function VersionInfoModal(props: VersionInfoModalProps): React.Node {
   const { robot, robotUpdateType, close, proceed } = props
-  const appUpdate = useSelector(getShellUpdateState)
+  const [showUpdateAppModal, setShowUpdateAppModal] = React.useState(false)
+  const availableAppUpdateVersion = useSelector(getAvailableShellUpdate)
   const robotVersion = getRobotApiVersion(robot)
-  const appUpdateVersion = appUpdate.info?.version
+
+  if (showUpdateAppModal)
+    return (
+      <Portal>
+        <UpdateAppModal closeModal={close} />
+      </Portal>
+    )
 
   const versionProps = {
     robotVersion: robotVersion != null ? robotVersion : null,
     appVersion: CURRENT_VERSION,
-    availableUpdate:
-      appUpdateVersion != null ? appUpdateVersion : CURRENT_VERSION,
+    availableUpdate: availableAppUpdateVersion ?? CURRENT_VERSION,
   }
 
   let heading = ''
@@ -45,15 +52,14 @@ export function VersionInfoModal(props: VersionInfoModalProps): React.Node {
   let message = null
   let secondaryMessage = null
 
-  if (appUpdate.available) {
-    heading = `App Version ${versionProps.availableUpdate} Available`
+  if (availableAppUpdateVersion !== null) {
+    heading = `App Version ${availableAppUpdateVersion} Available`
     message = <UpdateAppMessage {...versionProps} />
     secondaryMessage = <SkipAppUpdateMessage onClick={proceed} />
     primaryButton = {
       ...primaryButton,
-      Component: Link,
-      to: '/more/app/update',
       children: 'View App Update',
+      onClick: () => setShowUpdateAppModal(true),
     }
   } else if (robotUpdateType === 'upgrade' || robotUpdateType === 'downgrade') {
     heading = 'Robot Update Available'

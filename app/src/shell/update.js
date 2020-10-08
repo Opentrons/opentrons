@@ -21,17 +21,11 @@ export function applyShellUpdate(): ShellUpdateAction {
   return { type: 'shell:APPLY_UPDATE', meta: { shell: true } }
 }
 
-export function setShellUpdateSeen(): ShellUpdateAction {
-  return { type: 'shell:SET_UPDATE_SEEN' }
-}
-
-type StringSelector = State => ?string
-
 export function getShellUpdateState(state: State): ShellUpdateState {
   return state.shell.update
 }
 
-export const getAvailableShellUpdate: StringSelector = createSelector(
+export const getAvailableShellUpdate: State => string | null = createSelector(
   getShellUpdateState,
   state => (state.available && state.info ? state.info.version : null)
 )

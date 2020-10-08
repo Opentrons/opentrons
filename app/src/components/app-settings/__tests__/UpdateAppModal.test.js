@@ -10,6 +10,7 @@ import { UpdateAppModal } from '../UpdateAppModal'
 
 import type { State } from '../../../types'
 import type { ShellUpdateState, UpdateInfo } from '../../../shell/types'
+import type { UpdateAppModalProps } from '../UpdateAppModal'
 
 // TODO(mc, 2020-10-06): this is a partial mock because the shell/update
 // needs some reorg to split actions and selectors
@@ -24,10 +25,11 @@ const getShellUpdateState: JestMockFn<[State], $Shape<ShellUpdateState>> =
 const MOCK_STATE: State = ({ mockState: true }: any)
 
 describe('UpdateAppModal', () => {
-  const handleClose = jest.fn()
+  const closeModal = jest.fn()
+  const dismissAlert = jest.fn()
 
-  const render = () => {
-    return mountWithStore(<UpdateAppModal closeModal={handleClose} />, {
+  const render = (props: UpdateAppModalProps) => {
+    return mountWithStore(<UpdateAppModal {...props} />, {
       initialState: MOCK_STATE,
     })
   }
@@ -49,7 +51,7 @@ describe('UpdateAppModal', () => {
   })
 
   it('should render an BaseModal using available version from state', () => {
-    const { wrapper } = render()
+    const { wrapper } = render({ closeModal })
     const modal = wrapper.find(BaseModal)
     const title = modal.find('h2')
     const titleIcon = title.closest(Flex).find(Icon)
@@ -59,25 +61,25 @@ describe('UpdateAppModal', () => {
   })
 
   it('should render a <ReleaseNotes> component with the release notes', () => {
-    const { wrapper } = render()
+    const { wrapper } = render({ closeModal })
     const releaseNotes = wrapper.find(ReleaseNotes)
 
     expect(releaseNotes.prop('source')).toBe('this is a release')
   })
 
   it('should render a "Not Now" button that closes the modal', () => {
-    const { wrapper } = render()
+    const { wrapper } = render({ closeModal })
     const notNowButton = wrapper
       .find('button')
       .filterWhere(b => /not now/i.test(b.text()))
 
-    expect(handleClose).not.toHaveBeenCalled()
+    expect(closeModal).not.toHaveBeenCalled()
     notNowButton.invoke('onClick')()
-    expect(handleClose).toHaveBeenCalled()
+    expect(closeModal).toHaveBeenCalled()
   })
 
   it('should render a "Download" button that starts the update', () => {
-    const { wrapper, store } = render()
+    const { wrapper, store } = render({ closeModal })
     const downloadButton = wrapper
       .find('button')
       .filterWhere(b => /download/i.test(b.text()))
@@ -89,7 +91,7 @@ describe('UpdateAppModal', () => {
 
   it('should render a spinner if update is downloading', () => {
     getShellUpdateState.mockReturnValue({ downloading: true })
-    const { wrapper } = render()
+    const { wrapper } = render({ closeModal })
     const spinner = wrapper
       .find(Icon)
       .filterWhere(i => i.prop('name') === 'ot-spinner')
@@ -107,7 +109,7 @@ describe('UpdateAppModal', () => {
       }: $Shape<UpdateInfo>),
     })
 
-    const { wrapper } = render()
+    const { wrapper } = render({ closeModal })
     const title = wrapper.find('h2')
 
     expect(title.text()).toBe('App Version 1.2.3 Downloaded')
@@ -117,7 +119,7 @@ describe('UpdateAppModal', () => {
 
   it('should render a "Restart App" button if update is downloaded', () => {
     getShellUpdateState.mockReturnValue({ downloaded: true })
-    const { wrapper, store } = render()
+    const { wrapper, store } = render({ closeModal })
     const restartButton = wrapper
       .find('button')
       .filterWhere(b => /restart/i.test(b.text()))
@@ -128,13 +130,13 @@ describe('UpdateAppModal', () => {
 
   it('should render a "Not Now" button if update is downloaded', () => {
     getShellUpdateState.mockReturnValue({ downloaded: true })
-    const { wrapper } = render()
+    const { wrapper } = render({ closeModal })
     const notNowButton = wrapper
       .find('button')
       .filterWhere(b => /not now/i.test(b.text()))
 
     notNowButton.invoke('onClick')()
-    expect(handleClose).toHaveBeenCalled()
+    expect(closeModal).toHaveBeenCalled()
   })
 
   it('should render an ErrorModal if the update errors', () => {
@@ -145,7 +147,7 @@ describe('UpdateAppModal', () => {
       },
     })
 
-    const { wrapper } = render()
+    const { wrapper } = render({ closeModal })
     const errorModal = wrapper.find(ErrorModal)
 
     expect(errorModal.prop('heading')).toBe('Update Error')
@@ -159,6 +161,33 @@ describe('UpdateAppModal', () => {
 
     errorModal.invoke('close')()
 
-    expect(handleClose).toHaveBeenCalled()
+    expect(closeModal).toHaveBeenCalled()
+  })
+
+  it('should call props.dismissAlert via the "Not Now" button', () => {
+    const { wrapper } = render({ dismissAlert })
+    const notNowButton = wrapper
+      .find('button')
+      .filterWhere(b => /not now/i.test(b.text()))
+
+    expect(dismissAlert).not.toHaveBeenCalled()
+    notNowButton.invoke('onClick')()
+    expect(dismissAlert).toHaveBeenCalledWith(false)
+  })
+
+  it('should  call props.dismissAlert via the Error modal "close" button', () => {
+    getShellUpdateState.mockReturnValue({
+      error: {
+        message: 'Could not get code signature for running application',
+        name: 'Error',
+      },
+    })
+
+    const { wrapper } = render({ dismissAlert })
+    const errorModal = wrapper.find(ErrorModal)
+
+    errorModal.invoke('close')()
+
+    expect(dismissAlert).toHaveBeenCalledWith(false)
   })
 })
