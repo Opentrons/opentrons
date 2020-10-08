@@ -25,7 +25,7 @@ const spinnerCommandBlockList: Array<SessionCommandString> = [
 export function useCalibratePipetteOffset(
   robotName: string,
   mount: Mount,
-  onComplete: () => mixed
+  onComplete: (() => mixed) | null = null
 ): [() => void, React.Node | null] {
   const [showWizard, setShowWizard] = React.useState(false)
 

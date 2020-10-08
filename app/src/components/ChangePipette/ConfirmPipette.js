@@ -4,9 +4,10 @@ import cx from 'classnames'
 
 import {
   Icon,
-  PrimaryButton,
   PrimaryBtn,
   ModalPage,
+  SPACING_2,
+  SPACING_4,
 } from '@opentrons/components'
 import { PipetteOffsetCalibrationControl } from '../InstrumentSettings/PipetteOffsetCalibrationControl'
 import { getDiagramsSrc } from './InstructionStep'
@@ -20,6 +21,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { Mount } from '../../pipettes/types'
 import type { PipetteOffsetCalibration } from '../../calibration/types'
+import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
@@ -70,9 +72,7 @@ export function ConfirmPipette(props: Props): React.Node {
       {!success && <TryAgainButton {...props} />}
       {success && !actualPipette && <AttachAnotherButton {...props} />}
       {success && actualPipette && !actualPipetteOffset && (
-        <PrimaryBtn flex="1" onClick={startPipetteOffsetCalibration}>
-          {CONTINUE_TO_PIP_OFFSET}
-        </PrimaryBtn>
+        <CalibratePipetteOffsetButton {...props} />
       )}
       <ExitButton {...props} />
     </ModalPage>
@@ -163,9 +163,21 @@ function StatusDetails(props: Props) {
 
 function AttachAnotherButton(props: Props) {
   return (
-    <PrimaryButton className={styles.confirm_button} onClick={props.back}>
+    <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={props.back}>
       attach another pipette
-    </PrimaryButton>
+    </PrimaryBtn>
+  )
+}
+
+function CalibratePipetteOffsetButton(props: Props) {
+  return (
+    <PrimaryBtn
+      marginBottom={SPACING_2}
+      width="100%"
+      onClick={props.startPipetteOffsetCalibration}
+    >
+      {CONTINUE_TO_PIP_OFFSET}
+    </PrimaryBtn>
   )
 }
 
@@ -180,9 +192,9 @@ function TryAgainButton(props: Props) {
 
   if (wantedPipette && attachedWrong) {
     return (
-      <PrimaryButton className={styles.confirm_button} onClick={tryAgain}>
+      <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={tryAgain}>
         detach and try again
-      </PrimaryButton>
+      </PrimaryBtn>
     )
   }
 
@@ -205,8 +217,8 @@ function ExitButton(props: Props) {
     : EXIT_BUTTON_MESSAGE
 
   return (
-    <PrimaryButton className={styles.confirm_button} onClick={exit}>
+    <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
       {children}
-    </PrimaryButton>
+    </PrimaryBtn>
   )
 }
