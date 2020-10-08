@@ -71,7 +71,13 @@ export function PipetteListComponent(
         const displayName = protocolPipette?.modelSpecs?.displayName || 'N/A'
         const { disabledReason = null } = urlsByMount[mount].default
         const pip_tipracks = uniqBy(
-          tipracks.filter(t => t.calibratorMount === mount),
+          tipracks.filter(
+            t =>
+              t.calibratorMount === mount ||
+              (protocolPipette
+                ? protocolPipette.tipRacks.includes(t._id)
+                : false)
+          ),
           t => t.definitionHash ?? t.name
         )
         const calibratePathFor = (
