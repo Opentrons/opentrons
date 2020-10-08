@@ -2,8 +2,10 @@
 
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
+import { saveAs } from 'file-saver'
 
 import * as PipetteOffset from '../../../calibration/pipette-offset'
+import * as TipLength from '../../../calibration/tip-length'
 import * as Calibration from '../../../calibration'
 import * as Pipettes from '../../../pipettes'
 import * as Config from '../../../config'
@@ -18,13 +20,22 @@ import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 
 import type { State, Action } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
+import type { AnalyticsEvent } from '../../../analytics/types'
+
+const mockCallTrackEvent: JestMockFn<[AnalyticsEvent], void> = jest.fn()
 
 jest.mock('react-router-dom', () => ({ Link: 'a' }))
+jest.mock('file-saver')
 
 jest.mock('../../../robot/selectors')
 jest.mock('../../../config/selectors')
 jest.mock('../../../calibration/selectors')
+jest.mock('../../../calibration/tip-length/selectors')
+jest.mock('../../../calibration/pipette-offset/selectors')
 jest.mock('../../../sessions/selectors')
+jest.mock('../../../analytics', () => ({
+  useTrackEvent: () => mockCallTrackEvent,
+}))
 
 jest.mock('../CheckCalibrationControl', () => ({
   CheckCalibrationControl: () => <></>,
@@ -62,6 +73,7 @@ const getDeckCalibrationStatus: JestMockFn<
   [State, string],
   $Call<typeof Calibration.getDeckCalibrationStatus, State, string>
 > = Calibration.getDeckCalibrationStatus
+
 const getDeckCalButton = wrapper =>
   wrapper
     .find('TitledControl[title="Calibrate deck"]')
@@ -70,6 +82,9 @@ const getDeckCalButton = wrapper =>
 
 const getCheckCalibrationControl = wrapper =>
   wrapper.find(CheckCalibrationControl)
+
+const getDownloadButton = wrapper =>
+  wrapper.find('a').filter({ children: 'Download your calibration data' })
 
 describe('CalibrationCard', () => {
   const render = (robot: ViewableRobot = mockRobot) => {
@@ -80,6 +95,17 @@ describe('CalibrationCard', () => {
       }
     )
   }
+
+  const realBlob = global.Blob
+  beforeAll(() => {
+    global.Blob = function(content, options) {
+      return { content, options }
+    }
+  })
+
+  afterAll(() => {
+    global.Blob = realBlob
+  })
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -111,6 +137,10 @@ describe('CalibrationCard', () => {
     expect(store.dispatch).toHaveBeenNthCalledWith(
       3,
       PipetteOffset.fetchPipetteOffsetCalibrations(mockRobot.name)
+    )
+    expect(store.dispatch).toHaveBeenNthCalledWith(
+      4,
+      TipLength.fetchTipLengthCalibrations(mockRobot.name)
     )
     store.dispatch.mockReset()
     jest.advanceTimersByTime(20000)
@@ -199,5 +229,16 @@ describe('CalibrationCard', () => {
   it('renders PipetteOffsets', () => {
     const { wrapper } = render()
     expect(wrapper.exists(PipetteOffsets)).toBe(true)
+  })
+
+  it('lets you click download to download', () => {
+    const { wrapper } = render()
+
+    getDownloadButton(wrapper).invoke('onClick')({ preventDefault: () => {} })
+    expect(saveAs).toHaveBeenCalled()
+    expect(mockCallTrackEvent).toHaveBeenCalledWith({
+      name: 'calibrationDataDownloaded',
+      properties: {},
+    })
   })
 })
