@@ -19,12 +19,15 @@ import {
   ConfirmRecalibrationModal,
 } from '../../components/CalibrateTipLength'
 
-import { CalibrationInfoBox } from '../../components/CalibrationInfoBox'
+import { TipLengthCalibrationInfoBox } from '../../components/CalibrateTipLength/TipLengthCalibrationInfoBox'
 import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
 import { Portal } from '../../components/portal'
 import { CalibratePipetteOffset } from '../../components/CalibratePipetteOffset'
+import {
+  getLabwareDisplayName,
+  type LabwareDefinition2,
+} from '@opentrons/shared-data'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
 import type {
   SessionCommandString,
@@ -46,8 +49,8 @@ const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-const IS_CALIBRATED = 'Pipette tip height is calibrated'
-const IS_NOT_CALIBRATED = 'Pipette tip height is not calibrated'
+const IS_CALIBRATED = 'Pipette tip length has been calibrated'
+const IS_NOT_CALIBRATED = 'Pipette tip length is not calibrated'
 const CALIBRATE_TIP_LENGTH = 'Calibrate tip length'
 const RECALIBRATE_TIP_LENGTH = 'Re-Calibrate tip length'
 
@@ -216,25 +219,24 @@ export function CalibrateTipLengthControl({
 
   return (
     <>
-      <CalibrationInfoBox
-        confirmed={hasCalibrated}
-        title={`${mount} pipette tip length calibration`}
+      <TipLengthCalibrationInfoBox
+        title={getLabwareDisplayName(tipRackDefinition)}
       >
         <UncalibratedInfo
           showSpinner={showSpinner}
           hasCalibrated={hasCalibrated}
           handleStart={confirm}
         />
-      </CalibrationInfoBox>
-      {showConfirmation && (
-        <Portal>
-          <ConfirmRecalibrationModal
-            confirm={confirm}
-            cancel={cancel}
-            tiprackDisplayName={tipRackDefinition.metadata.displayName}
-          />
-        </Portal>
-      )}
+        {showConfirmation && (
+          <Portal>
+            <ConfirmRecalibrationModal
+              confirm={confirm}
+              cancel={cancel}
+              tiprackDisplayName={tipRackDefinition.metadata.displayName}
+            />
+          </Portal>
+        )}
+      </TipLengthCalibrationInfoBox>
       {showCalBlockPrompt && (
         <Portal>
           <AskForCalibrationBlockModal setHasBlock={setHasBlock} />
