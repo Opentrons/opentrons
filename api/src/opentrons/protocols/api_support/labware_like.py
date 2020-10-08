@@ -1,11 +1,12 @@
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Optional
-
-from opentrons.types import LocationLabware
+from typing import TYPE_CHECKING, Optional, Union, cast
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware, Well
     from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+
+
+LabwareLike = Union['Labware', 'Well', str, 'ModuleGeometry', None]
 
 
 class LabwareLikeType(int, Enum):
@@ -16,8 +17,8 @@ class LabwareLikeType(int, Enum):
     none = auto()
 
 
-class LabwareLike:
-    def __init__(self, labware_like: LocationLabware):
+class LabwareLikeWrapper:
+    def __init__(self, labware_like: LabwareLike):
         """
         Create a labware like object. Used by Location object's labware field.
         """
@@ -44,7 +45,7 @@ class LabwareLike:
             self._as_str = ""
 
     @property
-    def object(self) -> LocationLabware:
+    def object(self) -> LabwareLike:
         return self._labware_like
 
     @property
@@ -58,10 +59,28 @@ class LabwareLike:
                               LabwareLikeType.module}
 
     @property
-    def parent(self) -> Optional['LabwareLike']:
+    def parent(self) -> Optional['LabwareLikeWrapper']:
         if self.has_parent:
-            return LabwareLike(self.object.parent)
+            return LabwareLikeWrapper(self.object.parent)
         return None
+
+    @property
+    def is_well(self) -> bool:
+        return self.object_type == LabwareLikeType.well
+
+    @property
+    def is_labware(self) -> bool:
+        return self.object_type == LabwareLikeType.labware
+
+    def as_well(self) -> 'Well':
+        # Import locally to avoid circular dependency
+        from opentrons.protocol_api.labware import Well
+        return cast(Well, self.object)
+
+    def as_labware(self) -> 'Labware':
+        # Import locally to avoid circular dependency
+        from opentrons.protocol_api.labware import Labware
+        return cast(Labware, self.object)
 
     def __str__(self) -> str:
         return self._as_str
@@ -71,5 +90,5 @@ class LabwareLike:
 
     def __eq__(self, other):
         return other is not None and \
-            isinstance(other, LabwareLike) and \
-            self.object == other.object
+               isinstance(other, LabwareLikeWrapper) and \
+               self.object == other.object

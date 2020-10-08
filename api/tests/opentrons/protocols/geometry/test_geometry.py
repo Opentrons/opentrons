@@ -184,7 +184,7 @@ def test_no_labware_loc(labware_offset_tempdir):
     check_arc_basic(no_to, lw1.wells()[0].bottom(), no_lw)
     assert no_from[0][0].z == deck.highest_z + 15.0
 
-    no_well = Location(point=lw1.wells()[0].top(), labware=lw1)
+    no_well = Location(point=lw1.wells()[0].top().point, labware=lw1)
 
     no_from_well = plan_moves(no_well, lw1.wells()[1].top(), deck,
                               P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
@@ -207,7 +207,7 @@ def test_arc_tall_point():
     tall_z = 100
     old_top = lw1.wells()[0].top()
     tall_point = old_top.point._replace(z=tall_z)
-    tall_top = old_top._replace(point=tall_point)
+    tall_top = Location(point=tall_point, labware=old_top.labware)
     to_tall = plan_moves(lw1.wells()[2].top(), tall_top, deck, 7.0, 15.0)
     check_arc_basic(to_tall, lw1.wells()[2].top(), tall_top)
     assert to_tall[0][0].z == tall_z
@@ -216,7 +216,7 @@ def test_arc_tall_point():
     check_arc_basic(from_tall, tall_top, lw1.wells()[3].top())
     assert from_tall[0][0].z == tall_z
 
-    no_well = tall_top._replace(labware=lw1)
+    no_well = Location(point=tall_top.point, labware=lw1)
     from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
                               7.0, 15.0)
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
@@ -229,7 +229,7 @@ def test_arc_lower_minimum_z_height():
     minimum_z_height = 42
     old_top = lw1.wells()[0].top()
     tall_point = old_top.point._replace(z=tall_z)
-    tall_top = old_top._replace(point=tall_point)
+    tall_top = Location(point=tall_point, labware=old_top.labware)
     to_tall = plan_moves(
         lw1.wells()[2].top(), tall_top, deck,
         P300M_GEN2_MAX_HEIGHT, 7.0, 15.0, False,
@@ -244,7 +244,7 @@ def test_arc_lower_minimum_z_height():
     check_arc_basic(from_tall, tall_top, lw1.wells()[3].top())
     assert from_tall[0][0].z == tall_z
 
-    no_well = tall_top._replace(labware=lw1)
+    no_well = Location(point=tall_top.point, labware=lw1)
     from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
                               P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
@@ -424,7 +424,7 @@ def test_should_dodge():
     # with no parent
     assert not should_dodge_thermocycler(
         deck,
-        deck.position_for(1)._replace(labware=None),
+        Location(point=deck.position_for(1).point, labware=None),
         deck.position_for(12)
     )
 

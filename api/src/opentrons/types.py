@@ -3,6 +3,8 @@ import enum
 from math import sqrt, isclose
 from typing import Any, NamedTuple, TYPE_CHECKING, Union
 
+from opentrons.protocols.api_support.labware_like import LabwareLikeWrapper
+
 if TYPE_CHECKING:
     from typing import (Optional,       # noqa(F401) Used for typechecking
                         Tuple)
@@ -94,14 +96,14 @@ class Location:
     """
     def __init__(self, point: Point, labware: LocationLabware):
         self._point = point
-        self._labware = labware
+        self._labware = LabwareLikeWrapper(labware)
 
     @property
     def point(self) -> Point:
         return self._point
 
     @property
-    def labware(self) -> LocationLabware:
+    def labware(self) -> LabwareLikeWrapper:
         return self._labware
 
     def __iter__(self):
@@ -128,7 +130,8 @@ class Location:
             >>> assert loc.point == Point(1, 1, 1)  # True
 
         """
-        return Location(point=self.point + point, labware=self._labware)
+        return Location(point=self.point + point,
+                        labware=self._labware.object)
 
 
 # TODO(mc, 2020-10-22): use MountType implementation for Mount
