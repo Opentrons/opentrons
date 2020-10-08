@@ -9,7 +9,11 @@ import { selectors as robotSelectors } from '../../robot'
 import {
   PIPETTE_MOUNTS,
   fetchPipettes,
+<<<<<<< HEAD
   getProtocolPipettesInfo,
+=======
+  getAttachedPipettes,
+>>>>>>> refactor(app): Support tlc + poc flow in the app
 } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 import { getFeatureFlags } from '../../config'
@@ -24,7 +28,7 @@ import {
 import { SessionHeader } from '../../components/SessionHeader'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { Dispatch } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../pipettes/types'
 import type { Labware } from '../../robot/types'
 import { CalibrateTipLengthControl } from './CalibrateTipLengthControl'
@@ -38,8 +42,14 @@ export function Pipettes(props: Props): React.Node {
   const ff = useSelector(getFeatureFlags)
   const robotName = robot?.name || null
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
+<<<<<<< HEAD
   const pipettes = useSelector(
     state => robotName && getProtocolPipettesInfo(state, robotName)
+=======
+  const pipettes = useSelector(robotSelectors.getPipettes)
+  const attachedPipettes = useSelector((state: State) =>
+    getAttachedPipettes(state, robotName)
+>>>>>>> refactor(app): Support tlc + poc flow in the app
   )
 
   const changePipetteUrl =
@@ -80,6 +90,7 @@ export function Pipettes(props: Props): React.Node {
   const activeTipRack = currentPipette?.protocol?.mount
     ? activeTipracks[currentPipette.protocol.mount]
     : null
+<<<<<<< HEAD
 
   const activeTipRackDef = activeTipRack?.definition
 
@@ -105,6 +116,14 @@ export function Pipettes(props: Props): React.Node {
       ? omit(pipettes.right.protocol, 'displayName')
       : null,
   ].filter(Boolean)
+=======
+  )?.definition
+  const currentAttachedPipette = currentPipette
+    ? attachedPipettes[currentPipette.mount]
+    : null
+
+  const serialNumber = currentAttachedPipette ? currentAttachedPipette.id : null
+>>>>>>> refactor(app): Support tlc + poc flow in the app
 
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>

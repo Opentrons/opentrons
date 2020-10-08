@@ -58,11 +58,12 @@ class PipetteOffsetCalibrationUserFlow:
                  hardware: ThreadManager,
                  mount: Mount = Mount.RIGHT,
                  load_tip_length: bool = True,
+                 has_calibration_block: bool = False,
                  tip_rack_def: Optional['LabwareDefinition'] = None):
 
         self._hardware = hardware
         self._mount = mount
-        self._has_calibration_block = False
+        self._has_calibration_block = has_calibration_block
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
             raise RobotServerError(

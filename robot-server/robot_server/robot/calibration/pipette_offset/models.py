@@ -16,6 +16,10 @@ class SessionCreateParams(BaseModel):
         True,
         description='Whether tiplength for this tiprack should be loaded'
     )
+    hasCalibrationBlock: bool = Field(
+        False,
+        description='Whether to use a calibration block in the instance of TLC + pipette offset flow'
+    )
     tipRackDefinition: Optional[dict] = Field(
         None,
         description='The full labware definition of the tip rack to calibrate.'

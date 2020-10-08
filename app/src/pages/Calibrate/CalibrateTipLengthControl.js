@@ -9,8 +9,12 @@ import {
 } from '@opentrons/components'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
+
 import { getUseTrashSurfaceForTipCal } from '../../config'
-import { setUseTrashSurfaceForTipCal } from '../../calibration'
+import {
+  setUseTrashSurfaceForTipCal,
+  getCalibrationForPipette,
+} from '../../calibration'
 
 import {
   CalibrateTipLength,
@@ -32,6 +36,7 @@ export type CalibrateTipLengthControlProps = {|
   hasCalibrated: boolean,
   mount: Mount,
   tipRackDefinition: LabwareDefinition2,
+  serialNumber: string,
 |}
 
 // tip length calibration commands for which the full page spinner should not appear
@@ -49,6 +54,7 @@ export function CalibrateTipLengthControl({
   hasCalibrated,
   mount,
   tipRackDefinition,
+  serialNumber,
 }: CalibrateTipLengthControlProps): React.Node {
   const [showWizard, setShowWizard] = React.useState(false)
   const [showCalBlockPrompt, setShowCalBlockPrompt] = React.useState(false)
@@ -64,7 +70,7 @@ export function CalibrateTipLengthControl({
         createRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.DELETE_SESSION &&
-        tipLengthCalibrationSession?.id === dispatchedAction.payload.sessionId
+        calibrationSession?.id === dispatchedAction.payload.sessionId
       ) {
         deleteRequestId.current = dispatchedAction.meta.requestId
       } else if (
@@ -85,23 +91,60 @@ export function CalibrateTipLengthControl({
     useTrashSurfaceForTipCalSetting
   )
 
-  const tipLengthCalibrationSession = useSelector((state: State) => {
-    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
+  const calibrationSession = useSelector((state: State) => {
+    const tipLengthSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
       state,
       robotName,
       Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
     )
+    const pipetteCalibrationSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
+      state,
+      robotName,
+      Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+    )
     if (
-      session &&
-      session.sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+      tipLengthSession &&
+      tipLengthSession.sessionType ===
+        Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
     ) {
-      return session
+      return tipLengthSession
+    } else if (
+      pipetteCalibrationSession &&
+      pipetteCalibrationSession.sessionType ===
+        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+    ) {
+      return pipetteCalibrationSession
     }
     return null
   })
 
+  const tipRackURI = getLabwareDefURI(tipRackDefinition)
+  const pipetteOffsetCalibration = useSelector((state: State) =>
+    serialNumber
+      ? getCalibrationForPipette(state, robotName, serialNumber)
+      : null
+  )
+  const shouldCalibrateTipLength = true
+  console.log(pipetteOffsetCalibration)
+
   const handleStart = () => {
-    if (useTrashSurface.current !== null) {
+    if (
+      pipetteOffsetCalibration?.tiprackUri === tipRackURI &&
+      useTrashSurface.current !== null
+    ) {
+      dispatchRequests(
+        Sessions.ensureSession(
+          robotName,
+          Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+          {
+            mount,
+            shouldCalibrateTipLength,
+            hasCalibrationBlock: !useTrashSurface.current,
+            tipRackDefinition,
+          }
+        )
+      )
+    } else if (useTrashSurface.current !== null) {
       dispatchRequests(
         Sessions.ensureSession(
           robotName,
@@ -199,7 +242,7 @@ export function CalibrateTipLengthControl({
         <Portal>
           <CalibrateTipLength
             robotName={robotName}
-            session={tipLengthCalibrationSession}
+            session={calibrationSession}
             closeWizard={handleCloseWizard}
             hasBlock={!useTrashSurface.current}
             showSpinner={showSpinner}
