@@ -31,6 +31,7 @@ MODULE_LOG = logging.getLogger(__name__)
 # match e.g. "2.0" but not "hi", "2", "2.0.1"
 API_VERSION_RE = re.compile(r'^(\d+)\.(\d+)$')
 MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
+API_VERSION_FOR_JSON_V5_AND_BELOW = APIVersion(2, 8)
 
 
 def _validate_v2_ast(protocol_ast: ast.Module):
@@ -77,7 +78,7 @@ def _parse_json(
     version, validated = validate_json(protocol_json)
     return JsonProtocol(
         text=protocol_contents, filename=filename, contents=validated,
-        schema_version=version)
+        schema_version=version, api_level=API_VERSION_FOR_JSON_V5_AND_BELOW)
 
 
 def _parse_python(

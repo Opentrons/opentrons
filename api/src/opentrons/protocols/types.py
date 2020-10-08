@@ -31,6 +31,7 @@ class JsonProtocol(NamedTuple):
     filename: Optional[str]
     contents: 'JsonProtocolDef'
     schema_version: int
+    api_level: APIVersion
 
 
 class PythonProtocol(NamedTuple):

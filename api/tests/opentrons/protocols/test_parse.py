@@ -8,6 +8,7 @@ from opentrons.protocols.parse import (
     _get_protocol_schema_version,
     validate_json,
     parse,
+    API_VERSION_FOR_JSON_V5_AND_BELOW,
     MAX_SUPPORTED_JSON_SCHEMA_VERSION,
     version_from_metadata)
 from opentrons.protocols.types import (JsonProtocol,
@@ -258,7 +259,10 @@ def test_parse_json_details(get_json_protocol_fixture,
     assert isinstance(parsed, JsonProtocol)
     assert parsed.filename == fname
     assert parsed.contents == json.loads(protocol)
-    parsed.schema_version == int(protocol_details[0])
+    assert parsed.schema_version == int(protocol_details[0])
+    # TODO(IL, 2020-10-07): if schema v6 declares its own api_level,
+    # then those v6 fixtures will need to be asserted differently
+    assert parsed.api_level == API_VERSION_FOR_JSON_V5_AND_BELOW
 
 
 def test_parse_bundle_details(get_bundle_fixture):
