@@ -2,6 +2,7 @@
 // robot selectors
 import padStart from 'lodash/padStart'
 import some from 'lodash/some'
+import uniqBy from 'lodash/uniqBy'
 import { createSelector } from 'reselect'
 import { format } from 'date-fns'
 
@@ -25,7 +26,7 @@ import type {
   SessionStatus,
   SessionStatusInfo,
   SessionModule,
-  TiprackByMountMap,
+  TipracksByMountMap,
   CommandNode,
 } from './types'
 
@@ -480,22 +481,24 @@ export function getReturnTipInProgress(state: State): boolean {
 // return a tiprack used by the pipette on each mount for calibration processes
 export const getTipracksByMount: (
   state: State
-) => TiprackByMountMap = createSelector(
+) => TipracksByMountMap = createSelector(
   getTipracks,
   getPipettesByMount,
   (tipracks, pipettesMap) => {
-    return Constants.PIPETTE_MOUNTS.reduce<TiprackByMountMap>(
+    return Constants.PIPETTE_MOUNTS.reduce<TipracksByMountMap>(
       (tiprackMap, mount) => {
-        const byCalibrator = tipracks.find(tr => tr.calibratorMount === mount)
-        const byTiprackList = tipracks.find(tr =>
+        const byCalibrator = tipracks.filter(tr => tr.calibratorMount === mount)
+        const byTiprackList = tipracks.filter(tr =>
           (pipettesMap[mount]?.tipRacks ?? []).includes(tr._id)
         )
 
-        tiprackMap[mount] = byCalibrator ?? byTiprackList ?? null
-
+        tiprackMap[mount] = uniqBy(
+          byCalibrator.concat(byTiprackList),
+          item => item.definitionHash ?? item._id
+        )
         return tiprackMap
       },
-      { left: null, right: null }
+      { left: [], right: [] }
     )
   }
 )

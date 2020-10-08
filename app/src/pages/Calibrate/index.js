@@ -37,7 +37,10 @@ function CalibrateComponent(props: Props) {
   return (
     <Switch>
       <Redirect exact from={path} to={getRedirectUrl(props)} />
-      <Route path={`${path}/pipettes/:mount?`} component={CalibratePipettes} />
+      <Route
+        path={`${path}/pipettes/:mount?/:definitionHash?`}
+        component={CalibratePipettes}
+      />
       <Route path={`${path}/labware/:slot`} component={CalibrateLabware} />
     </Switch>
   )

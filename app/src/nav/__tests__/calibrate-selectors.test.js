@@ -28,6 +28,11 @@ const mockGetPipettes: JestMockFn<
   $Call<typeof RobotSelectors.getPipettes, State>
 > = RobotSelectors.getPipettes
 
+const mockGetTipracksByMount: JestMockFn<
+  [State],
+  $Call<typeof RobotSelectors.getTipracksByMount, State>
+> = RobotSelectors.getTipracksByMount
+
 const ENABLED_CALIBRATE = {
   id: 'calibrate',
   path: '/calibrate',
@@ -47,6 +52,7 @@ describe('calibrate nav selectors', () => {
   beforeEach(() => {
     mockGetCalibrateLocation.mockReturnValue(DISABLED_CALIBRATE)
     mockGetPipettes.mockReturnValue([])
+    mockGetTipracksByMount.mockReturnValue({ left: [], right: [] })
   })
 
   afterEach(() => {
@@ -59,8 +65,18 @@ describe('calibrate nav selectors', () => {
         'getCalibratePipettesLocations returns disabled if /calibrate disabled',
       selector: CalibrateSelectors.getCalibratePipettesLocations,
       expected: {
-        left: { path: '/calibrate/pipettes/left', disabledReason: 'AH' },
-        right: { path: '/calibrate/pipettes/right', disabledReason: 'AH' },
+        left: {
+          default: {
+            path: '/calibrate/pipettes/left',
+            disabledReason: 'AH',
+          },
+        },
+        right: {
+          default: {
+            path: '/calibrate/pipettes/right',
+            disabledReason: 'AH',
+          },
+        },
       },
     },
     {
@@ -69,12 +85,16 @@ describe('calibrate nav selectors', () => {
       before: () => mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE),
       expected: {
         left: {
-          path: '/calibrate/pipettes/left',
-          disabledReason: expect.stringMatching(/No pipette specified/),
+          default: {
+            path: '/calibrate/pipettes/left',
+            disabledReason: expect.stringMatching(/No pipette specified/),
+          },
         },
         right: {
-          path: '/calibrate/pipettes/right',
-          disabledReason: expect.stringMatching(/No pipette specified/),
+          default: {
+            path: '/calibrate/pipettes/right',
+            disabledReason: expect.stringMatching(/No pipette specified/),
+          },
         },
       },
     },
@@ -89,12 +109,16 @@ describe('calibrate nav selectors', () => {
       },
       expected: {
         left: {
-          path: '/calibrate/pipettes/left',
-          disabledReason: expect.stringMatching(/No pipette specified/),
+          default: {
+            path: '/calibrate/pipettes/left',
+            disabledReason: expect.stringMatching(/No pipette specified/),
+          },
         },
         right: {
-          path: '/calibrate/pipettes/right',
-          disabledReason: expect.stringMatching(/not used/),
+          default: {
+            path: '/calibrate/pipettes/right',
+            disabledReason: expect.stringMatching(/not used/),
+          },
         },
       },
     },
@@ -109,12 +133,61 @@ describe('calibrate nav selectors', () => {
       },
       expected: {
         left: {
-          path: '/calibrate/pipettes/left',
-          disabledReason: expect.stringMatching(/No pipette specified/),
+          default: {
+            path: '/calibrate/pipettes/left',
+            disabledReason: expect.stringMatching(/No pipette specified/),
+          },
         },
         right: {
-          path: '/calibrate/pipettes/right',
-          disabledReason: null,
+          default: {
+            path: '/calibrate/pipettes/right',
+            disabledReason: null,
+          },
+        },
+      },
+    },
+    {
+      name:
+        'getCalibratePipetteLocations returns specifications for all tipracks',
+      selector: CalibrateSelectors.getCalibratePipettesLocations,
+      before: () => {
+        mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE)
+        mockGetPipettes.mockReturnValue([
+          ({ _id: 0, mount: 'right', tipRacks: [1, 2] }: any),
+        ])
+        mockGetTipracksByMount.mockReturnValue({
+          right: [
+            ({ _id: 1, definitionHash: 'hash-1' }: any),
+            ({ _id: 2, definitionHash: 'hash-2' }: any),
+            ({ _id: 3, definitionHash: null }: any),
+          ],
+          left: [({ _id: 1, definitionHash: 'hash-1' }: any)],
+        })
+      },
+      expected: {
+        left: {
+          default: {
+            path: '/calibrate/pipettes/left',
+            disabledReason: expect.stringMatching(/No pipette specified/),
+          },
+          'hash-1': {
+            path: '/calibrate/pipettes/left/hash-1',
+            disabledReason: expect.stringMatching(/No pipette specified/),
+          },
+        },
+        right: {
+          default: {
+            path: '/calibrate/pipettes/right',
+            disabledReason: null,
+          },
+          'hash-1': {
+            path: '/calibrate/pipettes/right/hash-1',
+            disabledReason: null,
+          },
+          'hash-2': {
+            path: '/calibrate/pipettes/right/hash-2',
+            disabledReason: null,
+          },
         },
       },
     },

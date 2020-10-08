@@ -23,7 +23,7 @@ export function AttachTipPanel(props: Props): React.Node {
   const { mount, channels } = props
   const dispatch = useDispatch<Dispatch>()
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
-  const tiprack = tipracksByMount[mount]
+  const tiprack = tipracksByMount[mount][0]
   const tiprackName =
     tiprack?.definition?.metadata.displayName || tiprack?.name || null
 
