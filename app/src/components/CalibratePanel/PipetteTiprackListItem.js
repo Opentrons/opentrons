@@ -72,8 +72,6 @@ export function PipetteTiprackListItem(
             <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{displayName}</Text>
             <TipLengthCalibrationData
               calibrationData={tipLengthCalibration}
-              // TODO: determine whether or not data were updated
-              calibratedThisSession={false}
               // the definitionHash will only be absent if old labware
               // or robot version <= 3.19
               calDataAvailable={definitionHash != null}
