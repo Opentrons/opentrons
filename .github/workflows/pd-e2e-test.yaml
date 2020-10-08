@@ -42,11 +42,11 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ./.yarn-cache
-            ./.npm-cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
