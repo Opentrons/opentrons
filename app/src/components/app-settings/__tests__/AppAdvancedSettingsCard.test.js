@@ -126,21 +126,10 @@ describe('AppAdvancedSettingsCard', () => {
     )
   })
 
-  it('checks for updates on mount and after channel changes', () => {
-    const { wrapper, store } = render()
+  it('checks for updates on mount', () => {
+    const { store } = render()
     const expectedAction = Shell.checkShellUpdate()
 
     expect(store.dispatch).toHaveBeenCalledWith(expectedAction)
-
-    store.dispatch.mockClear()
-    store.getState.mockReturnValue({ ...MOCK_STATE })
-    getUpdateChannel.mockReturnValue('alpha')
-    wrapper.setProps({})
-    expect(store.dispatch).toHaveBeenCalledWith(expectedAction)
-
-    store.dispatch.mockClear()
-    store.getState.mockReturnValue({ ...MOCK_STATE })
-    wrapper.setProps({})
-    expect(store.dispatch).not.toHaveBeenCalledWith(expectedAction)
   })
 })

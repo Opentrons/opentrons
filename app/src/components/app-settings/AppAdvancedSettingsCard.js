@@ -4,7 +4,13 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import startCase from 'lodash/startCase'
 
-import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
+import {
+  useMountEffect,
+  Card,
+  LabeledToggle,
+  LabeledSelect,
+} from '@opentrons/components'
+
 import { checkShellUpdate } from '../../shell'
 import * as Config from '../../config'
 import * as Calibration from '../../calibration'
@@ -50,11 +56,9 @@ export function AppAdvancedSettingsCard(): React.Node {
   const handleChannel = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
 
-  console.log(channel)
-  React.useEffect(() => {
-    console.log('Hey running effect because channel change', channel)
+  useMountEffect(() => {
     dispatch(checkShellUpdate())
-  }, [channel, dispatch])
+  })
 
   return (
     <>

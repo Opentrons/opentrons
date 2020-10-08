@@ -12,7 +12,8 @@ import {
 
 import { alertTriggered, ALERT_APP_UPDATE_AVAILABLE } from '../alerts'
 import { createLogger } from '../logger'
-import { getAvailableShellUpdate } from './update'
+import { getUpdateChannel } from '../config'
+import { getAvailableShellUpdate, checkShellUpdate } from './update'
 import { remote } from './remote'
 
 import type { Epic, Action } from '../types'
@@ -54,8 +55,18 @@ const appUpdateAvailableAlertEpic: Epic = (action$, state$) => {
   )
 }
 
+const checkForUpdateAfterChannelChangeEpic: Epic = (action$, state$) => {
+  return state$.pipe(
+    map(getUpdateChannel),
+    pairwise(),
+    filter(([prev, next]) => prev !== next),
+    mapTo(checkShellUpdate())
+  )
+}
+
 export const shellEpic: Epic = combineEpics(
   sendActionToShellEpic,
   receiveActionFromShellEpic,
-  appUpdateAvailableAlertEpic
+  appUpdateAvailableAlertEpic,
+  checkForUpdateAfterChannelChangeEpic
 )

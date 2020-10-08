@@ -1,6 +1,6 @@
 // @flow
 
-// grey scale
+// gray scale
 export const C_BLACK = '#000000'
 export const C_DARK_GRAY = '#4a4a4a'
 export const C_MED_DARK_GRAY = '#6c6c6c'

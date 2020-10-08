@@ -11,7 +11,7 @@ import { UpdateAppModal } from '../UpdateAppModal'
 
 import type { State } from '../../../types'
 
-// TODO(mc, 2020-10-08): this is a partial mock because the shell/update
+// TODO(mc, 2020-10-08): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
 jest.mock('../../../shell/update', () => ({
   ...jest.requireActual('../../../shell/update'),
