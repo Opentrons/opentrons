@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import uniqBy from 'lodash/uniqBy'
 
 import { selectors as robotSelectors } from '../../robot'
 import { getFeatureFlags } from '../../config'
@@ -68,14 +69,26 @@ export function PipetteListComponent(
           protocolPipettes.find(i => i.mount === mount) || null
         const attachedPipette = attachedPipettes[mount]
         const displayName = protocolPipette?.modelSpecs?.displayName || 'N/A'
-        const { path, disabledReason = null } = urlsByMount[mount]
-        const pip_tipracks = tipracks.filter(t => t.calibratorMount === mount)
+        const { disabledReason = null } = urlsByMount[mount].default
+        const pip_tipracks = uniqBy(
+          tipracks.filter(t => t.calibratorMount === mount),
+          t => t.definitionHash ?? t.name
+        )
+        const calibratePathFor = (
+          mount: 'left' | 'right',
+          hash: string | null
+        ) => {
+          const url =
+            urlsByMount[mount][hash ?? 'default'] ??
+            urlsByMount[mount]['default']
+          return url.path
+        }
         return !ff.enableCalibrationOverhaul ? (
           <PipetteListItem
             key={mount}
             mount={mount}
             pipette={protocolPipette}
-            calibrateUrl={path}
+            calibrateUrl={urlsByMount[mount].default.path}
             disabledReason={disabledReason}
           />
         ) : (
@@ -106,7 +119,7 @@ export function PipetteListComponent(
                       key={tr.name}
                       robotName={robotName}
                       pipette={attachedPipette}
-                      calibrateUrl={path}
+                      calibrateUrl={calibratePathFor(mount, tr.definitionHash)}
                     />
                   )
                 })

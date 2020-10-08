@@ -544,13 +544,29 @@ describe('robot selectors', () => {
               slot: '1',
               type: 's',
               isTiprack: true,
+              definitionHash: 'hash-1',
               calibratorMount: 'right',
             },
             2: {
               slot: '2',
               type: 'm',
               isTiprack: true,
+              definitionHash: 'hash-2',
               calibratorMount: 'left',
+            },
+            3: {
+              slot: '3',
+              type: 's',
+              isTiprack: true,
+              definitionHash: 'hash-1',
+              calibratorMount: 'left',
+            },
+            4: {
+              slot: '4',
+              type: 's',
+              isTiprack: true,
+              definitionHash: 'hash-1',
+              calibratorMount: 'right',
             },
             5: { slot: '5', type: 'a', isTiprack: false },
             7: { slot: '7', type: 'a', isTiprack: false },
@@ -601,8 +617,21 @@ describe('robot selectors', () => {
           confirmed: false,
           calibratorMount: 'left',
           definition: null,
+          definitionHash: 'hash-2',
         },
         // then single channel tiprack
+        {
+          slot: '3',
+          type: 's',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
+          confirmed: false,
+          calibratorMount: 'left',
+          definition: null,
+          definitionHash: 'hash-1',
+        },
+
         {
           slot: '1',
           type: 's',
@@ -612,6 +641,19 @@ describe('robot selectors', () => {
           confirmed: false,
           calibratorMount: 'right',
           definition: null,
+          definitionHash: 'hash-1',
+        },
+
+        {
+          calibration: 'unconfirmed',
+          calibratorMount: 'right',
+          confirmed: false,
+          definition: null,
+          definitionHash: 'hash-1',
+          isTiprack: true,
+          isMoving: false,
+          slot: '4',
+          type: 's',
         },
         // then other labware by slot
         {
@@ -657,7 +699,21 @@ describe('robot selectors', () => {
           confirmed: false,
           calibratorMount: 'left',
           definition: null,
+          definitionHash: 'hash-2',
         },
+        // then single channel tiprack
+        {
+          slot: '3',
+          type: 's',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
+          confirmed: false,
+          calibratorMount: 'left',
+          definition: null,
+          definitionHash: 'hash-1',
+        },
+
         {
           slot: '1',
           type: 's',
@@ -667,6 +723,19 @@ describe('robot selectors', () => {
           confirmed: false,
           calibratorMount: 'right',
           definition: null,
+          definitionHash: 'hash-1',
+        },
+
+        {
+          calibration: 'unconfirmed',
+          calibratorMount: 'right',
+          confirmed: false,
+          definition: null,
+          definitionHash: 'hash-1',
+          isTiprack: true,
+          isMoving: false,
+          slot: '4',
+          type: 's',
         },
       ])
     })
@@ -682,7 +751,21 @@ describe('robot selectors', () => {
           confirmed: false,
           calibratorMount: 'left',
           definition: null,
+          definitionHash: 'hash-2',
         },
+        // then single channel tiprack
+        {
+          slot: '3',
+          type: 's',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
+          confirmed: false,
+          calibratorMount: 'left',
+          definition: null,
+          definitionHash: 'hash-1',
+        },
+
         {
           slot: '1',
           type: 's',
@@ -692,6 +775,19 @@ describe('robot selectors', () => {
           confirmed: false,
           calibratorMount: 'right',
           definition: null,
+          definitionHash: 'hash-1',
+        },
+
+        {
+          calibration: 'unconfirmed',
+          calibratorMount: 'right',
+          confirmed: false,
+          definition: null,
+          definitionHash: 'hash-1',
+          isTiprack: true,
+          isMoving: false,
+          slot: '4',
+          type: 's',
         },
         {
           slot: '9',
@@ -712,6 +808,7 @@ describe('robot selectors', () => {
         isTiprack: true,
         isMoving: false,
         calibration: 'unconfirmed',
+        definitionHash: 'hash-2',
         confirmed: false,
         calibratorMount: 'left',
         definition: null,
@@ -732,9 +829,11 @@ describe('robot selectors', () => {
       }
 
       expect(getNextLabware(nextState)).toEqual({
-        slot: '9',
-        type: 'b',
-        isTiprack: false,
+        slot: '3',
+        calibratorMount: 'left',
+        definitionHash: 'hash-1',
+        type: 's',
+        isTiprack: true,
         isMoving: false,
         calibration: 'unconfirmed',
         confirmed: false,
@@ -742,28 +841,45 @@ describe('robot selectors', () => {
       })
     })
 
-    it('returns tipracks by calibratorMount with getTipracksByMount', () => {
+    it('returns tipracks uniquely', () => {
       expect(getTipracksByMount(state)).toEqual({
-        left: {
-          slot: '2',
-          type: 'm',
-          isTiprack: true,
-          isMoving: false,
-          calibration: 'unconfirmed',
-          confirmed: false,
-          calibratorMount: 'left',
-          definition: null,
-        },
-        right: {
-          slot: '1',
-          type: 's',
-          isTiprack: true,
-          isMoving: true,
-          calibration: 'moving-to-slot',
-          confirmed: false,
-          calibratorMount: 'right',
-          definition: null,
-        },
+        left: [
+          {
+            slot: '2',
+            type: 'm',
+            isTiprack: true,
+            isMoving: false,
+            calibration: 'unconfirmed',
+            definitionHash: 'hash-2',
+            confirmed: false,
+            calibratorMount: 'left',
+            definition: null,
+          },
+          {
+            slot: '3',
+            type: 's',
+            isTiprack: true,
+            isMoving: false,
+            calibration: 'unconfirmed',
+            confirmed: false,
+            calibratorMount: 'left',
+            definitionHash: 'hash-1',
+            definition: null,
+          },
+        ],
+        right: [
+          {
+            slot: '1',
+            type: 's',
+            isTiprack: true,
+            isMoving: true,
+            calibration: 'moving-to-slot',
+            confirmed: false,
+            calibratorMount: 'right',
+            definition: null,
+            definitionHash: 'hash-1',
+          },
+        ],
       })
     })
 
@@ -775,6 +891,7 @@ describe('robot selectors', () => {
               _id: 1,
               slot: '1',
               type: 's',
+              definitionHash: 'hash-1',
               isTiprack: true,
               calibratorMount: 'right',
             },
@@ -783,6 +900,7 @@ describe('robot selectors', () => {
               slot: '2',
               type: 'm',
               isTiprack: true,
+              definitionHash: 'hash-2',
               calibratorMount: 'right',
             },
           },
@@ -801,28 +919,46 @@ describe('robot selectors', () => {
       })
 
       expect(getTipracksByMount(state)).toEqual({
-        left: {
-          _id: 2,
-          slot: '2',
-          type: 'm',
-          isTiprack: true,
-          isMoving: false,
-          calibration: 'unconfirmed',
-          confirmed: false,
-          calibratorMount: 'right',
-          definition: null,
-        },
-        right: {
-          _id: 1,
-          slot: '1',
-          type: 's',
-          isTiprack: true,
-          isMoving: false,
-          calibration: 'unconfirmed',
-          confirmed: false,
-          calibratorMount: 'right',
-          definition: null,
-        },
+        left: [
+          {
+            _id: 2,
+            slot: '2',
+            type: 'm',
+            isTiprack: true,
+            isMoving: false,
+            calibration: 'unconfirmed',
+            confirmed: false,
+            calibratorMount: 'right',
+            definition: null,
+            definitionHash: 'hash-2',
+          },
+        ],
+        right: [
+          {
+            _id: 1,
+            slot: '1',
+            type: 's',
+            isTiprack: true,
+            isMoving: false,
+            definitionHash: 'hash-1',
+            calibration: 'unconfirmed',
+            confirmed: false,
+            calibratorMount: 'right',
+            definition: null,
+          },
+          {
+            _id: 2,
+            slot: '2',
+            type: 'm',
+            isTiprack: true,
+            isMoving: false,
+            calibration: 'unconfirmed',
+            confirmed: false,
+            calibratorMount: 'right',
+            definition: null,
+            definitionHash: 'hash-2',
+          },
+        ],
       })
     })
   })

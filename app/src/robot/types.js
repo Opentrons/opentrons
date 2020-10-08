@@ -195,7 +195,7 @@ export type SessionUpdate = {|
   |},
 |}
 
-export type TiprackByMountMap = {|
-  left: Labware | null,
-  right: Labware | null,
+export type TipracksByMountMap = {|
+  left: Array<Labware>,
+  right: Array<Labware>,
 |}

@@ -81,12 +81,32 @@ const stubTipRacks = [
 
 const mockPipetteLocations = {
   left: {
-    path: '/path',
-    disabledReason: null,
+    default: {
+      path: '/path/left',
+      disabledReason: null,
+    },
+    'hash-1': {
+      path: '/path/left/hash-1',
+      disabledReason: null,
+    },
+    'hash-2': {
+      path: '/path/left/hash-2',
+      disabledReason: null,
+    },
   },
   right: {
-    path: '/path2',
-    disabledReason: null,
+    default: {
+      path: '/path/right',
+      disabledReason: null,
+    },
+    'hash-3': {
+      path: '/path/right/hash-3',
+      disabledReason: null,
+    },
+    'hash-2': {
+      path: '/path/right/hash-2',
+      disabledReason: null,
+    },
   },
 }
 

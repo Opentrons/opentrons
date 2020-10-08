@@ -18,7 +18,7 @@ export function PipetteTabs(props: PipetteTabsProps): React.Node {
 
   const pages = PIPETTE_MOUNTS.map(mount => ({
     title: mount,
-    href: pagesByMount[mount].path,
+    href: pagesByMount[mount].default.path,
     isActive: mount === currentMount,
     isDisabled: pagesByMount[mount].disabledReason !== null,
   }))
