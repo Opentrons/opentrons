@@ -6,6 +6,7 @@ import head from 'lodash/head'
 import * as AppAlerts from '../../alerts'
 import { LostConnectionAlert } from '../LostConnectionAlert'
 import { AnalyticsSettingsModal } from '../analytics-settings'
+import { UpdateAppModal } from '../app-settings'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 
 import type { State, Dispatch } from '../../types'
@@ -36,6 +37,8 @@ export function Alerts(): React.Node {
 
       {activeAlert === AppAlerts.ALERT_U2E_DRIVER_OUTDATED ? (
         <U2EDriverOutdatedAlert dismissAlert={dismissAlert} />
+      ) : activeAlert === AppAlerts.ALERT_APP_UPDATE_AVAILABLE ? (
+        <UpdateAppModal dismissAlert={dismissAlert} />
       ) : null}
     </>
   )

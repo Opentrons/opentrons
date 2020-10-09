@@ -30,14 +30,14 @@ import {
   applyShellUpdate,
 } from '../../shell'
 
-import { Portal } from '../portal'
 import { ErrorModal } from '../modals'
 import { ReleaseNotes } from '../ReleaseNotes'
 
 import type { Dispatch } from '../../types'
 
 export type UpdateAppModalProps = {|
-  closeModal: () => mixed,
+  dismissAlert?: (remember: boolean) => mixed,
+  closeModal?: () => mixed,
 |}
 
 // TODO(mc, 2020-10-06): i18n
@@ -74,23 +74,21 @@ const FINISH_UPDATE_INSTRUCTIONS = (
 )
 
 const SPINNER = (
-  <Portal>
-    <BaseModal
-      color={C_WHITE}
-      backgroundColor={C_TRANSPARENT}
-      fontSize={FONT_SIZE_BODY_2}
-      fontStyle={FONT_STYLE_ITALIC}
-    >
-      <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
-        <Icon spin name="ot-spinner" width={SIZE_4} />
-        <Text marginTop={SPACING_4}>{DOWNLOAD_IN_PROGRESS}</Text>
-      </Flex>
-    </BaseModal>
-  </Portal>
+  <BaseModal
+    color={C_WHITE}
+    backgroundColor={C_TRANSPARENT}
+    fontSize={FONT_SIZE_BODY_2}
+    fontStyle={FONT_STYLE_ITALIC}
+  >
+    <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
+      <Icon spin name="ot-spinner" width={SIZE_4} />
+      <Text marginTop={SPACING_4}>{DOWNLOAD_IN_PROGRESS}</Text>
+    </Flex>
+  </BaseModal>
 )
 
 export function UpdateAppModal(props: UpdateAppModalProps): React.Node {
-  const { closeModal } = props
+  const { dismissAlert, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const updateState = useSelector(getShellUpdateState)
   const { downloaded, downloading, error, info: updateInfo } = updateState
@@ -98,8 +96,13 @@ export function UpdateAppModal(props: UpdateAppModalProps): React.Node {
   const releaseNotes = updateInfo?.releaseNotes
 
   const updateButtonText = downloaded ? RESTART_APP : DOWNLOAD
-  const handleUpdateButtonClick = () => {
+  const handleUpdateClick = () => {
     dispatch(downloaded ? applyShellUpdate() : downloadShellUpdate())
+  }
+
+  const handleCloseClick = () => {
+    if (typeof dismissAlert === 'function') dismissAlert(false)
+    if (typeof closeModal === 'function') closeModal()
   }
 
   if (error) {
@@ -108,7 +111,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): React.Node {
         error={error}
         heading={UPDATE_ERROR}
         description={SOMETHING_WENT_WRONG}
-        close={closeModal}
+        close={handleCloseClick}
       />
     )
   }
@@ -116,38 +119,36 @@ export function UpdateAppModal(props: UpdateAppModalProps): React.Node {
   if (downloading) return SPINNER
 
   return (
-    <Portal>
-      <BaseModal
-        fontSize={FONT_SIZE_BODY_2}
-        header={
-          <Flex alignItems={ALIGN_CENTER}>
-            <Icon name="alert" width="1em" marginRight={SPACING_2} />
-            <Text
-              as="h2"
-              fontSize={FONT_SIZE_HEADER}
-              fontWeight={FONT_WEIGHT_REGULAR}
-            >
-              {APP_VERSION} {version} {downloaded ? DOWNLOADED : AVAILABLE}
-            </Text>
-          </Flex>
-        }
-        footer={
-          <Flex justifyContent={JUSTIFY_FLEX_END}>
-            <SecondaryBtn marginRight={SPACING_3} onClick={closeModal}>
-              {NOT_NOW}
-            </SecondaryBtn>
-            <SecondaryBtn onClick={handleUpdateButtonClick}>
-              {updateButtonText}
-            </SecondaryBtn>
-          </Flex>
-        }
-      >
-        {downloaded ? (
-          FINISH_UPDATE_INSTRUCTIONS
-        ) : (
-          <ReleaseNotes source={releaseNotes} />
-        )}
-      </BaseModal>
-    </Portal>
+    <BaseModal
+      fontSize={FONT_SIZE_BODY_2}
+      header={
+        <Flex alignItems={ALIGN_CENTER}>
+          <Icon name="alert" width="1em" marginRight={SPACING_2} />
+          <Text
+            as="h2"
+            fontSize={FONT_SIZE_HEADER}
+            fontWeight={FONT_WEIGHT_REGULAR}
+          >
+            {APP_VERSION} {version} {downloaded ? DOWNLOADED : AVAILABLE}
+          </Text>
+        </Flex>
+      }
+      footer={
+        <Flex justifyContent={JUSTIFY_FLEX_END}>
+          <SecondaryBtn marginRight={SPACING_3} onClick={handleCloseClick}>
+            {NOT_NOW}
+          </SecondaryBtn>
+          <SecondaryBtn onClick={handleUpdateClick}>
+            {updateButtonText}
+          </SecondaryBtn>
+        </Flex>
+      }
+    >
+      {downloaded ? (
+        FINISH_UPDATE_INSTRUCTIONS
+      ) : (
+        <ReleaseNotes source={releaseNotes} />
+      )}
+    </BaseModal>
   )
 }

@@ -2,11 +2,12 @@
 
 import typeof {
   ALERT_U2E_DRIVER_OUTDATED,
+  ALERT_APP_UPDATE_AVAILABLE,
   ALERT_TRIGGERED,
   ALERT_DISMISSED,
 } from './constants.js'
 
-export type AlertId = ALERT_U2E_DRIVER_OUTDATED
+export type AlertId = ALERT_U2E_DRIVER_OUTDATED | ALERT_APP_UPDATE_AVAILABLE
 
 export type AlertTriggeredAction = {|
   type: ALERT_TRIGGERED,

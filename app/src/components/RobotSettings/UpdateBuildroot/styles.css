@@ -24,12 +24,6 @@
   margin: 0 0 1.5rem 2rem;
 }
 
-.sync_link {
-  color: var(--c-blue);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
 .sync_message {
   margin-left: 1rem;
   padding-bottom: 1rem;

@@ -24,12 +24,6 @@ describe('shell/update', () => {
         args: [],
         expected: { type: 'shell:APPLY_UPDATE', meta: { shell: true } },
       },
-      {
-        name: 'shell:SET_UPDATE_SEEN',
-        creator: ShellUpdate.setShellUpdateSeen,
-        args: [],
-        expected: { type: 'shell:SET_UPDATE_SEEN' },
-      },
     ]
 
     SPECS.forEach(spec => {
@@ -71,12 +65,8 @@ describe('shell/update', () => {
       {
         name: 'handles shell:DOWNLOAD_UPDATE',
         action: { type: 'shell:DOWNLOAD_UPDATE' },
-        initialState: {
-          downloading: false,
-          seen: false,
-          error: { message: 'AH' },
-        },
-        expected: { downloading: true, seen: true, error: null },
+        initialState: { downloading: false, error: { message: 'AH' } },
+        expected: { downloading: true, error: null },
       },
       {
         name: 'handles shell:DOWNLOAD_UPDATE_RESULT without error',
@@ -99,12 +89,6 @@ describe('shell/update', () => {
           downloaded: false,
           error: { message: 'AH' },
         },
-      },
-      {
-        name: 'handles shell:SET_UPDATE_SEEN',
-        action: { type: 'shell:SET_UPDATE_SEEN' },
-        initialState: { seen: false, error: { message: 'AH' } },
-        expected: { seen: true, error: null },
       },
     ]
 
