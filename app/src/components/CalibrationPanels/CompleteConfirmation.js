@@ -66,7 +66,10 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
   const { headerText } = contentsBySessionType[lookupType]
 
   const proceed = () => {
-    sendCommands({ command: Sessions.sharedCalCommands.MOVE_TO_DECK })
+    sendCommands(
+      { command: Sessions.sharedCalCommands.SET_CALIBRATION_BLOCK },
+      { command: Sessions.sharedCalCommands.MOVE_TO_DECK }
+    )
   }
 
   return (

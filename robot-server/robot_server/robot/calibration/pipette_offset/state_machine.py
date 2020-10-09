@@ -71,6 +71,8 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
         CalibrationCommand.save_offset: POWTState.tipLengthComplete
     },
     POWTState.tipLengthComplete: {
+        CalibrationCommand.set_has_calibration_block:
+            POWTState.tipLengthComplete,
         CalibrationCommand.move_to_deck: POWTState.joggingToDeck,
     },
     POWTState.joggingToDeck: {

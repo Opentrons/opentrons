@@ -13,7 +13,10 @@ import {
 } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 import { getFeatureFlags } from '../../config'
-import { getTipLengthForPipetteAndTiprack, getCalibrationForPipette } from '../../calibration'
+import {
+  getTipLengthForPipetteAndTiprack,
+  getCalibrationForPipette,
+} from '../../calibration'
 
 import { Page } from '../../components/Page'
 import { TipProbe } from '../../components/TipProbe'
