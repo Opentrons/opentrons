@@ -86,12 +86,12 @@ def test_load_labware_from_json_defs(loop, get_labware_fixture):
             str(loaded_labware['destPlateId']))
 
 
-def test_get_location_with_offset(min_lw):
-    loaded_labware = {'someLabwareId': min_lw}
+def test_get_location_with_offset(min_lw2):
+    loaded_labware = {'someLabwareId': min_lw2}
     params = {'offsetFromBottomMm': 3,
               'labware': 'someLabwareId', 'well': 'A2'}
     result = _get_location_with_offset(loaded_labware, params)
-    assert result == Location(Point(19, 28, 8), min_lw['A2'])
+    assert result == Location(Point(19, 28, 8), min_lw2['A2'])
 
 
 def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
