@@ -3,8 +3,10 @@ from typing import Awaitable, cast, TYPE_CHECKING
 from opentrons.types import Mount
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
+from robot_server.robot.calibration.models import \
+    SessionCreateParams
 from robot_server.robot.calibration.pipette_offset.models import \
-    PipetteOffsetCalibrationSessionStatus, SessionCreateParams
+    PipetteOffsetCalibrationSessionStatus
 from robot_server.service.session.errors import (SessionCreationException,
                                                  CommandExecutionException)
 from robot_server.service.session.command_execution import \

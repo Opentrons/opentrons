@@ -4,28 +4,6 @@ from pydantic import BaseModel, Field
 from ..helper_classes import AttachedPipette, RequiredLabware, NextSteps
 
 
-class SessionCreateParams(BaseModel):
-    """
-    The parameters required to start a pipette offset calibration session.
-    """
-    mount: str = Field(
-        ...,
-        description='The mount on which the pipette is attached, left or right'
-    )
-    shouldPerformTipLength: bool = Field(
-        True,
-        description='Whether tiplength for this tiprack should be loaded'
-    )
-    hasCalibrationBlock: bool = Field(
-        False,
-        description='Whether to use a calibration block in the instance of TLC + pipette offset flow'
-    )
-    tipRackDefinition: Optional[dict] = Field(
-        None,
-        description='The full labware definition of the tip rack to calibrate.'
-    )
-
-
 class PipetteOffsetCalibrationSessionStatus(BaseModel):
     """The current status of a pipette offset calibration session."""
     instrument: AttachedPipette

@@ -195,14 +195,6 @@ class PipetteOffsetCalibrationUserFlow:
     async def load_labware(self):
         pass
 
-    async def set_has_calibration_block(self, has_calibration_block: bool):
-        self._has_calibration_block = has_calibration_block
-        if self._has_calibration_block:
-            self._load_calibration_block()
-        else:
-            slot = CAL_BLOCK_SETUP_BY_MOUNT[self._mount].slot
-            self._deck[slot] = None  # type: ignore
-
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
                                       delta=Point(*vector))
@@ -258,12 +250,6 @@ class PipetteOffsetCalibrationUserFlow:
             self._using_default_tiprack = True
         self._tip_rack = tr_lw
 
-    def _load_calibration_block(self):
-        cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
-        self._deck[cb_setup.slot] = labware.load(
-            cb_setup.load_name,
-            self._deck.position_for(cb_setup.slot))
-
     def _flag_unmet_transition_req(self, command_handler: str,
                                    unmet_condition: str):
         raise RobotServerError(
@@ -293,6 +279,7 @@ class PipetteOffsetCalibrationUserFlow:
             MOVE_TO_DECK_SAFETY_BUFFER
         to_loc = Location(new_pt, None)
         await self._move(to_loc)
+        self._should_perform_tip_length = False
 
     async def move_to_point_one(self):
         assert self._z_height_reference is not None, \
@@ -336,7 +323,6 @@ class PipetteOffsetCalibrationUserFlow:
                 tip_rack=self._tip_rack)
             self._has_calibrated_tip_length =\
                 (self._get_stored_tip_length_cal() is not None)
-            self._should_perform_tip_length = False
 
     async def move_to_reference_point(self):
         if not self.should_perform_tip_length and \
@@ -344,7 +330,7 @@ class PipetteOffsetCalibrationUserFlow:
                                         self._state.inspectingTip):
             self._flag_unmet_transition_req(
                 command_handler="move_to_reference_point",
-                unmet_condition="incorrect state machine loaded")
+                unmet_condition="performing additional tip length calibration")
         ref_loc = util.get_reference_location(
             mount=self._mount,
             deck=self._deck,

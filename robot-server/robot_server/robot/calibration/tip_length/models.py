@@ -4,23 +4,6 @@ from pydantic import BaseModel, Field
 from ..helper_classes import AttachedPipette, RequiredLabware, NextSteps
 
 
-class SessionCreateParams(BaseModel):
-    """The parameters required to start a tip length calibration session."""
-    mount: str = Field(
-        ...,
-        description='The mount on which the pipette is attached, left or right'
-    )
-    hasCalibrationBlock: bool = Field(
-        ...,
-        description='True if the user wants to use a calibration block; '
-                    'False otherwise'
-    )
-    tipRackDefinition: dict = Field(
-        ...,
-        description='The full labware definition of the tip rack to calibrate.'
-    )
-
-
 class TipCalibrationSessionStatus(BaseModel):
     """The current status of a tip length calibration session."""
     instrument: AttachedPipette
