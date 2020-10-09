@@ -31,7 +31,7 @@ const CONTINUE = 'continue to calibrate tip length'
 const CANCEL = 'cancel'
 
 // TODO: This link needs to be real(er)
-const CALIBRATION_URL = 'https://support.opentrons.com'
+const CALIBRATION_URL = 'https://support.opentrons.com/en/articles/4523313'
 
 type Props = {|
   confirm: () => mixed,
