@@ -11,7 +11,10 @@ import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
 import { getUseTrashSurfaceForTipCal } from '../../config'
-import { setUseTrashSurfaceForTipCal } from '../../calibration'
+import {
+  setUseTrashSurfaceForTipCal,
+  getUncalibratedTipracks,
+} from '../../calibration'
 
 import {
   CalibrateTipLength,
@@ -19,8 +22,8 @@ import {
   ConfirmRecalibrationModal,
 } from '../../components/CalibrateTipLength'
 
+import { UncalibratedInfo } from './UncalibratedInfo'
 import { TipLengthCalibrationInfoBox } from '../../components/CalibrateTipLength/TipLengthCalibrationInfoBox'
-import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
 import { Portal } from '../../components/portal'
 import { CalibratePipetteOffset } from '../../components/CalibratePipetteOffset'
 import {
@@ -48,11 +51,6 @@ export type CalibrateTipLengthControlProps = {|
 const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
 ]
-
-const IS_CALIBRATED = 'Pipette tip length has been calibrated'
-const IS_NOT_CALIBRATED = 'Pipette tip length is not calibrated'
-const CALIBRATE_TIP_LENGTH = 'Calibrate tip length'
-const RECALIBRATE_TIP_LENGTH = 'Re-Calibrate tip length'
 
 export function CalibrateTipLengthControl({
   robotName,
@@ -216,6 +214,9 @@ export function CalibrateTipLengthControl({
     handleStart,
     hasCalibrated
   )
+  const uncalibratedTipracksByMount = useSelector(state => {
+    return robotName && getUncalibratedTipracks(state, robotName)
+  })
 
   return (
     <>
@@ -223,6 +224,8 @@ export function CalibrateTipLengthControl({
         title={getLabwareDisplayName(tipRackDefinition)}
       >
         <UncalibratedInfo
+          uncalibratedTipracks={uncalibratedTipracksByMount}
+          mount={mount}
           showSpinner={showSpinner}
           hasCalibrated={hasCalibrated}
           handleStart={confirm}
@@ -267,31 +270,4 @@ export function CalibrateTipLengthControl({
       )}
     </>
   )
-}
-
-type UncalibratedInfoProps = {|
-  hasCalibrated: boolean,
-  handleStart: () => mixed,
-  showSpinner: boolean,
-|}
-function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
-  const { hasCalibrated, handleStart, showSpinner } = props
-
-  const buttonText = !hasCalibrated
-    ? CALIBRATE_TIP_LENGTH
-    : RECALIBRATE_TIP_LENGTH
-  const leftChildren = (
-    <div>
-      <p>{!hasCalibrated ? IS_NOT_CALIBRATED : IS_CALIBRATED}</p>
-      <PrimaryButton onClick={handleStart}>
-        {showSpinner ? (
-          <Icon name="ot-spinner" height="1em" spin />
-        ) : (
-          buttonText
-        )}
-      </PrimaryButton>
-    </div>
-  )
-
-  return <CalibrationInfoContent leftChildren={leftChildren} />
 }
