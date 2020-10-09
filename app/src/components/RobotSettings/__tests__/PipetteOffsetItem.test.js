@@ -66,6 +66,12 @@ describe('PipetteOffsetItem', () => {
           tiprack: 'asdagasdfasdsa',
           tiprackUri: 'opentrons/opentrons_96_tiprack_300ul/1',
           lastModified: '2020-09-10T05:13',
+          source: 'user',
+          status: {
+            markedBad: false,
+            source: 'unknown',
+            markedAt: '',
+          },
         },
         customLabware = [],
       } = props
