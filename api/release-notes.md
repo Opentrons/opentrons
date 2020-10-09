@@ -6,15 +6,15 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 3.21.1
+## OT-2 Software Changes in 3.21.1
 
 No changes - version bump only for synchronization with Opentrons App.
 
 ---
 
-# OT-2 Software Changes in 3.21.0
+## OT-2 Software Changes in 3.21.0
 
-## Fixes
+### Fixes
 
 - Prevent HardLimitErrors when jogging during labware calibration
   - The robot will now refuse to execute jog commands if it thinks doing so will cause it to hit an axis limit
@@ -28,7 +28,7 @@ No changes - version bump only for synchronization with Opentrons App.
 
 [pr 6260]: https://github.com/Opentrons/opentrons/pull/6260
 
-## Features
+### Features
 
 - Check if an instrument has a tip through the Python Protocol API
   - Using `apiLevel: '2.7'` in your Python protocol will allow you to access the new `has_tip` property of a given pipette

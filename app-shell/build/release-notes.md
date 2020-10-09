@@ -6,17 +6,19 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 3.21.1
+## Opentrons App Changes in 3.21.1
 
-## Features
+### Features
 
 - You can now disable app update pop-up notifications in More > App > App Software Settings
 
+&nbsp;
+
 ---
 
-# Opentrons App Changes in 3.21.0
+## Opentrons App Changes in 3.21.0
 
-## Fixes
+### Fixes
 
 - Properly enable / disable the "Update robot software from file" button
   - This button was sometimes enabled and disabled at improper times
@@ -28,7 +30,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 - Ensure modules render correctly in the deck map when loaded in slot 3, 6, or 9
 - Ensure "Last Updated" times for custom labware are correct
 
-## Features
+### Features
 
 - Automatically sync the OT-2's clock with the App on connect
   - When the App connects to an OT-2 running v3.21.0, it will sync the OT-2's clock with your computer's clock
