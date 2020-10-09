@@ -1,10 +1,18 @@
-# Robot OS Changes from 3.20.1 to 3.21.0
-
 For more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
+
+---
+
+# OT-2 Software Changes in 3.21.1
+
+No changes - version bump only for synchronization with Opentrons App.
+
+---
+
+# OT-2 Software Changes in 3.21.0
 
 ## Fixes
 
