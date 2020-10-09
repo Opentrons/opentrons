@@ -3,11 +3,17 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import head from 'lodash/head'
+import omit from 'lodash/omit'
 
 import { selectors as robotSelectors } from '../../robot'
-import { PIPETTE_MOUNTS, fetchPipettes } from '../../pipettes'
+import {
+  PIPETTE_MOUNTS,
+  fetchPipettes,
+  getProtocolPipettesInfo,
+} from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 import { getFeatureFlags } from '../../config'
+import { getTipLengthForPipetteAndTiprack } from '../../calibration'
 
 import { Page } from '../../components/Page'
 import { TipProbe } from '../../components/TipProbe'
@@ -32,7 +38,9 @@ export function Pipettes(props: Props): React.Node {
   const ff = useSelector(getFeatureFlags)
   const robotName = robot?.name || null
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
-  const pipettes = useSelector(robotSelectors.getPipettes)
+  const pipettes = useSelector(
+    state => robotName && getProtocolPipettesInfo(state, robotName)
+  )
 
   const changePipetteUrl =
     robotName !== null ? `/robots/${robotName}/instruments` : '/robots'
@@ -44,7 +52,7 @@ export function Pipettes(props: Props): React.Node {
   const currentMount: Mount | null =
     PIPETTE_MOUNTS.find(m => m === mount) || null
 
-  const currentPipette = pipettes.find(p => p.mount === currentMount) || null
+  const currentPipette = currentMount && pipettes && pipettes[currentMount]
 
   const activeTipracks = PIPETTE_MOUNTS.reduce<{|
     left: Labware | null,
@@ -69,35 +77,59 @@ export function Pipettes(props: Props): React.Node {
     { left: null, right: null }
   )
 
-  const activeTipRackDef = (currentPipette
-    ? activeTipracks[currentPipette.mount]
+  const activeTipRack = currentPipette?.protocol?.mount
+    ? activeTipracks[currentPipette.protocol.mount]
     : null
-  )?.definition
+
+  const activeTipRackDef = activeTipRack?.definition
+
+  const tipLengthDataForActivePipette = useSelector(state => {
+    return (
+      robotName &&
+      currentPipette?.actual?.id &&
+      activeTipRack?.definitionHash &&
+      getTipLengthForPipetteAndTiprack(
+        state,
+        robotName,
+        currentPipette.actual.id,
+        activeTipRack.definitionHash
+      )
+    )
+  })
+
+  const protoPipettes = [
+    pipettes?.left?.protocol
+      ? omit(pipettes.left.protocol, 'displayName')
+      : null,
+    pipettes?.right?.protocol
+      ? omit(pipettes.right.protocol, 'displayName')
+      : null,
+  ].filter(Boolean)
 
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>
       <PipetteTabs currentMount={currentMount} />
       <PipettesContents
-        {...{
-          currentMount,
-          pipettes,
-          activeTipracks,
-          changePipetteUrl,
-        }}
+        currentMount={currentMount}
+        pipettes={protoPipettes}
+        activeTipracks={activeTipracks}
+        changePipetteUrl={changePipetteUrl}
       />
       {robotName &&
-        !!currentPipette &&
+        currentMount &&
         (ff.enableCalibrationOverhaul ? (
           !!activeTipRackDef ? (
             <CalibrateTipLengthControl
-              mount={currentPipette.mount}
+              mount={currentMount}
               robotName={robotName}
-              hasCalibrated={currentPipette.probed}
+              hasCalibrated={!!tipLengthDataForActivePipette}
               tipRackDefinition={activeTipRackDef}
             />
           ) : null
         ) : (
-          <TipProbe {...currentPipette} />
+          currentPipette?.protocol && (
+            <TipProbe {...omit(currentPipette.protocol, 'displayName')} />
+          )
         ))}
     </Page>
   )
