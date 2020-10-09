@@ -328,7 +328,7 @@ class Labware(DeckItem):
         if isinstance(idx, int):
             res = self._implementation.get_wells()[idx]
         elif isinstance(idx, str):
-            res = self.wells_by_name()[idx]
+            res = self._implementation.get_wells_by_name()[idx]
         else:
             res = NotImplemented
         return self._well_from_impl(res)

@@ -2,7 +2,6 @@ from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.labware import LabwareImplementation
 from opentrons.protocols.implementations.well import WellImplementation
 
-from tests.opentrons.protocol_api.test_accessor_fn import minimal_labware_def2
 from unittest import mock
 from copy import deepcopy
 import pytest
@@ -87,16 +86,12 @@ def test_load_labware_from_json_defs(loop, get_labware_fixture):
             str(loaded_labware['destPlateId']))
 
 
-def test_get_location_with_offset(minimal_labware_def2):
-    deck = Location(Point(0, 0, 0), 'deck')
-    some_labware = labware.Labware(
-        implementation=LabwareImplementation(minimal_labware_def2, deck)
-    )
-    loaded_labware = {'someLabwareId': some_labware}
+def test_get_location_with_offset(min_lw):
+    loaded_labware = {'someLabwareId': min_lw}
     params = {'offsetFromBottomMm': 3,
               'labware': 'someLabwareId', 'well': 'A2'}
     result = _get_location_with_offset(loaded_labware, params)
-    assert result == Location(Point(19, 28, 8), some_labware['A2'])
+    assert result == Location(Point(19, 28, 8), min_lw['A2'])
 
 
 def test_get_location_with_offset_fixed_trash(minimal_labware_def2):

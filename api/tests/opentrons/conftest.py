@@ -2,6 +2,8 @@
 # import logging
 # from logging.config import dictConfig
 from opentrons.config import robot_configs
+from opentrons.protocol_api.labware import Labware
+from opentrons.protocols.implementations.labware import LabwareImplementation
 
 try:
     import aionotify
@@ -31,7 +33,7 @@ from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
 from opentrons.hardware_control import API, ThreadManager, ThreadedAsyncLock
 from opentrons.protocol_api import ProtocolContext
-from opentrons.types import Mount
+from opentrons.types import Mount, Location, Point
 from opentrons import (robot as rb,
                        instruments as ins,
                        containers as cns,
@@ -629,3 +631,153 @@ def get_bundle_fixture():
         return result
 
     return _get_bundle_protocol_fixture
+
+
+@pytest.fixture
+def minimal_labware_def():
+    return {
+        "metadata": {
+            "displayName": "minimal labware"
+        },
+        "cornerOffsetFromSlot": {
+            "x": 10,
+            "y": 10,
+            "z": 5
+        },
+        "parameters": {
+            "isTiprack": False,
+            "loadName": "minimal_labware_def"
+        },
+        "ordering": [["A1"], ["A2"]],
+        "wells": {
+            "A1": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
+            },
+            "A2": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 10,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
+            }
+        },
+        "dimensions": {
+            "xDimension": 1.0,
+            "yDimension": 2.0,
+            "zDimension": 3.0
+        }
+    }
+
+
+@pytest.fixture
+def minimal_labware_def2():
+    return {
+        "metadata": {
+            "displayName": "other test labware"
+        },
+        "cornerOffsetFromSlot": {
+                "x": 10,
+                "y": 10,
+                "z": 5
+        },
+        "parameters": {
+            "isTiprack": False,
+            "loadName": "minimal_labware_def"
+        },
+        "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
+        "wells": {
+            "A1": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 0,
+              "y": 18,
+              "z": 0,
+              "shape": "circular"
+            },
+            "B1": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 0,
+              "y": 9,
+              "z": 0,
+              "shape": "circular"
+            },
+            "C1": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
+            },
+            "A2": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 9,
+              "y": 18,
+              "z": 0,
+              "shape": "circular"
+            },
+            "B2": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 9,
+              "y": 9,
+              "z": 0,
+              "shape": "circular"
+            },
+            "C2": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 9,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
+            }
+        },
+        "dimensions": {
+            "xDimension": 1.0,
+            "yDimension": 2.0,
+            "zDimension": 3.0
+        }
+    }
+
+
+@pytest.fixture
+def min_lw_impl(minimal_labware_def) -> LabwareImplementation:
+    return LabwareImplementation(
+            definition=minimal_labware_def,
+            parent=Location(Point(0, 0, 0), 'deck')
+    )
+
+
+@pytest.fixture
+def min_lw2_impl(minimal_labware_def2) -> LabwareImplementation:
+    return LabwareImplementation(
+        definition=minimal_labware_def2,
+        parent=Location(Point(0, 0, 0), 'deck')
+    )
+
+
+@pytest.fixture
+def min_lw(min_lw_impl) -> Labware:
+    return Labware(implementation=min_lw_impl)
+
+
+@pytest.fixture
+def min_lw2(min_lw2_impl) -> Labware:
+    return Labware(implementation=min_lw2_impl)
