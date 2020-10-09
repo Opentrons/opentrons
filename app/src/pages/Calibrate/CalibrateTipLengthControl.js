@@ -1,7 +1,12 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
+import {
+  Icon,
+  PrimaryButton,
+  type Mount,
+  useConditionalConfirm,
+} from '@opentrons/components'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 import { getUseTrashSurfaceForTipCal } from '../../config'
@@ -10,6 +15,7 @@ import { setUseTrashSurfaceForTipCal } from '../../calibration'
 import {
   CalibrateTipLength,
   AskForCalibrationBlockModal,
+  ConfirmRecalibrationModal,
 } from '../../components/CalibrateTipLength'
 
 import { CalibrationInfoBox } from '../../components/CalibrationInfoBox'
@@ -158,6 +164,11 @@ export function CalibrateTipLengthControl({
     useTrashSurface.current = useTrashSurfaceForTipCalSetting
   }
 
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+    handleStart,
+    hasCalibrated
+  )
+
   return (
     <>
       <CalibrationInfoBox
@@ -167,9 +178,18 @@ export function CalibrateTipLengthControl({
         <UncalibratedInfo
           showSpinner={showSpinner}
           hasCalibrated={hasCalibrated}
-          handleStart={handleStart}
+          handleStart={confirm}
         />
       </CalibrationInfoBox>
+      {showConfirmation && (
+        <Portal>
+          <ConfirmRecalibrationModal
+            confirm={confirm}
+            cancel={cancel}
+            tiprackDisplayName={tipRackDefinition.metadata.displayName}
+          />
+        </Portal>
+      )}
       {showCalBlockPrompt && (
         <Portal>
           <AskForCalibrationBlockModal setHasBlock={setHasBlock} />
@@ -193,7 +213,7 @@ export function CalibrateTipLengthControl({
 
 type UncalibratedInfoProps = {|
   hasCalibrated: boolean,
-  handleStart: () => void,
+  handleStart: () => mixed,
   showSpinner: boolean,
 |}
 function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
