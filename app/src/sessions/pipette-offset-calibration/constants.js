@@ -2,6 +2,7 @@
 // pipette offset calibration session constants
 import { sharedCalCommands } from '../common-calibration/constants'
 
+// States
 export const PIP_OFFSET_STEP_SESSION_STARTED: 'sessionStarted' =
   'sessionStarted'
 export const PIP_OFFSET_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
@@ -22,10 +23,4 @@ export const PIP_OFFSET_STEP_COMPLETE_TIP_LENGTH: 'tipLengthComplete' =
   'tipLengthComplete'
 export const PIP_OFFSET_STEP_SESSION_EXITED: 'sessionExited' = 'sessionExited'
 
-const TIP_LENGTH_COMPLETE: 'calibration.pipetteOffset.tipLengthComplete' =
-  'calibration.pipetteOffset.tipLengthComplete'
-
-export const pipOffsetCalCommands = {
-  ...sharedCalCommands,
-  TIP_LENGTH_COMPLETE,
-}
+export const pipOffsetCalCommands = sharedCalCommands

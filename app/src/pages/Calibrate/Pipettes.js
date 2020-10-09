@@ -13,7 +13,11 @@ import {
 } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 import { getFeatureFlags } from '../../config'
+<<<<<<< HEAD
 import { getTipLengthForPipetteAndTiprack } from '../../calibration'
+=======
+import { getCalibrationForPipette } from '../../calibration'
+>>>>>>> Fixup: Add component test, fixup some naming
 
 import { Page } from '../../components/Page'
 import { TipProbe } from '../../components/TipProbe'
@@ -100,6 +104,17 @@ export function Pipettes(props: Props): React.Node {
   const tipRackURI = activeTipRackDef
     ? getLabwareDefURI(activeTipRackDef)
     : null
+  const activeTipRack = currentPipette
+    ? activeTipracks[currentPipette.mount]
+    : null
+  const activeTipRackDef = activeTipRack?.definition
+  const tipRackHash = activeTipRack ? activeTipRack.definitionHash : null
+
+  const currentAttachedPipette = currentPipette
+    ? attachedPipettes[currentPipette.mount]
+    : null
+  const serialNumber = currentAttachedPipette ? currentAttachedPipette.id : null
+
   const convertRobotNameToString = robotName || 'unknown'
   const pipetteOffsetCalibration = useSelector((state: State) =>
     serialNumber
@@ -107,6 +122,7 @@ export function Pipettes(props: Props): React.Node {
       : null
   )
 
+<<<<<<< HEAD
   const protoPipettes = [
     pipettes?.left?.protocol
       ? omit(pipettes.left.protocol, 'displayName')
@@ -115,6 +131,11 @@ export function Pipettes(props: Props): React.Node {
       ? omit(pipettes.right.protocol, 'displayName')
       : null,
   ].filter(Boolean)
+=======
+  const isExtendedPipOffset = pipetteOffsetCalibration
+    ? tipRackHash === pipetteOffsetCalibration.tiprack
+    : false
+>>>>>>> Fixup: Add component test, fixup some naming
 
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>
