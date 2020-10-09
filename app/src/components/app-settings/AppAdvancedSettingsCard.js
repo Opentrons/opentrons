@@ -4,14 +4,8 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import startCase from 'lodash/startCase'
 
-import {
-  useMountEffect,
-  Card,
-  LabeledToggle,
-  LabeledSelect,
-} from '@opentrons/components'
+import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
 
-import { checkShellUpdate } from '../../shell'
 import * as Config from '../../config'
 import * as Calibration from '../../calibration'
 
@@ -55,10 +49,6 @@ export function AppAdvancedSettingsCard(): React.Node {
     dispatch(Config.toggleDevInternalFlag(flag))
   const handleChannel = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
-
-  useMountEffect(() => {
-    dispatch(checkShellUpdate())
-  })
 
   return (
     <>

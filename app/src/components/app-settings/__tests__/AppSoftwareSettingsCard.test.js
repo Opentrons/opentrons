@@ -3,11 +3,13 @@
 import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components/__utils__'
-import { Card, LabeledValue, SecondaryBtn } from '@opentrons/components'
+import { Card, LabeledValue, Link, SecondaryBtn } from '@opentrons/components'
 import * as Shell from '../../../shell'
 import { Portal } from '../../portal'
+import { TitledControl } from '../../TitledControl'
 import { AppSoftwareSettingsCard } from '../AppSoftwareSettingsCard'
 import { UpdateAppModal } from '../UpdateAppModal'
+import { UpdateNotificationsControl } from '../UpdateNotificationsControl'
 
 import type { State } from '../../../types'
 
@@ -47,7 +49,7 @@ describe('AppSoftwareSettingsCard', () => {
     const { wrapper } = render()
     const card = wrapper.find(Card)
 
-    expect(card.prop('title')).toBe('Information')
+    expect(card.prop('title')).toBe('App Software Settings')
   })
 
   it('should have a labeled value with the current version', () => {
@@ -96,5 +98,38 @@ describe('AppSoftwareSettingsCard', () => {
     wrapper.find(UpdateAppModal).invoke('closeModal')()
 
     expect(wrapper.exists(UpdateAppModal)).toBe(false)
+  })
+
+  it('should render a <UpdateNotificationsControl>', () => {
+    const { wrapper } = render()
+    expect(wrapper.exists(UpdateNotificationsControl)).toBe(true)
+  })
+
+  it('should have a TitledControl for downloaded previous software versions', () => {
+    const { wrapper } = render()
+    const section = wrapper
+      .find(TitledControl)
+      .filterWhere(
+        t => t.prop('title') === 'Restore Different Software Version'
+      )
+
+    const releasesLink = section
+      .find(Link)
+      .filterWhere(
+        a =>
+          a.prop('href') === 'https://github.com/Opentrons/opentrons/releases'
+      )
+
+    const articleLink = section
+      .find(Link)
+      .filterWhere(
+        a =>
+          a.prop('href') ===
+          'https://support.opentrons.com/articles/2393514-uninstall-the-opentrons-app'
+      )
+
+    expect(section.text()).toMatch(/restore a different version/i)
+    expect(articleLink.prop('external')).toBe(true)
+    expect(releasesLink.prop('external')).toBe(true)
   })
 })

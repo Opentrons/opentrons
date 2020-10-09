@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { Link as InternalLink } from 'react-router-dom'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
 import { BaseModal, Flex, Icon } from '@opentrons/components'
@@ -18,6 +19,8 @@ jest.mock('../../../shell/update', () => ({
   ...jest.requireActual('../../../shell/update'),
   getShellUpdateState: jest.fn(),
 }))
+
+jest.mock('react-router-dom', () => ({ Link: () => <></> }))
 
 const getShellUpdateState: JestMockFn<[State], $Shape<ShellUpdateState>> =
   Shell.getShellUpdateState
@@ -175,7 +178,7 @@ describe('UpdateAppModal', () => {
     expect(dismissAlert).toHaveBeenCalledWith(false)
   })
 
-  it('should  call props.dismissAlert via the Error modal "close" button', () => {
+  it('should call props.dismissAlert via the Error modal "close" button', () => {
     getShellUpdateState.mockReturnValue({
       error: {
         message: 'Could not get code signature for running application',
@@ -188,6 +191,90 @@ describe('UpdateAppModal', () => {
 
     errorModal.invoke('close')()
 
+    expect(dismissAlert).toHaveBeenCalledWith(false)
+  })
+
+  it('should have a button to allow the user to dismiss alerts permanently', () => {
+    const { wrapper } = render({ dismissAlert })
+    const ignoreButton = wrapper
+      .find('button')
+      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+
+    ignoreButton.invoke('onClick')()
+
+    const title = wrapper.find('h2')
+
+    expect(wrapper.exists(ReleaseNotes)).toBe(false)
+    expect(title.text()).toMatch(/turned off update notifications/i)
+    expect(wrapper.text()).toMatch(
+      /You've chosen to not be notified when an app update is available/
+    )
+  })
+
+  it('should not show the "ignore" button if modal was not alert triggered', () => {
+    const { wrapper } = render({ closeModal })
+    const ignoreButton = wrapper
+      .find('button')
+      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+
+    expect(ignoreButton.exists()).toBe(false)
+  })
+
+  it('should dismiss the alert permanently once the user clicks "OK"', () => {
+    const { wrapper } = render({ dismissAlert })
+
+    wrapper
+      .find('button')
+      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+      .invoke('onClick')()
+
+    wrapper
+      .find('button')
+      .filterWhere(b => /ok/i.test(b.text()))
+      .invoke('onClick')()
+
+    expect(dismissAlert).toHaveBeenCalledWith(true)
+  })
+
+  it('should dismiss the alert permanently if the component unmounts, for safety', () => {
+    const { wrapper } = render({ dismissAlert })
+
+    wrapper
+      .find('button')
+      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+      .invoke('onClick')()
+
+    wrapper.unmount()
+
+    expect(dismissAlert).toHaveBeenCalledWith(true)
+  })
+
+  it('should have a link to /more/app that also dismisses alert permanently', () => {
+    const { wrapper } = render({ dismissAlert })
+
+    wrapper
+      .find('button')
+      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+      .invoke('onClick')()
+
+    wrapper
+      .find(InternalLink)
+      .filterWhere(b => b.prop('to') === '/more/app')
+      .invoke('onClick')()
+
+    expect(dismissAlert).toHaveBeenCalledWith(true)
+  })
+
+  it('should not send dismissal via unmount if button is close button clicked', () => {
+    const { wrapper } = render({ dismissAlert })
+    const notNowButton = wrapper
+      .find('button')
+      .filterWhere(b => /not now/i.test(b.text()))
+
+    notNowButton.invoke('onClick')()
+    wrapper.unmount()
+
+    expect(dismissAlert).toHaveBeenCalledTimes(1)
     expect(dismissAlert).toHaveBeenCalledWith(false)
   })
 })

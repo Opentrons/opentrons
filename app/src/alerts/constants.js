@@ -1,5 +1,8 @@
 // @flow
 
+// config path
+export const CONFIG_PATH_ALERTS_IGNORED = 'alerts.ignored'
+
 // alert types
 export const ALERT_U2E_DRIVER_OUTDATED: 'u2eDriverOutdated' =
   'u2eDriverOutdated'

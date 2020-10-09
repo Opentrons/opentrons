@@ -70,18 +70,17 @@ describe('BaseModal', () => {
       position: 'relative',
       backgroundColor: C_WHITE,
       maxHeight: '100%',
-      maxWidth: '32rem',
       width: '100%',
       overflowY: 'auto',
     })
   })
 
   it('should apply style props to content box', () => {
-    const wrapper = shallow(<BaseModal maxWidth="60rem" />)
+    const wrapper = shallow(<BaseModal maxWidth="32rem" />)
     const modal = wrapper.find(Flex).first()
     const content = modal.children(Box).first()
 
-    expect(content.prop('maxWidth')).toBe('60rem')
+    expect(content.prop('maxWidth')).toBe('32rem')
   })
 
   it('should render a header bar if props.header is passed', () => {

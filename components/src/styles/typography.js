@@ -15,6 +15,7 @@ export const FONT_SIZE_BODY_1 = '0.75rem'
 export const FONT_SIZE_CAPTION = '0.625rem'
 export const FONT_SIZE_TINY = '0.325rem'
 export const FONT_SIZE_MICRO = '0.2rem'
+export const FONT_SIZE_INHERIT = 'inherit'
 
 // line height values
 export const LINE_HEIGHT_SOLID = 1

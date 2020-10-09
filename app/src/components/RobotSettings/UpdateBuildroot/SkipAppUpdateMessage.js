@@ -1,6 +1,13 @@
 // @flow
 import * as React from 'react'
-import { C_BLUE, SPACING_3, Link, Text } from '@opentrons/components'
+
+import {
+  C_BLUE,
+  FONT_SIZE_INHERIT,
+  SPACING_3,
+  Btn,
+  Text,
+} from '@opentrons/components'
 
 type SkipAppUpdateMessageProps = {|
   onClick: () => mixed,
@@ -16,9 +23,9 @@ export function SkipAppUpdateMessage(
   return (
     <Text paddingLeft={SPACING_3}>
       {SKIP_APP_MESSAGE}
-      <Link href="#" color={C_BLUE} onClick={props.onClick}>
+      <Btn color={C_BLUE} onClick={props.onClick} fontSize={FONT_SIZE_INHERIT}>
         {CLICK_HERE}
-      </Link>
+      </Btn>
       .
     </Text>
   )

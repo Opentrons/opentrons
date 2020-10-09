@@ -22,7 +22,6 @@ const MODAL_STYLE = {
   backgroundColor: Styles.C_WHITE,
   position: Styles.POSITION_RELATIVE,
   overflowY: Styles.OVERFLOW_AUTO,
-  maxWidth: Styles.SIZE_6,
   maxHeight: '100%',
   width: '100%',
 }
