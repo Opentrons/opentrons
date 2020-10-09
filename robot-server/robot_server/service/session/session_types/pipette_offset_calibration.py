@@ -48,7 +48,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
                      instance_meta: SessionMetaData) -> 'BaseSession':
         assert isinstance(instance_meta.create_params, SessionCreateParams)
         mount = instance_meta.create_params.mount
-        perform_tip_length = instance_meta.create_params.shouldCalibrateTipLength
+        perform_tip_length = instance_meta.create_params.shouldPerformTipLength
         has_cal_block = instance_meta.create_params.hasCalibrationBlock
         tiprack = instance_meta.create_params.tipRackDefinition
         # if lights are on already it's because the user clicked the button,

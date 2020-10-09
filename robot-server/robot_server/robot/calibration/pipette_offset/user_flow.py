@@ -85,6 +85,7 @@ class PipetteOffsetCalibrationUserFlow:
 
         self._using_default_tiprack = False
         self._load_tiprack(tip_rack_def)
+        self._initialize_deck()
         self._has_calibrated_tip_length: bool =\
             (self._get_stored_tip_length_cal() is not None
              or self._using_default_tiprack)
@@ -145,7 +146,11 @@ class PipetteOffsetCalibrationUserFlow:
             serial=self._hw_pipette.pipette_id)
 
     def get_required_labware(self) -> List[RequiredLabware]:
-        return [RequiredLabware.from_lw(self._tip_rack)]
+        slots = self._deck.get_non_fixture_slots()
+        lw_by_slot = {s: self._deck[s] for s in slots if self._deck[s]}
+        return [
+            RequiredLabware.from_lw(lw, s)  # type: ignore
+            for s, lw in lw_by_slot.items()]
 
     def _set_current_state(self, to_state: GenericState):
         self._current_state = to_state
@@ -252,7 +257,6 @@ class PipetteOffsetCalibrationUserFlow:
                                  self._deck.position_for(TIP_RACK_SLOT))
             self._using_default_tiprack = True
         self._tip_rack = tr_lw
-        self._deck[TIP_RACK_SLOT] = self._tip_rack
 
     def _load_calibration_block(self):
         cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
@@ -316,10 +320,10 @@ class PipetteOffsetCalibrationUserFlow:
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri)
             self._saved_offset_this_session = True
-        elif isinstance(self._state, POWTState)\
+        elif isinstance(self._current_state, POWTState)\
                 and self._current_state == self._state.measuringNozzleOffset:
             self._nozzle_height_at_reference = cur_pt.z
-        elif isinstance(self._state, POWTState)\
+        elif isinstance(self._current_state, POWTState)\
                 and self._current_state == self._state.measuringTipOffset:
             assert self._hw_pipette.has_tip
             assert self._nozzle_height_at_reference is not None
@@ -358,6 +362,15 @@ class PipetteOffsetCalibrationUserFlow:
 
     async def _move(self, to_loc: Location):
         await util.move(self, to_loc)
+
+    def _initialize_deck(self):
+        self._deck[TIP_RACK_SLOT] = self._tip_rack
+
+        if self._has_calibration_block:
+            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
+            self._deck[cb_setup.slot] = labware.load(
+                cb_setup.load_name,
+                self._deck.position_for(cb_setup.slot))
 
     async def exit_session(self):
         await self.move_to_tip_rack()
