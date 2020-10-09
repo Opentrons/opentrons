@@ -11,7 +11,9 @@
 import types
 from unittest.mock import patch
 import pytest
-from opentrons.drivers.thermocycler import Thermocycler, ThermocyclerError, driver
+from opentrons.drivers.thermocycler import (
+    Thermocycler, ThermocyclerError, driver
+)
 
 
 @pytest.fixture
