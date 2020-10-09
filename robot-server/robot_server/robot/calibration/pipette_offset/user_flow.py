@@ -211,7 +211,7 @@ class PipetteOffsetCalibrationUserFlow:
         try:
             return get.load_tip_length_calibration(
                 self._hw_pipette.pipette_id,
-                self._tip_rack._definition,
+                self._tip_rack._implementation.get_definition(),
                 '')['tipLength']
         except TipLengthCalNotFound:
             return None
@@ -300,7 +300,7 @@ class PipetteOffsetCalibrationUserFlow:
                 cur_pt = await self._get_current_point(
                     critical_point=CriticalPoint.FRONT_NOZZLE)
             tiprack_hash = helpers.hash_labware_def(
-                self._tip_rack._definition)
+                self._tip_rack._implementation.get_definition())
             offset = self._cal_ref_point - cur_pt
             modify.save_pipette_calibration(
                 offset=offset,
