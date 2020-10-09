@@ -97,6 +97,9 @@ export function Pipettes(props: Props): React.Node {
     )
   })
   const tipRackURI = tipRackDef ? getLabwareDefURI(tipRackDef) : null
+  const tipRackURI = activeTipRackDef
+    ? getLabwareDefURI(activeTipRackDef)
+    : null
   const convertRobotNameToString = robotName || 'unknown'
   const pipetteOffsetCalibration = useSelector((state: State) =>
     serialNumber
