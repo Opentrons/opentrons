@@ -5,7 +5,12 @@ import { mount } from 'enzyme'
 
 import * as Sessions from '../../../sessions'
 
-import { DECK_CAL_STATUS_OK, DECK_CAL_STATUS_IDENTITY, DECK_CAL_STATUS_BAD_CALIBRATION, DECK_CAL_STATUS_SINGULARITY } from '../../../calibration'
+import {
+  DECK_CAL_STATUS_OK,
+  DECK_CAL_STATUS_IDENTITY,
+  DECK_CAL_STATUS_BAD_CALIBRATION,
+  DECK_CAL_STATUS_SINGULARITY,
+} from '../../../calibration'
 import { DeckCalibrationControl } from '../DeckCalibrationControl'
 import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
 
@@ -29,7 +34,7 @@ describe('DeckCalibrationControl', () => {
     wrapper.find('OutlineButton[children="continue"]').find('button')
 
   const getCalibrationWarning = wrapper =>
-        wrapper.find(InlineCalibrationWarning)
+    wrapper.find(InlineCalibrationWarning)
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -45,7 +50,7 @@ describe('DeckCalibrationControl', () => {
       const {
         robotName = 'robot-name',
         disabledReason = null,
-        deckCalStatus = 'OK',
+        deckCalStatus = DECK_CAL_STATUS_OK,
         deckCalData = {
           type: 'affine',
           matrix: [
@@ -121,41 +126,46 @@ describe('DeckCalibrationControl', () => {
     })
   })
 
-  const BAD_STATUSES = [DECK_CAL_STATUS_IDENTITY, DECK_CAL_STATUS_BAD_CALIBRATION, DECK_CAL_STATUS_SINGULARITY]
+  const BAD_STATUSES = [
+    DECK_CAL_STATUS_IDENTITY,
+    DECK_CAL_STATUS_BAD_CALIBRATION,
+    DECK_CAL_STATUS_SINGULARITY,
+  ]
 
-  BAD_STATUSES.forEach(
-    (badStatus) => {
-      it(`InlineCalibrationWarning component requested with error if deck cal is ${badStatus}`, () => {
-        const wrapper = render({ deckCalStatus: badStatus })
+  BAD_STATUSES.forEach(badStatus => {
+    it(`InlineCalibrationWarning component requested with error if deck cal is ${badStatus}`, () => {
+      const wrapper = render({ deckCalStatus: badStatus })
 
-        expect(getCalibrationWarning(wrapper).html()).toMatch(/required/i)
-      })
+      expect(getCalibrationWarning(wrapper).html()).toMatch(/required/i)
     })
+  })
 
-  BAD_STATUSES.forEach(
-    (badStatus) => {
-      it(`InlineCalibrationWarning component requested with error if deck cal is ${badStatus} and marked bad`, () => {
-
-        const wrapper = render({
-          deckCalStatus: badStatus,
-          deckCalData: {
-            type: 'affine',
-            matrix: [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
-            lastModified: null,
-            pipetteCalibratedWith: null,
-            tiprack: null,
-            source: 'user',
-            status: {
-              markedBad: true,
-              source: 'calibration_check',
-              markedAt: '',
-            },
+  BAD_STATUSES.forEach(badStatus => {
+    it(`InlineCalibrationWarning component requested with error if deck cal is ${badStatus} and marked bad`, () => {
+      const wrapper = render({
+        deckCalStatus: badStatus,
+        deckCalData: {
+          type: 'affine',
+          matrix: [
+            [1, 2, 3, 4],
+            [5, 6, 7, 8],
+            [9, 10, 11, 12],
+            [13, 14, 15, 16],
+          ],
+          lastModified: null,
+          pipetteCalibratedWith: null,
+          tiprack: null,
+          source: 'user',
+          status: {
+            markedBad: true,
+            source: 'calibration_check',
+            markedAt: '',
           },
-        })
-        expect(getCalibrationWarning(wrapper).html()).toMatch(/required/i)
+        },
       })
-    }
-  )
+      expect(getCalibrationWarning(wrapper).html()).toMatch(/required/i)
+    })
+  })
 
   it('InlineCalibrationWarning component requested with warning if deck cal is good but marked bad', () => {
     const wrapper = render({
@@ -173,7 +183,7 @@ describe('DeckCalibrationControl', () => {
         },
       },
     })
-      expect(getCalibrationWarning(wrapper).html()).toMatch(/recommended/i)
+    expect(getCalibrationWarning(wrapper).html()).toMatch(/recommended/i)
   })
 
   it('InlineCalibrationWarning component not rendered if deck cal is good and marked ok', () => {

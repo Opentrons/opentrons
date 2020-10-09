@@ -16,7 +16,6 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-
 export const REQUIRED: 'required' = 'required'
 export const RECOMMENDED: 'recommended' = 'recommended'
 export type WarningType = typeof REQUIRED | typeof RECOMMENDED
@@ -27,45 +26,43 @@ const CALIBRATION_RECOMMENDED = 'Calibration recommended'
 const CONTENT_MAP = {
   [REQUIRED]: {
     color: COLOR_ERROR,
-    content: CALIBRATION_REQUIRED
+    content: CALIBRATION_REQUIRED,
   },
   [RECOMMENDED]: {
     color: COLOR_WARNING,
-    content: CALIBRATION_RECOMMENDED
-  }
+    content: CALIBRATION_RECOMMENDED,
+  },
 }
 
 export type InlineCalibrationWarningProps = {|
-  warningType: WarningType | null
+  warningType: WarningType | null,
 |}
 
-
-export function InlineCalibrationWarning(props: InlineCalibrationWarningProps): React.Node {
-  const {warningType} = props
+export function InlineCalibrationWarning(
+  props: InlineCalibrationWarningProps
+): React.Node {
+  const { warningType } = props
   return (
     <>
-      {warningType &&
-        (
-          <Flex
-            alignItems={ALIGN_CENTER}
-            color={CONTENT_MAP[warningType].color}
-            marginTop={SPACING_2}
+      {warningType && (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          color={CONTENT_MAP[warningType].color}
+          marginTop={SPACING_2}
+        >
+          <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
+            <Icon name="alert-circle" />
+          </Box>
+          <Box
+            fontSize={FONT_SIZE_BODY_1}
+            paddingRight={SPACING_1}
+            marginRight={SPACING_AUTO}
+            fontWeight={FONT_WEIGHT_SEMIBOLD}
           >
-            <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
-              <Icon name="alert-circle" />
-            </Box>
-            <Box
-              fontSize={FONT_SIZE_BODY_1}
-              paddingRight={SPACING_1}
-              marginRight={SPACING_AUTO}
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-            >
-              <Text>
-                {CONTENT_MAP[warningType].content}
-              </Text>
-            </Box>
-          </Flex>
-        )}
+            <Text>{CONTENT_MAP[warningType].content}</Text>
+          </Box>
+        </Flex>
+      )}
     </>
   )
 }

@@ -10,7 +10,11 @@ import { Portal } from '../portal'
 import { CalibrateDeck } from '../CalibrateDeck'
 import { TitledControl } from '../TitledControl'
 import { ConfirmStartDeckCalModal } from './ConfirmStartDeckCalModal'
-import { InlineCalibrationWarning, REQUIRED, RECOMMENDED } from './InlineCalibrationWarning'
+import {
+  InlineCalibrationWarning,
+  REQUIRED,
+  RECOMMENDED,
+} from './InlineCalibrationWarning'
 import { useSelector } from 'react-redux'
 import { format } from 'date-fns'
 import {
@@ -24,7 +28,6 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { DECK_CAL_STATUS_OK } from '../../calibration'
 import type { State } from '../../types'
 import type {
   DeckCalibrationStatus,
@@ -158,9 +161,13 @@ export function DeckCalibrationControl(props: Props): React.Node {
   }, true)
 
   let warningType = null
-  if (deckCalStatus && deckCalStatus !== DECK_CAL_STATUS_OK) {
+  if (deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_OK) {
     warningType = REQUIRED
-  } else if (!Array.isArray(deckCalData) && deckCalData?.status && deckCalData.status.markedBad) {
+  } else if (
+    !Array.isArray(deckCalData) &&
+    deckCalData?.status &&
+    deckCalData.status.markedBad
+  ) {
     warningType = RECOMMENDED
   }
 
@@ -171,9 +178,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
         title={CALIBRATE_TITLE_TEXT}
         description={
           <>
-            <InlineCalibrationWarning
-              warningType={warningType}
-            />
+            <InlineCalibrationWarning warningType={warningType} />
             <Text>{CALIBRATE_DECK_DESCRIPTION}</Text>
           </>
         }

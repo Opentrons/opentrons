@@ -13,7 +13,6 @@ import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { LegacyDeckCalibrationControl } from '../LegacyDeckCalibrationControl'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
-import { LegacyDeckCalibrationWarning } from '../LegacyDeckCalibrationWarning'
 
 import type { State, Action } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'

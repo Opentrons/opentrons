@@ -2,20 +2,17 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 
-import * as Calibration from '../../../calibration'
 import { Flex, Icon, COLOR_ERROR, COLOR_WARNING } from '@opentrons/components'
-import { InlineCalibrationWarning, REQUIRED, RECOMMENDED } from '../InlineCalibrationWarning'
-import type { WarningType} from '../InlineCalibrationWarning'
+import {
+  InlineCalibrationWarning,
+  REQUIRED,
+  RECOMMENDED,
+} from '../InlineCalibrationWarning'
+import type { WarningType } from '../InlineCalibrationWarning'
 
 describe('Calibration Warning Component', () => {
-  const render = (
-    warningType: WarningType | null
-  ) => {
-    return mount(
-      <InlineCalibrationWarning
-        warningType={warningType}
-      />
-    )
+  const render = (warningType: WarningType | null) => {
+    return mount(<InlineCalibrationWarning warningType={warningType} />)
   }
 
   it('renders nothing when no warning is requested', () => {
