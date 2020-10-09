@@ -10,7 +10,6 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
 } from '../../utils'
-import { SOURCE_WELL_BLOWOUT_DESTINATION } from '../../utils/misc'
 import {
   airGap,
   aspirate,
@@ -339,103 +338,133 @@ export const transfer: CommandCreator<TransferArgs> = (
               ]
             : []
 
-          const blowoutCommand = blowoutUtil({
-            pipette: args.pipette,
-            sourceLabwareId: args.sourceLabware,
-            sourceWell: sourceWell,
-            destLabwareId: args.destLabware,
-            destWell: destWell,
-            blowoutLocation: args.blowoutLocation,
-            flowRate: blowoutFlowRateUlSec,
-            offsetFromTopMm: blowoutOffsetFromTopMm,
-            invariantContext,
-          })
-
-          const airGapAfterDispenseCommands = dispenseAirGapVolume
-            ? [
-                curryCommandCreator(airGap, {
-                  pipette: args.pipette,
-                  volume: dispenseAirGapVolume,
-                  labware: args.destLabware,
-                  well: destWell,
-                  flowRate: aspirateFlowRateUlSec,
-                  offsetFromBottomMm: airGapOffsetDestWell,
-                }),
-                ...(aspirateDelay
-                  ? [
-                      curryCommandCreator(delay, {
-                        commandCreatorFnName: 'delay',
-                        description: null,
-                        name: null,
-                        meta: null,
-                        wait: aspirateDelay.seconds,
-                      }),
-                    ]
-                  : []),
-              ]
-            : []
-
-          // only if blowing out in source well or trash, air gap before blowout
-          const airGapBeforeBlowoutCommands =
-            args.blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION ||
-            args.blowoutLocation === FIXED_TRASH_ID
-              ? airGapAfterDispenseCommands
+          const airGapAfterDispenseCommands =
+            dispenseAirGapVolume && isLastChunk
+              ? [
+                  curryCommandCreator(airGap, {
+                    pipette: args.pipette,
+                    volume: dispenseAirGapVolume,
+                    labware: args.destLabware,
+                    well: destWell,
+                    flowRate: aspirateFlowRateUlSec,
+                    offsetFromBottomMm: airGapOffsetDestWell,
+                  }),
+                  ...(aspirateDelay
+                    ? [
+                        curryCommandCreator(delay, {
+                          commandCreatorFnName: 'delay',
+                          description: null,
+                          name: null,
+                          meta: null,
+                          wait: aspirateDelay.seconds,
+                        }),
+                      ]
+                    : []),
+                ]
               : []
 
-          // cleanup commands following a "dispense > air gap"
-          let cleanUpAfterAirGapAfterDispenseCommands = []
-          if (dispenseAirGapVolume) {
-            let willReuseTip = true // never or once --> true
-            if (isLastChunk && isLastPair) {
-              // if we're at the end of this step, we won't reuse the tip in this step
-              // so we can discard it
-              willReuseTip = false
-            } else if (args.changeTip === 'always') {
-              willReuseTip = false
-            } else if (
-              args.changeTip === 'perSource' ||
-              args.changeTip === 'perDest'
-            ) {
-              willReuseTip = !changeTipNow
-            }
+          // only if blowing out in source well or trash, air gap before blowout
+          let willReuseTip = true // never or once --> true
+          if (isLastChunk && isLastPair) {
+            // if we're at the end of this step, we won't reuse the tip in this step
+            // so we can discard it (even if changeTip is never, we'll drop it!)
+            willReuseTip = false
+          } else if (args.changeTip === 'always') {
+            willReuseTip = false
+          } else if (
+            args.changeTip === 'perSource' ||
+            args.changeTip === 'perDest'
+          ) {
+            willReuseTip = !changeTipNow
+          }
+          const airGapBeforeBlowoutCommands = !willReuseTip
+            ? airGapAfterDispenseCommands
+            : []
 
-            if (willReuseTip) {
-              // dispense in source well
-              cleanUpAfterAirGapAfterDispenseCommands = [
-                curryCommandCreator(dispenseAirGap, {
-                  pipette: args.pipette,
-                  labware: args.sourceLabware,
-                  well: sourceWell,
-                  flowRate: dispenseFlowRateUlSec,
-                  offsetFromBottomMm: airGapOffsetSourceWell,
-                  volume: dispenseAirGapVolume,
-                }),
-                ...(dispenseDelay
-                  ? [
-                      curryCommandCreator(delay, {
-                        commandCreatorFnName: 'delay',
-                        description: null,
-                        name: null,
-                        meta: null,
-                        wait: dispenseDelay.seconds,
-                      }),
-                    ]
-                  : []),
-              ]
+          const replaceTipIfDispenseAirGapWasUsed = []
+          if (airGapBeforeBlowoutCommands.length > 0) {
+            // if using dispense > air gap, drop or change the tip
+            if (isLastChunk && isLastPair) {
+              replaceTipIfDispenseAirGapWasUsed.push(
+                curryCommandCreator(dropTip, { pipette: args.pipette })
+              )
             } else {
-              if (isLastPair && isLastChunk) {
-                // step is over, drop tip
-                cleanUpAfterAirGapAfterDispenseCommands = [
-                  curryCommandCreator(dropTip, { pipette: args.pipette }),
-                ]
-              } else {
-                // more work to do in this step, change tip
-                cleanUpAfterAirGapAfterDispenseCommands = [
-                  curryCommandCreator(replaceTip, { pipette: args.pipette }),
-                ]
-              }
+              replaceTipIfDispenseAirGapWasUsed.push(
+                curryCommandCreator(replaceTip, { pipette: args.pipette })
+              )
             }
           }
+
+          const blowoutCommand =
+            replaceTipIfDispenseAirGapWasUsed.length > 0 &&
+            args.blowoutLocation === FIXED_TRASH_ID
+              ? [] // skip blowout it's in the trash we're replacing the tip due to dispense > air gap
+              : blowoutUtil({
+                  pipette: args.pipette,
+                  sourceLabwareId: args.sourceLabware,
+                  sourceWell: sourceWell,
+                  destLabwareId: args.destLabware,
+                  destWell: destWell,
+                  blowoutLocation: args.blowoutLocation,
+                  flowRate: blowoutFlowRateUlSec,
+                  offsetFromTopMm: blowoutOffsetFromTopMm,
+                  invariantContext,
+                })
+
+          // // cleanup commands following a "dispense > air gap"
+          // let cleanUpAfterAirGapAfterDispenseCommands = []
+          // if (dispenseAirGapVolume) {
+          //   let willReuseTip = true // never or once --> true
+          //   if (isLastChunk && isLastPair) {
+          //     // if we're at the end of this step, we won't reuse the tip in this step
+          //     // so we can discard it
+          //     willReuseTip = false
+          //   } else if (args.changeTip === 'always') {
+          //     willReuseTip = false
+          //   } else if (
+          //     args.changeTip === 'perSource' ||
+          //     args.changeTip === 'perDest'
+          //   ) {
+          //     willReuseTip = !changeTipNow
+          //   }
+
+          //   if (willReuseTip) {
+          //     // dispense in source well
+          //     cleanUpAfterAirGapAfterDispenseCommands = [
+          //       curryCommandCreator(dispenseAirGap, {
+          //         pipette: args.pipette,
+          //         labware: args.sourceLabware,
+          //         well: sourceWell,
+          //         flowRate: dispenseFlowRateUlSec,
+          //         offsetFromBottomMm: airGapOffsetSourceWell,
+          //         volume: dispenseAirGapVolume,
+          //       }),
+          //       ...(dispenseDelay
+          //         ? [
+          //             curryCommandCreator(delay, {
+          //               commandCreatorFnName: 'delay',
+          //               description: null,
+          //               name: null,
+          //               meta: null,
+          //               wait: dispenseDelay.seconds,
+          //             }),
+          //           ]
+          //         : []),
+          //     ]
+          //   } else {
+          //     if (isLastPair && isLastChunk) {
+          //       // step is over, drop tip
+          //       cleanUpAfterAirGapAfterDispenseCommands = [
+          //         curryCommandCreator(dropTip, { pipette: args.pipette }),
+          //       ]
+          //     } else {
+          //       // more work to do in this step, change tip
+          //       cleanUpAfterAirGapAfterDispenseCommands = [
+          //         curryCommandCreator(replaceTip, { pipette: args.pipette }),
+          //       ]
+          //     }
+          //   }
+          // }
 
           const nextCommands = [
             ...tipCommands,
@@ -465,12 +494,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...touchTipAfterDispenseCommands,
             ...airGapBeforeBlowoutCommands,
             ...blowoutCommand,
-            ...(isLastPair &&
-            isLastChunk &&
-            args.blowoutLocation === FIXED_TRASH_ID
-              ? []
-              : airGapAfterDispenseCommands),
-            ...cleanUpAfterAirGapAfterDispenseCommands,
+            ...replaceTipIfDispenseAirGapWasUsed,
           ]
 
           // NOTE: side-effecting
