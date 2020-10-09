@@ -11,7 +11,7 @@ import typeof {
   PIP_OFFSET_STEP_COMPLETE_TIP_LENGTH,
   PIP_OFFSET_STEP_SESSION_EXITED,
 } from '../constants'
-
+import type { CalibrationLabware } from '../types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export type PipetteOffsetCalibrationStep =
@@ -33,25 +33,16 @@ export type PipetteOffsetCalibrationInstrument = {|
   serial: string,
 |}
 
-export type PipetteOffsetCalibrationLabware = {|
-  slot: string,
-  loadName: string,
-  namespace: string,
-  version: number,
-  isTiprack: boolean,
-  definition: LabwareDefinition2,
-|}
-
 export type PipetteOffsetCalibrationSessionParams = {|
   mount: string,
-  shouldCalibrateTipLength: boolean,
-  hasCalibrationBlock?: boolean,
+  shouldPerformTipLength: boolean,
+  hasCalibrationBlock: boolean,
   tipRackDefinition: ?LabwareDefinition2,
 |}
 
 export type PipetteOffsetCalibrationSessionDetails = {|
   instrument: PipetteOffsetCalibrationInstrument,
   currentStep: PipetteOffsetCalibrationStep,
-  labware: Array<PipetteOffsetCalibrationLabware>,
+  labware: Array<CalibrationLabware>,
   shouldPerformTipLength: boolean,
 |}

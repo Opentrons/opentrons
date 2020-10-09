@@ -95,6 +95,7 @@ describe('CalibratePipetteOffset', () => {
           closeWizard={jest.fn()}
           dispatchRequests={jest.fn()}
           showSpinner={showSpinner}
+          hasBlock={false}
         />,
         {
           wrappingComponent: Provider,

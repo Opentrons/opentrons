@@ -1,5 +1,7 @@
 // @flow
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
 import typeof {
   CREATE_SESSION,
   CREATE_SESSION_SUCCESS,
@@ -381,3 +383,12 @@ export type CalibrationCheckSessionIntercomProps = {|
 
 export type SessionAnalyticsProps = CalibrationCheckSessionAnalyticsProps
 export type SessionIntercomProps = CalibrationCheckSessionIntercomProps
+
+export type CalibrationLabware = {|
+  slot: string,
+  loadName: string,
+  namespace: string,
+  version: number,
+  isTiprack: boolean,
+  definition: LabwareDefinition2,
+|}

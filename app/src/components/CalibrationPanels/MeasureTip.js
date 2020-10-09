@@ -119,13 +119,8 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
   }
 
   const proceedPipetteOffset = () => {
-    sendCommands(
-      { command: Sessions.sharedCalCommands.SAVE_OFFSET },
-      { command: Sessions.sharedCalCommands.MOVE_TO_DECK }
-    )
+    sendCommands({ command: Sessions.sharedCalCommands.SAVE_OFFSET })
   }
-
-  console.log('In measure tip')
 
   const proceed = isExtendedPipOffset ? proceedPipetteOffset : proceedTipLength
 

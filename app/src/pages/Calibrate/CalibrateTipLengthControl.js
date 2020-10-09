@@ -26,7 +26,11 @@ import { CalibratePipetteOffset } from '../../components/CalibratePipetteOffset'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
-import type { SessionCommandString } from '../../sessions/types'
+import type {
+  SessionCommandString,
+  PipetteOffsetCalibrationSession,
+  TipLengthCalibrationSession,
+} from '../../sessions/types'
 import type { RequestState } from '../../robot-api/types'
 
 export type CalibrateTipLengthControlProps = {|
@@ -89,33 +93,45 @@ export function CalibrateTipLengthControl({
     useTrashSurfaceForTipCalSetting
   )
 
-  const calibrationSession = useSelector((state: State) => {
-    const tipLengthSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
-      state,
-      robotName,
-      Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
-    )
-    const extendedPipOffsetSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
-      state,
-      robotName,
-      Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-    )
-    if (
-      tipLengthSession &&
-      tipLengthSession.sessionType ===
+  const tipLengthCalibrationSession: TipLengthCalibrationSession | null = useSelector(
+    (state: State) => {
+      const tipLengthSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
+        state,
+        robotName,
         Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
-    ) {
-      return tipLengthSession
-    } else if (
-      extendedPipOffsetSession &&
-      extendedPipOffsetSession.sessionType ===
-        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-    ) {
-      return extendedPipOffsetSession
-    }
-    return null
-  })
+      )
 
+      if (
+        tipLengthSession &&
+        tipLengthSession.sessionType ===
+          Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+      ) {
+        return tipLengthSession
+      }
+      return null
+    }
+  )
+  const extendedPipetteCalibrationSession: PipetteOffsetCalibrationSession | null = useSelector(
+    (state: State) => {
+      const extendedPipOffsetSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
+        state,
+        robotName,
+        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+      )
+      if (
+        extendedPipOffsetSession &&
+        extendedPipOffsetSession.sessionType ===
+          Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+      ) {
+        return extendedPipOffsetSession
+      }
+      return null
+    }
+  )
+
+  const calibrationSession = isExtendedPipOffset
+    ? extendedPipetteCalibrationSession
+    : tipLengthCalibrationSession
   const handleStart = () => {
     if (isExtendedPipOffset && useTrashSurface.current !== null) {
       dispatchRequests(
@@ -125,7 +141,7 @@ export function CalibrateTipLengthControl({
           {
             mount,
             hasCalibrationBlock: !useTrashSurface.current,
-            shouldCalibrateTipLength: true,
+            shouldPerformTipLength: true,
             tipRackDefinition,
           }
         )
@@ -228,16 +244,17 @@ export function CalibrateTipLengthControl({
         <Portal>
           {isExtendedPipOffset ? (
             <CalibratePipetteOffset
-              session={calibrationSession}
+              session={extendedPipetteCalibrationSession}
               robotName={robotName}
-              closeWizard={() => setShowWizard(false)}
+              hasBlock={!useTrashSurface.current}
+              closeWizard={handleCloseWizard}
               showSpinner={showSpinner}
               dispatchRequests={dispatchRequests}
             />
           ) : (
             <CalibrateTipLength
               robotName={robotName}
-              session={calibrationSession}
+              session={tipLengthCalibrationSession}
               closeWizard={handleCloseWizard}
               hasBlock={!useTrashSurface.current}
               showSpinner={showSpinner}

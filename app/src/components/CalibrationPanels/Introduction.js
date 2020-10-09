@@ -95,13 +95,27 @@ const contentsBySessionType: {
 }
 
 export function Introduction(props: CalibrationPanelProps): React.Node {
-  const { tipRack, calBlock, sendCommands, sessionType } = props
+  const {
+    tipRack,
+    calBlock,
+    sendCommands,
+    sessionType,
+    shouldPerformTipLength,
+  } = props
+
+  const isExtendedPipOffset =
+    sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
+    shouldPerformTipLength === true
+
+  const lookupType = isExtendedPipOffset
+    ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+    : sessionType
 
   const { showConfirmation, confirm: proceed, cancel } = useConditionalConfirm(
     () => {
       sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
     },
-    sessionType !== Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+    lookupType !== Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
   )
 
   const {
@@ -110,7 +124,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     continueButtonText,
     continuingToText,
     noteBody,
-  } = contentsBySessionType[sessionType]
+  } = contentsBySessionType[lookupType]
 
   return (
     <>

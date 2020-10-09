@@ -33,13 +33,14 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 import type {
-  DeckCalibrationLabware,
+  CalibrationLabware,
   SessionCommandParams,
 } from '../../sessions/types'
 import type { CalibratePipetteOffsetParentProps } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
+const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
 const EXIT = 'exit'
 
 const darkContentsStyleProps = {
@@ -102,6 +103,7 @@ export function CalibratePipetteOffset(
     closeWizard,
     dispatchRequests,
     showSpinner,
+    hasBlock,
   } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
@@ -112,6 +114,11 @@ export function CalibratePipetteOffset(
   } = useConditionalConfirm(() => {
     cleanUpAndExit()
   }, true)
+
+  const tipRack: CalibrationLabware | null =
+    (labware && labware.find(l => l.isTiprack)) ?? null
+  const calBlock: CalibrationLabware | null =
+    hasBlock && labware ? labware.find(l => !l.isTiprack) ?? null : null
 
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)
@@ -143,15 +150,14 @@ export function CalibratePipetteOffset(
     closeWizard()
   }
 
-  const tipRack: DeckCalibrationLabware | null =
-    (labware && labware.find(l => l.isTiprack)) ?? null
-
   if (!session || !tipRack) {
     return null
   }
-
+  const shouldPerformTipLength = session.details.shouldPerformTipLength
   const titleBarProps = {
-    title: PIPETTE_OFFSET_CALIBRATION_SUBTITLE,
+    title: shouldPerformTipLength
+      ? TIP_LENGTH_CALIBRATION_SUBTITLE
+      : PIPETTE_OFFSET_CALIBRATION_SUBTITLE,
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
@@ -172,9 +178,10 @@ export function CalibratePipetteOffset(
           tipRack={tipRack}
           isMulti={isMulti}
           mount={instrument?.mount.toLowerCase()}
+          calBlock={calBlock}
           currentStep={currentStep}
           sessionType={session.sessionType}
-          shouldPerformTipLength={session.details.shouldPerformTipLength}
+          shouldPerformTipLength={shouldPerformTipLength}
         />
       </ModalPage>
       {showConfirmExit && (

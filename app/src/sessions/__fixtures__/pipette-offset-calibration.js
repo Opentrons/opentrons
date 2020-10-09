@@ -1,12 +1,12 @@
 // @flow
 import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
-import type { PipetteOffsetCalibrationSessionDetails } from '../types'
 import type {
-  PipetteOffsetCalibrationSessionParams,
-  PipetteOffsetCalibrationLabware,
-} from '../pipette-offset-calibration/types'
+  PipetteOffsetCalibrationSessionDetails,
+  CalibrationLabware,
+} from '../types'
+import type { PipetteOffsetCalibrationSessionParams } from '../pipette-offset-calibration/types'
 
-export const mockPipetteOffsetTipRack: PipetteOffsetCalibrationLabware = {
+export const mockPipetteOffsetTipRack: CalibrationLabware = {
   slot: '8',
   loadName: 'opentrons_96_tiprack_300ul',
   namespace: 'opentrons',
@@ -30,6 +30,7 @@ export const mockPipetteOffsetCalibrationSessionDetails: PipetteOffsetCalibratio
 
 export const mockPipetteOffsetCalibrationSessionParams: PipetteOffsetCalibrationSessionParams = {
   mount: 'left',
-  shouldCalibrateTipLength: true,
+  shouldPerformTipLength: true,
   tipRackDefinition: null,
+  hasCalibrationBlock: true,
 }

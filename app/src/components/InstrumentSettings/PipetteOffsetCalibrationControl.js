@@ -91,7 +91,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
   }, [shouldOpen, shouldClose])
 
   const hasCalibrationBlock = false
-  const shouldCalibrateTipLength = false
+  const shouldPerformTipLength = false
   const tipRackDefinition = null
   const handleStartPipOffsetCalSession = () => {
     dispatchRequests(
@@ -100,7 +100,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
         Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
         {
           mount,
-          shouldCalibrateTipLength,
+          shouldPerformTipLength,
           hasCalibrationBlock,
           tipRackDefinition,
         }
@@ -141,6 +141,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
             closeWizard={() => setShowWizard(false)}
             showSpinner={showSpinner}
             dispatchRequests={dispatchRequests}
+            hasBlock={false}
           />
         </Portal>
       )}
