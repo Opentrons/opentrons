@@ -13,10 +13,10 @@ import os
 import shutil
 
 from pathlib import Path
-from itertools import takewhile, dropwhile
+from itertools import dropwhile
 from typing import (
     Any, AnyStr, List, Dict,
-    Optional, Union, Sequence, Tuple,
+    Optional, Union, Tuple,
     TYPE_CHECKING)
 
 import jsonschema  # type: ignore
@@ -331,7 +331,7 @@ class Labware(DeckItem):
             res = self.wells_by_name()[idx]
         else:
             res = NotImplemented
-        return res
+        return self._well_from_impl(res)
 
     @requires_version(2, 0)
     def wells(self, *args) -> List[Well]:
@@ -354,10 +354,10 @@ class Labware(DeckItem):
         if not args:
             res = self._implementation.get_wells()
         elif isinstance(args[0], int):
-            res = (self._implementation.get_wells()[idx] for idx in args)
+            res = [self._implementation.get_wells()[idx] for idx in args]
         elif isinstance(args[0], str):
             by_name = self._implementation.get_wells_by_name()
-            res = (by_name[idx] for idx in args)
+            res = [by_name[idx] for idx in args]
         else:
             raise TypeError
         return [self._well_from_impl(w) for w in res]
@@ -407,9 +407,9 @@ class Labware(DeckItem):
         if not args:
             res = grid.get_rows()
         elif isinstance(args[0], int):
-            res = (grid.get_rows()[idx] for idx in args)
+            res = [grid.get_rows()[idx] for idx in args]
         elif isinstance(args[0], str):
-            res = (grid.get_row(idx) for idx in args)
+            res = [grid.get_row(idx) for idx in args]
         else:
             raise TypeError
         return [[self._well_from_impl(w) for w in row] for row in res]
@@ -459,9 +459,9 @@ class Labware(DeckItem):
         if not args:
             res = grid.get_columns()
         elif isinstance(args[0], int):
-            res = (grid.get_columns()[idx] for idx in args)
+            res = [grid.get_columns()[idx] for idx in args]
         elif isinstance(args[0], str):
-            res = (grid.get_column(idx) for idx in args)
+            res = [grid.get_column(idx) for idx in args]
         else:
             raise TypeError
         return [[self._well_from_impl(w) for w in col] for col in res]
