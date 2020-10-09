@@ -192,7 +192,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): React.Node {
             </>
           ) : (
             <>
-              {dismissAlert != null ? (
+              {dismissAlert != null && !downloaded ? (
                 <Btn
                   color={C_BLUE}
                   marginRight={SPACING_AUTO}

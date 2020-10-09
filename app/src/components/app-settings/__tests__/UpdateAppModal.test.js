@@ -220,6 +220,17 @@ describe('UpdateAppModal', () => {
     expect(ignoreButton.exists()).toBe(false)
   })
 
+  it('should not show the "ignore" button if the user has proceeded with the update', () => {
+    getShellUpdateState.mockReturnValue({ downloaded: true })
+
+    const { wrapper } = render({ dismissAlert })
+    const ignoreButton = wrapper
+      .find('button')
+      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+
+    expect(ignoreButton.exists()).toBe(false)
+  })
+
   it('should dismiss the alert permanently once the user clicks "OK"', () => {
     const { wrapper } = render({ dismissAlert })
 
