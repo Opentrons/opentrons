@@ -25,4 +25,4 @@ def test_row_column(name, row, col):
                          ])
 def test_row_column_fail(name):
     with pytest.raises(AssertionError, match=f"could not match '{name}'"):
-        w = WellImplementation(None, None, None, name=name)
+        WellImplementation(None, None, None, name=name)

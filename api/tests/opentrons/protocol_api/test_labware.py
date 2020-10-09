@@ -52,7 +52,9 @@ def set_up_index_file(labware_offset_tempdir):
     for idx, name in enumerate(labware_list):
         parent = deck.position_for(idx+1)
         definition = labware.get_labware_definition(name)
-        lw = labware.Labware(implementation=LabwareImplementation(definition, parent))
+        lw = labware.Labware(
+            implementation=LabwareImplementation(definition, parent)
+        )
         labware.save_calibration(lw, Point(0, 0, 0))
 
     return labware_list
@@ -221,6 +223,7 @@ def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
             parent=Location(Point(0, 0, 0), 'Test Slot'))
     )
 
+
 @pytest.fixture
 def opentrons_96_tiprack_300ul_def():
     labware_name = "opentrons_96_tiprack_300ul"
@@ -287,9 +290,11 @@ def test_well_parent(corning_96_wellplate_360ul_flat):
     well = labware.Well(
         api_level=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
-            well_geometry=WellGeometry(well_props=test_data[well_name],
-                                       parent_point=parent.point,
-                                       parent_object=parent.labware._implementation),
+            well_geometry=WellGeometry(
+                well_props=test_data[well_name],
+                parent_point=parent.point,
+                parent_object=parent.labware._implementation
+            ),
             display_name=well_name,
             has_tip=has_tip,
             name="A1"
@@ -582,8 +587,7 @@ def test_uris():
     lw = labware.Labware(
         implementation=LabwareImplementation(defn,
                                              Location(Point(0, 0, 0),
-                                                      'Test Slot'
-                                                      )
+                                                      'Test Slot')
                                              )
     )
     assert lw.uri == uri
@@ -599,10 +603,8 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
     deck = Deck()
     parent = deck.position_for(1)
     definition = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(implementation=LabwareImplementation(definition,
-                                                              parent
-                                                              )
-                         )
+    lw = labware.Labware(
+        implementation=LabwareImplementation(definition, parent))
     labware_hash = helpers.hash_labware_def(definition)
     labware.save_calibration(lw, Point(0, 0, 0))
 
@@ -660,8 +662,7 @@ def test_get_parent_identifier():
     lw = labware.Labware(
         implementation=LabwareImplementation(labware_def,
                                              Location(Point(0, 0, 0),
-                                                      'Test Slot')
-                                             )
+                                                      'Test Slot'))
     )
     # slots have no parent identifier
     assert labware._get_parent_identifier(lw) == ''
@@ -671,6 +672,8 @@ def test_get_parent_identifier():
                          ModuleType.MAGNETIC,
                          Point(0, 0, 0), 10, 10, Location(Point(1, 2, 3), '3'),
                          APIVersion(2, 4))
-    lw = labware.Labware(implementation=LabwareImplementation(labware_def, mmg.location))
+    lw = labware.Labware(
+        implementation=LabwareImplementation(labware_def, mmg.location)
+    )
     assert labware._get_parent_identifier(lw)\
         == MagneticModuleModel.MAGNETIC_V1.value

@@ -427,7 +427,9 @@ class Labware(DeckItem):
         """
         row_dict = self._implementation.get_well_grid().get_row_dict()
         return {
-            k: [self._well_from_impl(w) for w in v] for k, v in row_dict.items()
+            k: [
+                self._well_from_impl(w) for w in v
+            ] for k, v in row_dict.items()
         }
 
     @requires_version(2, 0)
@@ -480,7 +482,9 @@ class Labware(DeckItem):
         """
         column_dict = self._implementation.get_well_grid().get_column_dict()
         return {
-            k: [self._well_from_impl(w) for w in v] for k, v in column_dict.items()
+            k: [
+                self._well_from_impl(w) for w in v
+            ] for k, v in column_dict.items()
         }
 
     @requires_version(2, 0)

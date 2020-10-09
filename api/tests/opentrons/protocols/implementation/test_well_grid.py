@@ -66,9 +66,9 @@ def test_row_headers(names, expected):
             "D": [8]}],
     ])
 def test_row_dict(names, expected):
-    l = wells_from_names(names)
-    grid = WellGrid(l)
-    assert grid.get_row_dict() == {k: [l[i] for i in v]
+    wells = wells_from_names(names)
+    grid = WellGrid(wells)
+    assert grid.get_row_dict() == {k: [wells[i] for i in v]
                                    for k, v in expected.items()}
 
 

@@ -877,7 +877,8 @@ def test_bundled_labware(loop, get_labware_fixture):
     ctx = papi.ProtocolContext(loop, bundled_labware=bundled_labware)
     lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
     assert ctx.loaded_labwares[3] == lw1
-    assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
+    assert ctx.loaded_labwares[3]._implementation.get_definition() ==\
+           fixture_96_plate
 
 
 def test_bundled_labware_missing(loop, get_labware_fixture):
@@ -916,7 +917,8 @@ def test_extra_labware(loop, get_labware_fixture):
     ctx = papi.ProtocolContext(loop, extra_labware=bundled_labware)
     ls1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
     assert ctx.loaded_labwares[3] == ls1
-    assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
+    assert ctx.loaded_labwares[3]._implementation.get_definition() ==\
+           fixture_96_plate
 
 
 def test_api_version_checking():

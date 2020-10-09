@@ -330,16 +330,24 @@ def test_load_calibration(monkeypatch, clear_calibration):
 
 
 def test_wells_rebuilt_with_offset():
-    test_labware = labware.Labware(labware.LabwareImplementation(minimalLabwareDef,
-                                   Location(Point(0, 0, 0), 'deck')))
+    test_labware = labware.Labware(
+        implementation=labware.LabwareImplementation(
+            minimalLabwareDef,
+            Location(Point(0, 0, 0), 'deck')
+        )
+    )
     old_wells = test_labware.wells()
-    assert test_labware._implementation.get_geometry().offset == Point(10, 10, 5)
-    assert test_labware._implementation.get_calibrated_offset() == Point(10, 10, 5)
+    assert test_labware._implementation.get_geometry().offset ==\
+           Point(10, 10, 5)
+    assert test_labware._implementation.get_calibrated_offset() ==\
+           Point(10, 10, 5)
     labware.save_calibration(test_labware, Point(2, 2, 2))
     new_wells = test_labware.wells()
     assert old_wells[0] != new_wells[0]
-    assert test_labware._implementation.get_geometry().offset == Point(10, 10, 5)
-    assert test_labware._implementation.get_calibrated_offset() == Point(12, 12, 7)
+    assert test_labware._implementation.get_geometry().offset ==\
+           Point(10, 10, 5)
+    assert test_labware._implementation.get_calibrated_offset() ==\
+           Point(12, 12, 7)
 
 
 def test_clear_calibrations():
