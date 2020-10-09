@@ -2,7 +2,6 @@
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 import * as Config from '../../../config'
-import * as Shell from '../../../shell'
 import { AppAdvancedSettingsCard } from '../AppAdvancedSettingsCard'
 
 import type { State } from '../../../types'
@@ -124,12 +123,5 @@ describe('AppAdvancedSettingsCard', () => {
     expect(store.dispatch).toHaveBeenCalledWith(
       Config.toggleConfigValue('calibration.useTrashSurfaceForTipCal')
     )
-  })
-
-  it('checks for updates on mount', () => {
-    const { store } = render()
-    const expectedAction = Shell.checkShellUpdate()
-
-    expect(store.dispatch).toHaveBeenCalledWith(expectedAction)
   })
 })

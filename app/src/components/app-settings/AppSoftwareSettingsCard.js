@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import {
   ALIGN_START,
+  BORDER_SOLID_LIGHT,
   SPACING_3,
   SPACING_AUTO,
   Card,
@@ -22,10 +23,12 @@ import {
 
 import { Portal } from '../portal'
 import { UpdateAppModal } from './UpdateAppModal'
+import { UpdateNotificationsControl } from './UpdateNotificationsControl'
+import { DowngradeAppControl } from './DowngradeAppControl'
 
 import type { Dispatch } from '../../types'
 
-const INFORMATION = 'Information'
+const APP_SOFTWARE_SETTINGS = 'App Software Settings'
 const VERSION_LABEL = 'Software Version'
 
 const UPDATE_AVAILABLE = 'view available update'
@@ -42,7 +45,7 @@ export function AppSoftwareSettingsCard(): React.Node {
 
   return (
     <>
-      <Card title={INFORMATION}>
+      <Card title={APP_SOFTWARE_SETTINGS}>
         <Flex padding={SPACING_3} alignItems={ALIGN_START}>
           <LabeledValue label={VERSION_LABEL} value={CURRENT_VERSION} />
           <SecondaryBtn
@@ -53,6 +56,8 @@ export function AppSoftwareSettingsCard(): React.Node {
             {updateAvailable ? UPDATE_AVAILABLE : UPDATE_NOT_AVAILABLE}
           </SecondaryBtn>
         </Flex>
+        <UpdateNotificationsControl borderTop={BORDER_SOLID_LIGHT} />
+        <DowngradeAppControl borderTop={BORDER_SOLID_LIGHT} />
       </Card>
       {showUpdateModal ? (
         <Portal>

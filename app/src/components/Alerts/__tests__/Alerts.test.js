@@ -42,7 +42,7 @@ describe('app-wide Alerts component', () => {
 
   const stubActiveAlerts = alertIds => {
     getActiveAlerts.mockImplementation(state => {
-      expect(state).toBe(MOCK_STATE)
+      expect(state).toEqual(MOCK_STATE)
       return alertIds
     })
   }
@@ -70,11 +70,11 @@ describe('app-wide Alerts component', () => {
   })
 
   it('should render a U2EDriverOutdatedAlert if alert is triggered', () => {
-    const { wrapper, store } = render()
+    const { wrapper, store, refresh } = render()
     expect(wrapper.exists(U2EDriverOutdatedAlert)).toBe(false)
 
     stubActiveAlerts([AppAlerts.ALERT_U2E_DRIVER_OUTDATED])
-    wrapper.setProps({})
+    refresh()
     expect(wrapper.exists(U2EDriverOutdatedAlert)).toBe(true)
 
     wrapper.find(U2EDriverOutdatedAlert).invoke('dismissAlert')(true)
@@ -85,11 +85,11 @@ describe('app-wide Alerts component', () => {
   })
 
   it('should render an UpdateAppModal if appUpdateAvailable alert is triggered', () => {
-    const { wrapper, store } = render()
+    const { wrapper, store, refresh } = render()
     expect(wrapper.exists(UpdateAppModal)).toBe(false)
 
     stubActiveAlerts([AppAlerts.ALERT_APP_UPDATE_AVAILABLE])
-    wrapper.setProps({})
+    refresh()
     expect(wrapper.exists(UpdateAppModal)).toBe(true)
 
     wrapper.find(UpdateAppModal).invoke('dismissAlert')(true)

@@ -15,11 +15,13 @@ export const C_TRANSPARENT = 'transparent'
 export const C_BLUE = '#006fff'
 
 // colors by usage
-export const COLOR_DISABLED = '#9c9c9c'
+// TODO(mc, 2020-10-08): s/COLOR_/C_
 export const COLOR_WARNING = '#e28200'
 export const COLOR_WARNING_LIGHT = '#ffd58f'
 export const COLOR_ERROR = '#d12929'
 export const COLOR_SUCCESS = '#60b120'
+export const C_DISABLED = '#9c9c9c'
+export const C_SELECTED_DARK = '#00c3e6'
 
 // overlays
 export const OVERLAY_WHITE_10 = 'rgba(255, 255, 255, 0.1)'
