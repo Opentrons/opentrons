@@ -219,7 +219,7 @@ class PipetteOffsetCalibrationUserFlow:
                 not self.should_perform_tip_length:
             self._flag_unmet_transition_req(
                 command_handler="move_to_tip_rack",
-                unmet_condition="tip length calibration data does not exist")
+                unmet_condition="not performing tip length calibration")
         point = self._tip_rack.wells()[0].top().point + \
             MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)

@@ -57,7 +57,7 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
 
   const isExtendedPipOffset =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-    shouldPerformTipLength === true
+    shouldPerformTipLength
 
   const lookupType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
@@ -116,7 +116,7 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
         justifyContent={JUSTIFY_CENTER}
         marginY={SPACING_3}
       >
-        {isExtendedPipOffset === true && (
+        {isExtendedPipOffset && (
           <PrimaryBtn
             title={PROCEED_TO_DECK}
             flex="1"
@@ -126,9 +126,9 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
             {PROCEED_TO_PIP_OFFSET}
           </PrimaryBtn>
         )}
-        {isExtendedPipOffset !== true && (
+        {!isExtendedPipOffset && (
           <PrimaryBtn title={RETURN_TIP} flex="1" onClick={cleanUpAndExit}>
-            {shouldPerformTipLength === true ? EXIT : RETURN_TIP}
+            {shouldPerformTipLength ? EXIT : RETURN_TIP}
           </PrimaryBtn>
         )}
       </Flex>

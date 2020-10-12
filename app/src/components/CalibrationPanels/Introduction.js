@@ -105,7 +105,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
 
   const isExtendedPipOffset =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-    shouldPerformTipLength === true
+    shouldPerformTipLength
 
   const lookupType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION

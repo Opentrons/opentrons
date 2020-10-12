@@ -141,7 +141,6 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
             closeWizard={() => setShowWizard(false)}
             showSpinner={showSpinner}
             dispatchRequests={dispatchRequests}
-            hasBlock={false}
           />
         </Portal>
       )}

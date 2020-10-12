@@ -78,7 +78,7 @@ const PANEL_BY_STEP: {
   [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: TipConfirmation,
   [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: SaveZPoint,
   [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: SaveXYPoint,
-  [Sessions.PIP_OFFSET_STEP_COMPLETE_TIP_LENGTH]: CompleteConfirmation,
+  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: CompleteConfirmation,
   [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
 
@@ -91,7 +91,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: contentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: contentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: contentsStyleProps,
-  [Sessions.PIP_OFFSET_STEP_COMPLETE_TIP_LENGTH]: terminalContentsStyleProps,
+  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: terminalContentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
 export function CalibratePipetteOffset(
