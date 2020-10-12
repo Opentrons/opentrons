@@ -163,11 +163,10 @@ class InstrumentContext(CommandPublisher):
         """
         Aspirate a given volume of liquid from the specified location, using
         this pipette.
-        
 
         :param volume: The volume to aspirate, in microliters (µL).  If 0 or
-                       unspecified, defaults to the highest volume possible with
-                       this pipette and its currently attached tip.
+                       unspecified, defaults to the highest volume possible
+                       with this pipette and its currently attached tip.
         :type volume: int or float
         :param location: Where to aspirate from. If `location` is a
                          :py:class:`.Well`, the robot will aspirate from
@@ -342,13 +341,13 @@ class InstrumentContext(CommandPublisher):
             location: Union[types.Location, Well] = None,
             rate: float = 1.0) -> InstrumentContext:
         """
-        Mix a volume of liquid (uL) using this pipette, by repeatedly aspirating
-        and dispensing in the same place.
+        Mix a volume of liquid (uL) using this pipette, by repeatedly
+        aspirating and dispensing in the same place.
 
         :param repetitions: how many times the pipette should mix (default: 1)
         :param volume: number of microliters to mix.  If 0 or unspecified,
-                       defaults to the highest volume possible with this pipette
-                       and its currently attached tip.
+                       defaults to the highest volume possible with this
+                       pipette and its currently attached tip.
         :param location: a Well or a position relative to well.
                          e.g, `plate.rows()[0][0].bottom()`
         :type location: types.Location

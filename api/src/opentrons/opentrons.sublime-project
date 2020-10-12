@@ -1,0 +1,13 @@
+{
+	"folders":
+	[
+		{
+			"path": "/Users/maxpm/Code/Opentrons/opentrons"
+		}
+	],
+	"settings":
+	{
+		"rulers": [79],
+	},
+	"folder_exclude_patterns": ["api/build"]
+}
