@@ -4,7 +4,7 @@ import { createSelector } from 'reselect'
 
 import { getProtocolPipettesInfo } from '../../pipettes/selectors'
 import { getTipracksByMount } from '../../robot/selectors'
-import { PIPETTE_MOUNTS } from  '../../robot/constants'
+import { PIPETTE_MOUNTS } from '../../robot/constants'
 
 import type { State } from '../../types'
 import type { TipLengthCalibration } from '../api-types'

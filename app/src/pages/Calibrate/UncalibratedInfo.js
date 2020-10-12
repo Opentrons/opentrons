@@ -7,6 +7,7 @@ import {
   Icon,
   PrimaryBtn,
   SecondaryBtn,
+  Text,
   SPACING_2,
   type Mount,
 } from '@opentrons/components'
@@ -68,7 +69,7 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
   ) : (
     buttonText
   )
-  console.log(`mount: ${mount}`)
+
   const otherMount: Mount | null = PIPETTE_MOUNTS.find(m => m !== mount) || null
   const nextLabware = useSelector(robotSelectors.getUnconfirmedLabware)[0]
 
@@ -91,8 +92,9 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
   }
   const leftChildren = (
     <div>
-      <p>{!hasCalibrated ? IS_NOT_CALIBRATED : IS_CALIBRATED}</p>
+      <Text>{!hasCalibrated ? IS_NOT_CALIBRATED : IS_CALIBRATED}</Text>
       <CalibrateButton
+        title={buttonText}
         hasCalibrated={hasCalibrated}
         marginBottom={SPACING_2}
         width={BTN_WIDTH}
