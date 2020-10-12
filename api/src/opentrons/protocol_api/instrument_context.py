@@ -169,8 +169,9 @@ class InstrumentContext(CommandPublisher):
         ``instr.aspirate(location=wellplate['A1'])``,
         :py:meth:`aspirate` will default to the amount of volume available.
 
-        :param volume: The volume to aspirate, in microliters. If not
-                       specified, :py:attr:`max_volume`.
+        :param volume: The volume to aspirate, in microliters.  If 0 or
+                       unspecified, defaults to the highest volume possible with
+                       this pipette and its currently attached tip.
         :type volume: int or float
         :param location: Where to aspirate from. If `location` is a
                          :py:class:`.Well`, the robot will aspirate from
