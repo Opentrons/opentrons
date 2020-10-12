@@ -161,15 +161,11 @@ class InstrumentContext(CommandPublisher):
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> InstrumentContext:
         """
-        Aspirate a volume of liquid (in microliters/uL) using this pipette
-        from the specified location
+        Aspirate a given volume of liquid from the specified location, using
+        this pipette.
+        
 
-        If only a volume is passed, the pipette will aspirate
-        from its current position. If only a location is passed (as in
-        ``instr.aspirate(location=wellplate['A1'])``,
-        :py:meth:`aspirate` will default to the amount of volume available.
-
-        :param volume: The volume to aspirate, in microliters.  If 0 or
+        :param volume: The volume to aspirate, in microliters (µL).  If 0 or
                        unspecified, defaults to the highest volume possible with
                        this pipette and its currently attached tip.
         :type volume: int or float
