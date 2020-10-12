@@ -65,6 +65,7 @@ class ComparisonStatus(BaseModel):
 class CalibrationSessionStatus(BaseModel):
     """The current status of a given session."""
     instruments: Dict[str, AttachedPipette]
+    activePipette: AttachedPipette
     currentStep: str = Field(..., description="Current step of session")
     comparisonsByStep: Dict[str, ComparisonStatus]
     nextSteps: Optional[NextSteps] =\

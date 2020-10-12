@@ -37,31 +37,6 @@ offset or a robot deck transform.
 """
 
 
-class CalibrationCheckState(str, Enum):
-    sessionStarted = "sessionStarted"
-    labwareLoaded = "labwareLoaded"
-    preparingFirstPipette = "preparingFirstPipette"
-    inspectingFirstTip = "inspectingFirstTip"
-    joggingFirstPipetteToHeight = "joggingFirstPipetteToHeight"
-    comparingFirstPipetteHeight = "comparingFirstPipetteHeight"
-    joggingFirstPipetteToPointOne = "joggingFirstPipetteToPointOne"
-    comparingFirstPipettePointOne = "comparingFirstPipettePointOne"
-    joggingFirstPipetteToPointTwo = "joggingFirstPipetteToPointTwo"
-    comparingFirstPipettePointTwo = "comparingFirstPipettePointTwo"
-    joggingFirstPipetteToPointThree = "joggingFirstPipetteToPointThree"
-    comparingFirstPipettePointThree = "comparingFirstPipettePointThree"
-    preparingSecondPipette = "preparingSecondPipette"
-    inspectingSecondTip = "inspectingSecondTip"
-    joggingSecondPipetteToHeight = "joggingSecondPipetteToHeight"
-    comparingSecondPipetteHeight = "comparingSecondPipetteHeight"
-    joggingSecondPipetteToPointOne = "joggingSecondPipetteToPointOne"
-    comparingSecondPipettePointOne = "comparingSecondPipettePointOne"
-    returningTip = "returningTip"
-    sessionExited = "sessionExited"
-    badCalibrationData = "badCalibrationData"
-    checkComplete = "checkComplete"
-
-
 class CalibrationCheckTrigger(str, Enum):
     load_labware = CalibrationCommand.load_labware.value
     prepare_pipette = CalibrationCheckCommand.prepare_pipette.value
@@ -73,212 +48,6 @@ class CalibrationCheckTrigger(str, Enum):
     go_to_next_check = CalibrationCheckCommand.go_to_next_check.value
     exit = CalibrationCommand.exit.value
     reject_calibration = CalibrationCheckCommand.reject_calibration.value
-
-
-CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [
-    {
-        "trigger": CalibrationCheckTrigger.load_labware,
-        "from_state": CalibrationCheckState.sessionStarted,
-        "to_state": CalibrationCheckState.labwareLoaded,
-        "before": "_load_tip_rack_objects"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.prepare_pipette,
-        "from_state": CalibrationCheckState.labwareLoaded,
-        "to_state": CalibrationCheckState.preparingFirstPipette,
-        "after": "_move_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.preparingFirstPipette,
-        "to_state": CalibrationCheckState.preparingFirstPipette,
-        "before": "_jog_first_pipette",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.pick_up_tip,
-        "from_state": CalibrationCheckState.preparingFirstPipette,
-        "to_state": CalibrationCheckState.inspectingFirstTip,
-        "after": [
-            "_register_point_first_pipette",
-            "_pick_up_tip_first_pipette"]
-    },
-    {
-        "trigger": CalibrationCheckTrigger.invalidate_tip,
-        "from_state": CalibrationCheckState.inspectingFirstTip,
-        "to_state": CalibrationCheckState.preparingFirstPipette,
-        "before": "_return_first_tip",
-        "after": "_move_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.confirm_tip_attached,
-        "from_state": CalibrationCheckState.inspectingFirstTip,
-        "to_state": CalibrationCheckState.badCalibrationData,
-        "condition": "_is_tip_pick_up_dangerous",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.confirm_tip_attached,
-        "from_state": CalibrationCheckState.inspectingFirstTip,
-        "to_state": CalibrationCheckState.joggingFirstPipetteToHeight,
-        "after": "_move_first_pipette",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.joggingFirstPipetteToHeight,
-        "to_state": CalibrationCheckState.joggingFirstPipetteToHeight,
-        "before": "_jog_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.compare_point,
-        "from_state": CalibrationCheckState.joggingFirstPipetteToHeight,
-        "to_state": CalibrationCheckState.comparingFirstPipetteHeight,
-        "after": "_register_point_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.go_to_next_check,
-        "from_state": CalibrationCheckState.comparingFirstPipetteHeight,
-        "to_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
-        "after": "_move_first_pipette",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
-        "to_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
-        "before": "_jog_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.compare_point,
-        "from_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
-        "to_state": CalibrationCheckState.comparingFirstPipettePointOne,
-        "after": "_register_point_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.go_to_next_check,
-        "from_state": CalibrationCheckState.comparingFirstPipettePointOne,
-        "to_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        "after": "_move_first_pipette",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        "to_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        "before": "_jog_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.compare_point,
-        "from_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        "to_state": CalibrationCheckState.comparingFirstPipettePointTwo,
-        "after": "_register_point_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.go_to_next_check,
-        "from_state": CalibrationCheckState.comparingFirstPipettePointTwo,
-        "to_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
-        "after": "_move_first_pipette",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
-        "to_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
-        "before": "_jog_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.compare_point,
-        "from_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
-        "to_state": CalibrationCheckState.comparingFirstPipettePointThree,
-        "after": "_register_point_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.go_to_next_check,
-        "from_state": CalibrationCheckState.comparingFirstPipettePointThree,
-        "to_state": CalibrationCheckState.preparingSecondPipette,
-        "condition": "_is_checking_both_mounts",
-        "before": "_trash_first_pipette_tip",
-        "after": "_move_second_pipette",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.go_to_next_check,
-        "from_state": CalibrationCheckState.comparingFirstPipettePointThree,
-        "to_state": CalibrationCheckState.checkComplete,
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.preparingSecondPipette,
-        "to_state": CalibrationCheckState.preparingSecondPipette,
-        "before": "_jog_second_pipette",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.pick_up_tip,
-        "from_state": CalibrationCheckState.preparingSecondPipette,
-        "to_state": CalibrationCheckState.inspectingSecondTip,
-        "after": [
-            "_register_point_second_pipette",
-            "_pick_up_tip_second_pipette"]
-    },
-    {
-        "trigger": CalibrationCheckTrigger.invalidate_tip,
-        "from_state": CalibrationCheckState.inspectingSecondTip,
-        "to_state": CalibrationCheckState.preparingSecondPipette,
-        "before": "_return_second_tip",
-        "after": "_move_second_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.confirm_tip_attached,
-        "from_state": CalibrationCheckState.inspectingSecondTip,
-        "to_state": CalibrationCheckState.badCalibrationData,
-        "condition": "_is_tip_pick_up_dangerous",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.confirm_tip_attached,
-        "from_state": CalibrationCheckState.inspectingSecondTip,
-        "to_state": CalibrationCheckState.joggingSecondPipetteToHeight,
-        "after": "_move_second_pipette",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.joggingSecondPipetteToHeight,
-        "to_state": CalibrationCheckState.joggingSecondPipetteToHeight,
-        "before": "_jog_second_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.compare_point,
-        "from_state": CalibrationCheckState.joggingSecondPipetteToHeight,
-        "to_state": CalibrationCheckState.comparingSecondPipetteHeight,
-        "after": "_register_point_second_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.go_to_next_check,
-        "from_state": CalibrationCheckState.comparingSecondPipetteHeight,
-        "to_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
-        "after": "_move_second_pipette",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
-        "to_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
-        "before": "_jog_second_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.compare_point,
-        "from_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
-        "to_state": CalibrationCheckState.comparingSecondPipettePointOne,
-        "after": "_register_point_second_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.go_to_next_check,
-        "from_state": CalibrationCheckState.comparingSecondPipettePointOne,
-        "to_state": CalibrationCheckState.checkComplete,
-    },
-    {
-        "trigger": CalibrationCheckTrigger.exit,
-        "from_state": WILDCARD,
-        "to_state": CalibrationCheckState.sessionExited
-    },
-    {
-        "trigger": CalibrationCheckTrigger.reject_calibration,
-        "from_state": WILDCARD,
-        "to_state": CalibrationCheckState.badCalibrationData
-    }
-]
 
 
 @dataclass
@@ -308,19 +77,47 @@ COMPARISON_STATE_MAP: typing.Dict[CalibrationCheckState, ComparisonParams] = {
 }
 
 
-class CheckCalibrationSession(CalibrationSession, StateMachine):
+class CheckCalibrationSession(CalibrationSession):
     def __init__(self, hardware: 'ThreadManager',
                  lights_on_before: bool = False):
         CalibrationSession.__init__(self, hardware, lights_on_before)
-        StateMachine.__init__(self, states=[s for s in CalibrationCheckState],
-                              transitions=CHECK_TRANSITIONS,
-                              initial_state="sessionStarted")
-        self.session_type = 'check'
+        # StateMachine.__init__(self, states=[s for s in CalibrationCheckState],
+        #                       transitions=CHECK_TRANSITIONS,
+        #                       initial_state="sessionStarted")
+        self._hardware = hardware
+        self._state_machine = CalibrationCheckStateMachine()
+        self._current_state = State.sessionStarted
         self._saved_points: typing.Dict[CalibrationCheckState, Point] = {}
+        self._active_pipette = self._get_pipette_by_rank(PipetteRank.first)
+        self._mount = self._active_pipette.mount
+        self._command_map: COMMAND_MAP = {
+            CalibrationCommand.load_labware: self.load_labware,
+            CalibrationCommand.jog: self.jog,
+            CalibrationCommand.pick_up_tip: self.pick_up_tip,
+            CalibrationCommand.invalidate_tip: self.invalidate_tip,
+            CalibrationCommand.compare_point: self.get_comparisons_by_step,
+            CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
+            CalibrationCommand.move_to_deck: self.move_to_deck,
+            CalibrationCommand.move_to_point_one: self.move_to_point_one,
+            DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
+            DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
+            CalibrationCommand.exit: self.exit_session,
+        }
+
+    @property
+    def hardware(self) -> ThreadManager:
+        return self._hardware
+
+    @property
+    def current_state(self) -> State:
+        return self._current_state
+
+    def _set_current_state(self, to_state: State):
+        self._current_state = to_state
 
     async def handle_command(self,
-                             name: str,
-                             data: typing.Dict[typing.Any, typing.Any]):
+                             name: Any,
+                             data: Dict[Any, Any]):
         """
         Handle a client command
 
@@ -328,7 +125,29 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         :param data: Data supplied in command
         :return: None
         """
-        await self.trigger_transition(trigger=name, **data)
+        next_state = self._state_machine.get_next_state(self._current_state,
+                                                        name)
+
+        handler = self._command_map.get(name)
+        if handler is not None:
+            await handler(**data)
+        self._set_current_state(next_state)
+        MODULE_LOG.debug(
+            f'CalibrationCheckUserFlow handled command {name}, transitioned'
+            f'from {self._current_state} to {next_state}')
+
+    def get_required_labware(self) -> List[RequiredLabware]:
+        slots = self._deck.get_non_fixture_slots()
+        lw_by_slot = {s: self._deck[s] for s in slots if self._deck[s]}
+        return [
+            RequiredLabware.from_lw(lw, s)  # type: ignore
+            for s, lw in lw_by_slot.items()]
+
+    async def _get_current_point(
+            self,
+            critical_point: CriticalPoint = None) -> Point:
+        return await self._hardware.gantry_position(self._mount,
+                                                    critical_point)
 
     def _get_pipette_by_rank(self, rank: PipetteRank) -> \
             typing.Optional[PipetteInfo]:
@@ -738,31 +557,44 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await super(self.__class__, self)._jog(second_pip.mount,
                                                Point(*vector))
 
-    async def _return_first_tip(self):
-        first_pip = self._get_pipette_by_rank(PipetteRank.first)
-        assert first_pip, \
-            'cannot drop tip on first mount, pipette not present'
-        mount = first_pip.mount
-        z_value = float(self.pipettes[mount]['tip_length']) * 0.5
-        state_name = CalibrationCheckState.inspectingFirstTip
+    async def pick_up_tip(self):
+        await uf.pick_up_tip(self, tip_length=self._get_default_tip_length())
 
-        return_pt = self._saved_points[getattr(CalibrationCheckState,
-                                       state_name)]
-        account_for_tip = return_pt - Point(0, 0, z_value)
-        loc = Location(account_for_tip, None)
-        await self._move(first_pip.mount, loc)
-        await self._drop_tip(first_pip.mount)
+    async def _return_tip(self):
+        await uf.return_tip(self, tip_length=self._get_default_tip_length())
 
-    async def _return_second_tip(self):
-        second_pip = self._get_pipette_by_rank(PipetteRank.second)
-        assert second_pip, \
-            'cannot drop tip on second mount, pipette not present'
-        mount = second_pip.mount
-        z_value = float(self.pipettes[mount]['tip_length']) * 0.5
-        state_name = CalibrationCheckState.inspectingSecondTip
-        return_pt = self._saved_points[getattr(CalibrationCheckState,
-                                       state_name)]
-        account_for_tip = return_pt - Point(0, 0, z_value)
-        loc = Location(account_for_tip, None)
-        await self._move(second_pip.mount, loc)
-        await self._drop_tip(second_pip.mount)
+    async def _move(self, to_loc: Location):
+        await uf.move(self, to_loc)
+
+    async def exit_session(self):
+        await self.move_to_tip_rack()
+        await self._return_tip()
+
+    # async def _return_first_tip(self):
+    #     first_pip = self._get_pipette_by_rank(PipetteRank.first)
+    #     assert first_pip, \
+    #         'cannot drop tip on first mount, pipette not present'
+    #     mount = first_pip.mount
+    #     z_value = float(self.pipettes[mount]['tip_length']) * 0.5
+    #     state_name = CalibrationCheckState.inspectingFirstTip
+
+    #     return_pt = self._saved_points[getattr(CalibrationCheckState,
+    #                                    state_name)]
+    #     account_for_tip = return_pt - Point(0, 0, z_value)
+    #     loc = Location(account_for_tip, None)
+    #     await self._move(first_pip.mount, loc)
+    #     await self._drop_tip(first_pip.mount)
+
+    # async def _return_second_tip(self):
+    #     second_pip = self._get_pipette_by_rank(PipetteRank.second)
+    #     assert second_pip, \
+    #         'cannot drop tip on second mount, pipette not present'
+    #     mount = second_pip.mount
+    #     z_value = float(self.pipettes[mount]['tip_length']) * 0.5
+    #     state_name = CalibrationCheckState.inspectingSecondTip
+    #     return_pt = self._saved_points[getattr(CalibrationCheckState,
+    #                                    state_name)]
+    #     account_for_tip = return_pt - Point(0, 0, z_value)
+    #     loc = Location(account_for_tip, None)
+    #     await self._move(second_pip.mount, loc)
+    #     await self._drop_tip(second_pip.mount)

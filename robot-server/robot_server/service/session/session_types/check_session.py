@@ -14,12 +14,12 @@ from robot_server.service.session.errors import SessionCreationException, \
     CommandExecutionException, UnsupportedFeature
 
 
-class CheckSessionStateExecutor(CallableExecutor):
+class CheckSessionCommandExecutor(CallableExecutor):
 
     async def execute(self, command: Command) -> CompletedCommand:
         try:
             return await super().execute(command)
-        except (StateMachineError, AssertionError) as e:
+        except AssertionError as e:
             raise CommandExecutionException(str(e))
 
 
@@ -28,24 +28,39 @@ class CheckSession(BaseSession):
     def __init__(self,
                  configuration: SessionConfiguration,
                  instance_meta: SessionMetaData,
-                 calibration_check: CheckCalibrationSession):
+                 calibration_check: CheckCalibrationSession,
+                 shutdown_handler: Awaitable[None] = None):
         super().__init__(configuration, instance_meta)
         self._calibration_check = calibration_check
-        self._command_executor = CheckSessionStateExecutor(
+        self._command_executor = CheckSessionCommandExecutor(
             self._calibration_check.handle_command
         )
+        self._shutdown_coroutine = shutdown_handler
 
     @classmethod
     async def create(cls,
                      configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> BaseSession:
         """Create an instance"""
+        # assert isinstance(instance_meta.create_params, SessionCreateParams)
+        # mount = instance_meta.create_params.mount
+        # if lights are on already it's because the user clicked the button,
+        # so a) we don't need to turn them on now and b) we shouldn't turn them
+        # off after
+        session_controls_lights =\
+            not configuration.hardware.get_lights()['rails']
         try:
             calibration_check = await CheckCalibrationSession.build(
                 configuration.hardware
             )
         except AssertionError as e:
             raise SessionCreationException(str(e))
+
+        if session_controls_lights:
+            await configuration.hardware.set_lights(rails=True)
+            shutdown_handler = configuration.hardware.set_lights(rails=False)
+        else:
+            shutdown_handler = None
 
         return cls(
             configuration=configuration,
@@ -101,3 +116,7 @@ class CheckSession(BaseSession):
     @property
     def session_type(self) -> SessionType:
         return SessionType.calibration_check
+
+    async def clean_up(self):
+        if self._shutdown_coroutine:
+            await self._shutdown_coroutine
