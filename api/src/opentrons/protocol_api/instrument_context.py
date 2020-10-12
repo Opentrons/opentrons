@@ -342,10 +342,8 @@ class InstrumentContext(CommandPublisher):
             location: Union[types.Location, Well] = None,
             rate: float = 1.0) -> InstrumentContext:
         """
-        Mix a volume of liquid (uL) using this pipette.
-        If no location is specified, the pipette will mix from its current
-        position. If no volume is passed, ``mix`` will default to the
-        pipette's :py:attr:`max_volume`.
+        Mix a volume of liquid (uL) using this pipette, by repeatedly aspirating
+        and dispensing in the same place.
 
         :param repetitions: how many times the pipette should mix (default: 1)
         :param volume: number of microliters to mix.  If 0 or unspecified,
