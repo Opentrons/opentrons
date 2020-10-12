@@ -338,8 +338,22 @@ export const transfer: CommandCreator<TransferArgs> = (
               ]
             : []
 
+          // only if blowing out in source well or trash, air gap before blowout
+          let willReuseTip = true // never or once --> true
+          if (isLastChunk && isLastPair) {
+            // if we're at the end of this step, we won't reuse the tip in this step
+            // so we can discard it (even if changeTip is never, we'll drop it!)
+            willReuseTip = false
+          } else if (args.changeTip === 'always') {
+            willReuseTip = false
+          } else if (
+            args.changeTip === 'perSource' ||
+            args.changeTip === 'perDest'
+          ) {
+            willReuseTip = !changeTipNow
+          }
           const airGapAfterDispenseCommands =
-            dispenseAirGapVolume && isLastChunk
+            dispenseAirGapVolume && !willReuseTip
               ? [
                   curryCommandCreator(airGap, {
                     pipette: args.pipette,
@@ -363,26 +377,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []
 
-          // only if blowing out in source well or trash, air gap before blowout
-          let willReuseTip = true // never or once --> true
-          if (isLastChunk && isLastPair) {
-            // if we're at the end of this step, we won't reuse the tip in this step
-            // so we can discard it (even if changeTip is never, we'll drop it!)
-            willReuseTip = false
-          } else if (args.changeTip === 'always') {
-            willReuseTip = false
-          } else if (
-            args.changeTip === 'perSource' ||
-            args.changeTip === 'perDest'
-          ) {
-            willReuseTip = !changeTipNow
-          }
-          const airGapBeforeBlowoutCommands = !willReuseTip
-            ? airGapAfterDispenseCommands
-            : []
-
           const replaceTipIfDispenseAirGapWasUsed = []
-          if (airGapBeforeBlowoutCommands.length > 0) {
+          if (airGapAfterDispenseCommands.length > 0) {
+            console.log({ isLastChunk, isLastPair, chunkIdx, pairIdx })
             // if using dispense > air gap, drop or change the tip
             if (isLastChunk && isLastPair) {
               replaceTipIfDispenseAirGapWasUsed.push(
@@ -492,8 +489,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,
             ...touchTipAfterDispenseCommands,
-            ...airGapBeforeBlowoutCommands,
             ...blowoutCommand,
+            ...airGapAfterDispenseCommands,
             ...replaceTipIfDispenseAirGapWasUsed,
           ]
 
