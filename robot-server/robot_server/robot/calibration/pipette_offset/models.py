@@ -4,24 +4,6 @@ from pydantic import BaseModel, Field
 from ..helper_classes import AttachedPipette, RequiredLabware, NextSteps
 
 
-class SessionCreateParams(BaseModel):
-    """
-    The parameters required to start a pipette offset calibration session.
-    """
-    mount: str = Field(
-        ...,
-        description='The mount on which the pipette is attached, left or right'
-    )
-    shouldCalibrateTipLength: bool = Field(
-        True,
-        description='Whether tiplength for this tiprack should be loaded'
-    )
-    tipRackDefinition: Optional[dict] = Field(
-        None,
-        description='The full labware definition of the tip rack to calibrate.'
-    )
-
-
 class PipetteOffsetCalibrationSessionStatus(BaseModel):
     """The current status of a pipette offset calibration session."""
     instrument: AttachedPipette
@@ -29,7 +11,7 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
         ...,
         description="Current step of pipette offset user flow")
     labware: List[RequiredLabware]
-    hasCalibratedTipLength: bool =\
+    shouldPerformTipLength: bool =\
         Field(None, description="Does tip length calibration data exist for "
                                 "this pipette and tip rack combination")
     nextSteps: Optional[NextSteps] =\
@@ -62,7 +44,7 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
                           "definition": {"ordering": "the ordering section..."}
                       },
                     ],
-                    "hasCalibratedTipLength": True,
+                    "shouldPerformTipLength": True,
                 }
             ]
         }

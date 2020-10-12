@@ -9,6 +9,7 @@ import typeof {
   TIP_LENGTH_STEP_MEASURING_TIP_OFFSET,
   TIP_LENGTH_STEP_CALIBRATION_COMPLETE,
 } from '../constants'
+import type { CalibrationLabware } from '../types'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -29,15 +30,6 @@ export type TipLengthCalibrationInstrument = {|
   serial: string,
 |}
 
-export type TipLengthCalibrationLabware = {|
-  slot: string,
-  loadName: string,
-  namespace: string,
-  version: number,
-  isTiprack: boolean,
-  definition: LabwareDefinition2,
-|}
-
 export type TipLengthCalibrationSessionParams = {|
   mount: string,
   hasCalibrationBlock: boolean,
@@ -47,5 +39,5 @@ export type TipLengthCalibrationSessionParams = {|
 export type TipLengthCalibrationSessionDetails = {|
   instrument: TipLengthCalibrationInstrument,
   currentStep: TipLengthCalibrationStep,
-  labware: Array<TipLengthCalibrationLabware>,
+  labware: Array<CalibrationLabware>,
 |}

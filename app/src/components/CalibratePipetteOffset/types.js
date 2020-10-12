@@ -3,12 +3,10 @@ import type { Action } from '../../types'
 import type {
   SessionCommandParams,
   PipetteOffsetCalibrationSession,
+  CalibrationLabware,
 } from '../../sessions/types'
 
-import type {
-  PipetteOffsetCalibrationLabware,
-  PipetteOffsetCalibrationStep,
-} from '../../sessions/pipette-offset-calibration/types'
+import type { PipetteOffsetCalibrationStep } from '../../sessions/pipette-offset-calibration/types'
 
 export type CalibratePipetteOffsetParentProps = {|
   robotName: string,
@@ -18,12 +16,13 @@ export type CalibratePipetteOffsetParentProps = {|
     ...Array<{ ...Action, meta: { requestId: string } }>
   ) => void,
   showSpinner: boolean,
+  hasBlock?: boolean,
 |}
 
 export type CalibratePipetteOffsetChildProps = {|
   sendSessionCommands: (...Array<SessionCommandParams>) => void,
   deleteSession: () => void,
-  tipRack: PipetteOffsetCalibrationLabware,
+  tipRack: CalibrationLabware,
   isMulti: boolean,
   mount: string,
   currentStep: PipetteOffsetCalibrationStep,

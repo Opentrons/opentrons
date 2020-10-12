@@ -39,11 +39,11 @@ const contentsBySessionType: {
   },
 }
 export function TipConfirmation(props: CalibrationPanelProps): React.Node {
-  const { sendCommands, sessionType, hasCalibratedTipLength } = props
+  const { sendCommands, sessionType, shouldPerformTipLength } = props
 
   const isExtendedPipOffset =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-    hasCalibratedTipLength === false
+    shouldPerformTipLength
 
   const lookupType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION

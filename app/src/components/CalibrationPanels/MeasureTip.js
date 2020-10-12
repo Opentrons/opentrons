@@ -69,7 +69,14 @@ const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
 const SLOT = 'slot'
 
 export function MeasureTip(props: CalibrationPanelProps): React.Node {
-  const { sendCommands, calBlock, isMulti, mount } = props
+  const {
+    sendCommands,
+    calBlock,
+    isMulti,
+    mount,
+    shouldPerformTipLength,
+    sessionType,
+  } = props
 
   const referencePointStr = calBlock ? (
     BLOCK
@@ -100,12 +107,22 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
     })
   }
 
-  const proceed = () => {
+  const isExtendedPipOffset =
+    sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
+    shouldPerformTipLength
+
+  const proceedTipLength = () => {
     sendCommands(
       { command: Sessions.sharedCalCommands.SAVE_OFFSET },
       { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
     )
   }
+
+  const proceedPipetteOffset = () => {
+    sendCommands({ command: Sessions.sharedCalCommands.SAVE_OFFSET })
+  }
+
+  const proceed = isExtendedPipOffset ? proceedPipetteOffset : proceedTipLength
 
   return (
     <>

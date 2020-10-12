@@ -33,13 +33,14 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 import type {
-  DeckCalibrationLabware,
+  CalibrationLabware,
   SessionCommandParams,
 } from '../../sessions/types'
 import type { CalibratePipetteOffsetParentProps } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
+const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
 const EXIT = 'exit'
 
 const darkContentsStyleProps = {
@@ -77,6 +78,7 @@ const PANEL_BY_STEP: {
   [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: TipConfirmation,
   [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: SaveZPoint,
   [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: SaveXYPoint,
+  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: CompleteConfirmation,
   [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
 
@@ -89,6 +91,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: contentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: contentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: contentsStyleProps,
+  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: terminalContentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
 export function CalibratePipetteOffset(
@@ -100,6 +103,7 @@ export function CalibratePipetteOffset(
     closeWizard,
     dispatchRequests,
     showSpinner,
+    hasBlock,
   } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
@@ -110,6 +114,11 @@ export function CalibratePipetteOffset(
   } = useConditionalConfirm(() => {
     cleanUpAndExit()
   }, true)
+
+  const tipRack: CalibrationLabware | null =
+    (labware && labware.find(l => l.isTiprack)) ?? null
+  const calBlock: CalibrationLabware | null =
+    hasBlock && labware ? labware.find(l => !l.isTiprack) ?? null : null
 
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)
@@ -141,15 +150,14 @@ export function CalibratePipetteOffset(
     closeWizard()
   }
 
-  const tipRack: DeckCalibrationLabware | null =
-    (labware && labware.find(l => l.isTiprack)) ?? null
-
   if (!session || !tipRack) {
     return null
   }
-
+  const shouldPerformTipLength = session.details.shouldPerformTipLength
   const titleBarProps = {
-    title: PIPETTE_OFFSET_CALIBRATION_SUBTITLE,
+    title: shouldPerformTipLength
+      ? TIP_LENGTH_CALIBRATION_SUBTITLE
+      : PIPETTE_OFFSET_CALIBRATION_SUBTITLE,
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
@@ -170,9 +178,10 @@ export function CalibratePipetteOffset(
           tipRack={tipRack}
           isMulti={isMulti}
           mount={instrument?.mount.toLowerCase()}
+          calBlock={calBlock}
           currentStep={currentStep}
           sessionType={session.sessionType}
-          hasCalibratedTipLength={session.details.hasCalibratedTipLength}
+          shouldPerformTipLength={shouldPerformTipLength}
         />
       </ModalPage>
       {showConfirmExit && (
