@@ -82,6 +82,20 @@ const contentsBySessionType: {
     continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
     noteBody: NOTE_BODY_PRE_PROTOCOL,
   },
+  [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
+    headerText: TIP_LENGTH_CAL_HEADER,
+    bodyText: TIP_LENGTH_CAL_BODY,
+    continueButtonText: `${CONTINUE} ${TIP_LENGTH_CAL_PROCEDURE}`,
+    continuingToText: TIP_LENGTH_CAL_PROCEDURE,
+    noteBody: NOTE_BODY_PRE_PROTOCOL,
+  },
+  [Sessions.SESSION_TYPE_CALIBRATION_CHECK]: {
+    headerText: TIP_LENGTH_CAL_HEADER,
+    bodyText: TIP_LENGTH_CAL_BODY,
+    continueButtonText: `${CONTINUE} ${TIP_LENGTH_CAL_PROCEDURE}`,
+    continuingToText: TIP_LENGTH_CAL_PROCEDURE,
+    noteBody: NOTE_BODY_PRE_PROTOCOL,
+  },
 }
 
 export function Introduction(props: CalibrationPanelProps): React.Node {
