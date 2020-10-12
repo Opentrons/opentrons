@@ -187,7 +187,6 @@ export const moveLiquidFormToArgs = (
     'dispense_airGap_checkbox',
     'dispense_airGap_volume'
   )
-  console.log('moveLiquid', { dispenseAirGapVolume, fields })
 
   const commonFields = {
     pipette: pipetteId,
