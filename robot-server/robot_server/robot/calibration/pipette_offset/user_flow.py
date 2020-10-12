@@ -288,7 +288,7 @@ class PipetteOffsetCalibrationUserFlow:
                 self._current_state == self._state.inspectingTip:
             self._flag_unmet_transition_req(
                 command_handler="move_to_deck",
-                unmet_condition="tip length calibration data does not exist")
+                unmet_condition="tip length calibration data exists")
         if self._current_state == self._state.calibrationComplete:
             # recache tip length cal which has just been saved
             self._has_calibrated_tip_length =\
