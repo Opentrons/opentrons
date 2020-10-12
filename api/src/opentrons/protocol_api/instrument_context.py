@@ -348,8 +348,9 @@ class InstrumentContext(CommandPublisher):
         pipette's :py:attr:`max_volume`.
 
         :param repetitions: how many times the pipette should mix (default: 1)
-        :param volume: number of microliters to mix (default:
-                       :py:attr:`max_volume`)
+        :param volume: number of microliters to mix.  If 0 or unspecified,
+                       defaults to the highest volume possible with this pipette
+                       and its currently attached tip.
         :param location: a Well or a position relative to well.
                          e.g, `plate.rows()[0][0].bottom()`
         :type location: types.Location
