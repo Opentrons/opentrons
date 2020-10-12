@@ -1282,7 +1282,13 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def max_volume(self) -> float:
         """
-        The maximum volume, in microliters, this pipette can hold.
+        The maximum volume, in microliters (µL), that this pipette can hold.
+
+        The maximum volume that you can actually aspirate might be lower than
+        this, depending on what kind of tip is attached to this pipette.  For
+        example, a P300 Single-Channel pipette always has a ``max_volume`` of
+        300 µL, but if it's using a 200 µL filter tip, its usable volume would
+        be limited to 200 µL.
         """
         return self.hw_pipette['max_volume']
 
