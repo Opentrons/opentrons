@@ -64,8 +64,11 @@ describe('Testing calibrate tip length control', () => {
 
   it('check dispatch is called with a tip length session', () => {
     const { wrapper } = render()
-    const toClick = wrapper.find('UncalibratedInfo').find('button')
-    toClick.invoke('onClick')()
+    const beginButton = wrapper.find('UncalibratedInfo').find('button')
+    beginButton.invoke('onClick')()
+    wrapper.update()
+    const continueButton = wrapper.find('UncalibratedInfo').find('button')
+    continueButton.invoke('onClick')()
     wrapper.update()
     expect(dispatchApiRequests).toHaveBeenCalledWith(
       Sessions.ensureSession(
@@ -82,8 +85,11 @@ describe('Testing calibrate tip length control', () => {
 
   it('check dispatch is called with a pipette offset session', () => {
     const { wrapper } = render({ isExtendedPipOffset: true })
-    const toClick = wrapper.find('UncalibratedInfo').find('button')
-    toClick.invoke('onClick')()
+    const beginButton = wrapper.find('UncalibratedInfo').find('button')
+    beginButton.invoke('onClick')()
+    wrapper.update()
+    const continueButton = wrapper.find('UncalibratedInfo').find('button')
+    continueButton.invoke('onClick')()
     wrapper.update()
     expect(dispatchApiRequests).toHaveBeenCalledWith(
       Sessions.ensureSession(
