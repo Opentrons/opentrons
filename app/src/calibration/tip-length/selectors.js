@@ -1,14 +1,14 @@
 // @flow
-import { createSelector } from 'reselect'
 import { head } from 'lodash'
-import { PIPETTE_MOUNTS } from '../../pipettes/constants'
-import { getProtocolPipettesInfo } from '../../pipettes/'
+import { createSelector } from 'reselect'
+
+import { getProtocolPipettesInfo } from '../../pipettes/selectors'
 import { getTipracksByMount } from '../../robot/selectors'
+import { PIPETTE_MOUNTS } from  '../../robot/constants'
 
 import type { State } from '../../types'
-import type { ProtocolPipetteInfoByMount } from '../../pipettes/types'
 import type { TipLengthCalibration } from '../api-types'
-import type { TipracksByMountMap, Labware } from '../../robot/types'
+import type { TipracksByMountMap } from '../../robot/types'
 
 export const getTipLengthCalibrations: (
   state: State,
@@ -56,7 +56,7 @@ export const tipLengthExistsForPipetteAndTiprack: (
   return !!calibration
 }
 
-export const getUncalibratedTipracks: (
+export const getUncalibratedTipracksByMount: (
   state: State,
   robotName: string
 ) => TipracksByMountMap = createSelector(

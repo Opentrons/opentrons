@@ -43,7 +43,7 @@ function CalibrateButton(props: CalibrateButtonProps) {
 }
 
 type UncalibratedInfoProps = {|
-  uncalibratedTipracks: TipracksByMountMap,
+  uncalibratedTipracksByMount: TipracksByMountMap,
   mount: Mount,
   hasCalibrated: boolean,
   handleStart: () => void,
@@ -52,7 +52,7 @@ type UncalibratedInfoProps = {|
 
 export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
   const {
-    uncalibratedTipracks,
+    uncalibratedTipracksByMount,
     mount,
     hasCalibrated,
     handleStart,
@@ -68,20 +68,21 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
   ) : (
     buttonText
   )
-  const otherMount: Mount = PIPETTE_MOUNTS.find(m => m !== mount)
+  console.log(`mount: ${mount}`)
+  const otherMount: Mount | null = PIPETTE_MOUNTS.find(m => m !== mount) || null
   const nextLabware = useSelector(robotSelectors.getUnconfirmedLabware)[0]
-  console.log(nextLabware)
+
   let continueText
   let defHash
   let continueButtonOnClick
-  if (uncalibratedTipracks[mount].length) {
+  if (uncalibratedTipracksByMount[mount].length) {
     continueText = CONTINUE_TO_NEXT_TIP_TYPE
-    defHash = uncalibratedTipracks[mount][0].definitionHash || ''
+    defHash = uncalibratedTipracksByMount[mount][0].definitionHash || ''
     continueButtonOnClick = `/calibrate/pipettes/${mount}/${defHash}`
   } else {
-    if (uncalibratedTipracks[otherMount].length) {
+    if (otherMount && uncalibratedTipracksByMount[otherMount].length) {
       continueText = CONTINUE_TO_NEXT_PIPETTE
-      defHash = uncalibratedTipracks[otherMount][0].definitionHash || ''
+      defHash = uncalibratedTipracksByMount[otherMount][0].definitionHash || ''
       continueButtonOnClick = `/calibrate/pipettes/${otherMount}/${defHash}`
     } else {
       continueText = CONTINUE_TO_LABWARE_CALIBRATION

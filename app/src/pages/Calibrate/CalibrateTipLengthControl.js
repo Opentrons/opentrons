@@ -13,7 +13,7 @@ import * as Sessions from '../../sessions'
 import { getUseTrashSurfaceForTipCal } from '../../config'
 import {
   setUseTrashSurfaceForTipCal,
-  getUncalibratedTipracks,
+  getUncalibratedTipracksByMount,
 } from '../../calibration'
 
 import {
@@ -38,6 +38,7 @@ import type {
   TipLengthCalibrationSession,
 } from '../../sessions/types'
 import type { RequestState } from '../../robot-api/types'
+import type { TipracksByMountMap } from '../../robot'
 
 export type CalibrateTipLengthControlProps = {|
   robotName: string,
@@ -214,8 +215,9 @@ export function CalibrateTipLengthControl({
     handleStart,
     hasCalibrated
   )
-  const uncalibratedTipracksByMount = useSelector(state => {
-    return robotName && getUncalibratedTipracks(state, robotName)
+
+  const uncalibratedTipracksByMount: TipracksByMountMap = useSelector(state => {
+    return getUncalibratedTipracksByMount(state, robotName)
   })
 
   return (
@@ -224,7 +226,7 @@ export function CalibrateTipLengthControl({
         title={getLabwareDisplayName(tipRackDefinition)}
       >
         <UncalibratedInfo
-          uncalibratedTipracks={uncalibratedTipracksByMount}
+          uncalibratedTipracksByMount={uncalibratedTipracksByMount}
           mount={mount}
           showSpinner={showSpinner}
           hasCalibrated={hasCalibrated}
