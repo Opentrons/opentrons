@@ -338,7 +338,8 @@ export const transfer: CommandCreator<TransferArgs> = (
               ]
             : []
 
-          // only if blowing out in source well or trash, air gap before blowout
+          // `willReuseTip` is like changeTipNow, but thinking ahead about
+          //  the NEXT subtransfer and not this current one
           let willReuseTip = true // never or once --> true
           if (isLastChunk && isLastPair) {
             // if we're at the end of this step, we won't reuse the tip in this step
@@ -346,12 +347,15 @@ export const transfer: CommandCreator<TransferArgs> = (
             willReuseTip = false
           } else if (args.changeTip === 'always') {
             willReuseTip = false
-          } else if (
-            args.changeTip === 'perSource' ||
-            args.changeTip === 'perDest'
-          ) {
-            willReuseTip = !changeTipNow
+          } else if (args.changeTip === 'perSource' && !isLastPair) {
+            const nextSourceWell = sourceDestPairs[pairIdx + 1][0]
+            willReuseTip = nextSourceWell === sourceWell
+          } else if (args.changeTip === 'perDest' && !isLastPair) {
+            const nextDestWell = sourceDestPairs[pairIdx + 1][1]
+            willReuseTip = nextDestWell === destWell
           }
+          // TODO(IL, 2020-10-12): extract this ^ into a util to reuse in distribute/consolidate??
+
           const airGapAfterDispenseCommands =
             dispenseAirGapVolume && !willReuseTip
               ? [
@@ -377,23 +381,14 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []
 
-          const replaceTipIfDispenseAirGapWasUsed = []
-          if (airGapAfterDispenseCommands.length > 0) {
-            console.log({ isLastChunk, isLastPair, chunkIdx, pairIdx })
-            // if using dispense > air gap, drop or change the tip
-            if (isLastChunk && isLastPair) {
-              replaceTipIfDispenseAirGapWasUsed.push(
-                curryCommandCreator(dropTip, { pipette: args.pipette })
-              )
-            } else {
-              replaceTipIfDispenseAirGapWasUsed.push(
-                curryCommandCreator(replaceTip, { pipette: args.pipette })
-              )
-            }
-          }
+          // if using dispense > air gap, drop or change the tip at the end
+          const dropTipIfDispenseAirGapWasUsed =
+            airGapAfterDispenseCommands.length > 0 && isLastChunk && isLastPair
+              ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
+              : []
 
           const blowoutCommand =
-            replaceTipIfDispenseAirGapWasUsed.length > 0 &&
+            dropTipIfDispenseAirGapWasUsed.length > 0 &&
             args.blowoutLocation === FIXED_TRASH_ID
               ? [] // skip blowout it's in the trash we're replacing the tip due to dispense > air gap
               : blowoutUtil({
@@ -407,61 +402,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                   offsetFromTopMm: blowoutOffsetFromTopMm,
                   invariantContext,
                 })
-
-          // // cleanup commands following a "dispense > air gap"
-          // let cleanUpAfterAirGapAfterDispenseCommands = []
-          // if (dispenseAirGapVolume) {
-          //   let willReuseTip = true // never or once --> true
-          //   if (isLastChunk && isLastPair) {
-          //     // if we're at the end of this step, we won't reuse the tip in this step
-          //     // so we can discard it
-          //     willReuseTip = false
-          //   } else if (args.changeTip === 'always') {
-          //     willReuseTip = false
-          //   } else if (
-          //     args.changeTip === 'perSource' ||
-          //     args.changeTip === 'perDest'
-          //   ) {
-          //     willReuseTip = !changeTipNow
-          //   }
-
-          //   if (willReuseTip) {
-          //     // dispense in source well
-          //     cleanUpAfterAirGapAfterDispenseCommands = [
-          //       curryCommandCreator(dispenseAirGap, {
-          //         pipette: args.pipette,
-          //         labware: args.sourceLabware,
-          //         well: sourceWell,
-          //         flowRate: dispenseFlowRateUlSec,
-          //         offsetFromBottomMm: airGapOffsetSourceWell,
-          //         volume: dispenseAirGapVolume,
-          //       }),
-          //       ...(dispenseDelay
-          //         ? [
-          //             curryCommandCreator(delay, {
-          //               commandCreatorFnName: 'delay',
-          //               description: null,
-          //               name: null,
-          //               meta: null,
-          //               wait: dispenseDelay.seconds,
-          //             }),
-          //           ]
-          //         : []),
-          //     ]
-          //   } else {
-          //     if (isLastPair && isLastChunk) {
-          //       // step is over, drop tip
-          //       cleanUpAfterAirGapAfterDispenseCommands = [
-          //         curryCommandCreator(dropTip, { pipette: args.pipette }),
-          //       ]
-          //     } else {
-          //       // more work to do in this step, change tip
-          //       cleanUpAfterAirGapAfterDispenseCommands = [
-          //         curryCommandCreator(replaceTip, { pipette: args.pipette }),
-          //       ]
-          //     }
-          //   }
-          // }
 
           const nextCommands = [
             ...tipCommands,
@@ -491,7 +431,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...touchTipAfterDispenseCommands,
             ...blowoutCommand,
             ...airGapAfterDispenseCommands,
-            ...replaceTipIfDispenseAirGapWasUsed,
+            ...dropTipIfDispenseAirGapWasUsed,
           ]
 
           // NOTE: side-effecting
