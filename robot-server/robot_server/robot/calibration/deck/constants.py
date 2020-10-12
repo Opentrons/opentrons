@@ -22,8 +22,6 @@ class DeckCalibrationState(str, Enum):
     sessionExited = "sessionExited"
     WILDCARD = STATE_WILDCARD
 
-
-JOG_TO_DECK_SLOT = '5'
 TIP_RACK_SLOT = '8'
 
 MOVE_POINT_STATE_MAP: StatePointMap = {

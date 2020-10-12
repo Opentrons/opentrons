@@ -215,6 +215,16 @@ class DeckCalibrationCommand(CommandDefinition):
         return "calibration.deck"
 
 
+class CheckCalibrationCommand(CommandDefinition):
+    """Check Calibration Health Specific"""
+    compare_point = "comparePoint"
+    switch_pipette = "switchPipette"
+    return_tip = "returnTip"
+
+    @staticmethod
+    def namespace():
+        return "calibration.check"
+
 """
 IMPORTANT: See note for SessionCreateParamType
 

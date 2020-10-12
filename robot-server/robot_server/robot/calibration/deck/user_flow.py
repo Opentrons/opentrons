@@ -26,11 +26,10 @@ from robot_server.service.session.models.command import (
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER, POINT_ONE_ID, POINT_TWO_ID,
-    POINT_THREE_ID)
+    POINT_THREE_ID, JOG_TO_DECK_SLOT)
 import robot_server.robot.calibration.util as uf
 from .constants import (
     DeckCalibrationState as State,
-    JOG_TO_DECK_SLOT,
     TIP_RACK_SLOT,
     MOVE_POINT_STATE_MAP,
     SAVE_POINT_STATE_MAP)

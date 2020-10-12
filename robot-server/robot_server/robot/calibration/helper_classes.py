@@ -94,21 +94,8 @@ class PipetteRank(str, Enum):
 class PipetteInfo:
     rank: PipetteRank
     mount: Mount
-    tiprack_id: typing.Optional[UUID]
-    critical_point: typing.Optional[CriticalPoint]
-
-
-@dataclass
-class PipetteStatus:
-    model: str
-    name: str
-    tip_length: float
-    mount: str
-    has_tip: bool
-    rank: str
-    tiprack_id: typing.Optional[UUID]
-    serial: str
-
+    max_volume: int
+    channels: int
 
 # TODO: BC: the mount field here is typed as a string
 # because of serialization problems, though they are actually

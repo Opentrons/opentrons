@@ -4,12 +4,12 @@ import pytest
 from opentrons import types
 from opentrons.hardware_control import API, ThreadManager
 
-from robot_server.robot.calibration.check import session, util
+from robot_server.robot.calibration.check.user_flow import CheckCalibrationUserFlow
 from robot_server.service.errors import RobotServerError
 
 
 @pytest.fixture
-async def check_calibration_session(loop) -> session.CheckCalibrationSession:
+async def check_calibration_session(loop) -> CheckCalibrationUserFlow:
     attached_instruments = {
         types.Mount.LEFT: {
             'model': 'p10_single_v1',
@@ -23,12 +23,12 @@ async def check_calibration_session(loop) -> session.CheckCalibrationSession:
 
     simulator = ThreadManager(API.build_hardware_simulator,
                               attached_instruments=attached_instruments)
-    return await session.CheckCalibrationSession.build(simulator)
+    return await CheckCalibrationUserFlow.build(simulator)
 
 
 @pytest.fixture
 async def check_calibration_session_shared_tips(loop) \
-        -> session.CheckCalibrationSession:
+        -> CheckCalibrationUserFlow:
     attached_instruments = {
         types.Mount.LEFT: {
             'model': 'p300_multi_v1',
@@ -42,12 +42,12 @@ async def check_calibration_session_shared_tips(loop) \
 
     simulator = ThreadManager(API.build_hardware_simulator,
                               attached_instruments=attached_instruments)
-    return await session.CheckCalibrationSession.build(simulator)
+    return await CheckCalibrationUserFlow.build(simulator)
 
 
 @pytest.fixture
 async def check_calibration_session_only_right(loop) \
-        -> session.CheckCalibrationSession:
+        -> CheckCalibrationUserFlow:
     attached_instruments = {
         types.Mount.RIGHT: {
             'model': 'p300_single_v1',
@@ -57,12 +57,12 @@ async def check_calibration_session_only_right(loop) \
 
     simulator = ThreadManager(API.build_hardware_simulator,
                               attached_instruments=attached_instruments)
-    return await session.CheckCalibrationSession.build(simulator)
+    return await CheckCalibrationUserFlow.build(simulator)
 
 
 @pytest.fixture
 async def check_calibration_session_only_left(loop) \
-        -> session.CheckCalibrationSession:
+        -> CheckCalibrationUserFlow:
     attached_instruments = {
         types.Mount.LEFT: {
             'model': 'p300_single_v1',
@@ -71,7 +71,7 @@ async def check_calibration_session_only_left(loop) \
     }
     simulator = ThreadManager(API.build_hardware_simulator,
                               attached_instruments=attached_instruments)
-    return await session.CheckCalibrationSession.build(simulator)
+    return await CheckCalibrationUserFlow.build(simulator)
 
 
 BAD_DIFF_VECTOR = types.Point(30, 30, 30)
@@ -356,7 +356,7 @@ async def test_session_no_pipettes_error():
     simulator = ThreadManager(API.build_hardware_simulator)
 
     with pytest.raises(RobotServerError) as e:
-        await session.CheckCalibrationSession.build(simulator)
+        await CheckCalibrationUserFlow.build(simulator)
 
     assert e.value.status_code == 403
     assert e.value.error.title == "No Pipette Attached"

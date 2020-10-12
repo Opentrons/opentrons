@@ -25,8 +25,7 @@ FILTERTIPRACK_300 = _lw_fmt.format(_filtertiprack, 300)
 FILTERTIPRACK_1000 = _lw_fmt.format(_filtertiprack, 1000)
 
 
-ALLOWED_SESSIONS = {'check'}
-
+JOG_TO_DECK_SLOT: Final = '5'
 
 @dataclass
 class LabwareInfo:

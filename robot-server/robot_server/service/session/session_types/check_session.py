@@ -1,7 +1,8 @@
-from robot_server.robot.calibration.check.session import\
-    CheckCalibrationSession
+from typing import Awaitable
+
+from robot_server.robot.calibration.check.user_flow import\
+    CheckCalibrationUserFlow
 from robot_server.robot.calibration.check import models as calibration_models
-from robot_server.robot.calibration.check.util import StateMachineError
 
 from robot_server.service.session.command_execution import \
     CommandQueue, CallableExecutor, Command, CompletedCommand
@@ -28,7 +29,7 @@ class CheckSession(BaseSession):
     def __init__(self,
                  configuration: SessionConfiguration,
                  instance_meta: SessionMetaData,
-                 calibration_check: CheckCalibrationSession,
+                 calibration_check: CheckCalibrationUserFlow,
                  shutdown_handler: Awaitable[None] = None):
         super().__init__(configuration, instance_meta)
         self._calibration_check = calibration_check
@@ -42,17 +43,17 @@ class CheckSession(BaseSession):
                      configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> BaseSession:
         """Create an instance"""
-        # assert isinstance(instance_meta.create_params, SessionCreateParams)
-        # mount = instance_meta.create_params.mount
+        assert isinstance(instance_meta.create_params, SessionCreateParams)
+        tip_racks = instance_meta.create_params.tipRacks
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
         try:
-            calibration_check = await CheckCalibrationSession.build(
-                configuration.hardware
-            )
+            calibration_check = CheckCalibrationUserFlow(
+                configuration.hardware,
+                tip_rack_defs=tip_racks)
         except AssertionError as e:
             raise SessionCreationException(str(e))
 
@@ -67,42 +68,16 @@ class CheckSession(BaseSession):
             instance_meta=instance_meta,
             calibration_check=calibration_check)
 
-    async def clean_up(self):
-        await super().clean_up()
-        await self._calibration_check.delete_session()
-
     def _get_response_details(self) -> SessionDetails:
-        instruments = {
-            str(k): calibration_models.AttachedPipette(
-                model=v.model,
-                name=v.name,
-                tip_length=v.tip_length,
-                mount=str(v.mount),
-                has_tip=v.has_tip,
-                rank=v.rank,
-                tiprack_id=v.tiprack_id,
-                serial=v.serial)
-            for k, v in self._calibration_check.pipette_status().items()
-        }
-        labware = [
-            calibration_models.LabwareStatus(
-                alternatives=data.alternatives,
-                slot=data.slot,
-                id=data.id,
-                forMounts=[str(m) for m in data.forMounts],
-                loadName=data.loadName,
-                namespace=data.namespace,
-                version=str(data.version)) for data in
-            self._calibration_check.labware_status.values()
-        ]
 
         # TODO(mc, 2020-09-17): type of get_comparisons_by_step doesn't quite
         # match what CalibrationSessionStatus expects for comparisonsByStep
-        return calibration_models.CalibrationSessionStatus(
-            instruments=instruments,
-            currentStep=self._calibration_check.current_state_name,
-            comparisonsByStep=self._calibration_check.get_comparisons_by_step(),  # type: ignore[arg-type] # noqa: e501
-            labware=labware,
+        return calibration_models.CalibrationCheckSessionStatus(
+            instruments=self._calibration_check.get_instruments(),
+            currentStep=self._calibration_check.current_state,
+            comparisonsByStep=self._calibration_check.comparison_map,  # type: ignore[arg-type] # noqa: e501
+            labware=self._calibration_check.get_required_labware(),
+            activePipette=self._calibration_check.active_pipette
         )
 
     @property

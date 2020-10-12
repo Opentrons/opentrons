@@ -6,7 +6,7 @@ import typing
 from pydantic import BaseModel, Field, validator
 
 from robot_server.robot.calibration.check.models import \
-    CalibrationSessionStatus
+    CalibrationCheckSessionStatus
 from robot_server.robot.calibration.deck.models import \
     DeckCalibrationSessionStatus
 from robot_server.robot.calibration.models import \
@@ -81,7 +81,7 @@ IMPORTANT: See note for SessionCreateParamType
 Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
 """
 SessionDetails = typing.Union[
-    CalibrationSessionStatus,
+    CalibrationCheckSessionStatus,
     PipetteOffsetCalibrationSessionStatus,
     TipCalibrationSessionStatus,
     DeckCalibrationSessionStatus,

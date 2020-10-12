@@ -118,6 +118,10 @@ class TipCalibrationUserFlow:
     def current_state(self) -> State:
         return self._current_state
 
+    @property
+    def mount(self) -> Mount:
+        return self._mount
+
     def get_pipette(self) -> AttachedPipette:
         # TODO(mc, 2020-09-17): s/tip_length/tipLength
         return AttachedPipette(  # type: ignore[call-arg]
