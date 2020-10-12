@@ -22,7 +22,6 @@ import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   Tooltip,
-  TEXT_TRANSFORM_CAPITALIZE,
   useHoverTooltip,
 } from '@opentrons/components'
 
@@ -44,7 +43,7 @@ const CHECK_ROBOT_CAL = 'Check robot calibration'
 const CHECK_ROBOT_CAL_DESCRIPTION =
   "Check the robot's calibration status and diagnose common pipette positioning problems."
 const CAL_HEALTH_CHECK_DESCRIPTION =
-      'Check the calibration settings for your robot.'
+  'Check the calibration settings for your robot.'
 const COULD_NOT_START = 'Could not start Robot Calibration Check'
 const PLEASE_TRY_AGAIN =
   'Please try again or contact support if you continue to experience issues'
@@ -72,30 +71,27 @@ export function CheckCalibrationControl({
   const buttonDisabled =
     Boolean(disabledReason) || requestStatus === RobotApi.PENDING
 
-
   const ff = useSelector(getFeatureFlags)
 
   React.useEffect(() => {
     if (requestStatus === RobotApi.SUCCESS) setShowWizard(true)
   }, [requestStatus])
 
-  const titleContent: (boolean) => string = (useNewContent) =>
-    useNewContent
-        ? CAL_HEALTH_CHECK
-        : CHECK_ROBOT_CAL
-  const descriptionContent: (boolean) => React.Node = (useNewContent) =>
-        useNewContent
-        ? (<Text>{CAL_HEALTH_CHECK_DESCRIPTION}</Text>)
-        : (<Text>{CHECK_ROBOT_CAL_DESCRIPTION}</Text>)
-  const buttonChildren: (boolean) => React.Node =
-    requestStatus !== RobotApi.PENDING ? (
-      (useNewContent) => useNewContent ? <Text>{CHECK_HEALTH}</Text> : <Text>{CHECK}</Text>
+  const titleContent: boolean => string = useNewContent =>
+    useNewContent ? CAL_HEALTH_CHECK : CHECK_ROBOT_CAL
+  const descriptionContent: boolean => React.Node = useNewContent =>
+    useNewContent ? (
+      <Text>{CAL_HEALTH_CHECK_DESCRIPTION}</Text>
     ) : (
-      (_) => <Icon name="ot-spinner" height="1em" spin />
+      <Text>{CHECK_ROBOT_CAL_DESCRIPTION}</Text>
     )
-  const buttonWidth: (boolean) => string =
-        useNewContent => useNewContent ? "12rem" : "9rem"
-
+  const buttonChildren: boolean => React.Node =
+    requestStatus !== RobotApi.PENDING
+      ? useNewContent =>
+          useNewContent ? <Text>{CHECK_HEALTH}</Text> : <Text>{CHECK}</Text>
+      : _ => <Icon name="ot-spinner" height="1em" spin />
+  const buttonWidth: boolean => string = useNewContent =>
+    useNewContent ? '12rem' : '9rem'
 
   // TODO(mc, 2020-06-17): extract alert presentational stuff
   return (
