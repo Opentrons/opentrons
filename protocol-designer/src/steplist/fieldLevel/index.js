@@ -88,6 +88,14 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
     maskValue: defaultTo([]),
   },
+  dispense_airGap_volume: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: Number,
+  },
   dispense_labware: {
     getErrors: composeErrors(requiredField),
     hydrate: getLabwareEntity,

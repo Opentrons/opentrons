@@ -107,6 +107,7 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
+  console.log({ dispenseAirGapVolume, args })
 
   const effectiveTransferVol =
     getPipetteWithTipMaxVol(args.pipette, invariantContext) -
