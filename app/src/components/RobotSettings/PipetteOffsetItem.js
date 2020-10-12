@@ -14,10 +14,15 @@ import {
   DISPLAY_INLINE_BLOCK,
   FONT_STYLE_ITALIC,
   FONT_WEIGHT_SEMIBOLD,
+  SPACING_1,
   SPACING_2,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
+import {
+  InlineCalibrationWarning,
+  RECOMMENDED,
+} from './InlineCalibrationWarning'
 import type { AttachedPipette } from '../../pipettes/types'
 import type { PipetteOffsetCalibration } from '../../calibration/types'
 
@@ -90,13 +95,17 @@ export function PipetteOffsetItem(props: Props): React.Node {
         as={'h4'}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        marginBottom={SPACING_2}
+        marginBottom={SPACING_1}
       >
         {mount}
       </Text>
+      {pipette && calibration?.status.markedBad && (
+        <InlineCalibrationWarning warningType={RECOMMENDED} />
+      )}
       <Text
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
+        marginTop={SPACING_1}
         marginBottom={SPACING_2}
       >
         {pipette && pipette.modelSpecs

@@ -23,6 +23,12 @@ export const mockCalibrationStatus: CalibrationStatus = {
       lastModified: null,
       pipetteCalibratedWith: null,
       tiprack: null,
+      source: 'user',
+      status: {
+        markedBad: false,
+        source: 'unknown',
+        markedAt: '',
+      },
     },
   },
   instrumentCalibration: {

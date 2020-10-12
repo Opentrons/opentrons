@@ -18,6 +18,12 @@ export const mockTipLengthCalibration1: TipLengthCalibrationModel = {
     tiprack: 'opentrons_96_tiprack_300ul_hash',
     tipLength: 30.5,
     lastModified: '2020-09-29T10:02',
+    source: 'user',
+    status: {
+      markedBad: false,
+      source: 'unknown',
+      markedAt: '',
+    },
   },
   id: 'someID',
   type: 'TipLengthCalibration',
@@ -29,6 +35,12 @@ export const mockTipLengthCalibration2: TipLengthCalibrationModel = {
     tiprack: 'opentrons_96_tiprack_300ul_hash',
     tipLength: 32.5,
     lastModified: '2020-09-29T12:02',
+    source: 'user',
+    status: {
+      markedBad: false,
+      source: 'unknown',
+      markedAt: '',
+    },
   },
   id: 'someID',
   type: 'TipLengthCalibration',
@@ -40,7 +52,14 @@ export const mockTipLengthCalibration3: TipLengthCalibrationModel = {
     tiprack: 'opentrons_96_tiprack_20ul_hash',
     tipLength: 29.0,
     lastModified: '2020-09-29T13:02',
+    source: 'user',
+    status: {
+      markedBad: false,
+      source: 'unknown',
+      markedAt: '',
+    },
   },
+
   id: 'someID',
   type: 'TipLengthCalibration',
 }

@@ -13,8 +13,6 @@ import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { LegacyDeckCalibrationControl } from '../LegacyDeckCalibrationControl'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
-import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
-import { LegacyDeckCalibrationWarning } from '../LegacyDeckCalibrationWarning'
 
 import type { State, Action } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
@@ -275,22 +273,6 @@ describe('ControlsCard', () => {
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Please perform a full deck calibration.'
     )
-  })
-
-  it('DeckCalibrationWarning component renders if deck calibration is bad', () => {
-    const { wrapper } = render()
-
-    // check that the deck calibration warning component is not null
-    // TODO(lc, 2020-06-18): Mock out the new transform status such that
-    // this should evaluate to true.
-    expect(wrapper.exists(LegacyDeckCalibrationWarning)).toBe(true)
-  })
-
-  it('DeckCalibrationWarning component does not render if cal is bad but ff is on', () => {
-    getFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
-    const { wrapper } = render()
-
-    expect(wrapper.exists(DeckCalibrationWarning)).toBe(false)
   })
 
   it('DeckCalibrationControl does not render if ff is on', () => {
