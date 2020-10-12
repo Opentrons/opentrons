@@ -19,6 +19,10 @@ class BlowoutLocation(Enum):
     TRASH = 'trash'
 
 
+LiquidHandlingCommand = Union[Literal['transfer'], Literal['consolidate'],
+                              Literal['distribute']]
+
+
 class LabwareRequirement(TypedDict):
     slot: str
     definitionId: str

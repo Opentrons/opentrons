@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from functools import lru_cache
 import logging
-from typing import Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union
-
+from typing import (
+    Any, Dict, List, Optional, Tuple, Sequence, TYPE_CHECKING, Union)
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
 from opentrons.hardware_control.types import CriticalPoint, PipettePair
@@ -14,7 +14,8 @@ from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances,
     clamp_value, requires_version, build_edges, first_parent)
 from opentrons.protocols.types import APIVersion
-from opentrons_shared_data.protocol.dev_types import BlowoutLocation
+from opentrons_shared_data.protocol.dev_types import (
+    BlowoutLocation, LiquidHandlingCommand)
 from .labware import (
     filter_tipracks_to_start, Labware, OutOfTipsError, quirks_from_any_parent,
     select_tiprack_from_list, Well)
@@ -155,6 +156,33 @@ class InstrumentContext(CommandPublisher):
                     f'{tiprack.load_name} in slot {tiprack.parent} appear to '
                     'be mismatched. Please check your protocol before running '
                     'on the robot.')
+
+    def _validate_blowout_location(
+            self,
+            liquid_handling_command: LiquidHandlingCommand,
+            blowout_location: Optional[Any]):
+
+        if blowout_location and self._api_version < APIVersion(2, 8):
+            raise ValueError(
+                'Cannot specify blowout location when using api' +
+                ' version below 2.8, current version is {api_version}'
+                .format(api_version=self._api_version))
+
+        elif liquid_handling_command == 'consolidate' \
+                and blowout_location == 'source well':
+            raise ValueError(
+                "blowout location for consolidate cannot be source well")
+        elif liquid_handling_command == 'distribute' \
+                and blowout_location == 'destination well':
+            raise ValueError(
+                "blowout location for distribute cannot be destination well")
+        elif liquid_handling_command == 'transfer' and \
+            blowout_location and blowout_location not in [
+                location.value for location in BlowoutLocation]:
+            raise ValueError(
+                "blowout location should be either 'source well', " +
+                " 'destination well', or 'trash'" +
+                f" but it is {blowout_location}")
 
     @requires_version(2, 0)
     def aspirate(self,
@@ -858,15 +886,8 @@ class InstrumentContext(CommandPublisher):
             'disposal_volume', self.min_volume)
         kwargs['mix_after'] = (0, 0)
         blowout_location = kwargs.get('blowout_location')
+        self._validate_blowout_location('distribute', blowout_location)
 
-        if blowout_location and self._api_version < APIVersion(2, 8):
-            raise ValueError(
-                'Cannot specify blowout location when using api' +
-                ' version below 2.8, current version is {api_version}'
-                .format(api_version=self._api_version))
-        if blowout_location == 'destination well':
-            raise ValueError(
-                "blowout location for distribute cannot be destination well")
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.consolidate)
@@ -895,15 +916,8 @@ class InstrumentContext(CommandPublisher):
         kwargs['mix_before'] = (0, 0)
         kwargs['disposal_volume'] = 0
         blowout_location = kwargs.get('blowout_location')
+        self._validate_blowout_location('consolidate', blowout_location)
 
-        if blowout_location and self._api_version < APIVersion(2, 8):
-            raise ValueError(
-                'Cannot specify blowout location when using api' +
-                ' version below 2.8, current version is {api_version}'
-                .format(api_version=self._api_version))
-        if blowout_location == 'source well':
-            raise ValueError(
-                "blowout location for consolidate cannot be source well")
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.transfer)  # noqa(C901)
@@ -1013,6 +1027,9 @@ class InstrumentContext(CommandPublisher):
         self._log.debug("Transfer {} from {} to {}".format(
             volume, source, dest))
 
+        blowout_location = kwargs.get('blowout_location')
+        self._validate_blowout_location('transfer', blowout_location)
+
         kwargs['mode'] = kwargs.get('mode', 'transfer')
 
         mix_strategy, mix_opts = self._mix_from_kwargs(kwargs)
@@ -1026,34 +1043,21 @@ class InstrumentContext(CommandPublisher):
         if isinstance(new_tip, str):
             new_tip = types.TransferTipPolicy[new_tip.upper()]
 
-        blow_out = None
-        blowout_location = kwargs.get('blowout_location')
+        blow_out = kwargs.get('blow_out')
+        blow_out_strategy = None
 
-        if blowout_location and self._api_version < APIVersion(2, 8):
-            raise ValueError(
-                'Cannot specify blowout location when using api' +
-                ' version below 2.8, current version is {api_version}'
-                .format(api_version=self._api_version))
-
-        if blowout_location and blowout_location not in [
-                location.value for location in BlowoutLocation]:
-            raise ValueError(
-                'blowout location should be either "source well",' +
-                ' "destination well", or "trash", but it is {}'
-                .format(blowout_location))
-
-        if kwargs.get('blow_out') and not blowout_location:
+        if blow_out and not blowout_location:
             if self.current_volume:
-                blow_out = transfers.BlowOutStrategy.SOURCE
+                blow_out_strategy = transfers.BlowOutStrategy.SOURCE
             else:
-                blow_out = transfers.BlowOutStrategy.TRASH
-        elif kwargs.get('blow_out') and blowout_location:
+                blow_out_strategy = transfers.BlowOutStrategy.TRASH
+        elif blow_out and blowout_location:
             if blowout_location == 'source well':
-                blow_out = transfers.BlowOutStrategy.SOURCE
+                blow_out_strategy = transfers.BlowOutStrategy.SOURCE
             elif blowout_location == 'destination well':
-                blow_out = transfers.BlowOutStrategy.DEST
+                blow_out_strategy = transfers.BlowOutStrategy.DEST
             elif blowout_location == 'trash':
-                blow_out = transfers.BlowOutStrategy.TRASH
+                blow_out_strategy = transfers.BlowOutStrategy.TRASH
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = self._next_available_tip()
@@ -1086,7 +1090,8 @@ class InstrumentContext(CommandPublisher):
             disposal_volume=disposal,
             mix_strategy=mix_strategy,
             drop_tip_strategy=drop_tip,
-            blow_out_strategy=blow_out or default_args.blow_out_strategy,
+            blow_out_strategy=blow_out_strategy or
+            default_args.blow_out_strategy,
             touch_tip_strategy=(touch_tip or
                                 default_args.touch_tip_strategy)
         )
