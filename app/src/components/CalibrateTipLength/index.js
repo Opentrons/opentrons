@@ -39,6 +39,7 @@ import {
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
+export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'
 
 const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
 const EXIT = 'exit'
