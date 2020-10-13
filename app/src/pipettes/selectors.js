@@ -8,11 +8,20 @@ import {
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 
-import { getPipettes as getProtocolPipettes } from '../robot/selectors'
+import {
+  getPipettes as getProtocolPipettes,
+  getTipracksByMount,
+} from '../robot/selectors'
+
 import {
   getPipetteOffsetCalibrations,
   filterCalibrationForPipette,
 } from '../calibration/pipette-offset'
+import {
+  getTipLengthCalibrations,
+  filterTipLengthForPipetteAndTiprack,
+  tipLengthExistsForPipetteAndTiprack,
+} from '../calibration/tip-length'
 import { getFeatureFlags } from '../config'
 import type { PipetteOffsetCalibration } from '../calibration/types'
 import * as Constants from './constants'
@@ -20,6 +29,9 @@ import * as Types from './types'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { State } from '../types'
+import type { TipracksByMountMap } from '../robot/types'
+
+import { PIPETTE_MOUNTS } from '../robot/constants'
 
 export const getAttachedPipettes: (
   state: State,
@@ -72,17 +84,36 @@ export const getAttachedPipetteSettings: (
 export const getAttachedPipetteCalibrations: (
   state: State,
   robotName: string
-) => Types.PipetteOffsetCalibrationsByMount = createSelector(
+) => Types.PipetteCalibrationsByMount = createSelector(
   getAttachedPipettes,
   getPipetteOffsetCalibrations,
-  (attached, calibrations) => {
-    return {
+  getTipLengthCalibrations,
+  (attached, calibrations, tipLengths) => {
+    const offsets = {
       left: attached.left
         ? filterCalibrationForPipette(calibrations, attached.left.id)
         : null,
       right: attached.right
         ? filterCalibrationForPipette(calibrations, attached.right.id)
         : null,
+    }
+    return {
+      left: {
+        offset: offsets.left,
+        tipLength: filterTipLengthForPipetteAndTiprack(
+          tipLengths,
+          attached.left?.id ?? null,
+          offsets.left?.tiprack ?? null
+        ),
+      },
+      right: {
+        offset: offsets.right,
+        tipLength: filterTipLengthForPipetteAndTiprack(
+          tipLengths,
+          attached.right?.id ?? null,
+          offsets.right?.tiprack ?? null
+        ),
+      },
     }
   }
 )
@@ -223,6 +254,38 @@ export const getSomeProtocolPipettesInexact: (
     return some(
       infoByMount,
       info => info.compatibility === Constants.INEXACT_MATCH
+    )
+  }
+)
+
+export const getUncalibratedTipracksByMount: (
+  state: State,
+  robotName: string
+) => TipracksByMountMap = createSelector(
+  getProtocolPipettesInfo,
+  getTipLengthCalibrations,
+  getTipracksByMount,
+  (infoByMount, calibrations, tipracksByMount) => {
+    return PIPETTE_MOUNTS.reduce<TipracksByMountMap>(
+      (result, mount) => {
+        const pip = infoByMount?.[mount]
+        const pipetteSerial = pip?.actual?.id
+        const tipracks = tipracksByMount?.[mount]
+        result[mount] =
+          Array.isArray(tipracks) && tipracks?.length && pipetteSerial
+            ? tipracks.filter(
+                tr =>
+                  tr.definitionHash &&
+                  !tipLengthExistsForPipetteAndTiprack(
+                    calibrations,
+                    pipetteSerial,
+                    tr.definitionHash
+                  )
+              )
+            : []
+        return result
+      },
+      { left: [], right: [] }
     )
   }
 )

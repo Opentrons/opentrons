@@ -6,10 +6,8 @@ import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
 import { getUseTrashSurfaceForTipCal } from '../../config'
-import {
-  setUseTrashSurfaceForTipCal,
-  getUncalibratedTipracksByMount,
-} from '../../calibration'
+import { setUseTrashSurfaceForTipCal } from '../../calibration'
+import { getUncalibratedTipracksByMount } from '../../pipettes'
 import { getTipLengthCalibrationSession } from '../../sessions/tip-length-calibration/selectors'
 import { getPipetteOffsetCalibrationSession } from '../../sessions/pipette-offset-calibration/selectors'
 

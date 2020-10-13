@@ -2,7 +2,8 @@
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import * as Fixtures from '../__fixtures__'
-import * as CalibrationFixtures from '../../calibration/pipette-offset/__fixtures__'
+import * as POCFixtures from '../../calibration/pipette-offset/__fixtures__'
+import * as TLCFixtures from '../../calibration/tip-length/__fixtures__'
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
@@ -81,15 +82,11 @@ describe('getAttachedPipetteCalibrations', () => {
           attachedByMount: {
             left: {
               ...Fixtures.mockAttachedPipette,
-              id:
-                CalibrationFixtures.mockPipetteOffsetCalibration1.attributes
-                  .pipette,
+              id: POCFixtures.mockPipetteOffsetCalibration1.attributes.pipette,
             },
             right: {
               ...Fixtures.mockAttachedPipette,
-              id:
-                CalibrationFixtures.mockPipetteOffsetCalibration2.attributes
-                  .pipette,
+              id: POCFixtures.mockPipetteOffsetCalibration2.attributes.pipette,
             },
           },
           settingsById: null,
@@ -98,10 +95,10 @@ describe('getAttachedPipetteCalibrations', () => {
       calibration: {
         robotName: {
           pipetteOffsetCalibrations:
-            CalibrationFixtures.mockAllPipetteOffsetsCalibration,
+            POCFixtures.mockAllPipetteOffsetsCalibration,
           calibrationStatus: null,
           labwareCalibrations: null,
-          tipLengthCalibrations: null,
+          tipLengthCalibrations: TLCFixtures.mockAllTipLengthCalibrations,
         },
       },
     }
@@ -109,11 +106,17 @@ describe('getAttachedPipetteCalibrations', () => {
     expect(
       Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
     ).toEqual({
-      left: CalibrationFixtures.mockPipetteOffsetCalibration1.attributes,
-      right: CalibrationFixtures.mockPipetteOffsetCalibration2.attributes,
+      left: {
+        offset: POCFixtures.mockPipetteOffsetCalibration1.attributes,
+        tipLength: TLCFixtures.mockTipLengthCalibration1.attributes,
+      },
+      right: {
+        offset: POCFixtures.mockPipetteOffsetCalibration2.attributes,
+        tipLength: TLCFixtures.mockTipLengthCalibration2.attributes,
+      },
     })
   })
-  it('should return null if a pipette is attached but there is no calibration', () => {
+  it('should return empty obj if a pipette is attached but there is no calibration', () => {
     const mockPipetteState: $Shape<State> = {
       pipettes: {
         robotName: {
@@ -135,9 +138,12 @@ describe('getAttachedPipetteCalibrations', () => {
     }
     expect(
       Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
-    ).toEqual({ left: null, right: null })
+    ).toEqual({
+      left: { offset: null, tipLength: null },
+      right: { offset: null, tipLength: null },
+    })
   })
-  it('should return null if no pipette is attached', () => {
+  it('should return empty obj if no pipette is attached', () => {
     const mockPipetteState: $Shape<State> = {
       pipettes: {
         robotName: {
@@ -151,15 +157,18 @@ describe('getAttachedPipetteCalibrations', () => {
       calibration: {
         robotName: {
           pipetteOffsetCalibrations:
-            CalibrationFixtures.mockAllPipetteOffsetsCalibration,
+            POCFixtures.mockAllPipetteOffsetsCalibration,
           calibrationStatus: null,
           labwareCalibrations: null,
-          tipLengthCalibrations: null,
+          tipLengthCalibrations: TLCFixtures.mockAllTipLengthCalibrations,
         },
       },
     }
     expect(
       Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
-    ).toEqual({ left: null, right: null })
+    ).toEqual({
+      left: { offset: null, tipLength: null },
+      right: { offset: null, tipLength: null },
+    })
   })
 })

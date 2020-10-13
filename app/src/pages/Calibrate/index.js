@@ -12,7 +12,7 @@ import { getConnectedRobot } from '../../discovery'
 import { getFeatureFlags } from '../../config'
 
 import { selectors as robotSelectors } from '../../robot'
-import { getUncalibratedTipracksByMount } from '../../calibration/tip-length/selectors'
+import { getUncalibratedTipracksByMount } from '../../pipettes/selectors'
 import { Pipettes as CalibratePipettes } from './Pipettes'
 import { Labware as CalibrateLabware } from './Labware'
 

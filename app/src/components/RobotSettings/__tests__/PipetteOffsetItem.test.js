@@ -62,17 +62,31 @@ describe('PipetteOffsetItem', () => {
           }: $Shape<PipetteModelSpecs>),
         },
         calibration = {
-          pipette: 'pipette-id-11',
-          mount: 'left',
-          offset: [1, 2, 3],
-          tiprack: 'asdagasdfasdsa',
-          tiprackUri: 'opentrons/opentrons_96_tiprack_300ul/1',
-          lastModified: '2020-09-10T05:13',
-          source: 'user',
-          status: {
-            markedBad: false,
-            source: 'unknown',
-            markedAt: '',
+          offset: {
+            pipette: 'pipette-id-11',
+            mount: 'left',
+            offset: [1, 2, 3],
+            tiprack: 'asdagasdfasdsa',
+            tiprackUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+            lastModified: '2020-09-10T05:13Z',
+            source: 'user',
+            status: {
+              markedBad: false,
+              source: 'unknown',
+              markedAt: '',
+            },
+          },
+          tipLength: {
+            tipLength: 30,
+            tiprack: 'asdagasdfasdsa',
+            pipette: 'pipette-id-11',
+            lastModified: '2020-09-10T05:10Z',
+            source: 'user',
+            status: {
+              markedBad: false,
+              source: 'unknown',
+              markedAt: '',
+            },
           },
         },
         customLabware = [],
@@ -126,7 +140,7 @@ describe('PipetteOffsetItem', () => {
     expect(getCalibrationWarning(wrapper).exists()).toBe(false)
   })
 
-  it('displays a warning when its calibration is marked bad', () => {
+  it('displays a warning when its offset calibration is marked bad', () => {
     mockGetLatestLabwareDef.mockReturnValue(
       ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } }: any)
     )
@@ -134,17 +148,71 @@ describe('PipetteOffsetItem', () => {
 
     const wrapper = render({
       calibration: {
-        pipette: 'pipette-id-11',
-        mount: 'left',
-        offset: [1, 2, 3],
-        tiprack: 'asdagasdfasdsa',
-        tiprackUri: 'opentrons/opentrons_96_tiprack_300ul/1',
-        lastModified: '2020-09-10T05:13',
-        source: 'user',
-        status: {
-          markedBad: true,
-          source: 'calibration_check',
-          markedAt: '2020-10-09T13:30:00Z',
+        offset: {
+          pipette: 'pipette-id-11',
+          mount: 'left',
+          offset: [1, 2, 3],
+          tiprack: 'asdagasdfasdsa',
+          tiprackUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+          lastModified: '2020-09-10T05:13',
+          source: 'user',
+          status: {
+            markedBad: true,
+            source: 'calibration_check',
+            markedAt: '2020-10-09T13:30:00Z',
+          },
+        },
+        tipLength: {
+          tipLength: 30,
+          tiprack: 'asdagasdfasdsa',
+          pipette: 'pipette-id-11',
+          lastModified: '2020-09-10T05:10Z',
+          source: 'user',
+          status: {
+            markedBad: false,
+            source: 'unknown',
+            markedAt: '',
+          },
+        },
+      },
+    })
+    expect(getCalibrationWarning(wrapper).exists()).toBe(true)
+    expect(getCalibrationWarning(wrapper).html()).toMatch(/recommended/i)
+  })
+
+  it('displays a warning when its tip length calibration is marked bad', () => {
+    mockGetLatestLabwareDef.mockReturnValue(
+      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } }: any)
+    )
+    mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
+
+    const wrapper = render({
+      calibration: {
+        offset: {
+          pipette: 'pipette-id-11',
+          mount: 'left',
+          offset: [1, 2, 3],
+          tiprack: 'asdagasdfasdsa',
+          tiprackUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+          lastModified: '2020-09-10T05:13',
+          source: 'user',
+          status: {
+            markedBad: false,
+            source: 'unknown',
+            markedAt: '2020-10-09T13:30:00Z',
+          },
+        },
+        tipLength: {
+          tipLength: 30,
+          tiprack: 'asdagasdfasdsa',
+          pipette: 'pipette-id-11',
+          lastModified: '2020-09-10T05:10Z',
+          source: 'user',
+          status: {
+            markedBad: true,
+            source: 'unknown',
+            markedAt: '',
+          },
         },
       },
     })
