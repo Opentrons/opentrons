@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 import logging
 from typing import (
-    Any, Dict, List, Optional, Tuple, Sequence, TYPE_CHECKING, Union)
+    Any, Callable, Dict, List, Optional, Tuple, Sequence, TYPE_CHECKING, Union)
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
 from opentrons.hardware_control.types import CriticalPoint, PipettePair
@@ -103,6 +103,10 @@ class InstrumentContext(CommandPublisher):
         self._starting_tip: Union[Well, None] = None
         self.requested_as = requested_as
         self._flow_rates.set_defaults(self._api_version)
+        # fall back to transfer function without defined keyword args
+        # for legacy api versions
+        if at_version < APIVersion(2, 8):
+            self.transfer = self._transfer_kwargs
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -183,6 +187,26 @@ class InstrumentContext(CommandPublisher):
                 "blowout location should be either 'source well', " +
                 " 'destination well', or 'trash'" +
                 f" but it is {blowout_location}")
+
+    def _get_blowout_strategy(self,
+                              blow_out,
+                              blowout_location,
+                              default_strategy):
+        blow_out_strategy = default_strategy
+
+        if blow_out and not blowout_location:
+            if self.current_volume:
+                blow_out_strategy = transfers.BlowOutStrategy.SOURCE
+            else:
+                blow_out_strategy = transfers.BlowOutStrategy.TRASH
+        elif blow_out and blowout_location:
+            if blowout_location == 'source well':
+                blow_out_strategy = transfers.BlowOutStrategy.SOURCE
+            elif blowout_location == 'destination well':
+                blow_out_strategy = transfers.BlowOutStrategy.DEST
+            elif blowout_location == 'trash':
+                blow_out_strategy = transfers.BlowOutStrategy.TRASH
+        return blow_out_strategy
 
     @requires_version(2, 0)
     def aspirate(self,
@@ -920,14 +944,137 @@ class InstrumentContext(CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
+    def _transfer_impl(self,
+                       volume: Union[float, Sequence[float]],
+                       source: AdvancedLiquidHandling,
+                       dest: AdvancedLiquidHandling,
+                       trash=True,
+                       *,
+                       mode: str = None,
+                       air_gap: float = None,
+                       carryover: bool = None,
+                       new_tip: str = None,
+                       touch_tip: bool = None,
+                       blow_out: bool = None,
+                       blowout_location: str = None,
+                       mix_before: Tuple[int, float] = None,
+                       mix_after: Tuple[int, float] = None,
+                       disposal_volume: float = None,
+                       carry_over: bool = None,
+                       gradient_function: Callable[[float], float] = None,
+                       ):
+        self._log.debug("Transfer {} from {} to {}".format(
+            volume, source, dest))
+
+        self._validate_blowout_location('transfer', blowout_location)
+
+        mix_strategy, mix_opts = self._mix_from_kwargs(
+            {'mix_before': mix_before, 'mix_after': mix_after})
+
+        default_args = transfers.Transfer()
+
+        if trash:
+            drop_tip = transfers.DropTipStrategy.TRASH
+        else:
+            drop_tip = transfers.DropTipStrategy.RETURN
+
+        if isinstance(new_tip, str):
+            new_tip_policy = \
+                types.TransferTipPolicy[new_tip.upper(
+                )]
+        else:
+            new_tip_policy = default_args.new_tip
+
+        blow_out_strategy = self._get_blowout_strategy(
+            blow_out,
+            blowout_location,
+            default_args.blow_out_strategy)
+
+        if new_tip_policy != types.TransferTipPolicy.NEVER:
+            tr, next_tip = self._next_available_tip()
+            max_volume = min(next_tip.max_volume, self.max_volume)
+        else:
+            max_volume = self.hw_pipette['working_volume']
+
+        if touch_tip:
+            touch_tip_strategy = transfers.TouchTipStrategy.ALWAYS
+        else:
+            touch_tip_strategy = default_args.touch_tip_strategy
+
+        air_gap_volume = air_gap or default_args.air_gap
+        if air_gap_volume < 0 or air_gap_volume >= max_volume:
+            raise ValueError(
+                "air_gap must be between 0uL and the pipette's expected "
+                f"working volume, {max_volume}uL")
+
+        transfer_args = transfers.Transfer(
+            new_tip=new_tip_policy,
+            air_gap=air_gap_volume,
+            carryover=carryover or default_args.carryover,
+            gradient_function=(gradient_function or
+                               default_args.gradient_function),
+            disposal_volume=(disposal_volume or default_args.disposal_volume),
+            mix_strategy=mix_strategy,
+            drop_tip_strategy=drop_tip,
+            blow_out_strategy=blow_out_strategy,
+            touch_tip_strategy=(touch_tip_strategy)
+        )
+        transfer_options = transfers.TransferOptions(transfer=transfer_args,
+                                                     mix=mix_opts)
+        plan = transfers.TransferPlan(volume, source, dest, self, max_volume,
+                                      self.api_version, mode,
+                                      transfer_options)
+        self._execute_transfer(plan)
+        return self
+
+    @cmds.publish.both(command=cmds.transfer)  # noqa(C901)
+    @requires_version(2, 8)
+    def _transfer_signature(self,
+                            volume: Union[float, Sequence[float]],
+                            source: AdvancedLiquidHandling,
+                            dest: AdvancedLiquidHandling,
+                            trash=True,
+                            *,
+                            mode: str = None,
+                            air_gap: float = None,
+                            carryover: bool = None,
+                            new_tip: str = None,
+                            touch_tip: bool = None,
+                            blow_out: bool = None,
+                            blowout_location: str = None,
+                            mix_before: Tuple[int, float] = None,
+                            mix_after: Tuple[int, float] = None,
+                            disposal_volume: float = None,
+                            carry_over: bool = None,
+                            gradient_function: Callable[
+                                [float], float] = None):
+
+        return self._transfer_impl(
+            volume=volume,
+            source=source,
+            dest=dest,
+            trash=trash,
+            mode=mode,
+            air_gap=air_gap,
+            carryover=carryover,
+            new_tip=new_tip,
+            touch_tip=touch_tip,
+            blow_out=blow_out,
+            blowout_location=blowout_location,
+            mix_before=mix_before,
+            mix_after=mix_after,
+            disposal_volume=disposal_volume,
+            carry_over=carry_over,
+            gradient_function=gradient_function)
+
     @cmds.publish.both(command=cmds.transfer)  # noqa(C901)
     @requires_version(2, 0)
-    def transfer(self,
-                 volume: Union[float, Sequence[float]],
-                 source: AdvancedLiquidHandling,
-                 dest: AdvancedLiquidHandling,
-                 trash=True,
-                 **kwargs) -> InstrumentContext:
+    def _transfer_kwargs(self,
+                         volume: Union[float, Sequence[float]],
+                         source: AdvancedLiquidHandling,
+                         dest: AdvancedLiquidHandling,
+                         trash=True,
+                         **kwargs) -> InstrumentContext:
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
         # TODO: Reach consensus on kwargs
@@ -1024,84 +1171,32 @@ class InstrumentContext(CommandPublisher):
 
         :returns: This instance
         """
-        self._log.debug("Transfer {} from {} to {}".format(
-            volume, source, dest))
+        kwarg_allowed_list = [
+            'mode',
+            'air_gap',
+            'carryover',
+            'new_tip',
+            'touch_tip',
+            'blow_out',
+            'blowout_location',
+            'mix_before',
+            'mix_after',
+            'disposal_volume',
+            'carry_over',
+            'gradient_function'
+        ]
 
-        blowout_location = kwargs.get('blowout_location')
-        self._validate_blowout_location('transfer', blowout_location)
+        good_kwargs = {
+            k: v for k, v in kwargs.items() if k in kwarg_allowed_list
+        }
 
-        kwargs['mode'] = kwargs.get('mode', 'transfer')
+        return self._transfer_impl(volume, source, dest, trash, **good_kwargs)
 
-        mix_strategy, mix_opts = self._mix_from_kwargs(kwargs)
-
-        if trash:
-            drop_tip = transfers.DropTipStrategy.TRASH
-        else:
-            drop_tip = transfers.DropTipStrategy.RETURN
-
-        new_tip = kwargs.get('new_tip')
-        if isinstance(new_tip, str):
-            new_tip = types.TransferTipPolicy[new_tip.upper()]
-
-        blow_out = kwargs.get('blow_out')
-        blow_out_strategy = None
-
-        if blow_out and not blowout_location:
-            if self.current_volume:
-                blow_out_strategy = transfers.BlowOutStrategy.SOURCE
-            else:
-                blow_out_strategy = transfers.BlowOutStrategy.TRASH
-        elif blow_out and blowout_location:
-            if blowout_location == 'source well':
-                blow_out_strategy = transfers.BlowOutStrategy.SOURCE
-            elif blowout_location == 'destination well':
-                blow_out_strategy = transfers.BlowOutStrategy.DEST
-            elif blowout_location == 'trash':
-                blow_out_strategy = transfers.BlowOutStrategy.TRASH
-
-        if new_tip != types.TransferTipPolicy.NEVER:
-            tr, next_tip = self._next_available_tip()
-            max_volume = min(next_tip.max_volume, self.max_volume)
-        else:
-            max_volume = self.hw_pipette['working_volume']
-
-        touch_tip = None
-        if kwargs.get('touch_tip'):
-            touch_tip = transfers.TouchTipStrategy.ALWAYS
-
-        default_args = transfers.Transfer()
-
-        disposal = kwargs.get('disposal_volume')
-        if disposal is None:
-            disposal = default_args.disposal_volume
-
-        air_gap = kwargs.get('air_gap', default_args.air_gap)
-        if air_gap < 0 or air_gap >= max_volume:
-            raise ValueError(
-                "air_gap must be between 0uL and the pipette's expected "
-                f"working volume, {max_volume}uL")
-
-        transfer_args = transfers.Transfer(
-            new_tip=new_tip or default_args.new_tip,
-            air_gap=air_gap,
-            carryover=kwargs.get('carryover') or default_args.carryover,
-            gradient_function=(kwargs.get('gradient_function') or
-                               default_args.gradient_function),
-            disposal_volume=disposal,
-            mix_strategy=mix_strategy,
-            drop_tip_strategy=drop_tip,
-            blow_out_strategy=blow_out_strategy or
-            default_args.blow_out_strategy,
-            touch_tip_strategy=(touch_tip or
-                                default_args.touch_tip_strategy)
-        )
-        transfer_options = transfers.TransferOptions(transfer=transfer_args,
-                                                     mix=mix_opts)
-        plan = transfers.TransferPlan(volume, source, dest, self, max_volume,
-                                      self.api_version, kwargs['mode'],
-                                      transfer_options)
-        self._execute_transfer(plan)
-        return self
+    # transfer function will default to the version that requires
+    # all keyword arguments to be explicitly defined
+    transfer = _transfer_signature
+    # copy the docstring so tooling will pick up on the types
+    _transfer_kwargs.__doc__ = _transfer_signature.__doc__
 
     def _execute_transfer(self, plan: transfers.TransferPlan):
         for cmd in plan:
