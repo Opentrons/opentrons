@@ -54,12 +54,12 @@ export function DeckSetup(props: CalibrationPanelProps): React.Node {
     calBlock,
     sendCommands,
     sessionType,
-    hasCalibratedTipLength,
+    shouldPerformTipLength,
   } = props
 
   const isExtendedPipOffset =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-    hasCalibratedTipLength === false
+    shouldPerformTipLength
 
   const lookupType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION

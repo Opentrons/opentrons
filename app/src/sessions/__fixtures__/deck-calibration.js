@@ -2,10 +2,10 @@
 import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
 import type {
   DeckCalibrationSessionDetails,
-  DeckCalibrationLabware,
+  CalibrationLabware,
 } from '../types'
 
-export const mockDeckCalTipRack: DeckCalibrationLabware = {
+export const mockDeckCalTipRack: CalibrationLabware = {
   slot: '8',
   loadName: 'opentrons_96_tiprack_300ul',
   namespace: 'opentrons',

@@ -12,8 +12,7 @@ import typeof {
   DECK_STEP_SAVING_POINT_THREE,
   DECK_STEP_CALIBRATION_COMPLETE,
 } from '../constants'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { CalibrationLabware } from '../types'
 
 export type DeckCalibrationStep =
   | DECK_STEP_SESSION_STARTED
@@ -34,17 +33,8 @@ export type DeckCalibrationInstrument = {|
   serial: string,
 |}
 
-export type DeckCalibrationLabware = {|
-  slot: string,
-  loadName: string,
-  namespace: string,
-  version: number,
-  isTiprack: boolean,
-  definition: LabwareDefinition2,
-|}
-
 export type DeckCalibrationSessionDetails = {|
   instrument: DeckCalibrationInstrument,
   currentStep: DeckCalibrationStep,
-  labware: Array<DeckCalibrationLabware>,
+  labware: Array<CalibrationLabware>,
 |}

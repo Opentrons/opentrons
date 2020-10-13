@@ -13,6 +13,8 @@ const MOVE_TO_POINT_ONE: 'calibration.moveToPointOne' =
 const MOVE_TO_REFERENCE_POINT: 'calibration.moveToReferencePoint' =
   'calibration.moveToReferencePoint'
 const SAVE_OFFSET: 'calibration.saveOffset' = 'calibration.saveOffset'
+const SET_CALIBRATION_BLOCK: 'calibration.setHasCalibrationBlock' =
+  'calibration.setHasCalibrationBlock'
 const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
 
 export const sharedCalCommands = {
@@ -26,5 +28,6 @@ export const sharedCalCommands = {
   MOVE_TO_POINT_ONE,
   MOVE_TO_REFERENCE_POINT,
   SAVE_OFFSET,
+  SET_CALIBRATION_BLOCK,
   EXIT,
 }

@@ -31,6 +31,12 @@ describe('Calibration Download Component', () => {
           lastModified: '2020-08-25T14:14:30.422070+00:00',
           pipetteCalibratedWith: 'P20MV202020042206',
           tiprack: 'somehash',
+          source: 'user',
+          status: {
+            markedBad: false,
+            source: 'unknown',
+            markedAt: '',
+          },
         },
         calStatus = Calibration.DECK_CAL_STATUS_OK,
         name = 'opentrons',
@@ -88,6 +94,12 @@ describe('Calibration Download Component', () => {
       lastModified: '2020-08-25T14:14:30.422070+00:00',
       pipetteCalibratedWith: 'P20MV202020042206',
       tiprack: 'somehash',
+      source: 'user',
+      status: {
+        markedBad: false,
+        source: 'unknown',
+        markedAt: '',
+      },
     }
     const blob = new Blob([JSON.stringify(report)], {
       type: 'application/json',

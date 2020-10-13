@@ -5,6 +5,11 @@ import typeof {
   DECK_CAL_STATUS_IDENTITY,
   DECK_CAL_STATUS_BAD_CALIBRATION,
   DECK_CAL_STATUS_SINGULARITY,
+  CALIBRATION_SOURCE_DEFAULT,
+  CALIBRATION_SOURCE_FACTORY,
+  CALIBRATION_SOURCE_USER,
+  CALIBRATION_SOURCE_CALIBRATION_CHECK,
+  CALIBRATION_SOURCE_UNKNOWN,
 } from './constants'
 
 import type { Mount } from '@opentrons/components'
@@ -28,12 +33,27 @@ export type AttitudeMatrix = [
   [number, number, number]
 ]
 
+export type CalibrationSource =
+  | CALIBRATION_SOURCE_DEFAULT
+  | CALIBRATION_SOURCE_FACTORY
+  | CALIBRATION_SOURCE_USER
+  | CALIBRATION_SOURCE_CALIBRATION_CHECK
+  | CALIBRATION_SOURCE_UNKNOWN
+
+export type IndividualCalibrationStatus = {|
+  markedBad: boolean,
+  source: CalibrationSource | null,
+  markedAt: string | null,
+|}
+
 export type DeckCalibrationInfo = {|
   matrix: AffineMatrix | AttitudeMatrix,
   lastModified: string | null,
   pipetteCalibratedWith: string | null,
   tiprack: string | null,
   type: string,
+  source?: CalibrationSource,
+  status?: IndividualCalibrationStatus,
 |}
 
 export type DeckCalibrationData = DeckCalibrationInfo | AffineMatrix
@@ -97,6 +117,8 @@ export type PipetteOffsetCalibration = {|
   tiprack: string,
   tiprackUri: string,
   lastModified: string,
+  source: CalibrationSource,
+  status: IndividualCalibrationStatus,
 |}
 
 export type PipetteOffsetCalibrationModel = {|
@@ -115,6 +137,8 @@ export type TipLengthCalibration = {|
   tiprack: string,
   pipette: string,
   lastModified: string,
+  source: CalibrationSource,
+  status: IndividualCalibrationStatus,
 |}
 
 export type TipLengthCalibrationModel = {|

@@ -112,6 +112,8 @@ calibrations/
 # local IDE configs
 .vscode
 *.code-workspace
+*.sublime-project
+*.sublime-workspace
 
 # TODO(mc, 2020-10-30): remove this ignore when we need pyproject.toml
 # recent versions of setuptools create pyproject.toml automatically

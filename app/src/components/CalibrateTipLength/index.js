@@ -20,7 +20,7 @@ import {
 import type { StyleProps } from '@opentrons/components'
 import type {
   SessionCommandParams,
-  TipLengthCalibrationLabware,
+  CalibrationLabware,
 } from '../../sessions/types'
 import * as Sessions from '../../sessions'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
@@ -39,6 +39,7 @@ import {
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
+export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'
 
 const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
 const EXIT = 'exit'
@@ -107,9 +108,9 @@ export function CalibrateTipLength(
     return spec ? spec.channels > 1 : false
   }, [instrument])
 
-  const tipRack: TipLengthCalibrationLabware | null =
+  const tipRack: CalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
-  const calBlock: TipLengthCalibrationLabware | null =
+  const calBlock: CalibrationLabware | null =
     hasBlock && labware ? labware.find(l => !l.isTiprack) ?? null : null
 
   function sendCommands(...commands: Array<SessionCommandParams>) {

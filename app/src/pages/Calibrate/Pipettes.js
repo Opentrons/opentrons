@@ -13,7 +13,10 @@ import {
 } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 import { getFeatureFlags } from '../../config'
-import { getTipLengthForPipetteAndTiprack } from '../../calibration'
+import {
+  getTipLengthForPipetteAndTiprack,
+  getCalibrationForPipette,
+} from '../../calibration'
 
 import { Page } from '../../components/Page'
 import { TipProbe } from '../../components/TipProbe'
@@ -24,7 +27,7 @@ import {
 import { SessionHeader } from '../../components/SessionHeader'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { Dispatch } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../pipettes/types'
 import type { Labware } from '../../robot/types'
 import { CalibrateTipLengthControl } from './CalibrateTipLengthControl'
@@ -97,6 +100,17 @@ export function Pipettes(props: Props): React.Node {
     )
   })
 
+  const tipRackHash = activeTipRack ? activeTipRack.definitionHash : null
+
+  const serialNumber = currentPipette ? currentPipette.actual?.id : null
+
+  const convertRobotNameToString = robotName || 'unknown'
+  const pipetteOffsetCalibration = useSelector((state: State) =>
+    serialNumber
+      ? getCalibrationForPipette(state, convertRobotNameToString, serialNumber)
+      : null
+  )
+
   const protoPipettes = [
     pipettes?.left?.protocol
       ? omit(pipettes.left.protocol, 'displayName')
@@ -105,6 +119,10 @@ export function Pipettes(props: Props): React.Node {
       ? omit(pipettes.right.protocol, 'displayName')
       : null,
   ].filter(Boolean)
+
+  const isExtendedPipOffset = pipetteOffsetCalibration
+    ? tipRackHash === pipetteOffsetCalibration.tiprack
+    : false
 
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>
@@ -124,6 +142,7 @@ export function Pipettes(props: Props): React.Node {
               robotName={robotName}
               hasCalibrated={!!tipLengthDataForActivePipette}
               tipRackDefinition={activeTipRackDef}
+              isExtendedPipOffset={isExtendedPipOffset}
             />
           ) : null
         ) : (

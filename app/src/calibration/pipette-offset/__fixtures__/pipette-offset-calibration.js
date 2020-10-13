@@ -20,6 +20,12 @@ export const mockPipetteOffsetCalibration1: PipetteOffsetCalibrationModel = {
     tiprackUri: 'opentrons/opentrons_96_tiprack_300ul/1',
     tiprack: 'asdasfasdasdhasjhdasdasda',
     lastModified: '2020-08-30T10:02',
+    source: 'user',
+    status: {
+      markedBad: false,
+      source: 'unknown',
+      markedAt: '',
+    },
   },
   id: 'some id',
   type: 'Pipette Offset Calibration',
@@ -33,6 +39,12 @@ export const mockPipetteOffsetCalibration2: PipetteOffsetCalibrationModel = {
     tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
     tiprack: 'aasdhakfghakjsdhlaksjhdak',
     lastModified: '2020-07-25T20:00',
+    source: 'user',
+    status: {
+      markedBad: false,
+      source: 'unknown',
+      markedAt: '',
+    },
   },
   id: 'some id',
   type: 'Pipette Offset Calibration',
@@ -47,6 +59,12 @@ export const mockPipetteOffsetCalibration3: PipetteOffsetCalibrationModel = {
     tiprack: 'asdakjsdhalksjdhlakjsdhalkhsd',
 
     lastModified: '2020-09-10T05:13',
+    source: 'user',
+    status: {
+      markedBad: false,
+      source: 'unknown',
+      markedAt: '',
+    },
   },
   id: 'some id',
   type: 'Pipette Offset Calibration',

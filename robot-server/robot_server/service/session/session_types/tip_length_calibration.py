@@ -2,8 +2,10 @@ from typing import TYPE_CHECKING, cast, Awaitable
 from opentrons.types import Mount
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
+from robot_server.robot.calibration.models import \
+    SessionCreateParams
 from robot_server.robot.calibration.tip_length.models import \
-    TipCalibrationSessionStatus, SessionCreateParams
+    TipCalibrationSessionStatus
 from robot_server.service.session.errors import (SessionCreationException,
                                                  CommandExecutionException)
 from robot_server.service.session.command_execution import \

@@ -31,6 +31,12 @@ describe('TipLengthCalibrationData', () => {
         tiprack: 'tiprack',
         pipette: 'pip',
         lastModified: 'time',
+        source: 'user',
+        status: {
+          markedBad: false,
+          source: 'unknown',
+          markedAt: '',
+        },
       },
     })
     expect(wrapper.text().includes('Existing data')).toBe(true)

@@ -32,7 +32,7 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 import type {
-  DeckCalibrationLabware,
+  CalibrationLabware,
   SessionCommandParams,
 } from '../../sessions/types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
@@ -139,7 +139,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     closeWizard()
   }
 
-  const tipRack: DeckCalibrationLabware | null =
+  const tipRack: CalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
 
   if (!session || !tipRack) {

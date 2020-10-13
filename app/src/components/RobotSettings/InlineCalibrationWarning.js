@@ -8,6 +8,7 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_BODY_1,
   COLOR_ERROR,
+  COLOR_WARNING,
   SIZE_2,
   SPACING_AUTO,
   SPACING_1,
@@ -15,24 +16,38 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { DECK_CAL_STATUS_OK } from '../../calibration'
-import type { DeckCalibrationStatus } from '../../calibration/types'
-
-export type DeckCalibrationWarningProps = {|
-  deckCalibrationStatus: DeckCalibrationStatus | null,
-|}
+export const REQUIRED: 'required' = 'required'
+export const RECOMMENDED: 'recommended' = 'recommended'
+export type WarningType = typeof REQUIRED | typeof RECOMMENDED
 
 const CALIBRATION_REQUIRED = 'Calibration required'
+const CALIBRATION_RECOMMENDED = 'Calibration recommended'
 
-export function DeckCalibrationWarning({
-  deckCalibrationStatus,
-}: DeckCalibrationWarningProps): React.Node {
+const CONTENT_MAP = {
+  [REQUIRED]: {
+    color: COLOR_ERROR,
+    content: CALIBRATION_REQUIRED,
+  },
+  [RECOMMENDED]: {
+    color: COLOR_WARNING,
+    content: CALIBRATION_RECOMMENDED,
+  },
+}
+
+export type InlineCalibrationWarningProps = {|
+  warningType: WarningType | null,
+|}
+
+export function InlineCalibrationWarning(
+  props: InlineCalibrationWarningProps
+): React.Node {
+  const { warningType } = props
   return (
     <>
-      {deckCalibrationStatus && deckCalibrationStatus !== DECK_CAL_STATUS_OK && (
+      {warningType && (
         <Flex
           alignItems={ALIGN_CENTER}
-          color={COLOR_ERROR}
+          color={CONTENT_MAP[warningType].color}
           marginTop={SPACING_2}
         >
           <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
@@ -44,7 +59,7 @@ export function DeckCalibrationWarning({
             marginRight={SPACING_AUTO}
             fontWeight={FONT_WEIGHT_SEMIBOLD}
           >
-            <Text>{CALIBRATION_REQUIRED}</Text>
+            <Text>{CONTENT_MAP[warningType].content}</Text>
           </Box>
         </Flex>
       )}

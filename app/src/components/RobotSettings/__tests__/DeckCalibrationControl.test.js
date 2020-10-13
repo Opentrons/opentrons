@@ -5,8 +5,14 @@ import { mount } from 'enzyme'
 
 import * as Sessions from '../../../sessions'
 
+import {
+  DECK_CAL_STATUS_OK,
+  DECK_CAL_STATUS_IDENTITY,
+  DECK_CAL_STATUS_BAD_CALIBRATION,
+  DECK_CAL_STATUS_SINGULARITY,
+} from '../../../calibration'
 import { DeckCalibrationControl } from '../DeckCalibrationControl'
-import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
+import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
 
 jest.mock('../../../robot-api/selectors')
 jest.mock('../../../sessions/selectors')
@@ -27,6 +33,9 @@ describe('DeckCalibrationControl', () => {
   const getConfirmDeckCalButton = wrapper =>
     wrapper.find('OutlineButton[children="continue"]').find('button')
 
+  const getCalibrationWarning = wrapper =>
+    wrapper.find(InlineCalibrationWarning)
+
   beforeEach(() => {
     jest.useFakeTimers()
     mockStore = {
@@ -41,7 +50,7 @@ describe('DeckCalibrationControl', () => {
       const {
         robotName = 'robot-name',
         disabledReason = null,
-        deckCalStatus = 'OK',
+        deckCalStatus = DECK_CAL_STATUS_OK,
         deckCalData = {
           type: 'affine',
           matrix: [
@@ -53,6 +62,12 @@ describe('DeckCalibrationControl', () => {
           lastModified: null,
           pipetteCalibratedWith: null,
           tiprack: null,
+          source: 'user',
+          status: {
+            markedBad: false,
+            source: 'unknown',
+            markedAt: '',
+          },
         },
       } = props
       return mount(
@@ -111,12 +126,68 @@ describe('DeckCalibrationControl', () => {
     })
   })
 
-  it('DeckCalibrationWarning component renders if deck calibration is bad', () => {
-    const wrapper = render({ deckCalStatus: 'BAD_CALIBRATION' })
+  const BAD_STATUSES = [
+    DECK_CAL_STATUS_IDENTITY,
+    DECK_CAL_STATUS_BAD_CALIBRATION,
+    DECK_CAL_STATUS_SINGULARITY,
+  ]
 
-    // check that the deck calibration warning component is not null
-    // TODO(lc, 2020-06-18): Mock out the new transform status such that
-    // this should evaluate to true.
-    expect(wrapper.exists(DeckCalibrationWarning)).toBe(true)
+  BAD_STATUSES.forEach(badStatus => {
+    it(`InlineCalibrationWarning component requested with error if deck cal is ${badStatus}`, () => {
+      const wrapper = render({ deckCalStatus: badStatus })
+
+      expect(getCalibrationWarning(wrapper).html()).toMatch(/required/i)
+    })
+  })
+
+  BAD_STATUSES.forEach(badStatus => {
+    it(`InlineCalibrationWarning component requested with error if deck cal is ${badStatus} and marked bad`, () => {
+      const wrapper = render({
+        deckCalStatus: badStatus,
+        deckCalData: {
+          type: 'affine',
+          matrix: [
+            [1, 2, 3, 4],
+            [5, 6, 7, 8],
+            [9, 10, 11, 12],
+            [13, 14, 15, 16],
+          ],
+          lastModified: null,
+          pipetteCalibratedWith: null,
+          tiprack: null,
+          source: 'user',
+          status: {
+            markedBad: true,
+            source: 'calibration_check',
+            markedAt: '',
+          },
+        },
+      })
+      expect(getCalibrationWarning(wrapper).html()).toMatch(/required/i)
+    })
+  })
+
+  it('InlineCalibrationWarning component requested with warning if deck cal is good but marked bad', () => {
+    const wrapper = render({
+      deckCalData: {
+        type: 'affine',
+        matrix: [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+        lastModified: null,
+        pipetteCalibratedWith: null,
+        tiprack: null,
+        source: 'user',
+        status: {
+          markedBad: true,
+          source: 'calibration_check',
+          markedAt: '',
+        },
+      },
+    })
+    expect(getCalibrationWarning(wrapper).html()).toMatch(/recommended/i)
+  })
+
+  it('InlineCalibrationWarning component not rendered if deck cal is good and marked ok', () => {
+    const wrapper = render()
+    expect(getCalibrationWarning(wrapper).children()).toHaveLength(0)
   })
 })
