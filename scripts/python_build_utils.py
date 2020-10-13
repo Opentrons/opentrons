@@ -34,6 +34,9 @@ package_entries = {
     'shared-data': PackageEntry(
         os.path.join(HERE, '..', 'shared-data', 'package.json'),
         'shared_data'),
+    'notify-server': PackageEntry(
+        os.path.join(HERE, '..', 'notify-server', 'notify_server', 'package.json'),
+        'notify_server'),
 }
 
 
