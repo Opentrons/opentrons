@@ -141,7 +141,7 @@ export function CalibrateTipLengthControl({
           {
             mount,
             hasCalibrationBlock: !useTrashSurface.current,
-            shouldPerformTipLength: true,
+            shouldRecalibrateTipLength: true,
             tipRackDefinition,
           }
         )

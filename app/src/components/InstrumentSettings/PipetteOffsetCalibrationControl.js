@@ -91,7 +91,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
   }, [shouldOpen, shouldClose])
 
   const hasCalibrationBlock = false
-  const shouldPerformTipLength = false
+  const shouldRecalibrateTipLength = false
   const tipRackDefinition = null
   const handleStartPipOffsetCalSession = () => {
     dispatchRequests(
@@ -100,7 +100,7 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
         Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
         {
           mount,
-          shouldPerformTipLength,
+          shouldRecalibrateTipLength,
           hasCalibrationBlock,
           tipRackDefinition,
         }
