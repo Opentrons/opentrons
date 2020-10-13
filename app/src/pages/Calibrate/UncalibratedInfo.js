@@ -71,23 +71,27 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
   )
 
   const otherMount: Mount | null = PIPETTE_MOUNTS.find(m => m !== mount) || null
-  const nextLabware = useSelector(robotSelectors.getUnconfirmedLabware)[0]
+  const nextUnconfirmedLabware = useSelector(
+    robotSelectors.getUnconfirmedLabware
+  )
+  const nextLabware = useSelector(robotSelectors.getNotTipracks)
 
   let continueText
   let defHash
   let continueButtonOnClick
-  if (uncalibratedTipracksByMount[mount].length) {
+  if (uncalibratedTipracksByMount?.[mount].length) {
     continueText = CONTINUE_TO_NEXT_TIP_TYPE
     defHash = uncalibratedTipracksByMount[mount][0].definitionHash || ''
     continueButtonOnClick = `/calibrate/pipettes/${mount}/${defHash}`
   } else {
-    if (otherMount && uncalibratedTipracksByMount[otherMount].length) {
+    if (otherMount && uncalibratedTipracksByMount?.[otherMount].length) {
       continueText = CONTINUE_TO_NEXT_PIPETTE
       defHash = uncalibratedTipracksByMount[otherMount][0].definitionHash || ''
       continueButtonOnClick = `/calibrate/pipettes/${otherMount}/${defHash}`
     } else {
       continueText = CONTINUE_TO_LABWARE_CALIBRATION
-      continueButtonOnClick = `/calibrate/labware/${nextLabware.slot}`
+      const slot = nextUnconfirmedLabware?.[0].slot || nextLabware?.[0].slot
+      continueButtonOnClick = `/calibrate/labware/${slot}`
     }
   }
   const leftChildren = (
@@ -105,7 +109,9 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
       {hasCalibrated ? (
         <PrimaryBtn
           width={BTN_WIDTH}
-          onClick={() => dispatch(push(continueButtonOnClick))}
+          onClick={() => {
+            dispatch(push(continueButtonOnClick))
+          }}
         >
           {continueText}
         </PrimaryBtn>
