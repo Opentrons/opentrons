@@ -47,7 +47,7 @@ type UncalibratedInfoProps = {|
   uncalibratedTipracksByMount: TipracksByMountMap,
   mount: Mount,
   hasCalibrated: boolean,
-  handleStart: () => void,
+  handleStart: () => mixed,
   showSpinner: boolean,
 |}
 

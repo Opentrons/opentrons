@@ -1,5 +1,6 @@
 // @flow
 // robot selectors
+import { head } from 'lodash'
 import padStart from 'lodash/padStart'
 import some from 'lodash/some'
 import uniqBy from 'lodash/uniqBy'
@@ -27,6 +28,7 @@ import type {
   SessionStatusInfo,
   SessionModule,
   TipracksByMountMap,
+  NextTiprackPipetteInfo,
   CommandNode,
 } from './types'
 
@@ -502,3 +504,21 @@ export const getTipracksByMount: (
     )
   }
 )
+
+export const getNextTiprackPipette: (
+  uncalibratedTipracksByMount: TipracksByMountMap
+) => NextTiprackPipetteInfo | null = uncalibratedTipracksByMount => {
+  const targetMount = head(
+    Constants.PIPETTE_MOUNTS.filter(
+      mount => uncalibratedTipracksByMount[mount].length > 0
+    )
+  )
+  if (targetMount) {
+    return {
+      mount: targetMount,
+      tiprack: uncalibratedTipracksByMount[targetMount][0],
+    }
+  } else {
+    return null
+  }
+}

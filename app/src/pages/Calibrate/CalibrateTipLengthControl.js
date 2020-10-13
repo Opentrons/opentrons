@@ -1,12 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  Icon,
-  PrimaryButton,
-  type Mount,
-  useConditionalConfirm,
-} from '@opentrons/components'
+import { type Mount, useConditionalConfirm } from '@opentrons/components'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
