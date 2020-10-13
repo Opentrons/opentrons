@@ -199,3 +199,8 @@ export type TipracksByMountMap = {|
   left: Array<Labware>,
   right: Array<Labware>,
 |}
+
+export type NextTiprackPipetteInfo = {|
+  mount: Mount,
+  tiprack: Labware,
+|}
