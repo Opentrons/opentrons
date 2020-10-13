@@ -19,7 +19,7 @@ following lifecycle:
 3. Relavent data is from side-effects is loaded into a command result
 4. Command result is added to protocol state
 """
-
+from typing import Union
 from .equipment import LoadLabwareRequest, LoadPipetteRequest
 
 from .pipetting import (
@@ -30,7 +30,18 @@ from .pipetting import (
     DispenseRequest
 )
 
+CommandRequest = Union[
+    MoveToWellRequest,
+    PickUpTipRequest,
+    DropTipRequest,
+    AspirateRequest,
+    DispenseRequest
+]
+
 __all__ = [
+    # type unions
+    "CommandRequest",
+
     # equipment commands
     "LoadLabwareRequest",
     "LoadPipetteRequest",

@@ -30,11 +30,16 @@ class LoadLabwareResponse(BaseModel):
     labwareId: str
 
 
-LoadLabwareCommand = BaseCommand[LoadLabwareRequest, LoadLabwareResponse]
-
-
 class LoadPipetteRequest(BaseModel):
     pipetteName: PipetteName = Field(
         ...,
         description="The name of the pipette to be required")
     mount: Mount
+
+
+class LoadPipetteResponse(BaseModel):
+    pass
+
+
+LoadLabwareCommand = BaseCommand[LoadLabwareRequest, LoadLabwareResponse]
+LoadPipetteCommand = BaseCommand[LoadPipetteRequest, LoadPipetteResponse]

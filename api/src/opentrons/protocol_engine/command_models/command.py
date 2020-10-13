@@ -1,7 +1,7 @@
 """Command model and type definitions."""
+from dataclasses import dataclass
 from datetime import datetime
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 from typing import Generic, TypeVar, Union
 from typing_extensions import Literal
 
@@ -9,20 +9,23 @@ ReqT = TypeVar('ReqT', bound=BaseModel)
 ResT = TypeVar('ResT', bound=BaseModel)
 
 
-class PendingCommand(GenericModel, Generic[ReqT]):
+@dataclass
+class PendingCommand(Generic[ReqT]):
     status: Literal['pending']
     createdAt: datetime
     request: ReqT
 
 
-class RunningCommand(GenericModel, Generic[ReqT]):
+@dataclass
+class RunningCommand(Generic[ReqT]):
     status: Literal['running']
     createdAt: datetime
     startedAt: datetime
     request: ReqT
 
 
-class CompletedCommand(GenericModel, Generic[ReqT, ResT]):
+@dataclass
+class CompletedCommand(Generic[ReqT, ResT]):
     status: Literal['completed']
     createdAt: datetime
     startedAt: datetime

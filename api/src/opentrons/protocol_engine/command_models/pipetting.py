@@ -19,12 +19,6 @@ class BaseLiquidHandlingRequest(BasePipettingRequest):
                     "than a pipette-specific maximum volume.",
         gt=0,
     )
-    # TODO(mc, 2020-10-08): allow a vector
-    offsetFromBottom: float = Field(
-        ...,
-        description="Offset from the bottom of the well in mm",
-        gt=0,
-    )
     flowRate: float = Field(
         ...,
         description="The absolute flow rate in uL/second. Must be greater "

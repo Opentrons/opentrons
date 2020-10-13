@@ -57,22 +57,17 @@ def test_aspirate_command():
     assert payload.labwareId == "123"
     assert payload.wellId == "A3"
     assert payload.volume == 50
-    assert payload.offsetFromBottom == 1.5
     assert payload.flowRate == 1.0
 
 
-@pytest.mark.parametrize(
-    "key_under_test",
-    ["volume", "flowRate", "offsetFromBottom"]
-)
+@pytest.mark.parametrize("key_under_test", ["volume", "flowRate"])
 def test_aspirate_command_validation(key_under_test):
-    """AspirateRequest require positive volume, flowRate, offsetFromBottom."""
+    """AspirateRequest should require positive volume, flowRate."""
     init_args = {
         "pipetteId": "abc",
         "labwareId": "123",
         "wellId": "A3",
         "volume": 50,
-        "offsetFromBottom": 1.5,
         "flowRate": 1.0
     }
     init_args[key_under_test] = -1
@@ -88,7 +83,6 @@ def test_dispense_command():
         labwareId="123",
         wellId="A3",
         volume=50,
-        offsetFromBottom=1.5,
         flowRate=1.0
     )
 
@@ -96,5 +90,4 @@ def test_dispense_command():
     assert payload.labwareId == "123"
     assert payload.wellId == "A3"
     assert payload.volume == 50
-    assert payload.offsetFromBottom == 1.5
     assert payload.flowRate == 1.0
