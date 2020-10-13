@@ -6,4 +6,4 @@ ExecStart=python -m notify_server.main
 Restart=on-failure
 
 [Install]
-WantedBy=opentrons.target
+WantedBy=opentrons-robot-server.service
