@@ -6,6 +6,7 @@ authors = ["amit lissack <amit@opentrons.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
+pyzmq = "^19.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
