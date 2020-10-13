@@ -1,7 +1,7 @@
 // @flow
 
 import { of } from 'rxjs'
-import { filter, withLatestFrom, mergeMap } from 'rxjs/operators'
+import { filter, withLatestFrom, map } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
 import { getConnectedRobotName } from '../../../robot/selectors'
@@ -37,8 +37,8 @@ export const fetchPipetteOffsetCalibrationsOnCalibrationEndEpic: Epic = (
         sessionIncursRefetch(action.payload.data.attributes.sessionType) &&
         robotName != null
     ),
-    mergeMap(robotName => {
-      return of(Actions.fetchPipetteOffsetCalibrations(robotName))
+    map((robotName) => {
+      return Actions.fetchPipetteOffsetCalibrations(robotName)
     })
   )
 }

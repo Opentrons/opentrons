@@ -1,7 +1,7 @@
 // @flow
 
 import { of } from 'rxjs'
-import { filter, withLatestFrom, mergeMap } from 'rxjs/operators'
+import { filter, withLatestFrom, map } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
 import { getConnectedRobotName } from '../../../robot/selectors'
@@ -35,8 +35,8 @@ export const fetchTipLengthCalibrationsOnCalibrationEndEpic: Epic = (
         sessionIncursRefetch(action.payload.data.attributes.sessionType) &&
         robotName != null
     ),
-    mergeMap(robotName => {
-      return of(Actions.fetchTipLengthCalibrations(robotName))
+    map(([_action, robotName]) => {
+      return Actions.fetchTipLengthCalibrations(robotName)
     })
   )
 }
