@@ -75,6 +75,7 @@ ERROR_KEYWORD = 'error'
 DEFAULT_TC_TIMEOUT = 40
 DEFAULT_COMMAND_RETRIES = 3
 DEFAULT_STABILIZE_DELAY = 0.1
+DEFAULT_POLLER_WAIT_SECONDS = 0.1
 POLLING_FREQUENCY_MS = 1000
 HOLD_TIME_FUZZY_SECONDS = POLLING_FREQUENCY_MS / 1000 * 5
 TEMP_THRESHOLD = 0.3
@@ -433,7 +434,8 @@ class Thermocycler:
         retries = 0
         while self._target_temp != temp or \
                 not self.hold_time_probably_set(hold_time):
-            await asyncio.sleep(0.1)    # Wait for the poller to update
+            # Wait for the poller to update
+            await asyncio.sleep(DEFAULT_POLLER_WAIT_SECONDS)
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
                 raise ThermocyclerError(f'Thermocycler driver set the block '
@@ -457,7 +459,8 @@ class Thermocycler:
         await self._write_and_wait(lid_temp_cmd)
         retries = 0
         while self._lid_target != _lid_target:
-            await asyncio.sleep(0.1)    # Wait for the poller to update
+            # Wait for the poller to update
+            await asyncio.sleep(DEFAULT_POLLER_WAIT_SECONDS)
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
                 raise ThermocyclerError(f'Thermocycler driver set lid temp to'

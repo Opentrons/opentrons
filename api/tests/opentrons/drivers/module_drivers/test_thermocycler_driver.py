@@ -9,11 +9,20 @@
 # expected ACK, then it'll eventually time out and return an error
 
 import types
+from unittest.mock import patch
 import pytest
-from opentrons.drivers.thermocycler import Thermocycler, ThermocyclerError
+from opentrons.drivers.thermocycler import (
+    Thermocycler, ThermocyclerError, driver
+)
 
 
-async def test_set_block_temperature():
+@pytest.fixture
+def patch_poller_wait():
+    with patch.object(driver, 'DEFAULT_POLLER_WAIT_SECONDS', new=0) as p:
+        yield p
+
+
+async def test_set_block_temperature(patch_poller_wait):
     # set the block target temperature
 
     tc = Thermocycler(lambda x: None)
@@ -77,7 +86,7 @@ async def test_set_block_temperature():
     assert command_log.pop(0) == 'M104 S21'
 
 
-async def test_set_temperature_with_fuzzy_hold_time():
+async def test_set_temperature_with_fuzzy_hold_time(patch_poller_wait):
     tc = Thermocycler(lambda x: None)
     command_log = []
 
@@ -118,7 +127,7 @@ async def test_set_temperature_with_fuzzy_hold_time():
     assert command_log.pop(0) == 'M104 S21 H5'
 
 
-async def test_deactivates():
+async def test_deactivates(patch_poller_wait):
     tc = Thermocycler(lambda x: None)
     command_log = []
 
@@ -140,7 +149,7 @@ async def test_deactivates():
     assert command_log.pop(0) == 'M14'
 
 
-async def test_set_lid_temperature():
+async def test_set_lid_temperature(patch_poller_wait):
     tc = Thermocycler(lambda x: None)
     command_log = []
 
@@ -166,7 +175,7 @@ async def test_set_lid_temperature():
     assert command_log.pop(0) == 'M140 S60'
 
 
-def test_holding_at_target():
+def test_holding_at_target(patch_poller_wait):
     tc = Thermocycler(lambda x: None)
 
     tc._target_temp = 30
