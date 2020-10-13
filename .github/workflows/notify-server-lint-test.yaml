@@ -8,11 +8,9 @@ on:
   push:
     paths:
       - 'Makefile'
+      - 'notify-server/**'
       - '.github/workflows/notify-server-lint-test.yaml'
       - '.github/actions/python/**'
-    branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'master'
-      - 'chore_release-**'
     tags-ignore:
       - '*'
   pull_request:
