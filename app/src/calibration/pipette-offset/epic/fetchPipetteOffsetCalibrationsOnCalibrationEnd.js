@@ -1,6 +1,5 @@
 // @flow
 
-import { of } from 'rxjs'
 import { filter, withLatestFrom, map } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
@@ -37,7 +36,7 @@ export const fetchPipetteOffsetCalibrationsOnCalibrationEndEpic: Epic = (
         sessionIncursRefetch(action.payload.data.attributes.sessionType) &&
         robotName != null
     ),
-    map((robotName) => {
+    map(robotName => {
       return Actions.fetchPipetteOffsetCalibrations(robotName)
     })
   )

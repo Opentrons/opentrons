@@ -1,6 +1,5 @@
 // @flow
 
-import { of } from 'rxjs'
 import { filter, withLatestFrom, map } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
