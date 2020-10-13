@@ -76,16 +76,22 @@ const assetMap = {
 }
 
 const SAVE_XY_POINT_HEADER = 'Calibrate the X and Y-axis in'
+const CHECK_POINT_XY_HEADER = 'Check the X and Y-axis in'
 const SLOT = 'slot'
 const JOG_UNTIL = 'Jog the robot until the tip is'
 const PRECISELY_CENTERED = 'precisely centered'
 const ABOVE_THE_CROSS = 'above the cross in'
 const THEN = 'Then press the'
 const TO_SAVE = 'button to calibrate the x and y-axis in'
+const TO_CHECK =
+  'button to determine how this position compares to the previously-saved x and y-axis calibration coordinates.'
 
 const BASE_BUTTON_TEXT = 'save calibration'
+const HEALTH_BUTTON_TEXT = 'check x and y-axis'
 const MOVE_TO_POINT_TWO_BUTTON_TEXT = `${BASE_BUTTON_TEXT} and move to slot 3`
 const MOVE_TO_POINT_THREE_BUTTON_TEXT = `${BASE_BUTTON_TEXT} and move to slot 7`
+const HEALTH_POINT_TWO_BUTTON_TEXT = `${HEALTH_BUTTON_TEXT} and move to slot 3`
+const HEALTH_POINT_THREE_BUTTON_TEXT = `${HEALTH_BUTTON_TEXT} and move to slot 7`
 
 const contentsBySessionTypeByCurrentStep: {
   [SessionType]: {
@@ -120,6 +126,23 @@ const contentsBySessionTypeByCurrentStep: {
       moveCommandString: null,
     },
   },
+  [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
+    [Sessions.HEALTH_STEP_COMPARING_POINT_ONE]: {
+      slotNumber: '1',
+      buttonText: HEALTH_POINT_TWO_BUTTON_TEXT,
+      moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_TWO,
+    },
+    [Sessions.HEALTH_STEP_COMPARING_POINT_TWO]: {
+      slotNumber: '3',
+      buttonText: HEALTH_POINT_THREE_BUTTON_TEXT,
+      moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_THREE,
+    },
+    [Sessions.HEALTH_STEP_COMPARING_POINT_THREE]: {
+      slotNumber: '7',
+      buttonText: HEALTH_BUTTON_TEXT,
+      moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+    },
+  },
 }
 
 export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
@@ -137,6 +160,8 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     [slotNumber, mount, isMulti]
   )
 
+  const isHealthCheck =
+    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
@@ -167,7 +192,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
       >
-        {SAVE_XY_POINT_HEADER}
+        {isHealthCheck ? CHECK_POINT_XY_HEADER : SAVE_XY_POINT_HEADER}
         {` ${SLOT} ${slotNumber || ''}`}
       </Text>
       <Flex
@@ -185,7 +210,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           <br />
           {THEN}
           <b>{` ${buttonText} `}</b>
-          {`${TO_SAVE} ${SLOT} ${slotNumber}`}.
+          {`${isHealthCheck ? TO_CHECK : TO_SAVE} ${SLOT} ${slotNumber}`}.
         </Text>
         <video
           key={String(demoAsset)}

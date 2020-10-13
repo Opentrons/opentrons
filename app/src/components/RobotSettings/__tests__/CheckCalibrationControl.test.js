@@ -76,7 +76,7 @@ describe('CheckCalibrationControl', () => {
     expect(dispatch).toHaveBeenCalledWith({
       ...Sessions.ensureSession(
         robotName,
-        Sessions.SESSION_TYPE_CALIBRATION_CHECK
+        Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
       ),
       meta: { requestId: expect.any(String) },
     })

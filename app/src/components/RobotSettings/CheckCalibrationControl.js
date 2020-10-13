@@ -59,7 +59,7 @@ export function CheckCalibrationControl({
 
   const ensureSession = () => {
     dispatch(
-      Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_CALIBRATION_CHECK)
+      Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK)
     )
   }
 

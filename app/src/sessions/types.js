@@ -19,7 +19,7 @@ import typeof {
   CREATE_SESSION_COMMAND,
   CREATE_SESSION_COMMAND_SUCCESS,
   CREATE_SESSION_COMMAND_FAILURE,
-  SESSION_TYPE_CALIBRATION_CHECK,
+  SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   SESSION_TYPE_TIP_LENGTH_CALIBRATION,
   SESSION_TYPE_DECK_CALIBRATION,
   SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
@@ -48,7 +48,7 @@ export type * from './pipette-offset-calibration/types'
 
 // The available session types
 export type SessionType =
-  | SESSION_TYPE_CALIBRATION_CHECK
+  | SESSION_TYPE_CALIBRATION_HEALTH_CHECK
   | SESSION_TYPE_TIP_LENGTH_CALIBRATION
   | SESSION_TYPE_DECK_CALIBRATION
   | SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
@@ -83,7 +83,7 @@ export type SessionCommandParams = {
 }
 
 export type CalibrationCheckSessionResponseAttributes = {|
-  sessionType: SESSION_TYPE_CALIBRATION_CHECK,
+  sessionType: SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   details: CalCheckTypes.RobotCalibrationCheckSessionDetails,
   createParams: {},
 |}

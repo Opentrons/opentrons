@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -29,10 +30,13 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 import type {
-  DeckCalibrationLabware,
+  calibrationLabware,
   SessionCommandParams,
 } from '../../sessions/types'
-import type { CalibratePipetteOffsetParentProps } from './types'
+
+import { BadCalibration } from './BadCalibration'
+import { ResultsSummary } from './ResultsSummary'
+import type { CalibrationHealthCheckParentProps } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 
@@ -49,7 +53,8 @@ const PANEL_BY_STEP: {
   [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: SaveZPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: SaveXYPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: CompleteConfirmation,
-  [Sessions.CHECK_STEP_CHECK_COMPLETE]: CompleteConfirmation,
+  [Sessions.CHECK_STEP_BAD_CALIBRATION]: BadCalibration,
+  [Sessions.CHECK_STEP_CHECK_COMPLETE]: ResultsSummary,
 }
 
 const PANEL_STYLE_PROPS_BY_STEP: {
@@ -65,8 +70,8 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.CHECK_STEP_CHECK_COMPLETE]: terminalContentsStyleProps,
 }
 
-export function CheckCalibration(
-  props: CheckCalibrationParentProps
+export function CheckHealthCalibration(
+  props: CalibrationHealthCheckParentProps
 ): React.Node {
   const {
     session,
@@ -115,7 +120,7 @@ export function CheckCalibration(
     closeWizard()
   }
 
-  const tipRack: DeckCalibrationLabware | null =
+  const tipRack: calibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
 
   if (!session || !tipRack) {

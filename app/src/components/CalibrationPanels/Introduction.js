@@ -37,6 +37,12 @@ const DECK_CAL_HEADER = 'deck calibration'
 const DECK_CAL_BODY =
   'Deck calibration ensures positional accuracy so that your robot moves as expected. It will accurately establish the OT-2’s deck orientation relative to the gantry.'
 
+const HEALTH_CHECK_HEADER = 'calibration health check'
+const HEALTH_CHECK_BODY =
+  'Checking the OT-2’s calibration is a first step towards diagnosing and troubleshooting common pipette positioning problems you may be experiencing.'
+const HEALTH_CHECK_PROCEDURE =
+  'For this process you will be asked to manually jog each attached pipette to designated positions on the robot’s deck. You will then prompt the robot to check how this positional coordinate compares to your previously saved calibration coordinate. Note that this process does not overwrite your existing calibration data.'
+
 const PIP_OFFSET_CAL_HEADER = 'pipette offset calibration'
 const PIP_OFFSET_CAL_BODY =
   'Calibrating pipette offset enables robot to accurately establish the location of the mounted pipette’s nozzle, relative to the deck.'
@@ -54,6 +60,8 @@ const NOTE_BODY_OUTSIDE_PROTOCOL =
   'important you perform this calibration using the Opentrons tips and tip racks specified above, as the robot determines accuracy based on the measurements of these tips.'
 const NOTE_BODY_PRE_PROTOCOL =
   'important you perform this calibration using the exact tips specified in your protocol, as the robot uses the corresponding labware definition data to find the tip.'
+const NOTE_HEALTH_CHECK_OUTCOMES =
+  'If the difference between the two coordinates falls within the acceptable tolerance range for the given pipette, the check will pass. Otherwise, it will fail and you’ll be provided with troubleshooting guidance. You may exit at any point or continue through to the end to check the overall calibration status of your robot.'
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 
 const contentsBySessionType: {
@@ -82,19 +90,12 @@ const contentsBySessionType: {
     continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
     noteBody: NOTE_BODY_PRE_PROTOCOL,
   },
-  [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
-    headerText: TIP_LENGTH_CAL_HEADER,
-    bodyText: TIP_LENGTH_CAL_BODY,
-    continueButtonText: `${CONTINUE} ${TIP_LENGTH_CAL_PROCEDURE}`,
-    continuingToText: TIP_LENGTH_CAL_PROCEDURE,
-    noteBody: NOTE_BODY_PRE_PROTOCOL,
-  },
-  [Sessions.SESSION_TYPE_CALIBRATION_CHECK]: {
-    headerText: TIP_LENGTH_CAL_HEADER,
-    bodyText: TIP_LENGTH_CAL_BODY,
-    continueButtonText: `${CONTINUE} ${TIP_LENGTH_CAL_PROCEDURE}`,
-    continuingToText: TIP_LENGTH_CAL_PROCEDURE,
-    noteBody: NOTE_BODY_PRE_PROTOCOL,
+  [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
+    headerText: HEALTH_CHECK_HEADER,
+    bodyText: HEALTH_CHECK_BODY,
+    continueButtonText: `${CONTINUE} to ${HEALTH_CHECK_HEADER}`,
+    continuingToText: HEALTH_CHECK_PROCEDURE,
+    noteBody: NOTE_HEALTH_CHECK_OUTCOMES,
   },
 }
 

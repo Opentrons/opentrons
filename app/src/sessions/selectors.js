@@ -128,7 +128,7 @@ export const getAnalyticsPropsForRobotSessionById: (
   const session = getRobotSessionById(state, robotName, sessionId)
   if (!session) return null
 
-  if (session.sessionType === Constants.SESSION_TYPE_CALIBRATION_CHECK) {
+  if (session.sessionType === Constants.SESSION_TYPE_CALIBRATION_HEALTH_CHECK) {
     return getAnalyticsPropsFromCalibrationCheck(session)
   } else {
     // the exited session type doesn't report to analytics
@@ -143,7 +143,7 @@ export const getIntercomEventPropsForRobotSessionById: (
 ) => Types.SessionIntercomProps | null = (state, robotName, sessionId) => {
   const session = getRobotSessionById(state, robotName, sessionId)
   if (!session) return null
-  if (session.sessionType === Constants.SESSION_TYPE_CALIBRATION_CHECK) {
+  if (session.sessionType === Constants.SESSION_TYPE_CALIBRATION_HEALTH_CHECK) {
     return getIntercomPropsFromCalibrationCheck(session)
   } else {
     // the exited session type doesn't report to analytics

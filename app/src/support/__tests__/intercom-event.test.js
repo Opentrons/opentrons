@@ -29,7 +29,7 @@ describe('support event tests', () => {
     const built = makeIntercomEvent(
       Sessions.createSession(
         'whocares',
-        Sessions.SESSION_TYPE_CALIBRATION_CHECK,
+        Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
         {}
       ),
       MOCK_STATE

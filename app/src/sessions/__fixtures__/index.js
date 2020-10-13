@@ -30,7 +30,7 @@ export const mockSessionId: string = 'fake_session_id'
 export const mockOtherSessionId: string = 'other_fake_session_id'
 
 export const mockCalibrationCheckSessionAttributes: Types.CalibrationCheckSessionResponseAttributes = {
-  sessionType: Constants.SESSION_TYPE_CALIBRATION_CHECK,
+  sessionType: Constants.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   createParams: {},
   details: mockRobotCalibrationCheckSessionDetails,
 }
@@ -261,7 +261,7 @@ export const {
 })
 
 export const mockCalibrationCheckSessionAnalyticsProps = {
-  sessionType: Constants.SESSION_TYPE_CALIBRATION_CHECK,
+  sessionType: Constants.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   leftPipetteModel:
     mockRobotCalibrationCheckSessionDetails.instruments.left.model,
   rightPipetteModel:
@@ -341,7 +341,7 @@ export const mockCalibrationCheckSessionAnalyticsProps = {
 }
 
 export const mockCalibrationCheckSessionIntercomProps = {
-  sessionType: Constants.SESSION_TYPE_CALIBRATION_CHECK,
+  sessionType: Constants.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   leftPipetteModel:
     mockRobotCalibrationCheckSessionDetails.instruments.left.model,
   rightPipetteModel:
