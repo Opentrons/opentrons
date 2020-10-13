@@ -86,14 +86,14 @@ class PipetteOffsetCalibrationUserFlow:
 
         self._using_default_tiprack = False
 
-        self._has_calibrated_tip_length: bool =\
-            (self._get_stored_tip_length_cal() is not None
-             or self._using_default_tiprack)
-
         existing_offset_calibration = self._get_stored_pipette_offset_cal()
         self._initialize_deck(tip_rack_def, existing_offset_calibration)
 
         existing_tip_length_calibration = self._get_stored_tip_length_cal()
+
+        self._has_calibrated_tip_length: bool =\
+            (self._get_stored_tip_length_cal() is not None
+             or self._using_default_tiprack)
 
         perform_tip_length = recalibrate_tip_length \
             or not existing_tip_length_calibration
@@ -249,7 +249,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_stored_pipette_offset_cal(
             self) -> Optional[PipetteOffsetByPipetteMount]:
         return get.get_pipette_offset(
-            self._hw_pipette['pipette_id'], self._mount
+            self._hw_pipette.pipette_id, self._mount
         )
 
     def _get_tip_length(self) -> float:
