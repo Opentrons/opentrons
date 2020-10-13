@@ -349,7 +349,8 @@ class InstrumentContext(CommandPublisher):
                        defaults to the highest volume possible with this
                        pipette and its currently attached tip.
         :param location: a Well or a position relative to well.
-                         e.g, `plate.rows()[0][0].bottom()`
+                         e.g, `plate.rows()[0][0].bottom()`.  If unspecified,
+                         the pipette will mix from its current position.
         :type location: types.Location
         :param rate: Set plunger speed for this mix, where,
                      ``speed = rate * (aspirate_speed or dispense_speed)``
