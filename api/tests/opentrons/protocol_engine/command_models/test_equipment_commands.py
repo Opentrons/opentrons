@@ -8,29 +8,14 @@ def test_load_labware_request():
     payload = commands.LoadLabwareRequest(
         location=3,
         loadName="some-load-name",
-        displayName=None,
         namespace="opentrons-test",
         version=1
     )
 
     assert payload.location == 3
     assert payload.loadName == "some-load-name"
-    assert payload.displayName is None
     assert payload.namespace == "opentrons-test"
     assert payload.version == 1
-
-
-def test_load_labware_request_with_display_name():
-    """LoadLabwareRequest should take an optional displayName."""
-    payload = commands.LoadLabwareRequest(
-        location=3,
-        loadName="some-load-name",
-        displayName="Nice Name",
-        namespace="opentrons-test",
-        version=1
-    )
-
-    assert payload.displayName == "Nice Name"
 
 
 def test_load_pipette_command():

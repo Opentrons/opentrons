@@ -1,7 +1,7 @@
 """Equipment loading command models."""
 from pydantic import BaseModel, Field
-from typing import Optional
-from opentrons.types import Mount
+from typing import Any
+from opentrons.types import Mount, Point
 from opentrons_shared_data.pipette.dev_types import PipetteName
 
 from .command import BaseCommand
@@ -14,10 +14,6 @@ class LoadLabwareRequest(BaseModel):
     loadName: str = Field(
         ...,
         description="Name used to reference a labware definition")
-    # TODO(mc, 2020-10-08): default this field value to None if missing
-    displayName: Optional[str] = Field(
-        ...,
-        description="User-readable name for labware")
     namespace: str = Field(
         ...,
         description="The namespace the labware definition belongs to")
@@ -28,6 +24,8 @@ class LoadLabwareRequest(BaseModel):
 
 class LoadLabwareResponse(BaseModel):
     labwareId: str
+    definition: Any
+    calibration: Point
 
 
 class LoadPipetteRequest(BaseModel):
@@ -38,7 +36,7 @@ class LoadPipetteRequest(BaseModel):
 
 
 class LoadPipetteResponse(BaseModel):
-    pass
+    pipetteId: str
 
 
 LoadLabwareCommand = BaseCommand[LoadLabwareRequest, LoadLabwareResponse]
