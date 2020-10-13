@@ -1,18 +1,14 @@
 # This workflow runs test and lint on branch pushes that touch the
-# robot-server project or its dependencies
+# notify-server project or its dependencies
 
-name: 'Robot server lint/test'
+name: 'Notify server lint/test'
 
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
     paths:
-      - 'api/**'
       - 'Makefile'
-      - 'shared-data/*/**'
-      - '!shared-data/js/**'
-      - 'robot-server/**'
-      - '.github/workflows/robot-server-test-lint.yaml'
+      - '.github/workflows/notify-server-lint-test.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'master'
@@ -21,11 +17,8 @@ on:
       - '*'
   pull_request:
     paths:
-      - 'api/**'
       - 'Makefile'
-      - 'shared-data/*/**'
-      - '!shared-data/js/**'
-      - 'robot-server/**'
+      - 'notify-server/**'
   workflow_dispatch:
 
 defaults:
@@ -34,7 +27,7 @@ defaults:
 
 jobs:
   lint-test:
-    name: 'robot server package linting and tests'
+    name: 'notify server package linting and tests'
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
@@ -47,11 +40,11 @@ jobs:
 
       - uses: './.github/actions/python/setup'
         with:
-          project: 'robot-server'
+          project: 'notify-server'
       - name: Lint
-        run: make -C robot-server lint
+        run: make -C notify-server lint
       - name: Test
-        run: make -C robot-server test
+        run: make -C notify-server test
       - uses: 'codecov/codecov-action@v1'
         with:
-          file: ./robot-server/coverage.xml
+          file: ./notify-server/coverage.xml
