@@ -22,7 +22,7 @@ import {
   HOME,
 } from '../../robot-controls'
 
-import { useCalibratePipetteOffset } from '../CalibratePipetteOffset'
+import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
