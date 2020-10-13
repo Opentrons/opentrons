@@ -190,16 +190,12 @@ class InstrumentContext(CommandPublisher):
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> InstrumentContext:
         """
-        Aspirate a volume of liquid (in microliters/uL) using this pipette
-        from the specified location
+        Aspirate a given volume of liquid from the specified location, using
+        this pipette.
 
-        If only a volume is passed, the pipette will aspirate
-        from its current position. If only a location is passed (as in
-        ``instr.aspirate(location=wellplate['A1'])``,
-        :py:meth:`aspirate` will default to the amount of volume available.
-
-        :param volume: The volume to aspirate, in microliters. If not
-                       specified, :py:attr:`max_volume`.
+        :param volume: The volume to aspirate, in microliters (µL).  If 0 or
+                       unspecified, defaults to the highest volume possible
+                       with this pipette and its currently attached tip.
         :type volume: int or float
         :param location: Where to aspirate from. If `location` is a
                          :py:class:`.Well`, the robot will aspirate from
@@ -374,16 +370,16 @@ class InstrumentContext(CommandPublisher):
             location: Union[types.Location, Well] = None,
             rate: float = 1.0) -> InstrumentContext:
         """
-        Mix a volume of liquid (uL) using this pipette.
-        If no location is specified, the pipette will mix from its current
-        position. If no volume is passed, ``mix`` will default to the
-        pipette's :py:attr:`max_volume`.
+        Mix a volume of liquid (uL) using this pipette, by repeatedly
+        aspirating and dispensing in the same place.
 
         :param repetitions: how many times the pipette should mix (default: 1)
-        :param volume: number of microliters to mix (default:
-                       :py:attr:`max_volume`)
+        :param volume: number of microliters to mix.  If 0 or unspecified,
+                       defaults to the highest volume possible with this
+                       pipette and its currently attached tip.
         :param location: a Well or a position relative to well.
-                         e.g, `plate.rows()[0][0].bottom()`
+                         e.g, `plate.rows()[0][0].bottom()`.  If unspecified,
+                         the pipette will mix from its current position.
         :type location: types.Location
         :param rate: Set plunger speed for this mix, where,
                      ``speed = rate * (aspirate_speed or dispense_speed)``
@@ -1348,7 +1344,13 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def max_volume(self) -> float:
         """
-        The maximum volume, in microliters, this pipette can hold.
+        The maximum volume, in microliters (µL), that this pipette can hold.
+
+        The maximum volume that you can actually aspirate might be lower than
+        this, depending on what kind of tip is attached to this pipette.  For
+        example, a P300 Single-Channel pipette always has a ``max_volume`` of
+        300 µL, but if it's using a 200 µL filter tip, its usable volume would
+        be limited to 200 µL.
         """
         return self.hw_pipette['max_volume']
 
