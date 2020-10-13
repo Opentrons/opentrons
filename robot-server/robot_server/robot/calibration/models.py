@@ -16,14 +16,24 @@ class SessionCreateParams(BaseModel):
     hasCalibrationBlock: bool = Field(
         False,
         description='Whether to use a calibration block in the'
-                    'instance of TLC + pipette offset flow'
+                    'instance of TLC + pipette offset flow. If no tip length '
+                    'is performed, this is ignored, but it should always be '
+                    'specified.'
     )
     tipRackDefinition: Optional[dict] = Field(
         None,
-        description='The full labware definition of the tip rack to calibrate.'
+        description='The full labware definition of the tip rack to '
+                    'calibrate. If not specified, then a default will be '
+                    'used - either the same tiprack as in the current '
+                    'calibration, or, if there is no calibration, the '
+                    'default Opentrons tiprack for this pipette.'
     )
-    shouldPerformTipLength: bool = Field(
+    shouldRecalibrateTipLength: bool = Field(
         True,
-        description='whether to perform TLC with the loaded tip rack,'
-                    'prior to calibrating the pipette offset'
+        description='whether to perform TLC with the loaded tip rack, '
+                    'prior to recalibrating the pipette offset. If the '
+                    'tiprack used (either the one specified by '
+                    'tipRackDefinition or the default if not specified) '
+                    'does not have a tip length calibration, this will be '
+                    'forced to be true.'
     )
