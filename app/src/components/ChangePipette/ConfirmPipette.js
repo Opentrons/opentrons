@@ -2,14 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import {
-  Icon,
-  PrimaryBtn,
-  ModalPage,
-  SPACING_2,
-  SPACING_4,
-} from '@opentrons/components'
-import { PipetteOffsetCalibrationControl } from '../InstrumentSettings/PipetteOffsetCalibrationControl'
+import { Icon, PrimaryBtn, ModalPage, SPACING_2 } from '@opentrons/components'
 import { getDiagramsSrc } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
@@ -21,7 +14,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { Mount } from '../../pipettes/types'
 import type { PipetteOffsetCalibration } from '../../calibration/types'
-import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
@@ -54,9 +46,6 @@ export function ConfirmPipette(props: Props): React.Node {
     actualPipette,
     actualPipetteOffset,
     back,
-    robotName,
-    mount,
-    startPipetteOffsetCalibration,
   } = props
 
   return (

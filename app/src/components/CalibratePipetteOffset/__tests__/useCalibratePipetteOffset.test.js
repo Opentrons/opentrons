@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import uniqueId from 'lodash/uniqueId'
 import { mountWithStore } from '@opentrons/components/__utils__'
 import { act } from 'react-dom/test-utils'
@@ -10,7 +9,6 @@ import * as Sessions from '../../../sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
 
 import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
-import { mount } from 'enzyme'
 
 import type { State } from '../../../types'
 import type { SessionType } from '../../../sessions'
@@ -32,13 +30,20 @@ const mockGetRequestById: JestMockFn<
 describe('useCalibratePipetteOffset hook', () => {
   let startCalibration
   let CalWizardComponent
-  let store
   const robotName = 'robotName'
   const mountString = 'left'
+  const onComplete = jest.fn()
+
   const TestUseCalibratePipetteOffset = () => {
     const [_startCalibration, _CalWizardComponent] = useCalibratePipetteOffset(
       robotName,
-      mountString
+      {
+        mount: mountString,
+        shouldPerformTipLength: false,
+        hasCalibrationBlock: false,
+        tipRackDefinition: null,
+      },
+      onComplete
     )
     React.useEffect(() => {
       startCalibration = _startCalibration
@@ -69,7 +74,12 @@ describe('useCalibratePipetteOffset hook', () => {
       ...Sessions.ensureSession(
         robotName,
         Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-        { mount: mountString }
+        {
+          mount: mountString,
+          shouldPerformTipLength: false,
+          hasCalibrationBlock: false,
+          tipRackDefinition: null,
+        }
       ),
       meta: { requestId: expect.any(String) },
     })
@@ -85,12 +95,9 @@ describe('useCalibratePipetteOffset hook', () => {
         currentStep: Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
       },
     }
-    const { store, wrapper } = mountWithStore(
-      <TestUseCalibratePipetteOffset />,
-      {
-        initialState: { robotApi: {} },
-      }
-    )
+    const { wrapper } = mountWithStore(<TestUseCalibratePipetteOffset />, {
+      initialState: { robotApi: {} },
+    })
     mockGetRobotSessionOfType.mockReturnValue(mockPipOffsetCalSession)
     mockGetRequestById.mockReturnValue({
       status: RobotApi.SUCCESS,
@@ -105,8 +112,11 @@ describe('useCalibratePipetteOffset hook', () => {
     wrapper.setProps({})
     expect(CalWizardComponent).not.toBe(null)
 
-    wrapper.find('button[children="exit"]').invoke('onClick')()
+    wrapper
+      .find('button[title="Return tip to tip rack and exit"]')
+      .invoke('onClick')()
     wrapper.setProps({})
     expect(CalWizardComponent).toBe(null)
+    expect(onComplete).toHaveBeenCalled()
   })
 })

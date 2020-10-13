@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { SecondaryBtn, SPACING_2 } from '@opentrons/components'
 
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
@@ -10,8 +9,8 @@ import type { State } from '../../types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
+  PipetteOffsetCalibrationSessionParams,
 } from '../../sessions/types'
-import type { Mount } from '../../pipettes/types'
 import type { RequestState } from '../../robot-api/types'
 
 import { Portal } from '../portal'
@@ -24,7 +23,7 @@ const spinnerCommandBlockList: Array<SessionCommandString> = [
 
 export function useCalibratePipetteOffset(
   robotName: string,
-  mount: Mount,
+  sessionParams: $Shape<PipetteOffsetCalibrationSessionParams>,
   onComplete: (() => mixed) | null = null
 ): [() => void, React.Node | null] {
   const [showWizard, setShowWizard] = React.useState(false)
@@ -74,24 +73,39 @@ export function useCalibratePipetteOffset(
         : null
     )?.status === RobotApi.SUCCESS
 
+  const closeWizard = React.useCallback(() => {
+    setShowWizard(false)
+    onComplete && onComplete()
+  }, [onComplete])
+
   React.useEffect(() => {
     if (shouldOpen) {
       setShowWizard(true)
       createRequestId.current = null
     }
     if (shouldClose) {
-      setShowWizard(false)
-      onComplete && onComplete()
+      closeWizard()
       deleteRequestId.current = null
     }
-  }, [shouldOpen, shouldClose])
+  }, [shouldOpen, shouldClose, closeWizard])
 
+  const {
+    mount,
+    shouldPerformTipLength = false,
+    hasCalibrationBlock = false,
+    tipRackDefinition = null,
+  } = sessionParams
   const handleStartPipOffsetCalSession = () => {
     dispatchRequests(
       Sessions.ensureSession(
         robotName,
         Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-        { mount }
+        {
+          mount,
+          shouldPerformTipLength,
+          hasCalibrationBlock,
+          tipRackDefinition,
+        }
       )
     )
   }
@@ -118,7 +132,7 @@ export function useCalibratePipetteOffset(
         <CalibratePipetteOffset
           session={pipOffsetCalSession}
           robotName={robotName}
-          closeWizard={() => setShowWizard(false)}
+          closeWizard={closeWizard}
           showSpinner={showSpinner}
           dispatchRequests={dispatchRequests}
         />

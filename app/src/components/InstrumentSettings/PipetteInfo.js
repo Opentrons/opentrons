@@ -68,7 +68,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const [
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
-  ] = useCalibratePipetteOffset(robotName, mount)
+  ] = useCalibratePipetteOffset(robotName, { mount })
 
   const pipImage = (
     <Box
