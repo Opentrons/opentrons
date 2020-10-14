@@ -15,7 +15,7 @@ import {
   InlineCalibrationWarning,
   REQUIRED,
   RECOMMENDED,
-} from './InlineCalibrationWarning'
+} from '../InlineCalibrationWarning'
 import { useSelector } from 'react-redux'
 import { format } from 'date-fns'
 import {

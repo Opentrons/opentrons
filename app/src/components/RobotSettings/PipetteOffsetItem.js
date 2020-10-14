@@ -22,7 +22,7 @@ import {
 import {
   InlineCalibrationWarning,
   RECOMMENDED,
-} from './InlineCalibrationWarning'
+} from '../InlineCalibrationWarning'
 import type { AttachedPipette, PipetteCalibrations } from '../../pipettes/types'
 
 type Props = {|

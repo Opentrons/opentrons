@@ -8,7 +8,7 @@ import type {
 } from '@opentrons/shared-data'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { PipetteOffsetItem } from '../PipetteOffsetItem'
-import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
+import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
 
 import { getLatestLabwareDef } from '../../../getLabware'
 
