@@ -43,7 +43,9 @@ class CheckSession(BaseSession):
                      configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> BaseSession:
         """Create an instance"""
-        assert isinstance(instance_meta.create_params, SessionCreateParams)
+        assert isinstance(
+            instance_meta.create_params,
+            calibration_models.SessionCreateParams)
         tip_racks = instance_meta.create_params.tipRacks
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
@@ -77,7 +79,7 @@ class CheckSession(BaseSession):
             currentStep=self._calibration_check.current_state,
             comparisonsByStep=self._calibration_check.comparison_map,  # type: ignore[arg-type] # noqa: e501
             labware=self._calibration_check.get_required_labware(),
-            activePipette=self._calibration_check.active_pipette
+            activePipette=self._calibration_check.get_active_pipette()
         )
 
     @property

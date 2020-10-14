@@ -11,6 +11,15 @@ OffsetVectorField = partial(Field, ...,
                             description="An offset vector in deck "
                                         "coordinates (x, y, z)")
 
+class SessionCreateParams(BaseModel):
+    """
+    The parameters required to start a calibration health session.
+    """
+    tipRacks: Optional[List[dict]] = Field(
+        None,
+        description='The full labware definition of the tip rack to calibrate.'
+    )
+
 
 class ComparisonStatus(BaseModel):
     """

@@ -42,7 +42,7 @@ CALIBRATION_CHECK_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     },
     State.comparingPointThree: {
         CalibrationCommand.jog: State.comparingPointThree,
-        CalibrationCommand.compare_point: State.comparingPointThree,
+        CheckCalibrationCommand.compare_point: State.comparingPointThree,
         CalibrationCommand.move_to_tip_rack: State.checkForSecondPipette
     },
     State.checkForSecondPipette: {
