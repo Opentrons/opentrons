@@ -1,5 +1,5 @@
 """
-Basic tests for the protocol_engine state store.
+Tests for the command lifecycle state in the protocol_engine state store.
 
 More extensive tests for individual sub-states should be created in
 appropriately named test files for those sub-states.
