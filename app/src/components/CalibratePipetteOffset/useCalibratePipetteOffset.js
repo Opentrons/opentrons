@@ -74,8 +74,8 @@ export function useCalibratePipetteOffset(
     )?.status === RobotApi.SUCCESS
 
   const closeWizard = React.useCallback(() => {
-    setShowWizard(false)
     onComplete && onComplete()
+    setShowWizard(false)
   }, [onComplete])
 
   React.useEffect(() => {

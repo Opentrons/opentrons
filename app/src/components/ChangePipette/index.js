@@ -7,6 +7,7 @@ import {
   useDispatchApiRequests,
   getRequestById,
   SUCCESS,
+  PENDING,
 } from '../../robot-api'
 import { getCalibrationForPipette } from '../../calibration'
 import { getAttachedPipettes } from '../../pipettes'
@@ -86,18 +87,17 @@ export function ChangePipette(props: Props): React.Node {
     return getMovementStatus(state, robotName)
   })
 
-  const homePipSuccess =
-    useSelector((state: State) => {
-      return homePipRequestId.current
-        ? getRequestById(state, homePipRequestId.current)
-        : null
-    })?.status === SUCCESS
+  const homePipStatus = useSelector((state: State) => {
+    return homePipRequestId.current
+      ? getRequestById(state, homePipRequestId.current)
+      : null
+  })?.status
 
   React.useEffect(() => {
-    if (homePipSuccess) {
+    if (homePipStatus === SUCCESS) {
       closeModal()
     }
-  }, [homePipSuccess, closeModal])
+  }, [homePipStatus, closeModal])
 
   const homePipAndExit = React.useCallback(
     () => dispatchApiRequests(home(robotName, PIPETTE, mount)),
@@ -120,7 +120,11 @@ export function ChangePipette(props: Props): React.Node {
     (movementStatus === HOMING || movementStatus === MOVING)
   ) {
     return (
-      <RequestInProgressModal {...baseProps} movementStatus={movementStatus} />
+      <RequestInProgressModal
+        {...baseProps}
+        movementStatus={movementStatus}
+        isPipetteHoming={homePipStatus === PENDING}
+      />
     )
   }
 

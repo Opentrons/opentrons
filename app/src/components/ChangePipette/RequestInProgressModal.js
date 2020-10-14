@@ -14,22 +14,28 @@ const CARRIAGE_MOVING = 'carriage moving'
 const TO_FRONT_AND_LEFT = 'to front and left'
 const TO_FRONT_AND_RIGHT = 'to front and right'
 const UP = 'up'
+const ROBOT_IS_HOMING = 'robot is homing'
 
 type Props = {|
   title: string,
   subtitle: string,
   mount: Mount,
   movementStatus: MovementStatus,
+  isPipetteHoming: boolean,
 |}
 
 export function RequestInProgressModal(props: Props): React.Node {
-  const { title, subtitle, mount, movementStatus } = props
+  const { title, subtitle, mount, movementStatus, isPipetteHoming } = props
   let message = `${mount === RIGHT ? RIGHT_PIP : LEFT_PIP} ${CARRIAGE_MOVING}`
 
   if (movementStatus === MOVING) {
     message += ` ${mount === RIGHT ? TO_FRONT_AND_LEFT : TO_FRONT_AND_RIGHT}.`
   } else if (movementStatus === HOMING) {
-    message += ` ${UP}.`
+    if (isPipetteHoming) {
+      message += ` ${UP}.`
+    } else {
+      message = ROBOT_IS_HOMING
+    }
   }
 
   return (
