@@ -18,7 +18,7 @@ from os import path
 from io import open
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
-with open(path.join(here, ''), encoding='utf-8') as f:
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 # Arguments marked as "Required" below must be included for upload to PyPI.
 # Fields marked as "Optional" may be commented out.
@@ -29,7 +29,7 @@ setup(
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.1.0',  # Required
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description="",  # Required
+    description="pub sub system for ot2",  # Required
     # https://packaging.python.org/specifications/core-metadata/#description-optional
     long_description=long_description,  # Optional
     # https://packaging.python.org/specifications/core-metadata/#description-content-type-optional
