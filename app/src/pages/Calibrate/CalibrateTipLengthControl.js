@@ -10,6 +10,8 @@ import {
   setUseTrashSurfaceForTipCal,
   getUncalibratedTipracksByMount,
 } from '../../calibration'
+import { getTipLengthCalibrationSession } from '../../sessions/tip-length-calibration/selectors'
+import { getPipetteOffsetCalibrationSession } from '../../sessions/pipette-offset-calibration/selectors'
 
 import {
   CalibrateTipLength,
@@ -92,37 +94,12 @@ export function CalibrateTipLengthControl({
 
   const tipLengthCalibrationSession: TipLengthCalibrationSession | null = useSelector(
     (state: State) => {
-      const tipLengthSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
-        state,
-        robotName,
-        Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
-      )
-
-      if (
-        tipLengthSession &&
-        tipLengthSession.sessionType ===
-          Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
-      ) {
-        return tipLengthSession
-      }
-      return null
+      return getTipLengthCalibrationSession(state, robotName)
     }
   )
   const extendedPipetteCalibrationSession: PipetteOffsetCalibrationSession | null = useSelector(
     (state: State) => {
-      const extendedPipOffsetSession: Sessions.Session | null = Sessions.getRobotSessionOfType(
-        state,
-        robotName,
-        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-      )
-      if (
-        extendedPipOffsetSession &&
-        extendedPipOffsetSession.sessionType ===
-          Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-      ) {
-        return extendedPipOffsetSession
-      }
-      return null
+      return getPipetteOffsetCalibrationSession(state, robotName)
     }
   )
 
@@ -159,7 +136,6 @@ export function CalibrateTipLengthControl({
       setShowCalBlockPrompt(true)
     }
   }
-
   const showSpinner =
     useSelector<State, RequestState | null>(state =>
       trackedRequestId.current

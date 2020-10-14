@@ -2,33 +2,66 @@
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
+import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
+import { getUseTrashSurfaceForTipCal } from '../../../config'
+import { selectors as robotSelectors } from '../../../robot'
 import { useDispatchApiRequests } from '../../../robot-api'
+import { getUncalibratedTipracksByMount } from '../../../calibration/tip-length'
 import * as Sessions from '../../../sessions'
 import { CalibrateTipLengthControl } from '../CalibrateTipLengthControl'
 
+import type { Labware } from '../../../robot/types'
 import type { State } from '../../../types'
 
 jest.mock('../../../robot-api')
+jest.mock('../../../robot/selectors')
 jest.mock('../../../sessions/selectors')
-jest.mock('react-redux', () => {
-  const actualModule = jest.requireActual('react-redux')
-  return {
-    ...actualModule,
-    useSelector: jest.fn(),
-    useDispatch: jest.fn(),
-  }
-})
+jest.mock('../../../config/selectors')
+jest.mock('../../../calibration/tip-length/selectors')
+
+const mockGetUncalibratedTipracksByMount: JestMockFn<
+  [State, string],
+  $Call<typeof getUncalibratedTipracksByMount, State, string>
+> = getUncalibratedTipracksByMount
+
+const mockGetUnconfirmedLabware: JestMockFn<
+  [State],
+  $Call<typeof robotSelectors.getUnconfirmedLabware, State>
+> = robotSelectors.getUnconfirmedLabware
 
 const mockUseDispatchApiRequests: JestMockFn<
   [() => void],
   [() => void, Array<string>]
 > = useDispatchApiRequests
 
+const mockGetUseTrashSurfaceForTipCal: JestMockFn<
+  [State],
+  $Call<typeof getUseTrashSurfaceForTipCal, State>
+> = getUseTrashSurfaceForTipCal
+
 const threehundredtiprack: LabwareDefinition2 = tiprack300Def
 const MOCK_STATE: State = ({ mockState: true }: any)
+
+const stubUnconfirmedLabware = [
+  ({
+    _id: 123,
+    type: 'some_wellplate',
+    slot: '4',
+    position: null,
+    name: 'some wellplate',
+    calibratorMount: 'left',
+    isTiprack: false,
+    confirmed: false,
+    isLegacy: false,
+    definitionHash: 'some_hash',
+    calibration: 'unconfirmed',
+    isMoving: false,
+    definition: wellPlate96Def,
+  }: $Shape<Labware>),
+]
 
 describe('Testing calibrate tip length control', () => {
   let dispatchApiRequests
@@ -39,6 +72,9 @@ describe('Testing calibrate tip length control', () => {
   beforeEach(() => {
     dispatchApiRequests = jest.fn()
     mockUseDispatchApiRequests.mockReturnValue([dispatchApiRequests, []])
+    mockGetUncalibratedTipracksByMount.mockReturnValue({ left: [], right: [] })
+    mockGetUnconfirmedLabware.mockReturnValue(stubUnconfirmedLabware)
+    mockGetUseTrashSurfaceForTipCal.mockReturnValue(false)
     render = (
       props: $Shape<React.ElementProps<typeof CalibrateTipLengthControl>> = {}
     ) => {

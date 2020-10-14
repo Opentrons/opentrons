@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
+import { getPipetteOffsetCalibrationSession } from '../../sessions/pipette-offset-calibration/selectors'
 
 import type { State } from '../../types'
 import type {
@@ -32,20 +33,11 @@ export function useCalibratePipetteOffset(
   const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
 
-  const pipOffsetCalSession = useSelector<
-    State,
-    PipetteOffsetCalibrationSession | null
-  >((state: State) => {
-    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
-      state,
-      robotName,
-      Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-    )
-    return session &&
-      session.sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-      ? session
-      : null
-  })
+  const pipOffsetCalSession: PipetteOffsetCalibrationSession | null = useSelector(
+    (state: State) => {
+      return getPipetteOffsetCalibrationSession(state, robotName)
+    }
+  )
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {

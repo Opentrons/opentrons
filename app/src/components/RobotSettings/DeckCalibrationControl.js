@@ -10,6 +10,7 @@ import { Portal } from '../portal'
 import { CalibrateDeck } from '../CalibrateDeck'
 import { TitledControl } from '../TitledControl'
 import { ConfirmStartDeckCalModal } from './ConfirmStartDeckCalModal'
+import { getDeckCalibrationSession } from '../../sessions/deck-calibration/selectors'
 import {
   InlineCalibrationWarning,
   REQUIRED,
@@ -33,7 +34,10 @@ import type {
   DeckCalibrationStatus,
   DeckCalibrationData,
 } from '../../calibration/types'
-import type { SessionCommandString } from '../../sessions/types'
+import type {
+  SessionCommandString,
+  DeckCalibrationSession,
+} from '../../sessions/types'
 import type { RequestState } from '../../robot-api/types'
 
 const DECK_NEVER_CALIBRATED = "You haven't calibrated the deck yet"
@@ -137,20 +141,11 @@ export function DeckCalibrationControl(props: Props): React.Node {
     )
   }
 
-  const deckCalibrationSession = useSelector((state: State) => {
-    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
-      state,
-      robotName,
-      Sessions.SESSION_TYPE_DECK_CALIBRATION
-    )
-    if (
-      session &&
-      session.sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION
-    ) {
-      return session
+  const deckCalibrationSession: DeckCalibrationSession | null = useSelector(
+    (state: State) => {
+      return getDeckCalibrationSession(state, robotName)
     }
-    return null
-  })
+  )
 
   const {
     showConfirmation: showConfirmStart,
