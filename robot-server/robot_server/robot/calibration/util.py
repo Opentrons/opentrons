@@ -184,6 +184,8 @@ def save_tip_length_calibration(pipette_id: str,
     # TODO: 07-22-2020 parent slot is not important when tracking
     # tip length data, hence the empty string, we should remove it
     # from create_tip_length_data in a refactor
-    tip_length_data = modify.create_tip_length_data(tip_rack._definition, '',
-                                                    tip_length_offset)
+    tip_length_data = modify.create_tip_length_data(
+        tip_rack._implementation.get_definition(), '',
+        tip_length_offset
+    )
     modify.save_tip_length_calibration(pipette_id, tip_length_data)

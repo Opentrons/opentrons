@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 
 from opentrons.types import Location, Point
@@ -391,7 +393,12 @@ def test_first_parent():
     assert first_parent(mod_trough) == '6'
     assert first_parent(mod) == '6'
 
-    mod_trough._parent = mod_trough
+    # Set up recursion cycle test.
+    mock_labware_geometry = MagicMock()
+    mock_labware_geometry.parent = Location(point=None, labware=mod_trough)
+    mod_trough._implementation.get_geometry = MagicMock(
+        return_value=mock_labware_geometry)
+
     with pytest.raises(RuntimeError):
         # make sure we catch cycles
         first_parent(mod_trough)

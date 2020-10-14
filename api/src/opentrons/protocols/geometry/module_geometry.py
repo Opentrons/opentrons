@@ -16,6 +16,7 @@ from typing import (Mapping, Optional,
 
 import numpy as np  # type: ignore
 import jsonschema  # type: ignore
+from opentrons.protocols.implementations.labware import LabwareImplementation
 
 from opentrons_shared_data import module
 from opentrons.types import Location, Point, LocationLabware
@@ -334,10 +335,12 @@ class ThermocyclerGeometry(ModuleGeometry):
     # NOTE: this func is unused until "semi" configuration
     def labware_accessor(self, labware: Labware) -> Labware:
         # Block first three columns from being accessed
-        definition = labware._definition
+        definition = labware._implementation.get_definition()
         definition['ordering'] = definition['ordering'][2::]
         return Labware(
-            definition, super().location, api_level=self._api_version)
+            implementation=LabwareImplementation(definition, super().location),
+            api_level=self._api_version
+        )
 
     def add_labware(self, labware: Labware) -> Labware:
         assert not self._labware,\

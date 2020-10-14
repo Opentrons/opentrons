@@ -2,7 +2,7 @@ from unittest import mock
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.well import WellImplementation
-from opentrons.types import Location, Point
+from opentrons.types import Point
 from opentrons.protocol_api import InstrumentContext, \
     labware, MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution.execute_json_v5 import _move_to_well
@@ -22,10 +22,12 @@ def test_move_to_well_with_optional_params():
                 'x': 40,
                 'y': 50,
                 'z': 3},
-                parent=Location(Point(10, 20, 30), 1)
+                parent_point=Point(10, 20, 30),
+                parent_object=1
             ),
             has_tip=False,
-            display_name='some well'
+            display_name='some well',
+            name="A2"
         ),
         api_level=MAX_SUPPORTED_VERSION)
 
@@ -70,10 +72,12 @@ def test_move_to_well_without_optional_params():
                 'x': 40,
                 'y': 50,
                 'z': 3},
-                parent=Location(Point(10, 20, 30), 1)
+                parent_point=Point(10, 20, 30),
+                parent_object=1
             ),
             has_tip=False,
-            display_name='some well'
+            display_name='some well',
+            name="A2"
         ),
         api_level=MAX_SUPPORTED_VERSION)
 

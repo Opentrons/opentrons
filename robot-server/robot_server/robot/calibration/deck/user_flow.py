@@ -257,7 +257,9 @@ class DeckCalibrationUserFlow:
     def _save_attitude_matrix(self):
         e = tuplefy_cal_point_dicts(self._expected_points)
         a = tuplefy_cal_point_dicts(self._saved_points)
-        tiprack_hash = helpers.hash_labware_def(self._tip_rack._definition)
+        tiprack_hash = helpers.hash_labware_def(
+            self._tip_rack._implementation.get_definition()
+        )
         pip_id = self._hw_pipette.pipette_id
         assert pip_id
         robot_cal.save_attitude_matrix(expected=e, actual=a, pipette_id=pip_id,
@@ -267,9 +269,11 @@ class DeckCalibrationUserFlow:
         pip_id = self._hw_pipette.pipette_id
         assert pip_id
         try:
-            return get.load_tip_length_calibration(pip_id,
-                                                   self._tip_rack._definition,
-                                                   '')['tipLength']
+            return get.load_tip_length_calibration(
+                pip_id,
+                self._tip_rack._implementation.get_definition(),
+                ''
+            )['tipLength']
         except TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(
                 self._tip_rack.uri,

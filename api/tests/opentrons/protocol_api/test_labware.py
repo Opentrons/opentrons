@@ -6,6 +6,7 @@ from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION)
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocols.implementations.labware import LabwareImplementation
 from opentrons.protocols.implementations.well import WellImplementation
 
 from opentrons_shared_data import load_shared_data
@@ -51,7 +52,9 @@ def set_up_index_file(labware_offset_tempdir):
     for idx, name in enumerate(labware_list):
         parent = deck.position_for(idx+1)
         definition = labware.get_labware_definition(name)
-        lw = labware.Labware(definition, parent)
+        lw = labware.Labware(
+            implementation=LabwareImplementation(definition, parent)
+        )
         labware.save_calibration(lw, Point(0, 0, 0))
 
     return labware_list
@@ -64,9 +67,12 @@ def test_well_init():
     well1 = labware.Well(
         api_level=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
-            well_geometry=WellGeometry(test_data[well_name], slot),
+            well_geometry=WellGeometry(well_props=test_data[well_name],
+                                       parent_point=slot.point,
+                                       parent_object=slot.labware),
             display_name=well_name,
-            has_tip=has_tip
+            has_tip=has_tip,
+            name="A1"
         )
     )
     assert well1.geometry.diameter == test_data[well_name]['diameter']
@@ -77,9 +83,12 @@ def test_well_init():
     well2 = labware.Well(
         api_level=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
-            well_geometry=WellGeometry(test_data[well2_name], slot),
+            well_geometry=WellGeometry(well_props=test_data[well2_name],
+                                       parent_point=slot.point,
+                                       parent_object=slot.labware),
             display_name=well2_name,
-            has_tip=has_tip
+            has_tip=has_tip,
+            name="A1"
         )
     )
     assert well2.geometry.diameter is None
@@ -94,9 +103,12 @@ def test_top():
     well = labware.Well(
         api_level=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
-            well_geometry=WellGeometry(test_data[well_name], slot),
+            well_geometry=WellGeometry(well_props=test_data[well_name],
+                                       parent_point=slot.point,
+                                       parent_object=slot.labware),
             display_name=well_name,
-            has_tip=has_tip
+            has_tip=has_tip,
+            name="A1"
         )
     )
     well_data = test_data[well_name]
@@ -114,9 +126,12 @@ def test_bottom():
     well = labware.Well(
         api_level=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
-            well_geometry=WellGeometry(test_data[well_name], slot),
+            well_geometry=WellGeometry(well_props=test_data[well_name],
+                                       parent_point=slot.point,
+                                       parent_object=slot.labware),
             display_name=well_name,
-            has_tip=has_tip
+            has_tip=has_tip,
+            name="A1"
         )
     )
     well_data = test_data[well_name]
@@ -134,9 +149,12 @@ def test_from_center_cartesian():
     well1 = labware.Well(
         api_level=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
-            well_geometry=WellGeometry(test_data[well_name], slot1),
+            well_geometry=WellGeometry(well_props=test_data[well_name],
+                                       parent_point=slot1.point,
+                                       parent_object=slot1.labware),
             display_name=well_name,
-            has_tip=has_tip
+            has_tip=has_tip,
+            name="A1"
         )
     )
 
@@ -164,9 +182,12 @@ def test_from_center_cartesian():
     well2 = labware.Well(
         api_level=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
-            well_geometry=WellGeometry(test_data[well2_name], slot2),
+            well_geometry=WellGeometry(well_props=test_data[well2_name],
+                                       parent_point=slot2.point,
+                                       parent_object=slot2.labware),
             display_name=well2_name,
-            has_tip=has_tip
+            has_tip=has_tip,
+            name="A1"
         )
     )
     percent2_x = -0.25
@@ -188,10 +209,38 @@ def test_from_center_cartesian():
     assert point2.z == expected_z
 
 
-def test_back_compat():
+@pytest.fixture
+def corning_96_wellplate_360ul_flat_def():
     labware_name = 'corning_96_wellplate_360ul_flat'
-    labware_def = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
+    return labware.get_labware_definition(labware_name)
+
+
+@pytest.fixture
+def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
+    return labware.Labware(
+        implementation=LabwareImplementation(
+            definition=corning_96_wellplate_360ul_flat_def,
+            parent=Location(Point(0, 0, 0), 'Test Slot'))
+    )
+
+
+@pytest.fixture
+def opentrons_96_tiprack_300ul_def():
+    labware_name = "opentrons_96_tiprack_300ul"
+    return labware.get_labware_definition(labware_name)
+
+
+@pytest.fixture
+def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
+    return labware.Labware(
+        implementation=LabwareImplementation(
+            definition=opentrons_96_tiprack_300ul_def,
+            parent=Location(Point(0, 0, 0), 'Test Slot'))
+    )
+
+
+def test_back_compat(corning_96_wellplate_360ul_flat):
+    lw = corning_96_wellplate_360ul_flat
 
     # Note that this test uses the display name of wells to test for equality,
     # because dimensional parameters could be subject to modification through
@@ -233,52 +282,48 @@ def test_back_compat():
     assert repr(w11[1][2]) == well_c3_name
 
 
-def test_well_parent():
-    labware_name = 'corning_96_wellplate_360ul_flat'
-    labware_def = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
+def test_well_parent(corning_96_wellplate_360ul_flat):
+    lw = corning_96_wellplate_360ul_flat
     parent = Location(Point(7, 8, 9), lw)
     well_name = 'circular_well_json'
     has_tip = True
     well = labware.Well(
         api_level=MAX_SUPPORTED_VERSION,
         well_implementation=WellImplementation(
-            well_geometry=WellGeometry(test_data[well_name], parent),
+            well_geometry=WellGeometry(
+                well_props=test_data[well_name],
+                parent_point=parent.point,
+                parent_object=parent.labware._implementation
+            ),
             display_name=well_name,
-            has_tip=has_tip
+            has_tip=has_tip,
+            name="A1"
         )
     )
-    assert well.parent is lw
-    assert well.top().labware is well
-    assert well.top().labware.parent is lw
-    assert well.bottom().labware is well
-    assert well.bottom().labware.parent is lw
-    assert well.center().labware is well
-    assert well.center().labware.parent is lw
+    assert well.parent == lw
+    assert well.top().labware == well
+    assert well.top().labware.parent == lw
+    assert well.bottom().labware == well
+    assert well.bottom().labware.parent == lw
+    assert well.center().labware == well
+    assert well.center().labware.parent == lw
 
 
-def test_tip_tracking_init():
-    labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.get_labware_definition(labware_name)
-    tiprack = labware.Labware(labware_def,
-                              Location(Point(0, 0, 0), 'Test Slot'))
+def test_tip_tracking_init(corning_96_wellplate_360ul_flat,
+                           opentrons_96_tiprack_300ul):
+    tiprack = opentrons_96_tiprack_300ul
     assert tiprack.is_tiprack
     for well in tiprack.wells():
         assert well.has_tip
 
-    labware_name = 'corning_96_wellplate_360ul_flat'
-    labware_def = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
+    lw = corning_96_wellplate_360ul_flat
     assert not lw.is_tiprack
     for well in lw.wells():
         assert not well.has_tip
 
 
-def test_use_tips():
-    labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.get_labware_definition(labware_name)
-    tiprack = labware.Labware(labware_def,
-                              Location(Point(0, 0, 0), 'Test Slot'))
+def test_use_tips(opentrons_96_tiprack_300ul):
+    tiprack = opentrons_96_tiprack_300ul
     well_list = tiprack.wells()
 
     # Test only using one tip
@@ -313,11 +358,9 @@ def test_use_tips():
         assert well.has_tip
 
 
-def test_select_next_tip():
-    labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.get_labware_definition(labware_name)
-    tiprack = labware.Labware(labware_def,
-                              Location(Point(0, 0, 0), 'Test Slot'))
+def test_select_next_tip(opentrons_96_tiprack_300ul,
+                         opentrons_96_tiprack_300ul_def):
+    tiprack = opentrons_96_tiprack_300ul
     well_list = tiprack.wells()
 
     next_one = tiprack.next_tip()
@@ -366,24 +409,25 @@ def test_select_next_tip():
     tiprack.use_tips(well_list[0])
 
     # you can't on api level 2.1 or previous
-    early_tr = labware.Labware(labware_def,
-                               Location(Point(0, 0, 0), 'Test Slot'),
-                               api_level=APIVersion(2, 1))
+    early_tr = labware.Labware(
+        implementation=LabwareImplementation(
+            definition=opentrons_96_tiprack_300ul_def,
+            parent=Location(Point(0, 0, 0), 'Test Slot')
+        ),
+        api_level=APIVersion(2, 1)
+    )
     early_tr.use_tips(well_list[0])
     with pytest.raises(AssertionError):
         early_tr.use_tips(well_list[0])
 
 
-def test_previous_tip():
-    labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.get_labware_definition(labware_name)
-    tiprack = labware.Labware(labware_def,
-                              Location(Point(0, 0, 0), 'Test Slot'))
+def test_previous_tip(opentrons_96_tiprack_300ul):
+    tiprack = opentrons_96_tiprack_300ul
     # If all wells are used, we can't get a previous tip
     assert tiprack.previous_tip() is None
     # If one well is empty, wherever it is, we can get a slot
     tiprack.wells()[5].has_tip = False
-    assert tiprack.previous_tip() is tiprack.wells()[5]
+    assert tiprack.previous_tip() == tiprack.wells()[5]
     # But not if we ask for more slots than are available
     assert tiprack.previous_tip(2) is None
     tiprack.wells()[7].has_tip = False
@@ -391,14 +435,12 @@ def test_previous_tip():
     assert tiprack.previous_tip(2) is None
     # But if they are, we're good
     tiprack.wells()[6].has_tip = False
-    assert tiprack.previous_tip(3) is tiprack.wells()[5]
+    assert tiprack.previous_tip(3) == tiprack.wells()[5]
 
 
-def test_return_tips():
-    labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.get_labware_definition(labware_name)
-    tiprack = labware.Labware(labware_def,
-                              Location(Point(0, 0, 0), 'Test Slot'))
+def test_return_tips(opentrons_96_tiprack_300ul):
+    tiprack = opentrons_96_tiprack_300ul
+
     # If all wells are used, we get an error if we try to return
     with pytest.raises(AssertionError):
         tiprack.return_tips(tiprack.wells()[0])
@@ -500,10 +542,20 @@ def test_module_load_labware(module_name):
 def test_tiprack_list():
     labware_name = 'opentrons_96_tiprack_300ul'
     labware_def = labware.get_labware_definition(labware_name)
-    tiprack = labware.Labware(labware_def,
-                              Location(Point(0, 0, 0), 'Test Slot'))
-    tiprack_2 = labware.Labware(labware_def,
-                                Location(Point(0, 0, 0), 'Test Slot'))
+    tiprack = labware.Labware(
+        implementation=LabwareImplementation(labware_def,
+                                             Location(Point(0, 0, 0),
+                                                      'Test Slot'
+                                                      )
+                                             )
+    )
+    tiprack_2 = labware.Labware(
+        implementation=LabwareImplementation(labware_def,
+                                             Location(Point(0, 0, 0),
+                                                      'Test Slot'
+                                                      )
+                                             )
+    )
 
     assert labware.select_tiprack_from_list(
         [tiprack], 1) == (tiprack, tiprack['A1'])
@@ -532,7 +584,12 @@ def test_uris():
     assert helpers.uri_from_details(*details) == uri
     defn = labware.get_labware_definition(details[1], details[0], details[2])
     assert helpers.uri_from_definition(defn) == uri
-    lw = labware.Labware(defn, Location(Point(0, 0, 0), 'Test Slot'))
+    lw = labware.Labware(
+        implementation=LabwareImplementation(defn,
+                                             Location(Point(0, 0, 0),
+                                                      'Test Slot')
+                                             )
+    )
     assert lw.uri == uri
 
 
@@ -546,7 +603,8 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
     deck = Deck()
     parent = deck.position_for(1)
     definition = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(definition, parent)
+    lw = labware.Labware(
+        implementation=LabwareImplementation(definition, parent))
     labware_hash = helpers.hash_labware_def(definition)
     labware.save_calibration(lw, Point(0, 0, 0))
 
@@ -601,7 +659,11 @@ def test_delete_one_calibration(set_up_index_file):
 def test_get_parent_identifier():
     labware_name = 'corning_96_wellplate_360ul_flat'
     labware_def = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
+    lw = labware.Labware(
+        implementation=LabwareImplementation(labware_def,
+                                             Location(Point(0, 0, 0),
+                                                      'Test Slot'))
+    )
     # slots have no parent identifier
     assert labware._get_parent_identifier(lw) == ''
     # modules do
@@ -610,6 +672,8 @@ def test_get_parent_identifier():
                          ModuleType.MAGNETIC,
                          Point(0, 0, 0), 10, 10, Location(Point(1, 2, 3), '3'),
                          APIVersion(2, 4))
-    lw = labware.Labware(labware_def, mmg.location)
+    lw = labware.Labware(
+        implementation=LabwareImplementation(labware_def, mmg.location)
+    )
     assert labware._get_parent_identifier(lw)\
         == MagneticModuleModel.MAGNETIC_V1.value

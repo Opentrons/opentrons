@@ -12,6 +12,8 @@ import requests
 from fastapi import routing
 import pytest
 from datetime import datetime
+
+from opentrons.protocols.implementations.labware import LabwareImplementation
 from starlette.testclient import TestClient
 from robot_server.service.app import app
 from robot_server.service.dependencies import get_hardware, verify_hardware
@@ -136,7 +138,9 @@ def set_up_index_file_temporary_directory(server_temp_directory):
     for idx, name in enumerate(labware_list):
         parent = deck.position_for(idx+1)
         definition = labware.get_labware_definition(name)
-        lw = labware.Labware(definition, parent)
+        lw = labware.Labware(
+            implementation=LabwareImplementation(definition, parent)
+        )
         labware.save_calibration(lw, Point(0, 0, 0))
 
 

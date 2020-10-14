@@ -150,18 +150,19 @@ class RequiredLabware(BaseModel):
                 lw: labware.Labware,
                 slot: typing.Optional[DeckLocation] = None):
         if not slot:
-            slot = lw._parent  # type: ignore[assignment]
+            slot = lw.parent  # type: ignore[assignment]
+        lw_def = lw._implementation.get_definition()
         return cls(
             # TODO(mc, 2020-09-17): DeckLocation does not match
             #  Union[int,str,None] expected by cls
             slot=slot,  # type: ignore[arg-type]
             loadName=lw.load_name,
-            namespace=lw._definition['namespace'],
-            version=str(lw._definition['version']),
+            namespace=lw_def['namespace'],
+            version=str(lw_def['version']),
             isTiprack=lw.is_tiprack,
             # TODO(mc, 2020-09-17): LabwareDefinition does not match
             # Dict[any,any] expected by cls
-            definition=lw._definition)  # type: ignore[arg-type]
+            definition=lw_def)  # type: ignore[arg-type]
 
 
 class NextStepLink(BaseModel):

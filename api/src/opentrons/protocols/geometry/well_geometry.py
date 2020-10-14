@@ -1,25 +1,40 @@
-from typing import Optional, cast
+from __future__ import annotations
 
-from opentrons.types import Location, Point
+from typing import Optional, cast, TYPE_CHECKING
+
+
+from opentrons.types import Point
 from opentrons_shared_data.labware.dev_types import (
     WellDefinition, CircularWellDefinition, RectangularWellDefinition)
+
+if TYPE_CHECKING:
+    from opentrons.protocols.implementations.interfaces.labware import \
+        AbstractLabwareImplementation
 
 
 class WellGeometry:
 
     def __init__(self,
                  well_props: WellDefinition,
-                 parent: Location):
+                 parent_point: Point,
+                 parent_object: AbstractLabwareImplementation):
+        """
+        Construct a well geometry object.
+
+        :param well_props: Properties from the labware definition
+        :param parent_point: The coordinate of parent labware
+        :param parent_object: The parent labware
+        """
 
         self._position\
             = Point(well_props['x'],
                     well_props['y'],
-                    well_props['z'] + well_props['depth']) + parent.point
+                    well_props['z'] + well_props['depth']) + parent_point
 
-        if not parent.labware:
+        if not parent_object:
             raise ValueError("Wells must have a parent")
 
-        self._parent = parent
+        self._parent = parent_object
 
         self._length: Optional[float] = None
         self._width: Optional[float] = None
@@ -44,8 +59,12 @@ class WellGeometry:
         self._depth = well_props['depth']
 
     @property
-    def parent(self) -> Location:
+    def parent(self) -> AbstractLabwareImplementation:
         return self._parent
+
+    @property
+    def position(self) -> Point:
+        return self._position
 
     @property
     def diameter(self) -> Optional[float]:

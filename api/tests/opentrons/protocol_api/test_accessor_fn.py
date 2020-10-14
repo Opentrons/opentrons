@@ -1,239 +1,103 @@
-from opentrons.protocol_api import labware
-from opentrons.types import Point, Location
-
-minimalLabwareDef = {
-    "metadata": {
-        "displayName": "minimal labware"
-    },
-    "cornerOffsetFromSlot": {
-        "x": 10,
-        "y": 10,
-        "z": 5
-    },
-    "parameters": {
-        "isTiprack": False,
-        "loadName": "minimal_labware_def"
-    },
-    "ordering": [["A1"], ["A2"]],
-    "wells": {
-        "A1": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 0,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
-        },
-        "A2": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 10,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
-        }
-    },
-    "dimensions": {
-        "xDimension": 1.0,
-        "yDimension": 2.0,
-        "zDimension": 3.0
-    }
-}
-
-minimalLabwareDef2 = {
-    "metadata": {
-        "displayName": "other test labware"
-    },
-    "cornerOffsetFromSlot": {
-            "x": 10,
-            "y": 10,
-            "z": 5
-    },
-    "parameters": {
-        "isTiprack": False,
-        "loadName": "minimal_labware_def"
-    },
-    "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
-    "wells": {
-        "A1": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 0,
-          "y": 18,
-          "z": 0,
-          "shape": "circular"
-        },
-        "B1": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 0,
-          "y": 9,
-          "z": 0,
-          "shape": "circular"
-        },
-        "C1": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 0,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
-        },
-        "A2": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 9,
-          "y": 18,
-          "z": 0,
-          "shape": "circular"
-        },
-        "B2": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 9,
-          "y": 9,
-          "z": 0,
-          "shape": "circular"
-        },
-        "C2": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 9,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
-        }
-    },
-    "dimensions": {
-        "xDimension": 1.0,
-        "yDimension": 2.0,
-        "zDimension": 3.0
-    }
-}
+from opentrons.types import Point
 
 
-def test_labware_init():
-    deck = Location(Point(0, 0, 0), 'deck')
-    fake_labware = labware.Labware(minimalLabwareDef, deck)
-    ordering = [well for col in minimalLabwareDef['ordering'] for well in col]
-    assert fake_labware._ordering == ordering
-    assert fake_labware._well_definition == minimalLabwareDef['wells']
-    assert fake_labware._offset == Point(x=10, y=10, z=5)
+def test_labware_init(min_lw_impl, minimal_labware_def):
+    ordering = [well for col in minimal_labware_def['ordering']
+                for well in col]
+    assert min_lw_impl._ordering == ordering
+    assert min_lw_impl._well_definition == minimal_labware_def['wells']
+    assert min_lw_impl.get_geometry()._offset == Point(x=10, y=10, z=5)
 
 
-def test_wells_accessor():
-    deck = Location(Point(0, 0, 0), 'deck')
-    fake_labware = labware.Labware(minimalLabwareDef, deck)
-    depth1 = minimalLabwareDef['wells']['A1']['depth']
-    depth2 = minimalLabwareDef['wells']['A2']['depth']
-    x = minimalLabwareDef['wells']['A2']['x']
-    y = minimalLabwareDef['wells']['A2']['y']
-    offset = fake_labware._offset
+def test_wells_accessor(min_lw, min_lw_impl, minimal_labware_def):
+    depth1 = minimal_labware_def['wells']['A1']['depth']
+    depth2 = minimal_labware_def['wells']['A2']['depth']
+    x = minimal_labware_def['wells']['A2']['x']
+    y = minimal_labware_def['wells']['A2']['y']
+    offset = min_lw_impl.get_geometry()._offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.wells()[0].geometry._position == a1
-    assert fake_labware.wells()[1].geometry._position == a2
+    assert min_lw.wells()[0].geometry._position == a1
+    assert min_lw.wells()[1].geometry._position == a2
 
 
-def test_wells_name_accessor():
-    deck = Location(Point(0, 0, 0), 'deck')
-    fake_labware = labware.Labware(minimalLabwareDef, deck)
-    depth1 = minimalLabwareDef['wells']['A1']['depth']
-    depth2 = minimalLabwareDef['wells']['A2']['depth']
-    x = minimalLabwareDef['wells']['A2']['x']
-    y = minimalLabwareDef['wells']['A2']['y']
-    offset = fake_labware._offset
+def test_wells_name_accessor(min_lw, min_lw_impl, minimal_labware_def):
+    depth1 = minimal_labware_def['wells']['A1']['depth']
+    depth2 = minimal_labware_def['wells']['A2']['depth']
+    x = minimal_labware_def['wells']['A2']['x']
+    y = minimal_labware_def['wells']['A2']['y']
+    offset = min_lw_impl.get_geometry().offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.wells_by_name()['A1'].geometry._position == a1
-    assert fake_labware.wells_by_name()['A2'].geometry._position == a2
+    assert min_lw.wells_by_name()['A1'].geometry._position == a1
+    assert min_lw.wells_by_name()['A2'].geometry._position == a2
 
 
-def test_deprecated_index_accessors():
-    deck = Location(Point(0, 0, 0), 'deck')
-    fake_labware = labware.Labware(minimalLabwareDef, deck)
-    assert fake_labware.wells_by_name() == fake_labware.wells_by_index()
-    assert fake_labware.rows_by_name() == fake_labware.rows_by_index()
-    assert fake_labware.columns_by_name() == fake_labware.columns_by_index()
+def test_deprecated_index_accessors(min_lw):
+    assert min_lw.wells_by_name() == min_lw.wells_by_index()
+    assert min_lw.rows_by_name() == min_lw.rows_by_index()
+    assert min_lw.columns_by_name() == min_lw.columns_by_index()
 
 
-def test_dict_accessor():
-    deck = Location(Point(0, 0, 0), 'deck')
-    fake_labware = labware.Labware(minimalLabwareDef, deck)
-    depth1 = minimalLabwareDef['wells']['A1']['depth']
-    depth2 = minimalLabwareDef['wells']['A2']['depth']
-    x = minimalLabwareDef['wells']['A2']['x']
-    y = minimalLabwareDef['wells']['A2']['y']
-    offset = fake_labware._offset
+def test_dict_accessor(min_lw, min_lw_impl, minimal_labware_def):
+    depth1 = minimal_labware_def['wells']['A1']['depth']
+    depth2 = minimal_labware_def['wells']['A2']['depth']
+    x = minimal_labware_def['wells']['A2']['x']
+    y = minimal_labware_def['wells']['A2']['y']
+    offset = min_lw_impl.get_geometry().offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware['A1'].geometry._position == a1
-    assert fake_labware['A2'].geometry._position == a2
+    assert min_lw['A1'].geometry._position == a1
+    assert min_lw['A2'].geometry._position == a2
 
 
-def test_rows_accessor():
-    deck = Location(Point(0, 0, 0), 'deck')
-    fake_labware = labware.Labware(minimalLabwareDef2, deck)
-    depth1 = minimalLabwareDef2['wells']['A1']['depth']
-    x1 = minimalLabwareDef2['wells']['A1']['x']
-    y1 = minimalLabwareDef2['wells']['A1']['y']
-    depth2 = minimalLabwareDef2['wells']['B2']['depth']
-    x2 = minimalLabwareDef2['wells']['B2']['x']
-    y2 = minimalLabwareDef2['wells']['B2']['y']
-    offset = fake_labware._offset
+def test_rows_accessor(min_lw2_impl, min_lw2, minimal_labware_def2):
+    depth1 = minimal_labware_def2['wells']['A1']['depth']
+    x1 = minimal_labware_def2['wells']['A1']['x']
+    y1 = minimal_labware_def2['wells']['A1']['y']
+    depth2 = minimal_labware_def2['wells']['B2']['depth']
+    x2 = minimal_labware_def2['wells']['B2']['x']
+    y2 = minimal_labware_def2['wells']['B2']['y']
+    offset = min_lw2_impl.get_geometry().offset
     a1 = Point(x=offset[0] + x1, y=offset[1] + y1, z=offset[2] + depth1)
     b2 = Point(x=offset[0] + x2, y=offset[1] + y2, z=offset[2] + depth2)
-    assert fake_labware.rows()[0][0].geometry._position == a1
-    assert fake_labware.rows()[1][1].geometry._position == b2
+    assert min_lw2.rows()[0][0].geometry._position == a1
+    assert min_lw2.rows()[1][1].geometry._position == b2
 
 
-def test_row_name_accessor():
-    deck = Location(Point(0, 0, 0), 'deck')
-    fake_labware = labware.Labware(minimalLabwareDef2, deck)
-    depth1 = minimalLabwareDef2['wells']['A1']['depth']
-    x1 = minimalLabwareDef2['wells']['A1']['x']
-    y1 = minimalLabwareDef2['wells']['A1']['y']
-    depth2 = minimalLabwareDef2['wells']['B2']['depth']
-    x2 = minimalLabwareDef2['wells']['B2']['x']
-    y2 = minimalLabwareDef2['wells']['B2']['y']
-    offset = fake_labware._offset
+def test_row_name_accessor(min_lw2_impl, min_lw2, minimal_labware_def2):
+    depth1 = minimal_labware_def2['wells']['A1']['depth']
+    x1 = minimal_labware_def2['wells']['A1']['x']
+    y1 = minimal_labware_def2['wells']['A1']['y']
+    depth2 = minimal_labware_def2['wells']['B2']['depth']
+    x2 = minimal_labware_def2['wells']['B2']['x']
+    y2 = minimal_labware_def2['wells']['B2']['y']
+    offset = min_lw2_impl.get_geometry().offset
     a1 = Point(x=offset[0] + x1, y=offset[1] + y1, z=offset[2] + depth1)
     b2 = Point(x=offset[0] + x2, y=offset[1] + y2, z=offset[2] + depth2)
-    assert fake_labware.rows_by_name()['A'][0].geometry._position == a1
-    assert fake_labware.rows_by_name()['B'][1].geometry._position == b2
+    assert min_lw2.rows_by_name()['A'][0].geometry._position == a1
+    assert min_lw2.rows_by_name()['B'][1].geometry._position == b2
 
 
-def test_cols_accessor():
-    deck = Location(Point(0, 0, 0), 'deck')
-    fake_labware = labware.Labware(minimalLabwareDef, deck)
-    depth1 = minimalLabwareDef['wells']['A1']['depth']
-    depth2 = minimalLabwareDef['wells']['A2']['depth']
-    x = minimalLabwareDef['wells']['A2']['x']
-    y = minimalLabwareDef['wells']['A2']['y']
-    offset = fake_labware._offset
+def test_cols_accessor(min_lw_impl, min_lw, minimal_labware_def):
+    depth1 = minimal_labware_def['wells']['A1']['depth']
+    depth2 = minimal_labware_def['wells']['A2']['depth']
+    x = minimal_labware_def['wells']['A2']['x']
+    y = minimal_labware_def['wells']['A2']['y']
+    offset = min_lw_impl.get_geometry().offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.columns()[0][0].geometry._position == a1
-    assert fake_labware.columns()[1][0].geometry._position == a2
+    assert min_lw.columns()[0][0].geometry._position == a1
+    assert min_lw.columns()[1][0].geometry._position == a2
 
 
-def test_col_name_accessor():
-    deck = Location(Point(0, 0, 0), 'deck')
-    fake_labware = labware.Labware(minimalLabwareDef, deck)
-    depth1 = minimalLabwareDef['wells']['A1']['depth']
-    depth2 = minimalLabwareDef['wells']['A2']['depth']
-    x = minimalLabwareDef['wells']['A2']['x']
-    y = minimalLabwareDef['wells']['A2']['y']
-    offset = fake_labware._offset
+def test_col_name_accessor(min_lw, min_lw_impl, minimal_labware_def):
+    depth1 = minimal_labware_def['wells']['A1']['depth']
+    depth2 = minimal_labware_def['wells']['A2']['depth']
+    x = minimal_labware_def['wells']['A2']['x']
+    y = minimal_labware_def['wells']['A2']['y']
+    offset = min_lw_impl.get_geometry().offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.columns_by_name()['1'][0].geometry._position == a1
-    assert fake_labware.columns_by_name()['2'][0].geometry._position == a2
+    assert min_lw.columns_by_name()['1'][0].geometry._position == a1
+    assert min_lw.columns_by_name()['2'][0].geometry._position == a2

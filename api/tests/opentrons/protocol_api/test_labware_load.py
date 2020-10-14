@@ -8,9 +8,11 @@ labware_name = 'corning_96_wellplate_360ul_flat'
 def test_load_to_slot(loop):
     ctx = papi.ProtocolContext(loop=loop)
     labware = ctx.load_labware(labware_name, '1')
-    assert labware._offset == types.Point(0, 0, 0)
+    assert labware._implementation.get_geometry().offset == \
+           types.Point(0, 0, 0)
     other = ctx.load_labware(labware_name, 2)
-    assert other._offset == types.Point(132.5, 0, 0)
+    assert other._implementation.get_geometry().offset ==\
+           types.Point(132.5, 0, 0)
 
 
 def test_loaded(loop):

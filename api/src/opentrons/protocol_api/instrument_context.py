@@ -147,7 +147,8 @@ class InstrumentContext(CommandPublisher):
     def _validate_tiprack(self, tiprack: Labware):
         # TODO AA 2020-06-24 - we should instead add the acceptable Opentrons
         # tipracks to the pipette as a refactor
-        if tiprack._definition['namespace'] == 'opentrons':
+        if tiprack._implementation.get_definition()['namespace'] \
+                == 'opentrons':
             tiprack_vol = tiprack.wells()[0].max_volume
             valid_vols = VALID_PIP_TIPRACK_VOL[self.name.split('_')[0]]
             if tiprack_vol not in valid_vols:
@@ -1533,7 +1534,7 @@ class InstrumentContext(CommandPublisher):
                 parent = first_parent(tiprack) or ''
                 return get.load_tip_length_calibration(
                     self.hw_pipette['pipette_id'],
-                    tiprack._definition,
+                    tiprack._implementation.get_definition(),
                     parent)['tipLength']
             except TipLengthCalNotFound:
                 return _build_length_from_overlap()

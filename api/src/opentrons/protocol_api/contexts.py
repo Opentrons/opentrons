@@ -7,4 +7,5 @@ from .module_contexts import (
 
 __all__ = [
     'ProtocolContext', 'InstrumentContext', 'ModuleContext',
-    'ThermocyclerContext', 'MagneticModuleContext', 'TemperatureModuleContext']
+    'ThermocyclerContext', 'MagneticModuleContext', 'TemperatureModuleContext'
+]

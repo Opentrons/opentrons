@@ -4,6 +4,8 @@ from uuid import uuid4
 from enum import Enum
 from dataclasses import dataclass
 
+from opentrons.protocols.implementations.labware import LabwareImplementation
+
 from robot_server.robot.calibration.session import CalibrationSession, \
     HEIGHT_SAFETY_BUFFER
 from opentrons.types import Mount, Point, Location
@@ -360,7 +362,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         for name, lw_data in self._labware_info.items():
             parent = self._deck.position_for(lw_data.slot)
-            lw = labware.Labware(lw_data.definition, parent)
+            lw = labware.Labware(
+                implementation=LabwareImplementation(
+                    lw_data.definition,
+                    parent
+                )
+            )
             self._deck[lw_data.slot] = lw
 
             for mount in lw_data.forMounts:
