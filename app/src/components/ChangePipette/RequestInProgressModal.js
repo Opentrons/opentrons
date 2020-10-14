@@ -14,7 +14,7 @@ const CARRIAGE_MOVING = 'carriage moving'
 const TO_FRONT_AND_LEFT = 'to front and left'
 const TO_FRONT_AND_RIGHT = 'to front and right'
 const UP = 'up'
-const ROBOT_IS_HOMING = 'robot is homing'
+const ROBOT_IS_HOMING = 'Robot is homing'
 
 type Props = {|
   title: string,
