@@ -101,3 +101,8 @@ install-key:
 .PHONY: term
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+
+# Create the setup.py on changes to poetry project file.
+.PHONY: setup.py
+setup.py: pyproject.toml
+	$(poetry_run) poetry-setup
