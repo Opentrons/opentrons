@@ -147,7 +147,6 @@ export function CalibratePipetteOffset(
         Sessions.deleteSession(robotName, session.id)
       )
     }
-    closeWizard()
   }
 
   if (!session || !tipRack) {
