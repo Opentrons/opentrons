@@ -11,6 +11,7 @@ import {
   Box,
   Flex,
   Text,
+  SecondaryBtn,
   DIRECTION_COLUMN,
   SPACING_1,
   SPACING_2,
@@ -26,7 +27,7 @@ import {
   JUSTIFY_START,
 } from '@opentrons/components'
 import styles from './styles.css'
-import { PipetteOffsetCalibrationControl } from './PipetteOffsetCalibrationControl'
+import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import type { State } from '../../types'
 
 import { getCalibrationForPipette } from '../../calibration'
@@ -49,6 +50,7 @@ const LABEL_BY_MOUNT = {
 const SERIAL_NUMBER = 'Serial number'
 const PIPETTE_OFFSET_MISSING = 'Pipette offset calibration missing.'
 const CALIBRATE_NOW = 'Please calibrate offset now.'
+const CALIBRATE_OFFSET = 'Calibrate offset'
 
 export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const { robotName, mount, pipette, changeUrl, settingsUrl } = props
@@ -62,6 +64,12 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
       ? getCalibrationForPipette(state, robotName, serialNumber)
       : null
   )
+
+  const [
+    startPipetteOffsetCalibration,
+    PipetteOffsetCalibrationWizard,
+  ] = useCalibratePipetteOffset(robotName, { mount })
+
   const pipImage = (
     <Box
       key={`pipetteImage${mount}`}
@@ -120,7 +128,17 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         </OutlineButton>
       )}
       {serialNumber && (
-        <PipetteOffsetCalibrationControl robotName={robotName} mount={mount} />
+        <>
+          <SecondaryBtn
+            width="11rem"
+            marginTop={SPACING_2}
+            padding={SPACING_2}
+            onClick={startPipetteOffsetCalibration}
+          >
+            {CALIBRATE_OFFSET}
+          </SecondaryBtn>
+          {PipetteOffsetCalibrationWizard}
+        </>
       )}
       {serialNumber && !pipetteOffsetCalibration && (
         <Flex

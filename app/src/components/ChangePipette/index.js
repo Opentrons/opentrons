@@ -1,10 +1,15 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import last from 'lodash/last'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
 
-import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
+import {
+  useDispatchApiRequests,
+  getRequestById,
+  SUCCESS,
+  PENDING,
+} from '../../robot-api'
+import { getCalibrationForPipette } from '../../calibration'
 import { getAttachedPipettes } from '../../pipettes'
 import {
   home,
@@ -12,10 +17,13 @@ import {
   getMovementStatus,
   HOMING,
   MOVING,
+  ROBOT,
   PIPETTE,
   CHANGE_PIPETTE,
+  HOME,
 } from '../../robot-controls'
 
+import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
@@ -23,7 +31,14 @@ import { ConfirmPipette } from './ConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { LevelPipette } from './LevelPipette'
 
-import { ATTACH, DETACH, CLEAR_DECK, INSTRUCTIONS, CONFIRM } from './constants'
+import {
+  ATTACH,
+  DETACH,
+  CLEAR_DECK,
+  INSTRUCTIONS,
+  CONFIRM,
+  CALIBRATE_PIPETTE,
+} from './constants'
 
 import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../robot/types'
@@ -44,33 +59,55 @@ const MOUNT = 'mount'
 export function ChangePipette(props: Props): React.Node {
   const { robotName, mount, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
-  const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
+  const homePipRequestId = React.useRef<string | null>(null)
+  const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
+    if (
+      dispatchedAction.type === HOME &&
+      dispatchedAction.payload.target === PIPETTE
+    ) {
+      // track final home pipette request, its success closes modal
+      homePipRequestId.current = dispatchedAction.meta.requestId
+    }
+  })
   const [wizardStep, setWizardStep] = React.useState<WizardStep>(CLEAR_DECK)
   const [wantedName, setWantedName] = React.useState<string | null>(null)
   const [confirmExit, setConfirmExit] = React.useState(false)
   const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName) : null
-  const actualPipette = useSelector((state: State) => {
-    return getAttachedPipettes(state, robotName)[mount]?.modelSpecs || null
-  })
+  const attachedPipette = useSelector(
+    (state: State) => getAttachedPipettes(state, robotName)[mount]
+  )
+  const actualPipette = attachedPipette?.modelSpecs || null
+  const actualPipetteOffset = useSelector((state: State) =>
+    attachedPipette?.id
+      ? getCalibrationForPipette(state, robotName, attachedPipette.id)
+      : null
+  )
 
   const movementStatus = useSelector((state: State) => {
     return getMovementStatus(state, robotName)
   })
 
-  const homeRequest = useSelector((state: State) => {
-    return getRequestById(state, last(requestIds))
+  const homePipStatus = useSelector((state: State) => {
+    return homePipRequestId.current
+      ? getRequestById(state, homePipRequestId.current)
+      : null
   })?.status
 
   React.useEffect(() => {
-    if (homeRequest && homeRequest !== PENDING) {
+    if (homePipStatus === SUCCESS) {
       closeModal()
     }
-  }, [homeRequest, closeModal])
+  }, [homePipStatus, closeModal])
 
-  const homeAndExit = React.useCallback(
-    () => dispatchApiRequest(home(robotName, PIPETTE, mount)),
-    [dispatchApiRequest, robotName, mount]
+  const homePipAndExit = React.useCallback(
+    () => dispatchApiRequests(home(robotName, PIPETTE, mount)),
+    [dispatchApiRequests, robotName, mount]
   )
+
+  const [
+    startPipetteOffsetCalibration,
+    PipetteOffsetCalibrationWizard,
+  ] = useCalibratePipetteOffset(robotName, { mount }, closeModal)
 
   const baseProps = {
     title: PIPETTE_SETUP,
@@ -83,7 +120,11 @@ export function ChangePipette(props: Props): React.Node {
     (movementStatus === HOMING || movementStatus === MOVING)
   ) {
     return (
-      <RequestInProgressModal {...baseProps} movementStatus={movementStatus} />
+      <RequestInProgressModal
+        {...baseProps}
+        movementStatus={movementStatus}
+        isPipetteHoming={homePipStatus === PENDING}
+      />
     )
   }
 
@@ -119,7 +160,7 @@ export function ChangePipette(props: Props): React.Node {
         {confirmExit && (
           <ExitAlertModal
             back={() => setConfirmExit(false)}
-            exit={homeAndExit}
+            exit={homePipAndExit}
           />
         )}
         <Instructions
@@ -144,6 +185,13 @@ export function ChangePipette(props: Props): React.Node {
 
     const attachedWrong = Boolean(!success && wantedPipette && actualPipette)
 
+    const launchPOC = () => {
+      // home before cal flow to account for skips when attaching pipette
+      setWizardStep(CALIBRATE_PIPETTE)
+      dispatchApiRequests(home(robotName, ROBOT))
+      startPipetteOffsetCalibration()
+    }
+
     if (success && wantedPipette && shouldLevel(wantedPipette)) {
       return (
         <LevelPipette
@@ -151,7 +199,9 @@ export function ChangePipette(props: Props): React.Node {
             pipetteModelName: actualPipette ? actualPipette.name : '',
             ...basePropsWithPipettes,
             back: () => setWizardStep(INSTRUCTIONS),
-            exit: homeAndExit,
+            exit: homePipAndExit,
+            actualPipetteOffset: actualPipetteOffset,
+            startPipetteOffsetCalibration: launchPOC,
           }}
         />
       )
@@ -167,11 +217,17 @@ export function ChangePipette(props: Props): React.Node {
               setWizardStep(INSTRUCTIONS)
             },
             back: () => setWizardStep(INSTRUCTIONS),
-            exit: homeAndExit,
+            exit: homePipAndExit,
+            actualPipetteOffset: actualPipetteOffset,
+            startPipetteOffsetCalibration: launchPOC,
           }}
         />
       )
     }
+  }
+
+  if (wizardStep === CALIBRATE_PIPETTE) {
+    return PipetteOffsetCalibrationWizard
   }
 
   // this will never be reached

@@ -2,9 +2,17 @@
 
 import * as React from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 
-import { Icon, ModalPage, PrimaryButton } from '@opentrons/components'
+import {
+  Icon,
+  ModalPage,
+  PrimaryBtn,
+  SecondaryBtn,
+  SPACING_2,
+} from '@opentrons/components'
 import styles from './styles.css'
+import { getFeatureFlags } from '../../config'
 
 import type {
   PipetteNameSpecs,
@@ -13,9 +21,12 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { Mount } from '../../pipettes/types'
+import type { PipetteOffsetCalibration } from '../../calibration/types'
 
 // TODO: i18n
 const EXIT_BUTTON_MESSAGE = 'confirm pipette is leveled'
+const EXIT_WITHOUT_CAL = 'exit without calibrating'
+const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 const LEVEL_MESSAGE = (displayName: string) => `Next, level the ${displayName}`
 const CONNECTED_MESSAGE = (displayName: string) => `${displayName} connected`
 
@@ -26,11 +37,13 @@ type Props = {|
   subtitle: string,
   wantedPipette: PipetteNameSpecs | null,
   actualPipette: PipetteModelSpecs | null,
+  actualPipetteOffset: PipetteOffsetCalibration | null,
   displayName: string,
   displayCategory: PipetteDisplayCategory | null,
   pipetteModelName: string,
   back: () => mixed,
   exit: () => mixed,
+  startPipetteOffsetCalibration: () => void,
 |}
 
 function Status(props: { displayName: string }) {
@@ -45,14 +58,6 @@ function Status(props: { displayName: string }) {
       <Icon name={iconName} className={iconClass} />
       {CONNECTED_MESSAGE(props.displayName)}
     </div>
-  )
-}
-
-function ExitButton(props: { exit: () => mixed }) {
-  return (
-    <PrimaryButton className={styles.confirm_button} onClick={props.exit}>
-      {EXIT_BUTTON_MESSAGE}
-    </PrimaryButton>
   )
 }
 
@@ -88,10 +93,15 @@ export function LevelPipette(props: Props): React.Node {
     subtitle,
     pipetteModelName,
     displayName,
+    actualPipetteOffset,
     mount,
     back,
     exit,
+    startPipetteOffsetCalibration,
   } = props
+
+  const ff = useSelector(getFeatureFlags)
+
   return (
     <ModalPage
       titleBar={{
@@ -104,7 +114,18 @@ export function LevelPipette(props: Props): React.Node {
       <Status displayName={displayName} />
       <LevelingInstruction displayName={displayName} />
       <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
-      <ExitButton exit={exit} />
+      {ff.enableCalibrationOverhaul && !actualPipetteOffset && (
+        <PrimaryBtn
+          marginBottom={SPACING_2}
+          width="100%"
+          onClick={startPipetteOffsetCalibration}
+        >
+          {CONTINUE_TO_PIP_OFFSET}
+        </PrimaryBtn>
+      )}
+      <SecondaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
+        {actualPipetteOffset ? EXIT_BUTTON_MESSAGE : EXIT_WITHOUT_CAL}
+      </SecondaryBtn>
     </ModalPage>
   )
 }

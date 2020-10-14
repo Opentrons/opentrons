@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { SecondaryBtn, SPACING_2 } from '@opentrons/components'
 
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
@@ -10,33 +9,43 @@ import type { State } from '../../types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
+  PipetteOffsetCalibrationSessionParams,
 } from '../../sessions/types'
-import type { Mount } from '../../pipettes/types'
 import type { RequestState } from '../../robot-api/types'
 
 import { Portal } from '../portal'
 import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
-
-type Props = {|
-  robotName: string,
-  mount: Mount,
-|}
 
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-const BUTTON_TEXT = 'Calibrate offset'
-
-export function PipetteOffsetCalibrationControl(props: Props): React.Node {
-  const { robotName, mount } = props
-
+export function useCalibratePipetteOffset(
+  robotName: string,
+  sessionParams: $Shape<PipetteOffsetCalibrationSessionParams>,
+  onComplete: (() => mixed) | null = null
+): [() => void, React.Node | null] {
   const [showWizard, setShowWizard] = React.useState(false)
 
   const trackedRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
+
+  const pipOffsetCalSession = useSelector<
+    State,
+    PipetteOffsetCalibrationSession | null
+  >((state: State) => {
+    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
+      state,
+      robotName,
+      Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+    )
+    return session &&
+      session.sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+      ? session
+      : null
+  })
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -79,20 +88,28 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
         : null
     )?.status === RobotApi.SUCCESS
 
+  const closeWizard = React.useCallback(() => {
+    onComplete && onComplete()
+    setShowWizard(false)
+  }, [onComplete])
+
   React.useEffect(() => {
     if (shouldOpen) {
       setShowWizard(true)
       createRequestId.current = null
     }
     if (shouldClose) {
-      setShowWizard(false)
+      closeWizard()
       deleteRequestId.current = null
     }
-  }, [shouldOpen, shouldClose])
+  }, [shouldOpen, shouldClose, closeWizard])
 
-  const hasCalibrationBlock = false
-  const shouldRecalibrateTipLength = false
-  const tipRackDefinition = null
+  const {
+    mount,
+    shouldRecalibrateTipLength = false,
+    hasCalibrationBlock = false,
+    tipRackDefinition = null,
+  } = sessionParams
   const handleStartPipOffsetCalSession = () => {
     dispatchRequests(
       Sessions.ensureSession(
@@ -108,42 +125,18 @@ export function PipetteOffsetCalibrationControl(props: Props): React.Node {
     )
   }
 
-  const pipOffsetCalSession = useSelector<
-    State,
-    PipetteOffsetCalibrationSession | null
-  >((state: State) => {
-    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
-      state,
-      robotName,
-      Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-    )
-    return session &&
-      session.sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-      ? session
-      : null
-  })
-
-  return (
-    <>
-      <SecondaryBtn
-        width="11rem"
-        marginTop={SPACING_2}
-        padding={SPACING_2}
-        onClick={handleStartPipOffsetCalSession}
-      >
-        {BUTTON_TEXT}
-      </SecondaryBtn>
-      {showWizard && (
-        <Portal>
-          <CalibratePipetteOffset
-            session={pipOffsetCalSession}
-            robotName={robotName}
-            closeWizard={() => setShowWizard(false)}
-            showSpinner={showSpinner}
-            dispatchRequests={dispatchRequests}
-          />
-        </Portal>
-      )}
-    </>
-  )
+  return [
+    handleStartPipOffsetCalSession,
+    showWizard ? (
+      <Portal>
+        <CalibratePipetteOffset
+          session={pipOffsetCalSession}
+          robotName={robotName}
+          closeWizard={closeWizard}
+          showSpinner={showSpinner}
+          dispatchRequests={dispatchRequests}
+        />
+      </Portal>
+    ) : null,
+  ]
 }

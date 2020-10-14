@@ -1,11 +1,13 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 
-import { Icon, PrimaryButton, ModalPage } from '@opentrons/components'
+import { Icon, PrimaryBtn, ModalPage, SPACING_2 } from '@opentrons/components'
 import { getDiagramsSrc } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
+import { getFeatureFlags } from '../../config'
 
 import type {
   PipetteNameSpecs,
@@ -13,9 +15,12 @@ import type {
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 import type { Mount } from '../../pipettes/types'
+import type { PipetteOffsetCalibration } from '../../calibration/types'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
+const EXIT_WITHOUT_CAL = 'exit without calibrating'
+const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 
 type Props = {|
   robotName: string,
@@ -26,15 +31,27 @@ type Props = {|
   attachedWrong: boolean,
   wantedPipette: PipetteNameSpecs | null,
   actualPipette: PipetteModelSpecs | null,
+  actualPipetteOffset: PipetteOffsetCalibration | null,
   displayName: string,
   displayCategory: PipetteDisplayCategory | null,
   tryAgain: () => mixed,
   back: () => mixed,
   exit: () => mixed,
+  startPipetteOffsetCalibration: () => void,
 |}
 
 export function ConfirmPipette(props: Props): React.Node {
-  const { title, subtitle, success, attachedWrong, actualPipette, back } = props
+  const {
+    title,
+    subtitle,
+    success,
+    attachedWrong,
+    actualPipette,
+    actualPipetteOffset,
+    back,
+  } = props
+
+  const ff = useSelector(getFeatureFlags)
 
   return (
     <ModalPage
@@ -48,6 +65,10 @@ export function ConfirmPipette(props: Props): React.Node {
       <StatusDetails {...props} />
       {!success && <TryAgainButton {...props} />}
       {success && !actualPipette && <AttachAnotherButton {...props} />}
+      {ff.enableCalibrationOverhaul &&
+        success &&
+        actualPipette &&
+        !actualPipetteOffset && <CalibratePipetteOffsetButton {...props} />}
       <ExitButton {...props} />
     </ModalPage>
   )
@@ -137,9 +158,21 @@ function StatusDetails(props: Props) {
 
 function AttachAnotherButton(props: Props) {
   return (
-    <PrimaryButton className={styles.confirm_button} onClick={props.back}>
+    <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={props.back}>
       attach another pipette
-    </PrimaryButton>
+    </PrimaryBtn>
+  )
+}
+
+function CalibratePipetteOffsetButton(props: Props) {
+  return (
+    <PrimaryBtn
+      marginBottom={SPACING_2}
+      width="100%"
+      onClick={props.startPipetteOffsetCalibration}
+    >
+      {CONTINUE_TO_PIP_OFFSET}
+    </PrimaryBtn>
   )
 }
 
@@ -154,9 +187,9 @@ function TryAgainButton(props: Props) {
 
   if (wantedPipette && attachedWrong) {
     return (
-      <PrimaryButton className={styles.confirm_button} onClick={tryAgain}>
+      <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={tryAgain}>
         detach and try again
-      </PrimaryButton>
+      </PrimaryBtn>
     )
   }
 
@@ -173,14 +206,14 @@ function TryAgainButton(props: Props) {
 }
 
 function ExitButton(props: Props) {
-  const { exit, attachedWrong } = props
-  const children = attachedWrong
-    ? EXIT_BUTTON_MESSAGE_WRONG
-    : EXIT_BUTTON_MESSAGE
+  const { exit, attachedWrong, actualPipetteOffset } = props
+  let buttonText = EXIT_BUTTON_MESSAGE
+  if (attachedWrong) buttonText = EXIT_BUTTON_MESSAGE_WRONG
+  else if (!actualPipetteOffset) buttonText = EXIT_WITHOUT_CAL
 
   return (
-    <PrimaryButton className={styles.confirm_button} onClick={exit}>
-      {children}
-    </PrimaryButton>
+    <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
+      {buttonText}
+    </PrimaryBtn>
   )
 }

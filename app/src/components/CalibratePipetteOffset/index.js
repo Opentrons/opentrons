@@ -97,14 +97,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
 ): React.Node {
-  const {
-    session,
-    robotName,
-    closeWizard,
-    dispatchRequests,
-    showSpinner,
-    hasBlock,
-  } = props
+  const { session, robotName, dispatchRequests, showSpinner, hasBlock } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
   const {
@@ -147,7 +140,6 @@ export function CalibratePipetteOffset(
         Sessions.deleteSession(robotName, session.id)
       )
     }
-    closeWizard()
   }
 
   if (!session || !tipRack) {
