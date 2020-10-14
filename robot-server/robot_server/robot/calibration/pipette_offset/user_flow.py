@@ -289,13 +289,13 @@ class PipetteOffsetCalibrationUserFlow:
                 tip_rack_def, position)
         if existing_calibration and existing_calibration.uri:
             try:
-                namespace, loadname, version\
-                    = existing_calibration.uri.split('/')
-            except (IndexError, ValueError):
-                pass
-            try:
-                return True, labware.load(loadname, position)
-            except FileNotFoundError:
+                details \
+                     = helpers.details_from_uri(existing_calibration.uri)
+                return True, labware.load(load_name=details.load_name,
+                                          namespace=details.namespace,
+                                          version=details.version,
+                                          parent=position)
+            except (IndexError, ValueError, FileNotFoundError):
                 pass
         tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(volume)].load_name
         return True, labware.load(tr_load_name, position)
