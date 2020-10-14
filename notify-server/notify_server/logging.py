@@ -16,7 +16,7 @@ def initialize_logging(production: bool) -> None:
 
 def _production_log_config() -> Dict[str, Any]:
     """Log configuration for robot deployment."""
-    lvl = logging.getLevelName(logging.INFO)
+    lvl = logging.INFO
     return {
         'version': 1,
         'disable_existing_loggers': False,
@@ -39,13 +39,17 @@ def _production_log_config() -> Dict[str, Any]:
                 'level': lvl,
                 'propagate': False
             },
+        },
+        'root': {
+            'handlers': ['notify_server'],
+            'level': lvl
         }
     }
 
 
 def _dev_log_config() -> Dict[str, Any]:
     """Log configuration for local dev deployment."""
-    lvl = logging.getLevelName(logging.DEBUG)
+    lvl = logging.DEBUG
     return {
         'version': 1,
         'disable_existing_loggers': False,
@@ -67,5 +71,9 @@ def _dev_log_config() -> Dict[str, Any]:
                 'level': lvl,
                 'propagate': False
             },
+        },
+        'root': {
+            'handlers': ['notify_server'],
+            'level': lvl
         }
     }

@@ -77,6 +77,7 @@ lint: $(ot_py_sources)
 	$(poetry_run) flake8 $(SRC_PATH) tests
 
 .PHONY: dev
+dev: export OT_NOTIFY_SERVER_PRODUCTION := 0
 dev:
 	$(poetry_run) python -m notify_server.main
 
