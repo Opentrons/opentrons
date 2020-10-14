@@ -56,7 +56,7 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	$(POETRY) update
+	$(POETRY) install
 	$(POETRY) show
 
 .PHONY: clean
@@ -65,7 +65,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	rm -rf  `${POETRY} env info -p`
+	$(SHX) rm -rf  `${POETRY} env info -p`
 
 dist/notify_server-%-py3-none-any.whl: $(ot_sources)
 	$(clean_cmd)
