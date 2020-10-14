@@ -9,7 +9,14 @@ python = "^3.7"
 pyzmq = "^19.0.2"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^6.1"
+pytest-watch = "^4.2.0"
+pytest-cov = "^2.10.1"
+mypy = "^0.790"
+flake8 = "^3.8.4"
+flake8-docstrings = "^1.5.0"
+flake8-annotations = "^2.4.1"
+mock = "^4.0.2"
 
 [build-system]
 requires = ["poetry>=0.12"]

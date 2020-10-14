@@ -1,7 +1,10 @@
+"""The main entry point of the server application."""
+
 import asyncio
 
 
-async def run():
+async def run() -> None:
+    """Entry point for the application."""
     pass
 
 

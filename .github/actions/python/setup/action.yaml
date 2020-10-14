@@ -13,5 +13,6 @@ runs:
       run: |
         npm install --global shx@0.2.2
         pip install pipenv==2020.8.13
+        pip install poetry
     - shell: bash
       run: 'make -C ${{ inputs.project}} setup'

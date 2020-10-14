@@ -15,6 +15,9 @@ pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated --clear)
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 
+poetry := poetry
+poetry_run := $(poetry) run
+
 pypi_upload_url := https://upload.pypi.org/legacy/
 pypi_test_upload_url := https://test.pypi.org/legacy/
 
@@ -27,6 +30,10 @@ define python_package_version
 $(shell $(python) $(if $(3),$(3),../scripts/python_build_utils.py) $(1) normalize_version $(if $(2),-e $(2)))
 endef
 
+# This is the poetry version of python_get_wheelname. Arguments are identical.
+define poetry_python_get_wheelname
+$(2)-$(call python_package_version,$(1),$(3),$(4))-py3-none-any.whl
+endef
 
 # get the name of the wheel that setup.py will build
 # parameter 1: the name of the project (aka api, robot-server, etc)

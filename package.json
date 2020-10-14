@@ -14,7 +14,8 @@
     "robot-server/robot_server",
     "shared-data",
     "update-server/otupdate",
-    "webpack-config"
+    "webpack-config",
+    "notify-server/notify_server"
   ],
   "config": {
     "commitizen": {
