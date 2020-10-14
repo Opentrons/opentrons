@@ -8,7 +8,15 @@ import {
   getModuleType,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { ListItem, HoverTooltip } from '@opentrons/components'
+import {
+  ListItem,
+  Flex,
+  Tooltip,
+  Text,
+  useHoverTooltip,
+  FONT_SIZE_BODY_1,
+  C_WHITE,
+} from '@opentrons/components'
 import { CalibrationData } from './CalibrationData'
 import type { BaseProtocolLabware } from '../../calibration/labware/types'
 import styles from './styles.css'
@@ -44,6 +52,8 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
   }
   const moduleDisplayName = parent && getModuleDisplayName(parent)
 
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
   return (
     <ListItem
       url={!isDisabled ? url : undefined}
@@ -52,61 +62,40 @@ export function LabwareListItem(props: LabwareListItemProps): React.Node {
       className={cx(styles.labware_item, { [styles.disabled]: isDisabled })}
       activeClassName={styles.active}
     >
-      <HoverTooltip
-        tooltipComponent={
-          <LabwareNameTooltip
-            name={name}
-            displayName={
-              moduleDisplayName
-                ? `${displayName} on ${moduleDisplayName}`
-                : displayName
-            }
-          />
-        }
-      >
-        {handlers => (
-          <div {...handlers} className={styles.item_info}>
-            <span className={styles.item_info_location}>{displaySlot}</span>
-            <div className={styles.slot_contents_names}>
-              {parent && (
-                <span className={styles.module_name}>{moduleDisplayName}</span>
-              )}
-              <span className={styles.labware_item_name}>
-                {isTiprack ? (
-                  <span className={styles.tiprack_item_mount}>
-                    <span className={styles.tiprack_item_mount}>
-                      {calibratorMount
-                        ? calibratorMount.charAt(0).toUpperCase()
-                        : ''}
-                    </span>
-                    {displayName}
-                  </span>
-                ) : (
-                  displayName
-                )}
+      <Flex {...targetProps} className={styles.item_info}>
+        <span className={styles.item_info_location}>{displaySlot}</span>
+        <div className={styles.slot_contents_names}>
+          {parent && (
+            <span className={styles.module_name}>{moduleDisplayName}</span>
+          )}
+          <span className={styles.labware_item_name}>
+            {isTiprack ? (
+              <span className={styles.tiprack_item_mount}>
+                <span className={styles.tiprack_item_mount}>
+                  {calibratorMount
+                    ? calibratorMount.charAt(0).toUpperCase()
+                    : ''}
+                </span>
+                {displayName}
               </span>
-              <CalibrationData
-                calibrationData={calibrationData}
-                calibratedThisSession={confirmed}
-                // the definitionHash will only be absent if old labware
-                // or robot version <= 3.19
-                calDataAvailable={definitionHash !== null}
-              />
-            </div>
-          </div>
-        )}
-      </HoverTooltip>
+            ) : (
+              displayName
+            )}
+          </span>
+          <CalibrationData
+            calibrationData={calibrationData}
+            calibratedThisSession={confirmed}
+            // the definitionHash will only be absent if old labware
+            // or robot version <= 3.19
+            calDataAvailable={definitionHash !== null}
+          />
+        </div>
+      </Flex>
+      <Tooltip {...tooltipProps}>
+        <Text fontSize={FONT_SIZE_BODY_1} color={C_WHITE}>
+          {name}
+        </Text>
+      </Tooltip>
     </ListItem>
-  )
-}
-
-function LabwareNameTooltip(props: {| name: string, displayName: string |}) {
-  const { name, displayName } = props
-
-  return (
-    <div className={styles.item_info_tooltip}>
-      <p>{name}</p>
-      <p>{displayName}</p>
-    </div>
   )
 }
