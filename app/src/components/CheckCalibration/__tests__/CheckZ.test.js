@@ -8,9 +8,9 @@ import {
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_DECK,
 } from '../../../sessions'
-import { CheckHeight } from '../CheckHeight'
+import { CompareZ } from '../CompareZ'
 
-describe('CheckHeight', () => {
+describe('CompareZ', () => {
   let render
 
   const mockComparePoint = jest.fn()
@@ -53,7 +53,7 @@ describe('CheckHeight', () => {
         pipetteModel = 'p300_single_v2.1',
       } = props
       return mount(
-        <CheckHeight
+        <CompareZ
           isMulti={isMulti}
           isInspecting={isInspecting}
           comparison={comparison}

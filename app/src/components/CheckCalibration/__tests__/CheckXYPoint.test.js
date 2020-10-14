@@ -9,9 +9,9 @@ import {
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_DECK,
 } from '../../../sessions'
-import { CheckXYPoint } from '../CheckXYPoint'
+import { CompareXY } from '../CompareXY'
 
-describe('CheckXYPoint', () => {
+describe('CompareXYPoint', () => {
   let render
 
   const mockComparePoint = jest.fn()
@@ -35,7 +35,7 @@ describe('CheckXYPoint', () => {
   const getVideo = wrapper => wrapper.find(`source`)
 
   beforeEach(() => {
-    render = (props: $Shape<React.ElementProps<typeof CheckXYPoint>> = {}) => {
+    render = (props: $Shape<React.ElementProps<typeof CompareXY>> = {}) => {
       const {
         slotNumber = '1',
         isMulti = false,
@@ -51,7 +51,7 @@ describe('CheckXYPoint', () => {
         nextButtonText = 'continue',
       } = props
       return mount(
-        <CheckXYPoint
+        <CompareXY
           slotNumber={slotNumber}
           isMulti={isMulti}
           mount={mountProp}

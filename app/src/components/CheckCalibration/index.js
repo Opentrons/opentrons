@@ -6,14 +6,6 @@ import {
   ModalPage,
   SpinnerModalPage,
   useConditionalConfirm,
-  DISPLAY_FLEX,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  SPACING_3,
-  C_TRANSPARENT,
-  ALIGN_FLEX_START,
-  C_WHITE,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -30,7 +22,7 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 import type {
-  calibrationLabware,
+  CalibrationLabware,
   SessionCommandParams,
 } from '../../sessions/types'
 
@@ -39,8 +31,7 @@ import { ResultsSummary } from './ResultsSummary'
 import type { CalibrationHealthCheckParentProps } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
-
-const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Robot calibration check'
+const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Robot calibration heatlh check'
 const EXIT = 'exit'
 
 const PANEL_BY_STEP: {
@@ -120,7 +111,7 @@ export function CheckHealthCalibration(
     closeWizard()
   }
 
-  const tipRack: calibrationLabware | null =
+  const tipRack: CalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
 
   if (!session || !tipRack) {

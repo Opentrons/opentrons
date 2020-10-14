@@ -25,7 +25,7 @@ import {
 } from '@opentrons/components'
 
 import { Portal } from '../portal'
-import { CheckCalibration } from '../CheckCalibration'
+import { CheckHealthCalibration } from '../CheckCalibration'
 import { TitledControl } from '../TitledControl'
 
 import type { State } from '../../types'
@@ -59,7 +59,10 @@ export function CheckCalibrationControl({
 
   const ensureSession = () => {
     dispatch(
-      Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK)
+      Sessions.ensureSession(
+        robotName,
+        Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+      )
     )
   }
 
@@ -117,7 +120,7 @@ export function CheckCalibrationControl({
       </TitledControl>
       {showWizard && (
         <Portal level="top">
-          <CheckCalibration
+          <CheckHealthCalibration
             robotName={robotName}
             closeCalibrationCheck={() => setShowWizard(false)}
           />

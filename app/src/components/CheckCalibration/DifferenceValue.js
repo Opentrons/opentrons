@@ -7,12 +7,11 @@ import styles from './styles.css'
 import type { RobotCalibrationCheckStep } from '../../sessions/types'
 
 const axisIndicesByStep: { [RobotCalibrationCheckStep]: Array<number>, ... } = {
-  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT]: [2],
-  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: [0, 1],
-  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: [0, 1],
-  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: [0, 1],
-  [Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT]: [2],
-  [Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: [0, 1],
+  [Sessions.CHECK_STEP_COMPARING_HEIGHT]: [2],
+  [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: [0, 1],
+  [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: [0, 1],
+  [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: [0, 1],
+  [Sessions.CHECK_STEP_COMPARING_HEIGHT]: [2],
 }
 const AXIS_NAMES = ['X', 'Y', 'Z']
 

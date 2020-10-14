@@ -22,19 +22,16 @@ export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badCalibrationData' =
 export const CHECK_STEP_NO_PIPETTES_ATTACHED: 'noPipettesAttached' =
   'noPipettesAttached'
 
-const PREPARE_PIPETTE: 'calibration.check.preparePipette' =
-  'calibration.check.preparePipette'
+const CHECK_SECOND_PIPETTE: 'calibration.check.checkForSecondPipette' =
+  'calibration.check.checkForSecondPipette'
 const COMPARE_POINT: 'calibration.check.comparePoint' =
   'calibration.check.comparePoint'
-const GO_TO_NEXT_CHECK: 'calibration.check.goToNextCheck' =
-  'calibration.check.goToNextCheck'
 const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
 
 export const checkCommands = {
   ...sharedCalCommands,
-  PREPARE_PIPETTE,
+  CHECK_SECOND_PIPETTE,
   COMPARE_POINT,
-  GO_TO_NEXT_CHECK,
   EXIT,
 }
 

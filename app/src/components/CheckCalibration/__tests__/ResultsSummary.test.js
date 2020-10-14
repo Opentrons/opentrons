@@ -158,8 +158,7 @@ describe('ResultsSummary', () => {
     const wrapper = render({
       comparisonsByStep: {
         ...mockSessionDetails.comparisonsByStep,
-        [Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]:
-          Fixtures.badXYComparison,
+        [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: Fixtures.badXYComparison,
       },
     })
 
