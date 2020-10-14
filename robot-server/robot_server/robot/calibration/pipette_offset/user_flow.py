@@ -1,10 +1,11 @@
 import logging
 from typing import (
     Any, Awaitable, Callable, Dict,
-    List, Optional, Union, TYPE_CHECKING)
+    List, Optional, Union, TYPE_CHECKING, Tuple)
 
 from opentrons.calibration_storage import get, modify, helpers
-from opentrons.calibration_storage.types import TipLengthCalNotFound
+from opentrons.calibration_storage.types import (
+    TipLengthCalNotFound, PipetteOffsetByPipetteMount)
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.protocol_api import labware
@@ -57,7 +58,7 @@ class PipetteOffsetCalibrationUserFlow:
     def __init__(self,
                  hardware: ThreadManager,
                  mount: Mount = Mount.RIGHT,
-                 perform_tip_length: bool = False,
+                 recalibrate_tip_length: bool = False,
                  has_calibration_block: bool = False,
                  tip_rack_def: Optional['LabwareDefinition'] = None):
 
@@ -84,11 +85,18 @@ class PipetteOffsetCalibrationUserFlow:
         self._nozzle_height_at_reference: Optional[float] = None
 
         self._using_default_tiprack = False
-        self._initialize_deck(tip_rack_def)
+
+        existing_offset_calibration = self._get_stored_pipette_offset_cal()
+        self._initialize_deck(tip_rack_def, existing_offset_calibration)
+
+        existing_tip_length_calibration = self._get_stored_tip_length_cal()
+
         self._has_calibrated_tip_length: bool =\
             (self._get_stored_tip_length_cal() is not None
              or self._using_default_tiprack)
 
+        perform_tip_length = recalibrate_tip_length \
+            or not existing_tip_length_calibration
         if perform_tip_length:
             self._state_machine: PipetteOffsetStateMachine =\
                 PipetteOffsetWithTipLengthStateMachine()
@@ -97,6 +105,7 @@ class PipetteOffsetCalibrationUserFlow:
             self._state_machine =\
                 PipetteOffsetCalibrationStateMachine()
             self._state = POCState  # type: ignore
+
         self._current_state = self._state.sessionStarted
         self._should_perform_tip_length = perform_tip_length
 
@@ -164,8 +173,11 @@ class PipetteOffsetCalibrationUserFlow:
     def _set_current_state(self, to_state: GenericState):
         self._current_state = to_state
 
-    def _initialize_deck(self, tiprack_def):
-        self._load_tiprack(tiprack_def)
+    def _initialize_deck(
+            self,
+            tiprack_def: Optional['LabwareDefinition'],
+            existing_calibration: Optional[PipetteOffsetByPipetteMount]):
+        self._load_tiprack(tiprack_def, existing_calibration)
         if self._has_calibration_block:
             self._load_calibration_block()
 
@@ -234,6 +246,12 @@ class PipetteOffsetCalibrationUserFlow:
         except TipLengthCalNotFound:
             return None
 
+    def _get_stored_pipette_offset_cal(
+            self) -> Optional[PipetteOffsetByPipetteMount]:
+        return get.get_pipette_offset(
+            self._hw_pipette.pipette_id, self._mount
+        )
+
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
         if stored_tip_length_cal is None:
@@ -255,24 +273,46 @@ class PipetteOffsetCalibrationUserFlow:
         cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
         del self._deck[cb_setup.slot]
 
-    def _load_tiprack(self,
-                      tip_rack_def: Optional['LabwareDefinition'] = None):
+    @staticmethod
+    def _get_tr_lw(tip_rack_def: Optional['LabwareDefinition'],
+                   existing_calibration: Optional[PipetteOffsetByPipetteMount],
+                   volume: float,
+                   position: Location) -> Tuple[bool, labware.Labware]:
+        """ Find the right tiprack to use. Specifically,
+
+        - If it's specified from above, use that
+        - If it's not, and we have a calibration, use that
+        - If we don't, use the default
+        """
+        if tip_rack_def:
+            return False, labware.load_from_definition(
+                tip_rack_def, position)
+        if existing_calibration and existing_calibration.uri:
+            try:
+                details \
+                     = helpers.details_from_uri(existing_calibration.uri)
+                return True, labware.load(load_name=details.load_name,
+                                          namespace=details.namespace,
+                                          version=details.version,
+                                          parent=position)
+            except (IndexError, ValueError, FileNotFoundError):
+                pass
+        tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(volume)].load_name
+        return True, labware.load(tr_load_name, position)
+
+    def _load_tiprack(
+            self,
+            tip_rack_def: Optional['LabwareDefinition'],
+            existing_calibration: Optional[PipetteOffsetByPipetteMount]):
         """
         load onto the deck the default opentrons tip rack labware for this
         pipette and return the tip rack labware. If tip_rack_def is supplied,
         load specific tip rack from def onto the deck and return the labware.
         """
-        if tip_rack_def:
-            tr_lw = labware.load_from_definition(
-                tip_rack_def,
-                self._deck.position_for(TIP_RACK_SLOT))
-        else:
-            pip_vol = self._hw_pipette.config.max_volume
-            tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
-            tr_lw = labware.load(tr_load_name,
-                                 self._deck.position_for(TIP_RACK_SLOT))
-            self._using_default_tiprack = True
-        self._tip_rack = tr_lw
+        self._using_default_tiprack, self._tip_rack = self._get_tr_lw(
+            tip_rack_def, existing_calibration,
+            self._hw_pipette.config.max_volume,
+            self._deck.position_for(TIP_RACK_SLOT))
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
     def _flag_unmet_transition_req(self, command_handler: str,

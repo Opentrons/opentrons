@@ -56,14 +56,11 @@ export function PipetteListComponent(
     robotName && dispatch(fetchTipLengthCalibrations(robotName))
   }, [dispatch, robotName])
 
+  const titleListTitle = !ff.enableCalibrationOverhaul
+    ? PIPETTE_CALIBRATION
+    : TIP_LENGTH_CALIBRATION
   return (
-    <TitledList
-      title={
-        !ff.enableCalibrationOverhaul
-          ? PIPETTE_CALIBRATION
-          : TIP_LENGTH_CALIBRATION
-      }
-    >
+    <TitledList key={titleListTitle} title={titleListTitle}>
       {PIPETTE_MOUNTS.map(mount => {
         const protocolPipette =
           protocolPipettes.find(i => i.mount === mount) || null

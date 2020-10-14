@@ -1,10 +1,14 @@
+import datetime
+
 import pytest
 from unittest.mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
-from opentrons.calibration_storage import modify, helpers
+from opentrons.calibration_storage import modify, helpers, types as CSTypes
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from opentrons.config.pipette_config import load
+
+from opentrons_shared_data.labware import load_definition
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import CalibrationCommand
@@ -12,6 +16,7 @@ from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
 from robot_server.robot.calibration.pipette_offset.constants import\
     PipetteOffsetCalibrationState as POCState
+
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
 
@@ -29,6 +34,37 @@ pipette_map = {
     "p20_multi_v2.1": "opentrons_96_tiprack_20ul",
     "p300_multi_v2.1": "opentrons_96_tiprack_300ul",
 }
+
+
+def build_mock_stored_pipette_offset(kind='normal'):
+    if kind == 'normal':
+        return MagicMock(
+            return_value=CSTypes.PipetteOffsetByPipetteMount(
+                offset=[0, 1, 2],
+                tiprack='tiprack-id',
+                uri='opentrons/opentrons_96_filtertiprack_200ul/1',
+                last_modified=datetime.datetime.now(),
+                source=CSTypes.SourceType.user,
+                status=CSTypes.CalibrationStatus(markedBad=False)))
+    elif kind == 'empty':
+        return MagicMock(return_value=None)
+    else:
+        assert False,\
+            'specify normal or empty to build_mock_stored_pipette_offset'
+
+
+def build_mock_stored_tip_length(kind='normal'):
+    if kind == 'normal':
+        return MagicMock(return_value=30)
+    elif kind == 'empty':
+        return MagicMock(return_value=None)
+    else:
+        assert False,\
+            'specify normal or empty to build_mock_stored_tip_length'
+
+
+LW_DEFINITION = load_definition('opentrons_96_filtertiprack_200ul', 1)
+LW_DEFINITION['version'] = 2
 
 
 @pytest.fixture(params=pipette_map.keys())
@@ -110,12 +146,14 @@ def mock_hw(hardware):
 def mock_user_flow(mock_hw):
     mount = next(k for k, v in
                  mock_hw._attached_instruments.items() if v)
-
-    mock_stored_tip_length = MagicMock(return_value=30)
     with patch.object(
             PipetteOffsetCalibrationUserFlow,
             '_get_stored_tip_length_cal',
-            new=mock_stored_tip_length):
+            new=build_mock_stored_tip_length()),\
+            patch.object(
+                PipetteOffsetCalibrationUserFlow,
+                '_get_stored_pipette_offset_cal',
+                new=build_mock_stored_pipette_offset()):
         m = PipetteOffsetCalibrationUserFlow(hardware=mock_hw, mount=mount)
         yield m
 
@@ -132,6 +170,69 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
     (CalibrationCommand.move_to_tip_rack, POCState.labwareLoaded,
      {}, 'move_to'),
 ]
+
+
+@pytest.mark.parametrize(
+    'existing_poc,existing_tlc,recalibrate,trd,whichdef,dotip', [
+        # If we otherwise have everything we need, follow the argument
+        (build_mock_stored_pipette_offset(),
+         build_mock_stored_tip_length(),
+         True, None, 'stored', True),
+        (build_mock_stored_pipette_offset(),
+         build_mock_stored_tip_length(),
+         False, None, 'stored', False),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length(),
+         False, LW_DEFINITION, 'specified', False),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length(),
+         True, LW_DEFINITION, 'specified', True),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length(),
+         True, None, 'default', True),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length(),
+         True, None, 'default', True),
+        # In all cases where we cannot resolve a TLC for this
+        # labware, recalibrate tip length
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length('empty'),
+         False, LW_DEFINITION, 'specified', True),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length('empty'),
+         False, None, 'default', True),
+    ]
+)
+def test_recalibrate_options(mock_hw,
+                             existing_poc, existing_tlc, recalibrate,
+                             trd, whichdef, dotip):
+    with patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            '_get_stored_tip_length_cal',
+            new=existing_tlc),\
+            patch.object(
+                PipetteOffsetCalibrationUserFlow,
+                '_get_stored_pipette_offset_cal',
+                new=existing_poc):
+        m = PipetteOffsetCalibrationUserFlow(
+            hardware=mock_hw, mount=Mount.RIGHT,
+            recalibrate_tip_length=recalibrate,
+            tip_rack_def=trd,
+            has_calibration_block=False)
+        assert m.should_perform_tip_length == dotip
+        if whichdef == 'stored':
+            required = m.get_required_labware()[0]
+            assert required.loadName == 'opentrons_96_filtertiprack_200ul'
+            assert required.version == '1'
+        elif whichdef == 'default':
+            assert m.get_required_labware()[0].loadName\
+                == 'opentrons_96_tiprack_300ul'
+        elif whichdef == 'specified':
+            required = m.get_required_labware()[0]
+            assert required.loadName == 'opentrons_96_filtertiprack_200ul'
+            assert required.version == '2'
+        else:
+            assert False, 'you messed up the param spec'
 
 
 async def test_move_to_tip_rack(mock_user_flow):
@@ -190,13 +291,6 @@ async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
 def test_load_trash(mock_user_flow):
     assert mock_user_flow._deck['12'].load_name == \
         'opentrons_1_trash_1100ml_fixed'
-
-
-def test_load_deck(mock_user_flow):
-    uf = mock_user_flow
-    pip_model = uf._hw_pipette.model
-    tip_rack = pipette_map[pip_model]
-    assert uf._deck['8'].load_name == tip_rack
 
 
 @pytest.mark.parametrize(argnames="mount",

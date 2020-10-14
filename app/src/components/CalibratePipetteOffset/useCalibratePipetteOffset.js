@@ -91,7 +91,7 @@ export function useCalibratePipetteOffset(
 
   const {
     mount,
-    shouldPerformTipLength = false,
+    shouldRecalibrateTipLength = false,
     hasCalibrationBlock = false,
     tipRackDefinition = null,
   } = sessionParams
@@ -102,7 +102,7 @@ export function useCalibratePipetteOffset(
         Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
         {
           mount,
-          shouldPerformTipLength,
+          shouldRecalibrateTipLength,
           hasCalibrationBlock,
           tipRackDefinition,
         }

@@ -13,10 +13,14 @@ import type { State } from '../../../types'
 
 jest.mock('../../../robot-api')
 jest.mock('../../../sessions/selectors')
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(),
-  useDispatch: jest.fn(),
-}))
+jest.mock('react-redux', () => {
+  const actualModule = jest.requireActual('react-redux')
+  return {
+    ...actualModule,
+    useSelector: jest.fn(),
+    useDispatch: jest.fn(),
+  }
+})
 
 const mockUseDispatchApiRequests: JestMockFn<
   [() => void],
@@ -64,10 +68,16 @@ describe('Testing calibrate tip length control', () => {
 
   it('check dispatch is called with a tip length session', () => {
     const { wrapper } = render()
-    const beginButton = wrapper.find('UncalibratedInfo').find('button')
+    const beginButton = wrapper
+      .find('UncalibratedInfo')
+      .find('button')
+      .at(0)
     beginButton.invoke('onClick')()
     wrapper.update()
-    const continueButton = wrapper.find('UncalibratedInfo').find('button')
+    const continueButton = wrapper
+      .find('ConfirmRecalibrationModal')
+      .find('button')
+      .at(0)
     continueButton.invoke('onClick')()
     wrapper.update()
     expect(dispatchApiRequests).toHaveBeenCalledWith(
@@ -85,10 +95,16 @@ describe('Testing calibrate tip length control', () => {
 
   it('check dispatch is called with a pipette offset session', () => {
     const { wrapper } = render({ isExtendedPipOffset: true })
-    const beginButton = wrapper.find('UncalibratedInfo').find('button')
+    const beginButton = wrapper
+      .find('UncalibratedInfo')
+      .find('button')
+      .at(0)
     beginButton.invoke('onClick')()
     wrapper.update()
-    const continueButton = wrapper.find('UncalibratedInfo').find('button')
+    const continueButton = wrapper
+      .find('ConfirmRecalibrationModal')
+      .find('button')
+      .at(0)
     continueButton.invoke('onClick')()
     wrapper.update()
     expect(dispatchApiRequests).toHaveBeenCalledWith(
@@ -98,7 +114,7 @@ describe('Testing calibrate tip length control', () => {
         {
           mount: fakeMount,
           hasCalibrationBlock: true,
-          shouldPerformTipLength: true,
+          shouldRecalibrateTipLength: true,
           tipRackDefinition: threehundredtiprack,
         }
       )
