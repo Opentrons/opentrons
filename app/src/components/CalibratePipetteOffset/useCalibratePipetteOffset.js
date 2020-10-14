@@ -32,6 +32,21 @@ export function useCalibratePipetteOffset(
   const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
 
+  const pipOffsetCalSession = useSelector<
+    State,
+    PipetteOffsetCalibrationSession | null
+  >((state: State) => {
+    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
+      state,
+      robotName,
+      Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+    )
+    return session &&
+      session.sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+      ? session
+      : null
+  })
+
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
@@ -109,21 +124,6 @@ export function useCalibratePipetteOffset(
       )
     )
   }
-
-  const pipOffsetCalSession = useSelector<
-    State,
-    PipetteOffsetCalibrationSession | null
-  >((state: State) => {
-    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
-      state,
-      robotName,
-      Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-    )
-    return session &&
-      session.sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-      ? session
-      : null
-  })
 
   return [
     handleStartPipOffsetCalSession,

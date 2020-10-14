@@ -39,7 +39,7 @@ describe('useCalibratePipetteOffset hook', () => {
       robotName,
       {
         mount: mountString,
-        shouldPerformTipLength: false,
+        shouldRecalibrateTipLength: false,
         hasCalibrationBlock: false,
         tipRackDefinition: null,
       },
@@ -76,7 +76,7 @@ describe('useCalibratePipetteOffset hook', () => {
         Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
         {
           mount: mountString,
-          shouldPerformTipLength: false,
+          shouldRecalibrateTipLength: false,
           hasCalibrationBlock: false,
           tipRackDefinition: null,
         }
@@ -95,9 +95,12 @@ describe('useCalibratePipetteOffset hook', () => {
         currentStep: Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
       },
     }
-    const { wrapper } = mountWithStore(<TestUseCalibratePipetteOffset />, {
-      initialState: { robotApi: {} },
-    })
+    const { store, wrapper } = mountWithStore(
+      <TestUseCalibratePipetteOffset />,
+      {
+        initialState: { robotApi: {} },
+      }
+    )
     mockGetRobotSessionOfType.mockReturnValue(mockPipOffsetCalSession)
     mockGetRequestById.mockReturnValue({
       status: RobotApi.SUCCESS,
@@ -116,6 +119,11 @@ describe('useCalibratePipetteOffset hook', () => {
       .find('button[title="Return tip to tip rack and exit"]')
       .invoke('onClick')()
     wrapper.setProps({})
+    expect(store.dispatch).toHaveBeenCalledWith({
+      ...Sessions.deleteSession(robotName, seshId),
+      meta: { requestId: expect.any(String) },
+    })
+    wrapper.setProps({}) // update so delete request can be handled on success
     expect(CalWizardComponent).toBe(null)
     expect(onComplete).toHaveBeenCalled()
   })

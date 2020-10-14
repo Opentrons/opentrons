@@ -61,14 +61,6 @@ function Status(props: { displayName: string }) {
   )
 }
 
-function ExitButton(props: { exit: () => mixed }) {
-  return (
-    <SecondaryBtn marginBottom={SPACING_2} width="100%" onClick={props.exit}>
-      {EXIT_BUTTON_MESSAGE}
-    </SecondaryBtn>
-  )
-}
-
 function LevelingInstruction(props: { displayName: string }) {
   return (
     <div className={styles.leveling_instruction}>
