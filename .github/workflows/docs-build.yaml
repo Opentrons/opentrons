@@ -14,7 +14,7 @@ on:
       - '.github/actions/webstack/deploy-to-sandbox/**'
       - '.github/workflows/utils.js'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'master'
+      - 'release'
       - 'chore_release-**'
     tags-ignore:
       - '*'
