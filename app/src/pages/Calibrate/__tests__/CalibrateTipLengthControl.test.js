@@ -114,7 +114,7 @@ describe('Testing calibrate tip length control', () => {
         {
           mount: fakeMount,
           hasCalibrationBlock: true,
-          shouldPerformTipLength: true,
+          shouldRecalibrateTipLength: true,
           tipRackDefinition: threehundredtiprack,
         }
       )
