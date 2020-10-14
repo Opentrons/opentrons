@@ -3,8 +3,6 @@
 include ../scripts/push.mk
 include ../scripts/python.mk
 
-POETRY ?= poetry
-
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
@@ -16,12 +14,6 @@ SHX := npx shx
 
 # Path of source package
 SRC_PATH = notify_server
-
-# This is the poetry version of python_get_wheelname defined in
-# scripts/python.mk.
-define poetry_python_get_wheelname
-$(2)-$(call python_package_version,$(1),$(3),$(4))-py3-none-any.whl
-endef
 
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -56,8 +48,8 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	$(POETRY) install
-	$(POETRY) show
+	$(poetry) install
+	$(poetry) show
 
 .PHONY: clean
 clean:
@@ -69,7 +61,7 @@ teardown:
 
 dist/notify_server-%-py3-none-any.whl: $(ot_sources)
 	$(clean_cmd)
-	$(POETRY) build -f wheel
+	$(poetry) build -f wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -77,20 +69,20 @@ wheel: $(wheel_file)
 
 .PHONY: test
 test:
-	$(POETRY) run py.test $(tests) $(test_opts)
+	$(poetry_run) py.test $(tests) $(test_opts)
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(POETRY) run python -m mypy $(SRC_PATH)
-	$(POETRY) run flake8 $(SRC_PATH) tests
+	$(poetry_run) python -m mypy $(SRC_PATH)
+	$(poetry_run) flake8 $(SRC_PATH) tests
 
 .PHONY: dev
 dev:
-	$(POETRY) run python -m notify_server.main
+	$(poetry_run) python -m notify_server.main
 
 .PHONY: local-shell
 local-shell:
-	$(POETRY) shell
+	$(poetry) shell
 
 .PHONY: push
 push: wheel
