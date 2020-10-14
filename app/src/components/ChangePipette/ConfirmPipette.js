@@ -1,11 +1,13 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 
 import { Icon, PrimaryBtn, ModalPage, SPACING_2 } from '@opentrons/components'
 import { getDiagramsSrc } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
+import { getFeatureFlags } from '../../config'
 
 import type {
   PipetteNameSpecs,
@@ -17,6 +19,7 @@ import type { PipetteOffsetCalibration } from '../../calibration/types'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
+const EXIT_WITHOUT_CAL = 'exit without calibrating'
 const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 
 type Props = {|
@@ -48,6 +51,8 @@ export function ConfirmPipette(props: Props): React.Node {
     back,
   } = props
 
+  const ff = useSelector(getFeatureFlags)
+
   return (
     <ModalPage
       titleBar={{
@@ -60,9 +65,10 @@ export function ConfirmPipette(props: Props): React.Node {
       <StatusDetails {...props} />
       {!success && <TryAgainButton {...props} />}
       {success && !actualPipette && <AttachAnotherButton {...props} />}
-      {success && actualPipette && !actualPipetteOffset && (
-        <CalibratePipetteOffsetButton {...props} />
-      )}
+      {ff.enableCalibrationOverhaul &&
+        success &&
+        actualPipette &&
+        !actualPipetteOffset && <CalibratePipetteOffsetButton {...props} />}
       <ExitButton {...props} />
     </ModalPage>
   )
@@ -200,14 +206,14 @@ function TryAgainButton(props: Props) {
 }
 
 function ExitButton(props: Props) {
-  const { exit, attachedWrong } = props
-  const children = attachedWrong
-    ? EXIT_BUTTON_MESSAGE_WRONG
-    : EXIT_BUTTON_MESSAGE
+  const { exit, attachedWrong, actualPipetteOffset } = props
+  let buttonText = EXIT_BUTTON_MESSAGE
+  if (attachedWrong) buttonText = EXIT_BUTTON_MESSAGE_WRONG
+  else if (!actualPipetteOffset) buttonText = EXIT_WITHOUT_CAL
 
   return (
     <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
-      {children}
+      {buttonText}
     </PrimaryBtn>
   )
 }

@@ -2,14 +2,17 @@
 
 import * as React from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 
 import {
   Icon,
   ModalPage,
-  PrimaryButton,
   PrimaryBtn,
+  SecondaryBtn,
+  SPACING_2,
 } from '@opentrons/components'
 import styles from './styles.css'
+import { getFeatureFlags } from '../../config'
 
 import type {
   PipetteNameSpecs,
@@ -22,6 +25,7 @@ import type { PipetteOffsetCalibration } from '../../calibration/types'
 
 // TODO: i18n
 const EXIT_BUTTON_MESSAGE = 'confirm pipette is leveled'
+const EXIT_WITHOUT_CAL = 'exit without calibrating'
 const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 const LEVEL_MESSAGE = (displayName: string) => `Next, level the ${displayName}`
 const CONNECTED_MESSAGE = (displayName: string) => `${displayName} connected`
@@ -59,9 +63,9 @@ function Status(props: { displayName: string }) {
 
 function ExitButton(props: { exit: () => mixed }) {
   return (
-    <PrimaryButton className={styles.confirm_button} onClick={props.exit}>
+    <SecondaryBtn marginBottom={SPACING_2} width="100%" onClick={props.exit}>
       {EXIT_BUTTON_MESSAGE}
-    </PrimaryButton>
+    </SecondaryBtn>
   )
 }
 
@@ -103,6 +107,9 @@ export function LevelPipette(props: Props): React.Node {
     exit,
     startPipetteOffsetCalibration,
   } = props
+
+  const ff = useSelector(getFeatureFlags)
+
   return (
     <ModalPage
       titleBar={{
@@ -115,12 +122,18 @@ export function LevelPipette(props: Props): React.Node {
       <Status displayName={displayName} />
       <LevelingInstruction displayName={displayName} />
       <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
-      {!actualPipetteOffset && (
-        <PrimaryBtn flex="1" onClick={startPipetteOffsetCalibration}>
+      {ff.enableCalibrationOverhaul && !actualPipetteOffset && (
+        <PrimaryBtn
+          marginBottom={SPACING_2}
+          width="100%"
+          onClick={startPipetteOffsetCalibration}
+        >
           {CONTINUE_TO_PIP_OFFSET}
         </PrimaryBtn>
       )}
-      <ExitButton exit={exit} />
+      <SecondaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
+        {actualPipetteOffset ? EXIT_BUTTON_MESSAGE : EXIT_WITHOUT_CAL}
+      </SecondaryBtn>
     </ModalPage>
   )
 }
