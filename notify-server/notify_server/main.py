@@ -2,10 +2,14 @@
 
 import asyncio
 
+from notify_server.logging import initialize_logging
+from notify_server.settings import Settings
+
 
 async def run() -> None:
     """Entry point for the application."""
-    pass
+    settings = Settings()
+    initialize_logging(settings.production)
 
 
 if __name__ == '__main__':
