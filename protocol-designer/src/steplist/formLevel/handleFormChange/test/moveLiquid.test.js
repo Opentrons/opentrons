@@ -13,6 +13,13 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../../../step-generation'
+import { getPrereleaseFeatureFlag } from '../../../../persist'
+jest.mock('../../../../persist')
+
+const getPrereleaseFeatureFlagMock: JestMockFn<
+  any,
+  boolean
+> = getPrereleaseFeatureFlag
 
 let pipetteEntities
 let labwareEntities
@@ -79,7 +86,7 @@ describe('path should update...', () => {
       const testCases = [
         {
           description:
-            'should not reset path when air gap checkbox is unchecked',
+            'should not reset path when aspirate > air gap checkbox is unchecked',
           volume: '3',
           aspirate_airGap_checkbox: false,
           aspirate_airGap_volume: '8',
@@ -88,7 +95,7 @@ describe('path should update...', () => {
         },
         {
           description:
-            'should not reset path when air gap volume is not a number',
+            'should not reset path when aspirate > air gap volume is not a number',
           volume: '3',
           aspirate_airGap_checkbox: true,
           aspirate_airGap_volume: '',
@@ -96,7 +103,8 @@ describe('path should update...', () => {
           expectedPath: path,
         },
         {
-          description: 'should not reset path when air gap volume is small',
+          description:
+            'should not reset path when aspirate > air gap volume is small',
           volume: '3',
           aspirate_airGap_checkbox: true,
           aspirate_airGap_volume: '1',
@@ -104,7 +112,8 @@ describe('path should update...', () => {
           expectedPath: path,
         },
         {
-          description: 'should reset path when air gap volume is large',
+          description:
+            'should reset path when aspirate > air gap volume is large',
           volume: '3',
           aspirate_airGap_checkbox: true,
           aspirate_airGap_volume: '5',
@@ -112,7 +121,8 @@ describe('path should update...', () => {
           expectedPath: 'single',
         },
         {
-          description: 'should reset path when volume is large',
+          description:
+            'should reset path when aspirate > air gap volume is large',
           volume: '6',
           aspirate_airGap_checkbox: false,
           aspirate_airGap_volume: '5',
@@ -232,7 +242,7 @@ describe('disposal volume should update...', () => {
     expect(result).toEqual(patch)
   })
 
-  it('when the air gap volume is large', () => {
+  it('when the aspirate > air gap volume is large', () => {
     const patch = { disposalVolume_volume: '6' }
     const result = handleFormHelper(patch, {
       ...form,
@@ -242,7 +252,7 @@ describe('disposal volume should update...', () => {
     })
     expect(result).toEqual({ disposalVolume_volume: '5' })
   })
-  it('when the air gap volume is increased', () => {
+  it('when the aspirate > air gap volume is increased', () => {
     const patch = { aspirate_airGap_volume: '3' }
     const result = handleFormHelper(patch, {
       ...form,
@@ -256,7 +266,7 @@ describe('disposal volume should update...', () => {
       disposalVolume_volume: '5',
     })
   })
-  it('skipped when the air gap checkbox not checked', () => {
+  it('skipped when the aspirate > air gap checkbox not checked', () => {
     const patch = { disposalVolume_volume: '6' }
     const result = handleFormHelper(patch, {
       ...form,
@@ -377,7 +387,7 @@ describe('disposal volume should update...', () => {
   })
 })
 
-describe('air gap volume', () => {
+describe('aspirate > air gap volume', () => {
   describe('when the path is single', () => {
     let form
     beforeEach(() => {
@@ -392,22 +402,22 @@ describe('air gap volume', () => {
       }
     })
 
-    it('should update the air gap volume to 0 when the patch volume is less than 0', () => {
+    it('should update the aspirate > air gap volume to 0 when the patch volume is less than 0', () => {
       const result = handleFormHelper({ aspirate_airGap_volume: '-1' }, form)
       expect(result.aspirate_airGap_volume).toEqual('0')
     })
-    it('should update the air gap volume to 0 when the raw form volume is less than 0', () => {
+    it('should update the aspirate > air gap volume to 0 when the raw form volume is less than 0', () => {
       const result = handleFormHelper(
         {},
         { ...form, aspirate_airGap_volume: '-1' }
       )
       expect(result.aspirate_airGap_volume).toEqual('0')
     })
-    it('should update the air gap volume to the pipette capacity - min pipette volume when the patch air gap volume is too big', () => {
+    it('should update the aspirate > air gap volume to the pipette capacity - min pipette volume when the patch air gap volume is too big', () => {
       const result = handleFormHelper({ aspirate_airGap_volume: '100' }, form)
       expect(result.aspirate_airGap_volume).toEqual('9')
     })
-    it('should update the air gap volume to the pipette capacity - min pipette volume when the raw form air gap volume is too big', () => {
+    it('should update the aspirate > air gap volume to the pipette capacity - min pipette volume when the raw form air gap volume is too big', () => {
       const result = handleFormHelper(
         {},
         { ...form, aspirate_airGap_volume: '10' }
@@ -452,22 +462,22 @@ describe('air gap volume', () => {
       }
     })
 
-    it('should update the air gap volume to 0 when the patch volume is less than 0', () => {
+    it('should update the aspirate > air gap volume to 0 when the patch volume is less than 0', () => {
       const result = handleFormHelper({ aspirate_airGap_volume: '-1' }, form)
       expect(result.aspirate_airGap_volume).toEqual('0')
     })
-    it('should update the air gap volume to 0 when the raw form volume is less than 0', () => {
+    it('should update the aspirate > air gap volume to 0 when the raw form volume is less than 0', () => {
       const result = handleFormHelper(
         {},
         { ...form, aspirate_airGap_volume: '-1' }
       )
       expect(result.aspirate_airGap_volume).toEqual('0')
     })
-    it('should update the air gap volume to the pipette capacity - min pipette volume when the air gap volume is too big', () => {
+    it('should update the aspirate > air gap volume to the pipette capacity - min pipette volume when the air gap volume is too big', () => {
       const result = handleFormHelper({ aspirate_airGap_volume: '100' }, form)
       expect(result.aspirate_airGap_volume).toEqual('9')
     })
-    it('should update the air gap volume to the pipette capacity - min pipette volume when the raw form air gap volume is too big', () => {
+    it('should update the aspirate > air gap volume to the pipette capacity - min pipette volume when the raw form air gap volume is too big', () => {
       const result = handleFormHelper(
         {},
         { ...form, aspirate_airGap_volume: '10' }
@@ -512,6 +522,158 @@ describe('air gap volume', () => {
     it('should reset to pipette min when pipette is changed', () => {
       const result = handleFormHelper({ pipette: 'otherPipetteId' }, form)
       expect(result).toMatchObject({ aspirate_airGap_volume: '30' })
+    })
+  })
+})
+
+describe('air gap > dispense volume', () => {
+  getPrereleaseFeatureFlagMock.mockImplementation(flag => {
+    expect(flag).toEqual('OT_PD_ENABLE_AIR_GAP_DISPENSE')
+    return true
+  })
+
+  const paths = ['single', 'multiAspirate']
+  paths.forEach(path => {
+    // max should equal pipette/tip capacity for single and for multi-dispense
+
+    it(`should clamp max dispense > air gap when pipette field is changed, for ${path} path`, () => {
+      // for otherPipetteId, P300, capacity is 300 so 150 is below air gap max
+      const form = {
+        path,
+        aspirate_wells: ['A1'],
+        dispense_wells: ['B2', 'B3'],
+        volume: '2',
+        pipette: 'otherPipetteId',
+        disposalVolume_checkbox: true,
+        disposalVolume_volume: '1.1',
+        dispense_airGap_checkbox: true,
+        dispense_airGap_volume: '150',
+      }
+      const result = handleFormHelper({ pipette: 'pipetteId' }, form)
+      // new max should be 10 for the P10
+      expect(result).toMatchObject({ dispense_airGap_volume: '10' })
+    })
+
+    it(`should clamp max dispense > air gap when dispense_airGap_volume field is changed, for ${path} path`, () => {
+      const form = {
+        path,
+        aspirate_wells: ['A1', 'A2'],
+        dispense_wells: ['B2'],
+        volume: '2',
+        pipette: 'pipetteId',
+        disposalVolume_checkbox: true,
+        disposalVolume_volume: '1.1',
+        dispense_airGap_checkbox: true,
+        dispense_airGap_volume: '2',
+      }
+      const result = handleFormHelper({ dispense_airGap_volume: '29' }, form)
+      // clamp to max, which should be 10 for the P10
+      expect(result).toMatchObject({ dispense_airGap_volume: '10' })
+    })
+  })
+
+  it('should clamp max dispense > air gap when going from single path to multiDispense', () => {
+    // NOTE: multiDispense is potentially lower max than single, so changing the path can cause this clamp
+    const form = {
+      path: 'single',
+      aspirate_wells: ['A1'],
+      dispense_wells: ['B2', 'B3'],
+      volume: '5',
+      pipette: 'pipetteId',
+      // NOTE: disposal volume is cleared out when changing the path to multiDispense,
+      // so should not affect the clamp
+      disposalVolume_checkbox: true,
+      disposalVolume_volume: '4',
+      dispense_airGap_checkbox: true,
+      dispense_airGap_volume: '9',
+    }
+    const result = handleFormHelper({ path: 'multiDispense' }, form)
+    expect(result).toMatchObject({
+      dispense_airGap_volume: String(10 - 0 - 5),
+
+      // this isn't specific to dispense > air gap
+      path: 'multiDispense',
+      disposalVolume_checkbox: false,
+      disposalVolume_volume: null,
+    })
+  })
+
+  const multiDispenseCases = [
+    {
+      update: { dispense_airGap_volume: '300' },
+      expected: {
+        dispense_airGap_volume: String(300 - 1.1 - 2),
+      },
+    },
+    {
+      // NOTE: in this case, disposal volume gets rounded due to pipette change,
+      // which affects dispense > airgap clamping
+      update: { pipette: 'pipetteId' },
+      expected: {
+        pipette: 'pipetteId',
+        dispense_airGap_volume: String(10 - Math.round(1.1) - 2),
+      },
+    },
+    {
+      update: { disposalVolume_volume: '50' },
+      expected: {
+        dispense_airGap_volume: String(300 - 50 - 2),
+      },
+    },
+    {
+      update: { volume: '55' },
+      expected: {
+        dispense_airGap_volume: String(300 - 1.1 - 55),
+      },
+    },
+  ]
+  // Multi-dispense max is different: max = pipette/tip capacity - disposal volume - transfer volume
+  // Ensure updating ANY one of the fields will cause the clamp (selected pipette, disposal volume, transfer volume, air gap)
+  multiDispenseCases.forEach(({ update, expected }) => {
+    it(`should clamp max air gap > dispense volume, if path is multi-dispense, when field '${Object.keys(
+      update
+    ).join(', ')}' updated`, () => {
+      const form = {
+        path: 'multiDispense',
+        aspirate_wells: ['A1'],
+        dispense_wells: ['B2', 'B3'],
+        volume: '2',
+        pipette: 'otherPipetteId',
+        disposalVolume_checkbox: true,
+        disposalVolume_volume: '1.1',
+        dispense_airGap_checkbox: true,
+        dispense_airGap_volume: '295',
+      }
+      const result = handleFormHelper(update, form)
+      expect(result).toMatchObject(expected)
+    })
+  })
+
+  // FF OFF cases: remove when removing FF
+  getPrereleaseFeatureFlagMock.mockImplementation(flag => {
+    expect(flag).toEqual('OT_PD_ENABLE_AIR_GAP_DISPENSE')
+    return false
+  })
+  const noFlagCases = [
+    { pipette: 'pipetteId' },
+    { volume: '55' },
+    { disposalVolume_volume: '12.3' },
+    { path: 'multiAspirate' },
+  ]
+  noFlagCases.forEach(update => {
+    it('with FF off, dispense > air gap fields should not be added in', () => {
+      const form = {
+        path: 'transfer',
+        aspirate_wells: ['A1', 'A2'],
+        dispense_wells: ['B2'],
+        volume: '2',
+        pipette: 'otherPipetteId',
+        disposalVolume_checkbox: true,
+        disposalVolume_volume: '1.1',
+      }
+      const result = handleFormHelper(update, form)
+      expect(result.dispense_airGap_checkbox).toBeUndefined()
+      expect(result.dispense_airGap_volume).toBeUndefined()
     })
   })
 })
