@@ -46,4 +46,5 @@ export const labwareImages = {
   ],
   opentrons_calibrationblock_short_side_right: require('../../assets/images/labware/opentrons_calibration_block.png'),
   opentrons_calibrationblock_short_side_left: require('../../assets/images/labware/opentrons_calibration_block.png'),
+  generic_custom_tiprack: require('../../assets/images/labware/generic_tiprack_side_view.png'),
 }

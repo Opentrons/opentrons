@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { css } from 'styled-components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
   Box,
   Flex,
@@ -28,7 +29,6 @@ import {
 
 import * as Sessions from '../../sessions'
 import { labwareImages } from './labwareImages'
-import { getLatestLabwareDef } from '../../getLabware'
 import { Portal } from '../portal'
 import { ConfirmClearDeckModal } from './ConfirmClearDeckModal'
 import type { SessionType } from '../../sessions/types'
@@ -126,6 +126,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     noteBody,
   } = contentsBySessionType[lookupType]
 
+  const isKnownTiprack = tipRack.loadName in labwareImages
   return (
     <>
       <Flex
@@ -146,12 +147,17 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
         </Text>
         <h5>{LABWARE_REQS}</h5>
         <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING_3}>
-          <RequiredLabwareCard loadName={tipRack.loadName} />
+          <RequiredLabwareCard
+            loadName={tipRack.loadName}
+            displayName={getLabwareDisplayName(tipRack.definition)}
+            linkToMeasurements={isKnownTiprack}
+          />
           {calBlock && (
             <>
               <Box width={SPACING_2} />
               <RequiredLabwareCard
                 loadName={calBlock.loadName}
+                displayName={getLabwareDisplayName(calBlock.definition)}
                 linkToMeasurements={false}
               />
             </>
@@ -195,6 +201,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
 
 type RequiredLabwareCardProps = {|
   loadName: string,
+  displayName: string,
   linkToMeasurements?: boolean,
 |}
 
@@ -205,7 +212,12 @@ const linkStyles = css`
 `
 
 function RequiredLabwareCard(props: RequiredLabwareCardProps) {
-  const { loadName, linkToMeasurements = true } = props
+  const { loadName, displayName, linkToMeasurements } = props
+  const imageSrc =
+    loadName in labwareImages
+      ? labwareImages[loadName]
+      : labwareImages['generic_custom_tiprack']
+
   return (
     <Flex
       width="50%"
@@ -225,12 +237,10 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
             width: 100%;
             max-height: 100%;
           `}
-          src={labwareImages[loadName]}
+          src={imageSrc}
         />
       </Flex>
-      <Text fontSize={FONT_SIZE_BODY_2}>
-        {getLatestLabwareDef(loadName)?.metadata.displayName}
-      </Text>
+      <Text fontSize={FONT_SIZE_BODY_2}>{displayName}</Text>
       {linkToMeasurements && (
         <Link
           external
