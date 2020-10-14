@@ -14,6 +14,10 @@ type ListItemProps = {|
   onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
   /** mouse leave handler */
   onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
+  /** mouse enter handler */
+  onPointerEnter?: (event: SyntheticPointerEvent<>) => mixed,
+  /** mouse leave handler */
+  onPointerLeave?: (event: SyntheticPointerEvent<>) => mixed,
   /** if URL is specified, ListItem is wrapped in a React Router NavLink */
   url?: string | null,
   /** if URL is specified NavLink can receive an active class name */
@@ -26,6 +30,8 @@ type ListItemProps = {|
   isDisabled?: boolean,
   /** name constant of the icon to display */
   iconName?: IconName,
+  'aria-describedby'?: string,
+  ref?: {| current: Element | null |} | ((current: Element | null) => mixed),
   children: React.Node,
 |}
 
