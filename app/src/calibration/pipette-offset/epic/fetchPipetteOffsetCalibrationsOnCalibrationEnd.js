@@ -55,7 +55,7 @@ export const fetchPipetteOffsetCalibrationsOnCalibrationEndEpic: Epic = (
       ([action, state, robotName, sessionId]) =>
         robotName != null && sessionIncursRefetch(state, robotName, sessionId)
     ),
-    map(robotName => {
+    map(([_action, _state, robotName, _sessionId]) => {
       return Actions.fetchPipetteOffsetCalibrations(robotName)
     })
   )

@@ -53,7 +53,7 @@ export const fetchTipLengthCalibrationsOnCalibrationEndEpic: Epic = (
       ([action, state, robotName, sessionId]) =>
         robotName != null && sessionIncursRefetch(state, robotName, sessionId)
     ),
-    map(([_action, robotName]) => {
+    map(([_action, _state, robotName, _sessionId]) => {
       return Actions.fetchTipLengthCalibrations(robotName)
     })
   )
