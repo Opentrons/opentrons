@@ -4,6 +4,10 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { Link } from 'react-router-dom'
 import cx from 'classnames'
+
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
 import {
   LabeledValue,
   OutlineButton,
@@ -13,6 +17,7 @@ import {
   Text,
   SecondaryBtn,
   DIRECTION_COLUMN,
+  FONT_WEIGHT_SEMIBOLD,
   SPACING_1,
   SPACING_2,
   SPACING_3,
@@ -20,19 +25,28 @@ import {
   SIZE_4,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_START,
+  ALIGN_CENTER,
   BORDER_SOLID_LIGHT,
   Icon,
-  COLOR_WARNING,
+  COLOR_ERROR,
   FONT_SIZE_BODY_1,
+  FONT_STYLE_ITALIC,
   JUSTIFY_START,
 } from '@opentrons/components'
 import styles from './styles.css'
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import type { State } from '../../types'
 
-import { getCalibrationForPipette } from '../../calibration'
+import {
+  getCalibrationForPipette,
+  getTipLengthForPipetteAndTiprack,
+} from '../../calibration'
+
+import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
 
 import type { Mount, AttachedPipette } from '../../pipettes/types'
+import { findLabwareDefWithCustom } from '../../findLabware'
+import * as CustomLabware from '../../custom-labware'
 
 export type PipetteInfoProps = {|
   robotName: string,
@@ -47,10 +61,34 @@ const LABEL_BY_MOUNT = {
   right: 'Right pipette',
 }
 
+const UNKNOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
 const SERIAL_NUMBER = 'Serial number'
 const PIPETTE_OFFSET_MISSING = 'Pipette offset calibration missing.'
 const CALIBRATE_NOW = 'Please calibrate offset now.'
 const CALIBRATE_OFFSET = 'Calibrate offset'
+const CALIBRATED_WITH = 'Calibrated with:'
+const PER_PIPETTE_BTN_STYLE = {
+  width: '11rem',
+  marginTop: SPACING_2,
+  padding: SPACING_2,
+}
+const RECALIBRATE_TIP = 'recalibrate tip'
+
+function getDisplayNameForTiprack(
+  tiprackUri: string,
+  customLabware: Array<LabwareDefinition2>
+): string {
+  const [namespace, loadName] = tiprackUri ? tiprackUri.split('/') : ['', '']
+  const definition = findLabwareDefWithCustom(
+    namespace,
+    loadName,
+    null,
+    customLabware
+  )
+  return definition
+    ? getLabwareDisplayName(definition)
+    : `${UNKNOWN_CUSTOM_LABWARE}`
+}
 
 export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const { robotName, mount, pipette, changeUrl, settingsUrl } = props
@@ -64,11 +102,29 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
       ? getCalibrationForPipette(state, robotName, serialNumber)
       : null
   )
+  const tipLengthCalibration = useSelector((state: State) =>
+    serialNumber && pipetteOffsetCalibration
+      ? getTipLengthForPipetteAndTiprack(
+          state,
+          robotName,
+          serialNumber,
+          pipetteOffsetCalibration?.tiprack
+        )
+      : null
+  )
 
   const [
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount })
+
+  const startTipLengthAndPipetteOffsetCalibration = () => {
+    startPipetteOffsetCalibration({ shouldRecalibrateTipLength: true })
+  }
+
+  const customLabwareDefs = useSelector((state: State) => {
+    return CustomLabware.getCustomLabwareDefinitions(state)
+  })
 
   const pipImage = (
     <Box
@@ -115,24 +171,14 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         </OutlineButton>
       </Flex>
       {settingsUrl !== null && (
-        <OutlineButton
-          Component={Link}
-          to={settingsUrl}
-          css={css`
-            padding: ${SPACING_2};
-            margin-top: ${SPACING_3};
-            width: 11rem;
-          `}
-        >
+        <SecondaryBtn {...PER_PIPETTE_BTN_STYLE} as={Link} to={settingsUrl}>
           settings
-        </OutlineButton>
+        </SecondaryBtn>
       )}
       {serialNumber && (
         <>
           <SecondaryBtn
-            width="11rem"
-            marginTop={SPACING_2}
-            padding={SPACING_2}
+            {...PER_PIPETTE_BTN_STYLE}
             onClick={startPipetteOffsetCalibration}
           >
             {CALIBRATE_OFFSET}
@@ -140,31 +186,69 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           {PipetteOffsetCalibrationWizard}
         </>
       )}
-      {serialNumber && !pipetteOffsetCalibration && (
+      {serialNumber && (
         <Flex
           marginTop={SPACING_2}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_START}
         >
-          <Icon
-            name="alert-circle"
-            width={SIZE_2}
-            padding="0"
-            color={COLOR_WARNING}
-          />
-          <Flex
-            marginLeft={SPACING_2}
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_START}
-          >
-            <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_WARNING}>
-              {PIPETTE_OFFSET_MISSING}
-            </Text>
-            <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_WARNING}>
-              {CALIBRATE_NOW}
-            </Text>
-          </Flex>
+          {!pipetteOffsetCalibration ? (
+            <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_START}>
+              <Box size={SIZE_2} paddingRight={SPACING_2} paddingY={SPACING_1}>
+                <Icon name="alert-circle" color={COLOR_ERROR} />
+              </Box>
+              <Flex
+                marginLeft={SPACING_1}
+                flexDirection={DIRECTION_COLUMN}
+                justifyContent={JUSTIFY_START}
+              >
+                <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
+                  {PIPETTE_OFFSET_MISSING}
+                </Text>
+                <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
+                  {CALIBRATE_NOW}
+                </Text>
+              </Flex>
+            </Flex>
+          ) : pipetteOffsetCalibration.status.markedBad ? (
+            <InlineCalibrationWarning warningType="recommended" marginTop="0" />
+          ) : (
+            <Box size={SIZE_2} padding="0" />
+          )}
         </Flex>
+      )}
+
+      {serialNumber && pipetteOffsetCalibration && tipLengthCalibration && (
+        <>
+          <Box>
+            <Text
+              marginTop={SPACING_2}
+              fontWeight={FONT_WEIGHT_SEMIBOLD}
+              fontSize={FONT_SIZE_BODY_1}
+            >
+              {CALIBRATED_WITH}
+            </Text>
+            <Text
+              marginTop={SPACING_2}
+              fontStyle={FONT_STYLE_ITALIC}
+              fontSize={FONT_SIZE_BODY_1}
+            >
+              {getDisplayNameForTiprack(
+                pipetteOffsetCalibration.tiprackUri,
+                customLabwareDefs
+              )}
+            </Text>
+          </Box>
+          <SecondaryBtn
+            {...PER_PIPETTE_BTN_STYLE}
+            onClick={startTipLengthAndPipetteOffsetCalibration}
+          >
+            {RECALIBRATE_TIP}
+          </SecondaryBtn>
+          {tipLengthCalibration.status.markedBad && (
+            <InlineCalibrationWarning warningType="recommended" />
+          )}
+        </>
       )}
     </Flex>
   )

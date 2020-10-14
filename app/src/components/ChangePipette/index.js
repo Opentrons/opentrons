@@ -189,7 +189,7 @@ export function ChangePipette(props: Props): React.Node {
       // home before cal flow to account for skips when attaching pipette
       setWizardStep(CALIBRATE_PIPETTE)
       dispatchApiRequests(home(robotName, ROBOT))
-      startPipetteOffsetCalibration()
+      startPipetteOffsetCalibration({})
     }
 
     if (success && wantedPipette && shouldLevel(wantedPipette)) {

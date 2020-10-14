@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { format } from 'date-fns'
-import { head } from 'lodash'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDisplayName } from '@opentrons/shared-data'

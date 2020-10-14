@@ -22,11 +22,15 @@ const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
 ]
 
+export type Invoker = (
+  paramOverrides: $Shape<PipetteOffsetCalibrationSessionParams>
+) => void
+
 export function useCalibratePipetteOffset(
   robotName: string,
   sessionParams: $Shape<PipetteOffsetCalibrationSessionParams>,
   onComplete: (() => mixed) | null = null
-): [() => void, React.Node | null] {
+): [Invoker, React.Node | null] {
   const [showWizard, setShowWizard] = React.useState(false)
 
   const trackedRequestId = React.useRef<string | null>(null)
@@ -102,7 +106,7 @@ export function useCalibratePipetteOffset(
     hasCalibrationBlock = false,
     tipRackDefinition = null,
   } = sessionParams
-  const handleStartPipOffsetCalSession = () => {
+  const handleStartPipOffsetCalSession: Invoker = overrideParams => {
     dispatchRequests(
       Sessions.ensureSession(
         robotName,
@@ -112,6 +116,7 @@ export function useCalibratePipetteOffset(
           shouldRecalibrateTipLength,
           hasCalibrationBlock,
           tipRackDefinition,
+          ...overrideParams,
         }
       )
     )

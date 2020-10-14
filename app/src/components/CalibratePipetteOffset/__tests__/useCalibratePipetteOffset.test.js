@@ -68,7 +68,7 @@ describe('useCalibratePipetteOffset hook', () => {
     expect(typeof startCalibration).toBe('function')
     expect(CalWizardComponent).toBe(null)
 
-    act(() => startCalibration())
+    act(() => startCalibration({}))
 
     expect(store.dispatch).toHaveBeenCalledWith({
       ...Sessions.ensureSession(
@@ -78,6 +78,32 @@ describe('useCalibratePipetteOffset hook', () => {
           mount: mountString,
           shouldRecalibrateTipLength: false,
           hasCalibrationBlock: false,
+          tipRackDefinition: null,
+        }
+      ),
+      meta: { requestId: expect.any(String) },
+    })
+  })
+
+  it('accepts createParam overrides in start callback', () => {
+    const { store } = mountWithStore(<TestUseCalibratePipetteOffset />, {
+      initialState: { robotApi: {}, sessions: {} },
+    })
+    expect(typeof startCalibration).toBe('function')
+    expect(CalWizardComponent).toBe(null)
+
+    act(() =>
+      startCalibration({ mount: 'other-mount', hasCalibrationBlock: true })
+    )
+
+    expect(store.dispatch).toHaveBeenCalledWith({
+      ...Sessions.ensureSession(
+        robotName,
+        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+        {
+          mount: 'other-mount',
+          shouldRecalibrateTipLength: false,
+          hasCalibrationBlock: true,
           tipRackDefinition: null,
         }
       ),
@@ -111,7 +137,7 @@ describe('useCalibratePipetteOffset hook', () => {
         status: 200,
       },
     })
-    act(() => startCalibration())
+    act(() => startCalibration({}))
     wrapper.setProps({})
     expect(CalWizardComponent).not.toBe(null)
 
