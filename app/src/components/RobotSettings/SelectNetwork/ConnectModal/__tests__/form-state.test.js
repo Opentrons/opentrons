@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 import * as Formik from 'formik'
 
@@ -55,9 +54,7 @@ describe('ConnectModal state hooks', () => {
       mockFormOnce({ ssid: 'foo', securityType: 'qux', psk: 'baz' })
       const wrapper = render()
 
-      act(() => {
-        wrapper.setProps({})
-      })
+      wrapper.setProps({})
 
       expect(setValues).toHaveBeenCalledTimes(1)
       expect(setValues).toHaveBeenCalledWith({
@@ -72,9 +69,7 @@ describe('ConnectModal state hooks', () => {
       mockFormOnce({ ssid: '', securityType: 'qux', psk: 'baz' }, errors)
       const wrapper = render()
 
-      act(() => {
-        wrapper.setProps({})
-      })
+      wrapper.setProps({})
 
       expect(setErrors).toHaveBeenCalledTimes(1)
       expect(setErrors).toHaveBeenCalledWith({ ssid: 'missing!' })
@@ -86,9 +81,7 @@ describe('ConnectModal state hooks', () => {
       mockFormOnce({ ssid: '', securityType: 'qux', psk: 'baz' }, {}, touched)
       const wrapper = render()
 
-      act(() => {
-        wrapper.setProps({})
-      })
+      wrapper.setProps({})
 
       expect(setTouched).toHaveBeenCalledTimes(1)
       expect(setTouched).toHaveBeenCalledWith(

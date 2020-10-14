@@ -1,7 +1,7 @@
 // @flow
 import { filter, map } from 'rxjs/operators'
 
-import { addUniqueConfigValue } from '../config'
+import { alertPermanentlyIgnored } from './actions'
 import { ALERT_DISMISSED } from './constants'
 
 import type { Action, Epic } from '../types'
@@ -14,11 +14,6 @@ export const alertsEpic: Epic = (action$, state$) => {
     filter<Action, AlertDismissedAction>(
       a => a.type === ALERT_DISMISSED && a.payload.remember
     ),
-    map(dismissAction => {
-      return addUniqueConfigValue(
-        'alerts.ignored',
-        dismissAction.payload.alertId
-      )
-    })
+    map(dismiss => alertPermanentlyIgnored(dismiss.payload.alertId))
   )
 }

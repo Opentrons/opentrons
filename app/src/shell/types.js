@@ -8,7 +8,7 @@ export type Remote = {|
 
 export type UpdateInfo = {
   version: string,
-  files: Array<{ sha512: string, url: string }>,
+  files: Array<{ sha512: string, url: string, ... }>,
   releaseDate: string,
   releaseNotes?: string,
 }
@@ -19,7 +19,6 @@ export type ShellUpdateState = {|
   available: boolean,
   downloaded: boolean,
   error: ?Error,
-  seen: boolean,
   info: ?UpdateInfo,
 |}
 
@@ -32,7 +31,6 @@ export type ShellUpdateAction =
   | {| type: 'shell:DOWNLOAD_UPDATE', meta: {| shell: true |} |}
   | {| type: 'shell:DOWNLOAD_UPDATE_RESULT', payload: {| error?: Error |} |}
   | {| type: 'shell:APPLY_UPDATE', meta: {| shell: true |} |}
-  | {| type: 'shell:SET_UPDATE_SEEN' |}
 
 export type ShellState = {|
   update: ShellUpdateState,

@@ -27,3 +27,11 @@ export const getActiveAlerts: (
       : []
   }
 )
+
+export const getAlertIsPermanentlyIgnored = (
+  state: State,
+  alertId: AlertId
+): boolean | null => {
+  const permaIgnoreList = getIgnoredAlertsFromConfig(state)
+  return permaIgnoreList ? permaIgnoreList.includes(alertId) : null
+}

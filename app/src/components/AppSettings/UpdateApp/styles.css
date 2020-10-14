@@ -1,7 +1,0 @@
-@import '@opentrons/components';
-
-.update_message {
-  @apply --font-body-2-dark;
-
-  margin: 1rem;
-}

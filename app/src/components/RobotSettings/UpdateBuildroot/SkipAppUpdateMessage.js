@@ -1,6 +1,13 @@
 // @flow
 import * as React from 'react'
-import styles from './styles.css'
+
+import {
+  C_BLUE,
+  FONT_SIZE_INHERIT,
+  SPACING_3,
+  Btn,
+  Text,
+} from '@opentrons/components'
 
 type SkipAppUpdateMessageProps = {|
   onClick: () => mixed,
@@ -8,17 +15,18 @@ type SkipAppUpdateMessageProps = {|
 
 const SKIP_APP_MESSAGE =
   'If you wish to skip this app update and only sync your robot server with your current app version, please '
+const CLICK_HERE = 'click here'
 
 export function SkipAppUpdateMessage(
   props: SkipAppUpdateMessageProps
 ): React.Node {
   return (
-    <p className={styles.sync_message}>
+    <Text paddingLeft={SPACING_3}>
       {SKIP_APP_MESSAGE}
-      <a className={styles.sync_link} onClick={props.onClick} disabled>
-        click here
-      </a>
+      <Btn color={C_BLUE} onClick={props.onClick} fontSize={FONT_SIZE_INHERIT}>
+        {CLICK_HERE}
+      </Btn>
       .
-    </p>
+    </Text>
   )
 }

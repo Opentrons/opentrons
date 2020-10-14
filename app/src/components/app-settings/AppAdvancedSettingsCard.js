@@ -3,12 +3,15 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import startCase from 'lodash/startCase'
+
 import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
+
+import * as Config from '../../config'
+import * as Calibration from '../../calibration'
+
 import type { DropdownOption } from '@opentrons/components'
 import type { DevInternalFlag } from '../../config/types'
 import type { Dispatch } from '../../types'
-import * as Config from '../../config'
-import * as Calibration from '../../calibration'
 
 const TITLE = 'Advanced Settings'
 
@@ -27,11 +30,7 @@ const ENABLE_DEV_TOOLS_BODY =
 
 const DEV_TITLE = 'Developer Only (unstable)'
 
-type Props = {|
-  checkUpdate: () => void,
-|}
-
-export function AdvancedSettingsCard(props: Props): React.Node {
+export function AppAdvancedSettingsCard(): React.Node {
   const useTrashSurfaceForTipCal = useSelector(
     Config.getUseTrashSurfaceForTipCal
   )
@@ -50,8 +49,6 @@ export function AdvancedSettingsCard(props: Props): React.Node {
     dispatch(Config.toggleDevInternalFlag(flag))
   const handleChannel = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
-
-  React.useEffect(props.checkUpdate, [channel])
 
   return (
     <>

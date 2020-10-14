@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
+import { mountWithStore } from '@opentrons/components/__utils__'
+import * as Config from '../../../config'
+import { AppAdvancedSettingsCard } from '../AppAdvancedSettingsCard'
 
 import type { State } from '../../../types'
-import * as Config from '../../../config'
-import { AdvancedSettingsCard } from '../AdvancedSettingsCard'
 
 jest.mock('../../../config/selectors')
 
@@ -34,11 +33,14 @@ const getUpdateChannelOptions: JestMockFn<
   $Call<typeof Config.getUpdateChannelOptions, State>
 > = Config.getUpdateChannelOptions
 
-describe('AdvancedSettingsCard', () => {
-  let mockStore
-  let render
-  let dispatch
-  let checkUpdate
+const MOCK_STATE: $Shape<State> = { robotApi: {} }
+
+describe('AppAdvancedSettingsCard', () => {
+  const render = () => {
+    return mountWithStore(<AppAdvancedSettingsCard />, {
+      initialState: MOCK_STATE,
+    })
+  }
 
   const getUseTrashForTipCalToggle = wrapper =>
     wrapper.find('LabeledToggle[data-test="useTrashSurfaceForTipCalToggle"]')
@@ -50,15 +52,6 @@ describe('AdvancedSettingsCard', () => {
     wrapper.find('LabeledSelect[data-test="updateChannelSetting"]')
 
   beforeEach(() => {
-    checkUpdate = jest.fn()
-    dispatch = jest.fn()
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        robotApi: {},
-      }),
-      dispatch,
-    }
     getDevtoolsEnabled.mockReturnValue(false)
     getUpdateChannel.mockReturnValue('latest')
     getUpdateChannelOptions.mockReturnValue([
@@ -69,13 +62,6 @@ describe('AdvancedSettingsCard', () => {
       enableBundleUpload: false,
       enableCalibrationOverhaul: true,
     })
-
-    render = () => {
-      return mount(<AdvancedSettingsCard checkUpdate={checkUpdate} />, {
-        wrappingComponent: Provider,
-        wrappingComponentProps: { store: mockStore },
-      })
-    }
   })
 
   afterEach(() => {
@@ -83,44 +69,44 @@ describe('AdvancedSettingsCard', () => {
   })
 
   it('renders evergreen settings', () => {
-    const wrapper = render()
+    const { wrapper } = render()
 
     expect(getUpdateChannelSelect(wrapper).exists()).toBe(true)
     expect(getDevtoolsToggle(wrapper).exists()).toBe(true)
   })
 
   it('does not render optional settings when not present', () => {
-    const wrapper = render()
+    const { wrapper } = render()
 
     expect(getUseTrashForTipCalToggle(wrapper).exists()).toBe(false)
   })
 
   it('does render optional settings when present', () => {
     getUseTrashSurfaceForTipCal.mockReturnValue(false)
-    const wrapper = render()
+    const { wrapper } = render()
 
     expect(getUseTrashForTipCalToggle(wrapper).exists()).toBe(true)
   })
 
   it('does not render dev feature flags when dev tools not enabled', () => {
-    const wrapper = render()
+    const { wrapper } = render()
 
     expect(wrapper.text().includes('__DEV__')).toBe(false)
   })
 
   it('does renders dev feature flags when dev tools enabled', () => {
     getDevtoolsEnabled.mockReturnValue(true)
-    const wrapper = render()
+    const { wrapper } = render()
 
     expect(wrapper.text().includes('__DEV__')).toBe(true)
   })
 
   it('switching toggles dispatches toggle action', () => {
     getUseTrashSurfaceForTipCal.mockReturnValue(false)
-    const wrapper = render()
+    const { wrapper, store } = render()
     getDevtoolsToggle(wrapper).invoke('onClick')()
     wrapper.update()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenCalledWith(
       expect.objectContaining(Config.toggleConfigValue('devtools'))
     )
 
@@ -128,25 +114,14 @@ describe('AdvancedSettingsCard', () => {
       target: { value: 'alpha' },
     })
     wrapper.update()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenCalledWith(
       Config.updateConfigValue('update.channel', 'alpha')
     )
 
     getUseTrashForTipCalToggle(wrapper).invoke('onClick')()
     wrapper.update()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenCalledWith(
       Config.toggleConfigValue('calibration.useTrashSurfaceForTipCal')
     )
-  })
-
-  it('checks for updates on mount and after channel changes', () => {
-    const wrapper = render()
-
-    expect(checkUpdate).toHaveBeenCalledTimes(1)
-
-    getUpdateChannel.mockReturnValue('alpha')
-    wrapper.update()
-
-    expect(checkUpdate).toHaveBeenCalledTimes(1)
   })
 })

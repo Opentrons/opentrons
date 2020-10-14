@@ -248,7 +248,7 @@ describe('ControlsCard', () => {
       return Calibration.DECK_CAL_STATUS_BAD_CALIBRATION
     })
 
-    const { wrapper } = render()
+    const { wrapper, refresh } = render()
 
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Bad deck calibration detected. Please perform a full deck calibration.'
@@ -257,8 +257,7 @@ describe('ControlsCard', () => {
     getDeckCalibrationStatus.mockReturnValue(
       Calibration.DECK_CAL_STATUS_SINGULARITY
     )
-    wrapper.setProps({})
-    wrapper.update()
+    refresh()
 
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Bad deck calibration detected. Please perform a full deck calibration.'
@@ -267,8 +266,7 @@ describe('ControlsCard', () => {
     getDeckCalibrationStatus.mockReturnValue(
       Calibration.DECK_CAL_STATUS_IDENTITY
     )
-    wrapper.setProps({})
-    wrapper.update()
+    refresh()
 
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       'Please perform a full deck calibration.'

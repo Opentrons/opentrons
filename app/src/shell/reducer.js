@@ -12,7 +12,6 @@ const INITIAL_STATE: ShellUpdateState = {
   downloading: false,
   available: false,
   downloaded: false,
-  seen: false,
   info: null,
   error: null,
 }
@@ -23,25 +22,26 @@ export function shellUpdateReducer(
   action: Action
 ): ShellUpdateState {
   switch (action.type) {
-    case 'shell:CHECK_UPDATE':
+    case 'shell:CHECK_UPDATE': {
       return { ...state, checking: true, error: null }
+    }
 
-    case 'shell:CHECK_UPDATE_RESULT':
+    case 'shell:CHECK_UPDATE_RESULT': {
       return { ...state, ...action.payload, checking: false }
+    }
 
-    case 'shell:DOWNLOAD_UPDATE':
-      return { ...state, downloading: true, seen: true, error: null }
+    case 'shell:DOWNLOAD_UPDATE': {
+      return { ...state, downloading: true, error: null }
+    }
 
-    case 'shell:DOWNLOAD_UPDATE_RESULT':
+    case 'shell:DOWNLOAD_UPDATE_RESULT': {
       return {
         ...state,
         downloading: false,
         error: action.payload.error || null,
         downloaded: !action.payload.error,
       }
-
-    case 'shell:SET_UPDATE_SEEN':
-      return { ...state, seen: true, error: null }
+    }
   }
 
   return state
