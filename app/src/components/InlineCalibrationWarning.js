@@ -42,14 +42,14 @@ export type InlineCalibrationWarningProps = {|
 export function InlineCalibrationWarning(
   props: InlineCalibrationWarningProps
 ): React.Node {
-  const { warningType, marginTop = null } = props
+  const { warningType, marginTop = SPACING_2 } = props
   return (
     <>
       {warningType && (
         <Flex
           alignItems={ALIGN_CENTER}
           color={CONTENT_MAP[warningType].color}
-          marginTop={marginTop ?? SPACING_2}
+          marginTop={marginTop}
         >
           <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
             <Icon name="alert-circle" />
