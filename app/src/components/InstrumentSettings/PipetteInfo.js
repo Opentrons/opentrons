@@ -135,6 +135,10 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
 
   const [showAskForBlock, AskForBlockModal] = useAskForCalibrationBlock(null)
 
+  const startPipetteOffsetCalibrationDirectly = () => {
+    startPipetteOffsetCalibration({})
+  }
+
   const showBlockForPipetteOffset = () => {
     showAskForBlock(startPipetteOffsetCalibrationOnly)
   }
@@ -195,7 +199,11 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         <>
           <SecondaryBtn
             {...PER_PIPETTE_BTN_STYLE}
-            onClick={showBlockForPipetteOffset}
+            onClick={
+              pipetteOffsetCalibration
+                ? startPipetteOffsetCalibrationDirectly
+                : showBlockForPipetteOffset
+            }
           >
             {CALIBRATE_OFFSET}
           </SecondaryBtn>
