@@ -26,12 +26,14 @@ const CHECK_SECOND_PIPETTE: 'calibration.check.checkForSecondPipette' =
   'calibration.check.checkForSecondPipette'
 const COMPARE_POINT: 'calibration.check.comparePoint' =
   'calibration.check.comparePoint'
+const CHECK_TIP: 'calibration.check.checkTip' = 'calibration.check.checkTip'
 const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
 
 export const checkCommands = {
   ...sharedCalCommands,
   CHECK_SECOND_PIPETTE,
   COMPARE_POINT,
+  CHECK_TIP,
   EXIT,
 }
 

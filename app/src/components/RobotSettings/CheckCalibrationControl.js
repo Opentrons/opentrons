@@ -115,7 +115,7 @@ export function CheckCalibrationControl({
     const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
       state,
       robotName,
-      Sessions.SESSION_TYPE_DECK_CALIBRATION
+      Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
     )
     if (
       session &&

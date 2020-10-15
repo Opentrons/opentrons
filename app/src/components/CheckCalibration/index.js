@@ -76,8 +76,8 @@ const PANEL_BY_STEP: {
   [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: SaveZPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: SaveXYPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: CompleteConfirmation,
-  [Sessions.CHECK_STEP_BAD_CALIBRATION]: BadCalibration,
-  [Sessions.CHECK_STEP_CHECK_COMPLETE]: ResultsSummary,
+//   [Sessions.CHECK_STEP_BAD_CALIBRATION]: BadCalibration,
+//   [Sessions.CHECK_STEP_CHECK_COMPLETE]: ResultsSummary,
 }
 
 const PANEL_STYLE_PROPS_BY_STEP: {
