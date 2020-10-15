@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "notify-server"
-version = "0.1.0"
+version = "3.21.0"
 description = "pub sub system for ot2"
-authors = ["amit lissack <amit@opentrons.com>"]
+authors = ["Opentrons Labwarks <engineering@opentrons.com>"]
 readme = "README.rst"
 
 [tool.pytest.ini_options]
