@@ -7,6 +7,7 @@ import { Icon } from '@opentrons/components'
 import {
   PIPETTE_MOUNTS,
   fetchPipettes,
+  getAttachedPipetteCalibrations,
   getProtocolPipettesInfo,
   getProtocolPipettesMatching,
   getProtocolPipettesCalibrated,
@@ -44,6 +45,9 @@ export function ProtocolPipettesCard(
   const someInexactMatches = useSelector((state: State) =>
     getSomeProtocolPipettesInexact(state, robotName)
   )
+  const pipetteOffsetCalibrations = useSelector((state: State) =>
+    getAttachedPipetteCalibrations(state, robotName)
+  )
 
   React.useEffect(() => {
     dispatch(fetchPipettes(robotName))
@@ -53,6 +57,7 @@ export function ProtocolPipettesCard(
 
   const pipetteItemProps = PIPETTE_MOUNTS.map(mount => {
     const info = infoByMount[mount]
+    const offsetData = pipetteOffsetCalibrations[mount]
 
     return info.protocol
       ? {
@@ -61,6 +66,7 @@ export function ProtocolPipettesCard(
           hidden: !info.protocol.name,
           displayName: info.protocol.displayName,
           needsOffsetCalibration: info.needsOffsetCalibration,
+          calibrationData: offsetData ? offsetData.offset : null,
         }
       : null
   }).filter(Boolean)
@@ -77,6 +83,7 @@ export function ProtocolPipettesCard(
             mount={itemProps.mount}
             hidden={itemProps.hidden}
             needsOffsetCalibration={itemProps.needsOffsetCalibration}
+            pipetteOffsetData={itemProps.calibrationData}
           >
             {itemProps.displayName}
           </InstrumentItem>
