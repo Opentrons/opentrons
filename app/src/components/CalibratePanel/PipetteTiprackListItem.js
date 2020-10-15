@@ -4,10 +4,14 @@ import { useSelector } from 'react-redux'
 
 import {
   ListItem,
-  HoverTooltip,
+  useHoverTooltip,
+  TOOLTIP_BOTTOM,
+  Tooltip,
   Box,
   Text,
   FONT_WEIGHT_SEMIBOLD,
+  FONT_SIZE_BODY_1,
+  C_WHITE,
 } from '@opentrons/components'
 import styles from './styles.css'
 
@@ -52,44 +56,26 @@ export function PipetteTiprackListItem(
         )
       : null
   )
-  return (
-    <HoverTooltip
-      placement="bottom"
-      tooltipComponent={
-        <TiprackNameTooltip name={name} displayName={displayName} />
-      }
-    >
-      {tooltipHandlers => (
-        <ListItem
-          key={name}
-          ref={tooltipHandlers?.ref}
-          onMouseEnter={tooltipHandlers?.onMouseEnter}
-          onMouseLeave={tooltipHandlers?.onMouseLeave}
-          url={calibrateUrl}
-          activeClassName={styles.active}
-        >
-          <Box marginLeft={MARGIN_LEFT_SIZE}>
-            <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{displayName}</Text>
-            <TipLengthCalibrationData
-              calibrationData={tipLengthCalibration}
-              // the definitionHash will only be absent if old labware
-              // or robot version <= 3.19
-              calDataAvailable={definitionHash != null}
-            />
-          </Box>
-        </ListItem>
-      )}
-    </HoverTooltip>
-  )
-}
 
-function TiprackNameTooltip(props: {| name: string, displayName: string |}) {
-  const { name, displayName } = props
-
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_BOTTOM,
+  })
   return (
-    <div className={styles.item_info_tooltip}>
-      <p>{name}</p>
-      <p>{displayName}</p>
-    </div>
+    <ListItem key={name} url={calibrateUrl} activeClassName={styles.active}>
+      <Box {...targetProps} marginLeft={MARGIN_LEFT_SIZE}>
+        <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{displayName}</Text>
+        <TipLengthCalibrationData
+          calibrationData={tipLengthCalibration}
+          // the definitionHash will only be absent if old labware
+          // or robot version <= 3.19
+          calDataAvailable={definitionHash != null}
+        />
+      </Box>
+      <Tooltip {...tooltipProps}>
+        <Text fontSize={FONT_SIZE_BODY_1} color={C_WHITE}>
+          {name}
+        </Text>
+      </Tooltip>
+    </ListItem>
   )
 }
