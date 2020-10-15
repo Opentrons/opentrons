@@ -25,7 +25,7 @@ const GET_NOTIFIED_ABOUT_UPDATES =
 
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
 
-const EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLE = 'appUpdateNotificationsToggle'
+const EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED = 'appUpdateNotificationsToggled'
 
 export function UpdateNotificationsControl(props: StyleProps): React.Node {
   const dispatch = useDispatch<Dispatch>()
@@ -46,8 +46,11 @@ export function UpdateNotificationsControl(props: StyleProps): React.Node {
       )
 
       trackEvent({
-        name: EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLE,
-        properties: { enabled: !enabled },
+        name: EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED,
+        // this looks wierd, but the control is a toggle, which makes the next
+        // "enabled" setting `!enabled`. Therefore the next "ignored" setting is
+        // `!!enabled`, or just `enabled`
+        properties: { updatesIgnored: enabled },
       })
     }
   }

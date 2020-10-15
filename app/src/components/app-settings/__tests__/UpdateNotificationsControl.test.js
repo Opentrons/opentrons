@@ -112,7 +112,7 @@ describe('UpdateNotificationsControl', () => {
     )
   })
 
-  it('should send an appUpdateNotificationsToggle analytics event when toggled from on to off', () => {
+  it('should send an appUpdateNotificationsToggled analytics event when toggled from on to off', () => {
     // false means alert is enabled which means toggle is currently on
     getAlertIsPermanentlyIgnored.mockReturnValue(false)
 
@@ -122,12 +122,12 @@ describe('UpdateNotificationsControl', () => {
     toggle.invoke('onClick')()
 
     expect(trackEvent).toHaveBeenCalledWith({
-      name: 'appUpdateNotificationsToggle',
-      properties: { enabled: false },
+      name: 'appUpdateNotificationsToggled',
+      properties: { updatesIgnored: true },
     })
   })
 
-  it('should send an appUpdateNotificationsToggle analytics event when toggled from off to on', () => {
+  it('should send an appUpdateNotificationsToggled analytics event when toggled from off to on', () => {
     // true means alert is disabled which means toggle is currently off
     getAlertIsPermanentlyIgnored.mockReturnValue(true)
 
@@ -137,8 +137,8 @@ describe('UpdateNotificationsControl', () => {
     toggle.invoke('onClick')()
 
     expect(trackEvent).toHaveBeenCalledWith({
-      name: 'appUpdateNotificationsToggle',
-      properties: { enabled: true },
+      name: 'appUpdateNotificationsToggled',
+      properties: { updatesIgnored: false },
     })
   })
 })
