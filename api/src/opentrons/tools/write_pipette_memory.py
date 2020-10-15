@@ -60,6 +60,9 @@ MODELS = {
         'P20SV21': 'p20_single_v2.1',
         'P3HMV21': 'p300_multi_v2.1',
         'P20MV21': 'p20_multi_v2.1',
+    },
+    'v2.2': {
+        'P20MV22': 'p20_multi_v2.2'
     }
 }
 
