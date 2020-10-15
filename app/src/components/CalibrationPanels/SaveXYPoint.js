@@ -127,20 +127,20 @@ const contentsBySessionTypeByCurrentStep: {
     },
   },
   [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
-    [Sessions.HEALTH_STEP_COMPARING_POINT_ONE]: {
+    [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: {
       slotNumber: '1',
       buttonText: HEALTH_POINT_TWO_BUTTON_TEXT,
       moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_TWO,
     },
-    [Sessions.HEALTH_STEP_COMPARING_POINT_TWO]: {
+    [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: {
       slotNumber: '3',
       buttonText: HEALTH_POINT_THREE_BUTTON_TEXT,
       moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_THREE,
     },
-    [Sessions.HEALTH_STEP_COMPARING_POINT_THREE]: {
+    [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: {
       slotNumber: '7',
       buttonText: HEALTH_BUTTON_TEXT,
-      moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+      moveCommandString: Sessions.checkCommands.CHECK_SECOND_PIPETTE,
     },
   },
 }
@@ -172,8 +172,12 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
   }
 
   const savePoint = () => {
-    let commands = [{ command: Sessions.sharedCalCommands.SAVE_OFFSET }]
-
+    let commands = null
+    if (isHealthCheck) {
+      commands = [{ command: Sessions.checkCommands.COMPARE_POINT }]
+    } else {
+      commands = [{ command: Sessions.sharedCalCommands.SAVE_OFFSET }]
+    }
     if (moveCommandString) {
       commands = [...commands, { command: moveCommandString }]
     }

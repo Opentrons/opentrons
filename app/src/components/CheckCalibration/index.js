@@ -36,7 +36,7 @@ import type {
 
 import { BadCalibration } from './BadCalibration'
 import { ResultsSummary } from './ResultsSummary'
-import type { CalibrationHealthCheckParentProps } from './types'
+import type { CalibrationHealthCheckParentProps } from '../../sessions/types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Robot calibration heatlh check'

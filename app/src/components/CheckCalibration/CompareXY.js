@@ -8,6 +8,7 @@ import { getBadOutcomeHeader } from './utils'
 import styles from './styles.css'
 import { EndOfStepComparison } from './EndOfStepComparisons'
 import { BadOutcomeBody } from './BadOutcomeBody'
+import type { CalibrationHealthCheckComparison } from './types'
 
 const EXIT_CHECK = 'Exit robot calibration check'
 
@@ -21,7 +22,7 @@ const GOOD_INSPECTING_PREAMBLE =
 const CONTINUE_BLURB = 'You may also continue forward to the next check.'
 
 type CompareXYProps = {|
-  comparison: RobotCalibrationCheckComparison,
+  comparison: CalibrationHealthCheckComparison,
   pipetteModel: string,
   goToNextCheck: () => void,
   exit: () => mixed,

@@ -85,7 +85,7 @@ export type SessionCommandParams = {
 
 export type CalibrationCheckSessionResponseAttributes = {|
   sessionType: SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-  details: CalCheckTypes.RobotCalibrationCheckSessionDetails,
+  details: CalCheckTypes.CheckCalibrationHealthSessionDetails,
   createParams: CalCheckTypes.CheckCalibrationHealthSessionParams,
 |}
 
