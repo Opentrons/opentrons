@@ -35,13 +35,13 @@ describe('app config profile updates', () => {
     const action = Config.configValueUpdated('does not', 'matter')
     const result = makeProfileUpdate(action, MOCK_STATE)
 
-    expect(result).toMatchObject({ appUpdateIgnored: true })
+    expect(result).toMatchObject({ appUpdatesIgnored: true })
   })
 
   it('should trigger an profile update if appUpdateAvailable is not ignored', () => {
     const action = Config.configValueUpdated('does not', 'matter')
     const result = makeProfileUpdate(action, MOCK_STATE)
 
-    expect(result).toMatchObject({ appUpdateIgnored: false })
+    expect(result).toMatchObject({ appUpdatesIgnored: false })
   })
 })

@@ -91,7 +91,7 @@ export function makeProfileUpdate(
 
     case Cfg.VALUE_UPDATED: {
       return {
-        appUpdateIgnored: Alerts.getAlertIsPermanentlyIgnored(
+        appUpdatesIgnored: Alerts.getAlertIsPermanentlyIgnored(
           state,
           Alerts.ALERT_APP_UPDATE_AVAILABLE
         ),
