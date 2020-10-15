@@ -7,7 +7,6 @@ export type CalibrateTipLengthParentProps = {|
   robotName: string,
   session: TipLengthCalibrationSession | null,
   closeWizard: () => void,
-  hasBlock: boolean,
   dispatchRequests: (
     ...Array<{ ...Action, meta: { requestId: string } }>
   ) => void,

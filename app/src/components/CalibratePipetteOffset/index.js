@@ -97,7 +97,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
 ): React.Node {
-  const { session, robotName, dispatchRequests, showSpinner, hasBlock } = props
+  const { session, robotName, dispatchRequests, showSpinner } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
   const {
@@ -111,7 +111,7 @@ export function CalibratePipetteOffset(
   const tipRack: CalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
   const calBlock: CalibrationLabware | null =
-    hasBlock && labware ? labware.find(l => !l.isTiprack) ?? null : null
+    labware ? labware.find(l => !l.isTiprack) ?? null : null
 
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)

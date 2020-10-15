@@ -96,7 +96,6 @@ export function CalibrateTipLength(
   const {
     session,
     robotName,
-    hasBlock,
     closeWizard,
     showSpinner,
     dispatchRequests,
@@ -111,7 +110,7 @@ export function CalibrateTipLength(
   const tipRack: CalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
   const calBlock: CalibrationLabware | null =
-    hasBlock && labware ? labware.find(l => !l.isTiprack) ?? null : null
+    labware ? labware.find(l => !l.isTiprack) ?? null : null
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
     if (session?.id) {

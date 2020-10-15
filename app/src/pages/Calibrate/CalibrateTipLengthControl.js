@@ -222,7 +222,6 @@ export function CalibrateTipLengthControl({
             <CalibratePipetteOffset
               session={extendedPipetteCalibrationSession}
               robotName={robotName}
-              hasBlock={!useTrashSurface.current}
               closeWizard={handleCloseWizard}
               showSpinner={showSpinner}
               dispatchRequests={dispatchRequests}
@@ -232,7 +231,6 @@ export function CalibrateTipLengthControl({
               robotName={robotName}
               session={tipLengthCalibrationSession}
               closeWizard={handleCloseWizard}
-              hasBlock={!useTrashSurface.current}
               showSpinner={showSpinner}
               dispatchRequests={dispatchRequests}
             />
