@@ -12,7 +12,7 @@ import {
   DECK_CAL_STATUS_SINGULARITY,
 } from '../../../calibration'
 import { DeckCalibrationControl } from '../DeckCalibrationControl'
-import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
+import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
 
 jest.mock('../../../robot-api/selectors')
 jest.mock('../../../sessions/selectors')

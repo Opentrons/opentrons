@@ -36,19 +36,20 @@ const CONTENT_MAP = {
 
 export type InlineCalibrationWarningProps = {|
   warningType: WarningType | null,
+  marginTop?: string,
 |}
 
 export function InlineCalibrationWarning(
   props: InlineCalibrationWarningProps
 ): React.Node {
-  const { warningType } = props
+  const { warningType, marginTop = null } = props
   return (
     <>
       {warningType && (
         <Flex
           alignItems={ALIGN_CENTER}
           color={CONTENT_MAP[warningType].color}
-          marginTop={SPACING_2}
+          marginTop={marginTop ?? SPACING_2}
         >
           <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
             <Icon name="alert-circle" />

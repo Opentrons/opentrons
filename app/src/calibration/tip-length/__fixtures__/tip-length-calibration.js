@@ -15,7 +15,7 @@ import type {
 export const mockTipLengthCalibration1: TipLengthCalibrationModel = {
   attributes: {
     pipette: 'P3HSV2008052020A02',
-    tiprack: 'opentrons_96_tiprack_300ul_hash',
+    tiprack: 'asdasfasdasdhasjhdasdasda',
     tipLength: 30.5,
     lastModified: '2020-09-29T10:02',
     source: 'user',
@@ -31,8 +31,8 @@ export const mockTipLengthCalibration1: TipLengthCalibrationModel = {
 
 export const mockTipLengthCalibration2: TipLengthCalibrationModel = {
   attributes: {
-    pipette: 'P3HMV2008052020A02',
-    tiprack: 'opentrons_96_tiprack_300ul_hash',
+    pipette: 'P20MV2008052020A02',
+    tiprack: 'aasdhakfghakjsdhlaksjhdak',
     tipLength: 32.5,
     lastModified: '2020-09-29T12:02',
     source: 'user',

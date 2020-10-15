@@ -9,7 +9,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getUseTrashSurfaceForTipCal } from '../../../config'
 import { selectors as robotSelectors } from '../../../robot'
 import { useDispatchApiRequests } from '../../../robot-api'
-import { getUncalibratedTipracksByMount } from '../../../calibration/tip-length'
+import { getUncalibratedTipracksByMount } from '../../../pipettes'
 import * as Sessions from '../../../sessions'
 import { CalibrateTipLengthControl } from '../CalibrateTipLengthControl'
 
@@ -20,7 +20,7 @@ jest.mock('../../../robot-api')
 jest.mock('../../../robot/selectors')
 jest.mock('../../../sessions/selectors')
 jest.mock('../../../config/selectors')
-jest.mock('../../../calibration/tip-length/selectors')
+jest.mock('../../../pipettes/selectors')
 
 const mockGetUncalibratedTipracksByMount: JestMockFn<
   [State, string],

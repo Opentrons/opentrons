@@ -18,7 +18,10 @@ import { CardContentFlex } from '../layout'
 import { Card, useInterval } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
-import { fetchPipetteOffsetCalibrations } from '../../calibration'
+import {
+  fetchPipetteOffsetCalibrations,
+  fetchTipLengthCalibrations,
+} from '../../calibration'
 import type { Mount } from '../../pipettes/types'
 
 type Props = {|
@@ -50,6 +53,7 @@ export function AttachedPipettesCard(props: Props): React.Node {
       dispatch(fetchPipettes(robotName))
       dispatch(fetchPipetteSettings(robotName))
       dispatch(fetchPipetteOffsetCalibrations(robotName))
+      dispatch(fetchTipLengthCalibrations(robotName))
     },
     FETCH_PIPETTES_INTERVAL_MS,
     true

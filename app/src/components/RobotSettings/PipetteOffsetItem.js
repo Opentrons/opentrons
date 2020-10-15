@@ -2,11 +2,10 @@
 
 import * as React from 'react'
 import { format } from 'date-fns'
-import { head } from 'lodash'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { getLatestLabwareDef } from '../../getLabware'
+import { findLabwareDefWithCustom } from '../../findLabware'
 
 import {
   Box,
@@ -22,14 +21,13 @@ import {
 import {
   InlineCalibrationWarning,
   RECOMMENDED,
-} from './InlineCalibrationWarning'
-import type { AttachedPipette } from '../../pipettes/types'
-import type { PipetteOffsetCalibration } from '../../calibration/types'
+} from '../InlineCalibrationWarning'
+import type { AttachedPipette, PipetteCalibrations } from '../../pipettes/types'
 
 type Props = {|
   mount: 'left' | 'right',
   pipette: AttachedPipette | null,
-  calibration: PipetteOffsetCalibration | null,
+  calibration: PipetteCalibrations | null,
   customLabware: Array<LabwareDefinition2>,
 |}
 
@@ -39,45 +37,37 @@ const LAST_CALIBRATED = 'Last calibrated'
 const WITH = 'with'
 const UNKNOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
 
-function getCustomLabwareDefinition(
-  loadName: string,
-  customLabware: Array<LabwareDefinition2>
-): LabwareDefinition2 | null {
-  return (
-    head(customLabware.filter(def => def.parameters.loadName === loadName)) ||
-    null
-  )
-}
-
 function getDisplayNameForTiprack(
   tiprackUri: string,
   customLabware: Array<LabwareDefinition2>
 ): string {
   const [namespace, loadName] = tiprackUri ? tiprackUri.split('/') : ['', '']
-  const definition =
-    namespace === 'opentrons'
-      ? getLatestLabwareDef(loadName)
-      : getCustomLabwareDefinition(loadName, customLabware)
+  const definition = findLabwareDefWithCustom(
+    namespace,
+    loadName,
+    null,
+    customLabware
+  )
   return definition
     ? getLabwareDisplayName(definition)
     : `${UNKNOWN_CUSTOM_LABWARE}`
 }
 
 function buildCalibrationText(
-  calibration: PipetteOffsetCalibration | null,
+  calibration: PipetteCalibrations | null,
   customLabware: Array<LabwareDefinition2>
 ): React.Node {
-  return calibration ? (
+  return calibration && calibration.offset ? (
     <>
       <Text fontStyle={FONT_STYLE_ITALIC}>
         {`${LAST_CALIBRATED}: ${format(
-          new Date(calibration.lastModified),
+          new Date(calibration?.offset?.lastModified ?? ''),
           'MMMM d y HH:mm'
         )}`}
       </Text>
       <Text fontStyle={FONT_STYLE_ITALIC}>
         {`${WITH} ${getDisplayNameForTiprack(
-          calibration.tiprackUri,
+          calibration?.offset?.tiprackUri ?? '',
           customLabware
         )}`}
       </Text>
@@ -99,9 +89,11 @@ export function PipetteOffsetItem(props: Props): React.Node {
       >
         {mount}
       </Text>
-      {pipette && calibration?.status.markedBad && (
-        <InlineCalibrationWarning warningType={RECOMMENDED} />
-      )}
+      {pipette &&
+        (calibration?.offset?.status.markedBad ||
+          calibration?.tipLength?.status.markedBad) && (
+          <InlineCalibrationWarning warningType={RECOMMENDED} />
+        )}
       <Text
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
