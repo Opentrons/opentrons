@@ -3,7 +3,7 @@ import datetime
 import pytest
 from unittest.mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
-from opentrons.calibration_storage import modify, helpers, types as CSTypes
+from opentrons.calibration_storage import helpers, types as CSTypes
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from opentrons.config.pipette_config import load
@@ -304,14 +304,15 @@ def test_no_pipette(hardware, mount):
     assert error.value.error.detail == f"No pipette present on {mount} mount"
 
 
-async def test_save_pipette_calibration(mock_user_flow):
+@pytest.fixture
+def mock_save_pipette():
+    with patch('opentrons.calibration_storage.modify.save_pipette_calibration',
+               autospec=True) as mock_save:
+        yield mock_save
+
+
+async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
     uf = mock_user_flow
-
-    def mock_save_pipette_offset(*args, **kwargs):
-        pass
-
-    modify.save_pipette_calibration = \
-        MagicMock(side_effect=mock_save_pipette_offset)
 
     uf._current_state = 'savingPointOne'
     await uf._hardware.move_to(
@@ -325,7 +326,7 @@ async def test_save_pipette_calibration(mock_user_flow):
         uf._tip_rack._implementation.get_definition()
     )
     offset = uf._cal_ref_point - Point(x=10, y=10, z=40)
-    modify.save_pipette_calibration.assert_called_with(
+    mock_save_pipette.assert_called_with(
         offset=offset,
         mount=uf._mount,
         pip_id=uf._hw_pipette.pipette_id,
