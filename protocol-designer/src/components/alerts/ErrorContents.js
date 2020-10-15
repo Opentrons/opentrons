@@ -32,6 +32,16 @@ export const ErrorContents = (props: ErrorContentsProps): React.Node => {
             </KnowledgeBaseLink>
           </>
         )
+      case 'NO_TIP_ON_PIPETTE':
+        return (
+          <>
+            {i18n.t(`alert.timeline.error.${props.errorType}.body1`)}
+            <KnowledgeBaseLink to="airGap">
+              {i18n.t(`alert.timeline.error.${props.errorType}.link`)}
+            </KnowledgeBaseLink>
+            {i18n.t(`alert.timeline.error.${props.errorType}.body2`)}
+          </>
+        )
       default:
         return bodyText
     }
