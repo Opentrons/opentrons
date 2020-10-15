@@ -232,7 +232,6 @@ def tavern_disable_calibration_overhaul(run_server):
     requests.post(url, json=data)
 
 
-
 @pytest.fixture
 def apiclient_enable_calibration_overhaul(api_client):
     """For integration tests that need to set then clear the

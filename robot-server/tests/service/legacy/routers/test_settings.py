@@ -310,6 +310,7 @@ def test_reset_success(
     assert resp.status_code == 200
     mock_reset.assert_called_once_with(called_with)
 
+
 @pytest.mark.parametrize(argnames="body,called_with",
                          argvalues=[
                              # Empty body
