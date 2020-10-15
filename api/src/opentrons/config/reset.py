@@ -29,14 +29,12 @@ class ResetOptionId(str, Enum):
     tip_probe = 'tipProbe'
     labware_calibration = 'labwareCalibration'
     boot_scripts = 'bootScripts'
+    deck_calibration = 'deckCalibration'
+    pipette_offset = 'pipetteOffsetCalibrations'
+    tip_length_calibrations = 'tipLengthCalibrations'
 
 
 _common_settings_reset_options = {
-    ResetOptionId.tip_probe:
-        CommonResetOption(
-            name='Pipette Calibration',
-            description='Clear pipette offset and tip length calibration'
-        ),
     ResetOptionId.labware_calibration:
         CommonResetOption(
             name='Labware Calibration',
@@ -49,9 +47,42 @@ _common_settings_reset_options = {
         ),
 }
 
+_legacy_cal_reset_options = {
+    ResetOptionId.tip_probe:
+        CommonResetOption(
+            name='Pipette Calibration',
+            description='Clear pipette offset and tip length calibration'
+        ),
+}
+
+_cal_overhaul_reset_options = {
+    ResetOptionId.deck_calibration:
+        CommonResetOption(
+            name='Deck Calibration',
+            description='Clear deck calibration (will also clear pipette '
+                        'offset)'
+        ),
+    ResetOptionId.pipette_offset:
+        CommonResetOption(
+            name='Pipette Offset Calibrations',
+            description='Clear pipette offset calibrations'
+        ),
+    ResetOptionId.tip_length_calibrations:
+        CommonResetOption(
+            name='Tip Length Calibrations',
+            description='Clear tip length calibrations (will also clear '
+                        'pipette offset)'
+        )
+}
+
 
 def reset_options() -> Dict[ResetOptionId, CommonResetOption]:
-    return _common_settings_reset_options
+    options = {k: v for k, v in _common_settings_reset_options.items()}
+    if ff.enable_calibration_overhaul():
+        options.update(_cal_overhaul_reset_options)
+    else:
+        options.update(_legacy_cal_reset_options)
+    return options
 
 
 def reset(options: Set[ResetOptionId]) -> None:
@@ -70,6 +101,15 @@ def reset(options: Set[ResetOptionId]) -> None:
     if ResetOptionId.boot_scripts in options:
         reset_boot_scripts()
 
+    if ResetOptionId.deck_calibration in options:
+        reset_deck_calibration()
+
+    if ResetOptionId.pipette_offset in options:
+        reset_pipette_offset()
+
+    if ResetOptionId.tip_length_calibrations in options:
+        reset_tip_length_calibrations()
+
 
 def reset_boot_scripts():
     if IS_ROBOT:
@@ -77,6 +117,20 @@ def reset_boot_scripts():
             shutil.rmtree(DATA_BOOT_D)
     else:
         log.debug(f'Not on pi, not removing {DATA_BOOT_D}')
+
+
+def reset_deck_calibration():
+    delete.delete_robot_deck_attitude()
+    delete.clear_pipette_offset_calibrations()
+
+
+def reset_pipette_offset():
+    delete.clear_pipette_offset_calibrations()
+
+
+def reset_tip_length_calibrations():
+    delete.clear_tip_length_calibration()
+    delete.clear_pipette_offset_calibrations()
 
 
 def reset_labware_calibration():
@@ -88,8 +142,5 @@ def reset_tip_probe():
     config = rc.load()
     config = config._replace(
         instrument_offset=rc.build_fallback_instrument_offset({}))
-    if ff.enable_calibration_overhaul():
-        delete.clear_tip_length_calibration()
-    else:
-        config.tip_length.clear()
+    config.tip_length.clear()
     rc.save_robot_settings(config)

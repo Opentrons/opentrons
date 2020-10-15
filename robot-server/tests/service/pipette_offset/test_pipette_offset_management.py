@@ -5,7 +5,8 @@ WRONG_MOUNT = 'right'
 
 
 def test_access_pipette_offset_calibration(
-        api_client, set_up_pipette_offset_temp_directory):
+        api_client, set_up_pipette_offset_temp_directory,
+        apiclient_enable_calibration_overhaul, server_temp_directory):
     expected = {
         'offset': [0, 0, 0],
         'pipette': 'pip_1',
@@ -37,7 +38,8 @@ def test_access_pipette_offset_calibration(
 
 
 def test_delete_pipette_offset_calibration(
-        api_client, set_up_pipette_offset_temp_directory):
+        api_client, set_up_pipette_offset_temp_directory,
+        apiclient_enable_calibration_overhaul):
     resp = api_client.delete(
         f'/calibration/pipette_offset?pipette_id={PIPETTE_ID}&'
         f'mount={WRONG_MOUNT}')

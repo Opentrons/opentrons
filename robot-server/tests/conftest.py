@@ -144,7 +144,7 @@ def set_up_index_file_temporary_directory(server_temp_directory):
         labware.save_calibration(lw, Point(0, 0, 0))
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def set_up_pipette_offset_temp_directory(server_temp_directory):
     pip_list = ['pip_1', 'pip_2']
     mount_list = [Mount.LEFT, Mount.RIGHT]
@@ -157,7 +157,7 @@ def set_up_pipette_offset_temp_directory(server_temp_directory):
             tiprack_uri='uri')
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def set_up_tip_length_temp_directory(server_temp_directory):
     pip_list = ['pip_1', 'pip_2']
     tiprack_hash = 'fakehash'
@@ -200,3 +200,61 @@ def get_labware_fixture():
             return json.loads(f.read().decode('utf-8'))
 
     return _get_labware_fixture
+
+
+@pytest.fixture
+def tavern_enable_calibration_overhaul(run_server):
+    """For integration tests that need to set then clear the
+    enableTiplengthCalibration feature flag"""
+    url = "http://localhost:31950/settings"
+    data = {
+        "id": "enableTipLengthCalibration",
+        "value": True
+    }
+    requests.post(url, json=data)
+    yield None
+    data['value'] = None
+    requests.post(url, json=data)
+
+
+@pytest.fixture
+def tavern_disable_calibration_overhaul(run_server):
+    """For integration tests that need to set then clear the
+    enableTiplengthCalibration feature flag"""
+    url = "http://localhost:31950/settings"
+    data = {
+        "id": "enableTipLengthCalibration",
+        "value": False
+    }
+    requests.post(url, json=data)
+    yield None
+    data['value'] = None
+    requests.post(url, json=data)
+
+
+@pytest.fixture
+def apiclient_enable_calibration_overhaul(api_client):
+    """For integration tests that need to set then clear the
+    enableTiplengthCalibration feature flag"""
+    data = {
+        "id": "enableTipLengthCalibration",
+        "value": True
+    }
+    api_client.post(url='/settings', json=data)
+    yield None
+    data['value'] = None
+    api_client.post('/settings', json=data)
+
+
+@pytest.fixture
+def apiclient_disable_calibration_overhaul(api_client):
+    """For integration tests that need to set then clear the
+    enableTiplengthCalibration feature flag"""
+    data = {
+        "id": "enableTipLengthCalibration",
+        "value": False
+    }
+    api_client.post('/settings', json=data)
+    yield None
+    data['value'] = None
+    api_client.post('/settings', json=data)

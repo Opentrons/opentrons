@@ -156,3 +156,14 @@ def clear_pipette_offset_calibrations():
         _remove_json_files_in_directories(offset_dir)
     except FileNotFoundError:
         pass
+
+
+def delete_robot_deck_attitude():
+    """
+    Delete the robot deck attitude calibration.
+    """
+
+    robot_dir = config.get_opentrons_path('robot_calibration_dir')
+    gantry_path = robot_dir / 'deck_calibration.json'
+    if gantry_path.exists():
+        gantry_path.unlink()

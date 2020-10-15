@@ -249,12 +249,25 @@ def test_modify_pipette_settings_failure(api_client, mock_pipette_config):
     assert patch_body == {'message': "Failed!"}
 
 
-def test_available_resets(api_client):
+def test_available_resets(
+        api_client, apiclient_disable_calibration_overhaul):
     resp = api_client.get('/settings/reset/options')
     body = resp.json()
     options_list = body.get('options')
     assert resp.status_code == 200
     assert sorted(['tipProbe', 'labwareCalibration', 'bootScripts'])\
+        == sorted([item['id'] for item in options_list])
+
+
+def test_available_resets_overhaul(
+        api_client, apiclient_enable_calibration_overhaul):
+    resp = api_client.get('/settings/reset/options')
+    body = resp.json()
+    options_list = body.get('options')
+    assert resp.status_code == 200
+    assert sorted(
+        ['pipetteOffsetCalibrations', 'labwareCalibration', 'bootScripts',
+         'deckCalibration', 'tipLengthCalibrations'])\
         == sorted([item['id'] for item in options_list])
 
 
@@ -280,7 +293,9 @@ def mock_reset():
                                  'labwareCalibration': True,
                                  'tipProbe': True,
                                  'bootScripts': True
-                             }, set(v for v in ResetOptionId)],
+                             }, {ResetOptionId.labware_calibration,
+                                 ResetOptionId.tip_probe,
+                                 ResetOptionId.boot_scripts}],
                              [{'labwareCalibration': True},
                               {ResetOptionId.labware_calibration}],
                              [{'tipProbe': True},
@@ -288,7 +303,50 @@ def mock_reset():
                              [{'bootScripts': True},
                               {ResetOptionId.boot_scripts}],
                          ])
-def test_reset_success(api_client, mock_reset, body, called_with):
+def test_reset_success(
+        api_client, mock_reset, body, called_with,
+        apiclient_disable_calibration_overhaul):
+    resp = api_client.post('/settings/reset', json=body)
+    assert resp.status_code == 200
+    mock_reset.assert_called_once_with(called_with)
+
+
+@pytest.mark.parametrize(argnames="body,called_with",
+                         argvalues=[
+                             # Empty body
+                             [{}, set()],
+                             # None true
+                             [{
+                                 'labwareCalibration': False,
+                                 'deckCalibration': False,
+                                 'bootScripts': False,
+                                 'pipetteOffsetCalibrations': False,
+                                 'tipLengthCalibrations': False,
+                             }, set()],
+                             # All set
+                             [{
+                                 'labwareCalibration': True,
+                                 'bootScripts': True,
+                                 'pipetteOffsetCalibrations': True,
+                                 'tipLengthCalibrations': True,
+                                 'deckCalibration': True,
+                             }, {ResetOptionId.labware_calibration,
+                                 ResetOptionId.boot_scripts,
+                                 ResetOptionId.deck_calibration,
+                                 ResetOptionId.pipette_offset,
+                                 ResetOptionId.tip_length_calibrations}],
+                             [{'labwareCalibration': True},
+                              {ResetOptionId.labware_calibration}],
+                             [{'bootScripts': True},
+                              {ResetOptionId.boot_scripts}],
+                             [{'pipetteOffsetCalibrations': True},
+                              {ResetOptionId.pipette_offset}],
+                             [{'tipLengthCalibrations': True},
+                              {ResetOptionId.tip_length_calibrations}]
+                         ])
+def test_reset_success_overhaul(
+        api_client, mock_reset, body, called_with,
+        apiclient_enable_calibration_overhaul):
     resp = api_client.post('/settings/reset', json=body)
     assert resp.status_code == 200
     mock_reset.assert_called_once_with(called_with)
