@@ -16,7 +16,7 @@ async def run() -> None:
     settings = Settings()
     initialize_logging(settings.production)
     log.info(settings)
-    await server.run(None)
+    await server.run(settings)
 
 
 if __name__ == '__main__':
