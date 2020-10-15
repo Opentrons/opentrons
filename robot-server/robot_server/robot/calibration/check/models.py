@@ -32,14 +32,34 @@ class ComparisonStatus(BaseModel):
     transformType: str
 
 
+class ComparisonMap(BaseModel):
+    inspectingTip: Optional[ComparisonStatus] =\
+        Field(None, description="tiprack validation step")
+    comparingHeight: Optional[ComparisonStatus] =\
+        Field(None, description="height validation step")
+    comparingPointOne: Optional[ComparisonStatus] =\
+        Field(None, description="point 1 validation step")
+    comparingPointTwo: Optional[ComparisonStatus] =\
+        Field(None, description="point 2 validation step")
+    comparingPointThree: Optional[ComparisonStatus] =\
+        Field(None, description="point 3 validation step")
+
+
+class ComparisonStatePerPipette(BaseModel):
+    first: ComparisonMap
+    second: ComparisonMap
+
+
+class CheckAttachedPipette(AttachedPipette):
+    rank: str
+
+
 class CalibrationCheckSessionStatus(BaseModel):
     """The current status of a given session."""
-    instruments: List[AttachedPipette]
-    activePipette: AttachedPipette
+    instruments: List[CheckAttachedPipette]
+    activePipette: CheckAttachedPipette
     currentStep: str = Field(..., description="Current step of session")
-    comparisonsByStep: Dict[str, ComparisonStatus]
-    nextSteps: Optional[NextSteps] =\
-        Field(None, description="Next Available Steps in Session")
+    comparisonsByStep: ComparisonStatePerPipette
     labware: List[RequiredLabware]
 
     class Config:

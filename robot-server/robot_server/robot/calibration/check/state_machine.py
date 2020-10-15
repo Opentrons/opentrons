@@ -21,7 +21,7 @@ CALIBRATION_CHECK_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
         CalibrationCommand.pick_up_tip: State.inspectingTip,
     },
     State.inspectingTip: {
-        CheckCalibrationCommand.compare_point: State.inspectingTip,
+        CheckCalibrationCommand.compare_point: State.WILDCARD,
         CalibrationCommand.invalidate_tip: State.preparingPipette,
         CalibrationCommand.move_to_deck: State.comparingHeight,
     },

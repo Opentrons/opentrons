@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from typing import Optional
 
 from opentrons.types import Point
-from robot_server.robot.calibration.check.models import ComparisonStatus
+
+from .models import ComparisonStatus
 
 WILDCARD = '*'
 

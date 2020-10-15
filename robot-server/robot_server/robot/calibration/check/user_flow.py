@@ -23,7 +23,6 @@ import robot_server.robot.calibration.util as uf
 from robot_server.robot.calibration.helper_classes import (
     DeckCalibrationError, PipetteRank, PipetteInfo,
     AttachedPipette, RequiredLabware)
-from robot_server.robot.calibration.check.models import ComparisonStatus
 
 from robot_server.service.session.models.command import (
     CalibrationCommand, CheckCalibrationCommand, DeckCalibrationCommand)
@@ -32,6 +31,7 @@ from robot_server.service.errors import RobotServerError
 from .util import (
     PointTypes, ReferencePoints,
     ComparisonMap, ComparisonStatePerPipette)
+from .models import ComparisonStatus, CheckAttachedPipette
 from .state_machine import CalibrationCheckStateMachine
 
 from .constants import (PIPETTE_TOLERANCES,
@@ -93,6 +93,7 @@ class CheckCalibrationUserFlow:
             CalibrationCommand.jog: self.jog,
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
+            CheckCalibrationCommand.check_tip: self.check_tip_threshold,
             CheckCalibrationCommand.compare_point: self.update_comparison_map,
             CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
             CalibrationCommand.move_to_deck: self.move_to_deck,
@@ -140,6 +141,7 @@ class CheckCalibrationUserFlow:
             self._active_pipette = second_pip
             self._active_tiprack = self._tip_racks[1]
             self._mount = self._active_pipette.mount
+            self._set_current_state(State.preparingPipette)
         else:
             self._set_current_state(State.checkComplete)
 
@@ -283,38 +285,62 @@ class CheckCalibrationUserFlow:
         for i, tr in enumerate(self._tip_racks):
             self._deck[TIPRACK_SLOTS[i]] = tr
 
-    def _get_hw_pipettes(self):
+    def _get_hw_pipettes(self) -> List[Pipette]:
         # Return a list of instruments, ordered with the active pipette first
         active_mount = self.active_pipette.mount
         hw_instruments = self._hardware._attached_instruments
         if active_mount == Mount.RIGHT:
-            return [hw_instruments[active_mount], hw_instruments[Mount.LEFT]]
+            other_mount = Mount.LEFT
         else:
-            return [hw_instruments[active_mount], hw_instruments[Mount.RIGHT]]
+            other_mount = Mount.RIGHT
+        if self._is_checking_both_mounts():
+            return [hw_instruments[active_mount], hw_instruments[other_mount]]
+        else:
+            return [hw_instruments[active_mount]]
 
-    def get_instruments(self) -> List[AttachedPipette]:
+    def _get_ordered_info_pipettes(self) -> List[PipetteInfo]:
+        active_rank = self.active_pipette.rank
+        if active_rank == PipetteRank.first:
+            other_rank = PipetteRank.second
+        else:
+            other_rank = PipetteRank.first
+        pip1 = self._get_pipette_by_rank(active_rank)
+        assert pip1
+        if self._is_checking_both_mounts():
+            pip2 = self._get_pipette_by_rank(other_rank)
+            assert pip2
+            return [pip1, pip2]
+        else:
+            return [pip1]
+
+    def get_instruments(self) -> List[CheckAttachedPipette]:
         """
         Public property to help format the current pipettes
         being used for a given session for the client.
         """
         hw_pips = self._get_hw_pipettes()
+        info_pips = self._get_ordered_info_pipettes()
         return [
-            AttachedPipette(  # type: ignore[call-arg]
+            CheckAttachedPipette(  # type: ignore[call-arg]
                 model=hw_pip.model,
                 name=hw_pip.name,
                 tip_length=hw_pip.config.tip_length,
+                rank=info_pip.rank,
                 mount=str(self._mount),
-                serial=hw_pip.pipette_id) for hw_pip in hw_pips]
+                serial=hw_pip.pipette_id)  # type: ignore[arg-type]
+                for hw_pip, info_pip in zip(hw_pips, info_pips)]
 
-    def get_active_pipette(self) -> AttachedPipette:
+    def get_active_pipette(self) -> CheckAttachedPipette:
         # TODO(mc, 2020-09-17): s/tip_length/tipLength
         # TODO(mc, 2020-09-17): type of pipette_id does not match expected
         # type of AttachedPipette.serial
         assert self._hw_pipette
-        return AttachedPipette(  # type: ignore[call-arg]
+        assert self.active_pipette
+        return CheckAttachedPipette(  # type: ignore[call-arg]
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
             tip_length=self._hw_pipette.config.tip_length,
+            rank=self.active_pipette.rank,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id)  # type: ignore[arg-type]
 
@@ -339,6 +365,13 @@ class CheckCalibrationUserFlow:
         zDiffMag = ref_pt_no_safety._replace(x=0, y=0).magnitude_to(
                 jogged_pt._replace(x=0, y=0))
         return xyDiffMag > xyThresholdMag or zDiffMag > zThresholdMag
+
+    async def check_tip_threshold(self):
+        dangerous = await self._is_tip_pick_up_dangerous()
+        if dangerous:
+            self._set_current_state(State.badCalibrationData)
+        else:
+            self._set_current_state(State.inspectingTip)
 
     def _determine_threshold(self) -> Point:
         """
@@ -403,6 +436,7 @@ class CheckCalibrationUserFlow:
     def update_comparison_map(self):
         ref_pt, jogged_pt = self._get_reference_points_by_state()
         rank = self.active_pipette.rank
+        second_pip = rank == PipetteRank.second
         threshold_vector = self._determine_threshold()
         if (ref_pt is not None and jogged_pt is not None):
             diff_magnitude = None
@@ -432,6 +466,8 @@ class CheckCalibrationUserFlow:
             intermediate_map =\
                 self._update_compare_status_by_rank(rank, status)
             self._comparison_map.set_value(rank.name, intermediate_map)
+            if self.current_state == State.comparingPointOne and second_pip:
+                self._set_current_state(State.checkComplete)
 
     def _get_reference_points_by_state(self):
         saved_points = self._reference_points

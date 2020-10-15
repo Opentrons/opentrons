@@ -2,7 +2,10 @@ from typing import Awaitable, cast, TYPE_CHECKING
 
 from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
-from robot_server.robot.calibration.check import models as calibration_models
+from robot_server.robot.calibration.check.models import (
+    SessionCreateParams, ComparisonMap, ComparisonStatePerPipette,
+    CalibrationCheckSessionStatus)
+from robot_server.robot.calibration.check import util
 
 from robot_server.service.session.command_execution import \
     CommandQueue, CallableExecutor, Command, CompletedCommand
@@ -46,9 +49,7 @@ class CheckSession(BaseSession):
                      configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> BaseSession:
         """Create an instance"""
-        assert isinstance(
-            instance_meta.create_params,
-            calibration_models.SessionCreateParams)
+        assert isinstance(instance_meta.create_params, SessionCreateParams)
         tip_racks = instance_meta.create_params.tipRacks
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
@@ -77,14 +78,33 @@ class CheckSession(BaseSession):
             calibration_check=calibration_check,
             shutdown_handler=shutdown_handler)
 
+    def _map_to_pydantic_model(
+            self, comparison_map: util.ComparisonStatePerPipette
+            ) -> ComparisonStatePerPipette:
+        first = comparison_map.first
+        second = comparison_map.second
+        first_compmap = ComparisonMap(
+            inspectingTip=first.inspectingTip,
+            comparingHeight=first.comparingHeight,
+            comparingPointOne=first.comparingPointOne,
+            comparingPointTwo=first.comparingPointTwo,
+            comparingPointThree=first.comparingPointThree)
+        second_compmap = ComparisonMap(
+            inspectingTip=second.inspectingTip,
+            comparingHeight=second.comparingHeight)
+        return ComparisonStatePerPipette(
+            first=first_compmap, second=second_compmap)
+
     def _get_response_details(self) -> SessionDetails:
 
         # TODO(mc, 2020-09-17): type of get_comparisons_by_step doesn't quite
         # match what CalibrationSessionStatus expects for comparisonsByStep
-        return calibration_models.CalibrationCheckSessionStatus(
+        comparison_map =\
+            self._map_to_pydantic_model(self._calibration_check.comparison_map)
+        return CalibrationCheckSessionStatus(
             instruments=self._calibration_check.get_instruments(),
             currentStep=self._calibration_check.current_state,
-            comparisonsByStep=self._calibration_check.comparison_map,  # type: ignore[arg-type] # noqa: e501
+            comparisonsByStep=comparison_map,  # type: ignore[arg-type] # noqa: e501
             labware=self._calibration_check.get_required_labware(),
             activePipette=self._calibration_check.get_active_pipette()
         )
