@@ -4,7 +4,7 @@ import { combineEpics, ofType } from 'redux-observable'
 import { of, from, zip } from 'rxjs'
 import {
   map,
-  switchMap,
+  mergeMap,
   filter,
   tap,
   withLatestFrom,
@@ -35,7 +35,9 @@ const initialzeAnalyticsEpic: Epic = (action$, state$) => {
 const sendAnalyticsEventEpic: Epic = (action$, state$) => {
   return action$.pipe(
     withLatestFrom(state$),
-    switchMap<[Action, State], _, TrackEventArgs>(([action, state]) => {
+    // use a merge map to ensure actions dispatched in the same tick do
+    // not clobber each other
+    mergeMap<[Action, State], _, TrackEventArgs>(([action, state]) => {
       const event$ = from(makeEvent(action, state))
       return zip(event$, of(getAnalyticsConfig(state)))
     }),
