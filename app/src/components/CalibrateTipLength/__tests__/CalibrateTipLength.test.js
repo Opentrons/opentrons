@@ -99,7 +99,7 @@ describe('CalibrateTipLength', () => {
           robotName="robot-name"
           session={session}
           closeWizard={() => {}}
-          dispatchRequests={jest.fn()}
+          dispatchRequests={dispatchRequests}
           showSpinner={showSpinner}
           isJogging={isJogging}
         />,
