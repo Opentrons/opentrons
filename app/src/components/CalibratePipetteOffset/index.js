@@ -97,7 +97,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
 ): React.Node {
-  const { session, robotName, dispatchRequests, showSpinner } = props
+  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
   const {
@@ -120,7 +120,7 @@ export function CalibratePipetteOffset(
   }, [instrument])
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
-    if (session?.id) {
+    if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,
