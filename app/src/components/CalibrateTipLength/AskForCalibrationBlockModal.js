@@ -17,7 +17,6 @@ import {
 
 import styles from './styles.css'
 import { labwareImages } from '../CalibrationPanels/labwareImages'
-import { Portal } from '../portal'
 
 const ALERT_TIP_LENGTH_CAL_HEADER = 'Pipette calibration has been updated!'
 const ALERT_TIP_LENGTH_CAL_BODY =
@@ -52,60 +51,58 @@ export function AskForCalibrationBlockModal(props: Props): React.Node {
   }
 
   return (
-    <Portal>
-      <AlertModal
-        className={styles.alert_modal_padding}
-        iconName={null}
-        heading={ALERT_TIP_LENGTH_CAL_HEADER}
-        alertOverlay
-      >
-        <Box fontSize={FONT_SIZE_BODY_2}>
-          <Text marginBottom={SPACING_3}>{ALERT_TIP_LENGTH_CAL_BODY}</Text>
-          <Flex width="100%" flexDirection={DIRECTION_ROW}>
-            <div>
-              <Text marginBottom={SPACING_3}>
-                {PREREQS}
-                &nbsp;
-                <b>{CALIBRATION_BLOCK}</b>
-              </Text>
-              <Text marginBottom={SPACING_3}>
-                {IF_NO_BLOCK}
-                &nbsp;
-                <Link href={BLOCK_REQUEST_URL} external>
-                  {CONTACT_US}
-                </Link>
-                &nbsp;
-                {TO_RECEIVE}
-              </Text>
-              <Text marginBottom={SPACING_3}>{ALTERNATIVE}</Text>
-            </div>
-            <div>
-              <img
-                className={styles.block_image}
-                src={labwareImages[CAL_BLOCK_LOAD_NAME]}
-              />
-            </div>
-          </Flex>
-        </Box>
-        <Flex marginY={SPACING_3} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <SecondaryBtn onClick={makeSetHasBlock(true)}>
-            {HAVE_BLOCK}
-          </SecondaryBtn>
-          <SecondaryBtn onClick={makeSetHasBlock(false)}>
-            {USE_TRASH}
-          </SecondaryBtn>
+    <AlertModal
+      className={styles.alert_modal_padding}
+      iconName={null}
+      heading={ALERT_TIP_LENGTH_CAL_HEADER}
+      alertOverlay
+    >
+      <Box fontSize={FONT_SIZE_BODY_2}>
+        <Text marginBottom={SPACING_3}>{ALERT_TIP_LENGTH_CAL_BODY}</Text>
+        <Flex width="100%" flexDirection={DIRECTION_ROW}>
+          <div>
+            <Text marginBottom={SPACING_3}>
+              {PREREQS}
+              &nbsp;
+              <b>{CALIBRATION_BLOCK}</b>
+            </Text>
+            <Text marginBottom={SPACING_3}>
+              {IF_NO_BLOCK}
+              &nbsp;
+              <Link href={BLOCK_REQUEST_URL} external>
+                {CONTACT_US}
+              </Link>
+              &nbsp;
+              {TO_RECEIVE}
+            </Text>
+            <Text marginBottom={SPACING_3}>{ALTERNATIVE}</Text>
+          </div>
+          <div>
+            <img
+              className={styles.block_image}
+              src={labwareImages[CAL_BLOCK_LOAD_NAME]}
+            />
+          </div>
         </Flex>
-        <div>
-          <CheckboxField
-            label={REMEMBER}
-            onChange={e => setRememberPreference(e.currentTarget.checked)}
-            value={rememberPreference}
-          />
-          <Text fontSize={FONT_SIZE_BODY_1} paddingX={NOTE_SPACING}>
-            {CAN_CHANGE}
-          </Text>
-        </div>
-      </AlertModal>
-    </Portal>
+      </Box>
+      <Flex marginY={SPACING_3} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <SecondaryBtn onClick={makeSetHasBlock(true)}>
+          {HAVE_BLOCK}
+        </SecondaryBtn>
+        <SecondaryBtn onClick={makeSetHasBlock(false)}>
+          {USE_TRASH}
+        </SecondaryBtn>
+      </Flex>
+      <div>
+        <CheckboxField
+          label={REMEMBER}
+          onChange={e => setRememberPreference(e.currentTarget.checked)}
+          value={rememberPreference}
+        />
+        <Text fontSize={FONT_SIZE_BODY_1} paddingX={NOTE_SPACING}>
+          {CAN_CHANGE}
+        </Text>
+      </div>
+    </AlertModal>
   )
 }
