@@ -82,7 +82,6 @@ class LoadInstrumentResponse(BaseModel):
     instrumentId: IdentifierType
 
 
-
 class CommandStatus(str, Enum):
     """The command status"""
     executed = "executed"
