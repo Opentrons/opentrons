@@ -23,6 +23,7 @@ import type { PipetteCompatibility } from '../../pipettes/types'
 const NOT_CALIBRATED = 'Not yet calibrated'
 const NOT_CONNECTED = 'Not connected'
 const CALIBRATION_DATA = 'Calibration data:'
+const AXIS_NAMES = ['x', 'y', 'z']
 
 export type InstrumentItemProps = {|
   compatibility?: PipetteCompatibility,
@@ -103,7 +104,7 @@ function BuildOffsetText(props: {|
   return (
     <Flex>
       <Text marginRight={SPACING_2}>{CALIBRATION_DATA}</Text>
-      {['x', 'y', 'z'].map((key, index) => (
+      {AXIS_NAMES.map((key, index) => (
         <React.Fragment key={key}>
           <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{key.toUpperCase()}</Text>
           <Text marginLeft={SPACING_1} marginRight={SPACING_3}>

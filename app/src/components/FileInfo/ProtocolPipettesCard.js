@@ -66,7 +66,7 @@ export function ProtocolPipettesCard(
           hidden: !info.protocol.name,
           displayName: info.protocol.displayName,
           needsOffsetCalibration: info.needsOffsetCalibration,
-          calibrationData: offsetData ? offsetData.offset : null,
+          calibrationData: offsetData,
         }
       : null
   }).filter(Boolean)
@@ -83,7 +83,7 @@ export function ProtocolPipettesCard(
             mount={itemProps.mount}
             hidden={itemProps.hidden}
             needsOffsetCalibration={itemProps.needsOffsetCalibration}
-            pipetteOffsetData={itemProps.calibrationData}
+            pipetteOffsetData={itemProps.calibrationData?.offset}
           >
             {itemProps.displayName}
           </InstrumentItem>
