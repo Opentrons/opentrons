@@ -11,6 +11,7 @@ import {
   alertUnignored,
 } from '../../alerts'
 
+import { useTrackEvent } from '../../analytics'
 import { TitledControl } from '../TitledControl'
 import { ToggleBtn } from '../ToggleBtn'
 
@@ -24,8 +25,11 @@ const GET_NOTIFIED_ABOUT_UPDATES =
 
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
 
+const EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLE = 'appUpdateNotificationsToggle'
+
 export function UpdateNotificationsControl(props: StyleProps): React.Node {
   const dispatch = useDispatch<Dispatch>()
+  const trackEvent = useTrackEvent()
 
   // may be enabled, disabled, or unknown (because config is loading)
   const enabled = useSelector((s: State) => {
@@ -40,6 +44,11 @@ export function UpdateNotificationsControl(props: StyleProps): React.Node {
           ? alertPermanentlyIgnored(ALERT_APP_UPDATE_AVAILABLE)
           : alertUnignored(ALERT_APP_UPDATE_AVAILABLE)
       )
+
+      trackEvent({
+        name: EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLE,
+        properties: { enabled: !enabled },
+      })
     }
   }
 
