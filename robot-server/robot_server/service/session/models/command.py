@@ -66,6 +66,12 @@ class LiquidRequest(PipetteRequestBase):
     )
 
 
+class SetHasCalibrationBlockRequest(BaseModel):
+    hasBlock: bool = Field(
+        ...,
+        description="whether or not there is a calibration block present")
+
+
 class LoadLabwareResponse(BaseModel):
     labwareId: IdentifierType
     definition: LabwareDefinition
@@ -168,7 +174,8 @@ class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
     load_labware = "loadLabware"
     jog = ("jog", JogPosition)
-    set_has_calibration_block = "setHasCalibrationBlock"
+    set_has_calibration_block = ("setHasCalibrationBlock",
+                                 SetHasCalibrationBlockRequest)
     move_to_tip_rack = "moveToTipRack"
     move_to_point_one = "moveToPointOne"
     move_to_deck = "moveToDeck"
@@ -213,6 +220,7 @@ IMPORTANT: See note for SessionCreateParamType
 Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
 """
 CommandDataType = typing.Union[
+    SetHasCalibrationBlockRequest,
     JogPosition,
     LiquidRequest,
     PipetteRequestBase,

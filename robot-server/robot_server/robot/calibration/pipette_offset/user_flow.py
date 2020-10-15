@@ -87,7 +87,9 @@ class PipetteOffsetCalibrationUserFlow:
         self._using_default_tiprack = False
 
         existing_offset_calibration = self._get_stored_pipette_offset_cal()
-        self._initialize_deck(tip_rack_def, existing_offset_calibration)
+        self._load_tip_rack(tip_rack_def, existing_offset_calibration)
+        if recalibrate_tip_length and has_calibration_block:
+            self._load_calibration_block()
 
         existing_tip_length_calibration = self._get_stored_tip_length_cal()
 
@@ -162,24 +164,15 @@ class PipetteOffsetCalibrationUserFlow:
             RequiredLabware.from_lw(lw, s)  # type: ignore
             for s, lw in lw_by_slot.items()]
 
-    async def set_has_calibration_block(self):
-        if self._has_calibration_block:
-            self._has_calibration_block = False
+    async def set_has_calibration_block(self, hasBlock: bool):
+        if self._has_calibration_block and not hasBlock:
             self._remove_calibration_block()
-        else:
-            self._has_calibration_block = True
+        elif hasBlock and not self._has_calibration_block:
             self._load_calibration_block()
+        self._has_calibration_block = hasBlock
 
     def _set_current_state(self, to_state: GenericState):
         self._current_state = to_state
-
-    def _initialize_deck(
-            self,
-            tiprack_def: Optional['LabwareDefinition'],
-            existing_calibration: Optional[PipetteOffsetByPipetteMount]):
-        self._load_tiprack(tiprack_def, existing_calibration)
-        if self._has_calibration_block:
-            self._load_calibration_block()
 
     def _get_tip_rack_lw(self) -> labware.Labware:
         pip_vol = self._hw_pipette.config.max_volume
@@ -300,7 +293,7 @@ class PipetteOffsetCalibrationUserFlow:
         tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(volume)].load_name
         return True, labware.load(tr_load_name, position)
 
-    def _load_tiprack(
+    def _load_tip_rack(
             self,
             tip_rack_def: Optional['LabwareDefinition'],
             existing_calibration: Optional[PipetteOffsetByPipetteMount]):
