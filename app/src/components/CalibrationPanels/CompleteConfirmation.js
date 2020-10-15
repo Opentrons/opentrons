@@ -69,7 +69,7 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
     sendCommands(
       {
         command: Sessions.sharedCalCommands.SET_CALIBRATION_BLOCK,
-        data: { has_block: false },
+        data: { hasBlock: false },
       },
       { command: Sessions.sharedCalCommands.MOVE_TO_DECK }
     )

@@ -75,7 +75,7 @@ export type VectorTuple = [number, number, number]
 
 export type SessionCommandData =
   | {| vector: VectorTuple |}
-  | {| has_block: boolean |}
+  | {| hasBlock: boolean |}
   | {||}
 export type SessionCommandParams = {
   command: SessionCommandString,

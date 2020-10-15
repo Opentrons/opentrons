@@ -67,7 +67,7 @@ class LiquidRequest(PipetteRequestBase):
 
 
 class SetHasCalibrationBlockRequest(BaseModel):
-    has_block: bool = Field(
+    hasBlock: bool = Field(
         ...,
         description="whether or not there is a calibration block present")
 
