@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.0) (2020-10-15)
+
+
+### Bug Fixes
+
+* **api:** Do not perform a transfer if a zero volume is passed in ([#6620](https://github.com/Opentrons/opentrons/issues/6620)) ([05e66b4](https://github.com/Opentrons/opentrons/commit/05e66b4))
+
+
+### Features
+
+* **api:** Add calibration status to all of the calibration data models ([#6648](https://github.com/Opentrons/opentrons/issues/6648)) ([2753734](https://github.com/Opentrons/opentrons/commit/2753734))
+* **api:** add source blowout location option to transfer function ([#6670](https://github.com/Opentrons/opentrons/issues/6670)) ([811a767](https://github.com/Opentrons/opentrons/commit/811a767)), closes [#6576](https://github.com/Opentrons/opentrons/issues/6576)
+* **api:** pin JSON protocols to APIVersion 2.8 ([#6691](https://github.com/Opentrons/opentrons/issues/6691)) ([0804474](https://github.com/Opentrons/opentrons/commit/0804474)), closes [#6681](https://github.com/Opentrons/opentrons/issues/6681)
+* **api:** Use more human-friendly names in "API version too low" error messages ([#6662](https://github.com/Opentrons/opentrons/issues/6662)) ([55daec2](https://github.com/Opentrons/opentrons/commit/55daec2))
+
+
+
+
+
 ## [3.21.1](https://github.com/Opentrons/opentrons/compare/v3.21.0...v3.21.1) (2020-10-14)
 
 **Note:** Version bump only for package @opentrons/api-server

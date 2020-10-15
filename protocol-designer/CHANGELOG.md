@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.0) (2020-10-15)
+
+
+### Bug Fixes
+
+* **protocol-designer:** cast mix tip offset to number ([#6629](https://github.com/Opentrons/opentrons/issues/6629)) ([7b4ee9b](https://github.com/Opentrons/opentrons/commit/7b4ee9b)), closes [#6552](https://github.com/Opentrons/opentrons/issues/6552)
+* **protocol-designer:** fix 5.1.0 migration ([#6643](https://github.com/Opentrons/opentrons/issues/6643)) ([cc7cd17](https://github.com/Opentrons/opentrons/commit/cc7cd17))
+
+
+### Features
+
+* **protocol designer:** put mix delay behind FF ([#6619](https://github.com/Opentrons/opentrons/issues/6619)) ([5c7bf7d](https://github.com/Opentrons/opentrons/commit/5c7bf7d))
+* **protocol-designer:** add air gap dispense FF ([#6647](https://github.com/Opentrons/opentrons/issues/6647)) ([4c53b73](https://github.com/Opentrons/opentrons/commit/4c53b73)), closes [#6522](https://github.com/Opentrons/opentrons/issues/6522)
+* **protocol-designer:** add air gap dispense for fields to move liquid form ([#6658](https://github.com/Opentrons/opentrons/issues/6658)) ([a6c1930](https://github.com/Opentrons/opentrons/commit/a6c1930)), closes [#6499](https://github.com/Opentrons/opentrons/issues/6499)
+* **protocol-designer:** add dispenseAirGapVolume arg ([#6656](https://github.com/Opentrons/opentrons/issues/6656)) ([4703456](https://github.com/Opentrons/opentrons/commit/4703456)), closes [#6653](https://github.com/Opentrons/opentrons/issues/6653)
+* **protocol-designer:** add mix delay commands ([#6631](https://github.com/Opentrons/opentrons/issues/6631)) ([953d454](https://github.com/Opentrons/opentrons/commit/953d454)), closes [#6498](https://github.com/Opentrons/opentrons/issues/6498)
+* **protocol-designer:** add mix delay default values ([#6607](https://github.com/Opentrons/opentrons/issues/6607)) ([db2b331](https://github.com/Opentrons/opentrons/commit/db2b331)), closes [#6579](https://github.com/Opentrons/opentrons/issues/6579)
+* **protocol-designer:** bump pd to 5.1.0; add migration ([#6583](https://github.com/Opentrons/opentrons/issues/6583)) ([d6ba128](https://github.com/Opentrons/opentrons/commit/d6ba128)), closes [#6573](https://github.com/Opentrons/opentrons/issues/6573) [#6634](https://github.com/Opentrons/opentrons/issues/6634)
+* **protocol-designer:** implement dispense > air gap for Transfer command creator ([#6745](https://github.com/Opentrons/opentrons/issues/6745)) ([e684f7d](https://github.com/Opentrons/opentrons/commit/e684f7d)), closes [#6508](https://github.com/Opentrons/opentrons/issues/6508)
+* **protocol-designer:** update air gap dispense tooltip ([#6753](https://github.com/Opentrons/opentrons/issues/6753)) ([b6ace2d](https://github.com/Opentrons/opentrons/commit/b6ace2d)), closes [#6714](https://github.com/Opentrons/opentrons/issues/6714)
+
+
+
+
+
 ## [3.21.1](https://github.com/Opentrons/opentrons/compare/v3.21.0...v3.21.1) (2020-10-14)
 
 **Note:** Version bump only for package protocol-designer
