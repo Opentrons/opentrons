@@ -57,6 +57,7 @@ export type SessionParams =
   | {||}
   | TipLengthCalTypes.TipLengthCalibrationSessionParams
   | PipOffsetCalTypes.PipetteOffsetCalibrationSessionParams
+  | CalCheckTypes.CheckCalibrationHealthSessionParams
 
 export type SessionCommandString =
   | $Values<typeof CalCheckConstants.checkCommands>
@@ -85,7 +86,7 @@ export type SessionCommandParams = {
 export type CalibrationCheckSessionResponseAttributes = {|
   sessionType: SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   details: CalCheckTypes.RobotCalibrationCheckSessionDetails,
-  createParams: {},
+  createParams: CalCheckTypes.CheckCalibrationHealthSessionParams,
 |}
 
 export type TipLengthCalibrationSessionResponseAttributes = {|

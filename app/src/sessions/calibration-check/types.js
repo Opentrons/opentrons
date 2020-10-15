@@ -1,4 +1,7 @@
 // @flow
+import type { CalibrationLabware } from '../types'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 // calibration check session types
 
 import typeof {
@@ -39,7 +42,7 @@ export type RobotCalibrationCheckPipetteRank =
   | CHECK_PIPETTE_RANK_FIRST
   | CHECK_PIPETTE_RANK_SECOND
 
-export type RobotCalibrationCheckInstrument = {|
+export type CalibrationHealthCheckInstrument = {|
   model: string,
   name: string,
   tip_length: number,
@@ -49,44 +52,36 @@ export type RobotCalibrationCheckInstrument = {|
   serial: string,
 |}
 
-export type RobotCalibrationCheckLabware = {|
-  alternatives: Array<string>,
-  slot: string,
-  id: string,
-  forMounts: Array<string>,
-  loadName: string,
-  namespace: string,
-  version: number,
-|}
-
 export type CheckTransformType =
   | CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET
   | CHECK_TRANSFORM_TYPE_UNKNOWN
   | CHECK_TRANSFORM_TYPE_DECK
 
-export type RobotCalibrationCheckComparison = {|
+export type CalibrationHealthCheckComparison = {|
   differenceVector: [number, number, number],
   thresholdVector: [number, number, number],
   exceedsThreshold: boolean,
   transformType: CheckTransformType,
 |}
 
-export type RobotCalibrationCheckInstrumentsByMount = {
-  [mount: string]: RobotCalibrationCheckInstrument,
+export type CalibrationHealthCheckComparisonsByStep = {
+  [RobotCalibrationCheckStep]: CalibrationHealthCheckComparison,
   ...,
 }
 
-export type RobotCalibrationCheckComparisonsByStep = {
-  [RobotCalibrationCheckStep]: RobotCalibrationCheckComparison,
-  ...,
+export type CalibrationHealthCheckComparisonByPipette = {
+  first: CalibrationHealthCheckComparisonsByStep,
+  second: CalibrationHealthCheckComparisonsByStep,
 }
 
-export type RobotCalibrationCheckSessionDetails = {|
-  instruments: RobotCalibrationCheckInstrumentsByMount,
+export type CheckCalibrationHealthSessionParams = {|
+  tipRacks?: Array<LabwareDefinition2>,
+|}
+
+export type CheckCalibrationHealthSessionDetails = {|
+  instruments: Array<CalibrationHealthCheckInstrument>,
   currentStep: RobotCalibrationCheckStep,
-  nextSteps: {|
-    links: { [RobotCalibrationCheckStep]: string, ... },
-  |},
-  comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
-  labware: Array<RobotCalibrationCheckLabware>,
+  comparisonsByStep: CalibrationHealthCheckComparisonByPipette,
+  labware: Array<CalibrationLabware>,
+  activePipette: CalibrationHealthCheckInstrument,
 |}

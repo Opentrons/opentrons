@@ -263,9 +263,9 @@ export const {
 export const mockCalibrationCheckSessionAnalyticsProps = {
   sessionType: Constants.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   leftPipetteModel:
-    mockRobotCalibrationCheckSessionDetails.instruments.left.model,
+    mockRobotCalibrationCheckSessionDetails.instruments[0].model,
   rightPipetteModel:
-    mockRobotCalibrationCheckSessionDetails.instruments.right.model,
+    mockRobotCalibrationCheckSessionDetails.instruments[1].model,
   comparingFirstPipetteHeightDifferenceVector:
     mockRobotCalibrationCheckSessionDetails.comparisonsByStep.comparingHeight
       .differenceVector,
@@ -315,29 +315,8 @@ export const mockCalibrationCheckSessionAnalyticsProps = {
     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
       .comparingPointThree.transformType,
   comparingSecondPipetteHeightDifferenceVector:
-//     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
-//       .comparingSecondPipetteHeight.differenceVector,
-//   comparingSecondPipetteHeightThresholdVector:
-//     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
-//       .comparingSecondPipetteHeight.thresholdVector,
-//   comparingSecondPipetteHeightExceedsThreshold:
-//     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
-//       .comparingSecondPipetteHeight.exceedsThreshold,
-//   comparingSecondPipetteHeightErrorSource:
-//     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
-//       .comparingSecondPipetteHeight.transformType,
-//   comparingSecondPipettePointOneDifferenceVector:
-//     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
-//       .comparingSecondPipettePointOne.differenceVector,
-//   comparingSecondPipettePointOneThresholdVector:
-//     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
-//       .comparingSecondPipettePointOne.thresholdVector,
-//   comparingSecondPipettePointOneExceedsThreshold:
-//     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
-//       .comparingSecondPipettePointOne.exceedsThreshold,
-//   comparingSecondPipettePointOneErrorSource:
-//     mockRobotCalibrationCheckSessionDetails.comparisonsByStep
-//       .comparingSecondPipettePointOne.transformType,
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingSecondPipetteHeight.differenceVector,
 }
 
 export const mockCalibrationCheckSessionIntercomProps = {

@@ -6,6 +6,14 @@ import {
   ModalPage,
   SpinnerModalPage,
   useConditionalConfirm,
+  DISPLAY_FLEX,
+  DIRECTION_COLUMN,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  SPACING_3,
+  C_TRANSPARENT,
+  ALIGN_FLEX_START,
+  C_WHITE,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -33,6 +41,30 @@ import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Robot calibration heatlh check'
 const EXIT = 'exit'
+
+const darkContentsStyleProps = {
+  display: DISPLAY_FLEX,
+  flexDirection: DIRECTION_COLUMN,
+  alignItems: ALIGN_CENTER,
+  padding: SPACING_3,
+  backgroundColor: C_TRANSPARENT,
+  height: '100%',
+}
+const contentsStyleProps = {
+  display: DISPLAY_FLEX,
+  backgroundColor: C_WHITE,
+  flexDirection: DIRECTION_COLUMN,
+  justifyContent: JUSTIFY_CENTER,
+  alignItems: ALIGN_FLEX_START,
+  padding: SPACING_3,
+  maxWidth: '48rem',
+  minHeight: '14rem',
+}
+
+const terminalContentsStyleProps = {
+  ...contentsStyleProps,
+  paddingX: '1.5rem',
+}
 
 const PANEL_BY_STEP: {
   [string]: React.ComponentType<CalibrationPanelProps>,

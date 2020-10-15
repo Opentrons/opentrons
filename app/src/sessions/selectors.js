@@ -57,7 +57,8 @@ const getSharedAnalyticsPropsFromCalibrationCheck: (
 const getAnalyticsPropsFromCalibrationCheck: (
   session: Types.CalibrationCheckSession
 ) => Types.CalibrationCheckSessionAnalyticsProps = session => {
-  const { comparisonsByStep } = session.details
+  const { comparisonsByStep, activePipette } = session.details
+  const rank = activePipette.rank
   const initialStepData: $Shape<Types.CalibrationCheckAnalyticsData> = {}
   const normalizedStepData = Object.keys(comparisonsByStep).reduce(
     (
@@ -69,7 +70,7 @@ const getAnalyticsPropsFromCalibrationCheck: (
         thresholdVector,
         exceedsThreshold,
         transformType,
-      } = comparisonsByStep[stepName]
+      } = comparisonsByStep[rank][stepName]
       return {
         ...acc,
         [`${stepName}DifferenceVector`]: differenceVector,
@@ -90,14 +91,17 @@ const getAnalyticsPropsFromCalibrationCheck: (
 const getIntercomPropsFromCalibrationCheck: (
   session: Types.CalibrationCheckSession
 ) => Types.CalibrationCheckSessionIntercomProps = session => {
-  const { comparisonsByStep } = session.details
+  const { comparisonsByStep, activePipette } = session.details
+  const rank = activePipette.rank
   const initialStepData: $Shape<Types.CalibrationCheckIntercomData> = {}
   const normalizedStepData = Object.keys(comparisonsByStep).reduce(
     (
       acc: Types.CalibrationCheckIntercomData,
       stepName: Types.RobotCalibrationCheckStep
     ) => {
-      const { exceedsThreshold, transformType } = comparisonsByStep[stepName]
+      const { exceedsThreshold, transformType } = comparisonsByStep[rank][
+        stepName
+      ]
       return {
         ...acc,
         [`${stepName}ExceedsThreshold`]: exceedsThreshold,
@@ -109,7 +113,7 @@ const getIntercomPropsFromCalibrationCheck: (
 
   const succeeded = !some(
     Object.keys(comparisonsByStep).map(k =>
-      Boolean(comparisonsByStep[k].exceedsThreshold)
+      Boolean(comparisonsByStep[rank][k].exceedsThreshold)
     )
   )
   return {

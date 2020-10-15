@@ -11,7 +11,7 @@ import { mockRobot } from '../../../robot-api/__fixtures__'
 import { Icon, Tooltip, SecondaryBtn } from '@opentrons/components'
 import { Portal } from '../../portal'
 import { TitledControl } from '../../TitledControl'
-import { CheckCalibration } from '../../CheckCalibration'
+import { CheckHealthCalibration } from '../../CheckCalibration'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 
 import type { State } from '../../../types'
@@ -113,11 +113,11 @@ describe('CheckCalibrationControl', () => {
     wrapper.setProps({})
     wrapper.update()
 
-    const wizard = wrapper.find(Portal).find(CheckCalibration)
+    const wizard = wrapper.find(Portal).find(CheckHealthCalibration)
     expect(wizard.prop('robotName')).toBe(robotName)
 
-    wrapper.find(CheckCalibration).invoke('closeCalibrationCheck')()
-    expect(wrapper.exists(CheckCalibration)).toBe(false)
+    wrapper.find(CheckHealthCalibration).invoke('closeCalibrationCheck')()
+    expect(wrapper.exists(CheckHealthCalibration)).toBe(false)
   })
 
   it('should show a warning message if the request fails', () => {
@@ -132,7 +132,7 @@ describe('CheckCalibrationControl', () => {
     wrapper.setProps({})
     wrapper.update()
 
-    expect(wrapper.exists(CheckCalibration)).toBe(false)
+    expect(wrapper.exists(CheckHealthCalibration)).toBe(false)
     expect(wrapper.exists('Icon[name="alert-circle"]')).toBe(true)
     expect(wrapper.html()).toMatch(/could not start robot calibration check/i)
     expect(wrapper.html()).toContain('oh no!')
