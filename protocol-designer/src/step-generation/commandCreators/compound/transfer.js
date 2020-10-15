@@ -107,7 +107,6 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
-  console.log({ dispenseAirGapVolume, args })
 
   const effectiveTransferVol =
     getPipetteWithTipMaxVol(args.pipette, invariantContext) -
@@ -383,13 +382,13 @@ export const transfer: CommandCreator<TransferArgs> = (
               : []
 
           // if using dispense > air gap, drop or change the tip at the end
-          const dropTipIfDispenseAirGapWasUsed =
+          const dropTipAfterDispenseAirGap =
             airGapAfterDispenseCommands.length > 0 && isLastChunk && isLastPair
               ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
               : []
 
           const blowoutCommand =
-            dropTipIfDispenseAirGapWasUsed.length > 0 &&
+            dropTipAfterDispenseAirGap.length > 0 &&
             args.blowoutLocation === FIXED_TRASH_ID
               ? [] // skip blowout it's in the trash we're replacing the tip due to dispense > air gap
               : blowoutUtil({
@@ -432,7 +431,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...touchTipAfterDispenseCommands,
             ...blowoutCommand,
             ...airGapAfterDispenseCommands,
-            ...dropTipIfDispenseAirGapWasUsed,
+            ...dropTipAfterDispenseAirGap,
           ]
 
           // NOTE: side-effecting
