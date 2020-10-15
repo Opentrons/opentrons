@@ -66,7 +66,7 @@ export function ProtocolPipettesCard(
           hidden: !info.protocol.name,
           displayName: info.protocol.displayName,
           needsOffsetCalibration: info.needsOffsetCalibration,
-          calibrationData: offsetData,
+          calibrationData: offsetData.offset,
         }
       : null
   }).filter(Boolean)
