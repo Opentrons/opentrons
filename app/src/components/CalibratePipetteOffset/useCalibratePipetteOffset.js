@@ -46,7 +46,6 @@ export function useCalibratePipetteOffset(
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
-      console.log('dispatched')
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
         createRequestId.current = dispatchedAction.meta.requestId
       } else if (
@@ -124,7 +123,6 @@ export function useCalibratePipetteOffset(
   const handleStartPipOffsetCalSession: Invoker = (
     overrideParams: $Shape<PipetteOffsetCalibrationSessionParams> | void = {}
   ) => {
-    console.log(overrideParams)
     dispatchRequests(
       Sessions.ensureSession(
         robotName,
