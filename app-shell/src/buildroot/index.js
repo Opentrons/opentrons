@@ -153,44 +153,43 @@ export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
 export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<mixed> {
   const fileDownloadDir = path.join(DIRECTORY, CURRENT_VERSION)
 
-  return getBuildrootUpdateUrls().then(urls => {
-    if (urls === null) return Promise.resolve()
+  return (ensureDir(fileDownloadDir): Promise<void>)
+    .then(getBuildrootUpdateUrls)
+    .then(urls => {
+      if (urls === null) return Promise.resolve()
 
-    dispatch({ type: 'buildroot:UPDATE_VERSION', payload: CURRENT_VERSION })
+      dispatch({ type: 'buildroot:UPDATE_VERSION', payload: CURRENT_VERSION })
 
-    return (ensureDir(fileDownloadDir): Promise<void>)
-      .then(() => {
-        let prevPercentDone = 0
+      let prevPercentDone = 0
 
-        const handleProgress = progress => {
-          const { downloaded, size } = progress
-          if (size !== null) {
-            const percentDone = Math.round((downloaded / size) * 100)
+      const handleProgress = progress => {
+        const { downloaded, size } = progress
+        if (size !== null) {
+          const percentDone = Math.round((downloaded / size) * 100)
 
-            if (Math.abs(percentDone - prevPercentDone) > 0) {
-              dispatch({
-                type: 'buildroot:DOWNLOAD_PROGRESS',
-                payload: percentDone,
-              })
-              prevPercentDone = percentDone
-            }
+          if (Math.abs(percentDone - prevPercentDone) > 0) {
+            dispatch({
+              type: 'buildroot:DOWNLOAD_PROGRESS',
+              payload: percentDone,
+            })
+            prevPercentDone = percentDone
           }
         }
+      }
 
-        return getReleaseFiles(urls, fileDownloadDir, handleProgress)
-      })
-      .then(filepaths => cacheUpdateSet(filepaths))
-      .then(updateInfo =>
-        dispatch({ type: 'buildroot:UPDATE_INFO', payload: updateInfo })
-      )
-      .catch((error: Error) =>
-        dispatch({ type: 'buildroot:DOWNLOAD_ERROR', payload: error.message })
-      )
-      .then(() => cleanupReleaseFiles(DIRECTORY, CURRENT_VERSION))
-      .catch((error: Error) => {
-        log.warn('Unable to cleanup old release files', { error })
-      })
-  })
+      return getReleaseFiles(urls, fileDownloadDir, handleProgress)
+        .then(filepaths => cacheUpdateSet(filepaths))
+        .then(updateInfo =>
+          dispatch({ type: 'buildroot:UPDATE_INFO', payload: updateInfo })
+        )
+        .catch((error: Error) =>
+          dispatch({ type: 'buildroot:DOWNLOAD_ERROR', payload: error.message })
+        )
+        .then(() => cleanupReleaseFiles(DIRECTORY, CURRENT_VERSION))
+        .catch((error: Error) => {
+          log.warn('Unable to cleanup old release files', { error })
+        })
+    })
 }
 
 function cacheUpdateSet(
