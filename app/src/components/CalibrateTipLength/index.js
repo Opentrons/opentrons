@@ -109,8 +109,9 @@ export function CalibrateTipLength(
 
   const tipRack: CalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
-  const calBlock: CalibrationLabware | null =
-    labware ? labware.find(l => !l.isTiprack) ?? null : null
+  const calBlock: CalibrationLabware | null = labware
+    ? labware.find(l => !l.isTiprack) ?? null
+    : null
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
     if (session?.id) {

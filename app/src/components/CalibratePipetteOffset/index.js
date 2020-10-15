@@ -110,8 +110,9 @@ export function CalibratePipetteOffset(
 
   const tipRack: CalibrationLabware | null =
     (labware && labware.find(l => l.isTiprack)) ?? null
-  const calBlock: CalibrationLabware | null =
-    labware ? labware.find(l => !l.isTiprack) ?? null : null
+  const calBlock: CalibrationLabware | null = labware
+    ? labware.find(l => !l.isTiprack) ?? null
+    : null
 
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)

@@ -35,6 +35,7 @@ import {
 } from '@opentrons/components'
 import styles from './styles.css'
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { useAskForCalibrationBlock } from '../CalibrateTipLength/useAskForCalibrationBlock'
 import type { State } from '../../types'
 
 import {
@@ -118,13 +119,28 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount })
 
-  const startTipLengthAndPipetteOffsetCalibration = () => {
-    startPipetteOffsetCalibration({ shouldRecalibrateTipLength: true })
+  const startPipetteOffsetCalibrationOnly = useCalBlock => {
+    startPipetteOffsetCalibration({ hasCalibrationBlock: useCalBlock === true })
+  }
+  const startTipLengthAndPipetteOffsetCalibration = useCalBlock => {
+    startPipetteOffsetCalibration({
+      shouldRecalibrateTipLength: true,
+      hasCalibrationBlock: useCalBlock === true,
+    })
   }
 
   const customLabwareDefs = useSelector((state: State) => {
     return CustomLabware.getCustomLabwareDefinitions(state)
   })
+
+  const [showAskForBlock, AskForBlockModal] = useAskForCalibrationBlock(null)
+
+  const showBlockForPipetteOffset = () => {
+    showAskForBlock(startPipetteOffsetCalibrationOnly)
+  }
+  const showBlockForTipLength = () => {
+    showAskForBlock(startTipLengthAndPipetteOffsetCalibration)
+  }
 
   const pipImage = (
     <Box
@@ -179,11 +195,10 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         <>
           <SecondaryBtn
             {...PER_PIPETTE_BTN_STYLE}
-            onClick={startPipetteOffsetCalibration}
+            onClick={showBlockForPipetteOffset}
           >
             {CALIBRATE_OFFSET}
           </SecondaryBtn>
-          {PipetteOffsetCalibrationWizard}
         </>
       )}
       {serialNumber && (
@@ -241,7 +256,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           </Box>
           <SecondaryBtn
             {...PER_PIPETTE_BTN_STYLE}
-            onClick={startTipLengthAndPipetteOffsetCalibration}
+            onClick={showBlockForTipLength}
           >
             {RECALIBRATE_TIP}
           </SecondaryBtn>
@@ -254,11 +269,15 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   )
 
   return (
-    <Flex width="50%" flexDirection={DIRECTION_COLUMN}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        {mount === 'right' ? [pipImage, pipInfo] : [pipInfo, pipImage]}
+    <>
+      {PipetteOffsetCalibrationWizard}
+      {AskForBlockModal}
+      <Flex width="50%" flexDirection={DIRECTION_COLUMN}>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          {mount === 'right' ? [pipImage, pipInfo] : [pipInfo, pipImage]}
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }
 
