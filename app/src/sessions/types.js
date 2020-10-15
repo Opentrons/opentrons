@@ -73,7 +73,10 @@ export type CalibrationSessionStep =
 
 export type VectorTuple = [number, number, number]
 
-export type SessionCommandData = {| vector: VectorTuple |} | {||}
+export type SessionCommandData =
+  | {| vector: VectorTuple |}
+  | {| has_block: boolean |}
+  | {||}
 export type SessionCommandParams = {
   command: SessionCommandString,
   data?: SessionCommandData,

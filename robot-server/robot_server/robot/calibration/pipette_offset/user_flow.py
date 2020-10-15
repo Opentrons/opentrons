@@ -162,13 +162,12 @@ class PipetteOffsetCalibrationUserFlow:
             RequiredLabware.from_lw(lw, s)  # type: ignore
             for s, lw in lw_by_slot.items()]
 
-    async def set_has_calibration_block(self):
-        if self._has_calibration_block:
-            self._has_calibration_block = False
+    async def set_has_calibration_block(self, has_block: bool):
+        if self._has_calibration_block and not has_block:
             self._remove_calibration_block()
-        else:
-            self._has_calibration_block = True
+        elif has_block and not self._has_calibration_block:
             self._load_calibration_block()
+        self._has_calibration_block = has_block
 
     def _set_current_state(self, to_state: GenericState):
         self._current_state = to_state

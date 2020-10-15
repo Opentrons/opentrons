@@ -123,7 +123,7 @@ export function CalibratePipetteOffset(
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,
-          data: c.data || {},
+          data: c.data ?? {},
         })
       )
       dispatchRequests(...sessionCommandActions)
