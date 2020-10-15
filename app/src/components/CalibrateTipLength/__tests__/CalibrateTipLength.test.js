@@ -93,7 +93,6 @@ describe('CalibrateTipLength', () => {
           robotName="robot-name"
           session={mockTipLengthSession}
           closeWizard={() => {}}
-          hasBlock={true}
           dispatchRequests={jest.fn()}
           showSpinner={showSpinner}
         />,
