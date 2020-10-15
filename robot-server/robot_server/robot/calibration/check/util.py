@@ -4,8 +4,6 @@ from typing import Optional
 from opentrons.types import Point
 from robot_server.robot.calibration.check.models import ComparisonStatus
 
-
-
 WILDCARD = '*'
 
 
@@ -31,11 +29,17 @@ class ComparisonMap:
     comparingPointTwo: Optional[ComparisonStatus] = None
     comparingPointThree: Optional[ComparisonStatus] = None
 
+    def set_value(self, name: str, value: ComparisonStatus):
+        setattr(self, name, value)
+
 
 @dataclass
 class ComparisonStatePerPipette:
     first: ComparisonMap
     second: ComparisonMap
+
+    def set_value(self, name: str, value: ComparisonStatus):
+        setattr(self, name, value)
 
 
 REFERENCE_POINT_MAP = {

@@ -5,7 +5,6 @@ from enum import Enum, auto
 from uuid import uuid4, UUID
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
-from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.types import DeckLocation
 
@@ -96,6 +95,7 @@ class PipetteInfo:
     mount: Mount
     max_volume: int
     channels: int
+
 
 # TODO: BC: the mount field here is typed as a string
 # because of serialization problems, though they are actually

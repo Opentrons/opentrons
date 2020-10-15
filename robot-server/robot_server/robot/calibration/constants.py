@@ -27,6 +27,7 @@ FILTERTIPRACK_1000 = _lw_fmt.format(_filtertiprack, 1000)
 
 JOG_TO_DECK_SLOT: Final = '5'
 
+
 @dataclass
 class LabwareInfo:
     slot: str

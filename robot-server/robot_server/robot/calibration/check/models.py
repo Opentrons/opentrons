@@ -1,4 +1,3 @@
-from uuid import UUID
 from typing import Dict, Optional, List, Tuple
 from functools import partial
 from pydantic import BaseModel, Field
@@ -11,13 +10,15 @@ OffsetVectorField = partial(Field, ...,
                             description="An offset vector in deck "
                                         "coordinates (x, y, z)")
 
+
 class SessionCreateParams(BaseModel):
     """
     The parameters required to start a calibration health session.
     """
     tipRacks: Optional[List[dict]] = Field(
         None,
-        description='The full labware definition of the tip rack to calibrate.'
+        description='The full labware definition(s)'
+                    'to use for calibration check.'
     )
 
 

@@ -5,8 +5,9 @@ import typing
 
 from pydantic import BaseModel, Field, validator
 
-from robot_server.robot.calibration.check.models import \
-    CalibrationCheckSessionStatus
+from robot_server.robot.calibration.check.models import (
+    CalibrationCheckSessionStatus,
+    SessionCreateParams as CheckCreateParams)
 from robot_server.robot.calibration.deck.models import \
     DeckCalibrationSessionStatus
 from robot_server.robot.calibration.models import \
@@ -39,7 +40,7 @@ class SessionType(str, Enum):
 
     null = 'null'
     default = 'default'
-    calibration_check = 'calibrationCheck'
+    calibration_check = ('calibrationCheck', CheckCreateParams)
     tip_length_calibration = (
         'tipLengthCalibration',
         TipLengthPipetteOffsetSessionCreateParams
@@ -71,6 +72,9 @@ https://pydantic-docs.helpmanual.io/usage/types/#literal-type
 SessionCreateParamType = typing.Union[
     TipLengthPipetteOffsetSessionCreateParams,
     ProtocolCreateParams,
+    CheckCreateParams,
+    # TODO(lc, 2020-10-13): this order will be a
+    # problem when we pass tipracks to a check session
     None,
     EmptyModel
 ]

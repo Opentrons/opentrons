@@ -1,7 +1,7 @@
 from typing import Dict, Union
 from typing_extensions import Literal
 
-from  enum import Enum
+from enum import Enum
 from opentrons.types import Point
 
 from robot_server.robot.calibration.constants import (
@@ -25,14 +25,11 @@ class CalibrationCheckState(str, Enum):
     WILDCARD = STATE_WILDCARD
 
 
-MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
-
 # Add in a 2mm buffer to tiprack thresholds on top of
 # the max acceptable range for a given pipette based
 # on calibration research data.
 DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(3.79, 3.64, 2.8)
 P1000_OK_TIP_PICK_UP_VECTOR = Point(4.7, 4.7, 2.8)
-INITIAL_Z_OFFSET = Point(0, 0, 0.3)
 
 
 # The tolerances below are absolute values that a pipette

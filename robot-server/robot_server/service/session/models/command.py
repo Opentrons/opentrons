@@ -225,6 +225,7 @@ class CheckCalibrationCommand(CommandDefinition):
     def namespace():
         return "calibration.check"
 
+
 """
 IMPORTANT: See note for SessionCreateParamType
 

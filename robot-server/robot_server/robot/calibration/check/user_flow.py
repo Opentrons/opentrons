@@ -1,8 +1,4 @@
 import logging
-from uuid import uuid4
-from enum import Enum
-from dataclasses import dataclass
-from itertools import count
 from typing import (
     List, Optional, Tuple, Awaitable,
     Callable, Dict, Any, TYPE_CHECKING)
@@ -21,30 +17,26 @@ from opentrons.protocols.geometry import deck
 
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
-    MOVE_TO_TIP_RACK_SAFETY_BUFFER, POINT_ONE_ID, POINT_TWO_ID,
-    POINT_THREE_ID, JOG_TO_DECK_SLOT, TIP_RACK_LOOKUP_BY_MAX_VOL)
+    MOVE_TO_TIP_RACK_SAFETY_BUFFER, JOG_TO_DECK_SLOT,
+    TIP_RACK_LOOKUP_BY_MAX_VOL)
 import robot_server.robot.calibration.util as uf
 from robot_server.robot.calibration.helper_classes import (
     DeckCalibrationError, PipetteRank, PipetteInfo,
     AttachedPipette, RequiredLabware)
-    
+from robot_server.robot.calibration.check.models import ComparisonStatus
+
 from robot_server.service.session.models.command import (
     CalibrationCommand, CheckCalibrationCommand, DeckCalibrationCommand)
 from robot_server.service.errors import RobotServerError
 
 from .util import (
-    WILDCARD, PointTypes, ReferencePoints,
+    PointTypes, ReferencePoints,
     ComparisonMap, ComparisonStatePerPipette)
 from .state_machine import CalibrationCheckStateMachine
 
-from robot_server.service.session.models.command import \
-    CalibrationCommand, CalibrationCheckCommand
-from robot_server.service.session.models.common import OffsetVector
 from .constants import (PIPETTE_TOLERANCES,
                         P1000_OK_TIP_PICK_UP_VECTOR,
                         DEFAULT_OK_TIP_PICK_UP_VECTOR,
-                        MOVE_TO_TIP_RACK_SAFETY_BUFFER,
-                        INITIAL_Z_OFFSET,
                         MOVE_POINT_STATE_MAP,
                         CalibrationCheckState as State,
                         TIPRACK_SLOTS)
@@ -142,9 +134,10 @@ class CheckCalibrationUserFlow:
         pass
 
     def _change_active_pipette(self):
-        self._active_pipette =\
+        second_pip =\
             self._get_pipette_by_rank(PipetteRank.second)
-        if self._active_pipette:
+        if second_pip:
+            self._active_pipette = second_pip
             self._active_tiprack = self._tip_racks[1]
             self._mount = self._active_pipette.mount
         else:
@@ -185,7 +178,8 @@ class CheckCalibrationUserFlow:
             RequiredLabware.from_lw(lw, s)  # type: ignore
             for s, lw in lw_by_slot.items()]
 
-    def _select_starting_pipette(self) -> Tuple[PipetteInfo, List[PipetteInfo]]:
+    def _select_starting_pipette(
+            self) -> Tuple[PipetteInfo, List[PipetteInfo]]:
         """
         Select pipette for calibration based on:
         1: larger max volume
@@ -211,13 +205,13 @@ class CheckCalibrationUserFlow:
         left_pip = pips[Mount.LEFT]
 
         r_info = PipetteInfo(
-            channels=right_pip.channels,
-            max_volume=right_pip.max_volume,
+            channels=right_pip.config.channels,
+            max_volume=right_pip.config.max_volume,
             rank=PipetteRank.first,
             mount=Mount.RIGHT)
         l_info = PipetteInfo(
-            channels=left_pip.channels,
-            max_volume=left_pip.max_volume,
+            channels=left_pip.config.channels,
+            max_volume=left_pip.config.max_volume,
             rank=PipetteRank.first,
             mount=Mount.LEFT)
         if right_pip.config.max_volume > left_pip.config.max_volume or \
@@ -251,7 +245,7 @@ class CheckCalibrationUserFlow:
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         return first_pip and first_pip.mount != Mount.LEFT
 
-    async def _is_checking_both_mounts(self):
+    def _is_checking_both_mounts(self):
         return len(self._pip_info) == 2
 
     def _load_tipracks(self,
@@ -261,9 +255,10 @@ class CheckCalibrationUserFlow:
         pipette and return the tip rack labware. If tip_rack_def is supplied,
         load specific tip rack from def onto the deck and return the labware.
         """
-        pipettes =\
-            [self._get_pipette_by_rank(PipetteRank.first),
-             self._get_pipette_by_rank(PipetteRank.second)]
+        both_mounts = self._is_checking_both_mounts()
+        pipettes = [self._get_pipette_by_rank(PipetteRank.first)]
+        if both_mounts:
+            pipettes.append(self._get_pipette_by_rank(PipetteRank.second))
         active_max_vol = self.active_pipette.max_volume
         if tip_racks:
             for i, tip_rack_def in enumerate(tip_racks):
@@ -276,8 +271,10 @@ class CheckCalibrationUserFlow:
                     self._active_tiprack = tr_lw
         else:
             for i, pipette in enumerate(pipettes):
+                assert pipette
                 pip_vol = pipette.max_volume
-                tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
+                tr_load_name =\
+                    TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
                 tr_lw = labware.load(tr_load_name,
                                      self._deck.position_for(TIPRACK_SLOTS[i]))
                 self._tip_racks.append(tr_lw)
@@ -297,17 +294,17 @@ class CheckCalibrationUserFlow:
 
     def get_instruments(self) -> List[AttachedPipette]:
         """
-        Public property to help format the current pipettes being used for a given
-        session for the client.
+        Public property to help format the current pipettes
+        being used for a given session for the client.
         """
         hw_pips = self._get_hw_pipettes()
         return [
-        AttachedPipette(  # type: ignore[call-arg]
-            model=hw_pip.model,
-            name=hw_pip.name,
-            tip_length=hw_pip.config.tip_length,
-            mount=str(self._mount),
-            serial=hw_pip.pipette_id) for hw_pip in hw_pips]
+            AttachedPipette(  # type: ignore[call-arg]
+                model=hw_pip.model,
+                name=hw_pip.name,
+                tip_length=hw_pip.config.tip_length,
+                mount=str(self._mount),
+                serial=hw_pip.pipette_id) for hw_pip in hw_pips]
 
     def get_active_pipette(self) -> AttachedPipette:
         # TODO(mc, 2020-09-17): s/tip_length/tipLength
@@ -326,7 +323,6 @@ class CheckCalibrationUserFlow:
         Function to determine whether jogged to pick up tip position is
         outside of the safe threshold for conducting the rest of the check.
         """
-        mount = self.active_pipette.mount
         ref_pt, jogged_pt = self._get_reference_points_by_state()
 
         ref_pt_no_safety = ref_pt - MOVE_TO_TIP_RACK_SAFETY_BUFFER
@@ -384,10 +380,11 @@ class CheckCalibrationUserFlow:
             State.comparingPointTwo,
             State.comparingPointThree,
         ]
-        compared_first = all((k in comparisons.first) for k in compare_states)
+        compared_first =\
+            all(hasattr(comparisons.first, k.name) for k in compare_states)
         first_pip_steps_passed = compared_first
         for key in compare_states:
-            c = getattr(comparisons, key)
+            c = getattr(comparisons, key.name)
             if c and c.exceedsThreshold:
                 first_pip_steps_passed = False
                 break
@@ -398,9 +395,14 @@ class CheckCalibrationUserFlow:
         else:
             return DeckCalibrationError.UNKNOWN
 
+    def _update_compare_status_by_rank(
+            self, rank: PipetteRank, status: ComparisonStatus):
+        intermediate_map = getattr(self._comparison_map, rank.name)
+        return intermediate_map.set_value(self.current_state.name, status)
+
     def update_comparison_map(self):
         ref_pt, jogged_pt = self._get_reference_points_by_state()
-
+        rank = self.active_pipette.rank
         threshold_vector = self._determine_threshold()
         if (ref_pt is not None and jogged_pt is not None):
             diff_magnitude = None
@@ -421,12 +423,15 @@ class CheckCalibrationUserFlow:
             tform_type = DeckCalibrationError.UNKNOWN
 
             if exceeds:
-                tform_type = self._get_error_source(comparisons)
-            self._comparison_map =\
-                ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
-                                 thresholdVector=threshold_vector,
-                                 exceedsThreshold=exceeds,
-                                 transformType=str(tform_type))
+                tform_type = self._get_error_source(self._comparison_map)
+
+            status = ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
+                                      thresholdVector=threshold_vector,
+                                      exceedsThreshold=exceeds,
+                                      transformType=str(tform_type))
+            intermediate_map =\
+                self._update_compare_status_by_rank(rank, status)
+            self._comparison_map.set_value(rank.name, intermediate_map)
 
     def _get_reference_points_by_state(self):
         saved_points = self._reference_points
@@ -487,9 +492,9 @@ class CheckCalibrationUserFlow:
         assert pip_id
         assert self.active_tiprack
         try:
-            return get.load_tip_length_calibration(pip_id,
-                                                   self.active_tiprack._definition,
-                                                   '')['tipLength']
+            return get.load_tip_length_calibration(
+                pip_id, self.active_tiprack._definition,
+                '')['tipLength']
         except TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(
                 self.active_tiprack.uri,

@@ -1,4 +1,4 @@
-from typing import Awaitable
+from typing import Awaitable, cast, TYPE_CHECKING
 
 from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
@@ -13,6 +13,9 @@ from robot_server.service.session.session_types.base_session \
     import BaseSession, SessionMetaData
 from robot_server.service.session.errors import SessionCreationException, \
     CommandExecutionException, UnsupportedFeature
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware import LabwareDefinition
 
 
 class CheckSessionCommandExecutor(CallableExecutor):
@@ -50,12 +53,15 @@ class CheckSession(BaseSession):
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
+        if not tip_racks:
+            tip_racks = []
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
         try:
             calibration_check = CheckCalibrationUserFlow(
                 configuration.hardware,
-                tip_rack_defs=tip_racks)
+                tip_rack_defs=[
+                    cast('LabwareDefinition', rack) for rack in tip_racks])
         except AssertionError as e:
             raise SessionCreationException(str(e))
 
@@ -68,7 +74,8 @@ class CheckSession(BaseSession):
         return cls(
             configuration=configuration,
             instance_meta=instance_meta,
-            calibration_check=calibration_check)
+            calibration_check=calibration_check,
+            shutdown_handler=shutdown_handler)
 
     def _get_response_details(self) -> SessionDetails:
 
