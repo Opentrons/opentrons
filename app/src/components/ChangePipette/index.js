@@ -24,6 +24,7 @@ import {
 } from '../../robot-controls'
 
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { useAskForCalibrationBlock } from '../CalibrateTipLength/useAskForCalibrationBlock'
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
@@ -109,6 +110,13 @@ export function ChangePipette(props: Props): React.Node {
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount }, closeModal)
 
+  const [
+    showAskForCalibrationBlock,
+    AskForCalibrationBlockModal,
+  ] = useAskForCalibrationBlock(calBlock => {
+    startPipetteOffsetCalibration({ hasCalibrationBlock: calBlock })
+  })
+
   const baseProps = {
     title: PIPETTE_SETUP,
     subtitle: `${mount} ${MOUNT}`,
@@ -189,7 +197,7 @@ export function ChangePipette(props: Props): React.Node {
       // home before cal flow to account for skips when attaching pipette
       setWizardStep(CALIBRATE_PIPETTE)
       dispatchApiRequests(home(robotName, ROBOT))
-      startPipetteOffsetCalibration({})
+      showAskForCalibrationBlock(null)
     }
 
     if (success && wantedPipette && shouldLevel(wantedPipette)) {
@@ -227,7 +235,7 @@ export function ChangePipette(props: Props): React.Node {
   }
 
   if (wizardStep === CALIBRATE_PIPETTE) {
-    return PipetteOffsetCalibrationWizard
+    return AskForCalibrationBlockModal || PipetteOffsetCalibrationWizard
   }
 
   // this will never be reached

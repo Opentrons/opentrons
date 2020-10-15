@@ -1,21 +1,19 @@
 // @flow
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { type Mount, useConditionalConfirm } from '@opentrons/components'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
-import { getUseTrashSurfaceForTipCal } from '../../config'
-import { setUseTrashSurfaceForTipCal } from '../../calibration'
 import { getUncalibratedTipracksByMount } from '../../pipettes'
 import { getTipLengthCalibrationSession } from '../../sessions/tip-length-calibration/selectors'
 import { getPipetteOffsetCalibrationSession } from '../../sessions/pipette-offset-calibration/selectors'
 
 import {
   CalibrateTipLength,
-  AskForCalibrationBlockModal,
   ConfirmRecalibrationModal,
 } from '../../components/CalibrateTipLength'
+import { useAskForCalibrationBlock } from '../../components/CalibrateTipLength/useAskForCalibrationBlock'
 
 import { UncalibratedInfo } from './UncalibratedInfo'
 import { TipLengthCalibrationInfoBox } from '../../components/CalibrateTipLength/TipLengthCalibrationInfoBox'
@@ -26,7 +24,7 @@ import {
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
 
-import type { State, Dispatch } from '../../types'
+import type { State } from '../../types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
@@ -56,8 +54,6 @@ export function CalibrateTipLengthControl({
   isExtendedPipOffset,
 }: CalibrateTipLengthControlProps): React.Node {
   const [showWizard, setShowWizard] = React.useState(false)
-  const [showCalBlockPrompt, setShowCalBlockPrompt] = React.useState(false)
-  const dispatch = useDispatch<Dispatch>()
 
   const trackedRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
@@ -83,13 +79,6 @@ export function CalibrateTipLengthControl({
     }
   )
 
-  const useTrashSurfaceForTipCalSetting = useSelector(
-    getUseTrashSurfaceForTipCal
-  )
-  const useTrashSurface = React.useRef<boolean | null>(
-    useTrashSurfaceForTipCalSetting
-  )
-
   const tipLengthCalibrationSession: TipLengthCalibrationSession | null = useSelector(
     (state: State) => {
       return getTipLengthCalibrationSession(state, robotName)
@@ -104,34 +93,32 @@ export function CalibrateTipLengthControl({
   const calibrationSession = isExtendedPipOffset
     ? extendedPipetteCalibrationSession
     : tipLengthCalibrationSession
-  const handleStart = () => {
-    if (isExtendedPipOffset && useTrashSurface.current !== null) {
+  const handleStart = (useCalBlock: boolean) => {
+    if (isExtendedPipOffset) {
       dispatchRequests(
         Sessions.ensureSession(
           robotName,
           Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
           {
             mount,
-            hasCalibrationBlock: !useTrashSurface.current,
+            hasCalibrationBlock: useCalBlock,
             shouldRecalibrateTipLength: true,
             tipRackDefinition,
           }
         )
       )
-    } else if (useTrashSurface.current !== null) {
+    } else {
       dispatchRequests(
         Sessions.ensureSession(
           robotName,
           Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
           {
             mount,
-            hasCalibrationBlock: !useTrashSurface.current,
+            hasCalibrationBlock: useCalBlock,
             tipRackDefinition,
           }
         )
       )
-    } else {
-      setShowCalBlockPrompt(true)
     }
   }
   const showSpinner =
@@ -166,28 +153,21 @@ export function CalibrateTipLengthControl({
     }
   }, [shouldOpen, shouldClose])
 
-  const setHasBlock = (hasBlock: boolean, rememberPreference: boolean) => {
-    useTrashSurface.current = !hasBlock
-    if (rememberPreference) {
-      dispatch(setUseTrashSurfaceForTipCal(!hasBlock))
-    }
-    handleStart()
-    setShowCalBlockPrompt(false)
-  }
-
   const handleCloseWizard = () => {
     setShowWizard(false)
-    useTrashSurface.current = useTrashSurfaceForTipCalSetting
   }
-
-  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    handleStart,
-    hasCalibrated
-  )
 
   const uncalibratedTipracksByMount: TipracksByMountMap = useSelector(state => {
     return getUncalibratedTipracksByMount(state, robotName)
   })
+
+  const [showCalBlockRequest, calBlockRequestModal] = useAskForCalibrationBlock(
+    handleStart
+  )
+
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(() => {
+    showCalBlockRequest(null)
+  }, hasCalibrated)
 
   return (
     <>
@@ -211,18 +191,13 @@ export function CalibrateTipLengthControl({
           </Portal>
         )}
       </TipLengthCalibrationInfoBox>
-      {showCalBlockPrompt && (
-        <Portal>
-          <AskForCalibrationBlockModal setHasBlock={setHasBlock} />
-        </Portal>
-      )}
-      {showWizard && useTrashSurface.current !== null && (
+      {calBlockRequestModal}
+      {showWizard && (
         <Portal>
           {isExtendedPipOffset ? (
             <CalibratePipetteOffset
               session={extendedPipetteCalibrationSession}
               robotName={robotName}
-              hasBlock={!useTrashSurface.current}
               closeWizard={handleCloseWizard}
               showSpinner={showSpinner}
               dispatchRequests={dispatchRequests}
@@ -232,7 +207,6 @@ export function CalibrateTipLengthControl({
               robotName={robotName}
               session={tipLengthCalibrationSession}
               closeWizard={handleCloseWizard}
-              hasBlock={!useTrashSurface.current}
               showSpinner={showSpinner}
               dispatchRequests={dispatchRequests}
             />
