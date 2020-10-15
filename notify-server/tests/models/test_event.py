@@ -14,7 +14,7 @@ from notify_server.models.sample_events import (
                          argvalues=[
                              # Empty
                              [{}],
-                             # Unknowy type
+                             # Unknown type
                              [{"type": "SampleThree"}],
                              # Missing Data
                              [{"type": "SampleOne"}],
