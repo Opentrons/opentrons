@@ -2,7 +2,7 @@
 import assert from 'assert'
 import zip from 'lodash/zip'
 import { getWellDepth } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../../constants'
+import { AIR_GAP_OFFSET_FROM_TOP, FIXED_TRASH_ID } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
@@ -16,6 +16,7 @@ import {
   delay,
   dispense,
   dispenseAirGap,
+  dropTip,
   replaceTip,
   touchTip,
   moveToWell,
@@ -105,6 +106,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   } = args
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
+  const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
 
   const effectiveTransferVol =
     getPipetteWithTipMaxVol(args.pipette, invariantContext) -
@@ -156,6 +158,8 @@ export const transfer: CommandCreator<TransferArgs> = (
           chunkIdx: number
         ): Array<CurriedCommandCreator> => {
           const isInitialSubtransfer = pairIdx === 0 && chunkIdx === 0
+          const isLastPair = pairIdx + 1 === sourceDestPairs.length
+          const isLastChunk = chunkIdx + 1 === subTransferVolumes.length
           let changeTipNow = false // 'never' by default
 
           if (args.changeTip === 'always') {
@@ -334,17 +338,70 @@ export const transfer: CommandCreator<TransferArgs> = (
               ]
             : []
 
-          const blowoutCommand = blowoutUtil({
-            pipette: args.pipette,
-            sourceLabwareId: args.sourceLabware,
-            sourceWell: sourceWell,
-            destLabwareId: args.destLabware,
-            destWell: destWell,
-            blowoutLocation: args.blowoutLocation,
-            flowRate: blowoutFlowRateUlSec,
-            offsetFromTopMm: blowoutOffsetFromTopMm,
-            invariantContext,
-          })
+          // `willReuseTip` is like changeTipNow, but thinking ahead about
+          //  the NEXT subtransfer and not this current one
+          let willReuseTip = true // never or once --> true
+          if (isLastChunk && isLastPair) {
+            // if we're at the end of this step, we won't reuse the tip in this step
+            // so we can discard it (even if changeTip is never, we'll drop it!)
+            willReuseTip = false
+          } else if (args.changeTip === 'always') {
+            willReuseTip = false
+          } else if (args.changeTip === 'perSource' && !isLastPair) {
+            const nextSourceWell = sourceDestPairs[pairIdx + 1][0]
+            willReuseTip = nextSourceWell === sourceWell
+          } else if (args.changeTip === 'perDest' && !isLastPair) {
+            const nextDestWell = sourceDestPairs[pairIdx + 1][1]
+            willReuseTip = nextDestWell === destWell
+          }
+          // TODO(IL, 2020-10-12): extract this ^ into a util to reuse in distribute/consolidate??
+
+          const airGapAfterDispenseCommands =
+            dispenseAirGapVolume && !willReuseTip
+              ? [
+                  curryCommandCreator(airGap, {
+                    pipette: args.pipette,
+                    volume: dispenseAirGapVolume,
+                    labware: args.destLabware,
+                    well: destWell,
+                    flowRate: aspirateFlowRateUlSec,
+                    offsetFromBottomMm: airGapOffsetDestWell,
+                  }),
+                  ...(aspirateDelay
+                    ? [
+                        curryCommandCreator(delay, {
+                          commandCreatorFnName: 'delay',
+                          description: null,
+                          name: null,
+                          meta: null,
+                          wait: aspirateDelay.seconds,
+                        }),
+                      ]
+                    : []),
+                ]
+              : []
+
+          // if using dispense > air gap, drop or change the tip at the end
+          const dropTipAfterDispenseAirGap =
+            airGapAfterDispenseCommands.length > 0 && isLastChunk && isLastPair
+              ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
+              : []
+
+          const blowoutCommand =
+            dropTipAfterDispenseAirGap.length > 0 &&
+            args.blowoutLocation === FIXED_TRASH_ID
+              ? [] // skip blowout it's in the trash we're replacing the tip due to dispense > air gap
+              : blowoutUtil({
+                  pipette: args.pipette,
+                  sourceLabwareId: args.sourceLabware,
+                  sourceWell: sourceWell,
+                  destLabwareId: args.destLabware,
+                  destWell: destWell,
+                  blowoutLocation: args.blowoutLocation,
+                  flowRate: blowoutFlowRateUlSec,
+                  offsetFromTopMm: blowoutOffsetFromTopMm,
+                  invariantContext,
+                })
 
           const nextCommands = [
             ...tipCommands,
@@ -373,6 +430,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...mixInDestinationCommands,
             ...touchTipAfterDispenseCommands,
             ...blowoutCommand,
+            ...airGapAfterDispenseCommands,
+            ...dropTipAfterDispenseAirGap,
           ]
 
           // NOTE: side-effecting
