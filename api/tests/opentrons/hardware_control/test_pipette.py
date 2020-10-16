@@ -30,30 +30,6 @@ def test_tip_tracking():
 
 
 @pytest.mark.parametrize('model', pipette_config.config_models)
-def test_critical_points(model):
-    loaded = pipette_config.load(model)
-    pip = pipette.Pipette(loaded,
-                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
-                          PIP_CAL,
-                          'testID')
-    mod_offset = Point(*loaded.model_offset)
-    assert pip.critical_point() == mod_offset
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_offset
-    assert pip.critical_point(types.CriticalPoint.TIP) == mod_offset
-    tip_length = 25.0
-    pip.add_tip(tip_length)
-    new = mod_offset._replace(z=mod_offset.z
-                              - tip_length)
-    assert pip.critical_point() == new
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_offset
-    assert pip.critical_point(types.CriticalPoint.TIP) == new
-    pip.remove_tip()
-    assert pip.critical_point() == mod_offset
-    assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_offset
-    assert pip.critical_point(types.CriticalPoint.TIP) == mod_offset
-
-
-@pytest.mark.parametrize('model', pipette_config.config_models)
 def test_critical_points_nozzle_offset(model, use_new_calibration):
     loaded = pipette_config.load(model)
     pip = pipette.Pipette(loaded,

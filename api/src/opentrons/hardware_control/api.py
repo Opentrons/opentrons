@@ -10,8 +10,7 @@ from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.util import linal
 from functools import lru_cache
-from opentrons.config import (
-    robot_configs, feature_flags as ff)
+from opentrons.config import robot_configs
 
 from .util import (
     use_or_initialize_loop, DeckTransformState, check_motion_bounds)
@@ -247,15 +246,7 @@ class API(HardwareAPILike):
 
         Once decorators are more fully supported, we can remove this.
         """
-        if ff.enable_calibration_overhaul():
-            return self._calculate_valid_attitude()
-        else:
-            return self._calculate_valid_calibration()
-
-    @lru_cache(maxsize=1)
-    def _calculate_valid_calibration(self) -> DeckTransformState:
-        return rb_cal.validate_gantry_calibration(
-            self._config.gantry_calibration)
+        return self._calculate_valid_attitude()
 
     @lru_cache(maxsize=1)
     def _calculate_valid_attitude(self) -> DeckTransformState:
@@ -729,22 +720,12 @@ class API(HardwareAPILike):
                 with_enum[Axis.Y],
                 with_enum[Axis.by_mount(top_types.Mount.LEFT)])
 
-        if ff.enable_calibration_overhaul():
-            gantry_calibration =\
-                self.robot_calibration.deck_calibration.attitude
-            right_deck = linal.apply_reverse(
-                gantry_calibration, right, with_offsets=False)
-            left_deck = linal.apply_reverse(
-                gantry_calibration, left, with_offsets=False)
-        else:
-            gantry_calibration = self._config.gantry_calibration
-            # Tell apply_transform to just do the change of
-            # base part of the transform rather than the full
-            # affine transform, because this is an offset
-            right_deck = linal.apply_reverse(gantry_calibration,
-                                             right)
-            left_deck = linal.apply_reverse(gantry_calibration,
-                                            left)
+        gantry_calibration =\
+            self.robot_calibration.deck_calibration.attitude
+        right_deck = linal.apply_reverse(
+            gantry_calibration, right, with_offsets=False)
+        left_deck = linal.apply_reverse(
+            gantry_calibration, left, with_offsets=False)
         deck_pos = {Axis.X: right_deck[0],
                     Axis.Y: right_deck[1],
                     Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
@@ -780,10 +761,7 @@ class API(HardwareAPILike):
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
-                if ff.enable_calibration_overhaul():
-                    offset = top_types.Point(*self._config.left_mount_offset)
-                else:
-                    offset = top_types.Point(*self._config.mount_offset)
+                offset = top_types.Point(*self._config.left_mount_offset)
             z_ax = Axis.by_mount(mount)
             plunger_ax = Axis.of_plunger(mount)
             cp = self._critical_point_for(mount, critical_point)
@@ -883,10 +861,7 @@ class API(HardwareAPILike):
         if len(mounts) > 1:
             secondary_mount = mounts[1]  # type: ignore
 
-        if ff.enable_calibration_overhaul():
-            mount_offset = self._config.left_mount_offset
-        else:
-            mount_offset = self._config.mount_offset
+        mount_offset = self._config.left_mount_offset
         if primary_mount == top_types.Mount.LEFT:
             primary_offset = top_types.Point(*mount_offset)
             s_offset = top_types.Point(0, 0, 0)
@@ -1029,22 +1004,14 @@ class API(HardwareAPILike):
         # target_position.items() is (rightly) Tuple[float, ...] with unbounded
         # size; unfortunately, mypy can’t quite figure out the length check
         # above that makes this OK
-        if ff.enable_calibration_overhaul():
-            primary_transformed = linal.apply_transform(
-                self.robot_calibration.deck_calibration.attitude,
-                to_transform_primary,  # type: ignore
-                with_offsets=False)
-            secondary_transformed = linal.apply_transform(
-                self.robot_calibration.deck_calibration.attitude,
-                to_transform_secondary,  # type: ignore
-                with_offsets=False)
-        else:
-            primary_transformed = linal.apply_transform(
-                self._config.gantry_calibration,
-                to_transform_primary)  # type: ignore
-            secondary_transformed = linal.apply_transform(
-                self._config.gantry_calibration,
-                to_transform_secondary)  # type: ignore
+        primary_transformed = linal.apply_transform(
+            self.robot_calibration.deck_calibration.attitude,
+            to_transform_primary,  # type: ignore
+            with_offsets=False)
+        secondary_transformed = linal.apply_transform(
+            self.robot_calibration.deck_calibration.attitude,
+            to_transform_secondary,  # type: ignore
+            with_offsets=False)
         return primary_transformed, secondary_transformed
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
@@ -1204,8 +1171,6 @@ class API(HardwareAPILike):
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.
         """
-        if kwargs.get('gantry_calibration'):
-            self._calculate_valid_calibration.cache_clear()
         self._config = self._config._replace(**kwargs)  # type: ignore
 
     async def update_deck_calibration(self, new_transform):

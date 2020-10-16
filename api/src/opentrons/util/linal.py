@@ -5,7 +5,6 @@ from numpy.linalg import inv  # type: ignore
 from typing import List, Tuple, Union
 
 from opentrons.calibration_storage.types import AttitudeMatrix
-from opentrons.config import feature_flags as ff
 
 mod_log = logging.getLogger(__name__)
 
@@ -22,10 +21,7 @@ SolvePoints = Tuple[
 
 def identity_deck_transform() -> np.ndarray:
     """ The default deck transform """
-    if ff.enable_calibration_overhaul():
-        return np.identity(3)
-    else:
-        return np.identity(4)
+    return np.identity(3)
 
 
 def solve_attitude(

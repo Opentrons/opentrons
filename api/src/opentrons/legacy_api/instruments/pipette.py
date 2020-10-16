@@ -12,7 +12,7 @@ from ..containers.placeable import (
 from opentrons.commands import CommandPublisher, do_publish
 from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
-from opentrons.config import pipette_config, feature_flags as ff
+from opentrons.config import pipette_config
 
 log = logging.getLogger(__name__)
 
@@ -1052,7 +1052,7 @@ class Pipette(CommandPublisher):
                 self.move_to(
                     self.current_tip().top(0),
                     strategy='direct')
-            if ff.enable_calibration_overhaul() and self.pipette_id:
+            if self.pipette_id:
                 tip_length_cal = load_tip_length_calibration(
                     self.pipette_id, location)
                 self._tip_length = tip_length_cal['tipLength']

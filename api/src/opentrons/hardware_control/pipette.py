@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING
 from opentrons.types import Point
 from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount
 from opentrons.config import pipette_config
-from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.drivers.types import MoveSplit
 from opentrons.config.robot_configs import robot_config
 from .types import CriticalPoint
@@ -142,12 +141,8 @@ class Pipette:
         we have a tip, or :py:attr:`CriticalPoint.XY_CENTER` - the specified
         critical point will be used.
         """
-        if enable_calibration_overhaul():
-            instr = Point(*self._pipette_offset.offset)
-            offsets = self.nozzle_offset
-        else:
-            instr = self._instrument_offset._replace(z=0)
-            offsets = self.model_offset
+        instr = Point(*self._pipette_offset.offset)
+        offsets = self.nozzle_offset
 
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
@@ -191,11 +186,7 @@ class Pipette:
     @property
     def current_tip_length(self) -> float:
         """ The length of the current tip attached (0.0 if no tip) """
-        if enable_calibration_overhaul():
-            return self._current_tip_length
-        else:
-            return (self._current_tip_length
-                    - self._instrument_offset.z)
+        return self._current_tip_length
 
     @property
     def current_tiprack_diameter(self) -> float:

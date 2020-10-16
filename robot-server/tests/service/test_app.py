@@ -33,22 +33,10 @@ def test_custom_http_exception_handler(api_client):
 def test_custom_request_validation_exception_handler(api_client):
 
     expected = {
-        "message": "operation.command: value is not a valid enumeration "
-                   "member; permitted: 'jog', 'move', 'save xy', 'attach tip',"
-                   " 'detach tip', 'save z', 'save transform', 'release'. "
-                   "operation.point: value is not a valid enumeration member;"
-                   " permitted: '1', '2', '3', 'safeZ', 'attachTip'"
+        "message": "log_level must be set"
     }
-    resp = api_client.post('/calibration/deck',
-                           json={
-                               "token": "1fdec5cc-234a-11ea-b24d-f2189817b27e",
-                               "command": 123,  # Invalid command
-                               "tipLength": 0,
-                               "point": "true",  # Invalid point
-                               "axis": "x",
-                               "direction": 1,
-                               "step": 0}
-                           )
+    resp = api_client.post('/settings/log_level/local',
+                           json={'level': 'blah'})
     text = resp.json()
     assert resp.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
     assert text == expected
