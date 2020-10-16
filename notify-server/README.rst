@@ -27,6 +27,20 @@ clients
 =======
 The ``clients`` package has two clients: a subscriber and a publisher.
 
+Publisher Client Example
+........................
+
+.. code-block:: python
+
+   from notify_server.clients.publisher import create
+
+   # Create the async publisher client
+   pub = create("tcp://123.123.123.123:1234")
+
+   # Publish an event
+   await pub.send(topic="topic", event=my_event)
+
+
 models
 =======
 The ``models`` package defines event models.
