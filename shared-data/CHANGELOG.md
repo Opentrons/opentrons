@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.1) (2020-10-16)
+
+
+### Bug Fixes
+
+* **api,robot-server:** add pydantic to api, upgrade and add test dev deps ([#6673](https://github.com/Opentrons/opentrons/issues/6673)) ([2e4ad6a](https://github.com/Opentrons/opentrons/commit/2e4ad6a))
+
+
+### Features
+
+* **api:** add source blowout location option to transfer function ([#6670](https://github.com/Opentrons/opentrons/issues/6670)) ([811a767](https://github.com/Opentrons/opentrons/commit/811a767)), closes [#6576](https://github.com/Opentrons/opentrons/issues/6576)
+
+
+
+
+
 # [4.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.0) (2020-10-15)
 
 
