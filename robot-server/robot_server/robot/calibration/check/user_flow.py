@@ -93,7 +93,6 @@ class CheckCalibrationUserFlow:
             CalibrationCommand.jog: self.jog,
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
-            CheckCalibrationCommand.check_tip: self.check_tip_threshold,
             CheckCalibrationCommand.compare_point: self.update_comparison_map,
             CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
             CalibrationCommand.move_to_deck: self.move_to_deck,
@@ -588,6 +587,7 @@ class CheckCalibrationUserFlow:
 
     async def pick_up_tip(self):
         await uf.pick_up_tip(self, tip_length=self._get_tip_length())
+        await self.check_tip_threshold()
 
     async def invalidate_tip(self):
         await uf.invalidate_tip(self)

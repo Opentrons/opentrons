@@ -220,7 +220,6 @@ class CheckCalibrationCommand(CommandDefinition):
     compare_point = "comparePoint"
     switch_pipette = "switchPipette"
     return_tip = "returnTip"
-    check_tip = "checkTip"
 
     @staticmethod
     def namespace():
