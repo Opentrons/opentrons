@@ -31,8 +31,8 @@ from notify_server.models.sample_events import (
                                "val2": "egg"}],
                              # Use SampleOne schema on sample two type
                              [{"type": "SampleTwo",
-                               "data": {"val1": 123, "val2": "egg"}}],
-                         ])
+                               "data": {"val1": 123, "val2": "egg"}}]]
+                         )
 def test_bad_data_attribute(data: Dict[str, Any]) -> None:
     """Test that invalid data attribute will cause a validation error."""
     event = {
