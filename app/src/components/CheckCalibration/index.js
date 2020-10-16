@@ -34,12 +34,10 @@ import type {
   SessionCommandParams,
 } from '../../sessions/types'
 
-import { BadCalibration } from './BadCalibration'
-import { ResultsSummary } from './ResultsSummary'
-import type { CalibrationHealthCheckParentProps } from '../../sessions/types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
+import type { CalibrationHealthCheckParentProps } from './types'
 
-const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Robot calibration heatlh check'
+const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration heatlh check'
 const EXIT = 'exit'
 
 const darkContentsStyleProps = {
@@ -76,8 +74,7 @@ const PANEL_BY_STEP: {
   [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: SaveZPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: SaveXYPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: CompleteConfirmation,
-//   [Sessions.CHECK_STEP_BAD_CALIBRATION]: BadCalibration,
-//   [Sessions.CHECK_STEP_CHECK_COMPLETE]: ResultsSummary,
+  [Sessions.CHECK_STEP_CHECK_COMPLETE]: CompleteConfirmation,
 }
 
 const PANEL_STYLE_PROPS_BY_STEP: {
@@ -103,7 +100,7 @@ export function CheckHealthCalibration(
     dispatchRequests,
     showSpinner,
   } = props
-  const { currentStep, instrument, labware } = session?.details || {}
+  const { currentStep, activePipette, labware } = session?.details || {}
 
   const {
     showConfirmation: showConfirmExit,
@@ -114,9 +111,9 @@ export function CheckHealthCalibration(
   }, true)
 
   const isMulti = React.useMemo(() => {
-    const spec = instrument && getPipetteModelSpecs(instrument.model)
+    const spec = activePipette && getPipetteModelSpecs(activePipette.model)
     return spec ? spec.channels > 1 : false
-  }, [instrument])
+  }, [activePipette])
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
     if (session?.id) {
@@ -171,7 +168,7 @@ export function CheckHealthCalibration(
           cleanUpAndExit={cleanUpAndExit}
           tipRack={tipRack}
           isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase()}
+          mount={activePipette?.mount.toLowerCase()}
           currentStep={currentStep}
           sessionType={session.sessionType}
         />

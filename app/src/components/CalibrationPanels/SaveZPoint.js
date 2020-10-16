@@ -106,7 +106,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
   } else {
     continueCommands = () => {
       sendCommands(
-        { command: Sessions.calHealthCheck.COMPARE_POINT },
+        { command: Sessions.checkCommands.COMPARE_POINT },
         { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
       )
     }

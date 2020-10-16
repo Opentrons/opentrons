@@ -8,12 +8,12 @@ import { ThresholdValue } from './ThresholdValue'
 import { IndividualAxisDifferenceValue } from './DifferenceValue'
 
 import type { Axis } from '../../robot/types'
-import type { RobotCalibrationCheckComparison } from '../../sessions/types'
+import type { CalibrationHealthCheckComparison } from '../../sessions/types'
 
 import styles from './styles.css'
 
 type EndOfStepComparisonsProps = {|
-  comparison: RobotCalibrationCheckComparison,
+  comparison: CalibrationHealthCheckComparison,
   forAxes: Array<Axis>,
 |}
 

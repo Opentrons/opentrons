@@ -3,8 +3,6 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { PrimaryButton, OutlineButton } from '@opentrons/components'
 import find from 'lodash/find'
-import pick from 'lodash/pick'
-import partition from 'lodash/partition'
 import type { State } from '../../types'
 import * as Sessions from '../../sessions'
 import * as Calibration from '../../calibration'
@@ -16,9 +14,9 @@ import { getBadOutcomeHeader } from './utils'
 
 import type { CalibrationStatus } from '../../calibration/types'
 import type {
-  RobotCalibrationCheckComparisonsByStep,
-  RobotCalibrationCheckComparison,
-  RobotCalibrationCheckInstrument,
+  CalibrationHealthCheckComparisonByPipette,
+  CalibrationHealthCheckComparison,
+  CalibrationHealthCheckInstrument,
 } from '../../sessions/types'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
@@ -30,15 +28,15 @@ const STILL_HAVING_PROBLEMS =
 type ResultsSummaryProps = {|
   robotName: string,
   deleteSession: () => mixed,
-  comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
-  instrumentsByMount: { [mount: string]: RobotCalibrationCheckInstrument, ... },
+  comparisonsByPipette: CalibrationHealthCheckComparisonByPipette,
+  instrumentList: Array<CalibrationHealthCheckInstrument>,
 |}
 export function ResultsSummary(props: ResultsSummaryProps): React.Node {
   const {
     robotName,
     deleteSession,
-    comparisonsByStep,
-    instrumentsByMount,
+    comparisonsByPipette,
+    instrumentList,
   } = props
 
   const calibrationStatus = useSelector<State, CalibrationStatus | null>(
@@ -48,8 +46,8 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
   const handleDownloadButtonClick = () => {
     const now = new Date()
     const report = {
-      comparisonsByStep,
-      instrumentsByMount,
+      comparisonsByPipette,
+      instrumentList,
       calibrationStatus,
       savedAt: now.toISOString(),
     }
@@ -60,27 +58,36 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
   }
 
   const firstPipette = find(
-    instrumentsByMount,
-    (p: RobotCalibrationCheckInstrument) =>
+    instrumentList,
+    (p: CalibrationHealthCheckInstrument) =>
       p.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
   )
   const secondPipette = find(
-    instrumentsByMount,
-    (p: RobotCalibrationCheckInstrument) =>
+    instrumentList,
+    (p: CalibrationHealthCheckInstrument) =>
       p.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
   )
-  const [firstComparisonsByStep, secondComparisonsByStep] = partition(
-    Object.keys(comparisonsByStep),
-    compStep => Sessions.FIRST_PIPETTE_COMPARISON_STEPS.includes(compStep)
-  ).map(stepNames => pick(comparisonsByStep, stepNames))
+  const firstComparisonsByStep = comparisonsByPipette.first
+  const secondComparisonsByStep = comparisonsByPipette.second
 
   const lastFailedComparison = [
     ...Sessions.FIRST_PIPETTE_COMPARISON_STEPS,
-    ...Sessions.SECOND_PIPETTE_COMPARISON_STEPS,
-  ].reduce((acc, step): RobotCalibrationCheckComparison | null => {
-    const comparison = comparisonsByStep[step]
-    if (comparison && comparison.exceedsThreshold) {
-      return comparison
+  ].reduce((acc, step): CalibrationHealthCheckComparison | null => {
+    const first_pipette_comparison = comparisonsByPipette.first[step]
+    const second_pipette_comparison = comparisonsByPipette.second[step]
+    if (
+      second_pipette_comparison &&
+      second_pipette_comparison.exceedsThreshold
+    ) {
+      // We must first check if a comparison for the second
+      // pipette exists and return that, otherwise check
+      // the first pipette's steps.
+      return second_pipette_comparison
+    } else if (
+      first_pipette_comparison &&
+      first_pipette_comparison.exceedsThreshold
+    ) {
+      return first_pipette_comparison
     } else {
       return acc
     }
@@ -131,7 +138,7 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
 }
 
 type TroubleshootingInstructionsProps = {
-  comparison: RobotCalibrationCheckComparison,
+  comparison: CalibrationHealthCheckComparison,
 }
 function TroubleshootingInstructions(
   props: TroubleshootingInstructionsProps

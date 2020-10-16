@@ -2,19 +2,27 @@
 import type { Action } from '../../types'
 import type {
   SessionCommandParams,
-  PipetteOffsetCalibrationSession,
+  CalibrationCheckSession,
   CalibrationLabware,
+  RobotCalibrationCheckStep,
 } from '../../sessions/types'
 
-import type { PipetteOffsetCalibrationStep } from '../../sessions/pipette-offset-calibration/types'
-
 export type CalibrationHealthCheckParentProps = {|
-    robotName: string,
-    session: PipetteOffsetCalibrationSession | null,
-    closeWizard: () => void,
-    dispatchRequests: (
-      ...Array<{ ...Action, meta: { requestId: string } }>
-    ) => void,
-    showSpinner: boolean,
-    hasBlock?: boolean,
-  |}
+  robotName: string,
+  session: CalibrationCheckSession | null,
+  closeWizard: () => void,
+  dispatchRequests: (
+    ...Array<{ ...Action, meta: { requestId: string } }>
+  ) => void,
+  showSpinner: boolean,
+  hasBlock?: boolean,
+|}
+
+export type CalibrateHealthCheckChildProps = {|
+  sendSessionCommands: (...Array<SessionCommandParams>) => void,
+  deleteSession: () => void,
+  tipRackList: Array<CalibrationLabware>,
+  isMulti: boolean,
+  mount: string,
+  currentStep: RobotCalibrationCheckStep,
+|}

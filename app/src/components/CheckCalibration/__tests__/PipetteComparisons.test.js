@@ -4,8 +4,8 @@ import { mount } from 'enzyme'
 import * as Sessions from '../../../sessions'
 import * as Fixtures from '../../../sessions/__fixtures__'
 import type {
-  RobotCalibrationCheckComparisonsByStep,
-  RobotCalibrationCheckInstrument,
+  CalibrationHealthCheckComparisonsByStep,
+  CalibrationHealthCheckInstrument,
 } from '../../../sessions/types'
 import { PipetteComparisons } from '../PipetteComparisons'
 
@@ -22,11 +22,11 @@ describe('PipetteComparisons', () => {
 
   beforeEach(() => {
     render = ({
-      pipette = mockSessionDetails.instruments.right,
+      pipette = mockSessionDetails.activePipette,
       comparisonsByStep = mockSessionDetails.comparisonsByStep,
     }: {
-      pipette?: RobotCalibrationCheckInstrument,
-      comparisonsByStep?: RobotCalibrationCheckComparisonsByStep,
+      pipette?: CalibrationHealthCheckInstrument,
+      comparisonsByStep?: CalibrationHealthCheckComparisonsByStep,
     } = {}) => {
       return mount(
         <PipetteComparisons

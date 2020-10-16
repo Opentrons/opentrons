@@ -8,7 +8,7 @@ import { getBadOutcomeHeader } from './utils'
 import styles from './styles.css'
 import { EndOfStepComparison } from './EndOfStepComparisons'
 import { BadOutcomeBody } from './BadOutcomeBody'
-import type { CalibrationHealthCheckComparison } from './types'
+import type { CalibrationHealthCheckComparison } from '../../sessions/types'
 
 const EXIT_CHECK = 'Exit robot calibration check'
 
@@ -28,7 +28,7 @@ type CompareXYProps = {|
   exit: () => mixed,
   nextButtonText: string,
 |}
-export function CompareXY(props: CompareXYProps) {
+export function CompareXY(props: CompareXYProps): React.Node {
   const {
     comparison,
     pipetteModel,

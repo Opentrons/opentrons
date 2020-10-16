@@ -13,8 +13,8 @@ import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
 
 import type {
-  RobotCalibrationCheckInstrumentsByMount,
-  RobotCalibrationCheckComparisonsByStep,
+  CalibrationHealthCheckInstrument,
+  CalibrationHealthCheckComparisonByPipette,
 } from '../../../sessions/types'
 
 jest.mock('file-saver')
@@ -60,17 +60,17 @@ describe('ResultsSummary', () => {
     }
     mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
     render = ({
-      instrumentsByMount = mockSessionDetails.instruments,
+      instrumentList = mockSessionDetails.instruments,
       comparisonsByStep = mockSessionDetails.comparisonsByStep,
     }: {
-      instrumentsByMount?: RobotCalibrationCheckInstrumentsByMount,
-      comparisonsByStep?: RobotCalibrationCheckComparisonsByStep,
+      instrumentList?: Array<CalibrationHealthCheckInstrument>,
+      comparisonsByStep?: CalibrationHealthCheckComparisonByPipette,
     } = {}) => {
       return mount(
         <ResultsSummary
           robotName="robot-name"
-          instrumentsByMount={instrumentsByMount}
-          comparisonsByStep={comparisonsByStep}
+          instrumentList={instrumentList}
+          comparisonsByPipette={comparisonsByStep}
           deleteSession={mockDeleteSession}
         />,
         {

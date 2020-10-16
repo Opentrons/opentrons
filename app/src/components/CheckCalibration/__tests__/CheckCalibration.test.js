@@ -11,13 +11,15 @@ import * as Calibration from '../../../calibration'
 import * as Sessions from '../../../sessions'
 import * as RobotApi from '../../../robot-api'
 
-import { CheckCalibration } from '../index'
-import { Introduction } from '../Introduction'
-import { DeckSetup } from '../DeckSetup'
-import { TipPickUp } from '../TipPickUp'
-import { CheckXYPoint } from '../CheckXYPoint'
-import { CheckHeight } from '../CheckHeight'
-import { ResultsSummary } from '../ResultsSummary'
+import { CheckHealthCalibration } from '../index'
+import {
+  Introduction,
+  DeckSetup,
+  TipPickUp,
+  CheckXYPoint,
+  CheckHeight,
+  ResultsSummary,
+} from '../../CalibrationPanels'
 import { ConfirmExitModal } from '../ConfirmExitModal'
 
 import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
@@ -105,22 +107,12 @@ describe('CheckCalibration', () => {
   const SPECS: Array<CheckCalibrationSpec> = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
-    { component: TipPickUp, currentStep: 'preparingFirstPipette' },
-    { component: TipPickUp, currentStep: 'inspectingFirstTip' },
-    { component: TipPickUp, currentStep: 'preparingSecondPipette' },
-    { component: TipPickUp, currentStep: 'inspectingSecondTip' },
-    { component: CheckXYPoint, currentStep: 'joggingFirstPipetteToPointOne' },
-    { component: CheckXYPoint, currentStep: 'comparingFirstPipettePointOne' },
-    { component: CheckXYPoint, currentStep: 'joggingFirstPipetteToPointTwo' },
-    { component: CheckXYPoint, currentStep: 'comparingFirstPipettePointTwo' },
-    { component: CheckXYPoint, currentStep: 'joggingFirstPipetteToPointThree' },
-    { component: CheckXYPoint, currentStep: 'comparingFirstPipettePointThree' },
-    { component: CheckXYPoint, currentStep: 'joggingSecondPipetteToPointOne' },
-    { component: CheckXYPoint, currentStep: 'comparingSecondPipettePointOne' },
-    { component: CheckHeight, currentStep: 'joggingFirstPipetteToHeight' },
-    { component: CheckHeight, currentStep: 'comparingFirstPipetteHeight' },
-    { component: CheckHeight, currentStep: 'joggingSecondPipetteToHeight' },
-    { component: CheckHeight, currentStep: 'comparingSecondPipetteHeight' },
+    { component: TipPickUp, currentStep: 'preparingPipette' },
+    { component: TipPickUp, currentStep: 'inspectingTip' },
+    { component: CheckXYPoint, currentStep: 'comparingPointOne' },
+    { component: CheckXYPoint, currentStep: 'comparingPointTwo' },
+    { component: CheckXYPoint, currentStep: 'comparingPointThree' },
+    { component: CheckHeight, currentStep: 'comparingHeight' },
     { component: ResultsSummary, currentStep: 'sessionExited' },
     { component: ResultsSummary, currentStep: 'checkComplete' },
   ]
@@ -142,11 +134,16 @@ describe('CheckCalibration', () => {
       ...mockCalibrationCheckSessionAttributes,
     }
 
-    render = () => {
+    render = (props = {}) => {
+      const { showSpinner = false } = props
       return mount(
-        <CheckCalibration
+        <CheckHealthCalibration
           robotName="robot-name"
-          closeCalibrationCheck={mockCloseCalibrationCheck}
+          session={mockCalibrationCheckSession}
+          closeWizard={mockCloseCalibrationCheck}
+          dispatchRequests={jest.fn()}
+          showSpinner={showSpinner}
+          hasBlock={false}
         />,
         {
           wrappingComponent: Provider,

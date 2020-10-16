@@ -15,10 +15,10 @@ import { ThresholdValue } from './ThresholdValue'
 import styles from './styles.css'
 
 import type {
-  RobotCalibrationCheckInstrument,
+  CalibrationHealthCheckInstrument,
+  CalibrationHealthCheckComparisonsByStep,
+  CalibrationHealthCheckComparison,
   RobotCalibrationCheckStep,
-  RobotCalibrationCheckComparison,
-  RobotCalibrationCheckComparisonsByStep,
 } from '../../sessions/types'
 
 const PASS = 'pass'
@@ -47,8 +47,8 @@ const stepDisplayNameMap: { [RobotCalibrationCheckStep]: string, ... } = {
 }
 
 type PipetteComparisonsProps = {|
-  pipette: RobotCalibrationCheckInstrument,
-  comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
+  pipette: CalibrationHealthCheckInstrument,
+  comparisonsByStep: CalibrationHealthCheckComparisonsByStep,
   allSteps: Array<RobotCalibrationCheckStep>,
 |}
 
@@ -117,7 +117,7 @@ export function PipetteComparisons(props: PipetteComparisonsProps): React.Node {
 }
 
 type StepStatusProps = {|
-  comparison: RobotCalibrationCheckComparison | null,
+  comparison: CalibrationHealthCheckComparison | null,
 |}
 
 const StepStatus = (props: StepStatusProps): React.Node => {

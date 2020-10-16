@@ -8,6 +8,7 @@ import styles from './styles.css'
 import { getBadOutcomeHeader } from './utils'
 import { EndOfStepComparison } from './EndOfStepComparisons'
 import { BadOutcomeBody } from './BadOutcomeBody'
+import type { CalibrationHealthCheckComparison } from '../../sessions/types'
 
 const EXIT_CALIBRATION_CHECK = 'exit robot calibration check'
 
@@ -21,13 +22,13 @@ const INSPECTING_COMPARISON =
 const CONTINUE_BLURB = 'You may also continue forward to the next check.'
 
 type CompareZProps = {|
-  comparison: RobotCalibrationCheckComparison,
+  comparison: CalibrationHealthCheckComparison,
   goToNextCheck: () => void,
   pipetteModel: string,
   exit: () => mixed,
   nextButtonText: string,
 |}
-export function CompareZ(props: CompareZProps) {
+export function CompareZ(props: CompareZProps): React.Node {
   const {
     comparison,
     pipetteModel,

@@ -36,12 +36,13 @@ const getMountEventPropsFromCalibrationCheck: (
 ) => Types.AnalyticsModelsByMount = session => {
   const { instruments } = session.details
   const initialModelsByMount: $Shape<Types.AnalyticsModelsByMount> = {}
-  const modelsByMount: Types.AnalyticsModelsByMount = Object.keys(
-    instruments
-  ).reduce(
-    (acc: Types.AnalyticsModelsByMount, mount: string) => ({
+  const modelsByMount: Types.AnalyticsModelsByMount = instruments.reduce(
+    (
+      acc: Types.AnalyticsModelsByMount,
+      instrument: Types.CalibrationHealthCheckInstrument
+    ) => ({
       ...acc,
-      [`${mount.toLowerCase()}PipetteModel`]: instruments[mount].model,
+      [`${instrument.mount.toLowerCase()}PipetteModel`]: instrument.model,
     }),
     initialModelsByMount
   )
@@ -60,7 +61,32 @@ const getAnalyticsPropsFromCalibrationCheck: (
   const { comparisonsByStep, activePipette } = session.details
   const rank = activePipette.rank
   const initialStepData: $Shape<Types.CalibrationCheckAnalyticsData> = {}
-  const normalizedStepData = Object.keys(comparisonsByStep).reduce(
+  const normalizedStepDataFirstPip = Object.keys(
+    comparisonsByStep.first
+  ).reduce(
+    (
+      acc: Types.CalibrationCheckAnalyticsData,
+      stepName: Types.RobotCalibrationCheckStep
+    ) => {
+      const {
+        differenceVector,
+        thresholdVector,
+        exceedsThreshold,
+        transformType,
+      } = comparisonsByStep[rank][stepName]
+      return {
+        ...acc,
+        [`${stepName}DifferenceVector`]: differenceVector,
+        [`${stepName}ThresholdVector`]: thresholdVector,
+        [`${stepName}ExceedsThreshold`]: exceedsThreshold,
+        [`${stepName}ErrorSource`]: transformType,
+      }
+    },
+    initialStepData
+  )
+  const normalizedStepDataSecondPip = Object.keys(
+    comparisonsByStep.second
+  ).reduce(
     (
       acc: Types.CalibrationCheckAnalyticsData,
       stepName: Types.RobotCalibrationCheckStep
@@ -84,7 +110,8 @@ const getAnalyticsPropsFromCalibrationCheck: (
   return {
     ...getSharedAnalyticsPropsFromCalibrationCheck(session),
     ...getMountEventPropsFromCalibrationCheck(session),
-    ...normalizedStepData,
+    ...normalizedStepDataFirstPip,
+    ...normalizedStepDataSecondPip,
   }
 }
 
@@ -93,8 +120,9 @@ const getIntercomPropsFromCalibrationCheck: (
 ) => Types.CalibrationCheckSessionIntercomProps = session => {
   const { comparisonsByStep, activePipette } = session.details
   const rank = activePipette.rank
+  const comparisons = comparisonsByStep[rank]
   const initialStepData: $Shape<Types.CalibrationCheckIntercomData> = {}
-  const normalizedStepData = Object.keys(comparisonsByStep).reduce(
+  const normalizedStepData = Object.keys(comparisons).reduce(
     (
       acc: Types.CalibrationCheckIntercomData,
       stepName: Types.RobotCalibrationCheckStep
@@ -112,9 +140,7 @@ const getIntercomPropsFromCalibrationCheck: (
   )
 
   const succeeded = !some(
-    Object.keys(comparisonsByStep).map(k =>
-      Boolean(comparisonsByStep[rank][k].exceedsThreshold)
-    )
+    Object.keys(comparisons).map(k => Boolean(comparisons[k].exceedsThreshold))
   )
   return {
     ...getSharedAnalyticsPropsFromCalibrationCheck(session),
