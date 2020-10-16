@@ -8,7 +8,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ## OT-2 Software Changes in 3.21.2
 
-No changes - version bump only for synchronization with Opentrons App.
+### Fixes
+
+- Fixed an issue that could cause the API server to fail to boot if certain testing files were present
+
+&nbsp;
 
 ---
 
