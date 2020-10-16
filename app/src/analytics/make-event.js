@@ -7,6 +7,8 @@ import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
 import * as Sessions from '../sessions'
+import * as Alerts from '../alerts'
+
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,
@@ -17,6 +19,8 @@ import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
 
 const log = createLogger(__filename)
+
+const EVENT_APP_UPDATE_DISMISSED = 'appUpdateDismissed'
 
 export function makeEvent(
   action: Action,
@@ -286,6 +290,19 @@ export function makeEvent(
       } else {
         return Promise.resolve(null)
       }
+    }
+
+    case Alerts.ALERT_DISMISSED: {
+      const { alertId, remember } = action.payload
+
+      if (alertId === Alerts.ALERT_APP_UPDATE_AVAILABLE) {
+        return Promise.resolve({
+          name: EVENT_APP_UPDATE_DISMISSED,
+          properties: { updatesIgnored: remember },
+        })
+      }
+
+      return Promise.resolve(null)
     }
   }
 
