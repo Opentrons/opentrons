@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
-import { getFeatureFlags } from '../../config'
 
 import {
   Icon,
@@ -38,10 +37,6 @@ export type CheckCalibrationControlProps = {|
 
 const CAL_HEALTH_CHECK = 'Calibration Health Check'
 const CHECK_HEALTH = 'check health'
-const CHECK = 'check'
-const CHECK_ROBOT_CAL = 'Check robot calibration'
-const CHECK_ROBOT_CAL_DESCRIPTION =
-  "Check the robot's calibration status and diagnose common pipette positioning problems."
 const CAL_HEALTH_CHECK_DESCRIPTION =
   'Check the calibration settings for your robot.'
 const COULD_NOT_START = 'Could not start Robot Calibration Check'
@@ -71,43 +66,32 @@ export function CheckCalibrationControl({
   const buttonDisabled =
     Boolean(disabledReason) || requestStatus === RobotApi.PENDING
 
-  const ff = useSelector(getFeatureFlags)
-
   React.useEffect(() => {
     if (requestStatus === RobotApi.SUCCESS) setShowWizard(true)
   }, [requestStatus])
 
-  const titleContent: boolean => string = useNewContent =>
-    useNewContent ? CAL_HEALTH_CHECK : CHECK_ROBOT_CAL
-  const descriptionContent: boolean => React.Node = useNewContent =>
-    useNewContent ? (
-      <Text>{CAL_HEALTH_CHECK_DESCRIPTION}</Text>
+  const buttonChildren =
+    requestStatus !== RobotApi.PENDING ? (
+      <Text>{CHECK_HEALTH}</Text>
     ) : (
-      <Text>{CHECK_ROBOT_CAL_DESCRIPTION}</Text>
+      <Icon name="ot-spinner" height="1em" spin />
     )
-  const buttonChildren: boolean => React.Node =
-    requestStatus !== RobotApi.PENDING
-      ? useNewContent =>
-          useNewContent ? <Text>{CHECK_HEALTH}</Text> : <Text>{CHECK}</Text>
-      : _ => <Icon name="ot-spinner" height="1em" spin />
-  const buttonWidth: boolean => string = useNewContent =>
-    useNewContent ? '12rem' : '9rem'
 
   // TODO(mc, 2020-06-17): extract alert presentational stuff
   return (
     <>
       <TitledControl
         borderBottom={BORDER_SOLID_LIGHT}
-        title={titleContent(Boolean(ff.enableCalibrationOverhaul))}
-        description={descriptionContent(Boolean(ff.enableCalibrationOverhaul))}
+        title={CAL_HEALTH_CHECK}
+        description={CAL_HEALTH_CHECK_DESCRIPTION}
         control={
           <SecondaryBtn
             {...targetProps}
-            width={buttonWidth(Boolean(ff.enableCalibrationOverhaul))}
+            width="12rem"
             onClick={ensureSession}
             disabled={buttonDisabled}
           >
-            {buttonChildren(Boolean(ff.enableCalibrationOverhaul))}
+            {buttonChildren}
           </SecondaryBtn>
         }
       >

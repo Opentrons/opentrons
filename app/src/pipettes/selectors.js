@@ -22,7 +22,6 @@ import {
   filterTipLengthForPipetteAndTiprack,
   tipLengthExistsForPipetteAndTiprack,
 } from '../calibration/tip-length'
-import { getFeatureFlags } from '../config'
 import type { PipetteOffsetCalibration } from '../calibration/types'
 import * as Constants from './constants'
 import * as Types from './types'
@@ -149,13 +148,7 @@ export const getProtocolPipettesInfo: (
   getAttachedPipettes,
   getProtocolPipettes,
   getPipetteOffsetCalibrations,
-  getFeatureFlags,
-  (
-    attachedByMount,
-    protocolPipettes,
-    pipetteOffsetCalibrations,
-    featureFlags
-  ) => {
+  (attachedByMount, protocolPipettes, pipetteOffsetCalibrations) => {
     const pipetteHasOffset = (
       calibrations: Array<PipetteOffsetCalibration>,
       serial: string
@@ -201,14 +194,13 @@ export const getProtocolPipettesInfo: (
                   displayName: actualModelSpecs.displayName,
                 }
               : null,
-          needsOffsetCalibration: !featureFlags.enableCalibrationOverhaul
-            ? false
-            : actualPipette &&
-              protocolPipette &&
-              actualModelSpecs &&
-              compatibility !== Constants.INCOMPATIBLE
-            ? !pipetteHasOffset(pipetteOffsetCalibrations, actualPipette.id)
-            : false,
+          needsOffsetCalibration:
+            actualPipette &&
+            protocolPipette &&
+            actualModelSpecs &&
+            compatibility !== Constants.INCOMPATIBLE
+              ? !pipetteHasOffset(pipetteOffsetCalibrations, actualPipette.id)
+              : false,
         }
 
         return result

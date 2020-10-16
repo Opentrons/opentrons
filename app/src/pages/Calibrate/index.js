@@ -4,12 +4,10 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom'
 
-import type { FeatureFlags } from '../../config/types'
 import type { State, Dispatch } from '../../types'
 import type { Pipette, Labware, NextTiprackPipetteInfo } from '../../robot'
 
 import { getConnectedRobot } from '../../discovery'
-import { getFeatureFlags } from '../../config'
 
 import { selectors as robotSelectors } from '../../robot'
 import { getUncalibratedTipracksByMount } from '../../pipettes/selectors'
@@ -24,7 +22,6 @@ type SP = {|
   nextLabware: Labware | void,
   isTipsProbed: boolean,
   nextPipetteTiprack: NextTiprackPipetteInfo | null,
-  featureFlags: FeatureFlags,
 |}
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
@@ -65,29 +62,14 @@ function mapStateToProps(state: State): SP {
           getUncalibratedTipracksByMount(state, robotName)
         )
       : null,
-    featureFlags: getFeatureFlags(state),
   }
 }
 
 function getRedirectUrl(props: Props): string {
-  const {
-    nextPipette,
-    labware,
-    nextLabware,
-    isTipsProbed,
-    nextPipetteTiprack,
-    featureFlags,
-  } = props
+  const { labware, nextLabware, nextPipetteTiprack } = props
 
-  if (
-    featureFlags.enableCalibrationOverhaul &&
-    nextPipetteTiprack &&
-    nextPipetteTiprack.tiprack.definitionHash
-  ) {
+  if (nextPipetteTiprack && nextPipetteTiprack.tiprack.definitionHash) {
     return `/calibrate/pipettes/${nextPipetteTiprack.mount}/${nextPipetteTiprack.tiprack.definitionHash}`
-  }
-  if (!featureFlags.enableCalibrationOverhaul && !isTipsProbed && nextPipette) {
-    return `/calibrate/pipettes/${nextPipette.mount}`
   }
 
   if (nextLabware) return `/calibrate/labware/${nextLabware.slot}`
