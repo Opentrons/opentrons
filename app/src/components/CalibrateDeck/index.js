@@ -98,6 +98,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     closeWizard,
     dispatchRequests,
     showSpinner,
+    isJogging,
   } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
@@ -115,7 +116,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
   }, [instrument])
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
-    if (session?.id) {
+    if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,

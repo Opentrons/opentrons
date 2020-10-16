@@ -33,9 +33,10 @@ export function useCalibratePipetteOffset(
 ): [Invoker, React.Node | null] {
   const [showWizard, setShowWizard] = React.useState(false)
 
-  const trackedRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
+  const jogRequestId = React.useRef<string | null>(null)
+  const spinnerRequestId = React.useRef<string | null>(null)
 
   const pipOffsetCalSession: PipetteOffsetCalibrationSession | null = useSelector(
     (state: State) => {
@@ -53,20 +54,26 @@ export function useCalibratePipetteOffset(
       ) {
         deleteRequestId.current = dispatchedAction.meta.requestId
       } else if (
+        dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
+        dispatchedAction.payload.command.command ===
+          Sessions.sharedCalCommands.JOG
+      ) {
+        jogRequestId.current = dispatchedAction.meta.requestId
+      } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
-        trackedRequestId.current = dispatchedAction.meta.requestId
+        spinnerRequestId.current = dispatchedAction.meta.requestId
       }
     }
   )
 
   const showSpinner =
     useSelector<State, RequestState | null>(state =>
-      trackedRequestId.current
-        ? RobotApi.getRequestById(state, trackedRequestId.current)
+      spinnerRequestId.current
+        ? RobotApi.getRequestById(state, spinnerRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
@@ -83,6 +90,13 @@ export function useCalibratePipetteOffset(
         ? RobotApi.getRequestById(state, createRequestId.current)
         : null
     )?.status === RobotApi.SUCCESS
+
+  const isJogging =
+    useSelector((state: State) =>
+      jogRequestId.current
+        ? RobotApi.getRequestById(state, jogRequestId.current)
+        : null
+    )?.status === RobotApi.PENDING
 
   const closeWizard = React.useCallback(() => {
     onComplete && onComplete()
@@ -106,7 +120,9 @@ export function useCalibratePipetteOffset(
     hasCalibrationBlock = false,
     tipRackDefinition = null,
   } = sessionParams
-  const handleStartPipOffsetCalSession: Invoker = overrideParams => {
+  const handleStartPipOffsetCalSession: Invoker = (
+    overrideParams: $Shape<PipetteOffsetCalibrationSessionParams> | void = {}
+  ) => {
     dispatchRequests(
       Sessions.ensureSession(
         robotName,
@@ -132,6 +148,7 @@ export function useCalibratePipetteOffset(
           closeWizard={closeWizard}
           showSpinner={showSpinner}
           dispatchRequests={dispatchRequests}
+          isJogging={isJogging}
         />
       </Portal>
     ) : null,

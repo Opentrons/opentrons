@@ -58,6 +58,7 @@ export function CalibrateTipLengthControl({
   const trackedRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
+  const jogRequestId = React.useRef<string | null>(null)
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -68,6 +69,12 @@ export function CalibrateTipLengthControl({
         calibrationSession?.id === dispatchedAction.payload.sessionId
       ) {
         deleteRequestId.current = dispatchedAction.meta.requestId
+      } else if (
+        dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
+        dispatchedAction.payload.command.command ===
+          Sessions.sharedCalCommands.JOG
+      ) {
+        jogRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
@@ -142,6 +149,13 @@ export function CalibrateTipLengthControl({
         : null
     )?.status === RobotApi.SUCCESS
 
+  const isJogging =
+    useSelector((state: State) =>
+      jogRequestId.current
+        ? RobotApi.getRequestById(state, jogRequestId.current)
+        : null
+    )?.status === RobotApi.PENDING
+
   React.useEffect(() => {
     if (shouldOpen) {
       setShowWizard(true)
@@ -201,6 +215,7 @@ export function CalibrateTipLengthControl({
               closeWizard={handleCloseWizard}
               showSpinner={showSpinner}
               dispatchRequests={dispatchRequests}
+              isJogging={isJogging}
             />
           ) : (
             <CalibrateTipLength
@@ -209,6 +224,7 @@ export function CalibrateTipLengthControl({
               closeWizard={handleCloseWizard}
               showSpinner={showSpinner}
               dispatchRequests={dispatchRequests}
+              isJogging={isJogging}
             />
           )}
         </Portal>

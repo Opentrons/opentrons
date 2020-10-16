@@ -16,6 +16,7 @@ export type CalibratePipetteOffsetParentProps = {|
     ...Array<{ ...Action, meta: { requestId: string } }>
   ) => void,
   showSpinner: boolean,
+  isJogging: boolean,
 |}
 
 export type CalibratePipetteOffsetChildProps = {|

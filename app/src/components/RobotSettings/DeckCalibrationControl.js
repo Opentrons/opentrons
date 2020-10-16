@@ -82,6 +82,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
   const trackedRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
+  const jogRequestId = React.useRef<string | null>(null)
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -92,6 +93,12 @@ export function DeckCalibrationControl(props: Props): React.Node {
         deckCalibrationSession?.id === dispatchedAction.payload.sessionId
       ) {
         deleteRequestId.current = dispatchedAction.meta.requestId
+      } else if (
+        dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
+        dispatchedAction.payload.command.command ===
+          Sessions.sharedCalCommands.JOG
+      ) {
+        jogRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
@@ -123,6 +130,13 @@ export function DeckCalibrationControl(props: Props): React.Node {
         ? RobotApi.getRequestById(state, createRequestId.current)
         : null
     )?.status === RobotApi.SUCCESS
+
+  const isJogging =
+    useSelector((state: State) =>
+      jogRequestId.current
+        ? RobotApi.getRequestById(state, jogRequestId.current)
+        : null
+    )?.status === RobotApi.PENDING
 
   React.useEffect(() => {
     if (shouldOpen) {
@@ -214,6 +228,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
             closeWizard={() => setShowWizard(false)}
             dispatchRequests={dispatchRequests}
             showSpinner={showSpinner}
+            isJogging={isJogging}
           />
         </Portal>
       )}

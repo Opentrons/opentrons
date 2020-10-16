@@ -10,4 +10,5 @@ export type CalibrateDeckParentProps = {|
     ...Array<{ ...Action, meta: { requestId: string } }>
   ) => void,
   showSpinner: boolean,
+  isJogging: boolean,
 |}

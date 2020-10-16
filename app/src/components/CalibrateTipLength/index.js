@@ -99,6 +99,7 @@ export function CalibrateTipLength(
     closeWizard,
     showSpinner,
     dispatchRequests,
+    isJogging,
   } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
@@ -114,7 +115,7 @@ export function CalibrateTipLength(
     : null
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
-    if (session?.id) {
+    if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,

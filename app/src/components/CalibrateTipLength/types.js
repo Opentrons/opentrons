@@ -11,4 +11,5 @@ export type CalibrateTipLengthParentProps = {|
     ...Array<{ ...Action, meta: { requestId: string } }>
   ) => void,
   showSpinner: boolean,
+  isJogging: boolean,
 |}
