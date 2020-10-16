@@ -1,13 +1,11 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { useSelector } from 'react-redux'
 
 import { Icon, PrimaryBtn, ModalPage, SPACING_2 } from '@opentrons/components'
 import { getDiagramsSrc } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
-import { getFeatureFlags } from '../../config'
 
 import type {
   PipetteNameSpecs,
@@ -51,8 +49,6 @@ export function ConfirmPipette(props: Props): React.Node {
     back,
   } = props
 
-  const ff = useSelector(getFeatureFlags)
-
   return (
     <ModalPage
       titleBar={{
@@ -65,10 +61,9 @@ export function ConfirmPipette(props: Props): React.Node {
       <StatusDetails {...props} />
       {!success && <TryAgainButton {...props} />}
       {success && !actualPipette && <AttachAnotherButton {...props} />}
-      {ff.enableCalibrationOverhaul &&
-        success &&
-        actualPipette &&
-        !actualPipetteOffset && <CalibratePipetteOffsetButton {...props} />}
+      {success && actualPipette && !actualPipetteOffset && (
+        <CalibratePipetteOffsetButton {...props} />
+      )}
       <ExitButton {...props} />
     </ModalPage>
   )

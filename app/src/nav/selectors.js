@@ -10,7 +10,6 @@ import { selectors as RobotSelectors } from '../robot'
 import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
 import { getU2EWindowsDriverStatus, OUTDATED } from '../system-info'
-import { getFeatureFlags } from '../config'
 import { getDeckCalibrationStatus, DECK_CAL_STATUS_OK } from '../calibration'
 
 import type { State } from '../types'
@@ -69,10 +68,6 @@ const getConnectedRobotUpdateAvailable = (state: State): boolean => {
 }
 
 const getDeckCalibrationOk = (state: State): boolean => {
-  const ff = getFeatureFlags(state)
-  if (!ff.enableCalibrationOverhaul) {
-    return true
-  }
   const connectedRobot = getConnectedRobot(state)
   const deckCalStatus = connectedRobot
     ? getDeckCalibrationStatus(state, connectedRobot.name)
@@ -173,8 +168,7 @@ export const getRunLocation: State => NavLocation = createSelector(
 export const getMoreLocation: State => NavLocation = createSelector(
   getAvailableShellUpdate,
   getU2EWindowsDriverStatus,
-  getFeatureFlags,
-  (appUpdate, driverStatus, flags) => {
+  (appUpdate, driverStatus) => {
     let notificationReason = null
     if (appUpdate) {
       notificationReason = APP_UPDATE_AVAILABLE

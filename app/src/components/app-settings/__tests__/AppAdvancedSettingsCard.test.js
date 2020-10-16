@@ -60,7 +60,6 @@ describe('AppAdvancedSettingsCard', () => {
     ])
     getFeatureFlags.mockReturnValue({
       enableBundleUpload: false,
-      enableCalibrationOverhaul: true,
     })
   })
 

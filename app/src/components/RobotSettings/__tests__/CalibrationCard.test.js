@@ -111,7 +111,6 @@ describe('CalibrationCard', () => {
     jest.useFakeTimers()
     getDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
     getFeatureFlags.mockReturnValue({
-      enableCalibrationOverhaul: true,
       allPipetteConfig: false,
       enableBundleUpload: false,
     })
