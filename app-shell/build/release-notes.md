@@ -6,6 +6,16 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 3.21.2
+
+### Fixes
+
+- Fixed an issue that prevented fresh installations of the app from downloading robot updates from our release server
+
+&nbsp;
+
+---
+
 ## Opentrons App Changes in 3.21.1
 
 ### Features
