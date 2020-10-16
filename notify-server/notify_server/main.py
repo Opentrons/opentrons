@@ -2,6 +2,7 @@
 
 import logging
 import asyncio
+from . import server
 
 from notify_server.logging import initialize_logging
 from notify_server.settings import Settings
@@ -15,6 +16,7 @@ async def run() -> None:
     settings = Settings()
     initialize_logging(settings.production)
     log.info(settings)
+    await server.run(settings)
 
 
 if __name__ == '__main__':
