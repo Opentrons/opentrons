@@ -124,9 +124,14 @@ def load_attitude_matrix() -> DeckCalibration:
                                             lw_hash=None)
             calibration_data = get.get_robot_deck_attitude()
 
+    deck_cal_obj = None
     if calibration_data:
-        deck_cal_obj = DeckCalibration(**calibration_data)
-    else:
+        try:
+            deck_cal_obj = DeckCalibration(**calibration_data)
+        except Exception as e:
+            log.warning(f"Bad deck calibration, falling back to identity: {e}")
+
+    if not deck_cal_obj:
         deck_cal_obj = DeckCalibration(
             attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2)
     return deck_cal_obj
