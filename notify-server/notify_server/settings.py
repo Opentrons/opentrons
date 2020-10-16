@@ -13,7 +13,7 @@ class ServerBindAddress(BaseModel):
 class Settings(BaseSettings):
     """Application Settings."""
 
-    publisher_address: ServerBindAddress = ServerBindAddress(scheme="ipc",
+    publisher_address: ServerBindAddress = ServerBindAddress(scheme="tcp",
                                                              port=5555)
     subscriber_address: ServerBindAddress = ServerBindAddress(scheme="tcp",
                                                               port=5556)
