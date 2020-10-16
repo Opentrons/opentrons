@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.21.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2-alpha.0) (2020-10-16)
+
+
+### Bug Fixes
+
+* **app-shell:** ensure robot update download folder exists before caching manifest ([#6787](https://github.com/Opentrons/opentrons/issues/6787)) ([200b3d5](https://github.com/Opentrons/opentrons/commit/200b3d5)), closes [#6786](https://github.com/Opentrons/opentrons/issues/6786)
+
+
+
+
+
 ## [3.21.1](https://github.com/Opentrons/opentrons/compare/v3.21.0...v3.21.1) (2020-10-14)
 
 **Note:** Version bump only for package @opentrons/app-shell

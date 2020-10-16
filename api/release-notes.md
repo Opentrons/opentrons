@@ -6,6 +6,12 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## OT-2 Software Changes in 3.21.2
+
+No changes - version bump only for synchronization with Opentrons App.
+
+---
+
 ## OT-2 Software Changes in 3.21.1
 
 No changes - version bump only for synchronization with Opentrons App.
