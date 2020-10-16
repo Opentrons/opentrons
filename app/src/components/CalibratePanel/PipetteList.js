@@ -80,7 +80,7 @@ export function PipetteListComponent(
           return url.path
         }
         return (
-          <>
+          <React.Fragment key={`${mount}`}>
             <Flex key={`${mount} box`}>
               <Text
                 key={`${mount} key`}
@@ -112,7 +112,7 @@ export function PipetteListComponent(
                   )
                 })
               : null}
-          </>
+          </React.Fragment>
         )
       })}
     </TitledList>
