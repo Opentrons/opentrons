@@ -7,7 +7,7 @@ from asyncio import Queue
 from zmq.asyncio import Context  # type: ignore
 import zmq  # type: ignore
 
-from notify_server.settings import Settings, ServerBindAddress
+from notify_server.settings import Settings
 
 log = logging.getLogger(__name__)
 
@@ -57,22 +57,19 @@ async def _subscriber_server_task(address: str, queue: Queue) -> None:
         await sock.send_multipart(s)
 
 
-def _to_zmq_address(address: ServerBindAddress) -> str:
-    """Create a zmq bind address from a ServerBindAddress."""
-    return f"{address.scheme}://*:{address.port}"
-
-
 async def run(settings: Settings) -> None:
     """Run the server tasks. Will not return."""
     queue: Queue = Queue()
 
     subtask = asyncio.create_task(
-        _subscriber_server_task(_to_zmq_address(settings.subscriber_address),
-                                queue)
+        _subscriber_server_task(
+            settings.subscriber_address.connection_string(), queue
+        )
     )
     pubtask = asyncio.create_task(
-        _publisher_server_task(_to_zmq_address(settings.publisher_address),
-                               queue)
+        _publisher_server_task(
+            settings.publisher_address.connection_string(), queue
+        )
     )
     await subtask
     await pubtask
