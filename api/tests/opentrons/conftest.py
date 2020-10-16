@@ -28,8 +28,7 @@ from opentrons.legacy_api.instruments.pipette import Pipette
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
 from opentrons.data_storage import database_migration
-from opentrons import config, types
-from opentrons.deck_calibration import endpoints
+from opentrons import config
 from opentrons import hardware_control as hc
 from opentrons.hardware_control import API, ThreadManager, ThreadedAsyncLock
 from opentrons.protocol_api import ProtocolContext
@@ -232,19 +231,6 @@ async def toggle_new_calibration(request):
             'enableTipLengthCalibration', False)
     else:
         yield
-
-
-@pytest.fixture
-async def dc_session(request, hardware, monkeypatch, loop):
-    """
-    Mock session manager for deck calibation
-    """
-    await hardware.cache_instruments({
-        types.Mount.RIGHT: 'p300_multi'})
-    ses = endpoints.SessionManager(hardware)
-    endpoints.session_wrapper.session = ses
-    yield ses
-    endpoints.session_wrapper.session = None
 
 
 @pytest.fixture(params=["dinosaur.py"])

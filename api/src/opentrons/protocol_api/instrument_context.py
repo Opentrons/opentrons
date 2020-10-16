@@ -7,7 +7,6 @@ from typing import (
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
 from opentrons.hardware_control.types import CriticalPoint, PipettePair
-from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.protocols.api_support.util import (
@@ -1527,14 +1526,11 @@ class InstrumentContext(CommandPublisher):
             tip_length = tiprack.tip_length
             return tip_length - tip_overlap
 
-        if not enable_calibration_overhaul():
+        try:
+            parent = first_parent(tiprack) or ''
+            return get.load_tip_length_calibration(
+                self.hw_pipette['pipette_id'],
+                tiprack._implementation.get_definition(),
+                parent)['tipLength']
+        except TipLengthCalNotFound:
             return _build_length_from_overlap()
-        else:
-            try:
-                parent = first_parent(tiprack) or ''
-                return get.load_tip_length_calibration(
-                    self.hw_pipette['pipette_id'],
-                    tiprack._implementation.get_definition(),
-                    parent)['tipLength']
-            except TipLengthCalNotFound:
-                return _build_length_from_overlap()

@@ -139,7 +139,7 @@ async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
     # The home position from hardware_control/simulator.py, taking into account
     # that the right pipette is a p10 single which is a different height than
     # the reference p300 single
-    assert test_args[0].point == Point(418, 353, 205)
+    assert test_args[0].point == Point(418, 353, 230)
     assert test_args[0].labware is None
 
     # Once we have a location cache, that should be our from_loc
@@ -210,21 +210,21 @@ def test_pick_up_and_drop_tip(loop, get_labware_def):
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
 
     pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
-    model_offset = Point(*pipette.config.model_offset)
-    assert pipette.critical_point() == model_offset
+    nozzle_offset = Point(*pipette.config.nozzle_offset)
+    assert pipette.critical_point() == nozzle_offset
     target_location = tiprack['A1'].top()
 
     instr.pick_up_tip(target_location)
     assert not tiprack.wells()[0].has_tip
     overlap = instr.hw_pipette['tip_overlap'][tiprack.uri]
-    new_offset = model_offset - Point(0, 0,
-                                      tip_length-overlap)
+    new_offset = nozzle_offset - Point(0, 0,
+                                       tip_length-overlap)
     assert pipette.critical_point() == new_offset
     assert pipette.has_tip
 
     instr.drop_tip(target_location)
     assert not pipette.has_tip
-    assert pipette.critical_point() == model_offset
+    assert pipette.critical_point() == nozzle_offset
 
 
 def test_return_tip_old_version(loop, get_labware_def):
@@ -325,8 +325,8 @@ def test_pick_up_tip_no_location(loop, get_labware_def,
         pipette_model, mount, tip_racks=[tiprack1, tiprack2])
 
     pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
-    model_offset = Point(*pipette.config.model_offset)
-    assert pipette.critical_point() == model_offset
+    nozzle_offset = Point(*pipette.config.nozzle_offset)
+    assert pipette.critical_point() == nozzle_offset
 
     instr.pick_up_tip()
 
@@ -334,14 +334,14 @@ def test_pick_up_tip_no_location(loop, get_labware_def,
                                          for cmd in ctx.commands()])
     assert not tiprack1.wells()[0].has_tip
     overlap = instr.hw_pipette['tip_overlap'][tiprack1.uri]
-    new_offset = model_offset - Point(0, 0,
-                                      tip_length1-overlap)
+    new_offset = nozzle_offset - Point(0, 0,
+                                       tip_length1-overlap)
     assert pipette.critical_point() == new_offset
 
     # TODO: remove argument and verify once trash container is added
     instr.drop_tip(tiprack1.wells()[0].top())
     assert not pipette.has_tip
-    assert pipette.critical_point() == model_offset
+    assert pipette.critical_point() == nozzle_offset
 
     for well in tiprack1.wells():
         if well.has_tip:

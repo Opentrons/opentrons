@@ -64,7 +64,7 @@ class PipetteOffsetCalibrationUserFlow:
 
         self._hardware = hardware
         self._mount = mount
-        self._has_calibration_block = has_calibration_block
+
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:
             raise RobotServerError(
@@ -88,17 +88,21 @@ class PipetteOffsetCalibrationUserFlow:
 
         existing_offset_calibration = self._get_stored_pipette_offset_cal()
         self._load_tip_rack(tip_rack_def, existing_offset_calibration)
-        if recalibrate_tip_length and has_calibration_block:
-            self._load_calibration_block()
 
         existing_tip_length_calibration = self._get_stored_tip_length_cal()
+        perform_tip_length = recalibrate_tip_length \
+            or not existing_tip_length_calibration
+
+        if perform_tip_length and has_calibration_block:
+            self._load_calibration_block()
+            self._has_calibration_block = has_calibration_block
+        else:
+            self._has_calibration_block = False
 
         self._has_calibrated_tip_length: bool =\
             (self._get_stored_tip_length_cal() is not None
              or self._using_default_tiprack)
 
-        perform_tip_length = recalibrate_tip_length \
-            or not existing_tip_length_calibration
         if perform_tip_length:
             self._state_machine: PipetteOffsetStateMachine =\
                 PipetteOffsetWithTipLengthStateMachine()

@@ -173,39 +173,53 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
 
 
 @pytest.mark.parametrize(
-    'existing_poc,existing_tlc,recalibrate,trd,whichdef,dotip', [
+    'existing_poc,existing_tlc,recalibrate,trd,whichdef,dotip,'
+    'hasblock,useblock',
+    [
         # If we otherwise have everything we need, follow the argument
         (build_mock_stored_pipette_offset(),
          build_mock_stored_tip_length(),
-         True, None, 'stored', True),
+         True, None, 'stored', True, True, True),
         (build_mock_stored_pipette_offset(),
          build_mock_stored_tip_length(),
-         False, None, 'stored', False),
+         True, None, 'stored', True, False, False),
+        (build_mock_stored_pipette_offset(),
+         build_mock_stored_tip_length(),
+         False, None, 'stored', False, True, False),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length(),
-         False, LW_DEFINITION, 'specified', False),
+         False, LW_DEFINITION, 'specified', False, True, False),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length(),
-         True, LW_DEFINITION, 'specified', True),
+         True, LW_DEFINITION, 'specified', True, True, True),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length(),
-         True, None, 'default', True),
+         True, LW_DEFINITION, 'specified', True, False, False),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length(),
-         True, None, 'default', True),
+         True, None, 'default', True, True, True),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length(),
+         True, None, 'default', True, False, False),
         # In all cases where we cannot resolve a TLC for this
         # labware, recalibrate tip length
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length('empty'),
-         False, LW_DEFINITION, 'specified', True),
+         False, LW_DEFINITION, 'specified', True, True, True),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length('empty'),
-         False, None, 'default', True),
+         False, LW_DEFINITION, 'specified', True, False, False,),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length('empty'),
+         False, None, 'default', True, True, True),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length('empty'),
+         False, None, 'default', True, False, False),
     ]
 )
-def test_recalibrate_options(mock_hw,
-                             existing_poc, existing_tlc, recalibrate,
-                             trd, whichdef, dotip):
+def test_create_params(mock_hw,
+                       existing_poc, existing_tlc, recalibrate,
+                       trd, whichdef, dotip, hasblock, useblock):
     with patch.object(
             PipetteOffsetCalibrationUserFlow,
             '_get_stored_tip_length_cal',
@@ -218,21 +232,26 @@ def test_recalibrate_options(mock_hw,
             hardware=mock_hw, mount=Mount.RIGHT,
             recalibrate_tip_length=recalibrate,
             tip_rack_def=trd,
-            has_calibration_block=False)
+            has_calibration_block=hasblock)
         assert m.should_perform_tip_length == dotip
+        tiprack = next(
+                lw for lw in m.get_required_labware() if lw.isTiprack)
         if whichdef == 'stored':
-            required = m.get_required_labware()[0]
-            assert required.loadName == 'opentrons_96_filtertiprack_200ul'
-            assert required.version == '1'
+            assert tiprack.loadName == 'opentrons_96_filtertiprack_200ul'
+            assert tiprack.version == '1'
         elif whichdef == 'default':
-            assert m.get_required_labware()[0].loadName\
+            assert tiprack.loadName\
                 == 'opentrons_96_tiprack_300ul'
         elif whichdef == 'specified':
-            required = m.get_required_labware()[0]
-            assert required.loadName == 'opentrons_96_filtertiprack_200ul'
-            assert required.version == '2'
+            assert tiprack.loadName == 'opentrons_96_filtertiprack_200ul'
+            assert tiprack.version == '2'
         else:
             assert False, 'you messed up the param spec'
+        assert m._has_calibration_block == useblock
+        assert any('calibration'
+                   in lw.loadName
+                   for lw in m.get_required_labware()
+                   if lw) == useblock
 
 
 async def test_move_to_tip_rack(mock_user_flow):

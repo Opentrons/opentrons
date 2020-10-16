@@ -249,25 +249,14 @@ def test_modify_pipette_settings_failure(api_client, mock_pipette_config):
     assert patch_body == {'message': "Failed!"}
 
 
-def test_available_resets(
-        api_client, apiclient_disable_calibration_overhaul):
+def test_available_resets(api_client):
     resp = api_client.get('/settings/reset/options')
     body = resp.json()
     options_list = body.get('options')
     assert resp.status_code == 200
-    assert sorted(['tipProbe', 'labwareCalibration', 'bootScripts'])\
-        == sorted([item['id'] for item in options_list])
-
-
-def test_available_resets_overhaul(
-        api_client, apiclient_enable_calibration_overhaul):
-    resp = api_client.get('/settings/reset/options')
-    body = resp.json()
-    options_list = body.get('options')
-    assert resp.status_code == 200
-    assert sorted(
-        ['pipetteOffsetCalibrations', 'labwareCalibration', 'bootScripts',
-         'deckCalibration', 'tipLengthCalibrations'])\
+    assert sorted(['deckCalibration', 'pipetteOffsetCalibrations',
+                   'labwareCalibration', 'bootScripts',
+                   'tipLengthCalibrations'])\
         == sorted([item['id'] for item in options_list])
 
 
@@ -276,39 +265,6 @@ def mock_reset():
     with patch("robot_server.service.legacy.routers."
                "settings.reset_util.reset") as m:
         yield m
-
-
-@pytest.mark.parametrize(argnames="body,called_with",
-                         argvalues=[
-                             # Empty body
-                             [{}, set()],
-                             # None true
-                             [{
-                                 'labwareCalibration': False,
-                                 'tipProbe': False,
-                                 'bootScripts': False
-                             }, set()],
-                             # All set
-                             [{
-                                 'labwareCalibration': True,
-                                 'tipProbe': True,
-                                 'bootScripts': True
-                             }, {ResetOptionId.labware_calibration,
-                                 ResetOptionId.tip_probe,
-                                 ResetOptionId.boot_scripts}],
-                             [{'labwareCalibration': True},
-                              {ResetOptionId.labware_calibration}],
-                             [{'tipProbe': True},
-                              {ResetOptionId.tip_probe}],
-                             [{'bootScripts': True},
-                              {ResetOptionId.boot_scripts}],
-                         ])
-def test_reset_success(
-        api_client, mock_reset, body, called_with,
-        apiclient_disable_calibration_overhaul):
-    resp = api_client.post('/settings/reset', json=body)
-    assert resp.status_code == 200
-    mock_reset.assert_called_once_with(called_with)
 
 
 @pytest.mark.parametrize(argnames="body,called_with",
@@ -344,9 +300,8 @@ def test_reset_success(
                              [{'tipLengthCalibrations': True},
                               {ResetOptionId.tip_length_calibrations}]
                          ])
-def test_reset_success_overhaul(
-        api_client, mock_reset, body, called_with,
-        apiclient_enable_calibration_overhaul):
+def test_reset_success(
+        api_client, mock_reset, body, called_with):
     resp = api_client.post('/settings/reset', json=body)
     assert resp.status_code == 200
     mock_reset.assert_called_once_with(called_with)

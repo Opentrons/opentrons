@@ -2,53 +2,11 @@ from unittest import mock
 import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
-from opentrons.config import robot_configs
 from opentrons.calibration_storage.types import (
     DeckCalibration, SourceType, CalibrationStatus)
 from opentrons.hardware_control.types import (
     Axis, CriticalPoint, OutOfBoundsMove, MotionChecks)
 from opentrons.hardware_control.robot_calibration import RobotCalibration
-
-
-async def test_controller_home(loop, is_robot):
-    c = await hc.API.build_hardware_simulator(
-        loop=loop,
-        config=robot_configs.build_config({}, {}))
-    await c.home()
-
-    assert c._current_position == {Axis.X: 418,
-                                   Axis.Y: 353,
-                                   Axis.Z: 218,
-                                   Axis.A: 218,
-                                   Axis.B: 19,
-                                   Axis.C: 19}
-    c._config = c._config._replace(gantry_calibration=[[1, 0, 0, 10],
-                                                       [0, 1, 0, 20],
-                                                       [0, 0, 1, 30],
-                                                       [0, 0, 0, 1]],
-                                   mount_offset=[0, 0, 10])
-    conf = c.config
-    assert conf.gantry_calibration == [[1, 0, 0, 10],
-                                       [0, 1, 0, 20],
-                                       [0, 0, 1, 30],
-                                       [0, 0, 0, 1]]
-    await c.home()
-    # Check that we correctly apply the inverse gantry calibration
-    assert c._current_position == {Axis.X: 408,
-                                   Axis.Y: 333,
-                                   Axis.Z: 188,
-                                   Axis.A: 188,
-                                   Axis.B: 19,
-                                   Axis.C: 19}
-    # Check that we subsequently apply mount offset
-    assert await c.current_position(types.Mount.RIGHT) == {Axis.X: 408,
-                                                           Axis.Y: 333,
-                                                           Axis.A: 188,
-                                                           Axis.C: 19}
-    assert await c.current_position(types.Mount.LEFT) == {Axis.X: 408,
-                                                          Axis.Y: 333,
-                                                          Axis.Z: 198,
-                                                          Axis.B: 19}
 
 
 async def test_controller_musthome(hardware_api):
@@ -165,7 +123,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     target_no_offset = {Axis.X: 0,
                         Axis.Y: 0,
                         Axis.Z: 218,
-                        Axis.A: 13,  # from pipette-config.json model offset
+                        Axis.A: -12,  # from pipette-config.json nozzle offset
                         Axis.B: 19,
                         Axis.C: 19}
     assert hardware_api._current_position == target_no_offset
@@ -175,7 +133,8 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
               Axis.C: 19}
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
     p10_tip_length = 33
-    # Specifiying critical point overrides as mount should not use model offset
+    # Specifiying critical point overrides as mount should not use nozzle
+    # offset
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
                                critical_point=CriticalPoint.MOUNT)
     assert hardware_api._current_position == {Axis.X: 0.0, Axis.Y: 0.0,
@@ -192,12 +151,12 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     await hardware_api.pick_up_tip(types.Mount.RIGHT, p10_tip_length)
     # Now the current position (with offset applied) should change
     # pos_after_pickup + model_offset + critical point
-    target[Axis.A] = 218 + (-13) + (-1 * p10_tip_length)
+    target[Axis.A] = 218 + 12 + (-1 * p10_tip_length)
     target_no_offset[Axis.C] = target[Axis.C] = 2
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
     # This move should take the new critical point into account
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
-    target_no_offset[Axis.A] = 46
+    target_no_offset[Axis.A] = 21
     assert hardware_api._current_position == target_no_offset
     # But the position with offset should be back to the original
     target[Axis.A] = 0
@@ -213,7 +172,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     target[Axis.X] = 0
     target_no_offset[Axis.X] = 0
-    target_no_offset[Axis.A] = 13
+    target_no_offset[Axis.A] = -12
     target[Axis.A] = 0
     assert hardware_api._current_position == target_no_offset
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
@@ -283,35 +242,6 @@ async def test_new_critical_point_applied(
     target[Axis.A] = 0
     assert hardware_api._current_position == target_no_offset
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
-
-
-async def test_deck_cal_applied(monkeypatch, loop):
-    new_gantry_cal = [[1, 0, 0, 10],
-                      [0, 1, 0, 20],
-                      [0, 0, 1, 30],
-                      [0, 0, 0, 1]]
-    called_with = None
-
-    def mock_move(position, speed=None, home_flagged_axes=True,
-                  axis_max_speeds=None):
-        nonlocal called_with
-        called_with = position
-
-    hardware_api = await hc.API.build_hardware_simulator(loop=loop)
-    monkeypatch.setattr(hardware_api._backend, 'move', mock_move)
-    old_config = hardware_api.config
-    hardware_api._config = old_config._replace(
-        gantry_calibration=new_gantry_cal)
-    await hardware_api.home()
-    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
-    assert called_with['X'] == 10
-    assert called_with['Y'] == 20
-    assert called_with['A'] == 30
-    # Check that mount offset is also applied
-    await hardware_api.move_to(types.Mount.LEFT, types.Point(0, 0, 0))
-    assert called_with['X'] == 44
-    assert called_with['Y'] == 20
-    assert called_with['Z'] == 30
 
 
 async def test_attitude_deck_cal_applied(
