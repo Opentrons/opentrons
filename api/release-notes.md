@@ -14,3 +14,8 @@ OT-2 Software 4.0.0 has two major changes.
 2. The first of those big changes is a massive overhaul of the robot calibration process. With these changes, you'll calibrate less often; the calibration processes are shorter, easier, and more reliable; and you can finally do things like calibrate multiple kinds of tiprack for use in a protocol.
 
 This release is a beta release for the real 4.0.0. Please make sure you back up robot calibration data by SSHing in to the robot and copying `/data/deck_calibration.json` and `/data/robot_calibration.json` to new locations before applying this update.
+
+## Known Issues
+
+- The return tip position may be slightly incorrect in some calibration flows, but since this is after the flow it doesn't affect calibration outcomes
+- If you navigate in the app while a flow is active without cancelling the flow (e.g. clicking the "more" or "calibration" tabs while you're doing deck calibration, pipette offset calibration, or tip length calibration) the robot will get stuck and you'll have to restart it
