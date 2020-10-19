@@ -101,6 +101,7 @@ class CheckCalibrationUserFlow:
             DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
             CheckCalibrationCommand.switch_pipette: self.change_active_pipette,
             CheckCalibrationCommand.return_tip: self._return_tip,
+            CheckCalibrationCommand.transition: self.load_labware,
             CalibrationCommand.exit: self.exit_session,
         }
 

@@ -29,12 +29,15 @@ const CHECK_SWITCH_PIPETTE: 'calibration.check.switchPipette' =
 const COMPARE_POINT: 'calibration.check.comparePoint' =
   'calibration.check.comparePoint'
 const RETURN_TIP: 'calibration.check.returnTip' = 'calibration.check.returnTip'
+const TRANSITION: 'calibration.check.transition' =
+  'calibration.check.transition'
 const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
 
 export const checkCommands = {
   ...sharedCalCommands,
   CHECK_SWITCH_PIPETTE,
   COMPARE_POINT,
+  TRANSITION,
   RETURN_TIP,
   EXIT,
 }

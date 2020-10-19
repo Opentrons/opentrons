@@ -47,12 +47,9 @@ CALIBRATION_CHECK_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     },
     State.returningTip: {
         CheckCalibrationCommand.return_tip: State.returningTip,
-        CalibrationCommand.exit: State.resultsSummary,
+        CheckCalibrationCommand.transition: State.resultsSummary,
         CheckCalibrationCommand.switch_pipette: State.labwareLoaded
     },
-    # State.resultsSummary: {
-    #     CheckCalibrationCommand.compare_point: State.calibrationComplete
-    # },
     State.badCalibrationData: {
         CalibrationCommand.move_to_tip_rack: State.badCalibrationData,
         CheckCalibrationCommand.return_tip: State.WILDCARD,
