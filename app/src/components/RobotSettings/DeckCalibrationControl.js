@@ -60,11 +60,11 @@ const buildDeckLastCalibrated: (
       ? format(new Date(data.lastModified), 'yyyy-MM-dd HH:mm')
       : 'unknown'
   const prefix = calData =>
-        typeof data?.source === 'string'
-        ? (calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
-           ? MIGRATED
-           : LAST_CALIBRATED)
+    typeof data?.source === 'string'
+      ? calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
+        ? MIGRATED
         : LAST_CALIBRATED
+      : LAST_CALIBRATED
 
   return `${prefix(data)} ${datestring}`
 }

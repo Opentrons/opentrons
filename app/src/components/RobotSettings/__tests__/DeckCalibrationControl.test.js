@@ -112,7 +112,7 @@ describe('DeckCalibrationControl', () => {
       it: 'displays calibrated if source is unknown',
       source: CALIBRATION_SOURCE_UNKNOWN,
       shouldMatch: /calibrated/i,
-    }
+    },
   ]
   SOURCE_SPECS.forEach(spec => {
     it(spec.it, () => {
