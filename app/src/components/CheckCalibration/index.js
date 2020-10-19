@@ -143,7 +143,7 @@ export function CheckHealthCalibration(
     }
   }
 
-  const checkBothPipettes = instruments.length === 2
+  const checkBothPipettes = instruments?.length === 2
 
   if (!session || !activeTipRack) {
     return null
