@@ -204,9 +204,9 @@ class CheckCalibrationUserFlow:
         if len(pips) == 1:
             for mount, pip in pips.items():
                 info = PipetteInfo(
-                    channels=pip.channels,
+                    channels=pip.config.channels,
                     rank=PipetteRank.first,
-                    max_volume=pip.max_volume,
+                    max_volume=pip.config.max_volume,
                     mount=mount)
                 return info, [info]
 
@@ -318,7 +318,9 @@ class CheckCalibrationUserFlow:
         being used for a given session for the client.
         """
         hw_pips = self._get_hw_pipettes()
+        MODULE_LOG.info(f"HW PIPS: {hw_pips}")
         info_pips = self._get_ordered_info_pipettes()
+        MODULE_LOG.info(f"INFO PIPS: {info_pips}")
         return [
             CheckAttachedPipette(  # type: ignore[call-arg]
                 model=hw_pip.model,
