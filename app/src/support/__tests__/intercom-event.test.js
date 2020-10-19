@@ -37,25 +37,6 @@ describe('support event tests', () => {
     expect(built).toBeNull()
   })
 
-  it('makeIntercomEvent should send an event for calibration check complete', () => {
-    const sessionState = {
-      sessionType: 'calibrationCheck',
-      succeeded: false,
-      leftPipetteModel: 'p300_single_v2.0',
-      comparingFirstPipetteHeightExceedsThreshold: true,
-      comparingFirstPipetteHeightErrorSource: 'unknown',
-    }
-    getIntercomEventPropsForRobotSessionById.mockReturnValue(sessionState)
-    const built = makeIntercomEvent(
-      Sessions.deleteSession('silly-robot', 'dummySessionID'),
-      MOCK_STATE
-    )
-    expect(built).toEqual({
-      eventName: Constants.INTERCOM_EVENT_CALCHECK_COMPLETE,
-      metadata: sessionState,
-    })
-  })
-
   it('makeIntercomEvent should ignore events for which no data can be retrieved', () => {
     getIntercomEventPropsForRobotSessionById.mockReturnValue(null)
     const built = makeIntercomEvent(

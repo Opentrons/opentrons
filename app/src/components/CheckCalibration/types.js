@@ -10,7 +10,6 @@ import type {
 export type CalibrationHealthCheckParentProps = {|
   robotName: string,
   session: CalibrationCheckSession | null,
-  closeWizard: () => void,
   dispatchRequests: (
     ...Array<{ ...Action, meta: { requestId: string } }>
   ) => void,

@@ -26,9 +26,9 @@ import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import styles from './styles.css'
 
 const DECK_SETUP_WITH_BLOCK_PROMPT =
-  'Place full tip rack and Calibration Block on the deck within their designated slots as illustrated below.'
+  'Place full tip rack(s) and Calibration Block on the deck within their designated slots as illustrated below.'
 const DECK_SETUP_NO_BLOCK_PROMPT =
-  'Place full tip rack on the deck within the designated slot as illustrated below.'
+  'Place full tip rack(s) on the deck within the designated slot as illustrated below.'
 const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 const contentsBySessionType: {
   [SessionType]: {

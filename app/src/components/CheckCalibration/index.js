@@ -27,12 +27,12 @@ import {
   CompleteConfirmation,
   ConfirmExitModal,
 } from '../CalibrationPanels'
+import { ReturnTip } from './ReturnTip'
+import { ResultsSummary } from './ResultsSummary'
+import { BadCalibration } from './BadCalibration'
 
 import type { StyleProps } from '@opentrons/components'
-import type {
-  CalibrationLabware,
-  SessionCommandParams,
-} from '../../sessions/types'
+import type { SessionCommandParams } from '../../sessions/types'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type { CalibrationHealthCheckParentProps } from './types'
@@ -70,10 +70,14 @@ const PANEL_BY_STEP: {
   [Sessions.CHECK_STEP_SESSION_STARTED]: Introduction,
   [Sessions.CHECK_STEP_LABWARE_LOADED]: DeckSetup,
   [Sessions.CHECK_STEP_PREPARING_PIPETTE]: TipPickUp,
-  [Sessions.CHECK_STEP_COMPARING_HEIGHT]: TipConfirmation,
-  [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: SaveZPoint,
+  [Sessions.CHECK_STEP_INSPECTING_TIP]: TipConfirmation,
+  [Sessions.CHECK_STEP_COMPARING_HEIGHT]: SaveZPoint,
+  [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: SaveXYPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: SaveXYPoint,
-  [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: CompleteConfirmation,
+  [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: SaveXYPoint,
+  [Sessions.CHECK_STEP_RETURNING_TIP]: ReturnTip,
+  [Sessions.CHECK_STEP_RESULTS_SUMMARY]: ResultsSummary,
+  [Sessions.CHECK_STEP_BAD_ROBOT_CALIBRATION]: BadCalibration,
   [Sessions.CHECK_STEP_CHECK_COMPLETE]: CompleteConfirmation,
 }
 
@@ -93,14 +97,14 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 export function CheckHealthCalibration(
   props: CalibrationHealthCheckParentProps
 ): React.Node {
+  const { session, robotName, dispatchRequests, showSpinner } = props
   const {
-    session,
-    robotName,
-    closeWizard,
-    dispatchRequests,
-    showSpinner,
-  } = props
-  const { currentStep, activePipette, labware } = session?.details || {}
+    currentStep,
+    activePipette,
+    activeTipRack,
+    instruments,
+    comparisonsByPipette,
+  } = session?.details || {}
 
   const {
     showConfirmation: showConfirmExit,
@@ -137,13 +141,11 @@ export function CheckHealthCalibration(
         Sessions.deleteSession(robotName, session.id)
       )
     }
-    closeWizard()
   }
 
-  const tipRack: CalibrationLabware | null =
-    (labware && labware.find(l => l.isTiprack)) ?? null
+  const checkBothPipettes = instruments.length === 2
 
-  if (!session || !tipRack) {
+  if (!session || !activeTipRack) {
     return null
   }
 
@@ -166,11 +168,15 @@ export function CheckHealthCalibration(
         <Panel
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
-          tipRack={tipRack}
+          tipRack={activeTipRack}
           isMulti={isMulti}
           mount={activePipette?.mount.toLowerCase()}
           currentStep={currentStep}
           sessionType={session.sessionType}
+          checkBothPipettes={checkBothPipettes}
+          instruments={instruments}
+          comparisonsByPipette={comparisonsByPipette}
+          activePipette={activePipette}
         />
       </ModalPage>
       {showConfirmExit && (

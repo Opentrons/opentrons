@@ -4,6 +4,8 @@ import type {
   SessionType,
   CalibrationSessionStep,
   CalibrationLabware,
+  CalibrationHealthCheckInstrument,
+  CalibrationHealthCheckComparisonByPipette,
 } from '../../sessions/types'
 
 export type CalibrationPanelProps = {|
@@ -16,4 +18,8 @@ export type CalibrationPanelProps = {|
   sessionType: SessionType,
   calBlock?: CalibrationLabware | null,
   shouldPerformTipLength?: boolean | null,
+  checkBothPipettes?: boolean | null,
+  instruments?: Array<CalibrationHealthCheckInstrument> | null,
+  comparisonsByPipette?: CalibrationHealthCheckComparisonByPipette | null,
+  activePipette?: CalibrationHealthCheckInstrument,
 |}

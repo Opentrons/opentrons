@@ -1,20 +1,16 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { PrimaryButton, OutlineButton } from '@opentrons/components'
 import find from 'lodash/find'
-import type { State } from '../../types'
 import * as Sessions from '../../sessions'
-import * as Calibration from '../../calibration'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
 import { BadOutcomeBody } from './BadOutcomeBody'
 import { saveAs } from 'file-saver'
 import { getBadOutcomeHeader } from './utils'
 
-import type { CalibrationStatus } from '../../calibration/types'
+import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type {
-  CalibrationHealthCheckComparisonByPipette,
   CalibrationHealthCheckComparison,
   CalibrationHealthCheckInstrument,
 } from '../../sessions/types'
@@ -25,30 +21,14 @@ const DOWNLOAD_SUMMARY = 'Download JSON summary'
 const STILL_HAVING_PROBLEMS =
   'If you are still experiencing issues, please download the JSON summary and share it with our support team who will then follow up with you.'
 
-type ResultsSummaryProps = {|
-  robotName: string,
-  deleteSession: () => mixed,
-  comparisonsByPipette: CalibrationHealthCheckComparisonByPipette,
-  instrumentList: Array<CalibrationHealthCheckInstrument>,
-|}
-export function ResultsSummary(props: ResultsSummaryProps): React.Node {
-  const {
-    robotName,
-    deleteSession,
-    comparisonsByPipette,
-    instrumentList,
-  } = props
-
-  const calibrationStatus = useSelector<State, CalibrationStatus | null>(
-    state => Calibration.getCalibrationStatus(state, robotName)
-  )
+export function ResultsSummary(props: CalibrationPanelProps): React.Node {
+  const { comparisonsByPipette, instruments, cleanUpAndExit } = props
 
   const handleDownloadButtonClick = () => {
     const now = new Date()
     const report = {
       comparisonsByPipette,
-      instrumentList,
-      calibrationStatus,
+      instruments,
       savedAt: now.toISOString(),
     }
     const data = new Blob([JSON.stringify(report)], {
@@ -58,23 +38,23 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
   }
 
   const firstPipette = find(
-    instrumentList,
+    instruments,
     (p: CalibrationHealthCheckInstrument) =>
       p.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
   )
   const secondPipette = find(
-    instrumentList,
+    instruments,
     (p: CalibrationHealthCheckInstrument) =>
       p.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
   )
-  const firstComparisonsByStep = comparisonsByPipette.first
-  const secondComparisonsByStep = comparisonsByPipette.second
+  const firstComparisonsByStep = comparisonsByPipette?.first
+  const secondComparisonsByStep = comparisonsByPipette?.second
 
   const lastFailedComparison = [
     ...Sessions.FIRST_PIPETTE_COMPARISON_STEPS,
   ].reduce((acc, step): CalibrationHealthCheckComparison | null => {
-    const first_pipette_comparison = comparisonsByPipette.first[step]
-    const second_pipette_comparison = comparisonsByPipette.second[step]
+    const first_pipette_comparison = comparisonsByPipette?.first[step]
+    const second_pipette_comparison = comparisonsByPipette?.second[step]
     if (
       second_pipette_comparison &&
       second_pipette_comparison.exceedsThreshold
@@ -101,13 +81,15 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
 
       <div className={styles.summary_page_contents}>
         <div className={styles.summary_section}>
-          <PipetteComparisons
-            pipette={firstPipette}
-            comparisonsByStep={firstComparisonsByStep}
-            allSteps={Sessions.FIRST_PIPETTE_COMPARISON_STEPS}
-          />
+          {firstPipette && firstComparisonsByStep && (
+            <PipetteComparisons
+              pipette={firstPipette}
+              comparisonsByStep={firstComparisonsByStep}
+              allSteps={Sessions.FIRST_PIPETTE_COMPARISON_STEPS}
+            />
+          )}
         </div>
-        {secondPipette && (
+        {secondPipette && secondComparisonsByStep && (
           <div className={styles.summary_section}>
             <PipetteComparisons
               pipette={secondPipette}
@@ -129,7 +111,7 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
 
       <PrimaryButton
         className={styles.summary_exit_button}
-        onClick={deleteSession}
+        onClick={cleanUpAndExit}
       >
         {DROP_TIP_AND_EXIT}
       </PrimaryButton>

@@ -40,8 +40,7 @@ const DECK_CAL_BODY =
 const HEALTH_CHECK_HEADER = 'calibration health check'
 const HEALTH_CHECK_BODY =
   'Checking the OT-2’s calibration is a first step towards diagnosing and troubleshooting common pipette positioning problems you may be experiencing.'
-const HEALTH_CHECK_PROCEDURE =
-  'For this process you will be asked to manually jog each attached pipette to designated positions on the robot’s deck. You will then prompt the robot to check how this positional coordinate compares to your previously saved calibration coordinate. Note that this process does not overwrite your existing calibration data.'
+const HEALTH_CHECK_PROCEDURE = 'to calibration health check'
 
 const PIP_OFFSET_CAL_HEADER = 'pipette offset calibration'
 const PIP_OFFSET_CAL_BODY =
@@ -115,6 +114,8 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
   const lookupType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
     : sessionType
+  const isHealthCheck =
+    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
   const proceed = () =>
     sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
@@ -164,16 +165,27 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
           )}
         </Flex>
         <Box fontSize={FONT_SIZE_BODY_1} marginY={SPACING_3}>
-          <Text>
-            <b
-              css={css`
-                text-transform: uppercase;
-              `}
-            >{`${NOTE_HEADER} `}</b>
-            {IT_IS}
-            <u>{` ${EXTREMELY} `}</u>
-            {noteBody}
-          </Text>
+          {!isHealthCheck ? (
+            <Text>
+              <b
+                css={css`
+                  text-transform: uppercase;
+                `}
+              >{`${NOTE_HEADER} `}</b>
+              {IT_IS}
+              <u>{` ${EXTREMELY} `}</u>
+              {noteBody}
+            </Text>
+          ) : (
+            <Text>
+              <b
+                css={css`
+                  text-transform: uppercase;
+                `}
+              >{`${NOTE_HEADER} `}</b>
+              {noteBody}
+            </Text>
+          )}
         </Box>
       </Flex>
       <Flex width="100%" justifyContent={JUSTIFY_CENTER}>

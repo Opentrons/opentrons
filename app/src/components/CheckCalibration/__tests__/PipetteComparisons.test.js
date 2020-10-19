@@ -23,7 +23,7 @@ describe('PipetteComparisons', () => {
   beforeEach(() => {
     render = ({
       pipette = mockSessionDetails.activePipette,
-      comparisonsByStep = mockSessionDetails.comparisonsByStep,
+      comparisonsByStep = mockSessionDetails.comparisonsByPipette,
     }: {
       pipette?: CalibrationHealthCheckInstrument,
       comparisonsByStep?: CalibrationHealthCheckComparisonsByStep,

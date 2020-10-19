@@ -160,7 +160,6 @@ export function CheckCalibrationControl({
           <CheckHealthCalibration
             session={checkHealthSession}
             robotName={robotName}
-            closeWizard={() => setShowWizard(false)}
             dispatchRequests={dispatchRequests}
             showSpinner={showSpinner}
           />

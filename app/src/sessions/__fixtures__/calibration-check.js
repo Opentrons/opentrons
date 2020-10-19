@@ -69,7 +69,7 @@ export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationHealthSess
     },
   ],
   currentStep: 'sessionStarted',
-  comparisonsByStep: {
+  comparisonsByPipette: {
     first: {
       [CHECK_STEP_COMPARING_HEIGHT]: goodZComparison,
       [CHECK_STEP_COMPARING_POINT_ONE]: goodXYComparison,

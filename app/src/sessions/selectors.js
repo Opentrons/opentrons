@@ -58,11 +58,11 @@ const getSharedAnalyticsPropsFromCalibrationCheck: (
 const getAnalyticsPropsFromCalibrationCheck: (
   session: Types.CalibrationCheckSession
 ) => Types.CalibrationCheckSessionAnalyticsProps = session => {
-  const { comparisonsByStep, activePipette } = session.details
+  const { comparisonsByPipette, activePipette } = session.details
   const rank = activePipette.rank
   const initialStepData: $Shape<Types.CalibrationCheckAnalyticsData> = {}
   const normalizedStepDataFirstPip = Object.keys(
-    comparisonsByStep.first
+    comparisonsByPipette.first
   ).reduce(
     (
       acc: Types.CalibrationCheckAnalyticsData,
@@ -73,7 +73,7 @@ const getAnalyticsPropsFromCalibrationCheck: (
         thresholdVector,
         exceedsThreshold,
         transformType,
-      } = comparisonsByStep[rank][stepName]
+      } = comparisonsByPipette[rank][stepName]
       return {
         ...acc,
         [`${stepName}DifferenceVector`]: differenceVector,
@@ -85,7 +85,7 @@ const getAnalyticsPropsFromCalibrationCheck: (
     initialStepData
   )
   const normalizedStepDataSecondPip = Object.keys(
-    comparisonsByStep.second
+    comparisonsByPipette.second
   ).reduce(
     (
       acc: Types.CalibrationCheckAnalyticsData,
@@ -96,7 +96,7 @@ const getAnalyticsPropsFromCalibrationCheck: (
         thresholdVector,
         exceedsThreshold,
         transformType,
-      } = comparisonsByStep[rank][stepName]
+      } = comparisonsByPipette[rank][stepName]
       return {
         ...acc,
         [`${stepName}DifferenceVector`]: differenceVector,
@@ -118,16 +118,16 @@ const getAnalyticsPropsFromCalibrationCheck: (
 const getIntercomPropsFromCalibrationCheck: (
   session: Types.CalibrationCheckSession
 ) => Types.CalibrationCheckSessionIntercomProps = session => {
-  const { comparisonsByStep, activePipette } = session.details
+  const { comparisonsByPipette, activePipette } = session.details
   const rank = activePipette.rank
-  const comparisons = comparisonsByStep[rank]
+  const comparisons = comparisonsByPipette[rank]
   const initialStepData: $Shape<Types.CalibrationCheckIntercomData> = {}
   const normalizedStepData = Object.keys(comparisons).reduce(
     (
       acc: Types.CalibrationCheckIntercomData,
       stepName: Types.RobotCalibrationCheckStep
     ) => {
-      const { exceedsThreshold, transformType } = comparisonsByStep[rank][
+      const { exceedsThreshold, transformType } = comparisonsByPipette[rank][
         stepName
       ]
       return {

@@ -61,7 +61,7 @@ describe('ResultsSummary', () => {
     mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
     render = ({
       instrumentList = mockSessionDetails.instruments,
-      comparisonsByStep = mockSessionDetails.comparisonsByStep,
+      comparisonsByStep = mockSessionDetails.comparisonsByPipette,
     }: {
       instrumentList?: Array<CalibrationHealthCheckInstrument>,
       comparisonsByStep?: CalibrationHealthCheckComparisonByPipette,
@@ -107,7 +107,7 @@ describe('ResultsSummary', () => {
   it('summarizes both pipettes if no comparisons have been made', () => {
     const wrapper = render({
       comparisonsByStep: omit(
-        mockSessionDetails.comparisonsByStep,
+        mockSessionDetails.comparisonsByPipette,
         Sessions.SECOND_PIPETTE_COMPARISON_STEPS
       ),
     })
@@ -157,7 +157,7 @@ describe('ResultsSummary', () => {
   it('does show troubleshooting intstructions at least one failed check', () => {
     const wrapper = render({
       comparisonsByStep: {
-        ...mockSessionDetails.comparisonsByStep,
+        ...mockSessionDetails.comparisonsByPipette,
         [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: Fixtures.badXYComparison,
       },
     })

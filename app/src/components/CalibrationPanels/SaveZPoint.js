@@ -99,14 +99,14 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
   if (sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK) {
     continueCommands = () => {
       sendCommands(
-        { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+        { command: Sessions.checkCommands.COMPARE_POINT },
         { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
       )
     }
   } else {
     continueCommands = () => {
       sendCommands(
-        { command: Sessions.checkCommands.COMPARE_POINT },
+        { command: Sessions.sharedCalCommands.SAVE_OFFSET },
         { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
       )
     }

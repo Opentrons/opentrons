@@ -11,7 +11,6 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
-import { BadCalibration } from '../CheckCalibration/BadCalibration'
 import type { SessionType, SessionCommandString } from '../../sessions/types'
 import type { CalibrationPanelProps } from './types'
 
@@ -38,15 +37,13 @@ const contentsBySessionType: {
     yesButtonText: YES_AND_MOVE_TO_MEASURE_TIP,
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
   },
+  [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
+    yesButtonText: YES_AND_MOVE_TO_DECK,
+    moveCommandString: Sessions.sharedCalCommands.MOVE_TO_DECK,
+  },
 }
 export function TipConfirmation(props: CalibrationPanelProps): React.Node {
-  const {
-    sendCommands,
-    sessionType,
-    shouldPerformTipLength,
-    currentStep,
-    cleanUpAndExit,
-  } = props
+  const { sendCommands, sessionType, shouldPerformTipLength } = props
 
   const isExtendedPipOffset =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
@@ -65,13 +62,7 @@ export function TipConfirmation(props: CalibrationPanelProps): React.Node {
     sendCommands({ command: moveCommandString })
   }
 
-  const isBadTipPickUp =
-    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK &&
-    currentStep === Sessions.CHECK_STEP_BAD_ROBOT_CALIBRATION
-
-  return isBadTipPickUp ? (
-    <BadCalibration deleteSession={cleanUpAndExit} />
-  ) : (
+  return (
     <Flex
       width="100%"
       flexDirection={DIRECTION_COLUMN}

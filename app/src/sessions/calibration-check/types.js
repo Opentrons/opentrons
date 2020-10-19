@@ -13,6 +13,8 @@ import typeof {
   CHECK_STEP_COMPARING_POINT_ONE,
   CHECK_STEP_COMPARING_POINT_TWO,
   CHECK_STEP_COMPARING_POINT_THREE,
+  CHECK_STEP_RETURNING_TIP,
+  CHECK_STEP_RESULTS_SUMMARY,
   CHECK_STEP_SESSION_EXITED,
   CHECK_STEP_CHECK_COMPLETE,
   CHECK_STEP_BAD_ROBOT_CALIBRATION,
@@ -34,6 +36,8 @@ export type RobotCalibrationCheckStep =
   | CHECK_STEP_COMPARING_POINT_ONE
   | CHECK_STEP_COMPARING_POINT_TWO
   | CHECK_STEP_COMPARING_POINT_THREE
+  | CHECK_STEP_RETURNING_TIP
+  | CHECK_STEP_RESULTS_SUMMARY
   | CHECK_STEP_SESSION_EXITED
   | CHECK_STEP_CHECK_COMPLETE
   | CHECK_STEP_BAD_ROBOT_CALIBRATION
@@ -73,14 +77,11 @@ export type CalibrationHealthCheckComparisonByPipette = {
   second: CalibrationHealthCheckComparisonsByStep,
 }
 
-export type CheckCalibrationHealthSessionParams = {|
-  tipRacks?: Array<LabwareDefinition2>,
-|}
-
 export type CheckCalibrationHealthSessionDetails = {|
   instruments: Array<CalibrationHealthCheckInstrument>,
   currentStep: RobotCalibrationCheckStep,
-  comparisonsByStep: CalibrationHealthCheckComparisonByPipette,
+  comparisonsByPipette: CalibrationHealthCheckComparisonByPipette,
   labware: Array<CalibrationLabware>,
   activePipette: CalibrationHealthCheckInstrument,
+  activeTipRack: CalibrationLabware,
 |}

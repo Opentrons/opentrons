@@ -21,9 +21,10 @@ import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from './types'
 import type {
-  SessionCommandString,
+  SessionCommandParams,
   SessionType,
   CalibrationSessionStep,
+  SessionCommandString,
 } from '../../sessions/types'
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
@@ -98,7 +99,8 @@ const contentsBySessionTypeByCurrentStep: {
     [CalibrationSessionStep]: {
       slotNumber: string,
       buttonText: string,
-      moveCommandString: SessionCommandString | null,
+      moveCommand: SessionCommandString | null,
+      finalCommand?: SessionCommandString | null,
     },
   },
 } = {
@@ -106,52 +108,61 @@ const contentsBySessionTypeByCurrentStep: {
     [Sessions.DECK_STEP_SAVING_POINT_ONE]: {
       slotNumber: '1',
       buttonText: MOVE_TO_POINT_TWO_BUTTON_TEXT,
-      moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_TWO,
+      moveCommand: Sessions.deckCalCommands.MOVE_TO_POINT_TWO,
     },
     [Sessions.DECK_STEP_SAVING_POINT_TWO]: {
       slotNumber: '3',
       buttonText: MOVE_TO_POINT_THREE_BUTTON_TEXT,
-      moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_THREE,
+      moveCommand: Sessions.deckCalCommands.MOVE_TO_POINT_THREE,
     },
     [Sessions.DECK_STEP_SAVING_POINT_THREE]: {
       slotNumber: '7',
       buttonText: BASE_BUTTON_TEXT,
-      moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+      moveCommand: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
     },
   },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: {
       slotNumber: '1',
       buttonText: BASE_BUTTON_TEXT,
-      moveCommandString: null,
+      moveCommand: null,
     },
   },
   [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
     [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: {
       slotNumber: '1',
       buttonText: HEALTH_POINT_TWO_BUTTON_TEXT,
-      moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_TWO,
+      moveCommand: Sessions.deckCalCommands.MOVE_TO_POINT_TWO,
+      finalCommand: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
     },
     [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: {
       slotNumber: '3',
       buttonText: HEALTH_POINT_THREE_BUTTON_TEXT,
-      moveCommandString: Sessions.deckCalCommands.MOVE_TO_POINT_THREE,
+      moveCommand: Sessions.deckCalCommands.MOVE_TO_POINT_THREE,
     },
     [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: {
       slotNumber: '7',
       buttonText: HEALTH_BUTTON_TEXT,
-      moveCommandString: Sessions.checkCommands.CHECK_SECOND_PIPETTE,
+      moveCommand: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
     },
   },
 }
 
 export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
-  const { isMulti, mount, sendCommands, currentStep, sessionType } = props
+  const {
+    isMulti,
+    mount,
+    sendCommands,
+    currentStep,
+    sessionType,
+    activePipette,
+  } = props
 
   const {
     slotNumber,
     buttonText,
-    moveCommandString,
+    moveCommand,
+    finalCommand,
   } = contentsBySessionTypeByCurrentStep[sessionType][currentStep]
 
   const demoAsset = React.useMemo(
@@ -178,8 +189,14 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     } else {
       commands = [{ command: Sessions.sharedCalCommands.SAVE_OFFSET }]
     }
-    if (moveCommandString) {
-      commands = [...commands, { command: moveCommandString }]
+    if (
+      finalCommand &&
+      activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
+    ) {
+      commands = [...commands, { command: finalCommand }]
+      console.log("in final command")
+    } else if (moveCommand) {
+      commands = [...commands, { command: moveCommand }]
     }
     sendCommands(...commands)
   }

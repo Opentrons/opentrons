@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
 import { Icon, PrimaryButton, Link } from '@opentrons/components'
+import type { CalibrationPanelProps } from '../CalibrationPanels/types'
+
 import styles from './styles.css'
 
 const BAD_ROBOT_CALIBRATION_CHECK_HEADER = 'Unable to check robot calibration'
@@ -17,11 +19,9 @@ const BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip in trash and exit'
 
 const DECK_CAL_ARTICLE_URL =
   'https://support.opentrons.com/en/articles/4028788-checking-your-ot-2-s-calibration'
-type BadCalibrationProps = {|
-  deleteSession: () => mixed,
-|}
-export function BadCalibration(props: BadCalibrationProps): React.Node {
-  const { deleteSession } = props
+
+export function BadCalibration(props: CalibrationPanelProps): React.Node {
+  const { cleanUpAndExit } = props
 
   return (
     <div className={styles.padded_contents_wrapper}>
@@ -46,7 +46,7 @@ export function BadCalibration(props: BadCalibrationProps): React.Node {
           {LEARN_MORE}
         </p>
       </div>
-      <PrimaryButton onClick={deleteSession}>
+      <PrimaryButton onClick={cleanUpAndExit}>
         {BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}
       </PrimaryButton>
     </div>
