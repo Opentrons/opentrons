@@ -87,7 +87,8 @@ CalibrationUserFlow = Union[
 
 
 async def invalidate_tip(user_flow: CalibrationUserFlow):
-    await user_flow._return_tip()
+    await user_flow.return_tip()
+    user_flow.reset_tip_origin()
     await user_flow.move_to_tip_rack()
 
 
@@ -105,16 +106,16 @@ def save_default_pick_up_current(instr: Pipette):
 
 async def pick_up_tip(user_flow: CalibrationUserFlow, tip_length: float):
     # grab position of active nozzle for ref when returning tip later
-    cp = user_flow._get_critical_point_override()
-    user_flow._tip_origin_pt = await user_flow._hardware.gantry_position(
-        user_flow._mount, critical_point=cp)
+    cp = user_flow.critical_point_override
+    user_flow.tip_origin = await user_flow.hardware.gantry_position(
+        user_flow.mount, critical_point=cp)
 
     with contextlib.ExitStack() as stack:
-        if user_flow._hw_pipette.config.channels > 1:
+        if user_flow.hw_pipette.config.channels > 1:
             stack.enter_context(
-                save_default_pick_up_current(user_flow._hw_pipette))
+                save_default_pick_up_current(user_flow.hw_pipette))
 
-        await user_flow._hardware.pick_up_tip(user_flow._mount, tip_length)
+        await user_flow.hardware.pick_up_tip(user_flow.mount, tip_length)
 
 
 async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
@@ -125,34 +126,33 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
     Each pipette config contains a coefficient to apply to an
     attached tip's length to determine proper z offset
     """
-    if user_flow._tip_origin_pt and user_flow._hw_pipette.has_tip:
-        coeff = user_flow._hw_pipette.config.return_tip_height
-        to_pt = user_flow._tip_origin_pt - Point(0, 0, tip_length * coeff)
-        cp = user_flow._get_critical_point_override()
-        await user_flow._hardware.move_to(mount=user_flow._mount,
-                                          abs_position=to_pt,
-                                          critical_point=cp)
-        await user_flow._hardware.drop_tip(user_flow._mount)
-        user_flow._tip_origin_pt = None
+    if user_flow.tip_origin and user_flow.hw_pipette.has_tip:
+        coeff = user_flow.hw_pipette.config.return_tip_height
+        to_pt = user_flow.tip_origin - Point(0, 0, tip_length * coeff)
+        cp = user_flow.critical_point_override
+        await user_flow.hardware.move_to(mount=user_flow.mount,
+                                         abs_position=to_pt,
+                                         critical_point=cp)
+        await user_flow.hardware.drop_tip(user_flow.mount)
 
 
 async def move(user_flow: CalibrationUserFlow, to_loc: Location):
-    from_pt = await user_flow._get_current_point(None)
+    from_pt = await user_flow.get_current_point(None)
     from_loc = Location(from_pt, None)
-    cp = user_flow._get_critical_point_override()
+    cp = user_flow.critical_point_override
 
-    max_height = user_flow._hardware.get_instrument_max_height(
-        user_flow._mount)
+    max_height = user_flow.hardware.get_instrument_max_height(
+        user_flow.mount)
 
     safe = planning.safe_height(
-        from_loc, to_loc, user_flow._deck, max_height)
+        from_loc, to_loc, user_flow.deck, max_height)
     moves = plan_arc(from_pt, to_loc.point, safe,
                      origin_cp=None,
                      dest_cp=cp)
     for move in moves:
-        await user_flow._hardware.move_to(mount=user_flow._mount,
-                                          abs_position=move[0],
-                                          critical_point=move[1])
+        await user_flow.hardware.move_to(mount=user_flow.mount,
+                                         abs_position=move[0],
+                                         critical_point=move[1])
 
 
 def get_reference_location(mount: Mount,

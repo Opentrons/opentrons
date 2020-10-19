@@ -155,7 +155,7 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
 async def test_move_to_tip_rack(mock_user_flow):
     uf = mock_user_flow
     await uf.move_to_tip_rack()
-    cur_pt = await uf._get_current_point(None)
+    cur_pt = await uf.get_current_point(None)
     assert cur_pt == uf._deck['8'].wells()[0].top().point + Point(0, 0, 10)
 
 
@@ -164,7 +164,7 @@ async def test_move_to_reference_point(mock_user_flow_all_combos):
     await uf.move_to_reference_point()
     buff = Point(0, 0, 5)
     trash_offset = Point(-57.84, -55, 0)  # offset from center of trash
-    cur_pt = await uf._get_current_point(None)
+    cur_pt = await uf.get_current_point(None)
     if uf._has_calibration_block:
         if uf._mount == Mount.LEFT:
             assert cur_pt == \
@@ -181,9 +181,9 @@ async def test_move_to_reference_point(mock_user_flow_all_combos):
 async def test_jog(mock_user_flow):
     uf = mock_user_flow
     await uf.jog(vector=(0, 0, 0.1))
-    assert await uf._get_current_point(None) == Point(0, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(0, 0, 0.1)
     await uf.jog(vector=(1, 0, 0))
-    assert await uf._get_current_point(None) == Point(1, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(1, 0, 0.1)
 
 
 async def test_pick_up_tip(mock_user_flow):
@@ -206,8 +206,7 @@ async def test_invalidate_tip(mock_user_flow):
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._get_critical_point_override()
-        ),
+            critical_point=uf.critical_point_override,)
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
     uf._hardware.drop_tip.assert_called()
@@ -225,8 +224,7 @@ async def test_exit(mock_user_flow):
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._get_critical_point_override()
-        ),
+            critical_point=uf.critical_point_override)
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
     uf._hardware.drop_tip.assert_called()
@@ -294,8 +292,7 @@ async def test_save_offsets(mock_user_flow):
         await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=10),
-            critical_point=uf._get_critical_point_override()
-        )
+            critical_point=uf.critical_point_override)
         await uf.save_offset()
         assert uf._nozzle_height_at_reference == 10
 
@@ -304,8 +301,7 @@ async def test_save_offsets(mock_user_flow):
         await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=40),
-            critical_point=uf._get_critical_point_override()
-        )
+            critical_point=uf.critical_point_override)
         await uf.save_offset()
         create_tip_length_data_patch.assert_called_with(ANY, '', 30)
 
