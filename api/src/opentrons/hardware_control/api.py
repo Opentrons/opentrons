@@ -95,6 +95,10 @@ class API(HardwareAPILike):
     def robot_calibration(self) -> rb_cal.RobotCalibration:
         return self._robot_calibration
 
+    def reset_robot_calibration(self):
+        self._calculate_valid_attitude.cache_clear()
+        self._robot_calibration = rb_cal.load()
+
     def set_robot_calibration(
             self, robot_calibration: rb_cal.RobotCalibration):
         self._calculate_valid_attitude.cache_clear()
