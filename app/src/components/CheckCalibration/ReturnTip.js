@@ -33,7 +33,7 @@ export function ReturnTip(props: CalibrationPanelProps): React.Node {
   } else {
     commandsList = [
       { command: Sessions.checkCommands.RETURN_TIP },
-      { command: Sessions.checkCommands.COMPARE_POINT },
+      { command: Sessions.checkCommands.EXIT },
     ]
   }
 

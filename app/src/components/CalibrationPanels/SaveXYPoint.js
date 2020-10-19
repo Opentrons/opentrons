@@ -194,7 +194,6 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
       activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
     ) {
       commands = [...commands, { command: finalCommand }]
-      console.log("in final command")
     } else if (moveCommand) {
       commands = [...commands, { command: moveCommand }]
     }
