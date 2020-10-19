@@ -1,3 +1,4 @@
+import logging
 import contextlib
 from typing import Set, Dict, Any, Union, TYPE_CHECKING
 
@@ -43,6 +44,7 @@ class StateTransitionError(RobotServerError):
 
 
 TransitionMap = Dict[Any, Dict[Any, Any]]
+MODULE_LOG = logging.getLogger(__name__)
 
 
 class SimpleStateMachine:

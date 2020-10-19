@@ -16,6 +16,7 @@ class PointTypes:
 
 @dataclass
 class ReferencePoints:
+    tip: PointTypes
     height: PointTypes
     one: PointTypes
     two: PointTypes
@@ -24,7 +25,6 @@ class ReferencePoints:
 
 @dataclass
 class ComparisonMap:
-    inspectingTip: Optional[ComparisonStatus] = None
     comparingHeight: Optional[ComparisonStatus] = None
     comparingPointOne: Optional[ComparisonStatus] = None
     comparingPointTwo: Optional[ComparisonStatus] = None
@@ -39,7 +39,7 @@ class ComparisonStatePerPipette:
     first: ComparisonMap
     second: ComparisonMap
 
-    def set_value(self, name: str, value: ComparisonStatus):
+    def set_value(self, name: str, value: ComparisonMap):
         setattr(self, name, value)
 
 

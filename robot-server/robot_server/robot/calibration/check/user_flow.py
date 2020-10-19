@@ -22,7 +22,7 @@ from robot_server.robot.calibration.constants import (
 import robot_server.robot.calibration.util as uf
 from robot_server.robot.calibration.helper_classes import (
     DeckCalibrationError, PipetteRank, PipetteInfo,
-    AttachedPipette, RequiredLabware)
+    RequiredLabware)
 
 from robot_server.service.session.models.command import (
     CalibrationCommand, CheckCalibrationCommand, DeckCalibrationCommand)
@@ -39,7 +39,7 @@ from .constants import (PIPETTE_TOLERANCES,
                         DEFAULT_OK_TIP_PICK_UP_VECTOR,
                         MOVE_POINT_STATE_MAP,
                         CalibrationCheckState as State,
-                        TIPRACK_SLOTS)
+                        TIPRACK_SLOT)
 from ..errors import CalibrationError
 
 if TYPE_CHECKING:
@@ -66,6 +66,7 @@ class CheckCalibrationUserFlow:
         self._state_machine = CalibrationCheckStateMachine()
         self._current_state = State.sessionStarted
         self._reference_points = ReferencePoints(
+            tip=PointTypes(),
             height=PointTypes(),
             one=PointTypes(),
             two=PointTypes(),
@@ -77,7 +78,6 @@ class CheckCalibrationUserFlow:
         )
 
         self._active_pipette, self._pip_info = self._select_starting_pipette()
-        self._active_tiprack: Optional[labware.Labware] = None
         self._mount = self._active_pipette.mount
         self._tip_origin_pt: Optional[Point] = None
         self._z_height_reference: Optional[float] = None
@@ -85,8 +85,8 @@ class CheckCalibrationUserFlow:
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
         self._deck = deck.Deck(load_name=deck_load_name)
-        self._tip_racks: List[labware.Labware] = []
-        self._load_tipracks(tip_rack_defs)
+        self._tip_racks: Optional[List['LabwareDefinition']] = tip_rack_defs
+        self._active_tiprack = self._load_active_tiprack()
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.load_labware,
@@ -99,6 +99,8 @@ class CheckCalibrationUserFlow:
             CalibrationCommand.move_to_point_one: self.move_to_point_one,
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
             DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
+            CheckCalibrationCommand.switch_pipette: self.change_active_pipette,
+            CheckCalibrationCommand.return_tip: self._return_tip,
             CalibrationCommand.exit: self.exit_session,
         }
 
@@ -123,7 +125,7 @@ class CheckCalibrationUserFlow:
         return self._comparison_map
 
     @property
-    def active_tiprack(self) -> Optional[labware.Labware]:
+    def active_tiprack(self) -> labware.Labware:
         return self._active_tiprack
 
     @property
@@ -133,16 +135,18 @@ class CheckCalibrationUserFlow:
     async def load_labware(self):
         pass
 
-    def _change_active_pipette(self):
+    async def change_active_pipette(self):
         second_pip =\
             self._get_pipette_by_rank(PipetteRank.second)
-        if second_pip:
-            self._active_pipette = second_pip
-            self._active_tiprack = self._tip_racks[1]
-            self._mount = self._active_pipette.mount
-            self._set_current_state(State.preparingPipette)
-        else:
-            self._set_current_state(State.checkComplete)
+        if not second_pip:
+            raise RobotServerError(
+                definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
+                state=self._current_state,
+                handler="change_active_pipette",
+                condition="second pipette")
+        self._active_pipette = second_pip
+        del self._deck[TIPRACK_SLOT]
+        self._active_tiprack = self._load_active_tiprack()
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
@@ -178,6 +182,9 @@ class CheckCalibrationUserFlow:
         return [
             RequiredLabware.from_lw(lw, s)  # type: ignore
             for s, lw in lw_by_slot.items()]
+
+    def get_active_tiprack(self) -> RequiredLabware:
+        return RequiredLabware.from_lw(self.active_tiprack)
 
     def _select_starting_pipette(
             self) -> Tuple[PipetteInfo, List[PipetteInfo]]:
@@ -215,18 +222,18 @@ class CheckCalibrationUserFlow:
             max_volume=left_pip.config.max_volume,
             rank=PipetteRank.first,
             mount=Mount.LEFT)
-        if right_pip.config.max_volume > left_pip.config.max_volume or \
+        if left_pip.config.max_volume > right_pip.config.max_volume or \
                 right_pip.config.channels > left_pip.config.channels:
-            l_info.rank = PipetteRank.second
-            return r_info, [r_info, l_info]
-        else:
             r_info.rank = PipetteRank.second
             return l_info, [l_info, r_info]
+        else:
+            l_info.rank = PipetteRank.second
+            return r_info, [r_info, l_info]
 
     async def _get_current_point(
             self,
             critical_point: CriticalPoint = None) -> Point:
-        return await self._hardware.gantry_position(self._mount,
+        return await self._hardware.gantry_position(self.mount,
                                                     critical_point)
 
     def _get_pipette_by_rank(self, rank: PipetteRank) -> \
@@ -249,40 +256,32 @@ class CheckCalibrationUserFlow:
     def _is_checking_both_mounts(self):
         return len(self._pip_info) == 2
 
-    def _load_tipracks(self,
-                       tip_racks: Optional[List['LabwareDefinition']] = None):
+    def _get_volume_from_tiprack_def(
+            self, tip_rack_def: 'LabwareDefinition') -> float:
+        first_well = tip_rack_def['wells']['A1']
+        return float(first_well['totalLiquidVolume'])
+
+    def _load_active_tiprack(self) -> labware.Labware:
         """
         load onto the deck the default opentrons tip rack labware for this
         pipette and return the tip rack labware. If tip_rack_def is supplied,
         load specific tip rack from def onto the deck and return the labware.
         """
-        both_mounts = self._is_checking_both_mounts()
-        pipettes = [self._get_pipette_by_rank(PipetteRank.first)]
-        if both_mounts:
-            pipettes.append(self._get_pipette_by_rank(PipetteRank.second))
         active_max_vol = self.active_pipette.max_volume
-        if tip_racks:
-            for i, tip_rack_def in enumerate(tip_racks):
-                tr_lw = labware.load_from_definition(
-                    tip_rack_def,
-                    self._deck.position_for(TIPRACK_SLOTS[i]))
-                self._tip_racks.append(tr_lw)
-                tiprack_vol = tr_lw.wells()[0].max_volume
+        if self._tip_racks:
+            for tip_rack_def in self._tip_racks:
+                tiprack_vol = self._get_volume_from_tiprack_def(tip_rack_def)
                 if active_max_vol == tiprack_vol:
-                    self._active_tiprack = tr_lw
+                    tr_lw = labware.load_from_definition(
+                        tip_rack_def,
+                        self._deck.position_for(TIPRACK_SLOT))
         else:
-            for i, pipette in enumerate(pipettes):
-                assert pipette
-                pip_vol = pipette.max_volume
-                tr_load_name =\
-                    TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
-                tr_lw = labware.load(tr_load_name,
-                                     self._deck.position_for(TIPRACK_SLOTS[i]))
-                self._tip_racks.append(tr_lw)
-                if pip_vol == active_max_vol:
-                    self._active_tiprack = tr_lw
-        for i, tr in enumerate(self._tip_racks):
-            self._deck[TIPRACK_SLOTS[i]] = tr
+            tr_load_name =\
+                TIP_RACK_LOOKUP_BY_MAX_VOL[str(active_max_vol)].load_name
+            tr_lw = labware.load(tr_load_name,
+                                 self._deck.position_for(TIPRACK_SLOT))
+        self._deck[TIPRACK_SLOT] = tr_lw
+        return tr_lw
 
     def _get_hw_pipettes(self) -> List[Pipette]:
         # Return a list of instruments, ordered with the active pipette first
@@ -324,10 +323,10 @@ class CheckCalibrationUserFlow:
                 model=hw_pip.model,
                 name=hw_pip.name,
                 tip_length=hw_pip.config.tip_length,
-                rank=info_pip.rank,
-                mount=str(self._mount),
+                rank=str(info_pip.rank),
+                mount=str(self.mount),
                 serial=hw_pip.pipette_id)  # type: ignore[arg-type]
-                for hw_pip, info_pip in zip(hw_pips, info_pips)]
+            for hw_pip, info_pip in zip(hw_pips, info_pips)]
 
     def get_active_pipette(self) -> CheckAttachedPipette:
         # TODO(mc, 2020-09-17): s/tip_length/tipLength
@@ -339,8 +338,8 @@ class CheckCalibrationUserFlow:
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
             tip_length=self._hw_pipette.config.tip_length,
-            rank=self.active_pipette.rank,
-            mount=str(self._mount),
+            rank=str(self.active_pipette.rank),
+            mount=str(self.mount),
             serial=self._hw_pipette.pipette_id)  # type: ignore[arg-type]
 
     async def _is_tip_pick_up_dangerous(self):
@@ -416,7 +415,7 @@ class CheckCalibrationUserFlow:
             all(hasattr(comparisons.first, k.name) for k in compare_states)
         first_pip_steps_passed = compared_first
         for key in compare_states:
-            c = getattr(comparisons, key.name)
+            c = getattr(comparisons.first, key.name)
             if c and c.exceedsThreshold:
                 first_pip_steps_passed = False
                 break
@@ -428,14 +427,15 @@ class CheckCalibrationUserFlow:
             return DeckCalibrationError.UNKNOWN
 
     def _update_compare_status_by_rank(
-            self, rank: PipetteRank, status: ComparisonStatus):
+            self, rank: PipetteRank,
+            status: ComparisonStatus) -> ComparisonMap:
         intermediate_map = getattr(self._comparison_map, rank.name)
-        return intermediate_map.set_value(self.current_state.name, status)
+        intermediate_map.set_value(self.current_state.name, status)
+        return intermediate_map
 
-    def update_comparison_map(self):
+    async def update_comparison_map(self):
         ref_pt, jogged_pt = self._get_reference_points_by_state()
         rank = self.active_pipette.rank
-        second_pip = rank == PipetteRank.second
         threshold_vector = self._determine_threshold()
         if (ref_pt is not None and jogged_pt is not None):
             diff_magnitude = None
@@ -465,40 +465,44 @@ class CheckCalibrationUserFlow:
             intermediate_map =\
                 self._update_compare_status_by_rank(rank, status)
             self._comparison_map.set_value(rank.name, intermediate_map)
-            if self.current_state == State.comparingPointOne and second_pip:
-                self._set_current_state(State.checkComplete)
 
     def _get_reference_points_by_state(self):
         saved_points = self._reference_points
-        if self.current_state == State.comparingHeight:
+        if self.current_state == State.preparingPipette:
+            return saved_points.tip.initial_point,\
+                saved_points.tip.final_point
+        elif self.current_state == State.comparingHeight:
             return saved_points.height.initial_point,\
                 saved_points.height.final_point
         elif self.current_state == State.comparingPointOne:
-            return saved_points.height.initial_point,\
-                saved_points.height.final_point
+            return saved_points.one.initial_point,\
+                saved_points.one.final_point
         elif self.current_state == State.comparingPointTwo:
-            return saved_points.height.initial_point,\
-                saved_points.height.final_point
+            return saved_points.two.initial_point,\
+                saved_points.two.final_point
         elif self.current_state == State.comparingPointThree:
-            return saved_points.height.initial_point,\
-                saved_points.height.final_point
+            return saved_points.three.initial_point,\
+                saved_points.three.final_point
 
     async def register_initial_point(self):
         critical_point = self._get_critical_point_override()
         current_point = \
             await self._get_current_point(critical_point)
         buffer = Point(0, 0, 0)
-        if self.current_state == State.comparingHeight:
+        if self.current_state == State.labwareLoaded:
+            self._reference_points.tip.initial_point = \
+                current_point + buffer
+        elif self.current_state == State.inspectingTip:
             buffer = MOVE_TO_DECK_SAFETY_BUFFER
             self._reference_points.height.initial_point = \
                 current_point + buffer
-        elif self.current_state == State.comparingPointOne:
+        elif self.current_state == State.comparingHeight:
             self._reference_points.one.initial_point = \
                 current_point + buffer
-        elif self.current_state == State.comparingPointTwo:
+        elif self.current_state == State.comparingPointOne:
             self._reference_points.two.initial_point = \
                 current_point + buffer
-        elif self.current_state == State.comparingPointThree:
+        elif self.current_state == State.comparingPointTwo:
             self._reference_points.three.initial_point = \
                 current_point + buffer
 
@@ -507,7 +511,10 @@ class CheckCalibrationUserFlow:
         current_point = \
             await self._get_current_point(critical_point)
         buffer = Point(0, 0, 0)
-        if self.current_state == State.comparingHeight:
+        if self.current_state == State.preparingPipette:
+            self._reference_points.tip.final_point = \
+                current_point + buffer
+        elif self.current_state == State.comparingHeight:
             buffer = MOVE_TO_DECK_SAFETY_BUFFER
             self._reference_points.height.final_point = \
                 current_point + buffer
@@ -562,7 +569,7 @@ class CheckCalibrationUserFlow:
 
     def _get_move_to_point_loc_by_state(self) -> Location:
         assert self._z_height_reference is not None, \
-            "saveOffset has not been called yet"
+            "comparePoint has not been called yet"
         pt_id = MOVE_POINT_STATE_MAP[self._current_state]
         coords = self._deck.get_calibration_position(pt_id).position
         loc = Location(Point(*coords), None)
@@ -581,7 +588,7 @@ class CheckCalibrationUserFlow:
         await self.register_initial_point()
 
     async def jog(self, vector):
-        await self._hardware.move_rel(mount=self._mount,
+        await self._hardware.move_rel(mount=self.mount,
                                       delta=Point(*vector))
         await self.register_final_point()
 
@@ -599,5 +606,8 @@ class CheckCalibrationUserFlow:
         await uf.move(self, to_loc)
 
     async def exit_session(self):
-        await self.move_to_tip_rack()
-        await self._return_tip()
+        MODULE_LOG.info("exit session was initiated")
+        if self._hw_pipette.has_tip:
+            await self.move_to_tip_rack()
+            await self._return_tip()
+        await self._hardware.home()

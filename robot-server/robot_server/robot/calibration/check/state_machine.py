@@ -32,7 +32,8 @@ CALIBRATION_CHECK_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.comparingPointOne: {
         CalibrationCommand.jog: State.comparingPointOne,
         CheckCalibrationCommand.compare_point: State.comparingPointOne,
-        DeckCalibrationCommand.move_to_point_two: State.comparingPointTwo
+        DeckCalibrationCommand.move_to_point_two: State.comparingPointTwo,
+        CalibrationCommand.move_to_tip_rack: State.returningTip
     },
     State.comparingPointTwo: {
         CalibrationCommand.jog: State.comparingPointTwo,
@@ -42,13 +43,19 @@ CALIBRATION_CHECK_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.comparingPointThree: {
         CalibrationCommand.jog: State.comparingPointThree,
         CheckCalibrationCommand.compare_point: State.comparingPointThree,
-        CalibrationCommand.move_to_tip_rack: State.checkForSecondPipette
+        CalibrationCommand.move_to_tip_rack: State.returningTip,
     },
-    State.checkForSecondPipette: {
-        CheckCalibrationCommand.switch_pipette: State.WILDCARD,
+    State.returningTip: {
+        CheckCalibrationCommand.return_tip: State.returningTip,
+        CheckCalibrationCommand.compare_point: State.resultsSummary,
+        CheckCalibrationCommand.switch_pipette: State.labwareLoaded
+    },
+    State.resultsSummary: {
+        CheckCalibrationCommand.compare_point: State.calibrationComplete
     },
     State.badCalibrationData: {
-        CheckCalibrationCommand.return_tip: State.returningTip
+        CalibrationCommand.move_to_tip_rack: State.badCalibrationData,
+        CheckCalibrationCommand.return_tip: State.WILDCARD,
     },
     State.WILDCARD: {
         CalibrationCommand.exit: State.sessionExited

@@ -1,3 +1,4 @@
+from typing import List, Tuple
 from unittest.mock import patch, call, MagicMock
 
 import pytest
@@ -5,10 +6,13 @@ from opentrons import types
 from opentrons.hardware_control import ThreadManager
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage import types as cal_types
+from opentrons.config import robot_configs
 
 from robot_server.robot.calibration.check.user_flow import CheckCalibrationUserFlow
 from robot_server.robot.calibration.check.constants import CalibrationCheckState 
 from robot_server.service.errors import RobotServerError
+from robot_server.robot.calibration.constants import (
+    POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID)
 
 
 PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(

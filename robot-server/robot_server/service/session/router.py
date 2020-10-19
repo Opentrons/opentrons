@@ -80,7 +80,8 @@ async def delete_session_handler(
     session_obj = get_session(manager=session_manager,
                               session_id=sessionId,
                               api_router=router)
-
+    log.info("delete was called! ")
+    log.info(f"session object {session_obj}")
     await session_manager.remove(session_obj.meta.identifier)
 
     return SessionResponse(

@@ -256,7 +256,7 @@ class DeckCalibrationUserFlow:
     def _get_move_to_point_loc_by_state(self) -> Location:
         assert self._z_height_reference is not None, \
             "saveOffset has not been called yet"
-        pt_id = MOVE_POINT_STATE_MAP[self._current_state]
+        pt_id = MOVE_POINT_STATE_MAP[self.current_state]
         coords = self._deck.get_calibration_position(pt_id).position
         loc = Location(Point(*coords), None)
         return loc.move(point=Point(0, 0, self._z_height_reference))

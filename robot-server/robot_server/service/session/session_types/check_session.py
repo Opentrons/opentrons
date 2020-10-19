@@ -1,9 +1,9 @@
-from typing import Awaitable, cast, TYPE_CHECKING
+from typing import Awaitable, cast, TYPE_CHECKING, List, Optional
 
 from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
 from robot_server.robot.calibration.check.models import (
-    SessionCreateParams, ComparisonMap, ComparisonStatePerPipette,
+    ComparisonMap, ComparisonStatePerPipette,
     CalibrationCheckSessionStatus)
 from robot_server.robot.calibration.check import util
 
@@ -49,13 +49,13 @@ class CheckSession(BaseSession):
                      configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> BaseSession:
         """Create an instance"""
-        assert isinstance(instance_meta.create_params, SessionCreateParams)
-        tip_racks = instance_meta.create_params.tipRacks
+        # (lc, 10-19-2020) For now, only pass in empty tipracks. We cannot
+        # have a session model with an optional tiprack for session
+        # create params right now because of the pydantic union problem.
+        tip_racks: List[Optional['LabwareDefinition']] = []
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
-        if not tip_racks:
-            tip_racks = []
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
         try:
@@ -84,29 +84,26 @@ class CheckSession(BaseSession):
         first = comparison_map.first
         second = comparison_map.second
         first_compmap = ComparisonMap(
-            inspectingTip=first.inspectingTip,
             comparingHeight=first.comparingHeight,
             comparingPointOne=first.comparingPointOne,
             comparingPointTwo=first.comparingPointTwo,
             comparingPointThree=first.comparingPointThree)
         second_compmap = ComparisonMap(
-            inspectingTip=second.inspectingTip,
-            comparingHeight=second.comparingHeight)
+            comparingHeight=second.comparingHeight,
+            comparingPointOne=second.comparingPointOne)
         return ComparisonStatePerPipette(
             first=first_compmap, second=second_compmap)
 
     def _get_response_details(self) -> SessionDetails:
-
-        # TODO(mc, 2020-09-17): type of get_comparisons_by_step doesn't quite
-        # match what CalibrationSessionStatus expects for comparisonsByStep
         comparison_map =\
             self._map_to_pydantic_model(self._calibration_check.comparison_map)
         return CalibrationCheckSessionStatus(
             instruments=self._calibration_check.get_instruments(),
             currentStep=self._calibration_check.current_state,
-            comparisonsByStep=comparison_map,  # type: ignore[arg-type] # noqa: e501
+            comparisonsByPipette=comparison_map,
             labware=self._calibration_check.get_required_labware(),
-            activePipette=self._calibration_check.get_active_pipette()
+            activePipette=self._calibration_check.get_active_pipette(),
+            activeTipRack=self._calibration_check.get_active_tiprack()
         )
 
     @property

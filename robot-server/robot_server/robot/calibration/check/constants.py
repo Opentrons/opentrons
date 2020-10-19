@@ -17,11 +17,11 @@ class CalibrationCheckState(str, Enum):
     comparingPointOne = "comparingPointOne"
     comparingPointTwo = "comparingPointTwo"
     comparingPointThree = "comparingPointThree"
-    checkForSecondPipette = "checkForSecondPipette"
     returningTip = "returningTip"
+    resultsSummary = "resultsSummary"
     sessionExited = "sessionExited"
     badCalibrationData = "badCalibrationData"
-    checkComplete = "checkComplete"
+    calibrationComplete = "calibrationComplete"
     WILDCARD = STATE_WILDCARD
 
 
@@ -45,13 +45,13 @@ PIPETTE_TOLERANCES = {
     'other_height': Point(0.0, 0.0, 0.8)
 }
 
-TIPRACK_SLOTS = ['8', '6']
+TIPRACK_SLOT = '8'
 
 StatePointMap = Dict[
     CalibrationCheckState, Union[Literal['1BLC', '3BRC', '7TLC']]]
 
 MOVE_POINT_STATE_MAP: StatePointMap = {
-    CalibrationCheckState.comparingPointOne: POINT_ONE_ID,
-    CalibrationCheckState.comparingPointTwo: POINT_TWO_ID,
-    CalibrationCheckState.comparingPointThree: POINT_THREE_ID
+    CalibrationCheckState.comparingHeight: POINT_ONE_ID,
+    CalibrationCheckState.comparingPointOne: POINT_TWO_ID,
+    CalibrationCheckState.comparingPointTwo: POINT_THREE_ID
 }

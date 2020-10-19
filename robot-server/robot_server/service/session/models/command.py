@@ -192,19 +192,6 @@ class CalibrationCommand(CommandDefinition):
         return "calibration"
 
 
-class CalibrationCheckCommand(CommandDefinition):
-    """Cal Check Specific"""
-    prepare_pipette = "preparePipette"
-    compare_point = "comparePoint"
-    go_to_next_check = "goToNextCheck"
-    # TODO: remove unused command name and trigger
-    reject_calibration = "rejectCalibration"
-
-    @staticmethod
-    def namespace():
-        return "calibration.check"
-
-
 class DeckCalibrationCommand(CommandDefinition):
     """Deck Calibration Specific"""
     move_to_point_two = "moveToPointTwo"
@@ -246,7 +233,7 @@ CommandDataType = typing.Union[
 CommandDefinitionType = typing.Union[
     RobotCommand,
     CalibrationCommand,
-    CalibrationCheckCommand,
+    CheckCalibrationCommand,
     DeckCalibrationCommand,
     ProtocolCommand,
     PipetteCommand,
@@ -290,7 +277,7 @@ class BasicSessionCommand(BaseModel):
         """Create a dictionary of pre-namespace name to CommandDefinition"""
         # A tuple of CommandDefinition enums which need to be identified by
         # localname and full namespaced name
-        pre_namespace_ns = CalibrationCheckCommand, CalibrationCommand
+        pre_namespace_ns = CheckCalibrationCommand, CalibrationCommand
         # Flatten
         t = tuple(v for k in pre_namespace_ns for v in k)
         return {k.localname: k for k in t}
