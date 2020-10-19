@@ -221,7 +221,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
         )}
       </TitledControl>
       {showConfirmStart && (
-        <Portal>
+        <Portal level="top">
           <ConfirmStartDeckCalModal
             confirm={confirmStart}
             cancel={cancelStart}
@@ -229,7 +229,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
         </Portal>
       )}
       {showWizard && (
-        <Portal>
+        <Portal level="top">
           <CalibrateDeck
             session={deckCalibrationSession}
             robotName={robotName}

@@ -187,7 +187,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
         </PrimaryBtn>
       </Flex>
       {showConfirmation && (
-        <Portal>
+        <Portal level="top">
           <ConfirmClearDeckModal
             continuingTo={continuingToText}
             confirm={proceed}
