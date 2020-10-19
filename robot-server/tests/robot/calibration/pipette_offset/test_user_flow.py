@@ -257,21 +257,20 @@ def test_create_params(mock_hw,
 async def test_move_to_tip_rack(mock_user_flow):
     uf = mock_user_flow
     await uf.move_to_tip_rack()
-    cur_pt = await uf._get_current_point(None)
+    cur_pt = await uf.get_current_point(None)
     assert cur_pt == uf._deck['8'].wells()[0].top().point + Point(0, 0, 10)
 
 
 async def test_jog(mock_user_flow):
     uf = mock_user_flow
     await uf.jog(vector=(0, 0, 0.1))
-    assert await uf._get_current_point(None) == Point(0, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(0, 0, 0.1)
     await uf.jog(vector=(1, 0, 0))
-    assert await uf._get_current_point(None) == Point(1, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(1, 0, 0.1)
 
 
 async def test_pick_up_tip(mock_user_flow):
     uf = mock_user_flow
-    assert uf._tip_origin_pt is None
     await uf.pick_up_tip()
     # check that it saves the tip pick up location locally
     assert uf._tip_origin_pt == Point(0, 0, 0)
@@ -283,14 +282,13 @@ async def test_return_tip(mock_user_flow):
     uf._hw_pipette._has_tip = True
     z_offset = uf._hw_pipette.config.return_tip_height * \
         uf._get_tip_length()
-    await uf._return_tip()
+    await uf.return_tip()
     # should move to return tip
     move_calls = [
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._get_critical_point_override()
-        ),
+            critical_point=uf.critical_point_override)
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
     uf._hardware.drop_tip.assert_called()
@@ -337,8 +335,7 @@ async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
     await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=40),
-            critical_point=uf._get_critical_point_override()
-        )
+            critical_point=uf.critical_point_override)
 
     await uf.save_offset()
     tiprack_hash = helpers.hash_labware_def(

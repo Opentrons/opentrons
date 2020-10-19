@@ -13,7 +13,7 @@ from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry import deck
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
 
 from robot_server.robot.calibration.constants import \
@@ -75,7 +75,7 @@ class DeckCalibrationUserFlow:
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck = deck.Deck(load_name=deck_load_name)
+        self._deck = Deck(load_name=deck_load_name)
         self._tip_rack = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
@@ -102,8 +102,35 @@ class DeckCalibrationUserFlow:
         }
 
     @property
+    def deck(self) -> Deck:
+        return self._deck
+
+    @property
     def hardware(self) -> ThreadManager:
         return self._hardware
+
+    @property
+    def mount(self) -> Mount:
+        return self._mount
+
+    @property
+    def hw_pipette(self) -> Pipette:
+        return self._hw_pipette
+
+    @property
+    def tip_origin(self) -> Point:
+        if self._tip_origin_pt:
+            return self._tip_origin_pt
+        else:
+            return self._tip_rack.wells()[0].top().point +\
+                MOVE_TO_TIP_RACK_SAFETY_BUFFER
+
+    @tip_origin.setter
+    def tip_origin(self, new_val: Optional[Point]):
+        self._tip_origin_pt = new_val
+
+    def reset_tip_origin(self):
+        self._tip_origin_pt = None
 
     @property
     def current_state(self) -> State:
@@ -194,11 +221,12 @@ class DeckCalibrationUserFlow:
             f'DeckCalUserFlow handled command {name}, transitioned'
             f'from {self._current_state} to {next_state}')
 
-    def _get_critical_point_override(self) -> Optional[CriticalPoint]:
+    @property
+    def critical_point_override(self) -> Optional[CriticalPoint]:
         return (CriticalPoint.FRONT_NOZZLE if
                 self._hw_pipette.config.channels == 8 else None)
 
-    async def _get_current_point(
+    async def get_current_point(
             self,
             critical_point: CriticalPoint = None) -> Point:
         return await self._hardware.gantry_position(self._mount,
@@ -212,10 +240,7 @@ class DeckCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def move_to_tip_rack(self):
-        point = self._tip_rack.wells()[0].top().point + \
-                MOVE_TO_TIP_RACK_SAFETY_BUFFER
-        to_loc = Location(point, None)
-        await self._move(to_loc)
+        await self._move(Location(self.tip_origin, None))
 
     async def move_to_deck(self):
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
@@ -244,7 +269,7 @@ class DeckCalibrationUserFlow:
         await self._move(self._get_move_to_point_loc_by_state())
 
     async def save_offset(self):
-        cur_pt = await self._get_current_point(critical_point=None)
+        cur_pt = await self.get_current_point(critical_point=None)
         if self.current_state == State.joggingToDeck:
             self._z_height_reference = cur_pt.z
         else:
@@ -287,7 +312,7 @@ class DeckCalibrationUserFlow:
     async def invalidate_tip(self):
         await uf.invalidate_tip(self)
 
-    async def _return_tip(self):
+    async def return_tip(self):
         await uf.return_tip(self, tip_length=self._get_tip_length())
 
     async def _move(self, to_loc: Location):
@@ -295,5 +320,5 @@ class DeckCalibrationUserFlow:
 
     async def exit_session(self):
         await self.move_to_tip_rack()
-        await self._return_tip()
+        await self.return_tip()
         await self._hardware.home()
