@@ -103,5 +103,5 @@ jobs:
         name: 'upload to pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
-          proejct: 'shared-data/python'
+          project: 'shared-data/python'
           repository_url: 'https://upload.pypi.org/legacy/'
