@@ -1,5 +1,6 @@
 """A publisher client."""
 import asyncio
+import logging
 from asyncio import Task, Queue
 from dataclasses import dataclass
 from typing import List
@@ -8,6 +9,8 @@ import zmq  # type: ignore
 from zmq.asyncio import Context  # type: ignore
 
 from notify_server.models.event import Event
+
+log = logging.getLogger(__name__)
 
 
 def create(host_address: str) -> '_Publisher':
@@ -25,6 +28,8 @@ async def _send_task(address: str, queue: Queue) -> None:
     """Run asyncio task that reads from queue and publishes to server."""
     ctx = Context()
     sock = ctx.socket(zmq.PUSH)
+
+    log.info("Publisher connecting to %s", address)
 
     sock.connect(address)
 

@@ -71,5 +71,4 @@ async def run(settings: Settings) -> None:
             settings.publisher_address.connection_string(), queue
         )
     )
-    await subtask
-    await pubtask
+    asyncio.gather([subtask, pubtask])
