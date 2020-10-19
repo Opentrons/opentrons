@@ -35,10 +35,29 @@ Publisher Client Example
    from notify_server.clients.publisher import create
 
    # Create the async publisher client
-   pub = create("tcp://123.123.123.123:1234")
+   pub = create("tcp://localhost:1234")
 
    # Publish an event
    await pub.send(topic="topic", event=my_event)
+
+
+Subscriber Client Example
+.........................
+
+.. code-block:: python
+
+   from notify_server.clients.subscriber import create, Event
+
+   async def my_callback(topic: str, event: Event) -> None:
+      """A callback for handling new events."""
+      ...
+
+
+   # Create the async subscriber client.
+   subscriber = create("tcp://localhost:1234",
+                       ["topic"],
+                       my_callback)
+
 
 
 models
