@@ -104,7 +104,8 @@ def load_attitude_matrix() -> types.DeckCalibration:
             attitude = migrate_affine_xy_to_attitude(gantry_cal)
             modify.save_robot_deck_attitude(transform=attitude,
                                             pip_id=None,
-                                            lw_hash=None)
+                                            lw_hash=None,
+                                            source=types.SourceType.legacy)
             calibration_data = get.get_robot_deck_attitude()
 
     if calibration_data:

@@ -18,6 +18,7 @@ class SourceType(str, Enum):
     factory = "factory"
     user = "user"
     calibration_check = "calibration_check"
+    legacy = 'legacy'
     unknown = "unknown"
 
 

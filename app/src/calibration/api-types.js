@@ -10,6 +10,7 @@ import typeof {
   CALIBRATION_SOURCE_USER,
   CALIBRATION_SOURCE_CALIBRATION_CHECK,
   CALIBRATION_SOURCE_UNKNOWN,
+  CALIBRATION_SOURCE_LEGACY,
 } from './constants'
 
 import type { Mount } from '@opentrons/components'
@@ -39,6 +40,7 @@ export type CalibrationSource =
   | CALIBRATION_SOURCE_USER
   | CALIBRATION_SOURCE_CALIBRATION_CHECK
   | CALIBRATION_SOURCE_UNKNOWN
+  | CALIBRATION_SOURCE_LEGACY
 
 export type IndividualCalibrationStatus = {|
   markedBad: boolean,
