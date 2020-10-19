@@ -20,7 +20,6 @@ import {
   Link,
   PrimaryBtn,
   Text,
-  useConditionalConfirm,
   FONT_SIZE_BODY_1,
   FONT_SIZE_BODY_2,
   BORDER_SOLID_MEDIUM,
@@ -29,8 +28,6 @@ import {
 
 import * as Sessions from '../../sessions'
 import { labwareImages } from './labwareImages'
-import { Portal } from '../portal'
-import { ConfirmClearDeckModal } from './ConfirmClearDeckModal'
 import type { SessionType } from '../../sessions/types'
 import type { CalibrationPanelProps } from './types'
 
@@ -44,7 +41,6 @@ const DECK_CAL_PROCEDURE = 'to calibrate deck'
 const PIP_OFFSET_CAL_HEADER = 'pipette offset calibration'
 const PIP_OFFSET_CAL_BODY =
   'Calibrating pipette offset enables robot to accurately establish the location of the mounted pipette’s nozzle, relative to the deck.'
-const PIP_OFFSET_CAL_PROCEDURE = 'to calibrate pipette offset'
 
 const TIP_LENGTH_CAL_HEADER = 'tip length calibration'
 const TIP_LENGTH_CAL_BODY =
@@ -67,7 +63,6 @@ const contentsBySessionType: {
     headerText: string,
     bodyText: string,
     continueButtonText: string,
-    continuingToText: string,
     noteBody: string,
   },
 } = {
@@ -75,21 +70,18 @@ const contentsBySessionType: {
     headerText: DECK_CAL_HEADER,
     bodyText: DECK_CAL_BODY,
     continueButtonText: `${CONTINUE} ${DECK_CAL_PROCEDURE}`,
-    continuingToText: DECK_CAL_PROCEDURE,
     noteBody: NOTE_BODY_OUTSIDE_PROTOCOL,
   },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     headerText: PIP_OFFSET_CAL_HEADER,
     bodyText: PIP_OFFSET_CAL_BODY,
     continueButtonText: CONTINUE,
-    continuingToText: PIP_OFFSET_CAL_PROCEDURE,
     noteBody: NOTE_BODY_OUTSIDE_PROTOCOL,
   },
   [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
     headerText: TIP_LENGTH_CAL_HEADER,
     bodyText: TIP_LENGTH_CAL_BODY,
     continueButtonText: `${CONTINUE} ${TIP_LENGTH_CAL_PROCEDURE}`,
-    continuingToText: TIP_LENGTH_CAL_PROCEDURE,
     noteBody: NOTE_BODY_PRE_PROTOCOL,
   },
 }
@@ -111,18 +103,13 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
     : sessionType
 
-  const { showConfirmation, confirm: proceed, cancel } = useConditionalConfirm(
-    () => {
-      sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
-    },
-    lookupType !== Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
-  )
+  const proceed = () =>
+    sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
 
   const {
     headerText,
     bodyText,
     continueButtonText,
-    continuingToText,
     noteBody,
   } = contentsBySessionType[lookupType]
 
@@ -186,15 +173,6 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
           {continueButtonText}
         </PrimaryBtn>
       </Flex>
-      {showConfirmation && (
-        <Portal>
-          <ConfirmClearDeckModal
-            continuingTo={continuingToText}
-            confirm={proceed}
-            cancel={cancel}
-          />
-        </Portal>
-      )}
     </>
   )
 }
