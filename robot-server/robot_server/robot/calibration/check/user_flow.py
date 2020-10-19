@@ -494,10 +494,10 @@ class CheckCalibrationUserFlow:
             self._reference_points.tip.initial_point = \
                 current_point + buffer
         elif self.current_state == State.inspectingTip:
-            buffer = MOVE_TO_DECK_SAFETY_BUFFER
             self._reference_points.height.initial_point = \
                 current_point + buffer
         elif self.current_state == State.comparingHeight:
+            buffer = MOVE_TO_DECK_SAFETY_BUFFER
             self._reference_points.one.initial_point = \
                 current_point + buffer
         elif self.current_state == State.comparingPointOne:
