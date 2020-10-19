@@ -320,7 +320,7 @@ class DeckCalibrationUserFlow:
 
     async def exit_session(self):
         await self.move_to_tip_rack()
-        await self._return_tip()
+        await self.return_tip()
         # reload new deck calibration
         self._hardware.reset_robot_calibration()
         await self._hardware.home()
