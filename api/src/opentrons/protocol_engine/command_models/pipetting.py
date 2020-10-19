@@ -1,7 +1,6 @@
 """Pipetting command models."""
 
 from pydantic import BaseModel, Field
-from .command import BaseCommand
 
 
 class BasePipettingRequest(BaseModel):
@@ -33,7 +32,7 @@ class MoveToWellRequest(BasePipettingRequest):
     pass
 
 
-class MoveToWellResponse(BaseModel):
+class MoveToWellResult(BaseModel):
     pass
 
 
@@ -41,7 +40,7 @@ class PickUpTipRequest(BasePipettingRequest):
     pass
 
 
-class PickUpTipResponse(BaseModel):
+class PickUpTipResult(BaseModel):
     pass
 
 
@@ -49,7 +48,7 @@ class DropTipRequest(BasePipettingRequest):
     pass
 
 
-class DropTipResponse(BaseModel):
+class DropTipResult(BaseModel):
     pass
 
 
@@ -57,7 +56,7 @@ class AspirateRequest(BaseLiquidHandlingRequest):
     pass
 
 
-class AspirateResponse(BaseModel):
+class AspirateResult(BaseModel):
     pass
 
 
@@ -65,12 +64,5 @@ class DispenseRequest(BaseLiquidHandlingRequest):
     pass
 
 
-class DispenseResponse(BaseModel):
+class DispenseResult(BaseModel):
     pass
-
-
-MoveToWellCommand = BaseCommand[MoveToWellRequest, MoveToWellResponse]
-PickUpTipCommand = BaseCommand[PickUpTipRequest, PickUpTipResponse]
-DropTipCommand = BaseCommand[DropTipRequest, DropTipResponse]
-AspirateCommand = BaseCommand[AspirateRequest, AspirateResponse]
-DispenseCommand = BaseCommand[DispenseRequest, DispenseResponse]

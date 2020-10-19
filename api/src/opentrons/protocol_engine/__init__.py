@@ -6,6 +6,6 @@ protocol commands, issued by some arbitrary protocol runner, and turn it into
 robot actions (via `hardware_control`) and protocol state.
 """
 
+from .protocol_engine import ProtocolEngine
 
-class ProtocolEngine():
-    pass
+__all__ = ["ProtocolEngine"]

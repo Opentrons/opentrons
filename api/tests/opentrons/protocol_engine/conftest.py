@@ -1,0 +1,146 @@
+import pytest
+from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
+
+from opentrons.types import Mount
+from opentrons.util.helpers import utc_now
+from opentrons.hardware_control.api import API as HardwareController
+
+from opentrons.protocol_engine import command_models
+from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.execution import CommandExecutor
+from opentrons.protocol_engine.execution.equipment import EquipmentHandler
+
+
+@pytest.fixture
+def now():
+    return utc_now()
+
+
+@pytest.fixture
+def store():
+    return StateStore()
+
+
+@pytest.fixture
+def mock_state_store(store):
+    return MagicMock(wraps=store)
+
+
+@pytest.fixture
+def mock_hardware():
+    return AsyncMock(spec=HardwareController)
+
+
+@pytest.fixture
+def mock_equipment_handler():
+    return AsyncMock(spec=EquipmentHandler)
+
+
+@pytest.fixture
+def executor(mock_hardware, mock_equipment_handler):
+    return CommandExecutor(
+        hardware=mock_hardware,
+        equipment_handler=mock_equipment_handler
+    )
+
+
+@pytest.fixture
+def load_labware_request(minimal_labware_def):
+    return command_models.LoadLabwareRequest(
+        loadName=minimal_labware_def["parameters"]["loadName"],
+        namespace="opentrons-test",
+        version=1,
+        location=1,
+    )
+
+
+@pytest.fixture
+def load_labware_result(minimal_labware_def):
+    return command_models.LoadLabwareResult(
+        labwareId="abc",
+        definition=minimal_labware_def,
+        calibration=(1, 2, 3),
+    )
+
+
+@pytest.fixture
+def pending_load_labware_command(now, load_labware_request):
+    return command_models.PendingCommand(
+        uid="unique-id",
+        createdAt=now,
+        request=load_labware_request,
+    )
+
+
+@pytest.fixture
+def running_load_labware_command(now, load_labware_request):
+    return command_models.RunningCommand(
+        uid="unique-id",
+        createdAt=now,
+        startedAt=now,
+        request=load_labware_request,
+    )
+
+
+@pytest.fixture
+def completed_load_labware_command(
+    now,
+    load_labware_request,
+    load_labware_result,
+):
+    return command_models.CompletedCommand(
+        uid="unique-id",
+        createdAt=now,
+        startedAt=now,
+        completedAt=now,
+        request=load_labware_request,
+        result=load_labware_result,
+    )
+
+
+@pytest.fixture
+def load_pipette_request():
+    return command_models.LoadPipetteRequest(
+        pipetteName="p300_single",
+        mount=Mount.LEFT,
+    )
+
+
+@pytest.fixture
+def load_pipette_result():
+    return command_models.LoadPipetteResult(pipetteId="123")
+
+
+@pytest.fixture
+def pending_load_pipette_command(now, load_pipette_request):
+    return command_models.PendingCommand(
+        uid="unique-id",
+        createdAt=now,
+        request=load_pipette_request,
+    )
+
+
+@pytest.fixture
+def running_load_pipette_command(now, load_pipette_request):
+    return command_models.RunningCommand(
+        uid="unique-id",
+        createdAt=now,
+        startedAt=now,
+        request=load_pipette_request,
+    )
+
+
+@pytest.fixture
+def completed_load_pipette_command(
+    now,
+    load_pipette_request,
+    load_pipette_result,
+):
+    return command_models.CompletedCommand(
+        uid="unique-id",
+        createdAt=now,
+        startedAt=now,
+        completedAt=now,
+        request=load_pipette_request,
+        result=load_pipette_result,
+    )

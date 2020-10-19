@@ -20,36 +20,35 @@ following lifecycle:
 4. Command result is added to protocol state
 """
 from typing import Union
-from .command import PendingCommand, RunningCommand, CompletedCommand
+from .command import (
+    PendingCommand,
+    RunningCommand,
+    CompletedCommand,
+    FailedCommand,
+    GenericCommandType
+)
 
 from .equipment import (
     LoadLabwareRequest,
-    LoadLabwareResponse,
-    LoadLabwareCommand,
+    LoadLabwareResult,
     LoadPipetteRequest,
-    LoadPipetteResponse,
-    LoadPipetteCommand,
+    LoadPipetteResult,
 )
 
 from .pipetting import (
     MoveToWellRequest,
-    MoveToWellResponse,
-    MoveToWellCommand,
+    MoveToWellResult,
     PickUpTipRequest,
-    PickUpTipResponse,
-    PickUpTipCommand,
+    PickUpTipResult,
     DropTipRequest,
-    DropTipResponse,
-    DropTipCommand,
+    DropTipResult,
     AspirateRequest,
-    AspirateResponse,
-    AspirateCommand,
+    AspirateResult,
     DispenseRequest,
-    DispenseResponse,
-    DispenseCommand
+    DispenseResult,
 )
 
-CommandRequest = Union[
+CommandRequestType = Union[
     LoadLabwareRequest,
     LoadPipetteRequest,
     MoveToWellRequest,
@@ -59,59 +58,88 @@ CommandRequest = Union[
     DispenseRequest
 ]
 
-CommandResponse = Union[
-    LoadLabwareResponse,
-    LoadPipetteResponse,
-    MoveToWellResponse,
-    PickUpTipResponse,
-    DropTipResponse,
-    AspirateResponse,
-    DispenseResponse
+CommandType = Union[
+    GenericCommandType[LoadLabwareRequest, LoadLabwareResult],
+    GenericCommandType[LoadPipetteRequest, LoadPipetteResult],
+    GenericCommandType[MoveToWellRequest, MoveToWellResult],
+    GenericCommandType[PickUpTipRequest, PickUpTipResult],
+    GenericCommandType[AspirateRequest, AspirateResult],
+    GenericCommandType[DispenseRequest, DispenseResult],
 ]
 
-Command = Union[
-    LoadLabwareCommand,
-    LoadPipetteCommand,
-    MoveToWellCommand,
-    PickUpTipCommand,
-    DropTipCommand,
-    AspirateCommand,
-    DispenseCommand,
+PendingCommandType = Union[
+    PendingCommand[LoadLabwareRequest, LoadLabwareResult],
+    PendingCommand[LoadPipetteRequest, LoadPipetteResult],
+    PendingCommand[MoveToWellRequest, MoveToWellResult],
+    PendingCommand[PickUpTipRequest, PickUpTipResult],
+    PendingCommand[AspirateRequest, AspirateResult],
+    PendingCommand[DispenseRequest, DispenseResult],
+]
+
+RunningCommandType = Union[
+    RunningCommand[LoadLabwareRequest, LoadLabwareResult],
+    RunningCommand[LoadPipetteRequest, LoadPipetteResult],
+    RunningCommand[MoveToWellRequest, MoveToWellResult],
+    RunningCommand[PickUpTipRequest, PickUpTipResult],
+    RunningCommand[AspirateRequest, AspirateResult],
+    RunningCommand[DispenseRequest, DispenseResult],
+]
+
+CompletedCommandType = Union[
+    CompletedCommand[LoadLabwareRequest, LoadLabwareResult],
+    CompletedCommand[LoadPipetteRequest, LoadPipetteResult],
+    CompletedCommand[MoveToWellRequest, MoveToWellResult],
+    CompletedCommand[PickUpTipRequest, PickUpTipResult],
+    CompletedCommand[AspirateRequest, AspirateResult],
+    CompletedCommand[DispenseRequest, DispenseResult],
+]
+
+FailedCommandType = Union[
+    FailedCommand[LoadLabwareRequest],
+    FailedCommand[LoadPipetteRequest],
+    FailedCommand[MoveToWellRequest],
+    FailedCommand[PickUpTipRequest],
+    FailedCommand[AspirateRequest],
+    FailedCommand[DispenseRequest],
 ]
 
 __all__ = [
-    # command lifecycle state
+    # command lifecycle state and union types
     "PendingCommand",
     "RunningCommand",
     "CompletedCommand",
+    "FailedCommandType",
 
     # type unions
-    "CommandRequest",
-    "CommandResponse",
-    "Command",
+    "CommandRequestType",
+    "CommandResultType",
+    "PendingCommandType",
+    "RunningCommandType",
+    "CompletedCommandType",
+    "CommandType",
 
     # equipment commands
     "LoadLabwareRequest",
-    "LoadLabwareResponse",
+    "LoadLabwareResult",
     "LoadLabwareCommand",
     "LoadPipetteRequest",
-    "LoadPipetteResponse",
+    "LoadPipetteResult",
     "LoadPipetteCommand",
 
     # pipetting commands
     "MoveToWellRequest",
-    "MoveToWellResponse",
+    "MoveToWellResult",
     "MoveToWellCommand",
     "PickUpTipRequest",
-    "PickUpTipResponse",
+    "PickUpTipResult",
     "PickUpTipCommand",
     "DropTipRequest",
-    "DropTipResponse",
+    "DropTipResult",
     "DropTipCommand",
     "AspirateRequest",
-    "AspirateResponse",
+    "AspirateResult",
     "AspirateCommand",
     "DispenseRequest",
-    "DispenseResponse",
+    "DispenseResult",
     "DispenseCommand"
 ]

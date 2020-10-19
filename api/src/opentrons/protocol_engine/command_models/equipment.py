@@ -1,10 +1,8 @@
 """Equipment loading command models."""
 from pydantic import BaseModel, Field
-from typing import Any
-from opentrons.types import Mount, Point
+from typing import Any, Tuple
+from opentrons.types import Mount
 from opentrons_shared_data.pipette.dev_types import PipetteName
-
-from .command import BaseCommand
 
 
 class LoadLabwareRequest(BaseModel):
@@ -22,10 +20,10 @@ class LoadLabwareRequest(BaseModel):
         description="The labware definition version")
 
 
-class LoadLabwareResponse(BaseModel):
+class LoadLabwareResult(BaseModel):
     labwareId: str
     definition: Any
-    calibration: Point
+    calibration: Tuple[float, float, float]
 
 
 class LoadPipetteRequest(BaseModel):
@@ -35,9 +33,5 @@ class LoadPipetteRequest(BaseModel):
     mount: Mount
 
 
-class LoadPipetteResponse(BaseModel):
+class LoadPipetteResult(BaseModel):
     pipetteId: str
-
-
-LoadLabwareCommand = BaseCommand[LoadLabwareRequest, LoadLabwareResponse]
-LoadPipetteCommand = BaseCommand[LoadPipetteRequest, LoadPipetteResponse]

@@ -1,5 +1,5 @@
 """Protocol engine state module."""
 
-from .state_store import StateStore
+from .state_store import State, StateStore, PipetteData, LabwareData
 
-__all__ = ["StateStore"]
+__all__ = ["State", "StateStore", "PipetteData", "LabwareData"]
