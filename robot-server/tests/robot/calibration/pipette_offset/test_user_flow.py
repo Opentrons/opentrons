@@ -138,6 +138,7 @@ def mock_hw(hardware):
     hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
+    hardware.home_plunger = MagicMock(side_effect=async_mock)
 
     return hardware
 
