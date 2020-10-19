@@ -4,9 +4,14 @@ import ReactDom from 'react-dom'
 
 type PortalLevel = 'page' | 'top'
 
-type Props = {| children: React.Node, level: PortalLevel |}
+type Props = {|
+  children: React.Node,
+  level: PortalLevel,
+|}
 
-type State = {| hasRoot: boolean |}
+type State = {|
+  hasRoot: boolean,
+|}
 
 const PORTAL_ROOT_ID_BY_LEVEL: { [PortalLevel]: string } = {
   page: '__otAppModalPortalRoot',
