@@ -10,6 +10,10 @@ import {
   DECK_CAL_STATUS_IDENTITY,
   DECK_CAL_STATUS_BAD_CALIBRATION,
   DECK_CAL_STATUS_SINGULARITY,
+  CALIBRATION_SOURCE_USER,
+  CALIBRATION_SOURCE_FACTORY,
+  CALIBRATION_SOURCE_LEGACY,
+  CALIBRATION_SOURCE_UNKNOWN,
 } from '../../../calibration'
 import { DeckCalibrationControl } from '../DeckCalibrationControl'
 import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
@@ -87,6 +91,46 @@ describe('DeckCalibrationControl', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+  })
+  const SOURCE_SPECS = [
+    {
+      it: 'displays migrated if source is legacy',
+      source: CALIBRATION_SOURCE_LEGACY,
+      shouldMatch: /migrated/i,
+    },
+    {
+      it: 'displays calibrated if source is user',
+      source: CALIBRATION_SOURCE_USER,
+      shouldMatch: /calibrated/i,
+    },
+    {
+      it: 'displays calibrated if source is factory',
+      source: CALIBRATION_SOURCE_FACTORY,
+      shouldMatch: /calibrated/i,
+    },
+    {
+      it: 'displays calibrated if source is unknown',
+      source: CALIBRATION_SOURCE_UNKNOWN,
+      shouldMatch: /calibrated/i,
+    }
+  ]
+  SOURCE_SPECS.forEach(spec => {
+    it(spec.it, () => {
+      const wrapper = render({
+        deckCalData: {
+          type: 'affine',
+          matrix: [[1, 2, 3], [5, 6, 7], [8, 9, 10]],
+          lastModified: '2020-10-19T00:01:02+00:00',
+          pipetteCalibratedWith: null,
+          tiprack: null,
+          source: spec.source,
+          status: { markedBad: false, source: 'unknown', markedAt: '' },
+        },
+      })
+      expect(
+        wrapper.findWhere(elem => elem.prop('fontStyle') === 'italic').html()
+      ).toMatch(spec.shouldMatch)
+    })
   })
 
   it('button launches new deck calibration after confirm', () => {

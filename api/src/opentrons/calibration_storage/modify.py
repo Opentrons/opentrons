@@ -196,7 +196,8 @@ def save_tip_length_calibration(
 def save_robot_deck_attitude(
         transform: local_types.AttitudeMatrix,
         pip_id: typing.Optional[str],
-        lw_hash: typing.Optional[str]):
+        lw_hash: typing.Optional[str],
+        source: local_types.SourceType = None):
     robot_dir = config.get_opentrons_path('robot_calibration_dir')
     robot_dir.mkdir(parents=True, exist_ok=True)
     gantry_path = robot_dir/'deck_calibration.json'
@@ -208,7 +209,7 @@ def save_robot_deck_attitude(
         'pipette_calibrated_with': pip_id,
         'last_modified': utc_now(),
         'tiprack': lw_hash,
-        'source': local_types.SourceType.user,
+        'source': source or local_types.SourceType.user,
         'status': status
     }
     io.save_to_file(gantry_path, gantry_dict)

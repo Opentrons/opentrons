@@ -42,6 +42,7 @@ import type { RequestState } from '../../robot-api/types'
 
 const DECK_NEVER_CALIBRATED = "You haven't calibrated the deck yet"
 const LAST_CALIBRATED = 'Last calibrated: '
+const MIGRATED = 'Migrated from legacy data: '
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
 const CALIBRATE_BUTTON_TEXT = 'Calibrate'
@@ -58,7 +59,14 @@ const buildDeckLastCalibrated: (
     typeof data.lastModified === 'string'
       ? format(new Date(data.lastModified), 'yyyy-MM-dd HH:mm')
       : 'unknown'
-  return `${LAST_CALIBRATED} ${datestring}`
+  const prefix = calData =>
+        typeof data?.source === 'string'
+        ? (calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
+           ? MIGRATED
+           : LAST_CALIBRATED)
+        : LAST_CALIBRATED
+
+  return `${prefix(data)} ${datestring}`
 }
 
 // deck calibration commands for which the full page spinner should not appear
