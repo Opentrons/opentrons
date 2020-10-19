@@ -92,4 +92,5 @@ export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationHealthSess
     rank: 'second',
     serial: 'fake pipette serial 1',
   },
+  activeTipRack: mockCalibrationCheckLabware,
 }

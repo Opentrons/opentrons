@@ -13,12 +13,7 @@ export function makeIntercomEvent(
 ): IntercomEvent | null {
   switch (action.type) {
     case Sessions.DELETE_SESSION: {
-      const { robotName, sessionId } = action.payload
-      const eventProps = Sessions.getIntercomEventPropsForRobotSessionById(
-        state,
-        robotName,
-        sessionId
-      )
+      const eventProps = null
       if (eventProps === null) {
         return null
       }

@@ -1,7 +1,6 @@
 // @flow
 import type { CalibrationLabware } from '../types'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 // calibration check session types
 
 import typeof {
