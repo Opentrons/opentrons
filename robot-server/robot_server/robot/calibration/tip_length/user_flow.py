@@ -196,6 +196,7 @@ class TipCalibrationUserFlow:
     async def exit_session(self):
         await self.move_to_tip_rack()
         await self._return_tip()
+        await self._hardware.home()
 
     def _get_tip_rack_lw(self,
                          tip_rack_def: 'LabwareDefinition') -> labware.Labware:

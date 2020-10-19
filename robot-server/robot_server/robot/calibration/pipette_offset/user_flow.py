@@ -417,3 +417,4 @@ class PipetteOffsetCalibrationUserFlow:
         await self._return_tip()
         # reload new pipette offset data by resetting instrument
         self._hardware.reset_instrument(self._mount)
+        await self._hardware.home()

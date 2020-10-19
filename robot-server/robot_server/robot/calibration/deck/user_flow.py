@@ -296,3 +296,4 @@ class DeckCalibrationUserFlow:
     async def exit_session(self):
         await self.move_to_tip_rack()
         await self._return_tip()
+        await self._hardware.home()
