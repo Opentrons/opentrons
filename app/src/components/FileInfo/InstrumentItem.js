@@ -6,7 +6,6 @@ import {
   Flex,
   Text,
   ALIGN_CENTER,
-  C_DARK_GRAY,
   COLOR_ERROR,
   FONT_BODY_1_DARK,
   FONT_SIZE_BODY_1,
