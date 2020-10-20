@@ -2683,16 +2683,6 @@
       }
     },
     {
-      "command": "blowout",
-      "params": {
-        "pipette": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
-        "labware": "trashId",
-        "well": "A1",
-        "flowRate": 46.43,
-        "offsetFromBottomMm": 0
-      }
-    },
-    {
       "command": "dropTip",
       "params": {
         "pipette": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
