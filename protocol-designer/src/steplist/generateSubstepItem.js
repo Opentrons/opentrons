@@ -78,9 +78,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWells: stepArgs.destWells,
-      disposalLabware: stepArgs.disposalLabware,
       disposalVolume: stepArgs.disposalVolume,
-      disposalWell: stepArgs.disposalWell,
       sourceWell: stepArgs.sourceWell,
       // set special values for substeps
       mixBeforeAspirate: null,

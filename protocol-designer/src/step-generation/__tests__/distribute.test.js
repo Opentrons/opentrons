@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-disabled-tests */
 // @flow
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -24,6 +25,10 @@ import {
 } from '../__fixtures__'
 import { distribute } from '../commandCreators/compound/distribute'
 import type { DistributeArgs } from '../types'
+import {
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '../utils/misc'
 
 // well depth for 96 plate is 10.54, so need to add 1mm to top of well
 const airGapHelper = makeAirGapHelper({ offsetFromBottomMm: 11.54 })
@@ -42,6 +47,8 @@ let robotStateWithTip
 let robotInitialStateNoTipsRemain
 let blowoutSingleToTrash
 let blowoutSingleToSourceA1
+let blowoutSingleToDestA4
+let blowoutSingleToDestA3
 
 beforeEach(() => {
   mixinArgs = {
@@ -57,8 +64,7 @@ beforeEach(() => {
     preWetTip: false,
     touchTipAfterAspirate: false,
     disposalVolume: 60,
-    disposalLabware: FIXED_TRASH_ID,
-    disposalWell: 'A1',
+    blowoutLocation: FIXED_TRASH_ID,
     mixBeforeAspirate: null,
     aspirateDelay: null,
     dispenseDelay: null,
@@ -71,6 +77,14 @@ beforeEach(() => {
   })
   blowoutSingleToSourceA1 = blowoutHelper(SOURCE_LABWARE, {
     offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+  })
+  blowoutSingleToDestA4 = blowoutHelper(DEST_LABWARE, {
+    offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+    well: 'A4',
+  })
+  blowoutSingleToDestA3 = blowoutHelper(DEST_LABWARE, {
+    offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+    well: 'A3',
   })
 
   invariantContext = makeContext()
@@ -234,8 +248,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       volume: 120,
       mixBeforeAspirate: { times: 2, volume: 50 },
       disposalVolume: 12,
-      disposalLabware: SOURCE_LABWARE,
-      disposalWell: 'A1',
+      blowoutLocation: SOURCE_LABWARE,
     }
     const result = distribute(
       distributeArgs,
@@ -583,8 +596,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
   it('should mix before aspirate w/ disposal vol', () => {
     const volume = 130
     const disposalVolume = 20
-    const disposalLabware = SOURCE_LABWARE
-    const disposalWell = 'A1'
     const aspirateVol = volume * 2 + disposalVolume
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
@@ -597,8 +608,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         times: 2,
       },
       disposalVolume,
-      disposalLabware,
-      disposalWell,
+      blowoutLocation: SOURCE_LABWARE,
     }
 
     const result = distribute(
@@ -724,6 +734,32 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
   })
 
   describe('all advanced settings enabled', () => {
+    let allArgs: $Shape<DistributeArgs>
+    beforeEach(() => {
+      allArgs = {
+        ...mixinArgs,
+        sourceWell: 'A1',
+        destWells: ['B1', 'B2'],
+        changeTip: 'never',
+        volume: 45,
+        // aspirate column
+        preWetTip: true,
+        mixBeforeAspirate: {
+          volume: 35,
+          times: 1,
+        },
+        aspirateDelay: { seconds: 11, mmFromBottom: 15 },
+        touchTipAfterAspirate: true,
+        touchTipAfterAspirateOffsetMmFromBottom: 14.5,
+        aspirateAirGapVolume: 31,
+        // dispense column
+        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        touchTipAfterDispense: true,
+        blowoutFlowRateUlSec: 2.3,
+        blowoutOffsetFromTopMm: 3.3,
+        dispenseAirGapVolume: 3,
+      }
+    })
     it('should create commands in the expected order with expected params', () => {
       const args: $Shape<DistributeArgs> = {
         ...mixinArgs,
@@ -752,209 +788,749 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // mix (asp)
-        {
-          command: 'aspirate',
-          params: {
-            pipette: 'p300SingleId',
-            volume: 35,
-            labware: 'sourcePlateId',
-            well: 'A1',
-            offsetFromBottomMm: 3.1,
-            flowRate: 2.1,
-          },
-        },
-        {
-          command: 'delay',
-          params: {
-            wait: 11,
-          },
-        },
-        {
-          command: 'dispense',
-          params: {
-            pipette: 'p300SingleId',
-            volume: 35,
-            labware: 'sourcePlateId',
-            well: 'A1',
-            offsetFromBottomMm: 3.1,
-            flowRate: 2.2,
-          },
-        },
-        {
-          command: 'delay',
-          params: {
-            wait: 12,
-          },
-        },
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
         // aspirate
-        {
-          command: 'aspirate',
-          params: {
-            pipette: 'p300SingleId',
-            volume: 150,
-            labware: 'sourcePlateId',
-            well: 'A1',
-            offsetFromBottomMm: 3.1,
-            flowRate: 2.1,
-          },
-        },
-        {
-          command: 'moveToWell',
-          params: {
-            pipette: 'p300SingleId',
-            labware: 'sourcePlateId',
-            well: 'A1',
-            offset: {
-              x: 0,
-              y: 0,
-              z: 15,
-            },
-          },
-        },
-        {
-          command: 'delay',
-          params: {
-            wait: 11,
-          },
-        },
+        aspirateHelper('A1', 150),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
-        {
-          command: 'touchTip',
-          params: {
-            pipette: 'p300SingleId',
-            labware: 'sourcePlateId',
-            well: 'A1',
-            offsetFromBottomMm: 14.5,
-          },
-        },
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
         // air gap
-        {
-          command: 'airGap',
-          params: {
-            pipette: 'p300SingleId',
-            volume: 31,
-            labware: 'sourcePlateId',
-            well: 'A1',
-            offsetFromBottomMm: 11.54,
-            flowRate: 2.1,
-          },
-        },
-        {
-          command: 'delay',
-          params: {
-            wait: 11,
-          },
-        },
+        airGapHelper('A1', 31),
+        delayCommand(11),
         // dispense #1
-        {
-          command: 'dispenseAirGap',
-          params: {
-            pipette: 'p300SingleId',
-            volume: 31,
-            labware: 'destPlateId',
-            well: 'B1',
-            offsetFromBottomMm: 11.54,
-            flowRate: 2.2,
-          },
-        },
-        {
-          command: 'delay',
-          params: {
-            wait: 12,
-          },
-        },
-        {
-          command: 'dispense',
-          params: {
-            pipette: 'p300SingleId',
-            volume: 45,
-            labware: 'destPlateId',
-            well: 'B1',
-            offsetFromBottomMm: 3.2,
-            flowRate: 2.2,
-          },
-        },
-        {
-          command: 'moveToWell',
-          params: {
-            pipette: 'p300SingleId',
-            labware: 'destPlateId',
-            well: 'B1',
-            offset: {
-              x: 0,
-              y: 0,
-              z: 14,
-            },
-          },
-        },
-        {
-          command: 'delay',
-          params: {
-            wait: 12,
-          },
-        },
+        dispenseAirGapHelper('B1', 31),
+        delayCommand(12),
+        dispenseHelper('B1', 45),
+        ...delayWithOffset('B1', DEST_LABWARE),
         // touch tip (disp #1)
-        {
-          command: 'touchTip',
-          params: {
-            pipette: 'p300SingleId',
-            labware: 'destPlateId',
-            well: 'B1',
-            offsetFromBottomMm: 3.4,
-          },
-        },
+        touchTipHelper('B1', { labware: DEST_LABWARE }),
         // dispense #2
-        {
-          command: 'dispense',
-          params: {
-            pipette: 'p300SingleId',
-            volume: 45,
-            labware: 'destPlateId',
-            well: 'B2',
-            offsetFromBottomMm: 3.2,
-            flowRate: 2.2,
-          },
-        },
-        {
-          command: 'moveToWell',
-          params: {
-            pipette: 'p300SingleId',
-            labware: 'destPlateId',
-            well: 'B2',
-            offset: {
-              x: 0,
-              y: 0,
-              z: 14,
-            },
-          },
-        },
-        {
-          command: 'delay',
-          params: {
-            wait: 12,
-          },
-        },
+        dispenseHelper('B2', 45),
+        ...delayWithOffset('B2', DEST_LABWARE),
         // touch tip (disp #2)
-        {
-          command: 'touchTip',
-          params: {
-            pipette: 'p300SingleId',
-            labware: 'destPlateId',
-            well: 'B2',
-            offsetFromBottomMm: 3.4,
-          },
-        },
+        touchTipHelper('B2', { labware: DEST_LABWARE }),
         // blowout
-        {
-          command: 'blowout',
-          params: {
-            pipette: 'p300SingleId',
-            labware: 'trashId',
-            well: 'A1',
-            flowRate: 2.3,
-            offsetFromBottomMm: 80.3,
-          },
-        },
+        blowoutSingleToTrash,
+      ])
+    })
+    it('should create commands in the expected order with expected params (blowout in trash, reuse tip)', () => {
+      const args = {
+        ...allArgs,
+        volume: 100,
+        sourceWell: 'A1',
+        destWells: ['A2', 'A3', 'A4'],
+        changeTip: 'never',
+        blowoutLocation: 'trashId',
+      }
+
+      const mixCommandsWithDelay = [
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+      ]
+
+      const result = distribute(args, invariantContext, robotStateWithTip)
+      // blowout location IS trash! but I am never changing the tip, so i still gotta blow out
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate
+        aspirateHelper('A1', 260),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A2', 31),
+        delayCommand(12),
+        dispenseHelper('A2', 100),
+        ...delayWithOffset('A2', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A2', { labware: DEST_LABWARE }),
+        // dispense #2
+        dispenseHelper('A3', 100),
+        ...delayWithOffset('A3', DEST_LABWARE),
+        // touch tip (disp #2)
+        touchTipHelper('A3', { labware: DEST_LABWARE }),
+
+        // after touch tip, this is the final dispense in the chunk
+        // does the chunk end in a tip change?
+        // changeTip: never => do not change tip => so NO
+        // this means we must blowout into trash, and then go back to aspirate
+        blowoutSingleToTrash,
+        // next chunk from A1: remaining volume
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate 100 liquid + 60 for disposal vol
+        aspirateHelper('A1', 160),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A4', 31),
+        delayCommand(12),
+        dispenseHelper('A4', 100),
+        ...delayWithOffset('A4', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // use the dispense > air gap here before moving to trash
+        airGapHelper('A4', 3, { labware: DEST_LABWARE }),
+        delayCommand(11),
+        // since we used dispense > air gap, drop the tip
+        // skip blowout into trash b/c we're about to drop tip anyway
+        dropTipHelper('A1'),
+      ])
+    })
+    it('should create commands in the expected order with expected params (blowout in trash, change tip each aspirate)', () => {
+      const args = {
+        ...allArgs,
+        volume: 100,
+        sourceWell: 'A1',
+        destWells: ['A2', 'A3', 'A4'],
+        changeTip: 'always',
+        blowoutLocation: 'trashId',
+      }
+
+      const mixCommandsWithDelay = [
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+      ]
+      const result = distribute(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // replace tip
+        dropTipHelper('A1'),
+        pickUpTipHelper('A1'),
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate
+        aspirateHelper('A1', 260),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A2', 31),
+        delayCommand(12),
+        dispenseHelper('A2', 100),
+        ...delayWithOffset('A2', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A2', { labware: DEST_LABWARE }),
+        // dispense #2
+        dispenseHelper('A3', 100),
+        ...delayWithOffset('A3', DEST_LABWARE),
+        // touch tip (disp #2)
+        touchTipHelper('A3', { labware: DEST_LABWARE }),
+
+        // after touch tip, this is the final dispense in the chunk
+        // does the chunk end in a tip change?
+        // changeTip: always => change tip => so YES
+        // chunk ending in a tip change so no need to blowout
+        airGapHelper('A3', 3, { labware: DEST_LABWARE }), // need to air gap here
+        delayCommand(11),
+        // just drop the tip in the trash
+        dropTipHelper('A1'),
+        // next chunk from A1: remaining volume
+        pickUpTipHelper('B1'),
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate 100 liquid + 60 for disposal vol
+        aspirateHelper('A1', 160),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A4', 31),
+        delayCommand(12),
+        dispenseHelper('A4', 100),
+        ...delayWithOffset('A4', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // use the dispense > air gap here before moving to trash
+        airGapHelper('A4', 3, { labware: DEST_LABWARE }),
+        delayCommand(11),
+        // since we used dispense > air gap, drop the tip
+        // skip blowout into trash b/c we're about to drop tip anyway
+        dropTipHelper('A1'),
+      ])
+    })
+    it('should create commands in the expected order with expected params (blowout in trash, change tip once)', () => {
+      const args = {
+        ...allArgs,
+        volume: 100,
+        sourceWell: 'A1',
+        destWells: ['A2', 'A3', 'A4'],
+        changeTip: 'once',
+        blowoutLocation: 'trashId',
+      }
+
+      const mixCommandsWithDelay = [
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+      ]
+      const result = distribute(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // replace tip
+        dropTipHelper('A1'),
+        pickUpTipHelper('A1'),
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate
+        aspirateHelper('A1', 260),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A2', 31),
+        delayCommand(12),
+        dispenseHelper('A2', 100),
+        ...delayWithOffset('A2', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A2', { labware: DEST_LABWARE }),
+        // dispense #2
+        dispenseHelper('A3', 100),
+        ...delayWithOffset('A3', DEST_LABWARE),
+        // touch tip (disp #2)
+        touchTipHelper('A3', { labware: DEST_LABWARE }),
+
+        // after touch tip, this is the final dispense in the chunk
+        // does the chunk end in a tip change?
+        // changeTip: once => so NO
+        // chunk NOT ending in a tip change, so we must blowout to trash
+        blowoutSingleToTrash,
+        // skip dispense => air gap since we are reusing the tip
+
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate 100 liquid + 60 for disposal vol
+        aspirateHelper('A1', 160),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #3
+        dispenseAirGapHelper('A4', 31),
+        delayCommand(12),
+        dispenseHelper('A4', 100),
+        ...delayWithOffset('A4', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // use the dispense > air gap here before moving to trash
+        // since it is the final dispense in the step
+        // skip blowout into trash b/c we're about to drop tip anyway
+        airGapHelper('A4', 3, { labware: DEST_LABWARE }),
+        delayCommand(11),
+        // since we used dispense > air gap, drop the tip
+        dropTipHelper('A1'),
+      ])
+    })
+    it('should create commands in the expected order with expected params (blowout in source, reuse tip)', () => {
+      const args = {
+        ...allArgs,
+        volume: 100,
+        sourceWell: 'A1',
+        destWells: ['A2', 'A3', 'A4'],
+        changeTip: 'never',
+        blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
+      }
+
+      const mixCommandsWithDelay = [
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+      ]
+      const result = distribute(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate
+        aspirateHelper('A1', 260),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A2', 31),
+        delayCommand(12),
+        dispenseHelper('A2', 100),
+        ...delayWithOffset('A2', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A2', { labware: DEST_LABWARE }),
+        // dispense #2
+        dispenseHelper('A3', 100),
+        ...delayWithOffset('A3', DEST_LABWARE),
+        // touch tip (disp #2)
+        touchTipHelper('A3', { labware: DEST_LABWARE }),
+
+        // blowout location is source so need to blowout
+        blowoutSingleToSourceA1,
+        // skip dispense => air gap since we are reusing the tip
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate 100 liquid + 60 for disposal vol
+        aspirateHelper('A1', 160),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #3
+        dispenseAirGapHelper('A4', 31),
+        delayCommand(12),
+        dispenseHelper('A4', 100),
+        ...delayWithOffset('A4', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // use the dispense > air gap here before moving to trash
+        // since it is the final dispense in the step
+        blowoutSingleToSourceA1,
+        // air gap from source since blowout location is source
+        airGapHelper('A1', 3),
+        delayCommand(11),
+        // since we used dispense > air gap, drop the tip
+        dropTipHelper('A1'),
+      ])
+    })
+    it('should create commands in the expected order with expected params (blowout in source, change tip each aspirate)', () => {
+      const args = {
+        ...allArgs,
+        volume: 100,
+        sourceWell: 'A1',
+        destWells: ['A2', 'A3', 'A4'],
+        changeTip: 'always',
+        blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
+      }
+
+      const mixCommandsWithDelay = [
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+      ]
+      const result = distribute(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // replace tip
+        dropTipHelper('A1'),
+        pickUpTipHelper('A1'),
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate
+        aspirateHelper('A1', 260),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A2', 31),
+        delayCommand(12),
+        dispenseHelper('A2', 100),
+        ...delayWithOffset('A2', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A2', { labware: DEST_LABWARE }),
+        // dispense #2
+        dispenseHelper('A3', 100),
+        ...delayWithOffset('A3', DEST_LABWARE),
+        // touch tip (disp #2)
+        touchTipHelper('A3', { labware: DEST_LABWARE }),
+
+        // blowout location is source so need to blowout
+        blowoutSingleToSourceA1,
+        // air gap so no liquid drops off the tip as pipette moves from source well to trash
+        airGapHelper('A1', 3),
+        // delay after aspirating air
+        delayCommand(11),
+        // just drop the tip in the trash
+        dropTipHelper('A1'),
+        // next chunk from A1: remaining volume
+        pickUpTipHelper('B1'),
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate 100 liquid + 60 for disposal vol
+        aspirateHelper('A1', 160),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #3
+        dispenseAirGapHelper('A4', 31),
+        delayCommand(12),
+        dispenseHelper('A4', 100),
+        ...delayWithOffset('A4', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // blowout to source
+        blowoutSingleToSourceA1,
+        // air gap so no liquid drops off the tip as pipette moves from source well to trash
+        airGapHelper('A1', 3),
+        delayCommand(11),
+        // since we used dispense > air gap, drop the tip
+        dropTipHelper('A1'),
+      ])
+    })
+    it('should create commands in the expected order with expected params (blowout in source, change tip once)', () => {
+      const args = {
+        ...allArgs,
+        volume: 100,
+        sourceWell: 'A1',
+        destWells: ['A2', 'A3', 'A4'],
+        changeTip: 'once',
+        blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
+      }
+
+      const mixCommandsWithDelay = [
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+      ]
+      const result = distribute(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // replace tip
+        dropTipHelper('A1'),
+        pickUpTipHelper('A1'),
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate
+        aspirateHelper('A1', 260),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A2', 31),
+        delayCommand(12),
+        dispenseHelper('A2', 100),
+        ...delayWithOffset('A2', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A2', { labware: DEST_LABWARE }),
+        // dispense #2
+        dispenseHelper('A3', 100),
+        ...delayWithOffset('A3', DEST_LABWARE),
+        // touch tip (disp #2)
+        touchTipHelper('A3', { labware: DEST_LABWARE }),
+
+        // blowout location is source so need to blowout
+        blowoutSingleToSourceA1,
+        // skip dispense > air gap since tip is being reused
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate 100 liquid + 60 for disposal vol
+        aspirateHelper('A1', 160),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #3
+        dispenseAirGapHelper('A4', 31),
+        delayCommand(12),
+        dispenseHelper('A4', 100),
+        ...delayWithOffset('A4', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // use the dispense > air gap here before moving to trash
+        // since it is the final dispense in the step
+        blowoutSingleToSourceA1,
+        airGapHelper('A1', 3),
+        delayCommand(11),
+        // since we used dispense > air gap, drop the tip
+        dropTipHelper('A1'),
+      ])
+    })
+    it('should create commands in the expected order with expected params (blowout in dest, reuse tip)', () => {
+      const args = {
+        ...allArgs,
+        volume: 100,
+        sourceWell: 'A1',
+        destWells: ['A2', 'A3', 'A4'],
+        changeTip: 'never',
+        blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
+      }
+
+      const mixCommandsWithDelay = [
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+      ]
+      const result = distribute(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate
+        aspirateHelper('A1', 260),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A2', 31),
+        delayCommand(12),
+        dispenseHelper('A2', 100),
+        ...delayWithOffset('A2', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A2', { labware: DEST_LABWARE }),
+        // dispense #2
+        dispenseHelper('A3', 100),
+        ...delayWithOffset('A3', DEST_LABWARE),
+        // touch tip (disp #2)
+        touchTipHelper('A3', { labware: DEST_LABWARE }),
+
+        // blowout location is dest so need to blowout
+        blowoutSingleToDestA3,
+        // skip dispense => air gap since we are reusing the tip
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate 100 liquid + 60 for disposal vol
+        aspirateHelper('A1', 160),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #3
+        dispenseAirGapHelper('A4', 31),
+        delayCommand(12),
+        dispenseHelper('A4', 100),
+        ...delayWithOffset('A4', DEST_LABWARE),
+        // touch tip (disp #3)
+        touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // blowout location is dest so need to blowout
+        blowoutSingleToDestA4,
+        // use the dispense > air gap here before moving to trash
+        // since it is the final dispense in the step
+        airGapHelper('A4', 3, { labware: DEST_LABWARE }),
+        delayCommand(11),
+        // since we used dispense > air gap, drop the tip
+        dropTipHelper('A1'),
+      ])
+    })
+    it('should create commands in the expected order with expected params (blowout in dest, change tip each aspirate)', () => {
+      const args = {
+        ...allArgs,
+        volume: 100,
+        sourceWell: 'A1',
+        destWells: ['A2', 'A3', 'A4'],
+        changeTip: 'always',
+        blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
+      }
+
+      const mixCommandsWithDelay = [
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+      ]
+      const result = distribute(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // replace tip
+        dropTipHelper('A1'),
+        pickUpTipHelper('A1'),
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate
+        aspirateHelper('A1', 260),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A2', 31),
+        delayCommand(12),
+        dispenseHelper('A2', 100),
+        ...delayWithOffset('A2', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A2', { labware: DEST_LABWARE }),
+        // dispense #2
+        dispenseHelper('A3', 100),
+        ...delayWithOffset('A3', DEST_LABWARE),
+        // touch tip (disp #2)
+        touchTipHelper('A3', { labware: DEST_LABWARE }),
+
+        // blowout location is dest so need to blowout
+        blowoutSingleToDestA3,
+        // air gap so no liquid drops off the tip as pipette moves from destination well to trash
+        airGapHelper('A3', 3, { labware: DEST_LABWARE }),
+        // dispense delay
+        delayCommand(11),
+        // just drop the tip in the trash
+        dropTipHelper('A1'),
+        // next chunk from A1: remaining volume
+        pickUpTipHelper('B1'),
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate 100 liquid + 60 for disposal vol
+        aspirateHelper('A1', 160),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #3
+        dispenseAirGapHelper('A4', 31),
+        delayCommand(12),
+        dispenseHelper('A4', 100),
+        ...delayWithOffset('A4', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // use the dispense > air gap here before moving to trash
+        // since it is the final dispense in the step
+        blowoutSingleToDestA4,
+        airGapHelper('A4', 3, { labware: DEST_LABWARE }),
+        delayCommand(11),
+        // since we used dispense > air gap, drop the tip
+        dropTipHelper('A1'),
+      ])
+    })
+    it('should create commands in the expected order with expected params (blowout in dest, change tip once)', () => {
+      const args = {
+        ...allArgs,
+        volume: 100,
+        sourceWell: 'A1',
+        destWells: ['A2', 'A3', 'A4'],
+        changeTip: 'once',
+        blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
+      }
+
+      const mixCommandsWithDelay = [
+        aspirateHelper('A1', 35),
+        delayCommand(11),
+        dispenseHelper('A1', 35, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
+        delayCommand(12),
+      ]
+      const result = distribute(args, invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        // replace tip
+        dropTipHelper('A1'),
+        pickUpTipHelper('A1'),
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate
+        aspirateHelper('A1', 260),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #1
+        dispenseAirGapHelper('A2', 31),
+        delayCommand(12),
+        dispenseHelper('A2', 100),
+        ...delayWithOffset('A2', DEST_LABWARE),
+        // touch tip (disp #1)
+        touchTipHelper('A2', { labware: DEST_LABWARE }),
+        // dispense #2
+        dispenseHelper('A3', 100),
+        ...delayWithOffset('A3', DEST_LABWARE),
+        // touch tip (disp #2)
+        touchTipHelper('A3', { labware: DEST_LABWARE }),
+        // blowout location is dest so need to blowout
+        blowoutSingleToDestA3,
+        // skip dispense > air gap since tip is being reused
+        // mix (asp)
+        ...mixCommandsWithDelay,
+        // aspirate 100 liquid + 60 for disposal vol
+        aspirateHelper('A1', 160),
+        ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
+        // touch tip (asp)
+        touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
+        // air gap
+        airGapHelper('A1', 31),
+        delayCommand(11),
+        // dispense #3
+        dispenseAirGapHelper('A4', 31),
+        delayCommand(12),
+        dispenseHelper('A4', 100),
+        ...delayWithOffset('A4', DEST_LABWARE),
+        // touch tip (disp #3)
+        touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // blowout location is dest so need to blowout
+        blowoutSingleToDestA4,
+        // use the dispense > air gap here before moving to trash
+        // since it is the final dispense in the step
+        airGapHelper('A4', 3, { labware: DEST_LABWARE }),
+        delayCommand(11),
+        // since we used dispense > air gap, drop the tip
+        dropTipHelper('A1'),
       ])
     })
   })
@@ -995,8 +1571,6 @@ describe('distribute volume exceeds pipette max volume', () => {
       changeTip,
       volume: 350,
       disposalVolume: null,
-      disposalLabware: null,
-      disposalWell: null,
     }
     const result = distribute(
       distributeArgs,
@@ -1018,8 +1592,6 @@ describe('distribute volume exceeds pipette max volume', () => {
       changeTip,
       volume: 250,
       disposalVolume: 100,
-      disposalLabware: FIXED_TRASH_ID,
-      disposalWell: 'A1',
     }
     const result = distribute(
       distributeArgs,

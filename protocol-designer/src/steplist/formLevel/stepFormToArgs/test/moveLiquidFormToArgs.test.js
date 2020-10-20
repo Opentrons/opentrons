@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
@@ -15,6 +16,7 @@ import {
 } from '../../../../step-generation/utils'
 import { getOrderedWells } from '../../../utils'
 jest.mock('../../../utils')
+jest.mock('assert')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests
 const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
@@ -92,6 +94,10 @@ describe('move liquid step form -> command creator args', () => {
         blowout_location: null,
       },
     }
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   it('moveLiquidFormToArgs calls getOrderedWells correctly', () => {
@@ -270,8 +276,21 @@ describe('move liquid step form -> command creator args', () => {
 
       expect(result).toMatchObject({
         disposalVolume: 123,
-        disposalLabware: blowoutLabwareId,
-        disposalWell: 'A1',
+      })
+    })
+
+    it('blowout location works when checkbox true', () => {
+      const result = moveLiquidFormToArgs({
+        ...hydratedForm,
+        fields: {
+          ...hydratedForm.fields,
+          ...disposalVolumeFields,
+          blowout_checkbox: true,
+        },
+      })
+
+      expect(result).toMatchObject({
+        blowoutLocation: blowoutLabwareId,
       })
     })
 
@@ -287,8 +306,6 @@ describe('move liquid step form -> command creator args', () => {
 
       expect(result).toMatchObject({
         disposalVolume: null,
-        disposalLabware: null,
-        disposalWell: null,
       })
     })
 
@@ -305,8 +322,7 @@ describe('move liquid step form -> command creator args', () => {
 
       expect(result).toMatchObject({
         disposalVolume: 123,
-        disposalLabware: blowoutLabwareId,
-        disposalWell: 'A1',
+        blowoutLocation: blowoutLabwareId,
       })
     })
 
@@ -323,13 +339,12 @@ describe('move liquid step form -> command creator args', () => {
 
       expect(result).toMatchObject({
         disposalVolume: null,
-        disposalLabware: blowoutLabwareId,
-        disposalWell: 'A1',
+        blowoutLocation: blowoutLabwareId,
       })
     })
 
-    it('blowout in source', () => {
-      const result = moveLiquidFormToArgs({
+    it('should not allow blowing out into the destination well', () => {
+      moveLiquidFormToArgs({
         ...hydratedForm,
         fields: {
           ...hydratedForm.fields,
@@ -339,14 +354,13 @@ describe('move liquid step form -> command creator args', () => {
         },
       })
 
-      expect(result).toMatchObject({
-        disposalVolume: null,
-        disposalLabware: 'sourceLabwareId',
-        disposalWell: ASPIRATE_WELL,
-      })
+      expect(assert).toHaveBeenCalledWith(
+        false,
+        'blowout location for multiDispense cannot be source well'
+      )
     })
 
-    it('blowout in dest', () => {
+    it('should blow out into the destination when checkbox is true and blowout location is destination', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
         fields: {
@@ -359,8 +373,7 @@ describe('move liquid step form -> command creator args', () => {
 
       expect(result).toMatchObject({
         disposalVolume: null,
-        disposalLabware: 'destLabwareId',
-        disposalWell: DISPENSE_WELL,
+        blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
       })
     })
   })
