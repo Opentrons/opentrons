@@ -52,17 +52,17 @@ async def mock_recv_multipart(mock_zmq_socket: AsyncMock,
 
 
 @pytest.mark.asyncio
-async def test_handler(
+async def test_process_frames(
         event_loop: AbstractEventLoop,
         zmq_context: MagicMock,
         mock_recv_multipart: AsyncMock,
         event: Event) -> None:
     """Test that _handle_event is called for each event."""
     s = subscriber.create("1234", ["a", "b"], None)
-    s._handle_event = AsyncMock()
+    s._process_frames = AsyncMock()
     await asyncio.sleep(0)
     s.stop()
-    assert s._handle_event.call_args_list == [
+    assert s._process_frames.call_args_list == [
         call([]),
         call([b"a", b"{"]),
         call([b"topic", event.json().encode('utf-8')])

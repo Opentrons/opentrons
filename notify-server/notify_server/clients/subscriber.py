@@ -44,11 +44,12 @@ class _Subscriber:
         """Stop the subscriber task."""
         self._task.cancel()
 
-    async def _handle_event(self, frames: typing.List[bytes]) -> None:
+    async def _process_frames(self, frames: typing.List[bytes]) -> None:
         """
-        Process a result of recv_multipart.
-
         Extract topic and Event, then call callback.
+
+        Process raw frames returned from recv_multipart. Frame 0 is the topic
+         and 1 is the Event object serialized as json.
         """
         try:
             topic = frames[0].decode()
@@ -75,4 +76,4 @@ class _Subscriber:
 
         while True:
             s = await sock.recv_multipart()
-            await self._handle_event(s)
+            await self._process_frames(s)
