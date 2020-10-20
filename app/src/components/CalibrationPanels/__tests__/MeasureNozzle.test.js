@@ -17,7 +17,9 @@ describe('MeasureNozzle', () => {
   const mockDeleteSession = jest.fn()
 
   const getContinueButton = wrapper =>
-    wrapper.find('button[children="Save nozzle z-axis"]').find('button')
+    wrapper
+      .find('button[children="Save nozzle z-axis and move to pick up tip"]')
+      .find('button')
 
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
