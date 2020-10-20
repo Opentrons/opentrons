@@ -9,6 +9,7 @@ import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../utils'
 import {
   airGap,
@@ -356,14 +357,22 @@ export const transfer: CommandCreator<TransferArgs> = (
           }
           // TODO(IL, 2020-10-12): extract this ^ into a util to reuse in distribute/consolidate??
 
+          let dispenseAirGapLabware = args.destLabware
+          let dispenseAirGapWell = destWell
+
+          if (args.blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
+            dispenseAirGapLabware = args.sourceLabware
+            dispenseAirGapWell = sourceWell
+          }
+
           const airGapAfterDispenseCommands =
             dispenseAirGapVolume && !willReuseTip
               ? [
                   curryCommandCreator(airGap, {
                     pipette: args.pipette,
                     volume: dispenseAirGapVolume,
-                    labware: args.destLabware,
-                    well: destWell,
+                    labware: dispenseAirGapLabware,
+                    well: dispenseAirGapWell,
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
                   }),

@@ -2589,8 +2589,8 @@ describe('advanced options', () => {
           command: 'airGap',
           params: {
             pipette: 'p300SingleId',
-            labware: 'destPlateId',
-            well: 'B1',
+            labware: 'sourcePlateId',
+            well: 'A1',
             flowRate: 2.1,
             offsetFromBottomMm: 11.54,
             volume: 3,
@@ -2822,8 +2822,8 @@ describe('advanced options', () => {
           command: 'airGap',
           params: {
             pipette: 'p300SingleId',
-            labware: 'destPlateId',
-            well: 'B1',
+            labware: 'sourcePlateId',
+            well: 'A1',
             volume: 3,
             flowRate: 2.1,
             offsetFromBottomMm: 11.54,
