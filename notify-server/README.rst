@@ -25,7 +25,7 @@ The ``server`` package contains the server application.
 
 clients
 =======
-The ``clients`` package has two clients: a subscriber and a publisher.
+The ``clients`` package has two client implementations: a subscriber and a publisher.
 
 Publisher Client Example
 ........................
@@ -48,17 +48,26 @@ Subscriber Client Example
 
    from notify_server.clients.subscriber import create, Event
 
-   async def my_callback(topic: str, event: Event) -> None:
-      """A callback for handling new events."""
-      ...
-
-
    # Create the async subscriber client.
    subscriber = create("tcp://localhost:1234",
                        ["topic"],
                        my_callback)
 
+   # Use the async iterator interface to wait for events.
+   async for e in subscriber:
+       print(f"{e.event.createdOn}: topic={e.topic}, "
+             f"publisher={e.event.publisher}, data={e.event.data}")
 
+
+Subscriber Application
+......................
+The ``notify_server.app_sub`` script is a useful application. It prints events from any number of topics to stdout.
+
+To start from the command line:
+
+.. code-block:: bash
+
+   python -m notify_server.subscriber -s tcp://localhost:5555 topic1 topic2
 
 models
 =======

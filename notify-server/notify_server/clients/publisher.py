@@ -4,12 +4,11 @@ from __future__ import annotations
 import asyncio
 import logging
 from asyncio import Task, Queue
-from dataclasses import dataclass
-from typing import List
 
 import zmq  # type: ignore
 from zmq.asyncio import Context  # type: ignore
 
+from notify_server.clients.queue_entry import QueueEntry
 from notify_server.models.event import Event
 
 log = logging.getLogger(__name__)
@@ -36,22 +35,8 @@ async def _send_task(address: str, queue: Queue) -> None:
     sock.connect(address)
 
     while True:
-        entry: _Entry = await queue.get()
+        entry: QueueEntry = await queue.get()
         await sock.send_multipart(entry.to_frames())
-
-
-@dataclass
-class _Entry:
-    """An entry in publisher send queue."""
-
-    topic: str
-    event: Event
-
-    def to_frames(self) -> List[bytes]:
-        """Create zmq frames from members."""
-        return [
-            bytes(v, 'utf-8') for v in (self.topic, self.event.json(),)
-        ]
 
 
 class Publisher:
@@ -64,7 +49,7 @@ class Publisher:
 
     async def send(self, topic: str, event: Event) -> None:
         """Publish an event to a topic."""
-        await self._queue.put(_Entry(topic, event))
+        await self._queue.put(QueueEntry(topic, event))
 
     def stop(self) -> None:
         """Stop the publisher task."""

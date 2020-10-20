@@ -1,7 +1,6 @@
 """Unit tests for subscriber module."""
 import asyncio
 from asyncio import Queue
-from asyncio import AbstractEventLoop
 from typing import Tuple
 from unittest.mock import MagicMock, call
 
@@ -10,12 +9,12 @@ import zmq
 from mock import AsyncMock
 
 from notify_server.clients import subscriber
+from notify_server.clients.queue_entry import QueueEntry
 from notify_server.models.event import Event
 
 
 @pytest.mark.asyncio
 async def test_connect_subscribe(
-        event_loop: AbstractEventLoop,
         zmq_context: MagicMock,
         mock_zmq_socket: AsyncMock) -> None:
     """Test that subscriber task connects and subscribes."""
@@ -24,7 +23,7 @@ async def test_connect_subscribe(
 
     mock_zmq_socket.recv_multipart.side_effect = mock_recv_multipart
 
-    s = subscriber.create("1234", ["a", "b"], None)
+    s = subscriber.create("1234", ["a", "b"])
     await asyncio.sleep(0)
     s.stop()
     mock_zmq_socket.connect.assert_called_once_with("1234")
@@ -53,12 +52,11 @@ async def mock_recv_multipart(mock_zmq_socket: AsyncMock,
 
 @pytest.mark.asyncio
 async def test_process_frames(
-        event_loop: AbstractEventLoop,
         zmq_context: MagicMock,
         mock_recv_multipart: AsyncMock,
         event: Event) -> None:
     """Test that _handle_event is called for each event."""
-    s = subscriber.create("1234", ["a", "b"], None)
+    s = subscriber.create("1234", ["a", "b"])
     s._process_frames = AsyncMock()
     await asyncio.sleep(0)
     s.stop()
@@ -71,18 +69,11 @@ async def test_process_frames(
 
 @pytest.mark.asyncio
 async def test_integration(
-        event_loop: AbstractEventLoop,
         zmq_context: MagicMock,
         mock_recv_multipart: AsyncMock,
         event: Event) -> None:
     """Test that only a well formed event reaches the callback."""
-    in_q: Queue = Queue()
-
-    async def callback(topic: str, e: Event) -> None:
-        """Insert event into a queue."""
-        await in_q.put((topic, e))
-
-    s = subscriber.create("1234", ["a", "b"], callback)
-    result = await in_q.get()
+    s = subscriber.create("1234", ["a", "b"])
+    result = await s.next_event()
     s.stop()
-    assert result == ("topic", event)
+    assert result == QueueEntry("topic", event)
