@@ -6,7 +6,6 @@ import { getWellDepth } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP, FIXED_TRASH_ID } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { SOURCE_WELL_BLOWOUT_DESTINATION } from '../../utils/misc'
 import {
   airGap,
   aspirate,
@@ -23,6 +22,7 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
   blowoutUtil,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../utils'
 import type {
   DistributeArgs,
