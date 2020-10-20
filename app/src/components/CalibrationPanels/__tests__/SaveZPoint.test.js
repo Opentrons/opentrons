@@ -128,7 +128,7 @@ describe('SaveZPoint', () => {
       sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
     })
     const allText = wrapper.text()
-    expect(allText).toContain('remember z-axis and move to slot 1')
+    expect(allText).toContain('save z-axis and move to slot 1')
     expect(allText).toContain('z-axis in slot 5')
   })
 })

@@ -51,7 +51,7 @@ describe('Introduction', () => {
     const allText = wrapper.text()
     expect(allText).toContain('pipette offset calibration')
     expect(allText).toContain('Calibrating pipette offset enables')
-    expect(allText).toContain('continue')
+    expect(allText).toContain('start pipette offset calibration')
 
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
@@ -67,7 +67,7 @@ describe('Introduction', () => {
     const allText = wrapper.text()
     expect(allText).toContain('deck calibration')
     expect(allText).toContain('Deck calibration ensures positional accuracy')
-    expect(allText).toContain('continue to calibrate deck')
+    expect(allText).toContain('start deck calibration')
 
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
@@ -85,7 +85,7 @@ describe('Introduction', () => {
     expect(allText).toContain(
       'Tip length calibration measures the length of the pipette'
     )
-    expect(allText).toContain('continue to tip length calibration')
+    expect(allText).toContain('start tip length calibration')
 
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
