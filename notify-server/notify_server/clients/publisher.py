@@ -5,11 +5,9 @@ import asyncio
 import logging
 from asyncio import Task, Queue
 
-import zmq  # type: ignore
-from zmq.asyncio import Context  # type: ignore
-
 from notify_server.clients.queue_entry import QueueEntry
 from notify_server.models.event import Event
+from notify_server.network.connection import create_push, Connection
 
 log = logging.getLogger(__name__)
 
@@ -21,22 +19,16 @@ def create(host_address: str) -> Publisher:
     :param host_address: uri to connect to.
     """
     queue: Queue = Queue()
-    task = asyncio.create_task(_send_task(address=host_address, queue=queue))
+    task = asyncio.create_task(_send_task(connection=create_push(host_address),
+                                          queue=queue))
     return Publisher(task=task, queue=queue)
 
 
-async def _send_task(address: str, queue: Queue) -> None:
+async def _send_task(connection: Connection, queue: Queue) -> None:
     """Run asyncio task that reads from queue and publishes to server."""
-    ctx = Context()
-    sock = ctx.socket(zmq.PUSH)
-
-    log.info("Publisher connecting to %s", address)
-
-    sock.connect(address)
-
     while True:
         entry: QueueEntry = await queue.get()
-        await sock.send_multipart(entry.to_frames())
+        await connection.send_multipart(entry.to_frames())
 
 
 class Publisher:

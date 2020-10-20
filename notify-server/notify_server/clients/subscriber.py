@@ -5,10 +5,8 @@ import logging
 import asyncio
 import typing
 
-import zmq  # type: ignore
-from zmq.asyncio import Context  # type: ignore
-
 from notify_server.clients.queue_entry import QueueEntry, MalformedFrames
+from notify_server.network.connection import create_subscriber, Connection
 
 log = logging.getLogger(__name__)
 
@@ -22,17 +20,16 @@ def create(host_address: str,
     :param topics: The topics to subscribe to.
     :return: A _Subscriber instance.
     """
-    return Subscriber(host_address, topics)
+    return Subscriber(create_subscriber(host_address, topics))
 
 
 class Subscriber:
     """Async Subscriber class."""
 
     def __init__(self,
-                 host_address: str,
-                 topics: typing.Sequence[str]) -> None:
+                 connection: Connection) -> None:
         """Construct."""
-        self._task = asyncio.create_task(self._read_task(host_address, topics))
+        self._task = asyncio.create_task(self._read_task(connection))
         self._q: asyncio.Queue = asyncio.Queue()
 
     def stop(self) -> None:
@@ -54,22 +51,10 @@ class Subscriber:
             log.exception("exception handling event %s", frames)
 
     async def _read_task(self,
-                         address: str,
-                         topics: typing.Sequence[str]) -> None:
+                         connection: Connection) -> None:
         """Connect to address and subscribe to topics."""
-        ctx = Context()
-        sock = ctx.socket(zmq.SUB)
-
-        log.info("Connecting to %s", address)
-
-        sock.connect(address)
-
-        log.info("Subscribing to %s", topics)
-        for t in topics:
-            sock.setsockopt_string(zmq.SUBSCRIBE, t)
-
         while True:
-            s = await sock.recv_multipart()
+            s = await connection.recv_multipart()
             await self._process_frames(s)
 
     async def next_event(self) -> QueueEntry:
