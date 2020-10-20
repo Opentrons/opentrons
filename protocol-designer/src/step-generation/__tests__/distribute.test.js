@@ -24,6 +24,7 @@ import {
   SOURCE_LABWARE,
 } from '../__fixtures__'
 import { distribute } from '../commandCreators/compound/distribute'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6.js'
 import type { DistributeArgs } from '../types'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -237,6 +238,18 @@ describe('tip handling for multiple distribute chunks', () => {
 })
 
 describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position', () => {
+  let mixCommandsWithDelay: Array<Command>
+  beforeEach(() => {
+    mixCommandsWithDelay = [
+      aspirateHelper('A1', 35),
+      delayCommand(11),
+      dispenseHelper('A1', 35, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      delayCommand(12),
+    ]
+  })
   it('should mix before aspirate, then aspirate disposal volume', () => {
     // NOTE this also tests "uneven final chunk" eg A6 in [A2 A3 | A4 A5 | A6]
     // which is especially relevant to disposal volume
@@ -490,14 +503,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       disposalVolume: 0,
     }
 
-    const result = distribute(
-      distributeArgs,
-      invariantContext,
-      robotStateWithTip
-    )
-    const res = getSuccessResult(result)
-
-    const mixCommandsWithDelay = [
+    mixCommandsWithDelay = [
       // mix 1
       aspirateHelper('A1', 50),
       delayCommand(12),
@@ -513,6 +519,13 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
       }),
     ]
+
+    const result = distribute(
+      distributeArgs,
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
       ...mixCommandsWithDelay,
@@ -829,16 +842,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutLocation: 'trashId',
       }
 
-      const mixCommandsWithDelay = [
-        aspirateHelper('A1', 35),
-        delayCommand(11),
-        dispenseHelper('A1', 35, {
-          labware: SOURCE_LABWARE,
-          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-        }),
-        delayCommand(12),
-      ]
-
       const result = distribute(args, invariantContext, robotStateWithTip)
       // blowout location IS trash! but I am never changing the tip, so i still gotta blow out
       const res = getSuccessResult(result)
@@ -907,15 +910,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutLocation: 'trashId',
       }
 
-      const mixCommandsWithDelay = [
-        aspirateHelper('A1', 35),
-        delayCommand(11),
-        dispenseHelper('A1', 35, {
-          labware: SOURCE_LABWARE,
-          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-        }),
-        delayCommand(12),
-      ]
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -990,15 +984,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutLocation: 'trashId',
       }
 
-      const mixCommandsWithDelay = [
-        aspirateHelper('A1', 35),
-        delayCommand(11),
-        dispenseHelper('A1', 35, {
-          labware: SOURCE_LABWARE,
-          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-        }),
-        delayCommand(12),
-      ]
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1071,15 +1056,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       }
 
-      const mixCommandsWithDelay = [
-        aspirateHelper('A1', 35),
-        delayCommand(11),
-        dispenseHelper('A1', 35, {
-          labware: SOURCE_LABWARE,
-          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-        }),
-        delayCommand(12),
-      ]
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1146,15 +1122,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       }
 
-      const mixCommandsWithDelay = [
-        aspirateHelper('A1', 35),
-        delayCommand(11),
-        dispenseHelper('A1', 35, {
-          labware: SOURCE_LABWARE,
-          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-        }),
-        delayCommand(12),
-      ]
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1230,15 +1197,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       }
 
-      const mixCommandsWithDelay = [
-        aspirateHelper('A1', 35),
-        delayCommand(11),
-        dispenseHelper('A1', 35, {
-          labware: SOURCE_LABWARE,
-          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-        }),
-        delayCommand(12),
-      ]
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1307,15 +1265,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
       }
 
-      const mixCommandsWithDelay = [
-        aspirateHelper('A1', 35),
-        delayCommand(11),
-        dispenseHelper('A1', 35, {
-          labware: SOURCE_LABWARE,
-          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-        }),
-        delayCommand(12),
-      ]
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1382,15 +1331,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
       }
 
-      const mixCommandsWithDelay = [
-        aspirateHelper('A1', 35),
-        delayCommand(11),
-        dispenseHelper('A1', 35, {
-          labware: SOURCE_LABWARE,
-          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-        }),
-        delayCommand(12),
-      ]
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1466,15 +1406,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
       }
 
-      const mixCommandsWithDelay = [
-        aspirateHelper('A1', 35),
-        delayCommand(11),
-        dispenseHelper('A1', 35, {
-          labware: SOURCE_LABWARE,
-          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-        }),
-        delayCommand(12),
-      ]
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
