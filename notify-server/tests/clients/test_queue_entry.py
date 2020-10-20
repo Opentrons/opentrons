@@ -18,8 +18,8 @@ def test_entry_to_frames(event: Event) -> None:
                          argvalues=[
                              [[]],
                              [[b"a", b"{"]],
-                             [[b"a", b"{}"]]
-                         ])
+                             [[b"a", b"{}"]]]
+                         )
 def test_entry_from_frames_fail(frames: List[bytes]) -> None:
     """Test that an exception is raised on bad message."""
     with pytest.raises(MalformedFrames):

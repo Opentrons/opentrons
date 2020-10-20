@@ -9,7 +9,6 @@ import zmq  # type: ignore
 from zmq.asyncio import Context  # type: ignore
 
 from notify_server.clients.queue_entry import QueueEntry, MalformedFrames
-from notify_server.models.event import Event
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +26,8 @@ def create(host_address: str,
 
 
 class Subscriber:
+    """Async Subscriber class."""
+
     def __init__(self,
                  host_address: str,
                  topics: typing.Sequence[str]) -> None:
@@ -59,7 +60,7 @@ class Subscriber:
         ctx = Context()
         sock = ctx.socket(zmq.SUB)
 
-        log.info("Connecting to %s", topics)
+        log.info("Connecting to %s", address)
 
         sock.connect(address)
 

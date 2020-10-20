@@ -4,6 +4,9 @@ version = "0.1.0"
 description = ""
 authors = ["amit lissack <amit@opentrons.com>"]
 
+[tool.pytest.ini_options]
+markers = ["env_var: used in test_settings"]
+
 [tool.poetry.dependencies]
 python = "^3.7"
 pyzmq = "^19.0.2"

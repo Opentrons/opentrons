@@ -8,6 +8,8 @@ from notify_server.models.event import Event
 
 
 class MalformedFrames(Exception):
+    """Exception raised on badly formed frames."""
+
     pass
 
 
