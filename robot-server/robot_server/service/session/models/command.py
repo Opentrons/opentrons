@@ -185,6 +185,7 @@ class CalibrationCommand(CommandDefinition):
     invalidate_tip = "invalidateTip"
     save_offset = "saveOffset"
     exit = "exitSession"
+    invalidate_last_action = "invalidateLastAction"
 
     @staticmethod
     def namespace():

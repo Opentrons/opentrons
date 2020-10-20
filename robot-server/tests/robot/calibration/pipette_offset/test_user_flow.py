@@ -14,8 +14,10 @@ from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
-from robot_server.robot.calibration.pipette_offset.constants import\
-    PipetteOffsetCalibrationState as POCState
+from robot_server.robot.calibration.pipette_offset.constants import (
+    PipetteOffsetCalibrationState as POCState,
+    PipetteOffsetWithTipLengthCalibrationState as POWTState
+)
 
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
@@ -139,6 +141,7 @@ def mock_hw(hardware):
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
     hardware.home_plunger = MagicMock(side_effect=async_mock)
+    hardware.home = MagicMock(side_effect=async_mock)
 
     return hardware
 
@@ -159,6 +162,23 @@ def mock_user_flow(mock_hw):
         yield m
 
 
+@pytest.fixture
+def mock_user_flow_fused(mock_hw):
+    mount = next(k for k, v in
+                 mock_hw._attached_instruments.items() if v)
+    with patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            '_get_stored_tip_length_cal',
+            new=build_mock_stored_tip_length()),\
+            patch.object(
+                PipetteOffsetCalibrationUserFlow,
+                '_get_stored_pipette_offset_cal',
+                new=build_mock_stored_pipette_offset()):
+        m = PipetteOffsetCalibrationUserFlow(
+            hardware=mock_hw, mount=mount, recalibrate_tip_length=True)
+        yield m
+
+
 hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
     (CalibrationCommand.jog, POCState.preparingPipette,
      stub_jog_data, 'move_rel'),
@@ -170,6 +190,53 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
      {}, 'move_to'),
     (CalibrationCommand.move_to_tip_rack, POCState.labwareLoaded,
      {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POCState.preparingPipette,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POCState.preparingPipette,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POCState.joggingToDeck,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POCState.joggingToDeck,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POCState.joggingToDeck,
+     {}, 'drop_tip'),
+    (CalibrationCommand.invalidate_last_action, POCState.savingPointOne,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POCState.savingPointOne,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POCState.savingPointOne,
+     {}, 'drop_tip'),
+]
+
+hw_commands_fused: List[Tuple[str, str, Dict[Any, Any], str]] = [
+    (CalibrationCommand.invalidate_last_action,
+     POWTState.measuringNozzleOffset,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action,
+     POWTState.measuringNozzleOffset,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.preparingPipette,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POWTState.preparingPipette,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.measuringTipOffset,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.measuringTipOffset,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POWTState.measuringTipOffset,
+     {}, 'drop_tip'),
+    (CalibrationCommand.invalidate_last_action, POWTState.joggingToDeck,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.joggingToDeck,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POWTState.joggingToDeck,
+     {}, 'drop_tip'),
+    (CalibrationCommand.invalidate_last_action, POWTState.savingPointOne,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.savingPointOne,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POWTState.savingPointOne,
+     {}, 'drop_tip'),
 ]
 
 
@@ -304,6 +371,18 @@ async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
     await mock_user_flow.handle_command(command, data)
 
     getattr(mock_user_flow._hardware, hw_meth).assert_called()
+
+
+@pytest.mark.parametrize('command,current_state,data,hw_meth', hw_commands_fused)
+async def test_hw_calls_fused(
+        command, current_state, data, hw_meth, mock_user_flow_fused):
+    mock_user_flow_fused._current_state = current_state
+    # z height reference must be present for moving to point one
+    if command == CalibrationCommand.move_to_point_one:
+        mock_user_flow_fused._z_height_reference = 0.1
+    await mock_user_flow_fused.handle_command(command, data)
+
+    getattr(mock_user_flow_fused._hardware, hw_meth).assert_called()
 
 
 def test_load_trash(mock_user_flow):

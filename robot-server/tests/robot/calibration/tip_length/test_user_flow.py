@@ -106,6 +106,8 @@ def mock_hw(hardware):
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
     hardware.home_plunger = MagicMock(side_effect=async_mock_home_plunger)
+    hardware.drop_tip = MagicMock(side_effect=async_mock)
+    hardware.home = MagicMock(side_effect=async_mock)
     return hardware
 
 
@@ -154,6 +156,20 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
      {}, 'move_to'),
     (CalibrationCommand.move_to_tip_rack, 'measuringTipOffset',
      {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action,
+     'preparingPipette', {}, 'home'),
+    (CalibrationCommand.invalidate_last_action,
+     'preparingPipette', {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringTipOffset', {}, 'home'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringTipOffset', {}, 'drop_tip'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringTipOffset', {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringNozzleOffset', {}, 'home'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringNozzleOffset', {}, 'move_to'),
 ]
 
 

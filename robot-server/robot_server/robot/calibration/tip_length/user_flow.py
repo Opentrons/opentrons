@@ -76,6 +76,7 @@ class TipCalibrationUserFlow:
             CalibrationCommand.save_offset: self.save_offset,
             CalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
             CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,  # noqa: E501
+            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
         }
 
@@ -250,3 +251,15 @@ class TipCalibrationUserFlow:
 
     async def _move(self, to_loc: Location):
         await util.move(self, to_loc)
+
+    async def invalidate_last_action(self):
+        if self._current_state == State.measuringNozzleOffset:
+            await self.hardware.home()
+            await self.move_to_reference_point()
+        elif self._current_state == State.preparingPipette:
+            await self.hardware.home()
+            await self.move_to_tip_rack()
+        else:
+            await self.hardware.home()
+            await self.hardware.drop_tip(self.mount)
+            await self.move_to_tip_rack()
