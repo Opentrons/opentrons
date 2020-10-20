@@ -1,4 +1,6 @@
 """A publisher client."""
+from __future__ import annotations
+
 import asyncio
 import logging
 from asyncio import Task, Queue
@@ -13,7 +15,7 @@ from notify_server.models.event import Event
 log = logging.getLogger(__name__)
 
 
-def create(host_address: str) -> '_Publisher':
+def create(host_address: str) -> Publisher:
     """
     Construct a publisher.
 
@@ -21,7 +23,7 @@ def create(host_address: str) -> '_Publisher':
     """
     queue: Queue = Queue()
     task = asyncio.create_task(_send_task(address=host_address, queue=queue))
-    return _Publisher(task=task, queue=queue)
+    return Publisher(task=task, queue=queue)
 
 
 async def _send_task(address: str, queue: Queue) -> None:
@@ -52,7 +54,7 @@ class _Entry:
         ]
 
 
-class _Publisher:
+class Publisher:
     """Async publisher class."""
 
     def __init__(self, task: Task, queue: Queue) -> None:

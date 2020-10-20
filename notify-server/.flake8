@@ -1,2 +1,2 @@
 [flake8]
-ignore = ANN101
+ignore = ANN101, ANN102
