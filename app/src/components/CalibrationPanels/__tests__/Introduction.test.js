@@ -15,12 +15,6 @@ describe('Introduction', () => {
   const getContinueButton = wrapper =>
     wrapper.find('button[data-test="continueButton"]')
 
-  const getCancelDeckClearButton = wrapper =>
-    wrapper.find('OutlineButton[children="cancel"]').find('button')
-
-  const getConfirmDeckClearButton = wrapper =>
-    wrapper.find('OutlineButton[children="continue"]').find('button')
-
   beforeEach(() => {
     render = (props: $Shape<React.ElementProps<typeof Introduction>> = {}) => {
       const {
@@ -50,37 +44,6 @@ describe('Introduction', () => {
     jest.resetAllMocks()
   })
 
-  it('clicking continue launches clear deck warning then confirm proceeds to next step', () => {
-    const wrapper = render()
-
-    expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(false)
-    getContinueButton(wrapper).invoke('onClick')()
-    wrapper.update()
-    expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(true)
-
-    getConfirmDeckClearButton(wrapper).invoke('onClick')()
-
-    expect(mockSendCommands).toHaveBeenCalledWith({
-      command: Sessions.sharedCalCommands.LOAD_LABWARE,
-    })
-  })
-
-  it('clicking continue launches clear deck warning then cancel closes modal', () => {
-    const wrapper = render()
-
-    expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(false)
-    getContinueButton(wrapper).invoke('onClick')()
-    wrapper.update()
-    expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(true)
-
-    getCancelDeckClearButton(wrapper).invoke('onClick')()
-
-    expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(false)
-    expect(mockSendCommands).not.toHaveBeenCalledWith({
-      command: Sessions.sharedCalCommands.LOAD_LABWARE,
-    })
-  })
-
   it('pip offset cal session type shows correct text', () => {
     const wrapper = render({
       sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
@@ -92,9 +55,9 @@ describe('Introduction', () => {
 
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
-    expect(wrapper.text()).toContain(
-      'Before continuing to calibrate pipette offset'
-    )
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.LOAD_LABWARE,
+    })
   })
 
   it('deck cal session type shows correct text', () => {
@@ -108,7 +71,9 @@ describe('Introduction', () => {
 
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
-    expect(wrapper.text()).toContain('Before continuing to calibrate deck')
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.LOAD_LABWARE,
+    })
   })
 
   it('tip length cal session type shows correct text', () => {

@@ -49,7 +49,6 @@ describe('CompleteConfirmation', () => {
   it('clicking continue sends exit command and deletes session', () => {
     const wrapper = render()
 
-    expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(false)
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
 
