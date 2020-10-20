@@ -80,6 +80,7 @@ describe('DeckCalibrationControl', () => {
           disabledReason={disabledReason}
           deckCalStatus={deckCalStatus}
           deckCalData={deckCalData}
+          pipOffsetDataPresent={true}
         />,
         {
           wrappingComponent: Provider,
