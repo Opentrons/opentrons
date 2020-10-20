@@ -10,10 +10,7 @@ import {
   getMixData,
   type HydratedMoveLiquidFormData,
 } from '../moveLiquidFormToArgs'
-import {
-  DEST_WELL_BLOWOUT_DESTINATION,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-} from '../../../../step-generation/utils'
+import { DEST_WELL_BLOWOUT_DESTINATION } from '../../../../step-generation/utils'
 import { getOrderedWells } from '../../../utils'
 jest.mock('../../../utils')
 jest.mock('assert')
