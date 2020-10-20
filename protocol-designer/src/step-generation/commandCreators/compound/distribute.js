@@ -22,7 +22,7 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
   blowoutUtil,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
+  getDispenseAirGapLocation,
 } from '../../utils'
 import type {
   DistributeArgs,
@@ -286,13 +286,16 @@ export const distribute: CommandCreator<DistributeArgs> = (
         moreWellsRemaining = true
       }
 
-      let dispenseAirGapLabware = args.destLabware
-      let dispenseAirGapWell = last(destWellChunk)
-
-      if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
-        dispenseAirGapLabware = args.sourceLabware
-        dispenseAirGapWell = args.sourceWell
-      }
+      const {
+        dispenseAirGapLabware,
+        dispenseAirGapWell,
+      } = getDispenseAirGapLocation({
+        blowoutLocation,
+        sourceLabware: args.sourceLabware,
+        destLabware: args.destLabware,
+        sourceWell: args.sourceWell,
+        destWell: last(destWellChunk),
+      })
 
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume &&

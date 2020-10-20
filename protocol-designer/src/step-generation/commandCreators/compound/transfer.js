@@ -8,8 +8,8 @@ import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
   blowoutUtil,
   curryCommandCreator,
+  getDispenseAirGapLocation,
   reduceCommandCreators,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../utils'
 import {
   airGap,
@@ -357,13 +357,16 @@ export const transfer: CommandCreator<TransferArgs> = (
           }
           // TODO(IL, 2020-10-12): extract this ^ into a util to reuse in distribute/consolidate??
 
-          let dispenseAirGapLabware = args.destLabware
-          let dispenseAirGapWell = destWell
-
-          if (args.blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
-            dispenseAirGapLabware = args.sourceLabware
-            dispenseAirGapWell = sourceWell
-          }
+          const {
+            dispenseAirGapLabware,
+            dispenseAirGapWell,
+          } = getDispenseAirGapLocation({
+            blowoutLocation: args.blowoutLocation,
+            sourceLabware: args.sourceLabware,
+            destLabware: args.destLabware,
+            sourceWell,
+            destWell,
+          })
 
           const airGapAfterDispenseCommands =
             dispenseAirGapVolume && !willReuseTip
