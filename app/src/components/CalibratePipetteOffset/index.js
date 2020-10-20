@@ -97,7 +97,14 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
 ): React.Node {
-  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
+  const {
+    session,
+    robotName,
+    dispatchRequests,
+    showSpinner,
+    isJogging,
+    intent,
+  } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
   const {
@@ -175,6 +182,7 @@ export function CalibratePipetteOffset(
           currentStep={currentStep}
           sessionType={session.sessionType}
           shouldPerformTipLength={shouldPerformTipLength}
+          intent={intent}
         />
       </ModalPage>
       {showConfirmExit && (

@@ -35,6 +35,10 @@ import {
 import styles from './styles.css'
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { useAskForCalibrationBlock } from '../CalibrateTipLength/useAskForCalibrationBlock'
+import {
+  INTENT_PIPETTE_OFFSET,
+  INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+} from '../CalibrationPanels'
 import type { State } from '../../types'
 
 import {
@@ -119,12 +123,18 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   ] = useCalibratePipetteOffset(robotName, { mount })
 
   const startPipetteOffsetCalibrationOnly = useCalBlock => {
-    startPipetteOffsetCalibration({ hasCalibrationBlock: useCalBlock === true })
+    startPipetteOffsetCalibration({
+      overrideParams: { hasCalibrationBlock: useCalBlock === true },
+      withIntent: INTENT_PIPETTE_OFFSET,
+    })
   }
   const startTipLengthAndPipetteOffsetCalibration = useCalBlock => {
     startPipetteOffsetCalibration({
-      shouldRecalibrateTipLength: true,
-      hasCalibrationBlock: useCalBlock === true,
+      overrideParams: {
+        shouldRecalibrateTipLength: true,
+        hasCalibrationBlock: useCalBlock === true,
+      },
+      withIntent: INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
     })
   }
 
@@ -135,7 +145,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const [showAskForBlock, AskForBlockModal] = useAskForCalibrationBlock(null)
 
   const startPipetteOffsetCalibrationDirectly = () => {
-    startPipetteOffsetCalibration({})
+    startPipetteOffsetCalibration({ withIntent: INTENT_PIPETTE_OFFSET })
   }
 
   const showBlockForPipetteOffset = () => {

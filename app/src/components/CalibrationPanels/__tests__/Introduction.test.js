@@ -4,6 +4,7 @@ import { mount } from 'enzyme'
 import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
 
+import * as Constants from '../constants'
 import { Introduction } from '../Introduction'
 
 describe('Introduction', () => {
@@ -25,6 +26,8 @@ describe('Introduction', () => {
         cleanUpAndExit = mockDeleteSession,
         currentStep = Sessions.DECK_STEP_SESSION_STARTED,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
+        shouldPerformTipLength = false,
+        intent = Constants.INTENT_PIPETTE_OFFSET,
       } = props
       return mount(
         <Introduction
@@ -35,6 +38,8 @@ describe('Introduction', () => {
           cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
+          shouldPerformTipLength={shouldPerformTipLength}
+          intent={intent}
         />
       )
     }
@@ -44,19 +49,73 @@ describe('Introduction', () => {
     jest.resetAllMocks()
   })
 
-  it('pip offset cal session type shows correct text', () => {
-    const wrapper = render({
-      sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-    })
-    const allText = wrapper.text()
-    expect(allText).toContain('pipette offset calibration')
-    expect(allText).toContain('Calibrating pipette offset enables')
-    expect(allText).toContain('start pipette offset calibration')
+  const PIP_OFFSET_SPECS = [
+    {
+      when: 'doing offset only with pipette offset intent',
+      intent: Constants.INTENT_PIPETTE_OFFSET,
+      shouldPerformTipLength: false,
+      header: 'pipette offset calibration',
+      body: /calibrating pipette offset/i,
+      note: /using the Opentrons tips/i,
+    },
+    {
+      when: 'doing offset only with tip length in proto intent',
+      intent: Constants.INTENT_TIP_LENGTH_IN_PROTOCOL,
+      shouldPerformTipLength: false,
+      header: 'pipette offset calibration',
+      body: /calibrating pipette offset/i,
+      note: /using the Opentrons tips/i,
+    },
+    {
+      when: 'doing offset only with tip length outside proto intent',
+      intent: Constants.INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+      shouldPerformTipLength: false,
+      header: 'pipette offset calibration',
+      body: /calibrating pipette offset/i,
+      note: /using the Opentrons tips/i,
+    },
+    {
+      when: 'doing fused with pipette offset intent',
+      intent: Constants.INTENT_PIPETTE_OFFSET,
+      shouldPerformTipLength: true,
+      header: 'tip length and pipette offset calibration',
+      body: /calibrating pipette offset.*tip length calibration/i,
+      note: /using the Opentrons tips/i,
+    },
+    {
+      when: 'doing fused with tip length in proto intent',
+      intent: Constants.INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+      shouldPerformTipLength: true,
+      header: 'tip length and pipette offset calibration',
+      body: /calibrating pipette offset.*tip length calibration/i,
+      note: /using the Opentrons tips/i,
+    },
+    {
+      when: 'doing fused with tip length in proto intent',
+      intent: Constants.INTENT_TIP_LENGTH_IN_PROTOCOL,
+      shouldPerformTipLength: true,
+      header: 'tip length and pipette offset calibration',
+      body: /calibrating pipette offset.*tip length calibration/i,
+      note: /using the exact tips/i,
+    },
+  ]
+  PIP_OFFSET_SPECS.forEach(spec => {
+    it(`pip offset cal when ${spec.when} shows correct text`, () => {
+      const wrapper = render({
+        sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+        intent: spec.intent,
+        shouldPerformTipLength: spec.shouldPerformTipLength,
+      })
+      const allText = wrapper.text()
+      expect(allText).toContain(spec.header)
+      expect(allText).toMatch(spec.body)
+      expect(allText).toMatch(spec.note)
 
-    getContinueButton(wrapper).invoke('onClick')()
-    wrapper.update()
-    expect(mockSendCommands).toHaveBeenCalledWith({
-      command: Sessions.sharedCalCommands.LOAD_LABWARE,
+      getContinueButton(wrapper).invoke('onClick')()
+      wrapper.update()
+      expect(mockSendCommands).toHaveBeenCalledWith({
+        command: Sessions.sharedCalCommands.LOAD_LABWARE,
+      })
     })
   })
 
@@ -76,21 +135,48 @@ describe('Introduction', () => {
     })
   })
 
-  it('tip length cal session type shows correct text', () => {
+  const TIP_LENGTH_SPECS = [
+    {
+      when: 'intending to calibrate in protocol',
+      intent: Constants.INTENT_TIP_LENGTH_IN_PROTOCOL,
+      note: /exact tips/i,
+    },
+    {
+      when: 'intending to calibrate outside protocol',
+      intent: Constants.INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+      note: /opentrons tips/i,
+    },
+  ]
+  TIP_LENGTH_SPECS.forEach(spec => {
+    it(`tip length cal session type shows correct text when ${spec.when}`, () => {
+      const wrapper = render({
+        sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+        intent: spec.intent,
+      })
+      const allText = wrapper.text()
+      expect(allText).toContain('tip length calibration')
+      expect(allText).toContain(
+        'Tip length calibration measures the length of the pipette'
+      )
+      expect(allText).toContain('start tip length calibration')
+      expect(allText).toMatch(spec.note)
+
+      getContinueButton(wrapper).invoke('onClick')()
+      wrapper.update()
+      expect(mockSendCommands).toHaveBeenCalledWith({
+        command: Sessions.sharedCalCommands.LOAD_LABWARE,
+      })
+    })
+  })
+
+  it('health cehck session type shows correct text', () => {
     const wrapper = render({
-      sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+      sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+      intent: Constants.INTENT_HEALTH_CHECK,
     })
     const allText = wrapper.text()
-    expect(allText).toContain('tip length calibration')
-    expect(allText).toContain(
-      'Tip length calibration measures the length of the pipette'
-    )
-    expect(allText).toContain('start tip length calibration')
-
-    getContinueButton(wrapper).invoke('onClick')()
-    wrapper.update()
-    expect(mockSendCommands).toHaveBeenCalledWith({
-      command: Sessions.sharedCalCommands.LOAD_LABWARE,
-    })
+    expect(allText).toContain('health check')
+    expect(allText).toMatch(/calibration is a first step towards/i)
+    expect(allText).toMatch(/if the difference between the two coordinates/i)
   })
 })
