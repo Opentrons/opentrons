@@ -126,31 +126,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     }
   }
 
-  const getBlowoutCommands = (
-    dropTipCommand: boolean,
-    destWell: string
-  ): Array<CurriedCommandCreator> => {
-    if (
-      !disposalVolume ||
-      // if we are dropping the tip in the trash a blowout is not necessary
-      (dropTipCommand && blowoutLocation === FIXED_TRASH_ID)
-    ) {
-      return []
-    } else {
-      return blowoutUtil({
-        pipette: pipette,
-        sourceLabwareId: args.sourceLabware,
-        sourceWell: args.sourceWell,
-        destLabwareId: args.destLabware,
-        destWell,
-        blowoutLocation: blowoutLocation,
-        flowRate: args.blowoutFlowRateUlSec,
-        offsetFromTopMm: args.blowoutOffsetFromTopMm,
-        invariantContext,
-      })
-    }
-  }
-
   const commandCreators = flatMap(
     chunk(args.destWells, maxWellsPerChunk),
     (
@@ -329,10 +304,19 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
           : []
 
-      const blowoutCommands = getBlowoutCommands(
-        Boolean(dropTipAfterDispenseAirGap.length),
-        last(destWellChunk)
-      )
+      const blowoutCommands = disposalVolume
+        ? blowoutUtil({
+            pipette: pipette,
+            sourceLabwareId: args.sourceLabware,
+            sourceWell: args.sourceWell,
+            destLabwareId: args.destLabware,
+            destWell: last(destWellChunk),
+            blowoutLocation: blowoutLocation,
+            flowRate: args.blowoutFlowRateUlSec,
+            offsetFromTopMm: args.blowoutOffsetFromTopMm,
+            invariantContext,
+          })
+        : []
 
       const delayAfterAspirateCommands =
         aspirateDelay != null

@@ -888,11 +888,11 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A4', DEST_LABWARE),
         // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
+        blowoutSingleToTrash,
         // use the dispense > air gap here before moving to trash
         airGapHelper('A4', 3, { labware: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        // skip blowout into trash b/c we're about to drop tip anyway
         dropTipHelper('A1'),
       ])
     })
@@ -934,11 +934,11 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-        // since we used dispense > air gap, drop the tip
-        // skip blowout into trash b/c we're about to drop tip anyway
+        blowoutSingleToTrash,
+        // dispense => air gap since we are about to change the tip
         airGapHelper('A3', 3, { labware: DEST_LABWARE }), // need to air gap here
         delayCommand(11),
-        // just drop the tip in the trash
+        // since we used dispense > air gap, drop the tip
         dropTipHelper('A1'),
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
@@ -959,6 +959,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A4', DEST_LABWARE),
         // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
+        blowoutSingleToTrash,
         // use the dispense > air gap here before moving to trash
         airGapHelper('A4', 3, { labware: DEST_LABWARE }),
         delayCommand(11),
@@ -1005,7 +1006,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-        // chunk NOT ending in a tip change, so we must blowout to trash
         blowoutSingleToTrash,
         // skip dispense => air gap since we are reusing the tip
         // mix (asp)
@@ -1025,8 +1025,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A4', DEST_LABWARE),
         // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
+        blowoutSingleToTrash,
         // use the dispense > air gap here before moving to trash
-        // skip blowout into trash b/c we're about to drop tip anyway
         airGapHelper('A4', 3, { labware: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
