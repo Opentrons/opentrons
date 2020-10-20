@@ -843,9 +843,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       }
 
       const result = distribute(args, invariantContext, robotStateWithTip)
-      // blowout location IS trash! but I am never changing the tip, so i still gotta blow out
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        // no need to pickup tip/drop tip since change tip is never
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -868,11 +868,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-
-        // after touch tip, this is the final dispense in the chunk
-        // does the chunk end in a tip change?
-        // changeTip: never => do not change tip => so NO
-        // this means we must blowout into trash, and then go back to aspirate
+        // blowout into trash since we are not changing tip
         blowoutSingleToTrash,
         // next chunk from A1: remaining volume
         // mix (asp)
@@ -885,12 +881,12 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // air gap
         airGapHelper('A1', 31),
         delayCommand(11),
-        // dispense #1
         dispenseAirGapHelper('A4', 31),
         delayCommand(12),
+        // dispense #3
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
-        // touch tip (disp #1)
+        // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
         // use the dispense > air gap here before moving to trash
         airGapHelper('A4', 3, { labware: DEST_LABWARE }),
@@ -913,7 +909,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        // replace tip
+        // replace tip since change tip is always
         dropTipHelper('A1'),
         pickUpTipHelper('A1'),
         // mix (asp)
@@ -938,11 +934,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-
-        // after touch tip, this is the final dispense in the chunk
-        // does the chunk end in a tip change?
-        // changeTip: always => change tip => so YES
-        // chunk ending in a tip change so no need to blowout
+        // since we used dispense > air gap, drop the tip
+        // skip blowout into trash b/c we're about to drop tip anyway
         airGapHelper('A3', 3, { labware: DEST_LABWARE }), // need to air gap here
         delayCommand(11),
         // just drop the tip in the trash
@@ -959,12 +952,12 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // air gap
         airGapHelper('A1', 31),
         delayCommand(11),
-        // dispense #1
+        // dispense #3
         dispenseAirGapHelper('A4', 31),
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
-        // touch tip (disp #1)
+        // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
         // use the dispense > air gap here before moving to trash
         airGapHelper('A4', 3, { labware: DEST_LABWARE }),
@@ -987,7 +980,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        // replace tip
+        // replace tip at the beginning of the step
         dropTipHelper('A1'),
         pickUpTipHelper('A1'),
         // mix (asp)
@@ -1012,14 +1005,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-
-        // after touch tip, this is the final dispense in the chunk
-        // does the chunk end in a tip change?
-        // changeTip: once => so NO
         // chunk NOT ending in a tip change, so we must blowout to trash
         blowoutSingleToTrash,
         // skip dispense => air gap since we are reusing the tip
-
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate 100 liquid + 60 for disposal vol
@@ -1035,10 +1023,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
-        // touch tip (disp #1)
+        // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
         // use the dispense > air gap here before moving to trash
-        // since it is the final dispense in the step
         // skip blowout into trash b/c we're about to drop tip anyway
         airGapHelper('A4', 3, { labware: DEST_LABWARE }),
         delayCommand(11),
@@ -1059,6 +1046,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        // no need to replace tip since change tip is never
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -1081,8 +1069,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-
-        // blowout location is source so need to blowout
+        // blowout location is source so we gotta blowout
         blowoutSingleToSourceA1,
         // skip dispense => air gap since we are reusing the tip
         // mix (asp)
@@ -1100,11 +1087,12 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
-        // touch tip (disp #1)
+        // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
+        // blowout location is source so we gotta blowout
+        blowoutSingleToSourceA1,
         // use the dispense > air gap here before moving to trash
         // since it is the final dispense in the step
-        blowoutSingleToSourceA1,
         // air gap from source since blowout location is source
         airGapHelper('A1', 3),
         delayCommand(11),
@@ -1150,7 +1138,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-
         // blowout location is source so need to blowout
         blowoutSingleToSourceA1,
         // air gap so no liquid drops off the tip as pipette moves from source well to trash
@@ -1176,9 +1163,9 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
-        // touch tip (disp #1)
+        // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
-        // blowout to source
+        // blowout location is source so need to blowout
         blowoutSingleToSourceA1,
         // air gap so no liquid drops off the tip as pipette moves from source well to trash
         airGapHelper('A1', 3),
@@ -1225,8 +1212,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-
-        // blowout location is source so need to blowout
+        // blowout location is source so we gotta blowout
         blowoutSingleToSourceA1,
         // skip dispense > air gap since tip is being reused
         // mix (asp)
@@ -1244,7 +1230,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
-        // touch tip (disp #1)
+        // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
         // use the dispense > air gap here before moving to trash
         // since it is the final dispense in the step
@@ -1268,6 +1254,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
+        // no need to replace tip since changeTip is never
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate
@@ -1290,8 +1277,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-
-        // blowout location is dest so need to blowout
+        // blowout location is dest so we gotta blowout
         blowoutSingleToDestA3,
         // skip dispense => air gap since we are reusing the tip
         // mix (asp)
@@ -1311,7 +1297,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A4', DEST_LABWARE),
         // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
-        // blowout location is dest so need to blowout
+        // blowout location is dest so we gotta blowout
         blowoutSingleToDestA4,
         // use the dispense > air gap here before moving to trash
         // since it is the final dispense in the step
@@ -1359,8 +1345,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-
-        // blowout location is dest so need to blowout
+        // blowout location is dest so we gotta blowout
         blowoutSingleToDestA3,
         // air gap so no liquid drops off the tip as pipette moves from destination well to trash
         airGapHelper('A3', 3, { labware: DEST_LABWARE }),
@@ -1385,7 +1370,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         delayCommand(12),
         dispenseHelper('A4', 100),
         ...delayWithOffset('A4', DEST_LABWARE),
-        // touch tip (disp #1)
+        // touch tip (disp #3)
         touchTipHelper('A4', { labware: DEST_LABWARE }),
         // use the dispense > air gap here before moving to trash
         // since it is the final dispense in the step
@@ -1434,7 +1419,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A3', DEST_LABWARE),
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
-        // blowout location is dest so need to blowout
+        // blowout location is dest so we gotta blowout
         blowoutSingleToDestA3,
         // skip dispense > air gap since tip is being reused
         // mix (asp)
