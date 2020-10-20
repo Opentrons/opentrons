@@ -399,21 +399,17 @@ export const transfer: CommandCreator<TransferArgs> = (
               ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
               : []
 
-          const blowoutCommand =
-            dropTipAfterDispenseAirGap.length > 0 &&
-            args.blowoutLocation === FIXED_TRASH_ID
-              ? [] // skip blowout it's in the trash we're replacing the tip due to dispense > air gap
-              : blowoutUtil({
-                  pipette: args.pipette,
-                  sourceLabwareId: args.sourceLabware,
-                  sourceWell: sourceWell,
-                  destLabwareId: args.destLabware,
-                  destWell: destWell,
-                  blowoutLocation: args.blowoutLocation,
-                  flowRate: blowoutFlowRateUlSec,
-                  offsetFromTopMm: blowoutOffsetFromTopMm,
-                  invariantContext,
-                })
+          const blowoutCommand = blowoutUtil({
+            pipette: args.pipette,
+            sourceLabwareId: args.sourceLabware,
+            sourceWell: sourceWell,
+            destLabwareId: args.destLabware,
+            destWell: destWell,
+            blowoutLocation: args.blowoutLocation,
+            flowRate: blowoutFlowRateUlSec,
+            offsetFromTopMm: blowoutOffsetFromTopMm,
+            invariantContext,
+          })
 
           const nextCommands = [
             ...tipCommands,

@@ -1326,6 +1326,16 @@ describe('advanced options', () => {
             offsetFromBottomMm: 3.4,
           },
         },
+        {
+          command: 'blowout',
+          params: {
+            flowRate: 2.3,
+            labware: 'trashId',
+            offsetFromBottomMm: 80.3,
+            pipette: 'p300SingleId',
+            well: 'A1',
+          },
+        },
         // use the dispense > air gap here before moving to trash
         {
           command: 'airGap',
@@ -1345,7 +1355,6 @@ describe('advanced options', () => {
           },
         },
         // since we used dispense > air gap, drop the tip
-        // skip blowout into trash b/c we're about to drop tip anyway
         {
           command: 'dropTip',
           params: {
