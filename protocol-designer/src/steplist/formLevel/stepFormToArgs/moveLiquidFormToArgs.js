@@ -1,7 +1,7 @@
 // @flow
 import assert from 'assert'
 import { getWellsDepth } from '@opentrons/shared-data'
-import { SOURCE_WELL_BLOWOUT_DESTINATION } from '../../../step-generation/utils'
+import { DEST_WELL_BLOWOUT_DESTINATION } from '../../../step-generation/utils'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -216,9 +216,9 @@ export const moveLiquidFormToArgs = (
   assert(
     !(
       path === 'multiDispense' &&
-      blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION
+      blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION
     ),
-    'blowout location for multiDispense cannot be source well'
+    'blowout location for multiDispense cannot be destination well'
   )
 
   switch (path) {

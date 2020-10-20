@@ -350,13 +350,13 @@ describe('move liquid step form -> command creator args', () => {
           ...hydratedForm.fields,
           ...disposalVolumeFields,
           blowout_checkbox: true,
-          blowout_location: SOURCE_WELL_BLOWOUT_DESTINATION,
+          blowout_location: DEST_WELL_BLOWOUT_DESTINATION,
         },
       })
 
       expect(assert).toHaveBeenCalledWith(
         false,
-        'blowout location for multiDispense cannot be source well'
+        'blowout location for multiDispense cannot be destination well'
       )
     })
 
