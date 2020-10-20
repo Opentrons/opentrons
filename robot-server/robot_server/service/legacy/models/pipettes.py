@@ -27,8 +27,6 @@ class AttachedPipette(BaseModel):
     id: typing.Optional[str] = \
         Field(...,
               description="The serial number of the attached pipette")
-    rank: typing.Optional[str] = \
-        Field(None, description="The order of a pipette, if relevant")
 
 
 class PipettesByMount(BaseModel):

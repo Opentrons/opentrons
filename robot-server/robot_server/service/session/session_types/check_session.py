@@ -1,4 +1,4 @@
-from typing import Awaitable, cast, TYPE_CHECKING, List, Optional
+from typing import Awaitable, cast, TYPE_CHECKING, List
 
 from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
@@ -49,15 +49,16 @@ class CheckSession(BaseSession):
                      configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> BaseSession:
         """Create an instance"""
-        # (lc, 10-19-2020) For now, only pass in empty tipracks. We cannot
+        # (lc, 10-19-2020) For now, only pass in an empty list. We cannot
         # have a session model with an optional tiprack for session
         # create params right now because of the pydantic union problem.
-        tip_racks: List[Optional['LabwareDefinition']] = []
+        tip_racks: List = []
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
+        await configuration.hardware.cache_instruments()
         try:
             calibration_check = CheckCalibrationUserFlow(
                 configuration.hardware,

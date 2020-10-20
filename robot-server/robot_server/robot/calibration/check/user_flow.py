@@ -89,7 +89,7 @@ class CheckCalibrationUserFlow:
         self._active_tiprack = self._load_active_tiprack()
 
         self._command_map: COMMAND_MAP = {
-            CalibrationCommand.load_labware: self.load_labware,
+            CalibrationCommand.load_labware: self.transition,
             CalibrationCommand.jog: self.jog,
             CalibrationCommand.pick_up_tip: self.pick_up_tip,
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
@@ -101,7 +101,7 @@ class CheckCalibrationUserFlow:
             DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
             CheckCalibrationCommand.switch_pipette: self.change_active_pipette,
             CheckCalibrationCommand.return_tip: self._return_tip,
-            CheckCalibrationCommand.transition: self.load_labware,
+            CheckCalibrationCommand.transition: self.transition,
             CalibrationCommand.exit: self.exit_session,
         }
 
@@ -133,7 +133,7 @@ class CheckCalibrationUserFlow:
     def _hw_pipette(self) -> Pipette:
         return self._get_hw_pipettes()[0]
 
-    async def load_labware(self):
+    async def transition(self):
         pass
 
     async def change_active_pipette(self):
@@ -318,9 +318,7 @@ class CheckCalibrationUserFlow:
         being used for a given session for the client.
         """
         hw_pips = self._get_hw_pipettes()
-        MODULE_LOG.info(f"HW PIPS: {hw_pips}")
         info_pips = self._get_ordered_info_pipettes()
-        MODULE_LOG.info(f"INFO PIPS: {info_pips}")
         return [
             CheckAttachedPipette(  # type: ignore[call-arg]
                 model=hw_pip.model,
@@ -555,7 +553,7 @@ class CheckCalibrationUserFlow:
                 handler="move_to_tip_rack",
                 condition="active tiprack")
         point = self.active_tiprack.wells()[0].top().point + \
-                MOVE_TO_TIP_RACK_SAFETY_BUFFER
+            MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
         await self._move(to_loc)
         await self.register_initial_point()
@@ -609,7 +607,6 @@ class CheckCalibrationUserFlow:
         await uf.move(self, to_loc)
 
     async def exit_session(self):
-        MODULE_LOG.info("exit session was initiated")
         if self._hw_pipette.has_tip:
             await self.move_to_tip_rack()
             await self._return_tip()

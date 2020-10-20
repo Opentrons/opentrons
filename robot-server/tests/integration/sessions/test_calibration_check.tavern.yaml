@@ -37,9 +37,11 @@ stages:
             createParams: null
             details: &session_data_attribute_details
               currentStep: sessionStarted
-              instruments: !anydict
+              instruments: !anylist
+              activePipette: !anydict
+              activeTipRack: !anydict
               labware: !anylist
-              comparisonsByStep: {}
+              comparisonsByPipette: !anydict
 
   - name: Load labware
     request: &post_command
@@ -75,7 +77,7 @@ stages:
           id: "{session_id}"
           type: SessionCommand
           attributes:
-            command: preparePipette
+            command: moveToTipRack
             data: {}
     response:
       status_code: 200
@@ -91,7 +93,7 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: preparingFirstPipette
+              currentStep: preparingPipette
 
   - name: Jog first pipette
     request:
@@ -117,7 +119,7 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: preparingFirstPipette
+              currentStep: preparingPipette
 
   - name: Pick up tip
     request:
@@ -142,7 +144,7 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: inspectingFirstTip
+              currentStep: inspectingTip
 
   - name: Confirm tip attached
     request:
@@ -151,7 +153,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: confirmTip
+            command: moveToDeck
             data: {}
     response:
       status_code: 200
@@ -167,7 +169,7 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: joggingFirstPipetteToHeight
+              currentStep: comparingHeight
 
   - name: Jog first pipette to height
     request:
@@ -193,7 +195,7 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: joggingFirstPipetteToHeight
+              currentStep: comparingHeight
 
   - name: Compare first pipette height
     request:
@@ -218,8 +220,8 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: comparingFirstPipetteHeight
-              comparisonsByStep:
+              currentStep: comparingHeight
+              comparisonsByPipette:
                 comparingFirstPipetteHeight: !anydict
 
   - name: Go to next check
@@ -229,7 +231,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: goToNextCheck
+            command: moveToPointOne
             data: {}
     response:
       status_code: 200
@@ -245,8 +247,8 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: joggingFirstPipetteToPointOne
-              comparisonsByStep:
+              currentStep: comparingPointOne
+              comparisonsByPipette:
                 comparingFirstPipetteHeight: !anydict
 
   - name: Compare first pipette point one
@@ -272,8 +274,8 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: comparingFirstPipettePointOne
-              comparisonsByStep:
+              currentStep: comparingPointOne
+              comparisonsByPipette:
                 comparingFirstPipetteHeight: !anydict
                 comparingFirstPipettePointOne: !anydict
 
@@ -284,7 +286,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: goToNextCheck
+            command: moveToPointTwo
             data: {}
     response:
       status_code: 200
@@ -300,10 +302,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: joggingFirstPipetteToPointTwo
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
+              currentStep: comparingPointTwo
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Compare first pipette point two
     request:
@@ -328,11 +330,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: comparingFirstPipettePointTwo
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
+              currentStep: comparingPointTwo
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Go to next check
     request:
@@ -341,7 +342,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: goToNextCheck
+            command: moveToPointThree
             data: {}
     response:
       status_code: 200
@@ -357,11 +358,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: joggingFirstPipetteToPointThree
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
+              currentStep: comparingPointThree
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Compare first pipette point three
     request:
@@ -386,12 +386,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: comparingFirstPipettePointThree
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
-                comparingFirstPipettePointThree: !anydict
+              currentStep: comparingPointThree
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Go to next check
     request:
@@ -400,7 +398,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: goToNextCheck
+            command: moveToTiprack
             data: {}
     response:
       status_code: 200
@@ -416,14 +414,67 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: preparingSecondPipette
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
-                comparingFirstPipettePointThree: !anydict
+              currentStep: returningTip
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
-  - name: Jog Second Pipette
+  - name: Switch To Second Pipette
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: switchPipette
+            data:
+              vector: [0, 0, -10]
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: preparingPipette
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
+
+  - name: Prepare second pipette
+    request:
+      <<: *post_command
+      json:
+        data:
+          id: "{session_id}"
+          type: SessionCommand
+          attributes:
+            command: moveToTipRack
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: preparingPipette
+
+  - name: Jog second pipette
     request:
       <<: *post_command
       json:
@@ -447,12 +498,7 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: preparingSecondPipette
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
-                comparingFirstPipettePointThree: !anydict
+              currentStep: preparingPipette
 
   - name: Pick up tip
     request:
@@ -477,12 +523,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: inspectingSecondTip
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
-                comparingFirstPipettePointThree: !anydict
+              currentStep: inspectingTip
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Confirm tip
     request:
@@ -491,7 +535,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: confirmTip
+            command: moveToDeck
             data: {}
     response:
       status_code: 200
@@ -507,12 +551,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: joggingSecondPipetteToHeight
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
-                comparingFirstPipettePointThree: !anydict
+              currentStep: comparingHeight
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Compare second pipette to height
     request:
@@ -537,13 +579,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: comparingSecondPipetteHeight
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
-                comparingFirstPipettePointThree: !anydict
-                comparingSecondPipetteHeight: !anydict
+              currentStep: comparingHeight
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Go to next check
     request:
@@ -552,7 +591,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: goToNextCheck
+            command: moveToPointOne
             data: {}
     response:
       status_code: 200
@@ -568,13 +607,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: joggingSecondPipetteToPointOne
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
-                comparingFirstPipettePointThree: !anydict
-                comparingSecondPipetteHeight: !anydict
+              currentStep: comparingPointOne
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Compare second pipette to point one
     request:
@@ -599,14 +635,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: comparingSecondPipettePointOne
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
-                comparingFirstPipettePointThree: !anydict
-                comparingSecondPipetteHeight: !anydict
-                comparingSecondPipettePointOne: !anydict
+              currentStep: comparingPointOne
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Go to next check
     request:
@@ -615,7 +647,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: goToNextCheck
+            command: moveToTiprack
             data: {}
     response:
       status_code: 200
@@ -631,14 +663,10 @@ stages:
             <<: *session_data_attributes
             details:
               <<: *session_data_attribute_details
-              currentStep: checkComplete
-              comparisonsByStep:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
-                comparingFirstPipettePointTwo: !anydict
-                comparingFirstPipettePointThree: !anydict
-                comparingSecondPipetteHeight: !anydict
-                comparingSecondPipettePointOne: !anydict
+              currentStep: returningTip
+              comparisonsByPipette:
+                first: !anydict
+                second: !anydict
 
   - name: Delete the session
     request:

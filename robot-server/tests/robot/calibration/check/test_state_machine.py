@@ -4,37 +4,39 @@ from typing import List, Tuple
 from robot_server.service.session.models.command import (
     CalibrationCommand as CalCommand,
     DeckCalibrationCommand as DeckCommand,
-    CalibrationCommand as CheckCommand)
+    CheckCalibrationCommand as CheckCommand)
 from robot_server.robot.calibration.check.state_machine import \
     CalibrationCheckStateMachine
 
 valid_commands: List[Tuple[str, str, str]] = [
     (CalCommand.load_labware, 'sessionStarted', 'labwareLoaded'),
     (CalCommand.move_to_tip_rack, 'labwareLoaded', 'preparingPipette'),
-    (CalCommand.move_to_tip_rack, 'preparingPipette', 'preparingPipette'),
     (CalCommand.jog, 'preparingPipette', 'preparingPipette'),
     (CalCommand.pick_up_tip, 'preparingPipette', 'inspectingTip'),
     (CalCommand.invalidate_tip, 'inspectingTip', 'preparingPipette'),
-    (CalCommand.move_to_deck, 'inspectingTip', 'joggingToDeck'),
-    (CalCommand.jog, 'joggingToDeck', 'joggingToDeck'),
-    (CalCommand.save_offset, 'joggingToDeck', 'joggingToDeck'),
-    (CalCommand.move_to_point_one, 'joggingToDeck', 'savingPointOne'),
-    (CalCommand.jog, 'savingPointOne', 'savingPointOne'),
-    (CalCommand.save_offset, 'savingPointOne', 'savingPointOne'),
-    (DeckCommand.move_to_point_two, 'savingPointOne', 'savingPointTwo'),
-    (CalCommand.jog, 'savingPointTwo', 'savingPointTwo'),
-    (CalCommand.save_offset, 'savingPointTwo', 'savingPointTwo'),
-    (DeckCommand.move_to_point_three, 'savingPointTwo', 'savingPointThree'),
-    (CalCommand.jog, 'savingPointThree', 'savingPointThree'),
-    (CalCommand.save_offset, 'savingPointThree', 'savingPointThree'),
-    (CalCommand.move_to_tip_rack, 'savingPointThree', 'calibrationComplete'),
+    (CalCommand.move_to_deck, 'inspectingTip', 'comparingHeight'),
+    (CalCommand.jog, 'comparingHeight', 'comparingHeight'),
+    (CheckCommand.compare_point, 'comparingHeight', 'comparingHeight'),
+    (CalCommand.move_to_point_one, 'comparingHeight', 'comparingPointOne'),
+    (CalCommand.jog, 'comparingPointOne', 'comparingPointOne'),
+    (CheckCommand.compare_point, 'comparingPointOne', 'comparingPointOne'),
+    (DeckCommand.move_to_point_two, 'comparingPointOne', 'comparingPointTwo'),
+    (CalCommand.jog, 'comparingPointTwo', 'comparingPointTwo'),
+    (CheckCommand.compare_point, 'comparingPointTwo', 'comparingPointTwo'),
+    (DeckCommand.move_to_point_three,
+        'comparingPointTwo', 'comparingPointThree'),
+    (CalCommand.jog, 'comparingPointThree', 'comparingPointThree'),
+    (CheckCommand.compare_point, 'comparingPointThree', 'comparingPointThree'),
+    (CalCommand.move_to_tip_rack, 'comparingPointThree', 'returningTip'),
+    (CheckCommand.return_tip, 'returningTip', 'returningTip'),
+    (CheckCommand.transition, 'returningTip', 'resultsSummary'),
     (CalCommand.exit, 'calibrationComplete', 'sessionExited'),
     (CalCommand.exit, 'sessionStarted', 'sessionExited'),
     (CalCommand.exit, 'labwareLoaded', 'sessionExited'),
     (CalCommand.exit, 'preparingPipette', 'sessionExited'),
-    (CalCommand.exit, 'savingPointOne', 'sessionExited'),
-    (CalCommand.exit, 'savingPointTwo', 'sessionExited'),
-    (CalCommand.exit, 'savingPointThree', 'sessionExited'),
+    (CalCommand.exit, 'comparingPointOne', 'sessionExited'),
+    (CalCommand.exit, 'comparingPointTwo', 'sessionExited'),
+    (CalCommand.exit, 'comparingPointThree', 'sessionExited'),
 ]
 
 
