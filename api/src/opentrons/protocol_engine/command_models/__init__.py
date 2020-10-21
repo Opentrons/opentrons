@@ -122,28 +122,21 @@ __all__ = [
     "FailedCommandType",
     "CommandType",
 
-    # equipment commands
+    # equipment request/result models
     "LoadLabwareRequest",
     "LoadLabwareResult",
-    "LoadLabwareCommand",
     "LoadPipetteRequest",
     "LoadPipetteResult",
-    "LoadPipetteCommand",
 
-    # pipetting commands
+    # pipetting request/result models
     "MoveToWellRequest",
     "MoveToWellResult",
-    "MoveToWellCommand",
     "PickUpTipRequest",
     "PickUpTipResult",
-    "PickUpTipCommand",
     "DropTipRequest",
     "DropTipResult",
-    "DropTipCommand",
     "AspirateRequest",
     "AspirateResult",
-    "AspirateCommand",
     "DispenseRequest",
     "DispenseResult",
-    "DispenseCommand"
 ]
