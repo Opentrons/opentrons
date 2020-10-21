@@ -6,12 +6,24 @@ import cx from 'classnames'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 
 import {
-  PrimaryButton,
+  Flex,
+  Box,
+  Text,
+  SPACING_1,
+  SPACING_4,
+  TEXT_ALIGN_LEFT,
+  DIRECTION_COLUMN,
+  PrimaryBtn,
   RadioGroup,
   Icon,
   HandleKeypress,
   type KeypressHandler,
   type IconName,
+  FONT_SIZE_HEADER,
+  FONT_WEIGHT_SEMIBOLD,
+  FONT_SIZE_BODY_1,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import styles from './styles.css'
@@ -182,38 +194,71 @@ export class JogControls extends React.Component<
     const hasAcrossControls =
       this.props.axes.includes('x') || this.props.axes.includes('y')
     return (
-      <div className={styles.jog_container}>
-        <div className={styles.jog_controls}>
-          <span className={styles.jog_increment}>
+      <Flex paddingX={SPACING_4} paddingTop={SPACING_4} paddingBottom="2.5rem">
+        <Flex flex={1} flexDirection={DIRECTION_COLUMN}>
+          <Text fontSize={FONT_SIZE_HEADER} fontWeight={FONT_WEIGHT_SEMIBOLD}>
             Jump Size
-            <span className={styles.jog_label_keys}>Change with + and -</span>
-          </span>
-          {hasAcrossControls ? (
-            <span className={styles.jog_label_xy}>
+          </Text>
+          <Text fontSize={FONT_SIZE_BODY_1}>Change with + and -</Text>
+          <Box textAlign={TEXT_ALIGN_LEFT}>
+            <RadioGroup
+              className={styles.increment_item}
+              value={`${this.state.step}`}
+              options={this.props.stepSizes.map(s => stepToOption(s))}
+              onChange={this.handleStepSelect}
+            />
+          </Box>
+        </Flex>
+        {hasAcrossControls ? (
+          <Flex flex={1} flexDirection={DIRECTION_COLUMN}>
+            <Text fontSize={FONT_SIZE_HEADER} fontWeight={FONT_WEIGHT_SEMIBOLD}>
               Across Deck
-              <span className={styles.jog_label_keys}>Arrow keys</span>
-            </span>
-          ) : null}
-          {this.props.axes.includes('z') ? (
-            <span className={styles.jog_label_z}>
-              Up & Down
-              <span className={styles.jog_label_keys}>Arrow keys + SHIFT</span>
-            </span>
-          ) : null}
-          {this.renderJogControls()}
-        </div>
-      </div>
+            </Text>
+            <Text fontSize={FONT_SIZE_BODY_1}>Arrow keys</Text>
+            <Box
+              display="grid"
+              gridGap={SPACING_1}
+              gridTemplateRows="repeat(2, [row] 3rem)"
+              gridTemplateColumns="repeat(3, [col] 3rem)"
+            ></Box>
+          </Flex>
+        ) : null}
+        {this.props.axes.includes('z') ? (
+          <span className={styles.jog_label_z}>
+            Up & Down
+            <span className={styles.jog_label_keys}>Arrow keys + SHIFT</span>
+          </span>
+        ) : null}
+      </Flex>
     )
   }
 }
 
+const colAndRowByDirection: { [string]: [number, number] } = {
+  back: [2, 2],
+  forward: [1, 2],
+  down: [2, 2],
+  up: [1, 2],
+  right: [2, 3],
+  left: [2, 1],
+}
 function JogButton(props: JogButtonProps) {
   const { name, icon, onClick } = props
   const className = cx(styles.jog_button, styles[name])
 
+  const [gridRow, gridColumn] = colAndRowByDirection[name]
+
   return (
-    <PrimaryButton className={className} title={name} onClick={onClick}>
+    <PrimaryBtn
+      title={name}
+      width="2.5rem"
+      height="2.5rem"
+      alignSelf={ALIGN_CENTER}
+      justifySelf={JUSTIFY_CENTER}
+      onClick={onClick}
+      {...{ gridRow, gridColumn }}
+    >
       <Icon name={icon} />
-    </PrimaryButton>
+    </PrimaryBtn>
   )
 }

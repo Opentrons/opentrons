@@ -56,6 +56,14 @@ const FLEXBOX_PROPS = [
   'alignSelf',
 ]
 
+const GRID_PROPS = [
+  'gridGap',
+  'gridTemplateRows',
+  'gridTemplateColumn',
+  'gridRows',
+  'gridColumns',
+]
+
 const LAYOUT_PROPS = [
   'display',
   'size',
@@ -78,6 +86,7 @@ const STYLE_PROPS = [
   ...SPACING_PROPS,
   ...BORDER_PROPS,
   ...FLEXBOX_PROPS,
+  ...GRID_PROPS,
   ...LAYOUT_PROPS,
   ...POSITION_PROPS,
 ]
@@ -124,6 +133,10 @@ const flexboxStyles = (props: { ...Types.FlexboxProps, ... }) => {
   return (pick(props, FLEXBOX_PROPS): Types.FlexboxProps)
 }
 
+const gridStyles = (props: { ...Types.GridProps, ... }) => {
+  return (pick(props, GRID_PROPS): Types.GridProps)
+}
+
 const layoutStyles = (props: { ...Types.LayoutProps, ... }) => {
   const { size, ...styles } = (pick(props, LAYOUT_PROPS): Types.LayoutProps)
 
@@ -145,6 +158,7 @@ export const styleProps = (props: { ...Types.StyleProps, ... }): Styles => ({
   ...spacingStyles(props),
   ...borderStyles(props),
   ...flexboxStyles(props),
+  ...gridStyles(props),
   ...layoutStyles(props),
   ...positionStyles(props),
 })

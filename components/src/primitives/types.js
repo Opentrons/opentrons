@@ -55,6 +55,14 @@ export type FlexboxProps = {|
   flexWrap?: string,
 |}
 
+export type GridProps = {|
+  gridGap?: string | number,
+  gridTemplateRows?: string,
+  gridTemplateColumns?: string,
+  gridRows?: string,
+  gridColumns?: string,
+|}
+
 export type LayoutProps = {|
   display?: string,
   size?: string | number,
@@ -81,6 +89,7 @@ export type StyleProps = {|
   ...SpacingProps,
   ...BorderProps,
   ...FlexboxProps,
+  ...GridProps,
   ...LayoutProps,
   ...PositionProps,
   className?: string,
