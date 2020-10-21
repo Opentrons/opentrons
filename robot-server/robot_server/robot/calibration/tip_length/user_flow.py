@@ -219,8 +219,9 @@ class TipCalibrationUserFlow:
         await util.invalidate_tip(self)
 
     async def exit_session(self):
-        await self.move_to_tip_rack()
-        await self.return_tip()
+        if self.hw_pipette.has_tip:
+            await self.move_to_tip_rack()
+            await self.return_tip()
         await self._hardware.home()
 
     def _get_tip_rack_lw(self,
