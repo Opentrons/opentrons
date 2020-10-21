@@ -32,9 +32,13 @@ class Subscriber:
         self._task = asyncio.create_task(self._read_task(connection))
         self._q: asyncio.Queue = asyncio.Queue()
 
-    def stop(self) -> None:
+    async def stop(self) -> None:
         """Stop the subscriber task."""
         self._task.cancel()
+        try:
+            await self._task
+        except asyncio.CancelledError:
+            pass
 
     async def _process_frames(self, frames: typing.List[bytes]) -> None:
         """

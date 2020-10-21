@@ -43,6 +43,10 @@ class Publisher:
         """Publish an event to a topic."""
         await self._queue.put(QueueEntry(topic, event))
 
-    def stop(self) -> None:
+    async def stop(self) -> None:
         """Stop the publisher task."""
         self._task.cancel()
+        try:
+            await self._task
+        except asyncio.CancelledError:
+            pass

@@ -1,4 +1,5 @@
 """Pub sub integration tests."""
+import asyncio
 from typing import AsyncGenerator
 
 import pytest
@@ -6,6 +7,7 @@ import pytest
 from notify_server.clients import publisher, subscriber
 from notify_server.models.event import Event
 from notify_server.settings import Settings
+from notify_server.network.connection import create_publisher
 
 pytestmark = pytest.mark.asyncio
 
@@ -23,8 +25,9 @@ async def test_one_pub_one_sub(
     e = await sub.next_event()
     assert e.topic == "topic1"
     assert e.event == event
-    pub.stop()
-    sub.stop()
+
+    await pub.stop()
+    await sub.stop()
 
 
 async def test_one_pub_two_sub(
@@ -45,9 +48,10 @@ async def test_one_pub_two_sub(
     e = await sub2.next_event()
     assert e.topic == "topic1"
     assert e.event == event
-    pub.stop()
-    sub1.stop()
-    sub2.stop()
+
+    await pub.stop()
+    await sub1.stop()
+    await sub2.stop()
 
 
 async def test_one_pub_two_sub_two_topics(
@@ -69,6 +73,32 @@ async def test_one_pub_two_sub_two_topics(
     e = await sub2.next_event()
     assert e.topic == "topic2"
     assert e.event == event
-    pub.stop()
-    sub1.stop()
-    sub2.stop()
+
+    await pub.stop()
+    await sub1.stop()
+    await sub2.stop()
+
+
+async def test_one_pub_one_sub_malformed(
+        integration_environment: None,
+        event: Event) -> None:
+    """Test that malformed frames are ignored."""
+    settings = Settings()
+
+    pub = create_publisher(settings.publisher_address.connection_string())
+    sub = subscriber.create(settings.publisher_address.connection_string(),
+                            ['topic'])
+
+    async def send_task() -> None:
+        """Send badly formed frames."""
+        await pub.send_multipart([b"topic", b"{"])
+        await pub.send_multipart([b"topic", b"{}"])
+        await pub.send_multipart([b"topic"])
+        await pub.send_multipart([b"topic", event.json().encode('utf-8')])
+
+    await asyncio.create_task(send_task())
+
+    e = await sub.next_event()
+    assert e.topic == "topic"
+    assert e.event == event
+    await sub.stop()

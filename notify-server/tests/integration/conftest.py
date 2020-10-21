@@ -27,3 +27,7 @@ async def server_fixture(integration_environment: None) -> AsyncGenerator:
     task = asyncio.create_task(run())
     yield task
     task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
