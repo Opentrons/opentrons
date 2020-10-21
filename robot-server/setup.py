@@ -24,7 +24,7 @@ def get_version():
         normalize_opts = {'extra_tag': buildno}
     else:
         normalize_opts = {}
-    return normalize_version('shared-data', **normalize_opts)
+    return normalize_version('robot-server', **normalize_opts)
 
 
 VERSION = get_version()
