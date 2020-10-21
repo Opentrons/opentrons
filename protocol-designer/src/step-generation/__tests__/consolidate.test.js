@@ -853,13 +853,13 @@ describe('consolidate single-channel', () => {
   })
 
   describe('all advanced settings enabled', () => {
-    it('should create commands in the expected order with expected params', () => {
+    it('should create commands in the expected order with expected params (changeTip: never, blowout in trash)', () => {
       const args = {
         ...mixinArgs,
-        sourceWells: ['A1', 'A2'],
+        sourceWells: ['A1', 'A2', 'A3'],
         destWell: 'B1',
         changeTip: 'never',
-        volume: 45,
+        volume: 100,
         // aspirate column
         preWetTip: true,
         aspirateDelay: { seconds: 11, mmFromBottom: 15 },
@@ -876,6 +876,7 @@ describe('consolidate single-channel', () => {
         blowoutLocation: 'trashId',
         blowoutFlowRateUlSec: 2.3,
         blowoutOffsetFromTopMm: 3.3,
+        dispenseAirGapVolume: 35,
       }
 
       const result = consolidate(
@@ -890,7 +891,7 @@ describe('consolidate single-channel', () => {
           command: 'aspirate',
           params: {
             pipette: 'p300SingleId',
-            volume: 45,
+            volume: 100,
             labware: 'sourcePlateId',
             well: 'A1',
             offsetFromBottomMm: 3.1,
@@ -907,7 +908,7 @@ describe('consolidate single-channel', () => {
           command: 'dispense',
           params: {
             pipette: 'p300SingleId',
-            volume: 45,
+            volume: 100,
             labware: 'sourcePlateId',
             well: 'A1',
             offsetFromBottomMm: 3.1,
@@ -925,7 +926,7 @@ describe('consolidate single-channel', () => {
           command: 'aspirate',
           params: {
             pipette: 'p300SingleId',
-            volume: 45,
+            volume: 100,
             labware: 'sourcePlateId',
             well: 'A1',
             offsetFromBottomMm: 3.1,
@@ -983,7 +984,7 @@ describe('consolidate single-channel', () => {
           command: 'aspirate',
           params: {
             pipette: 'p300SingleId',
-            volume: 45,
+            volume: 100,
             labware: 'sourcePlateId',
             well: 'A2',
             offsetFromBottomMm: 3.1,
@@ -1018,7 +1019,7 @@ describe('consolidate single-channel', () => {
             offsetFromBottomMm: 14.5,
           },
         },
-        // Air Gap: after aspirating from A2
+        // Aspirate > air gap: after aspirating from A2
         {
           command: 'airGap',
           params: {
@@ -1036,12 +1037,12 @@ describe('consolidate single-channel', () => {
             wait: 11,
           },
         },
-        // Dispense full air + liquid volume all together to dest well (45+31+45+31 = 152uL)
+        // Dispense full air + liquid volume all together to dest well (100+31+100+31 = 262uL)
         {
           command: 'dispense',
           params: {
             pipette: 'p300SingleId',
-            volume: 152,
+            volume: 262,
             labware: 'destPlateId',
             well: 'B1',
             offsetFromBottomMm: 3.2,
@@ -1112,6 +1113,10 @@ describe('consolidate single-channel', () => {
             offsetFromBottomMm: 3.4,
           },
         },
+
+        // No Dispense > Air Gap here because we're re-using the tip
+        // for the next chunk
+
         // Blowout to trash
         {
           command: 'blowout',
@@ -1123,8 +1128,220 @@ describe('consolidate single-channel', () => {
             offsetFromBottomMm: 80.3,
           },
         },
+
+        // Second chunk: source well A3
+        // pre-wet
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 100,
+            labware: 'sourcePlateId',
+            well: 'A3',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 100,
+            labware: 'sourcePlateId',
+            well: 'A3',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // actual aspirate A3
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 100,
+            labware: 'sourcePlateId',
+            well: 'A3',
+            offsetFromBottomMm: 3.1,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A3',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 15,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'sourcePlateId',
+            well: 'A3',
+            offsetFromBottomMm: 14.5,
+          },
+        },
+        // Aspirate > air gap: after aspirating from A3
+        {
+          command: 'airGap',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 31,
+            labware: 'sourcePlateId',
+            well: 'A3',
+            offsetFromBottomMm: 11.54,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // Dispense full air + liquid volume all together to dest well (100+31 = 131uL)
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 131,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'moveToWell',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 14,
+            },
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // Mix (disp)
+        {
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        {
+          command: 'dispense',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 36,
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            flowRate: 2.2,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 12,
+          },
+        },
+        // Touch tip (disp)
+        {
+          command: 'touchTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.4,
+          },
+        },
+        // Dispense > air gap in dest well
+        {
+          command: 'airGap',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 3.2,
+            volume: 35,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
+          },
+        },
+        // Skip blowout to trash since we're about to drop the tip
+        // TODO IMMEDIATELY: delete commented blowout:
+        // {
+        //   command: 'blowout',
+        //   params: {
+        //     pipette: 'p300SingleId',
+        //     labware: 'trashId',
+        //     well: 'A1',
+        //     flowRate: 2.3,
+        //     offsetFromBottomMm: 80.3,
+        //   },
+        // },
+
+        // we used dispense > air gap, so we will dispose of the tip
+        {
+          command: 'dropTip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'trashId',
+            well: 'A1',
+          },
+        },
       ])
     })
+
+    // TODO IMMEDIATELY more cases
   })
 })
 
