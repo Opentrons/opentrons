@@ -57,9 +57,14 @@ class Subscriber:
     async def _read_task(self,
                          connection: Connection) -> None:
         """Connect to address and subscribe to topics."""
-        while True:
-            s = await connection.recv_multipart()
-            await self._process_frames(s)
+        try:
+            while True:
+                s = await connection.recv_multipart()
+                await self._process_frames(s)
+        except asyncio.CancelledError:
+            log.exception("Done")
+        finally:
+            connection.close()
 
     async def next_event(self) -> QueueEntry:
         """Get next event."""

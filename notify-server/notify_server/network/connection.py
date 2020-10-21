@@ -74,3 +74,8 @@ class Connection:
     async def recv_multipart(self) -> Any:
         """Recv a multipart message."""
         return await self._socket.recv_multipart()
+
+    def close(self) -> None:
+        """Close the socket."""
+        log.info("Closing socket")
+        self._socket.close()

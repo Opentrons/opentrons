@@ -13,9 +13,9 @@ def integration_environment() -> None:
     """Set up the settings environment."""
     # Set up the publisher and server addresses.
     environ['OT_NOTIFY_SERVER_publisher_address'] =\
-        json.dumps({"scheme": "ipc", "path": "/tmp/ot2_ns_pub"})
+        json.dumps({"scheme": "tcp", "host": "127.0.0.1", "port": 5555})
     environ['OT_NOTIFY_SERVER_subscriber_address'] =\
-        json.dumps({"scheme": "ipc", "path": "/tmp/ot2_ns_sub"})
+        json.dumps({"scheme": "tcp", "host": "127.0.0.1", "port": 5556})
     # Set production to false
     environ['OT_NOTIFY_SERVER_production'] = "false"
 

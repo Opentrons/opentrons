@@ -26,9 +26,14 @@ def create(host_address: str) -> Publisher:
 
 async def _send_task(connection: Connection, queue: Queue) -> None:
     """Run asyncio task that reads from queue and publishes to server."""
-    while True:
-        entry: QueueEntry = await queue.get()
-        await connection.send_multipart(entry.to_frames())
+    try:
+        while True:
+            entry: QueueEntry = await queue.get()
+            await connection.send_multipart(entry.to_frames())
+    except asyncio.CancelledError:
+        log.exception("Done")
+    finally:
+        connection.close()
 
 
 class Publisher:

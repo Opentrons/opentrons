@@ -23,10 +23,15 @@ async def _publisher_server_task(connection: Connection,
     :param queue: Queue for received messages.
     :return: None
     """
-    while True:
-        m = await connection.recv_multipart()
-        log.debug("Event: %s", m)
-        await queue.put(m)
+    try:
+        while True:
+            m = await connection.recv_multipart()
+            log.debug("Event: %s", m)
+            await queue.put(m)
+    except asyncio.CancelledError:
+        log.exception("Done")
+    finally:
+        connection.close()
 
 
 async def _subscriber_server_task(connection: Connection,
@@ -38,10 +43,15 @@ async def _subscriber_server_task(connection: Connection,
     :param queue: The queue of multipart messages to send
     :return: None
     """
-    while True:
-        s = await queue.get()
-        log.debug("Publishing: %s", s)
-        await connection.send_multipart(s)
+    try:
+        while True:
+            s = await queue.get()
+            log.debug("Publishing: %s", s)
+            await connection.send_multipart(s)
+    except asyncio.CancelledError:
+        log.exception("Done")
+    finally:
+        connection.close()
 
 
 async def run(settings: Settings) -> None:
