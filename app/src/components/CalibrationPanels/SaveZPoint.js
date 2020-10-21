@@ -47,7 +47,7 @@ const JOG_UNTIL = 'Jog the pipette until the tip is'
 const JUST_BARELY_TOUCHING = 'barely touching (less than 0.1mm)'
 const DECK_IN = 'the deck in'
 const THEN = 'Then press the'
-const DECK_CAL_BUTTON_TEXT = 'save z-axis and move to slot 1'
+const DECK_CAL_BUTTON_TEXT = 'remember z-axis and move to slot 1'
 const PIP_OFFSET_BUTTON_TEXT = 'save calibration and move to slot 1'
 const TO_USE_Z =
   'button to use this z position for the rest of deck calibration'
