@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.2...v4.0.0-beta.1) (2020-10-21)
+
+
+### Bug Fixes
+
+* **app:** Center start over in measure nozzle ([c875f3d](https://github.com/Opentrons/opentrons/commit/c875f3d))
+
+
+
+
+
 # [4.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.0...v4.0.0-alpha.2) (2020-10-21)
 
 
