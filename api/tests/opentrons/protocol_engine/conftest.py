@@ -66,8 +66,7 @@ def load_labware_result(minimal_labware_def):
 @pytest.fixture
 def pending_load_labware_command(now, load_labware_request):
     return command_models.PendingCommand(
-        uid="unique-id",
-        createdAt=now,
+        created_at=now,
         request=load_labware_request,
     )
 
@@ -75,9 +74,8 @@ def pending_load_labware_command(now, load_labware_request):
 @pytest.fixture
 def running_load_labware_command(now, load_labware_request):
     return command_models.RunningCommand(
-        uid="unique-id",
-        createdAt=now,
-        startedAt=now,
+        created_at=now,
+        started_at=now,
         request=load_labware_request,
     )
 
@@ -89,10 +87,9 @@ def completed_load_labware_command(
     load_labware_result,
 ):
     return command_models.CompletedCommand(
-        uid="unique-id",
-        createdAt=now,
-        startedAt=now,
-        completedAt=now,
+        created_at=now,
+        started_at=now,
+        completed_at=now,
         request=load_labware_request,
         result=load_labware_result,
     )
@@ -114,8 +111,7 @@ def load_pipette_result():
 @pytest.fixture
 def pending_load_pipette_command(now, load_pipette_request):
     return command_models.PendingCommand(
-        uid="unique-id",
-        createdAt=now,
+        created_at=now,
         request=load_pipette_request,
     )
 
@@ -123,9 +119,8 @@ def pending_load_pipette_command(now, load_pipette_request):
 @pytest.fixture
 def running_load_pipette_command(now, load_pipette_request):
     return command_models.RunningCommand(
-        uid="unique-id",
-        createdAt=now,
-        startedAt=now,
+        created_at=now,
+        started_at=now,
         request=load_pipette_request,
     )
 
@@ -137,10 +132,9 @@ def completed_load_pipette_command(
     load_pipette_result,
 ):
     return command_models.CompletedCommand(
-        uid="unique-id",
-        createdAt=now,
-        startedAt=now,
-        completedAt=now,
+        created_at=now,
+        started_at=now,
+        completed_at=now,
         request=load_pipette_request,
         result=load_pipette_result,
     )

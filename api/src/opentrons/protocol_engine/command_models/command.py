@@ -3,44 +3,40 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from pydantic import BaseModel
-from typing import cast, Generic, TypeVar, Union
-from typing_extensions import Literal
+from typing import Generic, TypeVar, Union
 
-from ..errors import ProtocolEngineError, ProtocolEngineErrorType
+from ..errors import ProtocolEngineError
 
 ReqT = TypeVar("ReqT", bound=BaseModel)
 ResT = TypeVar("ResT", bound=BaseModel)
 
 
-@dataclass
+@dataclass(frozen=True)
 class CompletedCommand(Generic[ReqT, ResT]):
-    uid: str
-    createdAt: datetime
-    startedAt: datetime
-    completedAt: datetime
+    """A command that has been successfully executed."""
+    created_at: datetime
+    started_at: datetime
+    completed_at: datetime
     request: ReqT
     result: ResT
-    status: Literal["completed"] = "completed"
 
 
-@dataclass
+@dataclass(frozen=True)
 class FailedCommand(Generic[ReqT]):
-    uid: str
-    createdAt: datetime
-    startedAt: datetime
-    failedAt: datetime
+    """A command that was executed but failed."""
+    created_at: datetime
+    started_at: datetime
+    failed_at: datetime
     request: ReqT
-    error: ProtocolEngineErrorType
-    status: Literal["failed"] = "failed"
+    error: ProtocolEngineError
 
 
-@dataclass
+@dataclass(frozen=True)
 class RunningCommand(Generic[ReqT, ResT]):
-    uid: str
-    createdAt: datetime
-    startedAt: datetime
+    """A command that is currently being executed."""
+    created_at: datetime
+    started_at: datetime
     request: ReqT
-    status: Literal["running"] = "running"
 
     def to_completed(
         self,
@@ -48,11 +44,10 @@ class RunningCommand(Generic[ReqT, ResT]):
         completed_at: datetime,
     ) -> CompletedCommand[ReqT, ResT]:
         return CompletedCommand(
-            uid=self.uid,
-            createdAt=self.createdAt,
-            startedAt=self.startedAt,
+            created_at=self.created_at,
+            started_at=self.started_at,
             request=self.request,
-            completedAt=completed_at,
+            completed_at=completed_at,
             result=result
         )
 
@@ -62,28 +57,25 @@ class RunningCommand(Generic[ReqT, ResT]):
         failed_at: datetime,
     ) -> FailedCommand[ReqT]:
         return FailedCommand(
-            uid=self.uid,
-            createdAt=self.createdAt,
-            startedAt=self.startedAt,
+            created_at=self.created_at,
+            started_at=self.started_at,
             request=self.request,
-            failedAt=failed_at,
-            error=cast(ProtocolEngineErrorType, error)
+            failed_at=failed_at,
+            error=error
         )
 
 
-@dataclass
+@dataclass(frozen=True)
 class PendingCommand(Generic[ReqT, ResT]):
-    uid: str
-    createdAt: datetime
+    """A command that is has not yet been started."""
+    created_at: datetime
     request: ReqT
-    status: Literal["pending"] = "pending"
 
     def to_running(self, started_at: datetime) -> RunningCommand[ReqT, ResT]:
         return RunningCommand(
-            uid=self.uid,
-            createdAt=self.createdAt,
+            created_at=self.created_at,
             request=self.request,
-            startedAt=started_at,
+            started_at=started_at,
         )
 
 

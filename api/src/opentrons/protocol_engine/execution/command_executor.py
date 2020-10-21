@@ -1,4 +1,4 @@
-"""Command implementation executor."""
+"""Command executor router class."""
 from typing import Optional, Union
 
 from opentrons.util.helpers import utc_now
@@ -10,15 +10,20 @@ from .equipment import EquipmentHandler
 
 
 class CommandExecutor():
-    """Command side-effect router."""
-    _equipment_handler: EquipmentHandler
+    """
+    CommandExecutor class.
+
+    A CommandExecutor manages triggering the side-effects of a given command
+    and collecting the results of those side-effects.
+    """
 
     def __init__(
         self,
         hardware: HardwareAPI,
         equipment_handler: Optional[EquipmentHandler] = None
     ):
-        self._equipment_handler = (
+        """Initialize a CommandExecutor."""
+        self._equipment_handler: EquipmentHandler = (
             equipment_handler
             if equipment_handler is not None
             else EquipmentHandler(hardware=hardware)
@@ -29,6 +34,7 @@ class CommandExecutor():
         command: cmd.RunningCommandType,
         state: State
     ) -> Union[cmd.CompletedCommandType, cmd.FailedCommandType]:
+        """Execute a Command, returning a CompletedCommand or FailedCommand."""
         try:
             return await self._try_to_execute_command(command, state)
         except ProtocolEngineError as error:
@@ -44,6 +50,10 @@ class CommandExecutor():
         command: cmd.RunningCommandType,
         state: State
     ) -> cmd.CompletedCommandType:
+        """
+        Private method to execute commands by routing to a specific command
+        implementation class.
+        """
         # call to correct implementation based on command request type
         # load labware
         if isinstance(command.request, cmd.LoadLabwareRequest):

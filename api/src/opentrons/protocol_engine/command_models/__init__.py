@@ -1,31 +1,23 @@
 """
-Protocol engine commands.
+Protocol engine command models.
 
-The `protocol_engine.commands` module contains the data models of all commands
-that the engine is able to handle. A command consists of:
+The `protocol_engine.commands` module contains the data models of all command
+request and results the engine is able to handle. It also contains models and
+type definitions for Command resources, where a Command:
 
-- A unique identifier for a single instance of a command request
-- An identifying type
-- A payload
-
-A command is executed by the `protocol_engine`. Command execution has the
-following lifecycle:
-
-0. Command created and assigned an identifier
-1. Command state added to protocol state
-2. Command side-effects executed based on type and payload; e.g.
-    - Calls made to the `hardware_control` module
-    - Data read from the filesystem
-3. Relevent data is from side-effects is loaded into a command result
-4. Command result is added to protocol state
+- May be pending, running, completed, or failed
+- Contains request and, if applicable, result data
+- Has timestamps for when it was created, started, completed, and/or failed
 """
+
 from typing import Union
+
 from .command import (
     PendingCommand,
     RunningCommand,
     CompletedCommand,
     FailedCommand,
-    GenericCommandType
+    GenericCommandType,
 )
 
 from .equipment import (
@@ -55,7 +47,18 @@ CommandRequestType = Union[
     PickUpTipRequest,
     DropTipRequest,
     AspirateRequest,
-    DispenseRequest
+    DispenseRequest,
+]
+
+
+CommandResultType = Union[
+    LoadLabwareResult,
+    LoadPipetteResult,
+    MoveToWellResult,
+    PickUpTipResult,
+    DropTipResult,
+    AspirateResult,
+    DispenseResult,
 ]
 
 CommandType = Union[
@@ -108,7 +111,7 @@ __all__ = [
     "PendingCommand",
     "RunningCommand",
     "CompletedCommand",
-    "FailedCommandType",
+    "FailedCommand",
 
     # type unions
     "CommandRequestType",
@@ -116,6 +119,7 @@ __all__ = [
     "PendingCommandType",
     "RunningCommandType",
     "CompletedCommandType",
+    "FailedCommandType",
     "CommandType",
 
     # equipment commands

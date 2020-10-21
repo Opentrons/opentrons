@@ -23,7 +23,7 @@ def test_handles_load_labware(store, completed_load_labware_command):
     req = completed_load_labware_command.request
     res = completed_load_labware_command.result
 
-    store.handle_command(completed_load_labware_command)
+    store.handle_command(completed_load_labware_command, uid="unique-id")
     data = store.state.get_labware_data_by_id(res.labwareId)
 
     assert data.location == req.location
@@ -36,7 +36,7 @@ def test_handles_load_pipette(store, completed_load_pipette_command):
     req = completed_load_pipette_command.request
     res = completed_load_pipette_command.result
 
-    store.handle_command(completed_load_pipette_command)
+    store.handle_command(completed_load_pipette_command, uid="unique-id")
     data_by_id = store.state.get_pipette_data_by_id(res.pipetteId)
     data_by_mount = store.state.get_pipette_data_by_mount(req.mount)
 

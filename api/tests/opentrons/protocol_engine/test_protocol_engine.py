@@ -2,12 +2,11 @@
 import pytest
 from datetime import datetime, timezone, timedelta
 from math import isclose
-from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
+from mock import AsyncMock  # type: ignore[attr-defined]
 from typing import cast
 
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.execution import CommandExecutor
-from opentrons.protocol_engine.resources import IdGenerator
 
 from opentrons.protocol_engine.command_models import (
     MoveToWellRequest,
@@ -37,19 +36,11 @@ def mock_executor():
 
 
 @pytest.fixture
-def mock_id_generator():
-    return MagicMock(spec=IdGenerator)
-
-
-@pytest.fixture
-def engine(mock_hardware, mock_state_store, mock_executor, mock_id_generator):
-    mock_id_generator.generate_id.return_value = "unique-id"
-
+def engine(mock_hardware, mock_state_store, mock_executor):
     return ProtocolEngine(
         hardware=mock_hardware,
         state_store=mock_state_store,
         executor=mock_executor,
-        id_generator=mock_id_generator
     )
 
 
@@ -57,14 +48,14 @@ async def test_execute_command_creates_command(engine, mock_state_store):
     """It should create a command in the state store when executing."""
     req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")
 
-    await engine.execute_command(req)
+    await engine.execute_command(req, uid="unique-id")
     mock_state_store.handle_command.assert_any_call(
         RunningCommand(
-            uid="unique-id",
-            createdAt=cast(datetime, CloseToNow()),
-            startedAt=cast(datetime, CloseToNow()),
+            created_at=cast(datetime, CloseToNow()),
+            started_at=cast(datetime, CloseToNow()),
             request=req
         ),
+        uid="unique-id"
     )
 
 
@@ -76,13 +67,12 @@ async def test_execute_command_calls_executor(
     """It should create a command in the state store when executing."""
     req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")
 
-    await engine.execute_command(req)
+    await engine.execute_command(req, uid="unique-id")
 
     mock_executor.execute_command.assert_called_with(
         RunningCommand(
-            uid="unique-id",
-            createdAt=cast(datetime, CloseToNow()),
-            startedAt=cast(datetime, CloseToNow()),
+            created_at=cast(datetime, CloseToNow()),
+            started_at=cast(datetime, CloseToNow()),
             request=req
         ),
         state=mock_state_store.state
@@ -99,19 +89,19 @@ async def test_execute_command_adds_result_to_state(
     res = MoveToWellResult()
     later = datetime.now(tz=timezone.utc) + timedelta(seconds=42)
     completed_cmd = CompletedCommand(
-        uid="unique-id",
-        createdAt=cast(datetime, CloseToNow()),
-        startedAt=cast(datetime, CloseToNow()),
-        completedAt=later,
+        created_at=cast(datetime, CloseToNow()),
+        started_at=cast(datetime, CloseToNow()),
+        completed_at=later,
         request=req,
         result=res,
     )
 
     mock_executor.execute_command.return_value = completed_cmd
 
-    result = await engine.execute_command(req)
+    result = await engine.execute_command(req, uid="unique-id",)
 
     assert result == completed_cmd
     mock_state_store.handle_command.assert_called_with(
-        completed_cmd
+        completed_cmd,
+        uid="unique-id",
     )

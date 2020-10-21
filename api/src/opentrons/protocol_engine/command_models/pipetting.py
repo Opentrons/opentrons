@@ -1,4 +1,9 @@
-"""Pipetting command models."""
+"""
+Pipetting command request and result models.
+
+These models are defined using Pydantic because they are part of the public
+input / output of the engine, and need validation and/or scheme generation.
+"""
 
 from pydantic import BaseModel, Field
 

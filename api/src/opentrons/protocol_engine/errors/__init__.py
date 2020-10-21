@@ -1,9 +1,8 @@
 """Protocol engine errors module."""
-from typing import Union
 
 
 class ProtocolEngineError(RuntimeError):
-    """Base ProtocolEngine error class."""
+    """Base Protocol Engine error class."""
     pass
 
 
@@ -23,18 +22,12 @@ class UnexpectedProtocolError(ProtocolEngineError):
 
 
 class FailedToLoadPipetteError(ProtocolEngineError):
-    # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
     """
-    An error that's raised when a LoadPipette command fails.
+    An error that's raised when executing a LoadPipetteRequest fails.
 
     This failure may be caused by:
     - An incorrect pipette already attached to the mount
     - A missing pipette on the requested mount
     """
+    # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
     pass
-
-
-ProtocolEngineErrorType = Union[
-    UnexpectedProtocolError,
-    FailedToLoadPipetteError,
-]

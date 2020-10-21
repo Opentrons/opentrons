@@ -5,6 +5,7 @@ from opentrons.hardware_control.api import API as HardwareAPI
 from ..errors import FailedToLoadPipetteError
 from ..resources import IdGenerator, LabwareData
 from ..state import State
+
 from ..command_models import (
     LoadLabwareRequest,
     LoadLabwareResult,
@@ -14,17 +15,21 @@ from ..command_models import (
 
 
 class EquipmentHandler():
-    _hardware: HardwareAPI
-    _id_generator: IdGenerator
-    _labware_data: LabwareData
+    """Implementation logic for labware, pipette, and module loading."""
 
-    def __init__(self, hardware, id_generator=None, labware_data=None):
-        self._hardware = hardware
+    def __init__(
+        self,
+        hardware: HardwareAPI,
+        id_generator: IdGenerator = None,
+        labware_data: LabwareData = None
+    ):
+        """Initialize an EquipmentHandler instance."""
+        self._hardware: HardwareAPI = hardware
 
-        self._id_generator = (
+        self._id_generator: IdGenerator = (
             id_generator if id_generator is not None else IdGenerator()
         )
-        self._labware_data = (
+        self._labware_data: LabwareData = (
             labware_data if labware_data is not None else LabwareData()
         )
 
@@ -32,6 +37,7 @@ class EquipmentHandler():
         self,
         request: LoadLabwareRequest
     ) -> LoadLabwareResult:
+        """Load labware definition and calibration data."""
         labware_id = self._id_generator.generate_id()
         labware_def = await self._labware_data.get_labware_definition(
             load_name=request.loadName,
@@ -54,6 +60,7 @@ class EquipmentHandler():
         request: LoadPipetteRequest,
         state: State
     ) -> LoadPipetteResult:
+        """Ensure the requested pipette is attached."""
         mount = request.mount
         other_mount = Mount.LEFT if mount == Mount.RIGHT else Mount.RIGHT
         other_pipette = state.get_pipette_data_by_mount(other_mount)

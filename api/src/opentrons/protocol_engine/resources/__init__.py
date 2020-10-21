@@ -1,4 +1,6 @@
 """Resources used by command execution handlers."""
+# TODO(mc, 2020-10-21): break this module up when it becames > 100 lines
+
 from uuid import uuid4
 from typing import Tuple
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -9,7 +11,7 @@ from opentrons.calibration_storage.helpers import hash_labware_def
 
 
 class IdGenerator():
-    """Unique ID generation resource."""
+    """Unique ID generation provider."""
 
     def generate_id(self) -> str:
         """
