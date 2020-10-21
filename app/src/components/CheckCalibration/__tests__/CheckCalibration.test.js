@@ -19,7 +19,6 @@ import {
   SaveXYPoint,
   SaveZPoint,
 } from '../../CalibrationPanels'
-import { ConfirmExitModal } from '../ConfirmExitModal'
 
 import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
 
@@ -50,15 +49,6 @@ describe('CheckCalibration', () => {
   }
   const getExitButton = wrapper =>
     wrapper.find({ title: 'exit' }).find('button')
-
-  const getBackButton = wrapper =>
-    wrapper.find({ title: 'exit' }).find('button')
-
-  const getConfirmExitButton = wrapper =>
-    wrapper
-      .find(ConfirmExitModal)
-      .find({ children: 'continue' })
-      .find('button')
 
   const POSSIBLE_CHILDREN = [
     Introduction,
