@@ -102,14 +102,9 @@ export const moveLiquidFormToArgs = (
     }
   }
 
-  let disposalVolume = null
-  if (fields.disposalVolume_checkbox || fields.blowout_checkbox) {
-    if (fields.disposalVolume_checkbox) {
-      // the disposal volume is only relevant when disposalVolume is checked,
-      // not when just blowout is checked.
-      disposalVolume = fields.disposalVolume_volume
-    }
-  }
+  const disposalVolume = fields.disposalVolume_checkbox
+    ? fields.disposalVolume_volume
+    : null
 
   const touchTipAfterAspirate = Boolean(fields.aspirate_touchTip_checkbox)
 
@@ -251,8 +246,8 @@ export const moveLiquidFormToArgs = (
         ...commonFields,
         commandCreatorFnName: 'distribute',
         disposalVolume,
-        // TODO: Ian 2019-01-15 these args have TODOs to get renamed, let's do it after deleting Distribute step
-        blowoutLocation,
+        // distribute needs blowout location field because disposal volume checkbox might be checked without blowout checkbox being checked
+        blowoutLocation: fields.blowout_location,
         mixBeforeAspirate,
         sourceWell: sourceWells[0],
         destWells,

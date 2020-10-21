@@ -311,7 +311,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             sourceWell: args.sourceWell,
             destLabwareId: args.destLabware,
             destWell: last(destWellChunk),
-            blowoutLocation: blowoutLocation,
+            blowoutLocation,
             flowRate: args.blowoutFlowRateUlSec,
             offsetFromTopMm: args.blowoutOffsetFromTopMm,
             invariantContext,
