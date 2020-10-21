@@ -14,9 +14,7 @@ describe('ConfirmCrashRecoveryModal', () => {
   const getNoTipRestartButton = wrapper =>
     wrapper.find('OutlineButton[children="yes, start over"]')
   const getReplaceTipRestartButton = wrapper =>
-    wrapper.find(
-      'OutlineButton[children="confirm tip placement in a1 and start over"]'
-    )
+    wrapper.find('OutlineButton[children="tip placed in a1, start over"]')
 
   beforeEach(() => {
     render = (

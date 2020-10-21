@@ -1,7 +1,13 @@
 // @flow
 import * as React from 'react'
 
-import { AlertModal, FONT_WEIGHT_BOLD, Text } from '@opentrons/components'
+import {
+  AlertModal,
+  FONT_WEIGHT_SEMIBOLD,
+  Text,
+  SecondaryBtn,
+} from '@opentrons/components'
+import styles from './styles.css'
 
 export type ConfirmCrashRecoveryModalProps = {|
   back: () => mixed,
@@ -15,9 +21,9 @@ const HEADING = 'Start Over?'
 const MAIN_BODY = 'Starting over will cancel your calibration progress.'
 const CANCEL = 'cancel'
 const START_OVER = 'yes, start over'
-const CONFIRM_AND_START_OVER = 'confirm tip placement in a1 and start over'
+const CONFIRM_AND_START_OVER = 'tip placed in a1, start over'
 const buildTiprackRequest: (string, string) => string = (displayName, slot) =>
-  `Please put another tip in position A1 of the ${displayName} in slot ${slot}`
+  `Please put another tip in position A1 of the ${displayName} in slot ${slot}.`
 
 export function ConfirmCrashRecoveryModal(
   props: ConfirmCrashRecoveryModalProps
@@ -33,11 +39,14 @@ export function ConfirmCrashRecoveryModal(
   return (
     <AlertModal
       heading={HEADING}
+      className={styles.confirm_crash_modal}
       buttons={[
-        { children: CANCEL, onClick: back },
+        { Component: SecondaryBtn, children: CANCEL, onClick: back },
         {
+          Component: SecondaryBtn,
           children: requiresNewTip ? CONFIRM_AND_START_OVER : START_OVER,
           onClick: confirm,
+          width: '20rem',
         },
       ]}
       alertOverlay
@@ -45,7 +54,7 @@ export function ConfirmCrashRecoveryModal(
     >
       <Text>{MAIN_BODY}</Text>
       {requiresNewTip && (
-        <Text fontWeight={FONT_WEIGHT_BOLD}>
+        <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>
           {buildTiprackRequest(tipRackDisplayName, tipRackSlot)}
         </Text>
       )}

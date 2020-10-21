@@ -3,6 +3,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   PrimaryBtn,
+  Box,
   Flex,
   Text,
   FONT_WEIGHT_SEMIBOLD,
@@ -154,7 +155,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
           {buttonText}
         </PrimaryBtn>
       </Flex>
-      {confirmLink}
+      <Box width="100%">{confirmLink}</Box>
       {confirmModal}
     </>
   )

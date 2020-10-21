@@ -13,6 +13,7 @@ import {
   FONT_SIZE_BODY_2,
   JUSTIFY_CENTER,
   POSITION_RELATIVE,
+  SPACING_1,
   SPACING_2,
   SPACING_3,
   TEXT_ALIGN_CENTER,
@@ -90,11 +91,12 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
 
   return (
     <Flex
-      marginY={SPACING_2}
+      marginTop={SPACING_2}
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_FLEX_START}
       position={POSITION_RELATIVE}
       width="100%"
+      marginBottom="0"
     >
       <Text
         css={FONT_HEADER_DARK}
@@ -153,7 +155,9 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
           {TIP_PICK_UP_BUTTON_TEXT}
         </PrimaryBtn>
       </Flex>
-      {confirmLink}
+      <Box marginTop={SPACING_1} marginBottom="0" width="100%">
+        {confirmLink}
+      </Box>
       {confirmModal}
     </Flex>
   )

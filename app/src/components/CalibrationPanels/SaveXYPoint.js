@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
+  Box,
   PrimaryBtn,
   Flex,
   Text,
@@ -214,7 +215,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           {buttonText}
         </PrimaryBtn>
       </Flex>
-      {confirmLink}
+      <Box width="100%">{confirmLink}</Box>
       {confirmModal}
     </>
   )
