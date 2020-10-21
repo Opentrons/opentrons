@@ -50,7 +50,7 @@ export function useAskForCalibrationBlock(
   return [
     handleShowRequest,
     showCalBlockPrompt ? (
-      <Portal>
+      <Portal level="top">
         <AskForCalibrationBlockModal setHasBlock={setHasBlock} />
       </Portal>
     ) : null,

@@ -20,7 +20,7 @@ export function ExitAlertModal(props: Props): React.Node {
   const { back, exit } = props
 
   return (
-    <Portal>
+    <Portal level="top">
       <AlertModal
         heading={ARE_YOU_SURE_YOU_WANT_TO_GO_BACK}
         buttons={[

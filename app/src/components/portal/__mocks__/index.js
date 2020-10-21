@@ -8,3 +8,4 @@ type Props = {| children: React.Node |}
 export const Portal = ({ children }: Props): React.Node => <>{children}</>
 
 export const PortalRoot = (): React.Node => <></>
+export const TopPortalRoot = (): React.Node => <></>

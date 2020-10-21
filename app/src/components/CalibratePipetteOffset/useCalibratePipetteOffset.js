@@ -141,7 +141,7 @@ export function useCalibratePipetteOffset(
   return [
     handleStartPipOffsetCalSession,
     showWizard ? (
-      <Portal>
+      <Portal level="top">
         <CalibratePipetteOffset
           session={pipOffsetCalSession}
           robotName={robotName}

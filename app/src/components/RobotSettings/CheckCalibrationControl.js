@@ -116,7 +116,7 @@ export function CheckCalibrationControl({
         )}
       </TitledControl>
       {showWizard && (
-        <Portal>
+        <Portal level="top">
           <CheckCalibration
             robotName={robotName}
             closeCalibrationCheck={() => setShowWizard(false)}
