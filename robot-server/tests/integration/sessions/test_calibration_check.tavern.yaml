@@ -20,6 +20,7 @@ stages:
       save:
         json:
           session_id: data.id
+
   - name: Check that current state is sessionStarted
     request: &get_session
       url: "{host:s}:{port:d}/sessions/{session_id}"
@@ -51,7 +52,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: loadLabware
+            command: calibration.loadLabware
             data: {}
     response:
       status_code: 200
@@ -74,10 +75,9 @@ stages:
       <<: *post_command
       json:
         data:
-          id: "{session_id}"
           type: SessionCommand
           attributes:
-            command: moveToTipRack
+            command: calibration.moveToTipRack
             data: {}
     response:
       status_code: 200
@@ -102,7 +102,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: jog
+            command: calibration.jog
             data:
               vector: [0, 0, -10]
     response:
@@ -128,7 +128,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: pickUpTip
+            command: calibration.pickUpTip
             data: {}
     response:
       status_code: 200
@@ -153,7 +153,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: moveToDeck
+            command: calibration.moveToDeck
             data: {}
     response:
       status_code: 200
@@ -178,7 +178,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: jog
+            command: calibration.jog
             data:
               vector: [0, 0, -10]
     response:
@@ -204,7 +204,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: comparePoint
+            command: calibration.check.comparePoint
             data: {}
     response:
       status_code: 200
@@ -222,7 +222,14 @@ stages:
               <<: *session_data_attribute_details
               currentStep: comparingHeight
               comparisonsByPipette:
-                comparingFirstPipetteHeight: !anydict
+                first:
+                  comparingHeight: !anydict
+                  comparingPointOne: null
+                  comparingPointTwo: null
+                  comparingPointThree: null
+                second:
+                  comparingHeight: null
+                  comparingPointOne: null
 
   - name: Go to next check
     request:
@@ -231,7 +238,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: moveToPointOne
+            command: calibration.moveToPointOne
             data: {}
     response:
       status_code: 200
@@ -249,7 +256,14 @@ stages:
               <<: *session_data_attribute_details
               currentStep: comparingPointOne
               comparisonsByPipette:
-                comparingFirstPipetteHeight: !anydict
+                first:
+                  comparingHeight: !anydict
+                  comparingPointOne: null
+                  comparingPointTwo: null
+                  comparingPointThree: null
+                second:
+                  comparingHeight: null
+                  comparingPointOne: null
 
   - name: Compare first pipette point one
     request:
@@ -258,7 +272,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: comparePoint
+            command: calibration.check.comparePoint
             data: {}
     response:
       status_code: 200
@@ -276,8 +290,14 @@ stages:
               <<: *session_data_attribute_details
               currentStep: comparingPointOne
               comparisonsByPipette:
-                comparingFirstPipetteHeight: !anydict
-                comparingFirstPipettePointOne: !anydict
+                first:
+                  comparingHeight: !anydict
+                  comparingPointOne: !anydict
+                  comparingPointTwo: null
+                  comparingPointThree: null
+                second:
+                  comparingHeight: null
+                  comparingPointOne: null
 
   - name: Go to next check
     request:
@@ -286,7 +306,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: moveToPointTwo
+            command: calibration.deck.moveToPointTwo
             data: {}
     response:
       status_code: 200
@@ -314,7 +334,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: comparePoint
+            command: calibration.check.comparePoint
             data: {}
     response:
       status_code: 200
@@ -342,7 +362,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: moveToPointThree
+            command: calibration.deck.moveToPointThree
             data: {}
     response:
       status_code: 200
@@ -370,7 +390,7 @@ stages:
         data:
           type: SessionCommand
           attributes:
-            command: comparePoint
+            command: calibration.check.comparePoint
             data: {}
     response:
       status_code: 200
@@ -387,283 +407,6 @@ stages:
             details:
               <<: *session_data_attribute_details
               currentStep: comparingPointThree
-              comparisonsByPipette:
-                first: !anydict
-                second: !anydict
-
-  - name: Go to next check
-    request:
-      <<: *post_command
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: moveToTiprack
-            data: {}
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: returningTip
-              comparisonsByPipette:
-                first: !anydict
-                second: !anydict
-
-  - name: Switch To Second Pipette
-    request:
-      <<: *post_command
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: switchPipette
-            data:
-              vector: [0, 0, -10]
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: preparingPipette
-              comparisonsByPipette:
-                first: !anydict
-                second: !anydict
-
-  - name: Prepare second pipette
-    request:
-      <<: *post_command
-      json:
-        data:
-          id: "{session_id}"
-          type: SessionCommand
-          attributes:
-            command: moveToTipRack
-            data: {}
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: preparingPipette
-
-  - name: Jog second pipette
-    request:
-      <<: *post_command
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: jog
-            data:
-              vector: [0, 0, -10]
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: preparingPipette
-
-  - name: Pick up tip
-    request:
-      <<: *post_command
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: pickUpTip
-            data: {}
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: inspectingTip
-              comparisonsByPipette:
-                first: !anydict
-                second: !anydict
-
-  - name: Confirm tip
-    request:
-      <<: *post_command
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: moveToDeck
-            data: {}
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingHeight
-              comparisonsByPipette:
-                first: !anydict
-                second: !anydict
-
-  - name: Compare second pipette to height
-    request:
-      <<: *post_command
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: comparePoint
-            data: {}
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingHeight
-              comparisonsByPipette:
-                first: !anydict
-                second: !anydict
-
-  - name: Go to next check
-    request:
-      <<: *post_command
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: moveToPointOne
-            data: {}
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingPointOne
-              comparisonsByPipette:
-                first: !anydict
-                second: !anydict
-
-  - name: Compare second pipette to point one
-    request:
-      <<: *post_command
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: comparePoint
-            data: {}
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingPointOne
-              comparisonsByPipette:
-                first: !anydict
-                second: !anydict
-
-  - name: Go to next check
-    request:
-      <<: *post_command
-      json:
-        data:
-          type: SessionCommand
-          attributes:
-            command: moveToTiprack
-            data: {}
-    response:
-      status_code: 200
-  - name: Check the effect of command
-    request: *get_session
-    response:
-      status_code: 200
-      json:
-        links: !anydict
-        data:
-          <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: returningTip
               comparisonsByPipette:
                 first: !anydict
                 second: !anydict

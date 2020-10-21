@@ -24,7 +24,6 @@ import {
   TipConfirmation,
   SaveZPoint,
   SaveXYPoint,
-  CompleteConfirmation,
   ConfirmExitModal,
 } from '../CalibrationPanels'
 import { ReturnTip } from './ReturnTip'
@@ -37,7 +36,7 @@ import type { SessionCommandParams } from '../../sessions/types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type { CalibrationHealthCheckParentProps } from './types'
 
-const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration heatlh check'
+const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration health check'
 const EXIT = 'exit'
 
 const darkContentsStyleProps = {
@@ -78,7 +77,6 @@ const PANEL_BY_STEP: {
   [Sessions.CHECK_STEP_RETURNING_TIP]: ReturnTip,
   [Sessions.CHECK_STEP_RESULTS_SUMMARY]: ResultsSummary,
   [Sessions.CHECK_STEP_BAD_ROBOT_CALIBRATION]: BadCalibration,
-  [Sessions.CHECK_STEP_CHECK_COMPLETE]: CompleteConfirmation,
 }
 
 const PANEL_STYLE_PROPS_BY_STEP: {
@@ -91,7 +89,6 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: contentsStyleProps,
   [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: contentsStyleProps,
   [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: terminalContentsStyleProps,
-  [Sessions.CHECK_STEP_CHECK_COMPLETE]: terminalContentsStyleProps,
 }
 
 export function CheckHealthCalibration(

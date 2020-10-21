@@ -4,34 +4,28 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import { SpinnerModalPage } from '@opentrons/components'
-
-import * as Calibration from '../../../calibration'
 import * as Sessions from '../../../sessions'
-import * as RobotApi from '../../../robot-api'
+import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { CheckHealthCalibration } from '../index'
+import { BadCalibration } from '../BadCalibration'
+import { ResultsSummary } from '../ResultsSummary'
+import { ReturnTip } from '../ReturnTip'
 import {
   Introduction,
   DeckSetup,
   TipPickUp,
-  CheckXYPoint,
-  CheckHeight,
-  ResultsSummary,
+  TipConfirmation,
+  SaveXYPoint,
+  SaveZPoint,
 } from '../../CalibrationPanels'
 import { ConfirmExitModal } from '../ConfirmExitModal'
 
 import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
-import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
 
-import type { State } from '../../../types'
-import type { RequestState } from '../../../robot-api/types'
 import type { RobotCalibrationCheckStep } from '../../../sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
-jest.mock('../../../sessions/selectors')
-jest.mock('../../../robot-api/selectors')
 jest.mock('../../../calibration/selectors')
 
 type CheckCalibrationSpec = {
@@ -41,30 +35,10 @@ type CheckCalibrationSpec = {
   ...
 }
 
-const getRobotSessionOfType: JestMockFn<
-  [State, string, Sessions.SessionType],
-  $Call<
-    typeof Sessions.getRobotSessionOfType,
-    State,
-    string,
-    Sessions.SessionType
-  >
-> = Sessions.getRobotSessionOfType
-
-const getRequestById: JestMockFn<
-  [State, string],
-  $Call<typeof RobotApi.getRequestById, State, string>
-> = RobotApi.getRequestById
-
 const mockGetDeckDefinitions: JestMockFn<
   [],
   $Call<typeof getDeckDefinitions, any>
 > = getDeckDefinitions
-
-const mockGetCalibrationStatus: JestMockFn<
-  [State, string],
-  $Call<typeof Calibration.getCalibrationStatus, State, string>
-> = Calibration.getCalibrationStatus
 
 describe('CheckCalibration', () => {
   let mockStore
@@ -74,17 +48,8 @@ describe('CheckCalibration', () => {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
   }
-  let mockRequestState: RequestState = {
-    status: 'success',
-    response: {
-      path: '/fake/api/path',
-      method: 'POST',
-      status: 200,
-      ok: true,
-    },
-  }
-
-  const mockCloseCalibrationCheck = jest.fn()
+  const getExitButton = wrapper =>
+    wrapper.find({ title: 'exit' }).find('button')
 
   const getBackButton = wrapper =>
     wrapper.find({ title: 'exit' }).find('button')
@@ -99,22 +64,24 @@ describe('CheckCalibration', () => {
     Introduction,
     DeckSetup,
     TipPickUp,
-    CheckXYPoint,
-    CheckHeight,
+    TipConfirmation,
+    SaveZPoint,
+    SaveXYPoint,
     ResultsSummary,
+    BadCalibration,
   ]
 
   const SPECS: Array<CheckCalibrationSpec> = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: TipPickUp, currentStep: 'preparingPipette' },
-    { component: TipPickUp, currentStep: 'inspectingTip' },
-    { component: CheckXYPoint, currentStep: 'comparingPointOne' },
-    { component: CheckXYPoint, currentStep: 'comparingPointTwo' },
-    { component: CheckXYPoint, currentStep: 'comparingPointThree' },
-    { component: CheckHeight, currentStep: 'comparingHeight' },
-    { component: ResultsSummary, currentStep: 'sessionExited' },
-    { component: ResultsSummary, currentStep: 'checkComplete' },
+    { component: TipConfirmation, currentStep: 'inspectingTip' },
+    { component: SaveZPoint, currentStep: 'comparingHeight' },
+    { component: SaveXYPoint, currentStep: 'comparingPointOne' },
+    { component: SaveXYPoint, currentStep: 'comparingPointTwo' },
+    { component: SaveXYPoint, currentStep: 'comparingPointThree' },
+    { component: ReturnTip, currentStep: 'returningTip' },
+    { component: ResultsSummary, currentStep: 'resultsSummary' },
   ]
 
   beforeEach(() => {
@@ -127,7 +94,6 @@ describe('CheckCalibration', () => {
       dispatch,
     }
     mockGetDeckDefinitions.mockReturnValue({})
-    mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
 
     mockCalibrationCheckSession = {
       id: 'fake_check_session_id',
@@ -140,7 +106,6 @@ describe('CheckCalibration', () => {
         <CheckHealthCalibration
           robotName="robot-name"
           session={mockCalibrationCheckSession}
-          closeWizard={mockCloseCalibrationCheck}
           dispatchRequests={jest.fn()}
           showSpinner={showSpinner}
           hasBlock={false}
@@ -166,7 +131,6 @@ describe('CheckCalibration', () => {
           currentStep: spec.currentStep,
         },
       }
-      getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
       const wrapper = render()
       POSSIBLE_CHILDREN.forEach(child => {
         if (child === spec.component) {
@@ -176,66 +140,24 @@ describe('CheckCalibration', () => {
         }
       })
     })
-
-    it(`renders a spinner when a request is pending in ${spec.currentStep}`, () => {
-      mockCalibrationCheckSession = {
-        ...mockCalibrationCheckSession,
-        details: {
-          ...mockCalibrationCheckSession.details,
-          currentStep: spec.currentStep,
-        },
-      }
-
-      getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
-
-      mockRequestState = {
-        status: 'pending',
-      }
-      getRequestById.mockReturnValue(mockRequestState)
-
-      const wrapper = render()
-      expect(wrapper.exists(SpinnerModalPage)).toBe(true)
-    })
   })
 
-  it('pops a confirm exit modal on exit click', () => {
-    getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
+  it('renders confirm exit modal on exit click', () => {
     const wrapper = render()
 
-    act(() => {
-      getBackButton(wrapper).invoke('onClick')()
-    })
+    expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
+    act(() => getExitButton(wrapper).invoke('onClick')())
     wrapper.update()
-    expect(wrapper.exists(ConfirmExitModal)).toBe(true)
-    expect(mockCloseCalibrationCheck).not.toHaveBeenCalled()
+    expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
 
-  it('calls deleteRobotCalibrationCheckSession when exit is confirmed', () => {
-    getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
-    const wrapper = render()
+  it('does not render spinner when showSpinner is false', () => {
+    const wrapper = render({ showSpinner: false })
+    expect(wrapper.find('SpinnerModalPage').exists()).toBe(false)
+  })
 
-    act(() => {
-      getBackButton(wrapper).invoke('onClick')()
-    })
-    wrapper.update()
-
-    act(() => {
-      getConfirmExitButton(wrapper).invoke('onClick')()
-    })
-    wrapper.update()
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        ...Sessions.createSessionCommand(
-          'robot-name',
-          'fake_check_session_id',
-          {
-            command: Sessions.checkCommands.EXIT,
-            data: {},
-          }
-        ),
-        meta: { requestId: expect.any(String) },
-      })
-    )
+  it('renders spinner when showSpinner is true', () => {
+    const wrapper = render({ showSpinner: true })
+    expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
   })
 })

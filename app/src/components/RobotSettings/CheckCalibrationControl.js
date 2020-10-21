@@ -6,7 +6,6 @@ import * as Sessions from '../../sessions'
 
 import {
   Icon,
-  Text,
   SecondaryBtn,
   BORDER_SOLID_LIGHT,
   Tooltip,
@@ -31,9 +30,6 @@ const CAL_HEALTH_CHECK = 'Calibration Health Check'
 const CHECK_HEALTH = 'check health'
 const CAL_HEALTH_CHECK_DESCRIPTION =
   'Check the calibration settings for your robot.'
-const COULD_NOT_START = 'Could not start Robot Calibration Check'
-const PLEASE_TRY_AGAIN =
-  'Please try again or contact support if you continue to experience issues'
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
@@ -131,7 +127,7 @@ export function CheckCalibrationControl({
   const buttonChildren = showSpinner ? (
     <Icon name="ot-spinner" height="1em" spin />
   ) : (
-    CHECK
+    CHECK_HEALTH
   )
 
   return (

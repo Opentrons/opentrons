@@ -21,7 +21,6 @@ import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from './types'
 import type {
-  SessionCommandParams,
   SessionType,
   CalibrationSessionStep,
   SessionCommandString,

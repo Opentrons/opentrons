@@ -86,7 +86,7 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
     hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
 
     uf = CheckCalibrationUserFlow(hardware=hardware)
-    assert uf._hw_pipette == \
+    assert uf.hw_pipette == \
         hardware._attached_instruments[target_mount]
 
 
@@ -127,7 +127,7 @@ def mock_user_flow(mock_hw):
 async def test_move_to_tip_rack(mock_user_flow):
     uf = mock_user_flow
     await uf.move_to_tip_rack()
-    cur_pt = await uf._get_current_point(None)
+    cur_pt = await uf.get_current_point(None)
     assert cur_pt == uf.active_tiprack.wells()[0].top().point + Point(0, 0, 10)
 
 
@@ -135,7 +135,7 @@ async def test_pick_up_tip(mock_user_flow):
     uf = mock_user_flow
     assert uf._tip_origin_pt is None
     await uf.move_to_tip_rack()
-    cur_pt = await uf._get_current_point(None)
+    cur_pt = await uf.get_current_point(None)
     await uf.jog(vector=(0, 0, 1))
     await uf.pick_up_tip()
     assert uf._tip_origin_pt == cur_pt + Point(0, 0, 1)
@@ -144,16 +144,16 @@ async def test_pick_up_tip(mock_user_flow):
 async def test_return_tip(mock_user_flow):
     uf = mock_user_flow
     uf._tip_origin_pt = Point(1, 1, 1)
-    uf._hw_pipette._has_tip = True
-    z_offset = uf._hw_pipette.config.return_tip_height * \
+    uf.hw_pipette._has_tip = True
+    z_offset = uf.hw_pipette.config.return_tip_height * \
         uf._get_tip_length()
-    await uf._return_tip()
+    await uf.return_tip()
     # should move to return tip
     move_calls = [
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._get_critical_point_override()
+            critical_point=uf.critical_point_override
         ),
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
@@ -163,9 +163,9 @@ async def test_return_tip(mock_user_flow):
 async def test_jog(mock_user_flow):
     uf = mock_user_flow
     await uf.jog(vector=(0, 0, 0.1))
-    assert await uf._get_current_point(None) == Point(0, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(0, 0, 0.1)
     await uf.jog(vector=(1, 0, 0))
-    assert await uf._get_current_point(None) == Point(1, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(1, 0, 0.1)
 
 
 @pytest.mark.parametrize(
@@ -191,7 +191,7 @@ async def test_compare_z_height(mock_user_flow):
     await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=10),
-            critical_point=uf._hw_pipette.critical_point
+            critical_point=uf.hw_pipette.critical_point
         )
     await uf.update_comparison_map()
     # The initial and final mocked points have a 5 mm
@@ -217,7 +217,7 @@ async def test_compare_points(mock_user_flow):
     await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=10),
-            critical_point=uf._hw_pipette.critical_point
+            critical_point=uf.hw_pipette.critical_point
         )
     await uf.update_comparison_map()
 
@@ -228,7 +228,7 @@ async def test_compare_points(mock_user_flow):
     await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=10),
-            critical_point=uf._hw_pipette.critical_point
+            critical_point=uf.hw_pipette.critical_point
         )
     await uf.update_comparison_map()
     assert uf.comparison_map.first.comparingPointTwo == expected_status
@@ -238,7 +238,7 @@ async def test_compare_points(mock_user_flow):
     await uf._hardware.move_to(
         mount=uf._mount,
         abs_position=Point(x=10, y=10, z=10),
-        critical_point=uf._hw_pipette.critical_point
+        critical_point=uf.hw_pipette.critical_point
     )
     await uf.update_comparison_map()
 
@@ -251,7 +251,7 @@ async def test_compare_points(mock_user_flow):
     await uf._hardware.move_to(
         mount=uf._mount,
         abs_position=Point(x=10, y=10, z=10),
-        critical_point=uf._hw_pipette.critical_point
+        critical_point=uf.hw_pipette.critical_point
     )
     await uf.update_comparison_map()
 

@@ -8,6 +8,10 @@ import type {
   CalibrationHealthCheckComparisonByPipette,
 } from '../../sessions/types'
 
+// TODO (lc 10-20-2020) Given there are lots of optional
+// keys here now we should split these panel props out
+// into different session types and combine them into
+// a union object
 export type CalibrationPanelProps = {|
   sendCommands: (...Array<SessionCommandParams>) => void,
   cleanUpAndExit: () => void,

@@ -58,7 +58,7 @@ class CheckSession(BaseSession):
         # off after
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
-        await configuration.hardware.cache_instruments()
+        # await configuration.hardware.cache_instruments()
         try:
             calibration_check = CheckCalibrationUserFlow(
                 configuration.hardware,

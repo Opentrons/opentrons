@@ -15,7 +15,8 @@ export const CHECK_STEP_COMPARING_POINT_TWO: 'comparingPointTwo' =
   'comparingPointTwo'
 export const CHECK_STEP_COMPARING_POINT_THREE: 'comparingPointThree' =
   'comparingPointThree'
-export const CHECK_STEP_CHECK_COMPLETE: 'checkComplete' = 'checkComplete'
+export const CHECK_STEP_CHECK_COMPLETE: 'calibrationComplete' =
+  'calibrationComplete'
 export const CHECK_STEP_SESSION_EXITED: 'sessionExited' = 'sessionExited'
 export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badCalibrationData' =
   'badCalibrationData'

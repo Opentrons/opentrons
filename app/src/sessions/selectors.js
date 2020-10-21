@@ -31,6 +31,8 @@ export function getRobotSessionOfType(
   return foundSessionId ? sessionsById[foundSessionId] : null
 }
 
+// TODO (lc 10-20-2020) move these selectors into a
+// a cal check specific file.
 const getMountEventPropsFromCalibrationCheck: (
   session: Types.CalibrationCheckSession
 ) => Types.AnalyticsModelsByMount = session => {
@@ -49,12 +51,16 @@ const getMountEventPropsFromCalibrationCheck: (
   return modelsByMount
 }
 
+// TODO (lc 10-20-2020) move these selectors into a
+// a cal check specific file.
 const getSharedAnalyticsPropsFromCalibrationCheck: (
   session: Types.CalibrationCheckSession
 ) => Types.SharedAnalyticsProps = session => ({
   sessionType: session.sessionType,
 })
 
+// TODO (lc 10-20-2020) move these selectors into a
+// a cal check specific file.
 const getAnalyticsPropsFromCalibrationCheck: (
   session: Types.CalibrationCheckSession
 ) => Types.CalibrationCheckSessionAnalyticsProps = session => {
@@ -115,6 +121,8 @@ const getAnalyticsPropsFromCalibrationCheck: (
   }
 }
 
+// TODO (lc 10-20-2020) move these selectors into a
+// a cal check specific file.
 const getIntercomPropsFromCalibrationCheck: (
   session: Types.CalibrationCheckSession
 ) => Types.CalibrationCheckSessionIntercomProps = session => {

@@ -95,20 +95,21 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
     })
   }
 
-  let continueCommands
-  if (sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK) {
-    continueCommands = () => {
-      sendCommands(
-        { command: Sessions.checkCommands.COMPARE_POINT },
-        { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
-      )
-    }
-  } else {
-    continueCommands = () => {
-      sendCommands(
-        { command: Sessions.sharedCalCommands.SAVE_OFFSET },
-        { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
-      )
+  const continueCommands = () => {
+    if (sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK) {
+      return () => {
+        sendCommands(
+          { command: Sessions.checkCommands.COMPARE_POINT },
+          { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
+        )
+      }
+    } else {
+      return () => {
+        sendCommands(
+          { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+          { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
+        )
+      }
     }
   }
 
@@ -164,7 +165,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
       >
         <PrimaryBtn
           title="save"
-          onClick={continueCommands}
+          onClick={continueCommands()}
           flex="1"
           marginX={SPACING_5}
         >

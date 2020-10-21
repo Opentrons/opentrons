@@ -24,18 +24,15 @@ export function ReturnTip(props: CalibrationPanelProps): React.Node {
   const onFinalPipette =
     !checkBothPipettes ||
     activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
-  let commandsList
-  if (!onFinalPipette) {
-    commandsList = [
-      { command: Sessions.checkCommands.RETURN_TIP },
-      { command: Sessions.checkCommands.CHECK_SWITCH_PIPETTE },
-    ]
-  } else {
-    commandsList = [
-      { command: Sessions.checkCommands.RETURN_TIP },
-      { command: Sessions.checkCommands.TRANSITION },
-    ]
-  }
+  const commandsList = onFinalPipette
+    ? [
+        { command: Sessions.checkCommands.RETURN_TIP },
+        { command: Sessions.checkCommands.TRANSITION },
+      ]
+    : [
+        { command: Sessions.checkCommands.RETURN_TIP },
+        { command: Sessions.checkCommands.CHECK_SWITCH_PIPETTE },
+      ]
 
   const confirmReturnTip = () => {
     sendCommands(...commandsList)
@@ -49,7 +46,7 @@ export function ReturnTip(props: CalibrationPanelProps): React.Node {
     >
       <Text marginBottom={SPACING_3}>
         {`${CONFIRM_RETURN_BODY}
-        ${!onFinalPipette ? CONTINUE_TO_NEXT : EXIT_PROGRAM}`}
+        ${onFinalPipette ? EXIT_PROGRAM : CONTINUE_TO_NEXT}`}
       </Text>
       <PrimaryBtn
         title="confirmReturnTip"
@@ -57,7 +54,7 @@ export function ReturnTip(props: CalibrationPanelProps): React.Node {
         width="80%"
         onClick={confirmReturnTip}
       >
-        {!onFinalPipette ? CONTINUE : EXIT}
+        {onFinalPipette ? EXIT : CONTINUE}
       </PrimaryBtn>
     </Flex>
   )

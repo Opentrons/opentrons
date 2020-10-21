@@ -3,17 +3,13 @@ from typing import (
     List, Optional, Tuple, Awaitable,
     Callable, Dict, Any, TYPE_CHECKING)
 
-from opentrons.protocols.implementations.labware import LabwareImplementation
-
-from robot_server.robot.calibration.session import CalibrationSession, \
-    HEIGHT_SAFETY_BUFFER
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
 from opentrons.config import feature_flags as ff
-from opentrons.protocols.geometry import deck
+from opentrons.protocols.geometry.deck import Deck
 
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
@@ -84,7 +80,7 @@ class CheckCalibrationUserFlow:
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck = deck.Deck(load_name=deck_load_name)
+        self._deck = Deck(load_name=deck_load_name)
         self._tip_racks: Optional[List['LabwareDefinition']] = tip_rack_defs
         self._active_tiprack = self._load_active_tiprack()
 
@@ -100,14 +96,33 @@ class CheckCalibrationUserFlow:
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
             DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
             CheckCalibrationCommand.switch_pipette: self.change_active_pipette,
-            CheckCalibrationCommand.return_tip: self._return_tip,
+            CheckCalibrationCommand.return_tip: self.return_tip,
             CheckCalibrationCommand.transition: self.transition,
             CalibrationCommand.exit: self.exit_session,
         }
 
     @property
+    def deck(self) -> Deck:
+        return self._deck
+
+    @property
     def hardware(self) -> ThreadManager:
         return self._hardware
+
+    @property
+    def tip_origin(self) -> Point:
+        if self._tip_origin_pt:
+            return self._tip_origin_pt
+        else:
+            return self.active_tiprack.wells()[0].top().point +\
+                MOVE_TO_TIP_RACK_SAFETY_BUFFER
+
+    @tip_origin.setter
+    def tip_origin(self, new_val: Optional[Point]):
+        self._tip_origin_pt = new_val
+
+    def reset_tip_origin(self):
+        self._tip_origin_pt = None
 
     @property
     def current_state(self) -> State:
@@ -130,7 +145,7 @@ class CheckCalibrationUserFlow:
         return self._active_tiprack
 
     @property
-    def _hw_pipette(self) -> Pipette:
+    def hw_pipette(self) -> Pipette:
         return self._get_hw_pipettes()[0]
 
     async def transition(self):
@@ -152,9 +167,10 @@ class CheckCalibrationUserFlow:
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
 
-    def _get_critical_point_override(self) -> Optional[CriticalPoint]:
+    @property
+    def critical_point_override(self) -> Optional[CriticalPoint]:
         return (CriticalPoint.FRONT_NOZZLE if
-                self.active_pipette.channels == 8 else None)
+                self.hw_pipette.config.channels == 8 else None)
 
     async def handle_command(self,
                              name: Any,
@@ -231,7 +247,7 @@ class CheckCalibrationUserFlow:
             l_info.rank = PipetteRank.second
             return r_info, [r_info, l_info]
 
-    async def _get_current_point(
+    async def get_current_point(
             self,
             critical_point: CriticalPoint = None) -> Point:
         return await self._hardware.gantry_position(self.mount,
@@ -247,9 +263,10 @@ class CheckCalibrationUserFlow:
 
     def can_distinguish_instr_offset(self):
         """
-         whether or not we can separate out
-         calibration diffs that are due to instrument
-         offset or deck transform or both
+        TODO (lc 10-20-2020) we can now always distinguish
+        between instrument offset and mount offset. We
+        should remove this use-case during the cal check
+        refactor.
         """
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         return first_pip and first_pip.mount != Mount.LEFT
@@ -323,25 +340,24 @@ class CheckCalibrationUserFlow:
             CheckAttachedPipette(  # type: ignore[call-arg]
                 model=hw_pip.model,
                 name=hw_pip.name,
-                tip_length=hw_pip.config.tip_length,
+                tipLength=hw_pip.config.tip_length,
                 rank=str(info_pip.rank),
                 mount=str(self.mount),
                 serial=hw_pip.pipette_id)  # type: ignore[arg-type]
             for hw_pip, info_pip in zip(hw_pips, info_pips)]
 
     def get_active_pipette(self) -> CheckAttachedPipette:
-        # TODO(mc, 2020-09-17): s/tip_length/tipLength
         # TODO(mc, 2020-09-17): type of pipette_id does not match expected
         # type of AttachedPipette.serial
-        assert self._hw_pipette
+        assert self.hw_pipette
         assert self.active_pipette
         return CheckAttachedPipette(  # type: ignore[call-arg]
-            model=self._hw_pipette.model,
-            name=self._hw_pipette.name,
-            tip_length=self._hw_pipette.config.tip_length,
+            model=self.hw_pipette.model,
+            name=self.hw_pipette.name,
+            tipLength=self.hw_pipette.config.tip_length,
             rank=str(self.active_pipette.rank),
             mount=str(self.mount),
-            serial=self._hw_pipette.pipette_id)  # type: ignore[arg-type]
+            serial=self.hw_pipette.pipette_id)  # type: ignore[arg-type]
 
     async def _is_tip_pick_up_dangerous(self):
         """
@@ -405,6 +421,11 @@ class CheckCalibrationUserFlow:
             self,
             comparisons: ComparisonStatePerPipette
             ) -> DeckCalibrationError:
+        """
+        TODO(lc 10-20-2020), this needs to be refactored to fit
+        the current system. Error sources are no longer muddled
+        by mount offset or mounts.
+        """
         is_second_pip = self.active_pipette.rank is PipetteRank.second
         compare_states = [
             State.comparingHeight,
@@ -486,9 +507,9 @@ class CheckCalibrationUserFlow:
                 saved_points.three.final_point
 
     async def register_initial_point(self):
-        critical_point = self._get_critical_point_override()
+        critical_point = self.critical_point_override
         current_point = \
-            await self._get_current_point(critical_point)
+            await self.get_current_point(critical_point)
         buffer = Point(0, 0, 0)
         if self.current_state == State.labwareLoaded:
             self._reference_points.tip.initial_point = \
@@ -508,9 +529,9 @@ class CheckCalibrationUserFlow:
                 current_point + buffer
 
     async def register_final_point(self):
-        critical_point = self._get_critical_point_override()
+        critical_point = self.critical_point_override
         current_point = \
-            await self._get_current_point(critical_point)
+            await self.get_current_point(critical_point)
         buffer = Point(0, 0, 0)
         if self.current_state == State.preparingPipette:
             self._reference_points.tip.final_point = \
@@ -531,17 +552,18 @@ class CheckCalibrationUserFlow:
                 current_point + buffer
 
     def _get_tip_length(self) -> float:
-        pip_id = self._hw_pipette.pipette_id
+        pip_id = self.hw_pipette.pipette_id
         assert pip_id
         assert self.active_tiprack
         try:
             return get.load_tip_length_calibration(
-                pip_id, self.active_tiprack._definition,
+                pip_id,
+                self.active_tiprack._implementation.get_definition(),
                 '')['tipLength']
         except TipLengthCalNotFound:
-            tip_overlap = self._hw_pipette.config.tip_overlap.get(
+            tip_overlap = self.hw_pipette.config.tip_overlap.get(
                 self.active_tiprack.uri,
-                self._hw_pipette.config.tip_overlap['default'])
+                self.hw_pipette.config.tip_overlap['default'])
             tip_length = self.active_tiprack.tip_length
             return tip_length - tip_overlap
 
@@ -549,9 +571,12 @@ class CheckCalibrationUserFlow:
         if not self.active_tiprack:
             raise RobotServerError(
                 definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
-                state=self._current_state,
+                state=self.current_state,
                 handler="move_to_tip_rack",
                 condition="active tiprack")
+        if self.current_state == State.labwareLoaded:
+            MODULE_LOG.debug("homing")
+            await self.hardware.home()
         point = self.active_tiprack.wells()[0].top().point + \
             MOVE_TO_TIP_RACK_SAFETY_BUFFER
         to_loc = Location(point, None)
@@ -600,14 +625,14 @@ class CheckCalibrationUserFlow:
     async def invalidate_tip(self):
         await uf.invalidate_tip(self)
 
-    async def _return_tip(self):
+    async def return_tip(self):
         await uf.return_tip(self, tip_length=self._get_tip_length())
 
     async def _move(self, to_loc: Location):
         await uf.move(self, to_loc)
 
     async def exit_session(self):
-        if self._hw_pipette.has_tip:
+        if self.hw_pipette.has_tip:
             await self.move_to_tip_rack()
-            await self._return_tip()
+            await self.return_tip()
         await self._hardware.home()
