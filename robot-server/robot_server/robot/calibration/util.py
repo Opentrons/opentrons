@@ -3,6 +3,7 @@ from typing import Set, Dict, Any, Union, TYPE_CHECKING
 
 from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.geometry.deck import Deck
@@ -136,10 +137,12 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
         await user_flow.hardware.drop_tip(user_flow.mount)
 
 
-async def move(user_flow: CalibrationUserFlow, to_loc: Location):
+async def move(user_flow: CalibrationUserFlow,
+               to_loc: Location,
+               this_move_cp: CriticalPoint = None):
     from_pt = await user_flow.get_current_point(None)
     from_loc = Location(from_pt, None)
-    cp = user_flow.critical_point_override
+    cp = this_move_cp or user_flow.critical_point_override
 
     max_height = user_flow.hardware.get_instrument_max_height(
         user_flow.mount)
