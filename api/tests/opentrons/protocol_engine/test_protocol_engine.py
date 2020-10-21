@@ -1,12 +1,7 @@
 """Tests for the ProtocolEngine class."""
-import pytest
 from datetime import datetime, timezone, timedelta
 from math import isclose
-from mock import AsyncMock  # type: ignore[attr-defined]
 from typing import cast
-
-from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.execution import CommandExecutor
 
 from opentrons.protocol_engine.command_models import (
     MoveToWellRequest,
