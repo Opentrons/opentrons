@@ -182,7 +182,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
     cancel: cancelStart,
   } = useConditionalConfirm(() => {
     handleStartDeckCalSession()
-  }, true)
+  }, !!pipOffsetDataPresent)
 
   let warningType = null
   if (deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_OK) {
