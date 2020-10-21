@@ -5,20 +5,18 @@ from opentrons.types import Mount
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control.api import API as HardwareController
 
-from opentrons.protocol_engine import command_models
-from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.execution import CommandExecutor
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    StateStore,
+    CommandExecutor,
+    command_models
+)
 from opentrons.protocol_engine.execution.equipment import EquipmentHandler
 
 
 @pytest.fixture
 def now():
     return utc_now()
-
-
-@pytest.fixture
-def store():
-    return StateStore()
 
 
 @pytest.fixture
@@ -37,14 +35,29 @@ def mock_equipment_handler():
 
 
 @pytest.fixture
-def executor(mock_hardware, mock_equipment_handler):
-    return CommandExecutor(
-        hardware=mock_hardware,
-        equipment_handler=mock_equipment_handler
-    )
+def mock_executor():
+    return AsyncMock(spec=CommandExecutor)
 
 
 @pytest.fixture
+def store():
+    return StateStore()
+
+
+@pytest.fixture
+def executor(mock_equipment_handler):
+    return CommandExecutor(equipment_handler=mock_equipment_handler)
+
+
+@pytest.fixture
+def engine(mock_state_store, mock_executor):
+    return ProtocolEngine(
+        state_store=mock_state_store,
+        executor=mock_executor,
+    )
+
+
+@ pytest.fixture
 def load_labware_request(minimal_labware_def):
     return command_models.LoadLabwareRequest(
         loadName=minimal_labware_def["parameters"]["loadName"],
@@ -54,7 +67,7 @@ def load_labware_request(minimal_labware_def):
     )
 
 
-@pytest.fixture
+@ pytest.fixture
 def load_labware_result(minimal_labware_def):
     return command_models.LoadLabwareResult(
         labwareId="abc",
@@ -63,7 +76,7 @@ def load_labware_result(minimal_labware_def):
     )
 
 
-@pytest.fixture
+@ pytest.fixture
 def pending_load_labware_command(now, load_labware_request):
     return command_models.PendingCommand(
         created_at=now,
@@ -71,7 +84,7 @@ def pending_load_labware_command(now, load_labware_request):
     )
 
 
-@pytest.fixture
+@ pytest.fixture
 def running_load_labware_command(now, load_labware_request):
     return command_models.RunningCommand(
         created_at=now,
@@ -80,11 +93,13 @@ def running_load_labware_command(now, load_labware_request):
     )
 
 
-@pytest.fixture
+@ pytest.fixture
 def completed_load_labware_command(
     now,
     load_labware_request,
     load_labware_result,
+
+
 ):
     return command_models.CompletedCommand(
         created_at=now,

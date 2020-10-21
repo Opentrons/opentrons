@@ -1,11 +1,12 @@
 """Command executor router class."""
-from typing import Optional, Union
+from __future__ import annotations
+from typing import Union
 
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control.api import API as HardwareAPI
 from ..state import State
 from ..errors import ProtocolEngineError, UnexpectedProtocolError
-from .. import command_models as cmd
+from .. import resources, command_models as cmd
 from .equipment import EquipmentHandler
 
 
@@ -17,17 +18,31 @@ class CommandExecutor():
     and collecting the results of those side-effects.
     """
 
-    def __init__(
-        self,
+    @classmethod
+    def create(
+        cls,
         hardware: HardwareAPI,
-        equipment_handler: Optional[EquipmentHandler] = None
-    ):
-        """Initialize a CommandExecutor."""
-        self._equipment_handler: EquipmentHandler = (
-            equipment_handler
-            if equipment_handler is not None
-            else EquipmentHandler(hardware=hardware)
+    ) -> CommandExecutor:
+        """Create a CommandExecutor instance."""
+        id_generator = resources.IdGenerator()
+        labware_data = resources.LabwareData()
+
+        return cls(
+            equipment_handler=EquipmentHandler(
+                hardware=hardware,
+                id_generator=id_generator,
+                labware_data=labware_data,
+            )
         )
+
+    def __init__(self, equipment_handler: EquipmentHandler) -> None:
+        """
+        Initialize a CommandExecutor.
+
+        This constructor does not inject provider implementations. Prefer the
+        CommandExecutor.create factory classmethod.
+        """
+        self._equipment_handler = equipment_handler
 
     async def execute_command(
         self,

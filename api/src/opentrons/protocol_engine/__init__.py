@@ -7,5 +7,12 @@ protocol state and side-effects like robot movements.
 """
 
 from .protocol_engine import ProtocolEngine
+from .state import StateStore, State
+from .execution import CommandExecutor
 
-__all__ = ["ProtocolEngine"]
+__all__ = [
+    "ProtocolEngine",
+    "StateStore",
+    "State",
+    "CommandExecutor",
+]

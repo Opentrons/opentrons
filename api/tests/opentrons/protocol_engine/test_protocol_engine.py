@@ -30,20 +30,6 @@ class CloseToNow():
         return f"<datetime close to {self._now}>"
 
 
-@pytest.fixture
-def mock_executor():
-    return AsyncMock(spec=CommandExecutor)
-
-
-@pytest.fixture
-def engine(mock_hardware, mock_state_store, mock_executor):
-    return ProtocolEngine(
-        hardware=mock_hardware,
-        state_store=mock_state_store,
-        executor=mock_executor,
-    )
-
-
 async def test_execute_command_creates_command(engine, mock_state_store):
     """It should create a command in the state store when executing."""
     req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")

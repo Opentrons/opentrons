@@ -1,4 +1,5 @@
 """ProtocolEngine class definition."""
+from __future__ import annotations
 from typing import Optional, Union
 
 from opentrons.util.helpers import utc_now
@@ -25,19 +26,41 @@ class ProtocolEngine():
     of the commands themselves.
     """
 
-    def __init__(
-        self,
+    @classmethod
+    def create(
+        cls,
         hardware: HardwareAPI,
+        *,
         state_store: Optional[StateStore] = None,
         executor: Optional[CommandExecutor] = None,
+    ) -> ProtocolEngine:
+        """Create a ProtocolEngine instance."""
+        return cls(
+            state_store=(
+                state_store
+                if state_store is not None
+                else StateStore()
+            ),
+            executor=(
+                executor
+                if executor is not None
+                else CommandExecutor.create(hardware=hardware)
+            )
+        )
+
+    def __init__(
+        self,
+        state_store: StateStore,
+        executor: CommandExecutor,
     ):
-        """Initialize a ProtocolEngine instance."""
-        self.state_store: StateStore = (
-            state_store if state_store is not None else StateStore()
-        )
-        self.executor: CommandExecutor = (
-            executor if executor is not None else CommandExecutor(hardware)
-        )
+        """
+        Initialize a ProtocolEngine instance.
+
+        This constructor does not inject provider implementations. Prefer the
+        ProtocolEngine.create factory classmethod.
+        """
+        self.state_store = state_store
+        self.executor = executor
 
     async def execute_command(
         self,

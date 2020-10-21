@@ -20,18 +20,13 @@ class EquipmentHandler():
     def __init__(
         self,
         hardware: HardwareAPI,
-        id_generator: IdGenerator = None,
-        labware_data: LabwareData = None
-    ):
+        id_generator: IdGenerator,
+        labware_data: LabwareData
+    ) -> None:
         """Initialize an EquipmentHandler instance."""
         self._hardware: HardwareAPI = hardware
-
-        self._id_generator: IdGenerator = (
-            id_generator if id_generator is not None else IdGenerator()
-        )
-        self._labware_data: LabwareData = (
-            labware_data if labware_data is not None else LabwareData()
-        )
+        self._id_generator: IdGenerator = id_generator
+        self._labware_data: LabwareData = labware_data
 
     async def handle_load_labware(
         self,
