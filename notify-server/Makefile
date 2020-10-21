@@ -57,7 +57,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(SHX) rm -rf  `${POETRY} env info -p`
+	$(SHX) rm -rf  `${poetry} env info -p`
 
 dist/notify_server-%-py3-none-any.whl: $(ot_sources)
 	$(clean_cmd)
