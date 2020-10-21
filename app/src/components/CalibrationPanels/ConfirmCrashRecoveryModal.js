@@ -46,7 +46,7 @@ export function ConfirmCrashRecoveryModal(
           Component: SecondaryBtn,
           children: requiresNewTip ? CONFIRM_AND_START_OVER : START_OVER,
           onClick: confirm,
-          width: '20rem',
+          width: '17rem',
         },
       ]}
       alertOverlay
