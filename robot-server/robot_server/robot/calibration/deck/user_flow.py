@@ -330,6 +330,7 @@ class DeckCalibrationUserFlow:
 
     async def invalidate_last_action(self):
         await self.hardware.home()
+        await self._hardware.gantry_position(self.mount, refresh=True)
         if self._current_state != State.preparingPipette:
             trash = self._deck.get_fixed_trash()
             assert trash, 'Bad deck setup'

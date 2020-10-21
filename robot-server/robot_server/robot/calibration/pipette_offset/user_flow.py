@@ -433,9 +433,16 @@ class PipetteOffsetCalibrationUserFlow:
     async def invalidate_last_action(self):
         if self._current_state == POWTState.measuringNozzleOffset:
             await self._hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
             await self.move_to_reference_point()
+        elif self._current_state == self._state.preparingPipette:
+            self.reset_tip_origin()
+            await self._hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
+            await self.move_to_tip_rack()
         else:
             await self.hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, 'Bad deck setup'
             await self._move(trash['A1'].top())

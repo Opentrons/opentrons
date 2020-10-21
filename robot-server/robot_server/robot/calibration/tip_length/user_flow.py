@@ -255,12 +255,15 @@ class TipCalibrationUserFlow:
     async def invalidate_last_action(self):
         if self._current_state == State.measuringNozzleOffset:
             await self.hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
             await self.move_to_reference_point()
         elif self._current_state == State.preparingPipette:
             await self.hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
             await self.move_to_tip_rack()
         else:
             await self.hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, 'Bad deck setup'
             await self._move(trash['A1'].top())
