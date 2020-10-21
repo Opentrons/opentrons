@@ -99,6 +99,7 @@ class DeckCalibrationUserFlow:
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
             DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
+            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
         }
 
     @property
@@ -212,7 +213,6 @@ class DeckCalibrationUserFlow:
         """
         next_state = self._state_machine.get_next_state(self._current_state,
                                                         name)
-
         handler = self._command_map.get(name)
         if handler is not None:
             await handler(**data)
@@ -327,3 +327,13 @@ class DeckCalibrationUserFlow:
         # reload new deck calibration
         self._hardware.reset_robot_calibration()
         await self._hardware.home()
+
+    async def invalidate_last_action(self):
+        await self.hardware.home()
+        await self._hardware.gantry_position(self.mount, refresh=True)
+        if self._current_state != State.preparingPipette:
+            trash = self._deck.get_fixed_trash()
+            assert trash, 'Bad deck setup'
+            await uf.move(self, trash['A1'].top(), CriticalPoint.XY_CENTER)
+            await self.hardware.drop_tip(self.mount)
+        await self.move_to_tip_rack()

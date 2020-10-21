@@ -8,6 +8,7 @@ from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 from robot_server.robot.calibration.deck.user_flow import \
     DeckCalibrationUserFlow, tuplefy_cal_point_dicts
+from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.deck.constants import \
     POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID, DeckCalibrationState
 
@@ -51,6 +52,7 @@ def mock_hw(hardware):
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
     hardware.home_plunger = MagicMock(side_effect=async_mock)
+    hardware.home = MagicMock(side_effect=async_mock)
     return hardware
 
 
@@ -88,6 +90,25 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
 def mock_user_flow(mock_hw):
     m = DeckCalibrationUserFlow(hardware=mock_hw)
     yield m
+
+
+@pytest.mark.parametrize(
+    'state_name,commands',
+    [
+        ('preparingPipette', ['home', 'move_to']),
+        ('joggingToDeck', ['home', 'drop_tip', 'move_to']),
+        ('savingPointOne', ['home', 'drop_tip', 'move_to']),
+        ('savingPointTwo', ['home', 'drop_tip', 'move_to']),
+        ('savingPointThree', ['home', 'drop_tip', 'move_to'])
+    ]
+)
+async def test_invalidate_last_action(
+        state_name, commands, mock_user_flow, mock_hw):
+    uf = mock_user_flow
+    uf._current_state = state_name
+    await uf.handle_command(CalibrationCommand.invalidate_last_action, {})
+    for funcname in commands:
+        getattr(mock_hw, funcname).assert_called()
 
 
 async def test_move_to_tip_rack(mock_user_flow):

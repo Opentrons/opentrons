@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
+  Box,
   PrimaryBtn,
   Flex,
   Text,
@@ -26,6 +27,7 @@ import type {
 } from '../../sessions/types'
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 
 import slot1LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
 import slot1LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
@@ -153,6 +155,11 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     sendCommands(...commands)
   }
 
+  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
+    requiresNewTip: true,
+    ...props,
+  })
+
   return (
     <>
       <Text
@@ -208,6 +215,8 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           {buttonText}
         </PrimaryBtn>
       </Flex>
+      <Box width="100%">{confirmLink}</Box>
+      {confirmModal}
     </>
   )
 }

@@ -129,6 +129,8 @@ class PipetteOffsetCalibrationUserFlow:
             CalibrationCommand.set_has_calibration_block:
                 self.set_has_calibration_block,
             CalibrationCommand.exit: self.exit_session,
+            CalibrationCommand.invalidate_last_action:
+                self.invalidate_last_action,
         }
 
     @property
@@ -427,6 +429,25 @@ class PipetteOffsetCalibrationUserFlow:
             deck=self._deck,
             has_calibration_block=self._has_calibration_block)
         await self._move(ref_loc)
+
+    async def invalidate_last_action(self):
+        if self._current_state == POWTState.measuringNozzleOffset:
+            await self._hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
+            await self.move_to_reference_point()
+        elif self._current_state == self._state.preparingPipette:
+            self.reset_tip_origin()
+            await self._hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
+            await self.move_to_tip_rack()
+        else:
+            await self.hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
+            trash = self._deck.get_fixed_trash()
+            assert trash, 'Bad deck setup'
+            await util.move(self, trash['A1'].top(), CriticalPoint.XY_CENTER)
+            await self.hardware.drop_tip(self.mount)
+            await self.move_to_tip_rack()
 
     async def pick_up_tip(self):
         await util.pick_up_tip(self, tip_length=self._get_tip_length())
