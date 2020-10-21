@@ -373,7 +373,8 @@ async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
     getattr(mock_user_flow._hardware, hw_meth).assert_called()
 
 
-@pytest.mark.parametrize('command,current_state,data,hw_meth', hw_commands_fused)
+@pytest.mark.parametrize(
+    'command,current_state,data,hw_meth', hw_commands_fused)
 async def test_hw_calls_fused(
         command, current_state, data, hw_meth, mock_user_flow_fused):
     mock_user_flow_fused._current_state = current_state

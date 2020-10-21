@@ -130,7 +130,7 @@ class PipetteOffsetCalibrationUserFlow:
                 self.set_has_calibration_block,
             CalibrationCommand.exit: self.exit_session,
             CalibrationCommand.invalidate_last_action:
-               self.invalidate_last_action,
+                self.invalidate_last_action,
         }
 
     @property
