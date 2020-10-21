@@ -1,9 +1,9 @@
 """
 Protocol engine command models.
 
-The `protocol_engine.commands` module contains the data models of all command
-request and results the engine is able to handle. It also contains models and
-type definitions for Command resources, where a Command:
+The `protocol_engine.command_models` module contains the data models of all
+command requests and results the engine is able to handle. It also contains
+models and type definitions for command resources, where a command:
 
 - May be pending, running, completed, or failed
 - Contains request and, if applicable, result data
