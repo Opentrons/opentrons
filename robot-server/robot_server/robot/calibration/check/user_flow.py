@@ -284,6 +284,9 @@ class CheckCalibrationUserFlow:
         load onto the deck the default opentrons tip rack labware for this
         pipette and return the tip rack labware. If tip_rack_def is supplied,
         load specific tip rack from def onto the deck and return the labware.
+
+        TODO (lc 10-20-2020) we should load the tipracks from a pipette
+        offset before trying to load from default.
         """
         active_max_vol = self.active_pipette.max_volume
         if self._tip_racks:
@@ -507,6 +510,12 @@ class CheckCalibrationUserFlow:
                 saved_points.three.final_point
 
     async def register_initial_point(self):
+        """
+        Here we will register the initial and final
+        points to the current point before jogging
+        in the instance that a user doesn't jog at
+        all.
+        """
         critical_point = self.critical_point_override
         current_point = \
             await self.get_current_point(critical_point)
@@ -514,18 +523,28 @@ class CheckCalibrationUserFlow:
         if self.current_state == State.labwareLoaded:
             self._reference_points.tip.initial_point = \
                 current_point + buffer
+            self._reference_points.tip.final_point = \
+                current_point + buffer
         elif self.current_state == State.inspectingTip:
+            buffer = MOVE_TO_DECK_SAFETY_BUFFER
             self._reference_points.height.initial_point = \
                 current_point + buffer
+            self._reference_points.height.final_point = \
+                current_point + buffer
         elif self.current_state == State.comparingHeight:
-            buffer = MOVE_TO_DECK_SAFETY_BUFFER
             self._reference_points.one.initial_point = \
+                current_point + buffer
+            self._reference_points.one.final_point = \
                 current_point + buffer
         elif self.current_state == State.comparingPointOne:
             self._reference_points.two.initial_point = \
                 current_point + buffer
+            self._reference_points.two.final_point = \
+                current_point + buffer
         elif self.current_state == State.comparingPointTwo:
             self._reference_points.three.initial_point = \
+                current_point + buffer
+            self._reference_points.three.final_point = \
                 current_point + buffer
 
     async def register_final_point(self):
@@ -575,13 +594,11 @@ class CheckCalibrationUserFlow:
                 handler="move_to_tip_rack",
                 condition="active tiprack")
         if self.current_state == State.labwareLoaded:
-            MODULE_LOG.debug("homing")
-            await self.hardware.home()
-        point = self.active_tiprack.wells()[0].top().point + \
-            MOVE_TO_TIP_RACK_SAFETY_BUFFER
-        to_loc = Location(point, None)
-        await self._move(to_loc)
+            MODULE_LOG.debug("homing plunger")
+            await self.hardware.home_plunger(self.mount)
+        await self._move(Location(self.tip_origin, None))
         await self.register_initial_point()
+        await self.register_final_point()
 
     async def move_to_deck(self):
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
