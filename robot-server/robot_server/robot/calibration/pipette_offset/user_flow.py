@@ -257,6 +257,9 @@ class PipetteOffsetCalibrationUserFlow:
             self._flag_unmet_transition_req(
                 command_handler="move_to_tip_rack",
                 unmet_condition="not performing tip length calibration")
+        if self._current_state != self._state.calibrationComplete:
+            MODULE_LOG.info("Homing plunger")
+            await self.hardware.home_plunger(self.mount)
         await self._move(Location(self.tip_origin, None))
 
     def _get_stored_tip_length_cal(self) -> Optional[float]:

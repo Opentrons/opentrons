@@ -59,6 +59,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
         # off after
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
+        await configuration.hardware.cache_instruments()
         try:
             pip_offset_cal_user_flow = PipetteOffsetCalibrationUserFlow(
                     hardware=configuration.hardware,
