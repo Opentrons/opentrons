@@ -36,7 +36,6 @@ const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 const DECK_CAL_HEADER = 'deck calibration'
 const DECK_CAL_BODY =
   'Deck calibration ensures positional accuracy so that your robot moves as expected. It will accurately establish the OT-2’s deck orientation relative to the gantry.'
-const DECK_CAL_PROCEDURE = 'to calibrate deck'
 
 const PIP_OFFSET_CAL_HEADER = 'pipette offset calibration'
 const PIP_OFFSET_CAL_BODY =
@@ -45,9 +44,8 @@ const PIP_OFFSET_CAL_BODY =
 const TIP_LENGTH_CAL_HEADER = 'tip length calibration'
 const TIP_LENGTH_CAL_BODY =
   "Tip length calibration measures the length of the pipette's tip separately from the pipette's nozzle."
-const TIP_LENGTH_CAL_PROCEDURE = 'to tip length calibration'
 
-const CONTINUE = 'continue'
+const START = 'start'
 const LABWARE_REQS = 'For this process you will require:'
 const NOTE_HEADER = 'Please note:'
 const IT_IS = "It's"
@@ -69,19 +67,19 @@ const contentsBySessionType: {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     headerText: DECK_CAL_HEADER,
     bodyText: DECK_CAL_BODY,
-    continueButtonText: `${CONTINUE} ${DECK_CAL_PROCEDURE}`,
+    continueButtonText: `${START} ${DECK_CAL_HEADER}`,
     noteBody: NOTE_BODY_OUTSIDE_PROTOCOL,
   },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     headerText: PIP_OFFSET_CAL_HEADER,
     bodyText: PIP_OFFSET_CAL_BODY,
-    continueButtonText: CONTINUE,
+    continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
     noteBody: NOTE_BODY_OUTSIDE_PROTOCOL,
   },
   [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
     headerText: TIP_LENGTH_CAL_HEADER,
     bodyText: TIP_LENGTH_CAL_BODY,
-    continueButtonText: `${CONTINUE} ${TIP_LENGTH_CAL_PROCEDURE}`,
+    continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
     noteBody: NOTE_BODY_PRE_PROTOCOL,
   },
 }

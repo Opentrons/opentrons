@@ -67,7 +67,7 @@ const THE = 'the'
 const BLOCK = 'block in'
 const FLAT_SURFACE = 'flat surface'
 const OF_THE_TRASH_BIN = 'of the trash bin'
-const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis'
+const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis and move to pick up tip'
 const SLOT = 'slot'
 
 export function MeasureNozzle(props: CalibrationPanelProps): React.Node {

@@ -41,7 +41,7 @@ const CLOSEST = 'closest'
 const TO_YOU_IS_CENTERED = 'to you is centered above the'
 const POSITION = 'position'
 const AND = 'and'
-const FLUSH = 'flush'
+const FLUSH = 'even'
 const WITH_TOP_OF_TIP = 'with the top of the tip.'
 const TIP_WELL_NAME = 'A1'
 
