@@ -25,6 +25,7 @@ import * as Sessions from '../../sessions'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from '../CalibrationPanels/utils'
 import leftMultiBlockAsset from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
 import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
@@ -123,6 +124,10 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
   }
 
   const proceed = isExtendedPipOffset ? proceedPipetteOffset : proceedTipLength
+  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
+    requiresNewTip: true,
+    ...props,
+  })
 
   return (
     <>
@@ -181,6 +186,8 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
           </PrimaryBtn>
         </Flex>
       </Flex>
+      {confirmLink}
+      {confirmModal}
     </>
   )
 }

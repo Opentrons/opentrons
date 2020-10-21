@@ -23,6 +23,7 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from './types'
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 
 import slot5LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
 import slot5LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
@@ -94,6 +95,11 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
     )
   }
 
+  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
+    requiresNewTip: true,
+    ...props,
+  })
+
   return (
     <>
       <Text
@@ -148,6 +154,8 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
           {buttonText}
         </PrimaryBtn>
       </Flex>
+      {confirmLink}
+      {confirmModal}
     </>
   )
 }

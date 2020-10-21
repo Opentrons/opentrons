@@ -27,6 +27,7 @@ import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from './types'
 
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
 import leftMultiBlockAsset from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
 import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_NO_TIP_(330x260)REV1.webm'
@@ -109,6 +110,11 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
     )
   }
 
+  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
+    requiresNewTip: false,
+    ...props,
+  })
+
   return (
     <>
       <Flex
@@ -166,6 +172,8 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
           </PrimaryBtn>
         </Flex>
       </Flex>
+      {confirmLink}
+      {confirmModal}
     </>
   )
 }

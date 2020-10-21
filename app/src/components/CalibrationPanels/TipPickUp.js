@@ -29,6 +29,8 @@ import { JogControls } from '../JogControls'
 import type { CalibrationPanelProps } from './types'
 import { formatJogVector } from './utils'
 
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+
 import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
 import singleDemoAsset from '../../assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
 
@@ -81,6 +83,10 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
       },
     })
   }
+  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
+    requiresNewTip: false,
+    ...props,
+  })
 
   return (
     <Flex
@@ -147,6 +153,8 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
           {TIP_PICK_UP_BUTTON_TEXT}
         </PrimaryBtn>
       </Flex>
+      {confirmLink}
+      {confirmModal}
     </Flex>
   )
 }
