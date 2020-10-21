@@ -123,6 +123,9 @@ export function CalibrationCard(props: Props): React.Node {
     Calibration.DECK_CAL_STATUS_IDENTITY,
   ].includes(deckCalStatus)
 
+  const pipOffsetDataPresent = pipetteOffsetCalibrations
+    ? pipetteOffsetCalibrations.length > 0
+    : false
   return (
     <Card>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_BASELINE}>
@@ -160,6 +163,7 @@ export function CalibrationCard(props: Props): React.Node {
         disabledReason={buttonDisabledReason}
         deckCalStatus={deckCalStatus}
         deckCalData={deckCalData}
+        pipOffsetDataPresent={pipOffsetDataPresent}
       />
       <PipetteOffsets pipettesPageUrl={pipettesPageUrl} robot={robot} />
     </Card>

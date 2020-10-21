@@ -73,6 +73,7 @@ describe('DeckCalibrationControl', () => {
             markedAt: '',
           },
         },
+        pipOffsetDataPresent = true,
       } = props
       return mount(
         <DeckCalibrationControl
@@ -80,6 +81,7 @@ describe('DeckCalibrationControl', () => {
           disabledReason={disabledReason}
           deckCalStatus={deckCalStatus}
           deckCalData={deckCalData}
+          pipOffsetDataPresent={pipOffsetDataPresent}
         />,
         {
           wrappingComponent: Provider,
@@ -141,6 +143,21 @@ describe('DeckCalibrationControl', () => {
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(true)
 
     getConfirmDeckCalButton(wrapper).invoke('onClick')()
+
+    expect(mockStore.dispatch).toHaveBeenCalledWith({
+      ...Sessions.ensureSession(
+        'robot-name',
+        Sessions.SESSION_TYPE_DECK_CALIBRATION
+      ),
+      meta: expect.objectContaining({ requestId: expect.any(String) }),
+    })
+  })
+
+  it('button launches new deck calibration immediately without rendering ConfirmStartDeckCalModal', () => {
+    const wrapper = render({ pipOffsetDataPresent: false })
+    getDeckCalButton(wrapper).invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
 
     expect(mockStore.dispatch).toHaveBeenCalledWith({
       ...Sessions.ensureSession(

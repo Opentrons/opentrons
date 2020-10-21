@@ -79,10 +79,17 @@ export type Props = {|
   disabledReason: string | null,
   deckCalStatus: DeckCalibrationStatus | null,
   deckCalData: DeckCalibrationData | null,
+  pipOffsetDataPresent: boolean,
 |}
 
 export function DeckCalibrationControl(props: Props): React.Node {
-  const { robotName, disabledReason, deckCalStatus, deckCalData } = props
+  const {
+    robotName,
+    disabledReason,
+    deckCalStatus,
+    deckCalData,
+    pipOffsetDataPresent,
+  } = props
 
   const [showWizard, setShowWizard] = React.useState(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -175,7 +182,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
     cancel: cancelStart,
   } = useConditionalConfirm(() => {
     handleStartDeckCalSession()
-  }, true)
+  }, !!pipOffsetDataPresent)
 
   let warningType = null
   if (deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_OK) {
@@ -220,7 +227,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
           </Text>
         )}
       </TitledControl>
-      {showConfirmStart && (
+      {showConfirmStart && pipOffsetDataPresent && (
         <Portal level="top">
           <ConfirmStartDeckCalModal
             confirm={confirmStart}
