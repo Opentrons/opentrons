@@ -436,6 +436,9 @@ class PipetteOffsetCalibrationUserFlow:
             await self.move_to_reference_point()
         else:
             await self.hardware.home()
+            trash = self._deck.get_fixed_trash()
+            assert trash, 'Bad deck setup'
+            await self._move(trash['A1'].top())
             await self.hardware.drop_tip(self.mount)
             await self.move_to_tip_rack()
 
