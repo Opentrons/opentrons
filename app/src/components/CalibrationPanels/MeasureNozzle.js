@@ -172,7 +172,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
           </PrimaryBtn>
         </Flex>
       </Flex>
-      {confirmLink}
+      <Box width="100%">{confirmLink}</Box>
       {confirmModal}
     </>
   )
