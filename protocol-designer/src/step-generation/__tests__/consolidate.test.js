@@ -1300,6 +1300,19 @@ describe('consolidate single-channel', () => {
             offsetFromBottomMm: 3.4,
           },
         },
+
+        // Blowout to trash
+        {
+          command: 'blowout',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'trashId',
+            well: 'A1',
+            flowRate: 2.3,
+            offsetFromBottomMm: 80.3,
+          },
+        },
+
         // Dispense > air gap in dest well
         {
           command: 'airGap',
@@ -1318,7 +1331,6 @@ describe('consolidate single-channel', () => {
             wait: 11,
           },
         },
-        // Skip blowout to trash since we're about to drop the tip
 
         // we used dispense > air gap, so we will dispose of the tip
         {

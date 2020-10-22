@@ -2,7 +2,7 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import { getWellDepth } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP, FIXED_TRASH_ID } from '../../../constants'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
@@ -315,21 +315,17 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
           : []
 
-      const blowoutCommand =
-        dropTipAfterDispenseAirGap.length > 0 &&
-        args.blowoutLocation === FIXED_TRASH_ID
-          ? [] // skip blowout it's in the trash we're replacing the tip due to dispense > air gap
-          : blowoutUtil({
-              pipette: args.pipette,
-              sourceLabwareId: args.sourceLabware,
-              sourceWell: sourceWellChunk[0],
-              destLabwareId: args.destLabware,
-              destWell: args.destWell,
-              blowoutLocation: args.blowoutLocation,
-              flowRate: blowoutFlowRateUlSec,
-              offsetFromTopMm: blowoutOffsetFromTopMm,
-              invariantContext,
-            })
+      const blowoutCommand = blowoutUtil({
+        pipette: args.pipette,
+        sourceLabwareId: args.sourceLabware,
+        sourceWell: sourceWellChunk[0],
+        destLabwareId: args.destLabware,
+        destWell: args.destWell,
+        blowoutLocation: args.blowoutLocation,
+        flowRate: blowoutFlowRateUlSec,
+        offsetFromTopMm: blowoutOffsetFromTopMm,
+        invariantContext,
+      })
 
       return [
         ...tipCommands,
