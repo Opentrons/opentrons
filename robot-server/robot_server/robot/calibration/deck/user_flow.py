@@ -321,11 +321,9 @@ class DeckCalibrationUserFlow:
         await uf.move(self, to_loc)
 
     async def exit_session(self):
-        # TODO (lc 10-20-2020) only move to
-        # the tiprack and return tip if there
-        # is a tip that exists.
-        await self.move_to_tip_rack()
-        await self.return_tip()
+        if self.hw_pipette.has_tip:
+            await self.move_to_tip_rack()
+            await self.return_tip()
         # reload new deck calibration
         self._hardware.reset_robot_calibration()
         await self._hardware.home()
