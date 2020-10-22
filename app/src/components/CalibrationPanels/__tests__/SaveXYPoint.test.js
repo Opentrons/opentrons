@@ -144,6 +144,11 @@ describe('SaveXYPoint', () => {
     })
   })
 
+  it('renders need help link', () => {
+    const wrapper = render()
+    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
+  })
+
   it('deck cal session sends save offset and move to point two commands when current step is savingPointOne', () => {
     const wrapper = render({
       sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,

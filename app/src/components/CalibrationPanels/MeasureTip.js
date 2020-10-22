@@ -9,6 +9,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   BORDER_SOLID_LIGHT,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_2,
@@ -25,6 +26,8 @@ import * as Sessions from '../../sessions'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
+
+import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from '../CalibrationPanels/utils'
 import leftMultiBlockAsset from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
@@ -138,13 +141,16 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
         position={POSITION_RELATIVE}
         width="100%"
       >
-        <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-          fontWeight={FONT_WEIGHT_SEMIBOLD}
-          fontSize={FONT_SIZE_HEADER}
-        >
-          {HEADER}
-        </Text>
+        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Text
+            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            fontWeight={FONT_WEIGHT_SEMIBOLD}
+            fontSize={FONT_SIZE_HEADER}
+          >
+            {HEADER}
+          </Text>
+          <NeedHelpLink />
+        </Flex>
         <Box
           paddingX={SPACING_3}
           paddingY={SPACING_4}

@@ -122,7 +122,6 @@ describe('CheckCalibration', () => {
         },
       }
       const wrapper = render()
-      expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
       POSSIBLE_CHILDREN.forEach(child => {
         if (child === spec.component) {
           expect(wrapper.exists(child)).toBe(true)

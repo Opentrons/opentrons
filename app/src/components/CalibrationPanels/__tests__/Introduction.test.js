@@ -93,4 +93,9 @@ describe('Introduction', () => {
       command: Sessions.sharedCalCommands.LOAD_LABWARE,
     })
   })
+
+  it('renders need help link', () => {
+    const wrapper = render()
+    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
+  })
 })

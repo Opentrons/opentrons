@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_2,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   POSITION_RELATIVE,
   SPACING_1,
   SPACING_2,
@@ -30,6 +31,7 @@ import { JogControls } from '../JogControls'
 import type { CalibrationPanelProps } from './types'
 import { formatJogVector } from './utils'
 
+import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 
 import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
@@ -99,16 +101,19 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
         width="100%"
         marginBottom="0"
       >
-        <Text
-          css={FONT_HEADER_DARK}
-          marginBottom={SPACING_3}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-        >
-          {TIP_PICK_UP_HEADER}
-          {tipRackDef
-            ? getLabwareDisplayName(tipRackDef).replace('µL', 'uL')
-            : null}
-        </Text>
+        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Text
+            css={FONT_HEADER_DARK}
+            marginBottom={SPACING_3}
+            textTransform={TEXT_TRANSFORM_UPPERCASE}
+          >
+            {TIP_PICK_UP_HEADER}
+            {tipRackDef
+              ? getLabwareDisplayName(tipRackDef).replace('µL', 'uL')
+              : null}
+          </Text>
+          <NeedHelpLink />
+        </Flex>
         <Box
           padding={SPACING_3}
           border={BORDER_SOLID_LIGHT}

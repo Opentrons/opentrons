@@ -22,6 +22,7 @@ import * as Sessions from '../../sessions'
 
 import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
+import { NeedHelpLink } from './NeedHelpLink'
 
 const assetBySlot = {
   '1': slotOneRemoveBlockAsset,
@@ -84,14 +85,17 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
       width="100%"
       flex={1}
     >
-      <Flex alignItems={ALIGN_CENTER} marginTop={SPACING_3}>
-        <Icon
-          name="check-circle"
-          width="2.5rem"
-          marginRight={SPACING_3}
-          color={COLOR_SUCCESS}
-        />
-        <h3>{headerText}</h3>
+      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex alignItems={ALIGN_CENTER} marginTop={SPACING_3}>
+          <Icon
+            name="check-circle"
+            width="2.5rem"
+            marginRight={SPACING_3}
+            color={COLOR_SUCCESS}
+          />
+          <h3>{headerText}</h3>
+        </Flex>
+        <NeedHelpLink maxHeight="1rem" />
       </Flex>
       {calBlock && (
         <>

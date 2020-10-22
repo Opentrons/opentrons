@@ -29,7 +29,6 @@ import {
   ConfirmExitModal,
   MeasureNozzle,
   MeasureTip,
-  NeedHelpLink,
 } from '../CalibrationPanels'
 
 import type { StyleProps } from '@opentrons/components'
@@ -166,7 +165,6 @@ export function CalibratePipetteOffset(
         titleBar={titleBarProps}
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
-        <NeedHelpLink currentStep={currentStep} top={true} />
         <Panel
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}

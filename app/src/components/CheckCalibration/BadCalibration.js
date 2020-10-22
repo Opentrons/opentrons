@@ -1,6 +1,13 @@
 // @flow
 import * as React from 'react'
-import { Icon, PrimaryButton, Link } from '@opentrons/components'
+import {
+  Icon,
+  PrimaryButton,
+  Link,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+} from '@opentrons/components'
+import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 import styles from './styles.css'
@@ -25,10 +32,13 @@ export function BadCalibration(props: CalibrationPanelProps): React.Node {
 
   return (
     <div className={styles.padded_contents_wrapper}>
-      <div className={styles.modal_icon_wrapper}>
-        <Icon name="close-circle" className={styles.error_status_icon} />
-        <h3>{BAD_ROBOT_CALIBRATION_CHECK_HEADER}</h3>
-      </div>
+      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <div className={styles.modal_icon_wrapper}>
+          <Icon name="close-circle" className={styles.error_status_icon} />
+          <h3>{BAD_ROBOT_CALIBRATION_CHECK_HEADER}</h3>
+        </div>
+        <NeedHelpLink maxHeight="1rem" />
+      </Flex>
       <div className={styles.bad_cal_body}>
         <p className={styles.error_explanation}>{SUMMARY}</p>
         <p className={styles.error_explanation}>{TO_TROUBLESHOOT}</p>

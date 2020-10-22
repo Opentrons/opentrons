@@ -55,6 +55,11 @@ describe('CompleteConfirmation', () => {
     expect(mockCleanUpAndExit).toHaveBeenCalled()
   })
 
+  it('renders need help link', () => {
+    const wrapper = render()
+    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
+  })
+
   it('pip offset cal session type shows correct text', () => {
     const wrapper = render({
       sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
