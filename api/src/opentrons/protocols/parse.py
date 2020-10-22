@@ -17,7 +17,8 @@ import jsonschema  # type: ignore
 from opentrons.config import feature_flags as ff
 from opentrons_shared_data import load_shared_data, protocol
 from .types import (Protocol, PythonProtocol, JsonProtocol,
-                    Metadata, APIVersion, MalformedProtocolError)
+                    Metadata, APIVersion, MalformedProtocolError,
+                    ApiDeprecationError)
 from .bundle import extract_bundle
 
 if TYPE_CHECKING:
@@ -105,6 +106,8 @@ def _parse_python(
 
     if version >= APIVersion(2, 0):
         _validate_v2_ast(parsed)
+    else:
+        raise ApiDeprecationError(version)
 
     result = PythonProtocol(
         text=protocol_contents,

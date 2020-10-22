@@ -233,7 +233,7 @@ async def toggle_new_calibration(request):
         yield
 
 
-@pytest.fixture(params=["dinosaur.py"])
+@pytest.fixture(params=["testosaur_v2.py"])
 def protocol(request):
     try:
         root = request.getfixturevalue('protocol_file')

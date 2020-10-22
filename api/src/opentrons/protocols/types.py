@@ -71,6 +71,20 @@ This function is called by the robot when the robot executes the protol.
 This function is not present in the current protocol and must be added.
 """
 
+PYTHON_API_VERSION_DEPRECATED = """
+
+The python protocol you uploaded has the Python API Version {0}.  Robot server version 4.0.0 is
+the official end of life of Python API Version {1}. This means that this protocol will not run
+in robot server version 4.0.0 and above. Please downgrade your robot server version
+if you wish to run this protocol. Otherwise, please upgrade this protocol to Python API Version 2.
+
+To upgrade your protocol to Python API Version 2, please view our documentation at https://docs.opentrons.com/v2/index.html.
+
+Please contact support@opentrons.com to retrieve the previous software version and be guided
+through the downgrade process.
+
+"""  # noqa E511
+
 
 class MalformedProtocolError(Exception):
     def __init__(self, message):
@@ -82,3 +96,15 @@ class MalformedProtocolError(Exception):
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.message)
+
+
+class ApiDeprecationError(Exception):
+    def __init__(self, version):
+        self.version = version
+        super().__init__(version)
+
+    def __str__(self):
+        return PYTHON_API_VERSION_DEPRECATED.format(self.version, self.version)
+
+    def __repr__(self):
+        return '<{}: {}>'.format(self.__class__.__name__, self.version)
