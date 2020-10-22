@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
+import startCase from 'lodash/startCase'
 import {
   RobotWorkSpace,
   Flex,
@@ -29,7 +30,7 @@ const DECK_SETUP_WITH_BLOCK_PROMPT =
   'Place full tip rack and Calibration Block on the deck within their designated slots as illustrated below.'
 const DECK_SETUP_NO_BLOCK_PROMPT =
   'Place full tip rack on the deck within the designated slot as illustrated below.'
-const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
+const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and start'
 const contentsBySessionType: {
   [SessionType]: {
     moveCommandString: SessionCommandString,
@@ -94,7 +95,7 @@ export function DeckSetup(props: CalibrationPanelProps): React.Node {
           alignSelf={ALIGN_CENTER}
           margin={`${SPACING_2} 0 ${SPACING_3} 0`}
         >
-          {DECK_SETUP_BUTTON_TEXT}
+          {`${DECK_SETUP_BUTTON_TEXT} ${startCase(lookupType)}`}
         </LightSecondaryBtn>
       </Flex>
       <Flex
