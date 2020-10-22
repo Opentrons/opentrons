@@ -11,11 +11,11 @@ import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
 import { getStateAndContextTempTCModules } from '../../step-generation/__fixtures__'
 import { DEFAULT_DELAY_SECONDS } from '../../constants'
+import { getPrereleaseFeatureFlag } from '../../persist'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
 } from '../utils/createPresavedStepForm'
-import { getPrereleaseFeatureFlag } from '../../persist'
 jest.mock('../../persist')
 
 const getPrereleaseFeatureFlagMock: JestMockFn<
