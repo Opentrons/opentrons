@@ -92,7 +92,7 @@ const contentsBySessionType: {
   [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
     headerText: HEALTH_CHECK_HEADER,
     bodyText: HEALTH_CHECK_BODY,
-    continueButtonText: `${CONTINUE} to ${HEALTH_CHECK_HEADER}`,
+    continueButtonText: `${START} ${HEALTH_CHECK_HEADER}`,
     continuingToText: HEALTH_CHECK_PROCEDURE,
     noteBody: NOTE_HEALTH_CHECK_OUTCOMES,
   },
