@@ -1,5 +1,4 @@
 """Test entry."""
-
 from notify_server import __version__
 
 
