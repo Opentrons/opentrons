@@ -43,6 +43,7 @@ const assetMap = {
 }
 
 const CALIBRATE = 'calibrate'
+const CHECK = 'check'
 const TARGET_SLOT = 'slot 5'
 const BASE_HEADER = `z-axis in ${TARGET_SLOT}`
 const JOG_UNTIL = 'Jog the pipette until the tip is'
@@ -51,6 +52,7 @@ const DECK_IN = 'the deck in'
 const THEN = 'Then press the'
 const DECK_CAL_BUTTON_TEXT = 'remember z-axis and move to slot 1'
 const PIP_OFFSET_BUTTON_TEXT = 'save calibration and move to slot 1'
+const CALIBRATION_HEALTH_BUTTON_TEXT = 'Go To Next Check'
 const TO_USE_Z =
   'button to use this z position for the rest of deck calibration'
 
@@ -67,6 +69,10 @@ const contentsBySessionType: {
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     buttonText: PIP_OFFSET_BUTTON_TEXT,
     headerText: `${CALIBRATE} ${BASE_HEADER}`,
+  },
+  [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
+    buttonText: CALIBRATION_HEALTH_BUTTON_TEXT,
+    headerText: `${CHECK} ${BASE_HEADER}`,
   },
 }
 
@@ -89,11 +95,22 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
     })
   }
 
-  const savePoint = () => {
-    sendCommands(
-      { command: Sessions.sharedCalCommands.SAVE_OFFSET },
-      { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
-    )
+  const continueCommands = () => {
+    if (sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK) {
+      return () => {
+        sendCommands(
+          { command: Sessions.checkCommands.COMPARE_POINT },
+          { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
+        )
+      }
+    } else {
+      return () => {
+        sendCommands(
+          { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+          { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
+        )
+      }
+    }
   }
 
   const [confirmLink, confirmModal] = useConfirmCrashRecovery({
@@ -148,7 +165,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
       >
         <PrimaryBtn
           title="save"
-          onClick={savePoint}
+          onClick={continueCommands()}
           flex="1"
           marginX={SPACING_5}
         >

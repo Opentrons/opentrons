@@ -1,56 +1,27 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { PrimaryButton, OutlineButton } from '@opentrons/components'
 import find from 'lodash/find'
-import pick from 'lodash/pick'
-import partition from 'lodash/partition'
-import type { State } from '../../types'
 import * as Sessions from '../../sessions'
-import * as Calibration from '../../calibration'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
-import { BadOutcomeBody } from './BadOutcomeBody'
 import { saveAs } from 'file-saver'
-import { getBadOutcomeHeader } from './utils'
 
-import type { CalibrationStatus } from '../../calibration/types'
-import type {
-  RobotCalibrationCheckComparisonsByStep,
-  RobotCalibrationCheckComparison,
-  RobotCalibrationCheckInstrument,
-} from '../../sessions/types'
+import type { CalibrationPanelProps } from '../CalibrationPanels/types'
+import type { CalibrationHealthCheckInstrument } from '../../sessions/types'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
-const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
+const HOME_AND_EXIT = 'Home robot and exit'
 const DOWNLOAD_SUMMARY = 'Download JSON summary'
-const STILL_HAVING_PROBLEMS =
-  'If you are still experiencing issues, please download the JSON summary and share it with our support team who will then follow up with you.'
 
-type ResultsSummaryProps = {|
-  robotName: string,
-  deleteSession: () => mixed,
-  comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
-  instrumentsByMount: { [mount: string]: RobotCalibrationCheckInstrument, ... },
-|}
-export function ResultsSummary(props: ResultsSummaryProps): React.Node {
-  const {
-    robotName,
-    deleteSession,
-    comparisonsByStep,
-    instrumentsByMount,
-  } = props
-
-  const calibrationStatus = useSelector<State, CalibrationStatus | null>(
-    state => Calibration.getCalibrationStatus(state, robotName)
-  )
+export function ResultsSummary(props: CalibrationPanelProps): React.Node {
+  const { comparisonsByPipette, instruments, cleanUpAndExit } = props
 
   const handleDownloadButtonClick = () => {
     const now = new Date()
     const report = {
-      comparisonsByStep,
-      instrumentsByMount,
-      calibrationStatus,
+      comparisonsByPipette,
+      instruments,
       savedAt: now.toISOString(),
     }
     const data = new Blob([JSON.stringify(report)], {
@@ -60,31 +31,25 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
   }
 
   const firstPipette = find(
-    instrumentsByMount,
-    (p: RobotCalibrationCheckInstrument) =>
+    instruments,
+    (p: CalibrationHealthCheckInstrument) =>
       p.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
   )
   const secondPipette = find(
-    instrumentsByMount,
-    (p: RobotCalibrationCheckInstrument) =>
+    instruments,
+    (p: CalibrationHealthCheckInstrument) =>
       p.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
   )
-  const [firstComparisonsByStep, secondComparisonsByStep] = partition(
-    Object.keys(comparisonsByStep),
-    compStep => Sessions.FIRST_PIPETTE_COMPARISON_STEPS.includes(compStep)
-  ).map(stepNames => pick(comparisonsByStep, stepNames))
+  const firstComparisonsByStep = firstPipette
+    ? comparisonsByPipette?.first
+    : null
+  const secondComparisonsByStep = secondPipette
+    ? comparisonsByPipette?.second
+    : null
 
-  const lastFailedComparison = [
-    ...Sessions.FIRST_PIPETTE_COMPARISON_STEPS,
-    ...Sessions.SECOND_PIPETTE_COMPARISON_STEPS,
-  ].reduce((acc, step): RobotCalibrationCheckComparison | null => {
-    const comparison = comparisonsByStep[step]
-    if (comparison && comparison.exceedsThreshold) {
-      return comparison
-    } else {
-      return acc
-    }
-  }, null)
+  // TODO (lc 10-20-2020): Rather than having the app decide
+  // what the last failed comparison was, the robot should
+  // just send a final report over to the app to decipher.
 
   return (
     <>
@@ -94,13 +59,15 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
 
       <div className={styles.summary_page_contents}>
         <div className={styles.summary_section}>
-          <PipetteComparisons
-            pipette={firstPipette}
-            comparisonsByStep={firstComparisonsByStep}
-            allSteps={Sessions.FIRST_PIPETTE_COMPARISON_STEPS}
-          />
+          {firstPipette && firstComparisonsByStep && (
+            <PipetteComparisons
+              pipette={firstPipette}
+              comparisonsByStep={firstComparisonsByStep}
+              allSteps={Sessions.FIRST_PIPETTE_COMPARISON_STEPS}
+            />
+          )}
         </div>
-        {secondPipette && (
+        {secondPipette && secondComparisonsByStep && (
           <div className={styles.summary_section}>
             <PipetteComparisons
               pipette={secondPipette}
@@ -116,36 +83,13 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
       >
         {DOWNLOAD_SUMMARY}
       </OutlineButton>
-      {lastFailedComparison && (
-        <TroubleshootingInstructions comparison={lastFailedComparison} />
-      )}
 
       <PrimaryButton
         className={styles.summary_exit_button}
-        onClick={deleteSession}
+        onClick={cleanUpAndExit}
       >
-        {DROP_TIP_AND_EXIT}
+        {HOME_AND_EXIT}
       </PrimaryButton>
     </>
-  )
-}
-
-type TroubleshootingInstructionsProps = {
-  comparison: RobotCalibrationCheckComparison,
-}
-function TroubleshootingInstructions(
-  props: TroubleshootingInstructionsProps
-): React.Node {
-  const { comparison } = props
-  return (
-    <div>
-      <p className={styles.summary_bad_outcome_header}>
-        {getBadOutcomeHeader(comparison.transformType)}
-      </p>
-      <p className={styles.summary_bad_outcome_body}>
-        <BadOutcomeBody transform={comparison.transformType} />
-      </p>
-      <p className={styles.summary_bad_outcome_body}>{STILL_HAVING_PROBLEMS}</p>
-    </div>
   )
 }

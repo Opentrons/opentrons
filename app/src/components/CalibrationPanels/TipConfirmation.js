@@ -37,6 +37,10 @@ const contentsBySessionType: {
     yesButtonText: YES_AND_MOVE_TO_MEASURE_TIP,
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
   },
+  [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
+    yesButtonText: YES_AND_MOVE_TO_DECK,
+    moveCommandString: Sessions.sharedCalCommands.MOVE_TO_DECK,
+  },
 }
 export function TipConfirmation(props: CalibrationPanelProps): React.Node {
   const { sendCommands, sessionType, shouldPerformTipLength } = props

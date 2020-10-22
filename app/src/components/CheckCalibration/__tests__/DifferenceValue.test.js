@@ -19,7 +19,7 @@ describe('DifferenceValue', () => {
 
   beforeEach(() => {
     render = ({
-      stepName = Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+      stepName = Sessions.CHECK_STEP_COMPARING_HEIGHT,
       differenceVector = goodZComparison.differenceVector,
     }: {
       stepName?: RobotCalibrationCheckStep,
@@ -72,7 +72,7 @@ describe('DifferenceValue', () => {
 
   it('renders good X/Y comparison', () => {
     const wrapper = render({
-      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+      stepName: Sessions.CHECK_STEP_COMPARING_POINT_ONE,
       differenceVector: goodXYComparison.differenceVector,
     })
 
@@ -104,7 +104,7 @@ describe('DifferenceValue', () => {
 
   it('renders bad X/Y comparison', () => {
     const wrapper = render({
-      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+      stepName: Sessions.CHECK_STEP_COMPARING_POINT_ONE,
       differenceVector: badXYComparison.differenceVector,
     })
 
@@ -136,7 +136,7 @@ describe('DifferenceValue', () => {
 
   it('renders no sign with zero value', () => {
     const wrapper = render({
-      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+      stepName: Sessions.CHECK_STEP_COMPARING_HEIGHT,
       differenceVector: [0, 0, 0],
     })
 
@@ -150,7 +150,7 @@ describe('DifferenceValue', () => {
 
   it('renders plus sign with positive value', () => {
     const wrapper = render({
-      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+      stepName: Sessions.CHECK_STEP_COMPARING_HEIGHT,
       differenceVector: [0, 0, 5.2],
     })
 
@@ -164,7 +164,7 @@ describe('DifferenceValue', () => {
 
   it('renders minus sign with negative value', () => {
     const wrapper = render({
-      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+      stepName: Sessions.CHECK_STEP_COMPARING_HEIGHT,
       differenceVector: [0, 0, -3.1],
     })
 

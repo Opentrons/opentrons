@@ -272,12 +272,7 @@ export function makeEvent(
     }
 
     case Sessions.DELETE_SESSION: {
-      const { robotName, sessionId } = action.payload
-      const analyticsProps = Sessions.getAnalyticsPropsForRobotSessionById(
-        state,
-        robotName,
-        sessionId
-      )
+      const analyticsProps = null
       if (analyticsProps) {
         return Promise.resolve({
           name: `${analyticsProps.sessionType}SessionExit`,

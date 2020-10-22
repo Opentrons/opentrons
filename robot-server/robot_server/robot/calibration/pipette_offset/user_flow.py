@@ -22,13 +22,14 @@ from robot_server.robot.calibration.constants import (
     POINT_ONE_ID,
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
-    CAL_BLOCK_SETUP_BY_MOUNT)
+    CAL_BLOCK_SETUP_BY_MOUNT,
+    JOG_TO_DECK_SLOT)
 from ..errors import CalibrationError
 from ..helper_classes import (RequiredLabware, AttachedPipette)
 from .constants import (
     PipetteOffsetCalibrationState as POCState,
     PipetteOffsetWithTipLengthCalibrationState as POWTState,
-    GenericState, TIP_RACK_SLOT, JOG_TO_DECK_SLOT)
+    GenericState, TIP_RACK_SLOT)
 from .state_machine import (
     PipetteOffsetCalibrationStateMachine,
     PipetteOffsetWithTipLengthStateMachine)

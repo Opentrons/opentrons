@@ -15,10 +15,10 @@ import { ThresholdValue } from './ThresholdValue'
 import styles from './styles.css'
 
 import type {
-  RobotCalibrationCheckInstrument,
+  CalibrationHealthCheckInstrument,
+  CalibrationHealthCheckComparisonsByStep,
+  CalibrationHealthCheckComparison,
   RobotCalibrationCheckStep,
-  RobotCalibrationCheckComparison,
-  RobotCalibrationCheckComparisonsByStep,
 } from '../../sessions/types'
 
 const PASS = 'pass'
@@ -40,17 +40,15 @@ const POINT_TWO_CHECK_DISPLAY_NAME = 'Slot 3 X/Y-axis'
 const POINT_THREE_CHECK_DISPLAY_NAME = 'Slot 7 X/Y-axis'
 
 const stepDisplayNameMap: { [RobotCalibrationCheckStep]: string, ... } = {
-  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT]: HEIGHT_CHECK_DISPLAY_NAME,
-  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: POINT_ONE_CHECK_DISPLAY_NAME,
-  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: POINT_TWO_CHECK_DISPLAY_NAME,
-  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: POINT_THREE_CHECK_DISPLAY_NAME,
-  [Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT]: HEIGHT_CHECK_DISPLAY_NAME,
-  [Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: POINT_ONE_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_HEIGHT]: HEIGHT_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: POINT_ONE_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: POINT_TWO_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: POINT_THREE_CHECK_DISPLAY_NAME,
 }
 
 type PipetteComparisonsProps = {|
-  pipette: RobotCalibrationCheckInstrument,
-  comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
+  pipette: CalibrationHealthCheckInstrument,
+  comparisonsByStep: CalibrationHealthCheckComparisonsByStep,
   allSteps: Array<RobotCalibrationCheckStep>,
 |}
 
@@ -119,7 +117,7 @@ export function PipetteComparisons(props: PipetteComparisonsProps): React.Node {
 }
 
 type StepStatusProps = {|
-  comparison: RobotCalibrationCheckComparison | null,
+  comparison: CalibrationHealthCheckComparison | null,
 |}
 
 const StepStatus = (props: StepStatusProps): React.Node => {

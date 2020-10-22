@@ -80,7 +80,6 @@ async def delete_session_handler(
     session_obj = get_session(manager=session_manager,
                               session_id=sessionId,
                               api_router=router)
-
     await session_manager.remove(session_obj.meta.identifier)
 
     return SessionResponse(
@@ -156,7 +155,6 @@ async def session_command_execute_handler(
                              command_request.data.attributes.data)
     command_result = await session_obj.command_executor.execute(command)
 
-    log.info(f"Command completed: {command}")
     log.debug(f"Command result: {command_result}")
 
     return CommandResponse(

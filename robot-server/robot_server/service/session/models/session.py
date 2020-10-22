@@ -5,12 +5,11 @@ import typing
 
 from pydantic import BaseModel, Field, validator
 
-from robot_server.robot.calibration.check.models import \
-    CalibrationSessionStatus
+from robot_server.robot.calibration.check.models import\
+    CalibrationCheckSessionStatus
 from robot_server.robot.calibration.deck.models import \
     DeckCalibrationSessionStatus
-from robot_server.robot.calibration.models import \
-    SessionCreateParams as TipLengthPipetteOffsetSessionCreateParams
+from robot_server.robot.calibration.models import SessionCreateParams
 from robot_server.robot.calibration.pipette_offset.models import\
     PipetteOffsetCalibrationSessionStatus
 from robot_server.robot.calibration.tip_length.models import\
@@ -41,13 +40,11 @@ class SessionType(str, Enum):
     default = 'default'
     calibration_check = 'calibrationCheck'
     tip_length_calibration = (
-        'tipLengthCalibration',
-        TipLengthPipetteOffsetSessionCreateParams
-    )
+        'tipLengthCalibration', SessionCreateParams)
     deck_calibration = 'deckCalibration'
     pipette_offset_calibration = (
         'pipetteOffsetCalibration',
-        TipLengthPipetteOffsetSessionCreateParams
+        SessionCreateParams
     )
     protocol = ('protocol', ProtocolCreateParams)
     live_protocol = 'liveProtocol'
@@ -69,7 +66,7 @@ When we move to Python 3.8 we can use Literal type as described here
 https://pydantic-docs.helpmanual.io/usage/types/#literal-type
 """
 SessionCreateParamType = typing.Union[
-    TipLengthPipetteOffsetSessionCreateParams,
+    SessionCreateParams,
     ProtocolCreateParams,
     None,
     EmptyModel
@@ -81,7 +78,7 @@ IMPORTANT: See note for SessionCreateParamType
 Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
 """
 SessionDetails = typing.Union[
-    CalibrationSessionStatus,
+    CalibrationCheckSessionStatus,
     PipetteOffsetCalibrationSessionStatus,
     TipCalibrationSessionStatus,
     DeckCalibrationSessionStatus,

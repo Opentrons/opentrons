@@ -53,7 +53,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
         recalibrate_tip_length\
             = instance_meta.create_params.shouldRecalibrateTipLength
         has_cal_block = instance_meta.create_params.hasCalibrationBlock
-        tiprack = instance_meta.create_params.tipRackDefinition
+        tip_rack_def = instance_meta.create_params.tipRackDefinition
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
@@ -66,7 +66,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
                     mount=Mount[mount.upper()],
                     recalibrate_tip_length=recalibrate_tip_length,
                     has_calibration_block=has_cal_block,
-                    tip_rack_def=cast('LabwareDefinition', tiprack))
+                    tip_rack_def=cast('LabwareDefinition', tip_rack_def))
         except AssertionError as e:
             raise SessionCreationException(str(e))
 

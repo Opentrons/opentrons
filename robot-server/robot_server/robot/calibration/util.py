@@ -1,3 +1,4 @@
+import logging
 import contextlib
 from typing import Set, Dict, Any, Union, TYPE_CHECKING
 
@@ -20,14 +21,16 @@ from .tip_length.constants import TipCalibrationState
 from .pipette_offset.constants import (
     PipetteOffsetCalibrationState, PipetteOffsetWithTipLengthCalibrationState)
 from .deck.constants import DeckCalibrationState
+from .check.constants import CalibrationCheckState
 
 if TYPE_CHECKING:
     from .deck.user_flow import DeckCalibrationUserFlow
     from .tip_length.user_flow import TipCalibrationUserFlow
     from .pipette_offset.user_flow import PipetteOffsetCalibrationUserFlow
+    from .check.user_flow import CheckCalibrationUserFlow
 
 ValidState = Union[TipCalibrationState, DeckCalibrationState,
-                   PipetteOffsetCalibrationState,
+                   PipetteOffsetCalibrationState, CalibrationCheckState,
                    PipetteOffsetWithTipLengthCalibrationState]
 
 
@@ -41,6 +44,7 @@ class StateTransitionError(RobotServerError):
 
 
 TransitionMap = Dict[Any, Dict[Any, Any]]
+MODULE_LOG = logging.getLogger(__name__)
 
 
 class SimpleStateMachine:
@@ -84,7 +88,8 @@ class SimpleStateMachine:
 CalibrationUserFlow = Union[
     'DeckCalibrationUserFlow',
     'TipCalibrationUserFlow',
-    'PipetteOffsetCalibrationUserFlow']
+    'PipetteOffsetCalibrationUserFlow',
+    'CheckCalibrationUserFlow']
 
 
 async def invalidate_tip(user_flow: CalibrationUserFlow):

@@ -10,7 +10,7 @@ import type { Epic, State } from '../../../types'
 import type { SessionType } from '../../../sessions/types'
 import {
   DELETE_SESSION,
-  SESSION_TYPE_CALIBRATION_CHECK,
+  SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   SESSION_TYPE_TIP_LENGTH_CALIBRATION,
   SESSION_TYPE_DECK_CALIBRATION,
   SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
@@ -19,7 +19,7 @@ import { getRobotSessionById } from '../../../sessions/selectors'
 
 const isTargetSessionType: SessionType => boolean = sessionType =>
   [
-    SESSION_TYPE_CALIBRATION_CHECK,
+    SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
     SESSION_TYPE_TIP_LENGTH_CALIBRATION,
     SESSION_TYPE_DECK_CALIBRATION,
     SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,

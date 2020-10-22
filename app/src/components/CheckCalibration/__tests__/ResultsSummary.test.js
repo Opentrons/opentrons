@@ -3,7 +3,6 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import omit from 'lodash/omit'
 import * as Calibration from '../../../calibration'
 import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
 import * as Fixtures from '../../../sessions/__fixtures__'
@@ -11,11 +10,6 @@ import * as Sessions from '../../../sessions'
 import type { State } from '../../../types'
 import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
-
-import type {
-  RobotCalibrationCheckInstrumentsByMount,
-  RobotCalibrationCheckComparisonsByStep,
-} from '../../../sessions/types'
 
 jest.mock('file-saver')
 jest.mock('../../../calibration/selectors')
@@ -36,13 +30,10 @@ describe('ResultsSummary', () => {
   let render
   let mockStore
   let dispatch
-
-  const mockDeleteSession = jest.fn()
+  let mockDeleteSession
 
   const getExitButton = wrapper =>
-    wrapper
-      .find('PrimaryButton[children="Drop tip in trash and exit"]')
-      .find('button')
+    wrapper.find('PrimaryButton[children="Home robot and exit"]').find('button')
 
   const getSaveButton = wrapper =>
     wrapper
@@ -50,6 +41,9 @@ describe('ResultsSummary', () => {
       .find('button')
 
   beforeEach(() => {
+    mockDeleteSession = jest.fn()
+    const mockSendCommands = jest.fn()
+    mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
     dispatch = jest.fn()
     mockStore = {
       subscribe: () => {},
@@ -58,20 +52,33 @@ describe('ResultsSummary', () => {
       }),
       dispatch,
     }
-    mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
-    render = ({
-      instrumentsByMount = mockSessionDetails.instruments,
-      comparisonsByStep = mockSessionDetails.comparisonsByStep,
-    }: {
-      instrumentsByMount?: RobotCalibrationCheckInstrumentsByMount,
-      comparisonsByStep?: RobotCalibrationCheckComparisonsByStep,
-    } = {}) => {
+    render = (
+      props: $Shape<React.ElementProps<typeof ResultsSummary>> = {}
+    ) => {
+      const {
+        pipMount = 'left',
+        isMulti = false,
+        tipRack = Fixtures.mockDeckCalTipRack,
+        calBlock = null,
+        sendCommands = mockSendCommands,
+        cleanUpAndExit = mockDeleteSession,
+        currentStep = Sessions.CHECK_STEP_RESULTS_SUMMARY,
+        sessionType = Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+        comparisonsByPipette = mockSessionDetails.comparisonsByPipette,
+        instruments = mockSessionDetails.instruments,
+      } = props
       return mount(
         <ResultsSummary
-          robotName="robot-name"
-          instrumentsByMount={instrumentsByMount}
-          comparisonsByStep={comparisonsByStep}
-          deleteSession={mockDeleteSession}
+          isMulti={isMulti}
+          mount={pipMount}
+          tipRack={tipRack}
+          calBlock={calBlock}
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          currentStep={currentStep}
+          sessionType={sessionType}
+          comparisonsByPipette={comparisonsByPipette}
+          instruments={instruments}
         />,
         {
           wrappingComponent: Provider,
@@ -94,22 +101,23 @@ describe('ResultsSummary', () => {
         .at(0)
         .find('h5')
         .text()
-    ).toEqual(expect.stringContaining('right'))
+    ).toEqual(expect.stringContaining('left'))
     expect(
       wrapper
         .find('PipetteComparisons')
         .at(1)
         .find('h5')
         .text()
-    ).toEqual(expect.stringContaining('left'))
+    ).toEqual(expect.stringContaining('right'))
   })
 
   it('summarizes both pipettes if no comparisons have been made', () => {
+    const emptyComparison = {
+      first: {},
+      second: {},
+    }
     const wrapper = render({
-      comparisonsByStep: omit(
-        mockSessionDetails.comparisonsByStep,
-        Sessions.SECOND_PIPETTE_COMPARISON_STEPS
-      ),
+      comparisonsByPipette: emptyComparison,
     })
 
     expect(
@@ -118,28 +126,27 @@ describe('ResultsSummary', () => {
         .at(0)
         .find('h5')
         .text()
-    ).toEqual(expect.stringContaining('right'))
+    ).toEqual(expect.stringContaining('left'))
     expect(
       wrapper
         .find('PipetteComparisons')
         .at(1)
         .find('h5')
         .text()
-    ).toEqual(expect.stringContaining('left'))
+    ).toEqual(expect.stringContaining('right'))
   })
 
   it('does not summarize second pipette if none present', () => {
     const wrapper = render({
-      instrumentsByMount: omit(mockSessionDetails.instruments, 'left'),
+      instruments: [mockSessionDetails.instruments[0]],
     })
-
     expect(
       wrapper
         .find('PipetteComparisons')
         .at(0)
         .find('h5')
         .text()
-    ).toEqual(expect.stringContaining('right'))
+    ).toEqual(expect.stringContaining('left'))
     expect(
       wrapper
         .find('PipetteComparisons')
@@ -148,27 +155,8 @@ describe('ResultsSummary', () => {
     ).toBe(false)
   })
 
-  it('does not show troubleshooting intstructions if no failures', () => {
-    const wrapper = render()
-
-    expect(wrapper.find('TroubleshootingInstructions').exists()).toBe(false)
-  })
-
-  it('does show troubleshooting intstructions at least one failed check', () => {
-    const wrapper = render({
-      comparisonsByStep: {
-        ...mockSessionDetails.comparisonsByStep,
-        [Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]:
-          Fixtures.badXYComparison,
-      },
-    })
-
-    expect(wrapper.find('TroubleshootingInstructions').exists()).toBe(true)
-  })
-
   it('exits when button is clicked', () => {
     const wrapper = render()
-
     act(() => getExitButton(wrapper).invoke('onClick')())
     wrapper.update()
 
