@@ -28,6 +28,7 @@ import {
   SaveXYPoint,
   CompleteConfirmation,
   ConfirmExitModal,
+  NeedHelpLink,
 } from '../CalibrationPanels'
 
 import type { StyleProps } from '@opentrons/components'
@@ -163,6 +164,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
         titleBar={titleBarProps}
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
+        <NeedHelpLink currentStep={currentStep} />
         <Panel
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
