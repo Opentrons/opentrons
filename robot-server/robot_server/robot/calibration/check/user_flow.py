@@ -462,6 +462,8 @@ class CheckCalibrationUserFlow:
         ref_pt, jogged_pt = self._get_reference_points_by_state()
         rank = self.active_pipette.rank
         threshold_vector = self._determine_threshold()
+        MODULE_LOG.info(f"State {self.current_state}")
+        MODULE_LOG.info(f"Reference pts {ref_pt} {jogged_pt}")
         if (ref_pt is not None and jogged_pt is not None):
             diff_magnitude = None
             if threshold_vector.z == 0.0:
@@ -519,56 +521,52 @@ class CheckCalibrationUserFlow:
         critical_point = self.critical_point_override
         current_point = \
             await self.get_current_point(critical_point)
-        buffer = Point(0, 0, 0)
         if self.current_state == State.labwareLoaded:
             self._reference_points.tip.initial_point = \
-                current_point + buffer
+                current_point
             self._reference_points.tip.final_point = \
-                current_point + buffer
+                current_point
         elif self.current_state == State.inspectingTip:
-            buffer = MOVE_TO_DECK_SAFETY_BUFFER
             self._reference_points.height.initial_point = \
-                current_point + buffer
+                current_point
             self._reference_points.height.final_point = \
-                current_point + buffer
+                current_point
         elif self.current_state == State.comparingHeight:
             self._reference_points.one.initial_point = \
-                current_point + buffer
+                current_point
             self._reference_points.one.final_point = \
-                current_point + buffer
+                current_point
         elif self.current_state == State.comparingPointOne:
             self._reference_points.two.initial_point = \
-                current_point + buffer
+                current_point
             self._reference_points.two.final_point = \
-                current_point + buffer
+                current_point
         elif self.current_state == State.comparingPointTwo:
             self._reference_points.three.initial_point = \
-                current_point + buffer
+                current_point
             self._reference_points.three.final_point = \
-                current_point + buffer
+                current_point
 
     async def register_final_point(self):
         critical_point = self.critical_point_override
         current_point = \
             await self.get_current_point(critical_point)
-        buffer = Point(0, 0, 0)
         if self.current_state == State.preparingPipette:
             self._reference_points.tip.final_point = \
-                current_point + buffer
+                current_point
         elif self.current_state == State.comparingHeight:
-            buffer = MOVE_TO_DECK_SAFETY_BUFFER
             self._reference_points.height.final_point = \
-                current_point + buffer
+                current_point + MOVE_TO_DECK_SAFETY_BUFFER
             self._z_height_reference = current_point.z
         elif self.current_state == State.comparingPointOne:
             self._reference_points.one.final_point = \
-                current_point + buffer
+                current_point
         elif self.current_state == State.comparingPointTwo:
             self._reference_points.two.final_point = \
-                current_point + buffer
+                current_point
         elif self.current_state == State.comparingPointThree:
             self._reference_points.three.final_point = \
-                current_point + buffer
+                current_point
 
     def _get_tip_length(self) -> float:
         pip_id = self.hw_pipette.pipette_id
