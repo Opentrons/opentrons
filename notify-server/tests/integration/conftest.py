@@ -7,6 +7,8 @@ from typing import AsyncGenerator
 
 import pytest
 
+from notify_server.settings import Settings
+
 
 @pytest.fixture(scope="session")
 def integration_environment() -> None:
@@ -18,6 +20,12 @@ def integration_environment() -> None:
         json.dumps({"scheme": "tcp", "host": "127.0.0.1", "port": 5556})
     # Set production to false
     environ['OT_NOTIFY_SERVER_production'] = "false"
+
+
+@pytest.fixture(scope="session")
+def settings(integration_environment: None) -> Settings:
+    """Create Settings."""
+    return Settings()
 
 
 @pytest.fixture
