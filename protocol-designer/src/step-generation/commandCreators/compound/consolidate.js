@@ -282,7 +282,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             ]
           : []
 
-      const willReuseTip = false // TODO IMMEDIATELY
+      const willReuseTip = args.changeTip !== 'always' && !isLastChunk
+
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume && !willReuseTip
           ? [

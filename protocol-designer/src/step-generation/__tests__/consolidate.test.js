@@ -1307,7 +1307,8 @@ describe('consolidate single-channel', () => {
             pipette: 'p300SingleId',
             labware: 'destPlateId',
             well: 'B1',
-            offsetFromBottomMm: 3.2,
+            flowRate: 2.1,
+            offsetFromBottomMm: 11.54,
             volume: 35,
           },
         },
@@ -1782,23 +1783,6 @@ describe('consolidate single-channel', () => {
             offsetFromBottomMm: 3.4,
           },
         },
-        // Dispense > air gap in dest well
-        {
-          command: 'airGap',
-          params: {
-            pipette: 'p300SingleId',
-            labware: 'destPlateId',
-            well: 'B1',
-            offsetFromBottomMm: 3.2,
-            volume: 35,
-          },
-        },
-        {
-          command: 'delay',
-          params: {
-            wait: 11,
-          },
-        },
         // Blowout to dest
         {
           command: 'blowout',
@@ -1808,6 +1792,24 @@ describe('consolidate single-channel', () => {
             well: 'B1',
             flowRate: 2.3,
             offsetFromBottomMm: 13.84,
+          },
+        },
+        // Dispense > air gap in dest well
+        {
+          command: 'airGap',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            flowRate: 2.1,
+            offsetFromBottomMm: 11.54,
+            volume: 35,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
           },
         },
 
@@ -2108,8 +2110,9 @@ describe('consolidate single-channel', () => {
             pipette: 'p300SingleId',
             labware: 'destPlateId',
             well: 'B1',
-            offsetFromBottomMm: 3.2,
+            offsetFromBottomMm: 11.54,
             volume: 35,
+            flowRate: 2.1,
           },
         },
         {
@@ -2306,23 +2309,6 @@ describe('consolidate single-channel', () => {
             offsetFromBottomMm: 3.4,
           },
         },
-        // Dispense > air gap in dest well
-        {
-          command: 'airGap',
-          params: {
-            pipette: 'p300SingleId',
-            labware: 'destPlateId',
-            well: 'B1',
-            offsetFromBottomMm: 3.2,
-            volume: 35,
-          },
-        },
-        {
-          command: 'delay',
-          params: {
-            wait: 11,
-          },
-        },
         // Blowout to dest
         {
           command: 'blowout',
@@ -2332,6 +2318,24 @@ describe('consolidate single-channel', () => {
             well: 'B1',
             flowRate: 2.3,
             offsetFromBottomMm: 13.84,
+          },
+        },
+        // Dispense > air gap in dest well
+        {
+          command: 'airGap',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'destPlateId',
+            well: 'B1',
+            offsetFromBottomMm: 11.54,
+            volume: 35,
+            flowRate: 2.1,
+          },
+        },
+        {
+          command: 'delay',
+          params: {
+            wait: 11,
           },
         },
 
