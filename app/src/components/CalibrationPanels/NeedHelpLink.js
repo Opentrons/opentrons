@@ -21,6 +21,7 @@ const isTargetStep: CalibrationSessionStep => boolean = currentStep =>
     Sessions.TIP_LENGTH_STEP_LABWARE_LOADED,
     Sessions.PIP_OFFSET_STEP_LABWARE_LOADED,
     Sessions.DECK_STEP_LABWARE_LOADED,
+    Sessions.CHECK_STEP_LABWARE_LOADED,
   ].includes(currentStep)
 
 export type NeedHelpLinkProps = {|

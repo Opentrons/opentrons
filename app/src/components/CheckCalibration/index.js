@@ -25,6 +25,7 @@ import {
   SaveZPoint,
   SaveXYPoint,
   ConfirmExitModal,
+  NeedHelpLink,
 } from '../CalibrationPanels'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
@@ -162,6 +163,7 @@ export function CheckHealthCalibration(
         titleBar={titleBarProps}
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
+        <NeedHelpLink currentStep={currentStep} top={true} />
         <Panel
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}

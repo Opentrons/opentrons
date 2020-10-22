@@ -169,7 +169,7 @@ export function CalibrateTipLength(
         titleBar={titleBarProps}
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
-        <NeedHelpLink currentStep={currentStep} />
+        <NeedHelpLink currentStep={currentStep} top={true} />
         <Panel
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
