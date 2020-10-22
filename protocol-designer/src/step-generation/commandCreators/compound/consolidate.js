@@ -2,7 +2,7 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import { getWellDepth } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../../constants'
+import { AIR_GAP_OFFSET_FROM_TOP, FIXED_TRASH_ID } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
@@ -20,6 +20,7 @@ import {
   aspirate,
   delay,
   dispense,
+  dropTip,
   moveToWell,
   replaceTip,
   touchTip,
@@ -73,6 +74,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     aspirateOffsetFromBottomMm,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
+    dispenseAirGapVolume,
     dispenseDelay,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
@@ -87,12 +89,20 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       (args.volume + aspirateAirGapVolume)
   )
 
+  const sourceLabwareDef =
+    invariantContext.labwareEntities[args.sourceLabware].def
+  const destLabwareDef = invariantContext.labwareEntities[args.destLabware].def
+  const airGapOffsetDestWell =
+    getWellDepth(destLabwareDef, args.destWell) + AIR_GAP_OFFSET_FROM_TOP
+
+  const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
   const commandCreators = flatMap(
-    chunk(args.sourceWells, maxWellsPerChunk),
+    sourceWellChunks,
     (
       sourceWellChunk: Array<string>,
       chunkIndex: number
     ): Array<CurriedCommandCreator> => {
+      const isLastChunk = chunkIndex + 1 === sourceWellChunks.length
       // Aspirate commands for all source wells in the chunk
       const aspirateCommands = flatMap(
         sourceWellChunk,
@@ -100,9 +110,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           sourceWell: string,
           wellIndex: number
         ): Array<CurriedCommandCreator> => {
-          const sourceLabwareDef =
-            invariantContext.labwareEntities[args.sourceLabware].def
-
           const airGapOffsetSourceWell =
             getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
 
@@ -275,17 +282,53 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             ]
           : []
 
-      const blowoutCommand = blowoutUtil({
-        pipette: args.pipette,
-        sourceLabwareId: args.sourceLabware,
-        sourceWell: sourceWellChunk[0],
-        destLabwareId: args.destLabware,
-        destWell: args.destWell,
-        blowoutLocation: args.blowoutLocation,
-        flowRate: blowoutFlowRateUlSec,
-        offsetFromTopMm: blowoutOffsetFromTopMm,
-        invariantContext,
-      })
+      const willReuseTip = false // TODO IMMEDIATELY
+      const airGapAfterDispenseCommands =
+        dispenseAirGapVolume && !willReuseTip
+          ? [
+              curryCommandCreator(airGap, {
+                pipette: args.pipette,
+                volume: dispenseAirGapVolume,
+                labware: args.destLabware,
+                well: args.destWell,
+                flowRate: aspirateFlowRateUlSec,
+                offsetFromBottomMm: airGapOffsetDestWell,
+              }),
+              ...(aspirateDelay
+                ? [
+                    curryCommandCreator(delay, {
+                      commandCreatorFnName: 'delay',
+                      description: null,
+                      name: null,
+                      meta: null,
+                      wait: aspirateDelay.seconds,
+                    }),
+                  ]
+                : []),
+            ]
+          : []
+
+      // if using dispense > air gap, drop or change the tip at the end
+      const dropTipAfterDispenseAirGap =
+        airGapAfterDispenseCommands.length > 0 && isLastChunk
+          ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
+          : []
+
+      const blowoutCommand =
+        dropTipAfterDispenseAirGap.length > 0 &&
+        args.blowoutLocation === FIXED_TRASH_ID
+          ? [] // skip blowout it's in the trash we're replacing the tip due to dispense > air gap
+          : blowoutUtil({
+              pipette: args.pipette,
+              sourceLabwareId: args.sourceLabware,
+              sourceWell: sourceWellChunk[0],
+              destLabwareId: args.destLabware,
+              destWell: args.destWell,
+              blowoutLocation: args.blowoutLocation,
+              flowRate: blowoutFlowRateUlSec,
+              offsetFromTopMm: blowoutOffsetFromTopMm,
+              invariantContext,
+            })
 
       return [
         ...tipCommands,
@@ -306,6 +349,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ...mixAfterCommands,
         ...touchTipAfterDispenseCommands,
         ...blowoutCommand,
+        ...airGapAfterDispenseCommands,
+        ...dropTipAfterDispenseAirGap,
       ]
     }
   )
