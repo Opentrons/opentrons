@@ -14,11 +14,10 @@ class UnexpectedProtocolError(ProtocolEngineError):
     exception was raised somewhere in the stack and it was not properly caught
     and wrapped.
     """
-    original_error: Exception
 
     def __init__(self, original_error: Exception):
         super().__init__(str(original_error))
-        self.original_error = original_error
+        self.original_error: Exception = original_error
 
 
 class FailedToLoadPipetteError(ProtocolEngineError):

@@ -67,7 +67,7 @@ class RunningCommand(Generic[ReqT, ResT]):
 
 @dataclass(frozen=True)
 class PendingCommand(Generic[ReqT, ResT]):
-    """A command that is has not yet been started."""
+    """A command that has not yet been started."""
     created_at: datetime
     request: ReqT
 

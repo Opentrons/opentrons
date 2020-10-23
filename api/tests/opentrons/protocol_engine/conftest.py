@@ -1,7 +1,7 @@
 import pytest
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 
-from opentrons.types import Mount
+from opentrons.types import MountType
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control.api import API as HardwareController
 
@@ -114,7 +114,7 @@ def completed_load_labware_command(
 def load_pipette_request():
     return command_models.LoadPipetteRequest(
         pipetteName="p300_single",
-        mount=Mount.LEFT,
+        mount=MountType.LEFT,
     )
 
 

@@ -1,7 +1,7 @@
 """Test equipment command execution side effects."""
 import pytest
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
-from opentrons.types import Mount
+from opentrons.types import Mount as HwMount, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.state import PipetteData
@@ -103,7 +103,7 @@ async def test_load_pipette_assigns_id(
     mock_id_generator,
     handler
 ):
-    req = LoadPipetteRequest(pipetteName="p300_single", mount=Mount.LEFT)
+    req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
     res = await handler.handle_load_pipette(req, state=mock_state_store.state)
 
     assert type(res) == LoadPipetteResult
@@ -115,11 +115,11 @@ async def test_load_pipette_checks_checks_existence(
     mock_hardware,
     handler
 ):
-    req = LoadPipetteRequest(pipetteName="p300_single", mount=Mount.LEFT)
+    req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
     await handler.handle_load_pipette(req, state=mock_state_store.state)
 
     mock_hardware.cache_instruments.assert_called_with({
-        Mount.LEFT: "p300_single",
+        HwMount.LEFT: "p300_single",
     })
 
 
@@ -129,17 +129,17 @@ async def test_load_pipette_checks_checks_existence_with_already_loaded(
     handler
 ):
     mock_state_store.state.get_pipette_data_by_mount.return_value = \
-        PipetteData(mount=Mount.LEFT, pipette_name="p300_multi")
-    req = LoadPipetteRequest(pipetteName="p300_single", mount=Mount.RIGHT)
+        PipetteData(mount=MountType.LEFT, pipette_name="p300_multi")
+    req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.RIGHT)
 
     await handler.handle_load_pipette(req, state=mock_state_store.state)
 
     mock_state_store.state.get_pipette_data_by_mount.assert_called_with(
-        Mount.LEFT
+        MountType.LEFT
     )
     mock_hardware.cache_instruments.assert_called_with({
-        Mount.LEFT: "p300_multi",
-        Mount.RIGHT: "p300_single",
+        HwMount.LEFT: "p300_multi",
+        HwMount.RIGHT: "p300_single",
     })
 
 
@@ -153,7 +153,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
         'but no instrument is present'
     )
 
-    req = LoadPipetteRequest(pipetteName="p300_single", mount=Mount.LEFT)
+    req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
 
     with pytest.raises(
         errors.FailedToLoadPipetteError,

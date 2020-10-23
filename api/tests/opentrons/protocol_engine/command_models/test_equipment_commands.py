@@ -1,6 +1,6 @@
 """Text creating equipment commands."""
 from opentrons.protocol_engine import command_models as commands
-from opentrons.types import Mount
+from opentrons.types import MountType
 
 
 def test_load_labware_request():
@@ -22,8 +22,8 @@ def test_load_pipette_command():
     """It should have a LoadPipetteRequest model."""
     payload = commands.LoadPipetteRequest(
         pipetteName="p300_single",
-        mount=Mount.LEFT
+        mount=MountType.LEFT
     )
 
     assert payload.pipetteName == "p300_single"
-    assert payload.mount == Mount.LEFT
+    assert payload.mount == MountType.LEFT

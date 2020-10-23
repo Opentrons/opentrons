@@ -1,5 +1,4 @@
 """Equipment command side-effect logic."""
-from opentrons.types import Mount
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..errors import FailedToLoadPipetteError
@@ -57,11 +56,13 @@ class EquipmentHandler():
     ) -> LoadPipetteResult:
         """Ensure the requested pipette is attached."""
         mount = request.mount
-        other_mount = Mount.LEFT if mount == Mount.RIGHT else Mount.RIGHT
+        other_mount = request.mount.other_mount()
         other_pipette = state.get_pipette_data_by_mount(other_mount)
-        cache_request = {mount: request.pipetteName}
+        cache_request = {mount.to_hw_mount(): request.pipetteName}
         if other_pipette is not None:
-            cache_request[other_mount] = other_pipette.pipette_name
+            cache_request[
+                other_mount.to_hw_mount()
+            ] = other_pipette.pipette_name
 
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
         # behavior of protocol_context.load_instrument, and is used here as a

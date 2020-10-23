@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons.types import Mount
+from opentrons.types import MountType
 from .. import command_models as cmd
 
 
@@ -18,7 +18,7 @@ class LabwareData():
 @dataclass
 class PipetteData():
     """Pipette state data."""
-    mount: Mount
+    mount: MountType
     pipette_name: PipetteName
 
 
@@ -61,7 +61,7 @@ class State():
 
     def get_pipette_data_by_mount(
         self,
-        mount: Mount
+        mount: MountType
     ) -> Optional[PipetteData]:
         """Get pipette data by the pipette's mount."""
         for pipette in self._pipettes_by_id.values():

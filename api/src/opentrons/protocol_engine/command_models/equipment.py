@@ -6,7 +6,7 @@ input / output of the engine, and need validation and/or scheme generation.
 """
 from pydantic import BaseModel, Field
 from typing import Any, Tuple
-from opentrons.types import Mount
+from opentrons.types import MountType
 from opentrons_shared_data.pipette.dev_types import PipetteName
 
 
@@ -58,7 +58,7 @@ class LoadPipetteRequest(BaseModel):
         ...,
         description="The name of the pipette to be required."
     )
-    mount: Mount = Field(
+    mount: MountType = Field(
         ...,
         description="The mount the pipette should be present on."
     )

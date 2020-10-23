@@ -38,6 +38,11 @@ from .pipetting import (
     AspirateResult,
     DispenseRequest,
     DispenseResult,
+
+    # TODO(mc, 2020-10-22): remove these exports when robot-server no longer
+    # needs them and can disambiguate the specific request types directly
+    BasePipettingRequest,
+    BaseLiquidHandlingRequest,
 )
 
 CommandRequestType = Union[
@@ -139,4 +144,6 @@ __all__ = [
     "AspirateResult",
     "DispenseRequest",
     "DispenseResult",
+    "BasePipettingRequest",
+    "BaseLiquidHandlingRequest"
 ]
