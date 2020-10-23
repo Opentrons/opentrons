@@ -18,7 +18,7 @@ from opentrons import protocol_api, __version__
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import (MAX_SUPPORTED_VERSION)
 from opentrons.protocols.execution import execute as execute_apiv2
-from opentrons import commands
+from opentrons.commands import types as command_types
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import APIVersion, PythonProtocol
 from opentrons.hardware_control import API, ThreadManager
@@ -274,7 +274,7 @@ def execute(protocol_file: TextIO,
         opentrons.robot.home()
         if emit_runlog:
             opentrons.robot.broker.subscribe(
-                commands.command_types.COMMAND, emit_runlog)
+                command_types.COMMAND, emit_runlog)
         assert isinstance(protocol, PythonProtocol),\
             'Internal error: Only Python protocols may be executed in v1'
         exec(protocol.contents, {})
@@ -289,7 +289,7 @@ def execute(protocol_file: TextIO,
             extra_labware=gpa_extras)
         if emit_runlog:
             context.broker.subscribe(
-                commands.command_types.COMMAND, emit_runlog)
+                command_types.COMMAND, emit_runlog)
         context.home()
         try:
             execute_apiv2.run_protocol(protocol, context)

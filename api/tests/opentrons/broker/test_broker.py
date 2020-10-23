@@ -1,5 +1,4 @@
-from opentrons import commands
-from opentrons.commands import CommandPublisher
+from opentrons.commands.publisher import CommandPublisher, publish
 
 
 def my_command(arg1, meta=None, arg2='', arg3=''):
@@ -16,17 +15,17 @@ class FakeClass(CommandPublisher):
     def __init__(self):
         super().__init__(None)
 
-    @commands.publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
+    @publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
     def A(self, arg1, arg2, arg3='foo'):
         self.B(0)
         return 100
 
-    @commands.publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
+    @publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
     def C(self, arg1, arg2, arg3='bar'):
         self.B(0)
         return 100
 
-    @commands.publish.both(command=my_command, meta='{arg1}')
+    @publish.both(command=my_command, meta='{arg1}')
     def B(self, arg1):
         return None
 

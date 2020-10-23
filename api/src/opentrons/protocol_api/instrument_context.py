@@ -4,8 +4,9 @@ from functools import lru_cache
 import logging
 from typing import (
     Any, Dict, List, Optional, Tuple, Sequence, TYPE_CHECKING, Union)
-from opentrons import types, commands as cmds, hardware_control as hc
-from opentrons.commands import CommandPublisher
+from opentrons import types, hardware_control as hc
+from opentrons.commands import commands as cmds
+from opentrons.commands.publisher import CommandPublisher, do_publish, publish
 from opentrons.hardware_control.types import CriticalPoint, PipettePair
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
@@ -272,11 +273,11 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self.hw_pipette['available_volume'] if not volume else volume
 
-        cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
-                        'before', None, None, self, c_vol, dest, rate)
+        do_publish(self.broker, cmds.aspirate, self.aspirate,
+                   'before', None, None, self, c_vol, dest, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
-        cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
-                        'after', self, None, self, c_vol, dest, rate)
+        do_publish(self.broker, cmds.aspirate, self.aspirate,
+                   'after', self, None, self, c_vol, dest, rate)
         return self
 
     @requires_version(2, 0)
@@ -356,11 +357,11 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self.current_volume if not volume else volume
 
-        cmds.do_publish(self.broker, cmds.dispense, self.dispense,
-                        'before', None, None, self, c_vol, loc, rate)
+        do_publish(self.broker, cmds.dispense, self.dispense,
+                   'before', None, None, self, c_vol, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
-        cmds.do_publish(self.broker, cmds.dispense, self.dispense,
-                        'after', self, None, self, c_vol, loc, rate)
+        do_publish(self.broker, cmds.dispense, self.dispense,
+                   'after', self, None, self, c_vol, loc, rate)
         return self
 
     @requires_version(2, 0)
@@ -410,21 +411,21 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self.hw_pipette['available_volume'] if not volume else volume
 
-        cmds.do_publish(self.broker, cmds.mix, self.mix,
-                        'before', None, None,
-                        self, repetitions, c_vol, location)
+        do_publish(self.broker, cmds.mix, self.mix,
+                   'before', None, None,
+                   self, repetitions, c_vol, location)
         self.aspirate(volume, location, rate)
         while repetitions - 1 > 0:
             self.dispense(volume, rate=rate)
             self.aspirate(volume, rate=rate)
             repetitions -= 1
         self.dispense(volume, rate=rate)
-        cmds.do_publish(self.broker, cmds.mix, self.mix,
-                        'after', None, None,
-                        self, repetitions, c_vol, location)
+        do_publish(self.broker, cmds.mix, self.mix,
+                   'after', None, None,
+                   self, repetitions, c_vol, location)
         return self
 
-    @cmds.publish.both(command=cmds.blow_out)
+    @publish.both(command=cmds.blow_out)
     @requires_version(2, 0)
     def blow_out(self,
                  location: Union[types.Location, Well] = None
@@ -483,7 +484,7 @@ class InstrumentContext(CommandPublisher):
         else:
             return clamp_value(speed, 80, 1, 'touch_tip:')
 
-    @cmds.publish.both(command=cmds.touch_tip)
+    @publish.both(command=cmds.touch_tip)
     @requires_version(2, 0)
     def touch_tip(self,
                   location: Well = None,
@@ -563,7 +564,7 @@ class InstrumentContext(CommandPublisher):
             self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
         return self
 
-    @cmds.publish.both(command=cmds.air_gap)
+    @publish.both(command=cmds.air_gap)
     @requires_version(2, 0)
     def air_gap(self,
                 volume: float = None,
@@ -612,7 +613,7 @@ class InstrumentContext(CommandPublisher):
         self.aspirate(volume)
         return self
 
-    @cmds.publish.both(command=cmds.return_tip)
+    @publish.both(command=cmds.return_tip)
     @requires_version(2, 0)
     def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
@@ -712,8 +713,8 @@ class InstrumentContext(CommandPublisher):
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
         self._validate_tiprack(tiprack)
-        cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                        'before', None, None, self, location=target)
+        do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
+                   'before', None, None, self, location=target)
         self.move_to(target.top())
 
         self._hw_manager.hardware.set_current_tiprack_diameter(
@@ -721,8 +722,8 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.pick_up_tip(
             self._mount, self._tip_length_for(tiprack), presses, increment)
         # Note that the hardware API pick_up_tip action includes homing z after
-        cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                        'after', self, None, self, location=target)
+        do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
+                   'after', self, None, self, location=target)
         self._hw_manager.hardware.set_working_volume(
             self._mount, target.max_volume)
         tiprack.use_tips(target, self.channels)
@@ -808,12 +809,12 @@ class InstrumentContext(CommandPublisher):
                 "types.Location (e.g. the return value from "
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
-        cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                        'before', None, None, self, location=target)
+        do_publish(self.broker, cmds.drop_tip, self.drop_tip,
+                   'before', None, None, self, location=target)
         self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
-        cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                        'after', self, None, self, location=target)
+        do_publish(self.broker, cmds.drop_tip, self.drop_tip,
+                   'after', self, None, self, location=target)
         if self.api_version < APIVersion(2, 2) \
                 and isinstance(target.labware, Well) \
                 and target.labware.parent.is_tiprack:
@@ -837,12 +838,12 @@ class InstrumentContext(CommandPublisher):
         :returns: This instance.
         """
         def home_dummy(mount): pass
-        cmds.do_publish(self.broker, cmds.home, home_dummy,
-                        'before', None, None, self._mount.name.lower())
+        do_publish(self.broker, cmds.home, home_dummy,
+                   'before', None, None, self._mount.name.lower())
         self._hw_manager.hardware.home_z(self._mount)
         self._hw_manager.hardware.home_plunger(self._mount)
-        cmds.do_publish(self.broker, cmds.home, home_dummy,
-                        'after', self, None, self._mount.name.lower())
+        do_publish(self.broker, cmds.home, home_dummy,
+                   'after', self, None, self._mount.name.lower())
         return self
 
     @requires_version(2, 0)
@@ -854,7 +855,7 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.home_plunger(self._mount)
         return self
 
-    @cmds.publish.both(command=cmds.distribute)
+    @publish.both(command=cmds.distribute)
     @requires_version(2, 0)
     def distribute(self,
                    volume: Union[float, Sequence[float]],
@@ -886,7 +887,7 @@ class InstrumentContext(CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @cmds.publish.both(command=cmds.consolidate)
+    @publish.both(command=cmds.consolidate)
     @requires_version(2, 0)
     def consolidate(self,
                     volume: Union[float, Sequence[float]],
@@ -916,7 +917,7 @@ class InstrumentContext(CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @cmds.publish.both(command=cmds.transfer)  # noqa(C901)
+    @publish.both(command=cmds.transfer)  # noqa(C901)
     @requires_version(2, 0)
     def transfer(self,
                  volume: Union[float, Sequence[float]],

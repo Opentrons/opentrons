@@ -295,8 +295,8 @@ def test_extra_contents(
 # noqa(E122)
 @pytest.mark.parametrize('bad_protocol', [
     '''
-from opentrons import robot
 metadata={"apiLevel": "2.0"}
+def run(ctx): pass
 def run(ctx): pass
 ''',
     '''

@@ -9,8 +9,9 @@ from numpy import add, subtract, array  # type: ignore
 
 from opentrons_shared_data.pipette import name_for_model
 
-from opentrons import commands, drivers
-from opentrons.commands import CommandPublisher
+from opentrons import drivers
+from opentrons.commands import types as command_types
+from opentrons.commands.publisher import CommandPublisher
 
 from opentrons.data_storage import database, old_container_loading,\
     database_migration
@@ -913,7 +914,6 @@ class Robot(CommandPublisher):
                 )
             )
 
-    @commands.publish.both(command=commands.pause)
     def pause(self, msg=None):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
@@ -928,7 +928,6 @@ class Robot(CommandPublisher):
         """
         self._driver.pause()
 
-    @commands.publish.both(command=commands.resume)
     def resume(self):
         """
         Resume execution of the protocol after :meth:`pause`
@@ -1013,7 +1012,6 @@ class Robot(CommandPublisher):
             return False
         return self._driver.simulating
 
-    @commands.publish.both(command=commands.comment)
     def comment(self, msg):
         pass
 
@@ -1035,7 +1033,7 @@ class Robot(CommandPublisher):
                 self._commands.append(text.format(**payload))
 
         self._unsubscribe_commands = self.broker.subscribe(
-            commands.types.COMMAND, on_command)
+            command_types.COMMAND, on_command)
 
     def calibrate_container_with_instrument(self,
                                             container: Container,
