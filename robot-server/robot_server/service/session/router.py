@@ -6,7 +6,7 @@ from fastapi import APIRouter, Query, Depends
 from robot_server.service.session.models.common import IdentifierType
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError, CommonErrorDef
-from robot_server.service.json_api import ResourceLink, ResponseDataModel
+from robot_server.service.json_api import ResourceLink
 from robot_server.service.json_api.resource_links import ResourceLinkKey, \
     ResourceLinks
 from robot_server.service.session.command_execution import create_command
@@ -53,17 +53,15 @@ async def create_session_handler(
         session_manager: SessionManager = Depends(get_session_manager)) \
         -> SessionResponse:
     """Create a session"""
-    session_type = create_request.data.attributes.sessionType
-    create_params = create_request.data.attributes.createParams
+    session_type = create_request.data.sessionType
+    create_params = create_request.data.createParams
 
     new_session = await session_manager.add(
         session_type=session_type,
         session_meta_data=SessionMetaData(create_params=create_params))
 
     return SessionResponse(
-        data=ResponseDataModel.create(
-            attributes=new_session.get_response_model(),
-            resource_id=new_session.meta.identifier),
+        data=new_session.get_response_model(),
         links=get_valid_session_links(new_session.meta.identifier, router)
     )
 
@@ -84,9 +82,7 @@ async def delete_session_handler(
     await session_manager.remove(session_obj.meta.identifier)
 
     return SessionResponse(
-        data=ResponseDataModel.create(
-            attributes=session_obj.get_response_model(),
-            resource_id=sessionId),
+        data=session_obj.get_response_model(),
         links=get_sessions_links(router),
     )
 
@@ -104,9 +100,7 @@ async def get_session_handler(
                               api_router=router)
 
     return SessionResponse(
-        data=ResponseDataModel.create(
-            attributes=session_obj.get_response_model(),
-            resource_id=sessionId),
+        data=session_obj.get_response_model(),
         links=get_valid_session_links(sessionId, router)
     )
 
@@ -124,10 +118,7 @@ async def get_sessions_handler(
     """Get multiple sessions"""
     sessions = session_manager.get(session_type=session_type)
     return MultiSessionResponse(
-        data=[ResponseDataModel.create(
-            attributes=session.get_response_model(),
-            resource_id=session.meta.identifier) for session in sessions
-        ]
+        data=[session.get_response_model() for session in sessions]
     )
 
 
@@ -152,25 +143,23 @@ async def session_command_execute_handler(
             reason=f"Session '{sessionId}' is not active. "
                    "Only the active session can execute commands")
 
-    command = create_command(command_request.data.attributes.command,
-                             command_request.data.attributes.data)
+    command = create_command(command_request.data.command,
+                             command_request.data.data)
     command_result = await session_obj.command_executor.execute(command)
 
     log.info(f"Command completed: {command}")
     log.debug(f"Command result: {command_result}")
 
     return CommandResponse(
-        data=ResponseDataModel.create(
-            attributes=SessionCommand(
-                data=command_result.content.data,
-                command=command_result.content.name,
-                status=command_result.result.status,
-                createdAt=command_result.meta.created_at,
-                startedAt=command_result.result.started_at,
-                completedAt=command_result.result.completed_at,
-                result=command_result.result.data,
-            ),
-            resource_id=command_result.meta.identifier
+        data=SessionCommand(
+            id=command_result.meta.identifier,
+            data=command_result.content.data,
+            command=command_result.content.name,
+            status=command_result.result.status,
+            createdAt=command_result.meta.created_at,
+            startedAt=command_result.result.started_at,
+            completedAt=command_result.result.completed_at,
+            result=command_result.result.data,
         ),
         links=get_valid_session_links(sessionId, router)
     )

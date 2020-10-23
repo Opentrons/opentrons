@@ -15,8 +15,8 @@ from robot_server.robot.calibration.pipette_offset.models import\
     PipetteOffsetCalibrationSessionStatus
 from robot_server.robot.calibration.tip_length.models import\
     TipCalibrationSessionStatus
-from robot_server.service.json_api import RequestModel, ResponseModel
-from robot_server.service.json_api.response import MultiResponseModel
+from robot_server.service.json_api import (
+    RequestModel, ResponseModel, ResponseDataModel, MultiResponseModel)
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.protocol.models import \
     ProtocolCreateParams, ProtocolSessionDetails
@@ -116,7 +116,7 @@ class BasicSession(BaseModel):
         return v
 
 
-class Session(BasicSession):
+class Session(ResponseDataModel, BasicSession):
     """The attributes of a created session"""
     details: SessionDetails =\
         Field(...,
@@ -131,8 +131,8 @@ SessionCreateRequest = RequestModel[
     BasicSession
 ]
 SessionResponse = ResponseModel[
-    Session, dict
+    Session
 ]
 MultiSessionResponse = MultiResponseModel[
-    Session, dict
+    Session
 ]

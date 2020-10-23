@@ -43,7 +43,7 @@ stages:
       method: POST
       json:
         data:
-          command: loadLabware
+          command: calibration.loadLabware
           data: {}
     response:
       status_code: 200
@@ -64,8 +64,7 @@ stages:
       <<: *post_command
       json:
         data:
-          id: "{session_id}"
-          command: preparePipette
+          command: calibration.check.preparePipette
           data: {}
     response:
       status_code: 200
@@ -86,7 +85,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: jog
+          command: calibration.jog
           data:
             vector: [0, 0, -10]
     response:
@@ -108,7 +107,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: pickUpTip
+          command: calibration.pickUpTip
           data: {}
     response:
       status_code: 200
@@ -129,7 +128,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: confirmTip
+          command: calibration.confirmTip
           data: {}
     response:
       status_code: 200
@@ -150,7 +149,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: jog
+          command: calibration.jog
           data:
             vector: [0, 0, -10]
     response:
@@ -172,7 +171,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: comparePoint
+          command: calibration.check.comparePoint
           data: {}
     response:
       status_code: 200
@@ -195,7 +194,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: goToNextCheck
+          command: calibration.check.goToNextCheck
           data: {}
     response:
       status_code: 200
@@ -218,7 +217,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: comparePoint
+          command: calibration.check.comparePoint
           data: {}
     response:
       status_code: 200
@@ -242,7 +241,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: goToNextCheck
+          command: calibration.check.goToNextCheck
           data: {}
     response:
       status_code: 200
@@ -266,7 +265,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: comparePoint
+          command: calibration.check.comparePoint
           data: {}
     response:
       status_code: 200
@@ -291,7 +290,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: goToNextCheck
+          command: calibration.check.goToNextCheck
           data: {}
     response:
       status_code: 200
@@ -316,7 +315,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: comparePoint
+          command: calibration.check.comparePoint
           data: {}
     response:
       status_code: 200
@@ -342,7 +341,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: goToNextCheck
+          command: calibration.check.goToNextCheck
           data: {}
     response:
       status_code: 200
@@ -368,7 +367,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: jog
+          command: calibration.jog
           data:
             vector: [0, 0, -10]
     response:
@@ -395,7 +394,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: pickUpTip
+          command: calibration.pickUpTip
           data: {}
     response:
       status_code: 200
@@ -421,7 +420,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: confirmTip
+          command: calibration.confirmTip
           data: {}
     response:
       status_code: 200
@@ -447,7 +446,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: comparePoint
+          command: calibration.check.comparePoint
           data: {}
     response:
       status_code: 200
@@ -474,7 +473,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: goToNextCheck
+          command: calibration.check.goToNextCheck
           data: {}
     response:
       status_code: 200
@@ -501,7 +500,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: comparePoint
+          command: calibration.check.comparePoint
           data: {}
     response:
       status_code: 200
@@ -529,7 +528,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: goToNextCheck
+          command: calibration.check.goToNextCheck
           data: {}
     response:
       status_code: 200
@@ -607,7 +606,7 @@ stages:
       json:
         data:
           id: "{session_id}"
-          command: preparePipette
+          command: calibration.preparePipette
           data:
             vector: [1, 2, 3]
     response:
@@ -618,7 +617,7 @@ stages:
       <<: *post_command
       json:
         data:
-          command: jog
+          command: calibration.jog
           data: {}
     response:
       status_code: 422

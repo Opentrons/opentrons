@@ -273,7 +273,7 @@ def test_execute_command_no_session(api_client, mock_session_meta):
     """Test that command is rejected if there's no session"""
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("jog",
+        json=command("calibration.jog",
                      JogPosition(vector=(1, 2, 3,))))
     assert response.json() == {
         'errors': [{
@@ -370,7 +370,6 @@ def test_execute_command_no_body(api_client,
             'createdAt': '2000-01-01T00:00:00',
             'startedAt': '2019-01-01T00:00:00',
             'completedAt': '2020-01-01T00:00:00',
-            'type': 'SessionCommand',
             'id': command_id
         },
         'links': {
@@ -410,7 +409,7 @@ def test_execute_command_error(api_client,
 
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("jog",
+        json=command("calibration.jog",
                      JogPosition(vector=(1, 2, 3,)))
     )
 
@@ -436,7 +435,7 @@ def test_execute_command_session_inactive(
 
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("jog",
+        json=command("calibration.jog",
                      JogPosition(vector=(1, 2, 3,)))
     )
 

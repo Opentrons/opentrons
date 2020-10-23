@@ -8,6 +8,7 @@ def test_access_pipette_offset_calibration(
         api_client, set_up_pipette_offset_temp_directory,
         apiclient_enable_calibration_overhaul, server_temp_directory):
     expected = {
+        'id': 'pip_1&left',
         'offset': [0, 0, 0],
         'pipette': 'pip_1',
         'mount': 'left',

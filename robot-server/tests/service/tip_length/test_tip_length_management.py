@@ -7,6 +7,7 @@ WRONG_LW_HASH = 'wronghash'
 def test_access_tip_length_calibration(
         api_client, set_up_tip_length_temp_directory):
     expected = {
+        'id': 'fakehash&pip_1',
         'tipLength': 30.5,
         'pipette': PIPETTE_ID,
         'tiprack': LW_HASH,
@@ -21,7 +22,6 @@ def test_access_tip_length_calibration(
         f'tiprack_hash={LW_HASH}')
     assert resp.status_code == 200
     data = resp.json()['data'][0]
-    assert data['type'] == 'TipLengthCalibration'
     data['lastModified'] = None
     assert data == expected
 

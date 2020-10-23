@@ -55,7 +55,8 @@ class BaseSession(ABC):
 
     def get_response_model(self) -> models.Session:
         """Get the response model"""
-        return models.Session(sessionType=self.session_type,
+        return models.Session(id=self.meta.identifier,
+                              sessionType=self.session_type,
                               details=self._get_response_details(),
                               createdAt=self.meta.created_at,
                               createParams=self.meta.create_params)

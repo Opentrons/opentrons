@@ -4,8 +4,8 @@ import typing
 
 from pydantic import BaseModel, Field
 
-from robot_server.service.json_api import \
-    ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
+from robot_server.service.json_api import (
+    ResponseModel, RequestModel, ResponseDataModel, MultiResponseModel)
 
 TokenType = str
 
@@ -17,14 +17,18 @@ class AccessTokenInfo(BaseModel):
         Field(..., description="When this token was created")
 
 
+class AccessTokenInfoResponse(ResponseDataModel, AccessTokenInfo):
+    pass
+
+
 AccessTokenResponse = ResponseModel[
-    ResponseDataModel[AccessTokenInfo], dict
+    AccessTokenInfoResponse
 ]
-MultipleAccessTokenResponse = ResponseModel[
-    typing.List[ResponseDataModel[AccessTokenInfo]], dict
+MultipleAccessTokenResponse = MultiResponseModel[
+    AccessTokenInfoResponse
 ]
 AccessTokenRequest = RequestModel[
-    RequestDataModel[AccessTokenInfo]
+    AccessTokenInfo
 ]
 
 

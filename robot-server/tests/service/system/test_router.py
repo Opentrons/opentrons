@@ -19,7 +19,7 @@ def mock_set_system_time(mock_system_time):
 def response_links():
     return {
         'self': {
-            'href': '/system/time',
+            'href': '/system/time', 'meta': None,
         }
     }
 
@@ -82,7 +82,8 @@ def test_set_system_time(api_client, mock_system_time,
     assert response.json() == {
         'data': {
             'systemTime': mock_system_time.isoformat(),
-            'id': 'time',},
+            'id': 'time'
+        },
         'links': response_links,
     }
     assert response.status_code == 200

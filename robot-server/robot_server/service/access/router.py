@@ -25,12 +25,10 @@ async def create_access_token() -> access.AccessTokenResponse:
     token = secrets.token_urlsafe(nbytes=8)
     # TODO Store the token
     return access.AccessTokenResponse(
-        data=access.ResponseDataModel.create(
-            attributes=access.AccessTokenInfo(
-                token=token,
-                createdAt=utc_now()),
-            resource_id=token,
-        ))
+        data=access.AccessTokenInfoResponse(
+            id=token,
+            token=token,
+            createdAt=utc_now()))
 
 
 @router.delete("/access/tokens/{access_token}",

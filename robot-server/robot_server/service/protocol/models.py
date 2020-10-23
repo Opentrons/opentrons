@@ -3,23 +3,21 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from robot_server.service.json_api import ResponseModel, ResponseDataModel
-from robot_server.service.json_api.response import MultiResponseModel
+from robot_server.service.json_api import (
+    ResponseModel, ResponseDataModel, MultiResponseModel)
 
 
 class FileAttributes(BaseModel):
     basename: str
 
 
-class ProtocolResponseAttributes(BaseModel):
+class ProtocolResponseAttributes(ResponseDataModel):
     protocolFile: FileAttributes
     supportFiles: typing.List[FileAttributes]
     lastModifiedAt: datetime
     createdAt: datetime
 
 
-ProtocolResponseDataModel = ResponseDataModel[ProtocolResponseAttributes]
+ProtocolResponse = ResponseModel[ProtocolResponseAttributes]
 
-ProtocolResponse = ResponseModel[ProtocolResponseAttributes, dict]
-
-MultiProtocolResponse = MultiResponseModel[ProtocolResponseAttributes, dict]
+MultiProtocolResponse = MultiResponseModel[ProtocolResponseAttributes]

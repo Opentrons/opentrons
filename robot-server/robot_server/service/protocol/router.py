@@ -99,21 +99,19 @@ async def create_protocol_file(
 
 
 def _to_response(uploaded_protocol: UploadedProtocol) \
-        -> route_models.ProtocolResponseDataModel:
+        -> route_models.ProtocolResponseAttributes:
     """Create ProtocolResponse from an UploadedProtocol"""
     meta = uploaded_protocol.meta
-    return route_models.ProtocolResponseDataModel.create(
-        attributes=route_models.ProtocolResponseAttributes(
-            protocolFile=route_models.FileAttributes(
-                basename=meta.protocol_file.path.name
-            ),
-            supportFiles=[route_models.FileAttributes(
-                basename=s.path.name
-            ) for s in meta.support_files],
-            lastModifiedAt=meta.last_modified_at,
-            createdAt=meta.created_at
+    return route_models.ProtocolResponseAttributes(
+        id=meta.identifier,
+        protocolFile=route_models.FileAttributes(
+            basename=meta.protocol_file.path.name
         ),
-        resource_id=meta.identifier
+        supportFiles=[route_models.FileAttributes(
+            basename=s.path.name
+        ) for s in meta.support_files],
+        lastModifiedAt=meta.last_modified_at,
+        createdAt=meta.created_at,
     )
 
 

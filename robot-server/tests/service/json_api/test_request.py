@@ -3,22 +3,18 @@ from pytest import raises
 from pydantic import ValidationError
 
 from robot_server.service.json_api.request import (
-    RequestModel, RequestDataModel)
+    RequestModel)
 from tests.service.helpers import ItemModel
 
 
 def test_attributes_as_dict():
     DictRequest = RequestModel[dict]
     obj_to_validate = {
-        'data': {'type': 'item', 'attributes': {}}
+        'data': {'some_data': 1}
     }
     my_request_obj = DictRequest(**obj_to_validate)
     assert my_request_obj.dict() == {
-        'data': {
-            'type': 'item',
-            'attributes': {},
-            'id': None,
-        }
+        'data': {'some_data': 1}
     }
 
 
@@ -26,25 +22,19 @@ def test_attributes_as_item_model():
     ItemRequest = RequestModel[ItemModel]
     obj_to_validate = {
         'data': {
-            'type': 'item',
-            'attributes': {
-                'name': 'apple',
-                'quantity': 10,
-                'price': 1.20
-            },
-            'id': None,
+            'name': 'apple',
+            'quantity': 10,
+            'price': 1.20
         }
     }
     my_request_obj = ItemRequest(**obj_to_validate)
     assert my_request_obj.dict() == obj_to_validate
 
 
-def test_attributes_as_item_model__empty_dict():
+def test_attributes_as_item_model_empty_dict():
     ItemRequest = RequestModel[ItemModel]
     obj_to_validate = {
         'data': {
-            'type': 'item',
-            'attributes': {}
         }
     }
     with raises(ValidationError) as e:
@@ -52,15 +42,15 @@ def test_attributes_as_item_model__empty_dict():
 
     assert e.value.errors() == [
         {
-            'loc': ('data', 'attributes', 'name'),
+            'loc': ('data', 'name'),
             'msg': 'field required',
             'type': 'value_error.missing'
         }, {
-            'loc': ('data', 'attributes', 'quantity'),
+            'loc': ('data', 'quantity'),
             'msg': 'field required',
             'type': 'value_error.missing'
         }, {
-            'loc': ('data', 'attributes', 'price'),
+            'loc': ('data', 'price'),
             'msg': 'field required',
             'type': 'value_error.missing'
         }
@@ -68,16 +58,16 @@ def test_attributes_as_item_model__empty_dict():
 
 
 def test_attributes_required():
-    MyRequest = RequestModel[RequestDataModel[dict]]
+    MyRequest = RequestModel[dict]
     obj_to_validate = {
-        'data': {'type': 'item', 'attributes': None}
+        'data': None
     }
     with raises(ValidationError) as e:
         MyRequest(**obj_to_validate)
 
     assert e.value.errors() == [
         {
-            'loc': ('data', 'attributes'),
+            'loc': ('data',),
             'msg': 'none is not an allowed value',
             'type': 'type_error.none.not_allowed'
         },
@@ -85,7 +75,7 @@ def test_attributes_required():
 
 
 def test_data_required():
-    MyRequest = RequestModel[RequestDataModel[dict]]
+    MyRequest = RequestModel[dict]
     obj_to_validate = {
         'data': None
     }
