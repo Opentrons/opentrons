@@ -27,7 +27,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data: &session_data
           id: "{session_id}"
           sessionType: deckCalibration
@@ -54,7 +53,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -76,7 +74,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -98,7 +95,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -120,7 +116,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -152,7 +147,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -175,7 +169,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -197,7 +190,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -220,7 +212,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -243,7 +234,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -266,7 +256,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -289,7 +278,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -311,5 +299,4 @@ stages:
       status_code: 200
       json:
         links: null
-        meta: null
         data: []

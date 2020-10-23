@@ -15,12 +15,10 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: calibrationCheck
-            createParams:
-              tipRacks: []
-              hasCalibrationBlock: true
+          sessionType: calibrationCheck
+          createParams:
+            tipRacks: []
+            hasCalibrationBlock: true
     response:
       status_code: 201
       save:
@@ -35,23 +33,20 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data: &session_data
           id: "{session_id}"
-          type: !anystr
-          attributes: &session_data_attributes
-            sessionType: calibrationCheck
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            createParams:
-              tipRacks: []
-              hasCalibrationBlock: true
-            details: &session_data_attribute_details
-              currentStep: sessionStarted
-              instruments: !anylist
-              activePipette: !anydict
-              activeTipRack: !anydict
-              labware: !anylist
-              comparisonsByPipette: !anydict
+          sessionType: calibrationCheck
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createParams:
+            tipRacks: []
+            hasCalibrationBlock: true
+          details: &session_data_attribute_details
+            currentStep: sessionStarted
+            instruments: !anylist
+            activePipette: !anydict
+            activeTipRack: !anydict
+            labware: !anylist
+            comparisonsByPipette: !anydict
 
   - name: Load labware
     request: &post_command
@@ -59,10 +54,8 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.loadLabware
-            data: {}
+          command: calibration.loadLabware
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -71,24 +64,19 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: labwareLoaded
+          details:
+            <<: *session_data_attribute_details
+            currentStep: labwareLoaded
   
   - name: Move nozzle
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.moveToReferencePoint
-            data: {}
+          command: calibration.moveToReferencePoint
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -100,21 +88,17 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingNozzle
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingNozzle
 
   - name: Prepare first pipette
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.moveToTipRack
-            data: {}
+          command: calibration.moveToTipRack
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -123,25 +107,20 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: preparingPipette
+          details:
+            <<: *session_data_attribute_details
+            currentStep: preparingPipette
 
   - name: Jog first pipette
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.jog
-            data:
-              vector: [0, 0, -10]
+          command: calibration.jog
+          data:
+            vector: [0, 0, -10]
     response:
       status_code: 200
   - name: Check the effect of command
@@ -150,24 +129,19 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: preparingPipette
+          details:
+            <<: *session_data_attribute_details
+            currentStep: preparingPipette
 
   - name: Pick up tip
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.pickUpTip
-            data: {}
+          command: calibration.pickUpTip
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -176,24 +150,19 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: inspectingTip
+          details:
+            <<: *session_data_attribute_details
+            currentStep: inspectingTip
 
   - name: Confirm tip attached
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.moveToReferencePoint
-            data: {}
+          command: calibration.moveToReferencePoint
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -205,22 +174,18 @@ stages:
         meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingTip
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingTip
 
   - name: Jog pipette tip
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.jog
-            data:
-              vector: [0, 0, 0.1]
+          command: calibration.jog
+          data:
+            vector: [0, 0, 0.1]
     response:
       status_code: 200
   - name: Check the effect of command
@@ -232,21 +197,17 @@ stages:
         meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingTip
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingTip
 
   - name: Compare Tip Length
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.check.comparePoint
-            data: {}
+          command: calibration.check.comparePoint
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -255,14 +216,11 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingTip
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingTip
 
   - name: Move to deck
     request:
@@ -270,9 +228,8 @@ stages:
       json:
         data:
           type: SessionCommand
-          attributes:
-            command: calibration.moveToDeck
-            data: {}
+          command: calibration.moveToDeck
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -281,25 +238,20 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingHeight
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingHeight
 
   - name: Jog first pipette to height
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.jog
-            data:
-              vector: [0, 0, -10]
+          command: calibration.jog
+          data:
+            vector: [0, 0, -10]
     response:
       status_code: 200
   - name: Check the effect of command
@@ -308,24 +260,19 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingHeight
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingHeight
 
   - name: Compare first pipette height
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.check.comparePoint
-            data: {}
+          command: calibration.check.comparePoint
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -334,33 +281,28 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingHeight
-              comparisonsByPipette:
-                first:
-                  tipLength: !anydict
-                  pipetteOffset: !anydict
-                  deck: null
-                second:
-                  tipLength: null
-                  pipetteOffset: null
-                  deck: null
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingHeight
+            comparisonsByPipette:
+              first:
+                tipLength: !anydict
+                pipetteOffset: !anydict
+                deck: null
+              second:
+                tipLength: null
+                pipetteOffset: null
+                deck: null
 
   - name: Go to next check
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.moveToPointOne
-            data: {}
+          command: calibration.moveToPointOne
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -369,33 +311,28 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingPointOne
-              comparisonsByPipette:
-                first:
-                  tipLength: !anydict
-                  pipetteOffset: !anydict
-                  deck: null
-                second:
-                  tipLength: null
-                  pipetteOffset: null
-                  deck: null
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingPointOne
+            comparisonsByPipette:
+              first:
+                tipLength: !anydict
+                pipetteOffset: !anydict
+                deck: null
+              second:
+                tipLength: null
+                pipetteOffset: null
+                deck: null
 
   - name: Compare first pipette point one
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.check.comparePoint
-            data: {}
+          command: calibration.check.comparePoint
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -404,33 +341,28 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingPointOne
-              comparisonsByPipette:
-                first:
-                  tipLength: !anydict
-                  pipetteOffset: !anydict
-                  deck: !anydict
-                second:
-                  tipLength: null
-                  pipetteOffset: null
-                  deck: null
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingPointOne
+            comparisonsByPipette:
+              first:
+                tipLength: !anydict
+                pipetteOffset: !anydict
+                deck: !anydict
+              second:
+                tipLength: null
+                pipetteOffset: null
+                deck: null
 
   - name: Go to next check
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.deck.moveToPointTwo
-            data: {}
+          command: calibration.deck.moveToPointTwo
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -439,33 +371,28 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingPointTwo
-              comparisonsByPipette:
-                first:
-                  tipLength: !anydict
-                  pipetteOffset: !anydict
-                  deck: !anydict
-                second:
-                  tipLength: null
-                  pipetteOffset: null
-                  deck: null
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingPointTwo
+            comparisonsByPipette:
+              first:
+                tipLength: !anydict
+                pipetteOffset: !anydict
+                deck: !anydict
+              second:
+                tipLength: null
+                pipetteOffset: null
+                deck: null
 
   - name: Compare first pipette point two
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.check.comparePoint
-            data: {}
+          command: calibration.check.comparePoint
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -474,33 +401,28 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingPointTwo
-              comparisonsByPipette:
-                first:
-                  tipLength: !anydict
-                  pipetteOffset: !anydict
-                  deck: !anydict
-                second:
-                  tipLength: null
-                  pipetteOffset: null
-                  deck: null
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingPointTwo
+            comparisonsByPipette:
+              first:
+                tipLength: !anydict
+                pipetteOffset: !anydict
+                deck: !anydict
+              second:
+                tipLength: null
+                pipetteOffset: null
+                deck: null
 
   - name: Go to next check
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.deck.moveToPointThree
-            data: {}
+          command: calibration.deck.moveToPointThree
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -509,33 +431,28 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingPointThree
-              comparisonsByPipette:
-                first:
-                  tipLength: !anydict
-                  pipetteOffset: !anydict
-                  deck: !anydict
-                second:
-                  tipLength: null
-                  pipetteOffset: null
-                  deck: null
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingPointThree
+            comparisonsByPipette:
+              first:
+                tipLength: !anydict
+                pipetteOffset: !anydict
+                deck: !anydict
+              second:
+                tipLength: null
+                pipetteOffset: null
+                deck: null
 
   - name: Compare first pipette point three
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.check.comparePoint
-            data: {}
+          command: calibration.check.comparePoint
+          data: {}
     response:
       status_code: 200
 
@@ -545,23 +462,20 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: comparingPointThree
-              comparisonsByPipette:
-                first:
-                  tipLength: !anydict
-                  pipetteOffset: !anydict
-                  deck: !anydict
-                second:
-                  tipLength: null
-                  pipetteOffset: null
-                  deck: null
+          details:
+            <<: *session_data_attribute_details
+            currentStep: comparingPointThree
+            comparisonsByPipette:
+              first:
+                tipLength: !anydict
+                pipetteOffset: !anydict
+                deck: !anydict
+              second:
+                tipLength: null
+                pipetteOffset: null
+                deck: null
 
   - name: Delete the session
     request:
@@ -578,7 +492,6 @@ stages:
       status_code: 200
       json:
         links: null
-        meta: null
         data: []
 ---
 test_name: Calibration check session errors
@@ -597,12 +510,10 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: calibrationCheck
-            createParams:
-              tipRacks: []
-              hasCalibrationBlock: true
+          sessionType: calibrationCheck
+          createParams:
+            tipRacks: []
+            hasCalibrationBlock: true
     response:
       status_code: 201
       save:
@@ -613,10 +524,8 @@ stages:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: loadSomething
-            data: {}
+          command: loadSomething
+          data: {}
     response:
       status_code: 422
   - name: Send a command with invalid body
@@ -625,11 +534,9 @@ stages:
       json:
         data:
           id: "{session_id}"
-          type: SessionCommand
-          attributes:
-            command: preparePipette
-            data:
-              vector: [1, 2, 3]
+          command: calibration.moveToTipRack
+          data:
+            vector: [1, 2, 3]
     response:
       status_code: 422
 
@@ -638,10 +545,8 @@ stages:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: jog
-            data: {}
+          command: calibration.jog
+          data: {}
     response:
       status_code: 422
 

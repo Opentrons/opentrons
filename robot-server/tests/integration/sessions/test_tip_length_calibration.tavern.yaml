@@ -30,7 +30,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           id: "{session_id}"
           sessionType: tipLengthCalibration
@@ -58,7 +57,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           id: !anystr
           status: executed
@@ -68,6 +66,7 @@ stages:
           startedAt: *dt
           completedAt: *dt
           data: {}
+          result: null
 
   - name: Attempt conflicting command
     request:
@@ -95,5 +94,4 @@ stages:
       status_code: 200
       json:
         links: null
-        meta: null
         data: []

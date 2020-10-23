@@ -98,7 +98,9 @@ class CheckSession(BaseSession):
 
     def get_response_model(self) -> CalibrationCheckResponseAttributes:
         return CalibrationCheckResponseAttributes(
-            createParams=cast(SessionCreateParams, self.meta.create_params),
+            id=self.meta.identifier,
+            createParams=cast(SessionCreateParams,
+                              self.meta.create_params),
             createdAt=self.meta.created_at,
             details=self._get_response_details()
         )
