@@ -14,7 +14,8 @@ from robot_server.service.session.command_execution import \
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
-from ..models.session import SessionType, SessionDetails, PipetteOffsetCalibrationResponseAttributes
+from ..models.session import (
+    SessionType, PipetteOffsetCalibrationResponseAttributes)
 from ..errors import UnsupportedFeature
 
 if TYPE_CHECKING:
@@ -98,7 +99,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
             id=self.meta.identifier,
             details=self._get_response_details(),
             createdAt=self.meta.created_at,
-            createParams=self.meta.create_params
+            createParams=cast(SessionCreateParams, self.meta.create_params)
         )
 
     def _get_response_details(self) -> PipetteOffsetCalibrationSessionStatus:

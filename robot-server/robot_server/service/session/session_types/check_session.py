@@ -11,7 +11,7 @@ from robot_server.service.session.command_execution import \
     CommandQueue, CallableExecutor, Command, CompletedCommand
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models.session import SessionType, \
-    SessionDetails, CalibrationCheckResponseAttributes
+    CalibrationCheckResponseAttributes
 from robot_server.service.session.session_types.base_session \
     import BaseSession, SessionMetaData
 from robot_server.service.session.errors import SessionCreationException, \
@@ -102,7 +102,7 @@ class CheckSession(BaseSession):
             details=self._get_response_details()
         )
 
-    def _get_response_details(self) -> SessionDetails:
+    def _get_response_details(self) -> CalibrationCheckSessionStatus:
         comparison_map =\
             self._map_to_pydantic_model(self._calibration_check.comparison_map)
         return CalibrationCheckSessionStatus(

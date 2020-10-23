@@ -33,26 +33,17 @@ class SessionType(str, Enum):
 
 
 """
-IMPORTANT: Models in this Union should be sorted by specificity. If model A
-has `name`, `type` attributes and model B has just `name`, then model A must
-come first.
-
-Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
-
-When we move to Python 3.8 we can use Literal type as described here
-https://pydantic-docs.helpmanual.io/usage/types/#literal-type
+A Union of all the create param types.
 """
 SessionCreateParamType = typing.Union[
     SessionCreateParams,
     ProtocolCreateParams,
+    BaseModel,
     None,
-    BaseModel
 ]
 
 """
-IMPORTANT: See note for SessionCreateParamType
-
-Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
+A Union of all the possible session detail models.
 """
 SessionDetails = typing.Union[
     CalibrationCheckSessionStatus,
@@ -72,45 +63,61 @@ class SessionCreateAttributes(BaseModel):
 
 
 class SessionCreateAttributesNoParams(SessionCreateAttributes):
+    """The base model of request that has no createParams."""
     createParams: typing.Optional[BaseModel]
 
 
 class NullSessionCreateAttributes(SessionCreateAttributesNoParams):
+    """The NullSession create request."""
     sessionType: Literal[SessionType.null] = SessionType.null
 
 
 class DefaultSessionCreateAttributes(SessionCreateAttributesNoParams):
+    """The default session create request."""
     sessionType: Literal[SessionType.default] = SessionType.default
 
 
 class CalibrationCheckCreateAttributes(SessionCreateAttributesNoParams):
-    sessionType: Literal[SessionType.calibration_check] = SessionType.calibration_check
+    """The calibration check create request."""
+    sessionType: Literal[SessionType.calibration_check] =\
+        SessionType.calibration_check
 
 
 class TipLengthCalibrationCreateAttributes(SessionCreateAttributes):
-    sessionType: Literal[SessionType.tip_length_calibration] = SessionType.tip_length_calibration
+    """The tip length calibration create request."""
+    sessionType: Literal[SessionType.tip_length_calibration] =\
+        SessionType.tip_length_calibration
     createParams: SessionCreateParams
 
 
 class DeckCalibrationCreateAttributes(SessionCreateAttributesNoParams):
-    sessionType: Literal[SessionType.deck_calibration] = SessionType.deck_calibration
+    """The deck calibration create request."""
+    sessionType: Literal[SessionType.deck_calibration] =\
+        SessionType.deck_calibration
 
 
 class PipetteOffsetCalibrationCreateAttributes(SessionCreateAttributes):
-    sessionType: Literal[SessionType.pipette_offset_calibration] = SessionType.pipette_offset_calibration
+    """Pipette offset calibration create request."""
+    sessionType: Literal[SessionType.pipette_offset_calibration] =\
+        SessionType.pipette_offset_calibration
     createParams: SessionCreateParams
 
 
 class ProtocolCreateAttributes(SessionCreateAttributes):
-    sessionType: Literal[SessionType.protocol] = SessionType.protocol
+    """Protocol session create request."""
+    sessionType: Literal[SessionType.protocol] =\
+        SessionType.protocol
     createParams: ProtocolCreateParams
 
 
 class LiveProtocolCreateAttributes(SessionCreateAttributesNoParams):
-    sessionType: Literal[SessionType.live_protocol] = SessionType.live_protocol
+    """Live protocol session create request."""
+    sessionType: Literal[SessionType.live_protocol] =\
+        SessionType.live_protocol
 
 
 class SessionResponseAttributes(BaseModel):
+    """Common session response attributes."""
     createdAt: datetime = \
         Field(...,
               description="Date and time that this session was created")
@@ -119,58 +126,84 @@ class SessionResponseAttributes(BaseModel):
               description="Detailed session specific status")
 
 
-class NullSessionResponseAttributes(NullSessionCreateAttributes,
-                                    SessionResponseAttributes):
+class NullSessionResponseAttributes(
+    NullSessionCreateAttributes, SessionResponseAttributes
+):
+    """Response attributes of null session."""
     pass
 
 
-class DefaultSessionResponseAttributes(DefaultSessionCreateAttributes,
-                                       SessionResponseAttributes):
+class DefaultSessionResponseAttributes(
+    DefaultSessionCreateAttributes, SessionResponseAttributes
+):
+    """Response attributes of default session."""
     pass
 
 
-class CalibrationCheckResponseAttributes(CalibrationCheckCreateAttributes,
-                                         SessionResponseAttributes):
+class CalibrationCheckResponseAttributes(
+    CalibrationCheckCreateAttributes, SessionResponseAttributes
+):
+    """Response attributes of cal check session."""
     details: CalibrationCheckSessionStatus
 
 
-class TipLengthCalibrationResponseAttributes(TipLengthCalibrationCreateAttributes,
-                                             SessionResponseAttributes):
+class TipLengthCalibrationResponseAttributes(
+    TipLengthCalibrationCreateAttributes, SessionResponseAttributes
+):
+    """Response attributes of tip length calibration session."""
     details: TipCalibrationSessionStatus
 
 
-class DeckCalibrationResponseAttributes(DeckCalibrationCreateAttributes,
-                                        SessionResponseAttributes):
+class DeckCalibrationResponseAttributes(
+    DeckCalibrationCreateAttributes, SessionResponseAttributes
+):
+    """Response attributes of deck calibration session."""
     details: DeckCalibrationSessionStatus
 
 
-class PipetteOffsetCalibrationResponseAttributes(PipetteOffsetCalibrationCreateAttributes,
-                                                 SessionResponseAttributes):
+class PipetteOffsetCalibrationResponseAttributes(
+    PipetteOffsetCalibrationCreateAttributes, SessionResponseAttributes
+):
+    """Response attributes of pipette offset calibration session."""
     details: PipetteOffsetCalibrationSessionStatus
 
 
-class ProtocolResponseAttributes(ProtocolCreateAttributes,
-                                 SessionResponseAttributes):
+class ProtocolResponseAttributes(
+    ProtocolCreateAttributes, SessionResponseAttributes
+):
+    """Response attributes of protocol session."""
     details: ProtocolSessionDetails
 
 
-class LiveProtocolResponseAttributes(LiveProtocolCreateAttributes,
-                                     SessionResponseAttributes):
+class LiveProtocolResponseAttributes(
+    LiveProtocolCreateAttributes, SessionResponseAttributes
+):
+    """Response attributes of live protocol session."""
     pass
 
 
 RequestTypes = typing.Union[
-    NullSessionCreateAttributes, DefaultSessionCreateAttributes,
-    CalibrationCheckCreateAttributes, TipLengthCalibrationCreateAttributes,
-    DeckCalibrationCreateAttributes, PipetteOffsetCalibrationCreateAttributes,
-    ProtocolCreateAttributes, LiveProtocolCreateAttributes]
+    NullSessionCreateAttributes,
+    DefaultSessionCreateAttributes,
+    CalibrationCheckCreateAttributes,
+    TipLengthCalibrationCreateAttributes,
+    DeckCalibrationCreateAttributes,
+    PipetteOffsetCalibrationCreateAttributes,
+    ProtocolCreateAttributes,
+    LiveProtocolCreateAttributes
+]
 
 
 ResponseTypes = typing.Union[
-    NullSessionResponseAttributes, DefaultSessionResponseAttributes,
-    CalibrationCheckResponseAttributes, TipLengthCalibrationResponseAttributes,
-    DeckCalibrationResponseAttributes, PipetteOffsetCalibrationResponseAttributes,
-    ProtocolResponseAttributes, LiveProtocolResponseAttributes]
+    NullSessionResponseAttributes,
+    DefaultSessionResponseAttributes,
+    CalibrationCheckResponseAttributes,
+    TipLengthCalibrationResponseAttributes,
+    DeckCalibrationResponseAttributes,
+    PipetteOffsetCalibrationResponseAttributes,
+    ProtocolResponseAttributes,
+    LiveProtocolResponseAttributes
+]
 
 
 # Session create and query requests/responses
