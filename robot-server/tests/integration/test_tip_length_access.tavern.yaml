@@ -11,7 +11,6 @@ stages:
     response: &no_tip_length_response
       status_code: 200
       json:
-        meta: null
         links: null
         data: []
 
@@ -27,33 +26,28 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
 
   - name: GET request returns filter with pipette id
     request:
@@ -64,22 +58,19 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: '123'
-              tiprack: !anystr
-              tipLength: 30.5
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: '123'
+            tiprack: !anystr
+            tipLength: 30.5
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
 
             id: '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824&123'
-            type: 'TipLengthCalibration'
 
   - name: GET request returns filter with tiprack hash
     request:
@@ -90,33 +81,28 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
 
   - name: GET request returns filter with pipette AND tiprack
     request:
@@ -128,21 +114,18 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: '123'
-              tiprack: !anystr
-              tipLength: 30.5
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
-            id: '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824&123'
-            type: 'TipLengthCalibration'
+          - pipette: '123'
+            tiprack: !anystr
+            tipLength: 30.5
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
+          id: '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824&123'
 
   - name: GET request returns filter with wrong pipette AND tiprack
     request:

@@ -41,9 +41,9 @@ def test_access_individual_labware(api_client, grab_id):
     data = body['data']
     assert data['type'] == 'LabwareCalibration'
     assert data['id'] == calibration_id
-    data['attributes']['calibrationData']['offset']['lastModified'] = None
-    data['attributes']['calibrationData']['tipLength']['lastModified'] = None
-    assert data['attributes'] == expected
+    data['calibrationData']['offset']['lastModified'] = None
+    data['calibrationData']['tipLength']['lastModified'] = None
+    assert data == expected
 
     resp = api_client.get('/labware/calibrations/funnyId')
     assert resp.status_code == 404

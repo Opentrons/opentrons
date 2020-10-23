@@ -29,14 +29,11 @@ def mock_session_meta():
 @pytest.fixture
 def session_response(mock_session_meta):
     return {
-        'attributes': {
-            'details': {
-            },
-            'sessionType': 'liveProtocol',
-            'createdAt': mock_session_meta.created_at.isoformat(),
-            'createParams': None,
+        'details': {
         },
-        'type': 'LiveProtocolResponseAttributes',
+        'sessionType': 'liveProtocol',
+        'createdAt': mock_session_meta.created_at.isoformat(),
+        'createParams': None,
         'id': mock_session_meta.identifier,
     }
 
@@ -125,10 +122,7 @@ def test_create_session_error(api_client,
 
     response = api_client.post("/sessions", json={
         "data": {
-            "type": "Session",
-            "attributes": {
-                "sessionType": "liveProtocol"
-            }
+            "sessionType": "liveProtocol"
         }
     })
     assert response.json() == {
@@ -146,10 +140,7 @@ def test_create_session(api_client,
                         session_response):
     response = api_client.post("/sessions", json={
         "data": {
-            "type": "Session",
-            "attributes": {
-                "sessionType": "liveProtocol"
-            }
+            "sessionType": "liveProtocol"
         }
     })
     assert response.json() == {
@@ -283,11 +274,8 @@ def command(command_type: str, body: typing.Optional[BaseModel]):
     """Helper to create command"""
     return {
         "data": {
-            "type": "SessionCommand",
-            "attributes": {
-                "command": command_type,
-                "data": body.dict(exclude_unset=True) if body else {}
-            }
+            "command": command_type,
+            "data": body.dict(exclude_unset=True) if body else {}
         }
     }
 
@@ -337,16 +325,13 @@ def test_execute_command(api_client,
 
     assert response.json() == {
         'data': {
-            'attributes': {
-                'command': 'calibration.jog',
-                'data': {'vector': [1.0, 2.0, 3.0]},
-                'status': 'executed',
-                'createdAt': '2000-01-01T00:00:00',
-                'startedAt': '2019-01-01T00:00:00',
-                'completedAt': '2020-01-01T00:00:00',
-                'result': None,
-            },
-            'type': 'SessionCommand',
+            'command': 'calibration.jog',
+            'data': {'vector': [1.0, 2.0, 3.0]},
+            'status': 'executed',
+            'createdAt': '2000-01-01T00:00:00',
+            'startedAt': '2019-01-01T00:00:00',
+            'completedAt': '2020-01-01T00:00:00',
+            'result': None,
             'id': command_id,
         },
         'links': {
@@ -396,16 +381,13 @@ def test_execute_command_no_body(api_client,
 
     assert response.json() == {
         'data': {
-            'attributes': {
-                'command': 'calibration.loadLabware',
-                'data': {},
-                'status': 'executed',
-                'createdAt': '2000-01-01T00:00:00',
-                'startedAt': '2019-01-01T00:00:00',
-                'completedAt': '2020-01-01T00:00:00',
-                'result': None,
-            },
-            'type': 'SessionCommand',
+            'command': 'calibration.loadLabware',
+            'data': {},
+            'status': 'executed',
+            'createdAt': '2000-01-01T00:00:00',
+            'startedAt': '2019-01-01T00:00:00',
+            'completedAt': '2020-01-01T00:00:00',
+            'result': None,
             'id': command_id
         },
         'links': {

@@ -16,14 +16,12 @@ stages:
       json:
         data: &response_data
           id: phony_proto
-          type: ProtocolResponseAttributes
-          attributes:
-            protocolFile:
-              basename: phony_proto.py
-            supportFiles:
-              - basename: data.csv
-            lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          protocolFile:
+            basename: phony_proto.py
+          supportFiles:
+            - basename: data.csv
+          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
         links:
           self:
             href: '/protocols/phony_proto'
@@ -89,13 +87,11 @@ stages:
       json:
         data:
           id: phony_proto
-          type: ProtocolResponseAttributes
-          attributes:
-            protocolFile:
-              basename: phony_proto.py
-            supportFiles: []
-            lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          protocolFile:
+            basename: phony_proto.py
+          supportFiles: []
+          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
         links:
           self:
             href: '/protocols/phony_proto'
@@ -112,13 +108,11 @@ stages:
       json:
         data:
           id: phony_proto
-          type: ProtocolResponseAttributes
-          attributes:
-            protocolFile:
-              basename: phony_proto.py
-            supportFiles: []
-            lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          protocolFile:
+            basename: phony_proto.py
+          supportFiles: []
+          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
         links:
           self:
             href: '/protocols/phony_proto'
@@ -137,14 +131,12 @@ stages:
       json:
         data:
           id: phony_proto
-          type: ProtocolResponseAttributes
-          attributes:
-            protocolFile:
-              basename: phony_proto.py
-            supportFiles:
-            - basename: 'data.csv'
-            lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          protocolFile:
+            basename: phony_proto.py
+          supportFiles:
+          - basename: 'data.csv'
+          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
         links:
           self:
             href: '/protocols/phony_proto'
@@ -161,14 +153,12 @@ stages:
       json:
         data:
           id: phony_proto
-          type: ProtocolResponseAttributes
-          attributes:
-            protocolFile:
-              basename: phony_proto.py
-            supportFiles:
-            - basename: 'data.csv'
-            lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          protocolFile:
+            basename: phony_proto.py
+          supportFiles:
+          - basename: 'data.csv'
+          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
         links:
           self:
             href: '/protocols'

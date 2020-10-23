@@ -10,9 +10,7 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: deckCalibration
+          sessionType: deckCalibration
     response:
       status_code: 201
       save:
@@ -52,9 +50,7 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: "liveProtocol"
+          sessionType: "liveProtocol"
     response:
       status_code: 201
       save:
@@ -67,9 +63,7 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: deckCalibration
+          sessionType: deckCalibration
     response:
       status_code: 201
       save:
@@ -87,19 +81,15 @@ stages:
         meta: null
         data:
         - id: "{session_id_1}"
-          type: !anystr
-          attributes:
-            sessionType: "liveProtocol"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            details: {}
-            createParams: null
+          sessionType: "liveProtocol"
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          details: {}
+          createParams: null
         - id: "{session_id_2}"
-          type: !anystr
-          attributes:
-            sessionType: "deckCalibration"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            details: !anydict
-            createParams: null
+          sessionType: "deckCalibration"
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          details: !anydict
+          createParams: null
 
   - name: Get just the deck cal sessions
     request:
@@ -112,12 +102,10 @@ stages:
         meta: null
         data:
         - id: "{session_id_2}"
-          type: !anystr
-          attributes:
-            sessionType: "deckCalibration"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            details: !anydict
-            createParams: null
+          sessionType: "deckCalibration"
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          details: !anydict
+          createParams: null
 
   - name: Delete session 1
     request:
