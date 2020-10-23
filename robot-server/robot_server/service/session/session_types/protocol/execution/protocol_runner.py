@@ -5,7 +5,7 @@ import sys
 import typing
 
 from opentrons.broker import Broker
-from opentrons.commands import command_types
+from opentrons.commands import types as command_types
 from opentrons.hardware_control import ThreadedAsyncLock, ThreadManager
 from opentrons.api.session import Session as ApiProtocolSession
 

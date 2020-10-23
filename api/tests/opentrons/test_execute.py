@@ -174,30 +174,6 @@ def test_execute_function_bundle_apiv2(get_bundle_fixture,
         ]
 
 
-@pytest.mark.parametrize('protocol_file', ['testosaur.py'])
-def test_execute_function_v1(protocol, protocol_file,
-                             virtual_smoothie_env,
-                             mock_get_attached_instr):
-    entries = []
-
-    def emit_runlog(entry):
-        nonlocal entries
-        entries.append(entry)
-
-    mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        'config': load('p300_single_v1.5'), 'id': 'testid'}
-    execute.execute(protocol.filelike, 'testosaur.py', emit_runlog=emit_runlog)
-    assert [item['payload']['text'] for item in entries
-            if item['$'] == 'before'] == [
-        'Picking up tip from well A1 in "5"',
-        'Aspirating 10.0 uL from well A1 in "8" at 150.0 uL/sec',
-        'Dispensing 10.0 uL into well H12 in "8" at 300.0 uL/sec',
-        'Aspirating 10.0 uL from well A1 in "11" at 150.0 uL/sec',
-        'Dispensing 10.0 uL into well H12 in "11" at 300.0 uL/sec',
-        'Dropping tip into well A1 in "12"'
-    ]
-
-
 @pytest.mark.parametrize('protocol_file', ['python_v2_custom_lw.py'])
 def test_execute_extra_labware(protocol, protocol_file, monkeypatch,
                                virtual_smoothie_env, mock_get_attached_instr):

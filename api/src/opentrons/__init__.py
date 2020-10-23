@@ -1,4 +1,3 @@
-import importlib
 import json
 import os
 import sys
@@ -12,6 +11,8 @@ from opentrons.hardware_control import API, ThreadManager
 from opentrons.config import (feature_flags as ff, name,
                               robot_configs, IS_ROBOT, ROBOT_FIRMWARE_DIR)
 from opentrons.util import logging_config
+from opentrons.protocols.types import ApiDeprecationError
+from opentrons.protocols.api_support.types import APIVersion
 
 version = sys.version_info[0:2]
 if version < (3, 7):
@@ -33,27 +34,16 @@ from opentrons import config  # noqa(E402)
 LEGACY_MODULES = [
     'robot', 'reset', 'instruments', 'containers', 'labware', 'modules']
 
-__all__ = ['version', 'HERE', 'LEGACY_MODULES', 'config']
+__all__ = ['version', 'HERE', 'config']
 
 
 def __getattr__(attrname):
     """
-    Lazily load the robot singleton and friends to make importing faster
-
-    The first time somebody does opentrons.robot (or any other v1 "module"
-    that is actually a singleton), this will fire because the attr doesn't
-    exist, and we'll import and initialize all the singletons. Subsequently
-    this function won't be invoked.
+    Prevent import of legacy modules from global to officially
+    deprecate Python API Version 1.0.
     """
     if attrname in LEGACY_MODULES:
-        legacy_api = importlib.import_module(
-            '.'.join([__name__,
-                      'legacy_api',
-                      'api']))
-        for mod in LEGACY_MODULES:
-            setattr(sys.modules[__name__], attrname,
-                    getattr(legacy_api, attrname))
-        return getattr(sys.modules[__name__], attrname)
+        raise ApiDeprecationError(APIVersion(1, 0))
     raise AttributeError(attrname)
 
 

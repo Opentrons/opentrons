@@ -1,3 +1,16 @@
+from typing import Any, List
+
+
+def session_listify(location: Any) -> List:
+    if isinstance(location, list):
+        try:
+            return session_listify(location[0])
+        except IndexError:
+            return [location]
+    else:
+        return [location]
+
+
 def from_list(commands):
     """
     Given a list of tuples of form (depth, text)

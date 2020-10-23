@@ -4,7 +4,7 @@ from unittest import mock
 import opentrons.protocol_api as papi
 from opentrons.protocols.advanced_control import transfers
 from opentrons.types import Mount
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture
