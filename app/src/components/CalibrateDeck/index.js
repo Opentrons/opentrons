@@ -28,6 +28,7 @@ import {
   SaveXYPoint,
   CompleteConfirmation,
   ConfirmExitModal,
+  INTENT_DECK_CALIBRATION,
 } from '../CalibrationPanels'
 
 import type { StyleProps } from '@opentrons/components'
@@ -171,6 +172,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
           mount={instrument?.mount.toLowerCase()}
           currentStep={currentStep}
           sessionType={session.sessionType}
+          intent={INTENT_DECK_CALIBRATION}
         />
       </ModalPage>
       {showConfirmExit && (

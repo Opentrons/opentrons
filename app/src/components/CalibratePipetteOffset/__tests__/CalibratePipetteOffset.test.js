@@ -18,6 +18,7 @@ import {
   SaveZPoint,
   SaveXYPoint,
   CompleteConfirmation,
+  INTENT_PIPETTE_OFFSET,
 } from '../../CalibrationPanels'
 
 import type { PipetteOffsetCalibrationStep } from '../../../sessions/types'
@@ -99,6 +100,7 @@ describe('CalibratePipetteOffset', () => {
           dispatchRequests={dispatchRequests}
           showSpinner={showSpinner}
           isJogging={isJogging}
+          intent={INTENT_PIPETTE_OFFSET}
         />,
         {
           wrappingComponent: Provider,

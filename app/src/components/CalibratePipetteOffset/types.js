@@ -5,6 +5,7 @@ import type {
   PipetteOffsetCalibrationSession,
   CalibrationLabware,
 } from '../../sessions/types'
+import type { PipetteOffsetIntent } from '../CalibrationPanels/types'
 
 import type { PipetteOffsetCalibrationStep } from '../../sessions/pipette-offset-calibration/types'
 
@@ -17,6 +18,7 @@ export type CalibratePipetteOffsetParentProps = {|
   ) => void,
   showSpinner: boolean,
   isJogging: boolean,
+  intent: PipetteOffsetIntent,
 |}
 
 export type CalibratePipetteOffsetChildProps = {|

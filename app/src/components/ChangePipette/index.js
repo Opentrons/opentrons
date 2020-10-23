@@ -25,6 +25,7 @@ import {
 
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { useAskForCalibrationBlock } from '../CalibrateTipLength/useAskForCalibrationBlock'
+import { INTENT_PIPETTE_OFFSET } from '../CalibrationPanels'
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
@@ -114,7 +115,10 @@ export function ChangePipette(props: Props): React.Node {
     showAskForCalibrationBlock,
     AskForCalibrationBlockModal,
   ] = useAskForCalibrationBlock(calBlock => {
-    startPipetteOffsetCalibration({ hasCalibrationBlock: calBlock })
+    startPipetteOffsetCalibration({
+      overrideParams: { hasCalibrationBlock: calBlock },
+      withIntent: INTENT_PIPETTE_OFFSET,
+    })
   })
 
   const baseProps = {
