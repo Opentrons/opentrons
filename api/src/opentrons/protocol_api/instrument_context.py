@@ -13,7 +13,7 @@ from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances,
     clamp_value, requires_version, build_edges, first_parent)
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
     BlowoutLocation, LiquidHandlingCommand)
 from .labware import (

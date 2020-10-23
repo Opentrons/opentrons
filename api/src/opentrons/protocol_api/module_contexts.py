@@ -7,7 +7,7 @@ from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 from .labware import (
     Labware, load, load_from_definition)

@@ -1,29 +1,14 @@
 from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
+from .api_support.definitions import MINIMUM_SUPPORTED_VERSION
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons_shared_data.protocol.dev_types import (
         JsonProtocol as JsonProtocolDef
     )
+    from .api_support.types import APIVersion
 
 Metadata = Dict[str, Union[str, int]]
-
-
-class APIVersion(NamedTuple):
-    major: int
-    minor: int
-
-    @classmethod
-    def from_string(cls, inp: str) -> 'APIVersion':
-        parts = inp.split('.')
-        if len(parts) != 2:
-            raise ValueError(inp)
-        intparts = [int(p) for p in parts]
-
-        return cls(major=intparts[0], minor=intparts[1])
-
-    def __str__(self):
-        return f'{self.major}.{self.minor}'
 
 
 class JsonProtocol(NamedTuple):
@@ -31,7 +16,7 @@ class JsonProtocol(NamedTuple):
     filename: Optional[str]
     contents: 'JsonProtocolDef'
     schema_version: int
-    api_level: APIVersion
+    api_level: 'APIVersion'
 
 
 class PythonProtocol(NamedTuple):
@@ -39,7 +24,7 @@ class PythonProtocol(NamedTuple):
     filename: Optional[str]
     contents: Any  # This is the output of compile() which we can't type
     metadata: Metadata
-    api_level: APIVersion
+    api_level: 'APIVersion'
     # these 'bundled_' attrs should only be included when the protocol is a zip
     bundled_labware: Optional[Dict[str, 'LabwareDefinition']]
     bundled_data: Optional[Dict[str, bytes]]
@@ -106,7 +91,7 @@ class ApiDeprecationError(Exception):
 
     def __str__(self):
         return PYTHON_API_VERSION_DEPRECATED.format(
-            self.version, APIVersion(2, 0))
+            self.version, MINIMUM_SUPPORTED_VERSION)
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.version)

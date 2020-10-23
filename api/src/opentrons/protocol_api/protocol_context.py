@@ -12,7 +12,8 @@ from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.constants import SHORT_TRASH_DECK, \
     STANDARD_DECK
-from opentrons.protocols.types import APIVersion, Protocol
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.types import Protocol
 from .labware import (
     Labware, get_labware_definition, load_from_definition)
 from opentrons.protocols.geometry.module_geometry import (

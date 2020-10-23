@@ -13,9 +13,9 @@ from opentrons.protocols.parse import (
     version_from_metadata)
 from opentrons.protocols.types import (JsonProtocol,
                                        PythonProtocol,
-                                       APIVersion,
                                        MalformedProtocolError,
                                        ApiDeprecationError)
+from opentrons.protocols.api_support.types import APIVersion
 
 
 def test_extract_metadata():

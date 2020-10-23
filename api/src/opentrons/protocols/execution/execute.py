@@ -7,7 +7,8 @@ from opentrons.protocols.execution.json_dispatchers import (
     magnetic_module_command_map, thermocycler_module_command_map)
 from opentrons.protocols.execution import execute_json_v4, execute_json_v3
 
-from opentrons.protocols.types import (PythonProtocol, Protocol, APIVersion)
+from opentrons.protocols.types import PythonProtocol, Protocol
+from opentrons.protocols.api_support.types import APIVersion
 
 MODULE_LOG = logging.getLogger(__name__)
 

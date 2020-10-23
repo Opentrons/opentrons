@@ -11,7 +11,7 @@ from opentrons.hardware_control import ThreadedAsyncForbidden
 
 from tests.opentrons.conftest import state
 from functools import partial
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 

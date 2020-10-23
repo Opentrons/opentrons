@@ -20,7 +20,8 @@ from opentrons.protocol_api import (MAX_SUPPORTED_VERSION)
 from opentrons.protocols.execution import execute as execute_apiv2
 from opentrons.commands import types as command_types
 from opentrons.protocols.parse import parse, version_from_string
-from opentrons.protocols.types import APIVersion, PythonProtocol
+from opentrons.protocols.types import PythonProtocol
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API, ThreadManager
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 

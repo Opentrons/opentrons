@@ -27,7 +27,8 @@ from opentrons.commands import types as command_types
 from opentrons.protocols.api_support.util import HardwareToManage
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
-    PythonProtocol, BundleContents, APIVersion)
+    PythonProtocol, BundleContents)
+from opentrons.protocols.api_support.types import APIVersion
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 if TYPE_CHECKING:

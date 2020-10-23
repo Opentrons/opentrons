@@ -16,8 +16,9 @@ import jsonschema  # type: ignore
 
 from opentrons.config import feature_flags as ff
 from opentrons_shared_data import load_shared_data, protocol
+from .api_support.types import APIVersion
 from .types import (Protocol, PythonProtocol, JsonProtocol,
-                    Metadata, APIVersion, MalformedProtocolError,
+                    Metadata, MalformedProtocolError,
                     ApiDeprecationError)
 from .bundle import extract_bundle
 

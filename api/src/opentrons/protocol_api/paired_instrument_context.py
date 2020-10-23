@@ -7,7 +7,7 @@ from opentrons import types, hardware_control as hc
 from opentrons.commands import paired_commands as cmds
 from opentrons.commands.publisher import (
     CommandPublisher, publish_paired, publish)
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.implementations.paired_instrument import\
     PairedInstrument
 
