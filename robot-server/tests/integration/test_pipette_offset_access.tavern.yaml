@@ -11,7 +11,6 @@ stages:
     response: &no_offset_response
       status_code: 200
       json:
-        meta: null
         links: null
         data: []
 
@@ -27,31 +26,26 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: 'pip_1'
-              mount: 'left'
-              offset: [0.0, 0.0, 0.0]
-              tiprack: !anystr
-              lastModified: !anystr
-              tiprackUri: !anystr
-              source: 'user'
-              status: !anydict
+          - pipette: 'pip_1'
+            mount: 'left'
+            offset: [0.0, 0.0, 0.0]
+            tiprack: !anystr
+            lastModified: !anystr
+            tiprackUri: !anystr
+            source: 'user'
+            status: !anydict
             id: !anystr
-            type: 'PipetteOffsetCalibration'
-          - attributes:
-              pipette: 'pip_2'
-              mount: 'right'
-              offset: [0.0, 0.0, 0.0]
-              tiprack: !anystr
-              lastModified: !anystr
-              tiprackUri: !anystr
-              source: 'user'
-              status: !anydict
+          - pipette: 'pip_2'
+            mount: 'right'
+            offset: [0.0, 0.0, 0.0]
+            tiprack: !anystr
+            lastModified: !anystr
+            tiprackUri: !anystr
+            source: 'user'
+            status: !anydict
             id: !anystr
-            type: 'PipetteOffsetCalibration'
 
   - name: GET request returns filter with pipette id
     request:
@@ -62,20 +56,17 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: 'pip_1'
-              mount: 'left'
-              offset: [0.0, 0.0, 0.0]
-              tiprack: !anystr
-              lastModified: !anystr
-              tiprackUri: !anystr
-              source: 'user'
-              status: !anydict
+          - pipette: 'pip_1'
+            mount: 'left'
+            offset: [0.0, 0.0, 0.0]
+            tiprack: !anystr
+            lastModified: !anystr
+            tiprackUri: !anystr
+            source: 'user'
+            status: !anydict
             id: !anystr
-            type: 'PipetteOffsetCalibration'
 
   - name: GET request returns filter with mount
     request:
@@ -86,20 +77,17 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: 'pip_1'
-              mount: 'left'
-              offset: [0.0, 0.0, 0.0]
-              tiprack: !anystr
-              tiprackUri: !anystr
-              lastModified: !anystr
-              source: 'user'
-              status: !anydict
+          - pipette: 'pip_1'
+            mount: 'left'
+            offset: [0.0, 0.0, 0.0]
+            tiprack: !anystr
+            tiprackUri: !anystr
+            lastModified: !anystr
+            source: 'user'
+            status: !anydict
             id: !anystr
-            type: 'PipetteOffsetCalibration'
 
   - name: GET request returns filter with pipette AND mount
     request:
@@ -111,20 +99,17 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: 'pip_1'
-              mount: 'left'
-              offset: [0.0, 0.0, 0.0]
-              tiprack: !anystr
-              lastModified: !anystr
-              tiprackUri: !anystr
-              source: 'user'
-              status: !anydict
+          - pipette: 'pip_1'
+            mount: 'left'
+            offset: [0.0, 0.0, 0.0]
+            tiprack: !anystr
+            lastModified: !anystr
+            tiprackUri: !anystr
+            source: 'user'
+            status: !anydict
             id: !anystr
-            type: 'PipetteOffsetCalibration'
 
   - name: GET request returns filter with wrong pipette AND mount
     request:

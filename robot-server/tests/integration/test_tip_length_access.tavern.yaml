@@ -11,7 +11,6 @@ stages:
     response: &no_tip_length_response
       status_code: 200
       json:
-        meta: null
         links: null
         data: []
 
@@ -27,33 +26,28 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
 
   - name: GET request returns filter with pipette id
     request:
@@ -64,22 +58,18 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: 'pip_1'
-              tiprack: 'fakehash'
-              tipLength: 30.5
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
-
+          - pipette: 'pip_1'
+            tiprack: 'fakehash'
+            tipLength: 30.5
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: 'fakehash&pip_1'
-            type: 'TipLengthCalibration'
 
   - name: GET request returns filter with tiprack hash
     request:
@@ -90,33 +80,28 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
 
   - name: GET request returns filter with pipette AND tiprack
     request:
@@ -128,21 +113,18 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: 'pip_1'
-              tiprack: 'fakehash'
-              tipLength: 30.5
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: 'pip_1'
+            tiprack: 'fakehash'
+            tipLength: 30.5
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: 'fakehash&pip_1'
-            type: 'TipLengthCalibration'
 
   - name: GET request returns filter with wrong pipette AND tiprack
     request:

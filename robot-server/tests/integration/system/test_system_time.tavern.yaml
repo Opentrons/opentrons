@@ -12,15 +12,12 @@ stages:
       status_code: 200
       json:
         data:
-          attributes:
-            systemTime: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          systemTime: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           id: 'time'
-          type: 'SystemTimeAttributes'
         links:
           self:
             href: '/system/time'
             meta: null
-        meta: null
 
 ---
 test_name: PUT Time
@@ -35,8 +32,6 @@ stages:
       json:
         data:
           id: "time"
-          type: "SystemTimeAttributes"
-          attributes: {}
     response:
       status_code: 422
       json:
@@ -45,7 +40,7 @@ stages:
             title: "value_error.missing"
             detail: "field required"
             source:
-              pointer: "/body/new_time/data/attributes/systemTime"
+              pointer: "/body/new_time/data/systemTime"
   - name: System Time PUT request on a dev server raises error
     request:
       url: "{host:s}:{port:d}/system/time"
@@ -53,9 +48,7 @@ stages:
       json:
         data:
           id: "time"
-          type: "SystemTimeAttributes"
-          attributes:
-            systemTime: "2020-09-10T21:00:15.741Z"
+          systemTime: "2020-09-10T21:00:15.741Z"
     response:
       status_code: 501
       json:

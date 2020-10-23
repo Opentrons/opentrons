@@ -26,9 +26,8 @@ def test_access_pipette_offset_calibration(
         f'/calibration/pipette_offset?mount={MOUNT}&pipette_id={PIPETTE_ID}')
     assert resp.status_code == 200
     data = resp.json()['data'][0]
-    assert data['type'] == 'PipetteOffsetCalibration'
-    data['attributes']['lastModified'] = None
-    assert data['attributes'] == expected
+    data['lastModified'] = None
+    assert data == expected
 
     resp = api_client.get(
         f'/calibration/pipette_offset?mount={MOUNT}&'

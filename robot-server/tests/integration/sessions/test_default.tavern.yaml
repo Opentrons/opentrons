@@ -11,8 +11,7 @@ stages:
       json:
         data:
           type: Session
-          attributes:
-            sessionType: default
+          sessionType: default
     response:
       status_code: 403
       json:
@@ -53,12 +52,10 @@ stages:
         links: !anydict
         data:
           id: default
-          type: Session
-          attributes:
-            sessionType: default
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            details: {}
-            createParams: null
+          sessionType: default
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          details: {}
+          createParams: null
 ---
 test_name: Default Commands
 marks:
@@ -71,10 +68,8 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: robot.homeAllMotors
-            data: {}
+          command: robot.homeAllMotors
+          data: {}
     response:
       status_code: 200
   - name: Send a toggleLights command
@@ -83,10 +78,8 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: robot.toggleLights
-            data: {}
+          command: robot.toggleLights
+          data: {}
     response:
       status_code: 200
   - name: Rejects an unknown command
@@ -95,10 +88,8 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.loadLabware
-            data: {}
+          command: calibration.loadLabware
+          data: {}
     response:
       status_code: 403
 
