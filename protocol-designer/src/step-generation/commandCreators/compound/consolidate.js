@@ -311,7 +311,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
       // if using dispense > air gap, drop or change the tip at the end
       const dropTipAfterDispenseAirGap =
-        airGapAfterDispenseCommands.length > 0 && isLastChunk
+        airGapAfterDispenseCommands.length > 0
           ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
           : []
 
