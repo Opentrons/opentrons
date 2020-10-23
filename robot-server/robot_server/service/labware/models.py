@@ -4,8 +4,8 @@ from datetime import datetime
 from functools import partial
 from pydantic import BaseModel, Field
 
-from robot_server.service.json_api import ResponseModel
-from robot_server.service.json_api.response import MultiResponseModel
+from robot_server.service.json_api import (
+    ResponseModel, ResponseDataModel, MultiResponseModel)
 
 OffsetVector = typing.Tuple[float, float, float]
 
@@ -39,7 +39,7 @@ class CalibrationData(BaseModel):
         Field(..., description="The tip length of a labware, if relevant.")
 
 
-class LabwareCalibration(BaseModel):
+class LabwareCalibration(ResponseDataModel):
     """
     A model describing labware calibrations (tiplength and offset)
     """
@@ -102,9 +102,9 @@ class LabwareCalibration(BaseModel):
 
 
 MultipleCalibrationsResponse = MultiResponseModel[
-    LabwareCalibration, dict
+    LabwareCalibration
 ]
 
 SingleCalibrationResponse = ResponseModel[
-    LabwareCalibration, dict
+    LabwareCalibration
 ]

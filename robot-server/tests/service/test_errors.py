@@ -11,9 +11,7 @@ from tests.service.helpers import ItemRequest
 def test_transform_validation_error_to_json_api_errors():
     with pytest.raises(ValidationError) as e:
         ItemRequest(**{
-            'data': {
-                'type': 'type'
-            }
+            'data': {}
         })
     assert errors.transform_validation_error_to_json_api_errors(
         HTTP_422_UNPROCESSABLE_ENTITY,
@@ -24,7 +22,23 @@ def test_transform_validation_error_to_json_api_errors():
                 'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
                 'detail': 'field required',
                 'source': {
-                    'pointer': '/data/attributes'
+                    'pointer': '/data/name'
+                },
+                'title': 'value_error.missing'
+            },
+            {
+                'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
+                'detail': 'field required',
+                'source': {
+                    'pointer': '/data/quantity'
+                },
+                'title': 'value_error.missing'
+            },
+            {
+                'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
+                'detail': 'field required',
+                'source': {
+                    'pointer': '/data/price'
                 },
                 'title': 'value_error.missing'
             },
