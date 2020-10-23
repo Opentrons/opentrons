@@ -13,7 +13,7 @@ from robot_server.service.session.command_execution import \
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
-from ..models.session import SessionType, SessionDetails
+from ..models.session import SessionType, SessionDetails, TipLengthCalibrationResponseAttributes
 from ..errors import UnsupportedFeature
 
 if TYPE_CHECKING:
@@ -87,7 +87,15 @@ class TipLengthCalibration(BaseSession):
     def session_type(self) -> SessionType:
         return SessionType.tip_length_calibration
 
-    def _get_response_details(self) -> SessionDetails:
+    def get_response_model(self) -> TipLengthCalibrationResponseAttributes:
+        return TipLengthCalibrationResponseAttributes(
+            id=self.meta.identifier,
+            details=self._get_response_details(),
+            createdAt=self.meta.created_at,
+            createParams=self.meta.create_params
+        )
+
+    def _get_response_details(self) -> TipCalibrationSessionStatus:
         return TipCalibrationSessionStatus(
             instrument=self._tip_cal_user_flow.get_pipette(),
             currentStep=self._tip_cal_user_flow.current_state,

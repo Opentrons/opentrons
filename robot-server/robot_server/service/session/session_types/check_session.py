@@ -11,7 +11,7 @@ from robot_server.service.session.command_execution import \
     CommandQueue, CallableExecutor, Command, CompletedCommand
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models.session import SessionType, \
-    SessionDetails
+    SessionDetails, CalibrationCheckResponseAttributes
 from robot_server.service.session.session_types.base_session \
     import BaseSession, SessionMetaData
 from robot_server.service.session.errors import SessionCreationException, \
@@ -94,6 +94,13 @@ class CheckSession(BaseSession):
             comparingPointOne=second.comparingPointOne)
         return ComparisonStatePerPipette(
             first=first_compmap, second=second_compmap)
+
+    def get_response_model(self) -> CalibrationCheckResponseAttributes:
+        return CalibrationCheckResponseAttributes(
+            createParams=self.meta.create_params,
+            createdAt=self.meta.created_at,
+            details=self._get_response_details()
+        )
 
     def _get_response_details(self) -> SessionDetails:
         comparison_map =\

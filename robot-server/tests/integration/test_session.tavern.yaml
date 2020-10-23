@@ -83,6 +83,7 @@ stages:
     response:
       status_code: 200
       json:
+        links: null
         data:
         - id: "{session_id_1}"
           type: Session
@@ -106,6 +107,7 @@ stages:
     response:
       status_code: 200
       json:
+        links: null
         data:
         - id: "{session_id_2}"
           type: Session

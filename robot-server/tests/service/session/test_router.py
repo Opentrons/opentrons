@@ -157,15 +157,17 @@ def test_create_session(api_client,
         'links': {
             'commandExecute': {
                 'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: E501
+                'meta': None,
             },
             'self': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
+                'meta': None,
             },
             'sessions': {
-                'href': '/sessions'
+                'href': '/sessions', 'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}', 'meta': None,
             }
         }
     }
@@ -201,10 +203,10 @@ def test_delete_session(api_client,
         'data': session_response,
         'links': {
             'self': {
-                'href': '/sessions',
+                'href': '/sessions', 'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}', 'meta': None,
             },
         }
     }
@@ -237,15 +239,19 @@ def test_get_session(api_client,
         'links': {
             'commandExecute': {
                 'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e5011
+                'meta': None,
             },
             'self': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
+                'meta': None,
             },
             'sessions': {
-                'href': '/sessions'
+                'href': '/sessions',
+                'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}',
+                'meta': None,
             }
         }
     }
@@ -255,7 +261,7 @@ def test_get_session(api_client,
 def test_get_sessions_no_sessions(api_client):
     response = api_client.get("/sessions")
     assert response.json() == {
-        'data': [],
+        'data': [], 'links': None,
     }
     assert response.status_code == 200
 
@@ -265,7 +271,7 @@ def test_get_sessions(api_client,
                       session_response):
     response = api_client.get("/sessions")
     assert response.json() == {
-        'data': [session_response],
+        'data': [session_response], 'links': None
     }
     assert response.status_code == 200
 
@@ -338,19 +344,24 @@ def test_execute_command(api_client,
             },
             'type': 'SessionCommand',
             'id': command_id,
+            'result': None,
         },
         'links': {
             'commandExecute': {
                 'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e501
+                'meta': None,
             },
             'self': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
+                'meta': None,
             },
             'sessions': {
-                'href': '/sessions'
+                'href': '/sessions',
+                'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}',
+                'meta': None,
             },
         }
     }
@@ -395,15 +406,19 @@ def test_execute_command_no_body(api_client,
         'links': {
             'commandExecute': {
                 'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e501
+                'meta': None,
             },
             'self': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
+                'meta': None,
             },
             'sessions': {
-                'href': '/sessions'
+                'href': '/sessions',
+                'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}',
+                'meta': None,
             },
         }
     }

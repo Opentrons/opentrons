@@ -45,7 +45,6 @@ def get_session(manager: SessionManager,
 
 @router.post("/sessions",
              description="Create a session",
-             response_model_exclude_unset=True,
              response_model=SessionResponse,
              status_code=http_status_codes.HTTP_201_CREATED)
 async def create_session_handler(
@@ -70,7 +69,6 @@ async def create_session_handler(
 
 @router.delete(PATH_SESSION_BY_ID,
                description="Delete a session",
-               response_model_exclude_unset=True,
                response_model=SessionResponse)
 async def delete_session_handler(
         sessionId: IdentifierType,
@@ -92,7 +90,6 @@ async def delete_session_handler(
 
 @router.get(PATH_SESSION_BY_ID,
             description="Get session",
-            response_model_exclude_unset=True,
             response_model=SessionResponse)
 async def get_session_handler(
         sessionId: IdentifierType,
@@ -112,7 +109,6 @@ async def get_session_handler(
 
 @router.get("/sessions",
             description="Get all the sessions",
-            response_model_exclude_unset=True,
             response_model=MultiSessionResponse)
 async def get_sessions_handler(
         session_type: SessionType = Query(
@@ -132,8 +128,6 @@ async def get_sessions_handler(
 
 @router.post(f"{PATH_SESSION_BY_ID}/commands/execute",
              description="Create and execute a command immediately",
-             response_model_exclude_unset=True,
-             response_model_exclude_defaults=True,
              response_model=CommandResponse)
 async def session_command_execute_handler(
         sessionId: IdentifierType,
