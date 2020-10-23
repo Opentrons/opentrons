@@ -35,7 +35,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           id: !anystr
           data: *labware_data
@@ -65,7 +64,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           id: !anystr
           data: *tiprack_data
@@ -92,7 +90,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           id: !anystr
           data: *create_instrument_data

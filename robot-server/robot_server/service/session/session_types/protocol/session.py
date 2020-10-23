@@ -52,6 +52,7 @@ class ProtocolSession(BaseSession):
 
     def get_response_model(self) -> ProtocolResponseAttributes:
         return ProtocolResponseAttributes(
+            id=self.meta.identifier,
             createParams=cast(ProtocolCreateParams, self.meta.create_params),
             createdAt=self.meta.created_at,
             details=ProtocolSessionDetails(

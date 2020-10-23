@@ -78,7 +78,6 @@ stages:
       status_code: 200
       json:
         links: null
-        meta: null
         data:
         - id: "{session_id_1}"
           sessionType: "liveProtocol"
@@ -99,7 +98,6 @@ stages:
       status_code: 200
       json:
         links: null
-        meta: null
         data:
         - id: "{session_id_2}"
           sessionType: "deckCalibration"
@@ -129,5 +127,4 @@ stages:
       status_code: 200
       json:
         data: []
-        meta: null
         links: null

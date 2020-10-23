@@ -78,6 +78,7 @@ class DeckCalibrationSession(BaseSession):
 
     def get_response_model(self) -> DeckCalibrationResponseAttributes:
         return DeckCalibrationResponseAttributes(
+            id=self.meta.identifier,
             createParams=self.meta.create_params,
             details=self._get_response_details(),
             createdAt=self.meta.created_at
