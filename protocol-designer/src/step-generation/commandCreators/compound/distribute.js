@@ -126,8 +126,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
     }
   }
 
+  const destWellChunks = chunk(args.destWells, maxWellsPerChunk)
   const commandCreators = flatMap(
-    chunk(args.destWells, maxWellsPerChunk),
+    destWellChunks,
     (
       destWellChunk: Array<string>,
       chunkIndex: number
@@ -251,16 +252,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ]
       }
 
-      let moreWellsRemaining = false
-      if (destWellChunk.length < maxWellsPerChunk) {
-        moreWellsRemaining = false
-      } else if (
-        args.destWells.length -
-        destWellChunk.length * (chunkIndex + 1)
-      ) {
-        moreWellsRemaining = true
-      }
-
       const {
         dispenseAirGapLabware,
         dispenseAirGapWell,
@@ -272,9 +263,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
         destWell: last(destWellChunk),
       })
 
+      const isLastChunk = chunkIndex + 1 === destWellChunks.length
+      const willReuseTip = args.changeTip !== 'always' && !isLastChunk
+
       const airGapAfterDispenseCommands =
-        dispenseAirGapVolume &&
-        (args.changeTip === 'always' || !moreWellsRemaining)
+        dispenseAirGapVolume && !willReuseTip
           ? [
               curryCommandCreator(airGap, {
                 pipette: args.pipette,
