@@ -22,8 +22,8 @@ def test_access_tip_length_calibration(
     assert resp.status_code == 200
     data = resp.json()['data'][0]
     assert data['type'] == 'TipLengthCalibration'
-    data['attributes']['lastModified'] = None
-    assert data['attributes'] == expected
+    data['lastModified'] = None
+    assert data == expected
 
     resp = api_client.get(
         f'/calibration/tip_length?pipette_id={FAKE_PIPETTE_ID}&'
