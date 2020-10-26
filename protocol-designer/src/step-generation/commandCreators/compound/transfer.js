@@ -2,12 +2,13 @@
 import assert from 'assert'
 import zip from 'lodash/zip'
 import { getWellDepth } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP, FIXED_TRASH_ID } from '../../../constants'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
   blowoutUtil,
   curryCommandCreator,
+  getDispenseAirGapLocation,
   reduceCommandCreators,
 } from '../../utils'
 import {
@@ -356,14 +357,25 @@ export const transfer: CommandCreator<TransferArgs> = (
           }
           // TODO(IL, 2020-10-12): extract this ^ into a util to reuse in distribute/consolidate??
 
+          const {
+            dispenseAirGapLabware,
+            dispenseAirGapWell,
+          } = getDispenseAirGapLocation({
+            blowoutLocation: args.blowoutLocation,
+            sourceLabware: args.sourceLabware,
+            destLabware: args.destLabware,
+            sourceWell,
+            destWell,
+          })
+
           const airGapAfterDispenseCommands =
             dispenseAirGapVolume && !willReuseTip
               ? [
                   curryCommandCreator(airGap, {
                     pipette: args.pipette,
                     volume: dispenseAirGapVolume,
-                    labware: args.destLabware,
-                    well: destWell,
+                    labware: dispenseAirGapLabware,
+                    well: dispenseAirGapWell,
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
                   }),
@@ -387,21 +399,17 @@ export const transfer: CommandCreator<TransferArgs> = (
               ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
               : []
 
-          const blowoutCommand =
-            dropTipAfterDispenseAirGap.length > 0 &&
-            args.blowoutLocation === FIXED_TRASH_ID
-              ? [] // skip blowout it's in the trash we're replacing the tip due to dispense > air gap
-              : blowoutUtil({
-                  pipette: args.pipette,
-                  sourceLabwareId: args.sourceLabware,
-                  sourceWell: sourceWell,
-                  destLabwareId: args.destLabware,
-                  destWell: destWell,
-                  blowoutLocation: args.blowoutLocation,
-                  flowRate: blowoutFlowRateUlSec,
-                  offsetFromTopMm: blowoutOffsetFromTopMm,
-                  invariantContext,
-                })
+          const blowoutCommand = blowoutUtil({
+            pipette: args.pipette,
+            sourceLabwareId: args.sourceLabware,
+            sourceWell: sourceWell,
+            destLabwareId: args.destLabware,
+            destWell: destWell,
+            blowoutLocation: args.blowoutLocation,
+            flowRate: blowoutFlowRateUlSec,
+            offsetFromTopMm: blowoutOffsetFromTopMm,
+            invariantContext,
+          })
 
           const nextCommands = [
             ...tipCommands,

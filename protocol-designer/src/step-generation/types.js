@@ -129,11 +129,9 @@ export type DistributeArgs = {|
 
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
   disposalVolume: ?number,
-  /** Disposal labware and well for final blowout destination of disposalVolume contents (e.g. trash, source well, etc.) */
-  disposalLabware: ?string,
-  disposalWell: ?string,
-
   /** pass to blowout **/
+  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
+  blowoutLocation: ?string,
   blowoutFlowRateUlSec: number,
   blowoutOffsetFromTopMm: number,
 

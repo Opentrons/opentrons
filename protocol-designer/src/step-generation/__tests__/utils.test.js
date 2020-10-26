@@ -21,6 +21,9 @@ import {
   AIR,
   repeatArray,
   makeInitialRobotState,
+  getDispenseAirGapLocation,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
 import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { FIXED_TRASH_ID } from '../__fixtures__'
@@ -663,6 +666,55 @@ describe('thermocyclerPipetteColision', () => {
       expect(thermocyclerPipetteCollision(modules, labware, labwareId)).toBe(
         expected
       )
+    })
+  })
+})
+
+describe('getDispenseAirGapLocation', () => {
+  let sourceLabware
+  let destLabware
+  let sourceWell
+  let destWell
+  beforeEach(() => {
+    sourceLabware = 'sourceLabware'
+    destLabware = 'destLabware'
+    sourceWell = 'sourceWell'
+    destWell = 'destWell'
+  })
+  it('should return destination when blowout location is NOT source', () => {
+    const locations = [
+      DEST_WELL_BLOWOUT_DESTINATION,
+      FIXED_TRASH_ID,
+      'some_rando_location',
+    ]
+    expect.assertions(locations.length)
+    locations.forEach(blowoutLocation => {
+      expect(
+        getDispenseAirGapLocation({
+          blowoutLocation,
+          sourceLabware,
+          destLabware,
+          sourceWell,
+          destWell,
+        })
+      ).toEqual({
+        dispenseAirGapLabware: destLabware,
+        dispenseAirGapWell: destWell,
+      })
+    })
+  })
+  it('should return source when blowout location is source', () => {
+    expect(
+      getDispenseAirGapLocation({
+        blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
+        sourceLabware,
+        destLabware,
+        sourceWell,
+        destWell,
+      })
+    ).toEqual({
+      dispenseAirGapLabware: sourceLabware,
+      dispenseAirGapWell: sourceWell,
     })
   })
 })
