@@ -57,7 +57,6 @@ setup-py:
 
 .PHONY: clean
 clean:
-	@echo $(CURDIR)
 	$(clean_cmd)
 
 
