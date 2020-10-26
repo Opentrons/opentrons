@@ -812,7 +812,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -852,7 +852,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -877,7 +877,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         dispenseAirGapHelper('A4', 31),
@@ -918,7 +918,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -934,7 +934,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
         blowoutSingleToTrash,
-        // dispense => air gap since we are about to change the tip
+        // dispense > air gap since we are about to change the tip
         airGapHelper('A3', 3, { labware: DEST_LABWARE }), // need to air gap here
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -948,7 +948,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #3
@@ -990,7 +990,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -1006,7 +1006,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // touch tip (disp #2)
         touchTipHelper('A3', { labware: DEST_LABWARE }),
         blowoutSingleToTrash,
-        // skip dispense => air gap since we are reusing the tip
+        // skip dispense > air gap since we are reusing the tip
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate 100 liquid + 60 for disposal vol
@@ -1014,7 +1014,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #3
@@ -1053,7 +1053,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -1070,7 +1070,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A3', { labware: DEST_LABWARE }),
         // blowout location is source so we gotta blowout
         blowoutSingleToSourceA1,
-        // skip dispense => air gap since we are reusing the tip
+        // skip dispense > air gap since we are reusing the tip
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate 100 liquid + 60 for disposal vol
@@ -1078,7 +1078,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #3
@@ -1090,9 +1090,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A4', { labware: DEST_LABWARE }),
         // blowout location is source so we gotta blowout
         blowoutSingleToSourceA1,
-        // use the dispense > air gap here before moving to trash
-        // since it is the final dispense in the step
-        // air gap from source since blowout location is source
+        // use the dispense > air gap here before moving to trash since it is the final dispense in the step
+        // dispense > air gap from source since blowout location is source
         airGapHelper('A1', 3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1122,7 +1121,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -1139,7 +1138,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A3', { labware: DEST_LABWARE }),
         // blowout location is source so need to blowout
         blowoutSingleToSourceA1,
-        // air gap so no liquid drops off the tip as pipette moves from source well to trash
+        // dispense > air gap so no liquid drops off the tip as pipette moves from source well to trash
         airGapHelper('A1', 3),
         // delay after aspirating air
         delayCommand(11),
@@ -1154,7 +1153,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #3
@@ -1166,7 +1165,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A4', { labware: DEST_LABWARE }),
         // blowout location is source so need to blowout
         blowoutSingleToSourceA1,
-        // air gap so no liquid drops off the tip as pipette moves from source well to trash
+        // dispense > air gap so no liquid drops off the tip as pipette moves from source well to trash
         airGapHelper('A1', 3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1196,7 +1195,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -1221,7 +1220,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #3
@@ -1261,7 +1260,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -1278,7 +1277,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A3', { labware: DEST_LABWARE }),
         // blowout location is dest so we gotta blowout
         blowoutSingleToDestA3,
-        // skip dispense => air gap since we are reusing the tip
+        // skip dispense > air gap since we are reusing the tip
         // mix (asp)
         ...mixCommandsWithDelay,
         // aspirate 100 liquid + 60 for disposal vol
@@ -1286,7 +1285,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #3
@@ -1329,7 +1328,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -1346,7 +1345,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A3', { labware: DEST_LABWARE }),
         // blowout location is dest so we gotta blowout
         blowoutSingleToDestA3,
-        // air gap so no liquid drops off the tip as pipette moves from destination well to trash
+        // dispense > air gap so no liquid drops off the tip as pipette moves from destination well to trash
         airGapHelper('A3', 3, { labware: DEST_LABWARE }),
         // dispense delay
         delayCommand(11),
@@ -1361,7 +1360,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #3
@@ -1403,7 +1402,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #1
@@ -1428,7 +1427,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         ...delayWithOffset('A1', SOURCE_LABWARE, 11, 15),
         // touch tip (asp)
         touchTipHelper('A1', { offsetFromBottomMm: 14.5 }),
-        // air gap
+        // aspirate > air gap
         airGapHelper('A1', 31),
         delayCommand(11),
         // dispense #3
