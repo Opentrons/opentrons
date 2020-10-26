@@ -1,23 +1,29 @@
 // @flow
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import { getWellsDepth, getWellDepth } from '@opentrons/shared-data'
+import last from 'lodash/last'
+import { getWellDepth } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
   airGap,
   aspirate,
-  blowout,
   delay,
   dispense,
   dispenseAirGap,
+  dropTip,
   moveToWell,
   replaceTip,
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import {
+  curryCommandCreator,
+  reduceCommandCreators,
+  blowoutUtil,
+  getDispenseAirGapLocation,
+} from '../../utils'
 import type {
   DistributeArgs,
   CommandCreator,
@@ -86,9 +92,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
     dispenseDelay,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
+    blowoutLocation,
   } = args
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
+  const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
 
   // TODO error on negative args.disposalVolume?
   const disposalVolume =
@@ -118,8 +126,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
     }
   }
 
+  const destWellChunks = chunk(args.destWells, maxWellsPerChunk)
   const commandCreators = flatMap(
-    chunk(args.destWells, maxWellsPerChunk),
+    destWellChunks,
     (
       destWellChunk: Array<string>,
       chunkIndex: number
@@ -243,25 +252,64 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ]
       }
 
-      // TODO: BC 2018-11-29 instead of disposalLabware and disposalWell use blowoutLocation
-      let blowoutCommands = []
-      if (args.disposalVolume && args.disposalLabware && args.disposalWell) {
-        blowoutCommands = [
-          curryCommandCreator(blowout, {
-            pipette: args.pipette,
-            labware: args.disposalLabware,
-            well: args.disposalWell,
+      const {
+        dispenseAirGapLabware,
+        dispenseAirGapWell,
+      } = getDispenseAirGapLocation({
+        blowoutLocation,
+        sourceLabware: args.sourceLabware,
+        destLabware: args.destLabware,
+        sourceWell: args.sourceWell,
+        destWell: last(destWellChunk),
+      })
+
+      const isLastChunk = chunkIndex + 1 === destWellChunks.length
+      const willReuseTip = args.changeTip !== 'always' && !isLastChunk
+
+      const airGapAfterDispenseCommands =
+        dispenseAirGapVolume && !willReuseTip
+          ? [
+              curryCommandCreator(airGap, {
+                pipette: args.pipette,
+                volume: dispenseAirGapVolume,
+                labware: dispenseAirGapLabware,
+                well: dispenseAirGapWell,
+                flowRate: aspirateFlowRateUlSec,
+                offsetFromBottomMm: airGapOffsetDestWell,
+              }),
+              ...(aspirateDelay
+                ? [
+                    curryCommandCreator(delay, {
+                      commandCreatorFnName: 'delay',
+                      description: null,
+                      name: null,
+                      meta: null,
+                      wait: aspirateDelay.seconds,
+                    }),
+                  ]
+                : []),
+            ]
+          : []
+
+      // if using dispense > air gap, drop or change the tip at the end
+      const dropTipAfterDispenseAirGap =
+        airGapAfterDispenseCommands.length > 0
+          ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
+          : []
+
+      const blowoutCommands = disposalVolume
+        ? blowoutUtil({
+            pipette: pipette,
+            sourceLabwareId: args.sourceLabware,
+            sourceWell: args.sourceWell,
+            destLabwareId: args.destLabware,
+            destWell: last(destWellChunk),
+            blowoutLocation,
             flowRate: args.blowoutFlowRateUlSec,
-            offsetFromBottomMm:
-              // NOTE: when we use blowoutLocation as mentioned above,
-              // we can delegate this top -> bottom transform to blowoutUtil
-              getWellsDepth(
-                invariantContext.labwareEntities[args.disposalLabware].def,
-                [args.disposalWell]
-              ) + args.blowoutOffsetFromTopMm,
-          }),
-        ]
-      }
+            offsetFromTopMm: args.blowoutOffsetFromTopMm,
+            invariantContext,
+          })
+        : []
 
       const delayAfterAspirateCommands =
         aspirateDelay != null
@@ -330,6 +378,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
         ...dispenseCommands,
         ...blowoutCommands,
+        ...airGapAfterDispenseCommands,
+        ...dropTipAfterDispenseAirGap,
       ]
     }
   )

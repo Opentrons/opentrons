@@ -99,19 +99,36 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
 }
 
-export const minAirGapVolume = (fields: HydratedFormData): ?FormWarning => {
-  const { aspirate_airGap_checkbox, aspirate_airGap_volume, pipette } = fields
-  if (
-    !aspirate_airGap_checkbox ||
-    !aspirate_airGap_volume ||
-    !pipette ||
-    !pipette.spec
-  )
-    return null
+// both aspirate and dispense air gap volumes have the same minimums
+export const _minAirGapVolume: (
+  checkboxField: 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox',
+  volumeField: 'aspirate_airGap_volume' | 'dispense_airGap_volume'
+) => HydratedFormData => ?FormWarning = (
+  checkboxField,
+  volumeField
+) => fields => {
+  const checkboxValue = fields[checkboxField]
+  const volumeValue = fields[volumeField]
+  const { pipette } = fields
+  if (!checkboxValue || !volumeValue || !pipette || !pipette.spec) return null
 
-  const isBelowMin = Number(aspirate_airGap_volume) < pipette.spec.minVolume
+  const isBelowMin = Number(volumeValue) < pipette.spec.minVolume
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_AIR_GAP_VOLUME : null
 }
+
+export const minAspirateAirGapVolume: (
+  fields: HydratedFormData
+) => ?FormWarning = _minAirGapVolume(
+  'aspirate_airGap_checkbox',
+  'aspirate_airGap_volume'
+)
+
+export const minDispenseAirGapVolume: (
+  fields: HydratedFormData
+) => ?FormWarning = _minAirGapVolume(
+  'dispense_airGap_checkbox',
+  'dispense_airGap_volume'
+)
 
 /*******************
  **     Helpers    **

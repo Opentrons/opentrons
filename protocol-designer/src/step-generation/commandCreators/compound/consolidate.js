@@ -20,6 +20,7 @@ import {
   aspirate,
   delay,
   dispense,
+  dropTip,
   moveToWell,
   replaceTip,
   touchTip,
@@ -73,6 +74,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     aspirateOffsetFromBottomMm,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
+    dispenseAirGapVolume,
     dispenseDelay,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
@@ -87,12 +89,20 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       (args.volume + aspirateAirGapVolume)
   )
 
+  const sourceLabwareDef =
+    invariantContext.labwareEntities[args.sourceLabware].def
+  const destLabwareDef = invariantContext.labwareEntities[args.destLabware].def
+  const airGapOffsetDestWell =
+    getWellDepth(destLabwareDef, args.destWell) + AIR_GAP_OFFSET_FROM_TOP
+
+  const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
   const commandCreators = flatMap(
-    chunk(args.sourceWells, maxWellsPerChunk),
+    sourceWellChunks,
     (
       sourceWellChunk: Array<string>,
       chunkIndex: number
     ): Array<CurriedCommandCreator> => {
+      const isLastChunk = chunkIndex + 1 === sourceWellChunks.length
       // Aspirate commands for all source wells in the chunk
       const aspirateCommands = flatMap(
         sourceWellChunk,
@@ -100,9 +110,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           sourceWell: string,
           wellIndex: number
         ): Array<CurriedCommandCreator> => {
-          const sourceLabwareDef =
-            invariantContext.labwareEntities[args.sourceLabware].def
-
           const airGapOffsetSourceWell =
             getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
 
@@ -275,6 +282,39 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             ]
           : []
 
+      const willReuseTip = args.changeTip !== 'always' && !isLastChunk
+
+      const airGapAfterDispenseCommands =
+        dispenseAirGapVolume && !willReuseTip
+          ? [
+              curryCommandCreator(airGap, {
+                pipette: args.pipette,
+                volume: dispenseAirGapVolume,
+                labware: args.destLabware,
+                well: args.destWell,
+                flowRate: aspirateFlowRateUlSec,
+                offsetFromBottomMm: airGapOffsetDestWell,
+              }),
+              ...(aspirateDelay
+                ? [
+                    curryCommandCreator(delay, {
+                      commandCreatorFnName: 'delay',
+                      description: null,
+                      name: null,
+                      meta: null,
+                      wait: aspirateDelay.seconds,
+                    }),
+                  ]
+                : []),
+            ]
+          : []
+
+      // if using dispense > air gap, drop or change the tip at the end
+      const dropTipAfterDispenseAirGap =
+        airGapAfterDispenseCommands.length > 0
+          ? [curryCommandCreator(dropTip, { pipette: args.pipette })]
+          : []
+
       const blowoutCommand = blowoutUtil({
         pipette: args.pipette,
         sourceLabwareId: args.sourceLabware,
@@ -306,6 +346,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ...mixAfterCommands,
         ...touchTipAfterDispenseCommands,
         ...blowoutCommand,
+        ...airGapAfterDispenseCommands,
+        ...dropTipAfterDispenseAirGap,
       ]
     }
   )

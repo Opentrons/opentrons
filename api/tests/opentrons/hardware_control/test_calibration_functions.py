@@ -58,6 +58,20 @@ def test_load_calibration(ot_config_tempdir):
     assert np.allclose(obj.attitude, transform)
 
 
+def test_load_malformed_calibration(ot_config_tempdir):
+    pathway = config.get_opentrons_path(
+        'robot_calibration_dir') / 'deck_calibration.json'
+    data = {
+        'atsadasitude': [[1, 0, 1], [0, 1, -.5], [0, 0, 1]],
+        'last_modified': utc_now(),
+        'tiprack': 'hash',
+        'statu': [1, 2, 3],
+    }
+    io.save_to_file(pathway, data)
+    obj = robot_calibration.load_attitude_matrix()
+    assert np.allclose(obj.attitude, [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+
+
 def test_load_pipette_offset(ot_config_tempdir):
     pip_id = 'fakePip'
     mount = Mount.LEFT
