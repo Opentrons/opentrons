@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-disabled-tests */
 // @flow
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
