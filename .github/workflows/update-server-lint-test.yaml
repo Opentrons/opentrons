@@ -11,7 +11,7 @@ on:
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'master'
+      - 'release'
       - 'chore_release-*'
     tags-ignore:
       - '*'
@@ -22,7 +22,7 @@ on:
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'master'
+      - 'release'
       - 'chore_release-*'
   workflow_dispatch:
 

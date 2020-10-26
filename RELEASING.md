@@ -17,7 +17,7 @@ git checkout -b release_${version}
 git push --set-upstream origin release_${version}
 ```
 
-3. Open a PR into `master` for your empty release branch.
+3. Open a PR into `release` for your empty release branch.
 4. Create a new branch for your initial version bump:
 
 ```shell
@@ -51,14 +51,14 @@ git push origin v${version}
     - Make sure the comparison link is to the latest release verison (e.g.: `compare/v3.11.4...v3.12.0)` instead of `compare/v3.12.0-alpha.1...v3.12.0)`)
     - Delete the sub-sections that relate only to alpha releases, so that the changelog is against the latest actual release
 
-17. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
+17. Do a NORMAL MERGE into `release`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
 
 ```shell
 # note: make sure you have pulled the latest changes for branch
-# release_${version} locally before merging into master
-git checkout master
+# release_${version} locally before merging into release
+git checkout release
 git merge --ff-only release_${version}
-git push origin master
+git push origin release
 ```
 
 18. Tag the release:
@@ -68,12 +68,12 @@ git tag -a v${version} -m 'chore(release): ${version}'
 git push origin v${version}
 ```
 
-19. Open a PR of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
+19. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
 
 ```shell
 git checkout edge
 git pull
-git merge --no-ff master
+git merge --no-ff release
 ```
 
 20. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
@@ -82,10 +82,10 @@ git merge --no-ff master
 ## Releasing Robot Software Stack Hotfixes
 
 1. Ensure you have a buildroot release created in GitHub with all the changes you want to see, if any. If there aren't any, you don't have to create a new buildroot release; by default, the last tag is used for release builds.
-2. Checkout `master` and make a release branch, without any new changes. The branch name should match `hotfix_*` to make it clear this is a hotfix, and make `make bump` usage simpler.
+2. Checkout `release` and make a release branch, without any new changes. The branch name should match `hotfix_*` to make it clear this is a hotfix, and make `make bump` usage simpler.
 
 ```shell
-git checkout master
+git checkout release
 git pull
 git checkout -b hotfix_${version}
 git push --set-upstream origin hotfix_${version}
@@ -125,14 +125,14 @@ git push origin v${version}
 - Make sure the comparison link is to the latest release verison (e.g.: `compare/v3.11.4...v3.12.0)` instead of `compare/v3.12.0-alpha.1...v3.12.0)`)
 - Delete the sub-sections that relate only to alpha releases, so that the changelog is against the latest actual release
 
-17. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
+17. Do a NORMAL MERGE into `release`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
 
 ```shell
 # note: make sure you have pulled the latest changes for branch
-# release_${version} locally before merging into master
-git checkout master
+# release_${version} locally before merging into release
+git checkout release
 git merge --ff-only release_${version}
-git push origin master
+git push origin release
 ```
 
 18. Tag the release:
@@ -142,12 +142,12 @@ git tag -a v${version} -m 'chore(release): ${version}'
 git push origin v${version}
 ```
 
-19. Open a PR of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
+19. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
 
 ```shell
 git checkout edge
 git pull
-git merge --no-ff master
+git merge --no-ff release
 ```
 
 20. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.

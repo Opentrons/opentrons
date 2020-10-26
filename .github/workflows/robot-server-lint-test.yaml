@@ -15,7 +15,7 @@ on:
       - '.github/workflows/robot-server-test-lint.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
-      - 'master'
+      - 'release'
       - 'chore_release-**'
     tags-ignore:
       - '*'
