@@ -446,6 +446,10 @@ describe('aspirate > air gap volume', () => {
       )
       expect(result.aspirate_airGap_volume).toBeUndefined()
     })
+    it('should reset to pipette min when pipette is changed', () => {
+      const result = handleFormHelper({ pipette: 'otherPipetteId' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('30')
+    })
   })
 
   describe('when the path is multi aspirate', () => {
@@ -505,6 +509,10 @@ describe('aspirate > air gap volume', () => {
         { ...form, aspirate_airGap_volume: '1' }
       )
       expect(result.aspirate_airGap_volume).toBeUndefined()
+    })
+    it('should reset to pipette min when pipette is changed', () => {
+      const result = handleFormHelper({ pipette: 'otherPipetteId' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('30')
     })
   })
   describe('when the path is multi dispense', () => {
