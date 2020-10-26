@@ -21,6 +21,11 @@ export const getUseTrashSurfaceForTipCal = (state: State): boolean | null => {
   return state.config?.calibration.useTrashSurfaceForTipCal ?? null
 }
 
+export const getHasCalibrationBlock = (state: State): boolean | null => {
+  const useTrashSurface = getUseTrashSurfaceForTipCal(state)
+  return useTrashSurface === null ? null : !useTrashSurface
+}
+
 const UPDATE_CHANNEL_OPTS = [
   { name: 'Stable', value: (('latest': UpdateChannel): string) },
   { name: 'Beta', value: (('beta': UpdateChannel): string) },

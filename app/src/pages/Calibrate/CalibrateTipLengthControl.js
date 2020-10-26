@@ -2,8 +2,13 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { type Mount, useConditionalConfirm } from '@opentrons/components'
+import {
+  getLabwareDisplayName,
+  type LabwareDefinition2,
+} from '@opentrons/shared-data'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
+import * as Config from '../../config'
 
 import { getUncalibratedTipracksByMount } from '../../pipettes'
 import { getTipLengthCalibrationSession } from '../../sessions/tip-length-calibration/selectors'
@@ -13,16 +18,12 @@ import {
   CalibrateTipLength,
   ConfirmRecalibrationModal,
 } from '../../components/CalibrateTipLength'
-import { useAskForCalibrationBlock } from '../../components/CalibrateTipLength/useAskForCalibrationBlock'
+import { AskForCalibrationBlockModal } from '../../components/CalibrateTipLength/AskForCalibrationBlockModal'
 
 import { UncalibratedInfo } from './UncalibratedInfo'
 import { TipLengthCalibrationInfoBox } from '../../components/CalibrateTipLength/TipLengthCalibrationInfoBox'
 import { Portal } from '../../components/portal'
 import { CalibratePipetteOffset } from '../../components/CalibratePipetteOffset'
-import {
-  getLabwareDisplayName,
-  type LabwareDefinition2,
-} from '@opentrons/shared-data'
 
 import type { State } from '../../types'
 import type {
@@ -53,23 +54,12 @@ export function CalibrateTipLengthControl({
   tipRackDefinition,
   isExtendedPipOffset,
 }: CalibrateTipLengthControlProps): React.Node {
-  const [showWizard, setShowWizard] = React.useState(false)
-
   const trackedRequestId = React.useRef<string | null>(null)
-  const deleteRequestId = React.useRef<string | null>(null)
-  const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
-      if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
-        createRequestId.current = dispatchedAction.meta.requestId
-      } else if (
-        dispatchedAction.type === Sessions.DELETE_SESSION &&
-        calibrationSession?.id === dispatchedAction.payload.sessionId
-      ) {
-        deleteRequestId.current = dispatchedAction.meta.requestId
-      } else if (
+      if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
@@ -97,35 +87,28 @@ export function CalibrateTipLengthControl({
     }
   )
 
-  const calibrationSession = isExtendedPipOffset
-    ? extendedPipetteCalibrationSession
-    : tipLengthCalibrationSession
-  const handleStart = (useCalBlock: boolean) => {
-    if (isExtendedPipOffset) {
-      dispatchRequests(
-        Sessions.ensureSession(
-          robotName,
-          Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-          {
-            mount,
-            hasCalibrationBlock: useCalBlock,
-            shouldRecalibrateTipLength: true,
-            tipRackDefinition,
-          }
-        )
-      )
+  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
+  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+
+  const handleStart = (hasBlockModalResponse: boolean | null = null) => {
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setShowCalBlockModal(true)
     } else {
-      dispatchRequests(
-        Sessions.ensureSession(
-          robotName,
-          Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
-          {
-            mount,
-            hasCalibrationBlock: useCalBlock,
-            tipRackDefinition,
-          }
-        )
-      )
+      setShowCalBlockModal(false)
+      const sharedOptions = {
+        mount,
+        hasCalibrationBlock: Boolean(
+          configHasCalibrationBlock ?? hasBlockModalResponse
+        ),
+        tipRackDefinition,
+      }
+      const options = isExtendedPipOffset
+        ? { ...sharedOptions, shouldRecalibrateTipLength: true }
+        : sharedOptions
+      const sessionType = isExtendedPipOffset
+        ? Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+        : Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+      dispatchRequests(Sessions.ensureSession(robotName, sessionType, options))
     }
   }
   const showSpinner =
@@ -135,20 +118,6 @@ export function CalibrateTipLengthControl({
         : null
     )?.status === RobotApi.PENDING
 
-  const shouldClose =
-    useSelector<State, RequestState | null>(state =>
-      deleteRequestId.current
-        ? RobotApi.getRequestById(state, deleteRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
-
-  const shouldOpen =
-    useSelector((state: State) =>
-      createRequestId.current
-        ? RobotApi.getRequestById(state, createRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
-
   const isJogging =
     useSelector((state: State) =>
       jogRequestId.current
@@ -156,32 +125,14 @@ export function CalibrateTipLengthControl({
         : null
     )?.status === RobotApi.PENDING
 
-  React.useEffect(() => {
-    if (shouldOpen) {
-      setShowWizard(true)
-      createRequestId.current = null
-    }
-    if (shouldClose) {
-      setShowWizard(false)
-      deleteRequestId.current = null
-    }
-  }, [shouldOpen, shouldClose])
-
-  const handleCloseWizard = () => {
-    setShowWizard(false)
-  }
-
   const uncalibratedTipracksByMount: TipracksByMountMap = useSelector(state => {
     return getUncalibratedTipracksByMount(state, robotName)
   })
 
-  const [showCalBlockRequest, calBlockRequestModal] = useAskForCalibrationBlock(
-    handleStart
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+    handleStart,
+    hasCalibrated
   )
-
-  const { confirm, showConfirmation, cancel } = useConditionalConfirm(() => {
-    showCalBlockRequest(null)
-  }, hasCalibrated)
 
   return (
     <>
@@ -205,30 +156,28 @@ export function CalibrateTipLengthControl({
           </Portal>
         )}
       </TipLengthCalibrationInfoBox>
-      {calBlockRequestModal}
-      {showWizard && (
-        <Portal>
-          {isExtendedPipOffset ? (
-            <CalibratePipetteOffset
-              session={extendedPipetteCalibrationSession}
-              robotName={robotName}
-              closeWizard={handleCloseWizard}
-              showSpinner={showSpinner}
-              dispatchRequests={dispatchRequests}
-              isJogging={isJogging}
-            />
-          ) : (
-            <CalibrateTipLength
-              robotName={robotName}
-              session={tipLengthCalibrationSession}
-              closeWizard={handleCloseWizard}
-              showSpinner={showSpinner}
-              dispatchRequests={dispatchRequests}
-              isJogging={isJogging}
-            />
-          )}
-        </Portal>
-      )}
+      <Portal level="top">
+        {showCalBlockModal ? (
+          <AskForCalibrationBlockModal onResponse={handleStart} />
+        ) : null}
+        {isExtendedPipOffset ? (
+          <CalibratePipetteOffset
+            session={extendedPipetteCalibrationSession}
+            robotName={robotName}
+            showSpinner={showSpinner}
+            dispatchRequests={dispatchRequests}
+            isJogging={isJogging}
+          />
+        ) : (
+          <CalibrateTipLength
+            session={tipLengthCalibrationSession}
+            robotName={robotName}
+            showSpinner={showSpinner}
+            dispatchRequests={dispatchRequests}
+            isJogging={isJogging}
+          />
+        )}
+      </Portal>
     </>
   )
 }

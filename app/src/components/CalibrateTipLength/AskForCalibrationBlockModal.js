@@ -14,9 +14,13 @@ import {
   SecondaryBtn,
   DIRECTION_ROW,
 } from '@opentrons/components'
+import { useDispatch } from 'react-redux'
 
 import styles from './styles.css'
 import { labwareImages } from '../CalibrationPanels/labwareImages'
+import { setUseTrashSurfaceForTipCal } from '../../calibration'
+
+import type { Dispatch } from '../../types'
 
 const ALERT_TIP_LENGTH_CAL_HEADER = 'Pipette calibration has been updated!'
 const ALERT_TIP_LENGTH_CAL_BODY =
@@ -39,15 +43,19 @@ const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 const NOTE_SPACING = '1.75rem'
 
 type Props = {|
-  setHasBlock: (hasBlock: boolean, rememberPreference: boolean) => void,
+  onResponse: (hasBlock: boolean) => void,
 |}
 export function AskForCalibrationBlockModal(props: Props): React.Node {
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
     false
   )
+  const dispatch = useDispatch<Dispatch>()
 
   const makeSetHasBlock = hasBlock => () => {
-    props.setHasBlock(hasBlock, rememberPreference)
+    if (rememberPreference) {
+      dispatch(setUseTrashSurfaceForTipCal(!hasBlock))
+    }
+    props.onResponse(hasBlock)
   }
 
   return (

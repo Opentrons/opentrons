@@ -93,14 +93,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
-  const {
-    session,
-    robotName,
-    closeWizard,
-    showSpinner,
-    dispatchRequests,
-    isJogging,
-  } = props
+  const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
   const isMulti = React.useMemo(() => {
@@ -136,7 +129,6 @@ export function CalibrateTipLength(
         Sessions.deleteSession(robotName, session.id)
       )
     }
-    closeWizard()
   }
 
   const {

@@ -118,31 +118,48 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount })
 
-  const startPipetteOffsetCalibrationOnly = useCalBlock => {
-    startPipetteOffsetCalibration({ hasCalibrationBlock: useCalBlock === true })
+  const [
+    showCalBlockModal,
+    CalBlockPromptModal,
+    hasCalBlock,
+  ] = useAskForCalibrationBlock()
+
+  const calBlockPromptShouldRecalibrateTipLength = React.useRef<boolean | null>(
+    null
+  )
+
+  const startWizardExistingTipLength = () => {
+    console.table({ hasCalBlock })
+    if (hasCalBlock === null) {
+      calBlockPromptShouldRecalibrateTipLength.current = false
+      showCalBlockModal()
+    } else {
+      startPipetteOffsetCalibration({
+        hasCalibrationBlock: hasCalBlock,
+      })
+      calBlockPromptShouldRecalibrateTipLength.current = null
+    }
   }
-  const startTipLengthAndPipetteOffsetCalibration = useCalBlock => {
-    startPipetteOffsetCalibration({
-      shouldRecalibrateTipLength: true,
-      hasCalibrationBlock: useCalBlock === true,
-    })
+  const startWizardWithRedoTipLength = () => {
+    console.table({ hasCalBlock })
+    if (hasCalBlock === null) {
+      calBlockPromptShouldRecalibrateTipLength.current = true
+      showCalBlockModal()
+    } else {
+      startPipetteOffsetCalibration({
+        hasCalibrationBlock: hasCalBlock,
+        shouldRecalibrateTipLength: true,
+      })
+      calBlockPromptShouldRecalibrateTipLength.current = null
+    }
   }
 
   const customLabwareDefs = useSelector((state: State) => {
     return CustomLabware.getCustomLabwareDefinitions(state)
   })
 
-  const [showAskForBlock, AskForBlockModal] = useAskForCalibrationBlock(null)
-
   const startPipetteOffsetCalibrationDirectly = () => {
     startPipetteOffsetCalibration({})
-  }
-
-  const showBlockForPipetteOffset = () => {
-    showAskForBlock(startPipetteOffsetCalibrationOnly)
-  }
-  const showBlockForTipLength = () => {
-    showAskForBlock(startTipLengthAndPipetteOffsetCalibration)
   }
 
   const pipImage = (
@@ -201,7 +218,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
             onClick={
               pipetteOffsetCalibration
                 ? startPipetteOffsetCalibrationDirectly
-                : showBlockForPipetteOffset
+                : startWizardExistingTipLength
             }
           >
             {CALIBRATE_OFFSET}
@@ -263,7 +280,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           </Box>
           <SecondaryBtn
             {...PER_PIPETTE_BTN_STYLE}
-            onClick={showBlockForTipLength}
+            onClick={startWizardWithRedoTipLength}
           >
             {RECALIBRATE_TIP}
           </SecondaryBtn>
@@ -278,7 +295,13 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   return (
     <>
       {PipetteOffsetCalibrationWizard}
-      {AskForBlockModal}
+      <CalBlockPromptModal
+        startWizard={
+          calBlockPromptShouldRecalibrateTipLength.current
+            ? startWizardWithRedoTipLength
+            : startWizardExistingTipLength
+        }
+      />
       <Flex width="50%" flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {mount === 'right' ? [pipImage, pipInfo] : [pipInfo, pipImage]}

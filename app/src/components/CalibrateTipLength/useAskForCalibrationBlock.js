@@ -10,49 +10,56 @@ import { Portal } from '../portal'
 
 import { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
 
-export type OnComplete = boolean => void
-export type Invoker = (OnComplete | null) => void
+export type showModal = boolean => void
+export type Invoker = () => void
 
-export function useAskForCalibrationBlock(
-  onComplete: OnComplete | null = null
-): [Invoker, React.Node | null] {
+type PromptModalProps = {|
+  startWizard: () => void,
+|}
+
+export function useAskForCalibrationBlock(): [
+  () => void,
+  React.ComponentType<PromptModalProps>,
+  boolean | null
+] {
   const dispatch = useDispatch<Dispatch>()
-
-  const completer = React.useRef(onComplete)
 
   const useTrashSurfaceForTipCalSetting = useSelector(
     getUseTrashSurfaceForTipCal
   )
-  const useTrashSurface = React.useRef<boolean | null>(
-    useTrashSurfaceForTipCalSetting
+  const hasCalBlock = React.useRef<boolean | null>(
+    useTrashSurfaceForTipCalSetting === null
+      ? null
+      : useTrashSurfaceForTipCalSetting
   )
 
   const [showCalBlockPrompt, setShowCalBlockPrompt] = React.useState(false)
 
   const setHasBlock = (hasBlock: boolean, rememberPreference: boolean) => {
-    useTrashSurface.current = !hasBlock
+    hasCalBlock.current = hasBlock
     if (rememberPreference) {
       dispatch(setUseTrashSurfaceForTipCal(!hasBlock))
     }
-    completer.current && completer.current(hasBlock)
     setShowCalBlockPrompt(false)
   }
 
-  const handleShowRequest = onCompleteOverride => {
-    completer.current = onCompleteOverride ?? completer.current
-    useTrashSurface.current === null
-      ? setShowCalBlockPrompt(true)
-      : (() => {
-          setShowCalBlockPrompt(false)
-          completer.current && completer.current(!useTrashSurface.current)
-        })()
-  }
-  return [
-    handleShowRequest,
+  const CalBlockPromptModal = (props: { startWizard: () => void }) =>
     showCalBlockPrompt ? (
       <Portal level="top">
-        <AskForCalibrationBlockModal setHasBlock={setHasBlock} />
+        <AskForCalibrationBlockModal
+          setHasBlock={(hasBlock: boolean, rememberPreference: boolean) => {
+            setHasBlock(hasBlock, rememberPreference)
+            props.startWizard()
+          }}
+        />
       </Portal>
-    ) : null,
+    ) : null
+
+  return [
+    () => {
+      setShowCalBlockPrompt(true)
+    },
+    CalBlockPromptModal,
+    hasCalBlock.current,
   ]
 }

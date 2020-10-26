@@ -11,7 +11,6 @@ import type { PipetteOffsetCalibrationStep } from '../../sessions/pipette-offset
 export type CalibratePipetteOffsetParentProps = {|
   robotName: string,
   session: PipetteOffsetCalibrationSession | null,
-  closeWizard: () => void,
   dispatchRequests: (
     ...Array<{ ...Action, meta: { requestId: string } }>
   ) => void,
