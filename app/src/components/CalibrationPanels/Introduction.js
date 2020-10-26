@@ -44,8 +44,12 @@ const DECK_CAL_EXPLANATION =
   'Deck calibration ensures positional accuracy so that your robot moves as expected. It will accurately establish the OT-2’s deck orientation relative to the gantry.'
 
 const HEALTH_CHECK_HEADER = 'calibration health check'
-const HEALTH_CHECK_BODY =
-  'Checking the OT-2’s calibration is a first step towards diagnosing and troubleshooting common pipette positioning problems you may be experiencing.'
+const HEALTH_CHECK_INTRO_FRAGMENT =
+  'Calibration Health Check diagnoses calibration problems with tip length, pipette offset and the robot deck.'
+const HEALTH_CHECK_EXPLANATION_FRAGMENT =
+  "During this process, you will manually guide each attached pipette to designated positions on the robot's deck. We will compare these measurements to your saved calibration data."
+const HEALTH_CHECK_PROMPT_FRAGMENT =
+  'If the check data and stored data is outside of the acceptable threshold, you will be prompted to recalibrate tip length(s), pipette offset(s) or the robot deck.'
 
 const PIP_OFFSET_CAL_HEADER = 'pipette offset calibration'
 const PIP_OFFSET_CAL_NAME_FRAGMENT = 'pipette offset'
@@ -73,7 +77,7 @@ const NOTE_BODY_OUTSIDE_PROTOCOL =
 const NOTE_BODY_PRE_PROTOCOL =
   'important you perform this calibration using the exact tips specified in your protocol, as the robot uses the corresponding labware definition data to find the tip.'
 const NOTE_HEALTH_CHECK_OUTCOMES =
-  'If the difference between the two coordinates falls within the acceptable tolerance range for the given pipette, the check will pass. Otherwise, it will fail and you’ll be provided with troubleshooting guidance. You may exit at any point or continue through to the end to check the overall calibration status of your robot.'
+  'This is the tiprack you used to calibrate your pipette offset. You need to use the same tiprack to check the calibration.'
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 
 type BodySpec = {|
@@ -86,6 +90,7 @@ type PanelContents = {|
   headerText: string,
   invalidationText: string | null,
   bodyContentFragments: Array<BodySpec>,
+  outcomeText: string | null,
   continueButtonText: string,
   noteBody: BodySpec,
 |}
@@ -135,6 +140,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
             postFragment: DECK_CAL_EXPLANATION,
           },
         ],
+        outcomeText: null,
         continueButtonText: `${START} ${DECK_CAL_HEADER}`,
         noteBody: {
           preFragment: IT_IS,
@@ -153,6 +159,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
             postFragment: TIP_LENGTH_CAL_EXPLANATION_FRAGMENT,
           },
         ],
+        outcomeText: null,
         continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
         noteBody: {
           preFragment: IT_IS,
@@ -182,6 +189,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                   postFragment: PIP_OFFSET_CAL_EXPLANATION_FRAGMENT,
                 },
               ],
+              outcomeText: null,
               continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,
@@ -205,6 +213,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                   postFragment: PIP_OFFSET_CAL_EXPLANATION_FRAGMENT,
                 },
               ],
+              outcomeText: null,
               continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,
@@ -228,6 +237,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                   postFragment: PIP_OFFSET_CAL_EXPLANATION_FRAGMENT,
                 },
               ],
+              outcomeText: null,
               continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,
@@ -246,6 +256,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                   postFragment: PIP_OFFSET_CAL_EXPLANATION_FRAGMENT,
                 },
               ],
+              outcomeText: null,
               continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,
@@ -265,6 +276,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
               postFragment: PIP_OFFSET_CAL_EXPLANATION_FRAGMENT,
             },
           ],
+          outcomeText: null,
           continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
           noteBody: {
             preFragment: IT_IS,
@@ -276,14 +288,15 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
     case Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK:
       return {
         headerText: HEALTH_CHECK_HEADER,
-        invalidationText: null,
+        invalidationText: HEALTH_CHECK_INTRO_FRAGMENT,
         bodyContentFragments: [
           {
             preFragment: null,
             boldFragment: null,
-            postFragment: HEALTH_CHECK_BODY,
+            postFragment: HEALTH_CHECK_EXPLANATION_FRAGMENT,
           },
         ],
+        outcomeText: HEALTH_CHECK_PROMPT_FRAGMENT,
         continueButtonText: `${START} ${HEALTH_CHECK_HEADER}`,
         noteBody: {
           preFragment: null,
@@ -297,6 +310,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
         invalidationText: 'This panel is shown in error',
         bodyContentFragments: [],
         continueButtonText: 'Error',
+        outcomeText: null,
         noteBody: { preFragment: null, boldFragment: null, postFragment: null },
       }
   }
@@ -323,6 +337,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     headerText,
     invalidationText,
     bodyContentFragments,
+    outcomeText,
     continueButtonText,
     noteBody,
   } = contentsByParams(sessionType, isExtendedPipOffset, intent)
@@ -331,6 +346,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
   return (
     <>
       <Flex
+        key={'intro'}
         marginY={SPACING_2}
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_FLEX_START}
@@ -349,14 +365,20 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
         <Box marginBottom={SPACING_3}>
           {bodyContentFromFragments(bodyContentFragments)}
         </Box>
+        {outcomeText && <Text marginBottom={SPACING_3}>{outcomeText}</Text>}
         <Box marginX="5%">
           <h5>{LABWARE_REQS}</h5>
-          <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING_2}>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            marginTop={SPACING_2}
+            justifyContent={JUSTIFY_CENTER}
+          >
             <RequiredLabwareCard
               loadName={tipRack.loadName}
               displayName={getLabwareDisplayName(tipRack.definition)}
               linkToMeasurements={isKnownTiprack}
             />
+            {/* TODO: AA 2020-10-26 load both required tipracks for multi-pipette health check when the other tiprack info is available */}
             {calBlock && (
               <>
                 <Box width={SPACING_2} />
@@ -386,7 +408,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
           data-test="continueButton"
           onClick={proceed}
           flex="1"
-          margin="1.5rem 5rem 1rem"
+          margin="1rem 5rem 1rem"
         >
           {continueButtonText}
         </PrimaryBtn>

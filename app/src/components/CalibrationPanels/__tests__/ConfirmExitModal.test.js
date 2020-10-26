@@ -12,7 +12,7 @@ describe('ConfirmExitModal', () => {
   const mockExit = jest.fn()
 
   const getExitButton = wrapper =>
-    wrapper.find('OutlineButton[children="continue"]')
+    wrapper.find('OutlineButton[children="exit anyway"]')
 
   const getBackButton = wrapper =>
     wrapper.find('OutlineButton[children="go back"]')

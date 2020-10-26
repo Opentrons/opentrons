@@ -84,7 +84,7 @@ const ABOVE_THE_CROSS = 'above the cross in'
 const THEN = 'Then press the'
 const TO_SAVE = 'button to calibrate the x and y-axis in'
 const TO_CHECK =
-  'button to determine how this position compares to the previously-saved x and y-axis calibration coordinates.'
+  'button to determine how this position compares to the previously-saved x and y-axis calibration coordinates'
 
 const BASE_BUTTON_TEXT = 'save calibration'
 const HEALTH_BUTTON_TEXT = 'check x and y-axis'
@@ -203,7 +203,10 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     requiresNewTip: true,
     ...props,
   })
-
+  const continueButtonText =
+    isHealthCheck && activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
+      ? HEALTH_BUTTON_TEXT
+      : buttonText
   return (
     <>
       <Text
@@ -228,8 +231,8 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           <br />
           <br />
           {THEN}
-          <b>{` ${buttonText} `}</b>
-          {`${isHealthCheck ? TO_CHECK : TO_SAVE} ${SLOT} ${slotNumber}`}.
+          <b>{` '${continueButtonText}' `}</b>
+          {isHealthCheck ? TO_CHECK : `${TO_SAVE} ${SLOT} ${slotNumber}`}.
         </Text>
         <video
           key={String(demoAsset)}
@@ -256,7 +259,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           flex="1"
           marginX={SPACING_5}
         >
-          {buttonText}
+          {continueButtonText}
         </PrimaryBtn>
       </Flex>
       <Box width="100%">{confirmLink}</Box>
