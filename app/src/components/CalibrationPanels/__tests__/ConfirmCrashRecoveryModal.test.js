@@ -74,7 +74,9 @@ describe('ConfirmCrashRecoveryModal', () => {
     expect(wrapper.html()).toMatch(
       /starting over will cancel your calibration progress/i
     )
-    expect(wrapper.html()).not.toMatch(/please put an undamaged tip in position a1/i)
+    expect(wrapper.html()).not.toMatch(
+      /please put an undamaged tip in position a1/i
+    )
   })
 
   it('renders a request to replace tip with specified name if needed', () => {
@@ -86,7 +88,9 @@ describe('ConfirmCrashRecoveryModal', () => {
     expect(wrapper.html()).toMatch(
       /starting over will cancel your calibration progress/i
     )
-    expect(wrapper.html()).toMatch(/please put an undamaged tip in position a1/i)
+    expect(wrapper.html()).toMatch(
+      /please put an undamaged tip in position a1/i
+    )
     expect(wrapper.html()).toMatch(/my tip rack/i)
     expect(wrapper.html()).toMatch(/slot 4/i)
   })
