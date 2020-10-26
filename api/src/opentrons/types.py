@@ -1,3 +1,4 @@
+from __future__ import annotations
 import enum
 from math import sqrt, isclose
 from typing import Any, NamedTuple, TYPE_CHECKING, Union
@@ -40,12 +41,12 @@ class Point(NamedTuple):
     def __mul__(self, other: Union[int, float]) -> 'Point':
         if not isinstance(other, (float, int)):
             return NotImplemented
-        return Point(self.x*other, self.y*other, self.z*other)
+        return Point(self.x * other, self.y * other, self.z * other)
 
     def __rmul__(self, other: Union[int, float]) -> 'Point':
         if not isinstance(other, (float, int)):
             return NotImplemented
-        return Point(self.x*other, self.y*other, self.z*other)
+        return Point(self.x * other, self.y * other, self.z * other)
 
     def __abs__(self) -> 'Point':
         return Point(abs(self.x), abs(self.y), abs(self.z))
@@ -112,12 +113,24 @@ class Location(NamedTuple):
         return self._replace(point=self.point + point)
 
 
+# TODO(mc, 2020-10-22): use MountType implementation for Mount
 class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
 
     def __str__(self):
         return self.name
+
+
+class MountType(str, enum.Enum):
+    LEFT = "left"
+    RIGHT = "right"
+
+    def other_mount(self) -> MountType:
+        return MountType.LEFT if self is MountType.RIGHT else MountType.RIGHT
+
+    def to_hw_mount(self) -> Mount:
+        return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
 
 
 class TransferTipPolicy(enum.Enum):
