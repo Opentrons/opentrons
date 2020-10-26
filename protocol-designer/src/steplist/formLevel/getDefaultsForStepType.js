@@ -8,15 +8,11 @@ import {
   DEFAULT_DELAY_SECONDS,
   FIXED_TRASH_ID,
 } from '../../constants'
-import { getPrereleaseFeatureFlag } from '../../persist'
 import type { StepType, StepFieldName } from '../../form-types'
 
 export function getDefaultsForStepType(
   stepType: StepType
 ): { [StepFieldName]: any } {
-  const dispenseAirGapEnabled = getPrereleaseFeatureFlag(
-    'OT_PD_ENABLE_AIR_GAP_DISPENSE'
-  )
   switch (stepType) {
     case 'mix':
       return {
@@ -77,9 +73,8 @@ export function getDefaultsForStepType(
         aspirate_delay_checkbox: false,
         aspirate_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-        ...(dispenseAirGapEnabled
-          ? { dispense_airGap_checkbox: false, dispense_airGap_volume: null }
-          : {}),
+        dispense_airGap_checkbox: false,
+        dispense_airGap_volume: null,
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,

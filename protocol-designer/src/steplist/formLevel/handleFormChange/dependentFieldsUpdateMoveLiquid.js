@@ -31,7 +31,6 @@ import {
   getMinPipetteVolume,
   getPipetteCapacity,
 } from '../../../pipettes/pipetteData'
-import { getPrereleaseFeatureFlag } from '../../../persist'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
@@ -199,11 +198,6 @@ const updatePatchOnPipetteChange = (
       const pipetteSpec = pipetteEntities[newPipette].spec
       airGapVolume = `${pipetteSpec.minVolume}`
     }
-
-    const dispenseAirGapEnabled = getPrereleaseFeatureFlag(
-      'OT_PD_ENABLE_AIR_GAP_DISPENSE'
-    )
-
     return {
       ...patch,
       ...getDefaultFields(
@@ -216,9 +210,7 @@ const updatePatchOnPipetteChange = (
         'dispense_mmFromBottom'
       ),
       aspirate_airGap_volume: airGapVolume,
-      ...(dispenseAirGapEnabled
-        ? { dispense_airGap_volume: airGapVolume }
-        : {}),
+      dispense_airGap_volume: airGapVolume,
     }
   }
 
