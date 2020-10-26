@@ -18,12 +18,13 @@ export type ConfirmCrashRecoveryModalProps = {|
 |}
 
 const HEADING = 'Start Over?'
-const MAIN_BODY = 'Starting over will cancel your calibration progress.'
+const MAIN_BODY =
+  "Starting over will cancel your calibration progress. It's important to use an undamaged tip while you calibrate your robot."
 const CANCEL = 'cancel'
 const START_OVER = 'yes, start over'
 const CONFIRM_AND_START_OVER = 'tip placed in a1, start over'
 const buildTiprackRequest: (string, string) => string = (displayName, slot) =>
-  `Please put another tip in position A1 of the ${displayName} in slot ${slot}.`
+  `Please put an undamaged tip in position A1 of the ${displayName} in slot ${slot}.`
 
 export function ConfirmCrashRecoveryModal(
   props: ConfirmCrashRecoveryModalProps
