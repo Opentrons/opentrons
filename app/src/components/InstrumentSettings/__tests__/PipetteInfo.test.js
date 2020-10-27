@@ -2,8 +2,6 @@
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
-import * as Sessions from '../../../sessions'
-import * as CustomLabware from '../../../custom-labware'
 import * as Config from '../../../config'
 import {
   getCalibrationForPipette,

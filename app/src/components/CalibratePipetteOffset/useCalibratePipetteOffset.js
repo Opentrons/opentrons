@@ -32,7 +32,6 @@ export function useCalibratePipetteOffset(
   onComplete: (() => mixed) | null = null
 ): [Invoker, React.Node | null] {
   const deleteRequestId = React.useRef<string | null>(null)
-  const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
   const spinnerRequestId = React.useRef<string | null>(null)
 
@@ -92,7 +91,7 @@ export function useCalibratePipetteOffset(
       onComplete && onComplete()
       deleteRequestId.current = null
     }
-  }, [shouldClose])
+  }, [shouldClose, onComplete])
 
   const {
     mount,
