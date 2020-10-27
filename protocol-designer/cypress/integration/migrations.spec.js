@@ -11,7 +11,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
   const testCases = [
     {
       title:
-        'preFlexGrandfatheredProtocol 1.0.0 (schema 1, PD version pre-1) -> PD 5.1.x, schema 3',
+        'preFlexGrandfatheredProtocol 1.0.0 (schema 1, PD version pre-1) -> PD 5.2.x, schema 3',
       importFixture:
         '../../fixtures/protocol/1/preFlexGrandfatheredProtocol.json',
       expectedExportFixture:
@@ -22,7 +22,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       genericMigrationModal: false,
     },
     {
-      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 5.1.x, schema 3',
+      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 5.2.x, schema 3',
       importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:
         '../../fixtures/protocol/5/example_1_1_0MigratedFromV1_0_0.json',
@@ -32,16 +32,16 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       genericMigrationModal: false,
     },
     {
-      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 5.1.x, schema 3',
+      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 5.2.x, schema 3',
       importFixture: '../../fixtures/protocol/4/doItAllV3.json',
       expectedExportFixture: '../../fixtures/protocol/5/doItAllV3.json',
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,
       exportModalCopy: null,
-      genericMigrationModal: false,
+      genericMigrationModal: true,
     },
     {
-      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 5.1.x, schema 4',
+      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 5.2.x, schema 4',
       importFixture: '../../fixtures/protocol/4/doItAllV4.json',
       expectedExportFixture: '../../fixtures/protocol/5/doItAllV4.json',
       newLabwareDefsMigrationModal: false,
@@ -52,7 +52,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     },
     {
       title:
-        'doItAllV5 (schema 5, PD version 5.1.0) -> import and re-export should preserve data',
+        'doItAllV5 (schema 5, PD version 5.2.0) -> import and re-export should preserve data',
       importFixture: '../../fixtures/protocol/5/doItAllV5.json',
       expectedExportFixture: '../../fixtures/protocol/5/doItAllV5.json',
       newLabwareDefsMigrationModal: false,
@@ -62,9 +62,9 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     },
     {
       title:
-        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 5.1.x',
+        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 5.2.x',
       importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
-      expectedExportFixture: '../../fixtures/protocol/5/mix_5_1_0.json',
+      expectedExportFixture: '../../fixtures/protocol/5/mix_5_2_0.json',
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,
       exportModalCopy: null,
