@@ -32,9 +32,10 @@ import {
   FONT_STYLE_ITALIC,
   JUSTIFY_START,
 } from '@opentrons/components'
+import * as Config from '../../config'
 import styles from './styles.css'
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useAskForCalibrationBlock } from '../CalibrateTipLength/useAskForCalibrationBlock'
+import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import type { State } from '../../types'
 
 import {
@@ -118,39 +119,35 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount })
 
-  const [
-    showCalBlockModal,
-    CalBlockPromptModal,
-    hasCalBlock,
-  ] = useAskForCalibrationBlock()
-
   const calBlockPromptShouldRecalibrateTipLength = React.useRef<boolean | null>(
     null
   )
 
-  const startWizardExistingTipLength = () => {
-    console.table({ hasCalBlock })
-    if (hasCalBlock === null) {
-      calBlockPromptShouldRecalibrateTipLength.current = false
-      showCalBlockModal()
+  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
+  // null hides modal, true shows modal and continues with existing tlc data,
+  // false shows modal and recalibrates tip length
+  const [
+    showCalBlockModalAndKeepTipLength,
+    setShowCalBlockModalAndKeepTipLength,
+  ] = React.useState<null | boolean>(null)
+
+  type StartWizardOptions = {|
+    keepTipLength: boolean,
+    hasBlockModalResponse?: boolean | null,
+  |}
+  const startPipetteOffsetWizard = (options: StartWizardOptions) => {
+    console.log('start wizard', pipetteOffsetCalibration)
+    const { keepTipLength, hasBlockModalResponse = null } = options
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setShowCalBlockModalAndKeepTipLength(keepTipLength)
     } else {
       startPipetteOffsetCalibration({
-        hasCalibrationBlock: hasCalBlock,
+        hasCalibrationBlock: Boolean(
+          configHasCalibrationBlock ?? hasBlockModalResponse
+        ),
+        shouldRecalibrateTipLength: keepTipLength ? undefined : true,
       })
-      calBlockPromptShouldRecalibrateTipLength.current = null
-    }
-  }
-  const startWizardWithRedoTipLength = () => {
-    console.table({ hasCalBlock })
-    if (hasCalBlock === null) {
-      calBlockPromptShouldRecalibrateTipLength.current = true
-      showCalBlockModal()
-    } else {
-      startPipetteOffsetCalibration({
-        hasCalibrationBlock: hasCalBlock,
-        shouldRecalibrateTipLength: true,
-      })
-      calBlockPromptShouldRecalibrateTipLength.current = null
+      setShowCalBlockModalAndKeepTipLength(null)
     }
   }
 
@@ -159,6 +156,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   })
 
   const startPipetteOffsetCalibrationDirectly = () => {
+    console.log('start direct')
     startPipetteOffsetCalibration({})
   }
 
@@ -215,10 +213,11 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         <>
           <SecondaryBtn
             {...PER_PIPETTE_BTN_STYLE}
+            title="pipetteOffsetCalButton"
             onClick={
               pipetteOffsetCalibration
                 ? startPipetteOffsetCalibrationDirectly
-                : startWizardExistingTipLength
+                : () => startPipetteOffsetWizard({ keepTipLength: true })
             }
           >
             {CALIBRATE_OFFSET}
@@ -280,7 +279,8 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           </Box>
           <SecondaryBtn
             {...PER_PIPETTE_BTN_STYLE}
-            onClick={startWizardWithRedoTipLength}
+            title="recalibrateTipButton"
+            onClick={() => startPipetteOffsetWizard({ keepTipLength: false })}
           >
             {RECALIBRATE_TIP}
           </SecondaryBtn>
@@ -295,13 +295,16 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   return (
     <>
       {PipetteOffsetCalibrationWizard}
-      <CalBlockPromptModal
-        startWizard={
-          calBlockPromptShouldRecalibrateTipLength.current
-            ? startWizardWithRedoTipLength
-            : startWizardExistingTipLength
-        }
-      />
+      {showCalBlockModalAndKeepTipLength !== null ? (
+        <AskForCalibrationBlockModal
+          onResponse={hasBlockModalResponse => {
+            startPipetteOffsetWizard({
+              hasBlockModalResponse,
+              keepTipLength: showCalBlockModalAndKeepTipLength,
+            })
+          }}
+        />
+      ) : null}
       <Flex width="50%" flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {mount === 'right' ? [pipImage, pipInfo] : [pipInfo, pipImage]}
