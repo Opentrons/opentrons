@@ -1,13 +1,38 @@
-// @flow
+// @flo
 import * as React from 'react'
+import cx from 'classnames'
+import { css } from 'styled-components'
 import {
+  Icon,
+  Box,
+  Flex,
+  Link,
   PrimaryButton,
   OutlineButton,
-  Flex,
+  Text,
+  SPACING_2,
+  SPACING_3,
+  ALIGN_CENTER,
+  C_BLUE,
+  FONT_HEADER_DARK,
+  FONT_SIZE_BODY_2,
+  FONT_WEIGHT_BOLD,
+  FONT_WEIGHT_LIGHT,
+  FONT_WEIGHT_SEMIBOLD,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  TEXT_TRANSFORM_CAPITALIZE,
+  SPACING_5,
+  SPACING_4,
+  DIRECTION_ROW,
+  DIRECTION_COLUMN,
+  SPACING_6,
 } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+
 import find from 'lodash/find'
 import * as Sessions from '../../sessions'
+import { LEFT, RIGHT } from '../../pipettes'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
 import { saveAs } from 'file-saver'
@@ -16,8 +41,14 @@ import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type { CalibrationHealthCheckInstrument } from '../../sessions/types'
 
-const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
+const GOOD_CALIBRATION = 'Good calibration'
+const BAD_CALIBRATION = 'Bad calibration'
+
+const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'health check results:'
+const DECK_CALIBRATION_HEADER = 'Robot Deck'
+const PIPETTE = 'pipette'
 const HOME_AND_EXIT = 'Home robot and exit'
+const LOOKING_FOR_DATA = 'Looking for your detailed calibration data?'
 const DOWNLOAD_SUMMARY = 'Download JSON summary'
 
 export function ResultsSummary(props: CalibrationPanelProps): React.Node {
@@ -36,68 +67,109 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
     saveAs(data, 'OT-2 Robot Calibration Check Report.json')
   }
 
-  const firstPipette = find(
+  const leftPipette = find(
     instruments,
-    (p: CalibrationHealthCheckInstrument) =>
-      p.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
+    (p: CalibrationHealthCheckInstrument) => p.mount.toLowerCase() === LEFT
   )
-  const secondPipette = find(
+  const rightPipette = find(
     instruments,
-    (p: CalibrationHealthCheckInstrument) =>
-      p.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
+    (p: CalibrationHealthCheckInstrument) => p.mount.toLowerCase() === RIGHT
   )
-  const firstComparisonsByStep = firstPipette
-    ? comparisonsByPipette?.first
-    : null
-  const secondComparisonsByStep = secondPipette
-    ? comparisonsByPipette?.second
-    : null
-
-  // TODO (lc 10-20-2020): Rather than having the app decide
-  // what the last failed comparison was, the robot should
-  // just send a final report over to the app to decipher.
 
   return (
     <>
       <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <h3 className={styles.summary_page_header}>
+        <Text
+          css={FONT_HEADER_DARK}
+          marginBottom={SPACING_4}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        >
           {ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}
-        </h3>
+        </Text>
         <NeedHelpLink maxHeight="1rem" />
       </Flex>
-      <div className={styles.summary_page_contents}>
-        <div className={styles.summary_section}>
-          {firstPipette && firstComparisonsByStep && (
-            <PipetteComparisons
-              pipette={firstPipette}
-              comparisonsByStep={firstComparisonsByStep}
-              allSteps={Sessions.FIRST_PIPETTE_COMPARISON_STEPS}
-            />
+      <Box marginX="5%">
+        <Flex marginBottom={SPACING_4}>
+          <Text>{DECK_CALIBRATION_HEADER}</Text>
+        </Flex>
+        <Flex marginBottom={SPACING_5}>
+          {leftPipette && (
+            <Box width="50%">
+              <Text
+                textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                marginBottom={SPACING_3}
+              >{`${LEFT} ${PIPETTE}`}</Text>
+              <PipetteResult pipette={leftPipette} />
+            </Box>
           )}
-        </div>
-        {secondPipette && secondComparisonsByStep && (
-          <div className={styles.summary_section}>
-            <PipetteComparisons
-              pipette={secondPipette}
-              comparisonsByStep={secondComparisonsByStep}
-              allSteps={Sessions.SECOND_PIPETTE_COMPARISON_STEPS}
-            />
-          </div>
-        )}
-      </div>
-      <OutlineButton
-        className={styles.download_summary_button}
-        onClick={handleDownloadButtonClick}
+          {rightPipette && (
+            <Box>
+              <Text
+                textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                marginBottom={SPACING_3}
+              >{`${RIGHT} ${PIPETTE}`}</Text>
+              <PipetteResult pipette={rightPipette} />
+            </Box>
+          )}
+        </Flex>
+      </Box>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
+        marginBottom={SPACING_6}
+        flexDirection={DIRECTION_COLUMN}
+        fontWeight={FONT_WEIGHT_LIGHT}
       >
-        {DOWNLOAD_SUMMARY}
-      </OutlineButton>
-
+        <Text>{LOOKING_FOR_DATA}</Text>
+        <Text
+          as="a"
+          color={C_BLUE}
+          onClick={handleDownloadButtonClick}
+          css={css`
+            cursor: pointer;
+          `}
+        >
+          {DOWNLOAD_SUMMARY}
+        </Text>
+      </Flex>
       <PrimaryButton
         className={styles.summary_exit_button}
         onClick={cleanUpAndExit}
       >
         {HOME_AND_EXIT}
       </PrimaryButton>
+    </>
+  )
+}
+
+type PipetteResultProps = {|
+  pipette: CalibrationHealthCheckInstrument,
+|}
+
+function PipetteResult(props: PipetteResultProps): React.Node {
+  const { pipette } = props
+
+  const { displayName } = getPipetteModelSpecs(pipette.model) || {}
+  const markedBad = false
+  return (
+    <>
+      <Box marginBottom={SPACING_3}>
+        <Text fontWeight={FONT_WEIGHT_SEMIBOLD} marginBottom={SPACING_2}>
+          {displayName}
+        </Text>
+        <Flex>
+          <Icon
+            name={markedBad ? 'alert-circle' : 'check-circle'}
+            className={cx(styles.summary_icon, {
+              [styles.success_status_icon]: !markedBad,
+              [styles.error_status_icon]: markedBad,
+            })}
+          />
+          <Text fontSize={FONT_SIZE_BODY_2}>
+            {markedBad ? BAD_CALIBRATION : GOOD_CALIBRATION}
+          </Text>
+        </Flex>
+      </Box>
     </>
   )
 }
