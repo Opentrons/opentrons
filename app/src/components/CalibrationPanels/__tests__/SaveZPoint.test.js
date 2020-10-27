@@ -98,6 +98,11 @@ describe('SaveZPoint', () => {
     })
   })
 
+  it('renders need help link', () => {
+    const wrapper = render()
+    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
+  })
+
   it('sends save offset command when primary button is clicked', () => {
     const wrapper = render()
 

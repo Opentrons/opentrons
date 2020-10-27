@@ -14,6 +14,7 @@ import {
   FONT_SIZE_HEADER,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
@@ -28,6 +29,7 @@ import type {
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { NeedHelpLink } from './NeedHelpLink'
 
 import slot1LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
 import slot1LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
@@ -206,14 +208,17 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
 
   return (
     <>
-      <Text
-        fontSize={FONT_SIZE_HEADER}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
-      >
-        {isHealthCheck ? CHECK_POINT_XY_HEADER : SAVE_XY_POINT_HEADER}
-        {` ${SLOT} ${slotNumber || ''}`}
-      </Text>
+      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Text
+          fontSize={FONT_SIZE_HEADER}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+        >
+          {isHealthCheck ? CHECK_POINT_XY_HEADER : SAVE_XY_POINT_HEADER}
+          {` ${SLOT} ${slotNumber || ''}`}
+        </Text>
+        <NeedHelpLink />
+      </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         padding={SPACING_3}

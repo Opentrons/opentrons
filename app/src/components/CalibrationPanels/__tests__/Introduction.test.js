@@ -179,4 +179,9 @@ describe('Introduction', () => {
     expect(allText).toMatch(/calibration is a first step towards/i)
     expect(allText).toMatch(/if the difference between the two coordinates/i)
   })
+
+  it('renders need help link', () => {
+    const wrapper = render()
+    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
+  })
 })

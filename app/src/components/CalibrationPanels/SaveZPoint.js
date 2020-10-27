@@ -16,6 +16,7 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   TEXT_TRANSFORM_UPPERCASE,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -25,6 +26,7 @@ import type { CalibrationPanelProps } from './types'
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { NeedHelpLink } from './NeedHelpLink'
 
 import slot5LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
 import slot5LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
@@ -120,13 +122,16 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
 
   return (
     <>
-      <Text
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        fontSize={FONT_SIZE_HEADER}
-      >
-        {headerText}
-      </Text>
+      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Text
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          fontSize={FONT_SIZE_HEADER}
+        >
+          {headerText}
+        </Text>
+        <NeedHelpLink />
+      </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         padding={SPACING_3}

@@ -52,4 +52,9 @@ describe('BadCalibration', () => {
     wrapper.update()
     expect(mockDeleteSession).toHaveBeenCalled()
   })
+
+  it('renders need help link', () => {
+    const wrapper = render()
+    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
+  })
 })

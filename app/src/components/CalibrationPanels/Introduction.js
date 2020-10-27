@@ -13,6 +13,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   FONT_WEIGHT_SEMIBOLD,
   POSITION_RELATIVE,
   FONT_HEADER_DARK,
@@ -29,6 +30,7 @@ import {
 
 import * as Sessions from '../../sessions'
 import { labwareImages } from './labwareImages'
+import { NeedHelpLink } from './NeedHelpLink'
 import type { SessionType } from '../../sessions/types'
 import type { CalibrationPanelProps, Intent } from './types'
 import {
@@ -336,13 +338,16 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
         alignItems={ALIGN_FLEX_START}
         position={POSITION_RELATIVE}
       >
-        <Text
-          css={FONT_HEADER_DARK}
-          marginBottom={SPACING_3}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-        >
-          {headerText}
-        </Text>
+        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Text
+            css={FONT_HEADER_DARK}
+            marginBottom={SPACING_3}
+            textTransform={TEXT_TRANSFORM_UPPERCASE}
+          >
+            {headerText}
+          </Text>
+          <NeedHelpLink />
+        </Flex>
         {invalidationText && (
           <Text marginBottom={SPACING_3}>{invalidationText}</Text>
         )}
