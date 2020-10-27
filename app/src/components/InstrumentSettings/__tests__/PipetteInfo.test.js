@@ -4,6 +4,7 @@ import { mountWithStore } from '@opentrons/components/__utils__'
 
 import * as Sessions from '../../../sessions'
 import * as CustomLabware from '../../../custom-labware'
+import * as Config from '../../../config'
 import {
   getCalibrationForPipette,
   getTipLengthForPipetteAndTiprack,
@@ -19,6 +20,7 @@ import { mockTipLengthCalibration1 } from '../../../calibration/tip-length/__fix
 import { getCustomLabwareDefinitions } from '../../../custom-labware'
 
 jest.mock('../../../calibration')
+jest.mock('../../../config')
 jest.mock('../../../custom-labware')
 jest.mock('../../CalibratePipetteOffset/useCalibratePipetteOffset')
 jest.mock('react-router-dom', () => ({ Link: () => <></> }))
@@ -43,6 +45,11 @@ const mockUseCalibratePipetteOffset: JestMockFn<
   $Call<typeof useCalibratePipetteOffset, string, {}, null>
 > = useCalibratePipetteOffset
 
+const mockGetHasCalibrationBlock: JestMockFn<
+  [State],
+  $Call<typeof Config.getHasCalibrationBlock, State>
+> = Config.getHasCalibrationBlock
+
 describe('PipetteInfo', () => {
   const robotName = 'robot-name'
   let render
@@ -54,6 +61,7 @@ describe('PipetteInfo', () => {
     mockGetCalibrationForPipette.mockReturnValue(null)
     mockGetTipLengthForPipetteAndTiprack.mockReturnValue(null)
     mockGetCustomLabwareDefinitions.mockReturnValue([])
+    mockGetHasCalibrationBlock.mockReturnValue(null)
 
     render = (props: $Shape<React.ElementProps<typeof PipetteInfo>> = {}) => {
       const { pipette = mockAttachedPipette } = props
@@ -79,23 +87,122 @@ describe('PipetteInfo', () => {
     )
   })
 
-  it('launches pip cal offset alone with no cal block check if no pipette offset cal data', () => {
+  it('just launch POC w/o cal block modal if POC button clicked and data exists', () => {
+    mockGetCalibrationForPipette.mockReturnValue(
+      mockPipetteOffsetCalibration1.attributes
+    )
     const { wrapper } = render()
     wrapper.find('button[children="Calibrate offset"]').invoke('onClick')()
     wrapper.update()
     expect(startWizard).toHaveBeenCalledWith({})
   })
 
-  // it('launches pip cal offset alone with no cal block check if no pipette offset cal data', () => {
-  //   const { wrapper } = render()
-  //   mockGetCalibrationForPipette.mockReturnValue(
-  //     mockPipetteOffsetCalibration1.attributes
-  //   )
-  //   mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
-  //     mockTipLengthCalibration1.attributes
-  //   )
-  //   wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')()
-  //   wrapper.update()
-  //   expect(startWizard).toHaveBeenCalledWith({})
-  // })
+  it('launch POC w/ cal block modal denied if POC button clicked and no existing data and no cal block pref saved', () => {
+    const { wrapper } = render()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
+    wrapper.find('button[children="Calibrate offset"]').invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
+    wrapper
+      .find('button[children="I have a calibration block"]')
+      .invoke('onClick')()
+    expect(startWizard).toHaveBeenCalledWith({ hasCalibrationBlock: true })
+  })
+
+  it('launch POC w/ cal block modal confirmed if POC button clicked and no existing data and no cal block pref saved', () => {
+    const { wrapper } = render()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
+    wrapper.find('button[children="Calibrate offset"]').invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
+    wrapper.find('button[children="Use trash bin for now"]').invoke('onClick')()
+    expect(startWizard).toHaveBeenCalledWith({ hasCalibrationBlock: false })
+  })
+
+  it('no recalibrate tip button if POC and TLC data not present', () => {
+    const { wrapper } = render()
+    expect(wrapper.find('button[children="recalibrate tip"]').exists()).toBe(
+      false
+    )
+  })
+
+  it('launch POWT w/ cal block modal denied if recal tip button clicked and no cal block pref saved', () => {
+    mockGetCalibrationForPipette.mockReturnValue(
+      mockPipetteOffsetCalibration1.attributes
+    )
+    mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
+      mockTipLengthCalibration1.attributes
+    )
+    const { wrapper } = render()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
+    wrapper.find('button[children="recalibrate tip"]').invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
+    wrapper
+      .find('button[children="I have a calibration block"]')
+      .invoke('onClick')()
+    expect(startWizard).toHaveBeenCalledWith({
+      hasCalibrationBlock: true,
+      shouldRecalibrateTipLength: true,
+    })
+  })
+
+  it('launch POWT w/ cal block modal confirmed if recal tip button clicked and no cal block pref saved', () => {
+    mockGetCalibrationForPipette.mockReturnValue(
+      mockPipetteOffsetCalibration1.attributes
+    )
+    mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
+      mockTipLengthCalibration1.attributes
+    )
+    const { wrapper } = render()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
+    wrapper.find('button[children="recalibrate tip"]').invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
+    wrapper.find('button[children="Use trash bin for now"]').invoke('onClick')()
+    expect(startWizard).toHaveBeenCalledWith({
+      hasCalibrationBlock: false,
+      shouldRecalibrateTipLength: true,
+    })
+  })
+
+  it('launch POWT w/o cal block modal if recal tip button clicked and cal block pref saved as true', () => {
+    mockGetHasCalibrationBlock.mockReturnValue(true)
+
+    mockGetCalibrationForPipette.mockReturnValue(
+      mockPipetteOffsetCalibration1.attributes
+    )
+    mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
+      mockTipLengthCalibration1.attributes
+    )
+    const { wrapper } = render()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
+    wrapper.find('button[children="recalibrate tip"]').invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
+    expect(startWizard).toHaveBeenCalledWith({
+      hasCalibrationBlock: true,
+      shouldRecalibrateTipLength: true,
+    })
+  })
+
+  it('launch POWT w/o cal block modal if recal tip button clicked and cal block pref saved as false', () => {
+    mockGetHasCalibrationBlock.mockReturnValue(false)
+
+    mockGetCalibrationForPipette.mockReturnValue(
+      mockPipetteOffsetCalibration1.attributes
+    )
+    mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
+      mockTipLengthCalibration1.attributes
+    )
+    const { wrapper } = render()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
+    wrapper.find('button[children="recalibrate tip"]').invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
+    expect(startWizard).toHaveBeenCalledWith({
+      hasCalibrationBlock: false,
+      shouldRecalibrateTipLength: true,
+    })
+  })
 })

@@ -136,7 +136,6 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
     hasBlockModalResponse?: boolean | null,
   |}
   const startPipetteOffsetWizard = (options: StartWizardOptions) => {
-    console.log('start wizard', pipetteOffsetCalibration)
     const { keepTipLength, hasBlockModalResponse = null } = options
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setShowCalBlockModalAndKeepTipLength(keepTipLength)
@@ -156,7 +155,6 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   })
 
   const startPipetteOffsetCalibrationDirectly = () => {
-    console.log('start direct')
     startPipetteOffsetCalibration({})
   }
 
