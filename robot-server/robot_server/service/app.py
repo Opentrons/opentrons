@@ -20,7 +20,6 @@ from .dependencies import get_rpc_server, get_protocol_manager, api_wrapper, \
         verify_hardware, get_session_manager
 from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
-from robot_server.service.access.router import router as access_router
 from robot_server.service.session.router import router as session_router
 from robot_server.service.pipette_offset.router import router as pip_os_router
 from robot_server.service.labware.router import router as labware_router
@@ -56,8 +55,6 @@ routes = APIRouter()
 routes.include_router(router=session_router,
                       tags=["Session Management"],
                       dependencies=[Depends(verify_hardware)])
-routes.include_router(router=access_router,
-                      tags=["Access Control"])
 routes.include_router(router=labware_router,
                       tags=["Labware Calibration Management"])
 routes.include_router(router=protocol_router,
