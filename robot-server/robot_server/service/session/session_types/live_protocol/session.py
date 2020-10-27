@@ -42,7 +42,6 @@ class LiveProtocolSession(BaseSession):
 
     def get_response_model(self) -> models.LiveProtocolResponseAttributes:
         return models.LiveProtocolResponseAttributes(
-            id=self.meta.identifier,
             createdAt=self.meta.created_at,
             createParams=self.meta.create_params,
             details=EmptyModel()

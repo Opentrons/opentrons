@@ -39,6 +39,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           id: !anystr
           type: SessionCommand
@@ -72,6 +73,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           id: !anystr
           type: SessionCommand
@@ -102,6 +104,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           id: !anystr
           type: SessionCommand

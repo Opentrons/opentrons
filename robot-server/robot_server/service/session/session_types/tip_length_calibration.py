@@ -90,7 +90,6 @@ class TipLengthCalibration(BaseSession):
 
     def get_response_model(self) -> TipLengthCalibrationResponseAttributes:
         return TipLengthCalibrationResponseAttributes(
-            id=self.meta.identifier,
             details=self._get_response_details(),
             createdAt=self.meta.created_at,
             createParams=cast(SessionCreateParams, self.meta.create_params)
