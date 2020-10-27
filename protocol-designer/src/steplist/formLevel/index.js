@@ -26,7 +26,8 @@ import {
   minDisposalVolume,
   type FormWarning,
   type FormWarningType,
-  minAirGapVolume,
+  minAspirateAirGapVolume,
+  minDispenseAirGapVolume,
 } from './warnings'
 import type { StepType } from '../../form-types'
 
@@ -67,7 +68,8 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
       belowPipetteMinimumVolume,
       maxDispenseWellVolume,
       minDisposalVolume,
-      minAirGapVolume
+      minAspirateAirGapVolume,
+      minDispenseAirGapVolume
     ),
   },
   magnet: {

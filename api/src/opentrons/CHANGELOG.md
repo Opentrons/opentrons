@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.1...v4.0.0-alpha.3) (2020-10-26)
+
+
+### Features
+
+* **api:** Prevent Python API v1 protocol upload in server version 4.0.0 ([#6841](https://github.com/Opentrons/opentrons/issues/6841)) ([054f037](https://github.com/Opentrons/opentrons/commit/054f037))
+
+
+
+
+
 # [4.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.2...v4.0.0-beta.1) (2020-10-21)
 
 **Note:** Version bump only for package @opentrons/api-server
@@ -65,6 +76,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api:** add source blowout location option to transfer function ([#6670](https://github.com/Opentrons/opentrons/issues/6670)) ([811a767](https://github.com/Opentrons/opentrons/commit/811a767)), closes [#6576](https://github.com/Opentrons/opentrons/issues/6576)
 * **api:** pin JSON protocols to APIVersion 2.8 ([#6691](https://github.com/Opentrons/opentrons/issues/6691)) ([0804474](https://github.com/Opentrons/opentrons/commit/0804474)), closes [#6681](https://github.com/Opentrons/opentrons/issues/6681)
 * **api:** Use more human-friendly names in "API version too low" error messages ([#6662](https://github.com/Opentrons/opentrons/issues/6662)) ([55daec2](https://github.com/Opentrons/opentrons/commit/55daec2))
+
+
+
+
+## [3.21.2](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2) (2020-10-16)
+
+
+* **api:** Be fault-tolerant to bad deck cal data ([#6803](https://github.com/Opentrons/opentrons/issues/6803)) ([43ba721](https://github.com/Opentrons/opentrons/commit/43ba721))
 
 
 

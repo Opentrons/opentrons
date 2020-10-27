@@ -20,14 +20,15 @@ import opentrons
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution import execute
-import opentrons.commands
 import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons import protocol_api
+from opentrons.commands import types as command_types
 from opentrons.protocols.api_support.util import HardwareToManage
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
-    PythonProtocol, BundleContents, APIVersion)
+    PythonProtocol, BundleContents)
+from opentrons.protocols.api_support.types import APIVersion
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 if TYPE_CHECKING:
@@ -85,7 +86,7 @@ class CommandScraper:
         self._depth = 0
         self._commands: List[Mapping[str, Any]] = []
         self._unsub = self._broker.subscribe(
-            opentrons.commands.command_types.COMMAND,
+            command_types.COMMAND,
             self._command_callback)
 
     @property

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.1...v4.0.0-alpha.3) (2020-10-26)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
 # [4.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.2...v4.0.0-beta.1) (2020-10-21)
 
 **Note:** Version bump only for package @opentrons/app-shell
@@ -38,6 +46,17 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 # [4.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.0) (2020-10-15)
 
 **Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+## [3.21.2](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2) (2020-10-16)
+
+
+### Bug Fixes
+
+* **app-shell:** ensure robot update download folder exists before caching manifest ([#6787](https://github.com/Opentrons/opentrons/issues/6787)) ([200b3d5](https://github.com/Opentrons/opentrons/commit/200b3d5)), closes [#6786](https://github.com/Opentrons/opentrons/issues/6786)
 
 
 

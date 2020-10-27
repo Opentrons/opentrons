@@ -30,7 +30,7 @@ from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.labware import LabwareImplementation
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Location, Point, LocationLabware
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION)

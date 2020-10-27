@@ -19,6 +19,7 @@ import { UncalibratedInfo } from './UncalibratedInfo'
 import { TipLengthCalibrationInfoBox } from '../../components/CalibrateTipLength/TipLengthCalibrationInfoBox'
 import { Portal } from '../../components/portal'
 import { CalibratePipetteOffset } from '../../components/CalibratePipetteOffset'
+import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../components/CalibrationPanels'
 import {
   getLabwareDisplayName,
   type LabwareDefinition2,
@@ -216,6 +217,7 @@ export function CalibrateTipLengthControl({
               showSpinner={showSpinner}
               dispatchRequests={dispatchRequests}
               isJogging={isJogging}
+              intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
             />
           ) : (
             <CalibrateTipLength

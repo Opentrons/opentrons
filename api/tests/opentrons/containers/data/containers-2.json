@@ -1,9 +1,0 @@
-{
-  "containers":{
-    "container-2":{
-      "locations":{
-        "A1":{"x":0, "y":0, "z":0, "depth":0, "diameter":0, "total-liquid-volume":1 }
-      }
-    }
-  }
-}

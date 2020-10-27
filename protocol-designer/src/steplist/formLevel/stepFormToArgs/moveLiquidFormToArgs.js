@@ -1,10 +1,7 @@
 // @flow
 import assert from 'assert'
 import { getWellsDepth } from '@opentrons/shared-data'
-import {
-  DEST_WELL_BLOWOUT_DESTINATION,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-} from '../../../step-generation/utils'
+import { DEST_WELL_BLOWOUT_DESTINATION } from '../../../step-generation/utils'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -105,31 +102,9 @@ export const moveLiquidFormToArgs = (
     }
   }
 
-  let disposalVolume = null
-  let blowoutDestination = null
-  let blowoutLabware = null
-  let blowoutWell = null
-  if (fields.disposalVolume_checkbox || fields.blowout_checkbox) {
-    if (fields.disposalVolume_checkbox) {
-      // the disposal volume is only relevant when disposalVolume is checked,
-      // not when just blowout is checked.
-      disposalVolume = fields.disposalVolume_volume
-    }
-    blowoutDestination = fields.blowout_location
-    if (blowoutDestination === SOURCE_WELL_BLOWOUT_DESTINATION) {
-      blowoutLabware = sourceLabware.id
-      blowoutWell = sourceWells[0]
-    } else if (blowoutDestination === DEST_WELL_BLOWOUT_DESTINATION) {
-      blowoutLabware = destLabware.id
-      blowoutWell = destWells[0]
-    } else {
-      // NOTE: if blowoutDestination is not source/dest well, it is a labware ID.
-      // We are assuming this labware has a well A1, and that both single and multi
-      // channel pipettes can access that well A1.
-      blowoutLabware = blowoutDestination
-      blowoutWell = 'A1'
-    }
-  }
+  const disposalVolume = fields.disposalVolume_checkbox
+    ? fields.disposalVolume_volume
+    : null
 
   const touchTipAfterAspirate = Boolean(fields.aspirate_touchTip_checkbox)
 
@@ -233,6 +208,13 @@ export const moveLiquidFormToArgs = (
       sourceWellsUnordered.length === destWellsUnordered.length,
     `cannot do moveLiquidFormToArgs. Mismatched wells (not 1:N, N:1, or N:N!) for path="single". Neither source (${sourceWellsUnordered.length}) nor dest (${destWellsUnordered.length}) equal 1`
   )
+  assert(
+    !(
+      path === 'multiDispense' &&
+      blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION
+    ),
+    'blowout location for multiDispense cannot be destination well'
+  )
 
   switch (path) {
     case 'single': {
@@ -264,9 +246,8 @@ export const moveLiquidFormToArgs = (
         ...commonFields,
         commandCreatorFnName: 'distribute',
         disposalVolume,
-        // TODO: Ian 2019-01-15 these args have TODOs to get renamed, let's do it after deleting Distribute step
-        disposalLabware: blowoutLabware,
-        disposalWell: blowoutWell,
+        // distribute needs blowout location field because disposal volume checkbox might be checked without blowout checkbox being checked
+        blowoutLocation: fields.blowout_location,
         mixBeforeAspirate,
         sourceWell: sourceWells[0],
         destWells,
