@@ -3,20 +3,20 @@ import * as React from 'react'
 import {
   Box,
   CheckboxField,
-  Link,
-  SecondaryBtn,
-  FONT_HEADER_DARK,
-  FONT_SIZE_BODY_1,
-  FONT_SIZE_BODY_2,
-  SPACING_3,
   Flex,
-  Text,
-  JUSTIFY_CENTER,
-  PrimaryBtn,
-  ALIGN_CENTER,
+  Link,
   ModalPage,
+  PrimaryBtn,
+  SecondaryBtn,
+  Text,
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
+  FONT_HEADER_DARK,
+  FONT_BODY_2_DARK,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING_2,
+  SPACING_3,
   SPACING_4,
 } from '@opentrons/components'
 
@@ -77,7 +77,7 @@ export function AskForCalibrationBlockModal(props: Props): React.Node {
             src={labwareImages[CAL_BLOCK_LOAD_NAME]}
           />
         </Flex>
-        <Box fontSize={FONT_SIZE_BODY_2} marginY={SPACING_4}>
+        <Box css={FONT_BODY_2_DARK} marginY={SPACING_4}>
           <Text marginBottom={SPACING_3}>
             {ALERT_TIP_LENGTH_CAL_BODY}
             &nbsp;
@@ -91,13 +91,13 @@ export function AskForCalibrationBlockModal(props: Props): React.Node {
           </Text>
           <Text marginBottom={SPACING_4}>{ALTERNATIVE}</Text>
         </Box>
-        <Box marginX="1rem">
+        <Box css={FONT_BODY_2_DARK} marginX="1rem">
           <Flex marginLeft="1px" marginBottom={SPACING_3}>
             <CheckboxField
-              label={REMEMBER}
               onChange={e => setRememberPreference(e.currentTarget.checked)}
               value={rememberPreference}
             />
+            <Text marginLeft={SPACING_2}>{REMEMBER}</Text>
           </Flex>
           <Flex
             alignSelf={ALIGN_CENTER}
