@@ -84,13 +84,6 @@ stages:
       status_code: 200
       json:
         data:
-        - id: "default"
-          type: Session
-          attributes:
-            sessionType: "default"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            details: {}
-            createParams: null
         - id: "{session_id_1}"
           type: Session
           attributes:
@@ -143,11 +136,4 @@ stages:
     response:
       status_code: 200
       json:
-        data:
-        - id: "default"
-          type: Session
-          attributes:
-            sessionType: "default"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            details: {}
-            createParams: null
+        data: []
