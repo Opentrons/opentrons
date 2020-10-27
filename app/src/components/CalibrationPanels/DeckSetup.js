@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
-import startCase from 'lodash/startCase'
 import {
   RobotWorkSpace,
   Flex,
@@ -22,6 +21,8 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../sessions'
+import type { Mount } from '../../pipettes/types'
+import type { RobotCalibrationCheckPipetteRank } from '../../sessions/calibration-check/types'
 import type { SessionType, SessionCommandString } from '../../sessions/types'
 import type { CalibrationPanelProps } from './types'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
@@ -35,7 +36,8 @@ const PLACE_A_FULL = 'Place a full'
 const TIPRACK = 'tip rack'
 const DECK_SETUP_WITH_BLOCK_PROMPT =
   'and Calibration Block on the deck within their designated slots as illustrated below.'
-const DECK_SETUP_NO_BLOCK_PROMPT = 'on the deck within the designated slot as illustrated below'
+const DECK_SETUP_NO_BLOCK_PROMPT =
+  'on the deck within the designated slot as illustrated below'
 const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 const contentsBySessionType: {
   [SessionType]: {
@@ -57,14 +59,15 @@ const contentsBySessionType: {
 }
 
 function getHealthCheckText(
-  mount?: string | null,
-  rank?: string | null
+  mount?: Mount | null,
+  rank?: RobotCalibrationCheckPipetteRank | null
 ): string {
   if (!mount || !rank) {
     return ''
   }
   const toCheck = rank === 'first' ? FIRST_RANK_TO_CHECK : SECOND_RANK_TO_CHECK
-  const placeFull = rank === 'first' ? FIRST_RANK_PLACE_FULL : SECOND_RANK_PLACE_FULL
+  const placeFull =
+    rank === 'first' ? FIRST_RANK_PLACE_FULL : SECOND_RANK_PLACE_FULL
   return `${toCheck} ${mount.toLowerCase()} ${placeFull}`
 }
 
