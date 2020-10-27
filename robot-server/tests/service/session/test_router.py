@@ -16,8 +16,8 @@ from robot_server.service.session.errors import SessionCreationException, \
 from robot_server.service.session.models.common import EmptyModel, JogPosition
 from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.service.session.models.session import SessionType
-from robot_server.service.session.session_types import NullSession, \
-    SessionMetaData
+from robot_server.service.session.session_types import (
+    LiveProtocolSession, SessionMetaData)
 
 
 @pytest.fixture
@@ -32,7 +32,7 @@ def session_response(mock_session_meta):
         'attributes': {
             'details': {
             },
-            'sessionType': 'null',
+            'sessionType': 'liveProtocol',
             'createdAt': mock_session_meta.created_at.isoformat(),
             'createParams': None,
         },
@@ -79,10 +79,11 @@ def mock_command_executor():
 
 @pytest.fixture
 def mock_session(mock_session_meta, mock_command_executor):
-    session = NullSession(configuration=MagicMock(),
-                          instance_meta=mock_session_meta)
+    session = LiveProtocolSession(
+        configuration=MagicMock(),
+        instance_meta=mock_session_meta)
 
-    session._command_executor = mock_command_executor
+    session._executor = mock_command_executor
 
     async def func(*args, **kwargs):
         pass
@@ -105,7 +106,8 @@ def patch_create_session(mock_session):
 @pytest.mark.asyncio
 async def session_manager_with_session(loop, patch_create_session):
     manager = get_session_manager()
-    session = await manager.add(SessionType.null, SessionMetaData())
+    session = await manager.add(SessionType.live_protocol,
+                                SessionMetaData())
 
     yield manager
 
@@ -125,7 +127,7 @@ def test_create_session_error(api_client,
         "data": {
             "type": "Session",
             "attributes": {
-                "sessionType": "null"
+                "sessionType": "liveProtocol"
             }
         }
     })
@@ -146,7 +148,7 @@ def test_create_session(api_client,
         "data": {
             "type": "Session",
             "attributes": {
-                "sessionType": "null"
+                "sessionType": "liveProtocol"
             }
         }
     })

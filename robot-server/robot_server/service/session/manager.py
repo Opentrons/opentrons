@@ -12,7 +12,7 @@ from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models.session import SessionType
 from robot_server.service.session.models.common import IdentifierType
 from robot_server.service.session.session_types import (
-    NullSession, CheckSession, SessionMetaData, TipLengthCalibration,
+    CheckSession, SessionMetaData, TipLengthCalibration,
     DeckCalibrationSession, PipetteOffsetCalibrationSession)
 from robot_server.service.session.session_types.live_protocol.session import \
     LiveProtocolSession
@@ -22,7 +22,6 @@ from robot_server.service.session.session_types.protocol.session import \
 log = logging.getLogger(__name__)
 
 SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
-    SessionType.null: NullSession,
     SessionType.calibration_check: CheckSession,
     SessionType.tip_length_calibration: TipLengthCalibration,
     SessionType.deck_calibration: DeckCalibrationSession,

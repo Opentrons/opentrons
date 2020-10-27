@@ -15,7 +15,7 @@ async def side_effect(*args, **kwargs):
 @pytest.fixture
 async def session(session_manager, loop) -> BaseSession:
     """An added session"""
-    return await session_manager.add(session_type=SessionType.null,
+    return await session_manager.add(session_type=SessionType.live_protocol,
                                      session_meta_data=SessionMetaData())
 
 
@@ -43,7 +43,8 @@ async def test_add_no_class_doesnt_call_create(session_manager,
     with patch("robot_server.service.session.manager.SessionTypeToClass",
                new={}):
         with pytest.raises(SessionCreationException):
-            await session_manager.add(SessionType.null, SessionMetaData())
+            await session_manager.add(SessionType.live_protocol,
+                                      SessionMetaData())
         mock_session_create.assert_not_called()
 
 
@@ -62,7 +63,8 @@ async def test_remove_removes(session_manager, session):
 
 
 async def test_remove_calls_cleanup(session_manager):
-    session = await session_manager.add(SessionType.null, SessionMetaData())
+    session = await session_manager.add(SessionType.live_protocol,
+                                        SessionMetaData())
     session.clean_up = MagicMock(side_effect=side_effect)
     await session_manager.remove(session.meta.identifier)
     session.clean_up.assert_called_once()
@@ -75,7 +77,7 @@ async def test_remove_active_session(session_manager, session):
 
 
 async def test_remove_inactive_session(session_manager, session):
-    active_session = await session_manager.add(SessionType.null,
+    active_session = await session_manager.add(SessionType.live_protocol,
                                                SessionMetaData())
     await session_manager.remove(session.meta.identifier)
     assert session_manager._active.active_id is active_session.meta.identifier
@@ -91,9 +93,9 @@ def test_get_by_id_not_found(session_manager):
 
 async def test_get_by_type(session_manager):
     sessions = await asyncio.gather(
-        *[session_manager.add(SessionType.null, SessionMetaData()) for _ in range(5)]  # noqa: e501
+        *[session_manager.add(SessionType.live_protocol, SessionMetaData()) for _ in range(5)]  # noqa: e501
     )
-    assert session_manager.get(SessionType.null) == tuple(sessions)
+    assert session_manager.get(SessionType.live_protocol) == tuple(sessions)
     assert session_manager.get(SessionType.calibration_check) == tuple()
 
 

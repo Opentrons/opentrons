@@ -36,7 +36,6 @@ class SessionType(str, Enum):
         obj._model = create_param_model
         return obj
 
-    null = 'null'
     calibration_check = 'calibrationCheck'
     tip_length_calibration = (
         'tipLengthCalibration', SessionCreateParams)

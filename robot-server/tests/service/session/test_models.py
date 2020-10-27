@@ -38,7 +38,7 @@ def test_basic_session_type_validation_no_create_params(create_params):
     """Test that when create params have no mandatory members we accept null,
     and {}"""
     body = {
-        "sessionType": "null",
+        "sessionType": "liveProtocol",
     }
     body.update(create_params)
 
