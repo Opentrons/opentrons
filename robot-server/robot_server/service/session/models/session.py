@@ -67,16 +67,6 @@ class SessionCreateAttributesNoParams(SessionCreateAttributes):
     createParams: typing.Optional[BaseModel]
 
 
-class NullSessionCreateAttributes(SessionCreateAttributesNoParams):
-    """The NullSession create request."""
-    sessionType: Literal[SessionType.null] = SessionType.null
-
-
-class DefaultSessionCreateAttributes(SessionCreateAttributesNoParams):
-    """The default session create request."""
-    sessionType: Literal[SessionType.default] = SessionType.default
-
-
 class CalibrationCheckCreateAttributes(SessionCreateAttributesNoParams):
     """The calibration check create request."""
     sessionType: Literal[SessionType.calibration_check] =\
@@ -126,20 +116,6 @@ class SessionResponseAttributes(BaseModel):
               description="Detailed session specific status")
 
 
-class NullSessionResponseAttributes(
-    NullSessionCreateAttributes, SessionResponseAttributes
-):
-    """Response attributes of null session."""
-    pass
-
-
-class DefaultSessionResponseAttributes(
-    DefaultSessionCreateAttributes, SessionResponseAttributes
-):
-    """Response attributes of default session."""
-    pass
-
-
 class CalibrationCheckResponseAttributes(
     CalibrationCheckCreateAttributes, SessionResponseAttributes
 ):
@@ -183,8 +159,6 @@ class LiveProtocolResponseAttributes(
 
 
 RequestTypes = typing.Union[
-    NullSessionCreateAttributes,
-    DefaultSessionCreateAttributes,
     CalibrationCheckCreateAttributes,
     TipLengthCalibrationCreateAttributes,
     DeckCalibrationCreateAttributes,
@@ -195,8 +169,6 @@ RequestTypes = typing.Union[
 
 
 ResponseTypes = typing.Union[
-    NullSessionResponseAttributes,
-    DefaultSessionResponseAttributes,
     CalibrationCheckResponseAttributes,
     TipLengthCalibrationResponseAttributes,
     DeckCalibrationResponseAttributes,
