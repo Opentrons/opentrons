@@ -238,6 +238,8 @@ stages:
                 second:
                   comparingHeight: null
                   comparingPointOne: null
+                  comparingPointTwo: null
+                  comparingPointThree: null
 
   - name: Go to next check
     request:
@@ -273,6 +275,8 @@ stages:
                 second:
                   comparingHeight: null
                   comparingPointOne: null
+                  comparingPointTwo: null
+                  comparingPointThree: null
 
   - name: Compare first pipette point one
     request:
@@ -308,6 +312,8 @@ stages:
                 second:
                   comparingHeight: null
                   comparingPointOne: null
+                  comparingPointTwo: null
+                  comparingPointThree: null
 
   - name: Go to next check
     request:
@@ -407,12 +413,14 @@ stages:
             data: {}
     response:
       status_code: 200
+
   - name: Check the effect of command
     request: *get_session
     response:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -438,6 +446,8 @@ stages:
     response:
       status_code: 200
       json:
+        links: null
+        meta: null
         data: []
 ---
 test_name: Calibration check session errors
