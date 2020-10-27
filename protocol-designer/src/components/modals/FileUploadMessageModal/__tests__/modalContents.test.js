@@ -21,7 +21,11 @@ describe('modalContents', () => {
       })
     })
     it('should return the "no behavior change message" when migrating from v5.x to 5.2', () => {
-      const migrationsList = [['5.1.0'], ['5.1.0', '5.2.0']]
+      const migrationsList = [
+        ['5.0.0'],
+        ['5.0.0', '5.1.0'],
+        ['5.0.0', '5.1.0', '5.2.0'],
+      ]
 
       migrationsList.forEach(migrations => {
         expect(JSON.stringify(getMigrationMessage(migrations))).toEqual(
