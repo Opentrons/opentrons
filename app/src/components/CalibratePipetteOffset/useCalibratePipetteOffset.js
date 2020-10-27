@@ -31,8 +31,6 @@ export function useCalibratePipetteOffset(
   sessionParams: $Shape<PipetteOffsetCalibrationSessionParams>,
   onComplete: (() => mixed) | null = null
 ): [Invoker, React.Node | null] {
-  const [showWizard, setShowWizard] = React.useState(false)
-
   const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
@@ -46,9 +44,7 @@ export function useCalibratePipetteOffset(
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
-      if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
-        createRequestId.current = dispatchedAction.meta.requestId
-      } else if (
+      if (
         dispatchedAction.type === Sessions.DELETE_SESSION &&
         pipOffsetCalSession?.id === dispatchedAction.payload.sessionId
       ) {
@@ -84,13 +80,6 @@ export function useCalibratePipetteOffset(
         : null
     )?.status === RobotApi.SUCCESS
 
-  const shouldOpen =
-    useSelector((state: State) =>
-      createRequestId.current
-        ? RobotApi.getRequestById(state, createRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
-
   const isJogging =
     useSelector((state: State) =>
       jogRequestId.current
@@ -98,21 +87,12 @@ export function useCalibratePipetteOffset(
         : null
     )?.status === RobotApi.PENDING
 
-  const closeWizard = React.useCallback(() => {
-    onComplete && onComplete()
-    setShowWizard(false)
-  }, [onComplete])
-
   React.useEffect(() => {
-    if (shouldOpen) {
-      setShowWizard(true)
-      createRequestId.current = null
-    }
     if (shouldClose) {
-      closeWizard()
+      onComplete && onComplete()
       deleteRequestId.current = null
     }
-  }, [shouldOpen, shouldClose, closeWizard])
+  }, [shouldClose])
 
   const {
     mount,
@@ -140,12 +120,11 @@ export function useCalibratePipetteOffset(
 
   return [
     handleStartPipOffsetCalSession,
-    showWizard ? (
+    pipOffsetCalSession ? (
       <Portal level="top">
         <CalibratePipetteOffset
           session={pipOffsetCalSession}
           robotName={robotName}
-          closeWizard={closeWizard}
           showSpinner={showSpinner}
           dispatchRequests={dispatchRequests}
           isJogging={isJogging}

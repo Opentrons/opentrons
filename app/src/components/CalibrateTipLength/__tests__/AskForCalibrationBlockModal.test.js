@@ -4,7 +4,6 @@ import { mountWithStore } from '@opentrons/components/__utils__'
 import { act } from 'react-dom/test-utils'
 
 import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
-import { useAskForCalibrationBlock } from '../useAskForCalibrationBlock'
 import { SecondaryBtn, CheckboxField } from '@opentrons/components'
 import { setUseTrashSurfaceForTipCal } from '../../../calibration'
 

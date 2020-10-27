@@ -48,6 +48,7 @@ import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
 import type { Mount, AttachedPipette } from '../../pipettes/types'
 import { findLabwareDefWithCustom } from '../../findLabware'
 import * as CustomLabware from '../../custom-labware'
+import { Portal } from '../portal'
 
 export type PipetteInfoProps = {|
   robotName: string,
@@ -294,14 +295,16 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
     <>
       {PipetteOffsetCalibrationWizard}
       {showCalBlockModalAndKeepTipLength !== null ? (
-        <AskForCalibrationBlockModal
-          onResponse={hasBlockModalResponse => {
-            startPipetteOffsetWizard({
-              hasBlockModalResponse,
-              keepTipLength: showCalBlockModalAndKeepTipLength,
-            })
-          }}
-        />
+        <Portal>
+          <AskForCalibrationBlockModal
+            onResponse={hasBlockModalResponse => {
+              startPipetteOffsetWizard({
+                hasBlockModalResponse,
+                keepTipLength: showCalBlockModalAndKeepTipLength,
+              })
+            }}
+          />
+        </Portal>
       ) : null}
       <Flex width="50%" flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>

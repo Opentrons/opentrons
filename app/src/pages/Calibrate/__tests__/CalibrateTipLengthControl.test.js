@@ -6,7 +6,7 @@ import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-import { getUseTrashSurfaceForTipCal } from '../../../config'
+import { getHasCalibrationBlock } from '../../../config'
 import { selectors as robotSelectors } from '../../../robot'
 import { useDispatchApiRequests } from '../../../robot-api'
 import { getUncalibratedTipracksByMount } from '../../../pipettes'
@@ -37,10 +37,10 @@ const mockUseDispatchApiRequests: JestMockFn<
   [() => void, Array<string>]
 > = useDispatchApiRequests
 
-const mockGetUseTrashSurfaceForTipCal: JestMockFn<
+const mockGetHasCalibrationBlock: JestMockFn<
   [State],
-  $Call<typeof getUseTrashSurfaceForTipCal, State>
-> = getUseTrashSurfaceForTipCal
+  $Call<typeof getHasCalibrationBlock, State>
+> = getHasCalibrationBlock
 
 const threehundredtiprack: LabwareDefinition2 = tiprack300Def
 const MOCK_STATE: State = ({ mockState: true }: any)
@@ -74,7 +74,7 @@ describe('Testing calibrate tip length control', () => {
     mockUseDispatchApiRequests.mockReturnValue([dispatchApiRequests, []])
     mockGetUncalibratedTipracksByMount.mockReturnValue({ left: [], right: [] })
     mockGetUnconfirmedLabware.mockReturnValue(stubUnconfirmedLabware)
-    mockGetUseTrashSurfaceForTipCal.mockReturnValue(false)
+    mockGetHasCalibrationBlock.mockReturnValue(true)
     render = (
       props: $Shape<React.ElementProps<typeof CalibrateTipLengthControl>> = {}
     ) => {
