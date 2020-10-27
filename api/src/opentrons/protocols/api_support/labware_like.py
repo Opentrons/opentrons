@@ -6,7 +6,14 @@ if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
 
-LabwareLike = Union['Labware', 'Well', str, 'ModuleGeometry', None]
+LabwareLike = Union[
+    'Labware',
+    'Well',
+    str,
+    'ModuleGeometry',
+    'LabwareLikeWrapper',
+    None
+]
 
 
 class LabwareLikeType(int, Enum):
@@ -41,6 +48,9 @@ class LabwareLikeWrapper:
         elif isinstance(self._labware_like, ModuleGeometry):
             self._type = LabwareLikeType.module
             self._as_str = repr(self._labware_like)
+        elif isinstance(self._labware_like, LabwareLikeWrapper):
+            self._type = self._labware_like._type
+            self._labware_like = self._labware_like.object
         else:
             self._as_str = ""
 
