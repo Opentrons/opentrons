@@ -175,9 +175,10 @@ describe('Introduction', () => {
       intent: Constants.INTENT_HEALTH_CHECK,
     })
     const allText = wrapper.text()
-    expect(allText).toContain('health check')
-    expect(allText).toMatch(/calibration is a first step towards/i)
-    expect(allText).toMatch(/if the difference between the two coordinates/i)
+    expect(allText).toContain('calibration health check')
+    expect(allText).toMatch(/diagnoses calibration problems with tip length/i)
+    expect(allText).toMatch(/you will manually guide each attached pipette/i)
+    expect(allText).toMatch(/you will be prompted to recalibrate/i)
   })
 
   it('renders need help link', () => {
