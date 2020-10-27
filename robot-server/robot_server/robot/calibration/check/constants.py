@@ -11,8 +11,10 @@ from robot_server.robot.calibration.constants import (
 class CalibrationCheckState(str, Enum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
-    preparingPipette = "preparingPipette"
     inspectingTip = "inspectingTip"
+    preparingPipette = "preparingPipette"
+    comparingNozzle = "comparingNozzle"
+    comparingTip = "comparingTip"
     comparingHeight = "comparingHeight"
     comparingPointOne = "comparingPointOne"
     comparingPointTwo = "comparingPointTwo"
@@ -20,7 +22,6 @@ class CalibrationCheckState(str, Enum):
     returningTip = "returningTip"
     resultsSummary = "resultsSummary"
     sessionExited = "sessionExited"
-    badCalibrationData = "badCalibrationData"
     calibrationComplete = "calibrationComplete"
     WILDCARD = STATE_WILDCARD
 
@@ -28,8 +29,8 @@ class CalibrationCheckState(str, Enum):
 # Add in a 2mm buffer to tiprack thresholds on top of
 # the max acceptable range for a given pipette based
 # on calibration research data.
-DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(3.79, 3.64, 2.8)
-P1000_OK_TIP_PICK_UP_VECTOR = Point(4.7, 4.7, 2.8)
+DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(0.0, 0.0, 2.8)
+P1000_OK_TIP_PICK_UP_VECTOR = Point(0.0, 0.0, 2.8)
 
 
 # The tolerances below are absolute values that a pipette

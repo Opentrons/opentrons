@@ -71,6 +71,31 @@ stages:
             details:
               <<: *session_data_attribute_details
               currentStep: labwareLoaded
+  
+  - name: Move nozzle
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.moveToReferencePoint
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: comparingNozzle
 
   - name: Prepare first pipette
     request:
@@ -158,6 +183,82 @@ stages:
         data:
           type: SessionCommand
           attributes:
+            command: calibration.moveToReferencePoint
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: comparingTip
+
+  - name: Jog pipette tip
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.jog
+            data:
+              vector: [0, 0, 0.1]
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: comparingTip
+
+  - name: Compare Tip Length
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: calibration.check.comparePoint
+            data: {}
+    response:
+      status_code: 200
+  - name: Check the effect of command
+    request: *get_session
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          <<: *session_data
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: comparingTip
+
+  - name: Move to deck
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
             command: calibration.moveToDeck
             data: {}
     response:
@@ -231,15 +332,13 @@ stages:
               currentStep: comparingHeight
               comparisonsByPipette:
                 first:
-                  comparingHeight: !anydict
-                  comparingPointOne: null
-                  comparingPointTwo: null
-                  comparingPointThree: null
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: null
                 second:
-                  comparingHeight: null
-                  comparingPointOne: null
-                  comparingPointTwo: null
-                  comparingPointThree: null
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Go to next check
     request:
@@ -268,15 +367,13 @@ stages:
               currentStep: comparingPointOne
               comparisonsByPipette:
                 first:
-                  comparingHeight: !anydict
-                  comparingPointOne: null
-                  comparingPointTwo: null
-                  comparingPointThree: null
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: null
                 second:
-                  comparingHeight: null
-                  comparingPointOne: null
-                  comparingPointTwo: null
-                  comparingPointThree: null
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Compare first pipette point one
     request:
@@ -305,15 +402,13 @@ stages:
               currentStep: comparingPointOne
               comparisonsByPipette:
                 first:
-                  comparingHeight: !anydict
-                  comparingPointOne: !anydict
-                  comparingPointTwo: null
-                  comparingPointThree: null
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: !anydict
                 second:
-                  comparingHeight: null
-                  comparingPointOne: null
-                  comparingPointTwo: null
-                  comparingPointThree: null
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Go to next check
     request:
@@ -341,8 +436,14 @@ stages:
               <<: *session_data_attribute_details
               currentStep: comparingPointTwo
               comparisonsByPipette:
-                first: !anydict
-                second: !anydict
+                first:
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: !anydict
+                second:
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Compare first pipette point two
     request:
@@ -370,8 +471,14 @@ stages:
               <<: *session_data_attribute_details
               currentStep: comparingPointTwo
               comparisonsByPipette:
-                first: !anydict
-                second: !anydict
+                first:
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: !anydict
+                second:
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Go to next check
     request:
@@ -399,8 +506,14 @@ stages:
               <<: *session_data_attribute_details
               currentStep: comparingPointThree
               comparisonsByPipette:
-                first: !anydict
-                second: !anydict
+                first:
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: !anydict
+                second:
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Compare first pipette point three
     request:
@@ -429,8 +542,14 @@ stages:
               <<: *session_data_attribute_details
               currentStep: comparingPointThree
               comparisonsByPipette:
-                first: !anydict
-                second: !anydict
+                first:
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: !anydict
+                second:
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Delete the session
     request:

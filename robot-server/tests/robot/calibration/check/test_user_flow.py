@@ -12,8 +12,9 @@ from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
 from robot_server.robot.calibration.check.constants import\
     CalibrationCheckState
-from robot_server.robot.calibration.check.models import\
-    ComparisonStatus
+from robot_server.robot.calibration.check.models import (
+    ComparisonStatus, PipetteOffsetComparisonMap,
+    DeckComparisonMap, TipComparisonMap)
 from robot_server.service.errors import RobotServerError
 from robot_server.robot.calibration.constants import (
     POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID)
@@ -118,7 +119,7 @@ async def test_switching_to_second_pipette(pipettes, target_mount, hardware):
 def mock_user_flow(mock_hw):
     m = CheckCalibrationUserFlow(hardware=mock_hw)
     initial_pt = Point(1, 1, 5)
-    final_pt = Point(1, 1, 0)
+    final_pt = Point(1, 1, 5)
     m._get_reference_points_by_state =\
         MagicMock(return_value=(initial_pt, final_pt))
     yield m
@@ -187,9 +188,9 @@ async def test_get_move_to_cal_point_location(mock_user_flow,
 
 async def test_compare_z_height(mock_user_flow):
     uf = mock_user_flow
-    uf._current_state = CalibrationCheckState.comparingHeight
+    uf._current_state = CalibrationCheckState.comparingTip
     await uf._hardware.move_to(
-            mount=uf._mount,
+            mount=uf.mount,
             abs_position=Point(x=10, y=10, z=10),
             critical_point=uf.hw_pipette.critical_point
         )
@@ -197,63 +198,93 @@ async def test_compare_z_height(mock_user_flow):
     # The initial and final mocked points have a 5 mm
     # difference and so it should exceed the threshold
     expected_status = ComparisonStatus(
-        differenceVector=(0.0, 0.0, -5.0),
-        thresholdVector=(0.0, 0.0, 0.8),
-        exceedsThreshold=True,
-        transformType='BAD_DECK_TRANSFORM')
-    assert uf.comparison_map.first.comparingHeight == expected_status
-    assert uf.comparison_map.second.comparingHeight is None
+        differenceVector=(0.0, 0.0, 0.0),
+        thresholdVector=(0.0, 0.0, 2.8),
+        exceedsThreshold=False)
+    expected_tip_length = TipComparisonMap(
+        status='IN_THRESHOLD', comparingTip=expected_status)
+    assert uf.comparison_map.first.tipLength == expected_tip_length
+    assert uf.comparison_map.second.tipLength is None
 
 
 async def test_compare_points(mock_user_flow):
     uf = mock_user_flow
+    uf._current_state = CalibrationCheckState.comparingHeight
+    await uf.update_comparison_map()
+
     uf._current_state = CalibrationCheckState.comparingPointOne
 
     expected_status = ComparisonStatus(
-        differenceVector=(0.0, 0.0, -5.0),
+        differenceVector=(0.0, 0.0, 0.0),
         thresholdVector=(1.8, 1.8, 0.0),
-        exceedsThreshold=False,
-        transformType='UNKNOWN')
+        exceedsThreshold=False)
+    height_status = ComparisonStatus(
+        differenceVector=(0.0, 0.0, 0.0),
+        thresholdVector=(0.0, 0.0, 0.8),
+        exceedsThreshold=False)
+    all_status = 'IN_THRESHOLD'
+    expected_pip = PipetteOffsetComparisonMap(
+        status=all_status,
+        comparingHeight=height_status,
+        comparingPointOne=expected_status)
+    expected_deck = DeckComparisonMap(
+        status=all_status,
+        comparingPointOne=expected_status)
     await uf._hardware.move_to(
-            mount=uf._mount,
+            mount=uf.mount,
             abs_position=Point(x=10, y=10, z=10),
             critical_point=uf.hw_pipette.critical_point
         )
     await uf.update_comparison_map()
 
-    assert uf.comparison_map.first.comparingPointOne == expected_status
-    assert uf.comparison_map.second.comparingPointOne is None
+    assert uf.comparison_map.first.pipetteOffset == expected_pip
+    assert uf.comparison_map.first.deck == expected_deck
+    assert uf.comparison_map.second.pipetteOffset is None
+    assert uf.comparison_map.second.deck is None
 
     uf._current_state = CalibrationCheckState.comparingPointTwo
     await uf._hardware.move_to(
-            mount=uf._mount,
+            mount=uf.mount,
             abs_position=Point(x=10, y=10, z=10),
             critical_point=uf.hw_pipette.critical_point
         )
     await uf.update_comparison_map()
-    assert uf.comparison_map.first.comparingPointTwo == expected_status
-    assert uf.comparison_map.second.comparingPointTwo is None
+    expected_deck.comparingPointTwo = expected_status
+    assert uf.comparison_map.first.pipetteOffset == expected_pip
+    assert uf.comparison_map.first.deck == expected_deck
+    assert uf.comparison_map.second.pipetteOffset is None
+    assert uf.comparison_map.second.deck is None
 
     uf._current_state = CalibrationCheckState.comparingPointThree
     await uf._hardware.move_to(
-        mount=uf._mount,
+        mount=uf.mount,
         abs_position=Point(x=10, y=10, z=10),
         critical_point=uf.hw_pipette.critical_point
     )
     await uf.update_comparison_map()
-
-    assert uf.comparison_map.first.comparingPointThree == expected_status
-    assert uf.comparison_map.second.comparingPointThree is None
+    expected_deck.comparingPointThree = expected_status
+    assert uf.comparison_map.first.pipetteOffset == expected_pip
+    assert uf.comparison_map.first.deck == expected_deck
+    assert uf.comparison_map.second.pipetteOffset is None
+    assert uf.comparison_map.second.deck is None
 
     await uf.change_active_pipette()
 
-    uf._current_state = CalibrationCheckState.comparingPointOne
-    await uf._hardware.move_to(
-        mount=uf._mount,
-        abs_position=Point(x=10, y=10, z=10),
-        critical_point=uf.hw_pipette.critical_point
-    )
+    uf._current_state = CalibrationCheckState.comparingHeight
     await uf.update_comparison_map()
 
-    assert uf.comparison_map.first.comparingPointOne == expected_status
-    assert uf.comparison_map.second.comparingPointOne == expected_status
+    uf._current_state = CalibrationCheckState.comparingPointOne
+    await uf.update_comparison_map()
+
+    new_pip = PipetteOffsetComparisonMap(
+        status=all_status,
+        comparingHeight=height_status,
+        comparingPointOne=expected_status)
+    new_deck = DeckComparisonMap(
+        status=all_status,
+        comparingPointOne=expected_status)
+
+    assert uf.comparison_map.first.pipetteOffset == expected_pip
+    assert uf.comparison_map.first.deck == expected_deck
+    assert uf.comparison_map.second.pipetteOffset == new_pip
+    assert uf.comparison_map.second.deck == new_deck

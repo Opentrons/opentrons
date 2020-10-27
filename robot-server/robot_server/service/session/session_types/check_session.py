@@ -3,7 +3,7 @@ from typing import Awaitable, cast, TYPE_CHECKING, List
 from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
 from robot_server.robot.calibration.check.models import (
-    ComparisonMap, ComparisonStatePerPipette,
+    ComparisonStatePerCalibration, ComparisonStatePerPipette,
     CalibrationCheckSessionStatus)
 from robot_server.robot.calibration.check import util
 
@@ -53,6 +53,9 @@ class CheckSession(BaseSession):
         # have a session model with an optional tiprack for session
         # create params right now because of the pydantic union problem.
         tip_racks: List = []
+        # Here the calibration block is also a problem with the pydantic unions
+        # it will be addressed in a follow-up PR.
+        has_calibration_block = False
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
@@ -62,6 +65,7 @@ class CheckSession(BaseSession):
         try:
             calibration_check = CheckCalibrationUserFlow(
                 configuration.hardware,
+                has_calibration_block=has_calibration_block,
                 tip_rack_defs=[
                     cast('LabwareDefinition', rack) for rack in tip_racks])
         except AssertionError as e:
@@ -84,14 +88,14 @@ class CheckSession(BaseSession):
             ) -> ComparisonStatePerPipette:
         first = comparison_map.first
         second = comparison_map.second
-        first_compmap = ComparisonMap(
-            comparingHeight=first.comparingHeight,
-            comparingPointOne=first.comparingPointOne,
-            comparingPointTwo=first.comparingPointTwo,
-            comparingPointThree=first.comparingPointThree)
-        second_compmap = ComparisonMap(
-            comparingHeight=second.comparingHeight,
-            comparingPointOne=second.comparingPointOne)
+        first_compmap = ComparisonStatePerCalibration(
+            tipLength=first.tipLength,
+            pipetteOffset=first.pipetteOffset,
+            deck=first.deck)
+        second_compmap = ComparisonStatePerCalibration(
+            tipLength=second.tipLength,
+            pipetteOffset=second.pipetteOffset,
+            deck=second.deck)
         return ComparisonStatePerPipette(
             first=first_compmap, second=second_compmap)
 
