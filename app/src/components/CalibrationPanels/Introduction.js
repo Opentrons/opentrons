@@ -77,7 +77,7 @@ const NOTE_BODY_OUTSIDE_PROTOCOL =
 const NOTE_BODY_PRE_PROTOCOL =
   'important you perform this calibration using the exact tips specified in your protocol, as the robot uses the corresponding labware definition data to find the tip.'
 const NOTE_HEALTH_CHECK_OUTCOMES =
-  'This is the tiprack you used to calibrate your pipette offset. You need to use the same tiprack to check the calibration.'
+  'This is the tip rack you used to calibrate your pipette offset. You need to use the same tip rack to check the calibration.'
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 
 type BodySpec = {|
