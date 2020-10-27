@@ -64,7 +64,7 @@ export const genericDidMigrateMessage: ModalContents = {
 export const noBehaviorChangeMessage: ModalContents = {
   title: 'Your protocol was made in an older version of Protocol Designer',
   body: (
-    <>
+    <div className={styles.migration_message}>
       <p>Your protocol will be automatically updated to the latest version.</p>
       <p>
         We have added new features since the last time this protocol was
@@ -74,7 +74,7 @@ export const noBehaviorChangeMessage: ModalContents = {
         separate copy of the file you just imported.
       </p>
       <p>As always, please contact us with any questions or feedback.</p>
-    </>
+    </div>
   ),
 }
 
