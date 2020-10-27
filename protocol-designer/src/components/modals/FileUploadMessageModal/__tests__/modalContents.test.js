@@ -20,7 +20,7 @@ describe('modalContents', () => {
         )
       })
     })
-    it('should return the v5 migration message when migrating from v5.x to 5.2', () => {
+    it('should return the "no behavior change message" when migrating from v5.x to 5.2', () => {
       const migrationsList = [['5.1.0'], ['5.1.0', '5.2.0']]
 
       migrationsList.forEach(migrations => {
