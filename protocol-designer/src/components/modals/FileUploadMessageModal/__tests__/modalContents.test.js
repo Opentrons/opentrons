@@ -1,12 +1,6 @@
 // @flow
 import { getMigrationMessage } from '../modalContents'
 
-// '1.1.0': migrateFileOne,
-//   '3.0.0': migrateFileThree,
-//   '4.0.0': migrateFileFour,
-//   '5.0.0': migrateFileFive,
-//   '5.1.0': migrateFileFiveOne,
-//   '5.2.0': migrateFileFiveTwo,
 describe('modalContents', () => {
   describe('getMigrationMessage', () => {
     it('should return the v3 migration message when migrating to v3', () => {
