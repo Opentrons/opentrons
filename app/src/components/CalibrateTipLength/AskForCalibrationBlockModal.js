@@ -16,10 +16,12 @@ import {
   ALIGN_CENTER,
   ModalPage,
   DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import styles from './styles.css'
 import { labwareImages } from '../CalibrationPanels/labwareImages'
+import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 
 const EXIT = 'exit'
 const ALERT_TIP_LENGTH_CAL_HEADER = 'Do you have a calibration block?'
@@ -62,9 +64,12 @@ export function AskForCalibrationBlockModal(props: Props): React.Node {
       }}
     >
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING_3}>
-        <Text css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
-          {ALERT_TIP_LENGTH_CAL_HEADER}
-        </Text>
+        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Text css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
+            {ALERT_TIP_LENGTH_CAL_HEADER}
+          </Text>
+          <NeedHelpLink />
+        </Flex>
         <Flex justifyContent={JUSTIFY_CENTER} marginY="1rem">
           <img
             className={styles.block_image}
