@@ -14,7 +14,8 @@ export type OnComplete = boolean => void
 export type Invoker = (OnComplete | null) => void
 
 export function useAskForCalibrationBlock(
-  onComplete: OnComplete | null = null
+  onComplete: OnComplete | null = null,
+  titleBarTitle: string
 ): [Invoker, React.Node | null] {
   const dispatch = useDispatch<Dispatch>()
 
@@ -47,11 +48,19 @@ export function useAskForCalibrationBlock(
           completer.current && completer.current(!useTrashSurface.current)
         })()
   }
+
+  const handleCloseBlockPrompt = () => {
+    setShowCalBlockPrompt(false)
+  }
   return [
     handleShowRequest,
     showCalBlockPrompt ? (
       <Portal level="top">
-        <AskForCalibrationBlockModal setHasBlock={setHasBlock} />
+        <AskForCalibrationBlockModal
+          titleBarTitle={titleBarTitle}
+          closePrompt={handleCloseBlockPrompt}
+          setHasBlock={setHasBlock}
+        />
       </Portal>
     ) : null,
   ]

@@ -57,6 +57,7 @@ const PIPETTE_SETUP = 'Pipette Setup'
 const MOVE_PIPETTE_TO_FRONT = 'Move pipette to front'
 const CANCEL = 'Cancel'
 const MOUNT = 'mount'
+const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 
 export function ChangePipette(props: Props): React.Node {
   const { robotName, mount, closeModal } = props
@@ -119,7 +120,7 @@ export function ChangePipette(props: Props): React.Node {
       overrideParams: { hasCalibrationBlock: calBlock },
       withIntent: INTENT_PIPETTE_OFFSET,
     })
-  })
+  }, PIPETTE_OFFSET_CALIBRATION)
 
   const baseProps = {
     title: PIPETTE_SETUP,

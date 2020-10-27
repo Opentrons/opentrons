@@ -65,6 +65,7 @@ const LABEL_BY_MOUNT = {
   right: 'Right pipette',
 }
 
+const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 const UNKNOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
 const SERIAL_NUMBER = 'Serial number'
 const PIPETTE_OFFSET_MISSING = 'Pipette offset calibration missing.'
@@ -142,7 +143,10 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
     return CustomLabware.getCustomLabwareDefinitions(state)
   })
 
-  const [showAskForBlock, AskForBlockModal] = useAskForCalibrationBlock(null)
+  const [showAskForBlock, AskForBlockModal] = useAskForCalibrationBlock(
+    null,
+    PIPETTE_OFFSET_CALIBRATION
+  )
 
   const startPipetteOffsetCalibrationDirectly = () => {
     startPipetteOffsetCalibration({ withIntent: INTENT_PIPETTE_OFFSET })

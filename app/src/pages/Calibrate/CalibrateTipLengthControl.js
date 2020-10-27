@@ -34,6 +34,8 @@ import type {
 import type { RequestState } from '../../robot-api/types'
 import type { TipracksByMountMap } from '../../robot'
 
+const TIP_LENGTH_CALIBRATION = 'tip length calibration'
+
 export type CalibrateTipLengthControlProps = {|
   robotName: string,
   hasCalibrated: boolean,
@@ -177,7 +179,8 @@ export function CalibrateTipLengthControl({
   })
 
   const [showCalBlockRequest, calBlockRequestModal] = useAskForCalibrationBlock(
-    handleStart
+    handleStart,
+    TIP_LENGTH_CALIBRATION
   )
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(() => {
