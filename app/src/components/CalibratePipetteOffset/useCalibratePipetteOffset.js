@@ -16,15 +16,20 @@ import type { RequestState } from '../../robot-api/types'
 
 import { Portal } from '../portal'
 import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
+import { INTENT_PIPETTE_OFFSET } from '../CalibrationPanels'
+import type { PipetteOffsetIntent } from '../CalibrationPanels/types'
 
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-export type Invoker = (
-  paramOverrides: $Shape<PipetteOffsetCalibrationSessionParams>
-) => void
+export type InvokerProps = {|
+  overrideParams?: $Shape<PipetteOffsetCalibrationSessionParams>,
+  withIntent?: PipetteOffsetIntent,
+|}
+
+export type Invoker = (InvokerProps | void) => void
 
 export function useCalibratePipetteOffset(
   robotName: string,
@@ -93,15 +98,20 @@ export function useCalibratePipetteOffset(
     }
   }, [shouldClose, onComplete])
 
+  const [intent, setIntent] = React.useState(INTENT_PIPETTE_OFFSET)
+
   const {
     mount,
     shouldRecalibrateTipLength = false,
     hasCalibrationBlock = false,
     tipRackDefinition = null,
   } = sessionParams
-  const handleStartPipOffsetCalSession: Invoker = (
-    overrideParams: $Shape<PipetteOffsetCalibrationSessionParams> | void = {}
-  ) => {
+  const handleStartPipOffsetCalSession: Invoker = (props = {}) => {
+    const {
+      overrideParams = ({}: $Shape<PipetteOffsetCalibrationSessionParams>),
+      withIntent = INTENT_PIPETTE_OFFSET,
+    } = props
+    setIntent(withIntent)
     dispatchRequests(
       Sessions.ensureSession(
         robotName,
@@ -127,6 +137,7 @@ export function useCalibratePipetteOffset(
           showSpinner={showSpinner}
           dispatchRequests={dispatchRequests}
           isJogging={isJogging}
+          intent={intent}
         />
       </Portal>
     ) : null,

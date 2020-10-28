@@ -46,7 +46,7 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Create a null session
+  - name: Create a live protocol session
     request:
       url: "{host:s}:{port:d}/sessions"
       method: POST
@@ -54,7 +54,7 @@ stages:
         data:
           type: Session
           attributes:
-            sessionType: "null"
+            sessionType: "liveProtocol"
     response:
       status_code: 201
       save:
@@ -83,23 +83,18 @@ stages:
     response:
       status_code: 200
       json:
+        links: null
+        meta: null
         data:
-        - id: "default"
-          type: Session
-          attributes:
-            sessionType: "default"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            details: {}
-            createParams: null
         - id: "{session_id_1}"
-          type: Session
+          type: !anystr
           attributes:
-            sessionType: "null"
+            sessionType: "liveProtocol"
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
             details: {}
             createParams: null
         - id: "{session_id_2}"
-          type: Session
+          type: !anystr
           attributes:
             sessionType: "calibrationCheck"
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
@@ -113,9 +108,11 @@ stages:
     response:
       status_code: 200
       json:
+        links: null
+        meta: null
         data:
         - id: "{session_id_2}"
-          type: Session
+          type: !anystr
           attributes:
             sessionType: "calibrationCheck"
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
@@ -143,11 +140,6 @@ stages:
     response:
       status_code: 200
       json:
-        data:
-        - id: "default"
-          type: Session
-          attributes:
-            sessionType: "default"
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            details: {}
-            createParams: null
+        data: []
+        meta: null
+        links: null

@@ -36,6 +36,10 @@ import * as Config from '../../config'
 import styles from './styles.css'
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
+import {
+  INTENT_PIPETTE_OFFSET,
+  INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+} from '../CalibrationPanels'
 import type { State } from '../../types'
 
 import {
@@ -63,6 +67,7 @@ const LABEL_BY_MOUNT = {
   right: 'Right pipette',
 }
 
+const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 const UNKNOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
 const SERIAL_NUMBER = 'Serial number'
 const PIPETTE_OFFSET_MISSING = 'Pipette offset calibration missing.'
@@ -138,10 +143,15 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
       setShowCalBlockModalAndKeepTipLength(keepTipLength)
     } else {
       startPipetteOffsetCalibration({
-        hasCalibrationBlock: Boolean(
-          configHasCalibrationBlock ?? hasBlockModalResponse
-        ),
-        shouldRecalibrateTipLength: keepTipLength ? undefined : true,
+        overrideParams: {
+          hasCalibrationBlock: Boolean(
+            configHasCalibrationBlock ?? hasBlockModalResponse
+          ),
+          shouldRecalibrateTipLength: keepTipLength ? undefined : true,
+        },
+        withIntent: keepTipLength
+          ? INTENT_PIPETTE_OFFSET
+          : INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
       })
       setShowCalBlockModalAndKeepTipLength(null)
     }
@@ -152,7 +162,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   })
 
   const startPipetteOffsetCalibrationDirectly = () => {
-    startPipetteOffsetCalibration({})
+    startPipetteOffsetCalibration({ withIntent: INTENT_PIPETTE_OFFSET })
   }
 
   const pipImage = (
@@ -299,6 +309,8 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
                 keepTipLength: showCalBlockModalAndKeepTipLength,
               })
             }}
+            titleBarTitle={PIPETTE_OFFSET_CALIBRATION}
+            closePrompt={() => setShowCalBlockModalAndKeepTipLength(null)}
           />
         </Portal>
       ) : null}

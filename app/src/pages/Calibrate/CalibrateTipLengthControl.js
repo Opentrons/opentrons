@@ -24,6 +24,7 @@ import { UncalibratedInfo } from './UncalibratedInfo'
 import { TipLengthCalibrationInfoBox } from '../../components/CalibrateTipLength/TipLengthCalibrationInfoBox'
 import { Portal } from '../../components/portal'
 import { CalibratePipetteOffset } from '../../components/CalibratePipetteOffset'
+import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../components/CalibrationPanels'
 
 import type { State } from '../../types'
 import type {
@@ -33,6 +34,8 @@ import type {
 } from '../../sessions/types'
 import type { RequestState } from '../../robot-api/types'
 import type { TipracksByMountMap } from '../../robot'
+
+const TIP_LENGTH_CALIBRATION = 'tip length calibration'
 
 export type CalibrateTipLengthControlProps = {|
   robotName: string,
@@ -158,7 +161,11 @@ export function CalibrateTipLengthControl({
       </TipLengthCalibrationInfoBox>
       <Portal level="top">
         {showCalBlockModal ? (
-          <AskForCalibrationBlockModal onResponse={handleStart} />
+          <AskForCalibrationBlockModal
+            onResponse={handleStart}
+            titleBarTitle={TIP_LENGTH_CALIBRATION}
+            closePrompt={() => setShowCalBlockModal(false)}
+          />
         ) : null}
         {isExtendedPipOffset ? (
           <CalibratePipetteOffset
@@ -167,6 +174,7 @@ export function CalibrateTipLengthControl({
             showSpinner={showSpinner}
             dispatchRequests={dispatchRequests}
             isJogging={isJogging}
+            intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
           />
         ) : (
           <CalibrateTipLength

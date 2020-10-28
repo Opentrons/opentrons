@@ -16,6 +16,7 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   TEXT_TRANSFORM_UPPERCASE,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -25,6 +26,7 @@ import type { CalibrationPanelProps } from './types'
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { NeedHelpLink } from './NeedHelpLink'
 
 import slot5LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
 import slot5LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
@@ -52,9 +54,11 @@ const DECK_IN = 'the deck in'
 const THEN = 'Then press the'
 const DECK_CAL_BUTTON_TEXT = 'remember z-axis and move to slot 1'
 const PIP_OFFSET_BUTTON_TEXT = 'save calibration and move to slot 1'
-const CALIBRATION_HEALTH_BUTTON_TEXT = 'Go To Next Check'
+const CALIBRATION_HEALTH_BUTTON_TEXT = 'check z-axis'
 const TO_USE_Z =
   'button to use this z position for the rest of deck calibration'
+const CALIBRATION_HEALTH_TO_DETERMINE =
+  'button to determine how this position compares to the previously saved z-axis calibration coordinate'
 
 const contentsBySessionType: {
   [SessionType]: {
@@ -80,6 +84,9 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
   const { isMulti, mount, sendCommands, sessionType } = props
 
   const { headerText, buttonText } = contentsBySessionType[sessionType]
+
+  const isHealthCheck =
+    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
   const demoAsset = React.useMemo(
     () => mount && assetMap[mount][isMulti ? 'multi' : 'single'],
@@ -120,13 +127,16 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
 
   return (
     <>
-      <Text
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        fontSize={FONT_SIZE_HEADER}
-      >
-        {headerText}
-      </Text>
+      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Text
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          fontSize={FONT_SIZE_HEADER}
+        >
+          {headerText}
+        </Text>
+        <NeedHelpLink />
+      </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         padding={SPACING_3}
@@ -141,8 +151,8 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
           <br />
           <br />
           {THEN}
-          <b>{` ${buttonText} `}</b>
-          {TO_USE_Z}.
+          <b>{` '${buttonText}' `}</b>
+          {isHealthCheck ? CALIBRATION_HEALTH_TO_DETERMINE : TO_USE_Z}.
         </Text>
         <video
           key={demoAsset}

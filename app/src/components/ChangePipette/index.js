@@ -26,6 +26,7 @@ import {
 
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
+import { INTENT_PIPETTE_OFFSET } from '../CalibrationPanels'
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
@@ -57,6 +58,7 @@ const PIPETTE_SETUP = 'Pipette Setup'
 const MOVE_PIPETTE_TO_FRONT = 'Move pipette to front'
 const CANCEL = 'Cancel'
 const MOUNT = 'mount'
+const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 
 export function ChangePipette(props: Props): React.Node {
   const { robotName, mount, closeModal } = props
@@ -123,9 +125,12 @@ export function ChangePipette(props: Props): React.Node {
       setShowCalBlockModal(true)
     } else {
       startPipetteOffsetCalibration({
-        hasCalibrationBlock: Boolean(
-          configHasCalibrationBlock ?? hasBlockModalResponse
-        ),
+        overrideParams: {
+          hasCalibrationBlock: Boolean(
+            configHasCalibrationBlock ?? hasBlockModalResponse
+          ),
+        },
+        withIntent: INTENT_PIPETTE_OFFSET,
       })
       setShowCalBlockModal(false)
     }
@@ -250,7 +255,11 @@ export function ChangePipette(props: Props): React.Node {
 
   if (wizardStep === CALIBRATE_PIPETTE) {
     return showCalBlockModal ? (
-      <AskForCalibrationBlockModal onResponse={startPipetteOffsetWizard} />
+      <AskForCalibrationBlockModal
+        titleBarTitle={PIPETTE_OFFSET_CALIBRATION}
+        onResponse={startPipetteOffsetWizard}
+        closePrompt={homePipAndExit}
+      />
     ) : (
       PipetteOffsetCalibrationWizard
     )

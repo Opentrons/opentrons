@@ -32,9 +32,10 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           id: "{session_id}"
-          type: Session
+          type: !anystr
           attributes:
             sessionType: tipLengthCalibration
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
@@ -47,6 +48,7 @@ stages:
               mount: left
               hasCalibrationBlock: true
               tipRackDefinition: !include fixture_tiprack_300_ul.json
+              shouldRecalibrateTipLength: true
 
   - name: Load labware
     request:
@@ -62,6 +64,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           id: !anystr
           type: SessionCommand
@@ -73,6 +76,7 @@ stages:
             startedAt: *dt
             completedAt: *dt
             data: {}
+            result: null
 
   - name: Attempt conflicting command
     request:
@@ -94,19 +98,14 @@ stages:
     response:
       status_code: 200
 
-  - name: There are no sessions except default
+  - name: There are no sessions
     request:
       url: "{host:s}:{port:d}/sessions"
       method: GET
     response:
       status_code: 200
       json:
-        data:
-          - id: "default"
-            type: Session
-            attributes:
-              sessionType: default
-              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-              details: {}
-              createParams: null
+        links: null
+        meta: null
+        data: []
 

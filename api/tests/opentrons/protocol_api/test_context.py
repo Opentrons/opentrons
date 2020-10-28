@@ -14,7 +14,7 @@ from opentrons.hardware_control.types import Axis
 from opentrons.protocol_api import paired_instrument_context as paired
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.calibration_storage import get, types as cs_types
 
 import pytest

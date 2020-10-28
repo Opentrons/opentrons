@@ -4,6 +4,7 @@ import { mountWithStore } from '@opentrons/components/__utils__'
 
 import { BORDER_SOLID_LIGHT } from '@opentrons/components'
 import * as Alerts from '../../../alerts'
+import * as Analytics from '../../../analytics'
 import { TitledControl } from '../../TitledControl'
 import { ToggleBtn } from '../../ToggleBtn'
 import { UpdateNotificationsControl } from '../UpdateNotificationsControl'
@@ -11,17 +12,24 @@ import { UpdateNotificationsControl } from '../UpdateNotificationsControl'
 import type { StyleProps } from '@opentrons/components'
 import type { State } from '../../../types'
 import type { AlertId } from '../../../alerts/types'
+import type { AnalyticsEvent } from '../../../analytics/types'
 
 jest.mock('../../../alerts/selectors')
+jest.mock('../../../analytics/hooks')
 
 const getAlertIsPermanentlyIgnored: JestMockFn<
   [State, AlertId],
   boolean | null
 > = Alerts.getAlertIsPermanentlyIgnored
 
+const useTrackEvent: JestMockFn<[], JestMockFn<[AnalyticsEvent], void>> =
+  Analytics.useTrackEvent
+
 const MOCK_STATE: $Shape<State> = {}
 
 describe('UpdateNotificationsControl', () => {
+  const trackEvent = jest.fn()
+
   const render = (styleProps: $Shape<StyleProps> = {}) => {
     return mountWithStore(<UpdateNotificationsControl {...styleProps} />, {
       initialState: MOCK_STATE,
@@ -29,6 +37,7 @@ describe('UpdateNotificationsControl', () => {
   }
 
   beforeEach(() => {
+    useTrackEvent.mockReturnValue(trackEvent)
     getAlertIsPermanentlyIgnored.mockImplementation((state, alertId) => {
       expect(state).toBe(MOCK_STATE)
       expect(alertId).toBe(Alerts.ALERT_APP_UPDATE_AVAILABLE)
@@ -101,5 +110,35 @@ describe('UpdateNotificationsControl', () => {
     expect(store.dispatch).toHaveBeenCalledWith(
       Alerts.alertPermanentlyIgnored(Alerts.ALERT_APP_UPDATE_AVAILABLE)
     )
+  })
+
+  it('should send an appUpdateNotificationsToggled analytics event when toggled from on to off', () => {
+    // false means alert is enabled which means toggle is currently on
+    getAlertIsPermanentlyIgnored.mockReturnValue(false)
+
+    const { wrapper } = render()
+    const toggle = wrapper.find(ToggleBtn)
+
+    toggle.invoke('onClick')()
+
+    expect(trackEvent).toHaveBeenCalledWith({
+      name: 'appUpdateNotificationsToggled',
+      properties: { updatesIgnored: true },
+    })
+  })
+
+  it('should send an appUpdateNotificationsToggled analytics event when toggled from off to on', () => {
+    // true means alert is disabled which means toggle is currently off
+    getAlertIsPermanentlyIgnored.mockReturnValue(true)
+
+    const { wrapper } = render()
+    const toggle = wrapper.find(ToggleBtn)
+
+    toggle.invoke('onClick')()
+
+    expect(trackEvent).toHaveBeenCalledWith({
+      name: 'appUpdateNotificationsToggled',
+      properties: { updatesIgnored: false },
+    })
   })
 })

@@ -1,11 +1,17 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton, OutlineButton } from '@opentrons/components'
+import {
+  PrimaryButton,
+  OutlineButton,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+} from '@opentrons/components'
 import find from 'lodash/find'
 import * as Sessions from '../../sessions'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
 import { saveAs } from 'file-saver'
+import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type { CalibrationHealthCheckInstrument } from '../../sessions/types'
@@ -53,10 +59,12 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
 
   return (
     <>
-      <h3 className={styles.summary_page_header}>
-        {ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}
-      </h3>
-
+      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <h3 className={styles.summary_page_header}>
+          {ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}
+        </h3>
+        <NeedHelpLink maxHeight="1rem" />
+      </Flex>
       <div className={styles.summary_page_contents}>
         <div className={styles.summary_section}>
           {firstPipette && firstComparisonsByStep && (

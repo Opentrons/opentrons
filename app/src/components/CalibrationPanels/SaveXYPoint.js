@@ -14,6 +14,7 @@ import {
   FONT_SIZE_HEADER,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
@@ -28,6 +29,7 @@ import type {
 import { JogControls } from '../JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { NeedHelpLink } from './NeedHelpLink'
 
 import slot1LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
 import slot1LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
@@ -84,7 +86,7 @@ const ABOVE_THE_CROSS = 'above the cross in'
 const THEN = 'Then press the'
 const TO_SAVE = 'button to calibrate the x and y-axis in'
 const TO_CHECK =
-  'button to determine how this position compares to the previously-saved x and y-axis calibration coordinates.'
+  'button to determine how this position compares to the previously-saved x and y-axis calibration coordinates'
 
 const BASE_BUTTON_TEXT = 'save calibration'
 const HEALTH_BUTTON_TEXT = 'check x and y-axis'
@@ -203,17 +205,23 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     requiresNewTip: true,
     ...props,
   })
-
+  const continueButtonText =
+    isHealthCheck && activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
+      ? HEALTH_BUTTON_TEXT
+      : buttonText
   return (
     <>
-      <Text
-        fontSize={FONT_SIZE_HEADER}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
-      >
-        {isHealthCheck ? CHECK_POINT_XY_HEADER : SAVE_XY_POINT_HEADER}
-        {` ${SLOT} ${slotNumber || ''}`}
-      </Text>
+      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Text
+          fontSize={FONT_SIZE_HEADER}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+        >
+          {isHealthCheck ? CHECK_POINT_XY_HEADER : SAVE_XY_POINT_HEADER}
+          {` ${SLOT} ${slotNumber || ''}`}
+        </Text>
+        <NeedHelpLink />
+      </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         padding={SPACING_3}
@@ -228,8 +236,8 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           <br />
           <br />
           {THEN}
-          <b>{` ${buttonText} `}</b>
-          {`${isHealthCheck ? TO_CHECK : TO_SAVE} ${SLOT} ${slotNumber}`}.
+          <b>{` '${continueButtonText}' `}</b>
+          {isHealthCheck ? TO_CHECK : `${TO_SAVE} ${SLOT} ${slotNumber}`}.
         </Text>
         <video
           key={String(demoAsset)}
@@ -256,7 +264,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           flex="1"
           marginX={SPACING_5}
         >
-          {buttonText}
+          {continueButtonText}
         </PrimaryBtn>
       </Flex>
       <Box width="100%">{confirmLink}</Box>

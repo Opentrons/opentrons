@@ -41,7 +41,7 @@ ot_sources := $(ot_py_sources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
+clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'notify_server/**/.mypy_cache'
 
 .PHONY: all
 all: clean wheel
@@ -57,7 +57,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(SHX) rm -rf  `${POETRY} env info -p`
+	$(SHX) rm -rf  `${poetry} env info -p`
 
 dist/notify_server-%-py3-none-any.whl: $(ot_sources)
 	$(clean_cmd)
@@ -77,6 +77,7 @@ lint: $(ot_py_sources)
 	$(poetry_run) flake8 $(SRC_PATH) tests
 
 .PHONY: dev
+dev: export OT_NOTIFY_SERVER_PRODUCTION := 0
 dev:
 	$(poetry_run) python -m notify_server.main
 

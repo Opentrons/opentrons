@@ -277,6 +277,29 @@ export function createTipLiquidState<T>(
   )
 }
 
+// always return destination unless the blowout location is the source
+export const getDispenseAirGapLocation = (args: {|
+  blowoutLocation: ?string,
+  sourceLabware: string,
+  destLabware: string,
+  sourceWell: string,
+  destWell: string,
+|}): {|
+  dispenseAirGapLabware: string,
+  dispenseAirGapWell: string,
+|} => {
+  const {
+    blowoutLocation,
+    sourceLabware,
+    destLabware,
+    sourceWell,
+    destWell,
+  } = args
+  return blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION
+    ? { dispenseAirGapLabware: sourceLabware, dispenseAirGapWell: sourceWell }
+    : { dispenseAirGapLabware: destLabware, dispenseAirGapWell: destWell }
+}
+
 // NOTE: pipettes have no tips, tiprack are full
 export function makeInitialRobotState(args: {|
   invariantContext: InvariantContext,

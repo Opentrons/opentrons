@@ -193,14 +193,16 @@ def get_robot_deck_attitude() \
     gantry_path = robot_dir / 'deck_calibration.json'
     if gantry_path.exists():
         data = io.read_cal_file(gantry_path)
-        assert 'attitude' in data.keys(), 'Not valid deck calibration data'
-        return local_types.DeckCalibration(
-            attitude=data['attitude'],
-            source=_get_calibration_source(data),
-            pipette_calibrated_with=data['pipette_calibrated_with'],
-            tiprack=data['tiprack'],
-            last_modified=data['last_modified'],
-            status=_get_calibration_status(data))
+        try:
+            return local_types.DeckCalibration(
+                attitude=data['attitude'],
+                source=_get_calibration_source(data),
+                pipette_calibrated_with=data['pipette_calibrated_with'],
+                tiprack=data['tiprack'],
+                last_modified=data['last_modified'],
+                status=_get_calibration_status(data))
+        except Exception:
+            return None
     else:
         return None
 

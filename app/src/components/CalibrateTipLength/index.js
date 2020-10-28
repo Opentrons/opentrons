@@ -34,6 +34,7 @@ import {
   ConfirmExitModal,
   MeasureNozzle,
   MeasureTip,
+  INTENT_TIP_LENGTH_IN_PROTOCOL,
 } from '../CalibrationPanels'
 
 import type { CalibrateTipLengthParentProps } from './types'
@@ -169,6 +170,7 @@ export function CalibrateTipLength(
           calBlock={calBlock}
           currentStep={currentStep}
           sessionType={session.sessionType}
+          intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
         />
       </ModalPage>
       {showConfirmExit && (

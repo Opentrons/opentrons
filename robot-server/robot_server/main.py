@@ -30,7 +30,7 @@ def main():
     """
 
     # TODO Amit 7/14/2020
-    #  Now that aiohttp is goine, we can start the robot-server using uvicorn
+    #  Now that aiohttp is gone, we can start the robot-server using uvicorn
     #  command line.
     #  This function is just here for backwards compatibility.
 

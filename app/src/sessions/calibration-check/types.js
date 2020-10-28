@@ -1,5 +1,6 @@
 // @flow
 import type { CalibrationLabware } from '../types'
+import type { Mount } from '../../pipettes/types'
 
 // calibration check session types
 
@@ -49,7 +50,7 @@ export type CalibrationHealthCheckInstrument = {|
   model: string,
   name: string,
   tip_length: number,
-  mount: string,
+  mount: Mount,
   rank: RobotCalibrationCheckPipetteRank,
   serial: string,
 |}

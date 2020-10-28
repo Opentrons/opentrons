@@ -8,6 +8,16 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ## OT-2 Software Changes in 4.0.0-beta.0
 
+### Fixes
+
+- Fixed an issue that could cause the API server to fail to boot if certain testing files were present
+
+&nbsp;
+
+---
+
+## OT-2 Software Changes in 3.21.1
+
 OT-2 Software 4.0.0 has two major changes.
 
 1. Deprecation of Python Protocol API Version 1. APIv1 protocols are no longer supported on the OT-2. This is a big change, but it allows us to make changes and fix problems that go too deep to be supported by APIv1.

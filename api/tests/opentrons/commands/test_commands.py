@@ -1,5 +1,5 @@
 import pytest
-from opentrons import commands
+from opentrons.commands import protocol_commands
 
 
 @pytest.mark.parametrize(
@@ -21,7 +21,7 @@ def test_delay(seconds,
                expected_minutes,
                expected_text
                ):
-    command = commands.delay(seconds, minutes)
+    command = protocol_commands.delay(seconds, minutes)
     name = command['name']
     payload = command['payload']
 

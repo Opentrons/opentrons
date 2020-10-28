@@ -29,9 +29,10 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data: &session_data
           id: "{session_id}"
-          type: Session
+          type: !anystr
           attributes: &session_data_attributes
             sessionType: deckCalibration
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
@@ -59,6 +60,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -84,6 +86,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -109,6 +112,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -134,6 +138,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -171,6 +176,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -197,6 +203,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -222,6 +229,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -248,6 +256,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -274,6 +283,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -300,6 +310,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -326,6 +337,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -341,18 +353,13 @@ stages:
     response:
       status_code: 200
 
-  - name: There are no session except default
+  - name: There are no session
     request:
         url: "{host:s}:{port:d}/sessions"
         method: GET
     response:
       status_code: 200
       json:
-        data:
-          - id: "default"
-            type: Session
-            attributes:
-              sessionType: default
-              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-              details: {}
-              createParams: null
+        links: null
+        meta: null
+        data: []

@@ -234,7 +234,9 @@ export const delayCommand = (seconds: number): Command => ({
 
 export const delayWithOffset = (
   well: string,
-  labware: string
+  labware: string,
+  seconds?: number,
+  zOffset?: number
 ): Array<Command> => [
   {
     command: 'moveToWell',
@@ -245,13 +247,13 @@ export const delayWithOffset = (
       offset: {
         x: 0,
         y: 0,
-        z: 14,
+        z: zOffset || 14,
       },
     },
   },
   {
     command: 'delay',
-    params: { wait: 12 },
+    params: { wait: seconds || 12 },
   },
 ]
 

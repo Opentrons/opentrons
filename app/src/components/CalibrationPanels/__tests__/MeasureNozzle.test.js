@@ -60,6 +60,11 @@ describe('MeasureNozzle', () => {
     expect(wrapper.find('a[children="Start over"]').exists()).toBe(true)
   })
 
+  it('renders need help link', () => {
+    const wrapper = render()
+    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
+  })
+
   it('renders the confirm crash modal when invoked', () => {
     const wrapper = render()
     wrapper.find('a[children="Start over"]').invoke('onClick')()

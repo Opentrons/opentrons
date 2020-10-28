@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.1...v4.0.0-alpha.3) (2020-10-26)
+
+**Note:** Version bump only for package @opentrons/labware-library
+
+
+
+
+
 # [4.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.2...v4.0.0-beta.1) (2020-10-21)
 
 **Note:** Version bump only for package @opentrons/labware-library
@@ -44,6 +52,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 * **labware-library:** Add labware creator visibility ([#6667](https://github.com/Opentrons/opentrons/issues/6667)) ([eb906a3](https://github.com/Opentrons/opentrons/commit/eb906a3)), closes [#6307](https://github.com/Opentrons/opentrons/issues/6307)
+
+
+
+
+
+
+## [3.21.2](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2) (2020-10-16)
+
+**Note:** Version bump only for package @opentrons/labware-library
 
 
 

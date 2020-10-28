@@ -1,6 +1,8 @@
 // @flow
 // functions for managing the user's Intercom profile
 import { version as appVersion } from '../../package.json'
+import * as Cfg from '../config'
+import * as Alerts from '../alerts'
 import { FF_PREFIX, getRobotAnalyticsData } from '../analytics'
 import { getConnectedRobot } from '../discovery'
 import {
@@ -86,6 +88,16 @@ export function makeProfileUpdate(
     case SystemInfo.NETWORK_INTERFACES_CHANGED: {
       return SystemInfo.getU2EDeviceAnalyticsProps(state)
     }
+
+    case Cfg.VALUE_UPDATED: {
+      return {
+        appUpdatesIgnored: Alerts.getAlertIsPermanentlyIgnored(
+          state,
+          Alerts.ALERT_APP_UPDATE_AVAILABLE
+        ),
+      }
+    }
   }
+
   return null
 }

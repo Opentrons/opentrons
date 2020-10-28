@@ -42,7 +42,7 @@ ot_sources := $(ot_py_sources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
+clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
 
 .PHONY: all
 all: clean wheel
@@ -78,7 +78,7 @@ lint: $(ot_py_sources)
 	$(python) -m pylama $(SRC_PATH) tests
 
 .PHONY: dev
-dev: export OT_ROBOT_SERVER_DOT_ENV_PATH := dev.env
+dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
 	$(pipenv) run uvicorn "robot_server.service.app:app" --host localhost --port 31950 --ws wsproto --reload
 
