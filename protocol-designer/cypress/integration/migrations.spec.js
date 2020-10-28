@@ -157,8 +157,8 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
               assert.match(
                 savedFile.designerApplication.version,
-                /^5\.1\.\d+$/,
-                'designerApplication.version is 5.1.x'
+                /^5\.2\.\d+$/,
+                'designerApplication.version is 5.2.x'
               )
               ;[savedFile, expectedFile].forEach(f => {
                 // Homogenize fields we don't want to compare
