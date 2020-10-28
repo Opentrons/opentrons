@@ -27,13 +27,11 @@ describe('AskForCalibrationBlockModal', () => {
 
   const findCalBlockModal = wrapper => wrapper.find(AskForCalibrationBlockModal)
   const findHaveBlock = wrapper =>
-    findCalBlockModal(wrapper)
-      .find(SecondaryBtn)
-      .at(0)
+    findCalBlockModal(wrapper).find(
+      'button[children="Continue with calibration block"]'
+    )
   const findUseTrash = wrapper =>
-    findCalBlockModal(wrapper)
-      .find(SecondaryBtn)
-      .at(1)
+    findCalBlockModal(wrapper).find('button[children="Use trash bin"]')
   const findRemember = wrapper =>
     findCalBlockModal(wrapper)
       .find(CheckboxField)

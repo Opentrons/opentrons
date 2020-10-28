@@ -92,7 +92,7 @@ describe('PipetteInfo', () => {
     const { wrapper } = render()
     wrapper.find('button[children="Calibrate offset"]').invoke('onClick')()
     wrapper.update()
-    expect(startWizard).toHaveBeenCalledWith({})
+    expect(startWizard).toHaveBeenCalledWith({ withIntent: 'pipette-offset' })
   })
 
   it('launch POC w/ cal block modal denied if POC button clicked and no existing data and no cal block pref saved', () => {
@@ -102,9 +102,12 @@ describe('PipetteInfo', () => {
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
     wrapper
-      .find('button[children="I have a calibration block"]')
+      .find('button[children="Continue with calibration block"]')
       .invoke('onClick')()
-    expect(startWizard).toHaveBeenCalledWith({ hasCalibrationBlock: true })
+    expect(startWizard).toHaveBeenCalledWith({
+      overrideParams: { hasCalibrationBlock: true },
+      withIntent: 'pipette-offset',
+    })
   })
 
   it('launch POC w/ cal block modal confirmed if POC button clicked and no existing data and no cal block pref saved', () => {
@@ -113,8 +116,11 @@ describe('PipetteInfo', () => {
     wrapper.find('button[children="Calibrate offset"]').invoke('onClick')()
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
-    wrapper.find('button[children="Use trash bin for now"]').invoke('onClick')()
-    expect(startWizard).toHaveBeenCalledWith({ hasCalibrationBlock: false })
+    wrapper.find('button[children="Use trash bin"]').invoke('onClick')()
+    expect(startWizard).toHaveBeenCalledWith({
+      overrideParams: { hasCalibrationBlock: false },
+      withIntent: 'pipette-offset',
+    })
   })
 
   it('no recalibrate tip button if POC and TLC data not present', () => {
@@ -137,11 +143,14 @@ describe('PipetteInfo', () => {
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
     wrapper
-      .find('button[children="I have a calibration block"]')
+      .find('button[children="Continue with calibration block"]')
       .invoke('onClick')()
     expect(startWizard).toHaveBeenCalledWith({
-      hasCalibrationBlock: true,
-      shouldRecalibrateTipLength: true,
+      overrideParams: {
+        hasCalibrationBlock: true,
+        shouldRecalibrateTipLength: true,
+      },
+      withIntent: 'tip-length-no-protocol',
     })
   })
 
@@ -157,10 +166,13 @@ describe('PipetteInfo', () => {
     wrapper.find('button[children="recalibrate tip"]').invoke('onClick')()
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
-    wrapper.find('button[children="Use trash bin for now"]').invoke('onClick')()
+    wrapper.find('button[children="Use trash bin"]').invoke('onClick')()
     expect(startWizard).toHaveBeenCalledWith({
-      hasCalibrationBlock: false,
-      shouldRecalibrateTipLength: true,
+      overrideParams: {
+        hasCalibrationBlock: false,
+        shouldRecalibrateTipLength: true,
+      },
+      withIntent: 'tip-length-no-protocol',
     })
   })
 
@@ -179,8 +191,11 @@ describe('PipetteInfo', () => {
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
     expect(startWizard).toHaveBeenCalledWith({
-      hasCalibrationBlock: true,
-      shouldRecalibrateTipLength: true,
+      overrideParams: {
+        hasCalibrationBlock: true,
+        shouldRecalibrateTipLength: true,
+      },
+      withIntent: 'tip-length-no-protocol',
     })
   })
 
@@ -199,8 +214,11 @@ describe('PipetteInfo', () => {
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
     expect(startWizard).toHaveBeenCalledWith({
-      hasCalibrationBlock: false,
-      shouldRecalibrateTipLength: true,
+      overrideParams: {
+        hasCalibrationBlock: false,
+        shouldRecalibrateTipLength: true,
+      },
+      withIntent: 'tip-length-no-protocol',
     })
   })
 })
