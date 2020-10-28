@@ -126,6 +126,7 @@ describe('AppAdvancedSettingsCard', () => {
       spec.originalSettingValue
     )} and changes to ${String(spec.newSettingValue)}`, () => {
       getUseTrashSurfaceForTipCal.mockReturnValue(spec.originalSettingValue)
+
       const { wrapper, store, refresh } = render()
 
       expect(getUseTrashForTipCalRadioGroup(wrapper).exists()).toBe(true)
@@ -155,8 +156,6 @@ describe('AppAdvancedSettingsCard', () => {
       }
 
       getUseTrashSurfaceForTipCal.mockReturnValue(spec.newSettingValue)
-      console.log('the new value is', getUseTrashSurfaceForTipCal())
-
 
       refresh({state: 'value'})
       expect(

@@ -49,7 +49,7 @@ const DEV_TITLE = 'Developer Only (unstable)'
 
 export function AppAdvancedSettingsCard(): React.Node {
   const useTrashSurfaceForTipCal = useSelector(
-    Config.getUseTrashSurfaceForTipCal
+    state => Config.getUseTrashSurfaceForTipCal(state)
   )
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const devInternalFlags = useSelector(Config.getFeatureFlags)
@@ -60,18 +60,14 @@ export function AppAdvancedSettingsCard(): React.Node {
   const dispatch = useDispatch<Dispatch>()
 
   const handleUseTrashSelection: BlockSelection => void = selection => {
-    console.log('handle got', selection)
     switch (selection) {
       case ALWAYS_PROMPT:
-        console.log('handle dispatch reset')
         dispatch(Calibration.resetUseTrashSurfaceForTipCal())
         break
       case ALWAYS_BLOCK:
-        console.log('handle dispatch set false')
         dispatch(Calibration.setUseTrashSurfaceForTipCal(false))
         break
       case ALWAYS_TRASH:
-        console.log('handle dispatch set true')
         dispatch(Calibration.setUseTrashSurfaceForTipCal(true))
         break
     }
@@ -81,7 +77,6 @@ export function AppAdvancedSettingsCard(): React.Node {
     dispatch(Config.toggleDevInternalFlag(flag))
   const handleChannel = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
-  console.log('rerender with trash surface ', useTrashSurfaceForTipCal)
   return (
     <>
       <Card title={TITLE}>
