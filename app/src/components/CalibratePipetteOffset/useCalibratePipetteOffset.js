@@ -152,7 +152,9 @@ export function useCalibratePipetteOffset(
   const Wizard =
     startingSession ||
     (pipOffsetCalSession &&
-      mount === pipOffsetCalSession.createParams.mount) ? (
+      mount === pipOffsetCalSession.createParams.mount &&
+      tipRackDefinition ===
+        pipOffsetCalSession.createParams.tipRackDefinition) ? (
       <Portal level="top">
         {startingSession ? (
           <SpinnerModalPage

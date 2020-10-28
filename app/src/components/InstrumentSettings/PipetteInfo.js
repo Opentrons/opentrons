@@ -163,7 +163,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           hasCalibrationBlock: Boolean(
             configHasCalibrationBlock ?? hasBlockModalResponse
           ),
-          shouldRecalibrateTipLength: keepTipLength ? undefined : true,
+          shouldRecalibrateTipLength: !keepTipLength,
         },
         withIntent: keepTipLength
           ? INTENT_PIPETTE_OFFSET
