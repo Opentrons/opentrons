@@ -3,7 +3,6 @@ import * as React from 'react'
 
 import { StackedLabeledControl } from './StackedLabeledControl'
 import { RadioGroup } from '../forms'
-import styles from './styles.css'
 
 import type { RadioGroupProps } from '../forms'
 
@@ -21,11 +20,7 @@ export function LabeledRadioGroup(props: LabeledRadioGroupProps): React.Node {
     <StackedLabeledControl
       label={label}
       control={
-        <RadioGroup
-          value={value}
-          options={options}
-          onChange={onChange}
-        />
+        <RadioGroup value={value} options={options} onChange={onChange} />
       }
     >
       {props.children}
