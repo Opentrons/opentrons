@@ -9,14 +9,14 @@ on:
       - 'shared-data/**'
       - 'components/**'
       - 'webpack-config/**'
-      - '.package.json'
+      - 'package.json'
   push:
     paths:
       - 'protocol-designer/**'
       - 'shared-data/**'
       - 'components/**'
       - 'webpack-config/**'
-      - './package.json'
+      - 'package.json'
       - '.github/workflows/pd-e2e-test.yaml'
 
 defaults:
