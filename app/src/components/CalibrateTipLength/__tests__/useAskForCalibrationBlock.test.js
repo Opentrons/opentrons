@@ -5,14 +5,14 @@ import { act } from 'react-dom/test-utils'
 
 import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
 import { useAskForCalibrationBlock } from '../useAskForCalibrationBlock'
-import { SecondaryBtn, CheckboxField } from '@opentrons/components'
+import { SecondaryBtn, PrimaryBtn, CheckboxField } from '@opentrons/components'
 import { setUseTrashSurfaceForTipCal } from '../../../calibration'
 
 describe('useAskForCalibrationBlock', () => {
   const onComplete = jest.fn()
   let showCalBlock
   const TestUseAskForCalibrationBlock = () => {
-    const [invoker, modal] = useAskForCalibrationBlock(onComplete)
+    const [invoker, modal] = useAskForCalibrationBlock(onComplete, 'fake title')
     React.useEffect(() => {
       showCalBlock = invoker
     })
@@ -32,14 +32,8 @@ describe('useAskForCalibrationBlock', () => {
   }
 
   const findCalBlockModal = wrapper => wrapper.find(AskForCalibrationBlockModal)
-  const findHaveBlock = wrapper =>
-    findCalBlockModal(wrapper)
-      .find(SecondaryBtn)
-      .at(0)
-  const findUseTrash = wrapper =>
-    findCalBlockModal(wrapper)
-      .find(SecondaryBtn)
-      .at(1)
+  const findHaveBlock = wrapper => findCalBlockModal(wrapper).find(PrimaryBtn)
+  const findUseTrash = wrapper => findCalBlockModal(wrapper).find(SecondaryBtn)
   const findRemember = wrapper =>
     findCalBlockModal(wrapper)
       .find(CheckboxField)
