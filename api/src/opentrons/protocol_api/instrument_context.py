@@ -777,13 +777,19 @@ class InstrumentContext(CommandPublisher):
         :type location: :py:class:`.types.Location` or :py:class:`.Well` or
                         None
         :param home_after: Whether to home the plunger after dropping the tip
-                           (defaults to ``True``). The plungeer must home after
+                           (defaults to ``True``). The plunger must home after
                            dropping tips because the ejector shroud that pops
                            the tip off the end of the pipette is driven by the
                            plunger motor, and may skip steps when dropping the
                            tip.
 
         :returns: This instance
+        
+        .. warning:: Setting ``home_after=False`` can severely reduce the
+           volumetric accuracy of the pipette as well as cause unxexpected
+           hard limit errors. Only use this setting with extensive testing
+           to make sure the pipette motor does not skip steps when droping
+           tips.
         """
         if location and isinstance(location, types.Location):
             if isinstance(location.labware, Well):
