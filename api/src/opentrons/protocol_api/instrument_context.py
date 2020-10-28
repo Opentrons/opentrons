@@ -788,7 +788,7 @@ class InstrumentContext(CommandPublisher):
         .. warning:: Setting ``home_after=False`` can severely reduce the
            volumetric accuracy of the pipette as well as cause unxexpected
            hard limit errors. Only use this setting with extensive testing
-           to make sure the pipette motor does not skip steps when droping
+           to make sure the pipette motor does not skip steps when dropping
            tips.
         """
         if location and isinstance(location, types.Location):
