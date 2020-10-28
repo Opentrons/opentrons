@@ -140,8 +140,6 @@ describe('AppAdvancedSettingsCard', () => {
         .find(`input[value="${spec.newRadioValue}"]`)
         .simulate('change', { target: { value: spec.newRadioValue } })
 
-
-
       if (spec.newSettingValue === null) {
         expect(store.dispatch).toHaveBeenCalledWith(
           Config.resetConfigValue('calibration.useTrashSurfaceForTipCal')
@@ -157,7 +155,7 @@ describe('AppAdvancedSettingsCard', () => {
 
       getUseTrashSurfaceForTipCal.mockReturnValue(spec.newSettingValue)
 
-      refresh({state: 'value'})
+      refresh({ state: 'value' })
       expect(
         getUseTrashForTipCalRadioGroup(wrapper)
           .find(`input[value="${spec.newRadioValue}"]`)
