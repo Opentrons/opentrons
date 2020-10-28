@@ -623,6 +623,9 @@ class InstrumentContext(CommandPublisher):
         It will not reset tip tracking so the well flag will remain False.
 
         :returns: This instance
+
+        :param home_after:
+            See the ``home_after`` parameter in :py:obj:`drop_tip`.
         """
         if not self._has_tip:
             self._log.warning('Pipette has no tip to return')
