@@ -17,6 +17,7 @@
 .labeled_control_wrapper {
   width: 100%;
   padding: 1rem;
+  display: block;
 
   &:not(:last-child) {
     border-bottom: 1px solid var(--c-light-gray);
@@ -64,6 +65,9 @@
   float: right;
   width: 9rem;
   margin-top: 0.5rem;
+}
+
+.labeled_radio_group {
 }
 
 .labeled_select {
