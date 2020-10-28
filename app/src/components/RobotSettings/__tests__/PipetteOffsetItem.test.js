@@ -74,6 +74,7 @@ describe('PipetteOffsetItem', () => {
               source: 'unknown',
               markedAt: '',
             },
+            id: 'a_pip_id',
           },
           tipLength: {
             tipLength: 30,
@@ -86,6 +87,7 @@ describe('PipetteOffsetItem', () => {
               source: 'unknown',
               markedAt: '',
             },
+            id: 'fake_id',
           },
         },
         customLabware = [],
@@ -163,6 +165,7 @@ describe('PipetteOffsetItem', () => {
             source: 'calibration_check',
             markedAt: '2020-10-09T13:30:00Z',
           },
+          id: 'a_pip_id',
         },
         tipLength: {
           tipLength: 30,
@@ -175,6 +178,7 @@ describe('PipetteOffsetItem', () => {
             source: 'unknown',
             markedAt: '',
           },
+          id: 'fake_id',
         },
       },
     })
@@ -203,6 +207,7 @@ describe('PipetteOffsetItem', () => {
             source: 'unknown',
             markedAt: '2020-10-09T13:30:00Z',
           },
+          id: 'a_pip_id',
         },
         tipLength: {
           tipLength: 30,
@@ -215,6 +220,7 @@ describe('PipetteOffsetItem', () => {
             source: 'unknown',
             markedAt: '',
           },
+          id: 'fake_id',
         },
       },
     })

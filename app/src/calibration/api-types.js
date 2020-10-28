@@ -116,17 +116,11 @@ export type PipetteOffsetCalibration = {|
   lastModified: string,
   source: CalibrationSource,
   status: IndividualCalibrationStatus,
-|}
-
-export type PipetteOffsetCalibrationModel = {|
-  attributes: PipetteOffsetCalibration,
-  type: string,
   id: string,
 |}
 
 export type AllPipetteOffsetCalibrations = {|
-  data: Array<PipetteOffsetCalibrationModel>,
-  meta: { ... },
+  data: Array<PipetteOffsetCalibration>,
 |}
 
 export type TipLengthCalibration = {|

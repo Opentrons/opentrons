@@ -37,6 +37,7 @@ describe('TipLengthCalibrationData', () => {
           source: 'unknown',
           markedAt: '',
         },
+        id: 'fake_id'
       },
     })
     expect(wrapper.text().includes('Existing data')).toBe(true)
