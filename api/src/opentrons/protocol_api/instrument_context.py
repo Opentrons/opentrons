@@ -786,7 +786,7 @@ class InstrumentContext(CommandPublisher):
         :returns: This instance
 
         .. warning:: Setting ``home_after=False`` can severely reduce the
-           volumetric accuracy of the pipette as well as cause unxexpected
+           volumetric accuracy of the pipette as well as cause unexpected
            hard limit errors. Only use this setting with extensive testing
            to make sure the pipette motor does not skip steps when dropping
            tips.
