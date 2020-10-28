@@ -22,7 +22,6 @@ export function LabeledRadioGroup(props: LabeledRadioGroupProps): React.Node {
       label={label}
       control={
         <RadioGroup
-          className={styles.labeled_radio_group}
           value={value}
           options={options}
           onChange={onChange}

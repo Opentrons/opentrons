@@ -36,7 +36,7 @@
 
 .stacked_labeled_control_label {
   @apply --font-body-1-dark;
-  
+
   display: inline-block;
   font-weight: var(--fw-semibold);
 }
@@ -65,9 +65,6 @@
   float: right;
   width: 9rem;
   margin-top: 0.5rem;
-}
-
-.labeled_radio_group {
 }
 
 .labeled_select {
