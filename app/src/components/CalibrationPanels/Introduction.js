@@ -378,8 +378,8 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
           marginBottom={SPACING_2}
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
-          minHeight="300px"
-          maxHeight="450px"
+          minHeight="18.75rem"
+          maxHeight="25rem"
         >
           <Text fontWeight={FONT_WEIGHT_SEMIBOLD} marginBottom={SPACING_3}>
             {LABWARE_REQS}
@@ -418,7 +418,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
           data-test="continueButton"
           onClick={proceed}
           flex="1"
-          margin="0rem 5rem 0rem"
+          marginX="5rem"
         >
           {continueButtonText}
         </PrimaryBtn>
@@ -476,7 +476,7 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
             external
             flex={FLEX_MIN_CONTENT}
             paddingY={SPACING_1}
-            width="fit-content"
+            width="9.25rem"
             textTransform={TEXT_TRANSFORM_UPPERCASE}
             fontSize={FONT_SIZE_BODY_2}
             color={C_MED_DARK_GRAY}
