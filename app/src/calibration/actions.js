@@ -1,8 +1,8 @@
 // @flow
 
-import { toggleConfigValue, updateConfigValue } from '../config'
+import { resetConfigValue, updateConfigValue } from '../config'
 import type {
-  ToggleConfigValueAction,
+  ResetConfigValueAction,
   UpdateConfigValueAction,
 } from '../config/types'
 import * as Constants from './constants'
@@ -41,8 +41,8 @@ export const fetchCalibrationStatusFailure = (
   meta,
 })
 
-export function toggleUseTrashSurfaceForTipCal(): ToggleConfigValueAction {
-  return toggleConfigValue('calibration.useTrashSurfaceForTipCal')
+export function resetUseTrashSurfaceForTipCal(): ResetConfigValueAction {
+  return resetConfigValue('calibration.useTrashSurfaceForTipCal')
 }
 
 export function setUseTrashSurfaceForTipCal(
