@@ -9,76 +9,13 @@ import {
   DEFAULT_DELAY_SECONDS,
 } from '../../../constants'
 import { getDefaultsForStepType } from '..'
-import { getPrereleaseFeatureFlag } from '../../../persist'
-jest.mock('../../../persist')
-
-const getPrereleaseFeatureFlagMock: JestMockFn<
-  any,
-  boolean
-> = getPrereleaseFeatureFlag
 
 describe('getDefaultsForStepType', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
   describe('moveLiquid step', () => {
-    it('should get the correct defaults (DISPENSE AIR GAP DISABLED)', () => {
-      getPrereleaseFeatureFlagMock.mockImplementation(flag => {
-        expect(flag).toEqual('OT_PD_ENABLE_AIR_GAP_DISPENSE')
-        return false
-      })
-      expect(getDefaultsForStepType('moveLiquid')).toEqual({
-        pipette: null,
-        volume: null,
-        changeTip: DEFAULT_CHANGE_TIP_OPTION,
-        path: 'single',
-        aspirate_wells_grouped: false,
-
-        aspirate_flowRate: null,
-        aspirate_labware: null,
-        aspirate_wells: [],
-        aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-        aspirate_mix_checkbox: false,
-        aspirate_mix_times: null,
-        aspirate_mix_volume: null,
-        aspirate_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
-        aspirate_touchTip_checkbox: false,
-
-        dispense_flowRate: null,
-        dispense_labware: null,
-        dispense_wells: [],
-        dispense_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        dispense_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-        dispense_mix_checkbox: false,
-        dispense_mix_times: null,
-        dispense_mix_volume: null,
-        dispense_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
-        dispense_touchTip_checkbox: false,
-
-        disposalVolume_checkbox: false,
-        disposalVolume_volume: null,
-
-        blowout_checkbox: false,
-        blowout_location: FIXED_TRASH_ID,
-        preWetTip: false,
-
-        aspirate_airGap_checkbox: false,
-        aspirate_airGap_volume: null,
-        aspirate_delay_checkbox: false,
-        aspirate_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
-        aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-        dispense_delay_checkbox: false,
-        dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-        dispense_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
-      })
-    })
-
-    it('should get the correct defaults (DISPENSE AIR GAP ENABLED)', () => {
-      getPrereleaseFeatureFlagMock.mockImplementation(flag => {
-        expect(flag).toEqual('OT_PD_ENABLE_AIR_GAP_DISPENSE')
-        return true
-      })
+    it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('moveLiquid')).toEqual({
         pipette: null,
         volume: null,

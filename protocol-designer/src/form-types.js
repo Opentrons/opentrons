@@ -207,7 +207,7 @@ export type HydratedMoveLiquidFormData = {
     aspirate_delay_mmFromBottom: ?number,
 
     // TODO(IL, 2020-09-30): when FF is removed, change to `dispense_airGap_checkbox: boolean` (no longer Maybe-typed)
-    dispense_airGap_checkbox: ?boolean,
+    dispense_airGap_checkbox: boolean,
     dispense_airGap_volume: ?number,
     dispense_delay_checkbox: boolean,
     dispense_delay_seconds: ?number,

@@ -13,13 +13,6 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../../../step-generation'
-import { getPrereleaseFeatureFlag } from '../../../../persist'
-jest.mock('../../../../persist')
-
-const getPrereleaseFeatureFlagMock: JestMockFn<
-  any,
-  boolean
-> = getPrereleaseFeatureFlag
 
 let pipetteEntities
 let labwareEntities
@@ -446,6 +439,10 @@ describe('aspirate > air gap volume', () => {
       )
       expect(result.aspirate_airGap_volume).toBeUndefined()
     })
+    it('should reset to pipette min when pipette is changed', () => {
+      const result = handleFormHelper({ pipette: 'otherPipetteId' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('30')
+    })
   })
 
   describe('when the path is multi aspirate', () => {
@@ -506,6 +503,10 @@ describe('aspirate > air gap volume', () => {
       )
       expect(result.aspirate_airGap_volume).toBeUndefined()
     })
+    it('should reset to pipette min when pipette is changed', () => {
+      const result = handleFormHelper({ pipette: 'otherPipetteId' }, form)
+      expect(result.aspirate_airGap_volume).toEqual('30')
+    })
   })
   describe('when the path is multi dispense', () => {
     const form = {
@@ -527,16 +528,11 @@ describe('aspirate > air gap volume', () => {
 })
 
 describe('air gap > dispense volume', () => {
-  getPrereleaseFeatureFlagMock.mockImplementation(flag => {
-    expect(flag).toEqual('OT_PD_ENABLE_AIR_GAP_DISPENSE')
-    return true
-  })
-
   const paths = ['single', 'multiAspirate']
   paths.forEach(path => {
     // max should equal pipette/tip capacity for single and for multi-dispense
 
-    it(`should clamp max dispense > air gap when pipette field is changed, for ${path} path`, () => {
+    it(`should reset dispense > air gap volume when pipette field is changed, for ${path} path`, () => {
       // for otherPipetteId, P300, capacity is 300 so 150 is below air gap max
       const form = {
         path,
@@ -551,7 +547,7 @@ describe('air gap > dispense volume', () => {
       }
       const result = handleFormHelper({ pipette: 'pipetteId' }, form)
       // new max should be 10 for the P10
-      expect(result).toMatchObject({ dispense_airGap_volume: '10' })
+      expect(result).toMatchObject({ dispense_airGap_volume: '1' })
     })
 
     it(`should clamp max dispense > air gap when dispense_airGap_volume field is changed, for ${path} path`, () => {
@@ -606,12 +602,11 @@ describe('air gap > dispense volume', () => {
       },
     },
     {
-      // NOTE: in this case, disposal volume gets rounded due to pipette change,
-      // which affects dispense > airgap clamping
+      // NOTE: when pipette changes, the dispense > air gap volume gets reset to the min pipette volume
       update: { pipette: 'pipetteId' },
       expected: {
         pipette: 'pipetteId',
-        dispense_airGap_volume: String(10 - Math.round(1.1) - 2),
+        dispense_airGap_volume: String(1),
       },
     },
     {
@@ -646,34 +641,6 @@ describe('air gap > dispense volume', () => {
       }
       const result = handleFormHelper(update, form)
       expect(result).toMatchObject(expected)
-    })
-  })
-
-  // FF OFF cases: remove when removing FF
-  getPrereleaseFeatureFlagMock.mockImplementation(flag => {
-    expect(flag).toEqual('OT_PD_ENABLE_AIR_GAP_DISPENSE')
-    return false
-  })
-  const noFlagCases = [
-    { pipette: 'pipetteId' },
-    { volume: '55' },
-    { disposalVolume_volume: '12.3' },
-    { path: 'multiAspirate' },
-  ]
-  noFlagCases.forEach(update => {
-    it('with FF off, dispense > air gap fields should not be added in', () => {
-      const form = {
-        path: 'transfer',
-        aspirate_wells: ['A1', 'A2'],
-        dispense_wells: ['B2'],
-        volume: '2',
-        pipette: 'otherPipetteId',
-        disposalVolume_checkbox: true,
-        disposalVolume_volume: '1.1',
-      }
-      const result = handleFormHelper(update, form)
-      expect(result.dispense_airGap_checkbox).toBeUndefined()
-      expect(result.dispense_airGap_volume).toBeUndefined()
     })
   })
 })

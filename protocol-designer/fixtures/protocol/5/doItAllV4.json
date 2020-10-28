@@ -10,7 +10,7 @@
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "5.1.0",
+    "version": "5.2.0",
     "data": {
       "_internalAppBuildDate": "Thu, 02 Apr 2020 20:21:23 GMT",
       "defaultValues": {
@@ -104,6 +104,8 @@
           "id": "3961e4c0-75c7-11ea-b42f-4b64e50f43e5",
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": null,
+          "dispense_airGap_checkbox": false,
+          "dispense_airGap_volume": null,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_mmFromBottom": "1",
           "aspirate_delay_seconds": "1",

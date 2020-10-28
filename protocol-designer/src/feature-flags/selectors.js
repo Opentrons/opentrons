@@ -16,8 +16,3 @@ export const getDisableModuleRestrictions: Selector<?boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
-
-export const getEnabledAirGapDispense: Selector<?boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_AIR_GAP_DISPENSE
-)

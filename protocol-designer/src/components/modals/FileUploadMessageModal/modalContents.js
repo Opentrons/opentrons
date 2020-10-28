@@ -1,6 +1,7 @@
 // @flow
-import assert from 'assert'
 import * as React from 'react'
+import assert from 'assert'
+import semver from 'semver'
 import styles from './modalContents.css'
 import type { ModalContents } from './types'
 import type { FileUploadMessage } from '../../../load-file'
@@ -40,7 +41,7 @@ const invalidJsonModal = (errorMessage: ?string): ModalContents => ({
   ),
 })
 
-const genericDidMigrateMessage: ModalContents = {
+export const genericDidMigrateMessage: ModalContents = {
   title: 'Your protocol was made in an older version of Protocol Designer',
   body: (
     <>
@@ -60,7 +61,24 @@ const genericDidMigrateMessage: ModalContents = {
   ),
 }
 
-const toV3MigrationMessage: ModalContents = {
+export const noBehaviorChangeMessage: ModalContents = {
+  title: 'Your protocol was made in an older version of Protocol Designer',
+  body: (
+    <div className={styles.migration_message}>
+      <p>Your protocol will be automatically updated to the latest version.</p>
+      <p>
+        We have added new features since the last time this protocol was
+        updated, but have not made any changes to existing protocol behavior.
+        Because of this we do not expect any changes in how the robot will
+        execute this protocol. To be safe we will still recommend keeping a
+        separate copy of the file you just imported.
+      </p>
+      <p>As always, please contact us with any questions or feedback.</p>
+    </div>
+  ),
+}
+
+export const toV3MigrationMessage: ModalContents = {
   title: 'Update protocol to use new labware definitions',
   okButtonText: 'update protocol',
   body: (
@@ -105,9 +123,14 @@ const toV3MigrationMessage: ModalContents = {
   ),
 }
 
-function getMigrationMessage(migrationsRan: Array<string>): ModalContents {
+export function getMigrationMessage(
+  migrationsRan: Array<string>
+): ModalContents {
   if (migrationsRan.includes('3.0.0')) {
     return toV3MigrationMessage
+  }
+  if (migrationsRan.every(migration => semver.gt(migration, '4.0.0'))) {
+    return noBehaviorChangeMessage
   }
   return genericDidMigrateMessage
 }
