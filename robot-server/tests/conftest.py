@@ -102,7 +102,8 @@ def run_server(server_temp_directory):
             else:
                 break
             time.sleep(0.5)
-
+        requests.post("http://localhost:31950/robot/home",
+                      json={"target": "robot"})
         yield proc
         proc.kill()
 

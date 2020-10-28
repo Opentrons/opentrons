@@ -1,4 +1,5 @@
 from typing import Awaitable
+
 from robot_server.robot.calibration.deck.user_flow import \
     DeckCalibrationUserFlow
 from robot_server.robot.calibration.deck.models import \
@@ -10,7 +11,7 @@ from robot_server.service.session.command_execution import \
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
-from ..models.session import SessionType, SessionDetails
+from ..models.session import SessionType, DeckCalibrationResponseAttributes
 from ..errors import UnsupportedFeature
 
 
@@ -75,7 +76,14 @@ class DeckCalibrationSession(BaseSession):
     def session_type(self) -> SessionType:
         return SessionType.deck_calibration
 
-    def _get_response_details(self) -> SessionDetails:
+    def get_response_model(self) -> DeckCalibrationResponseAttributes:
+        return DeckCalibrationResponseAttributes(
+            createParams=self.meta.create_params,
+            details=self._get_response_details(),
+            createdAt=self.meta.created_at
+        )
+
+    def _get_response_details(self) -> DeckCalibrationSessionStatus:
         # TODO(mc, 2020-09-17): get_pipette() returns an Optional value but
         # DeckCalibrationSessionStatus has an exact type for instrument
         return DeckCalibrationSessionStatus(

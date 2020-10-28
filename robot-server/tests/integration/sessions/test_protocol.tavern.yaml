@@ -98,9 +98,10 @@ stages:
         json:
           session_id: data.id
       json: &proto_session
+        meta: null
         data:
           id: !anystr
-          type: Session
+          type: !anystr
           attributes:
             sessionType: protocol
             createParams:
