@@ -68,9 +68,9 @@ export type ResourceLink = {|
 export type ResourceLinks = $Shape<{| [string]: ResourceLink | string | void |}>
 
 // generic response data supertype
-export type RobotApiV2ResponseData = {|
+export type RobotApiV2ResponseData = {
   id: string,
-|}
+}
 
 export type RobotApiV2ResponseBody<
   DataT: RobotApiV2ResponseData | $ReadOnlyArray<RobotApiV2ResponseData>
