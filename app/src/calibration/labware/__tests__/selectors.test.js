@@ -65,6 +65,10 @@ describe('labware calibration selectors', () => {
   describe('getProtocolLabwareList', () => {
     let state: $Shape<State>
 
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
+
     beforeEach(() => {
       state = { calibration: {} }
 
@@ -77,7 +81,7 @@ describe('labware calibration selectors', () => {
             definition: wellPlate96Def,
             slot: '3',
             definitionHash:
-              Fixtures.mockLabwareCalibration1.attributes.definitionHash,
+              Fixtures.mockLabwareCalibration1.definitionHash,
           }: $Shape<ProtocolLabware>),
           ({
             type: 'some_v1_labware',
@@ -111,8 +115,7 @@ describe('labware calibration selectors', () => {
       getModulesBySlot.mockReturnValue({})
 
       const lwCalibration = Fixtures.mockLabwareCalibration1
-      const { attributes } = lwCalibration
-      const { calibrationData } = attributes
+      const { calibrationData } = lwCalibration
 
       state = ({
         calibration: {
@@ -125,18 +128,15 @@ describe('labware calibration selectors', () => {
               data: [
                 {
                   ...lwCalibration,
-                  attributes: {
-                    ...attributes,
-                    loadName: wellPlate96Def.parameters.loadName,
-                    namespace: wellPlate96Def.namespace,
-                    version: wellPlate96Def.version,
-                    parent: '',
-                    calibrationData: {
-                      ...calibrationData,
-                      offset: {
-                        ...calibrationData.offset,
-                        value: [1.23, 4.56, 7.89],
-                      },
+                  loadName: wellPlate96Def.parameters.loadName,
+                  namespace: wellPlate96Def.namespace,
+                  version: wellPlate96Def.version,
+                  parent: '',
+                  calibrationData: {
+                    ...calibrationData,
+                    offset: {
+                      ...calibrationData.offset,
+                      value: [1.23, 4.56, 7.89],
                     },
                   },
                 },
@@ -168,31 +168,25 @@ describe('labware calibration selectors', () => {
 
     it('grabs calibration data for labware on module if present', () => {
       const lwCalibration = Fixtures.mockLabwareCalibration1
-      const { attributes } = lwCalibration
-      const { calibrationData } = attributes
+      const { calibrationData } = lwCalibration
 
       const calNotOnModule = {
         ...lwCalibration,
-        attributes: {
-          ...attributes,
-          parent: '',
-          loadName: wellPlate96Def.parameters.loadName,
-          namespace: wellPlate96Def.namespace,
-          version: wellPlate96Def.version,
-          calibrationData: {
-            ...calibrationData,
-            offset: {
-              ...calibrationData.offset,
-              value: [0, 0, 0],
-            },
+        parent: '',
+        loadName: wellPlate96Def.parameters.loadName,
+        namespace: wellPlate96Def.namespace,
+        version: wellPlate96Def.version,
+        calibrationData: {
+          ...calibrationData,
+          offset: {
+            ...calibrationData.offset,
+            value: [0, 0, 0],
           },
         },
       }
 
       const calOnModule = {
         ...lwCalibration,
-        attributes: {
-          ...attributes,
           parent: 'magneticModuleV1',
           loadName: wellPlate96Def.parameters.loadName,
           namespace: wellPlate96Def.namespace,
@@ -204,7 +198,6 @@ describe('labware calibration selectors', () => {
               value: [1.23, 4.56, 7.89],
             },
           },
-        },
       }
 
       state = ({
@@ -231,7 +224,7 @@ describe('labware calibration selectors', () => {
           version: wellPlate96Def.version,
           parent: 'magneticModuleV1',
           calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
-          definitionHash: attributes.definitionHash,
+          definitionHash: lwCalibration.definitionHash,
         },
         {
           type: 'some_v1_labware',
@@ -248,41 +241,34 @@ describe('labware calibration selectors', () => {
 
     it('grabs calibration data for labware not on module if on-module cal data is present', () => {
       const lwCalibration = Fixtures.mockLabwareCalibration1
-      const { attributes } = lwCalibration
-      const { calibrationData } = attributes
+      const { calibrationData } = lwCalibration
 
       const calNotOnModule = {
-        ...lwCalibration,
-        attributes: {
-          ...attributes,
-          parent: '',
-          loadName: wellPlate96Def.parameters.loadName,
-          namespace: wellPlate96Def.namespace,
-          version: wellPlate96Def.version,
-          calibrationData: {
-            ...calibrationData,
-            offset: {
-              ...calibrationData.offset,
-              value: [1.23, 4.56, 7.89],
-            },
+      ...lwCalibration,
+        parent: '',
+        loadName: wellPlate96Def.parameters.loadName,
+        namespace: wellPlate96Def.namespace,
+        version: wellPlate96Def.version,
+        calibrationData: {
+          ...calibrationData,
+          offset: {
+            ...calibrationData.offset,
+            value: [1.23, 4.56, 7.89],
           },
         },
       }
 
       const calOnModule = {
         ...lwCalibration,
-        attributes: {
-          ...attributes,
-          parent: 'magneticModuleV1',
-          loadName: wellPlate96Def.parameters.loadName,
-          namespace: wellPlate96Def.namespace,
-          version: wellPlate96Def.version,
-          calibrationData: {
-            ...calibrationData,
-            offset: {
-              ...calibrationData.offset,
-              value: [0, 0, 0],
-            },
+        parent: 'magneticModuleV1',
+        loadName: wellPlate96Def.parameters.loadName,
+        namespace: wellPlate96Def.namespace,
+        version: wellPlate96Def.version,
+        calibrationData: {
+          ...calibrationData,
+          offset: {
+            ...calibrationData.offset,
+            value: [0, 0, 0],
           },
         },
       }
@@ -312,7 +298,7 @@ describe('labware calibration selectors', () => {
           namespace: wellPlate96Def.namespace,
           version: wellPlate96Def.version,
           parent: null,
-          definitionHash: attributes.definitionHash,
+          definitionHash: lwCalibration.definitionHash,
           calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
         },
         {
@@ -330,23 +316,19 @@ describe('labware calibration selectors', () => {
 
     it('grabs no calibration data for labware if definitionHash not present', () => {
       const lwCalibration = Fixtures.mockLabwareCalibration1
-      const { attributes } = lwCalibration
-      const { calibrationData } = attributes
+      const { calibrationData } = lwCalibration
 
       const oldLwCal = {
         ...omit(lwCalibration, 'definitionHash'),
-        attributes: {
-          ...attributes,
-          parent: '',
-          loadName: wellPlate96Def.parameters.loadName,
-          namespace: wellPlate96Def.namespace,
-          version: wellPlate96Def.version,
-          calibrationData: {
-            ...calibrationData,
-            offset: {
-              ...calibrationData.offset,
-              value: [1.23, 4.56, 7.89],
-            },
+        parent: '',
+        loadName: wellPlate96Def.parameters.loadName,
+        namespace: wellPlate96Def.namespace,
+        version: wellPlate96Def.version,
+        calibrationData: {
+          ...calibrationData,
+          offset: {
+            ...calibrationData.offset,
+            value: [1.23, 4.56, 7.89],
           },
         },
       }
@@ -368,7 +350,7 @@ describe('labware calibration selectors', () => {
       }: $Shape<State>)
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
-        {
+        { // No calibrationData
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
           slot: '3',
@@ -376,10 +358,14 @@ describe('labware calibration selectors', () => {
           namespace: wellPlate96Def.namespace,
           version: wellPlate96Def.version,
           parent: null,
-          definitionHash: attributes.definitionHash,
-          calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
+          definitionHash: lwCalibration.definitionHash,
+          calibrationData: null,
         },
-        {
+        { // This calibrationData is grabbed unintentionally as a side-effect
+          // of the Selector logic. Both labware & calibration have hashes missing
+          // hence the matchesLabwareIdentityForCalibration logic gets satisfied 
+          // and we get a calibrationData in the definition. This case should never arise
+          // in reality
           type: 'some_v1_labware',
           definition: null,
           slot: '1',
@@ -387,7 +373,7 @@ describe('labware calibration selectors', () => {
           namespace: null,
           version: null,
           parent: null,
-          calibrationData: null,
+          calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
         },
       ])
     })
@@ -408,7 +394,7 @@ describe('labware calibration selectors', () => {
             definition: wellPlate96Def,
             slot: '3',
             definitionHash:
-              Fixtures.mockLabwareCalibration1.attributes.definitionHash,
+              Fixtures.mockLabwareCalibration1.definitionHash,
           }: $Shape<ProtocolLabware>),
           ({
             type: 'some_v1_labware',

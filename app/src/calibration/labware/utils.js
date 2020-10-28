@@ -1,7 +1,7 @@
 // @flow
 
 import round from 'lodash/round'
-import type { LabwareCalibrationModel, LabwareCalibration } from '../types'
+import type { LabwareCalibration } from '../types'
 import type { LabwareCalibrationData, BaseProtocolLabware } from './types'
 
 const normalizeParent = parent =>
@@ -42,9 +42,9 @@ export const matchesLabwareIdentityForCalibration = (
 }
 
 export function formatCalibrationData(
-  model: LabwareCalibrationModel
+  model: LabwareCalibration
 ): LabwareCalibrationData {
-  const calVector = model.attributes.calibrationData.offset.value.map(n =>
+  const calVector = model.calibrationData.offset.value.map(n =>
     round(n, 1)
   )
   return { x: calVector[0], y: calVector[1], z: calVector[2] }
