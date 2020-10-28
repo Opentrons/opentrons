@@ -4,7 +4,7 @@ import { mountWithStore } from '@opentrons/components/__utils__'
 import { act } from 'react-dom/test-utils'
 
 import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
-import { SecondaryBtn, CheckboxField } from '@opentrons/components'
+import { CheckboxField } from '@opentrons/components'
 import { setUseTrashSurfaceForTipCal } from '../../../calibration'
 
 describe('AskForCalibrationBlockModal', () => {
@@ -14,11 +14,18 @@ describe('AskForCalibrationBlockModal', () => {
   beforeEach(() => {
     onResponse = jest.fn()
     render = (initialValue: boolean | null = null) =>
-      mountWithStore(<AskForCalibrationBlockModal onResponse={onResponse} />, {
-        initialState: {
-          config: { calibration: { useTrashSurfaceForTipCal: initialValue } },
-        },
-      })
+      mountWithStore(
+        <AskForCalibrationBlockModal
+          onResponse={onResponse}
+          titleBarTitle="Test Cal Flow"
+          closePrompt={jest.fn()}
+        />,
+        {
+          initialState: {
+            config: { calibration: { useTrashSurfaceForTipCal: initialValue } },
+          },
+        }
+      )
   })
 
   afterEach(() => {
