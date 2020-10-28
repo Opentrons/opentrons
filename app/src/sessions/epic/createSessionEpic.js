@@ -22,11 +22,8 @@ export const mapActionToRequest = (
   path: Constants.SESSIONS_PATH,
   body: {
     data: {
-      type: 'Session',
-      attributes: {
-        sessionType: action.payload.sessionType,
-        createParams: action.payload.params,
-      },
+      sessionType: action.payload.sessionType,
+      createParams: action.payload.params,
     },
   },
 })

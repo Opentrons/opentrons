@@ -65,62 +65,54 @@ export const mockSessionCommand: Types.SessionCommandAttributes = {
 
 export const mockSessionCommandAttributes: Types.SessionCommandAttributes = {
   command: 'calibration.check.comparePoint',
-  status: 'accepted',
   data: {},
 }
 
 export const mockSessionResponse: Types.SessionResponse = {
   data: {
+    ...mockCalibrationCheckSessionAttributes,
     id: mockSessionId,
-    type: 'Session',
-    attributes: mockCalibrationCheckSessionAttributes,
   },
 }
 
 export const mockTipLengthCalibrationSessionResponse: Types.SessionResponse = {
   data: {
+    ...mockTipLengthCalibrationSessionAttributes,
     id: mockSessionId,
-    type: 'Session',
-    attributes: mockTipLengthCalibrationSessionAttributes,
   },
 }
 
 export const mockPipetteOffsetCalibrationSessionResponse: Types.SessionResponse = {
   data: {
+    ...mockPipetteOffsetCalibrationSessionAttributes,
     id: mockSessionId,
-    type: 'Session',
-    attributes: mockPipetteOffsetCalibrationSessionAttributes,
   },
 }
 
 export const mockDeckCalibrationSessionResponse: Types.SessionResponse = {
   data: {
+    ...mockDeckCalibrationSessionAttributes,
     id: mockSessionId,
-    type: 'Session',
-    attributes: mockDeckCalibrationSessionAttributes,
   },
 }
 
 export const mockMultiSessionResponse: Types.MultiSessionResponse = {
   data: [
     {
+      ...mockCalibrationCheckSessionAttributes,
       id: mockSessionId,
-      type: 'Session',
-      attributes: mockCalibrationCheckSessionAttributes,
     },
     {
+      ...mockCalibrationCheckSessionAttributes,
       id: mockOtherSessionId,
-      type: 'Session',
-      attributes: mockCalibrationCheckSessionAttributes,
     },
   ],
 }
 
 export const mockSessionCommandResponse: Types.SessionCommandResponse = {
   data: {
+    ...mockSessionCommandAttributes,
     id: mockSessionId,
-    type: 'SessionCommand',
-    attributes: mockSessionCommandAttributes,
   },
 }
 

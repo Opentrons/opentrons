@@ -140,31 +140,22 @@ export type Session =
 export type SessionCommandAttributes = {|
   command: SessionCommandString,
   data: SessionCommandData,
+|}
+
+export type SessionResponseModel = Session
+
+export type SessionCommandResponseModel = {|
+  ...SessionCommandAttributes,
+  id: string,
   status?: string,
 |}
 
-export type SessionResponseModel = {|
-  id: string,
-  type: 'Session',
-  attributes: SessionResponseAttributes,
-|}
-
-export type SessionCommandResponseModel = {|
-  id: string,
-  type: 'SessionCommand',
-  attributes: SessionCommandAttributes,
-|}
-
-export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel, {||}>
+export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel>
 export type MultiSessionResponse = RobotApiV2ResponseBody<
-  $ReadOnlyArray<SessionResponseModel>,
-  {||}
+  $ReadOnlyArray<SessionResponseModel>
 >
 
-export type SessionCommandResponse = RobotApiV2ResponseBody<
-  SessionCommandResponseModel,
-  Session
->
+export type SessionCommandResponse = RobotApiV2ResponseBody<SessionCommandResponseModel>
 
 export type CreateSessionAction = {|
   type: CREATE_SESSION,

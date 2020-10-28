@@ -77,6 +77,7 @@ describe('PipetteOffsetItem', () => {
             id: 'a_pip_id',
           },
           tipLength: {
+            id: '1',
             tipLength: 30,
             tiprack: 'asdagasdfasdsa',
             pipette: 'pipette-id-11',
@@ -168,6 +169,7 @@ describe('PipetteOffsetItem', () => {
           id: 'a_pip_id',
         },
         tipLength: {
+          id: '1',
           tipLength: 30,
           tiprack: 'asdagasdfasdsa',
           pipette: 'pipette-id-11',
@@ -210,6 +212,7 @@ describe('PipetteOffsetItem', () => {
           id: 'a_pip_id',
         },
         tipLength: {
+          id: '1',
           tipLength: 30,
           tiprack: 'asdagasdfasdsa',
           pipette: 'pipette-id-11',
