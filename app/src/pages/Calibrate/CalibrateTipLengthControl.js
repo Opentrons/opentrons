@@ -1,7 +1,11 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { type Mount, useConditionalConfirm } from '@opentrons/components'
+import {
+  type Mount,
+  useConditionalConfirm,
+  SpinnerModalPage,
+} from '@opentrons/components'
 import {
   getLabwareDisplayName,
   type LabwareDefinition2,
@@ -36,6 +40,7 @@ import type { RequestState } from '../../robot-api/types'
 import type { TipracksByMountMap } from '../../robot'
 
 const TIP_LENGTH_CALIBRATION = 'tip length calibration'
+const EXIT = 'exit'
 
 export type CalibrateTipLengthControlProps = {|
   robotName: string,
@@ -57,12 +62,19 @@ export function CalibrateTipLengthControl({
   tipRackDefinition,
   isExtendedPipOffset,
 }: CalibrateTipLengthControlProps): React.Node {
+  const createRequestId = React.useRef<string | null>(null)
   const trackedRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (
+        dispatchedAction.type === Sessions.ENSURE_SESSION &&
+        dispatchedAction.payload.sessionType ===
+          Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+      ) {
+        createRequestId.current = dispatchedAction.meta.requestId
+      } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
@@ -114,6 +126,14 @@ export function CalibrateTipLengthControl({
       dispatchRequests(Sessions.ensureSession(robotName, sessionType, options))
     }
   }
+
+  const startingSession =
+    useSelector<State, RequestState | null>(state =>
+      createRequestId.current
+        ? RobotApi.getRequestById(state, createRequestId.current)
+        : null
+    )?.status === RobotApi.PENDING
+
   const showSpinner =
     useSelector<State, RequestState | null>(state =>
       trackedRequestId.current
@@ -165,6 +185,20 @@ export function CalibrateTipLengthControl({
             onResponse={handleStart}
             titleBarTitle={TIP_LENGTH_CALIBRATION}
             closePrompt={() => setShowCalBlockModal(false)}
+          />
+        ) : null}
+        {startingSession ? (
+          <SpinnerModalPage
+            titleBar={{
+              title: TIP_LENGTH_CALIBRATION,
+              back: {
+                onClick: () => {
+                  createRequestId.current = null
+                },
+                title: EXIT,
+                children: EXIT,
+              },
+            }}
           />
         ) : null}
         {isExtendedPipOffset ? (
