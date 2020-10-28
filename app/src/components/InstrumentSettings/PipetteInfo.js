@@ -301,7 +301,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
     <>
       {PipetteOffsetCalibrationWizard}
       {showCalBlockModalAndKeepTipLength !== null ? (
-        <Portal>
+        <Portal level="top">
           <AskForCalibrationBlockModal
             onResponse={hasBlockModalResponse => {
               startPipetteOffsetWizard({

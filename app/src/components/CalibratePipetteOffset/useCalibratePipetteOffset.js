@@ -129,7 +129,7 @@ export function useCalibratePipetteOffset(
 
   return [
     handleStartPipOffsetCalSession,
-    pipOffsetCalSession ? (
+    pipOffsetCalSession && mount === pipOffsetCalSession.createParams.mount ? (
       <Portal level="top">
         <CalibratePipetteOffset
           session={pipOffsetCalSession}
