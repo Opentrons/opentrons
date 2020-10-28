@@ -773,15 +773,33 @@ class InstrumentContext(CommandPublisher):
               can be a :py:class:`.types.Location`; for instance, you can call
               `instr.drop_tip(tiprack.wells()[0].top())`.
 
-        :param location: The location to drop the tip
-        :type location: :py:class:`.types.Location` or :py:class:`.Well` or
-                        None
-        :param home_after: Whether to home the plunger after dropping the tip
-                           (defaults to ``True``). The plungeer must home after
-                           dropping tips because the ejector shroud that pops
-                           the tip off the end of the pipette is driven by the
-                           plunger motor, and may skip steps when dropping the
-                           tip.
+        :param location:
+            The location to drop the tip
+        :type location:
+            :py:class:`.types.Location` or :py:class:`.Well` or None
+        :param home_after:
+            Whether to home this pipette's plunger after dropping the tip.
+            Defaults to ``True``.
+
+            Setting this to ``False`` saves waiting a couple of seconds after
+            the tip drop, but risks causing other problems.
+
+            The ejector shroud that pops the tip off the end of the pipette is
+            driven by the plunger's stepper motor.  Sometimes, the strain of
+            ejecting the tip can make that motor *skip* and fall out of sync
+            with where the robot thinks it is.  Homing the plunger fixes this,
+            so, to be safe, we normally do it after every tip drop.
+
+            If you disable homing the plunger, and the motor happens to skip,
+            you might see problems like these until the next time the plunger
+            is homed:
+
+            * The run halting with a "hard limit" error message.
+            * The pipette aspirating or dispensing the wrong volumes.
+            * The pipette not fully dropping subsequent tips.
+
+            These problems are more likely with GEN1 pipettes than GEN2
+            pipettes.
 
         :returns: This instance
         """
