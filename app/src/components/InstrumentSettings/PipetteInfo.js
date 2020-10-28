@@ -62,6 +62,18 @@ export type PipetteInfoProps = {|
   settingsUrl: string | null,
 |}
 
+const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
+  'cal_block_modal_closed'
+const CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC: 'cal_block_modal_redo' =
+  'cal_block_modal_redo'
+const CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC: 'cal_block_modal_keep' =
+  'cal_block_modal_keep'
+
+type CalBlockModalState =
+  | typeof CAL_BLOCK_MODAL_CLOSED
+  | typeof CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
+  | typeof CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
+
 const LABEL_BY_MOUNT = {
   left: 'Left pipette',
   right: 'Right pipette',
@@ -129,9 +141,9 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   // null hides modal, true shows modal and continues with existing tlc data,
   // false shows modal and recalibrates tip length
   const [
-    showCalBlockModalAndKeepTipLength,
-    setShowCalBlockModalAndKeepTipLength,
-  ] = React.useState<null | boolean>(null)
+    calBlockModalState,
+    setCalBlockModalState,
+  ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
 
   type StartWizardOptions = {|
     keepTipLength: boolean,
@@ -140,7 +152,11 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const startPipetteOffsetWizard = (options: StartWizardOptions) => {
     const { keepTipLength, hasBlockModalResponse = null } = options
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
-      setShowCalBlockModalAndKeepTipLength(keepTipLength)
+      setCalBlockModalState(
+        keepTipLength
+          ? CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
+          : CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
+      )
     } else {
       startPipetteOffsetCalibration({
         overrideParams: {
@@ -153,7 +169,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           ? INTENT_PIPETTE_OFFSET
           : INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
       })
-      setShowCalBlockModalAndKeepTipLength(null)
+      setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)
     }
   }
 
@@ -300,17 +316,18 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   return (
     <>
       {PipetteOffsetCalibrationWizard}
-      {showCalBlockModalAndKeepTipLength !== null ? (
+      {calBlockModalState !== CAL_BLOCK_MODAL_CLOSED ? (
         <Portal level="top">
           <AskForCalibrationBlockModal
             onResponse={hasBlockModalResponse => {
               startPipetteOffsetWizard({
                 hasBlockModalResponse,
-                keepTipLength: showCalBlockModalAndKeepTipLength,
+                keepTipLength:
+                  calBlockModalState === CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC,
               })
             }}
             titleBarTitle={PIPETTE_OFFSET_CALIBRATION}
-            closePrompt={() => setShowCalBlockModalAndKeepTipLength(null)}
+            closePrompt={() => setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)}
           />
         </Portal>
       ) : null}
