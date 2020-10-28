@@ -124,7 +124,6 @@ describe('labware calibration selectors', () => {
             pipetteOffsetCalibrations: null,
             tipLengthCalibrations: null,
             labwareCalibrations: {
-              meta: {},
               data: [
                 {
                   ...lwCalibration,
@@ -207,7 +206,6 @@ describe('labware calibration selectors', () => {
             pipetteOffsetCalibrations: null,
             tipLengthCalibrations: null,
             labwareCalibrations: {
-              meta: {},
               data: [calNotOnModule, calOnModule],
             },
           },
@@ -282,7 +280,6 @@ describe('labware calibration selectors', () => {
             pipetteOffsetCalibrations: null,
             tipLengthCalibrations: null,
             labwareCalibrations: {
-              meta: {},
               data: [calOnModule, calNotOnModule],
             },
           },
@@ -342,7 +339,6 @@ describe('labware calibration selectors', () => {
             pipetteOffsetCalibrations: null,
             tipLengthCalibrations: null,
             labwareCalibrations: {
-              meta: {},
               data: [oldLwCal],
             },
           },
