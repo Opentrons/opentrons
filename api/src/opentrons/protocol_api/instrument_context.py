@@ -805,7 +805,7 @@ class InstrumentContext(CommandPublisher):
             pipettes.
 
         :returns: This instance
-        
+
         .. warning:: Setting ``home_after=False`` can severely reduce the
            volumetric accuracy of the pipette as well as cause unxexpected
            hard limit errors. Only use this setting with extensive testing
