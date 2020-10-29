@@ -628,8 +628,7 @@ class API(HardwareAPILike):
             with self._backend.save_current():
                 self._backend.set_active_current(
                     {checked_axis: instr.config.plunger_current})
-                smoothie_pos = self._backend.home([checked_axis.name.upper()])
-                smoothie_pos.update(self._backend.update_position())
+                self._backend.home([checked_axis.name.upper()])
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
@@ -645,6 +644,7 @@ class API(HardwareAPILike):
         :param mount: the mount associated with the target plunger
         :type mount: :py:class:`.top_types.Mount`
         """
+        await self.current_position(mount=mount, refresh=True)
         await self._do_plunger_home(mount=mount,
                                     acquire_lock=True)
 
