@@ -66,12 +66,15 @@ export function CalibrateTipLengthControl({
   const trackedRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
 
+  const sessionType = isExtendedPipOffset
+    ? Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+    : Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (
         dispatchedAction.type === Sessions.ENSURE_SESSION &&
-        dispatchedAction.payload.sessionType ===
-          Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+        dispatchedAction.payload.sessionType === sessionType
       ) {
         createRequestId.current = dispatchedAction.meta.requestId
       } else if (
@@ -120,9 +123,6 @@ export function CalibrateTipLengthControl({
       const options = isExtendedPipOffset
         ? { ...sharedOptions, shouldRecalibrateTipLength: true }
         : sharedOptions
-      const sessionType = isExtendedPipOffset
-        ? Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-        : Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
       dispatchRequests(Sessions.ensureSession(robotName, sessionType, options))
     }
   }
