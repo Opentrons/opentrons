@@ -4,7 +4,7 @@ from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
 from robot_server.robot.calibration.check.models import (
     ComparisonStatePerCalibration, ComparisonStatePerPipette,
-    CalibrationCheckSessionStatus)
+    CalibrationCheckSessionStatus, SessionCreateParams)
 from robot_server.robot.calibration.check import util
 
 from robot_server.service.session.command_execution import \
@@ -49,13 +49,9 @@ class CheckSession(BaseSession):
                      configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> BaseSession:
         """Create an instance"""
-        # (lc, 10-19-2020) For now, only pass in an empty list. We cannot
-        # have a session model with an optional tiprack for session
-        # create params right now because of the pydantic union problem.
-        tip_racks: List = []
-        # Here the calibration block is also a problem with the pydantic unions
-        # it will be addressed in a follow-up PR.
-        has_calibration_block = False
+        assert isinstance(instance_meta.create_params, SessionCreateParams)
+        tip_racks = instance_meta.create_params.tipRacks
+        has_calibration_block = instance_meta.create_params.hasCalibrationBlock
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after

@@ -145,7 +145,7 @@ def set_up_index_file_temporary_directory(server_temp_directory):
         labware.save_calibration(lw, Point(0, 0, 0))
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def set_up_pipette_offset_temp_directory(server_temp_directory):
     pip_list = ['pip_1', 'pip_2']
     mount_list = [Mount.LEFT, Mount.RIGHT]
@@ -158,7 +158,7 @@ def set_up_pipette_offset_temp_directory(server_temp_directory):
             tiprack_uri='uri')
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def set_up_tip_length_temp_directory(server_temp_directory):
     pip_list = ['pip_1', 'pip_2']
     tip_length_list = [30.5, 31.5]
@@ -169,16 +169,18 @@ def set_up_tip_length_temp_directory(server_temp_directory):
         modify.save_tip_length_calibration(pip, cal)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def set_up_deck_calibration_temp_directory(server_temp_directory):
     transform = config.robot_configs.DEFAULT_DECK_CALIBRATION_V2
     modify.save_robot_deck_attitude(transform, 'pip_1', 'fakehash')
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def pipette_offset_temp_directory(server_temp_directory):
     pip_list = ['123', '321']
     mount_list = [Mount.LEFT, Mount.RIGHT]
+
+    breakpoint()
     for pip, mount in zip(pip_list, mount_list):
         modify.save_pipette_calibration(
             offset=Point(0, 0, 0),
@@ -188,9 +190,9 @@ def pipette_offset_temp_directory(server_temp_directory):
             tiprack_uri='opentrons/opentrons_96_filtertiprack_200ul/1')
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def tip_length_temp_directory(server_temp_directory):
-    pip_list = ['321', '123']
+    pip_list = ['123', '321']
     tip_length_list = [30.5, 31.5]
     for pip, tip_len in zip(pip_list, tip_length_list):
         cal = {f'hash_{pip}': {

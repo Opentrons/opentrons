@@ -6,8 +6,9 @@ import typing
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
-from robot_server.robot.calibration.check.models import\
-    CalibrationCheckSessionStatus
+from robot_server.robot.calibration.check.models import (
+    CalibrationCheckSessionStatus,
+    SessionCreateParams as CalCheckCreateParams)
 from robot_server.robot.calibration.deck.models import \
     DeckCalibrationSessionStatus
 from robot_server.robot.calibration.models import SessionCreateParams
@@ -71,6 +72,7 @@ class CalibrationCheckCreateAttributes(SessionCreateAttributesNoParams):
     """The calibration check create request."""
     sessionType: Literal[SessionType.calibration_check] =\
         SessionType.calibration_check
+    createParams: CalCheckCreateParams
 
 
 class TipLengthCalibrationCreateAttributes(SessionCreateAttributes):

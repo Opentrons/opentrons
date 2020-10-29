@@ -5,8 +5,8 @@ strict:
 marks:
   - usefixtures:
       - run_server
-      - set_up_pipette_offset_temp_directory
-      - set_up_tip_length_temp_directory
+      - pipette_offset_temp_directory
+      - tip_length_temp_directory
       - set_up_deck_calibration_temp_directory
 stages:
   - name: Create the session
@@ -18,6 +18,9 @@ stages:
           type: Session
           attributes:
             sessionType: calibrationCheck
+            createParams:
+              tipRacks: []
+              hasCalibrationBlock: true
     response:
       status_code: 201
       save:
@@ -591,6 +594,9 @@ stages:
           type: Session
           attributes:
             sessionType: calibrationCheck
+            createParams:
+              tipRacks: []
+              hasCalibrationBlock: true
     response:
       status_code: 201
       save:
