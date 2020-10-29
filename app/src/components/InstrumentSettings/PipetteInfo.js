@@ -138,8 +138,6 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   ] = useCalibratePipetteOffset(robotName, { mount })
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
-  // null hides modal, true shows modal and continues with existing tlc data,
-  // false shows modal and recalibrates tip length
   const [
     calBlockModalState,
     setCalBlockModalState,
