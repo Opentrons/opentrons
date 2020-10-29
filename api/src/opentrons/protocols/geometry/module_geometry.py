@@ -415,13 +415,13 @@ def _load_from_v2(definition: 'ModuleDefinitionV2',
     pre_transform = np.array((definition['labwareOffset']['x'],
                               definition['labwareOffset']['y'],
                               1))
-    if not isinstance(parent.labware, str):
+    if not parent.labware.is_slot:
         par = ''
         log.warning(
             f'module location parent labware was {parent.labware} which is'
             'not a slot name; slot transforms will not be loaded')
     else:
-        par = parent.labware
+        par = str(parent.labware.object)
 
     # this needs to change to look up the current deck type if/when we add
     # that notion

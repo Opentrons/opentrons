@@ -25,16 +25,6 @@ def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
 
-def split_loc_labware(
-        loc: types.Location) -> Tuple[Optional[Labware], Optional[Well]]:
-    if isinstance(loc.labware, Labware):
-        return loc.labware, None
-    elif isinstance(loc.labware, Well):
-        return loc.labware.parent, loc.labware
-    else:
-        return None, None
-
-
 BAD_PAIRS = [('1', '12'),
              ('12', '1'),
              ('4', '12'),
@@ -125,9 +115,9 @@ def _build_safe_height(from_loc: types.Location,
                        deck: Deck,
                        constraints: MoveConstraints) -> float:
     to_point = to_loc.point
-    to_lw, to_well = split_loc_labware(to_loc)
+    to_lw, to_well = to_loc.labware.split_labware()
     from_point = from_loc.point
-    from_lw, from_well = split_loc_labware(from_loc)
+    from_lw, from_well = from_loc.labware.split_labware()
 
     if to_lw and to_lw == from_lw:
         # If we know the labwares we’re moving from and to, we can calculate
@@ -219,9 +209,9 @@ def plan_moves(
     assert constraints.minimum_z_height >= 0.0
 
     to_point = to_loc.point
-    to_lw, to_well = split_loc_labware(to_loc)
+    to_lw, to_well = to_loc.labware.split_labware()
     from_point = from_loc.point
-    from_lw, from_well = split_loc_labware(from_loc)
+    from_lw, from_well = from_loc.labware.split_labware()
     dest_quirks = quirks_from_any_parent(to_lw)
     from_quirks = quirks_from_any_parent(from_lw)
     from_center = 'centerMultichannelOnWells' in from_quirks

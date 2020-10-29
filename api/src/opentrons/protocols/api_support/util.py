@@ -65,8 +65,8 @@ def determine_edge_path(
 
     r_mount = top_types.Mount.RIGHT
     l_mount = top_types.Mount.LEFT
-    l_col = labware.columns()[0]
-    r_col = labware.columns()[-1]
+    l_col = labware.as_labware().columns()[0]
+    r_col = labware.as_labware().columns()[-1]
     right_pip_criteria = mount is r_mount and where in l_col
     left_pip_criteria = mount is l_mount and where in r_col
 

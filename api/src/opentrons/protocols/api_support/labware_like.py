@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Optional, Union, cast
+from typing import TYPE_CHECKING, Optional, Union, cast, Tuple
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware, Well
@@ -18,7 +18,7 @@ LabwareLike = Union[
 
 class LabwareLikeType(int, Enum):
     labware = auto()
-    name_only = auto()
+    slot_name = auto()
     well = auto()
     module = auto()
     none = auto()
@@ -43,7 +43,7 @@ class LabwareLikeWrapper:
             self._type = LabwareLikeType.labware
             self._as_str = repr(self._labware_like)
         elif isinstance(self._labware_like, str):
-            self._type = LabwareLikeType.name_only
+            self._type = LabwareLikeType.slot_name
             self._as_str = self._labware_like
         elif isinstance(self._labware_like, ModuleGeometry):
             self._type = LabwareLikeType.module
@@ -82,6 +82,10 @@ class LabwareLikeWrapper:
     def is_labware(self) -> bool:
         return self.object_type == LabwareLikeType.labware
 
+    @property
+    def is_slot(self) -> bool:
+        return self.object_type == LabwareLikeType.slot_name
+
     def as_well(self) -> 'Well':
         # Import locally to avoid circular dependency
         from opentrons.protocol_api.labware import Well
@@ -91,6 +95,15 @@ class LabwareLikeWrapper:
         # Import locally to avoid circular dependency
         from opentrons.protocol_api.labware import Labware
         return cast(Labware, self.object)
+
+    def split_labware(self) -> Tuple[Optional['Labware'], Optional['Well']]:
+        """Attempt to split into a labware and well."""
+        if self.is_labware:
+            return self.as_labware(), None
+        elif self.is_well and self.parent:
+            return self.parent.as_labware(), self.as_well(),
+        else:
+            return None, None
 
     def __str__(self) -> str:
         return self._as_str
