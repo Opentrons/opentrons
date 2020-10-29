@@ -168,6 +168,7 @@ def build_mock_deck_calibration(kind='normal'):
     else:
         return MagicMock(return_value=None)
 
+
 def test_load_labware(mock_hw):
     # load a labware with calibrations
     with patch.object(
@@ -186,11 +187,11 @@ def test_load_labware(mock_hw):
         assert uf.active_tiprack._implementation.get_display_name() ==\
             'Opentrons 96 Filter Tip Rack 200 µL on 8'
         assert len(uf.get_required_labware()) == 2
-    
+
 
 def test_no_calibration(mock_hw):
-    with pytest.raises(RobotServerError) as e:
-        uf = CheckCalibrationUserFlow(hardware=mock_hw)
+    with pytest.raises(RobotServerError):
+        CheckCalibrationUserFlow(hardware=mock_hw)
 
 
 @pytest.fixture
@@ -288,7 +289,7 @@ async def test_compare_z_height(mock_user_flow):
     # difference and so it should exceed the threshold
     expected_status = ComparisonStatus(
         differenceVector=(0.0, 0.0, 0.0),
-        thresholdVector=(0.0, 0.0, 2.8),
+        thresholdVector=(0.0, 0.0, 0.39),
         exceedsThreshold=False)
     expected_tip_length = TipComparisonMap(
         status='IN_THRESHOLD', comparingTip=expected_status)

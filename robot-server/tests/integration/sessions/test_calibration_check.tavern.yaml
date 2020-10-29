@@ -5,8 +5,8 @@ strict:
 marks:
   - usefixtures:
       - run_server
-      - pipette_offset_temp_directory
-      - tip_length_temp_directory
+      - set_up_pipette_offset_temp_directory
+      - set_up_tip_length_temp_directory
       - set_up_deck_calibration_temp_directory
 stages:
   - name: Create the session
@@ -42,7 +42,9 @@ stages:
           attributes: &session_data_attributes
             sessionType: calibrationCheck
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            createParams: null
+            createParams:
+              tipRacks: []
+              hasCalibrationBlock: true
             details: &session_data_attribute_details
               currentStep: sessionStarted
               instruments: !anylist
@@ -94,6 +96,7 @@ stages:
     response:
       status_code: 200
       json:
+        meta: null
         links: !anydict
         data:
           <<: *session_data
@@ -199,6 +202,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -225,6 +229,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -250,6 +255,7 @@ stages:
       status_code: 200
       json:
         links: !anydict
+        meta: null
         data:
           <<: *session_data
           attributes:
@@ -581,8 +587,8 @@ strict:
 marks:
   - usefixtures:
       - run_server
-      - pipette_offset_temp_directory
-      - tip_length_temp_directory
+      - set_up_pipette_offset_temp_directory
+      - set_up_tip_length_temp_directory
       - set_up_deck_calibration_temp_directory
 stages:
   - name: Create the session

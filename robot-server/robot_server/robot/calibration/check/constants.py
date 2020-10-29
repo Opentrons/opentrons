@@ -26,13 +26,6 @@ class CalibrationCheckState(str, Enum):
     WILDCARD = STATE_WILDCARD
 
 
-# Add in a 2mm buffer to tiprack thresholds on top of
-# the max acceptable range for a given pipette based
-# on calibration research data.
-DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(0.0, 0.0, 2.8)
-P1000_OK_TIP_PICK_UP_VECTOR = Point(0.0, 0.0, 2.8)
-
-
 # The tolerances below are absolute values that a pipette
 # might be off due to things that cannot be controlled
 # such as tip straightness or slight changes betweeen
@@ -43,7 +36,10 @@ PIPETTE_TOLERANCES = {
     'p1000_height': Point(0.0, 0.0, 1.0),
     'p300_crosses': Point(1.8, 1.8, 0.0),
     'p20_crosses': Point(1.4, 1.4, 0.0),
-    'other_height': Point(0.0, 0.0, 0.8)
+    'other_height': Point(0.0, 0.0, 0.8),
+    'p20_tip': Point(0.0, 0.0, 0.20),
+    'p300_tip': Point(0.0, 0.0, 0.39),
+    'p1000_tip': Point(0.0, 0.0, 0.27)
 }
 
 TIPRACK_SLOT = '8'

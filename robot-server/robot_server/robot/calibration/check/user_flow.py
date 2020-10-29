@@ -35,8 +35,6 @@ from .models import (
 from .state_machine import CalibrationCheckStateMachine
 
 from .constants import (PIPETTE_TOLERANCES,
-                        P1000_OK_TIP_PICK_UP_VECTOR,
-                        DEFAULT_OK_TIP_PICK_UP_VECTOR,
                         MOVE_POINT_STATE_MAP,
                         CalibrationCheckState as State,
                         TIPRACK_SLOT)
@@ -82,7 +80,7 @@ class CheckCalibrationUserFlow:
         self._deck = Deck(load_name=deck_load_name)
         self._tip_racks: Optional[List['LabwareDefinition']] = tip_rack_defs
         self._active_pipette, self._pip_info = self._select_starting_pipette()
-        
+
         self._has_calibration_block = has_calibration_block
 
         self._tip_origin_pt: Optional[Point] = None
@@ -230,7 +228,7 @@ class CheckCalibrationUserFlow:
         if len(pips) == 1:
             for mount, pip in pips.items():
                 pip_calibration = \
-                    get.get_pipette_offset(pip.pipette_id, mount)
+                    self._get_stored_pipette_offset_cal(pip, mount)
                 info = PipetteInfo(
                     channels=pip.config.channels,
                     rank=PipetteRank.first,
@@ -243,9 +241,9 @@ class CheckCalibrationUserFlow:
         right_pip = pips[Mount.RIGHT]
         left_pip = pips[Mount.LEFT]
         r_calibration =\
-            get.get_pipette_offset(right_pip.pipette_id, Mount.RIGHT)
+            self._get_stored_pipette_offset_cal(right_pip, Mount.RIGHT)
         l_calibration =\
-            get.get_pipette_offset(left_pip.pipette_id, Mount.LEFT)
+            self._get_stored_pipette_offset_cal(left_pip, Mount.LEFT)
         r_info = PipetteInfo(
             channels=right_pip.config.channels,
             max_volume=right_pip.config.max_volume,
@@ -270,10 +268,8 @@ class CheckCalibrationUserFlow:
 
     def _get_tip_length_from_pipette(
             self, mount, pipette) -> Optional[float]:
-        print(f"HERE IS PIP ID {pipette.pipette_id}")
         pip_offset = get.get_pipette_offset(
             pipette.pipette_id, mount)
-        print(f"HERE IS PIP OFFSET {pip_offset}")
         if not pip_offset or not pip_offset.uri:
             return None
         details = helpers.details_from_uri(pip_offset.uri)
@@ -289,15 +285,13 @@ class CheckCalibrationUserFlow:
 
     def _check_valid_calibrations(self, pipettes: Dict):
         deck = get.get_robot_deck_attitude()
-        # tip_length = all(
-        #     self._get_tip_length_from_pipette(mount, pip)
-        #     for mount, pip in pipettes.items())
-        # pipette = all(
-        #     get.get_pipette_offset(
-        #         pip.pipette_id, mount)
-        #     for mount, pip in pipettes.items())
-        tip_length = True
-        pipette = True
+        tip_length = all(
+            self._get_tip_length_from_pipette(mount, pip)
+            for mount, pip in pipettes.items())
+        pipette = all(
+            get.get_pipette_offset(
+                pip.pipette_id, mount)
+            for mount, pip in pipettes.items())
         if not deck or not pipette or not tip_length:
             raise RobotServerError(
                 definition=CalibrationError.UNCALIBRATED_ROBOT,
@@ -333,10 +327,18 @@ class CheckCalibrationUserFlow:
                 self._deck.position_for(cb_setup.slot))
 
     def _get_stored_pipette_offset_cal(
-            self) -> Optional[PipetteOffsetByPipetteMount]:
-        return get.get_pipette_offset(
-            self.hw_pipette.pipette_id,  # type: ignore
-            self.mount)
+            self, pipette: Pipette = None,
+            mount: Mount = None) -> PipetteOffsetByPipetteMount:
+        if not pipette or not mount:
+            pip_offset = get.get_pipette_offset(
+                self.hw_pipette.pipette_id,  # type: ignore
+                self.mount)
+        else:
+            pip_offset = get.get_pipette_offset(
+                pipette.pipette_id,  # type: ignore
+                mount)
+        assert pip_offset, 'No Pipette Offset Found'
+        return pip_offset
 
     @staticmethod
     def _get_tr_lw(tip_rack_def: Optional['LabwareDefinition'],
@@ -351,13 +353,13 @@ class CheckCalibrationUserFlow:
         """
         if tip_rack_def:
             uri = helpers.uri_from_definition(tip_rack_def)
-            if existing_calibration and uri == existing_calibration.uri:
+            if uri == existing_calibration.uri:
                 return labware.load_from_definition(
                     tip_rack_def, position)
             else:
                 raise RobotServerError(
                     definition=CalibrationError.BAD_LABWARE_DEF)
-        if existing_calibration and existing_calibration.uri:
+        elif existing_calibration.uri:
             try:
                 details \
                      = helpers.details_from_uri(existing_calibration.uri)
@@ -387,7 +389,7 @@ class CheckCalibrationUserFlow:
 
     def _get_tiprack_by_pipette_volume(
             self, volume: float,
-            existing_calibration: Optional[PipetteOffsetByPipetteMount]
+            existing_calibration: PipetteOffsetByPipetteMount
             ) -> labware.Labware:
         tip_rack_def = None
         if self._tip_racks:
@@ -436,13 +438,13 @@ class CheckCalibrationUserFlow:
         hw_pips = self._get_hw_pipettes()
         info_pips = self._get_ordered_info_pipettes()
         return [
-            CheckAttachedPipette(  # type: ignore[call-arg]
+            CheckAttachedPipette(
                 model=hw_pip.model,
                 name=hw_pip.name,
                 tipLength=hw_pip.config.tip_length,
-                tipRack=info_pip.tip_rack.load_name,
+                tipRack=info_pip.tip_rack._implementation.get_display_name(),
                 rank=str(info_pip.rank),
-                mount=str(self.mount),
+                mount=str(info_pip.mount),
                 serial=hw_pip.pipette_id)  # type: ignore[arg-type]
             for hw_pip, info_pip in zip(hw_pips, info_pips)]
 
@@ -451,11 +453,13 @@ class CheckCalibrationUserFlow:
         # type of AttachedPipette.serial
         assert self.hw_pipette
         assert self.active_pipette
-        return CheckAttachedPipette(  # type: ignore[call-arg]
+        display_name =\
+            self.active_pipette.tip_rack._implementation.get_display_name()
+        return CheckAttachedPipette(
             model=self.hw_pipette.model,
             name=self.hw_pipette.name,
             tipLength=self.hw_pipette.config.tip_length,
-            tipRack=self.active_pipette.tip_rack.load_name,
+            tipRack=display_name,
             rank=str(self.active_pipette.rank),
             mount=str(self.mount),
             serial=self.hw_pipette.pipette_id)  # type: ignore[arg-type]
@@ -479,9 +483,11 @@ class CheckCalibrationUserFlow:
             State.comparingPointTwo,
             State.comparingPointThree]
         if is_p1000 and self.current_state == State.comparingTip:
-            return P1000_OK_TIP_PICK_UP_VECTOR
+            return PIPETTE_TOLERANCES['p1000_tip']
+        elif is_p20 and self.current_state == State.comparingTip:
+            return PIPETTE_TOLERANCES['p20_tip']
         elif self.current_state == State.comparingTip:
-            return DEFAULT_OK_TIP_PICK_UP_VECTOR
+            return PIPETTE_TOLERANCES['p300_tip']
         if is_p1000 and self.current_state in cross_states:
             return PIPETTE_TOLERANCES['p1000_crosses']
         elif is_p1000 and self.current_state == State.comparingHeight:
@@ -554,7 +560,9 @@ class CheckCalibrationUserFlow:
     def _get_reference_points_by_state(self):
         saved_points = self._reference_points
         if self.current_state == State.comparingTip:
-            return saved_points.tip.initial_point,\
+            initial = saved_points.tip.initial_point +\
+                    Point(0, 0, self._get_tip_length())
+            return initial,\
                 saved_points.tip.final_point
         elif self.current_state == State.comparingHeight:
             return saved_points.height.initial_point,\

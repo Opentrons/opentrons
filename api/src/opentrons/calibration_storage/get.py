@@ -212,7 +212,6 @@ def get_pipette_offset(
         mount: Mount
 ) -> typing.Optional[local_types.PipetteOffsetByPipetteMount]:
     pip_dir = config.get_opentrons_path('pipette_calibration_dir')
-    print(pip_dir)
     offset_path = pip_dir / mount.name.lower() / f'{pip_id}.json'
     if offset_path.exists():
         data = io.read_cal_file(offset_path)

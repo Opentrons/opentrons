@@ -1,4 +1,4 @@
-from typing import Awaitable, cast, TYPE_CHECKING, List
+from typing import Awaitable, cast, TYPE_CHECKING
 
 from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
@@ -97,7 +97,7 @@ class CheckSession(BaseSession):
 
     def get_response_model(self) -> CalibrationCheckResponseAttributes:
         return CalibrationCheckResponseAttributes(
-            createParams=self.meta.create_params,
+            createParams=cast(SessionCreateParams, self.meta.create_params),
             createdAt=self.meta.created_at,
             details=self._get_response_details()
         )

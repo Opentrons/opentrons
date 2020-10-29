@@ -1,4 +1,4 @@
-PIPETTE_ID = 'pip_1'
+PIPETTE_ID = '123'
 MOUNT = 'left'
 FAKE_PIPETTE_ID = 'fake'
 WRONG_MOUNT = 'right'
@@ -9,12 +9,12 @@ def test_access_pipette_offset_calibration(
         server_temp_directory):
     expected = {
         'offset': [0, 0, 0],
-        'pipette': 'pip_1',
+        'pipette': '123',
         'mount': 'left',
-        'tiprack': 'hash',
+        'tiprack': '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824',  # noqa: E501
         'lastModified': None,
         'source': 'user',
-        'tiprackUri': 'uri',
+        'tiprackUri': 'opentrons/opentrons_96_filtertiprack_200ul/1',
         'status': {
             'markedAt': None, 'markedBad': False, 'source': None}
     }
@@ -49,7 +49,7 @@ def test_delete_pipette_offset_calibration(
             'status': '404',
             'title': 'Resource Not Found',
             'detail': "Resource type 'PipetteOffsetCalibration' with id "
-                      "'pip_1&right' was not found"
+                      "'123&right' was not found"
         }]}
 
     resp = api_client.delete(
