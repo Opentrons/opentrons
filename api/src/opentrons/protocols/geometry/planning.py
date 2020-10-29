@@ -28,9 +28,9 @@ class MoveType(str, Enum):
     """
     Move type, where a move may be:
 
-    - GENERAL: a movement between two unrelated Locations
-    - IN_LABWARE: a movement between two locations in the same labware
-    - IN_WELL: a movement between two locations in the same well
+    - GENERAL_ARC: an arc movement between two unrelated locations
+    - IN_LABWARE_ARC: an arc movement between two locations in the same labware
+    - DIRECT: a direct movement between two locations
     """
     GENERAL_ARC = "general-arc"
     IN_LABWARE_ARC = "in-labware-arc"
