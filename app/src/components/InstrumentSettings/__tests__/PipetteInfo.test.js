@@ -105,7 +105,10 @@ describe('PipetteInfo', () => {
       .find('button[children="Continue with calibration block"]')
       .invoke('onClick')()
     expect(startWizard).toHaveBeenCalledWith({
-      overrideParams: { hasCalibrationBlock: true },
+      overrideParams: {
+        hasCalibrationBlock: true,
+        shouldRecalibrateTipLength: false,
+      },
       withIntent: 'pipette-offset',
     })
   })
@@ -118,7 +121,10 @@ describe('PipetteInfo', () => {
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
     wrapper.find('button[children="Use trash bin"]').invoke('onClick')()
     expect(startWizard).toHaveBeenCalledWith({
-      overrideParams: { hasCalibrationBlock: false },
+      overrideParams: {
+        hasCalibrationBlock: false,
+        shouldRecalibrateTipLength: false,
+      },
       withIntent: 'pipette-offset',
     })
   })
