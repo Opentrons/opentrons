@@ -1,9 +1,11 @@
 """ProtocolEngine class definition."""
 from __future__ import annotations
-from typing import Optional, Union
+from typing import Union
 
-from opentrons.util.helpers import utc_now
+from opentrons_shared_data.deck import load as load_deck
+from opentrons.protocols.api_support.constants import STANDARD_DECK
 from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.util.helpers import utc_now
 
 from .execution import CommandExecutor
 from .state import StateStore
@@ -27,25 +29,13 @@ class ProtocolEngine():
     """
 
     @classmethod
-    def create(
-        cls,
-        hardware: HardwareAPI,
-        *,
-        state_store: Optional[StateStore] = None,
-        executor: Optional[CommandExecutor] = None,
-    ) -> ProtocolEngine:
+    def create(cls, hardware: HardwareAPI) -> ProtocolEngine:
         """Create a ProtocolEngine instance."""
+        deck_definition = load_deck(STANDARD_DECK, 2)
+
         return cls(
-            state_store=(
-                state_store
-                if state_store is not None
-                else StateStore()
-            ),
-            executor=(
-                executor
-                if executor is not None
-                else CommandExecutor.create(hardware=hardware)
-            )
+            state_store=StateStore(deck_definition=deck_definition),
+            executor=CommandExecutor.create(hardware=hardware)
         )
 
     def __init__(

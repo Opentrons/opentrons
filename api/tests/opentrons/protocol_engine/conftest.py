@@ -1,6 +1,11 @@
 import pytest
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 
+from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.labware import load_definition
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.api_support.constants import STANDARD_DECK
 from opentrons.types import MountType
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control.api import API as HardwareController
@@ -8,6 +13,7 @@ from opentrons.hardware_control.api import API as HardwareController
 from opentrons.protocol_engine import (
     ProtocolEngine,
     StateStore,
+    State,
     CommandExecutor,
     command_models
 )
@@ -25,6 +31,11 @@ def mock_state_store(store):
 
 
 @pytest.fixture
+def mock_state():
+    return MagicMock(spec=State)
+
+
+@pytest.fixture
 def mock_hardware():
     return AsyncMock(spec=HardwareController)
 
@@ -39,9 +50,19 @@ def mock_executor():
     return AsyncMock(spec=CommandExecutor)
 
 
+@pytest.fixture(scope="session")
+def standard_deck_def() -> DeckDefinitionV2:
+    return load_deck(STANDARD_DECK, 2)
+
+
+@pytest.fixture(scope="session")
+def well_plate_def() -> LabwareDefinition:
+    return load_definition("corning_96_wellplate_360ul_flat", 1)
+
+
 @pytest.fixture
-def store():
-    return StateStore()
+def store(standard_deck_def):
+    return StateStore(deck_definition=standard_deck_def)
 
 
 @pytest.fixture

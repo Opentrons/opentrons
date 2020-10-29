@@ -8,7 +8,7 @@ class ProtocolEngineError(RuntimeError):
 
 class UnexpectedProtocolError(ProtocolEngineError):
     """
-    An error that's raised when an unexpected error occurs.
+    An error raised when an unexpected error occurs.
 
     This error is indicitive of a software bug. If it happens, it means an
     exception was raised somewhere in the stack and it was not properly caught
@@ -22,11 +22,21 @@ class UnexpectedProtocolError(ProtocolEngineError):
 
 class FailedToLoadPipetteError(ProtocolEngineError):
     """
-    An error that's raised when executing a LoadPipetteRequest fails.
+    An error raised when executing a LoadPipetteRequest fails.
 
     This failure may be caused by:
     - An incorrect pipette already attached to the mount
     - A missing pipette on the requested mount
     """
     # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
+    pass
+
+
+class LabwareDoesNotExistError(ProtocolEngineError):
+    """An error raised when referencing a labware that does not exist."""
+    pass
+
+
+class WellDoesNotExistError(ProtocolEngineError):
+    """An error raised when referencing a well that does not exist."""
     pass

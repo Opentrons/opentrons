@@ -2,9 +2,12 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons.types import MountType
+from opentrons.types import Location, MountType, Point
+
 from .. import command_models as cmd
+from ..errors import LabwareDoesNotExistError, WellDoesNotExistError
 
 
 @dataclass
@@ -23,6 +26,13 @@ class PipetteData():
 
 
 @dataclass
+class LocationData():
+    pipette_id: str
+    labware_id: str
+    well_id: str
+
+
+@dataclass
 class State():
     """
     ProtocolEngine State class.
@@ -31,9 +41,11 @@ class State():
     retrieve views of the data. The State should be considered read-only by
     everything that isn't a StateStore.
     """
+    _deck_definition: DeckDefinitionV2
     _commands_by_id: Dict[str, cmd.CommandType] = field(default_factory=dict)
     _labware_by_id: Dict[str, LabwareData] = field(default_factory=dict)
     _pipettes_by_id: Dict[str, PipetteData] = field(default_factory=dict)
+    _current_location: Optional[LocationData] = None
 
     def get_command_by_id(self, uid: str) -> Optional[cmd.CommandType]:
         """Get a command by its unique identifier."""
@@ -69,6 +81,40 @@ class State():
                 return pipette
         return None
 
+    def get_current_location_data(self) -> Optional[LocationData]:
+        """Get the current pipette and deck location the protocol is at."""
+        return self._current_location
+
+    def get_deck_definition(self) -> DeckDefinitionV2:
+        return self._deck_definition
+
+    def get_slot_position(self, slot: int) -> Point:
+        deck_def = self.get_deck_definition()
+        position = deck_def["locations"]["orderedSlots"][slot]["position"]
+
+        return Point(x=position[0], y=position[1], z=position[2])
+
+    def get_well_position(self, labware_id: str, well_id: str) -> Point:
+        labware_data = self.get_labware_data_by_id(labware_id)
+
+        if labware_data is None:
+            raise LabwareDoesNotExistError(f"{labware_id} does not exist.")
+
+        slot_pos = self.get_slot_position(labware_data.location)
+        cal_offset = labware_data.calibration
+        well_def = labware_data.definition["wells"].get(well_id)
+
+        if well_def is None:
+            raise WellDoesNotExistError(
+                f"{well_id} does not exist in {labware_id}."
+            )
+
+        return Point(
+            x=slot_pos[0] + cal_offset[0] + well_def["x"],
+            y=slot_pos[1] + cal_offset[1] + well_def["y"],
+            z=slot_pos[2] + cal_offset[2] + well_def["z"],
+        )
+
 
 class StateStore():
     """
@@ -79,9 +125,9 @@ class StateStore():
     only thing that should be allowed to modify State.
     """
 
-    def __init__(self):
+    def __init__(self, deck_definition: DeckDefinitionV2):
         """Initialize a StateStore."""
-        self.state: State = State()
+        self.state: State = State(_deck_definition=deck_definition)
 
     def handle_command(self, command: cmd.CommandType, uid: str) -> None:
         """Modify State in reaction to a Command."""
@@ -104,3 +150,13 @@ class StateStore():
                 PipetteData(
                     pipette_name=command.request.pipetteName,
                     mount=command.request.mount)
+
+        elif isinstance(
+            command.result,
+            (cmd.MoveToWellResult, cmd.AspirateResult, cmd.DispenseResult)
+        ):
+            self.state._current_location = LocationData(
+                pipette_id=command.request.pipetteId,
+                labware_id=command.request.labwareId,
+                well_id=command.request.wellId,
+            )

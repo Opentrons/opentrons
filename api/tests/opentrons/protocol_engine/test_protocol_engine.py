@@ -1,8 +1,11 @@
 """Tests for the ProtocolEngine class."""
 from datetime import datetime, timezone, timedelta
 from math import isclose
+from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from typing import cast
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.command_models import (
     MoveToWellRequest,
     MoveToWellResult,
@@ -25,7 +28,21 @@ class CloseToNow():
         return f"<datetime close to {self._now}>"
 
 
-async def test_execute_command_creates_command(engine, mock_state_store):
+async def test_create_engine_initializes_state_with_deck_geometry(
+    mock_hardware: MagicMock,
+    standard_deck_def: DeckDefinitionV2,
+) -> None:
+    """It should load deck geometry data into the store on create."""
+    engine = ProtocolEngine.create(hardware=mock_hardware)
+
+    assert engine.state_store.state.get_deck_definition() == \
+        standard_deck_def
+
+
+async def test_execute_command_creates_command(
+    engine: ProtocolEngine,
+    mock_state_store: MagicMock
+) -> None:
     """It should create a command in the state store when executing."""
     req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")
 
@@ -41,10 +58,10 @@ async def test_execute_command_creates_command(engine, mock_state_store):
 
 
 async def test_execute_command_calls_executor(
-    engine,
-    mock_executor,
-    mock_state_store
-):
+    engine: ProtocolEngine,
+    mock_executor: AsyncMock,
+    mock_state_store: MagicMock,
+) -> None:
     """It should create a command in the state store when executing."""
     req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")
 
@@ -61,9 +78,9 @@ async def test_execute_command_calls_executor(
 
 
 async def test_execute_command_adds_result_to_state(
-    engine,
-    mock_executor,
-    mock_state_store
+    engine: ProtocolEngine,
+    mock_executor: AsyncMock,
+    mock_state_store: MagicMock,
 ):
     """It should create a command in the state store when executing."""
     req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")
