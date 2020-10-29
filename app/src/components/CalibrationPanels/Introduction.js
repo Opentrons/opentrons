@@ -5,27 +5,28 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
   Box,
   Flex,
-  DISPLAY_INLINE,
-  SPACING_2,
-  SPACING_3,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
-  ALIGN_FLEX_START,
-  JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  FONT_WEIGHT_SEMIBOLD,
-  POSITION_RELATIVE,
-  FONT_HEADER_DARK,
-  TEXT_TRANSFORM_UPPERCASE,
-  TEXT_ALIGN_CENTER,
   Link,
   PrimaryBtn,
   Text,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  BORDER_SOLID_MEDIUM,
+  C_MED_DARK_GRAY,
+  C_NEAR_WHITE,
+  DIRECTION_COLUMN,
+  DISPLAY_INLINE,
+  FLEX_MIN_CONTENT,
+  FONT_HEADER_DARK,
   FONT_SIZE_BODY_1,
   FONT_SIZE_BODY_2,
-  BORDER_SOLID_MEDIUM,
-  C_NEAR_WHITE,
+  FONT_WEIGHT_SEMIBOLD,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_RELATIVE,
+  SPACING_1,
+  SPACING_2,
+  SPACING_3,
+  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
@@ -70,7 +71,7 @@ const TIP_LENGTH_INVALIDATES_PIPETTE_OFFSET =
 
 const START = 'start'
 const PIP_AND_TIP_CAL_HEADER = 'tip length and pipette offset calibration'
-const LABWARE_REQS = 'For this process you will require:'
+const LABWARE_REQS = 'You will need:'
 const NOTE_HEADER = 'Please note:'
 const IT_IS = "It's"
 const EXTREMELY = 'extremely'
@@ -353,6 +354,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_FLEX_START}
         position={POSITION_RELATIVE}
+        fontSize={FONT_SIZE_BODY_2}
       >
         <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Text
@@ -371,30 +373,33 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
           {bodyContentFromFragments(bodyContentFragments)}
         </Box>
         {outcomeText && <Text marginBottom={SPACING_3}>{outcomeText}</Text>}
-        <Box marginX="5%">
-          <h5>{LABWARE_REQS}</h5>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            marginTop={SPACING_2}
-            justifyContent={JUSTIFY_CENTER}
-          >
-            <RequiredLabwareCard
-              loadName={tipRack.loadName}
-              displayName={getLabwareDisplayName(tipRack.definition)}
-              linkToMeasurements={isKnownTiprack}
-            />
-            {/* TODO: AA 2020-10-26 load both required tipracks for multi-pipette health check when the other tiprack info is available */}
-            {calBlock && (
-              <>
-                <Box width={SPACING_2} />
-                <RequiredLabwareCard
-                  loadName={calBlock.loadName}
-                  displayName={getLabwareDisplayName(calBlock.definition)}
-                  linkToMeasurements={false}
-                />
-              </>
-            )}
-          </Flex>
+        <Flex
+          marginX="20%"
+          marginBottom={SPACING_2}
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_CENTER}
+          minHeight="18.75rem"
+          maxHeight="25rem"
+        >
+          <Text fontWeight={FONT_WEIGHT_SEMIBOLD} marginBottom={SPACING_3}>
+            {LABWARE_REQS}
+          </Text>
+          <RequiredLabwareCard
+            loadName={tipRack.loadName}
+            displayName={getLabwareDisplayName(tipRack.definition)}
+            linkToMeasurements={isKnownTiprack}
+          />
+          {/* TODO: AA 2020-10-26 load both required tipracks for multi-pipette health check when the other tiprack info is available */}
+          {calBlock && (
+            <>
+              <Box width={SPACING_2} />
+              <RequiredLabwareCard
+                loadName={calBlock.loadName}
+                displayName={getLabwareDisplayName(calBlock.definition)}
+                linkToMeasurements={false}
+              />
+            </>
+          )}
           <Box fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_2}>
             <Text
               display={DISPLAY_INLINE}
@@ -406,14 +411,14 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
             &nbsp;
             {bodyContentFromFragments([noteBody])}
           </Box>
-        </Box>
+        </Flex>
       </Flex>
       <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
         <PrimaryBtn
           data-test="continueButton"
           onClick={proceed}
           flex="1"
-          margin="1rem 5rem 1rem"
+          marginX="5rem"
         >
           {continueButtonText}
         </PrimaryBtn>
@@ -443,16 +448,16 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
 
   return (
     <Flex
-      width="50%"
+      width="100%"
+      height="30%"
       border={BORDER_SOLID_MEDIUM}
       paddingX={SPACING_3}
-      flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
+      marginBottom={SPACING_2}
     >
       <Flex
-        paddingY={SPACING_3}
-        height="75%"
-        width="75%"
+        paddingY={SPACING_2}
+        maxWidth="30%"
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
       >
@@ -464,22 +469,24 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
           src={imageSrc}
         />
       </Flex>
-      <Text fontSize={FONT_SIZE_BODY_2}>{displayName}</Text>
-      {linkToMeasurements && (
-        <Link
-          external
-          paddingY={SPACING_3}
-          flex="0.6"
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-          textAlign={TEXT_ALIGN_CENTER}
-          fontSize={FONT_SIZE_BODY_1}
-          color="inherit"
-          css={linkStyles}
-          href={`${LABWARE_LIBRARY_PAGE_PATH}/${loadName}`}
-        >
-          {VIEW_TIPRACK_MEASUREMENTS}
-        </Link>
-      )}
+      <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_3}>
+        <Text fontSize={FONT_SIZE_BODY_2}>{displayName}</Text>
+        {linkToMeasurements && (
+          <Link
+            external
+            flex={FLEX_MIN_CONTENT}
+            paddingY={SPACING_1}
+            width="9.25rem"
+            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            fontSize={FONT_SIZE_BODY_2}
+            color={C_MED_DARK_GRAY}
+            css={linkStyles}
+            href={`${LABWARE_LIBRARY_PAGE_PATH}/${loadName}`}
+          >
+            {VIEW_TIPRACK_MEASUREMENTS}
+          </Link>
+        )}
+      </Flex>
     </Flex>
   )
 }
