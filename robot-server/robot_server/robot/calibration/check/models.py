@@ -69,7 +69,8 @@ class ComparisonStatePerPipette(BaseModel):
 
 class CheckAttachedPipette(AttachedPipette):
     rank: str
-    tipRack: str
+    tipRackDisplay: str
+    tipRackUri: str
 
 
 class SessionCreateParams(BaseModel):

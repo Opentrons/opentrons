@@ -442,7 +442,8 @@ class CheckCalibrationUserFlow:
                 model=hw_pip.model,
                 name=hw_pip.name,
                 tipLength=hw_pip.config.tip_length,
-                tipRack=info_pip.tip_rack._implementation.get_display_name(),
+                tipRackDisplay=info_pip.tip_rack._implementation.get_display_name(),  # noqa: E501
+                tipRackUri=info_pip.tip_rack.uri,
                 rank=str(info_pip.rank),
                 mount=str(info_pip.mount),
                 serial=hw_pip.pipette_id)  # type: ignore[arg-type]
@@ -459,7 +460,8 @@ class CheckCalibrationUserFlow:
             model=self.hw_pipette.model,
             name=self.hw_pipette.name,
             tipLength=self.hw_pipette.config.tip_length,
-            tipRack=display_name,
+            tipRackDisplay=display_name,
+            tipRackUri=self.active_pipette.tip_rack.uri,
             rank=str(self.active_pipette.rank),
             mount=str(self.mount),
             serial=self.hw_pipette.pipette_id)  # type: ignore[arg-type]
