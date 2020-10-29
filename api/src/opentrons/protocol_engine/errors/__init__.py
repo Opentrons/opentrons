@@ -45,3 +45,10 @@ class WellDoesNotExistError(ProtocolEngineError):
 class PipetteDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a pipette that does not exist."""
     pass
+
+
+# TODO(mc, 2020-11-06): flesh out with structured data to replicate
+# existing LabwareHeightError
+class FailedToPlanMoveError(ProtocolEngineError):
+    """An error raised when a requested movement could not be planned."""
+    pass

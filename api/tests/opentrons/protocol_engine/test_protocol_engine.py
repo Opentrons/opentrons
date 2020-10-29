@@ -14,7 +14,7 @@ from opentrons.protocol_engine.command_models import (
 )
 
 
-class CloseToNow():
+class CloseToNow:
     def __init__(self):
         self._now = datetime.now(tz=timezone.utc)
 

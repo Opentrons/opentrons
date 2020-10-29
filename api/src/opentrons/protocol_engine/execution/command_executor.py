@@ -8,9 +8,10 @@ from ..state import StateView
 from ..errors import ProtocolEngineError, UnexpectedProtocolError
 from .. import resources, command_models as cmd
 from .equipment import EquipmentHandler
+from .pipetting import PipettingHandler
 
 
-class CommandExecutor():
+class CommandExecutor:
     """
     CommandExecutor class.
 
@@ -35,11 +36,13 @@ class CommandExecutor():
                 labware_data=labware_data,
                 hardware=hardware,
             ),
+            pipetting_handler=PipettingHandler(state=state, hardware=hardware),
         )
 
     def __init__(
         self,
         equipment_handler: EquipmentHandler,
+        pipetting_handler: PipettingHandler,
     ) -> None:
         """
         Initialize a CommandExecutor.
@@ -48,6 +51,7 @@ class CommandExecutor():
         CommandExecutor.create factory classmethod.
         """
         self._equipment_handler = equipment_handler
+        self._pipetting_handler = pipetting_handler
 
     async def execute_command(
         self,
@@ -86,5 +90,12 @@ class CommandExecutor():
                 command.request,
             )
             return command.to_completed(pip_res, utc_now())
+
+        # move to well
+        elif isinstance(command.request, cmd.MoveToWellRequest):
+            move_res = await self._pipetting_handler.handle_move_to_well(
+                command.request
+            )
+            return command.to_completed(move_res, utc_now())
 
         raise NotImplementedError(f"{type(command.request)} not implemented")

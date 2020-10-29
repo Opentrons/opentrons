@@ -12,7 +12,7 @@ from .substore import Substore, CommandReactive
 
 
 @dataclass(frozen=True)
-class LabwareData():
+class LabwareData:
     """Labware data entry."""
     location: int
     definition: LabwareDefinition
@@ -20,7 +20,7 @@ class LabwareData():
 
 
 @dataclass
-class LabwareState():
+class LabwareState:
     """Basic labware data state and getter methods."""
     _labware_by_id: Dict[str, LabwareData] = field(default_factory=dict)
 
@@ -34,6 +34,11 @@ class LabwareState():
     def get_all_labware(self) -> List[Tuple[str, LabwareData]]:
         """Get a list of all labware entries in state."""
         return [entry for entry in self._labware_by_id.items()]
+
+    def get_labware_has_quirk(self, uid: str, quirk: str) -> bool:
+        """Get if a labware has a certain quirk."""
+        data = self.get_labware_data_by_id(uid)
+        return quirk in data.definition["parameters"].get("quirks", ())
 
     def get_well_definition(
         self,

@@ -10,7 +10,7 @@ from opentrons.calibration_storage.get import get_labware_calibration
 from opentrons.calibration_storage.helpers import hash_labware_def
 
 
-class IdGenerator():
+class IdGenerator:
     """Unique ID generation provider."""
 
     def generate_id(self) -> str:
@@ -22,7 +22,7 @@ class IdGenerator():
         return str(uuid4())
 
 
-class LabwareData():
+class LabwareData:
     """Labware data provider."""
 
     # NOTE(mc, 2020-10-18): async to allow file reading and parsing to be

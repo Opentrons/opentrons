@@ -7,7 +7,7 @@ from .substore import Substore
 
 
 @dataclass
-class CommandState():
+class CommandState:
     """Command state and getters."""
     _commands_by_id: Dict[str, cmd.CommandType] = field(default_factory=dict)
 

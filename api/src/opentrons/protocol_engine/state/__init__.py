@@ -4,6 +4,7 @@ from .state_store import CommandState, StateStore, StateView
 from .labware import LabwareState, LabwareData
 from .pipettes import PipetteState, PipetteData
 from .geometry import GeometryState
+from .motion import MotionState, LocationData, PipetteLocationData
 
 __all__ = [
     "StateStore",
@@ -12,6 +13,9 @@ __all__ = [
     "LabwareState",
     "PipetteState",
     "GeometryState",
+    "MotionState",
     "LabwareData",
     "PipetteData",
+    "LocationData",
+    "PipetteLocationData",
 ]

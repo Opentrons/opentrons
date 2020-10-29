@@ -90,6 +90,42 @@ def test_get_all_labware(
     ]
 
 
+def test_get_labware_has_quirk(
+    well_plate_def: LabwareDefinition,
+    reservoir_def: LabwareDefinition,
+    store: StateStore,
+) -> None:
+    """It should return whether a labware by ID has a given quirk."""
+    load_labware(
+        store=store,
+        labware_id="plate-id",
+        location=1,
+        definition=well_plate_def,
+        calibration=(1, 2, 3),
+    )
+
+    load_labware(
+        store=store,
+        labware_id="reservoir-id",
+        location=2,
+        definition=reservoir_def,
+        calibration=(4, 5, 6),
+    )
+
+    well_plate_has_center_quirk = store.labware.get_labware_has_quirk(
+        "plate-id",
+        "centerMultichannelOnWells"
+    )
+
+    reservoir_has_center_quirk = store.labware.get_labware_has_quirk(
+        "reservoir-id",
+        "centerMultichannelOnWells"
+    )
+
+    assert well_plate_has_center_quirk is False
+    assert reservoir_has_center_quirk is True
+
+
 def test_get_well_definition_bad_id(
     well_plate_def: LabwareDefinition,
     store: StateStore,

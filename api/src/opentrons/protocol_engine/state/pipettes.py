@@ -10,14 +10,14 @@ from .substore import Substore, CommandReactive
 
 
 @dataclass(frozen=True)
-class PipetteData():
+class PipetteData:
     """Pipette state data."""
     mount: MountType
     pipette_name: PipetteName
 
 
 @dataclass
-class PipetteState():
+class PipetteState:
     """Basic labware data state and getter methods."""
     _pipettes_by_id: Dict[str, PipetteData] = field(default_factory=dict)
 
@@ -54,8 +54,8 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
         command: cmd.CompletedCommandType
     ) -> None:
         if isinstance(command.result, cmd.LoadPipetteResult):
-            self._state._pipettes_by_id[command.result.pipetteId] = \
-                PipetteData(
-                    pipette_name=command.request.pipetteName,
-                    mount=command.request.mount
+            pipette_id = command.result.pipetteId
+            self._state._pipettes_by_id[pipette_id] = PipetteData(
+                pipette_name=command.request.pipetteName,
+                mount=command.request.mount
             )
