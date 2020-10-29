@@ -6,12 +6,6 @@ import os
 import os.path
 from setuptools import setup, find_packages
 
-# make stdout blocking since Travis sets it to nonblocking
-if os.name == 'posix':
-    import fcntl
-    flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
-    fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
-
 HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(HERE, '..', 'scripts'))
 
@@ -29,7 +23,7 @@ def get_version():
 
 VERSION = get_version()
 
-DISTNAME = 'notifyserver'
+DISTNAME = 'notify_server'
 LICENSE = 'Apache 2.0'
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"

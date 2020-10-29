@@ -5,12 +5,12 @@
 ################################################################################
 
 # Get a key from package.json (like version)
-define get_pkg_json_key
+define PYTHON_OPENTRONS_NOTIFY_SERVER_get_pkg_json_key
 	$(shell python -c "import json; print(json.load(open('$(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/notify-server/notify_server/package.json'))[\"$(1)\"])")
 endef
 
-PYTHON_OPENTRONS_NOTIFY_SERVER_VERSION = $(call get_pkg_json_key,version)
-PYTHON_OPENTRONS_NOTIFY_SERVER_LICENSE = $(call get_pkg_json_key,license)
+PYTHON_OPENTRONS_NOTIFY_SERVER_VERSION = $(call PYTHON_OPENTRONS_NOTIFY_SERVER_get_pkg_json_key,version)
+PYTHON_OPENTRONS_NOTIFY_SERVER_LICENSE = $(call PYTHON_OPENTRONS_NOTIFY_SERVER_get_pkg_json_key,license)
 PYTHON_OPENTRONS_NOTIFY_SERVER_LICENSE_FILES = $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/LICENSE
 PYTHON_OPENTRONS_NOTIFY_SERVER_SETUP_TYPE = setuptools
 PYTHON_OPENTRONS_NOTIFY_SERVER_SITE_METHOD = local

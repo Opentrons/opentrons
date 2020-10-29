@@ -18,7 +18,7 @@ SRC_PATH = notify_server
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,notify-server,notifyserver,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,notify-server,notify_server,$(BUILD_NUMBER))
 
 
 # These variables can be overriden when make is invoked to customize the
@@ -60,7 +60,7 @@ clean:
 teardown:
 	$(pipenv) --rm
 
-dist/notifyserver-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+dist/notify_server-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel --universal
 	$(SHX) rm -rf build
@@ -74,8 +74,8 @@ test:
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(python) -m mypy $(SRC_PATH)
-	$(python) -m flake8 $(SRC_PATH) tests
+	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m flake8 $(SRC_PATH) $(tests)
 
 .PHONY: dev
 dev: export OT_NOTIFY_SERVER_PRODUCTION := 0
