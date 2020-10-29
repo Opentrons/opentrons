@@ -1,10 +1,10 @@
 from typing import List, Tuple
-from unittest.mock import call, MagicMock
+from unittest.mock import call, MagicMock, patch
 
 import pytest
 from opentrons.hardware_control import pipette
 from opentrons.types import Mount, Point
-from opentrons.calibration_storage import types as cal_types
+from opentrons.calibration_storage import get, types as CSTypes
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 
@@ -20,10 +20,10 @@ from robot_server.robot.calibration.constants import (
     POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID)
 
 
-PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(
+PIP_OFFSET = CSTypes.PipetteOffsetByPipetteMount(
         offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
-        source=cal_types.SourceType.user,
-        status=cal_types.CalibrationStatus())
+        source=CSTypes.SourceType.user,
+        status=CSTypes.CalibrationStatus())
 
 
 @pytest.fixture
@@ -85,10 +85,21 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
                                PIP_OFFSET,
                                'testId2')
     hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
-
-    uf = CheckCalibrationUserFlow(hardware=hardware)
-    assert uf.hw_pipette == \
-        hardware._attached_instruments[target_mount]
+    # load a labware with calibrations
+    with patch.object(
+            get,
+            'get_robot_deck_attitude',
+            new=build_mock_deck_calibration()),\
+            patch.object(
+                get,
+                'load_tip_length_calibration',
+                new=build_mock_stored_tip_length()),\
+            patch.object(
+                get, 'get_pipette_offset',
+                new=build_mock_stored_pipette_offset()):
+        uf = CheckCalibrationUserFlow(hardware=hardware)
+        assert uf.hw_pipette == \
+            hardware._attached_instruments[target_mount]
 
 
 @pytest.mark.parametrize('pipettes,target_mount', pipette_combos)
@@ -105,24 +116,102 @@ async def test_switching_to_second_pipette(pipettes, target_mount, hardware):
                                PIP_OFFSET,
                                'testId2')
     hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
-    uf = CheckCalibrationUserFlow(hardware=hardware)
-    if pip and pip2:
-        assert uf.mount == target_mount
-        await uf.change_active_pipette()
-        assert uf.mount != target_mount
-    else:
-        with pytest.raises(RobotServerError):
+    # load a labware with calibrations
+    with patch.object(
+            get,
+            'get_robot_deck_attitude',
+            new=build_mock_deck_calibration()),\
+            patch.object(
+                get,
+                'load_tip_length_calibration',
+                new=build_mock_stored_tip_length()),\
+            patch.object(
+                get, 'get_pipette_offset',
+                new=build_mock_stored_pipette_offset()):
+        uf = CheckCalibrationUserFlow(hardware=hardware)
+        if pip and pip2:
+            assert uf.mount == target_mount
             await uf.change_active_pipette()
+            assert uf.mount != target_mount
+        else:
+            with pytest.raises(RobotServerError):
+                await uf.change_active_pipette()
+
+
+def build_mock_stored_pipette_offset(kind='normal'):
+    if kind == 'normal':
+        return MagicMock(
+            return_value=CSTypes.PipetteOffsetByPipetteMount(
+                offset=[0, 1, 2],
+                tiprack='tiprack-id',
+                uri='opentrons/opentrons_96_filtertiprack_200ul/1',
+                source=CSTypes.SourceType.user,
+                status=CSTypes.CalibrationStatus(markedBad=False)))
+    else:
+        return MagicMock(return_value=None)
+
+
+def build_mock_stored_tip_length(kind='normal'):
+    if kind == 'normal':
+        return MagicMock(return_value={'tipLength': 30})
+    else:
+        return MagicMock(return_value=None)
+
+
+def build_mock_deck_calibration(kind='normal'):
+    if kind == 'normal':
+        return MagicMock(return_value=CSTypes.DeckCalibration(
+                attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2,
+                source=CSTypes.SourceType.user,
+                status=CSTypes.CalibrationStatus(markedBad=False)
+        ))
+    else:
+        return MagicMock(return_value=None)
+
+def test_load_labware(mock_hw):
+    # load a labware with calibrations
+    with patch.object(
+            get,
+            'get_robot_deck_attitude',
+            new=build_mock_deck_calibration()),\
+            patch.object(
+                get,
+                'load_tip_length_calibration',
+                new=build_mock_stored_tip_length()),\
+            patch.object(
+                get, 'get_pipette_offset',
+                new=build_mock_stored_pipette_offset()):
+        uf = CheckCalibrationUserFlow(
+            hardware=mock_hw, has_calibration_block=True)
+        assert uf.active_tiprack._implementation.get_display_name() ==\
+            'Opentrons 96 Filter Tip Rack 200 µL on 8'
+        assert len(uf.get_required_labware()) == 2
+    
+
+def test_no_calibration(mock_hw):
+    with pytest.raises(RobotServerError) as e:
+        uf = CheckCalibrationUserFlow(hardware=mock_hw)
 
 
 @pytest.fixture
 def mock_user_flow(mock_hw):
-    m = CheckCalibrationUserFlow(hardware=mock_hw)
-    initial_pt = Point(1, 1, 5)
-    final_pt = Point(1, 1, 5)
-    m._get_reference_points_by_state =\
-        MagicMock(return_value=(initial_pt, final_pt))
-    yield m
+    with patch.object(
+        get,
+        'get_robot_deck_attitude',
+        new=build_mock_deck_calibration()),\
+        patch.object(
+            get,
+            'load_tip_length_calibration',
+            new=build_mock_stored_tip_length()),\
+        patch.object(
+            get, 'get_pipette_offset',
+            new=build_mock_stored_pipette_offset()):
+        m = CheckCalibrationUserFlow(hardware=mock_hw)
+        initial_pt = Point(1, 1, 5)
+        final_pt = Point(1, 1, 5)
+        m._get_reference_points_by_state =\
+            MagicMock(return_value=(initial_pt, final_pt))
+        yield m
 
 
 async def test_move_to_tip_rack(mock_user_flow):

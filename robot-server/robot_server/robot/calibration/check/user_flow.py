@@ -15,7 +15,7 @@ from opentrons.protocols.geometry.deck import Deck
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER, JOG_TO_DECK_SLOT,
-    TIP_RACK_LOOKUP_BY_MAX_VOL, CAL_BLOCK_SETUP_BY_MOUNT)
+    CAL_BLOCK_SETUP_BY_MOUNT)
 import robot_server.robot.calibration.util as uf
 from robot_server.robot.calibration.helper_classes import (
     RobotHealthCheck, PipetteRank, PipetteInfo,
@@ -80,14 +80,16 @@ class CheckCalibrationUserFlow:
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
         self._deck = Deck(load_name=deck_load_name)
-
         self._tip_racks: Optional[List['LabwareDefinition']] = tip_rack_defs
         self._active_pipette, self._pip_info = self._select_starting_pipette()
+        
+        self._has_calibration_block = has_calibration_block
+
         self._tip_origin_pt: Optional[Point] = None
         self._z_height_reference: Optional[float] = None
 
         self._active_tiprack = self._load_active_tiprack()
-        self._has_calibration_block = has_calibration_block
+        self._load_cal_block()
 
         self._command_map: COMMAND_MAP = {
             CalibrationCommand.load_labware: self.transition,
@@ -96,16 +98,15 @@ class CheckCalibrationUserFlow:
             CalibrationCommand.invalidate_tip: self.invalidate_tip,
             CheckCalibrationCommand.compare_point: self.update_comparison_map,
             CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,
-            CalibrationCommand.move_to_reference_point:
-                self.move_to_reference_point,
+            CalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
             CalibrationCommand.move_to_deck: self.move_to_deck,
             CalibrationCommand.move_to_point_one: self.move_to_point_one,
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
-            DeckCalibrationCommand.move_to_point_three:
-                self.move_to_point_three,
+            DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
             CheckCalibrationCommand.switch_pipette: self.change_active_pipette,
             CheckCalibrationCommand.return_tip: self.return_tip,
             CheckCalibrationCommand.transition: self.transition,
+            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
         }
 
@@ -225,6 +226,7 @@ class CheckCalibrationUserFlow:
                 flow='Calibration Health Check')
         pips = {m: p for m, p in self._hardware._attached_instruments.items()
                 if p}
+        self._check_valid_calibrations(pips)
         if len(pips) == 1:
             for mount, pip in pips.items():
                 pip_calibration = \
@@ -266,6 +268,41 @@ class CheckCalibrationUserFlow:
             l_info.rank = PipetteRank.second
             return r_info, [r_info, l_info]
 
+    def _get_tip_length_from_pipette(
+            self, mount, pipette) -> Optional[float]:
+        print(f"HERE IS PIP ID {pipette.pipette_id}")
+        pip_offset = get.get_pipette_offset(
+            pipette.pipette_id, mount)
+        print(f"HERE IS PIP OFFSET {pip_offset}")
+        if not pip_offset or not pip_offset.uri:
+            return None
+        details = helpers.details_from_uri(pip_offset.uri)
+        position = self._deck.position_for(TIPRACK_SLOT)
+        tiprack = labware.load(load_name=details.load_name,
+                               namespace=details.namespace,
+                               version=details.version,
+                               parent=position)
+        return get.load_tip_length_calibration(
+            pipette.pipette_id,
+            tiprack._implementation.get_definition(),
+            '')['tipLength']
+
+    def _check_valid_calibrations(self, pipettes: Dict):
+        deck = get.get_robot_deck_attitude()
+        tip_length = all(
+            self._get_tip_length_from_pipette(mount, pip)
+            for mount, pip in pipettes.items())
+        pipette = all(
+            get.get_pipette_offset(
+                pip.pipette_id, mount)
+            for mount, pip in pipettes.items())
+        # tip_length = True
+        # pipette = True
+        if not deck or not pipette or not tip_length:
+            raise RobotServerError(
+                definition=CalibrationError.UNCALIBRATED_ROBOT,
+                flow='Calibration Health Check')
+
     async def get_current_point(
             self,
             critical_point: CriticalPoint = None) -> Point:
@@ -298,11 +335,12 @@ class CheckCalibrationUserFlow:
     def _get_stored_pipette_offset_cal(
             self) -> Optional[PipetteOffsetByPipetteMount]:
         return get.get_pipette_offset(
-            self.hw_pipette.pipette_id, self.mount)  # type: ignore
+            self.hw_pipette.pipette_id,  # type: ignore
+            self.mount)
 
     @staticmethod
     def _get_tr_lw(tip_rack_def: Optional['LabwareDefinition'],
-                   existing_calibration: Optional[PipetteOffsetByPipetteMount],
+                   existing_calibration: PipetteOffsetByPipetteMount,
                    volume: float,
                    position: Location) -> labware.Labware:
         """ Find the right tiprack to use. Specifically,
@@ -312,8 +350,13 @@ class CheckCalibrationUserFlow:
         - If we don't, use the default
         """
         if tip_rack_def:
-            return labware.load_from_definition(
-                tip_rack_def, position)
+            uri = helpers.uri_from_definition(tip_rack_def)
+            if existing_calibration and uri == existing_calibration.uri:
+                return labware.load_from_definition(
+                    tip_rack_def, position)
+            else:
+                raise RobotServerError(
+                    definition=CalibrationError.BAD_LABWARE_DEF)
         if existing_calibration and existing_calibration.uri:
             try:
                 details \
@@ -324,8 +367,8 @@ class CheckCalibrationUserFlow:
                                     parent=position)
             except (IndexError, ValueError, FileNotFoundError):
                 pass
-        tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(volume)].load_name
-        return labware.load(tr_load_name, position)
+        raise RobotServerError(
+            definition=CalibrationError.BAD_LABWARE_DEF)
 
     def _load_active_tiprack(self) -> labware.Labware:
         """
@@ -666,6 +709,16 @@ class CheckCalibrationUserFlow:
 
     async def _move(self, to_loc: Location):
         await uf.move(self, to_loc)
+
+    async def invalidate_last_action(self):
+        await self.hardware.home()
+        await self.hardware.gantry_position(self.mount, refresh=True)
+        if self._current_state != State.comparingNozzle:
+            trash = self._deck.get_fixed_trash()
+            assert trash, 'Bad deck setup'
+            await uf.move(self, trash['A1'].top(), CriticalPoint.XY_CENTER)
+            await self.hardware.drop_tip(self.mount)
+        await self.move_to_tip_rack()
 
     async def exit_session(self):
         if self.hw_pipette.has_tip:

@@ -238,6 +238,8 @@ def save_pipette_calibration(
         tiprack_hash: str, tiprack_uri: str):
     pip_dir = config.get_opentrons_path(
         'pipette_calibration_dir') / mount.name.lower()
+    print("dir in save")
+    print(pip_dir)
     pip_dir.mkdir(parents=True, exist_ok=True)
     status: 'CalibrationStatusDict' =\
         helpers.convert_to_dict(  # type: ignore

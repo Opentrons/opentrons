@@ -161,10 +161,39 @@ def set_up_pipette_offset_temp_directory(server_temp_directory):
 @pytest.fixture(scope="function")
 def set_up_tip_length_temp_directory(server_temp_directory):
     pip_list = ['pip_1', 'pip_2']
-    tiprack_hash = 'fakehash'
     tip_length_list = [30.5, 31.5]
     for pip, tip_len in zip(pip_list, tip_length_list):
-        cal = {tiprack_hash: {
+        cal = {f'fakehash': {
+                'tipLength': tip_len,
+                'lastModified': datetime.now()}}
+        modify.save_tip_length_calibration(pip, cal)
+
+
+@pytest.fixture(scope="function")
+def set_up_deck_calibration_temp_directory(server_temp_directory):
+    transform = config.robot_configs.DEFAULT_DECK_CALIBRATION_V2
+    modify.save_robot_deck_attitude(transform, 'pip_1', 'fakehash')
+
+
+@pytest.fixture(scope="function")
+def pipette_offset_temp_directory(server_temp_directory):
+    pip_list = ['123', '321']
+    mount_list = [Mount.LEFT, Mount.RIGHT]
+    for pip, mount in zip(pip_list, mount_list):
+        modify.save_pipette_calibration(
+            offset=Point(0, 0, 0),
+            pip_id=pip,
+            mount=mount,
+            tiprack_hash=f'hash_{pip}',
+            tiprack_uri='opentrons/opentrons_96_filtertiprack_200ul/1')
+
+
+@pytest.fixture(scope="function")
+def tip_length_temp_directory(server_temp_directory):
+    pip_list = ['321', '123']
+    tip_length_list = [30.5, 31.5]
+    for pip, tip_len in zip(pip_list, tip_length_list):
+        cal = {f'hash_{pip}': {
                 'tipLength': tip_len,
                 'lastModified': datetime.now()}}
         modify.save_tip_length_calibration(pip, cal)

@@ -5,6 +5,9 @@ strict:
 marks:
   - usefixtures:
       - run_server
+      - set_up_pipette_offset_temp_directory
+      - set_up_tip_length_temp_directory
+      - set_up_deck_calibration_temp_directory
 stages:
   - name: Create the session
     request:
@@ -575,6 +578,9 @@ strict:
 marks:
   - usefixtures:
       - run_server
+      - pipette_offset_temp_directory
+      - tip_length_temp_directory
+      - set_up_deck_calibration_temp_directory
 stages:
   - name: Create the session
     request:

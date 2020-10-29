@@ -80,7 +80,7 @@ class SessionCreateParams(BaseModel):
         False,
         description='Whether to use a calibration block in the'
                     'calibration health check flow.')
-    tipRacks: Optional[List[dict]] = Field(
+    tipRacks: List[dict] = Field(
         None,
         description='A list of labware definitions to use in'
                     'calibration health check')
