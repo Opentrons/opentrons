@@ -192,9 +192,7 @@ export function CalibrateTipLengthControl({
             titleBar={{
               title: TIP_LENGTH_CALIBRATION,
               back: {
-                onClick: () => {
-                  createRequestId.current = null
-                },
+                disabled: true,
                 title: EXIT,
                 children: EXIT,
               },

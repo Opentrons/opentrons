@@ -164,9 +164,7 @@ export function useCalibratePipetteOffset(
                   ? PIPETTE_OFFSET_TITLE
                   : TIP_LENGTH_TITLE,
               back: {
-                onClick: () => {
-                  createRequestId.current = null
-                },
+                disabled: true,
                 title: EXIT,
                 children: EXIT,
               },
