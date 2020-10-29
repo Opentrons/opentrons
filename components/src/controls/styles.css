@@ -17,6 +17,7 @@
 .labeled_control_wrapper {
   width: 100%;
   padding: 1rem;
+  display: block;
 
   &:not(:last-child) {
     border-bottom: 1px solid var(--c-light-gray);
@@ -25,6 +26,19 @@
 
 .labeled_control {
   display: block;
+}
+
+.stacked_labeled_control {
+  display: block;
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+}
+
+.stacked_labeled_control_label {
+  @apply --font-body-1-dark;
+
+  display: inline-block;
+  font-weight: var(--fw-semibold);
 }
 
 .labeled_control_label {
@@ -59,6 +73,16 @@
 
 .labeled_checkbox {
   float: right;
+}
+
+.stacked_control_info {
+  @apply --font-body-1-dark;
+
+  & > p {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
 }
 
 .control_info {
