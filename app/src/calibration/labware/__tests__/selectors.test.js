@@ -80,8 +80,7 @@ describe('labware calibration selectors', () => {
             type: wellPlate96Def.parameters.loadName,
             definition: wellPlate96Def,
             slot: '3',
-            definitionHash:
-              Fixtures.mockLabwareCalibration1.definitionHash,
+            definitionHash: Fixtures.mockLabwareCalibration1.definitionHash,
           }: $Shape<ProtocolLabware>),
           ({
             type: 'some_v1_labware',
@@ -186,17 +185,17 @@ describe('labware calibration selectors', () => {
 
       const calOnModule = {
         ...lwCalibration,
-          parent: 'magneticModuleV1',
-          loadName: wellPlate96Def.parameters.loadName,
-          namespace: wellPlate96Def.namespace,
-          version: wellPlate96Def.version,
-          calibrationData: {
-            ...calibrationData,
-            offset: {
-              ...calibrationData.offset,
-              value: [1.23, 4.56, 7.89],
-            },
+        parent: 'magneticModuleV1',
+        loadName: wellPlate96Def.parameters.loadName,
+        namespace: wellPlate96Def.namespace,
+        version: wellPlate96Def.version,
+        calibrationData: {
+          ...calibrationData,
+          offset: {
+            ...calibrationData.offset,
+            value: [1.23, 4.56, 7.89],
           },
+        },
       }
 
       state = ({
@@ -242,7 +241,7 @@ describe('labware calibration selectors', () => {
       const { calibrationData } = lwCalibration
 
       const calNotOnModule = {
-      ...lwCalibration,
+        ...lwCalibration,
         parent: '',
         loadName: wellPlate96Def.parameters.loadName,
         namespace: wellPlate96Def.namespace,
@@ -346,7 +345,8 @@ describe('labware calibration selectors', () => {
       }: $Shape<State>)
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
-        { // No calibrationData
+        {
+          // No calibrationData
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
           slot: '3',
@@ -357,9 +357,10 @@ describe('labware calibration selectors', () => {
           definitionHash: lwCalibration.definitionHash,
           calibrationData: null,
         },
-        { // This calibrationData is grabbed unintentionally as a side-effect
+        {
+          // This calibrationData is grabbed unintentionally as a side-effect
           // of the Selector logic. Both labware & calibration have hashes missing
-          // hence the matchesLabwareIdentityForCalibration logic gets satisfied 
+          // hence the matchesLabwareIdentityForCalibration logic gets satisfied
           // and we get a calibrationData in the definition. This case should never arise
           // in reality
           type: 'some_v1_labware',
@@ -389,8 +390,7 @@ describe('labware calibration selectors', () => {
             type: wellPlate96Def.parameters.loadName,
             definition: wellPlate96Def,
             slot: '3',
-            definitionHash:
-              Fixtures.mockLabwareCalibration1.definitionHash,
+            definitionHash: Fixtures.mockLabwareCalibration1.definitionHash,
           }: $Shape<ProtocolLabware>),
           ({
             type: 'some_v1_labware',

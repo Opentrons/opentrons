@@ -44,8 +44,6 @@ export const matchesLabwareIdentityForCalibration = (
 export function formatCalibrationData(
   model: LabwareCalibration
 ): LabwareCalibrationData {
-  const calVector = model.calibrationData.offset.value.map(n =>
-    round(n, 1)
-  )
+  const calVector = model.calibrationData.offset.value.map(n => round(n, 1))
   return { x: calVector[0], y: calVector[1], z: calVector[2] }
 }

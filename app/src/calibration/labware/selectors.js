@@ -46,7 +46,7 @@ export const getProtocolLabwareList: (
         calibrationData: null,
       }
       const calData = calibrations
-        .filter((calibration) =>
+        .filter(calibration =>
           matchesLabwareIdentityForCalibration(calibration, baseLabware)
         )
         .map(formatCalibrationData)

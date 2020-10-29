@@ -88,7 +88,6 @@ describe('PipetteOffsetItem', () => {
               source: 'unknown',
               markedAt: '',
             },
-            id: 'fake_id',
           },
         },
         customLabware = [],
@@ -180,7 +179,6 @@ describe('PipetteOffsetItem', () => {
             source: 'unknown',
             markedAt: '',
           },
-          id: 'fake_id',
         },
       },
     })
@@ -223,7 +221,6 @@ describe('PipetteOffsetItem', () => {
             source: 'unknown',
             markedAt: '',
           },
-          id: 'fake_id',
         },
       },
     })
