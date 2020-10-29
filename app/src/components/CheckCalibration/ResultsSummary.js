@@ -6,9 +6,7 @@ import {
   Icon,
   Box,
   Flex,
-  Link,
   PrimaryButton,
-  OutlineButton,
   Text,
   SPACING_2,
   SPACING_3,
@@ -16,7 +14,6 @@ import {
   C_BLUE,
   FONT_HEADER_DARK,
   FONT_SIZE_BODY_2,
-  FONT_WEIGHT_BOLD,
   FONT_WEIGHT_LIGHT,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
@@ -24,22 +21,20 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   SPACING_5,
   SPACING_4,
-  DIRECTION_ROW,
   DIRECTION_COLUMN,
-  SPACING_6,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import find from 'lodash/find'
 import * as Sessions from '../../sessions'
-import { LEFT, RIGHT } from '../../pipettes'
+import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../pipettes'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
 import { saveAs } from 'file-saver'
 import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
-import type { CalibrationHealthCheckInstrument } from '../../sessions/types'
+import type { CalibrationHealthCheckInstrument, CalibrationHealthCheckComparisonsPerCalibration } from '../../sessions/types'
 
 const GOOD_CALIBRATION = 'Good calibration'
 const BAD_CALIBRATION = 'Bad calibration'
@@ -76,49 +71,67 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
     (p: CalibrationHealthCheckInstrument) => p.mount.toLowerCase() === RIGHT
   )
 
+  const calibrationsByMount = {
+    left: {
+      headerText: `${LEFT} ${PIPETTE}`,
+      pipette: leftPipette,
+      calibration: comparisonsByPipette[leftPipette.rank],
+    },
+    right: {
+      headerText: `${RIGHT} ${PIPETTE}`,
+      pipette: rightPipette,
+      calibration: comparisonsByPipette[rightPipette.rank],
+    },
+  }
+
+  const deckCalibrationResult = comparisonsByPipette.first.deck.status
+
   return (
     <>
       <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Text
           css={FONT_HEADER_DARK}
-          marginBottom={SPACING_4}
+          marginTop={SPACING_2}
+          marginBottom={SPACING_5}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
         >
           {ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}
         </Text>
         <NeedHelpLink maxHeight="1rem" />
       </Flex>
-      <Box marginX="5%">
+      <Box paddingX="5%">
         <Flex marginBottom={SPACING_4}>
-          <Text>{DECK_CALIBRATION_HEADER}</Text>
+          <Box>
+            <Text marginBottom={SPACING_2}>{DECK_CALIBRATION_HEADER}</Text>
+            <RenderResult status={deckCalibrationResult} />
+          </Box>
         </Flex>
-        <Flex marginBottom={SPACING_5}>
-          {leftPipette && (
-            <Box width="50%">
-              <Text
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
-                marginBottom={SPACING_3}
-              >{`${LEFT} ${PIPETTE}`}</Text>
-              <PipetteResult pipette={leftPipette} />
-            </Box>
-          )}
-          {rightPipette && (
-            <Box>
-              <Text
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
-                marginBottom={SPACING_3}
-              >{`${RIGHT} ${PIPETTE}`}</Text>
-              <PipetteResult pipette={rightPipette} />
-            </Box>
-          )}
+        <Flex marginBottom={SPACING_5} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          {PIPETTE_MOUNTS.map(m => {
+            return (
+              <Box key={m} width="48%">
+                <Text
+                  textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                  marginBottom={SPACING_3}
+                >
+                  {calibrationsByMount[m].headerText}
+                </Text>
+                <PipetteResult
+                  pipetteInfo={calibrationsByMount[m].pipette}
+                  pipetteCalibration={calibrationsByMount[m].calibration}
+                />
+              </Box>
+            )
+          })}
         </Flex>
       </Box>
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        marginBottom={SPACING_6}
+        marginBottom={SPACING_5}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={FONT_WEIGHT_LIGHT}
+        fontSize={FONT_SIZE_BODY_2}
       >
         <Text>{LOOKING_FOR_DATA}</Text>
         <Text
@@ -132,43 +145,71 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
           {DOWNLOAD_SUMMARY}
         </Text>
       </Flex>
-      <PrimaryButton
-        className={styles.summary_exit_button}
-        onClick={cleanUpAndExit}
-      >
-        {HOME_AND_EXIT}
-      </PrimaryButton>
+      <Flex margin={SPACING_4}>
+        <PrimaryButton
+          className={styles.summary_exit_button}
+          onClick={cleanUpAndExit}
+        >
+          {HOME_AND_EXIT}
+        </PrimaryButton>
+      </Flex>
     </>
   )
 }
 
+type RenderResultProps = {|
+  status: string,
+|}
+
+function RenderResult(props: RenderResultProps): React.Node {
+  const isGoodCal = props.status === 'IN_THRESHOLD'
+  return (
+    <Flex>
+      <Icon
+        name={isGoodCal ? 'check-circle' : 'alert-circle'}
+        className={cx(styles.summary_icon, {
+          [styles.success_status_icon]: isGoodCal,
+          [styles.error_status_icon]: !isGoodCal,
+        })}
+      />
+      <Text fontSize={FONT_SIZE_BODY_2}>
+        {isGoodCal ? GOOD_CALIBRATION : BAD_CALIBRATION}
+      </Text>
+    </Flex>
+  )
+}
+
 type PipetteResultProps = {|
-  pipette: CalibrationHealthCheckInstrument,
+  pipetteInfo: CalibrationHealthCheckInstrument,
+  pipetteCalibration: CalibrationHealthCheckComparisonsPerCalibration,
 |}
 
 function PipetteResult(props: PipetteResultProps): React.Node {
-  const { pipette } = props
+  const { pipetteInfo, pipetteCalibration } = props
 
-  const { displayName } = getPipetteModelSpecs(pipette.model) || {}
-  const markedBad = false
+  const { displayName } = getPipetteModelSpecs(pipetteInfo.model) || {}
+  const tipRackdisplayName = pipetteInfo.tipRack
   return (
     <>
-      <Box marginBottom={SPACING_3}>
-        <Text fontWeight={FONT_WEIGHT_SEMIBOLD} marginBottom={SPACING_2}>
+      <Box marginBottom={SPACING_4}>
+        <Text
+          fontSize={FONT_SIZE_BODY_2}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          marginBottom={SPACING_2}
+        >
           {displayName}
         </Text>
-        <Flex>
-          <Icon
-            name={markedBad ? 'alert-circle' : 'check-circle'}
-            className={cx(styles.summary_icon, {
-              [styles.success_status_icon]: !markedBad,
-              [styles.error_status_icon]: markedBad,
-            })}
-          />
-          <Text fontSize={FONT_SIZE_BODY_2}>
-            {markedBad ? BAD_CALIBRATION : GOOD_CALIBRATION}
-          </Text>
-        </Flex>
+        <RenderResult status={pipetteCalibration.pipetteOffset.status} />
+      </Box>
+      <Box>
+        <Text
+          fontSize={FONT_SIZE_BODY_2}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          marginBottom={SPACING_2}
+        >
+          {tipRackdisplayName}
+        </Text>
+        <RenderResult status={pipetteCalibration.tipLength.status} />
       </Box>
     </>
   )
