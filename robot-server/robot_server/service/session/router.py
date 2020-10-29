@@ -54,11 +54,11 @@ async def create_session_handler(
     """Create a session"""
     session_type = create_request.data.attributes.sessionType
     create_params = create_request.data.attributes.createParams
-
+    log.info("session handler: session create begins")
     new_session = await session_manager.add(
         session_type=session_type,
         session_meta_data=SessionMetaData(create_params=create_params))
-
+    log.info("session handler: session create ends")
     return SessionResponse(
         data=ResponseDataModel.create(
             attributes=new_session.get_response_model(),
@@ -98,7 +98,7 @@ async def get_session_handler(
     session_obj = get_session(manager=session_manager,
                               session_id=sessionId,
                               api_router=router)
-
+    log.info("get session handler runs")
     return SessionResponse(
         data=ResponseDataModel.create(
             attributes=session_obj.get_response_model(),
@@ -137,6 +137,7 @@ async def session_command_execute_handler(
     """
     Execute a session command
     """
+    log.info("session command execute begins")
     session_obj = get_session(manager=session_manager,
                               session_id=sessionId,
                               api_router=router)
@@ -144,11 +145,12 @@ async def session_command_execute_handler(
         raise CommandExecutionException(
             reason=f"Session '{sessionId}' is not active. "
                    "Only the active session can execute commands")
-
+    log.info("session command execute got session")
     command = create_command(command_request.data.attributes.command,
                              command_request.data.attributes.data)
+    log.info("session command execute created command")
     command_result = await session_obj.command_executor.execute(command)
-
+    log.info("session command execute command executed")
     log.debug(f"Command result: {command_result}")
 
     return CommandResponse(

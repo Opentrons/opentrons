@@ -49,6 +49,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
     @classmethod
     async def create(cls, configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> 'BaseSession':
+        log.info("POC session create begins")
         assert isinstance(instance_meta.create_params, SessionCreateParams)
         mount = instance_meta.create_params.mount
         recalibrate_tip_length\
@@ -61,6 +62,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
         await configuration.hardware.cache_instruments()
+        log.info("POC session create cached instruments")
         try:
             pip_offset_cal_user_flow = PipetteOffsetCalibrationUserFlow(
                     hardware=configuration.hardware,
@@ -70,13 +72,13 @@ class PipetteOffsetCalibrationSession(BaseSession):
                     tip_rack_def=cast('LabwareDefinition', tip_rack_def))
         except AssertionError as e:
             raise SessionCreationException(str(e))
-
+        log.info("POC session user flow created")
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
             shutdown_handler = configuration.hardware.set_lights(rails=False)
         else:
             shutdown_handler = None
-
+        log.info("POC session creator ends")
         return cls(configuration=configuration,
                    instance_meta=instance_meta,
                    pip_offset_cal_user_flow=pip_offset_cal_user_flow,

@@ -117,6 +117,7 @@ export function CalibrateTipLength(
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
     if (session?.id && !isJogging) {
+      console.log('sending command')
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,

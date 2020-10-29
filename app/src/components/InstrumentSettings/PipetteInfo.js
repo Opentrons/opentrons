@@ -124,12 +124,14 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   ] = useCalibratePipetteOffset(robotName, { mount })
 
   const startPipetteOffsetCalibrationOnly = useCalBlock => {
+    console.log("starting pipette offset calibration only")
     startPipetteOffsetCalibration({
       overrideParams: { hasCalibrationBlock: useCalBlock === true },
       withIntent: INTENT_PIPETTE_OFFSET,
     })
   }
   const startTipLengthAndPipetteOffsetCalibration = useCalBlock => {
+    console.log("starting tip length and pipette offset")
     startPipetteOffsetCalibration({
       overrideParams: {
         shouldRecalibrateTipLength: true,
@@ -149,6 +151,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   )
 
   const startPipetteOffsetCalibrationDirectly = () => {
+    console.log("starting pipette offset directly")
     startPipetteOffsetCalibration({ withIntent: INTENT_PIPETTE_OFFSET })
   }
 

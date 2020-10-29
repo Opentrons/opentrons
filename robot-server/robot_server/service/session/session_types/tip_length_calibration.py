@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING, cast, Awaitable
 from opentrons.types import Mount
 from robot_server.robot.calibration.tip_length.user_flow import \
@@ -19,6 +20,9 @@ from ..errors import UnsupportedFeature
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware import LabwareDefinition
+
+
+log = logging.getLogger(__name__)
 
 
 class TipLengthCalibrationCommandExecutor(CallableExecutor):
@@ -47,6 +51,7 @@ class TipLengthCalibration(BaseSession):
     async def create(cls, configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> 'BaseSession':
         assert isinstance(instance_meta.create_params, SessionCreateParams)
+        log.info('TLC create begins')
         has_calibration_block = instance_meta.create_params.hasCalibrationBlock
         mount = instance_meta.create_params.mount
         tip_rack_def = instance_meta.create_params.tipRackDefinition
@@ -56,6 +61,7 @@ class TipLengthCalibration(BaseSession):
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
         await configuration.hardware.cache_instruments()
+        log.info('TLC create cached instruments')
         try:
             tip_cal_user_flow = TipCalibrationUserFlow(
                     hardware=configuration.hardware,
@@ -64,13 +70,13 @@ class TipLengthCalibration(BaseSession):
                     tip_rack=cast('LabwareDefinition', tip_rack_def))
         except AssertionError as e:
             raise SessionCreationException(str(e))
-
+        log.info('TLC create made session')
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
             shutdown_handler = configuration.hardware.set_lights(rails=False)
         else:
             shutdown_handler = None
-
+        log.info('TLC create ends')
         return cls(configuration=configuration,
                    instance_meta=instance_meta,
                    tip_cal_user_flow=tip_cal_user_flow,

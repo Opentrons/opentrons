@@ -1,3 +1,4 @@
+import logging
 from typing import Awaitable
 
 from robot_server.robot.calibration.deck.user_flow import \
@@ -13,6 +14,9 @@ from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
 from ..models.session import SessionType, DeckCalibrationResponseAttributes
 from ..errors import UnsupportedFeature
+
+
+log = logging.getLogger(__name__)
 
 
 class DeckCalibrationCommandExecutor(CallableExecutor):
@@ -44,21 +48,23 @@ class DeckCalibrationSession(BaseSession):
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
+        log.info("DC session create begins")
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
         await configuration.hardware.cache_instruments()
+        log.info("DC session create cached instruments")
         try:
             deck_cal_user_flow = DeckCalibrationUserFlow(
                 hardware=configuration.hardware)
         except AssertionError as e:
             raise SessionCreationException(str(e))
-
+        log.info("DC session create made user flow")
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
             shutdown_handler = configuration.hardware.set_lights(rails=False)
         else:
             shutdown_handler = None
-
+        log.info("DC session create ends")
         return cls(configuration=configuration,
                    instance_meta=instance_meta,
                    deck_cal_user_flow=deck_cal_user_flow,
