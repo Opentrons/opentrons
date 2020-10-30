@@ -1,9 +1,11 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 from opentrons.types import Point
 
-from .models import ComparisonStatus
+from .models import (
+    TipComparisonMap, PipetteOffsetComparisonMap,
+    DeckComparisonMap)
 
 WILDCARD = '*'
 
@@ -24,22 +26,26 @@ class ReferencePoints:
 
 
 @dataclass
-class ComparisonMap:
-    comparingHeight: Optional[ComparisonStatus] = None
-    comparingPointOne: Optional[ComparisonStatus] = None
-    comparingPointTwo: Optional[ComparisonStatus] = None
-    comparingPointThree: Optional[ComparisonStatus] = None
+class ComparisonStatePerCalibration:
+    tipLength: Optional[TipComparisonMap] = None
+    pipetteOffset: Optional[PipetteOffsetComparisonMap] = None
+    deck: Optional[DeckComparisonMap] = None
 
-    def set_value(self, name: str, value: ComparisonStatus):
+    def set_value(
+            self, name: str,
+            value: Union[TipComparisonMap, PipetteOffsetComparisonMap,
+                         DeckComparisonMap]):
         setattr(self, name, value)
 
 
 @dataclass
 class ComparisonStatePerPipette:
-    first: ComparisonMap
-    second: ComparisonMap
+    first: ComparisonStatePerCalibration
+    second: ComparisonStatePerCalibration
 
-    def set_value(self, name: str, value: ComparisonMap):
+    def set_value(
+            self, name: str,
+            value: ComparisonStatePerCalibration):
         setattr(self, name, value)
 
 

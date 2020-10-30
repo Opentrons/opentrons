@@ -1,10 +1,10 @@
 from typing import List, Tuple
-from unittest.mock import call, MagicMock
+from unittest.mock import call, MagicMock, patch
 
 import pytest
 from opentrons.hardware_control import pipette
 from opentrons.types import Mount, Point
-from opentrons.calibration_storage import types as cal_types
+from opentrons.calibration_storage import get, types as CSTypes
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 
@@ -12,17 +12,18 @@ from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
 from robot_server.robot.calibration.check.constants import\
     CalibrationCheckState
-from robot_server.robot.calibration.check.models import\
-    ComparisonStatus
+from robot_server.robot.calibration.check.models import (
+    ComparisonStatus, PipetteOffsetComparisonMap,
+    DeckComparisonMap, TipComparisonMap)
 from robot_server.service.errors import RobotServerError
 from robot_server.robot.calibration.constants import (
     POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID)
 
 
-PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(
+PIP_OFFSET = CSTypes.PipetteOffsetByPipetteMount(
         offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
-        source=cal_types.SourceType.user,
-        status=cal_types.CalibrationStatus())
+        source=CSTypes.SourceType.user,
+        status=CSTypes.CalibrationStatus())
 
 
 @pytest.fixture
@@ -84,10 +85,21 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
                                PIP_OFFSET,
                                'testId2')
     hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
-
-    uf = CheckCalibrationUserFlow(hardware=hardware)
-    assert uf.hw_pipette == \
-        hardware._attached_instruments[target_mount]
+    # load a labware with calibrations
+    with patch.object(
+            get,
+            'get_robot_deck_attitude',
+            new=build_mock_deck_calibration()),\
+            patch.object(
+                get,
+                'load_tip_length_calibration',
+                new=build_mock_stored_tip_length()),\
+            patch.object(
+                get, 'get_pipette_offset',
+                new=build_mock_stored_pipette_offset()):
+        uf = CheckCalibrationUserFlow(hardware=hardware)
+        assert uf.hw_pipette == \
+            hardware._attached_instruments[target_mount]
 
 
 @pytest.mark.parametrize('pipettes,target_mount', pipette_combos)
@@ -104,24 +116,128 @@ async def test_switching_to_second_pipette(pipettes, target_mount, hardware):
                                PIP_OFFSET,
                                'testId2')
     hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
-    uf = CheckCalibrationUserFlow(hardware=hardware)
-    if pip and pip2:
-        assert uf.mount == target_mount
-        await uf.change_active_pipette()
-        assert uf.mount != target_mount
-    else:
-        with pytest.raises(RobotServerError):
+    # load a labware with calibrations
+    with patch.object(
+            get,
+            'get_robot_deck_attitude',
+            new=build_mock_deck_calibration()),\
+            patch.object(
+                get,
+                'load_tip_length_calibration',
+                new=build_mock_stored_tip_length()),\
+            patch.object(
+                get, 'get_pipette_offset',
+                new=build_mock_stored_pipette_offset()):
+        uf = CheckCalibrationUserFlow(hardware=hardware)
+        if pip and pip2:
+            assert uf.mount == target_mount
             await uf.change_active_pipette()
+            assert uf.mount != target_mount
+        else:
+            with pytest.raises(RobotServerError):
+                await uf.change_active_pipette()
+
+
+def build_mock_stored_pipette_offset(kind='normal'):
+    if kind == 'normal':
+        return MagicMock(
+            return_value=CSTypes.PipetteOffsetByPipetteMount(
+                offset=[0, 1, 2],
+                tiprack='tiprack-id',
+                uri='opentrons/opentrons_96_filtertiprack_200ul/1',
+                source=CSTypes.SourceType.user,
+                status=CSTypes.CalibrationStatus(markedBad=False)))
+    else:
+        return MagicMock(return_value=None)
+
+
+def build_mock_stored_tip_length(kind='normal'):
+    if kind == 'normal':
+        return MagicMock(return_value={'tipLength': 30})
+    else:
+        return MagicMock(return_value=None)
+
+
+def build_mock_deck_calibration(kind='normal'):
+    if kind == 'normal':
+        attitude = [
+            [1.0008, 0.0052, 0.0],
+            [-0.1, 0.9, 0.0],
+            [0.0, 0.0, 1.0]]
+        return MagicMock(return_value=CSTypes.DeckCalibration(
+                attitude=attitude,
+                source=CSTypes.SourceType.user,
+                last_modified='date',
+                status=CSTypes.CalibrationStatus(markedBad=False)
+        ))
+    elif kind == 'identity':
+        return MagicMock(return_value=CSTypes.DeckCalibration(
+                attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2,
+                source=CSTypes.SourceType.user,
+                status=CSTypes.CalibrationStatus(markedBad=False)
+        ))
+    else:
+        return MagicMock(return_value=None)
+
+
+def test_load_labware(mock_hw):
+    # load a labware with calibrations
+    with patch.object(
+            get,
+            'get_robot_deck_attitude',
+            new=build_mock_deck_calibration()),\
+            patch.object(
+                get,
+                'load_tip_length_calibration',
+                new=build_mock_stored_tip_length()),\
+            patch.object(
+                get, 'get_pipette_offset',
+                new=build_mock_stored_pipette_offset()):
+        uf = CheckCalibrationUserFlow(
+            hardware=mock_hw, has_calibration_block=True)
+        assert uf.active_tiprack._implementation.get_display_name() ==\
+            'Opentrons 96 Filter Tip Rack 200 µL on 8'
+        assert len(uf.get_required_labware()) == 2
+
+
+def test_bad_calibration(mock_hw):
+    with pytest.raises(RobotServerError):
+        CheckCalibrationUserFlow(hardware=mock_hw)
+
+    with pytest.raises(RobotServerError):
+        with patch.object(
+            get,
+            'get_robot_deck_attitude',
+            new=build_mock_deck_calibration('identity')),\
+            patch.object(
+                get,
+                'load_tip_length_calibration',
+                new=build_mock_stored_tip_length()),\
+            patch.object(
+                get, 'get_pipette_offset',
+                new=build_mock_stored_pipette_offset()):
+            CheckCalibrationUserFlow(hardware=mock_hw)
 
 
 @pytest.fixture
 def mock_user_flow(mock_hw):
-    m = CheckCalibrationUserFlow(hardware=mock_hw)
-    initial_pt = Point(1, 1, 5)
-    final_pt = Point(1, 1, 0)
-    m._get_reference_points_by_state =\
-        MagicMock(return_value=(initial_pt, final_pt))
-    yield m
+    with patch.object(
+        get,
+        'get_robot_deck_attitude',
+        new=build_mock_deck_calibration()),\
+        patch.object(
+            get,
+            'load_tip_length_calibration',
+            new=build_mock_stored_tip_length()),\
+        patch.object(
+            get, 'get_pipette_offset',
+            new=build_mock_stored_pipette_offset()):
+        m = CheckCalibrationUserFlow(hardware=mock_hw)
+        initial_pt = Point(1, 1, 5)
+        final_pt = Point(1, 1, 5)
+        m._get_reference_points_by_state =\
+            MagicMock(return_value=(initial_pt, final_pt))
+        yield m
 
 
 async def test_move_to_tip_rack(mock_user_flow):
@@ -187,9 +303,9 @@ async def test_get_move_to_cal_point_location(mock_user_flow,
 
 async def test_compare_z_height(mock_user_flow):
     uf = mock_user_flow
-    uf._current_state = CalibrationCheckState.comparingHeight
+    uf._current_state = CalibrationCheckState.comparingTip
     await uf._hardware.move_to(
-            mount=uf._mount,
+            mount=uf.mount,
             abs_position=Point(x=10, y=10, z=10),
             critical_point=uf.hw_pipette.critical_point
         )
@@ -197,63 +313,93 @@ async def test_compare_z_height(mock_user_flow):
     # The initial and final mocked points have a 5 mm
     # difference and so it should exceed the threshold
     expected_status = ComparisonStatus(
-        differenceVector=(0.0, 0.0, -5.0),
-        thresholdVector=(0.0, 0.0, 0.8),
-        exceedsThreshold=True,
-        transformType='BAD_DECK_TRANSFORM')
-    assert uf.comparison_map.first.comparingHeight == expected_status
-    assert uf.comparison_map.second.comparingHeight is None
+        differenceVector=(0.0, 0.0, 0.0),
+        thresholdVector=(0.0, 0.0, 0.39),
+        exceedsThreshold=False)
+    expected_tip_length = TipComparisonMap(
+        status='IN_THRESHOLD', comparingTip=expected_status)
+    assert uf.comparison_map.first.tipLength == expected_tip_length
+    assert uf.comparison_map.second.tipLength is None
 
 
 async def test_compare_points(mock_user_flow):
     uf = mock_user_flow
+    uf._current_state = CalibrationCheckState.comparingHeight
+    await uf.update_comparison_map()
+
     uf._current_state = CalibrationCheckState.comparingPointOne
 
     expected_status = ComparisonStatus(
-        differenceVector=(0.0, 0.0, -5.0),
+        differenceVector=(0.0, 0.0, 0.0),
         thresholdVector=(1.8, 1.8, 0.0),
-        exceedsThreshold=False,
-        transformType='UNKNOWN')
+        exceedsThreshold=False)
+    height_status = ComparisonStatus(
+        differenceVector=(0.0, 0.0, 0.0),
+        thresholdVector=(0.0, 0.0, 0.8),
+        exceedsThreshold=False)
+    all_status = 'IN_THRESHOLD'
+    expected_pip = PipetteOffsetComparisonMap(
+        status=all_status,
+        comparingHeight=height_status,
+        comparingPointOne=expected_status)
+    expected_deck = DeckComparisonMap(
+        status=all_status,
+        comparingPointOne=expected_status)
     await uf._hardware.move_to(
-            mount=uf._mount,
+            mount=uf.mount,
             abs_position=Point(x=10, y=10, z=10),
             critical_point=uf.hw_pipette.critical_point
         )
     await uf.update_comparison_map()
 
-    assert uf.comparison_map.first.comparingPointOne == expected_status
-    assert uf.comparison_map.second.comparingPointOne is None
+    assert uf.comparison_map.first.pipetteOffset == expected_pip
+    assert uf.comparison_map.first.deck == expected_deck
+    assert uf.comparison_map.second.pipetteOffset is None
+    assert uf.comparison_map.second.deck is None
 
     uf._current_state = CalibrationCheckState.comparingPointTwo
     await uf._hardware.move_to(
-            mount=uf._mount,
+            mount=uf.mount,
             abs_position=Point(x=10, y=10, z=10),
             critical_point=uf.hw_pipette.critical_point
         )
     await uf.update_comparison_map()
-    assert uf.comparison_map.first.comparingPointTwo == expected_status
-    assert uf.comparison_map.second.comparingPointTwo is None
+    expected_deck.comparingPointTwo = expected_status
+    assert uf.comparison_map.first.pipetteOffset == expected_pip
+    assert uf.comparison_map.first.deck == expected_deck
+    assert uf.comparison_map.second.pipetteOffset is None
+    assert uf.comparison_map.second.deck is None
 
     uf._current_state = CalibrationCheckState.comparingPointThree
     await uf._hardware.move_to(
-        mount=uf._mount,
+        mount=uf.mount,
         abs_position=Point(x=10, y=10, z=10),
         critical_point=uf.hw_pipette.critical_point
     )
     await uf.update_comparison_map()
-
-    assert uf.comparison_map.first.comparingPointThree == expected_status
-    assert uf.comparison_map.second.comparingPointThree is None
+    expected_deck.comparingPointThree = expected_status
+    assert uf.comparison_map.first.pipetteOffset == expected_pip
+    assert uf.comparison_map.first.deck == expected_deck
+    assert uf.comparison_map.second.pipetteOffset is None
+    assert uf.comparison_map.second.deck is None
 
     await uf.change_active_pipette()
 
-    uf._current_state = CalibrationCheckState.comparingPointOne
-    await uf._hardware.move_to(
-        mount=uf._mount,
-        abs_position=Point(x=10, y=10, z=10),
-        critical_point=uf.hw_pipette.critical_point
-    )
+    uf._current_state = CalibrationCheckState.comparingHeight
     await uf.update_comparison_map()
 
-    assert uf.comparison_map.first.comparingPointOne == expected_status
-    assert uf.comparison_map.second.comparingPointOne == expected_status
+    uf._current_state = CalibrationCheckState.comparingPointOne
+    await uf.update_comparison_map()
+
+    new_pip = PipetteOffsetComparisonMap(
+        status=all_status,
+        comparingHeight=height_status,
+        comparingPointOne=expected_status)
+    new_deck = DeckComparisonMap(
+        status=all_status,
+        comparingPointOne=expected_status)
+
+    assert uf.comparison_map.first.pipetteOffset == expected_pip
+    assert uf.comparison_map.first.deck == expected_deck
+    assert uf.comparison_map.second.pipetteOffset == new_pip
+    assert uf.comparison_map.second.deck == new_deck

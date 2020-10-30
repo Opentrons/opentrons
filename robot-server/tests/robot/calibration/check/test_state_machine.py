@@ -10,11 +10,14 @@ from robot_server.robot.calibration.check.state_machine import \
 
 valid_commands: List[Tuple[str, str, str]] = [
     (CalCommand.load_labware, 'sessionStarted', 'labwareLoaded'),
-    (CalCommand.move_to_tip_rack, 'labwareLoaded', 'preparingPipette'),
-    (CalCommand.jog, 'preparingPipette', 'preparingPipette'),
+    (CalCommand.move_to_reference_point, 'labwareLoaded', 'comparingNozzle'),
+    (CalCommand.jog, 'comparingNozzle', 'comparingNozzle'),
+    (CalCommand.move_to_tip_rack, 'comparingNozzle', 'preparingPipette'),
     (CalCommand.pick_up_tip, 'preparingPipette', 'inspectingTip'),
     (CalCommand.invalidate_tip, 'inspectingTip', 'preparingPipette'),
-    (CalCommand.move_to_deck, 'inspectingTip', 'comparingHeight'),
+    (CalCommand.move_to_reference_point, 'inspectingTip', 'comparingTip'),
+    (CheckCommand.compare_point, 'comparingTip', 'comparingTip'),
+    (CalCommand.move_to_deck, 'comparingTip', 'comparingHeight'),
     (CalCommand.jog, 'comparingHeight', 'comparingHeight'),
     (CheckCommand.compare_point, 'comparingHeight', 'comparingHeight'),
     (CalCommand.move_to_point_one, 'comparingHeight', 'comparingPointOne'),

@@ -20,7 +20,7 @@ from robot_server.service.dependencies import get_hardware, verify_hardware
 from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock
 from opentrons import config
 
-from opentrons.calibration_storage import delete, modify
+from opentrons.calibration_storage import delete, modify, helpers
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
 from opentrons.protocols.geometry.deck import Deck
@@ -145,29 +145,43 @@ def set_up_index_file_temporary_directory(server_temp_directory):
         labware.save_calibration(lw, Point(0, 0, 0))
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def set_up_pipette_offset_temp_directory(server_temp_directory):
-    pip_list = ['pip_1', 'pip_2']
+    attached_pip_list = ['123', '321']
     mount_list = [Mount.LEFT, Mount.RIGHT]
-    for pip, mount in zip(pip_list, mount_list):
+    definition =\
+        labware.get_labware_definition('opentrons_96_filtertiprack_200ul')
+    def_hash = helpers.hash_labware_def(definition)
+    for pip, mount in zip(attached_pip_list, mount_list):
         modify.save_pipette_calibration(
             offset=Point(0, 0, 0),
             pip_id=pip,
             mount=mount,
-            tiprack_hash='hash',
-            tiprack_uri='uri')
+            tiprack_hash=def_hash,
+            tiprack_uri='opentrons/opentrons_96_filtertiprack_200ul/1')
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def set_up_tip_length_temp_directory(server_temp_directory):
-    pip_list = ['pip_1', 'pip_2']
-    tiprack_hash = 'fakehash'
+    attached_pip_list = ['123', '321']
     tip_length_list = [30.5, 31.5]
-    for pip, tip_len in zip(pip_list, tip_length_list):
-        cal = {tiprack_hash: {
+    definition =\
+        labware.get_labware_definition('opentrons_96_filtertiprack_200ul')
+    def_hash = helpers.hash_labware_def(definition)
+    for pip, tip_len in zip(attached_pip_list, tip_length_list):
+        cal = {def_hash: {
                 'tipLength': tip_len,
                 'lastModified': datetime.now()}}
         modify.save_tip_length_calibration(pip, cal)
+
+
+@pytest.fixture
+def set_up_deck_calibration_temp_directory(server_temp_directory):
+    attitude = [
+        [1.0008, 0.0052, 0.0],
+        [-0.0, 0.992, 0.0],
+        [0.0, 0.0, 1.0]]
+    modify.save_robot_deck_attitude(attitude, 'pip_1', 'fakehash')
 
 
 @pytest.fixture

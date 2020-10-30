@@ -1,4 +1,5 @@
 from typing import Optional, List, Tuple
+from typing_extensions import Literal
 from functools import partial
 from pydantic import BaseModel, Field
 
@@ -18,12 +19,14 @@ class ComparisonStatus(BaseModel):
     differenceVector: OffsetVector = OffsetVectorField()
     thresholdVector:  OffsetVector = OffsetVectorField()
     exceedsThreshold: bool
-    transformType: str
 
 
-class ComparisonMap(BaseModel):
-    comparingHeight: Optional[ComparisonStatus] =\
-        Field(None, description="height validation step")
+class DeckComparisonMap(BaseModel):
+    status: Literal['IN_THRESHOLD', 'OUTSIDE_THRESHOLD'] =\
+        Field(...,
+              description="The status of this calibration type,"
+                          "dependent on the calibration being"
+                          "inside or outside of the threshold")
     comparingPointOne: Optional[ComparisonStatus] =\
         Field(None, description="point 1 validation step")
     comparingPointTwo: Optional[ComparisonStatus] =\
@@ -32,13 +35,60 @@ class ComparisonMap(BaseModel):
         Field(None, description="point 3 validation step")
 
 
+class PipetteOffsetComparisonMap(BaseModel):
+    status: Literal['IN_THRESHOLD', 'OUTSIDE_THRESHOLD'] =\
+        Field(...,
+              description="The status of this calibration type,"
+                          "dependent on the calibration being"
+                          "inside or outside of the threshold")
+    comparingHeight: Optional[ComparisonStatus] =\
+        Field(None, description="height validation step")
+    comparingPointOne: Optional[ComparisonStatus] =\
+        Field(None, description="point 1 validation step")
+
+
+class TipComparisonMap(BaseModel):
+    status: Literal['IN_THRESHOLD', 'OUTSIDE_THRESHOLD'] =\
+        Field(...,
+              description="The status of this calibration type,"
+                          "dependent on the calibration being"
+                          "inside or outside of the threshold")
+    comparingTip: Optional[ComparisonStatus] =\
+        Field(None, description="tip validation step")
+
+
+class ComparisonStatePerCalibration(BaseModel):
+    tipLength: Optional[TipComparisonMap]
+    pipetteOffset: Optional[PipetteOffsetComparisonMap]
+    deck: Optional[DeckComparisonMap]
+
+
 class ComparisonStatePerPipette(BaseModel):
-    first: ComparisonMap
-    second: ComparisonMap
+    first: ComparisonStatePerCalibration
+    second: ComparisonStatePerCalibration
 
 
 class CheckAttachedPipette(AttachedPipette):
-    rank: str
+    rank: Literal['first', 'second'] =\
+        Field(..., description="The order of a given pipette")
+    tipRackDisplay: str =\
+        Field(..., description="The display name of the tiprack")
+    tipRackUri: str =\
+        Field(..., description="The uri of the tiprack")
+
+
+class SessionCreateParams(BaseModel):
+    """
+    Calibration Health Check create params
+    """
+    hasCalibrationBlock: bool = Field(
+        False,
+        description='Whether to use a calibration block in the'
+                    'calibration health check flow.')
+    tipRacks: List[dict] = Field(
+        [],
+        description='A list of labware definitions to use in'
+                    'calibration health check')
 
 
 class CalibrationCheckSessionStatus(BaseModel):

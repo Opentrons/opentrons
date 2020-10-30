@@ -1,5 +1,5 @@
-PIPETTE_ID = 'pip_1'
-LW_HASH = 'fakehash'
+PIPETTE_ID = '123'
+LW_HASH = '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824'
 FAKE_PIPETTE_ID = 'fake_pip'
 WRONG_LW_HASH = 'wronghash'
 

@@ -1,10 +1,10 @@
-from typing import Awaitable, cast, TYPE_CHECKING, List
+from typing import Awaitable, cast, TYPE_CHECKING
 
 from robot_server.robot.calibration.check.user_flow import\
     CheckCalibrationUserFlow
 from robot_server.robot.calibration.check.models import (
-    ComparisonMap, ComparisonStatePerPipette,
-    CalibrationCheckSessionStatus)
+    ComparisonStatePerCalibration, ComparisonStatePerPipette,
+    CalibrationCheckSessionStatus, SessionCreateParams)
 from robot_server.robot.calibration.check import util
 
 from robot_server.service.session.command_execution import \
@@ -49,10 +49,9 @@ class CheckSession(BaseSession):
                      configuration: SessionConfiguration,
                      instance_meta: SessionMetaData) -> BaseSession:
         """Create an instance"""
-        # (lc, 10-19-2020) For now, only pass in an empty list. We cannot
-        # have a session model with an optional tiprack for session
-        # create params right now because of the pydantic union problem.
-        tip_racks: List = []
+        assert isinstance(instance_meta.create_params, SessionCreateParams)
+        tip_racks = instance_meta.create_params.tipRacks
+        has_calibration_block = instance_meta.create_params.hasCalibrationBlock
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
@@ -62,6 +61,7 @@ class CheckSession(BaseSession):
         try:
             calibration_check = CheckCalibrationUserFlow(
                 configuration.hardware,
+                has_calibration_block=has_calibration_block,
                 tip_rack_defs=[
                     cast('LabwareDefinition', rack) for rack in tip_racks])
         except AssertionError as e:
@@ -84,20 +84,20 @@ class CheckSession(BaseSession):
             ) -> ComparisonStatePerPipette:
         first = comparison_map.first
         second = comparison_map.second
-        first_compmap = ComparisonMap(
-            comparingHeight=first.comparingHeight,
-            comparingPointOne=first.comparingPointOne,
-            comparingPointTwo=first.comparingPointTwo,
-            comparingPointThree=first.comparingPointThree)
-        second_compmap = ComparisonMap(
-            comparingHeight=second.comparingHeight,
-            comparingPointOne=second.comparingPointOne)
+        first_compmap = ComparisonStatePerCalibration(
+            tipLength=first.tipLength,
+            pipetteOffset=first.pipetteOffset,
+            deck=first.deck)
+        second_compmap = ComparisonStatePerCalibration(
+            tipLength=second.tipLength,
+            pipetteOffset=second.pipetteOffset,
+            deck=second.deck)
         return ComparisonStatePerPipette(
             first=first_compmap, second=second_compmap)
 
     def get_response_model(self) -> CalibrationCheckResponseAttributes:
         return CalibrationCheckResponseAttributes(
-            createParams=self.meta.create_params,
+            createParams=cast(SessionCreateParams, self.meta.create_params),
             createdAt=self.meta.created_at,
             details=self._get_response_details()
         )

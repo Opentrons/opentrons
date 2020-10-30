@@ -31,7 +31,7 @@ stages:
         links: null
         data:
           - attributes:
-              pipette: 'pip_1'
+              pipette: '123'
               mount: 'left'
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
@@ -42,7 +42,7 @@ stages:
             id: !anystr
             type: 'PipetteOffsetCalibration'
           - attributes:
-              pipette: 'pip_2'
+              pipette: '321'
               mount: 'right'
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
@@ -58,7 +58,7 @@ stages:
       url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: GET
       params:
-        pipette_id: 'pip_1'
+        pipette_id: '123'
     response:
       status_code: 200
       json:
@@ -66,7 +66,7 @@ stages:
         links: null
         data:
           - attributes:
-              pipette: 'pip_1'
+              pipette: '123'
               mount: 'left'
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
@@ -90,7 +90,7 @@ stages:
         links: null
         data:
           - attributes:
-              pipette: 'pip_1'
+              pipette: '123'
               mount: 'left'
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
@@ -106,7 +106,7 @@ stages:
       url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: GET
       params:
-        pipette_id: 'pip_1'
+        pipette_id: '123'
         mount: 'left'
     response:
       status_code: 200
@@ -115,7 +115,7 @@ stages:
         links: null
         data:
           - attributes:
-              pipette: 'pip_1'
+              pipette: '123'
               mount: 'left'
               offset: [0.0, 0.0, 0.0]
               tiprack: !anystr
@@ -131,7 +131,7 @@ stages:
       url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: GET
       params:
-        pipette_id: 'pip_2'
+        pipette_id: '321'
         mount: 'left'
     response: *no_offset_response
 
@@ -144,7 +144,7 @@ stages:
       url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: DELETE
       params:
-        pipette_id: 'pip_2'
+        pipette_id: '321'
         mount: 'right'
     response:
         status_code: 200
@@ -154,7 +154,7 @@ stages:
       url: "{host:s}:{port:d}/calibration/pipette_offset"
       method: DELETE
       params:
-        pipette_id: 'pip_1'
+        pipette_id: '321'
         mount: 'right'
     response:
         status_code: 404
