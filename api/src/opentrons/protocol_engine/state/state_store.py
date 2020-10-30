@@ -4,13 +4,19 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons.types import Location, MountType, Point
+from opentrons.types import MountType, Point
+from opentrons.hardware_control.types import CriticalPoint
 
-from .. import command_models as cmd
-from ..errors import LabwareDoesNotExistError, WellDoesNotExistError
+from opentrons.protocols.geometry.planning import (
+    Waypoint,
+    MoveType,
+    get_waypoints,
+)
+
+from .. import command_models as cmd, errors
 
 
-@dataclass
+@dataclass(frozen=True)
 class LabwareData():
     """Labware state data."""
     location: int
@@ -18,18 +24,24 @@ class LabwareData():
     calibration: Tuple[float, float, float]
 
 
-@dataclass
+@dataclass(frozen=True)
 class PipetteData():
     """Pipette state data."""
     mount: MountType
     pipette_name: PipetteName
 
 
-@dataclass
+@dataclass(frozen=True)
 class LocationData():
     pipette_id: str
     labware_id: str
     well_id: str
+
+
+@dataclass(frozen=True)
+class PipetteLocationData():
+    mount: MountType
+    critical_point: Optional[CriticalPoint]
 
 
 @dataclass
@@ -41,6 +53,8 @@ class State():
     retrieve views of the data. The State should be considered read-only by
     everything that isn't a StateStore.
     """
+    # TODO(mc, 2020-10-29): it is time to split this state into its own file,
+    # at least, and probably several files / classes, too.
     _deck_definition: DeckDefinitionV2
     _commands_by_id: Dict[str, cmd.CommandType] = field(default_factory=dict)
     _labware_by_id: Dict[str, LabwareData] = field(default_factory=dict)
@@ -55,17 +69,42 @@ class State():
         """Get a list of all command entries in state."""
         return [entry for entry in self._commands_by_id.items()]
 
-    def get_labware_data_by_id(self, uid: str) -> Optional[LabwareData]:
+    def get_labware_data_by_id(self, uid: str) -> LabwareData:
         """Get labware data by the labware's unique identifier."""
-        return self._labware_by_id.get(uid)
+        try:
+            return self._labware_by_id[uid]
+        except KeyError:
+            raise errors.LabwareDoesNotExistError(f"Labware {uid} not found.")
+
+    def get_labware_highest_z(self, uid: str) -> float:
+        """Get the highest Z-point of a labware."""
+        data = self.get_labware_data_by_id(uid)
+        z_dim = data.definition["dimensions"]["zDimension"]
+        slot_pos = self.get_slot_position(data.location)
+
+        return z_dim + slot_pos[2] + data.calibration[2]
+
+    def get_all_labware_highest_z(self) -> float:
+        """Get the highest Z-point of a labware."""
+        return max([
+            self.get_labware_highest_z(uid)
+            for uid in self._labware_by_id.keys()
+        ])
+
+    def get_labware_has_quirk(self, uid: str, quirk: str) -> bool:
+        data = self.get_labware_data_by_id(uid)
+        return quirk in data.definition["parameters"].get("quirks", ())
 
     def get_all_labware(self) -> List[Tuple[str, LabwareData]]:
         """Get a list of all labware entries in state."""
         return [entry for entry in self._labware_by_id.items()]
 
-    def get_pipette_data_by_id(self, uid: str) -> Optional[PipetteData]:
+    def get_pipette_data_by_id(self, uid: str) -> PipetteData:
         """Get pipette data by the pipette's unique identifier."""
-        return self._pipettes_by_id.get(uid)
+        try:
+            return self._pipettes_by_id[uid]
+        except KeyError:
+            raise errors.PipetteDoesNotExistError(f"Pipette {uid} not found.")
 
     def get_all_pipettes(self) -> List[Tuple[str, PipetteData]]:
         """Get a list of all pipette entries in state."""
@@ -95,24 +134,84 @@ class State():
         return Point(x=position[0], y=position[1], z=position[2])
 
     def get_well_position(self, labware_id: str, well_id: str) -> Point:
+        # TODO(mc, 2020-10-29): implement CSS-style key point + offset option
+        # rather than defaulting to well top
         labware_data = self.get_labware_data_by_id(labware_id)
-
-        if labware_data is None:
-            raise LabwareDoesNotExistError(f"{labware_id} does not exist.")
 
         slot_pos = self.get_slot_position(labware_data.location)
         cal_offset = labware_data.calibration
         well_def = labware_data.definition["wells"].get(well_id)
 
         if well_def is None:
-            raise WellDoesNotExistError(
+            raise errors.WellDoesNotExistError(
                 f"{well_id} does not exist in {labware_id}."
             )
 
         return Point(
             x=slot_pos[0] + cal_offset[0] + well_def["x"],
             y=slot_pos[1] + cal_offset[1] + well_def["y"],
-            z=slot_pos[2] + cal_offset[2] + well_def["z"],
+            z=slot_pos[2] + cal_offset[2] + well_def["z"] + well_def["depth"],
+        )
+
+    def get_pipette_location(self, pipette_id: str) -> PipetteLocationData:
+        pipette_data = self.get_pipette_data_by_id(pipette_id)
+        current_loc = self.get_current_location_data()
+        critical_point = None
+
+        if (
+            current_loc is not None and
+            current_loc.pipette_id == pipette_id and
+            self.get_labware_has_quirk(
+                current_loc.labware_id,
+                "centerMultichannelOnWells"
+            )
+        ):
+            critical_point = CriticalPoint.XY_CENTER
+
+        return PipetteLocationData(
+            mount=pipette_data.mount,
+            critical_point=critical_point,
+        )
+
+    def get_movement_waypoints(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_id: str,
+        origin: Point,
+        origin_cp: Optional[CriticalPoint],
+        max_travel_z: float
+    ) -> List[Waypoint]:
+        location = self.get_current_location_data()
+        center_dest = self.get_labware_has_quirk(
+            labware_id,
+            "centerMultichannelOnWells",
+        )
+
+        if (
+            location is not None and
+            pipette_id == location.pipette_id and
+            labware_id == location.labware_id
+        ):
+            move_type = (
+                MoveType.IN_LABWARE_ARC
+                if well_id != location.well_id else
+                MoveType.DIRECT
+            )
+            min_travel_z = self.get_labware_highest_z(labware_id)
+        else:
+            move_type = MoveType.GENERAL_ARC
+            min_travel_z = self.get_all_labware_highest_z()
+
+        return get_waypoints(
+            move_type=move_type,
+            origin=origin,
+            origin_cp=origin_cp,
+            dest=self.get_well_position(labware_id, well_id),
+            dest_cp=CriticalPoint.XY_CENTER if center_dest else None,
+            min_travel_z=min_travel_z,
+            max_travel_z=max_travel_z,
+            xy_waypoints=[],
         )
 
 

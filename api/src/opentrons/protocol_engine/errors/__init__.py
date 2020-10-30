@@ -40,3 +40,8 @@ class LabwareDoesNotExistError(ProtocolEngineError):
 class WellDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a well that does not exist."""
     pass
+
+
+class PipetteDoesNotExistError(ProtocolEngineError):
+    """An error raised when referencing a pipette that does not exist."""
+    pass

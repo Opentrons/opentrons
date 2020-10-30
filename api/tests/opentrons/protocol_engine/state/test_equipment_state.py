@@ -1,15 +1,19 @@
 """Tests for equipment state in the protocol_engine state store."""
+import pytest
 from opentrons.types import Mount
+from opentrons.protocol_engine import errors
 
 
 def test_initial_labware_data(store):
-    """get_labware_data_by_id should return None if ID doesn't exist."""
-    assert store.state.get_labware_data_by_id("asdfghjkl") is None
+    """get_labware_data_by_id should raise ID doesn't exist."""
+    with pytest.raises(errors.LabwareDoesNotExistError):
+        store.state.get_labware_data_by_id("asdfghjkl")
 
 
 def test_initial_pipette_data_by_id(store):
-    """get_pipette_data_by_id should return None if ID doesn't exist."""
-    assert store.state.get_pipette_data_by_id("asdfghjkl") is None
+    """get_pipette_data_by_id should raise if ID doesn't exist."""
+    with pytest.raises(errors.PipetteDoesNotExistError):
+        store.state.get_pipette_data_by_id("asdfghjkl")
 
 
 def test_initial_pipette_data_by_mount(store):

@@ -60,6 +60,11 @@ def well_plate_def() -> LabwareDefinition:
     return load_definition("corning_96_wellplate_360ul_flat", 1)
 
 
+@pytest.fixture(scope="session")
+def reservoir_def() -> LabwareDefinition:
+    return load_definition("nest_12_reservoir_15ml", 1)
+
+
 @pytest.fixture
 def store(standard_deck_def):
     return StateStore(deck_definition=standard_deck_def)

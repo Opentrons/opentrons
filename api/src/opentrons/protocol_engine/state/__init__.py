@@ -6,6 +6,14 @@ from .state_store import (
     PipetteData,
     LabwareData,
     LocationData,
+    PipetteLocationData,
 )
 
-__all__ = ["State", "StateStore", "PipetteData", "LabwareData", "LocationData"]
+__all__ = [
+    "State",
+    "StateStore",
+    "PipetteData",
+    "LabwareData",
+    "LocationData",
+    "PipetteLocationData",
+]
