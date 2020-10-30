@@ -30,8 +30,16 @@ BUILD_DIR := dist
 
 wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
 
-py_sources = $(filter %.py,$(shell $(SHX) find opentrons_shared_data))
-json_sources = $(filter %.json,$(shell $(SHX) find ..))
+py_sources = $(filter %.py,$(shell $(SHX) find opentrons_shared_data)) opentrons_shared_data/py.typed
+deck_sources = $(wildcard ../deck/definitions/*/*.json) $(wildcard ../deck/schemas/*.json)
+labware_sources = $(wildcard ../labware/definitions/*/*.json) $(wildcard ../labware/schemas/*.json)
+module_sources = $(wildcard ../module/definitions/*.json) $(wildcard ../module/definitions/*/*.json) $(wildcard ../module/schemas/*.json)
+pipette_sources = $(wildcard ../pipette/definitions/*.json) $(wildcard ../pipette/schemas/*.json)
+protocol_sources = $(wildcard ../protocol/schemas/*.json)
+
+json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources)
+
+
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
@@ -56,7 +64,7 @@ clean:
 wheel: $(wheel_file)
 
 
-$(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: setup.py $(py_sources) $(json_sources) clean
+$(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) ls $(BUILD_DIR)
