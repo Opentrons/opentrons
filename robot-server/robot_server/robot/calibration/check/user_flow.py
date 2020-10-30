@@ -716,10 +716,6 @@ class CheckCalibrationUserFlow:
             mount=self.mount,
             deck=self._deck,
             has_calibration_block=self._has_calibration_block)
-        if self.current_state == State.labwareLoaded:
-            MODULE_LOG.debug("homing plunger")
-            await self.hardware.home()
-            # await self.hardware.home_plunger(self.mount)
         await self._move(ref_loc)
 
     async def move_to_point_one(self):

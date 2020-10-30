@@ -159,9 +159,6 @@ class TipCalibrationUserFlow:
         pass
 
     async def move_to_tip_rack(self):
-        if self._current_state == State.measuringNozzleOffset:
-            MODULE_LOG.info("homing plunger")
-            await self.hardware.home_plunger(self.mount)
         await self._move(Location(self.tip_origin, None))
 
     async def save_offset(self):
