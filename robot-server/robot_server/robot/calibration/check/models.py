@@ -1,4 +1,5 @@
 from typing import Optional, List, Tuple
+from typing_extensions import Literal
 from functools import partial
 from pydantic import BaseModel, Field
 
@@ -21,7 +22,7 @@ class ComparisonStatus(BaseModel):
 
 
 class DeckComparisonMap(BaseModel):
-    status: str =\
+    status: Literal['IN_THRESHOLD', 'OUTSIDE_THRESHOLD'] =\
         Field(...,
               description="The status of this calibration type,"
                           "dependent on the calibration being"
@@ -35,7 +36,7 @@ class DeckComparisonMap(BaseModel):
 
 
 class PipetteOffsetComparisonMap(BaseModel):
-    status: str =\
+    status: Literal['IN_THRESHOLD', 'OUTSIDE_THRESHOLD'] =\
         Field(...,
               description="The status of this calibration type,"
                           "dependent on the calibration being"
@@ -47,8 +48,8 @@ class PipetteOffsetComparisonMap(BaseModel):
 
 
 class TipComparisonMap(BaseModel):
-    status: str =\
-        Field('acceptable',
+    status: Literal['IN_THRESHOLD', 'OUTSIDE_THRESHOLD'] =\
+        Field(...,
               description="The status of this calibration type,"
                           "dependent on the calibration being"
                           "inside or outside of the threshold")
@@ -68,9 +69,12 @@ class ComparisonStatePerPipette(BaseModel):
 
 
 class CheckAttachedPipette(AttachedPipette):
-    rank: str
-    tipRackDisplay: str
-    tipRackUri: str
+    rank: Literal['first', 'second'] =\
+        Field(..., description="The order of a given pipette")
+    tipRackDisplay: str =\
+        Field(..., description="The display name of the tiprack")
+    tipRackUri: str =\
+        Field(..., description="The uri of the tiprack")
 
 
 class SessionCreateParams(BaseModel):
@@ -82,7 +86,7 @@ class SessionCreateParams(BaseModel):
         description='Whether to use a calibration block in the'
                     'calibration health check flow.')
     tipRacks: List[dict] = Field(
-        None,
+        [],
         description='A list of labware definitions to use in'
                     'calibration health check')
 

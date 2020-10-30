@@ -177,8 +177,11 @@ def set_up_tip_length_temp_directory(server_temp_directory):
 
 @pytest.fixture
 def set_up_deck_calibration_temp_directory(server_temp_directory):
-    transform = config.robot_configs.DEFAULT_DECK_CALIBRATION_V2
-    modify.save_robot_deck_attitude(transform, 'pip_1', 'fakehash')
+    attitude = [
+        [1.0008, 0.0052, 0.0],
+        [-0.0, 0.992, 0.0],
+        [0.0, 0.0, 1.0]]
+    modify.save_robot_deck_attitude(attitude, 'pip_1', 'fakehash')
 
 
 @pytest.fixture

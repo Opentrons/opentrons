@@ -2,12 +2,14 @@ import logging
 from typing import (
     List, Optional, Tuple, Awaitable,
     Callable, Dict, Any, TYPE_CHECKING)
+from typing_extensions import Literal
 
 from opentrons.calibration_storage import get, helpers
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound, PipetteOffsetByPipetteMount)
 from opentrons.types import Mount, Point, Location
-from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
+from opentrons.hardware_control import (
+    ThreadManager, CriticalPoint, Pipette, robot_calibration, util)
 from opentrons.protocol_api import labware
 from opentrons.config import feature_flags as ff
 from opentrons.protocols.geometry.deck import Deck
@@ -224,6 +226,8 @@ class CheckCalibrationUserFlow:
                 flow='Calibration Health Check')
         pips = {m: p for m, p in self._hardware._attached_instruments.items()
                 if p}
+        # TODO(lc - 10/30): Clean up repeated logic here by fetching/storing
+        # calibrations at the beginning of the session
         self._check_valid_calibrations(pips)
         if len(pips) == 1:
             for mount, pip in pips.items():
@@ -293,6 +297,12 @@ class CheckCalibrationUserFlow:
                 pip.pipette_id, mount)
             for mount, pip in pipettes.items())
         if not deck or not pipette or not tip_length:
+            raise RobotServerError(
+                definition=CalibrationError.UNCALIBRATED_ROBOT,
+                flow='Calibration Health Check')
+        deck_state =\
+            robot_calibration.validate_attitude_deck_calibration(deck)
+        if deck_state != util.DeckTransformState.OK:
             raise RobotServerError(
                 definition=CalibrationError.UNCALIBRATED_ROBOT,
                 flow='Calibration Health Check')
@@ -444,7 +454,7 @@ class CheckCalibrationUserFlow:
                 tipLength=hw_pip.config.tip_length,
                 tipRackDisplay=info_pip.tip_rack._implementation.get_display_name(),  # noqa: E501
                 tipRackUri=info_pip.tip_rack.uri,
-                rank=str(info_pip.rank),
+                rank=info_pip.rank.value,
                 mount=str(info_pip.mount),
                 serial=hw_pip.pipette_id)  # type: ignore[arg-type]
             for hw_pip, info_pip in zip(hw_pips, info_pips)]
@@ -462,7 +472,7 @@ class CheckCalibrationUserFlow:
             tipLength=self.hw_pipette.config.tip_length,
             tipRackDisplay=display_name,
             tipRackUri=self.active_pipette.tip_rack.uri,
-            rank=str(self.active_pipette.rank),
+            rank=self.active_pipette.rank.value,
             mount=str(self.mount),
             serial=self.hw_pipette.pipette_id)  # type: ignore[arg-type]
 
@@ -501,28 +511,49 @@ class CheckCalibrationUserFlow:
         else:
             return PIPETTE_TOLERANCES['other_height']
 
+    @staticmethod
+    def _check_and_update_status(
+            new_status: RobotHealthCheck,
+            old_status: RobotHealthCheck
+            ) -> Literal['IN_THRESHOLD', 'OUTSIDE_THRESHOLD']:
+        if old_status == RobotHealthCheck.OUTSIDE_THRESHOLD:
+            return old_status.value
+        else:
+            return new_status.value
+
     def _update_compare_status_by_state(
             self, rank: PipetteRank,
             info: ComparisonStatus,
             status: RobotHealthCheck) -> ComparisonStatePerCalibration:
         intermediate_map = getattr(self._comparison_map, rank.name)
-        stringify_status = str(status)
         if self.current_state == State.comparingTip:
             tip = TipComparisonMap(
-                status=stringify_status, comparingTip=info)
+                status=status.value, comparingTip=info)
             intermediate_map.set_value('tipLength', tip)
         elif self.current_state == State.comparingHeight:
             pip = PipetteOffsetComparisonMap(
-                status=stringify_status, comparingHeight=info)
+                status=status.value, comparingHeight=info)
             intermediate_map.set_value('pipetteOffset', pip)
         elif self.current_state == State.comparingPointOne:
+            updated_status =\
+                self._check_and_update_status(
+                    status, intermediate_map.pipetteOffset.status)
             intermediate_map.pipetteOffset.comparingPointOne = info
+            intermediate_map.pipetteOffset.status = updated_status
             deck = DeckComparisonMap(
-                status=stringify_status, comparingPointOne=info)
+                status=status.value, comparingPointOne=info)
             intermediate_map.set_value('deck', deck)
         elif self.current_state == State.comparingPointTwo:
+            updated_status =\
+                self._check_and_update_status(
+                    status, intermediate_map.deck.status)
+            intermediate_map.deck.status = updated_status
             intermediate_map.deck.comparingPointTwo = info
         elif self.current_state == State.comparingPointThree:
+            updated_status =\
+                self._check_and_update_status(
+                    status, intermediate_map.deck.status)
+            intermediate_map.deck.status = updated_status
             intermediate_map.deck.comparingPointThree = info
         return intermediate_map
 

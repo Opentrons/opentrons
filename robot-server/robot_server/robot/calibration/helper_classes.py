@@ -1,7 +1,7 @@
 import typing
 
 from opentrons.types import Mount
-from enum import Enum, auto
+from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
 from opentrons.protocol_api import labware
@@ -13,8 +13,8 @@ if typing.TYPE_CHECKING:
 
 
 class RobotHealthCheck(Enum):
-    IN_THRESHOLD = auto()
-    OUTSIDE_THRESHOLD = auto()
+    IN_THRESHOLD = 'IN_THRESHOLD'
+    OUTSIDE_THRESHOLD = 'OUTSIDE_THRESHOLD'
 
     def __str__(self):
         return self.name
@@ -22,8 +22,8 @@ class RobotHealthCheck(Enum):
 
 class PipetteRank(str, Enum):
     """The rank in the order of pipettes to use within flow"""
-    first = 1
-    second = 2
+    first = 'first'
+    second = 'second'
 
     def __str__(self):
         return self.name

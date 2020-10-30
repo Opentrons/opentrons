@@ -160,6 +160,17 @@ def build_mock_stored_tip_length(kind='normal'):
 
 def build_mock_deck_calibration(kind='normal'):
     if kind == 'normal':
+        attitude = [
+            [1.0008, 0.0052, 0.0],
+            [-0.1, 0.9, 0.0],
+            [0.0, 0.0, 1.0]]
+        return MagicMock(return_value=CSTypes.DeckCalibration(
+                attitude=attitude,
+                source=CSTypes.SourceType.user,
+                last_modified='date',
+                status=CSTypes.CalibrationStatus(markedBad=False)
+        ))
+    elif kind == 'identity':
         return MagicMock(return_value=CSTypes.DeckCalibration(
                 attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2,
                 source=CSTypes.SourceType.user,
@@ -189,9 +200,23 @@ def test_load_labware(mock_hw):
         assert len(uf.get_required_labware()) == 2
 
 
-def test_no_calibration(mock_hw):
+def test_bad_calibration(mock_hw):
     with pytest.raises(RobotServerError):
         CheckCalibrationUserFlow(hardware=mock_hw)
+
+    with pytest.raises(RobotServerError):
+        with patch.object(
+            get,
+            'get_robot_deck_attitude',
+            new=build_mock_deck_calibration('identity')),\
+            patch.object(
+                get,
+                'load_tip_length_calibration',
+                new=build_mock_stored_tip_length()),\
+            patch.object(
+                get, 'get_pipette_offset',
+                new=build_mock_stored_pipette_offset()):
+            CheckCalibrationUserFlow(hardware=mock_hw)
 
 
 @pytest.fixture
