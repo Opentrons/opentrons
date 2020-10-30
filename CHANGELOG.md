@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.3...v4.0.0-alpha.4) (2020-10-30)
+
+
+### Bug Fixes
+
+* **api:** recache position before plunger home ([#6881](https://github.com/Opentrons/opentrons/issues/6881)) ([603dfff](https://github.com/Opentrons/opentrons/commit/603dfff))
+* **app:** cal wizards show if session exists, always ask for cal block if not saved ([#6870](https://github.com/Opentrons/opentrons/issues/6870)) ([e19b850](https://github.com/Opentrons/opentrons/commit/e19b850))
+* **build:** Dont break make with weird deps in shared-data ([#6857](https://github.com/Opentrons/opentrons/issues/6857)) ([0681ae0](https://github.com/Opentrons/opentrons/commit/0681ae0))
+
+
+### Features
+
+* **notify-server:** add models package and Event model ([#6785](https://github.com/Opentrons/opentrons/issues/6785)) ([aa26264](https://github.com/Opentrons/opentrons/commit/aa26264)), closes [#6705](https://github.com/Opentrons/opentrons/issues/6705)
+* **notify-server:** create pub sub server ([#6777](https://github.com/Opentrons/opentrons/issues/6777)) ([04b1e7e](https://github.com/Opentrons/opentrons/commit/04b1e7e)), closes [#6703](https://github.com/Opentrons/opentrons/issues/6703)
+* **notify-server:** Notify server publisher client ([#6817](https://github.com/Opentrons/opentrons/issues/6817)) ([12b1c09](https://github.com/Opentrons/opentrons/commit/12b1c09)), closes [#6706](https://github.com/Opentrons/opentrons/issues/6706)
+* **notify-server:** Notify server subscriber client ([#6818](https://github.com/Opentrons/opentrons/issues/6818)) ([6611e07](https://github.com/Opentrons/opentrons/commit/6611e07)), closes [#6707](https://github.com/Opentrons/opentrons/issues/6707)
+* **protocol-designer:** add dispense air gap to distribute command creator ([#6824](https://github.com/Opentrons/opentrons/issues/6824)) ([2aeccd4](https://github.com/Opentrons/opentrons/commit/2aeccd4)), closes [#6510](https://github.com/Opentrons/opentrons/issues/6510)
+* **protocol-designer:** add validation to dispense > air gap volume ([#6771](https://github.com/Opentrons/opentrons/issues/6771)) ([2594aa8](https://github.com/Opentrons/opentrons/commit/2594aa8)), closes [#6500](https://github.com/Opentrons/opentrons/issues/6500) [#6513](https://github.com/Opentrons/opentrons/issues/6513) [#6652](https://github.com/Opentrons/opentrons/issues/6652)
+* **protocol-designer:** implement consolidate dispense airgap commands ([#6845](https://github.com/Opentrons/opentrons/issues/6845)) ([0dd7157](https://github.com/Opentrons/opentrons/commit/0dd7157)), closes [#6512](https://github.com/Opentrons/opentrons/issues/6512)
+* add basic application configuration using pydantic BaseSettings. ([#6768](https://github.com/Opentrons/opentrons/issues/6768)) ([13db187](https://github.com/Opentrons/opentrons/commit/13db187)), closes [#6704](https://github.com/Opentrons/opentrons/issues/6704)
+
+
+
+## [3.21.2](https://github.com/Opentrons/opentrons/compare/v3.21.2-alpha.1...v3.21.2) (2020-10-16)
+
+
+
+## [3.21.2-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.2-alpha.0...v3.21.2-alpha.1) (2020-10-16)
+
+
+### Bug Fixes
+
+* **api:** Be fault-tolerant to bad deck cal data ([#6803](https://github.com/Opentrons/opentrons/issues/6803)) ([43ba721](https://github.com/Opentrons/opentrons/commit/43ba721))
+
+
+
+## [3.21.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2-alpha.0) (2020-10-16)
+
+
+### Bug Fixes
+
+* **app:** add analytics and support tracking to ignore app update ([#6790](https://github.com/Opentrons/opentrons/issues/6790)) ([079c2e9](https://github.com/Opentrons/opentrons/commit/079c2e9))
+* **app-shell:** ensure robot update download folder exists before caching manifest ([#6787](https://github.com/Opentrons/opentrons/issues/6787)) ([200b3d5](https://github.com/Opentrons/opentrons/commit/200b3d5)), closes [#6786](https://github.com/Opentrons/opentrons/issues/6786)
+
+
+
+
+
 # [4.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.1...v4.0.0-alpha.3) (2020-10-26)
 
 
