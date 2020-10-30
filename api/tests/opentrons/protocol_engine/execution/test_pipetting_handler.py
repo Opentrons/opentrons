@@ -16,6 +16,7 @@ from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 def handler(mock_hardware: AsyncMock) -> PipettingHandler:
     return PipettingHandler(hardware=mock_hardware)
 
+
 @pytest.fixture
 def move_to_well_request() -> MoveToWellRequest:
     return MoveToWellRequest(
@@ -23,6 +24,7 @@ def move_to_well_request() -> MoveToWellRequest:
         labwareId="labware-id",
         wellId="B2"
     )
+
 
 @pytest.fixture
 def pipette_location_data() -> PipetteLocationData:
@@ -38,6 +40,7 @@ def waypoints() -> List[Waypoint]:
         (Point(1, 2, 3), CriticalPoint.XY_CENTER),
         (Point(4, 5, 6), None)
     ]
+
 
 @pytest.fixture
 def state_with_data(

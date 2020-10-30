@@ -90,8 +90,6 @@ def test_get_all_labware_highest_z(
     assert store.state.get_all_labware_highest_z() == max(plate_z, reservoir_z)
 
 
-
-
 def test_get_well_position(
     well_plate_def: LabwareDefinition,
     standard_deck_def: DeckDefinitionV2,
