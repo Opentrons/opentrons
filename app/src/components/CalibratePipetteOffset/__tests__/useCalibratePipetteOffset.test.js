@@ -189,7 +189,8 @@ describe('useCalibratePipetteOffset hook', () => {
       ...Sessions.deleteSession(robotName, seshId),
       meta: { requestId: expect.any(String) },
     })
-    wrapper.setProps({}) // update so delete request can be handled on success
+    mockGetRobotSessionOfType.mockReturnValue(null)
+    wrapper.setProps({})
     expect(CalWizardComponent).toBe(null)
     expect(onComplete).toHaveBeenCalled()
   })

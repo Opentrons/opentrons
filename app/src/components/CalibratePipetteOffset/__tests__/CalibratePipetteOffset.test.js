@@ -96,7 +96,6 @@ describe('CalibratePipetteOffset', () => {
         <CalibratePipetteOffset
           robotName="robot-name"
           session={session}
-          closeWizard={jest.fn()}
           dispatchRequests={dispatchRequests}
           showSpinner={showSpinner}
           isJogging={isJogging}

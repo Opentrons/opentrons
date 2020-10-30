@@ -19,10 +19,14 @@ import {
   SPACING_3,
   SPACING_4,
 } from '@opentrons/components'
+import { useDispatch } from 'react-redux'
 
 import styles from './styles.css'
 import { labwareImages } from '../CalibrationPanels/labwareImages'
+import { setUseTrashSurfaceForTipCal } from '../../calibration'
 import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
+
+import type { Dispatch } from '../../types'
 
 const EXIT = 'exit'
 const ALERT_TIP_LENGTH_CAL_HEADER = 'Do you have a calibration block?'
@@ -40,17 +44,21 @@ const BLOCK_REQUEST_URL = 'https://opentrons-ux.typeform.com/to/DgvBE9Ir'
 const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 
 type Props = {|
+  onResponse: (hasBlock: boolean) => void,
   titleBarTitle: string,
   closePrompt: () => void,
-  setHasBlock: (hasBlock: boolean, rememberPreference: boolean) => void,
 |}
 export function AskForCalibrationBlockModal(props: Props): React.Node {
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
     false
   )
+  const dispatch = useDispatch<Dispatch>()
 
   const makeSetHasBlock = hasBlock => () => {
-    props.setHasBlock(hasBlock, rememberPreference)
+    if (rememberPreference) {
+      dispatch(setUseTrashSurfaceForTipCal(!hasBlock))
+    }
+    props.onResponse(hasBlock)
   }
 
   return (

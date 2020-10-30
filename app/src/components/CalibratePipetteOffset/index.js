@@ -162,7 +162,7 @@ export function CalibratePipetteOffset(
   }
 
   if (showSpinner) {
-    return <SpinnerModalPage titleBar={titleBarProps} />
+    return <SpinnerModalPage key={instrument?.mount} titleBar={titleBarProps} />
   }
 
   const Panel = PANEL_BY_STEP[currentStep]
@@ -171,6 +171,7 @@ export function CalibratePipetteOffset(
       <ModalPage
         titleBar={titleBarProps}
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
+        key={instrument?.mount}
       >
         <Panel
           sendCommands={sendCommands}

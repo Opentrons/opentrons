@@ -32,9 +32,10 @@ import {
   FONT_STYLE_ITALIC,
   JUSTIFY_START,
 } from '@opentrons/components'
+import * as Config from '../../config'
 import styles from './styles.css'
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useAskForCalibrationBlock } from '../CalibrateTipLength/useAskForCalibrationBlock'
+import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import {
   INTENT_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
@@ -51,6 +52,7 @@ import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
 import type { Mount, AttachedPipette } from '../../pipettes/types'
 import { findLabwareDefWithCustom } from '../../findLabware'
 import * as CustomLabware from '../../custom-labware'
+import { Portal } from '../portal'
 
 export type PipetteInfoProps = {|
   robotName: string,
@@ -59,6 +61,18 @@ export type PipetteInfoProps = {|
   changeUrl: string,
   settingsUrl: string | null,
 |}
+
+const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
+  'cal_block_modal_closed'
+const CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC: 'cal_block_modal_redo' =
+  'cal_block_modal_redo'
+const CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC: 'cal_block_modal_keep' =
+  'cal_block_modal_keep'
+
+type CalBlockModalState =
+  | typeof CAL_BLOCK_MODAL_CLOSED
+  | typeof CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
+  | typeof CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
 
 const LABEL_BY_MOUNT = {
   left: 'Left pipette',
@@ -123,40 +137,46 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount })
 
-  const startPipetteOffsetCalibrationOnly = useCalBlock => {
-    startPipetteOffsetCalibration({
-      overrideParams: { hasCalibrationBlock: useCalBlock === true },
-      withIntent: INTENT_PIPETTE_OFFSET,
-    })
-  }
-  const startTipLengthAndPipetteOffsetCalibration = useCalBlock => {
-    startPipetteOffsetCalibration({
-      overrideParams: {
-        shouldRecalibrateTipLength: true,
-        hasCalibrationBlock: useCalBlock === true,
-      },
-      withIntent: INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-    })
+  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
+  const [
+    calBlockModalState,
+    setCalBlockModalState,
+  ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
+
+  type StartWizardOptions = {|
+    keepTipLength: boolean,
+    hasBlockModalResponse?: boolean | null,
+  |}
+  const startPipetteOffsetWizard = (options: StartWizardOptions) => {
+    const { keepTipLength, hasBlockModalResponse = null } = options
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setCalBlockModalState(
+        keepTipLength
+          ? CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
+          : CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
+      )
+    } else {
+      startPipetteOffsetCalibration({
+        overrideParams: {
+          hasCalibrationBlock: Boolean(
+            configHasCalibrationBlock ?? hasBlockModalResponse
+          ),
+          shouldRecalibrateTipLength: !keepTipLength,
+        },
+        withIntent: keepTipLength
+          ? INTENT_PIPETTE_OFFSET
+          : INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+      })
+      setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)
+    }
   }
 
   const customLabwareDefs = useSelector((state: State) => {
     return CustomLabware.getCustomLabwareDefinitions(state)
   })
 
-  const [showAskForBlock, AskForBlockModal] = useAskForCalibrationBlock(
-    null,
-    PIPETTE_OFFSET_CALIBRATION
-  )
-
   const startPipetteOffsetCalibrationDirectly = () => {
     startPipetteOffsetCalibration({ withIntent: INTENT_PIPETTE_OFFSET })
-  }
-
-  const showBlockForPipetteOffset = () => {
-    showAskForBlock(startPipetteOffsetCalibrationOnly)
-  }
-  const showBlockForTipLength = () => {
-    showAskForBlock(startTipLengthAndPipetteOffsetCalibration)
   }
 
   const pipImage = (
@@ -212,10 +232,11 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         <>
           <SecondaryBtn
             {...PER_PIPETTE_BTN_STYLE}
+            title="pipetteOffsetCalButton"
             onClick={
               pipetteOffsetCalibration
                 ? startPipetteOffsetCalibrationDirectly
-                : showBlockForPipetteOffset
+                : () => startPipetteOffsetWizard({ keepTipLength: true })
             }
           >
             {CALIBRATE_OFFSET}
@@ -277,7 +298,8 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           </Box>
           <SecondaryBtn
             {...PER_PIPETTE_BTN_STYLE}
-            onClick={showBlockForTipLength}
+            title="recalibrateTipButton"
+            onClick={() => startPipetteOffsetWizard({ keepTipLength: false })}
           >
             {RECALIBRATE_TIP}
           </SecondaryBtn>
@@ -292,7 +314,21 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   return (
     <>
       {PipetteOffsetCalibrationWizard}
-      {AskForBlockModal}
+      {calBlockModalState !== CAL_BLOCK_MODAL_CLOSED ? (
+        <Portal level="top">
+          <AskForCalibrationBlockModal
+            onResponse={hasBlockModalResponse => {
+              startPipetteOffsetWizard({
+                hasBlockModalResponse,
+                keepTipLength:
+                  calBlockModalState === CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC,
+              })
+            }}
+            titleBarTitle={PIPETTE_OFFSET_CALIBRATION}
+            closePrompt={() => setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)}
+          />
+        </Portal>
+      ) : null}
       <Flex width="50%" flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {mount === 'right' ? [pipImage, pipInfo] : [pipInfo, pipImage]}

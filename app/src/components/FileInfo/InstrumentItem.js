@@ -70,9 +70,7 @@ export function InstrumentItem(props: InstrumentItemProps): React.Node {
               {NOT_ATTACHED}
             </Text>
           ) : !!pipetteOffsetData ? (
-            <Text css={FONT_BODY_1_DARK}>
-              <BuildOffsetText offsetData={pipetteOffsetData} />
-            </Text>
+            <BuildOffsetText offsetData={pipetteOffsetData} />
           ) : (
             <Text
               fontSize={FONT_SIZE_BODY_1}
@@ -101,7 +99,7 @@ function BuildOffsetText(props: {|
 |}): React.Node {
   const { offsetData } = props
   return (
-    <Flex>
+    <Flex css={FONT_BODY_1_DARK}>
       <Text marginRight={SPACING_2}>{CALIBRATION_DATA}</Text>
       {AXIS_NAMES.map((key, index) => (
         <React.Fragment key={key}>
