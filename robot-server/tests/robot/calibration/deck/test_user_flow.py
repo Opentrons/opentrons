@@ -59,6 +59,7 @@ def mock_hw(hardware):
 pipette_combos: List[Tuple[List[str], Mount]] = [
     (['p20_multi_v2.1', 'p20_multi_v2.1'], Mount.RIGHT),
     (['p20_single_v2.1', 'p20_multi_v2.1'], Mount.LEFT),
+    (['p1000_single_v2.1', 'p20_multi_v2.1'], Mount.RIGHT),
     (['p20_multi_v2.1', 'p300_single_v2.1'], Mount.LEFT),
     (['p300_multi_v2.1', 'p1000_single_v2.1'], Mount.LEFT),
     (['p1000_single_v2.1', ''], Mount.LEFT),

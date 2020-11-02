@@ -173,11 +173,18 @@ class DeckCalibrationUserFlow:
 
         right_pip = pips[Mount.RIGHT]
         left_pip = pips[Mount.LEFT]
-        if right_pip.config.max_volume > left_pip.config.max_volume or \
-                right_pip.config.channels > left_pip.config.channels:
-            return left_pip, Mount.LEFT
+        if right_pip.config.max_volume == left_pip.config.max_volume:
+            if right_pip.config.channels == left_pip.config.channels:
+                return right_pip, Mount.RIGHT
+            else:
+                return sorted(
+                    [(right_pip, Mount.RIGHT), (left_pip, Mount.LEFT)],
+                    key=lambda p_m: p_m[0].config.channels
+                )[0]
         else:
-            return right_pip, Mount.RIGHT
+            return sorted(
+                [(right_pip, Mount.RIGHT), (left_pip, Mount.LEFT)],
+                key=lambda p_m: p_m[0].config.max_volume)[0]
 
     def _get_tip_rack_lw(self) -> labware.Labware:
         pip_vol = self._hw_pipette.config.max_volume
