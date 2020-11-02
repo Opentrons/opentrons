@@ -68,6 +68,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: Array<string> } = {
     'opentrons_24_aluminumblock_nest_2ml_screwcap',
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
+    'opentrons_96_aluminumblock_nest_wellplate_100ul',
   ],
   [MAGNETIC_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
   [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
