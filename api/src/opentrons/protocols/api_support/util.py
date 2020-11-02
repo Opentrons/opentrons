@@ -7,6 +7,7 @@ from typing import (Any, Callable, Dict, Optional,
                     TYPE_CHECKING, Union, List, Set)
 
 from opentrons import types as top_types
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
@@ -65,8 +66,8 @@ def determine_edge_path(
 
     r_mount = top_types.Mount.RIGHT
     l_mount = top_types.Mount.LEFT
-    l_col = labware.as_labware().columns()[0]
-    r_col = labware.as_labware().columns()[-1]
+    l_col = labware.columns()[0]
+    r_col = labware.columns()[-1]
     right_pip_criteria = mount is r_mount and where in l_col
     left_pip_criteria = mount is l_mount and where in r_col
 
@@ -118,20 +119,7 @@ def first_parent(loc: top_types.LocationLabware) -> Optional[str]:
     either a string naming a slot or a None if the location isn't
     associated with a slot """
 
-    # cycle-detecting recursive climbing
-    seen: Set[top_types.LocationLabware] = set()
-
-    # internal function to have the cycle detector different per call
-    def _fp_recurse(location: top_types.LocationLabware):
-        if location in seen:
-            raise RuntimeError('Cycle in labware parent')
-        seen.add(location)
-        if location is None or isinstance(location, str):
-            return location
-        else:
-            return first_parent(location.parent)
-
-    return _fp_recurse(loc)
+    return LabwareLike(loc).first_parent()
 
 
 class FlowRates:
@@ -404,8 +392,7 @@ def requires_version(
             # about, but the docs leave it ambiguous, so fall back to str().
             name = getattr(decorated_obj, "__qualname__", str(decorated_obj))
 
-            if current_version >= APIVersion(2, 0)\
-               and current_version < added_in:
+            if APIVersion(2, 0) <= current_version < added_in:
                 raise APIVersionError(
                     f'{name} was added in {added_in}, but your '
                     f'protocol requested version {current_version}. You '

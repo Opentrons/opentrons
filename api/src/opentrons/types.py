@@ -3,7 +3,7 @@ import enum
 from math import sqrt, isclose
 from typing import Any, NamedTuple, TYPE_CHECKING, Union
 
-from opentrons.protocols.api_support.labware_like import LabwareLikeWrapper
+from opentrons.protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
     from typing import (Optional,       # noqa(F401) Used for typechecking
@@ -65,7 +65,8 @@ class Point(NamedTuple):
         return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
 
 
-LocationLabware = Union['Labware', 'Well', str, 'ModuleGeometry', None]
+LocationLabware = Union['Labware', 'Well', str,
+                        'ModuleGeometry', LabwareLike, None]
 
 
 class Location:
@@ -96,14 +97,14 @@ class Location:
     """
     def __init__(self, point: Point, labware: LocationLabware):
         self._point = point
-        self._labware = LabwareLikeWrapper(labware)
+        self._labware = LabwareLike(labware)
 
     @property
     def point(self) -> Point:
         return self._point
 
     @property
-    def labware(self) -> LabwareLikeWrapper:
+    def labware(self) -> LabwareLike:
         return self._labware
 
     def __iter__(self):

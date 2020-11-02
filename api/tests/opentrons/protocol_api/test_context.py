@@ -140,7 +140,7 @@ async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
     # that the right pipette is a p10 single which is a different height than
     # the reference p300 single
     assert test_args[0].point == Point(418, 353, 205)
-    assert test_args[0].labware is None
+    assert test_args[0].labware.is_empty
 
     # Once we have a location cache, that should be our from_loc
     right.move_to(lw.wells()[1].top())
@@ -416,7 +416,7 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     # reset plunger at the top of the well after blowout
     assert fake_move.call_args_list[0] ==\
         mock.call(
-            Mount.RIGHT, dest_lw.top().point, critical_point=None,
+            Mount.RIGHT, dest_lw.as_well().top().point, critical_point=None,
             speed=400, max_speeds={})
     assert fake_move.call_args_list[1] ==\
         mock.call(

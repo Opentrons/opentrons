@@ -10,6 +10,7 @@ from opentrons.hardware_control.types import CriticalPoint, PipettePair
 from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances,
     clamp_value, requires_version, build_edges, first_parent)
@@ -17,7 +18,7 @@ from opentrons.protocols.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
     BlowoutLocation, LiquidHandlingCommand)
 from .labware import (
-    filter_tipracks_to_start, Labware, OutOfTipsError, quirks_from_any_parent,
+    filter_tipracks_to_start, Labware, OutOfTipsError,
     select_tiprack_from_list, Well)
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.advanced_control import transfers
@@ -255,8 +256,8 @@ class InstrumentContext(CommandPublisher):
 
             if self._api_version < APIVersion(2, 3) or \
                     not self.hw_pipette['ready_to_aspirate']:
-                if isinstance(dest.labware, Well):
-                    self.move_to(dest.labware.top())
+                if dest.labware.is_well:
+                    self.move_to(dest.labware.as_well().top())
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
@@ -330,7 +331,7 @@ class InstrumentContext(CommandPublisher):
                                 location if location else 'current position',
                                 rate))
         if isinstance(location, Well):
-            if 'fixedTrash' in quirks_from_any_parent(location):
+            if LabwareLike(location).is_fixed_trash():
                 loc = location.top()
             else:
                 point, well = location.bottom()
@@ -535,22 +536,24 @@ class InstrumentContext(CommandPublisher):
             if not self._ctx.location_cache:
                 raise RuntimeError('No valid current location cache present')
             else:
-                location = self._ctx.location_cache.labware  # type: ignore
+                well = self._ctx.location_cache.labware  # type: ignore
                 # type checked below
+        else:
+            well = LabwareLike(location)
 
-        if isinstance(location, Well):
-            if 'touchTipDisabled' in quirks_from_any_parent(location):
-                self._log.info(f"Ignoring touch tip on labware {location}")
+        if well.is_well:
+            if 'touchTipDisabled' in well.quirks_from_any_parent():
+                self._log.info(f"Ignoring touch tip on labware {well}")
                 return self
-            if location.parent.is_tiprack:
+            if well.parent.as_labware().is_tiprack:
                 self._log.warning('Touch_tip being performed on a tiprack. '
                                   'Please re-check your code')
 
             if self._api_version < APIVersion(2, 4):
-                to_loc = location.top()
+                to_loc = well.as_well().top()
             else:
                 move_with_z_offset =\
-                    location.top().point + types.Point(0, 0, v_offset)
+                    well.as_well().top().point + types.Point(0, 0, v_offset)
                 to_loc = types.Location(move_with_z_offset, location)
             self.move_to(to_loc)
         else:
@@ -558,7 +561,7 @@ class InstrumentContext(CommandPublisher):
                 'location should be a Well, but it is {}'.format(location))
 
         edges = build_edges(
-            location, v_offset, self._mount,
+            well.as_well(), v_offset, self._mount,
             self._ctx._deck_layout, radius, self._api_version)
         for edge in edges:
             self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
@@ -606,9 +609,9 @@ class InstrumentContext(CommandPublisher):
         if height is None:
             height = 5
         loc = self._ctx.location_cache
-        if not loc or not isinstance(loc.labware, Well):
+        if not loc or not loc.labware.is_well:
             raise RuntimeError('No previous Well cached to perform air gap')
-        target = loc.labware.top(height)
+        target = loc.labware.as_well().top(height)
         self.move_to(target)
         self.aspirate(volume)
         return self
@@ -691,14 +694,14 @@ class InstrumentContext(CommandPublisher):
         :returns: This instance
         """
         if location and isinstance(location, types.Location):
-            if isinstance(location.labware, Labware):
-                tiprack = location.labware
+            if location.labware.is_labware:
+                tiprack = location.labware.as_labware()
                 target: Well = tiprack.next_tip(self.channels)  # type: ignore
                 if not target:
                     raise OutOfTipsError
-            elif isinstance(location.labware, Well):
-                tiprack = location.labware.parent
-                target = location.labware
+            elif location.labware.is_well:
+                target = location.labware.as_well()
+                tiprack = target.parent
         elif location and isinstance(location, Well):
             tiprack = location.parent
             target = location
@@ -786,7 +789,7 @@ class InstrumentContext(CommandPublisher):
         :returns: This instance
         """
         if location and isinstance(location, types.Location):
-            if isinstance(location.labware, Well):
+            if location.labware.is_well:
                 target = location
             else:
                 raise TypeError(
@@ -797,7 +800,7 @@ class InstrumentContext(CommandPublisher):
                     "dropped. The passed location, however, is in "
                     "reference to {}".format(location.labware))
         elif location and isinstance(location, Well):
-            if 'fixedTrash' in quirks_from_any_parent(location):
+            if LabwareLike(location).is_fixed_trash():
                 target = location.top()
             else:
                 target = self._determine_drop_target(location)
@@ -816,13 +819,13 @@ class InstrumentContext(CommandPublisher):
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                         'after', self, None, self, location=target)
         if self.api_version < APIVersion(2, 2) \
-                and isinstance(target.labware, Well) \
-                and target.labware.parent.is_tiprack:
+                and target.labware.is_well \
+                and target.labware.as_well().parent.is_tiprack:
             # If this is a tiprack we can try and add the tip back to the
             # tracker
             try:
-                target.labware.parent.return_tips(
-                    target.labware, self.channels)
+                target.labware.as_well().parent.return_tips(
+                    target.labware.as_well(), self.channels)
             except AssertionError:
                 # Similarly to :py:meth:`return_tips`, the failure case here
                 # just means the tip can't be reused, so don't actually stop
@@ -1179,13 +1182,12 @@ class InstrumentContext(CommandPublisher):
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
         else:
-            from_lw = None
+            from_lw = LabwareLike(None)
 
         if not speed:
             speed = self.default_speed
 
-        from_center = 'centerMultichannelOnWells'\
-            in quirks_from_any_parent(from_lw)
+        from_center = from_lw.center_multichannel_on_wells() if from_lw else False
         cp_override = CriticalPoint.XY_CENTER if from_center else None
         from_loc = types.Location(
             self._hw_manager.hardware.gantry_position(

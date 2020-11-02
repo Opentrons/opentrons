@@ -7,8 +7,9 @@ from typing import TYPE_CHECKING, Union, Optional, Callable, Tuple
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api.labware import (
-    Labware, Well, quirks_from_any_parent)
+    Labware, Well)
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges
 
@@ -68,10 +69,10 @@ class PairedInstrument:
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
         else:
-            from_lw = None
+            from_lw = LabwareLike(None)
 
         from_center = 'centerMultichannelOnWells'\
-            in quirks_from_any_parent(from_lw)
+            in from_lw.quirks_from_any_parent()
         cp_override = CriticalPoint.XY_CENTER if from_center else None
         from_loc = types.Location(
             self._hw_manager.hardware.gantry_position(
@@ -200,18 +201,21 @@ class PairedInstrument:
             if not self._ctx.location_cache:
                 raise RuntimeError('No valid current location cache present')
             else:
-                location = self._ctx.location_cache.labware  # type: ignore
+                well = self._ctx.location_cache.labware  # type: ignore
                 # type checked below
-        if isinstance(location, Well):
-            if 'touchTipDisabled' in quirks_from_any_parent(location):
-                self._log.info(f"Ignoring touch tip on labware {location}")
+        else:
+            well = LabwareLike(location)
+
+        if well.is_well:
+            if 'touchTipDisabled' in well.quirks_from_any_parent():
+                self._log.info(f"Ignoring touch tip on labware {well}")
                 return self
-            if location.parent.is_tiprack:
+            if well.parent.as_labware().is_tiprack:
                 self._log.warning('Touch_tip being performed on a tiprack. '
                                   'Please re-check your code')
 
             move_with_z_offset =\
-                location.top().point + types.Point(0, 0, v_offset)
+                well.as_well().top().point + types.Point(0, 0, v_offset)
             to_loc = types.Location(move_with_z_offset, location)
             self.move_to(to_loc)
         else:
@@ -220,7 +224,7 @@ class PairedInstrument:
                 'location should be a Well, but it is {}'.format(location))
 
         edges = build_edges(
-            location, v_offset, self._pair_policy.primary,
+            well.as_well(), v_offset, self._pair_policy.primary,
             self._ctx._deck_layout, radius)
         for edge in edges:
             self._hw_manager.hardware.move_to(

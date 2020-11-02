@@ -854,7 +854,7 @@ class TransferPlan:
 
     def _is_valid_row(self, well: Union[Well, types.Location]):
         if isinstance(well, types.Location):
-            test_well: Well = well.labware  # type: ignore
+            test_well = well.labware.as_well()
         else:
             test_well = well
 

@@ -55,12 +55,10 @@ class CommandPublisher:
 
 def _stringify_new_loc(loc: Union[Location, Well]) -> str:
     if isinstance(loc, Location):
-        if isinstance(loc.labware, str):
-            return loc.labware
-        elif isinstance(loc.labware, (Labware, Well, ModuleGeometry)):
-            return repr(loc.labware)
-        else:
+        if loc.labware.is_empty:
             return str(loc.point)
+        else:
+            return repr(loc.labware)
     elif isinstance(loc, Well):
         return str(loc)
     else:

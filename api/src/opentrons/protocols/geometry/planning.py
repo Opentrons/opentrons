@@ -6,12 +6,10 @@ from typing import List, Optional, Tuple
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
-from opentrons.protocol_api.labware import (
-    Labware, Well, quirks_from_any_parent)
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.module_geometry import (
     ThermocyclerGeometry, ModuleGeometry)
-from opentrons.protocols.api_support.util import first_parent
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -52,8 +50,8 @@ def should_dodge_thermocycler(
     Returns True if we need to dodge, False otherwise
     """
     if any([isinstance(item, ThermocyclerGeometry) for item in deck.values()]):
-        transit = (first_parent(from_loc.labware),
-                   first_parent(to_loc.labware))
+        transit = (from_loc.labware.first_parent(),
+                   to_loc.labware.first_parent())
         # mypy doesn't like this because transit could be none, but it's
         # checked by value in BAD_PAIRS which has only strings
         return transit in BAD_PAIRS
@@ -212,10 +210,8 @@ def plan_moves(
     to_lw, to_well = to_loc.labware.split_labware()
     from_point = from_loc.point
     from_lw, from_well = from_loc.labware.split_labware()
-    dest_quirks = quirks_from_any_parent(to_lw)
-    from_quirks = quirks_from_any_parent(from_lw)
-    from_center = 'centerMultichannelOnWells' in from_quirks
-    to_center = 'centerMultichannelOnWells' in dest_quirks
+    from_center = LabwareLike(from_lw).center_multichannel_on_wells()
+    to_center = LabwareLike(to_lw).center_multichannel_on_wells()
     dest_cp_override = CriticalPoint.XY_CENTER if to_center else None
     origin_cp_override = CriticalPoint.XY_CENTER if from_center else None
 
