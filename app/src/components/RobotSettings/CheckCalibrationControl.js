@@ -99,10 +99,17 @@ export function CheckCalibrationControl({
   }, [shouldOpen, shouldClose])
 
   const handleStart = () => {
+    const tipRacks = []
+    const useCalBlock = false
+    // TODO: show ask for cal block screen matching the changes in #6870
     dispatchRequests(
       Sessions.ensureSession(
         robotName,
-        Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+        Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+        {
+          tipRacks,
+          hasCalibrationBlock: useCalBlock,
+        }
       )
     )
   }

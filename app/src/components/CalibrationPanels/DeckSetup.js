@@ -51,7 +51,7 @@ const contentsBySessionType: {
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
   },
   [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
-    moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+    moveCommandString: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
   },
   [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,

@@ -25,10 +25,11 @@ import {
   SaveZPoint,
   SaveXYPoint,
   ConfirmExitModal,
+  MeasureNozzle,
+  MeasureTip,
 } from '../CalibrationPanels'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
-import { BadCalibration } from './BadCalibration'
 
 import type { StyleProps } from '@opentrons/components'
 import type { SessionCommandParams } from '../../sessions/types'
@@ -68,15 +69,16 @@ const PANEL_BY_STEP: {
 } = {
   [Sessions.CHECK_STEP_SESSION_STARTED]: Introduction,
   [Sessions.CHECK_STEP_LABWARE_LOADED]: DeckSetup,
+  [Sessions.CHECK_STEP_COMPARING_NOZZLE]: MeasureNozzle,
   [Sessions.CHECK_STEP_PREPARING_PIPETTE]: TipPickUp,
   [Sessions.CHECK_STEP_INSPECTING_TIP]: TipConfirmation,
+  [Sessions.CHECK_STEP_COMPARING_TIP]: MeasureTip,
   [Sessions.CHECK_STEP_COMPARING_HEIGHT]: SaveZPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: SaveXYPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_TWO]: SaveXYPoint,
   [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: SaveXYPoint,
   [Sessions.CHECK_STEP_RETURNING_TIP]: ReturnTip,
   [Sessions.CHECK_STEP_RESULTS_SUMMARY]: ResultsSummary,
-  [Sessions.CHECK_STEP_BAD_ROBOT_CALIBRATION]: BadCalibration,
 }
 
 const PANEL_STYLE_PROPS_BY_STEP: {
@@ -84,6 +86,8 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 } = {
   [Sessions.CHECK_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.CHECK_STEP_LABWARE_LOADED]: darkContentsStyleProps,
+  [Sessions.CHECK_STEP_COMPARING_NOZZLE]: contentsStyleProps,
+  [Sessions.CHECK_STEP_COMPARING_TIP]: contentsStyleProps,
   [Sessions.CHECK_STEP_PREPARING_PIPETTE]: contentsStyleProps,
   [Sessions.CHECK_STEP_COMPARING_HEIGHT]: contentsStyleProps,
   [Sessions.CHECK_STEP_COMPARING_POINT_ONE]: contentsStyleProps,

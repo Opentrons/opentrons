@@ -1,4 +1,4 @@
-// @flo
+// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { css } from 'styled-components'
@@ -26,15 +26,16 @@ import {
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import find from 'lodash/find'
-import * as Sessions from '../../sessions'
 import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../pipettes'
 import styles from './styles.css'
-import { PipetteComparisons } from './PipetteComparisons'
 import { saveAs } from 'file-saver'
 import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
-import type { CalibrationHealthCheckInstrument, CalibrationHealthCheckComparisonsPerCalibration } from '../../sessions/types'
+import type {
+  CalibrationHealthCheckInstrument,
+  CalibrationHealthCheckComparisonsPerCalibration,
+} from '../../sessions/types'
 
 const GOOD_CALIBRATION = 'Good calibration'
 const BAD_CALIBRATION = 'Bad calibration'
@@ -48,6 +49,10 @@ const DOWNLOAD_SUMMARY = 'Download JSON summary'
 
 export function ResultsSummary(props: CalibrationPanelProps): React.Node {
   const { comparisonsByPipette, instruments, cleanUpAndExit } = props
+
+  if (!comparisonsByPipette || !instruments) {
+    return null
+  }
 
   const handleDownloadButtonClick = () => {
     const now = new Date()
@@ -75,16 +80,20 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
     left: {
       headerText: `${LEFT} ${PIPETTE}`,
       pipette: leftPipette,
-      calibration: comparisonsByPipette[leftPipette.rank],
+      calibration: leftPipette
+        ? comparisonsByPipette?.[leftPipette.rank]
+        : null,
     },
     right: {
       headerText: `${RIGHT} ${PIPETTE}`,
       pipette: rightPipette,
-      calibration: comparisonsByPipette[rightPipette.rank],
+      calibration: rightPipette
+        ? comparisonsByPipette?.[rightPipette.rank]
+        : null,
     },
   }
 
-  const deckCalibrationResult = comparisonsByPipette.first.deck.status
+  const deckCalibrationResult = comparisonsByPipette.first.deck?.status ?? null
 
   return (
     <>
@@ -108,20 +117,25 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
         </Flex>
         <Flex marginBottom={SPACING_5} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {PIPETTE_MOUNTS.map(m => {
-            return (
-              <Box key={m} width="48%">
-                <Text
-                  textTransform={TEXT_TRANSFORM_CAPITALIZE}
-                  marginBottom={SPACING_3}
-                >
-                  {calibrationsByMount[m].headerText}
-                </Text>
-                <PipetteResult
-                  pipetteInfo={calibrationsByMount[m].pipette}
-                  pipetteCalibration={calibrationsByMount[m].calibration}
-                />
-              </Box>
-            )
+            if (
+              calibrationsByMount[m].pipette &&
+              calibrationsByMount[m].calibration
+            ) {
+              return (
+                <Box key={m} width="48%">
+                  <Text
+                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                    marginBottom={SPACING_3}
+                  >
+                    {calibrationsByMount[m].headerText}
+                  </Text>
+                  <PipetteResult
+                    pipetteInfo={calibrationsByMount[m].pipette}
+                    pipetteCalibration={calibrationsByMount[m].calibration}
+                  />
+                </Box>
+              )
+            }
           })}
         </Flex>
       </Box>
@@ -158,25 +172,30 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
 }
 
 type RenderResultProps = {|
-  status: string,
+  status: string | null,
 |}
 
 function RenderResult(props: RenderResultProps): React.Node {
-  const isGoodCal = props.status === 'IN_THRESHOLD'
-  return (
-    <Flex>
-      <Icon
-        name={isGoodCal ? 'check-circle' : 'alert-circle'}
-        className={cx(styles.summary_icon, {
-          [styles.success_status_icon]: isGoodCal,
-          [styles.error_status_icon]: !isGoodCal,
-        })}
-      />
-      <Text fontSize={FONT_SIZE_BODY_2}>
-        {isGoodCal ? GOOD_CALIBRATION : BAD_CALIBRATION}
-      </Text>
-    </Flex>
-  )
+  const { status } = props
+  if (!status) {
+    return null
+  } else {
+    const isGoodCal = status === 'IN_THRESHOLD'
+    return (
+      <Flex>
+        <Icon
+          name={isGoodCal ? 'check-circle' : 'alert-circle'}
+          className={cx(styles.summary_icon, {
+            [styles.success_status_icon]: isGoodCal,
+            [styles.error_status_icon]: !isGoodCal,
+          })}
+        />
+        <Text fontSize={FONT_SIZE_BODY_2}>
+          {isGoodCal ? GOOD_CALIBRATION : BAD_CALIBRATION}
+        </Text>
+      </Flex>
+    )
+  }
 }
 
 type PipetteResultProps = {|
@@ -187,8 +206,10 @@ type PipetteResultProps = {|
 function PipetteResult(props: PipetteResultProps): React.Node {
   const { pipetteInfo, pipetteCalibration } = props
 
-  const { displayName } = getPipetteModelSpecs(pipetteInfo.model) || {}
-  const tipRackdisplayName = pipetteInfo.tipRack
+  const displayName =
+    getPipetteModelSpecs(pipetteInfo.model)?.displayName || pipetteInfo.model
+
+  const tipRackdisplayName = pipetteInfo.tipRackDisplay
   return (
     <>
       <Box marginBottom={SPACING_4}>
@@ -199,7 +220,9 @@ function PipetteResult(props: PipetteResultProps): React.Node {
         >
           {displayName}
         </Text>
-        <RenderResult status={pipetteCalibration.pipetteOffset.status} />
+        <RenderResult
+          status={pipetteCalibration.pipetteOffset?.status ?? null}
+        />
       </Box>
       <Box>
         <Text
@@ -209,7 +232,7 @@ function PipetteResult(props: PipetteResultProps): React.Node {
         >
           {tipRackdisplayName}
         </Text>
-        <RenderResult status={pipetteCalibration.tipLength.status} />
+        <RenderResult status={pipetteCalibration.tipLength?.status ?? null} />
       </Box>
     </>
   )

@@ -64,6 +64,7 @@ const assetMap = {
 }
 
 const HEADER = 'Save the nozzle z-axis'
+const HEALTH_CHECK_HEADER = 'Check the nozzle z-axis'
 const JOG_UNTIL = 'Jog the robot until the nozzle is'
 const BARELY_TOUCHING = 'barely touching (less than 0.1 mm)'
 const THE = 'the'
@@ -71,10 +72,11 @@ const BLOCK = 'block in'
 const FLAT_SURFACE = 'flat surface'
 const OF_THE_TRASH_BIN = 'of the trash bin'
 const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis and move to pick up tip'
+const CHECK_NOZZLE_Z_AXIS = 'Check nozzle z-axis and move to pick up tip'
 const SLOT = 'slot'
 
 export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
-  const { sendCommands, calBlock, mount, isMulti } = props
+  const { sendCommands, calBlock, mount, isMulti, sessionType } = props
 
   const referencePointStr = calBlock ? (
     BLOCK
@@ -105,11 +107,16 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
     })
   }
 
+  const isHealthCheck =
+    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+
   const proceed = () => {
-    sendCommands(
-      { command: Sessions.sharedCalCommands.SAVE_OFFSET },
-      { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
-    )
+    isHealthCheck
+      ? sendCommands({ command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK })
+      : sendCommands(
+          { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+          { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
+        )
   }
 
   const [confirmLink, confirmModal] = useConfirmCrashRecovery({
@@ -132,7 +139,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
             fontWeight={FONT_WEIGHT_SEMIBOLD}
             fontSize={FONT_SIZE_HEADER}
           >
-            {HEADER}
+            {isHealthCheck ? HEALTH_CHECK_HEADER : HEADER}
           </Text>
           <NeedHelpLink />
         </Flex>
@@ -173,7 +180,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
         </div>
         <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
           <PrimaryBtn onClick={proceed} flex="1">
-            {SAVE_NOZZLE_Z_AXIS}
+            {isHealthCheck ? CHECK_NOZZLE_Z_AXIS : SAVE_NOZZLE_Z_AXIS}
           </PrimaryBtn>
         </Flex>
       </Flex>

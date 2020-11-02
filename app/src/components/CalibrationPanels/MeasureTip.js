@@ -63,6 +63,7 @@ const assetMap = {
 }
 
 const HEADER = 'Save the tip length'
+const HEALTH_CHECK_HEADER = 'Check the tip length'
 const JOG_UNTIL = 'Jog the robot until the tip is'
 const BARELY_TOUCHING = 'barely touching (less than 0.1 mm)'
 const THE = 'the'
@@ -70,6 +71,7 @@ const BLOCK = 'block in'
 const FLAT_SURFACE = 'flat surface'
 const OF_THE_TRASH_BIN = 'of the trash bin'
 const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
+const CHECK_NOZZLE_Z_AXIS = 'Check the tip length'
 const SLOT = 'slot'
 
 export function MeasureTip(props: CalibrationPanelProps): React.Node {
@@ -114,19 +116,23 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
   const isExtendedPipOffset =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
     shouldPerformTipLength
+  const isHealthCheck =
+    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
-  const proceedTipLength = () => {
-    sendCommands(
-      { command: Sessions.sharedCalCommands.SAVE_OFFSET },
-      { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
-    )
+  const proceed = () => {
+    isHealthCheck
+      ? sendCommands(
+          { command: Sessions.checkCommands.COMPARE_POINT },
+          { command: Sessions.sharedCalCommands.MOVE_TO_DECK }
+        )
+      : isExtendedPipOffset
+      ? sendCommands({ command: Sessions.sharedCalCommands.SAVE_OFFSET })
+      : sendCommands(
+          { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+          { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
+        )
   }
 
-  const proceedPipetteOffset = () => {
-    sendCommands({ command: Sessions.sharedCalCommands.SAVE_OFFSET })
-  }
-
-  const proceed = isExtendedPipOffset ? proceedPipetteOffset : proceedTipLength
   const [confirmLink, confirmModal] = useConfirmCrashRecovery({
     requiresNewTip: true,
     ...props,
@@ -147,7 +153,7 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
             fontWeight={FONT_WEIGHT_SEMIBOLD}
             fontSize={FONT_SIZE_HEADER}
           >
-            {HEADER}
+            {isHealthCheck ? HEALTH_CHECK_HEADER : HEADER}
           </Text>
           <NeedHelpLink />
         </Flex>
@@ -188,7 +194,7 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
         </div>
         <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
           <PrimaryBtn title="saveTipLengthButton" onClick={proceed} flex="1">
-            {SAVE_NOZZLE_Z_AXIS}
+            {isHealthCheck ? CHECK_NOZZLE_Z_AXIS : SAVE_NOZZLE_Z_AXIS}
           </PrimaryBtn>
         </Flex>
       </Flex>
