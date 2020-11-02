@@ -22,8 +22,6 @@ export const CHECK_STEP_CHECK_COMPLETE: 'calibrationComplete' =
 export const CHECK_STEP_SESSION_EXITED: 'sessionExited' = 'sessionExited'
 export const CHECK_STEP_RETURNING_TIP: 'returningTip' = 'returningTip'
 export const CHECK_STEP_RESULTS_SUMMARY: 'resultsSummary' = 'resultsSummary'
-// export const CHECK_STEP_NO_PIPETTES_ATTACHED: 'noPipettesAttached' =
-//   'noPipettesAttached'
 
 const CHECK_SWITCH_PIPETTE: 'calibration.check.switchPipette' =
   'calibration.check.switchPipette'
