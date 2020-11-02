@@ -29,9 +29,10 @@ import {
 import { ControlContainer } from './ControlContainer'
 
 import type { Jog, Plane, Sign, Bearing } from './types'
+import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
 type Control = {|
-  title: Bearing,
+  bearing: Bearing,
   keyName: string,
   shiftKey: boolean,
   gridRow: number,
@@ -47,12 +48,12 @@ type ControlsContents = {|
 |}
 
 const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
-  vertical: {
+  [VERTICAL_PLANE]: {
     controls: [
       {
         keyName: 'ArrowUp',
         shiftKey: true,
-        title: 'up',
+        bearing: 'up',
         gridRow: 1,
         gridColumn: 2,
         iconName: 'ot-arrow-up',
@@ -62,7 +63,7 @@ const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
       {
         keyName: 'ArrowDown',
         shiftKey: true,
-        title: 'down',
+        bearing: 'down',
         gridRow: 2,
         gridColumn: 2,
         iconName: 'ot-arrow-down',
@@ -73,12 +74,12 @@ const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
     title: 'Up & Down',
     subtitle: 'Arrow keys + SHIFT',
   },
-  horizontal: {
+  [HORIZONTAL_PLANE]: {
     controls: [
       {
         keyName: 'ArrowLeft',
         shiftKey: false,
-        title: 'left',
+        bearing: 'left',
         gridRow: 2,
         gridColumn: 1,
         iconName: 'ot-arrow-left',
@@ -88,7 +89,7 @@ const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
       {
         keyName: 'ArrowRight',
         shiftKey: false,
-        title: 'right',
+        bearing: 'right',
         gridRow: 2,
         gridColumn: 3,
         iconName: 'ot-arrow-right',
@@ -98,7 +99,7 @@ const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
       {
         keyName: 'ArrowUp',
         shiftKey: false,
-        title: 'back',
+        bearing: 'back',
         gridRow: 1,
         gridColumn: 2,
         iconName: 'ot-arrow-up',
@@ -108,7 +109,7 @@ const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
       {
         keyName: 'ArrowDown',
         shiftKey: false,
-        title: 'forward',
+        bearing: 'forward',
         gridRow: 2,
         gridColumn: 2,
         iconName: 'ot-arrow-down',
@@ -147,10 +148,10 @@ export function DirectionControl(props: DirectionControlProps): React.Node {
           gridTemplateColumns="repeat(3, [col] 3rem)"
         >
           {controls.map(
-            ({ title, gridRow, gridColumn, iconName, axis, sign }) => (
+            ({ bearing, gridRow, gridColumn, iconName, axis, sign }) => (
               <PrimaryBtn
-                key={title}
-                title={title}
+                key={bearing}
+                title={bearing}
                 width="2.5rem"
                 height="2.5rem"
                 alignSelf={ALIGN_CENTER}

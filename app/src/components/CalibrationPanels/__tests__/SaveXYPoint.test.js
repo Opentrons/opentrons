@@ -22,7 +22,7 @@ describe('SaveXYPoint', () => {
     wrapper.find('button[title="save"]')
 
   const getJogButton = (wrapper, direction) =>
-    wrapper.find(`JogButton[name="${direction}"]`).find('button')
+    wrapper.find(`button[title="${direction}"]`).find('button')
 
   const getVideo = wrapper => wrapper.find(`source`)
 

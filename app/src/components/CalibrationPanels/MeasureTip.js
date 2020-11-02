@@ -23,7 +23,7 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
-import { JogControls } from '../JogControls'
+import { JogControls, VERTICAL_PLANE } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
@@ -184,7 +184,11 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
           </Flex>
         </Box>
         <div>
-          <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
+          <JogControls
+            jog={jog}
+            stepSizes={[0.1, 1]}
+            planes={[VERTICAL_PLANE]}
+          />
         </div>
         <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
           <PrimaryBtn title="saveTipLengthButton" onClick={proceed} flex="1">

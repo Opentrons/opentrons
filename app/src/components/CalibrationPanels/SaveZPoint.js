@@ -9,13 +9,16 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_HEADER,
   FONT_SIZE_BODY_2,
+  FONT_BODY_2_DARK,
   DIRECTION_ROW,
   SPACING_3,
   SPACING_5,
   BORDER_SOLID_LIGHT,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
+  ALIGN_STRETCH,
   TEXT_TRANSFORM_UPPERCASE,
+  TEXT_ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
@@ -23,7 +26,7 @@ import * as Sessions from '../../sessions'
 import type { SessionType } from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from './types'
-import { JogControls } from '../JogControls'
+import { JogControls, HORIZONTAL_PLANE, VERTICAL_PLANE } from '../JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -59,6 +62,8 @@ const TO_USE_Z =
   'button to use this z position for the rest of deck calibration'
 const CALIBRATION_HEALTH_TO_DETERMINE =
   'button to determine how this position compares to the previously saved z-axis calibration coordinate'
+const ALLOW_HORIZONTAL_TEXT =
+  'Need to jog across the deck to align the pipette in slot 5?'
 
 const contentsBySessionType: {
   [SessionType]: {
@@ -93,6 +98,8 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
     [mount, isMulti]
   )
 
+  const [allowHorizontal, setAllowHorizontal] = React.useState(false)
+
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
@@ -124,6 +131,31 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
     requiresNewTip: true,
     ...props,
   })
+
+  const AllowHorizontalPrompt = () => (
+    <Flex
+      justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
+      flex={1}
+      alignSelf={ALIGN_STRETCH}
+    >
+      <Text
+        as="a"
+        onClick={e => {
+          e.preventDefault()
+          setAllowHorizontal(true)
+        }}
+        css={css`
+          ${FONT_BODY_2_DARK}
+          cursor: pointer;
+          text-decoration: underline;
+        `}
+        textAlign={TEXT_ALIGN_CENTER}
+      >
+        {ALLOW_HORIZONTAL_TEXT}
+      </Text>
+    </Flex>
+  )
 
   return (
     <>
@@ -167,7 +199,16 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
           <source src={demoAsset} />
         </video>
       </Flex>
-      <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
+      <JogControls
+        jog={jog}
+        stepSizes={[0.1, 1]}
+        planes={
+          allowHorizontal
+            ? [VERTICAL_PLANE, HORIZONTAL_PLANE]
+            : [VERTICAL_PLANE]
+        }
+        auxiliaryControl={allowHorizontal ? null : <AllowHorizontalPrompt />}
+      />
       <Flex
         width="100%"
         marginBottom={SPACING_3}

@@ -32,21 +32,30 @@ import {
 
 import { DirectionControl } from './DirectionControl'
 import { StepSizeControl } from './StepSizeControl'
-import { HORIZONTAL, VERTICAL, DEFAULT_STEP_SIZES } from './constants'
+import {
+  HORIZONTAL_PLANE,
+  VERTICAL_PLANE,
+  DEFAULT_STEP_SIZES,
+} from './constants'
 
 import type { Jog, Plane, StepSize } from './types'
 
+export type { Jog }
 export type JogControlsProps = {|
   jog: Jog,
-  planes: Array<Plane>,
-  stepSizes: Array<StepSize>,
+  planes?: Array<Plane>,
+  stepSizes?: Array<StepSize>,
+  auxiliaryControl?: React.Node | null,
 |}
+
+export { HORIZONTAL_PLANE, VERTICAL_PLANE }
 
 export function JogControls(props: JogControlsProps): React.Node {
   const {
     stepSizes = DEFAULT_STEP_SIZES,
-    planes = [HORIZONTAL, VERTICAL],
+    planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
     jog,
+    auxiliaryControl = null,
   } = props
   const [currentStepSize, setCurrentStepSize] = React.useState<number>(
     stepSizes[0]
@@ -70,6 +79,7 @@ export function JogControls(props: JogControlsProps): React.Node {
           stepSize={currentStepSize}
         />
       ))}
+      {auxiliaryControl}
     </Flex>
   )
 }
