@@ -52,7 +52,8 @@ describe('AskForCalibrationBlockModal', () => {
       useTrash: false,
     },
     {
-      it: 'no dispatch when trash is picked but not saved',
+      it:
+        'no dispatch (but yes intercom event) when trash is picked but not saved',
       save: false,
       savedVal: null,
       useTrash: true,
@@ -64,7 +65,8 @@ describe('AskForCalibrationBlockModal', () => {
       useTrash: false,
     },
     {
-      it: 'dispatches config command when trash is picked and saved',
+      it:
+        'dispatches config command and fires interocm event when trash is picked and saved',
       save: true,
       savedVal: false,
       useTrash: true,
