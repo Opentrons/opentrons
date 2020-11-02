@@ -84,7 +84,6 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: !anydict
         data:
           <<: *session_data
@@ -171,7 +170,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:
@@ -194,7 +192,6 @@ stages:
       status_code: 200
       json:
         links: !anydict
-        meta: null
         data:
           <<: *session_data
           details:

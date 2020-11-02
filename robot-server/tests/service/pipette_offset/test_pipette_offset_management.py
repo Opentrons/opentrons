@@ -1,4 +1,5 @@
 PIPETTE_ID = '123'
+LW_HASH = '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824'
 MOUNT = 'left'
 FAKE_PIPETTE_ID = 'fake'
 WRONG_MOUNT = 'right'
@@ -8,11 +9,11 @@ def test_access_pipette_offset_calibration(
         api_client, set_up_pipette_offset_temp_directory,
         server_temp_directory):
     expected = {
-        'id': 'pip_1&left',
+        'id': f'{PIPETTE_ID}&{MOUNT}',
         'offset': [0, 0, 0],
         'pipette': '123',
-        'mount': 'left',
-        'tiprack': '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824',  # noqa: E501
+        'mount': MOUNT,
+        'tiprack': LW_HASH,
         'lastModified': None,
         'source': 'user',
         'tiprackUri': 'opentrons/opentrons_96_filtertiprack_200ul/1',
