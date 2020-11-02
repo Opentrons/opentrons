@@ -13,7 +13,7 @@ export const getTipLengthCalibrations: (
   }
   const calibrations =
     state.calibration[robotName]?.tipLengthCalibrations?.data || []
-  return calibrations.map(calibration => calibration.attributes)
+  return calibrations
 }
 
 export const filterTipLengthForPipetteAndTiprack: (

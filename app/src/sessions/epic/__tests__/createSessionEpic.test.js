@@ -18,11 +18,8 @@ describe('createSessionEpic', () => {
     path: '/sessions',
     body: {
       data: {
-        type: 'Session',
-        attributes: {
-          sessionType: 'calibrationCheck',
-          createParams: {},
-        },
+        sessionType: 'calibrationCheck',
+        createParams: {},
       },
     },
   }
