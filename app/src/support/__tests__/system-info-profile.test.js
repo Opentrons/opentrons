@@ -25,7 +25,7 @@ const MOCK_ANALYTICS_PROPS = {
   'U2E IPv4 Address': '10.0.0.1',
 }
 
-describe('system info support profile updates', () => {
+describe('custom labware analytics events', () => {
   beforeEach(() => {
     getU2EDeviceAnalyticsProps.mockImplementation(state => {
       expect(state).toBe(MOCK_STATE)
