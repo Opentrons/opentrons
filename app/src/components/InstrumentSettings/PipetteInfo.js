@@ -31,6 +31,7 @@ import {
   FONT_SIZE_BODY_1,
   FONT_STYLE_ITALIC,
   JUSTIFY_START,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import * as Config from '../../config'
 import styles from './styles.css'
@@ -85,7 +86,9 @@ const SERIAL_NUMBER = 'Serial number'
 const PIPETTE_OFFSET_MISSING = 'Pipette offset calibration missing.'
 const CALIBRATE_NOW = 'Please calibrate offset now.'
 const CALIBRATE_OFFSET = 'Calibrate offset'
-const CALIBRATED_WITH = 'Calibrated with:'
+const DEFAULT_TIP = 'default tip'
+const TIP_NOT_CALIBRATED_BODY =
+  'Not calibrated yet. The tip you use to calibrate your pipette offset will become your default tip.'
 const PER_PIPETTE_BTN_STYLE = {
   width: '11rem',
   marginTop: SPACING_2,
@@ -241,71 +244,86 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           >
             {CALIBRATE_OFFSET}
           </SecondaryBtn>
-        </>
-      )}
-      {serialNumber && (
-        <Flex
-          marginTop={SPACING_2}
-          alignItems={ALIGN_FLEX_START}
-          justifyContent={JUSTIFY_START}
-        >
-          {!pipetteOffsetCalibration ? (
-            <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_START}>
-              <Box size={SIZE_2} paddingRight={SPACING_2} paddingY={SPACING_1}>
-                <Icon name="alert-circle" color={COLOR_ERROR} />
-              </Box>
-              <Flex
-                marginLeft={SPACING_1}
-                flexDirection={DIRECTION_COLUMN}
-                justifyContent={JUSTIFY_START}
-              >
-                <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
-                  {PIPETTE_OFFSET_MISSING}
-                </Text>
-                <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
-                  {CALIBRATE_NOW}
-                </Text>
+          <Flex
+            marginTop={SPACING_2}
+            alignItems={ALIGN_FLEX_START}
+            justifyContent={JUSTIFY_START}
+          >
+            {!pipetteOffsetCalibration ? (
+              <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_START}>
+                <Box
+                  size={SIZE_2}
+                  paddingRight={SPACING_2}
+                  paddingY={SPACING_1}
+                >
+                  <Icon name="alert-circle" color={COLOR_ERROR} />
+                </Box>
+                <Flex
+                  marginLeft={SPACING_1}
+                  flexDirection={DIRECTION_COLUMN}
+                  justifyContent={JUSTIFY_START}
+                >
+                  <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
+                    {PIPETTE_OFFSET_MISSING}
+                  </Text>
+                  <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
+                    {CALIBRATE_NOW}
+                  </Text>
+                </Flex>
               </Flex>
-            </Flex>
-          ) : pipetteOffsetCalibration.status.markedBad ? (
-            <InlineCalibrationWarning warningType="recommended" marginTop="0" />
-          ) : (
-            <Box size={SIZE_2} padding="0" />
-          )}
-        </Flex>
-      )}
-
-      {serialNumber && pipetteOffsetCalibration && tipLengthCalibration && (
-        <>
+            ) : pipetteOffsetCalibration.status.markedBad ? (
+              <InlineCalibrationWarning
+                warningType="recommended"
+                marginTop="0"
+              />
+            ) : (
+              <Box size={SIZE_2} padding="0" />
+            )}
+          </Flex>
           <Box>
             <Text
               marginTop={SPACING_2}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               fontSize={FONT_SIZE_BODY_1}
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
             >
-              {CALIBRATED_WITH}
+              {DEFAULT_TIP}
             </Text>
-            <Text
-              marginTop={SPACING_2}
-              fontStyle={FONT_STYLE_ITALIC}
-              fontSize={FONT_SIZE_BODY_1}
-            >
-              {getDisplayNameForTiprack(
-                pipetteOffsetCalibration.tiprackUri,
-                customLabwareDefs
-              )}
-            </Text>
+            {pipetteOffsetCalibration && tipLengthCalibration ? (
+              <>
+                <Text
+                  marginTop={SPACING_2}
+                  fontStyle={FONT_STYLE_ITALIC}
+                  fontSize={FONT_SIZE_BODY_1}
+                >
+                  {getDisplayNameForTiprack(
+                    pipetteOffsetCalibration.tiprackUri,
+                    customLabwareDefs
+                  )}
+                </Text>
+                <SecondaryBtn
+                  {...PER_PIPETTE_BTN_STYLE}
+                  title="recalibrateTipButton"
+                  onClick={() =>
+                    startPipetteOffsetWizard({ keepTipLength: false })
+                  }
+                >
+                  {RECALIBRATE_TIP}
+                </SecondaryBtn>
+                {tipLengthCalibration.status.markedBad && (
+                  <InlineCalibrationWarning warningType="recommended" />
+                )}
+              </>
+            ) : (
+              <Text
+                marginTop={SPACING_2}
+                fontStyle={FONT_STYLE_ITALIC}
+                fontSize={FONT_SIZE_BODY_1}
+              >
+                {TIP_NOT_CALIBRATED_BODY}
+              </Text>
+            )}
           </Box>
-          <SecondaryBtn
-            {...PER_PIPETTE_BTN_STYLE}
-            title="recalibrateTipButton"
-            onClick={() => startPipetteOffsetWizard({ keepTipLength: false })}
-          >
-            {RECALIBRATE_TIP}
-          </SecondaryBtn>
-          {tipLengthCalibration.status.markedBad && (
-            <InlineCalibrationWarning warningType="recommended" />
-          )}
         </>
       )}
     </Flex>
