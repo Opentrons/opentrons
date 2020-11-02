@@ -4,7 +4,7 @@ PD's versioning isn't semver because PD's main consumer is... PD itself! PD save
 
 The PD app is versioned `major.minor.patch` where...
 
-- major: the JSON schema version number of the protocol. When the schema increments, it's a major bump even if no big PD features have been added. However, since we added "differential export" (explained below), this is a little confusing bc PD might export a 5.x.x protocol that is in JSON schema. (Before we allowed differential export, making major version = JSON schema version made more sense, and if we keep differential export around we might want to drop or otherwise reconsider the major number?)
+- major: This number represents the highest JSON schema version that PD is currently able to export. (Before we added differential export, a given version of PD could only output one JSON schema version, and that was reflected in this major version number, so this was previously more intuitive.)
 - minor: must be bumped when a PD import migration is added to PD. This might happen even though nothing visually has changed (usually occurs when a form field is added, removed or modified, or when a new type of data is introduced like `modules` key added to Redux store, which requires a default value)
 - patch: any change that is not a JSON schema increment and does not need an import migration. We might do a release with a significant UI change, but still only do a patch bump.
 
