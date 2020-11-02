@@ -157,6 +157,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     currentStep,
     sessionType,
     activePipette,
+    instruments,
   } = props
 
   const {
@@ -192,7 +193,8 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     }
     if (
       finalCommand &&
-      activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
+      instruments?.length &&
+      activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
     ) {
       commands = [...commands, { command: finalCommand }]
     } else if (moveCommand) {
@@ -206,7 +208,9 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     ...props,
   })
   const continueButtonText =
-    isHealthCheck && activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
+    isHealthCheck &&
+    instruments?.length &&
+    activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
       ? HEALTH_BUTTON_TEXT
       : buttonText
   return (
