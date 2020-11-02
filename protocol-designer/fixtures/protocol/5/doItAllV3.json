@@ -10,7 +10,7 @@
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "5.2.0",
+    "version": "5.2.1",
     "data": {
       "_internalAppBuildDate": "Thu, 02 Apr 2020 20:21:23 GMT",
       "defaultValues": {
