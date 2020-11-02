@@ -282,7 +282,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           </Flex>
           <Box>
             <Text
-              marginTop={SPACING_2}
+              marginTop={SPACING_3}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               fontSize={FONT_SIZE_BODY_1}
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
