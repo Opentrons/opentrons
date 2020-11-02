@@ -26,7 +26,7 @@ The PD application needs to read its own version to know which migrations to run
 
 Upon importing a protocol, PD populates its Redux store with transformed data from the protocol file. Since the Redux store data changes over time, we need to handle importing older protocols when there were different keys, data types, etc. We handle this by having "migrations" where we define functions to transform eg PD version 1.0.0 protocol data to 1.1.0, then 1.1.0 to 2.0.0, and so on up to the latest version. These are in `protocol-designer/src/load-file/migration`.
 
-Because PD migrates protocol upon import, if you import a signifcantly older protocol and save it immediately with no changes, the new file may be different because it has passed through the migration process.
+Because PD migrates protocols when they are imported, if you import a signifcantly older protocol and save it immediately with no changes, the new file may be different because it has passed through the migration process.
 
 Certain migrations can get a special modal associated with them. For example, when you import a couple years old protocol with v1 schema labware, you will get a special 'Update protocol to use new labware definitions' import modal. In most cases, you'll get the generic modal 'Your protocol was made in an older version of Protocol Designer'. (This is handled in `protocol-designer/src/components/modals/FileUploadMessageModal/modalContents.js`)
 
