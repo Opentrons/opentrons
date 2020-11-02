@@ -239,9 +239,6 @@ class DeckCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def move_to_tip_rack(self):
-        if self._current_state == State.labwareLoaded:
-            MODULE_LOG.info("homing plunger")
-            await self.hardware.home_plunger(self.mount)
         await self._move(Location(self.tip_origin, None))
 
     async def move_to_deck(self):

@@ -56,6 +56,7 @@ class TipLengthCalibration(BaseSession):
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
         await configuration.hardware.cache_instruments()
+        await configuration.hardware.home()
         try:
             tip_cal_user_flow = TipCalibrationUserFlow(
                     hardware=configuration.hardware,
