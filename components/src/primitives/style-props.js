@@ -59,9 +59,9 @@ const FLEXBOX_PROPS = [
 const GRID_PROPS = [
   'gridGap',
   'gridTemplateRows',
-  'gridTemplateColumn',
-  'gridRows',
-  'gridColumns',
+  'gridTemplateColumns',
+  'gridRow',
+  'gridColumn',
 ]
 
 const LAYOUT_PROPS = [

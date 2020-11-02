@@ -59,8 +59,8 @@ export type GridProps = {|
   gridGap?: string | number,
   gridTemplateRows?: string,
   gridTemplateColumns?: string,
-  gridRows?: string,
-  gridColumns?: string,
+  gridRow?: string | number,
+  gridColumn?: string | number,
 |}
 
 export type LayoutProps = {|

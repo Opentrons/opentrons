@@ -24,6 +24,8 @@ import {
   FONT_SIZE_BODY_1,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
+  FONT_BODY_1_DARK,
+  FONT_HEADER_DARK,
 } from '@opentrons/components'
 
 import styles from './styles.css'
@@ -63,7 +65,7 @@ const JOG_ICONS_BY_NAME = {
   down: 'ot-arrow-down',
 }
 
-const JOG_PARAMS_BY_NAME = {
+const JOG_PARAMS_BY_DIRECTION = {
   left: ['x', -1],
   right: ['x', 1],
   back: ['y', 1],
@@ -77,6 +79,144 @@ const stepToOption = (step: JogStep) => ({
   name: `${step} mm`,
   value: `${step}`,
 })
+
+type ControlsContainerProps = {|
+  title: string,
+  subtitle: string,
+  children: React.Node,
+|}
+
+export function ControlsContainer(props: ControlsContainerProps): React.Node {
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <Text css={FONT_HEADER_DARK}>{props.title}</Text>
+      <Text css={FONT_BODY_1_DARK}>{props.subtitle}</Text>
+      <Box
+        display="grid"
+        gridGap={SPACING_1}
+        gridTemplateRows="repeat(2, [row] 3rem)"
+        gridTemplateColumns="repeat(3, [col] 3rem)"
+      >
+        {props.children}
+      </Box>
+    </Flex>
+  )
+}
+
+type Direction = 'left' | 'right' | 'forward' | 'back' | 'up' | 'down'
+type Plane = 'horizontal' | 'vertical'
+
+type Control = {|
+  direction: Direction,
+  keyName: string,
+  shiftKey: boolean,
+|}
+type ControlsContents = {|
+  controls: Array<Control>,
+  title: string,
+  subtitle: string,
+|}
+
+const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
+  vertical: {
+    controls: [
+      { keyName: 'ArrowUp', shiftKey: true, direction: 'up' },
+      { keyName: 'ArrowDown', shiftKey: true, direction: 'down' },
+    ],
+    title: 'Up & Down',
+    subtitle: 'Arrow keys + SHIFT',
+  },
+  horizontal: {
+    controls: [
+      { keyName: 'ArrowLeft', shiftKey: false, direction: 'left' },
+      { keyName: 'ArrowRight', shiftKey: false, direction: 'right' },
+      { keyName: 'ArrowUp', shiftKey: false, direction: 'back' },
+      { keyName: 'ArrowDown', shiftKey: false, direction: 'forward' },
+    ],
+    title: 'Across Deck',
+    subtitle: 'Arrow keys',
+  },
+}
+
+type JogControlProps = {|
+  plane: Plane,
+  jog: Jog,
+  step: number,
+|}
+export function JogControl(props: JogControlProps): React.Node {
+  const { title, subtitle, controls } = CONTROLS_CONTENTS_BY_PLANE[props.plane]
+
+  function makeJogInDirection(direction: Direction) {
+    return () => props.jog(...JOG_PARAMS_BY_DIRECTION[direction], props.step)
+  }
+
+  return (
+    <ControlsContainer {...{ title, subtitle }}>
+      <HandleKeypress
+        preventDefault
+        handlers={controls.map(({ keyName, shiftKey, direction }) => ({
+          key: keyName,
+          shiftKey,
+          onPress: makeJogInDirection(direction),
+        }))}
+      >
+        {controls.map(({ direction }) => (
+          <JogButton
+            key={direction}
+            name={direction}
+            icon={JOG_ICONS_BY_NAME[direction]}
+            onClick={makeJogInDirection(direction)}
+          />
+        ))}
+      </HandleKeypress>
+    </ControlsContainer>
+  )
+}
+
+type JogStepSizeSelectProps = {|
+  stepSizes: Array<JogStep>,
+|}
+export function JogStepSizeSelect(props: JogStepSizeSelectProps): React.Node {
+  const { stepSizes } = props
+  const [currentStepSize, setCurrentStepSize] = React.useState<number>(
+    stepSizes[0]
+  )
+
+  const increaseStepSize: () => void = () => {
+    const i = stepSizes.indexOf(currentStepSize)
+    if (i < stepSizes.length - 1) setCurrentStepSize(stepSizes[i + 1])
+  }
+
+  const decreaseStepSize: () => void = () => {
+    const i = stepSizes.indexOf(currentStepSize)
+    if (i > 0) setCurrentStepSize(stepSizes[i - 1])
+  }
+
+  const handleStepSelect: (
+    event: SyntheticInputEvent<HTMLInputElement>
+  ) => void = event => {
+    setCurrentStepSize(Number(event.target.value))
+    event.target.blur()
+  }
+  return (
+    <HandleKeypress
+      preventDefault
+      handlers={[
+        { key: '-', onPress: decreaseStepSize },
+        { key: '_', onPress: decreaseStepSize },
+        { key: '=', onPress: increaseStepSize },
+        { key: '+', onPress: increaseStepSize },
+      ]}
+    >
+      <RadioGroup
+        className={styles.increment_item}
+        value={`${currentStepSize}`}
+        options={stepSizes.map(s => stepToOption(s))}
+        onChange={handleStepSelect}
+      />
+    </HandleKeypress>
+  )
+}
 
 export class JogControls extends React.Component<
   JogControlsProps,
@@ -122,12 +262,12 @@ export class JogControls extends React.Component<
     const { step } = this.state
 
     return {
-      left: jog.bind(null, ...JOG_PARAMS_BY_NAME.left, step),
-      right: jog.bind(null, ...JOG_PARAMS_BY_NAME.right, step),
-      back: jog.bind(null, ...JOG_PARAMS_BY_NAME.back, step),
-      forward: jog.bind(null, ...JOG_PARAMS_BY_NAME.forward, step),
-      up: jog.bind(null, ...JOG_PARAMS_BY_NAME.up, step),
-      down: jog.bind(null, ...JOG_PARAMS_BY_NAME.down, step),
+      left: jog.bind(null, ...JOG_PARAMS_BY_DIRECTION.left, step),
+      right: jog.bind(null, ...JOG_PARAMS_BY_DIRECTION.right, step),
+      back: jog.bind(null, ...JOG_PARAMS_BY_DIRECTION.back, step),
+      forward: jog.bind(null, ...JOG_PARAMS_BY_DIRECTION.forward, step),
+      up: jog.bind(null, ...JOG_PARAMS_BY_DIRECTION.up, step),
+      down: jog.bind(null, ...JOG_PARAMS_BY_DIRECTION.down, step),
     }
   }
 
@@ -191,6 +331,7 @@ export class JogControls extends React.Component<
   }
 
   render(): React.Node {
+    const jogHandlers = this.getJogHandlers()
     const hasAcrossControls =
       this.props.axes.includes('x') || this.props.axes.includes('y')
     return (
@@ -220,13 +361,39 @@ export class JogControls extends React.Component<
               gridGap={SPACING_1}
               gridTemplateRows="repeat(2, [row] 3rem)"
               gridTemplateColumns="repeat(3, [col] 3rem)"
-            ></Box>
+            >
+              {['x', 'y']
+                .flatMap(a => JOG_BUTTON_NAMES_BY_AXIS[a])
+                .map(name => (
+                  <JogButton
+                    key={name}
+                    name={name}
+                    icon={JOG_ICONS_BY_NAME[name]}
+                    onClick={jogHandlers[name]}
+                  />
+                ))}
+            </Box>
           </Flex>
         ) : null}
         {this.props.axes.includes('z') ? (
           <span className={styles.jog_label_z}>
             Up & Down
             <span className={styles.jog_label_keys}>Arrow keys + SHIFT</span>
+            <Box
+              display="grid"
+              gridGap={SPACING_1}
+              gridTemplateRows="repeat(2, [row] 3rem)"
+              gridTemplateColumns="repeat(3, [col] 3rem)"
+            >
+              {JOG_BUTTON_NAMES_BY_AXIS['z'].map(name => (
+                <JogButton
+                  key={name}
+                  name={name}
+                  icon={JOG_ICONS_BY_NAME[name]}
+                  onClick={jogHandlers[name]}
+                />
+              ))}
+            </Box>
           </span>
         ) : null}
       </Flex>
@@ -235,8 +402,8 @@ export class JogControls extends React.Component<
 }
 
 const colAndRowByDirection: { [string]: [number, number] } = {
-  back: [2, 2],
-  forward: [1, 2],
+  back: [1, 2],
+  forward: [2, 2],
   down: [2, 2],
   up: [1, 2],
   right: [2, 3],
@@ -256,6 +423,7 @@ function JogButton(props: JogButtonProps) {
       alignSelf={ALIGN_CENTER}
       justifySelf={JUSTIFY_CENTER}
       onClick={onClick}
+      padding={0}
       {...{ gridRow, gridColumn }}
     >
       <Icon name={icon} />
