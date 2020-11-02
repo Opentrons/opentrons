@@ -17,11 +17,11 @@ LabwareLike = Union[
 
 
 class LabwareLikeType(int, Enum):
-    labware = auto()
-    slot_name = auto()
-    well = auto()
-    module = auto()
-    none = auto()
+    LABWARE = auto()
+    SLOT = auto()
+    WELL = auto()
+    MODULE = auto()
+    NONE = auto()
 
 
 class LabwareLikeWrapper:
@@ -34,19 +34,19 @@ class LabwareLikeWrapper:
         from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
         self._labware_like = labware_like
-        self._type = LabwareLikeType.none
+        self._type = LabwareLikeType.NONE
 
         if isinstance(self._labware_like, Well):
-            self._type = LabwareLikeType.well
+            self._type = LabwareLikeType.WELL
             self._as_str = repr(self._labware_like)
         elif isinstance(self._labware_like, Labware):
-            self._type = LabwareLikeType.labware
+            self._type = LabwareLikeType.LABWARE
             self._as_str = repr(self._labware_like)
         elif isinstance(self._labware_like, str):
-            self._type = LabwareLikeType.slot_name
+            self._type = LabwareLikeType.SLOT
             self._as_str = self._labware_like
         elif isinstance(self._labware_like, ModuleGeometry):
-            self._type = LabwareLikeType.module
+            self._type = LabwareLikeType.MODULE
             self._as_str = repr(self._labware_like)
         elif isinstance(self._labware_like, LabwareLikeWrapper):
             self._type = self._labware_like._type
@@ -64,9 +64,9 @@ class LabwareLikeWrapper:
 
     @property
     def has_parent(self) -> bool:
-        return self._type in {LabwareLikeType.labware,
-                              LabwareLikeType.well,
-                              LabwareLikeType.module}
+        return self._type in {LabwareLikeType.LABWARE,
+                              LabwareLikeType.WELL,
+                              LabwareLikeType.MODULE}
 
     @property
     def parent(self) -> Optional['LabwareLikeWrapper']:
@@ -76,15 +76,15 @@ class LabwareLikeWrapper:
 
     @property
     def is_well(self) -> bool:
-        return self.object_type == LabwareLikeType.well
+        return self.object_type == LabwareLikeType.WELL
 
     @property
     def is_labware(self) -> bool:
-        return self.object_type == LabwareLikeType.labware
+        return self.object_type == LabwareLikeType.LABWARE
 
     @property
     def is_slot(self) -> bool:
-        return self.object_type == LabwareLikeType.slot_name
+        return self.object_type == LabwareLikeType.SLOT
 
     def as_well(self) -> 'Well':
         # Import locally to avoid circular dependency
