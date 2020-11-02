@@ -361,13 +361,6 @@ describe('labware calibration selectors', () => {
           calibrationData: null,
         },
         {
-          // This calibrationData is grabbed unintentionally as a side-effect
-          // of the Selector logic. Both labware & calibration have hashes missing
-          // hence the matchesLabwareIdentityForCalibration logic gets satisfied
-          // and we get a calibrationData in the definition. This could happen
-          // in case of v1 labware. In such a case, the LabwareSummary object sets
-          // its calDataAvailable property to false and hides the calibrationData
-          // from view.
           type: 'some_v1_labware',
           definition: null,
           slot: '1',
