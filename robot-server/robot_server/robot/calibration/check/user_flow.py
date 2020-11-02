@@ -452,7 +452,7 @@ class CheckCalibrationUserFlow:
                 model=hw_pip.model,
                 name=hw_pip.name,
                 tipLength=hw_pip.config.tip_length,
-                tipRackDisplay=info_pip.tip_rack._implementation.get_display_name(),  # noqa: E501
+                tipRackDisplay=info_pip.tip_rack._implementation.get_definition()['metadata']['displayName'],  # noqa: E501
                 tipRackUri=info_pip.tip_rack.uri,
                 rank=info_pip.rank.value,
                 mount=str(info_pip.mount),
