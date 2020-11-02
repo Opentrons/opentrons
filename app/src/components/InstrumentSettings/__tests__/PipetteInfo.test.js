@@ -86,9 +86,7 @@ describe('PipetteInfo', () => {
   })
 
   it('just launch POC w/o cal block modal if POC button clicked and data exists', () => {
-    mockGetCalibrationForPipette.mockReturnValue(
-      mockPipetteOffsetCalibration1
-    )
+    mockGetCalibrationForPipette.mockReturnValue(mockPipetteOffsetCalibration1)
     const { wrapper } = render()
     wrapper.find('button[children="Calibrate offset"]').invoke('onClick')()
     wrapper.update()
@@ -137,9 +135,7 @@ describe('PipetteInfo', () => {
   })
 
   it('launch POWT w/ cal block modal denied if recal tip button clicked and no cal block pref saved', () => {
-    mockGetCalibrationForPipette.mockReturnValue(
-      mockPipetteOffsetCalibration1
-    )
+    mockGetCalibrationForPipette.mockReturnValue(mockPipetteOffsetCalibration1)
     mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
       mockTipLengthCalibration1
     )
@@ -161,9 +157,7 @@ describe('PipetteInfo', () => {
   })
 
   it('launch POWT w/ cal block modal confirmed if recal tip button clicked and no cal block pref saved', () => {
-    mockGetCalibrationForPipette.mockReturnValue(
-      mockPipetteOffsetCalibration1
-    )
+    mockGetCalibrationForPipette.mockReturnValue(mockPipetteOffsetCalibration1)
     mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
       mockTipLengthCalibration1
     )
@@ -185,9 +179,7 @@ describe('PipetteInfo', () => {
   it('launch POWT w/o cal block modal if recal tip button clicked and cal block pref saved as true', () => {
     mockGetHasCalibrationBlock.mockReturnValue(true)
 
-    mockGetCalibrationForPipette.mockReturnValue(
-      mockPipetteOffsetCalibration1
-    )
+    mockGetCalibrationForPipette.mockReturnValue(mockPipetteOffsetCalibration1)
     mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
       mockTipLengthCalibration1
     )
@@ -208,9 +200,7 @@ describe('PipetteInfo', () => {
   it('launch POWT w/o cal block modal if recal tip button clicked and cal block pref saved as false', () => {
     mockGetHasCalibrationBlock.mockReturnValue(false)
 
-    mockGetCalibrationForPipette.mockReturnValue(
-      mockPipetteOffsetCalibration1
-    )
+    mockGetCalibrationForPipette.mockReturnValue(mockPipetteOffsetCalibration1)
     mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
       mockTipLengthCalibration1
     )
