@@ -86,6 +86,7 @@ describe('labware calibration selectors', () => {
             type: 'some_v1_labware',
             definition: null,
             slot: '1',
+            definitionHash: null,
           }: $Shape<ProtocolLabware>),
         ]
       })
@@ -159,7 +160,7 @@ describe('labware calibration selectors', () => {
           parentDisplayName: null,
           quantity: 1,
           calibration: null,
-          calDataAvailable: true,
+          calDataAvailable: false,
         },
       ])
     })
@@ -232,11 +233,12 @@ describe('labware calibration selectors', () => {
           version: null,
           parent: null,
           calibrationData: null,
+          definitionHash: null,
         },
       ])
     })
 
-    it('grabs calibration data for labware not on module if on-module cal data is present', () => {
+    it('grabs calibration data for labware not on module even if on-module cal data is also present', () => {
       const lwCalibration = Fixtures.mockLabwareCalibration1
       const { calibrationData } = lwCalibration
 
@@ -305,6 +307,7 @@ describe('labware calibration selectors', () => {
           namespace: null,
           version: null,
           parent: null,
+          definitionHash: null,
           calibrationData: null,
         },
       ])
@@ -372,7 +375,8 @@ describe('labware calibration selectors', () => {
           namespace: null,
           version: null,
           parent: null,
-          calibrationData: { x: 1.2, y: 4.6, z: 7.9 },
+          definitionHash: null,
+          calibrationData: null,
         },
       ])
     })
