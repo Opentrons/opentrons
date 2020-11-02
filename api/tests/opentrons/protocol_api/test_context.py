@@ -144,7 +144,7 @@ async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
 
     # Once we have a location cache, that should be our from_loc
     right.move_to(lw.wells()[1].top())
-    assert test_args[0].labware == lw.wells()[0]
+    assert test_args[0].labware.as_well() == lw.wells()[0]
 
 
 async def test_move_uses_arc(loop, monkeypatch, get_labware_def, hardware):

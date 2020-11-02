@@ -4,7 +4,8 @@ import pytest
 
 from opentrons.types import Location, Point
 from opentrons.protocols.geometry.planning import (
-    plan_moves, safe_height, first_parent, should_dodge_thermocycler)
+    plan_moves, safe_height, should_dodge_thermocycler)
+from opentrons.protocols.api_support.util import first_parent
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import module_geometry
