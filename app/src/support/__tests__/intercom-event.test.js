@@ -30,19 +30,23 @@ describe('support event tests', () => {
   })
 
   it('makeIntercomEvent should send an event for no cal block selected', () => {
-    expect(makeIntercomEvent(
-      Calibration.setUseTrashSurfaceForTipCal(true),
-      MOCK_STATE
-    )).toEqual({
+    expect(
+      makeIntercomEvent(
+        Calibration.setUseTrashSurfaceForTipCal(true),
+        MOCK_STATE
+      )
+    ).toEqual({
       eventName: Constants.INTERCOM_EVENT_NO_CAL_BLOCK,
-      metadata: {}
+      metadata: {},
     })
   })
   it('makeIntercomEvent should not send an event for cal block present', () => {
-    expect(makeIntercomEvent(
-      Calibration.setUseTrashSurfaceForTipCal(false),
-      MOCK_STATE
-    )).toBe(null)
+    expect(
+      makeIntercomEvent(
+        Calibration.setUseTrashSurfaceForTipCal(false),
+        MOCK_STATE
+      )
+    ).toBe(null)
   })
 
   it('sendEvent should pass on its arguments', () => {
