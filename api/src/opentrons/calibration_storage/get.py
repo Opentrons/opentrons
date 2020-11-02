@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
 
 
 def _format_calibration_type(
-        data: 'CalibrationDict') -> local_types.CalibrationTypes:
+        data: 'CalibrationDict') -> local_types.LabwareCalibrationTypes:
     offset = local_types.OffsetData(
         value=data['default']['offset'],
         last_modified=data['default']['lastModified']
@@ -27,7 +27,7 @@ def _format_calibration_type(
     # the labware calibraiton file. We should
     # have a follow-up PR to grab tip lengths
     # based on the loaded pips + labware
-    return local_types.CalibrationTypes(
+    return local_types.LabwareCalibrationTypes(
             offset=offset,
             tip_length=local_types.TipLengthData())
 

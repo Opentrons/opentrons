@@ -241,6 +241,27 @@ def mock_user_flow(mock_hw):
         yield m
 
 
+@pytest.fixture
+def mock_user_flow_bad_vectors(mock_hw):
+    with patch.object(
+        get,
+        'get_robot_deck_attitude',
+        new=build_mock_deck_calibration()),\
+        patch.object(
+            get,
+            'load_tip_length_calibration',
+            new=build_mock_stored_tip_length()),\
+        patch.object(
+            get, 'get_pipette_offset',
+            new=build_mock_stored_pipette_offset()):
+        m = CheckCalibrationUserFlow(hardware=mock_hw)
+        initial_pt = Point(1, 6, 5)
+        final_pt = Point(1, 1, 0)
+        m._get_reference_points_by_state =\
+            MagicMock(return_value=(initial_pt, final_pt))
+        yield m
+
+
 async def test_move_to_tip_rack(mock_user_flow):
     uf = mock_user_flow
     await uf.move_to_tip_rack()
@@ -404,3 +425,44 @@ async def test_compare_points(mock_user_flow):
     assert uf.comparison_map.first.deck == expected_deck
     assert uf.comparison_map.second.pipetteOffset == new_pip
     assert uf.comparison_map.second.deck == new_deck
+
+
+async def test_mark_bad_calibration(mock_user_flow_bad_vectors):
+    uf = mock_user_flow_bad_vectors
+
+    with patch('opentrons.calibration_storage.modify.mark_bad') as m:
+        uf._current_state = CalibrationCheckState.comparingTip
+        await uf.update_comparison_map()
+        expected_tip_length_call = [
+            uf._tip_lengths[uf.mount],
+            CSTypes.SourceType.calibration_check]
+
+        m.assert_called_once_with(*expected_tip_length_call)
+        m.reset_mock()
+
+        uf._current_state = CalibrationCheckState.comparingHeight
+
+        await uf.update_comparison_map()
+        expected_pip_offset_call = (
+            uf._pipette_calibrations[uf.mount],
+            CSTypes.SourceType.calibration_check)
+        m.assert_called_once_with(*expected_pip_offset_call)
+        m.reset_mock()
+
+        await uf.change_active_pipette()
+
+        uf._current_state = CalibrationCheckState.comparingHeight
+        await uf.update_comparison_map()
+
+        uf._current_state = CalibrationCheckState.comparingPointOne
+        await uf.update_comparison_map()
+        m.reset_mock()
+
+        uf._current_state = CalibrationCheckState.comparingPointTwo
+        await uf.update_comparison_map()
+
+        expected_deck_cal_call = [
+            uf._deck_calibration,
+            CSTypes.SourceType.calibration_check]
+
+        m.assert_called_once_with(*expected_deck_cal_call)
