@@ -98,6 +98,38 @@ describe('SaveZPoint', () => {
     })
   })
 
+  it('allows jogging in xy axis after prompt clicked', () => {
+    const wrapper = render()
+
+    const jogDirections = ['left', 'right', 'back', 'forward']
+    const jogVectorByDirection = {
+      left: [-0.1, 0, 0],
+      right: [0.1, 0, 0],
+      back: [0, 0.1, 0],
+      forward: [0, -0.1, 0],
+    }
+    jogDirections.forEach(dir => {
+      expect(getJogButton(wrapper, dir).exists()).toBe(false)
+    })
+    wrapper
+      .find(
+        'a[children="Need to jog across the deck to align the pipette in slot 5?"]'
+      )
+      .invoke('onClick')({ preventDefault: () => {} })
+    wrapper.update()
+    jogDirections.forEach(direction => {
+      getJogButton(wrapper, direction).invoke('onClick')()
+      wrapper.update()
+
+      expect(mockSendCommands).toHaveBeenCalledWith({
+        command: Sessions.deckCalCommands.JOG,
+        data: {
+          vector: jogVectorByDirection[direction],
+        },
+      })
+    })
+  })
+
   it('renders need help link', () => {
     const wrapper = render()
     expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
