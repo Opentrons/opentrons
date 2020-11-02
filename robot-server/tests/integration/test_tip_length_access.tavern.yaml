@@ -125,7 +125,7 @@ stages:
               markedAt: null
               markedBad: false
               source: null
-          id: '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824&123'
+            id: '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824&123'
 
   - name: GET request returns filter with wrong pipette AND tiprack
     request:

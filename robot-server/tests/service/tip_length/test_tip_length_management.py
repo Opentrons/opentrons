@@ -7,7 +7,7 @@ WRONG_LW_HASH = 'wronghash'
 def test_access_tip_length_calibration(
         api_client, set_up_tip_length_temp_directory):
     expected = {
-        'id': 'fakehash&pip_1',
+        'id': f'{LW_HASH}&{PIPETTE_ID}',
         'tipLength': 30.5,
         'pipette': PIPETTE_ID,
         'tiprack': LW_HASH,
