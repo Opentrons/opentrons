@@ -1,6 +1,7 @@
 """Integration test fixtures."""
 
 import json
+from asyncio import Task
 from os import environ
 import asyncio
 from typing import AsyncGenerator
@@ -29,7 +30,8 @@ def settings(integration_environment: None) -> Settings:
 
 
 @pytest.fixture
-async def server_fixture(integration_environment: None) -> AsyncGenerator:
+async def server_fixture(integration_environment: None) -> \
+        AsyncGenerator[Task, None]:
     """Server fixture."""
     from notify_server.main import run
     task = asyncio.create_task(run())

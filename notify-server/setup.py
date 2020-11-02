@@ -6,12 +6,6 @@ import os
 import os.path
 from setuptools import setup, find_packages
 
-# make stdout blocking since Travis sets it to nonblocking
-if os.name == 'posix':
-    import fcntl
-    flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
-    fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
-
 HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(HERE, '..', 'scripts'))
 
@@ -24,12 +18,12 @@ def get_version():
         normalize_opts = {'extra_tag': buildno}
     else:
         normalize_opts = {}
-    return normalize_version('robot-server', **normalize_opts)
+    return normalize_version('notify-server', **normalize_opts)
 
 
 VERSION = get_version()
 
-DISTNAME = 'robotserver'
+DISTNAME = 'notify_server'
 LICENSE = 'Apache 2.0'
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
@@ -47,12 +41,11 @@ CLASSIFIERS = [
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = (
-    "A server providing access to the Opentrons API")
+    "A pub sub system for the Opentrons OT2")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    'fastapi==0.54.1',
-    'python-multipart==0.0.5',
-    'opentrons',
+    'pyzmq==19.0.2',
+    'pydantic==1.4'
 ]
 
 
@@ -78,7 +71,7 @@ if __name__ == "__main__":
         maintainer=AUTHOR,
         maintainer_email=EMAIL,
         keywords=KEYWORDS,
-        long_description=__doc__,
+        long_description=read("README.rst"),
         packages=PACKAGES,
         zip_safe=False,
         classifiers=CLASSIFIERS,
