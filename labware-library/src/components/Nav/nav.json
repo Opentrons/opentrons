@@ -2,40 +2,64 @@
   "homeUrl": "https://opentrons.com",
   "subdomainList": [
     {
-      "name":"Protocol Designer",
-      "url":"https://designer.opentrons.com/",
-      "linkout":true,
-      "gtm":{"action":"click","category": "toolbar","label":"protocol-designer"}
+      "name": "Protocol Designer",
+      "url": "https://designer.opentrons.com/",
+      "linkout": true,
+      "gtm": {
+        "action": "click",
+        "category": "toolbar",
+        "label": "protocol-designer"
+      }
     },
     {
-      "name":"Protocol Library",
-      "url":"https://protocols.opentrons.com/",
-      "linkout":true,
-      "gtm":{"action":"click","category": "toolbar","label":"protocol-library"}
+      "name": "Protocol Library",
+      "url": "https://protocols.opentrons.com/",
+      "linkout": true,
+      "gtm": {
+        "action": "click",
+        "category": "toolbar",
+        "label": "protocol-library"
+      }
     },
     {
-      "name":"Python API",
-      "url":"https://docs.opentrons.com/",
-      "linkout":true,
-      "gtm":{"action":"click","category": "toolbar","label":"opentrons-api"}
+      "name": "Python API",
+      "url": "https://docs.opentrons.com/",
+      "linkout": true,
+      "gtm": {
+        "action": "click",
+        "category": "toolbar",
+        "label": "opentrons-api"
+      }
     },
     {
-      "name":"Labware Library",
-      "url":"https://labware.opentrons.com/",
-      "linkout":true,
-      "gtm":{"action":"click","category": "toolbar","label":"labware-library"}
+      "name": "Labware Library",
+      "url": "https://labware.opentrons.com/",
+      "linkout": true,
+      "gtm": {
+        "action": "click",
+        "category": "toolbar",
+        "label": "labware-library"
+      }
     },
     {
-      "name":"GitHub",
-      "url":"https://github.com/Opentrons",
-      "linkout":true,
-      "gtm":{"action":"click","category": "toolbar","label":"github-protocols"}
+      "name": "GitHub",
+      "url": "https://github.com/Opentrons",
+      "linkout": true,
+      "gtm": {
+        "action": "click",
+        "category": "toolbar",
+        "label": "github-protocols"
+      }
     },
     {
-      "name":"Opentrons App",
-      "url":"/ot-app",
-      "linkout":true,
-      "gtm":{"action":"click","category": "toolbar","label":"opentrons-app"}
+      "name": "Opentrons App",
+      "url": "/ot-app",
+      "linkout": true,
+      "gtm": {
+        "action": "click",
+        "category": "toolbar",
+        "label": "opentrons-app"
+      }
     }
   ],
   "navigationList": [
