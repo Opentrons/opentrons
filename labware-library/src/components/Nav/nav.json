@@ -182,7 +182,6 @@
               "gtm": {
                 "action": "click",
                 "category": "header",
-                "category": "header",
                 "label": "magmod"
               }
             }
