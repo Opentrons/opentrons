@@ -262,7 +262,7 @@ class Labware(DeckItem):
     def parent(self) -> LocationLabware:
         """ The parent of this labware. Usually a slot name.
         """
-        return self._implementation.get_geometry().parent.labware
+        return self._implementation.get_geometry().parent.labware.object
 
     @property  # type: ignore
     @requires_version(2, 0)
