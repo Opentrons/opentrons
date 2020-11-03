@@ -4,7 +4,7 @@ import styles from './MainNav.module.css'
 
 import type { MobileNavProps } from './types'
 
-export default function MenuButton(props: MobileNavProps): React.Node {
+export function MenuButton(props: MobileNavProps): React.Node {
   return (
     <button onClick={props.onMobileClick} className={styles.nav_button}>
       {!props.isMobileOpen ? (

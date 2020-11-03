@@ -1,8 +1,8 @@
 // @flow
 // top nav bar component
 import * as React from 'react'
-import SubdomainNav from '../SubdomainNav'
-import MainNav from '../MainNav'
+import { SubdomainNav } from '../SubdomainNav'
+import { MainNav } from '../MainNav'
 import styles from './styles.css'
 import navData from './nav.json'
 

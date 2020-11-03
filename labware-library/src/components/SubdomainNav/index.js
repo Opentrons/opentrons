@@ -11,10 +11,7 @@ type Props = {|
   subdomainList: Submenu[],
 |}
 
-export default function SubdomainNav({
-  subdomainList,
-  homeUrl,
-}: Props): React.Node {
+export function SubdomainNav({ subdomainList, homeUrl }: Props): React.Node {
   return (
     <ul className={styles.subdomain_nav_contents}>
       <div />

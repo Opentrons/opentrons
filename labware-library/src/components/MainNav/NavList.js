@@ -3,21 +3,17 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import NavMenu from './NavMenu'
-import MenuButton from './MenuButton'
+import { MenuButton } from './MenuButton'
 import styles from './MainNav.module.css'
 import type { Submenu } from './types'
 import { ClickOutside } from '@opentrons/components'
-import { home } from '@opentrons/app/src/robot-controls'
 
 type Props = {|
   homeUrl: string,
   navigationList: Submenu[],
 |}
 
-export default function NavList({
-  homeUrl,
-  navigationList,
-}: Props): React.Node {
+export function NavList({ homeUrl, navigationList }: Props): React.Node {
   const [isOpen, setIsOpen] = React.useState(false)
   const [menu, setMenu] = React.useState(null)
 

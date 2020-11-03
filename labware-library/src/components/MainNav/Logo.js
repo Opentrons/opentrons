@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import styles from './MainNav.module.css'
 
-export default function Logo(): React.Node {
+export function Logo(): React.Node {
   return (
     <a href="/">
       <img

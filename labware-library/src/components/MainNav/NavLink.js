@@ -18,12 +18,7 @@ export type Props = {|
 |}
 
 export function NavLink(props: Props): React.Node {
-  const {
-    gtm,
-    className,
-    url,
-    homeUrl,
-  } = props
+  const { gtm, className, url, homeUrl } = props
 
   return (
     <>

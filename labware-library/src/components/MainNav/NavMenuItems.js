@@ -11,7 +11,7 @@ type Props = {|
   homeUrl: string,
 |}
 
-export default function NavMenuItems(props: Props): React.Node {
+export function NavMenuItems(props: Props): React.Node {
   const { name, links, url, homeUrl } = props
   return (
     <li className={styles.nav_sub_item}>

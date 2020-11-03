@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { NavLink } from './NavLink'
-import NavMenuItems from './NavMenuItems'
+import { NavMenuItems } from './NavMenuItems'
 import styles from './MainNav.module.css'
 
 import type { Submenu } from './types'
