@@ -15,7 +15,7 @@ type Props = {|
   homeUrl: string,
 |}
 
-export default function NavMenu(props: Props): React.Node {
+export function NavMenu(props: Props): React.Node {
   const { name, links, url, text, active, onToggle, homeUrl } = props
   const [isOpen, setIsOpen] = React.useState(false)
   React.useEffect(() => {

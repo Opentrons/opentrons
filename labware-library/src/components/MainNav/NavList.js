@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import NavMenu from './NavMenu'
+import { NavMenu } from './NavMenu'
 import { MenuButton } from './MenuButton'
 import styles from './MainNav.module.css'
 import type { Submenu } from './types'
