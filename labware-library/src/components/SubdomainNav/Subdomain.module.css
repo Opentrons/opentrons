@@ -1,0 +1,47 @@
+@import '../../styles/breakpoints.css';
+@import '../../styles/colors.css';
+@import '../../styles/typography.css';
+
+:root {
+  --c-nav-gray: #707070;
+  --spacing-link: 1.75rem;
+  --fs-subdomain: 0.75rem;
+}
+
+.subdomain_nav_contents {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+.subdomain_link {
+  margin-left: var(--spacing-6);
+  font-size: var(--fs-subdomain);
+  font-weight: var(--fw-semibold);
+  color: var(--c-nav-gray);
+  text-transform: capitalize;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.link_contents {
+  display: flex;
+
+  & > li {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.order_online {
+  & > a,
+  & > a:active,
+  & > a:focus,
+  & > a:visited {
+    font-size: 0.75rem;
+    color: var(--c-blue);
+    font-weight: var(--fw-semibold);
+    text-decoration: none;
+  }
+}

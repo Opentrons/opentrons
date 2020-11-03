@@ -1,0 +1,9 @@
+:root {
+  --ff-akko-reg: 'AkkoPro-Regular', sans-serif;
+  --ff-akko-med: 'AkkoPro-Medium', sans-serif;
+  --ff-open-sans: 'Open Sans', sans-serif;
+  --fw-bold: 700;
+  --fw-semibold: 600;
+  --fw-regular: 400;
+  --fw-light: 300;
+}

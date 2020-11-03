@@ -1,0 +1,362 @@
+{
+  "homeUrl": "https://opentrons.com",
+  "subdomainList": [
+    {
+      "name":"Protocol Designer",
+      "url":"https://designer.opentrons.com/",
+      "linkout":true,
+      "gtm":{"action":"click","category": "toolbar","label":"protocol-designer"}
+    },
+    {
+      "name":"Protocol Library",
+      "url":"https://protocols.opentrons.com/",
+      "linkout":true,
+      "gtm":{"action":"click","category": "toolbar","label":"protocol-library"}
+    },
+    {
+      "name":"Python API",
+      "url":"https://docs.opentrons.com/",
+      "linkout":true,
+      "gtm":{"action":"click","category": "toolbar","label":"opentrons-api"}
+    },
+    {
+      "name":"Labware Library",
+      "url":"https://labware.opentrons.com/",
+      "linkout":true,
+      "gtm":{"action":"click","category": "toolbar","label":"labware-library"}
+    },
+    {
+      "name":"GitHub",
+      "url":"https://github.com/Opentrons",
+      "linkout":true,
+      "gtm":{"action":"click","category": "toolbar","label":"github-protocols"}
+    },
+    {
+      "name":"Opentrons App",
+      "url":"/ot-app",
+      "linkout":true,
+      "gtm":{"action":"click","category": "toolbar","label":"opentrons-app"}
+    }
+  ],
+  "navigationList": [
+    {
+      "name": "About",
+      "links": [
+        {
+          "links": [
+            {
+              "name": "Mission",
+              "url": "/about",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "about"
+              }
+            },
+            {
+              "name": "Our Customers",
+              "url": "/customers",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "customers"
+              }
+            },
+            {
+              "name": "Press",
+              "url": "http://blog.opentrons.com/press",
+              "linkout": true,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "press"
+              }
+            },
+            {
+              "name": "Our Team",
+              "url": "/team",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "team"
+              }
+            },
+            {
+              "name": "How it works",
+              "url": "/how-it-works/",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "how-it-works"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "text": "100% transparent pricing. <a href=\"https://shop.opentrons.com\" target=\"_blank\" rel=\"noopener noreferrer\" data-gtm-category=\"b-header\" data-gtm-label=\"all-products\" data-gtm-action=\"click\">Order online  ›</a>",
+      "links": [
+        {
+          "name": "OT-2 LAB ROBOT",
+          "links": [
+            {
+              "name": "OT-2 Robot",
+              "url": "/ot-2",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "ot-2"
+              }
+            },
+            {
+              "name": "OT-2 Pipettes",
+              "url": "/pipettes",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "ot-2-pipettes"
+              }
+            }
+          ]
+        },
+        {
+          "name": "OT-2 WORKSTATIONS",
+          "links": [
+            {
+              "name": "Nucleic Acid Cleanup",
+              "linkout": false,
+              "url": "/workstations/automated-nucleic-acid-cleanup",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "workstation-nac"
+              }
+            },
+            {
+              "name": "NGS Library Prep",
+              "url": "/workstations/automated-ngs-library-prep/",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "ngs-prep"
+              }
+            }
+          ]
+        },
+        {
+          "name": "OT-2 HARDWARE MODULES",
+          "links": [
+            {
+              "name": "Thermocycler Module",
+              "url": "/modules/thermocycler-module",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "thermocycler"
+              }
+            },
+            {
+              "name": "Temperature Module",
+              "url": "/modules/temperature-module",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "tempmod"
+              }
+            },
+            {
+              "name": "Magnetic Module",
+              "url": "/modules/magnetic-module",
+              "linkout": false,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "category": "header",
+                "label": "magmod"
+              }
+            }
+          ]
+        },
+        {
+          "name": "CONSUMABLES & REAGENTS",
+          "links": [
+            {
+              "name": "Tips & Filter Tips",
+              "linkout": true,
+              "url": "https://shop.opentrons.com/collections/opentrons-tips",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "tips"
+              }
+            },
+            {
+              "name": "Reagents",
+              "linkout": true,
+              "url": "https://shop.opentrons.com/collections/verified-reagents",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "reagents"
+              }
+            },
+            {
+              "name": "Tubes & Vials",
+              "linkout": true,
+              "url": "https://shop.opentrons.com/collections/tubes",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "tube"
+              }
+            }
+          ]
+        },
+        {
+          "name": "VERIFIED LABWARE",
+          "links": [
+            {
+              "name": "Lab Plates",
+              "linkout": true,
+              "url": "https://shop.opentrons.com/collections/lab-plates",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "plates"
+              }
+            },
+            {
+              "name": "Reservoirs",
+              "linkout": true,
+              "url": "https://shop.opentrons.com/collections/reservoirs",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "reserv"
+              }
+            },
+            {
+              "name": "Tube Racks",
+              "linkout": true,
+              "url": "https://shop.opentrons.com/collections/racks-and-adapters",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "tubes-racks"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Applications",
+      "url": "/automated-lab-applications/",
+      "linkout": false,
+      "gtm": {
+        "action": "click",
+        "category": "header",
+        "label": "applications"
+      }
+    },
+    {
+      "name": "Blog",
+      "url": "https://blog.opentrons.com",
+      "linkout": true,
+      "gtm": {
+        "action": "click",
+        "category": "header",
+        "label": "blog"
+      }
+    },
+    {
+      "name": "Support",
+      "text": "<a href=\"https://opentrons.com/contact-support/\"  target=\"_blank\" rel=\"noopener noreferrer\" data-gtm-category=\"b-header\" data-gtm-label=\"contact-support\" data-gtm-action=\"click\">Contact support  ›</a>",
+      "links": [
+        {
+          "links": [
+            {
+              "name": "Product Help Center",
+              "linkout": true,
+              "url": "https://support.opentrons.com/",
+              "description": "Explore our in-depth support articles",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "product-help"
+              }
+            },
+            {
+              "name": "OT-2 Start guide",
+              "linkout": true,
+              "url": "https://support.opentrons.com/guide-for-getting-started-with-the-ot-2",
+              "description": "You recieved your robot, here's what's next",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "start-guide"
+              }
+            }
+          ]
+        },
+        {
+          "links": [
+            {
+              "name": "Python API",
+              "linkout": true,
+              "url": "https://docs.opentrons.com/",
+              "description": "Easily write new protocols using Python",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "opentrons-api"
+              }
+            },
+            {
+              "name": "Documentation",
+              "url": "https://blog.opentrons.com/resources/",
+              "description": "Manuals, white papers, eBooks, app notes, etc.",
+              "linkout": true,
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "documentation"
+              }
+            },
+            {
+              "name": "Return Policy",
+              "linkout": true,
+              "url": "https://support.opentrons.com/en/articles/3670461-our-risk-free-return-policy",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "return-policy"
+              }
+            },
+            {
+              "name": "Warranty",
+              "linkout": true,
+              "url": "https://support.opentrons.com/en/articles/736748-what-is-your-warranty-and-return-policy",
+              "gtm": {
+                "action": "click",
+                "category": "header",
+                "label": "warranty"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

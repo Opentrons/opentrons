@@ -4,6 +4,13 @@
 @import '../../styles/shadows.css';
 @import '../../styles/spacing.css';
 
+:root {
+  --subdomain-nav-max-width: 78.75rem;
+  --subdomain-nav-padding: 1.25rem;
+  --shadow-1: 0 2px 2px rgba(0, 0, 0, 0.2);
+  --nav-border: 1px solid #e3e3e3;
+}
+
 .nav {
   position: fixed;
   top: 0;
@@ -13,12 +20,33 @@
   z-index: 999;
 }
 
-/* TODO (ka 20194-16): Keeping wrapper and containers separate
-from individual navigation components so that responsive margins and padding
-are project specific  */
-
 .subdomain_nav_wrapper {
   display: none;
+
+  @media (--large) {
+    display: block;
+    width: 100%;
+    height: 30px;
+    background-color: var(--c-white);
+    border-bottom: var(--nav-border);
+  }
+}
+
+.nav_container {
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-1) var(--spacing-6);
+
+  @media (--medium) {
+    padding-left: var(--subdomain-nav-padding);
+    padding-right: var(--subdomain-nav-padding);
+  }
+
+  @media (--large) {
+    margin: auto;
+    max-width: var(--subdomain-nav-max-width);
+    padding: 0;
+  }
 }
 
 .main_nav_wrapper {
@@ -26,12 +54,15 @@ are project specific  */
   height: var(--size-mobile-nav);
   background-color: var(--c-white);
   border-bottom: var(--bd-light);
-}
 
-.nav_container {
-  width: 100%;
-  height: 100%;
-  padding: var(--spacing-1) var(--spacing-2);
+  @media (--medium) {
+    height: var(--size-main-nav);
+  }
+
+  @media (--large) {
+    border: none;
+    box-shadow: var(--shadow-1);
+  }
 }
 
 .breadcrumbs {
@@ -79,11 +110,6 @@ are project specific  */
     top: var(--size-main-nav);
   }
 
-  .main_nav_wrapper {
-    height: var(--size-main-nav);
-  }
-
-  .nav_container,
   .breadcrumbs_contents {
     padding-left: var(--spacing-7);
     padding-right: var(--spacing-7);
@@ -91,24 +117,10 @@ are project specific  */
 }
 
 @media (--large) {
-  .subdomain_nav_wrapper {
-    display: block;
-    width: 100%;
-    height: var(--size-subdomain-nav);
-    background-color: var(--c-white);
-    border-bottom: var(--bd-light);
-  }
-
-  .main_nav_wrapper {
-    border: none;
-    box-shadow: var(--shadow-1);
-  }
-
   .breadcrumbs {
     top: var(--size-total-nav);
   }
 
-  .nav_container,
   .breadcrumbs_contents {
     margin: auto;
     max-width: var(--screen-width-xlarge);
