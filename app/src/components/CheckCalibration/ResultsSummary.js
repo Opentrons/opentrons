@@ -6,12 +6,14 @@ import {
   Icon,
   Box,
   Flex,
-  PrimaryButton,
+  PrimaryBtn,
   Text,
   SPACING_2,
   SPACING_3,
   ALIGN_CENTER,
   C_BLUE,
+  COLOR_SUCCESS,
+  COLOR_WARNING,
   FONT_HEADER_DARK,
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_LIGHT,
@@ -139,34 +141,33 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
           })}
         </Flex>
       </Box>
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
-        marginBottom={SPACING_5}
-        flexDirection={DIRECTION_COLUMN}
-        fontWeight={FONT_WEIGHT_LIGHT}
-        fontSize={FONT_SIZE_BODY_2}
-      >
-        <Text>{LOOKING_FOR_DATA}</Text>
-        <Text
-          as="a"
-          color={C_BLUE}
-          onClick={handleDownloadButtonClick}
-          css={css`
-            cursor: pointer;
-          `}
+      <Box>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          marginBottom={SPACING_5}
+          flexDirection={DIRECTION_COLUMN}
+          fontWeight={FONT_WEIGHT_LIGHT}
+          fontSize={FONT_SIZE_BODY_2}
         >
-          {DOWNLOAD_SUMMARY}
-        </Text>
-      </Flex>
-      <Flex margin={SPACING_4}>
-        <PrimaryButton
-          className={styles.summary_exit_button}
-          onClick={cleanUpAndExit}
-        >
-          {HOME_AND_EXIT}
-        </PrimaryButton>
-      </Flex>
+          <Text>{LOOKING_FOR_DATA}</Text>
+          <Text
+            as="a"
+            color={C_BLUE}
+            onClick={handleDownloadButtonClick}
+            css={css`
+              cursor: pointer;
+            `}
+          >
+            {DOWNLOAD_SUMMARY}
+          </Text>
+        </Flex>
+        <Flex margin={SPACING_4}>
+          <PrimaryBtn width="100%" onClick={cleanUpAndExit}>
+            {HOME_AND_EXIT}
+          </PrimaryBtn>
+        </Flex>
+      </Box>
     </>
   )
 }
@@ -185,10 +186,10 @@ function RenderResult(props: RenderResultProps): React.Node {
       <Flex>
         <Icon
           name={isGoodCal ? 'check-circle' : 'alert-circle'}
-          className={cx(styles.summary_icon, {
-            [styles.success_status_icon]: isGoodCal,
-            [styles.error_status_icon]: !isGoodCal,
-          })}
+          height="1.25rem"
+          width="1.25rem"
+          color={isGoodCal ? COLOR_SUCCESS : COLOR_WARNING}
+          marginRight="0.75rem"
         />
         <Text fontSize={FONT_SIZE_BODY_2}>
           {isGoodCal ? GOOD_CALIBRATION : BAD_CALIBRATION}
