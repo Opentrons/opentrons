@@ -106,8 +106,8 @@ class LabwareLike:
         from opentrons.protocol_api.labware import Labware
         return cast(Labware, self.object)
 
-    def split_labware(self) -> Tuple[Optional['Labware'],
-                                     Optional['Well']]:
+    def get_parent_labware_and_well(self) -> Tuple[Optional['Labware'],
+                                                   Optional['Well']]:
         """Attempt to split into a labware and well."""
         if self.is_labware:
             return self.as_labware(), None

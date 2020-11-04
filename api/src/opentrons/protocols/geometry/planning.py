@@ -113,9 +113,9 @@ def _build_safe_height(from_loc: types.Location,
                        deck: Deck,
                        constraints: MoveConstraints) -> float:
     to_point = to_loc.point
-    to_lw, to_well = to_loc.labware.split_labware()
+    to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
     from_point = from_loc.point
-    from_lw, from_well = from_loc.labware.split_labware()
+    from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
 
     if to_lw and to_lw == from_lw:
         # If we know the labwares we’re moving from and to, we can calculate
@@ -207,9 +207,9 @@ def plan_moves(
     assert constraints.minimum_z_height >= 0.0
 
     to_point = to_loc.point
-    to_lw, to_well = to_loc.labware.split_labware()
+    to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
     from_point = from_loc.point
-    from_lw, from_well = from_loc.labware.split_labware()
+    from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
     from_center = LabwareLike(from_lw).center_multichannel_on_wells()
     to_center = LabwareLike(to_lw).center_multichannel_on_wells()
     dest_cp_override = CriticalPoint.XY_CENTER if to_center else None

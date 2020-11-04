@@ -435,8 +435,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def flag_unsafe_move(self,
                          to_loc: types.Location,
                          from_loc: types.Location):
-        to_lw, to_well = to_loc.labware.split_labware()
-        from_lw, from_well = from_loc.labware.split_labware()
+        to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
+        from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
         if self.labware is not None and \
                 (self.labware == to_lw or self.labware == from_lw) and \
                 self.lid_position != 'open':
