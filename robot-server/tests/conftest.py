@@ -220,9 +220,11 @@ def set_enable_http_protocol_sessions(request_session):
 @pytest.fixture
 def get_labware_fixture():
     def _get_labware_fixture(fixture_name):
-        with open((pathlib.Path(__file__).parent / '..' / '..' / 'shared-data' /
-                   'labware' / 'fixtures' / '2' / f'{fixture_name}.json'), 'rb'
-                  ) as f:
+        with open(
+            (pathlib.Path(__file__).parent / '..' / '..' / 'shared-data' /
+             'labware' / 'fixtures' / '2' / f'{fixture_name}.json'),
+            'rb'
+        ) as f:
             return json.loads(f.read().decode('utf-8'))
 
     return _get_labware_fixture
