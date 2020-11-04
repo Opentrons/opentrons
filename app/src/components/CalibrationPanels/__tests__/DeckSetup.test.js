@@ -77,7 +77,7 @@ describe('DeckSetup', () => {
       calBlock: mockTipLengthCalBlock,
     })
     expect(wrapper.text()).toContain(
-      'Place a full Opentrons GEB 300uL Tiprack and Calibration Block on'
+      'Clear the deck and place a full Opentrons GEB 300uL Tiprack and Calibration Block on'
     )
   })
 
@@ -87,7 +87,7 @@ describe('DeckSetup', () => {
       calBlock: null,
     })
     expect(wrapper.text()).toContain(
-      'Place a full Opentrons GEB 300uL Tiprack on'
+      'Clear the deck and place a full Opentrons GEB 300uL Tiprack on'
     )
   })
 })
