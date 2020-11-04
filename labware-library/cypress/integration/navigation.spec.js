@@ -30,8 +30,8 @@ describe('Desktop Navigation', () => {
     cy.get("div[class*='_main_nav_wrapper_']").contains('About')
     cy.get("div[class*='_main_nav_wrapper_']").contains('Products')
     cy.get("div[class*='_main_nav_wrapper_']").contains('Applications')
-    cy.get("div[class*='_main_nav_wrapper_']").contains('Protocols')
-    cy.get("div[class*='_main_nav_wrapper_']").contains('Support & Sales')
+    cy.get("div[class*='_main_nav_wrapper_']").contains('Blog')
+    cy.get("div[class*='_main_nav_wrapper_']").contains('Support')
   })
 
   it('displays correct about links', () => {
@@ -49,9 +49,9 @@ describe('Desktop Navigation', () => {
         cy.contains('Our Team')
           .should('have.prop', 'href')
           .and('equal', 'https://opentrons.com/team')
-        cy.contains('Blog')
+        cy.contains('How it works')
           .should('have.prop', 'href')
-          .and('equal', 'https://blog.opentrons.com/')
+          .and('equal', 'https://opentrons.com/how-it-works/')
       })
   })
 })

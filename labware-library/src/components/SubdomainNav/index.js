@@ -17,7 +17,7 @@ export function SubdomainNav({ subdomainList, homeUrl }: Props): React.Node {
       <div />
       <div className={styles.link_contents}>
         {/* eslint-disable-next-line react/prop-types */}
-        {subdomainList.map(({ gtm, url, name }, index) => (
+        {subdomainList.map(({ gtm, url, name, linkout }, index) => (
           <li key={index}>
             <NavLink
               url={url}
@@ -25,6 +25,7 @@ export function SubdomainNav({ subdomainList, homeUrl }: Props): React.Node {
               gtm={gtm}
               homeUrl={homeUrl}
               name={name}
+              linkout={linkout}
             />
           </li>
         ))}

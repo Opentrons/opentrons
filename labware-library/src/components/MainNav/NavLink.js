@@ -15,6 +15,7 @@ export type Props = {|
     category: string,
     label: string,
   },
+  linkout?: boolean,
 |}
 
 export function NavLink(props: Props): React.Node {

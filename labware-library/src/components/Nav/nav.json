@@ -54,7 +54,7 @@
     {
       "name": "Opentrons App",
       "url": "/ot-app",
-      "linkout": true,
+      "linkout": false,
       "gtm": {
         "action": "click",
         "category": "toolbar",
