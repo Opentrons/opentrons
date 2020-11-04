@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import { css } from 'styled-components'
 import {
   Icon,
@@ -29,7 +28,6 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import find from 'lodash/find'
 import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../pipettes'
-import styles from './styles.css'
 import { saveAs } from 'file-saver'
 import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 
