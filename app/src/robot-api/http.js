@@ -6,6 +6,8 @@ import mapValues from 'lodash/mapValues'
 import toString from 'lodash/toString'
 import omitBy from 'lodash/omitBy'
 
+import { HTTP_API_VERSION } from './constants'
+
 import type { Observable } from 'rxjs'
 import type {
   RobotHost,
@@ -38,10 +40,13 @@ export function fetchRobotApi(
 ): Observable<RobotApiResponse> {
   const { path, method, body: reqBody, form: reqForm } = request
   const url = robotApiUrl(host, request)
-  const options: RequestOptions = { method }
+  const options: RequestOptions = {
+    method,
+    headers: { 'Opentrons-Version': `${HTTP_API_VERSION}` },
+  }
 
   if (reqBody != null) {
-    options.headers = { 'Content-Type': 'application/json' }
+    options.headers = { ...options.headers, 'Content-Type': 'application/json' }
     options.body = JSON.stringify(reqBody)
   } else if (reqForm != null) {
     options.body = reqForm
