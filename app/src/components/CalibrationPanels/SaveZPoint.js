@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import {
   PrimaryBtn,
   Box,
+  Btn,
   Flex,
   Text,
   FONT_WEIGHT_SEMIBOLD,
@@ -18,6 +19,7 @@ import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
   TEXT_TRANSFORM_UPPERCASE,
+  TEXT_DECORATION_UNDERLINE,
   TEXT_ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
@@ -139,21 +141,14 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
       flex={1}
       alignSelf={ALIGN_STRETCH}
     >
-      <Text
-        as="a"
-        onClick={e => {
-          e.preventDefault()
-          setAllowHorizontal(true)
-        }}
-        css={css`
-          ${FONT_BODY_2_DARK}
-          cursor: pointer;
-          text-decoration: underline;
-        `}
+      <Btn
+        onClick={() => setAllowHorizontal(true)}
+        css={FONT_BODY_2_DARK}
+        textDecoration={TEXT_DECORATION_UNDERLINE}
         textAlign={TEXT_ALIGN_CENTER}
       >
         {ALLOW_HORIZONTAL_TEXT}
-      </Text>
+      </Btn>
     </Flex>
   )
 

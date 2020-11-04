@@ -90,6 +90,7 @@ describe('SaveZPoint', () => {
           vector: jogVectorByDirection[direction],
         },
       })
+      mockSendCommands.mockClear()
     })
 
     const unavailableJogDirections = ['left', 'right', 'back', 'forward']
@@ -113,13 +114,11 @@ describe('SaveZPoint', () => {
     })
     wrapper
       .find(
-        'a[children="Need to jog across the deck to align the pipette in slot 5?"]'
+        'button[children="Need to jog across the deck to align the pipette in slot 5?"]'
       )
       .invoke('onClick')({ preventDefault: () => {} })
-    wrapper.update()
     jogDirections.forEach(direction => {
       getJogButton(wrapper, direction).invoke('onClick')()
-      wrapper.update()
 
       expect(mockSendCommands).toHaveBeenCalledWith({
         command: Sessions.deckCalCommands.JOG,
@@ -127,6 +126,7 @@ describe('SaveZPoint', () => {
           vector: jogVectorByDirection[direction],
         },
       })
+      mockSendCommands.mockClear()
     })
   })
 

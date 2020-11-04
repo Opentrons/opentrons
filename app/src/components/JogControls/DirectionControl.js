@@ -5,6 +5,7 @@ import * as React from 'react'
 import {
   Box,
   SPACING_1,
+  SIZE_2,
   PrimaryBtn,
   Icon,
   type IconName,
@@ -137,11 +138,12 @@ export function DirectionControl(props: DirectionControlProps): React.Node {
               <PrimaryBtn
                 key={bearing}
                 title={bearing}
-                width="2.5rem"
-                height="2.5rem"
+                width={SIZE_2}
+                height={SIZE_2}
                 alignSelf={ALIGN_CENTER}
+                margin={SPACING_1}
+                padding={0}
                 onClick={() => props.jog(axis, sign, props.stepSize)}
-                padding={SPACING_1}
                 {...{ gridRow, gridColumn }}
               >
                 <Icon name={iconName} />

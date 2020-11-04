@@ -16,6 +16,7 @@ export type TypographyProps = {|
   lineHeight?: string | number,
   textAlign?: string,
   textTransform?: string,
+  textDecoration?: string,
 |}
 
 export type SpacingProps = {|

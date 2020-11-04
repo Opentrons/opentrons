@@ -17,6 +17,7 @@ const TYPOGRAPHY_PROPS = [
   'lineHeight',
   'textAlign',
   'textTransform',
+  'textDecoration',
 ]
 
 const SPACING_PROPS = [
