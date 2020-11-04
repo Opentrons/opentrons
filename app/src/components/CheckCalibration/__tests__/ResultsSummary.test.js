@@ -10,6 +10,7 @@ import * as Sessions from '../../../sessions'
 import type { State } from '../../../types'
 import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
+import { Box, Flex, PrimaryBtn } from '@opentrons/components'
 
 jest.mock('file-saver')
 jest.mock('../../../calibration/selectors')
@@ -32,14 +33,9 @@ describe('ResultsSummary', () => {
   let dispatch
   let mockDeleteSession
 
-  const getExitButton = wrapper =>
-    wrapper.find('PrimaryButton[children="Home robot and exit"]').find('button')
+  const getExitButton = wrapper => wrapper.find(PrimaryBtn)
 
-  const getSaveButton = wrapper =>
-    wrapper
-      .find('OutlineButton[children="Download JSON summary"]')
-      .find('button')
-
+  const getSaveLink = wrapper => wrapper.find('a').at(1)
   beforeEach(() => {
     mockDeleteSession = jest.fn()
     const mockSendCommands = jest.fn()
@@ -92,23 +88,67 @@ describe('ResultsSummary', () => {
     jest.resetAllMocks()
   })
 
-  it('summarizes both pipettes if comparisons have been made', () => {
+  it('displays good deck calibration result', () => {
     const wrapper = render()
+    const deckParent = wrapper.find(Flex).at(2)
 
+    expect(deckParent.text()).toEqual(expect.stringContaining('Robot Deck'))
+    expect(deckParent.find('RenderResult').text()).toEqual(
+      expect.stringContaining('Good calibration')
+    )
+  })
+
+  it('summarizes both pipettes & tip length calibrations if comparisons have been made', () => {
+    const wrapper = render()
+    const pipParent = wrapper.find(Flex).at(4)
+    const leftPipParent = pipParent.find(Box).at(0)
+    const rightPipParent = pipParent.find(Box).at(3)
+
+    // left pipette & tip length comparison
+    expect(leftPipParent.text()).toEqual(
+      expect.stringContaining('left pipette')
+    )
+    expect(leftPipParent.text()).toEqual(
+      expect.stringContaining('fake_pipette_model')
+    )
     expect(
-      wrapper
-        .find('PipetteComparisons')
+      leftPipParent
+        .find('RenderResult')
         .at(0)
-        .find('h5')
         .text()
-    ).toEqual(expect.stringContaining('left'))
+    ).toEqual(expect.stringContaining('Good calibration'))
+    expect(leftPipParent.text()).toEqual(
+      expect.stringContaining('fake tiprack display name')
+    )
     expect(
-      wrapper
-        .find('PipetteComparisons')
+      leftPipParent
+        .find('RenderResult')
         .at(1)
-        .find('h5')
         .text()
-    ).toEqual(expect.stringContaining('right'))
+    ).toEqual(expect.stringContaining('Good calibration'))
+
+    // right pipette & tip length comparison
+    expect(rightPipParent.text()).toEqual(
+      expect.stringContaining('right pipette')
+    )
+    expect(rightPipParent.text()).toEqual(
+      expect.stringContaining('fake_pipette_model')
+    )
+    expect(
+      rightPipParent
+        .find('RenderResult')
+        .at(0)
+        .text()
+    ).toEqual(expect.stringContaining('Bad calibration'))
+    expect(rightPipParent.text()).toEqual(
+      expect.stringContaining('fake tiprack display name 2')
+    )
+    expect(
+      rightPipParent
+        .find('RenderResult')
+        .at(1)
+        .text()
+    ).toEqual(expect.stringContaining('Bad calibration'))
   })
 
   it('summarizes both pipettes if no comparisons have been made', () => {
@@ -119,40 +159,24 @@ describe('ResultsSummary', () => {
     const wrapper = render({
       comparisonsByPipette: emptyComparison,
     })
+    const pipParent = wrapper.find(Flex).at(4)
+    const leftPipParent = pipParent.find(Box).at(0)
+    const rightPipParent = pipParent.find(Box).at(3)
 
-    expect(
-      wrapper
-        .find('PipetteComparisons')
-        .at(0)
-        .find('h5')
-        .text()
-    ).toEqual(expect.stringContaining('left'))
-    expect(
-      wrapper
-        .find('PipetteComparisons')
-        .at(1)
-        .find('h5')
-        .text()
-    ).toEqual(expect.stringContaining('right'))
+    expect(leftPipParent.exists()).toBe(false)
+    expect(rightPipParent.exists()).toBe(false)
   })
 
   it('does not summarize second pipette if none present', () => {
     const wrapper = render({
       instruments: [mockSessionDetails.instruments[0]],
     })
-    expect(
-      wrapper
-        .find('PipetteComparisons')
-        .at(0)
-        .find('h5')
-        .text()
-    ).toEqual(expect.stringContaining('left'))
-    expect(
-      wrapper
-        .find('PipetteComparisons')
-        .at(1)
-        .exists()
-    ).toBe(false)
+    const pipParent = wrapper.find(Flex).at(4)
+    const leftPipParent = pipParent.find(Box).at(0)
+    const rightPipParent = pipParent.find(Box).at(3)
+
+    expect(leftPipParent.exists()).toBe(true)
+    expect(rightPipParent.exists()).toBe(false)
   })
 
   it('exits when button is clicked', () => {
@@ -165,7 +189,7 @@ describe('ResultsSummary', () => {
 
   it('saves the calibration report when the button is clicked', () => {
     const wrapper = render()
-    act(() => getSaveButton(wrapper).invoke('onClick')())
+    act(() => getSaveLink(wrapper).invoke('onClick')())
     wrapper.update()
     expect(mockSaveAs).toHaveBeenCalled()
   })

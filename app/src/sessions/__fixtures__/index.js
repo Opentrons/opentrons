@@ -5,7 +5,10 @@ import {
   makeResponseFixtures,
   mockV2ErrorResponse,
 } from '../../robot-api/__fixtures__'
-import { mockRobotCalibrationCheckSessionDetails } from './calibration-check'
+import {
+  mockRobotCalibrationCheckSessionDetails,
+  mockRobotCalibrationCheckSessionParams,
+} from './calibration-check'
 import {
   mockTipLengthCalibrationSessionDetails,
   mockTipLengthCalibrationSessionParams,
@@ -31,7 +34,7 @@ export const mockOtherSessionId: string = 'other_fake_session_id'
 
 export const mockCalibrationCheckSessionAttributes: Types.CalibrationCheckSessionResponseAttributes = {
   sessionType: Constants.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-  createParams: {},
+  createParams: mockRobotCalibrationCheckSessionParams,
   details: mockRobotCalibrationCheckSessionDetails,
 }
 

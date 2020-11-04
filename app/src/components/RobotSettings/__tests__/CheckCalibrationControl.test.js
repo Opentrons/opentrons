@@ -91,7 +91,11 @@ describe('CheckCalibrationControl', () => {
     expect(store.dispatch).toHaveBeenCalledWith({
       ...Sessions.ensureSession(
         'robot-name',
-        Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+        Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+        {
+          hasCalibrationBlock: false,
+          tipRacks: [],
+        }
       ),
       meta: expect.objectContaining({ requestId: expect.any(String) }),
     })

@@ -7,8 +7,10 @@ import type { Mount } from '../../pipettes/types'
 import typeof {
   CHECK_STEP_SESSION_STARTED,
   CHECK_STEP_LABWARE_LOADED,
-  CHECK_STEP_PREPARING_PIPETTE,
   CHECK_STEP_INSPECTING_TIP,
+  CHECK_STEP_PREPARING_PIPETTE,
+  CHECK_STEP_COMPARING_NOZZLE,
+  CHECK_STEP_COMPARING_TIP,
   CHECK_STEP_COMPARING_HEIGHT,
   CHECK_STEP_COMPARING_POINT_ONE,
   CHECK_STEP_COMPARING_POINT_TWO,
@@ -17,12 +19,10 @@ import typeof {
   CHECK_STEP_RESULTS_SUMMARY,
   CHECK_STEP_SESSION_EXITED,
   CHECK_STEP_CHECK_COMPLETE,
-  CHECK_STEP_BAD_ROBOT_CALIBRATION,
-  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
-  CHECK_TRANSFORM_TYPE_UNKNOWN,
-  CHECK_TRANSFORM_TYPE_DECK,
   CHECK_PIPETTE_RANK_FIRST,
   CHECK_PIPETTE_RANK_SECOND,
+  CHECK_STATUS_IN_THRESHOLD,
+  CHECK_STATUS_OUTSIDE_THRESHOLD,
 } from './constants'
 
 /* Robot Calibration Check Types */
@@ -30,8 +30,10 @@ import typeof {
 export type RobotCalibrationCheckStep =
   | CHECK_STEP_SESSION_STARTED
   | CHECK_STEP_LABWARE_LOADED
-  | CHECK_STEP_PREPARING_PIPETTE
   | CHECK_STEP_INSPECTING_TIP
+  | CHECK_STEP_PREPARING_PIPETTE
+  | CHECK_STEP_COMPARING_NOZZLE
+  | CHECK_STEP_COMPARING_TIP
   | CHECK_STEP_COMPARING_HEIGHT
   | CHECK_STEP_COMPARING_POINT_ONE
   | CHECK_STEP_COMPARING_POINT_TWO
@@ -40,11 +42,14 @@ export type RobotCalibrationCheckStep =
   | CHECK_STEP_RESULTS_SUMMARY
   | CHECK_STEP_SESSION_EXITED
   | CHECK_STEP_CHECK_COMPLETE
-  | CHECK_STEP_BAD_ROBOT_CALIBRATION
 
 export type RobotCalibrationCheckPipetteRank =
   | CHECK_PIPETTE_RANK_FIRST
   | CHECK_PIPETTE_RANK_SECOND
+
+export type RobotCalibrationCheckStatus =
+  | CHECK_STATUS_IN_THRESHOLD
+  | CHECK_STATUS_OUTSIDE_THRESHOLD
 
 export type CalibrationHealthCheckInstrument = {|
   model: string,
@@ -52,29 +57,31 @@ export type CalibrationHealthCheckInstrument = {|
   tip_length: number,
   mount: Mount,
   rank: RobotCalibrationCheckPipetteRank,
+  tipRackDisplay: string,
+  tipRackUri: string,
   serial: string,
 |}
-
-export type CheckTransformType =
-  | CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET
-  | CHECK_TRANSFORM_TYPE_UNKNOWN
-  | CHECK_TRANSFORM_TYPE_DECK
 
 export type CalibrationHealthCheckComparison = {|
   differenceVector: [number, number, number],
   thresholdVector: [number, number, number],
   exceedsThreshold: boolean,
-  transformType: CheckTransformType,
 |}
 
-export type CalibrationHealthCheckComparisonsByStep = {
+export type CalibrationHealthCheckComparisonMap = {
+  status: RobotCalibrationCheckStatus,
   [RobotCalibrationCheckStep]: CalibrationHealthCheckComparison,
-  ...,
+}
+
+export type CalibrationHealthCheckComparisonsPerCalibration = {
+  tipLength?: CalibrationHealthCheckComparisonMap,
+  pipetteOffset?: CalibrationHealthCheckComparisonMap,
+  deck?: CalibrationHealthCheckComparisonMap,
 }
 
 export type CalibrationHealthCheckComparisonByPipette = {
-  first: CalibrationHealthCheckComparisonsByStep,
-  second: CalibrationHealthCheckComparisonsByStep,
+  first: CalibrationHealthCheckComparisonsPerCalibration,
+  second: CalibrationHealthCheckComparisonsPerCalibration,
 }
 
 export type CheckCalibrationHealthSessionDetails = {|
@@ -84,4 +91,9 @@ export type CheckCalibrationHealthSessionDetails = {|
   labware: Array<CalibrationLabware>,
   activePipette: CalibrationHealthCheckInstrument,
   activeTipRack: CalibrationLabware,
+|}
+
+export type CheckCalibrationHealthSessionParams = {|
+  hasCalibrationBlock: boolean,
+  tipRacks: Array<CalibrationLabware>,
 |}

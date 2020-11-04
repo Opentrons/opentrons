@@ -8,7 +8,6 @@ import * as Sessions from '../../../sessions'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { CheckHealthCalibration } from '../index'
-import { BadCalibration } from '../BadCalibration'
 import { ResultsSummary } from '../ResultsSummary'
 import { ReturnTip } from '../ReturnTip'
 import {
@@ -58,7 +57,6 @@ describe('CheckCalibration', () => {
     SaveZPoint,
     SaveXYPoint,
     ResultsSummary,
-    BadCalibration,
   ]
 
   const SPECS: Array<CheckCalibrationSpec> = [
