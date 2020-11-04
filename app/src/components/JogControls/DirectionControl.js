@@ -3,28 +3,13 @@
 import * as React from 'react'
 
 import {
-  Flex,
   Box,
-  Text,
   SPACING_1,
-  SPACING_2,
-  SPACING_4,
-  TEXT_ALIGN_LEFT,
-  DIRECTION_COLUMN,
   PrimaryBtn,
-  RadioGroup,
   Icon,
-  HandleKeypress,
-  type KeypressHandler,
   type IconName,
-  FONT_SIZE_HEADER,
-  FONT_WEIGHT_SEMIBOLD,
-  FONT_SIZE_BODY_1,
+  HandleKeypress,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  FONT_BODY_1_DARK,
-  FONT_HEADER_DARK,
-  ALIGN_STRETCH,
 } from '@opentrons/components'
 import { ControlContainer } from './ControlContainer'
 
