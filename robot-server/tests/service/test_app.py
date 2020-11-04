@@ -1,7 +1,11 @@
 import pytest
 from http import HTTPStatus
 
-from robot_server.constants import API_VERSION_HEADER, API_VERSION
+from robot_server.constants import (
+    API_VERSION_HEADER,
+    API_VERSION,
+    API_VERSION_LATEST,
+)
 
 
 def test_unhandled_exception_handler(api_client_no_errors):
@@ -54,18 +58,47 @@ def test_custom_request_validation_exception_handler(api_client):
             API_VERSION,
         ],
         [
-            {API_VERSION_HEADER: str(API_VERSION - 1)},
-            API_VERSION - 1,
-        ],
-        [
-            {},
-            API_VERSION,
-        ],
-        [
-            {API_VERSION_HEADER: "not a number"},
+            {API_VERSION_HEADER: str(API_VERSION_LATEST)},
             API_VERSION,
         ],
     ])
 def test_api_versioning(api_client, headers, expected_version):
-    resp = api_client.get('/openapi', headers=headers)
+    resp = api_client.get('/openapi.json', headers=headers)
     assert resp.headers.get(API_VERSION_HEADER) == str(expected_version)
+
+
+def test_api_version_too_low(api_client):
+    """It should reject any API version lower than 2."""
+    resp = api_client.get('/openapi.json', headers={API_VERSION_HEADER: "1"})
+
+    assert resp.status_code == HTTPStatus.BAD_REQUEST
+    assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)
+    assert resp.json()["errors"] == [
+        {
+            "id": "OutdatedAPIVersion",
+            "title": "Requested HTTP API version no longer supported",
+            "detail": (
+                "HTTP API version 1 is no longer supported. Please upgrade "
+                "your Opentrons App or other HTTP API client."
+            )
+        }
+    ]
+
+
+def test_api_version_missing(api_client):
+    """It should reject any request without an version header."""
+    del api_client.headers["Opentrons-Version"]
+    resp = api_client.get('/openapi.json')
+
+    assert resp.status_code == HTTPStatus.BAD_REQUEST
+    assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)
+    assert resp.json()["errors"] == [
+        {
+            "id": "InvalidAPIVersion",
+            "title": "Missing or invalid HTTP API version header",
+            "detail": (
+                "Requests must define the Opentrons-Version header. You may "
+                "need to upgrade your Opentrons App or other HTTP API client."
+            )
+        }
+    ]
