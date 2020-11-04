@@ -63,9 +63,11 @@ export function PipetteOffsets(props: Props): React.Node {
         </SecondaryBtn>
       }
     >
-      <Flex alignItems={ALIGN_START}
-            flexDirection={DIRECTION_COLUMN}
-            marginBottom={SPACING_3}>
+      <Flex
+        alignItems={ALIGN_START}
+        flexDirection={DIRECTION_COLUMN}
+        marginBottom={SPACING_3}
+      >
         <Flex width={'100%'} paddingTop={SPACING_4}>
           <PipetteOffsetItem
             mount={'left'}
