@@ -15,7 +15,7 @@ describe('SaveZPoint', () => {
   const getSaveButton = wrapper => wrapper.find('button[title="save"]')
 
   const getJogButton = (wrapper, direction) =>
-    wrapper.find(`JogButton[name="${direction}"]`).find('button')
+    wrapper.find(`button[title="${direction}"]`).find('button')
 
   const getVideo = wrapper => wrapper.find(`source`)
 
@@ -90,11 +90,43 @@ describe('SaveZPoint', () => {
           vector: jogVectorByDirection[direction],
         },
       })
+      mockSendCommands.mockClear()
     })
 
     const unavailableJogDirections = ['left', 'right', 'back', 'forward']
     unavailableJogDirections.forEach(direction => {
       expect(getJogButton(wrapper, direction)).toEqual({})
+    })
+  })
+
+  it('allows jogging in xy axis after prompt clicked', () => {
+    const wrapper = render()
+
+    const jogDirections = ['left', 'right', 'back', 'forward']
+    const jogVectorByDirection = {
+      left: [-0.1, 0, 0],
+      right: [0.1, 0, 0],
+      back: [0, 0.1, 0],
+      forward: [0, -0.1, 0],
+    }
+    jogDirections.forEach(dir => {
+      expect(getJogButton(wrapper, dir).exists()).toBe(false)
+    })
+    wrapper
+      .find(
+        'button[children="Need to jog across the deck to align the pipette in slot 5?"]'
+      )
+      .invoke('onClick')({ preventDefault: () => {} })
+    jogDirections.forEach(direction => {
+      getJogButton(wrapper, direction).invoke('onClick')()
+
+      expect(mockSendCommands).toHaveBeenCalledWith({
+        command: Sessions.deckCalCommands.JOG,
+        data: {
+          vector: jogVectorByDirection[direction],
+        },
+      })
+      mockSendCommands.mockClear()
     })
   })
 

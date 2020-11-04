@@ -26,7 +26,7 @@ import type {
   CalibrationSessionStep,
   SessionCommandString,
 } from '../../sessions/types'
-import { JogControls } from '../JogControls'
+import { JogControls, HORIZONTAL_PLANE } from '../JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -256,7 +256,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           <source src={demoAsset} />
         </video>
       </Flex>
-      <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['x', 'y']} />
+      <JogControls jog={jog} stepSizes={[0.1, 1]} planes={[HORIZONTAL_PLANE]} />
       <Flex
         width="100%"
         justifyContent={JUSTIFY_CENTER}

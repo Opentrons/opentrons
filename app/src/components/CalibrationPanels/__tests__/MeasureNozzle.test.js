@@ -22,7 +22,7 @@ describe('MeasureNozzle', () => {
       .find('button')
 
   const getJogButton = (wrapper, direction) =>
-    wrapper.find(`JogButton[name="${direction}"]`).find('button')
+    wrapper.find(`button[title="${direction}"]`).find('button')
 
   beforeEach(() => {
     render = (props: $Shape<React.ElementProps<typeof MeasureNozzle>> = {}) => {

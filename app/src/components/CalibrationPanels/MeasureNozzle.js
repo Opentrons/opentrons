@@ -23,7 +23,7 @@ import {
   SPACING_4,
 } from '@opentrons/components'
 
-import { JogControls } from '../JogControls'
+import { JogControls, VERTICAL_PLANE } from '../JogControls'
 import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import type { CalibrationPanelProps } from './types'
@@ -176,7 +176,11 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
           </Flex>
         </Box>
         <div>
-          <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
+          <JogControls
+            jog={jog}
+            stepSizes={[0.1, 1]}
+            planes={[VERTICAL_PLANE]}
+          />
         </div>
         <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
           <PrimaryBtn onClick={proceed} flex="1">
