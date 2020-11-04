@@ -23,10 +23,10 @@ import type {
 
 const DEFAULT_REQUEST_OPTS = {
   timeout: 10000,
-  // NOTE(mc, 2020-10-04): This api version is slightly duplicated
+  // NOTE(mc, 2020-11-04): This api version is slightly duplicated
   // across the larger monorepo codebase and is a good argument for a
   // standalone API client library that app, app-shell, and DC can share
-  // NOTE(mc, 2020-10-04): Discovery client should remain locked to the lowest
+  // NOTE(mc, 2020-11-04): Discovery client should remain locked to the lowest
   // available HTTP API version that satisfies its data needs
   headers: { 'Opentrons-Version': '2' },
 }
