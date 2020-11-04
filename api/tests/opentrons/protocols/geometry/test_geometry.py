@@ -1,11 +1,8 @@
-from unittest.mock import MagicMock
-
 import pytest
 
 from opentrons.types import Location, Point
 from opentrons.protocols.geometry.planning import (
     plan_moves, safe_height, should_dodge_thermocycler)
-from opentrons.protocols.api_support.util import first_parent
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import module_geometry
@@ -376,33 +373,6 @@ def test_instr_max_height():
             instr_max_height=round(instr_max_height, 2),
             well_z_margin=7.0,
             lw_z_margin=15.0)
-
-
-def test_first_parent():
-    deck = Deck()
-    trough = labware.load(trough_name, deck.position_for(1))
-    assert first_parent(trough) == '1'
-    assert first_parent(trough['A2']) == '1'
-    assert first_parent(None) is None
-    assert first_parent('6') == '6'
-    mod = module_geometry.load_module(
-        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
-        deck.position_for('6'),
-        MAX_SUPPORTED_VERSION)
-    mod_trough = mod.add_labware(labware.load(trough_name, mod.location))
-    assert first_parent(mod_trough['A5']) == '6'
-    assert first_parent(mod_trough) == '6'
-    assert first_parent(mod) == '6'
-
-    # Set up recursion cycle test.
-    mock_labware_geometry = MagicMock()
-    mock_labware_geometry.parent = Location(point=None, labware=mod_trough)
-    mod_trough._implementation.get_geometry = MagicMock(
-        return_value=mock_labware_geometry)
-
-    with pytest.raises(RuntimeError):
-        # make sure we catch cycles
-        first_parent(mod_trough)
 
 
 def test_should_dodge():

@@ -13,7 +13,7 @@ from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances,
-    clamp_value, requires_version, build_edges, first_parent)
+    clamp_value, requires_version, build_edges)
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
     BlowoutLocation, LiquidHandlingCommand)
@@ -1534,7 +1534,7 @@ class InstrumentContext(CommandPublisher):
             return _build_length_from_overlap()
         else:
             try:
-                parent = first_parent(tiprack) or ''
+                parent = LabwareLike(tiprack).first_parent() or ''
                 return get.load_tip_length_calibration(
                     self.hw_pipette['pipette_id'],
                     tiprack._implementation.get_definition(),

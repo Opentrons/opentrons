@@ -7,7 +7,6 @@ from typing import (Any, Callable, Dict, Optional,
                     TYPE_CHECKING, Union, List)
 
 from opentrons import types as top_types
-from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
@@ -112,14 +111,6 @@ def labware_column_shift(
     shifted_column = unshifted_column + well_spacing
     shifted_well = unshifted_index % modulo_value
     return tiprack.columns()[shifted_column][shifted_well]
-
-
-def first_parent(loc: top_types.LocationLabware) -> Optional[str]:
-    """ Return the topmost parent of this location. It should be
-    either a string naming a slot or a None if the location isn't
-    associated with a slot """
-
-    return LabwareLike(loc).first_parent()
 
 
 class FlowRates:
