@@ -257,7 +257,7 @@ describe('DeckCalibrationControl', () => {
   ]
 
   CALIBRATE_STATUSES.forEach(status => {
-    it(`The button says calibrate when status is ${status}`, () => {
+    it(`The button says calibrate when status is ${String(status)}`, () => {
       const wrapper = render({ deckCalStatus: status })
       expect(getDeckCalButton(wrapper).prop('children')).toMatch(
         /calibrate deck/i
