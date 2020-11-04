@@ -10,7 +10,7 @@ import * as Sessions from '../../../sessions'
 import type { State } from '../../../types'
 import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
-import { Box, Flex } from '@opentrons/components'
+import { Box, Flex, PrimaryBtn } from '@opentrons/components'
 
 jest.mock('file-saver')
 jest.mock('../../../calibration/selectors')
@@ -33,8 +33,7 @@ describe('ResultsSummary', () => {
   let dispatch
   let mockDeleteSession
 
-  const getExitButton = wrapper =>
-    wrapper.find('PrimaryButton[children="Home robot and exit"]').find('button')
+  const getExitButton = wrapper => wrapper.find(PrimaryBtn)
 
   const getSaveLink = wrapper => wrapper.find('a').at(1)
   beforeEach(() => {
