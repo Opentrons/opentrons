@@ -1187,7 +1187,8 @@ class InstrumentContext(CommandPublisher):
         if not speed:
             speed = self.default_speed
 
-        from_center = from_lw.center_multichannel_on_wells() if from_lw else False
+        from_center = from_lw.center_multichannel_on_wells() \
+            if from_lw else False
         cp_override = CriticalPoint.XY_CENTER if from_center else None
         from_loc = types.Location(
             self._hw_manager.hardware.gantry_position(

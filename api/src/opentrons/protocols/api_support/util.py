@@ -4,7 +4,7 @@ import functools
 import logging
 from dataclasses import dataclass, field, astuple
 from typing import (Any, Callable, Dict, Optional,
-                    TYPE_CHECKING, Union, List, Set)
+                    TYPE_CHECKING, Union, List)
 
 from opentrons import types as top_types
 from opentrons.protocols.api_support.labware_like import LabwareLike

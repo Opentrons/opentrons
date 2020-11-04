@@ -12,7 +12,6 @@ from .labware import (
     Labware, load, load_from_definition)
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry,\
     ThermocyclerGeometry
-from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import requires_version
 
 if TYPE_CHECKING:

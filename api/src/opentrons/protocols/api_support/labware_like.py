@@ -75,7 +75,9 @@ class LabwareLike:
     def parent(self) -> 'LabwareLike':
         # Type ignoring because type checker is not aware that has_parent
         # performs the validation.
-        parent = self.object.parent if self.has_parent else None  # type: ignore
+        parent = None
+        if self.has_parent:
+            parent = self.object.parent  # type: ignore
         return LabwareLike(parent)
 
     @property
