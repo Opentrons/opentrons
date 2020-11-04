@@ -26,9 +26,7 @@ describe('DeckCalibrationControl', () => {
   let render
 
   const getDeckCalButton = wrapper =>
-    wrapper
-      .find('DeckCalibrationControl')
-      .find('button')
+    wrapper.find('DeckCalibrationControl').find('button')
 
   const getCancelDeckCalButton = wrapper =>
     wrapper.find('OutlineButton[children="cancel"]').find('button')
@@ -251,27 +249,28 @@ describe('DeckCalibrationControl', () => {
     expect(getCalibrationWarning(wrapper).children()).toHaveLength(0)
   })
 
-  const CALIBRATE_STATUSES = [
-    DECK_CAL_STATUS_IDENTITY,
-    null
-  ]
+  const CALIBRATE_STATUSES = [DECK_CAL_STATUS_IDENTITY, null]
   const RECALIBRATE_STATUSES = [
     DECK_CAL_STATUS_OK,
     DECK_CAL_STATUS_BAD_CALIBRATION,
-    DECK_CAL_STATUS_SINGULARITY
+    DECK_CAL_STATUS_SINGULARITY,
   ]
 
   CALIBRATE_STATUSES.forEach(status => {
     it(`The button says calibrate when status is ${status}`, () => {
       const wrapper = render({ deckCalStatus: status })
-      expect(getDeckCalButton(wrapper).prop('children')).toMatch(/calibrate deck/i)
+      expect(getDeckCalButton(wrapper).prop('children')).toMatch(
+        /calibrate deck/i
+      )
     })
   })
 
   RECALIBRATE_STATUSES.forEach(status => {
     it(`The button says recalibrate when status is ${status}`, () => {
       const wrapper = render({ deckCalStatus: status })
-      expect(getDeckCalButton(wrapper).prop('children')).toMatch(/recalibrate deck/i)
+      expect(getDeckCalButton(wrapper).prop('children')).toMatch(
+        /recalibrate deck/i
+      )
     })
   })
 })

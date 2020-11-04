@@ -75,9 +75,7 @@ const getDeckCalibrationStatus: JestMockFn<
 > = Calibration.getDeckCalibrationStatus
 
 const getDeckCalButton = wrapper =>
-  wrapper
-    .find('DeckCalibrationControl')
-    .find('button')
+  wrapper.find('DeckCalibrationControl').find('button')
 
 const getCheckCalibrationControl = wrapper =>
   wrapper.find(CheckCalibrationControl)
