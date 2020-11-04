@@ -12,8 +12,8 @@ export type ConfirmExitModalProps = {|
 |}
 
 const HEADING = 'Are you sure?'
-const GO_BACK = 'go back'
-const EXIT = 'exit anyway'
+const GO_BACK = 'no, go back'
+const EXIT = 'yes, exit now'
 const ARE_YOU_SURE = 'Are you sure you want to exit'
 const NOW = 'now?'
 
