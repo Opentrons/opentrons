@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.4...v4.0.0-alpha.5) (2020-11-04)
+
+
+### Bug Fixes
+
+* **app:** Spinner for deck calibration button ([#6902](https://github.com/Opentrons/opentrons/issues/6902)) ([7df8b95](https://github.com/Opentrons/opentrons/commit/7df8b95))
+* **robot-server:** prefer smaller pipette in deck cal ([#6900](https://github.com/Opentrons/opentrons/issues/6900)) ([9f2830a](https://github.com/Opentrons/opentrons/commit/9f2830a))
+
+
+### Features
+
+* **app:** Send intercom event on no-cal-block selected ([#6893](https://github.com/Opentrons/opentrons/issues/6893)) ([8e7059a](https://github.com/Opentrons/opentrons/commit/8e7059a)), closes [#6781](https://github.com/Opentrons/opentrons/issues/6781)
+
+
+
+
+
 # [4.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.3...v4.0.0-alpha.4) (2020-10-30)
 
 
