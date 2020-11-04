@@ -76,9 +76,8 @@ const getDeckCalibrationStatus: JestMockFn<
 
 const getDeckCalButton = wrapper =>
   wrapper
-    .find('TitledControl[title="Calibrate deck"]')
+    .find('DeckCalibrationControl')
     .find('button')
-    .filter({ children: 'Calibrate' })
 
 const getCheckCalibrationControl = wrapper =>
   wrapper.find(CheckCalibrationControl)
