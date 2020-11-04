@@ -212,12 +212,16 @@ class PairedInstrumentContext(CommandPublisher):
         if location and isinstance(location, types.Location):
             if location.labware.is_labware:
                 tiprack = location.labware.as_labware()
-                target = tiprack.next_tip(self.channels)
+                target = tiprack.next_tip(self.channels)  # type: ignore
                 if not target:
                     raise OutOfTipsError
             elif location.labware.is_well:
                 tiprack = location.labware.parent.as_labware()
                 target = location.labware.as_well()
+            else:
+                raise TypeError(
+                    "The location must be in a well or labware."
+                )
         elif location and isinstance(location, Well):
             tiprack = location.parent
             target = location
@@ -394,6 +398,8 @@ class PairedInstrumentContext(CommandPublisher):
                         .format(volume,
                                 location if location else 'current position',
                                 rate))
+
+        loc: Optional[types.Location] = None
         if isinstance(location, Well):
             point, well = location.bottom()
             loc = types.Location(
@@ -511,8 +517,8 @@ class PairedInstrumentContext(CommandPublisher):
             self.paired_instrument_obj.dispense(volume, loc, rate)
 
         if isinstance(primary_loc.labware, Well):
-            labware = primary_loc.labware.parent
-            well = primary_loc.labware
+            well = primary_loc.labware.as_well()
+            labware = well.parent
             locations = [
                 primary_loc,
                 self._get_secondary_target(labware, well)]
