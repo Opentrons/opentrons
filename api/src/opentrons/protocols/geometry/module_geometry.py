@@ -212,7 +212,7 @@ class ModuleGeometry(DeckItem):
 
     @property
     def parent(self) -> LocationLabware:
-        return self._parent.labware
+        return self._parent.labware.object
 
     @property
     def labware(self) -> Optional[Labware]:
