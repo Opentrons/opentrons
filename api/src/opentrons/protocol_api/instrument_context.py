@@ -536,7 +536,7 @@ class InstrumentContext(CommandPublisher):
             if not self._ctx.location_cache:
                 raise RuntimeError('No valid current location cache present')
             else:
-                well = self._ctx.location_cache.labware  # type: ignore
+                well = self._ctx.location_cache.labware
                 # type checked below
         else:
             well = LabwareLike(location)
@@ -554,7 +554,7 @@ class InstrumentContext(CommandPublisher):
             else:
                 move_with_z_offset =\
                     well.as_well().top().point + types.Point(0, 0, v_offset)
-                to_loc = types.Location(move_with_z_offset, location)
+                to_loc = types.Location(move_with_z_offset, well)
             self.move_to(to_loc)
         else:
             raise TypeError(
