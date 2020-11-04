@@ -30,9 +30,9 @@ import styles from './styles.css'
 
 const FIRST_RANK_TO_CHECK = 'To check'
 const SECOND_RANK_TO_CHECK = 'In order to check'
-const FIRST_RANK_PLACE_FULL = 'pipette, place a full'
+const FIRST_RANK_PLACE_FULL = 'pipette, clear the deck and place a full'
 const SECOND_RANK_PLACE_FULL = 'pipette, switch out the tiprack for a full'
-const PLACE_A_FULL = 'Place a full'
+const CLEAR_AND_PLACE_A_FULL = 'Clear the deck and place a full'
 const TIPRACK = 'tip rack'
 const DECK_SETUP_WITH_BLOCK_PROMPT =
   'and Calibration Block on the deck within their designated slots as illustrated below.'
@@ -115,7 +115,7 @@ export function DeckSetup(props: CalibrationPanelProps): React.Node {
         >
           {isHealthCheck
             ? getHealthCheckText(activePipette?.mount, activePipette?.rank)
-            : PLACE_A_FULL}
+            : CLEAR_AND_PLACE_A_FULL}
           <b>{` ${tipRackDisplayName} `}</b>
           {calBlock ? DECK_SETUP_WITH_BLOCK_PROMPT : DECK_SETUP_NO_BLOCK_PROMPT}
           .
