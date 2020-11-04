@@ -19,6 +19,7 @@ import {
 import { useSelector } from 'react-redux'
 import { format } from 'date-fns'
 import {
+  Icon,
   Text,
   SecondaryBtn,
   BORDER_SOLID_LIGHT,
@@ -47,6 +48,8 @@ const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
 const CALIBRATE_BUTTON_TEXT = 'Calibrate'
 const CALIBRATE_TITLE_TEXT = 'Calibrate deck'
+const STARTING = 'Deck calibration is starting'
+const ENDING = 'Deck calibration is ending'
 
 const buildDeckLastCalibrated: (
   data: DeckCalibrationData,
@@ -103,6 +106,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
         createRequestId.current = dispatchedAction.meta.requestId
+        trackedRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.DELETE_SESSION &&
         deckCalibrationSession?.id === dispatchedAction.payload.sessionId
@@ -139,12 +143,14 @@ export function DeckCalibrationControl(props: Props): React.Node {
         : null
     )?.status === RobotApi.SUCCESS
 
-  const shouldOpen =
-    useSelector((state: State) =>
-      createRequestId.current
-        ? RobotApi.getRequestById(state, createRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
+  const createStatus = useSelector((state: State) =>
+    createRequestId.current
+      ? RobotApi.getRequestById(state, createRequestId.current)
+      : null
+  )?.status
+
+  const shouldOpen = createStatus === RobotApi.SUCCESS
+  const isCreating = createStatus === RobotApi.PENDING
 
   const isJogging =
     useSelector((state: State) =>
@@ -195,6 +201,18 @@ export function DeckCalibrationControl(props: Props): React.Node {
     warningType = RECOMMENDED
   }
 
+  const disabledIncludingSpinner = showSpinner
+    ? isCreating
+      ? STARTING
+      : ENDING
+    : disabledReason
+
+  const buttonChildren = showSpinner ? (
+    <Icon name="ot-spinner" height="1em" spin />
+  ) : (
+    CALIBRATE_BUTTON_TEXT
+  )
+
   return (
     <>
       <TitledControl
@@ -211,14 +229,14 @@ export function DeckCalibrationControl(props: Props): React.Node {
             {...targetProps}
             width="9rem"
             onClick={confirmStart}
-            disabled={disabledReason}
+            disabled={disabledIncludingSpinner}
           >
-            {CALIBRATE_BUTTON_TEXT}
+            {buttonChildren}
           </SecondaryBtn>
         }
       >
-        {disabledReason !== null && (
-          <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
+        {disabledIncludingSpinner !== null && (
+          <Tooltip {...tooltipProps}>{disabledIncludingSpinner}</Tooltip>
         )}
 
         {deckCalData && deckCalStatus && (
