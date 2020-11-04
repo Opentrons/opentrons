@@ -129,8 +129,8 @@ class PairedInstrument:
             primary_ready = self.p_instrument.hw_pipette['ready_to_aspirate']
             secondary_ready = self.s_instrument.hw_pipette['ready_to_aspirate']
             if not primary_ready or not secondary_ready:
-                if isinstance(loc.labware, Well):
-                    self.move_to(loc.labware.top())
+                if loc.labware.is_well:
+                    self.move_to(loc.labware.as_well().top())
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
@@ -147,7 +147,7 @@ class PairedInstrument:
             self.move_to(loc)
 
         hw_aspirate = self._hw_manager.hardware.aspirate
-        return (loc, partial(hw_aspirate, self._pair_policy, volume, rate))
+        return loc, partial(hw_aspirate, self._pair_policy, volume, rate)
 
     def dispense(
             self, volume: Optional[float],
@@ -185,9 +185,9 @@ class PairedInstrument:
 
     def air_gap(self, volume: Optional[float], height: float):
         loc = self._ctx.location_cache
-        if not loc or not isinstance(loc.labware, Well):
+        if not loc or not loc.labware.is_well:
             raise RuntimeError('No previous Well cached to perform air gap')
-        target = loc.labware.top(height)
+        target = loc.labware.as_well().top(height)
         self.move_to(target)
         # Aspirate now returns a partial function for run log purposes
         # but air gap only cares about executing an aspirate so here
@@ -216,7 +216,7 @@ class PairedInstrument:
 
             move_with_z_offset =\
                 well.as_well().top().point + types.Point(0, 0, v_offset)
-            to_loc = types.Location(move_with_z_offset, location)
+            to_loc = types.Location(move_with_z_offset, well)
             self.move_to(to_loc)
         else:
             # If location is a not a valid well, raise a type error
