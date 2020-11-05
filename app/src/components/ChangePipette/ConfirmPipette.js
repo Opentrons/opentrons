@@ -204,7 +204,8 @@ function ExitButton(props: Props) {
   const { exit, attachedWrong, actualPipetteOffset, wantedPipette } = props
   let buttonText = EXIT_BUTTON_MESSAGE
   if (attachedWrong) buttonText = EXIT_BUTTON_MESSAGE_WRONG
-  else if (Boolean(wantedPipette) && !actualPipetteOffset) buttonText = EXIT_WITHOUT_CAL
+  else if (Boolean(wantedPipette) && !actualPipetteOffset)
+    buttonText = EXIT_WITHOUT_CAL
 
   return (
     <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
