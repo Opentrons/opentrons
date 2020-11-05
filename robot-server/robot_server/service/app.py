@@ -154,6 +154,9 @@ async def api_version_check(request: Request, call_next) -> Response:
 
     # Put the api version in the response header
     response.headers[constants.API_VERSION_HEADER] = str(api_version)
+    response.headers[constants.MIN_API_VERSION_HEADER] = str(
+        constants.MIN_API_VERSION
+    )
     return response
 
 

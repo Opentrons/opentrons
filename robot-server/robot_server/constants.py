@@ -14,6 +14,9 @@ API_VERSION_LATEST = "*"
 # used to create response. Mandatory in requests and responses.
 API_VERSION_HEADER = "Opentrons-Version"
 
+# Response header specifing minimum acceptable API version
+MIN_API_VERSION_HEADER = "Opentrons-Min-Version"
+
 # Allow-list for routes that are not subject to versioning requirements
 # TODO(mc, 2020-11-05): allow routes to opt-in to versionsing and request +
 # response migrations via decorator. Puting an allow-list in place for now
