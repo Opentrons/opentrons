@@ -36,11 +36,11 @@ const mockGetLabwareDisplayName: JestMockFn<
 
 const getMountLabel = wrapper => wrapper.find('h4')
 
-const getPipetteName = wrapper => wrapper.find('p').at(0)
+const getPipetteName = wrapper => wrapper.find('p').at(1)
 const getNotCalibrated = wrapper => wrapper.find('p').at(1)
 const getCalibrationText = wrapper => wrapper.find('p')
-const getCalibrationTime = wrapper => wrapper.find('p').at(1)
-const getCalibrationTiprack = wrapper => wrapper.find('p').at(2)
+const getCalibrationTime = wrapper => wrapper.find('p').at(3)
+const getCalibrationTiprack = wrapper => wrapper.find('p').at(5)
 const getCalibrationWarning = wrapper => wrapper.find(InlineCalibrationWarning)
 
 describe('PipetteOffsetItem', () => {
@@ -105,18 +105,16 @@ describe('PipetteOffsetItem', () => {
 
   it('shows null when no pipette present', () => {
     const wrapper = render({ pipette: null })
-    expect(getMountLabel(wrapper).text()).toEqual('left')
-    expect(getCalibrationText(wrapper).text()).toEqual('n/a')
+    expect(getMountLabel(wrapper).text()).toEqual('left mount')
+    expect(getCalibrationText(wrapper).text()).toMatch(/no pipette attached/i)
     expect(getCalibrationWarning(wrapper).exists()).toBe(false)
   })
 
   it('says when you havent calibrated', () => {
     const wrapper = render({ calibration: null })
-    expect(getMountLabel(wrapper).text()).toEqual('left')
-    expect(getPipetteName(wrapper).text()).toEqual('P300 Single GEN2')
-    expect(getNotCalibrated(wrapper).text()).toMatch(/haven't calibrated/)
-    expect(getCalibrationText(wrapper)).toHaveLength(2)
-    expect(getCalibrationWarning(wrapper).exists()).toBe(false)
+    expect(getMountLabel(wrapper).text()).toEqual('left mount')
+    expect(getNotCalibrated(wrapper).text()).toMatch(/calibration required/i)
+    expect(getCalibrationWarning(wrapper).exists()).toBe(true)
   })
 
   it('displays date and tiprack display name from def', () => {
@@ -135,7 +133,7 @@ describe('PipetteOffsetItem', () => {
     expect(mockGetLabwareDisplayName).toHaveBeenCalledWith({
       parameters: { loadName: 'opentrons_96_tiprack_300ul' },
     })
-    expect(getMountLabel(wrapper).text()).toEqual('left')
+    expect(getMountLabel(wrapper).text()).toEqual('left mount')
     expect(getPipetteName(wrapper).text()).toEqual('P300 Single GEN2')
     expect(getCalibrationTime(wrapper).text()).toMatch(/September 10/)
     expect(getCalibrationTiprack(wrapper).text()).toMatch(

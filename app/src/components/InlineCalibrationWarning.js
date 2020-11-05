@@ -21,7 +21,7 @@ export const RECOMMENDED: 'recommended' = 'recommended'
 export type WarningType = typeof REQUIRED | typeof RECOMMENDED
 
 const CALIBRATION_REQUIRED = 'Calibration required'
-const CALIBRATION_RECOMMENDED = 'Calibration recommended'
+const CALIBRATION_RECOMMENDED = 'Recalibration recommended'
 
 const CONTENT_MAP = {
   [REQUIRED]: {
