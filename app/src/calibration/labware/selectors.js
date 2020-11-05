@@ -16,13 +16,13 @@ import {
 } from './utils'
 
 import type { State } from '../../types'
-import type { LabwareCalibrationModel } from '../types'
+import type { LabwareCalibration } from '../types'
 import type { LabwareSummary, BaseProtocolLabware } from './types'
 
 export const getLabwareCalibrations = (
   state: State,
   robotName: string
-): Array<LabwareCalibrationModel> => {
+): Array<LabwareCalibration> => {
   return state.calibration[robotName]?.labwareCalibrations?.data ?? []
 }
 
@@ -46,8 +46,8 @@ export const getProtocolLabwareList: (
         calibrationData: null,
       }
       const calData = calibrations
-        .filter(({ attributes }) =>
-          matchesLabwareIdentityForCalibration(attributes, baseLabware)
+        .filter(calibration =>
+          matchesLabwareIdentityForCalibration(calibration, baseLabware)
         )
         .map(formatCalibrationData)
 
@@ -72,7 +72,7 @@ export const getUniqueProtocolLabwareSummaries: (
   getLabwareCalibrations,
   (
     baseLabwareList: Array<BaseProtocolLabware>,
-    calibrations: Array<LabwareCalibrationModel>
+    calibrations: Array<LabwareCalibration>
   ) => {
     const uniqueLabware = uniqWith<BaseProtocolLabware>(
       baseLabwareList,

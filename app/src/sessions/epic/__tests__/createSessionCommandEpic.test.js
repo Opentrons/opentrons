@@ -31,12 +31,9 @@ describe('createSessionCommandEpic', () => {
     path: '/sessions/1234/commands/execute',
     body: {
       data: {
-        type: 'Command',
-        attributes: {
-          command: 'calibration.jog',
-          data: {
-            vector: [32, 0, 0],
-          },
+        command: 'calibration.jog',
+        data: {
+          vector: [32, 0, 0],
         },
       },
     },

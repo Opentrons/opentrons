@@ -25,11 +25,8 @@ const mapActionToRequest = (
   path: `${Constants.SESSIONS_PATH}/${action.payload.sessionId}${Constants.SESSIONS_COMMANDS_EXECUTE_PATH_EXTENSION}`,
   body: {
     data: {
-      type: 'Command',
-      attributes: {
-        command: action.payload.command.command,
-        data: action.payload.command.data,
-      },
+      command: action.payload.command.command,
+      data: action.payload.command.data,
     },
   },
 })

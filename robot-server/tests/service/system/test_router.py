@@ -19,8 +19,7 @@ def mock_set_system_time(mock_system_time):
 def response_links():
     return {
         'self': {
-            'href': '/system/time',
-            'meta': None
+            'href': '/system/time', 'meta': None,
         }
     }
 
@@ -34,8 +33,7 @@ def test_raise_system_synchronized_error(api_client,
     response = api_client.put("/system/time", json={
         "data": {
             "id": "time",
-            "type": "SystemTimeAttributes",
-            "attributes": {"systemTime": mock_system_time.isoformat()}
+            "systemTime": mock_system_time.isoformat()
         }
     })
     assert response.json() == {'errors': [{
@@ -55,8 +53,7 @@ def test_raise_system_exception(api_client,
     response = api_client.put("/system/time", json={
         "data": {
             "id": "time",
-            "type": "SystemTimeAttributes",
-            "attributes": {"systemTime": mock_system_time.isoformat()}
+            "systemTime": mock_system_time.isoformat()
         }
     })
     assert response.json() == {'errors': [{
@@ -77,18 +74,16 @@ def test_set_system_time(api_client, mock_system_time,
     response = api_client.put("/system/time",
                               json={
                                   'data': {
-                                      'attributes': {
-                                          'systemTime':
-                                              mock_system_time.isoformat()},
+                                      'systemTime':
+                                          mock_system_time.isoformat(),
                                       'id': 'time',
-                                      'type': 'SystemTimeAttributes'},
+                                  },
                               })
     assert response.json() == {
         'data': {
-            'attributes': {'systemTime': mock_system_time.isoformat()},
-            'id': 'time',
-            'type': 'SystemTimeAttributes'},
+            'systemTime': mock_system_time.isoformat(),
+            'id': 'time'
+        },
         'links': response_links,
-        'meta': None
     }
     assert response.status_code == 200

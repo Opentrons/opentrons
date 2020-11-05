@@ -16,8 +16,8 @@ from robot_server.robot.calibration.pipette_offset.models import\
     PipetteOffsetCalibrationSessionStatus
 from robot_server.robot.calibration.tip_length.models import\
     TipCalibrationSessionStatus
-from robot_server.service.json_api import RequestModel, ResponseModel
-from robot_server.service.json_api.response import MultiResponseModel
+from robot_server.service.json_api import (
+    RequestModel, ResponseModel, ResponseDataModel, MultiResponseModel)
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.protocol.models import \
     ProtocolCreateParams, ProtocolSessionDetails
@@ -108,7 +108,7 @@ class LiveProtocolCreateAttributes(SessionCreateAttributesNoParams):
         SessionType.live_protocol
 
 
-class SessionResponseAttributes(BaseModel):
+class SessionResponseAttributes(ResponseDataModel):
     """Common session response attributes."""
     createdAt: datetime = \
         Field(...,
@@ -185,8 +185,8 @@ SessionCreateRequest = RequestModel[
     RequestTypes
 ]
 SessionResponse = ResponseModel[
-    ResponseTypes, dict
+    ResponseTypes
 ]
 MultiSessionResponse = MultiResponseModel[
-    ResponseTypes, dict
+    ResponseTypes
 ]
