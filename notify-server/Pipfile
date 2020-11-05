@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple/"
+verify_ssl = true
+
+[requires]
+python_version = "3.7"
+
+[packages]
+pyzmq = "==19.*,>=19.0.2"
+pydantic = "==1.4"
+
+[dev-packages]
+flake8 = "==3.*,>=3.8.4"
+flake8-annotations = "==2.*,>=2.4.1"
+flake8-docstrings = "==1.*,>=1.5.0"
+mock = "==4.*,>=4.0.2"
+mypy = "==0.*,>=0.790.0"
+pytest = "==6.*,>=6.1.0"
+pytest-cov = "==2.*,>=2.10.1"
+pytest-watch = "==4.*,>=4.2.0"
+pytest-asyncio = "*"

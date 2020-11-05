@@ -18,7 +18,8 @@ SRC_PATH = notify_server
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call poetry_python_get_wheelname,notify-server,notify_server,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,notify-server,notify_server,$(BUILD_NUMBER))
+
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -48,8 +49,8 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	$(poetry) install
-	$(poetry) show
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean:
@@ -57,11 +58,11 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(SHX) rm -rf  `${poetry} env info -p`
+	$(pipenv) --rm
 
-dist/notify_server-%-py3-none-any.whl: $(ot_sources)
+dist/notify_server-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(clean_cmd)
-	$(poetry) build -f wheel
+	$(python) setup.py $(wheel_opts) bdist_wheel --universal
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -69,21 +70,21 @@ wheel: $(wheel_file)
 
 .PHONY: test
 test:
-	$(poetry_run) py.test $(tests) $(test_opts)
+	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(poetry_run) python -m mypy $(SRC_PATH)
-	$(poetry_run) flake8 $(SRC_PATH) tests
+	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m flake8 $(SRC_PATH) $(tests)
 
 .PHONY: dev
 dev: export OT_NOTIFY_SERVER_PRODUCTION := 0
 dev:
-	$(poetry_run) python -m notify_server.main
+	$(python) -m notify_server.main
 
 .PHONY: local-shell
 local-shell:
-	$(poetry) shell
+	$(python) shell
 
 .PHONY: push
 push: wheel

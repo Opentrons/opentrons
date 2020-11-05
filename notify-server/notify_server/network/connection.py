@@ -55,7 +55,7 @@ def create_subscriber(address: str, topics: Sequence[str]) -> Connection:
 
     log.info("Subscribing to %s", topics)
     for t in topics:
-        sock.setsockopt_string(zmq.SUBSCRIBE, t)
+        sock.subscribe(t)
 
     return Connection(sock)
 

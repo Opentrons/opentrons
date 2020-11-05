@@ -61,8 +61,10 @@
         "body": "Add another tip rack to an empty slot in "
       },
       "NO_TIP_ON_PIPETTE": {
-        "title": "No tip on pipette",
-        "body": "The setting \"Get new tip\" cannot be \"Never\" the first time a pipette is used in a protocol"
+        "title": "No tip on pipette at the start of step",
+        "body1": "Choose a different Change Tip setting. Change Tip cannot be \"Never\" the first time a pipette is used in a protocol, or following a step that used the ",
+        "link": "Air gap dispense setting",
+        "body2": ". Pipetting steps must begin with a tip on."
       },
       "MODULE_PIPETTE_COLLISION_DANGER": {
         "title": "Pipette cannot access labware",

@@ -1,5 +1,7 @@
 """Tests for the command lifecycle state."""
+from datetime import datetime
 
+from opentrons.protocol_engine import StateStore
 from opentrons.protocol_engine.command_models import (
     PendingCommand,
     LoadLabwareRequest,
@@ -7,12 +9,18 @@ from opentrons.protocol_engine.command_models import (
 )
 
 
-def test_state_store_handles_command(store, now, load_labware_request):
+def test_state_store_handles_command(store: StateStore, now: datetime) -> None:
     """It should add a command to the store."""
-    cmd: PendingCommand[LoadLabwareRequest, LoadLabwareResult] = (
-        PendingCommand(created_at=now, request=load_labware_request)
+    cmd = PendingCommand[LoadLabwareRequest, LoadLabwareResult](
+        created_at=now,
+        request=LoadLabwareRequest(
+            loadName="load-name",
+            namespace="opentrons-test",
+            version=1,
+            location=2,
+        )
     )
 
-    store.handle_command(cmd, uid="unique-id")
+    store.handle_command(cmd, command_id="unique-id")
 
-    assert store.state.get_command_by_id("unique-id") == cmd
+    assert store.commands.get_command_by_id("unique-id") == cmd

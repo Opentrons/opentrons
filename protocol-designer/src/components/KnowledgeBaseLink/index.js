@@ -5,6 +5,7 @@ export const KNOWLEDGEBASE_ROOT_URL =
   'https://support.opentrons.com/en/collections/493886-protocol-designer'
 
 export const links = {
+  airGap: `https://support.opentrons.com/en/articles/4398106-air-gap`,
   multiDispense: `https://support.opentrons.com/en/articles/4170341-paths`,
   protocolSteps: `https://support.opentrons.com/en/collections/493886-protocol-designer#building-a-protocol-steps`,
   customLabware: `https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions`,
