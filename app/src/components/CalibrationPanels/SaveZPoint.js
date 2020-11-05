@@ -64,8 +64,9 @@ const TO_USE_Z =
   'button to use this z position for the rest of deck calibration'
 const CALIBRATION_HEALTH_TO_DETERMINE =
   'button to determine how this position compares to the previously saved z-axis calibration coordinate'
-const ALLOW_HORIZONTAL_TEXT =
-  'Need to jog across the deck to align the pipette in slot 5?'
+const ALLOW_HORIZONTAL_TEXT = 'Reveal XY jog controls to move across deck'
+const ALLOW_XY_JOG_INSTRUCTIONS =
+  'If the pipette is over the embossed 5, on the ridge of the slot, or hard to see, reveal the jog controls to move the pipette across the deck.'
 
 const contentsBySessionType: {
   [SessionType]: {
@@ -180,6 +181,9 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
           {THEN}
           <b>{` '${buttonText}' `}</b>
           {isHealthCheck ? CALIBRATION_HEALTH_TO_DETERMINE : TO_USE_Z}.
+          <br />
+          <br />
+          {ALLOW_XY_JOG_INSTRUCTIONS}
         </Text>
         <video
           key={demoAsset}
