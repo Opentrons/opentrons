@@ -7,7 +7,7 @@ from opentrons.protocol_engine.state import LocationData
 
 def test_initial_location(store: StateStore) -> None:
     """get_current_location should return None initially."""
-    assert store.state.get_current_location_data() is None
+    assert store.motion.get_current_location_data() is None
 
 
 @pytest.mark.parametrize("req,res", [
@@ -46,7 +46,7 @@ def test_handles_move_to_well_result(
     req: cmd.CommandRequestType,
     res: cmd.CommandResultType,
 ) -> None:
-    """A pipetting command shoud update the current location."""
+    """A pipetting command should update the current location."""
     command: cmd.CompletedCommandType = \
         cmd.CompletedCommand(  # type: ignore[assignment]
             created_at=now,
@@ -57,7 +57,7 @@ def test_handles_move_to_well_result(
         )
 
     store.handle_command(command, "command-id")
-    assert store.state.get_current_location_data() == LocationData(
+    assert store.motion.get_current_location_data() == LocationData(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_id="B4"

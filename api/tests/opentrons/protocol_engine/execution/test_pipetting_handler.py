@@ -7,14 +7,9 @@ from opentrons.types import MountType, Mount, Point
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocols.geometry.planning import Waypoint
 
-from opentrons.protocol_engine.state import PipetteLocationData
+from opentrons.protocol_engine.state import StateStore, PipetteLocationData
 from opentrons.protocol_engine.command_models import MoveToWellRequest
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
-
-
-@pytest.fixture
-def handler(mock_hardware: AsyncMock) -> PipettingHandler:
-    return PipettingHandler(hardware=mock_hardware)
 
 
 @pytest.fixture
@@ -43,14 +38,16 @@ def waypoints() -> List[Waypoint]:
 
 
 @pytest.fixture
-def state_with_data(
-    mock_state: MagicMock,
+def store_with_data(
+    mock_state_view: MagicMock,
     pipette_location_data: PipetteLocationData,
     waypoints: List[Waypoint],
 ) -> MagicMock:
-    mock_state.get_pipette_location.return_value = pipette_location_data
-    mock_state.get_movement_waypoints.return_value = waypoints
-    return mock_state
+    mock_state_view.motion.get_pipette_location.return_value = \
+        pipette_location_data
+    mock_state_view.motion.get_movement_waypoints.return_value = waypoints
+
+    return mock_state_view
 
 
 @pytest.fixture
@@ -62,15 +59,24 @@ def hc_with_data(
     return mock_hardware
 
 
+@pytest.fixture
+def handler(
+    store_with_data: StateStore,
+    hc_with_data: AsyncMock
+) -> PipettingHandler:
+    return PipettingHandler(
+        state=store_with_data,
+        hardware=hc_with_data
+    )
+
+
 async def test_handle_move_to_passes_waypoint_to_hc(
     move_to_well_request: MoveToWellRequest,
-    waypoints: List[Waypoint],
-    state_with_data: MagicMock,
     hc_with_data: AsyncMock,
     handler: PipettingHandler
 ) -> None:
     """It should call hardware control with the movement data."""
-    await handler.handle_move_to_well(move_to_well_request, state_with_data)
+    await handler.handle_move_to_well(move_to_well_request)
 
     hc_with_data.gantry_position.assert_called_with(
         mount=Mount.LEFT,
@@ -98,18 +104,17 @@ async def test_handle_move_to_passes_waypoint_to_hc(
 
 async def test_handle_move_to_gets_movement_data_from_state(
     move_to_well_request: MoveToWellRequest,
-    state_with_data: MagicMock,
-    hc_with_data: AsyncMock,
+    store_with_data: MagicMock,
     handler: PipettingHandler
 ) -> None:
     """It should call state.get_movement_waypoints with request data."""
-    await handler.handle_move_to_well(move_to_well_request, state_with_data)
+    await handler.handle_move_to_well(move_to_well_request)
 
-    state_with_data.get_pipette_location.assert_called_with(
+    store_with_data.motion.get_pipette_location.assert_called_with(
         pipette_id=move_to_well_request.pipetteId,
     )
 
-    state_with_data.get_movement_waypoints.assert_called_with(
+    store_with_data.motion.get_movement_waypoints.assert_called_with(
         origin=Point(1, 1, 1),
         origin_cp=CriticalPoint.FRONT_NOZZLE,
         max_travel_z=42.0,

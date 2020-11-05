@@ -4,10 +4,11 @@ from typing import Union
 
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control.api import API as HardwareAPI
-from ..state import State
+from ..state import StateView
 from ..errors import ProtocolEngineError, UnexpectedProtocolError
 from .. import resources, command_models as cmd
 from .equipment import EquipmentHandler
+from .pipetting import PipettingHandler
 
 
 class CommandExecutor():
@@ -22,6 +23,7 @@ class CommandExecutor():
     def create(
         cls,
         hardware: HardwareAPI,
+        state: StateView
     ) -> CommandExecutor:
         """Create a CommandExecutor instance."""
         id_generator = resources.IdGenerator()
@@ -29,13 +31,19 @@ class CommandExecutor():
 
         return cls(
             equipment_handler=EquipmentHandler(
-                hardware=hardware,
+                state=state,
                 id_generator=id_generator,
                 labware_data=labware_data,
-            )
+                hardware=hardware,
+            ),
+            pipetting_handler=PipettingHandler(state=state, hardware=hardware)
         )
 
-    def __init__(self, equipment_handler: EquipmentHandler) -> None:
+    def __init__(
+        self,
+        equipment_handler: EquipmentHandler,
+        pipetting_handler: PipettingHandler,
+    ) -> None:
         """
         Initialize a CommandExecutor.
 
@@ -43,15 +51,15 @@ class CommandExecutor():
         CommandExecutor.create factory classmethod.
         """
         self._equipment_handler = equipment_handler
+        self._pipetting_handler = pipetting_handler
 
     async def execute_command(
         self,
         command: cmd.RunningCommandType,
-        state: State
     ) -> Union[cmd.CompletedCommandType, cmd.FailedCommandType]:
         """Execute a Command, returning a CompletedCommand or FailedCommand."""
         try:
-            return await self._try_to_execute_command(command, state)
+            return await self._try_to_execute_command(command)
         except ProtocolEngineError as error:
             return command.to_failed(error, utc_now())
         except Exception as unhandled_error:
@@ -63,7 +71,6 @@ class CommandExecutor():
     async def _try_to_execute_command(
         self,
         command: cmd.RunningCommandType,
-        state: State
     ) -> cmd.CompletedCommandType:
         """
         Private method to execute commands by routing to a specific command
@@ -81,8 +88,14 @@ class CommandExecutor():
         elif isinstance(command.request, cmd.LoadPipetteRequest):
             pip_res = await self._equipment_handler.handle_load_pipette(
                 command.request,
-                state=state
             )
             return command.to_completed(pip_res, utc_now())
+
+        # move to well
+        elif isinstance(command.request, cmd.MoveToWellRequest):
+            move_res = await self._pipetting_handler.handle_move_to_well(
+                command.request
+            )
+            return command.to_completed(move_res, utc_now())
 
         raise NotImplementedError(f"{type(command.request)} not implemented")

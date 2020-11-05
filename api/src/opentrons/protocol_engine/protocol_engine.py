@@ -8,7 +8,7 @@ from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.util.helpers import utc_now
 
 from .execution import CommandExecutor
-from .state import StateStore
+from .state import StateStore, StateView
 
 from .command_models import (
     CommandRequestType,
@@ -32,11 +32,13 @@ class ProtocolEngine():
     def create(cls, hardware: HardwareAPI) -> ProtocolEngine:
         """Create a ProtocolEngine instance."""
         deck_definition = load_deck(STANDARD_DECK, 2)
-
-        return cls(
-            state_store=StateStore(deck_definition=deck_definition),
-            executor=CommandExecutor.create(hardware=hardware)
+        state_store = StateStore(deck_definition=deck_definition)
+        executor = CommandExecutor.create(
+            hardware=hardware,
+            state=StateView.create_view(state_store)
         )
+
+        return cls(state_store=state_store, executor=executor)
 
     def __init__(
         self,
@@ -66,10 +68,7 @@ class ProtocolEngine():
         )
 
         self.state_store.handle_command(cmd, uid=uid)
-        completed_cmd = await self.executor.execute_command(
-            cmd,
-            state=self.state_store.state
-        )
+        completed_cmd = await self.executor.execute_command(cmd)
         self.state_store.handle_command(completed_cmd, uid=uid)
 
         return completed_cmd

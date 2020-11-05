@@ -35,7 +35,7 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     """It should load deck geometry data into the store on create."""
     engine = ProtocolEngine.create(hardware=mock_hardware)
 
-    assert engine.state_store.state.get_deck_definition() == \
+    assert engine.state_store.geometry.get_deck_definition() == \
         standard_deck_def
 
 
@@ -60,7 +60,6 @@ async def test_execute_command_creates_command(
 async def test_execute_command_calls_executor(
     engine: ProtocolEngine,
     mock_executor: AsyncMock,
-    mock_state_store: MagicMock,
 ) -> None:
     """It should create a command in the state store when executing."""
     req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")
@@ -72,8 +71,7 @@ async def test_execute_command_calls_executor(
             created_at=cast(datetime, CloseToNow()),
             started_at=cast(datetime, CloseToNow()),
             request=req
-        ),
-        state=mock_state_store.state
+        )
     )
 
 
