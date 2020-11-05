@@ -32,10 +32,8 @@ async def get_health(
     if inspect.isawaitable(fw_version):
         fw_version = await fw_version
 
-    if feature_flags.use_protocol_api_v2():
-        max_supported = protocol_api.MAX_SUPPORTED_VERSION
-    else:
-        max_supported = APIVersion(1, 0)
+    max_supported = protocol_api.MAX_SUPPORTED_VERSION
+    min_supported = protocol_api.MINIMUM_SUPPORTED_VERSION
 
     return Health(name=config.name(),
                   api_version=__version__,
@@ -43,7 +41,8 @@ async def get_health(
                   board_revision=hardware.board_revision,
                   logs=static_paths,
                   system_version=config.OT_SYSTEM_VERSION,
-                  protocol_api_version=list(max_supported),
+                  maximum_protocol_api_version=list(max_supported),
+                  minimum_protocol_api_version=list(min_supported),
                   links=Links(
                       apiLog='/logs/api.log',
                       serialLog='/logs/serial.log',

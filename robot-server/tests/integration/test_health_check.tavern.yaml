@@ -20,7 +20,10 @@ stages:
         - /logs/serial.log
         - /logs/api.log
         system_version: 0.0.0
-        protocol_api_version:
+        minimum_protocol_api_version:
+          - 2
+          - 0
+        maximum_protocol_api_version:
           - 2
           - 8
         links:
