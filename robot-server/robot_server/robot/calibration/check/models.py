@@ -71,6 +71,8 @@ class ComparisonStatePerPipette(BaseModel):
 class CheckAttachedPipette(AttachedPipette):
     rank: Literal['first', 'second'] =\
         Field(..., description="The order of a given pipette")
+    tipRackLoadName: str =\
+        Field(..., description="The load name of the tiprack")
     tipRackDisplay: str =\
         Field(..., description="The display name of the tiprack")
     tipRackUri: str =\

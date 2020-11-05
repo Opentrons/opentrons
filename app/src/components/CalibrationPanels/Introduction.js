@@ -327,12 +327,17 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     sessionType,
     shouldPerformTipLength,
     intent,
+    instruments,
   } = props
 
   const isExtendedPipOffset =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
     shouldPerformTipLength
-
+  const isHealtHCheck =
+    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+  const unqiueTipRacks = new Set(
+    instruments?.map(instr => instr.tipRackLoadName)
+  )
   const proceed = () =>
     sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
 
@@ -384,12 +389,24 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
           <Text fontWeight={FONT_WEIGHT_SEMIBOLD} marginBottom={SPACING_3}>
             {LABWARE_REQS}
           </Text>
-          <RequiredLabwareCard
-            loadName={tipRack.loadName}
-            displayName={getLabwareDisplayName(tipRack.definition)}
-            linkToMeasurements={isKnownTiprack}
-          />
-          {/* TODO: AA 2020-10-26 load both required tipracks for multi-pipette health check when the other tiprack info is available */}
+          {isHealtHCheck && unqiueTipRacks.size > 1 ? (
+            instruments?.map(instr => {
+              return (
+                <RequiredLabwareCard
+                  key={instr.tipRackUri}
+                  loadName={instr.tipRackLoadName}
+                  displayName={instr.tipRackDisplay}
+                  linkToMeasurements={instr.tipRackLoadName in labwareImages}
+                />
+              )
+            })
+          ) : (
+            <RequiredLabwareCard
+              loadName={tipRack.loadName}
+              displayName={getLabwareDisplayName(tipRack.definition)}
+              linkToMeasurements={isKnownTiprack}
+            />
+          )}
           {calBlock && (
             <>
               <Box width={SPACING_2} />

@@ -57,6 +57,7 @@ export type CalibrationHealthCheckInstrument = {|
   tip_length: number,
   mount: Mount,
   rank: RobotCalibrationCheckPipetteRank,
+  tipRackLoadName: string,
   tipRackDisplay: string,
   tipRackUri: string,
   serial: string,

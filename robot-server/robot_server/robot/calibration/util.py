@@ -14,8 +14,9 @@ from opentrons.types import Point, Location, Mount
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import (
     CommandDefinition)
-from .constants import STATE_WILDCARD, CAL_BLOCK_SETUP_BY_MOUNT, \
-    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET
+from .constants import (
+    STATE_WILDCARD, CAL_BLOCK_SETUP_BY_MOUNT, CAL_BLOCK_SETUP_CAL_CHECK,
+    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET)
 from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
 from .pipette_offset.constants import (
@@ -165,15 +166,20 @@ async def move(user_flow: CalibrationUserFlow,
 
 def get_reference_location(mount: Mount,
                            deck: Deck,
-                           has_calibration_block: bool) -> Location:
+                           has_calibration_block: bool,
+                           is_calibration_check: bool = False) -> Location:
     """
     Get location of static z reference point.
     Will be on Calibration Block if available, otherwise will be on
     flat surface of fixed trash insert.
     """
     if has_calibration_block:
-        slot = CAL_BLOCK_SETUP_BY_MOUNT[mount].slot
-        well = CAL_BLOCK_SETUP_BY_MOUNT[mount].well
+        if is_calibration_check:
+            cb_setup = CAL_BLOCK_SETUP_CAL_CHECK
+        else:
+            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[mount]
+        slot = cb_setup.slot
+        well = cb_setup.well
         calblock: labware.Labware = deck[slot]  # type: ignore
         calblock_loc = calblock.wells_by_name()[well].top()
         ref_loc = calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)

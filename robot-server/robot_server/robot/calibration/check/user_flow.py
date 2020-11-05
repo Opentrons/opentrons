@@ -17,7 +17,7 @@ from opentrons.protocols.geometry.deck import Deck
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER, JOG_TO_DECK_SLOT,
-    CAL_BLOCK_SETUP_BY_MOUNT)
+    CAL_BLOCK_SETUP_CAL_CHECK)
 import robot_server.robot.calibration.util as uf
 from robot_server.robot.calibration.helper_classes import (
     RobotHealthCheck, PipetteRank, PipetteInfo,
@@ -331,7 +331,7 @@ class CheckCalibrationUserFlow:
 
     def _load_cal_block(self):
         if self._has_calibration_block:
-            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self.mount]
+            cb_setup = CAL_BLOCK_SETUP_CAL_CHECK
             self._deck[cb_setup.slot] = labware.load(
                 cb_setup.load_name,
                 self._deck.position_for(cb_setup.slot))
@@ -452,6 +452,7 @@ class CheckCalibrationUserFlow:
                 model=hw_pip.model,
                 name=hw_pip.name,
                 tipLength=hw_pip.config.tip_length,
+                tipRackLoadName=info_pip.tip_rack.load_name,
                 tipRackDisplay=info_pip.tip_rack._implementation.get_definition()['metadata']['displayName'],  # noqa: E501
                 tipRackUri=info_pip.tip_rack.uri,
                 rank=info_pip.rank.value,
@@ -465,11 +466,12 @@ class CheckCalibrationUserFlow:
         assert self.hw_pipette
         assert self.active_pipette
         display_name =\
-            self.active_pipette.tip_rack._implementation.get_display_name()
+            self.active_pipette.tip_rack._implementation.get_definition()['metadata']['displayName']  # noqa: E501
         return CheckAttachedPipette(
             model=self.hw_pipette.model,
             name=self.hw_pipette.name,
             tipLength=self.hw_pipette.config.tip_length,
+            tipRackLoadName=self.active_pipette.tip_rack.load_name,
             tipRackDisplay=display_name,
             tipRackUri=self.active_pipette.tip_rack.uri,
             rank=self.active_pipette.rank.value,
@@ -715,7 +717,8 @@ class CheckCalibrationUserFlow:
         ref_loc = uf.get_reference_location(
             mount=self.mount,
             deck=self._deck,
-            has_calibration_block=self._has_calibration_block)
+            has_calibration_block=self._has_calibration_block,
+            is_calibration_check=True)
         await self._move(ref_loc)
 
     async def move_to_point_one(self):
