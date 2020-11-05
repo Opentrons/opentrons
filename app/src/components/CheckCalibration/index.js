@@ -32,7 +32,10 @@ import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 
 import type { StyleProps } from '@opentrons/components'
-import type { SessionCommandParams } from '../../sessions/types'
+import type {
+  CalibrationLabware,
+  SessionCommandParams,
+} from '../../sessions/types'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type { CalibrationHealthCheckParentProps } from './types'
@@ -105,6 +108,7 @@ export function CheckHealthCalibration(
     activeTipRack,
     instruments,
     comparisonsByPipette,
+    labware,
   } = session?.details || {}
 
   const {
@@ -119,6 +123,10 @@ export function CheckHealthCalibration(
     const spec = activePipette && getPipetteModelSpecs(activePipette.model)
     return spec ? spec.channels > 1 : false
   }, [activePipette])
+
+  const calBlock: CalibrationLabware | null = labware
+    ? labware.find(l => !l.isTiprack) ?? null
+    : null
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
     if (session?.id) {
@@ -170,6 +178,7 @@ export function CheckHealthCalibration(
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           tipRack={activeTipRack}
+          calBlock={calBlock}
           isMulti={isMulti}
           mount={activePipette?.mount.toLowerCase()}
           currentStep={currentStep}
