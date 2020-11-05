@@ -1,12 +1,20 @@
 import functools
 import logging
-from enum import Enum
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Tuple
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
+
+from opentrons.motion_planning import (
+    DEFAULT_GENERAL_ARC_Z_MARGIN,
+    DEFAULT_IN_LABWARE_ARC_Z_MARGIN,
+    MINIMUM_Z_MARGIN,
+    MoveType,
+    get_waypoints
+)
+
 from opentrons.protocol_api.labware import (
     Labware, Well, quirks_from_any_parent)
 from opentrons.protocols.geometry.deck import Deck
@@ -17,24 +25,9 @@ from opentrons.protocols.api_support.util import first_parent
 
 MODULE_LOG = logging.getLogger(__name__)
 
-Waypoint = Tuple[types.Point, Optional[CriticalPoint]]
-
 
 class LabwareHeightError(Exception):
     pass
-
-
-class MoveType(str, Enum):
-    """
-    Move type, where a move may be:
-
-    - GENERAL_ARC: an arc movement between two unrelated locations
-    - IN_LABWARE_ARC: an arc movement between two locations in the same labware
-    - DIRECT: a direct movement between two locations
-    """
-    GENERAL_ARC = "general-arc"
-    IN_LABWARE_ARC = "in-labware-arc"
-    DIRECT = "direct"
 
 
 def max_many(*args):
@@ -87,11 +80,6 @@ def should_dodge_thermocycler(
     return False
 
 
-DEFAULT_GENERAL_ARC_Z_MARGIN = 10.0
-DEFAULT_IN_LABWARE_ARC_Z_MARGIN = 5.0
-MINIMUM_Z_MARGIN = 1.0
-
-
 @dataclass
 class MoveConstraints:
     instr_max_height: float
@@ -114,12 +102,11 @@ def get_move_type(
     move_type = MoveType.GENERAL_ARC
     from_labware, from_well = split_loc_labware(from_loc)
     to_labware, to_well = split_loc_labware(to_loc)
+    same_labware = to_labware is not None and to_labware == from_labware
+    same_well = to_well is not None and to_well == from_well
 
-    if to_labware is not None and to_labware == from_labware:
-        if to_well is not None and to_well == from_well:
-            move_type = MoveType.DIRECT
-        else:
-            move_type = MoveType.IN_LABWARE_ARC
+    if same_labware:
+        move_type = MoveType.DIRECT if same_well else MoveType.IN_LABWARE_ARC
 
     return move_type if not force_direct else MoveType.DIRECT
 
@@ -233,7 +220,7 @@ def plan_moves(
     minimum_lw_z_margin: float = None,
     minimum_z_height: float = None,
     use_experimental_waypoint_planning: bool = False,
-) -> List[Waypoint]:
+) -> List[Tuple[types.Point, Optional[CriticalPoint]]]:
     """ Plan moves between one :py:class:`.Location` and another.
 
     Each :py:class:`.Location` instance might or might not have a specific
@@ -281,7 +268,10 @@ def plan_moves(
         if to_lw is not None and move_type == MoveType.IN_LABWARE_ARC:
             min_travel_z = to_lw.highest_z
 
-        return get_waypoints(
+        # TODO(mc, 2020-11-05): if this ever needs to be used, we need a
+        # story to re-create error messaging from LabwareHeightError above if
+        # this raises a MotionPlanningError
+        waypoints = get_waypoints(
             origin=from_point,
             dest=to_point,
             min_travel_z=min_travel_z,
@@ -291,6 +281,7 @@ def plan_moves(
             origin_cp=origin_cp_override,
             dest_cp=dest_cp_override,
         )
+        return [(wp.position, wp.critical_point) for wp in waypoints]
 
     is_same_location = ((to_lw and to_lw == from_lw)
                         and (to_well and to_well == from_well))
@@ -306,78 +297,3 @@ def plan_moves(
     return plan_arc(from_point, to_point, safe,
                     origin_cp_override, dest_cp_override,
                     extra_waypoints)
-
-
-def get_waypoints(
-    origin: types.Point,
-    dest: types.Point,
-    *,
-    max_travel_z: float,
-    min_travel_z: float = 0.0,
-    move_type: MoveType = MoveType.GENERAL_ARC,
-    xy_waypoints: Sequence[Tuple[float, float]] = (),
-    origin_cp: Optional[CriticalPoint] = None,
-    dest_cp: Optional[CriticalPoint] = None,
-) -> List[Waypoint]:
-    """
-    Get waypoints between an origin point and a destination point.
-
-    Given a move type and Z limits, which should be calculated according to
-    deck / labware / pipette geometry, creates waypoints with proper
-    z-clearances between `origin` and `dest`.
-
-    :param origin: The start point of the move.
-    :param dest: The end point of the move.
-    :param max_travel_z: The maximum allowed travel height of an arc move.
-    :param min_travel_z: The minimum allowed travel height of an arc move.
-    :param move_type: Direct move, in-labware arc, or general arc move type.
-    :param xy_waypoints: Extra XY destination waypoints to place in the path.
-    :param origin_cp: Pipette critical point override for origin waypoints.
-    :param dest_cp: Pipette critical point override for destination waypoints.
-
-    :returns: A list of tuples of :py:class:`.Point` and critical point
-              overrides to move through.
-    """
-    # NOTE(mc, 2020-10-28): This function is currently experimental. Flipping
-    # `use_experimental_waypoint_planning` to True in `plan_moves` above causes
-    # three test failure at the time of this writing.
-    #
-    # Eventually, it may take over for opentrons.hardware_control.util.plan_arc
-    waypoints: List[Waypoint] = []
-
-    if move_type != MoveType.DIRECT:
-        if dest.z + MINIMUM_Z_MARGIN > max_travel_z:
-            raise LabwareHeightError(
-                f"Move destination {dest} with Z clearance "
-                f"{MINIMUM_Z_MARGIN} exceeds {max_travel_z}"
-            )
-
-        if min_travel_z + MINIMUM_Z_MARGIN > max_travel_z:
-            raise LabwareHeightError(
-                f"Minimum travel height {min_travel_z} with clearance "
-                f"{MINIMUM_Z_MARGIN} exceeds {max_travel_z}"
-            )
-
-        travel_z_margin = (
-            DEFAULT_GENERAL_ARC_Z_MARGIN
-            if move_type == MoveType.GENERAL_ARC
-            else DEFAULT_IN_LABWARE_ARC_Z_MARGIN
-        )
-
-        travel_z = min(
-            max_travel_z,
-            max(min_travel_z + travel_z_margin, origin.z, dest.z)
-        )
-
-        if travel_z > origin.z:
-            waypoints.append((origin._replace(z=travel_z), origin_cp))
-
-        for x, y in xy_waypoints:
-            waypoints.append((types.Point(x=x, y=y, z=travel_z), dest_cp))
-
-        if travel_z > dest.z:
-            waypoints.append((dest._replace(z=travel_z), dest_cp))
-
-    waypoints.append((dest, dest_cp))
-
-    return waypoints
