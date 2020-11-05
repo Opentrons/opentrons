@@ -94,7 +94,7 @@ def test_get_waypoints_general_arc():
     ]
 
 
-def test_get_waypoints_general_arc_with_high_origin():
+def test_get_waypoints_general_arc_with_high_dest():
     """It should favor dest height over travel z if point is higher."""
     result = get_waypoints(
         origin=Point(1, 1, 14),
@@ -111,7 +111,7 @@ def test_get_waypoints_general_arc_with_high_origin():
     ]
 
 
-def test_get_waypoints_general_arc_with_high_dest():
+def test_get_waypoints_general_arc_with_high_origin():
     """It should favor origin height over travel z if point is higher."""
     result = get_waypoints(
         origin=Point(1, 1, 15),
@@ -167,6 +167,24 @@ def test_get_waypoints_with_critical_points():
         Waypoint(Point(1.5, 1, 15), CP.FRONT_NOZZLE),
         Waypoint(Point(2, 2, 15), CP.FRONT_NOZZLE),
         Waypoint(Point(2, 2, 3), CP.FRONT_NOZZLE),
+    ]
+
+
+def test_get_waypoints_transitions_cp_with_high_dest():
+    """It should ensure critical_points are blended when dest z is travel z."""
+    result = get_waypoints(
+        origin=Point(1, 1, 14),
+        dest=Point(2, 2, 15),
+        dest_cp=CP.XY_CENTER,
+        move_type=MoveType.IN_LABWARE_ARC,
+        # min_travel_z lower than to and from points
+        min_travel_z=3,
+        max_travel_z=100,
+    )
+
+    assert result == [
+        Waypoint(Point(1, 1, 15)),
+        Waypoint(Point(2, 2, 15), CP.XY_CENTER),
     ]
 
 

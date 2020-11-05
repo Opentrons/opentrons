@@ -231,6 +231,8 @@ def plan_moves(
     :param to_loc: The location to move to.
     :param deck: The :py:class:`Deck` instance describing the robot.
     :param force_direct: If True, ignore any Z margins force a direct move
+    :param use_experimental_waypoint_planning: If True, use waypoint logic
+                                               from opentrons.motion_planning
 
     The other parameters are as :py:meth:`safe_height`.
 
