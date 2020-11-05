@@ -3,9 +3,7 @@ import inspect
 from fastapi import APIRouter, Depends
 from opentrons import config, protocol_api
 from opentrons.hardware_control import ThreadManager
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons import __version__
-from opentrons.config import feature_flags
 from robot_server.service.legacy.models.health import Health, Links
 from robot_server.service.dependencies import get_hardware
 

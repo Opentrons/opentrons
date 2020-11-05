@@ -1,5 +1,6 @@
 from opentrons import __version__
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MINIMUM_SUPPORTED_VERSION
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION, MINIMUM_SUPPORTED_VERSION)
 
 
 def test_health(api_client, hardware):
