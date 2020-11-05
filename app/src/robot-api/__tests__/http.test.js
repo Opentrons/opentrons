@@ -9,7 +9,7 @@ import fetch from 'node-fetch'
 import FormData from 'form-data'
 
 import { robotApiUrl, fetchRobotApi } from '../http'
-import { GET, POST, PATCH, DELETE } from '../constants'
+import { HTTP_API_VERSION, GET, POST, PATCH, DELETE } from '../constants'
 
 import type { $Application } from 'express'
 import type { RobotHost } from '../types'
@@ -234,6 +234,29 @@ describe('robot-api http client', () => {
         ],
       },
       status: 201,
+      ok: true,
+    })
+  })
+
+  it('adds the Opentrons-Version header', () => {
+    testApp.get('/version', (req, res) => {
+      const version: any = req.header('Opentrons-Version')
+      res.status(200).send(`{ "version": "${version}" }`)
+    })
+
+    const result = fetchRobotApi(robot, {
+      method: GET,
+      path: '/version',
+    }).toPromise()
+
+    expect(HTTP_API_VERSION).toEqual(expect.any(Number))
+
+    return expect(result).resolves.toEqual({
+      host: robot,
+      method: GET,
+      path: '/version',
+      body: { version: `${HTTP_API_VERSION}` },
+      status: 200,
       ok: true,
     })
   })
