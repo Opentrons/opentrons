@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.2...v4.0.0-alpha.6) (2020-11-05)
+
+
+### Features
+
+* **app,discovery-client:** send Opentrons-Version header with HTTP requests ([#6914](https://github.com/Opentrons/opentrons/issues/6914)) ([089dd36](https://github.com/Opentrons/opentrons/commit/089dd36)), closes [#6852](https://github.com/Opentrons/opentrons/issues/6852)
+
+
+
+
+
 # [4.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.5...v4.0.0-beta.2) (2020-11-05)
 
 **Note:** Version bump only for package @opentrons/app-shell
