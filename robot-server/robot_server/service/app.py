@@ -7,7 +7,10 @@ from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, JSONResponse
 from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
+from starlette.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_422_UNPROCESSABLE_ENTITY
+)
 
 from .logging import initialize_logging
 from robot_server.service.legacy.models import V1BasicResponse
@@ -15,9 +18,9 @@ from .errors import V1HandlerError, \
     transform_http_exception_to_json_api_errors, \
     transform_validation_error_to_json_api_errors, \
     consolidate_fastapi_response, BaseRobotServerError, ErrorResponse, \
-    build_unhandled_exception_response
+    Error, build_unhandled_exception_response
 from .dependencies import get_rpc_server, get_protocol_manager, api_wrapper, \
-        verify_hardware, get_session_manager
+    verify_hardware, get_session_manager
 from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
 from robot_server.service.session.router import router as session_router
@@ -97,21 +100,63 @@ async def on_shutdown():
 @app.middleware("http")
 async def api_version_check(request: Request, call_next) -> Response:
     """Middleware to perform version check."""
-    try:
-        # Get the maximum version accepted by client
-        api_version = int(request.headers.get(constants.API_VERSION_HEADER,
-                                              constants.API_VERSION))
-        # We use the server version if api_version is too big
-        api_version = min(constants.API_VERSION, api_version)
-    except ValueError:
-        # Wasn't an integer, just use server version.
-        api_version = constants.API_VERSION
-    # Attach the api version to request's state dict.
-    request.state.api_version = api_version
+    error = None
+    requested_version = constants.API_VERSION
 
-    response: Response = await call_next(request)
+    # TODO(mc, 2020-11-05): allow routes to opt-in to versionsing and request +
+    # response migrations via decorator. Puting an allow-list in place for now
+    # because allowing an endpoint to bypass versioning requirements in the
+    # future is not a breaking change
+    if request.url.path not in constants.NON_VERSIONED_ROUTES:
+        try:
+            # Get the maximum version accepted by client
+            header_value = request.headers.get(constants.API_VERSION_HEADER)
+            requested_version = (
+                int(header_value)
+                if header_value != constants.API_VERSION_LATEST else
+                constants.API_VERSION
+            )
+
+            if requested_version < constants.MIN_API_VERSION:
+                error = Error(
+                    id="OutdatedAPIVersion",
+                    title="Requested HTTP API version no longer supported",
+                    detail=(
+                        f"HTTP API version {constants.MIN_API_VERSION - 1} is "
+                        "no longer supported. Please upgrade your Opentrons "
+                        "App or other HTTP API client."
+                    ),
+                )
+        except (ValueError, TypeError):
+            error = Error(
+                id="InvalidAPIVersion",
+                title="Missing or invalid HTTP API version header",
+                detail=(
+                    "Requests must define the Opentrons-Version "
+                    "header. You may need to upgrade your Opentrons "
+                    "App or other HTTP API client."
+                ),
+            )
+
+    if error is None:
+        api_version = min(requested_version, constants.API_VERSION)
+        # Attach the api version to request's state dict
+        request.state.api_version = api_version
+        response: Response = await call_next(request)
+    else:
+        api_version = constants.API_VERSION
+        response = JSONResponse(
+            status_code=HTTP_400_BAD_REQUEST,
+            content=ErrorResponse(
+                errors=[error]
+            ).dict(exclude_unset=True, exclude_none=True)
+        )
+
     # Put the api version in the response header
     response.headers[constants.API_VERSION_HEADER] = str(api_version)
+    response.headers[constants.MIN_API_VERSION_HEADER] = str(
+        constants.MIN_API_VERSION
+    )
     return response
 
 
@@ -188,7 +233,7 @@ async def custom_http_exception_handler(
 
 @app.exception_handler(Exception)
 async def unexpected_exception_handler(request: Request, exc: Exception) \
-          -> JSONResponse:
+        -> JSONResponse:
     """ Log unhandled errors (reraise always)"""
     log.error(f'Unhandled exception: {traceback.format_exc()}')
     return JSONResponse(
