@@ -226,6 +226,11 @@ export function DeckCalibrationControl(props: Props): React.Node {
           <>
             <InlineCalibrationWarning warningType={warningType} />
             <Text>{CALIBRATE_DECK_DESCRIPTION}</Text>
+            {deckCalData && deckCalStatus && (
+              <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
+                {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
+              </Text>
+            )}
           </>
         }
         control={
@@ -241,12 +246,6 @@ export function DeckCalibrationControl(props: Props): React.Node {
       >
         {disabledIncludingSpinner !== null && (
           <Tooltip {...tooltipProps}>{disabledIncludingSpinner}</Tooltip>
-        )}
-
-        {deckCalData && deckCalStatus && (
-          <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
-            {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
-          </Text>
         )}
       </TitledControl>
       {showConfirmStart && pipOffsetDataPresent && (

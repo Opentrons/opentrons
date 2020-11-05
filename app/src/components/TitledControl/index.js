@@ -5,7 +5,7 @@ import {
   Flex,
   Text,
   FLEX_NONE,
-  ALIGN_START,
+  ALIGN_CENTER,
   SPACING_AUTO,
   SPACING_1,
   SPACING_2,
@@ -33,7 +33,7 @@ export function TitledControl({
 }: TitledControlProps): React.Node {
   return (
     <Box fontSize={FONT_SIZE_BODY_1} padding={SPACING_3} {...styleProps}>
-      <Flex alignItems={ALIGN_START}>
+      <Flex alignItems={ALIGN_CENTER}>
         <Box paddingRight={SPACING_3} marginRight={SPACING_AUTO}>
           <Text
             as="h4"
