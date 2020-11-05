@@ -93,7 +93,7 @@ test:
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(python) -m mypy src/opentrons
+	$(python) -m mypy src/opentrons tests/opentrons/motion_planning
 	$(python) -m pylama src/opentrons tests
 
 docs/build/html/v%: docs/v%

@@ -12,7 +12,7 @@ from opentrons.motion_planning import (
 )
 
 
-def test_get_waypoints_direct():
+def test_get_waypoints_direct() -> None:
     """It should move directly to points."""
     result = get_waypoints(
         origin=Point(1, 2, 3),
@@ -26,7 +26,7 @@ def test_get_waypoints_direct():
     ]
 
 
-def test_get_waypoints_in_labware_arc():
+def test_get_waypoints_in_labware_arc() -> None:
     """It should use min_travel_z with well_z_margin to path in-labware arc."""
     result = get_waypoints(
         origin=Point(1, 1, 3),
@@ -43,7 +43,7 @@ def test_get_waypoints_in_labware_arc():
     ]
 
 
-def test_get_waypoints_in_labware_arc_with_high_origin():
+def test_get_waypoints_in_labware_arc_with_high_origin() -> None:
     """It should favor dest height over travel z if point is higher."""
     result = get_waypoints(
         origin=Point(1, 1, 10),
@@ -60,7 +60,7 @@ def test_get_waypoints_in_labware_arc_with_high_origin():
     ]
 
 
-def test_get_waypoints_in_labware_arc_with_high_dest():
+def test_get_waypoints_in_labware_arc_with_high_dest() -> None:
     """It should favor origin height over travel z if point is higher."""
     result = get_waypoints(
         origin=Point(1, 1, 11),
@@ -77,7 +77,7 @@ def test_get_waypoints_in_labware_arc_with_high_dest():
     ]
 
 
-def test_get_waypoints_general_arc():
+def test_get_waypoints_general_arc() -> None:
     """It should use the safe_z with lw_z_margin to path a general arc."""
     result = get_waypoints(
         origin=Point(1, 1, 3),
@@ -94,7 +94,7 @@ def test_get_waypoints_general_arc():
     ]
 
 
-def test_get_waypoints_general_arc_with_high_dest():
+def test_get_waypoints_general_arc_with_high_dest() -> None:
     """It should favor dest height over travel z if point is higher."""
     result = get_waypoints(
         origin=Point(1, 1, 14),
@@ -111,7 +111,7 @@ def test_get_waypoints_general_arc_with_high_dest():
     ]
 
 
-def test_get_waypoints_general_arc_with_high_origin():
+def test_get_waypoints_general_arc_with_high_origin() -> None:
     """It should favor origin height over travel z if point is higher."""
     result = get_waypoints(
         origin=Point(1, 1, 15),
@@ -128,7 +128,7 @@ def test_get_waypoints_general_arc_with_high_origin():
     ]
 
 
-def test_get_waypoints_with_extra_waypoints():
+def test_get_waypoints_with_extra_waypoints() -> None:
     """It should allow extra XY waypoints."""
     result = get_waypoints(
         origin=Point(1, 1, 3),
@@ -148,7 +148,7 @@ def test_get_waypoints_with_extra_waypoints():
     ]
 
 
-def test_get_waypoints_with_critical_points():
+def test_get_waypoints_with_critical_points() -> None:
     """It should attach critical points to origin and destination points."""
     result = get_waypoints(
         origin=Point(1, 1, 3),
@@ -170,7 +170,7 @@ def test_get_waypoints_with_critical_points():
     ]
 
 
-def test_get_waypoints_transitions_cp_with_high_dest():
+def test_get_waypoints_transitions_cp_with_high_dest() -> None:
     """It should ensure critical_points are blended when dest z is travel z."""
     result = get_waypoints(
         origin=Point(1, 1, 14),
@@ -188,7 +188,7 @@ def test_get_waypoints_transitions_cp_with_high_dest():
     ]
 
 
-def test_get_waypoints_clamps_to_max_travel_z():
+def test_get_waypoints_clamps_to_max_travel_z() -> None:
     """It should clamp the travel Z to max_travel_z if it has the clearance."""
     result = get_waypoints(
         origin=Point(1, 1, 3),
@@ -205,7 +205,7 @@ def test_get_waypoints_clamps_to_max_travel_z():
     ]
 
 
-def test_get_waypoints_raises_if_no_max_travel_z_clearance():
+def test_get_waypoints_raises_if_no_max_travel_z_clearance() -> None:
     """Raises ArcOutOfBoundsError if max_travel_z doesn't have clearance."""
     with pytest.raises(ArcOutOfBoundsError):
         get_waypoints(
@@ -217,7 +217,7 @@ def test_get_waypoints_raises_if_no_max_travel_z_clearance():
         )
 
 
-def test_get_waypoints_raises_if_dest_has_no_clearance():
+def test_get_waypoints_raises_if_dest_has_no_clearance() -> None:
     """Raises DestinationOutOfBoundsError if dest z doesn't have clearance."""
     with pytest.raises(DestinationOutOfBoundsError):
         get_waypoints(
@@ -229,7 +229,7 @@ def test_get_waypoints_raises_if_dest_has_no_clearance():
         )
 
 
-def test_get_waypoints_direct_moves_ignore_clearance_requirements():
+def test_get_waypoints_direct_moves_ignore_clearance_requirements() -> None:
     """It ignores clearance requirements for direct moves."""
     result = get_waypoints(
         origin=Point(1, 1, 3),

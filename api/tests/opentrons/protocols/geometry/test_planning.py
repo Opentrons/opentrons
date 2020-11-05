@@ -1,8 +1,4 @@
-"""Tests for motion planning module."""
-import pytest
-from opentrons.types import Point
-from opentrons.hardware_control.types import CriticalPoint as CP
-
+"""Tests for protocol geometry planning module."""
 from opentrons.motion_planning import MoveType
 from opentrons.protocols.geometry.planning import get_move_type
 
