@@ -101,36 +101,42 @@ async def on_shutdown():
 async def api_version_check(request: Request, call_next) -> Response:
     """Middleware to perform version check."""
     error = None
+    requested_version = constants.API_VERSION
 
-    try:
-        # Get the maximum version accepted by client
-        header_value = request.headers.get(constants.API_VERSION_HEADER)
-        requested_version = (
-            int(header_value)
-            if header_value != constants.API_VERSION_LATEST else
-            constants.API_VERSION
-        )
+    # TODO(mc, 2020-11-05): allow routes to opt-in to versionsing and request +
+    # response migrations via decorator. Puting an allow-list in place for now
+    # because allowing an endpoint to bypass versioning requirements in the
+    # future is not a breaking change
+    if request.url.path not in constants.NON_VERSIONED_ROUTES:
+        try:
+            # Get the maximum version accepted by client
+            header_value = request.headers.get(constants.API_VERSION_HEADER)
+            requested_version = (
+                int(header_value)
+                if header_value != constants.API_VERSION_LATEST else
+                constants.API_VERSION
+            )
 
-        if requested_version < constants.MIN_API_VERSION:
+            if requested_version < constants.MIN_API_VERSION:
+                error = Error(
+                    id="OutdatedAPIVersion",
+                    title="Requested HTTP API version no longer supported",
+                    detail=(
+                        f"HTTP API version {constants.MIN_API_VERSION - 1} is "
+                        "no longer supported. Please upgrade your Opentrons "
+                        "App or other HTTP API client."
+                    ),
+                )
+        except (ValueError, TypeError):
             error = Error(
-                id="OutdatedAPIVersion",
-                title="Requested HTTP API version no longer supported",
+                id="InvalidAPIVersion",
+                title="Missing or invalid HTTP API version header",
                 detail=(
-                    f"HTTP API version {constants.MIN_API_VERSION - 1} is no "
-                    "longer supported. Please upgrade your Opentrons App or "
-                    "other HTTP API client."
+                    "Requests must define the Opentrons-Version "
+                    "header. You may need to upgrade your Opentrons "
+                    "App or other HTTP API client."
                 ),
             )
-    except (ValueError, TypeError):
-        error = Error(
-            id="InvalidAPIVersion",
-            title="Missing or invalid HTTP API version header",
-            detail=(
-                "Requests must define the Opentrons-Version "
-                "header. You may need to upgrade your Opentrons "
-                "App or other HTTP API client."
-            ),
-        )
 
     if error is None:
         api_version = min(requested_version, constants.API_VERSION)

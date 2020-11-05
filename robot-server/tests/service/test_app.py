@@ -63,13 +63,28 @@ def test_custom_request_validation_exception_handler(api_client):
         ],
     ])
 def test_api_versioning(api_client, headers, expected_version):
-    resp = api_client.get('/openapi.json', headers=headers)
+    resp = api_client.get('/settings', headers=headers)
     assert resp.headers.get(API_VERSION_HEADER) == str(expected_version)
+
+
+@pytest.mark.parametrize(
+    argnames="path",
+    argvalues=[
+        "/openapi.json",
+        "/redoc",
+        "/docs",
+        "/",
+    ])
+def test_api_versioning_non_versions_endpoints(api_client, path):
+    del api_client.headers["Opentrons-Version"]
+    resp = api_client.get(path)
+    assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)
+    assert resp.status_code != HTTPStatus.BAD_REQUEST
 
 
 def test_api_version_too_low(api_client):
     """It should reject any API version lower than 2."""
-    resp = api_client.get('/openapi.json', headers={API_VERSION_HEADER: "1"})
+    resp = api_client.get('/settings', headers={API_VERSION_HEADER: "1"})
 
     assert resp.status_code == HTTPStatus.BAD_REQUEST
     assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)
@@ -88,7 +103,7 @@ def test_api_version_too_low(api_client):
 def test_api_version_missing(api_client):
     """It should reject any request without an version header."""
     del api_client.headers["Opentrons-Version"]
-    resp = api_client.get('/openapi.json')
+    resp = api_client.get('/settings')
 
     assert resp.status_code == HTTPStatus.BAD_REQUEST
     assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)
