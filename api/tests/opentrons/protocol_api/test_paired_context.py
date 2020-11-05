@@ -3,7 +3,7 @@ from unittest import mock
 
 import opentrons.protocol_api as papi
 from opentrons.hardware_control import API
-from opentrons.types import Mount, Point
+from opentrons.types import Mount, Point, Location
 from opentrons.protocol_api import paired_instrument_context as pc
 from opentrons.hardware_control.pipette import Pipette
 
@@ -26,6 +26,10 @@ def set_up_paired_instrument(loop):
 def test_pick_up_and_drop_tip_with_tipracks(set_up_paired_instrument):
     paired, tipracks = set_up_paired_instrument
     assert paired.tip_racks == [tipracks[1]]
+
+    random_location = Location(Point(0, 0, 0), tipracks[0])
+    paired.pick_up_tip(random_location)
+    paired.drop_tip()
     for col in tipracks[1].columns()[0:4]:
         for well in col:
             second_well = paired._get_secondary_target(tipracks[1], well)
