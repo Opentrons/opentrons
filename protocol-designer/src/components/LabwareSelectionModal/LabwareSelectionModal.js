@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import * as React from 'react'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
@@ -73,6 +74,18 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: Array<string> } = {
   [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
 }
 
+export const getLabwareIsRecommended = (
+  def: LabwareDefinition2,
+  moduleType: ModuleRealType
+): boolean => {
+  assert(
+    moduleType in RECOMMENDED_LABWARE_BY_MODULE,
+    `expected ${moduleType} in labware<>module recommended list`
+  )
+  const recommended = RECOMMENDED_LABWARE_BY_MODULE[moduleType] || []
+  return recommended.includes(def.parameters.loadName)
+}
+
 export const LabwareSelectionModal = (props: Props): React.Node => {
   const {
     customLabwareDefs,
@@ -136,12 +149,7 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
 
   const getLabwareRecommended = React.useCallback(
     (def: LabwareDefinition2) => {
-      return (
-        moduleType &&
-        RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
-          def.parameters.loadName
-        )
-      )
+      return moduleType && getLabwareIsRecommended(def, moduleType)
     },
     [moduleType]
   )
