@@ -3,7 +3,7 @@ from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..errors import FailedToLoadPipetteError
 from ..resources import IdGenerator, LabwareData
-from ..state import State
+from ..state import StateView
 
 from ..command_models import (
     LoadLabwareRequest,
@@ -19,11 +19,13 @@ class EquipmentHandler():
     def __init__(
         self,
         hardware: HardwareAPI,
+        state: StateView,
         id_generator: IdGenerator,
         labware_data: LabwareData
     ) -> None:
         """Initialize an EquipmentHandler instance."""
         self._hardware: HardwareAPI = hardware
+        self._state: StateView = state
         self._id_generator: IdGenerator = id_generator
         self._labware_data: LabwareData = labware_data
 
@@ -52,12 +54,14 @@ class EquipmentHandler():
     async def handle_load_pipette(
         self,
         request: LoadPipetteRequest,
-        state: State
     ) -> LoadPipetteResult:
         """Ensure the requested pipette is attached."""
         mount = request.mount
         other_mount = request.mount.other_mount()
-        other_pipette = state.get_pipette_data_by_mount(other_mount)
+        other_pipette = self._state.pipettes.get_pipette_data_by_mount(
+            other_mount
+        )
+
         cache_request = {mount.to_hw_mount(): request.pipetteName}
         if other_pipette is not None:
             cache_request[

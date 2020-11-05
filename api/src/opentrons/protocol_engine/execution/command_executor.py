@@ -4,7 +4,7 @@ from typing import Union
 
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control.api import API as HardwareAPI
-from ..state import State
+from ..state import StateView
 from ..errors import ProtocolEngineError, UnexpectedProtocolError
 from .. import resources, command_models as cmd
 from .equipment import EquipmentHandler
@@ -22,6 +22,7 @@ class CommandExecutor():
     def create(
         cls,
         hardware: HardwareAPI,
+        state: StateView
     ) -> CommandExecutor:
         """Create a CommandExecutor instance."""
         id_generator = resources.IdGenerator()
@@ -29,13 +30,17 @@ class CommandExecutor():
 
         return cls(
             equipment_handler=EquipmentHandler(
-                hardware=hardware,
+                state=state,
                 id_generator=id_generator,
                 labware_data=labware_data,
-            )
+                hardware=hardware,
+            ),
         )
 
-    def __init__(self, equipment_handler: EquipmentHandler) -> None:
+    def __init__(
+        self,
+        equipment_handler: EquipmentHandler,
+    ) -> None:
         """
         Initialize a CommandExecutor.
 
@@ -47,11 +52,10 @@ class CommandExecutor():
     async def execute_command(
         self,
         command: cmd.RunningCommandType,
-        state: State
     ) -> Union[cmd.CompletedCommandType, cmd.FailedCommandType]:
         """Execute a Command, returning a CompletedCommand or FailedCommand."""
         try:
-            return await self._try_to_execute_command(command, state)
+            return await self._try_to_execute_command(command)
         except ProtocolEngineError as error:
             return command.to_failed(error, utc_now())
         except Exception as unhandled_error:
@@ -63,7 +67,6 @@ class CommandExecutor():
     async def _try_to_execute_command(
         self,
         command: cmd.RunningCommandType,
-        state: State
     ) -> cmd.CompletedCommandType:
         """
         Private method to execute commands by routing to a specific command
@@ -81,7 +84,6 @@ class CommandExecutor():
         elif isinstance(command.request, cmd.LoadPipetteRequest):
             pip_res = await self._equipment_handler.handle_load_pipette(
                 command.request,
-                state=state
             )
             return command.to_completed(pip_res, utc_now())
 

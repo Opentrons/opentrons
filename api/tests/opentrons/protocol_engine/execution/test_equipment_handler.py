@@ -31,9 +31,15 @@ def mock_id_generator():
 
 
 @pytest.fixture
-def handler(mock_labware_data, mock_id_generator, mock_hardware):
+def handler(
+    mock_labware_data,
+    mock_id_generator,
+    mock_hardware,
+    mock_state_view,
+):
     return EquipmentHandler(
         hardware=mock_hardware,
+        state=mock_state_view,
         id_generator=mock_id_generator,
         labware_data=mock_labware_data,
     )
@@ -99,42 +105,45 @@ async def test_load_labware_gets_labware_cal_data(
 
 
 async def test_load_pipette_assigns_id(
-    mock_state_store,
     mock_id_generator,
     handler
 ):
     req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
-    res = await handler.handle_load_pipette(req, state=mock_state_store.state)
+    res = await handler.handle_load_pipette(req)
 
     assert type(res) == LoadPipetteResult
     assert res.pipetteId == "unique-id"
 
 
 async def test_load_pipette_checks_checks_existence(
-    mock_state_store,
+    mock_state_view,
     mock_hardware,
     handler
 ):
+    mock_state_view.pipettes.get_pipette_data_by_mount.return_value = None
     req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
-    await handler.handle_load_pipette(req, state=mock_state_store.state)
+    await handler.handle_load_pipette(req)
 
+    mock_state_view.pipettes.get_pipette_data_by_mount.assert_called_with(
+        MountType.RIGHT
+    )
     mock_hardware.cache_instruments.assert_called_with({
         HwMount.LEFT: "p300_single",
     })
 
 
 async def test_load_pipette_checks_checks_existence_with_already_loaded(
-    mock_state_store,
+    mock_state_view,
     mock_hardware,
     handler
 ):
-    mock_state_store.state.get_pipette_data_by_mount.return_value = \
+    mock_state_view.pipettes.get_pipette_data_by_mount.return_value = \
         PipetteData(mount=MountType.LEFT, pipette_name="p300_multi")
     req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.RIGHT)
 
-    await handler.handle_load_pipette(req, state=mock_state_store.state)
+    await handler.handle_load_pipette(req)
 
-    mock_state_store.state.get_pipette_data_by_mount.assert_called_with(
+    mock_state_view.pipettes.get_pipette_data_by_mount.assert_called_with(
         MountType.LEFT
     )
     mock_hardware.cache_instruments.assert_called_with({
@@ -144,7 +153,7 @@ async def test_load_pipette_checks_checks_existence_with_already_loaded(
 
 
 async def test_load_pipette_raises_if_pipette_not_attached(
-    mock_state_store,
+    mock_state_view,
     mock_hardware,
     handler
 ):
@@ -159,4 +168,4 @@ async def test_load_pipette_raises_if_pipette_not_attached(
         errors.FailedToLoadPipetteError,
         match=".+p300_single was requested"
     ):
-        await handler.handle_load_pipette(req, state=mock_state_store.state)
+        await handler.handle_load_pipette(req)
