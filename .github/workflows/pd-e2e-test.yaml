@@ -18,6 +18,8 @@ on:
       - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/pd-e2e-test.yaml'
+    tags:
+      - 'protocol-designer*'
 
 defaults:
   run:
