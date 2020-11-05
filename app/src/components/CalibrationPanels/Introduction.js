@@ -333,9 +333,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
   const isExtendedPipOffset =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
     shouldPerformTipLength
-  const isHealtHCheck =
-    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-  const unqiueTipRacks = new Set(
+  const uniqueTipRacks = new Set(
     instruments?.map(instr => instr.tipRackLoadName)
   )
   const proceed = () =>
@@ -389,7 +387,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
           <Text fontWeight={FONT_WEIGHT_SEMIBOLD} marginBottom={SPACING_3}>
             {LABWARE_REQS}
           </Text>
-          {isHealtHCheck && unqiueTipRacks.size > 1 ? (
+          {uniqueTipRacks.size > 1 ? (
             instruments?.map(instr => {
               return (
                 <RequiredLabwareCard

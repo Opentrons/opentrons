@@ -88,18 +88,15 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
   ) : (
     OF_THE_TRASH_BIN
   )
-  const isHealthCheck =
-    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
-  const demoAsset = React.useMemo(() => {
-    const newMount = isHealthCheck ? 'left' : mount
-    return (
+  const demoAsset = React.useMemo(
+    () =>
       mount &&
-      assetMap[calBlock ? 'block' : 'trash'][newMount][
+      assetMap[calBlock ? 'block' : 'trash'][mount][
         isMulti ? 'multi' : 'single'
-      ]
-    )
-  }, [mount, isHealthCheck, isMulti, calBlock])
+      ],
+    [mount, isMulti, calBlock]
+  )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
     sendCommands({
@@ -109,6 +106,9 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
       },
     })
   }
+
+  const isHealthCheck =
+    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
   const proceed = () => {
     isHealthCheck

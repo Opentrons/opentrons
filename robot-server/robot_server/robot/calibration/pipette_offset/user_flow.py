@@ -422,10 +422,16 @@ class PipetteOffsetCalibrationUserFlow:
             self._flag_unmet_transition_req(
                 command_handler="move_to_reference_point",
                 unmet_condition="performing additional tip length calibration")
+        if self._has_calibration_block:
+            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
+            calblock: labware.Labware = \
+                self._deck[cb_setup.slot]  # type: ignore
+            cal_block_target_well = calblock.wells_by_name()[cb_setup.well]
+        else:
+            cal_block_target_well = None
         ref_loc = util.get_reference_location(
-            mount=self._mount,
             deck=self._deck,
-            has_calibration_block=self._has_calibration_block)
+            cal_block_target_well=cal_block_target_well)
         await self._move(ref_loc)
 
     async def invalidate_last_action(self):

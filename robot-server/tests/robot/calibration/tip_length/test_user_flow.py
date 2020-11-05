@@ -6,7 +6,6 @@ from opentrons.hardware_control import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
 
-from robot_server.robot.calibration.util import get_reference_location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.tip_length.user_flow import \
@@ -289,9 +288,8 @@ def test_load_cal_block(mock_user_flow_all_combos):
 
 async def test_get_reference_location(mock_user_flow_all_combos):
     uf = mock_user_flow_all_combos
-    result = get_reference_location(
-        mount=uf._mount, deck=uf._deck,
-        has_calibration_block=uf._has_calibration_block)
+    await uf.move_to_reference_point()
+    cur_pt = await uf.get_current_point(None)
     if uf._has_calibration_block:
         if uf._mount == Mount.LEFT:
             exp = uf._deck['3'].wells()[0].top().move(Point(0, 0, 5))
@@ -300,7 +298,7 @@ async def test_get_reference_location(mock_user_flow_all_combos):
     else:
         exp = uf._deck.get_fixed_trash().wells()[0].top().move(
             Point(-57.84, -55, 5))
-    assert result == exp
+    assert cur_pt == exp.point
 
 
 async def test_save_offsets(mock_user_flow):

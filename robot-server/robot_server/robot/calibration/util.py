@@ -9,14 +9,14 @@ from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.calibration_storage import modify
-from opentrons.types import Point, Location, Mount
+from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import (
     CommandDefinition)
 from .constants import (
-    STATE_WILDCARD, CAL_BLOCK_SETUP_BY_MOUNT, CAL_BLOCK_SETUP_CAL_CHECK,
-    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET)
+    STATE_WILDCARD, MOVE_TO_REF_POINT_SAFETY_BUFFER,
+    TRASH_WELL, TRASH_REF_POINT_OFFSET)
 from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
 from .pipette_offset.constants import (
@@ -164,24 +164,16 @@ async def move(user_flow: CalibrationUserFlow,
                                          critical_point=move[1])
 
 
-def get_reference_location(mount: Mount,
-                           deck: Deck,
-                           has_calibration_block: bool,
-                           is_calibration_check: bool = False) -> Location:
+def get_reference_location(
+        deck: Deck,
+        cal_block_target_well: labware.Well = None) -> Location:
     """
     Get location of static z reference point.
     Will be on Calibration Block if available, otherwise will be on
     flat surface of fixed trash insert.
     """
-    if has_calibration_block:
-        if is_calibration_check:
-            cb_setup = CAL_BLOCK_SETUP_CAL_CHECK
-        else:
-            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[mount]
-        slot = cb_setup.slot
-        well = cb_setup.well
-        calblock: labware.Labware = deck[slot]  # type: ignore
-        calblock_loc = calblock.wells_by_name()[well].top()
+    if cal_block_target_well:
+        calblock_loc = cal_block_target_well.top()
         ref_loc = calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)
     else:
         trash = deck.get_fixed_trash()
