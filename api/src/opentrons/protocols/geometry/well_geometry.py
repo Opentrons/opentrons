@@ -9,7 +9,7 @@ from opentrons_shared_data.labware.dev_types import (
 
 if TYPE_CHECKING:
     from opentrons.protocols.implementations.interfaces.labware import \
-        AbstractLabwareImplementation
+        LabwareInterface
 
 
 class WellGeometry:
@@ -17,7 +17,7 @@ class WellGeometry:
     def __init__(self,
                  well_props: WellDefinition,
                  parent_point: Point,
-                 parent_object: AbstractLabwareImplementation):
+                 parent_object: LabwareInterface):
         """
         Construct a well geometry object.
 
@@ -59,7 +59,7 @@ class WellGeometry:
         self._depth = well_props['depth']
 
     @property
-    def parent(self) -> AbstractLabwareImplementation:
+    def parent(self) -> LabwareInterface:
         return self._parent
 
     @property

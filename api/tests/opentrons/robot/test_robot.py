@@ -3,7 +3,8 @@ import pytest
 from numpy import isclose
 from unittest import mock
 
-from opentrons.protocol_api.labware import _get_standard_labware_definition
+from opentrons.protocols.labware.definition import \
+    _get_standard_labware_definition
 from opentrons.legacy_api.containers import load as containers_load
 from opentrons.legacy_api.containers import _look_up_offsets
 from opentrons.trackers import pose_tracker

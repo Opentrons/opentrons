@@ -14,6 +14,8 @@ from opentrons.calibration_storage import (
     encoder_decoder as ed,
     types as cs_types)
 from opentrons.protocol_api import labware
+from opentrons.protocols.implementations.labware import LabwareImplementation
+from opentrons.protocols.labware.definition import _get_labware_path
 from opentrons.types import Point, Location
 from opentrons.util.helpers import utc_now
 
@@ -110,28 +112,23 @@ def clear_tlc_calibration(monkeypatch):
 def test_save_labware_calibration(monkeypatch, clear_calibration):
     # Test the save calibration file
     assert not os.path.exists(path(MOCK_HASH))
-    calibration_point = None
 
-    def mock_set_calibration(self, delta):
-        nonlocal calibration_point
-        calibration_point = delta
-
-    monkeypatch.setattr(
-        labware.Labware,
-        'set_calibration', mock_set_calibration)
+    impl = LabwareImplementation(
+        minimalLabwareDef,
+        Location(Point(0, 0, 0), 'deck'))
+    impl.set_calibration = Mock()
 
     monkeypatch.setattr(
         helpers,
         'hash_labware_def', mock_hash_labware
     )
 
-    test_labware = labware.Labware(
-        labware.LabwareImplementation(minimalLabwareDef,
-                                      Location(Point(0, 0, 0), 'deck')))
+    test_labware = labware.Labware(impl)
 
-    labware.save_calibration(test_labware, Point(1, 1, 1))
+    point = Point(1, 1, 1)
+    labware.save_calibration(test_labware, point)
     assert os.path.exists(path(MOCK_HASH))
-    assert calibration_point == Point(1, 1, 1)
+    impl.set_calibration.assert_called_once_with(delta=point)
 
 
 def test_json_datetime_encoder():
@@ -276,8 +273,8 @@ def test_schema_shape(monkeypatch, clear_calibration):
     mock.__class__ = datetime.datetime
 
     test_labware = labware.Labware(
-        labware.LabwareImplementation(minimalLabwareDef,
-                                      Location(Point(0, 0, 0), 'deck'))
+        LabwareImplementation(minimalLabwareDef,
+                              Location(Point(0, 0, 0), 'deck'))
     )
 
     monkeypatch.setattr(
@@ -309,9 +306,12 @@ def test_load_calibration(monkeypatch, clear_calibration):
         'hash_labware_def', mock_hash_labware
     )
 
-    test_labware = labware.Labware(labware.LabwareImplementation(
-        minimalLabwareDef, Location(Point(0, 0, 0), 'deck')
-    ))
+    test_labware = labware.Labware(
+        LabwareImplementation(
+            minimalLabwareDef,
+            Location(Point(0, 0, 0), 'deck')
+        )
+    )
 
     test_offset = Point(1, 1, 1)
 
@@ -321,7 +321,7 @@ def test_load_calibration(monkeypatch, clear_calibration):
     # data
     test_labware.set_calibration(Point(0, 0, 0))
     test_labware.tip_length = 46.8
-    lookup_path = labware._get_labware_path(test_labware)
+    lookup_path = _get_labware_path(test_labware._implementation)
     calibration_point = get.get_labware_calibration(
         lookup_path,
         test_labware._implementation.get_definition()
@@ -331,7 +331,7 @@ def test_load_calibration(monkeypatch, clear_calibration):
 
 def test_wells_rebuilt_with_offset():
     test_labware = labware.Labware(
-        implementation=labware.LabwareImplementation(
+        implementation=LabwareImplementation(
             minimalLabwareDef,
             Location(Point(0, 0, 0), 'deck')
         )

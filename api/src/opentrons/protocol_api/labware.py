@@ -8,9 +8,6 @@ transform from labware symbolic points (such as "well a1 of an opentrons
 tiprack") to points in deck coordinates.
 """
 import logging
-import json
-import os
-import shutil
 
 from pathlib import Path
 from itertools import dropwhile
@@ -19,24 +16,19 @@ from typing import (
     Optional, Union, Tuple,
     TYPE_CHECKING)
 
-import jsonschema  # type: ignore
 
 from opentrons.protocols.api_support.util import (
-    ModifiedList, requires_version, labware_column_shift)
-from opentrons.calibration_storage import get, helpers, modify
+    requires_version, labware_column_shift)
 from opentrons.protocols.implementations.interfaces.labware import \
-    AbstractLabwareImplementation
+    LabwareInterface
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.implementations.labware import LabwareImplementation
+from opentrons.protocols import labware as labware_module
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.types import APIVersion
-from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION)
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.api_support.constants import (
-    OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE, STANDARD_DEFS_PATH, USER_DEFS_PATH)
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa(F401)
     from opentrons_shared_data.labware.dev_types import (
@@ -223,7 +215,7 @@ class Labware(DeckItem):
     """
     def __init__(
             self,
-            implementation: AbstractLabwareImplementation,
+            implementation: LabwareInterface,
             api_level: APIVersion = None) -> None:
         """
         :param implementation: The class that implements the public interface
@@ -651,19 +643,6 @@ class Labware(DeckItem):
                     api_level=self._api_version)
 
 
-def _get_path_to_labware(
-        load_name: str, namespace: str, version: int, base_path: Path = None
-        ) -> Path:
-    if namespace == OPENTRONS_NAMESPACE:
-        # all labware in OPENTRONS_NAMESPACE is stored in shared data
-        return get_shared_data_root() / STANDARD_DEFS_PATH \
-               / load_name / f'{version}.json'
-    if not base_path:
-        base_path = USER_DEFS_PATH
-    def_path = base_path / namespace / load_name / f'{version}.json'
-    return def_path
-
-
 def save_definition(
     labware_def: 'LabwareDefinition',
     force: bool = False,
@@ -676,128 +655,9 @@ def save_definition(
     :param bool force: If true, overwrite an existing definition if found.
         Cannot overwrite Opentrons definitions.
     """
-    namespace = labware_def['namespace']
-    load_name = labware_def['parameters']['loadName']
-    version = labware_def['version']
-
-    verify_definition(labware_def)
-
-    if not namespace or not load_name or not version:
-        raise RuntimeError(
-            'Could not save definition, labware def is missing a field: ' +
-            f'{namespace}, {load_name}, {version}')
-
-    if namespace == OPENTRONS_NAMESPACE:
-        raise RuntimeError(
-            f'Saving definitions to the "{OPENTRONS_NAMESPACE}" namespace ' +
-            'is not permitted')
-
-    def_path = _get_path_to_labware(load_name, namespace, version, location)
-
-    if not force and def_path.is_file():
-        raise RuntimeError(
-            f'The given definition ({namespace}/{load_name} v{version}) ' +
-            'already exists. Cannot save definition without force=True')
-
-    Path(def_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(def_path, 'w') as f:
-        json.dump(labware_def, f)
-
-
-def delete_all_custom_labware() -> None:
-    if USER_DEFS_PATH.is_dir():
-        shutil.rmtree(USER_DEFS_PATH)
-
-
-def _get_labware_definition_from_bundle(
-    bundled_labware: Dict[str, 'LabwareDefinition'],
-    load_name: str,
-    namespace: str = None,
-    version: int = None,
-) -> 'LabwareDefinition':
-    """
-    Look up and return a bundled definition by ``load_name`` + ``namespace``
-    + ``version`` and return it or raise an exception. The``namespace`` and
-    ``version`` args are optional, they only have to be specified if there is
-    ambiguity (eg when multiple labware in the bundle share the same
-    ``load_name``)
-
-    :param str load_name: corresponds to 'loadName' key in definition
-    :param str namespace: The namespace the labware definition belongs to
-    :param int version: The version of the labware definition
-    :param Dict bundled_labware: A dictionary of labware definitions to search
-    """
-    load_name = load_name.lower()
-
-    bundled_candidates = [
-        b for b in bundled_labware.values()
-        if b['parameters']['loadName'] == load_name]
-    if namespace:
-        namespace = namespace.lower()
-        bundled_candidates = [
-            b for b in bundled_candidates if b['namespace'] == namespace]
-    if version:
-        bundled_candidates = [
-            b for b in bundled_candidates if b['version'] == version]
-
-    if len(bundled_candidates) == 1:
-        return bundled_candidates[0]
-    elif len(bundled_candidates) > 1:
-        raise RuntimeError(
-            f'Ambiguous labware access. Bundle contains multiple '
-            f'labware with load name {load_name}, '
-            f'namespace {namespace}, and version {version}.')
-    else:
-        raise RuntimeError(
-            f'No labware found in bundle with load name {load_name}, '
-            f'namespace {namespace}, and version {version}.')
-
-
-def _get_standard_labware_definition(
-        load_name: str, namespace: str = None, version: int = None)\
-        -> 'LabwareDefinition':
-
-    if version is None:
-        checked_version = 1
-    else:
-        checked_version = version
-    error_msg_string = """Unable to find a labware
-        definition for "{0}",
-        version {1}, in the {2} namespace.
-        Please confirm your protocol includes the correct
-        labware spelling and (optionally) the correct version
-        number and namespace.
-
-        If you are referencing a custom labware in your
-        protocol, you must add it to your Custom Labware
-        Definitions Folder from the Opentrons App before
-        uploading your protocol.
-        """
-
-    if namespace is None:
-        for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
-            try:
-                return _get_standard_labware_definition(
-                    load_name, fallback_namespace, checked_version)
-            except (FileNotFoundError):
-                pass
-
-        raise FileNotFoundError(error_msg_string.format(
-                load_name, checked_version, OPENTRONS_NAMESPACE))
-
-    namespace = namespace.lower()
-    def_path = _get_path_to_labware(load_name, namespace, checked_version)
-
-    try:
-        with open(def_path, 'rb') as f:
-            labware_def = json.loads(f.read().decode('utf-8'))
-    except FileNotFoundError:
-        raise FileNotFoundError(
-            f'Labware "{load_name}" not found with version {checked_version} '
-            f'in namespace "{namespace}".'
-        )
-
-    return labware_def
+    labware_module.save_definition(labware_def=labware_def,
+                                   force=force,
+                                   location=location)
 
 
 def verify_definition(contents: Union[
@@ -812,17 +672,7 @@ def verify_definition(contents: Union[
     :raises jsonschema.ValidationError: If the definition is not valid.
     :returns: The parsed definition
     """
-    schema_body = load_shared_data('labware/schemas/2.json').decode('utf-8')
-    labware_schema_v2 = json.loads(schema_body)
-
-    if isinstance(contents, dict):
-        to_return = contents
-    else:
-        to_return = json.loads(contents)
-    jsonschema.validate(to_return, labware_schema_v2)
-    # we can type ignore this because if it passes the jsonschema it has
-    # the correct structure
-    return to_return  # type: ignore
+    return labware_module.verify_definition(contents=contents)
 
 
 def get_labware_definition(
@@ -846,22 +696,13 @@ def get_labware_definition(
     :param extra_defs: An extra set of definitions (in addition to the system
         definitions) in which to search
     """
-    load_name = load_name.lower()
-
-    if bundled_defs is not None:
-        return _get_labware_definition_from_bundle(
-            bundled_defs, load_name, namespace, version)
-
-    checked_extras = extra_defs or {}
-
-    try:
-        return _get_labware_definition_from_bundle(
-            checked_extras, load_name, namespace, version)
-    except (FileNotFoundError, RuntimeError):
-        pass
-
-    return _get_standard_labware_definition(
-        load_name, namespace, version)
+    return labware_module.get_labware_definition(
+        load_name=load_name,
+        namespace=namespace,
+        version=version,
+        bundled_defs=bundled_defs,
+        extra_defs=extra_defs
+    )
 
 
 def get_all_labware_definitions() -> List[str]:
@@ -869,22 +710,7 @@ def get_all_labware_definitions() -> List[str]:
     Return a list of standard and custom labware definitions with load_name +
         name_space + version existing on the robot
     """
-    labware_list = ModifiedList()
-
-    def _check_for_subdirectories(path):
-        with os.scandir(path) as top_path:
-            for sub_dir in top_path:
-                if sub_dir.is_dir():
-                    labware_list.append(sub_dir.name)
-
-    # check for standard labware
-    _check_for_subdirectories(get_shared_data_root() / STANDARD_DEFS_PATH)
-
-    # check for custom labware
-    for namespace in os.scandir(USER_DEFS_PATH):
-        _check_for_subdirectories(namespace)
-
-    return labware_list
+    return labware_module.get_all_labware_definitions()
 
 
 def quirks_from_any_parent(
@@ -990,42 +816,16 @@ def filter_tipracks_to_start(
         lambda tr: starting_point.parent != tr, tipracks))
 
 
-def _get_parent_identifier(labware: 'Labware') -> str:
-    """
-    Helper function to return whether a labware is on top of a
-    module or not.
-    """
-    parent = labware.parent
-    # TODO (lc, 07-14-2020): Once we implement calibrations per slot,
-    # this function should either return a slot using `first_parent` or
-    # the module it is attached to.
-    if isinstance(parent, DeckItem) and parent.separate_calibration:
-        # treat a given labware on a given module type as same
-        return parent.load_name
-    else:
-        return ''  # treat all slots as same
-
-
 def get_labware_hash(labware: 'Labware') -> str:
-    return helpers.hash_labware_def(labware._implementation.get_definition())
+    return labware_module.get_labware_hash(
+        labware._implementation
+    )
 
 
 def get_labware_hash_with_parent(labware: 'Labware') -> str:
-    return helpers.hash_labware_def(
-        labware._implementation.get_definition()
-    ) + _get_parent_identifier(labware)
-
-
-def _get_labware_path(labware: 'Labware') -> str:
-    return f'{get_labware_hash_with_parent(labware)}.json'
-
-
-def _get_index_file_information(
-        labware: 'Labware') -> Tuple[str, 'LabwareDefinition', str]:
-    definition = labware._implementation.get_definition()
-    labware_path = _get_labware_path(labware)
-    parent = _get_parent_identifier(labware)
-    return labware_path, definition, parent
+    return labware_module.get_labware_hash_with_parent(
+        labware._implementation
+    )
 
 
 def load_from_definition(
@@ -1052,24 +852,18 @@ def load_from_definition(
                                  conform to this level. If not specified,
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
-    labware = Labware(
-        implementation=LabwareImplementation(
-            definition=definition, parent=parent, label=label
+    return Labware(
+        implementation=labware_module.load_from_definition(
+            definition=definition,
+            parent=parent,
+            label=label
         ),
         api_level=api_level
     )
-    index_info = _get_index_file_information(labware)
-    offset = get.get_labware_calibration(
-        index_info[0], index_info[1], parent=index_info[2])
-    labware.set_calibration(offset)
-    return labware
 
 
 def save_calibration(labware: 'Labware', delta: Point):
-    index_info = _get_index_file_information(labware)
-    modify.save_labware_calibration(
-        index_info[0], index_info[1], delta, parent=index_info[2])
-    labware.set_calibration(delta)
+    labware_module.save_calibration(labware._implementation, delta)
 
 
 def load(
@@ -1109,8 +903,16 @@ def load(
                                  conform to this level. If not specified,
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
-    definition = get_labware_definition(
-        load_name, namespace, version,
-        bundled_defs=bundled_defs,
-        extra_defs=extra_defs)
-    return load_from_definition(definition, parent, label, api_level)
+
+    return Labware(
+        implementation=labware_module.load(
+            load_name=load_name,
+            parent=parent,
+            label=label,
+            namespace=namespace,
+            version=version,
+            bundled_defs=bundled_defs,
+            extra_defs=extra_defs
+        ),
+        api_level=api_level,
+    )
