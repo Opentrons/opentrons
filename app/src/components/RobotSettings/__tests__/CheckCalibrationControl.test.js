@@ -68,7 +68,7 @@ describe('CheckCalibrationControl', () => {
 
     expect(titledButton.prop('title')).toMatch(/Calibration Health Check/)
     expect(titledButton.html()).toMatch(
-      /check the calibration settings for your robot/i
+      /check the health of the current calibration settings/i
     )
     expect(button.prop('width')).toBe('12rem')
     expect(button.html()).toMatch(/check health/i)

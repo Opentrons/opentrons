@@ -13,7 +13,6 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   Icon,
   SIZE_2,
-  SPACING_3,
   SPACING_2,
   SPACING_1,
   Text,

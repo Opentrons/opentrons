@@ -12,6 +12,10 @@ import * as Pipettes from '../../pipettes'
 import * as TipLength from '../../calibration/tip-length'
 import { CONNECTABLE } from '../../discovery'
 import type { ViewableRobot } from '../../discovery/types'
+import type {
+  AttachedPipettesByMount,
+  PipetteCalibrationsByMount,
+} from '../../pipettes/types'
 import { selectors as robotSelectors } from '../../robot'
 import { useTrackEvent } from '../../analytics'
 
@@ -53,6 +57,20 @@ const EVENT_CALIBRATION_DOWNLOADED = 'calibrationDataDownloaded'
 const TITLE = 'Robot Calibration'
 
 const DOWNLOAD_CALIBRATION = 'Download your calibration data'
+
+const attachedPipetteCalPresent: (
+  pipettes: AttachedPipettesByMount,
+  pipetteCalibrations: PipetteCalibrationsByMount
+) => boolean = (pipettes, pipetteCalibrations) => {
+  for (const m of Pipettes.PIPETTE_MOUNTS) {
+    if (pipettes[m]) {
+      if (!pipetteCalibrations[m].offset || !pipetteCalibrations[m].tipLength) {
+        return false
+      }
+    }
+  }
+  return true
+}
 
 export function CalibrationCard(props: Props): React.Node {
   const { robot, pipettesPageUrl } = props
@@ -96,7 +114,16 @@ export function CalibrationCard(props: Props): React.Node {
   const attachedPipettes = useSelector((state: State) => {
     return Pipettes.getAttachedPipettes(state, robotName)
   })
-  const pipetteAttached = !!attachedPipettes.left && attachedPipettes.right
+  const pipettePresent = !!attachedPipettes.left || !!attachedPipettes.right
+
+  const attachedPipetteCalibrations = useSelector((state: State) => {
+    return Pipettes.getAttachedPipetteCalibrations(state, robotName)
+  })
+  const pipetteCalPresent = attachedPipetteCalPresent(
+    attachedPipettes,
+    attachedPipetteCalibrations
+  )
+
   const doTrackEvent = useTrackEvent()
 
   let buttonDisabledReason = null
@@ -106,7 +133,7 @@ export function CalibrationCard(props: Props): React.Node {
     buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
   } else if (isRunning) {
     buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
-  } else if (!pipetteAttached) {
+  } else if (!pipettePresent) {
     buttonDisabledReason = DISABLED_NO_PIPETTE_ATTACHED
   }
 
@@ -125,11 +152,13 @@ export function CalibrationCard(props: Props): React.Node {
     )
   }
 
-  const warningInsteadOfCalcheck = [
-    Calibration.DECK_CAL_STATUS_SINGULARITY,
-    Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
-    Calibration.DECK_CAL_STATUS_IDENTITY,
-  ].includes(deckCalStatus)
+  const warningInsteadOfCalcheck =
+    [
+      Calibration.DECK_CAL_STATUS_SINGULARITY,
+      Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
+      Calibration.DECK_CAL_STATUS_IDENTITY,
+    ].includes(deckCalStatus) || !pipetteCalPresent
+
   const pipOffsetDataPresent = pipetteOffsetCalibrations
     ? pipetteOffsetCalibrations.length > 0
     : false
