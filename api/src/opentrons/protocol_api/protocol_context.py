@@ -498,7 +498,7 @@ class ProtocolContext(CommandPublisher):
         """
         def _modules() -> Iterator[Tuple[int, 'ModuleContext']]:
             for module in self._modules:
-                yield int(module.geometry.parent), module
+                yield int(str(module.geometry.parent)), module
 
         return dict(_modules())
 

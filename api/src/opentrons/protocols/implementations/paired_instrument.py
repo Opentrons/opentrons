@@ -7,8 +7,9 @@ from typing import TYPE_CHECKING, Union, Optional, Callable, Tuple
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api.labware import (
-    Labware, Well, quirks_from_any_parent)
+    Labware, Well)
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges
 
@@ -68,10 +69,10 @@ class PairedInstrument:
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
         else:
-            from_lw = None
+            from_lw = LabwareLike(None)
 
         from_center = 'centerMultichannelOnWells'\
-            in quirks_from_any_parent(from_lw)
+            in from_lw.quirks_from_any_parent()
         cp_override = CriticalPoint.XY_CENTER if from_center else None
         from_loc = types.Location(
             self._hw_manager.hardware.gantry_position(
@@ -128,8 +129,8 @@ class PairedInstrument:
             primary_ready = self.p_instrument.hw_pipette['ready_to_aspirate']
             secondary_ready = self.s_instrument.hw_pipette['ready_to_aspirate']
             if not primary_ready or not secondary_ready:
-                if isinstance(loc.labware, Well):
-                    self.move_to(loc.labware.top())
+                if loc.labware.is_well:
+                    self.move_to(loc.labware.as_well().top())
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
@@ -146,7 +147,7 @@ class PairedInstrument:
             self.move_to(loc)
 
         hw_aspirate = self._hw_manager.hardware.aspirate
-        return (loc, partial(hw_aspirate, self._pair_policy, volume, rate))
+        return loc, partial(hw_aspirate, self._pair_policy, volume, rate)
 
     def dispense(
             self, volume: Optional[float],
@@ -184,9 +185,9 @@ class PairedInstrument:
 
     def air_gap(self, volume: Optional[float], height: float):
         loc = self._ctx.location_cache
-        if not loc or not isinstance(loc.labware, Well):
+        if not loc or not loc.labware.is_well:
             raise RuntimeError('No previous Well cached to perform air gap')
-        target = loc.labware.top(height)
+        target = loc.labware.as_well().top(height)
         self.move_to(target)
         # Aspirate now returns a partial function for run log purposes
         # but air gap only cares about executing an aspirate so here
@@ -200,19 +201,22 @@ class PairedInstrument:
             if not self._ctx.location_cache:
                 raise RuntimeError('No valid current location cache present')
             else:
-                location = self._ctx.location_cache.labware  # type: ignore
+                well = self._ctx.location_cache.labware  # type: ignore
                 # type checked below
-        if isinstance(location, Well):
-            if 'touchTipDisabled' in quirks_from_any_parent(location):
-                self._log.info(f"Ignoring touch tip on labware {location}")
+        else:
+            well = LabwareLike(location)
+
+        if well.is_well:
+            if 'touchTipDisabled' in well.quirks_from_any_parent():
+                self._log.info(f"Ignoring touch tip on labware {well}")
                 return self
-            if location.parent.is_tiprack:
+            if well.parent.as_labware().is_tiprack:
                 self._log.warning('Touch_tip being performed on a tiprack. '
                                   'Please re-check your code')
 
             move_with_z_offset =\
-                location.top().point + types.Point(0, 0, v_offset)
-            to_loc = types.Location(move_with_z_offset, location)
+                well.as_well().top().point + types.Point(0, 0, v_offset)
+            to_loc = types.Location(move_with_z_offset, well)
             self.move_to(to_loc)
         else:
             # If location is a not a valid well, raise a type error
@@ -220,7 +224,7 @@ class PairedInstrument:
                 'location should be a Well, but it is {}'.format(location))
 
         edges = build_edges(
-            location, v_offset, self._pair_policy.primary,
+            well.as_well(), v_offset, self._pair_policy.primary,
             self._ctx._deck_layout, radius)
         for edge in edges:
             self._hw_manager.hardware.move_to(

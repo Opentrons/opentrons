@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Union, Tuple, List, Optional
+from typing import TYPE_CHECKING, Union, Tuple, List, Optional, Dict
 
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.types import APIVersion
 from opentrons.protocols.implementations.paired_instrument import\
     PairedInstrument
@@ -13,7 +14,7 @@ from opentrons.protocols.api_support.util import (
     requires_version, labware_column_shift, Clearances, clamp_value)
 from .labware import (
     Labware, Well, OutOfTipsError, select_tiprack_from_list_paired_pipettes,
-    filter_tipracks_to_start, quirks_from_any_parent)
+    filter_tipracks_to_start)
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
@@ -71,7 +72,7 @@ class PairedInstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 7)
     def api_version(self) -> APIVersion:
-        pass
+        return self._api_version
 
     @property  # type: ignore
     @requires_version(2, 7)
@@ -209,14 +210,18 @@ class PairedInstrumentContext(CommandPublisher):
             >>> right.drop_tip()
         """
         if location and isinstance(location, types.Location):
-            if isinstance(location.labware, Labware):
-                tiprack = location.labware
-                target: Well = tiprack.next_tip(self.channels)  # type: ignore
+            if location.labware.is_labware:
+                tiprack = location.labware.as_labware()
+                target = tiprack.next_tip(self.channels)  # type: ignore
                 if not target:
                     raise OutOfTipsError
-            elif isinstance(location.labware, Well):
-                tiprack = location.labware.parent
-                target = location.labware
+            elif location.labware.is_well:
+                tiprack = location.labware.parent.as_labware()
+                target = location.labware.as_well()
+            else:
+                raise TypeError(
+                    "The location must be in a well or labware."
+                )
         elif location and isinstance(location, Well):
             tiprack = location.parent
             target = location
@@ -297,9 +302,9 @@ class PairedInstrumentContext(CommandPublisher):
         is_trash = False
         tiprack = None
         if location and isinstance(location, types.Location):
-            if isinstance(location.labware, Well):
+            if location.labware.is_well:
                 target = location
-                tiprack = location.labware.parent
+                tiprack = location.labware.as_well().parent
             else:
                 raise TypeError(
                     "If a location is specified as a types.Location (for "
@@ -309,7 +314,7 @@ class PairedInstrumentContext(CommandPublisher):
                     "dropped. The passed location, however, is in "
                     "reference to {}".format(location.labware))
         elif location and isinstance(location, Well):
-            if 'fixedTrash' in quirks_from_any_parent(location):
+            if LabwareLike(location).is_fixed_trash():
                 target = location.top()
             else:
                 primary_pipette = self._instruments[self._pair_policy.primary]
@@ -329,7 +334,7 @@ class PairedInstrumentContext(CommandPublisher):
         if not is_trash and tiprack and isinstance(target.labware, Well):
             targets = [
                 target,
-                self._get_secondary_target(tiprack, target.labware)]
+                self._get_secondary_target(tiprack, target.labware.as_well())]
         else:
             targets = [target]
         cmds.publish_paired(self.broker, cmds.paired_drop_tip,
@@ -393,6 +398,7 @@ class PairedInstrumentContext(CommandPublisher):
                         .format(volume,
                                 location if location else 'current position',
                                 rate))
+
         loc: Optional[types.Location] = None
         if isinstance(location, Well):
             point, well = location.bottom()
@@ -415,9 +421,9 @@ class PairedInstrumentContext(CommandPublisher):
         instruments = list(self._instruments.values())
         primary_loc, aspirate_func =\
             self.paired_instrument_obj.aspirate(volume, loc, rate)
-        if isinstance(primary_loc.labware, Well):
-            labware = primary_loc.labware.parent
-            well = primary_loc.labware
+        if primary_loc.labware.is_well:
+            well = primary_loc.labware.as_well()
+            labware = well.parent
             locations = [
                 primary_loc,
                 self._get_secondary_target(labware, well)]
@@ -486,7 +492,7 @@ class PairedInstrumentContext(CommandPublisher):
                                 location if location else 'current position',
                                 rate))
         if isinstance(location, Well):
-            if 'fixedTrash' in quirks_from_any_parent(location):
+            if LabwareLike(location).is_fixed_trash():
                 loc = location.top()
             else:
                 point, well = location.bottom()
@@ -511,8 +517,8 @@ class PairedInstrumentContext(CommandPublisher):
             self.paired_instrument_obj.dispense(volume, loc, rate)
 
         if isinstance(primary_loc.labware, Well):
-            labware = primary_loc.labware.parent
-            well = primary_loc.labware
+            well = primary_loc.labware.as_well()
+            labware = well.parent
             locations = [
                 primary_loc,
                 self._get_secondary_target(labware, well)]
@@ -817,14 +823,14 @@ class PairedInstrumentContext(CommandPublisher):
                 filter_tipracks_to_start(start, self.tip_racks),
                 primary_channels, secondary_channels, starting_point=start)
 
-    def _get_locations(self, location) -> List:
+    def _get_locations(self, location: Union[types.Location, Well]) -> List:
         if isinstance(location, Well):
             labware = location.parent
             well = location
             return [location, self._get_secondary_target(labware, well)]
-        elif isinstance(location.labware, Well):
-            labware = location.labware.parent
-            well = location.labware
+        elif location.labware.is_well:
+            well = location.labware.as_well()
+            labware = well.parent
             return [location, self._get_secondary_target(labware, well)]
         return []
 
@@ -857,13 +863,15 @@ class PairedInstrumentContext(CommandPublisher):
                 'incompatible with a PipettePair pickup.')
 
     @staticmethod
-    def _get_minimum_available_volume(instruments) -> float:
+    def _get_minimum_available_volume(
+            instruments: Dict[types.Mount, InstrumentContext]) -> float:
         return min(
             instr.hw_pipette['available_volume']
             for instr in instruments.values())
 
     @staticmethod
-    def _get_minimum_current_volume(instruments) -> float:
+    def _get_minimum_current_volume(
+            instruments: Dict[types.Mount, InstrumentContext]) -> float:
         return min(
             instr.hw_pipette['current_volume']
             for instr in instruments.values())

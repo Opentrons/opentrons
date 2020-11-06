@@ -6,8 +6,8 @@ from typing import Optional, List, Dict, TYPE_CHECKING
 from opentrons import types
 from opentrons.protocol_api.labware import load as load_lw, Labware
 from opentrons.protocols.api_support.constants import STANDARD_DECK
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.api_support.util import first_parent
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry, \
     ModuleType, ThermocyclerGeometry
 from opentrons_shared_data.deck import load as load_deck
@@ -130,7 +130,7 @@ class Deck(UserDict):
         depending on the mount you are using and the column you are moving
         to inside of the labware.
         """
-        slot = first_parent(target)
+        slot = LabwareLike(target).first_parent()
         if not slot:
             return False
         if mount is types.Mount.RIGHT:

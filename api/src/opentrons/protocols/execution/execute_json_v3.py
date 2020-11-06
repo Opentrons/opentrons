@@ -3,6 +3,7 @@ from typing import Dict, TYPE_CHECKING
 
 from opentrons.protocol_api.contexts import ProtocolContext, InstrumentContext
 from opentrons.protocol_api import labware
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.types import Point, Location
 from opentrons_shared_data.protocol.constants import (
     JsonPipetteCommand, JsonRobotCommand)
@@ -83,7 +84,7 @@ def _get_location_with_offset(
     well = _get_well(loaded_labware, params)
 
     # Never move to the bottom of the fixed trash
-    if 'fixedTrash' in labware.quirks_from_any_parent(well):
+    if LabwareLike(well).is_fixed_trash():
         return well.top()
 
     offset_from_bottom = params['offsetFromBottomMm']

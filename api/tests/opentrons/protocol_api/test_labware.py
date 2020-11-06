@@ -294,7 +294,7 @@ def test_well_parent(corning_96_wellplate_360ul_flat):
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=parent.point,
-                parent_object=parent.labware._implementation
+                parent_object=parent.labware.as_labware()._implementation
             ),
             display_name=well_name,
             has_tip=has_tip,
@@ -302,12 +302,12 @@ def test_well_parent(corning_96_wellplate_360ul_flat):
         )
     )
     assert well.parent == lw
-    assert well.top().labware == well
-    assert well.top().labware.parent == lw
-    assert well.bottom().labware == well
-    assert well.bottom().labware.parent == lw
-    assert well.center().labware == well
-    assert well.center().labware.parent == lw
+    assert well.top().labware.object == well
+    assert well.top().labware.parent.object == lw
+    assert well.bottom().labware.object == well
+    assert well.bottom().labware.parent.object == lw
+    assert well.center().labware.object == well
+    assert well.center().labware.parent.object == lw
 
 
 def test_tip_tracking_init(corning_96_wellplate_360ul_flat,

@@ -270,7 +270,7 @@ def _get_parent_identifier(labware: LabwareInterface) -> str:
     Helper function to return whether a labware is on top of a
     module or not.
     """
-    parent = labware.get_geometry().parent.labware
+    parent = labware.get_geometry().parent.labware.object
     # TODO (lc, 07-14-2020): Once we implement calibrations per slot,
     # this function should either return a slot using `first_parent` or
     # the module it is attached to.

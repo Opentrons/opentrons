@@ -754,7 +754,7 @@ def _get_labware(command):  # noqa(C901)
 
     placeable = location
     if isinstance(location, Location):
-        placeable = location.labware
+        placeable = location.labware.object
     elif isinstance(location, tuple):
         placeable = location[0]
 
@@ -770,8 +770,11 @@ def _get_labware(command):  # noqa(C901)
             # named tuple like location descends from tuple and therefore
             # passes the check
             containers.append(get_container(location))
-        elif isinstance(location, (Location, labware.Well, labware.Labware)):
-            containers.append(_get_new_labware(location))
+        elif isinstance(location, Location):
+            if location.labware.is_well:
+                containers.append(location.labware.parent.as_labware())
+            elif location.labware.is_labware:
+                containers.append(location.labware.as_labware())
         else:
             log.error(f'Cant handle location {location!r}')
 

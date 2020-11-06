@@ -262,7 +262,7 @@ class Labware(DeckItem):
     def parent(self) -> LocationLabware:
         """ The parent of this labware. Usually a slot name.
         """
-        return self._implementation.get_geometry().parent.labware
+        return self._implementation.get_geometry().parent.labware.object
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -712,19 +712,6 @@ def get_all_labware_definitions() -> List[str]:
         name_space + version existing on the robot
     """
     return labware_module.get_all_labware_definitions()
-
-
-def quirks_from_any_parent(
-        loc: Union[Labware, Well, str, 'ModuleGeometry', None]) -> List[str]:
-    """ Walk the tree of wells and labwares and extract quirks """
-    def recursive_get_quirks(obj, found):
-        if isinstance(obj, Labware):
-            return found + obj.quirks
-        elif isinstance(obj, Well):
-            return recursive_get_quirks(obj.parent, found)
-        else:
-            return found
-    return recursive_get_quirks(loc, [])
 
 
 def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
