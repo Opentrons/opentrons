@@ -13,6 +13,7 @@ export type CalibrationHealthCheckParentProps = {|
   dispatchRequests: (
     ...Array<{ ...Action, meta: { requestId: string } }>
   ) => void,
+  isJogging: boolean,
   showSpinner: boolean,
   hasBlock?: boolean,
 |}
