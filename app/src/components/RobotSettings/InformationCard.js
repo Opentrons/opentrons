@@ -40,12 +40,8 @@ const TITLE = 'Information'
 const NAME_LABEL = 'Robot name'
 const SERVER_VERSION_LABEL = 'Server version'
 const FIRMWARE_VERSION_LABEL = 'Firmware version'
-const MAX_PROTOCOL_API_VERSION_LABEL = 'Max Protocol API Version'
 const BOTH_PROTOCOL_API_VERSIONS_LABEL = 'Supported Protocol API Versions'
 const UNKNOWN = 'Unknown'
-
-const DEFAULT_MAX_API_VERSION = '1.0'
-const DEFAULT_MINIMUM_API_VERSION = '2.0'
 
 const UPDATE_RECHECK_DELAY_MS = 60000
 
@@ -66,11 +62,8 @@ export function InformationCard(props: InformationCardProps): React.Node {
   const { displayName } = robot
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
-  const protocolApiVersions = getRobotProtocolApiVersion(robot).filter(
-    version => version
-  )
+  const protocolApiVersions = getRobotProtocolApiVersion(robot)
 
-  const oldHealthCheck = protocolApiVersions.length === 1
   const updateDisabled = autoUpdateDisabledReason !== null
 
   // check for available updates on an interval
@@ -95,19 +88,10 @@ export function InformationCard(props: InformationCardProps): React.Node {
               value={version || UNKNOWN}
             />
           </Box>
-          {oldHealthCheck ? (
-            <LabeledValue
-              label={MAX_PROTOCOL_API_VERSION_LABEL}
-              value={protocolApiVersions[0] || DEFAULT_MAX_API_VERSION}
-            />
-          ) : (
-            <LabeledValue
-              label={BOTH_PROTOCOL_API_VERSIONS_LABEL}
-              value={`Minimum: ${protocolApiVersions[0] ||
-                DEFAULT_MINIMUM_API_VERSION} Maximum: ${protocolApiVersions[1] ||
-                DEFAULT_MINIMUM_API_VERSION}`}
-            />
-          )}
+          <LabeledValue
+            label={BOTH_PROTOCOL_API_VERSIONS_LABEL}
+            value={`Minimum: ${protocolApiVersions.min} Maximum: ${protocolApiVersions.max}`}
+          />
         </Box>
         <SecondaryBtn
           {...updateBtnProps}

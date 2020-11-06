@@ -167,16 +167,19 @@ export const getRobotFirmwareVersion = (
 
 export const getRobotProtocolApiVersion = (
   robot: DiscoveredRobot
-): Array<string | null> => {
+): {| min: string, max: string |} => {
   const healthField = robot.health
+  const DEFAULT_MAX_API_VERSION = '2.0'
+  const DEFAULT_MINIMUM_API_VERSION = '1.0'
+
   const maxApiVersion =
-    healthField?.protocol_api_version ||
-    healthField?.maximum_protocol_api_version ||
-    null
-  const minApiVersion = healthField?.minimum_protocol_api_version || null
-  return [minApiVersion, maxApiVersion].map(version =>
-    Array.isArray(version) ? version.join('.') : null
-  )
+    healthField?.protocol_api_version ??
+    healthField?.maximum_protocol_api_version
+  const minApiVersion = healthField?.minimum_protocol_api_version
+  return {
+    min: minApiVersion ? minApiVersion.join('.') : DEFAULT_MINIMUM_API_VERSION,
+    max: maxApiVersion ? maxApiVersion.join('.') : DEFAULT_MAX_API_VERSION,
+  }
 }
 
 export const getRobotApiVersionByName = (

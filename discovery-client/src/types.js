@@ -10,28 +10,17 @@ import type {
 export type { RobotState, HostState, HealthStatus }
 
 // TODO(mc, 2018-10-03): figure out what to do with duplicate type in app
-export type DeprecatedHealthResponse = {
+export type HealthResponse = {
   name: string,
   api_version: string,
   fw_version: string,
   system_version?: string,
   logs?: Array<string>,
   protocol_api_version?: [number, number],
+  minimum_protocol_api_version?: [number, number],
+  maximum_protocol_api_version?: [number, number],
   ...
 }
-
-export type NewHealthResponse = {
-  name: string,
-  api_version: string,
-  fw_version: string,
-  system_version?: string,
-  logs?: Array<string>,
-  minimum_protocol_api_version: [number, number],
-  maximum_protocol_api_version: [number, number],
-  ...
-}
-
-export type HealthResponse = NewHealthResponse | DeprecatedHealthResponse
 
 export type Capability =
   | 'bootstrap'

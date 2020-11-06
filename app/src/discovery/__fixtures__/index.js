@@ -9,23 +9,13 @@ import {
 
 import type { BaseRobot, Robot, ReachableRobot } from '../types'
 
-export const mockOldHealthResponse = {
+export const mockHealthResponse = {
   name: 'robot-name',
   api_version: '0.0.0-mock',
   fw_version: '0.0.0-mock',
   system_version: '0.0.0-mock',
   logs: ([]: Array<string>),
   protocol_api_version: ([2, 0]: [number, number]),
-}
-
-export const mockNewHealthResponse = {
-  name: 'robot-name',
-  api_version: '0.0.0-mock',
-  fw_version: '0.0.0-mock',
-  system_version: '0.0.0-mock',
-  logs: ([]: Array<string>),
-  minimum_protocol_api_version: ([2, 0]: [number, number]),
-  maximum_protocol_api_version: ([2, 0]: [number, number]),
 }
 
 export const mockUpdateServerHealthResponse = {
@@ -39,7 +29,7 @@ export const mockUpdateServerHealthResponse = {
 
 export const mockDiscoveryClientRobot = {
   name: 'robot-name',
-  health: mockOldHealthResponse,
+  health: mockHealthResponse,
   serverHealth: mockUpdateServerHealthResponse,
   addresses: [
     {
@@ -67,7 +57,7 @@ export const mockBaseRobot: BaseRobot = {
 export const mockConnectableRobot: Robot = {
   ...mockBaseRobot,
   status: CONNECTABLE,
-  health: mockOldHealthResponse,
+  health: mockHealthResponse,
   serverHealth: mockUpdateServerHealthResponse,
   healthStatus: HEALTH_STATUS_OK,
   serverHealthStatus: HEALTH_STATUS_OK,
@@ -84,7 +74,7 @@ export const mockConnectedRobot: Robot = {
 export const mockReachableRobot: ReachableRobot = {
   ...mockBaseRobot,
   status: REACHABLE,
-  health: mockOldHealthResponse,
+  health: mockHealthResponse,
   serverHealth: mockUpdateServerHealthResponse,
   healthStatus: HEALTH_STATUS_NOT_OK,
   serverHealthStatus: HEALTH_STATUS_OK,

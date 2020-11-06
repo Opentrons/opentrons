@@ -409,10 +409,10 @@ describe('discovery selectors', () => {
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
         serverHealth: {},
-        health: { protocol_api_version: [2, 0] },
+        health: { protocol_api_version: [2, 1] },
       },
       selector: discovery.getRobotProtocolApiVersion,
-      expected: [null, '2.0'],
+      expected: { min: '1.0', max: '2.1' },
     },
     {
       name:
@@ -426,14 +426,14 @@ describe('discovery selectors', () => {
         },
       },
       selector: discovery.getRobotProtocolApiVersion,
-      expected: ['2.0', '2.8'],
+      expected: { min: '2.0', max: '2.8' },
     },
     {
       name: 'getRobotProtocolApiVersion returns null if no healths',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: { serverHealth: null, health: null },
       selector: discovery.getRobotProtocolApiVersion,
-      expected: [null, null],
+      expected: { min: '1.0', max: '2.0' },
     },
     {
       name: 'getRobotByName returns connectable robot by name',
