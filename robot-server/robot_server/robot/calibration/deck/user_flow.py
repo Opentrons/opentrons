@@ -248,6 +248,8 @@ class DeckCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def move_to_tip_rack(self):
+        if self._current_state == State.labwareLoaded:
+            await self.hardware.home()
         await self._move(Location(self.tip_origin, None))
 
     async def move_to_deck(self):
