@@ -467,24 +467,32 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps) {
       height="30%"
       border={BORDER_SOLID_MEDIUM}
       paddingX={SPACING_3}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       marginBottom={SPACING_2}
     >
       <Flex
         paddingY={SPACING_2}
-        maxWidth="30%"
-        flexDirection={DIRECTION_COLUMN}
+        height="6rem"
+        flex="0 1 30%"
         justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
       >
         <img
           css={css`
-            width: 100%;
+            max-width: 100%;
             max-height: 100%;
+            flex: 0 1 5rem;
+            display: block;
           `}
           src={imageSrc}
         />
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_3}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        paddingLeft={SPACING_3}
+        flex="0 1 70%"
+      >
         <Text fontSize={FONT_SIZE_BODY_2}>{displayName}</Text>
         {linkToMeasurements && (
           <Link
