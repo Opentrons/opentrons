@@ -97,7 +97,7 @@ def check_arc_basic(arc, from_loc, to_loc):
     assert arc[1][0].z >= to_loc.point.z
 
 
-def test_direct_movs():
+def test_direct_moves():
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
 
@@ -124,9 +124,9 @@ def test_basic_arc():
                          lw1.wells()[8].bottom(),
                          deck,
                          P300M_GEN2_MAX_HEIGHT,
-                         7.0, 15.0)
+                         5.0, 10.0)
     check_arc_basic(same_lw, lw1.wells()[0].top(), lw1.wells()[8].bottom())
-    assert same_lw[0][0].z == lw1.wells()[0].top().point.z + 7.0
+    assert same_lw[0][0].z == lw1.wells()[0].top().point.z + 5.0
 
     # different-labware moves, or moves with no labware attached,
     # should use the larger safe z and the global z
@@ -134,10 +134,10 @@ def test_basic_arc():
                               lw2.wells()[0].bottom(),
                               deck,
                               P300M_GEN2_MAX_HEIGHT,
-                              7.0, 15.0)
+                              5.0, 10.0)
     check_arc_basic(different_lw,
                     lw1.wells()[0].top(), lw2.wells()[0].bottom())
-    assert different_lw[0][0].z == deck.highest_z + 15.0
+    assert different_lw[0][0].z == deck.highest_z + 10.0
 
 
 def test_force_direct():
@@ -149,7 +149,7 @@ def test_force_direct():
                          lw1.wells()[8].bottom(),
                          deck,
                          P300M_GEN2_MAX_HEIGHT,
-                         7.0, 15.0, force_direct=True)
+                         5.0, 10.0, force_direct=True)
     assert same_lw == [(lw1.wells()[8].bottom().point, None)]
 
     # different-labware moves should move direct
@@ -157,7 +157,7 @@ def test_force_direct():
                               lw2.wells()[0].bottom(),
                               deck,
                               P300M_GEN2_MAX_HEIGHT,
-                              7.0, 15.0, force_direct=True)
+                              5.0, 10.0, force_direct=True)
     assert different_lw == [(lw2.wells()[0].bottom().point, None)]
 
 
@@ -173,27 +173,27 @@ def test_no_labware_loc(labware_offset_tempdir):
     no_lw = Location(point=lw1.wells()[0].top().point, labware=None)
 
     no_from = plan_moves(no_lw, lw2.wells()[0].bottom(), deck,
-                         P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
+                         P300M_GEN2_MAX_HEIGHT, 5.0, 10.0)
     check_arc_basic(no_from, no_lw, lw2.wells()[0].bottom())
-    assert no_from[0][0].z == deck.highest_z + 15.0
+    assert no_from[0][0].z == deck.highest_z + 10.0
 
     no_to = plan_moves(lw1.wells()[0].bottom(), no_lw, deck,
-                       P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
+                       P300M_GEN2_MAX_HEIGHT, 5.0, 10.0)
     check_arc_basic(no_to, lw1.wells()[0].bottom(), no_lw)
-    assert no_from[0][0].z == deck.highest_z + 15.0
+    assert no_from[0][0].z == deck.highest_z + 10.0
 
     no_well = Location(point=lw1.wells()[0].top().point, labware=lw1)
 
     no_from_well = plan_moves(no_well, lw1.wells()[1].top(), deck,
-                              P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
+                              P300M_GEN2_MAX_HEIGHT, 5.0, 10.0)
     check_arc_basic(no_from_well, no_well, lw1.wells()[1].top())
 
     no_from_well_height = no_from_well[0][0].z
-    lw_height_expected = labware_def['dimensions']['zDimension'] + 7
+    lw_height_expected = labware_def['dimensions']['zDimension'] + 5.0
     assert no_from_well_height == lw_height_expected
 
     no_to_well = plan_moves(lw1.wells()[1].top(), no_well, deck,
-                            P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
+                            P300M_GEN2_MAX_HEIGHT, 5.0, 10.0)
     check_arc_basic(no_to_well, lw1.wells()[1].top(), no_well)
     no_to_well_height = no_to_well[0][0].z
     assert no_to_well_height == lw_height_expected
@@ -206,17 +206,17 @@ def test_arc_tall_point():
     old_top = lw1.wells()[0].top()
     tall_point = old_top.point._replace(z=tall_z)
     tall_top = Location(point=tall_point, labware=old_top.labware)
-    to_tall = plan_moves(lw1.wells()[2].top(), tall_top, deck, 7.0, 15.0)
+    to_tall = plan_moves(lw1.wells()[2].top(), tall_top, deck, 5.0, 10.0)
     check_arc_basic(to_tall, lw1.wells()[2].top(), tall_top)
     assert to_tall[0][0].z == tall_z
 
-    from_tall = plan_moves(tall_top, lw1.wells()[3].top(), deck, 7.0, 15.0)
+    from_tall = plan_moves(tall_top, lw1.wells()[3].top(), deck, 5.0, 10.0)
     check_arc_basic(from_tall, tall_top, lw1.wells()[3].top())
     assert from_tall[0][0].z == tall_z
 
     no_well = Location(point=tall_top.point, labware=lw1)
     from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
-                              7.0, 15.0)
+                              5.0, 10.0)
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
 
 
@@ -230,21 +230,21 @@ def test_arc_lower_minimum_z_height():
     tall_top = Location(point=tall_point, labware=old_top.labware)
     to_tall = plan_moves(
         lw1.wells()[2].top(), tall_top, deck,
-        P300M_GEN2_MAX_HEIGHT, 7.0, 15.0, False,
+        P300M_GEN2_MAX_HEIGHT, 5.0, 10.0, False,
         minimum_z_height=minimum_z_height)
     check_arc_basic(to_tall, lw1.wells()[2].top(), tall_top)
     assert to_tall[0][0].z == tall_z
 
     from_tall = plan_moves(
         tall_top, lw1.wells()[3].top(), deck,
-        P300M_GEN2_MAX_HEIGHT, 7.0, 15.0,
+        P300M_GEN2_MAX_HEIGHT, 5.0, 10.0,
         minimum_z_height=minimum_z_height)
     check_arc_basic(from_tall, tall_top, lw1.wells()[3].top())
     assert from_tall[0][0].z == tall_z
 
     no_well = Location(point=tall_top.point, labware=lw1)
     from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
-                              P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
+                              P300M_GEN2_MAX_HEIGHT, 5.0, 10.0)
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
 
 
@@ -345,8 +345,8 @@ def test_instr_max_height():
         to_loc=trough2.wells()[0].top(),
         deck=deck,
         instr_max_height=round(instr_max_height, 2),
-        well_z_margin=7.0,
-        lw_z_margin=15.0)
+        well_z_margin=5.0,
+        lw_z_margin=10.0)
     assert height == round(instr_max_height, 2)
 
     # if the highest deck height is > 10 mm below the max instrument
@@ -357,10 +357,10 @@ def test_instr_max_height():
         to_loc=trough2.wells()[0].top(),
         deck=deck,
         instr_max_height=round(instr_max_height, 2),
-        well_z_margin=7.0,
-        lw_z_margin=15.0)
+        well_z_margin=5.0,
+        lw_z_margin=10.0)
     assert height2 ==\
-        round(fixed_trash.wells()[0].top().point.z, 2) + 15.0
+        round(fixed_trash.wells()[0].top().point.z, 2) + 10.0
 
     # it fails if the highest deck height is less than 1 mm below
     # the max instr achievable height
@@ -371,8 +371,8 @@ def test_instr_max_height():
             to_loc=trough2.wells()[0].top(),
             deck=deck,
             instr_max_height=round(instr_max_height, 2),
-            well_z_margin=7.0,
-            lw_z_margin=15.0)
+            well_z_margin=5.0,
+            lw_z_margin=10.0)
 
 
 def test_should_dodge():
