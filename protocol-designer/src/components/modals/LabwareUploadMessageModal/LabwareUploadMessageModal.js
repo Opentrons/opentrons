@@ -120,13 +120,15 @@ export const LabwareUploadMessageModal = (props: Props): React.Node => {
       alertOverlay
     >
       <MessageBody message={message} />
-      {buttons.map((button, index) => (
-        <OutlineButton
-          {...button}
-          key={index}
-          className={cx(modalStyles.bottom_button, button.className)}
-        />
-      ))}
+      <div className={modalStyles.button_row}>
+        {buttons.map((button, index) => (
+          <OutlineButton
+            {...button}
+            key={index}
+            className={cx(modalStyles.button_medium, button.className)}
+          />
+        ))}
+      </div>
     </AlertModal>
   )
 }

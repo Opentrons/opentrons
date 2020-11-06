@@ -71,6 +71,11 @@
 .scrollable_modal_contents {
   display: flex;
   width: 100%;
+
+  & p {
+    line-height: var(--lh-copy);
+    margin-top: 0.5rem;
+  }
 }
 
 .scrollable_modal_scroll {
