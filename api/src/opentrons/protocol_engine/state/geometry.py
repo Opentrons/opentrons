@@ -19,7 +19,7 @@ class GeometryState:
 
     def get_slot_position(self, slot: int) -> Point:
         deck_def = self.get_deck_definition()
-        position = deck_def["locations"]["orderedSlots"][slot]["position"]
+        position = deck_def["locations"]["orderedSlots"][slot - 1]["position"]
 
         return Point(x=position[0], y=position[1], z=position[2])
 

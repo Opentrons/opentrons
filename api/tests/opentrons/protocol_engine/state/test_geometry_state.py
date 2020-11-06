@@ -45,7 +45,7 @@ def test_get_slot_position(
 ) -> None:
     """It should get the absolute location of a deck slot's origin."""
     point = store.geometry.get_slot_position(3)
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][3]["position"]
+    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
 
     assert point == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
 
