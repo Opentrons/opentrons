@@ -42,6 +42,7 @@ describe('CheckCalibration', () => {
   let mockStore
   let render
   let dispatch
+  let dispatchRequests
   let mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
@@ -87,16 +88,18 @@ describe('CheckCalibration', () => {
       id: 'fake_check_session_id',
       ...mockCalibrationCheckSessionAttributes,
     }
+    dispatchRequests = jest.fn()
 
     render = (props = {}) => {
-      const { showSpinner = false } = props
+      const { showSpinner = false, isJogging = false } = props
       return mount(
         <CheckHealthCalibration
           robotName="robot-name"
           session={mockCalibrationCheckSession}
-          dispatchRequests={jest.fn()}
+          dispatchRequests={dispatchRequests}
           showSpinner={showSpinner}
           hasBlock={false}
+          isJogging={isJogging}
         />,
         {
           wrappingComponent: Provider,
@@ -147,5 +150,40 @@ describe('CheckCalibration', () => {
   it('renders spinner when showSpinner is true', () => {
     const wrapper = render({ showSpinner: true })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
+  })
+
+  it('does dispatch jog requests when not isJogging', () => {
+    mockCalibrationCheckSession = {
+      ...mockCalibrationCheckSession,
+      details: {
+        ...mockCalibrationCheckSession.details,
+        currentStep: 'preparingPipette',
+      },
+    }
+    const wrapper = render({ isJogging: false })
+    wrapper.find('button[title="forward"]').invoke('onClick')()
+    expect(dispatchRequests).toHaveBeenCalledWith(
+      Sessions.createSessionCommand(
+        'robot-name',
+        mockCalibrationCheckSession.id,
+        {
+          command: Sessions.sharedCalCommands.JOG,
+          data: { vector: [0, -0.1, 0] },
+        }
+      )
+    )
+  })
+  it('does not dispatch jog requests when isJogging', () => {
+    mockCalibrationCheckSession = {
+      ...mockCalibrationCheckSession,
+      details: {
+        ...mockCalibrationCheckSession.details,
+        currentStep: 'preparingPipette',
+      },
+    }
+    const wrapper = render({ isJogging: true })
+    dispatch.mockClear()
+    wrapper.find('button[title="forward"]').invoke('onClick')()
+    expect(dispatchRequests).not.toHaveBeenCalled()
   })
 })

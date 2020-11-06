@@ -24,7 +24,7 @@ CALIBRATION_CHECK_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.preparingPipette: {
         CalibrationCommand.jog: State.preparingPipette,
         CalibrationCommand.pick_up_tip: State.inspectingTip,
-        CalibrationCommand.invalidate_last_action: State.comparingNozzle
+        CalibrationCommand.invalidate_last_action: State.preparingPipette,
     },
     State.inspectingTip: {
         CalibrationCommand.invalidate_tip: State.preparingPipette,
@@ -34,32 +34,32 @@ CALIBRATION_CHECK_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
         CheckCalibrationCommand.compare_point: State.comparingTip,
         CalibrationCommand.jog: State.comparingTip,
         CalibrationCommand.move_to_deck: State.comparingHeight,
-        CalibrationCommand.invalidate_last_action: State.comparingNozzle
+        CalibrationCommand.invalidate_last_action: State.preparingPipette
     },
     State.comparingHeight: {
         CalibrationCommand.jog: State.comparingHeight,
         CheckCalibrationCommand.compare_point: State.comparingHeight,
         CalibrationCommand.move_to_point_one: State.comparingPointOne,
-        CalibrationCommand.invalidate_last_action: State.comparingNozzle
+        CalibrationCommand.invalidate_last_action: State.preparingPipette
     },
     State.comparingPointOne: {
         CalibrationCommand.jog: State.comparingPointOne,
         CheckCalibrationCommand.compare_point: State.comparingPointOne,
         DeckCalibrationCommand.move_to_point_two: State.comparingPointTwo,
         CalibrationCommand.move_to_tip_rack: State.returningTip,
-        CalibrationCommand.invalidate_last_action: State.comparingNozzle
+        CalibrationCommand.invalidate_last_action: State.preparingPipette
     },
     State.comparingPointTwo: {
         CalibrationCommand.jog: State.comparingPointTwo,
         CheckCalibrationCommand.compare_point: State.comparingPointTwo,
         DeckCalibrationCommand.move_to_point_three: State.comparingPointThree,
-        CalibrationCommand.invalidate_last_action: State.comparingNozzle
+        CalibrationCommand.invalidate_last_action: State.preparingPipette
     },
     State.comparingPointThree: {
         CalibrationCommand.jog: State.comparingPointThree,
         CheckCalibrationCommand.compare_point: State.comparingPointThree,
         CalibrationCommand.move_to_tip_rack: State.returningTip,
-        CalibrationCommand.invalidate_last_action: State.comparingNozzle
+        CalibrationCommand.invalidate_last_action: State.preparingPipette
     },
     State.returningTip: {
         CheckCalibrationCommand.return_tip: State.returningTip,

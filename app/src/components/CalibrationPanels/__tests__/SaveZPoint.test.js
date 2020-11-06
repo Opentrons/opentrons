@@ -113,9 +113,7 @@ describe('SaveZPoint', () => {
       expect(getJogButton(wrapper, dir).exists()).toBe(false)
     })
     wrapper
-      .find(
-        'button[children="Need to jog across the deck to align the pipette in slot 5?"]'
-      )
+      .find('button[children="Reveal XY jog controls to move across deck"]')
       .invoke('onClick')({ preventDefault: () => {} })
     jogDirections.forEach(direction => {
       getJogButton(wrapper, direction).invoke('onClick')()

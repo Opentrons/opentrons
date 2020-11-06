@@ -17,7 +17,7 @@ from opentrons.protocols.geometry.deck import Deck
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER, JOG_TO_DECK_SLOT,
-    CAL_BLOCK_SETUP_BY_MOUNT)
+    CAL_BLOCK_SETUP_CAL_CHECK)
 import robot_server.robot.calibration.util as uf
 from robot_server.robot.calibration.helper_classes import (
     RobotHealthCheck, PipetteRank, PipetteInfo,
@@ -172,6 +172,7 @@ class CheckCalibrationUserFlow:
         self._active_pipette = second_pip
         del self._deck[TIPRACK_SLOT]
         self._active_tiprack = self._load_active_tiprack()
+        self.reset_tip_origin()
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
@@ -331,7 +332,7 @@ class CheckCalibrationUserFlow:
 
     def _load_cal_block(self):
         if self._has_calibration_block:
-            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self.mount]
+            cb_setup = CAL_BLOCK_SETUP_CAL_CHECK
             self._deck[cb_setup.slot] = labware.load(
                 cb_setup.load_name,
                 self._deck.position_for(cb_setup.slot))
@@ -452,6 +453,7 @@ class CheckCalibrationUserFlow:
                 model=hw_pip.model,
                 name=hw_pip.name,
                 tipLength=hw_pip.config.tip_length,
+                tipRackLoadName=info_pip.tip_rack.load_name,
                 tipRackDisplay=info_pip.tip_rack._implementation.get_definition()['metadata']['displayName'],  # noqa: E501
                 tipRackUri=info_pip.tip_rack.uri,
                 rank=info_pip.rank.value,
@@ -465,11 +467,12 @@ class CheckCalibrationUserFlow:
         assert self.hw_pipette
         assert self.active_pipette
         display_name =\
-            self.active_pipette.tip_rack._implementation.get_display_name()
+            self.active_pipette.tip_rack._implementation.get_definition()['metadata']['displayName']  # noqa: E501
         return CheckAttachedPipette(
             model=self.hw_pipette.model,
             name=self.hw_pipette.name,
             tipLength=self.hw_pipette.config.tip_length,
+            tipRackLoadName=self.active_pipette.tip_rack.load_name,
             tipRackDisplay=display_name,
             tipRackUri=self.active_pipette.tip_rack.uri,
             rank=self.active_pipette.rank.value,
@@ -712,10 +715,16 @@ class CheckCalibrationUserFlow:
         return loc.move(point=Point(0, 0, self._z_height_reference))
 
     async def move_to_reference_point(self):
+        if self._has_calibration_block:
+            cb_setup = CAL_BLOCK_SETUP_CAL_CHECK
+            calblock: labware.Labware = \
+                self._deck[cb_setup.slot]  # type: ignore
+            cal_block_target_well = calblock.wells_by_name()[cb_setup.well]
+        else:
+            cal_block_target_well = None
         ref_loc = uf.get_reference_location(
-            mount=self.mount,
             deck=self._deck,
-            has_calibration_block=self._has_calibration_block)
+            cal_block_target_well=cal_block_target_well)
         await self._move(ref_loc)
 
     async def move_to_point_one(self):
@@ -743,19 +752,28 @@ class CheckCalibrationUserFlow:
 
     async def return_tip(self):
         await uf.return_tip(self, tip_length=self._get_tip_length())
+        await self.hardware.retract(self.mount)
 
     async def _move(self, to_loc: Location):
         await uf.move(self, to_loc)
 
     async def invalidate_last_action(self):
-        await self.hardware.home()
-        await self.hardware.gantry_position(self.mount, refresh=True)
-        if self._current_state != State.comparingNozzle:
+        if self._current_state not in (
+                State.comparingNozzle, State.preparingPipette):
+            await self.hardware.home()
+            await self.hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, 'Bad deck setup'
             await uf.move(self, trash['A1'].top(), CriticalPoint.XY_CENTER)
             await self.hardware.drop_tip(self.mount)
-        await self.move_to_tip_rack()
+            await self.move_to_tip_rack()
+        elif self._current_state == State.comparingNozzle:
+            await self.hardware.retract(self.mount)
+            await self.move_to_reference_point()
+        else:  # preparingPipette
+            await self.hardware.home()
+            await self.hardware.gantry_position(self.mount, refresh=True)
+            await self.move_to_tip_rack()
 
     async def exit_session(self):
         if self.hw_pipette.has_tip:

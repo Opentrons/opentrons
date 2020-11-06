@@ -43,11 +43,12 @@ import type {
 import type { RequestState } from '../../robot-api/types'
 
 const DECK_NEVER_CALIBRATED = "You haven't calibrated the deck yet"
-const LAST_CALIBRATED = 'Last calibrated: '
-const MIGRATED = 'Migrated from legacy data: '
+const LAST_CALIBRATED = 'Last calibrated:'
+const MIGRATED = 'Last known calibration migrated'
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
-const CALIBRATE_BUTTON_TEXT = 'Calibrate'
+const BUTTON_TEXT_CALIBRATE = 'calibrate deck'
+const BUTTON_TEXT_RECALIBRATE = 'recalibrate deck'
 const CALIBRATE_TITLE_TEXT = 'Calibrate deck'
 const STARTING = 'Deck calibration is starting'
 const ENDING = 'Deck calibration is ending'
@@ -190,6 +191,11 @@ export function DeckCalibrationControl(props: Props): React.Node {
       : ENDING
     : disabledReason
 
+  const buttonText =
+    deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
+      ? BUTTON_TEXT_RECALIBRATE
+      : BUTTON_TEXT_CALIBRATE
+
   return (
     <>
       <TitledControl
@@ -199,31 +205,30 @@ export function DeckCalibrationControl(props: Props): React.Node {
           <>
             <InlineCalibrationWarning warningType={warningType} />
             <Text>{CALIBRATE_DECK_DESCRIPTION}</Text>
+            {deckCalData && deckCalStatus && (
+              <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
+                {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
+              </Text>
+            )}
           </>
         }
         control={
           <SecondaryBtn
             {...targetProps}
-            width="9rem"
+            width="13rem"
             onClick={confirmStart}
             disabled={disabledOrBusyReason}
           >
             {showSpinner ? (
               <Icon name="ot-spinner" height="1em" spin />
             ) : (
-              CALIBRATE_BUTTON_TEXT
+              buttonText
             )}
           </SecondaryBtn>
         }
       >
         {disabledOrBusyReason !== null && (
           <Tooltip {...tooltipProps}>{disabledOrBusyReason}</Tooltip>
-        )}
-
-        {deckCalData && deckCalStatus && (
-          <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
-            {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
-          </Text>
         )}
       </TitledControl>
       <Portal level="top">

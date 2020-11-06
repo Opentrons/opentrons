@@ -15,7 +15,7 @@ const createConnectAction = robotName => (RobotActions.connect(robotName): any)
 
 const createTimeSuccessResponse = (time: Date) => {
   const response = cloneDeep(mockFetchSystemTimeSuccess)
-  set(response, 'body.data.attributes.systemTime', time.toISOString())
+  set(response, 'body.data.systemTime', time.toISOString())
   return response
 }
 
@@ -78,15 +78,14 @@ describe('syncTimeOnConnectEpic', () => {
         path: '/system/time',
         body: {
           data: {
-            type: 'SystemTimeAttributes',
-            attributes: { systemTime: expect.any(String) },
+            systemTime: expect.any(String),
           },
         },
       })
 
       const updatedTime = get(
         mocks.fetchRobotApi.mock.calls[1][1],
-        'body.data.attributes.systemTime'
+        'body.data.systemTime'
       )
 
       expect(

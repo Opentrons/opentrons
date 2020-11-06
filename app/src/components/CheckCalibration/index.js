@@ -32,7 +32,10 @@ import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 
 import type { StyleProps } from '@opentrons/components'
-import type { SessionCommandParams } from '../../sessions/types'
+import type {
+  CalibrationLabware,
+  SessionCommandParams,
+} from '../../sessions/types'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type { CalibrationHealthCheckParentProps } from './types'
@@ -98,13 +101,14 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 export function CheckHealthCalibration(
   props: CalibrationHealthCheckParentProps
 ): React.Node {
-  const { session, robotName, dispatchRequests, showSpinner } = props
+  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const {
     currentStep,
     activePipette,
     activeTipRack,
     instruments,
     comparisonsByPipette,
+    labware,
   } = session?.details || {}
 
   const {
@@ -120,8 +124,12 @@ export function CheckHealthCalibration(
     return spec ? spec.channels > 1 : false
   }, [activePipette])
 
+  const calBlock: CalibrationLabware | null = labware
+    ? labware.find(l => !l.isTiprack) ?? null
+    : null
+
   function sendCommands(...commands: Array<SessionCommandParams>) {
-    if (session?.id) {
+    if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,
@@ -170,6 +178,7 @@ export function CheckHealthCalibration(
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           tipRack={activeTipRack}
+          calBlock={calBlock}
           isMulti={isMulti}
           mount={activePipette?.mount.toLowerCase()}
           currentStep={currentStep}

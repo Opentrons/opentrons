@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import * as Sessions from '../../../sessions'
 
-import { Tooltip, SecondaryBtn } from '@opentrons/components'
+import { Tooltip, PrimaryBtn, SecondaryBtn } from '@opentrons/components'
 import { mountWithStore } from '@opentrons/components/__utils__'
 import { TitledControl } from '../../TitledControl'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
@@ -88,12 +88,16 @@ describe('CheckCalibrationControl', () => {
     getCalCheckButton(wrapper).invoke('onClick')()
     wrapper.update()
 
+    const calBlockButton = wrapper.find(PrimaryBtn)
+    calBlockButton.invoke('onClick')()
+    wrapper.update()
+
     expect(store.dispatch).toHaveBeenCalledWith({
       ...Sessions.ensureSession(
         'robot-name',
         Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
         {
-          hasCalibrationBlock: false,
+          hasCalibrationBlock: true,
           tipRacks: [],
         }
       ),

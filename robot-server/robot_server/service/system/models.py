@@ -10,8 +10,10 @@ class SystemTimeAttributes(BaseModel):
     systemTime: datetime
 
 
-SystemTimeResponseDataModel = ResponseDataModel[SystemTimeAttributes]
+class SystemTimeAttributesResponse(ResponseDataModel, SystemTimeAttributes):
+    pass
 
-SystemTimeResponse = ResponseModel[SystemTimeAttributes, dict]
+
+SystemTimeResponse = ResponseModel[SystemTimeAttributesResponse]
 
 SystemTimeRequest = RequestModel[SystemTimeAttributes]

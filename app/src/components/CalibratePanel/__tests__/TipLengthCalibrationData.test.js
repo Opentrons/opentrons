@@ -27,6 +27,7 @@ describe('TipLengthCalibrationData', () => {
   it('displays existing data if present and not calibrated in this session', () => {
     const wrapper = render({
       calibrationData: {
+        id: '1',
         tipLength: 30,
         tiprack: 'tiprack',
         pipette: 'pip',

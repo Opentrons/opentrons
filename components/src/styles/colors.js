@@ -27,6 +27,10 @@ export const C_SELECTED_DARK = '#00c3e6'
 export const OVERLAY_WHITE_10 = 'rgba(255, 255, 255, 0.1)'
 export const OVERLAY_WHITE_20 = 'rgba(255, 255, 255, 0.2)'
 
+// used to set aside further subsections of cards beyond
+// what can be distinguished with a border
+export const OVERLAY_LIGHT_GRAY_50 = 'rgba(230, 230, 230, 0.4)'
+
 // used as default BaseModal overlay color
 export const OVERLAY_GRAY_90 = 'rgba(127, 127, 127, 0.9)'
 

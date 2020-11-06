@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
+import * as Config from '../../config'
 
 import {
   Icon,
@@ -10,11 +11,13 @@ import {
   BORDER_SOLID_LIGHT,
   Tooltip,
   useHoverTooltip,
+  SpinnerModalPage,
 } from '@opentrons/components'
 
 import { Portal } from '../portal'
 import { CheckHealthCalibration } from '../CheckCalibration'
 import { TitledControl } from '../TitledControl'
+import { AskForCalibrationBlockModal } from '../../components/CalibrateTipLength/AskForCalibrationBlockModal'
 
 import type { SessionCommandString } from '../../sessions/types'
 import type { RequestState } from '../../robot-api/types'
@@ -30,6 +33,8 @@ const CAL_HEALTH_CHECK = 'Calibration Health Check'
 const CHECK_HEALTH = 'check health'
 const CAL_HEALTH_CHECK_DESCRIPTION =
   'Check the calibration settings for your robot.'
+const EXIT = 'exit'
+
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
@@ -45,6 +50,7 @@ export function CheckCalibrationControl({
   const trackedRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
+  const jogRequestId = React.useRef<string | null>(null)
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -56,6 +62,12 @@ export function CheckCalibrationControl({
       ) {
         deleteRequestId.current = dispatchedAction.meta.requestId
       } else if (
+        dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
+        dispatchedAction.payload.command.command ===
+          Sessions.sharedCalCommands.JOG
+      ) {
+        jogRequestId.current = dispatchedAction.meta.requestId
+      } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
@@ -66,10 +78,24 @@ export function CheckCalibrationControl({
     }
   )
 
+  const startingSession =
+    useSelector<State, RequestState | null>(state =>
+      createRequestId.current
+        ? RobotApi.getRequestById(state, createRequestId.current)
+        : null
+    )?.status === RobotApi.PENDING
+
   const showSpinner =
     useSelector<State, RequestState | null>(state =>
       trackedRequestId.current
         ? RobotApi.getRequestById(state, trackedRequestId.current)
+        : null
+    )?.status === RobotApi.PENDING
+
+  const isJogging =
+    useSelector((state: State) =>
+      jogRequestId.current
+        ? RobotApi.getRequestById(state, jogRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
@@ -98,20 +124,27 @@ export function CheckCalibrationControl({
     }
   }, [shouldOpen, shouldClose])
 
-  const handleStart = () => {
-    const tipRacks = []
-    const useCalBlock = false
-    // TODO: show ask for cal block screen matching the changes in #6870
-    dispatchRequests(
-      Sessions.ensureSession(
-        robotName,
-        Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-        {
-          tipRacks,
-          hasCalibrationBlock: useCalBlock,
-        }
+  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
+  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+
+  const handleStart = (hasBlockModalResponse: boolean | null = null) => {
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setShowCalBlockModal(true)
+    } else {
+      setShowCalBlockModal(false)
+      dispatchRequests(
+        Sessions.ensureSession(
+          robotName,
+          Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+          {
+            tipRacks: [],
+            hasCalibrationBlock: Boolean(
+              configHasCalibrationBlock ?? hasBlockModalResponse
+            ),
+          }
+        )
       )
-    )
+    }
   }
 
   const checkHealthSession = useSelector((state: State) => {
@@ -147,7 +180,7 @@ export function CheckCalibrationControl({
           <SecondaryBtn
             {...targetProps}
             width="12rem"
-            onClick={handleStart}
+            onClick={() => handleStart(null)} // passing in null because we want to show the AskForBlock modal
             disabled={buttonDisabled}
           >
             {buttonChildren}
@@ -158,16 +191,36 @@ export function CheckCalibrationControl({
           <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
         )}
       </TitledControl>
-      {showWizard && (
-        <Portal level="top">
+      <Portal level="top">
+        {showCalBlockModal ? (
+          <AskForCalibrationBlockModal
+            onResponse={handleStart}
+            titleBarTitle={CAL_HEALTH_CHECK}
+            closePrompt={() => setShowCalBlockModal(false)}
+          />
+        ) : null}
+        {startingSession ? (
+          <SpinnerModalPage
+            titleBar={{
+              title: CAL_HEALTH_CHECK,
+              back: {
+                disabled: true,
+                title: EXIT,
+                children: EXIT,
+              },
+            }}
+          />
+        ) : null}
+        {showWizard && (
           <CheckHealthCalibration
             session={checkHealthSession}
             robotName={robotName}
             dispatchRequests={dispatchRequests}
             showSpinner={showSpinner}
+            isJogging={isJogging}
           />
-        </Portal>
-      )}
+        )}
+      </Portal>
     </>
   )
 }

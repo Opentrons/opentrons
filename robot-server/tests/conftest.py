@@ -15,6 +15,7 @@ from datetime import datetime
 
 from opentrons.protocols.implementations.labware import LabwareImplementation
 from starlette.testclient import TestClient
+from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST
 from robot_server.service.app import app
 from robot_server.service.dependencies import get_hardware, verify_hardware
 from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock
@@ -59,14 +60,25 @@ def override_hardware(hardware):
 
 @pytest.fixture
 def api_client(override_hardware) -> TestClient:
-    return TestClient(app)
+    client = TestClient(app)
+    client.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
+    return client
 
 
 @pytest.fixture
 def api_client_no_errors(override_hardware) -> TestClient:
     """ An API client that won't raise server exceptions.
     Use only to test 500 pages; never use this for other tests. """
-    return TestClient(app, raise_server_exceptions=False)
+    client = TestClient(app, raise_server_exceptions=False)
+    client.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
+    return client
+
+
+@pytest.fixture(scope="session")
+def request_session():
+    session = requests.Session()
+    session.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
+    return session
 
 
 @pytest.fixture(scope="session")
@@ -82,7 +94,7 @@ def server_temp_directory():
 
 
 @pytest.fixture(scope="session")
-def run_server(server_temp_directory):
+def run_server(request_session, server_temp_directory):
     with subprocess.Popen([sys.executable, "-m", "robot_server.main"],
                           env={'OT_ROBOT_SERVER_DOT_ENV_PATH': "test.env",
                                'OT_API_CONFIG_DIR': server_temp_directory},
@@ -92,18 +104,17 @@ def run_server(server_temp_directory):
         # TODO (lc, 23-06-2020) We should investigate
         # using symlinks for the file copy to avoid
         # having such a long delay
-        import requests
         from requests.exceptions import ConnectionError
         while True:
             try:
-                requests.get("http://localhost:31950/health")
+                request_session.get("http://localhost:31950/health")
             except ConnectionError:
                 pass
             else:
                 break
             time.sleep(0.5)
-        requests.post("http://localhost:31950/robot/home",
-                      json={"target": "robot"})
+        request_session.post("http://localhost:31950/robot/home",
+                             json={"target": "robot"})
         yield proc
         proc.kill()
 
@@ -137,7 +148,7 @@ def set_up_index_file_temporary_directory(server_temp_directory):
         'nest_12_reservoir_15ml',
         'opentrons_96_tiprack_10ul']
     for idx, name in enumerate(labware_list):
-        parent = deck.position_for(idx+1)
+        parent = deck.position_for(idx + 1)
         definition = labware.get_labware_definition(name)
         lw = labware.Labware(
             implementation=LabwareImplementation(definition, parent)
@@ -170,8 +181,8 @@ def set_up_tip_length_temp_directory(server_temp_directory):
     def_hash = helpers.hash_labware_def(definition)
     for pip, tip_len in zip(attached_pip_list, tip_length_list):
         cal = {def_hash: {
-                'tipLength': tip_len,
-                'lastModified': datetime.now()}}
+            'tipLength': tip_len,
+            'lastModified': datetime.now()}}
         modify.save_tip_length_calibration(pip, cal)
 
 
@@ -192,7 +203,7 @@ def session_manager(hardware) -> SessionManager:
 
 
 @pytest.fixture
-def set_enable_http_protocol_sessions():
+def set_enable_http_protocol_sessions(request_session):
     """For integration tests that need to set then clear the
     enableHttpProtocolSessions feature flag"""
     url = "http://localhost:31950/settings"
@@ -200,18 +211,20 @@ def set_enable_http_protocol_sessions():
         "id": "enableHttpProtocolSessions",
         "value": True
     }
-    requests.post(url, json=data)
+    request_session.post(url, json=data)
     yield None
     data['value'] = None
-    requests.post(url, json=data)
+    request_session.post(url, json=data)
 
 
 @pytest.fixture
 def get_labware_fixture():
     def _get_labware_fixture(fixture_name):
-        with open((pathlib.Path(__file__).parent/'..'/'..'/'shared-data' /
-                   'labware' / 'fixtures'/'2'/f'{fixture_name}.json'), 'rb'
-                  ) as f:
+        with open(
+            (pathlib.Path(__file__).parent / '..' / '..' / 'shared-data' /
+             'labware' / 'fixtures' / '2' / f'{fixture_name}.json'),
+            'rb'
+        ) as f:
             return json.loads(f.read().decode('utf-8'))
 
     return _get_labware_fixture

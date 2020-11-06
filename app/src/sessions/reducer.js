@@ -29,10 +29,7 @@ export function sessionReducer(
           ...robotState,
           robotSessions: {
             ...robotState.robotSessions,
-            [sessionState.data.id]: {
-              ...sessionState.data.attributes,
-              id: sessionState.data.id,
-            },
+            [sessionState.data.id]: sessionState.data,
           },
         },
       }
@@ -42,7 +39,7 @@ export function sessionReducer(
       const { robotName, sessions } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
       const sessionsById = sessions.reduce(
-        (acc, s) => ({ ...acc, [s.id]: { ...s.attributes, id: s.id } }),
+        (acc, s) => ({ ...acc, [s.id]: { ...s, id: s.id } }),
         {}
       )
 

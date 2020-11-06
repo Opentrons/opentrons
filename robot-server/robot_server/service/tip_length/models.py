@@ -1,14 +1,14 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from opentrons.calibration_storage.types import SourceType
-from robot_server.service.json_api import ResponseModel
-from robot_server.service.json_api.response import MultiResponseModel
+from robot_server.service.json_api import (
+    ResponseModel, MultiResponseModel, ResponseDataModel)
 from robot_server.service.shared_models import calibration as cal_model
 
 
-class TipLengthCalibration(BaseModel):
+class TipLengthCalibration(ResponseDataModel):
     """
     A model describing tip length calibration
     """
@@ -27,9 +27,9 @@ class TipLengthCalibration(BaseModel):
 
 
 MultipleCalibrationsResponse = MultiResponseModel[
-    TipLengthCalibration, dict
+    TipLengthCalibration
 ]
 
 SingleCalibrationResponse = ResponseModel[
-    TipLengthCalibration, dict
+    TipLengthCalibration
 ]

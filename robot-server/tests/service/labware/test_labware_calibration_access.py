@@ -22,6 +22,7 @@ def grab_id(set_up_index_file_temporary_directory):
 def test_access_individual_labware(api_client, grab_id):
     calibration_id = grab_id
     expected = {
+        'id': calibration_id,
         'calibrationData': {
             'offset': {
                 'value': [0.0, 0.0, 0.0],
@@ -39,11 +40,9 @@ def test_access_individual_labware(api_client, grab_id):
     assert resp.status_code == 200
     body = resp.json()
     data = body['data']
-    assert data['type'] == 'LabwareCalibration'
-    assert data['id'] == calibration_id
-    data['attributes']['calibrationData']['offset']['lastModified'] = None
-    data['attributes']['calibrationData']['tipLength']['lastModified'] = None
-    assert data['attributes'] == expected
+    data['calibrationData']['offset']['lastModified'] = None
+    data['calibrationData']['tipLength']['lastModified'] = None
+    assert data == expected
 
     resp = api_client.get('/labware/calibrations/funnyId')
     assert resp.status_code == 404
