@@ -1,7 +1,20 @@
 // @flow
 
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { format } from 'date-fns'
+import {
+  Icon,
+  Text,
+  SecondaryBtn,
+  BORDER_SOLID_LIGHT,
+  SPACING_4,
+  useConditionalConfirm,
+  FONT_STYLE_ITALIC,
+  Tooltip,
+  useHoverTooltip,
+  AlertModal,
+} from '@opentrons/components'
 
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
@@ -17,20 +30,6 @@ import {
   REQUIRED,
   RECOMMENDED,
 } from '../InlineCalibrationWarning'
-import { useSelector } from 'react-redux'
-import { format } from 'date-fns'
-import {
-  Icon,
-  Text,
-  SecondaryBtn,
-  BORDER_SOLID_LIGHT,
-  SPACING_4,
-  useConditionalConfirm,
-  FONT_STYLE_ITALIC,
-  Tooltip,
-  useHoverTooltip,
-  AlertModal,
-} from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
 import type {
@@ -257,10 +256,10 @@ export function DeckCalibrationControl(props: Props): React.Node {
             ]}
           >
             <Text>{FAILED_START_BODY}</Text>
-            <Texts>
+            <Text>
               {createRequest?.error &&
                 RobotApi.getErrorResponseMessage(createRequest.error)}
-            </Texts>
+            </Text>
           </AlertModal>
         )}
       </Portal>
