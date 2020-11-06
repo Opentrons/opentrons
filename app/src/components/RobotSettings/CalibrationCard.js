@@ -199,7 +199,7 @@ export function CalibrationCard(props: Props): React.Node {
         pipOffsetDataPresent={pipOffsetDataPresent}
       />
       <PipetteOffsets pipettesPageUrl={pipettesPageUrl} robot={robot} />
-      {!warningInsteadOfCalcheck ? (
+      {!warningInsteadOfCalcheck && pipettePresent ? (
         <CheckCalibrationControl
           robotName={robotName}
           disabledReason={buttonDisabledReason}

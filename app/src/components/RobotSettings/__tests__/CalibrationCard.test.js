@@ -200,16 +200,14 @@ describe('CalibrationCard', () => {
     )
   })
 
-  it('DC and check cal buttons disabled if no pipette attached', () => {
+  it('DC buttons disabled and check cal not renderedif no pipette attached', () => {
     getAttachedPipettes.mockReturnValue({ left: null, right: null })
     const { wrapper } = render()
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(
       'Attach a pipette to proceed'
     )
-    expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
-      'Attach a pipette to proceed'
-    )
+    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
   })
 
   it('DC and check cal buttons disabled if not connectable', () => {
