@@ -33,8 +33,8 @@ import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type {
-  CalibrationHealthCheckInstrument,
-  CalibrationHealthCheckComparisonsPerCalibration,
+  CalibrationCheckInstrument,
+  CalibrationCheckComparisonsPerCalibration,
 } from '../../sessions/types'
 
 const GOOD_CALIBRATION = 'Good calibration'
@@ -69,11 +69,11 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
 
   const leftPipette = find(
     instruments,
-    (p: CalibrationHealthCheckInstrument) => p.mount.toLowerCase() === LEFT
+    (p: CalibrationCheckInstrument) => p.mount.toLowerCase() === LEFT
   )
   const rightPipette = find(
     instruments,
-    (p: CalibrationHealthCheckInstrument) => p.mount.toLowerCase() === RIGHT
+    (p: CalibrationCheckInstrument) => p.mount.toLowerCase() === RIGHT
   )
 
   const calibrationsByMount = {
@@ -198,8 +198,8 @@ function RenderResult(props: RenderResultProps): React.Node {
 }
 
 type PipetteResultProps = {|
-  pipetteInfo: CalibrationHealthCheckInstrument,
-  pipetteCalibration: CalibrationHealthCheckComparisonsPerCalibration,
+  pipetteInfo: CalibrationCheckInstrument,
+  pipetteCalibration: CalibrationCheckComparisonsPerCalibration,
 |}
 
 function PipetteResult(props: PipetteResultProps): React.Node {

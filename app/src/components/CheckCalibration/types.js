@@ -7,7 +7,7 @@ import type {
   RobotCalibrationCheckStep,
 } from '../../sessions/types'
 
-export type CalibrationHealthCheckParentProps = {|
+export type CalibrationCheckParentProps = {|
   robotName: string,
   session: CalibrationCheckSession | null,
   dispatchRequests: (
@@ -16,13 +16,4 @@ export type CalibrationHealthCheckParentProps = {|
   isJogging: boolean,
   showSpinner: boolean,
   hasBlock?: boolean,
-|}
-
-export type CalibrateHealthCheckChildProps = {|
-  sendSessionCommands: (...Array<SessionCommandParams>) => void,
-  deleteSession: () => void,
-  tipRackList: Array<CalibrationLabware>,
-  isMulti: boolean,
-  mount: string,
-  currentStep: RobotCalibrationCheckStep,
 |}

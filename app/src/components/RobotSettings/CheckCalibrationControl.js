@@ -15,9 +15,9 @@ import {
 } from '@opentrons/components'
 
 import { Portal } from '../portal'
-import { CheckHealthCalibration } from '../CheckCalibration'
+import { CheckCalibration } from '../CheckCalibration'
 import { TitledControl } from '../TitledControl'
-import { AskForCalibrationBlockModal } from '../../components/CalibrateTipLength/AskForCalibrationBlockModal'
+import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 
 import type { SessionCommandString } from '../../sessions/types'
 import type { RequestState } from '../../robot-api/types'
@@ -184,7 +184,7 @@ export function CheckCalibrationControl({
             }}
           />
         ) : null}
-        <CheckHealthCalibration
+        <CheckCalibration
           session={checkHealthSession}
           robotName={robotName}
           dispatchRequests={dispatchRequests}
