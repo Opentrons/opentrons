@@ -654,6 +654,7 @@ def save_definition(
     :param labware_def: A deserialized JSON labware definition
     :param bool force: If true, overwrite an existing definition if found.
         Cannot overwrite Opentrons definitions.
+    :param location: The path of the labware definition.
     """
     labware_module.save_definition(labware_def=labware_def,
                                    force=force,
