@@ -10,12 +10,13 @@ from opentrons.hardware_control.types import CriticalPoint
 
 @dataclass
 @final
-class Waypoint():
+class Waypoint:
     """Motion waypoint with position and optional pipette critical point."""
     position: Point
     critical_point: Optional[CriticalPoint] = None
 
 
+@final
 class MoveType(Enum):
     """
     Move type, where a move may be:
