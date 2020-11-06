@@ -172,6 +172,7 @@ class CheckCalibrationUserFlow:
         self._active_pipette = second_pip
         del self._deck[TIPRACK_SLOT]
         self._active_tiprack = self._load_active_tiprack()
+        self.reset_tip_origin()
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
@@ -751,19 +752,28 @@ class CheckCalibrationUserFlow:
 
     async def return_tip(self):
         await uf.return_tip(self, tip_length=self._get_tip_length())
+        await self.hardware.retract(self.mount)
 
     async def _move(self, to_loc: Location):
         await uf.move(self, to_loc)
 
     async def invalidate_last_action(self):
-        await self.hardware.home()
-        await self.hardware.gantry_position(self.mount, refresh=True)
-        if self._current_state != State.comparingNozzle:
+        if self._current_state not in (
+                State.comparingNozzle, State.preparingPipette):
+            await self.hardware.home()
+            await self.hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, 'Bad deck setup'
             await uf.move(self, trash['A1'].top(), CriticalPoint.XY_CENTER)
             await self.hardware.drop_tip(self.mount)
-        await self.move_to_tip_rack()
+            await self.move_to_tip_rack()
+        elif self._current_state == State.comparingNozzle:
+            await self.hardware.retract(self.mount)
+            await self.move_to_reference_point()
+        else:  # preparingPipette
+            await self.hardware.home()
+            await self.hardware.gantry_position(self.mount, refresh=True)
+            await self.move_to_tip_rack()
 
     async def exit_session(self):
         if self.hw_pipette.has_tip:
