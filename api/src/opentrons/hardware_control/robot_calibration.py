@@ -19,6 +19,17 @@ class RobotCalibration:
     deck_calibration: types.DeckCalibration
 
 
+def build_temporary_identity_calibration() -> RobotCalibration:
+    """
+    Get a temporary identity deck cal suitable for use during
+    calibration
+    """
+    return RobotCalibration(
+        deck_calibration=types.DeckCalibration(
+            attitude=linal.identity_deck_transform().tolist(),
+            source=types.SourceType.default,
+            status=types.CalibrationStatus()))
+
 def validate_attitude_deck_calibration(deck_cal: types.DeckCalibration):
     """
     This function determines whether the deck calibration is valid

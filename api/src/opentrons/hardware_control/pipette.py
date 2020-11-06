@@ -325,7 +325,8 @@ def _reload_and_check_skip(
     # are similar enough that we might skip, see if the configs
     # match closely enough.
     # Returns a pipette object and True if we may skip hw reconfig
-    if new_config == attached_instr.config:
+    if new_config == attached_instr.config\
+       and pipette_offset == attached_instr._pipette_offset:
         # Same config, good enough
         return attached_instr, True
     else:

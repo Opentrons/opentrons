@@ -15,11 +15,11 @@ from opentrons.hardware_control.pipette import Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
+from opentrons.util import linal
 
 from robot_server.robot.calibration.constants import \
     TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.service.errors import RobotServerError
-from opentrons.util import linal
 
 from robot_server.service.session.models.command import (
     CalibrationCommand, DeckCalibrationCommand)
@@ -100,6 +100,8 @@ class DeckCalibrationUserFlow:
             CalibrationCommand.exit: self.exit_session,
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
         }
+        self.hardware.set_robot_calibration(
+            robot_cal.build_temporary_identity_calibration())
 
     @property
     def deck(self) -> Deck:
