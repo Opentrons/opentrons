@@ -254,7 +254,8 @@ export class FilePipettesModal extends React.Component<Props, State> {
         <Modal
           contentsClassName={cx(
             styles.new_file_modal_contents,
-            modalStyles.scrollable_modal_wrapper
+            modalStyles.scrollable_modal_wrapper,
+            { [styles.edit_pipettes_modal]: !showProtocolFields }
           )}
           className={cx(modalStyles.modal, styles.new_file_modal)}
         >
