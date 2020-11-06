@@ -169,8 +169,8 @@ export function PipetteOffsetItem(props: Props): React.Node {
         marginBottom={SPACING_2}
       >
         {pipette &&
-          (calibration?.offset?.status.markedBad ||
-            calibration?.tipLength?.status.markedBad) && (
+          (calibration?.offset?.status?.markedBad ||
+            calibration?.tipLength?.status?.markedBad) && (
             <InlineCalibrationWarning
               marginTop={'0'}
               warningType={RECOMMENDED}
