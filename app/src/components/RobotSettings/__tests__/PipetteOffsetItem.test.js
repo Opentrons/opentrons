@@ -7,7 +7,7 @@ import type {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { PipetteOffsetItem, TipLengthSection } from '../PipetteOffsetItem'
+import { PipetteOffsetItem } from '../PipetteOffsetItem'
 import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
 import { findLabwareDefWithCustom } from '../../../findLabware'
 import type {
