@@ -8,7 +8,7 @@ from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint
 
 
-@dataclass
+@dataclass(frozen=True)
 @final
 class Waypoint:
     """Motion waypoint with position and optional pipette critical point."""
