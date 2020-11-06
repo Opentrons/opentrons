@@ -1,10 +1,8 @@
-from unittest.mock import MagicMock
-
 import pytest
 
 from opentrons.types import Location, Point
 from opentrons.protocols.geometry.planning import (
-    plan_moves, safe_height, first_parent, should_dodge_thermocycler)
+    plan_moves, safe_height, should_dodge_thermocycler)
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import module_geometry
@@ -172,7 +170,7 @@ def test_no_labware_loc(labware_offset_tempdir):
     deck[1] = lw1
     deck[2] = lw2
     # Various flavors of locations without labware should work
-    no_lw = lw1.wells()[0].top()._replace(labware=None)
+    no_lw = Location(point=lw1.wells()[0].top().point, labware=None)
 
     no_from = plan_moves(no_lw, lw2.wells()[0].bottom(), deck,
                          P300M_GEN2_MAX_HEIGHT, 5.0, 10.0)
@@ -184,7 +182,7 @@ def test_no_labware_loc(labware_offset_tempdir):
     check_arc_basic(no_to, lw1.wells()[0].bottom(), no_lw)
     assert no_from[0][0].z == deck.highest_z + 10.0
 
-    no_well = lw1.wells()[0].top()._replace(labware=lw1)
+    no_well = Location(point=lw1.wells()[0].top().point, labware=lw1)
 
     no_from_well = plan_moves(no_well, lw1.wells()[1].top(), deck,
                               P300M_GEN2_MAX_HEIGHT, 5.0, 10.0)
@@ -207,7 +205,7 @@ def test_arc_tall_point():
     tall_z = 100
     old_top = lw1.wells()[0].top()
     tall_point = old_top.point._replace(z=tall_z)
-    tall_top = old_top._replace(point=tall_point)
+    tall_top = Location(point=tall_point, labware=old_top.labware)
     to_tall = plan_moves(lw1.wells()[2].top(), tall_top, deck, 5.0, 10.0)
     check_arc_basic(to_tall, lw1.wells()[2].top(), tall_top)
     assert to_tall[0][0].z == tall_z
@@ -216,7 +214,7 @@ def test_arc_tall_point():
     check_arc_basic(from_tall, tall_top, lw1.wells()[3].top())
     assert from_tall[0][0].z == tall_z
 
-    no_well = tall_top._replace(labware=lw1)
+    no_well = Location(point=tall_top.point, labware=lw1)
     from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
                               5.0, 10.0)
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
@@ -229,7 +227,7 @@ def test_arc_lower_minimum_z_height():
     minimum_z_height = 42
     old_top = lw1.wells()[0].top()
     tall_point = old_top.point._replace(z=tall_z)
-    tall_top = old_top._replace(point=tall_point)
+    tall_top = Location(point=tall_point, labware=old_top.labware)
     to_tall = plan_moves(
         lw1.wells()[2].top(), tall_top, deck,
         P300M_GEN2_MAX_HEIGHT, 5.0, 10.0, False,
@@ -244,7 +242,7 @@ def test_arc_lower_minimum_z_height():
     check_arc_basic(from_tall, tall_top, lw1.wells()[3].top())
     assert from_tall[0][0].z == tall_z
 
-    no_well = tall_top._replace(labware=lw1)
+    no_well = Location(point=tall_top.point, labware=lw1)
     from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
                               P300M_GEN2_MAX_HEIGHT, 5.0, 10.0)
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
@@ -377,33 +375,6 @@ def test_instr_max_height():
             lw_z_margin=10.0)
 
 
-def test_first_parent():
-    deck = Deck()
-    trough = labware.load(trough_name, deck.position_for(1))
-    assert first_parent(trough) == '1'
-    assert first_parent(trough['A2']) == '1'
-    assert first_parent(None) is None
-    assert first_parent('6') == '6'
-    mod = module_geometry.load_module(
-        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
-        deck.position_for('6'),
-        MAX_SUPPORTED_VERSION)
-    mod_trough = mod.add_labware(labware.load(trough_name, mod.location))
-    assert first_parent(mod_trough['A5']) == '6'
-    assert first_parent(mod_trough) == '6'
-    assert first_parent(mod) == '6'
-
-    # Set up recursion cycle test.
-    mock_labware_geometry = MagicMock()
-    mock_labware_geometry.parent = Location(point=None, labware=mod_trough)
-    mod_trough._implementation.get_geometry = MagicMock(
-        return_value=mock_labware_geometry)
-
-    with pytest.raises(RuntimeError):
-        # make sure we catch cycles
-        first_parent(mod_trough)
-
-
 def test_should_dodge():
     deck = Deck()
     # with no tc loaded, doesn't matter what the positions are
@@ -424,7 +395,7 @@ def test_should_dodge():
     # with no parent
     assert not should_dodge_thermocycler(
         deck,
-        deck.position_for(1)._replace(labware=None),
+        Location(point=deck.position_for(1).point, labware=None),
         deck.position_for(12)
     )
 

@@ -8,6 +8,7 @@ from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.labware import LabwareImplementation
 from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.labware.definition import _get_parent_identifier
 
 from opentrons_shared_data import load_shared_data
 from opentrons.calibration_storage import (
@@ -293,7 +294,7 @@ def test_well_parent(corning_96_wellplate_360ul_flat):
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=parent.point,
-                parent_object=parent.labware._implementation
+                parent_object=parent.labware.as_labware()._implementation
             ),
             display_name=well_name,
             has_tip=has_tip,
@@ -301,12 +302,12 @@ def test_well_parent(corning_96_wellplate_360ul_flat):
         )
     )
     assert well.parent == lw
-    assert well.top().labware == well
-    assert well.top().labware.parent == lw
-    assert well.bottom().labware == well
-    assert well.bottom().labware.parent == lw
-    assert well.center().labware == well
-    assert well.center().labware.parent == lw
+    assert well.top().labware.object == well
+    assert well.top().labware.parent.object == lw
+    assert well.bottom().labware.object == well
+    assert well.bottom().labware.parent.object == lw
+    assert well.center().labware.object == well
+    assert well.center().labware.parent.object == lw
 
 
 def test_tip_tracking_init(corning_96_wellplate_360ul_flat,
@@ -610,7 +611,7 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
 
     lw_uri = helpers.uri_from_definition(definition)
 
-    str_parent = labware._get_parent_identifier(lw)
+    str_parent = _get_parent_identifier(lw._implementation)
     slot = '1'
     if str_parent:
         mod_dict = {str_parent: f'{slot}-{str_parent}'}
@@ -665,7 +666,7 @@ def test_get_parent_identifier():
                                                       'Test Slot'))
     )
     # slots have no parent identifier
-    assert labware._get_parent_identifier(lw) == ''
+    assert _get_parent_identifier(lw._implementation) == ''
     # modules do
     mmg = ModuleGeometry('my magdeck',
                          MagneticModuleModel.MAGNETIC_V1,
@@ -675,5 +676,5 @@ def test_get_parent_identifier():
     lw = labware.Labware(
         implementation=LabwareImplementation(labware_def, mmg.location)
     )
-    assert labware._get_parent_identifier(lw)\
+    assert _get_parent_identifier(lw._implementation)\
         == MagneticModuleModel.MAGNETIC_V1.value

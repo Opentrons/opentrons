@@ -15,12 +15,10 @@ from opentrons.motion_planning import (
     get_waypoints
 )
 
-from opentrons.protocol_api.labware import (
-    Labware, Well, quirks_from_any_parent)
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.module_geometry import (
     ThermocyclerGeometry, ModuleGeometry)
-from opentrons.protocols.api_support.util import first_parent
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -32,16 +30,6 @@ class LabwareHeightError(Exception):
 
 def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
-
-
-def split_loc_labware(
-        loc: types.Location) -> Tuple[Optional[Labware], Optional[Well]]:
-    if isinstance(loc.labware, Labware):
-        return loc.labware, None
-    elif isinstance(loc.labware, Well):
-        return loc.labware.parent, loc.labware
-    else:
-        return None, None
 
 
 BAD_PAIRS = [('1', '12'),
@@ -71,8 +59,8 @@ def should_dodge_thermocycler(
     Returns True if we need to dodge, False otherwise
     """
     if any([isinstance(item, ThermocyclerGeometry) for item in deck.values()]):
-        transit = (first_parent(from_loc.labware),
-                   first_parent(to_loc.labware))
+        transit = (from_loc.labware.first_parent(),
+                   to_loc.labware.first_parent())
         # mypy doesn't like this because transit could be none, but it's
         # checked by value in BAD_PAIRS which has only strings
         return transit in BAD_PAIRS
@@ -100,8 +88,8 @@ def get_move_type(
 ) -> MoveType:
     """Given two Locations, return the type of move."""
     move_type = MoveType.GENERAL_ARC
-    from_labware, from_well = split_loc_labware(from_loc)
-    to_labware, to_well = split_loc_labware(to_loc)
+    from_labware, from_well = from_loc.labware.get_parent_labware_and_well()
+    to_labware, to_well = to_loc.labware.get_parent_labware_and_well()
     same_labware = to_labware is not None and to_labware == from_labware
     same_well = to_well is not None and to_well == from_well
 
@@ -152,9 +140,9 @@ def _build_safe_height(from_loc: types.Location,
                        deck: Deck,
                        constraints: MoveConstraints) -> float:
     to_point = to_loc.point
-    to_lw, to_well = split_loc_labware(to_loc)
+    to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
     from_point = from_loc.point
-    from_lw, from_well = split_loc_labware(from_loc)
+    from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
 
     if to_lw and to_lw == from_lw:
         # If we know the labwares we’re moving from and to, we can calculate
@@ -248,13 +236,11 @@ def plan_moves(
     assert constraints.minimum_z_height >= 0.0
 
     to_point = to_loc.point
-    to_lw, to_well = split_loc_labware(to_loc)
+    to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
     from_point = from_loc.point
-    from_lw, from_well = split_loc_labware(from_loc)
-    dest_quirks = quirks_from_any_parent(to_lw)
-    from_quirks = quirks_from_any_parent(from_lw)
-    from_center = 'centerMultichannelOnWells' in from_quirks
-    to_center = 'centerMultichannelOnWells' in dest_quirks
+    from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
+    from_center = LabwareLike(from_lw).center_multichannel_on_wells()
+    to_center = LabwareLike(to_lw).center_multichannel_on_wells()
     dest_cp_override = CriticalPoint.XY_CENTER if to_center else None
     origin_cp_override = CriticalPoint.XY_CENTER if from_center else None
     extra_waypoints = []

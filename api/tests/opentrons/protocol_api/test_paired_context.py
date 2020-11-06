@@ -138,7 +138,7 @@ def test_aspirate(set_up_paired_instrument, monkeypatch):
     # reset plunger at the top of the well after blowout
     assert fake_move.call_args_list[0] ==\
         mock.call(
-            paired._pair_policy, dest_lw.top().point,
+            paired._pair_policy, dest_lw.as_well().top().point,
             critical_point=None, speed=400, max_speeds={})
     assert fake_move.call_args_list[1] ==\
         mock.call(

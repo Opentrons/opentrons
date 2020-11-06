@@ -4,7 +4,7 @@ import functools
 import logging
 from dataclasses import dataclass, field, astuple
 from typing import (Any, Callable, Dict, Optional,
-                    TYPE_CHECKING, Union, List, Set)
+                    TYPE_CHECKING, Union, List)
 
 from opentrons import types as top_types
 from opentrons.protocols.types import APIVersion
@@ -111,27 +111,6 @@ def labware_column_shift(
     shifted_column = unshifted_column + well_spacing
     shifted_well = unshifted_index % modulo_value
     return tiprack.columns()[shifted_column][shifted_well]
-
-
-def first_parent(loc: top_types.LocationLabware) -> Optional[str]:
-    """ Return the topmost parent of this location. It should be
-    either a string naming a slot or a None if the location isn't
-    associated with a slot """
-
-    # cycle-detecting recursive climbing
-    seen: Set[top_types.LocationLabware] = set()
-
-    # internal function to have the cycle detector different per call
-    def _fp_recurse(location: top_types.LocationLabware):
-        if location in seen:
-            raise RuntimeError('Cycle in labware parent')
-        seen.add(location)
-        if location is None or isinstance(location, str):
-            return location
-        else:
-            return first_parent(location.parent)
-
-    return _fp_recurse(loc)
 
 
 class FlowRates:
@@ -404,8 +383,7 @@ def requires_version(
             # about, but the docs leave it ambiguous, so fall back to str().
             name = getattr(decorated_obj, "__qualname__", str(decorated_obj))
 
-            if current_version >= APIVersion(2, 0)\
-               and current_version < added_in:
+            if APIVersion(2, 0) <= current_version < added_in:
                 raise APIVersionError(
                     f'{name} was added in {added_in}, but your '
                     f'protocol requested version {current_version}. You '

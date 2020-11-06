@@ -4,7 +4,7 @@ from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.interfaces.labware import \
-    AbstractLabwareImplementation
+    LabwareInterface
 from opentrons.protocols.implementations.tip_tracker import TipTracker
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.protocols.implementations.well_grid import WellGrid
@@ -13,7 +13,7 @@ from opentrons_shared_data.labware.dev_types import LabwareParameters, \
     LabwareDefinition
 
 
-class LabwareImplementation(AbstractLabwareImplementation):
+class LabwareImplementation(LabwareInterface):
 
     def __init__(self,
                  definition: LabwareDefinition,

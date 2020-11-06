@@ -11,7 +11,7 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareParameters, LabwareDefinition)
 
 
-class AbstractLabwareImplementation(DeckItem):
+class LabwareInterface(DeckItem):
     """Abstract base class of Labware Implementations"""
 
     @abstractmethod
