@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
 
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
@@ -28,9 +29,10 @@ import {
   FONT_STYLE_ITALIC,
   Tooltip,
   useHoverTooltip,
+  AlertModal,
 } from '@opentrons/components'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type {
   DeckCalibrationStatus,
   DeckCalibrationData,
@@ -50,6 +52,10 @@ const CALIBRATE_BUTTON_TEXT = 'Calibrate'
 const CALIBRATE_TITLE_TEXT = 'Calibrate deck'
 const STARTING = 'Deck calibration is starting'
 const ENDING = 'Deck calibration is ending'
+const OK_TEXT = 'Ok'
+const FAILED_START_HEADER = 'Failed to start deck calibration'
+const FAILED_START_BODY =
+  'An error occurred while trying to start deck calibration'
 
 const buildDeckLastCalibrated: (
   data: DeckCalibrationData,
@@ -94,11 +100,10 @@ export function DeckCalibrationControl(props: Props): React.Node {
     pipOffsetDataPresent,
   } = props
 
-  const [showWizard, setShowWizard] = React.useState(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const dispatch = useDispatch<Dispatch>()
 
   const trackedRequestId = React.useRef<string | null>(null)
-  const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
 
@@ -107,11 +112,6 @@ export function DeckCalibrationControl(props: Props): React.Node {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
         createRequestId.current = dispatchedAction.meta.requestId
         trackedRequestId.current = dispatchedAction.meta.requestId
-      } else if (
-        dispatchedAction.type === Sessions.DELETE_SESSION &&
-        deckCalibrationSession?.id === dispatchedAction.payload.sessionId
-      ) {
-        deleteRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
@@ -136,21 +136,12 @@ export function DeckCalibrationControl(props: Props): React.Node {
         : null
     )?.status === RobotApi.PENDING
 
-  const shouldClose =
-    useSelector<State, RequestState | null>(state =>
-      deleteRequestId.current
-        ? RobotApi.getRequestById(state, deleteRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
-
-  const createStatus = useSelector((state: State) =>
+  const createRequest = useSelector((state: State) =>
     createRequestId.current
       ? RobotApi.getRequestById(state, createRequestId.current)
       : null
-  )?.status
-
-  const shouldOpen = createStatus === RobotApi.SUCCESS
-  const isCreating = createStatus === RobotApi.PENDING
+  )
+  const createStatus = createRequest?.status
 
   const isJogging =
     useSelector((state: State) =>
@@ -160,15 +151,10 @@ export function DeckCalibrationControl(props: Props): React.Node {
     )?.status === RobotApi.PENDING
 
   React.useEffect(() => {
-    if (shouldOpen) {
-      setShowWizard(true)
+    if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }
-    if (shouldClose) {
-      setShowWizard(false)
-      deleteRequestId.current = null
-    }
-  }, [shouldOpen, shouldClose])
+  }, [createStatus])
 
   const handleStartDeckCalSession = () => {
     dispatchRequests(
@@ -186,9 +172,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
     showConfirmation: showConfirmStart,
     confirm: confirmStart,
     cancel: cancelStart,
-  } = useConditionalConfirm(() => {
-    handleStartDeckCalSession()
-  }, !!pipOffsetDataPresent)
+  } = useConditionalConfirm(handleStartDeckCalSession, !!pipOffsetDataPresent)
 
   let warningType = null
   if (deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_OK) {
@@ -201,17 +185,11 @@ export function DeckCalibrationControl(props: Props): React.Node {
     warningType = RECOMMENDED
   }
 
-  const disabledIncludingSpinner = showSpinner
-    ? isCreating
+  const disabledOrBusyReason = showSpinner
+    ? createStatus === RobotApi.PENDING
       ? STARTING
       : ENDING
     : disabledReason
-
-  const buttonChildren = showSpinner ? (
-    <Icon name="ot-spinner" height="1em" spin />
-  ) : (
-    CALIBRATE_BUTTON_TEXT
-  )
 
   return (
     <>
@@ -229,14 +207,18 @@ export function DeckCalibrationControl(props: Props): React.Node {
             {...targetProps}
             width="9rem"
             onClick={confirmStart}
-            disabled={disabledIncludingSpinner}
+            disabled={disabledOrBusyReason}
           >
-            {buttonChildren}
+            {showSpinner ? (
+              <Icon name="ot-spinner" height="1em" spin />
+            ) : (
+              CALIBRATE_BUTTON_TEXT
+            )}
           </SecondaryBtn>
         }
       >
-        {disabledIncludingSpinner !== null && (
-          <Tooltip {...tooltipProps}>{disabledIncludingSpinner}</Tooltip>
+        {disabledOrBusyReason !== null && (
+          <Tooltip {...tooltipProps}>{disabledOrBusyReason}</Tooltip>
         )}
 
         {deckCalData && deckCalStatus && (
@@ -245,26 +227,43 @@ export function DeckCalibrationControl(props: Props): React.Node {
           </Text>
         )}
       </TitledControl>
-      {showConfirmStart && pipOffsetDataPresent && (
-        <Portal level="top">
+      <Portal level="top">
+        <CalibrateDeck
+          session={deckCalibrationSession}
+          robotName={robotName}
+          dispatchRequests={dispatchRequests}
+          showSpinner={showSpinner}
+          isJogging={isJogging}
+        />
+        {showConfirmStart && pipOffsetDataPresent && (
           <ConfirmStartDeckCalModal
             confirm={confirmStart}
             cancel={cancelStart}
           />
-        </Portal>
-      )}
-      {showWizard && (
-        <Portal level="top">
-          <CalibrateDeck
-            session={deckCalibrationSession}
-            robotName={robotName}
-            closeWizard={() => setShowWizard(false)}
-            dispatchRequests={dispatchRequests}
-            showSpinner={showSpinner}
-            isJogging={isJogging}
-          />
-        </Portal>
-      )}
+        )}
+        {createStatus === RobotApi.FAILURE && (
+          <AlertModal
+            alertOverlay
+            heading={FAILED_START_HEADER}
+            buttons={[
+              {
+                children: OK_TEXT,
+                onClick: () => {
+                  createRequestId.current &&
+                    dispatch(RobotApi.dismissRequest(createRequestId.current))
+                  createRequestId.current = null
+                },
+              },
+            ]}
+          >
+            <Text>{FAILED_START_BODY}</Text>
+            <Texts>
+              {createRequest?.error &&
+                RobotApi.getErrorResponseMessage(createRequest.error)}
+            </Texts>
+          </AlertModal>
+        )}
+      </Portal>
     </>
   )
 }
