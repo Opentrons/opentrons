@@ -32,7 +32,7 @@ export type CheckCalibrationControlProps = {|
 const CAL_HEALTH_CHECK = 'Calibration Health Check'
 const CHECK_HEALTH = 'check health'
 const CAL_HEALTH_CHECK_DESCRIPTION =
-  'Check the calibration settings for your robot.'
+  'Check the health of the current calibration settings.'
 const EXIT = 'exit'
 
 // pipette calibration commands for which the full page spinner should not appear

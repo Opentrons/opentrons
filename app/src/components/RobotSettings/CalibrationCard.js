@@ -12,6 +12,10 @@ import * as Pipettes from '../../pipettes'
 import * as TipLength from '../../calibration/tip-length'
 import { CONNECTABLE } from '../../discovery'
 import type { ViewableRobot } from '../../discovery/types'
+import type {
+  AttachedPipettesByMount,
+  PipetteCalibrationsByMount,
+} from '../../pipettes/types'
 import { selectors as robotSelectors } from '../../robot'
 import { useTrackEvent } from '../../analytics'
 
@@ -29,6 +33,7 @@ import {
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_HEADER,
   C_DARK_GRAY,
+  C_BLUE,
 } from '@opentrons/components'
 
 import {
@@ -36,6 +41,7 @@ import {
   DISABLED_CANNOT_CONNECT,
   DISABLED_CONNECT_TO_ROBOT,
   DISABLED_PROTOCOL_IS_RUNNING,
+  DISABLED_NO_PIPETTE_ATTACHED,
 } from './constants'
 import { DeckCalibrationControl } from './DeckCalibrationControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
@@ -51,6 +57,20 @@ const EVENT_CALIBRATION_DOWNLOADED = 'calibrationDataDownloaded'
 const TITLE = 'Robot Calibration'
 
 const DOWNLOAD_CALIBRATION = 'Download your calibration data'
+
+const attachedPipetteCalPresent: (
+  pipettes: AttachedPipettesByMount,
+  pipetteCalibrations: PipetteCalibrationsByMount
+) => boolean = (pipettes, pipetteCalibrations) => {
+  for (const m of Pipettes.PIPETTE_MOUNTS) {
+    if (pipettes[m]) {
+      if (!pipetteCalibrations[m].offset || !pipetteCalibrations[m].tipLength) {
+        return false
+      }
+    }
+  }
+  return true
+}
 
 export function CalibrationCard(props: Props): React.Node {
   const { robot, pipettesPageUrl } = props
@@ -91,6 +111,19 @@ export function CalibrationCard(props: Props): React.Node {
     return Calibration.getTipLengthCalibrations(state, robotName)
   })
 
+  const attachedPipettes = useSelector((state: State) => {
+    return Pipettes.getAttachedPipettes(state, robotName)
+  })
+  const pipettePresent = !!attachedPipettes.left || !!attachedPipettes.right
+
+  const attachedPipetteCalibrations = useSelector((state: State) => {
+    return Pipettes.getAttachedPipetteCalibrations(state, robotName)
+  })
+  const pipetteCalPresent = attachedPipetteCalPresent(
+    attachedPipettes,
+    attachedPipetteCalibrations
+  )
+
   const doTrackEvent = useTrackEvent()
 
   let buttonDisabledReason = null
@@ -100,6 +133,8 @@ export function CalibrationCard(props: Props): React.Node {
     buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
   } else if (isRunning) {
     buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
+  } else if (!pipettePresent) {
+    buttonDisabledReason = DISABLED_NO_PIPETTE_ATTACHED
   }
 
   const onClickSaveAs = e => {
@@ -117,15 +152,17 @@ export function CalibrationCard(props: Props): React.Node {
     )
   }
 
-  const warningInsteadOfCalcheck = [
-    Calibration.DECK_CAL_STATUS_SINGULARITY,
-    Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
-    Calibration.DECK_CAL_STATUS_IDENTITY,
-  ].includes(deckCalStatus)
+  const warningInsteadOfCalcheck =
+    [
+      Calibration.DECK_CAL_STATUS_SINGULARITY,
+      Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
+      Calibration.DECK_CAL_STATUS_IDENTITY,
+    ].includes(deckCalStatus) || !pipetteCalPresent
 
   const pipOffsetDataPresent = pipetteOffsetCalibrations
     ? pipetteOffsetCalibrations.length > 0
     : false
+
   return (
     <Card>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_BASELINE}>
@@ -140,24 +177,20 @@ export function CalibrationCard(props: Props): React.Node {
         >
           {TITLE}
         </Text>
-        <Link
-          href="#"
-          paddingTop={SPACING_3}
-          paddingX={SPACING_3}
-          fontSize={FONT_SIZE_BODY_1}
-          onClick={onClickSaveAs}
-        >
-          {DOWNLOAD_CALIBRATION}
-        </Link>
+        {!warningInsteadOfCalcheck ? (
+          <Link
+            href="#"
+            color={C_BLUE}
+            paddingTop={SPACING_3}
+            paddingX={SPACING_3}
+            fontSize={FONT_SIZE_BODY_1}
+            onClick={onClickSaveAs}
+          >
+            {DOWNLOAD_CALIBRATION}
+          </Link>
+        ) : null}
       </Flex>
-      {warningInsteadOfCalcheck ? (
-        <CalibrationCardWarning />
-      ) : (
-        <CheckCalibrationControl
-          robotName={robotName}
-          disabledReason={buttonDisabledReason}
-        />
-      )}
+      {warningInsteadOfCalcheck ? <CalibrationCardWarning /> : null}
       <DeckCalibrationControl
         robotName={robotName}
         disabledReason={buttonDisabledReason}
@@ -166,6 +199,12 @@ export function CalibrationCard(props: Props): React.Node {
         pipOffsetDataPresent={pipOffsetDataPresent}
       />
       <PipetteOffsets pipettesPageUrl={pipettesPageUrl} robot={robot} />
+      {!warningInsteadOfCalcheck && pipettePresent ? (
+        <CheckCalibrationControl
+          robotName={robotName}
+          disabledReason={buttonDisabledReason}
+        />
+      ) : null}
     </Card>
   )
 }

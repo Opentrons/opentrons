@@ -15,12 +15,19 @@ import { CalibrationCard } from '../CalibrationCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { CalibrationCardWarning } from '../CalibrationCardWarning'
 import { PipetteOffsets } from '../PipetteOffsets'
+import { mockAttachedPipette } from '../../../pipettes/__fixtures__'
+import { mockPipetteOffsetCalibration1 } from '../../../calibration/pipette-offset/__fixtures__'
+import { mockTipLengthCalibration1 } from '../../../calibration/tip-length/__fixtures__'
 
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 
 import type { State, Action } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { AnalyticsEvent } from '../../../analytics/types'
+import type {
+  AttachedPipettesByMount,
+  PipetteCalibrationsByMount,
+} from '../../../pipettes/types'
 
 const mockCallTrackEvent: JestMockFn<[AnalyticsEvent], void> = jest.fn()
 
@@ -29,6 +36,7 @@ jest.mock('file-saver')
 
 jest.mock('../../../robot/selectors')
 jest.mock('../../../config/selectors')
+jest.mock('../../../pipettes/selectors')
 jest.mock('../../../calibration/selectors')
 jest.mock('../../../calibration/tip-length/selectors')
 jest.mock('../../../calibration/pipette-offset/selectors')
@@ -63,6 +71,32 @@ const mockRobot: ViewableRobot = ({
   connected: true,
   status: CONNECTABLE,
 }: any)
+
+const mockAttachedPipettes: AttachedPipettesByMount = ({
+  left: mockAttachedPipette,
+  right: null,
+}: any)
+
+const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = ({
+  left: {
+    offset: mockPipetteOffsetCalibration1,
+    tipLength: mockTipLengthCalibration1,
+  },
+  right: {
+    offset: null,
+    tipLength: null,
+  },
+}: any)
+
+const getAttachedPipettes: JestMockFn<
+  [State, string],
+  $Call<typeof Pipettes.getAttachedPipettes, State, string>
+> = Pipettes.getAttachedPipettes
+
+const getAttachedPipetteCalibrations: JestMockFn<
+  [State, string],
+  $Call<typeof Pipettes.getAttachedPipetteCalibrations, State, string>
+> = Pipettes.getAttachedPipetteCalibrations
 
 const getFeatureFlags: JestMockFn<
   [State],
@@ -111,6 +145,10 @@ describe('CalibrationCard', () => {
       allPipetteConfig: false,
       enableBundleUpload: false,
     })
+    getAttachedPipettes.mockReturnValue(mockAttachedPipettes)
+    getAttachedPipetteCalibrations.mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
   })
 
   afterEach(() => {
@@ -151,7 +189,7 @@ describe('CalibrationCard', () => {
     )
   })
 
-  it('DC and check cal buttons enabled if connected and not running', () => {
+  it('DC and check cal buttons enabled if connected and not running and with pipette attached', () => {
     mockGetIsRunning.mockReturnValue(false)
 
     const { wrapper } = render()
@@ -160,6 +198,16 @@ describe('CalibrationCard', () => {
     expect(getCheckCalibrationControl(wrapper).prop('disabledReason')).toBe(
       null
     )
+  })
+
+  it('DC buttons disabled and check cal not renderedif no pipette attached', () => {
+    getAttachedPipettes.mockReturnValue({ left: null, right: null })
+    const { wrapper } = render()
+
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(
+      'Attach a pipette to proceed'
+    )
+    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
   })
 
   it('DC and check cal buttons disabled if not connectable', () => {
@@ -220,6 +268,17 @@ describe('CalibrationCard', () => {
       expect(wrapper.exists(CalibrationCardWarning)).toBe(true)
       expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
     })
+  })
+
+  it('CalibrationCardWarning component renders instead of check calibration if pipette calibration is missing', () => {
+    getAttachedPipetteCalibrations.mockReturnValue({
+      left: { offset: null, tipLength: null },
+      right: { offset: null, tipLength: null },
+    })
+    const { wrapper } = render()
+
+    expect(wrapper.exists(CalibrationCardWarning)).toBe(true)
+    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
   })
 
   it('renders PipetteOffsets', () => {
