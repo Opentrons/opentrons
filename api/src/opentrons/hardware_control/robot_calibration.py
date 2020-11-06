@@ -30,6 +30,7 @@ def build_temporary_identity_calibration() -> RobotCalibration:
             source=types.SourceType.default,
             status=types.CalibrationStatus()))
 
+
 def validate_attitude_deck_calibration(deck_cal: types.DeckCalibration):
     """
     This function determines whether the deck calibration is valid
