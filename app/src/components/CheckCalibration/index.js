@@ -40,6 +40,8 @@ import type {
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type { CalibrationHealthCheckParentProps } from './types'
 
+import styles from './styles.css'
+
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration health check'
 const EXIT = 'exit'
 
@@ -160,7 +162,14 @@ export function CheckHealthCalibration(
 
   const titleBarProps = {
     title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
-    back: { onClick: confirmExit, title: EXIT, children: EXIT },
+    back: {
+      onClick: confirmExit,
+      title: EXIT,
+      children: EXIT,
+      ...(currentStep === Sessions.CHECK_STEP_RESULTS_SUMMARY
+        ? { className: styles.suppress_exit_button }
+        : {}),
+    },
   }
 
   if (showSpinner) {
