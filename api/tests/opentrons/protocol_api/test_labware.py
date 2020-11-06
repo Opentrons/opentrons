@@ -8,6 +8,7 @@ from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.labware import LabwareImplementation
 from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.labware.definition import _get_parent_identifier
 
 from opentrons_shared_data import load_shared_data
 from opentrons.calibration_storage import (
@@ -610,7 +611,7 @@ def test_add_index_file(labware_name, labware_offset_tempdir):
 
     lw_uri = helpers.uri_from_definition(definition)
 
-    str_parent = labware._get_parent_identifier(lw)
+    str_parent = _get_parent_identifier(lw._implementation)
     slot = '1'
     if str_parent:
         mod_dict = {str_parent: f'{slot}-{str_parent}'}
@@ -665,7 +666,7 @@ def test_get_parent_identifier():
                                                       'Test Slot'))
     )
     # slots have no parent identifier
-    assert labware._get_parent_identifier(lw) == ''
+    assert _get_parent_identifier(lw._implementation) == ''
     # modules do
     mmg = ModuleGeometry('my magdeck',
                          MagneticModuleModel.MAGNETIC_V1,
@@ -675,5 +676,5 @@ def test_get_parent_identifier():
     lw = labware.Labware(
         implementation=LabwareImplementation(labware_def, mmg.location)
     )
-    assert labware._get_parent_identifier(lw)\
+    assert _get_parent_identifier(lw._implementation)\
         == MagneticModuleModel.MAGNETIC_V1.value
