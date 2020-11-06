@@ -308,7 +308,7 @@ class DeckCalibrationUserFlow:
                 pip_id,
                 self._tip_rack._implementation.get_definition(),
                 ''
-            )['tipLength']
+            ).tip_length
         except TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(
                 self._tip_rack.uri,

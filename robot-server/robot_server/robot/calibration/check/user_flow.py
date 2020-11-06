@@ -4,7 +4,7 @@ from typing import (
     Callable, Dict, Any, TYPE_CHECKING)
 from typing_extensions import Literal
 
-from opentrons.calibration_storage import get, helpers, modify
+from opentrons.calibration_storage import get, helpers, modify, types as local_types
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound, PipetteOffsetByPipetteMount, SourceType)
 from opentrons.types import Mount, Point, Location
@@ -290,7 +290,7 @@ class CheckCalibrationUserFlow:
 
     def _get_tip_length_from_pipette(
             self, mount: Mount, pipette: Pipette
-            ) -> Optional[Tuple[float, str, labware.Labware]]:
+            ) -> Optional[local_types.TipLengthCalibration]:
         if not pipette.pipette_id:
             return None
         pip_offset = get.get_pipette_offset(
@@ -303,11 +303,10 @@ class CheckCalibrationUserFlow:
                                namespace=details.namespace,
                                version=details.version,
                                parent=position)
-        tip_length = get.load_tip_length_calibration(
+        return get.load_tip_length_calibration(
             pipette.pipette_id,
             tiprack._implementation.get_definition(),
-            '')['tipLength']
-        return (tip_length, pipette.pipette_id, tiprack)
+            '')
 
     def _check_valid_calibrations(self):
         deck = self._deck_calibration
@@ -546,6 +545,10 @@ class CheckCalibrationUserFlow:
             info: ComparisonStatus,
             status: RobotHealthCheck) -> ComparisonStatePerCalibration:
         intermediate_map = getattr(self._comparison_map, rank.name)
+        is_second_pipette =\
+            self.active_pipette.rank == PipetteRank.second
+        only_one_pipette = not self._is_checking_both_mounts()
+        deck_comparison_state = is_second_pipette or only_one_pipette
         if self.current_state == State.comparingTip:
             tip = TipComparisonMap(
                 status=status.value, comparingTip=info)
@@ -562,10 +565,11 @@ class CheckCalibrationUserFlow:
                     status, old_status)
             intermediate_map.pipetteOffset.comparingPointOne = info
             intermediate_map.pipetteOffset.status = updated_status
-            deck = DeckComparisonMap(
-                status=status.value, comparingPointOne=info)
-            intermediate_map.set_value('deck', deck)
-        elif self.current_state == State.comparingPointTwo:
+            if deck_comparison_state:
+                deck = DeckComparisonMap(
+                    status=status.value, comparingPointOne=info)
+                intermediate_map.set_value('deck', deck)
+        elif self.current_state == State.comparingPointTwo and deck_comparison_state:
             old_status = RobotHealthCheck.status_from_string(
                 intermediate_map.deck.status)
             updated_status =\
@@ -573,7 +577,7 @@ class CheckCalibrationUserFlow:
                     status, old_status)
             intermediate_map.deck.status = updated_status
             intermediate_map.deck.comparingPointTwo = info
-        elif self.current_state == State.comparingPointThree:
+        elif self.current_state == State.comparingPointThree and deck_comparison_state:
             old_status = RobotHealthCheck.status_from_string(
                 intermediate_map.deck.status)
             updated_status =\
@@ -598,18 +602,39 @@ class CheckCalibrationUserFlow:
             not self._is_checking_both_mounts()
         pipette_state = is_second_pipette or only_one_pipette
         if self.current_state == State.comparingTip:
-            modify.mark_bad(
+            calibration = modify.mark_bad(
                 self._tip_lengths[active_mount],
                 SourceType.calibration_check)
+            tip_length_dict = {
+                'tipLength': calibration.tip_length,
+                'lastModified': calibration.last_modified,
+                'source': calibration.source,
+                'status': calibration.status
+            }
+            modify.save_tip_length_calibration(
+                calibration.pipette, tip_length_dict)
         elif self.current_state in pipette_offset_states:
-            modify.mark_bad(
+            calibration = modify.mark_bad(
                 self._pipette_calibrations[active_mount],
                 SourceType.calibration_check)
+            modify.save_pipette_calibration(
+                offset=Point(*calibration.offset),
+                pip_id=calibration.pipette,
+                mount=Mount.string_to_mount(calibration.mount),
+                tiprack_hash=calibration.tiprack,
+                tiprack_uri=calibration.uri,
+                cal_status=calibration.status)
         elif self.current_state in deck_calibration_states\
                 and pipette_state:
-            modify.mark_bad(
+            calibration = modify.mark_bad(
                 self._deck_calibration,
                 SourceType.calibration_check)
+            modify.save_robot_deck_attitude(
+                transform=calibration.attitude,
+                pip_id=calibration.pipette_calibrated_with,
+                lw_hash=calibration.tiprack,
+                source=calibration.source,
+                cal_status=calibration.status)
 
     async def update_comparison_map(self):
         ref_pt, jogged_pt = self._get_reference_points_by_state()
@@ -730,7 +755,7 @@ class CheckCalibrationUserFlow:
             return get.load_tip_length_calibration(
                 pip_id,
                 self.active_tiprack._implementation.get_definition(),
-                '')['tipLength']
+                '').tip_length
         except TipLengthCalNotFound:
             tip_overlap = self.hw_pipette.config.tip_overlap.get(
                 self.active_tiprack.uri,
@@ -746,6 +771,7 @@ class CheckCalibrationUserFlow:
                 handler="move_to_tip_rack",
                 condition="active tiprack")
         await self.register_initial_point()
+        await self.register_final_point()
         await self._move(Location(self.tip_origin, None))
 
     async def move_to_deck(self):

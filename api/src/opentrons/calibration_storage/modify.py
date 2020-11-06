@@ -7,6 +7,7 @@ labware calibration to its designated file location.
 import typing
 from pathlib import Path
 
+from dataclasses import asdict
 from opentrons import config
 from opentrons.types import Mount, Point
 
@@ -23,7 +24,6 @@ if typing.TYPE_CHECKING:
         TipLengthCalibration, PipTipLengthCalibration,
         DeckCalibrationData, PipetteCalibrationData, CalibrationStatusDict)
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from opentrons.protocol_api.labware import Labware
 
 
 def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
@@ -108,7 +108,7 @@ def create_tip_length_data(
         definition: 'LabwareDefinition',
         parent: str,
         length: float,
-        cal_status: typing.Optional[local_types.CalibrationStatus] = None
+        cal_status: local_types.CalibrationStatus = None
         ) -> 'PipTipLengthCalibration':
     """
     Function to correctly format tip length data.
@@ -204,7 +204,7 @@ def save_robot_deck_attitude(
         pip_id: typing.Optional[str],
         lw_hash: typing.Optional[str],
         source: local_types.SourceType = None,
-        cal_status: typing.Optional[local_types.CalibrationStatus] = None):
+        cal_status: local_types.CalibrationStatus = None):
     robot_dir = config.get_opentrons_path('robot_calibration_dir')
     robot_dir.mkdir(parents=True, exist_ok=True)
     gantry_path = robot_dir/'deck_calibration.json'
@@ -247,7 +247,7 @@ def save_pipette_calibration(
         offset: Point,
         pip_id: str, mount: Mount,
         tiprack_hash: str, tiprack_uri: str,
-        cal_status: typing.Optional[local_types.CalibrationStatus] = None):
+        cal_status: local_types.CalibrationStatus = None):
     pip_dir = config.get_opentrons_path(
         'pipette_calibration_dir') / mount.name.lower()
     pip_dir.mkdir(parents=True, exist_ok=True)
@@ -270,34 +270,61 @@ def save_pipette_calibration(
     _add_to_pipette_offset_index_file(pip_id, mount)
 
 
+@typing.overload
 def mark_bad(
-        calibration: typing.Union[
-            local_types.DeckCalibration,
-            local_types.PipetteOffsetCalibration,
-            typing.Tuple[float, str, 'Labware']],
-        source_marked_bad: local_types.SourceType):
-    status = local_types.CalibrationStatus(
-        markedBad=True, source=source_marked_bad, markedAt=utc_now())
-    if isinstance(calibration, local_types.DeckCalibration):
-        save_robot_deck_attitude(
-            transform=calibration.attitude,
-            pip_id=calibration.pipette_calibrated_with,
-            lw_hash=calibration.tiprack,
-            source=calibration.source,
-            cal_status=status)
-    elif isinstance(calibration, local_types.PipetteOffsetCalibration):
-        save_pipette_calibration(
-            offset=Point(*calibration.offset),
-            pip_id=calibration.pipette,
-            mount=Mount.string_to_mount(calibration.mount),
-            tiprack_hash=calibration.tiprack,
-            tiprack_uri=calibration.uri,
-            cal_status=status)
-    else:
-        tip_length, pipette_id, tiprack = calibration
-        tip_length_dict = create_tip_length_data(
-            definition=tiprack._implementation.get_definition(),
-            parent=tiprack.parent,
-            length=tip_length,
-            cal_status=status)
-        save_tip_length_calibration(pipette_id, tip_length_dict)
+    calibration: local_types.DeckCalibration,
+    source_marked_bad: local_types.SourceType
+    ) -> local_types.DeckCalibration: ...
+
+
+@typing.overload
+def mark_bad(
+    calibration: local_types.PipetteOffsetCalibration,
+    source_marked_bad: local_types.SourceType
+    ) -> local_types.PipetteOffsetCalibration: ...
+
+
+@typing.overload
+def mark_bad(
+    calibration: local_types.TipLengthCalibration,
+    source_marked_bad: local_types.SourceType
+    ) -> local_types.TipLengthCalibration: ...
+
+
+def mark_bad(calibration, source_marked_bad: local_types.SourceType):
+    caldict = asdict(calibration)
+    caldict['status'] = helpers.convert_to_dict(local_types.CalibrationStatus(
+        markedBad=True, source=source_marked_bad, markedAt=utc_now()))
+    return type(calibration)(**caldict)
+
+# def mark_bad(
+#         calibration: typing.Union[
+#             local_types.DeckCalibration,
+#             local_types.PipetteOffsetCalibration,
+#             typing.Tuple[float, str, 'Labware']],
+#         source_marked_bad: local_types.SourceType):
+#     status = local_types.CalibrationStatus(
+#         markedBad=True, source=source_marked_bad, markedAt=utc_now())
+#     if isinstance(calibration, local_types.DeckCalibration):
+#         save_robot_deck_attitude(
+#             transform=calibration.attitude,
+#             pip_id=calibration.pipette_calibrated_with,
+#             lw_hash=calibration.tiprack,
+#             source=calibration.source,
+#             cal_status=status)
+#     elif isinstance(calibration, local_types.PipetteOffsetCalibration):
+#         save_pipette_calibration(
+#             offset=Point(*calibration.offset),
+#             pip_id=calibration.pipette,
+#             mount=Mount.string_to_mount(calibration.mount),
+#             tiprack_hash=calibration.tiprack,
+#             tiprack_uri=calibration.uri,
+#             cal_status=status)
+#     else:
+#         tip_length, pipette_id, tiprack = calibration
+#         tip_length_dict = create_tip_length_data(
+#             definition=tiprack._implementation.get_definition(),
+#             parent=tiprack.parent,
+#             length=tip_length,
+#             cal_status=status)
+#         save_tip_length_calibration(pipette_id, tip_length_dict)
