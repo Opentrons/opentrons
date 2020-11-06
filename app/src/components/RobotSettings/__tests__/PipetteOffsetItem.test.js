@@ -9,8 +9,11 @@ import type {
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { PipetteOffsetItem } from '../PipetteOffsetItem'
 import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
-
 import { findLabwareDefWithCustom } from '../../../findLabware'
+import type {
+  PipetteOffsetCalibration,
+  TipLengthCalibration,
+} from '../../../calibration/types'
 
 jest.mock('../../../findLabware')
 
@@ -101,6 +104,32 @@ describe('PipetteOffsetItem', () => {
         />
       )
     }
+  })
+
+  it('renders acceptably when talking to a robot with cal data but no status', () => {
+    const wrapper = render({
+      calibration: {
+        offset: ({
+          pipette: 'pipette-id-11',
+          mount: 'left',
+          offset: [1, 2, 3],
+          tiprack: 'asdagasdfasdsa',
+          tiprackUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+          lastModified: '2020-09-10T05:13Z',
+          source: 'user',
+          id: 'a_pip_id',
+        }: $Shape<PipetteOffsetCalibration>),
+        tipLength: ({
+          id: '1',
+          tipLength: 30,
+          tiprack: 'asdagasdfasdsa',
+          pipette: 'pipette-id-11',
+          lastModified: '2020-09-10T05:10Z',
+          source: 'user',
+        }: $Shape<TipLengthCalibration>),
+      },
+    })
+    expect(wrapper.find('PipetteOffsetItem')).not.toBeNull()
   })
 
   it('shows null when no pipette present', () => {
