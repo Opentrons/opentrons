@@ -735,11 +735,14 @@ class InstrumentContext(CommandPublisher):
         return self
 
     def _determine_drop_target(
-            self, location: Well, version_breakpoint: APIVersion = None):
+            self, location: Well,
+            version_breakpoint: APIVersion = None) -> types.Location:
         version_breakpoint = version_breakpoint or APIVersion(2, 2)
         if self.api_version < version_breakpoint:
             bot = location.bottom()
-            return bot.move(point=bot.point._replace(z=bot.point.z + 10))
+            return types.Location(
+                point=bot.point._replace(z=bot.point.z + 10),
+                labware=location)
         else:
             tr = location.parent
             assert tr.is_tiprack
