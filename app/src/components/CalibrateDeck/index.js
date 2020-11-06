@@ -93,14 +93,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
 export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
-  const {
-    session,
-    robotName,
-    closeWizard,
-    dispatchRequests,
-    showSpinner,
-    isJogging,
-  } = props
+  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
   const {
@@ -138,7 +131,6 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
         Sessions.deleteSession(robotName, session.id)
       )
     }
-    closeWizard()
   }
 
   const tipRack: CalibrationLabware | null =

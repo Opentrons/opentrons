@@ -100,7 +100,6 @@ describe('CalibrateDeck', () => {
         <CalibrateDeck
           robotName="robot-name"
           session={session}
-          closeWizard={() => {}}
           dispatchRequests={dispatchRequests}
           showSpinner={showSpinner}
           isJogging={isJogging}

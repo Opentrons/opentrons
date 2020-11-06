@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
 import * as Sessions from '../../../sessions'
+import * as RobotApi from '../../../robot-api'
 
 import {
   DECK_CAL_STATUS_OK,
@@ -18,8 +19,15 @@ import {
 import { DeckCalibrationControl } from '../DeckCalibrationControl'
 import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
 
+import type { State } from '../../../types'
+
 jest.mock('../../../robot-api/selectors')
 jest.mock('../../../sessions/selectors')
+
+const mockGetRequestById: JestMockFn<
+  [State, string],
+  $Call<typeof RobotApi.getRequestById, State, string>
+> = RobotApi.getRequestById
 
 describe('DeckCalibrationControl', () => {
   let mockStore
@@ -36,6 +44,9 @@ describe('DeckCalibrationControl', () => {
 
   const getCalibrationWarning = wrapper =>
     wrapper.find(InlineCalibrationWarning)
+
+  const getFailedStartModal = wrapper =>
+    wrapper.find('AlertModal[heading="Failed to start deck calibration"]')
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -247,6 +258,25 @@ describe('DeckCalibrationControl', () => {
   it('InlineCalibrationWarning component not rendered if deck cal is good and marked ok', () => {
     const wrapper = render()
     expect(getCalibrationWarning(wrapper).children()).toHaveLength(0)
+  })
+
+  it('Failed start component only rendered if create request has failed', () => {
+    const wrapper = render()
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.FAILURE,
+      response: {
+        method: 'POST',
+        ok: false,
+        path: '/',
+        status: 500,
+      },
+      error: { message: 'ruh roh' },
+    })
+    expect(getFailedStartModal(wrapper).exists()).toBe(false)
+    getDeckCalButton(wrapper).invoke('onClick')()
+    getConfirmDeckCalButton(wrapper).invoke('onClick')()
+    wrapper.update()
+    expect(getFailedStartModal(wrapper).exists()).toBe(true)
   })
 
   const CALIBRATE_STATUSES = [DECK_CAL_STATUS_IDENTITY, null]
