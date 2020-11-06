@@ -10,7 +10,10 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { PipetteOffsetItem, TipLengthSection } from '../PipetteOffsetItem'
 import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
 import { findLabwareDefWithCustom } from '../../../findLabware'
-import type {PipetteOffsetCalibration, TipLengthCalibration} from '../../../calibration/types'
+import type {
+  PipetteOffsetCalibration,
+  TipLengthCalibration,
+} from '../../../calibration/types'
 
 jest.mock('../../../findLabware')
 
@@ -123,8 +126,8 @@ describe('PipetteOffsetItem', () => {
           pipette: 'pipette-id-11',
           lastModified: '2020-09-10T05:10Z',
           source: 'user',
-        }: $Shape<TipLengthCalibration>)
-      }
+        }: $Shape<TipLengthCalibration>),
+      },
     })
     expect(wrapper.find('PipetteOffsetItem')).not.toBeNull()
   })
