@@ -1,9 +1,10 @@
 """Test equipment command execution side effects."""
 import pytest
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
-from opentrons.types import Mount as HwMount, MountType
+from opentrons.types import Mount as HwMount, MountType, DeckSlot
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.state import PipetteData
 from opentrons.protocol_engine.resources import IdGenerator, LabwareData
 from opentrons.protocol_engine.execution.equipment import EquipmentHandler
@@ -48,7 +49,7 @@ def handler(
 async def test_load_labware_assigns_id(mock_id_generator, handler):
     """LoadLabwareRequest should create a resource ID for the labware."""
     req = LoadLabwareRequest(
-        location=3,
+        location=DeckSlotLocation(DeckSlot.SLOT_3),
         loadName="load-name",
         namespace="opentrons-test",
         version=1
@@ -66,7 +67,7 @@ async def test_load_labware_gets_labware_def(
 ):
     """LoadLabwareRequest should create a resource ID for the labware."""
     req = LoadLabwareRequest(
-        location=3,
+        location=DeckSlotLocation(DeckSlot.SLOT_3),
         loadName="load-name",
         namespace="opentrons-test",
         version=1
@@ -89,7 +90,7 @@ async def test_load_labware_gets_labware_cal_data(
 ):
     """LoadLabwareRequest should create a resource ID for the labware."""
     req = LoadLabwareRequest(
-        location=3,
+        location=DeckSlotLocation(DeckSlot.SLOT_3),
         loadName="load-name",
         namespace="opentrons-test",
         version=1
@@ -100,7 +101,7 @@ async def test_load_labware_gets_labware_cal_data(
     assert res.calibration == (1, 2, 3)
     mock_labware_data.get_labware_calibration.assert_called_with(
         definition=minimal_labware_def,
-        location=3,
+        location=DeckSlotLocation(DeckSlot.SLOT_3),
     )
 
 

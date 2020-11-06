@@ -5,8 +5,9 @@ from datetime import datetime
 from mock import AsyncMock  # type: ignore[attr-defined]
 from typing import Any, Optional, cast
 
-from opentrons.types import MountType
+from opentrons.types import MountType, DeckSlot
 from opentrons.protocol_engine import errors, command_models as cmd
+from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.execution import CommandExecutor
 from opentrons.protocol_engine.execution.equipment import EquipmentHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
@@ -49,7 +50,7 @@ class ExecutorRoutingSpec:
         ExecutorRoutingSpec(
             name="Successful load labware",
             request=cmd.LoadLabwareRequest(
-                location=1,
+                location=DeckSlotLocation(DeckSlot.SLOT_1),
                 loadName="load-name",
                 namespace="opentrons-test",
                 version=1,
@@ -166,7 +167,7 @@ async def test_executor_handles_unexpected_error(
             created_at=now,
             started_at=now,
             request=cmd.LoadLabwareRequest(
-                location=1,
+                location=DeckSlotLocation(DeckSlot.SLOT_1),
                 loadName="load-name",
                 namespace="opentrons-test",
                 version=1,

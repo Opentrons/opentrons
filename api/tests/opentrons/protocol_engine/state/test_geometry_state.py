@@ -4,9 +4,10 @@ from mock import MagicMock
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlot
 
 from opentrons.protocol_engine import StateStore
+from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.state import LabwareData
 from opentrons.protocol_engine.state.labware import LabwareStore
 from opentrons.protocol_engine.state.geometry import GeometryStore
@@ -58,7 +59,7 @@ def test_get_labware_highest_z(
     """It should get the absolute location of a labware's highest Z point."""
     labware_data = LabwareData(
         definition=well_plate_def,
-        location=3,
+        location=DeckSlotLocation(DeckSlot.SLOT_3),
         calibration=(1, -2, 3)
     )
 
@@ -87,12 +88,12 @@ def test_get_all_labware_highest_z(
     """It should get the highest Z amongst all labware."""
     plate_data = LabwareData(
         definition=well_plate_def,
-        location=3,
+        location=DeckSlotLocation(DeckSlot.SLOT_3),
         calibration=(1, -2, 3)
     )
     reservoir_data = LabwareData(
         definition=reservoir_def,
-        location=4,
+        location=DeckSlotLocation(DeckSlot.SLOT_4),
         calibration=(1, -2, 3)
     )
 
@@ -127,7 +128,7 @@ def test_get_well_position(
     """It should be able to get the position of a well top in a labware."""
     labware_data = LabwareData(
         definition=well_plate_def,
-        location=3,
+        location=DeckSlotLocation(DeckSlot.SLOT_3),
         calibration=(1, -2, 3)
     )
     well_def = well_plate_def["wells"]["B2"]

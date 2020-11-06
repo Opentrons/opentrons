@@ -155,6 +155,22 @@ class MountType(str, enum.Enum):
         return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
 
 
+class DeckSlot(int, enum.Enum):
+    """Deck slot identifiers."""
+    SLOT_1 = 1
+    SLOT_2 = 2
+    SLOT_3 = 3
+    SLOT_4 = 4
+    SLOT_5 = 5
+    SLOT_6 = 6
+    SLOT_7 = 7
+    SLOT_8 = 8
+    SLOT_9 = 9
+    SLOT_10 = 10
+    SLOT_11 = 11
+    FIXED_TRASH = 12
+
+
 class TransferTipPolicy(enum.Enum):
     ONCE = enum.auto()
     NEVER = enum.auto()

@@ -3,14 +3,16 @@ import pytest
 from datetime import datetime, timezone
 from typing import Tuple
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.types import DeckSlot
 
 from opentrons.protocol_engine import command_models as cmd, errors, StateStore
+from opentrons.protocol_engine.types import LabwareLocation, DeckSlotLocation
 
 
 def load_labware(
     store: StateStore,
     labware_id: str,
-    location: int,
+    location: LabwareLocation,
     definition: LabwareDefinition,
     calibration: Tuple[float, float, float],
 ) -> cmd.CompletedCommand[cmd.LoadLabwareRequest, cmd.LoadLabwareResult]:
@@ -48,7 +50,7 @@ def test_handles_load_labware(store, well_plate_def):
     command = load_labware(
         store=store,
         labware_id="plate-id",
-        location=1,
+        location=DeckSlotLocation(DeckSlot.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -69,7 +71,7 @@ def test_get_all_labware(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=1,
+        location=DeckSlotLocation(DeckSlot.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -77,7 +79,7 @@ def test_get_all_labware(
     load_labware(
         store=store,
         labware_id="reservoir-id",
-        location=2,
+        location=DeckSlotLocation(DeckSlot.SLOT_2),
         definition=reservoir_def,
         calibration=(4, 5, 6),
     )
@@ -99,7 +101,7 @@ def test_get_labware_has_quirk(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=1,
+        location=DeckSlotLocation(DeckSlot.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -107,7 +109,7 @@ def test_get_labware_has_quirk(
     load_labware(
         store=store,
         labware_id="reservoir-id",
-        location=2,
+        location=DeckSlotLocation(DeckSlot.SLOT_2),
         definition=reservoir_def,
         calibration=(4, 5, 6),
     )
@@ -134,7 +136,7 @@ def test_get_well_definition_bad_id(
     load_labware(
         store=store,
         labware_id="uid",
-        location=1,
+        location=DeckSlotLocation(DeckSlot.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -151,7 +153,7 @@ def test_get_well_definition(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=1,
+        location=DeckSlotLocation(DeckSlot.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )

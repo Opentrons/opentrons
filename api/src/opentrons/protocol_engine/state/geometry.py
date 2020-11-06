@@ -49,7 +49,7 @@ class GeometryState:
             labware_id,
             well_id
         )
-        slot_pos = self.get_slot_position(labware_data.location)
+        slot_pos = self.get_slot_position(labware_data.location.slot)
         cal_offset = labware_data.calibration
 
         return Point(
@@ -60,7 +60,7 @@ class GeometryState:
 
     def _get_highest_z_from_labware_data(self, lw_data: LabwareData) -> float:
         z_dim = lw_data.definition["dimensions"]["zDimension"]
-        slot_pos = self.get_slot_position(lw_data.location)
+        slot_pos = self.get_slot_position(lw_data.location.slot)
 
         return z_dim + slot_pos[2] + lw_data.calibration[2]
 

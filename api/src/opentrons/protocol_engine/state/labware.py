@@ -8,13 +8,14 @@ from opentrons_shared_data.labware.dev_types import (
 )
 
 from .. import command_models as cmd, errors
+from ..types import LabwareLocation
 from .substore import Substore, CommandReactive
 
 
 @dataclass(frozen=True)
 class LabwareData:
     """Labware data entry."""
-    location: int
+    location: LabwareLocation
     definition: LabwareDefinition
     calibration: Tuple[float, float, float]
 

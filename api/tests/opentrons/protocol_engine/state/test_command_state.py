@@ -1,7 +1,9 @@
 """Tests for the command lifecycle state."""
 from datetime import datetime
 
+from opentrons.types import DeckSlot
 from opentrons.protocol_engine import StateStore
+from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.command_models import (
     PendingCommand,
     LoadLabwareRequest,
@@ -17,7 +19,7 @@ def test_state_store_handles_command(store: StateStore, now: datetime) -> None:
             loadName="load-name",
             namespace="opentrons-test",
             version=1,
-            location=2,
+            location=DeckSlotLocation(DeckSlot.SLOT_2),
         )
     )
 
