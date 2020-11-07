@@ -13,7 +13,8 @@ class MotionPlanningError(Exception):
         min_travel_z: float,
         max_travel_z: float,
         message: str
-    ):
+    ) -> None:
+        """Initialize an error with properties of the planned motion."""
         super().__init__(message)
         self.origin = origin
         self.dest = dest
@@ -24,9 +25,11 @@ class MotionPlanningError(Exception):
 
 class DestinationOutOfBoundsError(MotionPlanningError, ValueError):
     """An error raised when a requested destination is out of bounds."""
+
     pass
 
 
 class ArcOutOfBoundsError(MotionPlanningError, ValueError):
     """An error raised when a calculated movement arc is out of bounds."""
+
     pass

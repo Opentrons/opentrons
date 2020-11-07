@@ -1,4 +1,3 @@
-# pylama:ignore=E252
 from opentrons.legacy_api.containers.placeable import Well, Container
 from opentrons.util.vector import Vector
 from numbers import Number
@@ -49,7 +48,7 @@ def _well_to_json(well: Well) -> dict:
     return well_json
 
 
-def labware_to_json(container: Container, container_name: str=None) -> dict:
+def labware_to_json(container: Container, container_name: str = None) -> dict:
     if container_name is None:
         container_name = container.get_name()
     metadata = {'name': container_name}
