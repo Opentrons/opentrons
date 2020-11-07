@@ -96,7 +96,7 @@ test:
 .PHONY: lint
 lint: $(ot_py_sources)
 	$(python) -m mypy src/opentrons $(ot_tests_to_typecheck)
-	$(python) -m pylama src/opentrons tests
+	$(python) -m flake8 setup.py src/opentrons tests
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
