@@ -1,9 +1,10 @@
+"""Test for pipetting command models."""
 import pytest
 from pydantic import ValidationError
 from opentrons.protocol_engine import command_models as commands
 
 
-def test_move_to_well_command():
+def test_move_to_well_command() -> None:
     """It should be able to create a MoveToWellRequest."""
     payload = commands.MoveToWellRequest(
         pipetteId="abc",
@@ -16,7 +17,7 @@ def test_move_to_well_command():
     assert payload.wellId == "A3"
 
 
-def test_pick_up_tip_command():
+def test_pick_up_tip_command() -> None:
     """It should be able to create a PickUpTipRequest."""
     payload = commands.PickUpTipRequest(
         pipetteId="abc",
@@ -29,7 +30,7 @@ def test_pick_up_tip_command():
     assert payload.wellId == "A3"
 
 
-def test_drop_tip_command():
+def test_drop_tip_command() -> None:
     """It should be able to create a DropTipRequest."""
     payload = commands.DropTipRequest(
         pipetteId="abc",
@@ -42,14 +43,13 @@ def test_drop_tip_command():
     assert payload.wellId == "A3"
 
 
-def test_aspirate_command():
+def test_aspirate_command() -> None:
     """It should be able to create an AspirateRequest."""
     payload = commands.AspirateRequest(
         pipetteId="abc",
         labwareId="123",
         wellId="A3",
         volume=50,
-        offsetFromBottom=1.5,
         flowRate=1.0
     )
 
@@ -61,8 +61,8 @@ def test_aspirate_command():
 
 
 @pytest.mark.parametrize("key_under_test", ["volume", "flowRate"])
-def test_aspirate_command_validation(key_under_test):
-    """AspirateRequest should require positive volume, flowRate."""
+def test_aspirate_command_validation(key_under_test: str) -> None:
+    """Aspirate request should require positive volume, flowRate."""
     init_args = {
         "pipetteId": "abc",
         "labwareId": "123",
@@ -73,10 +73,10 @@ def test_aspirate_command_validation(key_under_test):
     init_args[key_under_test] = -1
 
     with pytest.raises(ValidationError):
-        commands.AspirateRequest(**init_args)
+        commands.AspirateRequest.parse_obj(init_args)
 
 
-def test_dispense_command():
+def test_dispense_command() -> None:
     """It should be able to create a DispenseRequest."""
     payload = commands.DispenseRequest(
         pipetteId="abc",

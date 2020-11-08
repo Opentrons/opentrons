@@ -21,17 +21,20 @@ from opentrons.protocol_engine.state.motion import MotionStore
 
 
 @pytest.fixture
-def mock_labware_store(reservoir_def, well_plate_def) -> MagicMock:
+def mock_labware_store() -> MagicMock:
+    """Get a mock in the shape of a LabwareStore."""
     return MagicMock(spec=LabwareStore)
 
 
 @pytest.fixture
 def mock_pipette_store() -> MagicMock:
+    """Get a mock in the shape of a PipetteStore."""
     return MagicMock(spec=PipetteStore)
 
 
 @pytest.fixture
 def mock_geometry_store() -> MagicMock:
+    """Get a mock in the shape of a GeometryStore."""
     return MagicMock(spec=GeometryStore)
 
 
@@ -41,6 +44,7 @@ def motion_store(
     mock_pipette_store: MagicMock,
     mock_geometry_store: MagicMock,
 ) -> MotionStore:
+    """Get a MotionStore with its dependecies mocked out."""
     return MotionStore(
         labware_store=mock_labware_store,
         pipette_store=mock_pipette_store,
@@ -142,6 +146,8 @@ def test_get_pipette_location_with_current_location_different_pipette(
 
 @dataclass(frozen=True)
 class WaypointSpec:
+    """Spec data for testing the get_movement_waypoints selector."""
+
     name: str
     expected_move_type: MoveType
     pipette_id: str = "pipette-id"

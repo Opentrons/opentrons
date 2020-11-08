@@ -1,5 +1,5 @@
 """Basic labware data state and store."""
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
 from opentrons_shared_data.labware.dev_types import (
@@ -15,15 +15,20 @@ from .substore import Substore, CommandReactive
 @dataclass(frozen=True)
 class LabwareData:
     """Labware data entry."""
+
     location: LabwareLocation
     definition: LabwareDefinition
     calibration: Tuple[float, float, float]
 
 
-@dataclass
 class LabwareState:
     """Basic labware data state and getter methods."""
-    _labware_by_id: Dict[str, LabwareData] = field(default_factory=dict)
+
+    _labware_by_id: Dict[str, LabwareData]
+
+    def __init__(self) -> None:
+        """Initialize a LabwareState instance."""
+        self._labware_by_id = {}
 
     def get_labware_data_by_id(self, uid: str) -> LabwareData:
         """Get labware data by the labware's unique identifier."""
@@ -58,9 +63,11 @@ class LabwareState:
 
 
 class LabwareStore(Substore[LabwareState], CommandReactive):
-    """Labware state store container class."""
+    """Labware state container."""
 
-    def __init__(self):
+    _state: LabwareState
+
+    def __init__(self) -> None:
         """Initialize a labware store and its state."""
         self._state = LabwareState()
 
@@ -68,6 +75,7 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
         self,
         command: cmd.CompletedCommandType
     ) -> None:
+        """Modify state in reaction to a completed command."""
         if isinstance(command.result, cmd.LoadLabwareResult):
             self._state._labware_by_id[command.result.labwareId] = LabwareData(
                 location=command.request.location,

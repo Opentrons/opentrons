@@ -1,23 +1,32 @@
 """Geometry state store and getters."""
-from dataclasses import dataclass
-
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlot
 
 from .substore import Substore, CommandReactive
 from .labware import LabwareStore, LabwareData
 
 
-@dataclass
 class GeometryState:
-    """Geometry state and getters."""
+    """Geometry getters."""
+
     _deck_definition: DeckDefinitionV2
     _labware_store: LabwareStore
 
+    def __init__(
+        self,
+        deck_definition: DeckDefinitionV2,
+        labware_store: LabwareStore
+    ) -> None:
+        """Initialize a GeometryState instance."""
+        self._deck_definition = deck_definition
+        self._labware_store = labware_store
+
     def get_deck_definition(self) -> DeckDefinitionV2:
+        """Get the current deck definition."""
         return self._deck_definition
 
-    def get_slot_position(self, slot: int) -> Point:
+    def get_slot_position(self, slot: DeckSlot) -> Point:
+        """Get the position of a deck slot."""
         deck_def = self.get_deck_definition()
         position = deck_def["locations"]["orderedSlots"][slot - 1]["position"]
 
@@ -66,7 +75,9 @@ class GeometryState:
 
 
 class GeometryStore(Substore[GeometryState], CommandReactive):
-    """Geometry state store container class."""
+    """Geometry state container."""
+
+    _state: GeometryState
 
     def __init__(
         self,
@@ -75,6 +86,6 @@ class GeometryStore(Substore[GeometryState], CommandReactive):
     ) -> None:
         """Initialize a geometry store and its state."""
         self._state = GeometryState(
-            _deck_definition=deck_definition,
-            _labware_store=labware_store,
+            deck_definition=deck_definition,
+            labware_store=labware_store,
         )

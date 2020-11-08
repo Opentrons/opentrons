@@ -15,6 +15,7 @@ from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 
 @pytest.fixture
 def move_to_well_request() -> MoveToWellRequest:
+    """Get an example MoveToWellRequest."""
     return MoveToWellRequest(
         pipetteId="pipette-id",
         labwareId="labware-id",
@@ -24,6 +25,7 @@ def move_to_well_request() -> MoveToWellRequest:
 
 @pytest.fixture
 def pipette_location_data() -> PipetteLocationData:
+    """Get an example PipetteLocationData."""
     return PipetteLocationData(
         mount=MountType.LEFT,
         critical_point=CriticalPoint.FRONT_NOZZLE,
@@ -32,6 +34,7 @@ def pipette_location_data() -> PipetteLocationData:
 
 @pytest.fixture
 def waypoints() -> List[Waypoint]:
+    """Get a list of example Waypoints."""
     return [
         Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER),
         Waypoint(Point(4, 5, 6))
@@ -44,6 +47,7 @@ def store_with_data(
     pipette_location_data: PipetteLocationData,
     waypoints: List[Waypoint],
 ) -> MagicMock:
+    """Prime a mock StateView with example data."""
     mock_state_view.motion.get_pipette_location.return_value = \
         pipette_location_data
     mock_state_view.motion.get_movement_waypoints.return_value = waypoints
@@ -55,6 +59,7 @@ def store_with_data(
 def hc_with_data(
     mock_hardware: AsyncMock,
 ) -> MagicMock:
+    """Prime a mock HardwareController with example data."""
     mock_hardware.gantry_position.return_value = Point(1, 1, 1)
     mock_hardware.get_instrument_max_height.return_value = 42.0
     return mock_hardware
@@ -65,6 +70,7 @@ def handler(
     store_with_data: StateStore,
     hc_with_data: AsyncMock
 ) -> PipettingHandler:
+    """Create a PipettingHandler with its dependencies mocked out."""
     return PipettingHandler(
         state=store_with_data,
         hardware=hc_with_data

@@ -20,6 +20,8 @@ from .geometry import GeometryStore
 
 @dataclass(frozen=True)
 class LocationData:
+    """Last used pipette, labware, and well."""
+
     pipette_id: str
     labware_id: str
     well_id: str
@@ -27,28 +29,48 @@ class LocationData:
 
 @dataclass(frozen=True)
 class PipetteLocationData:
+    """Pipette data used to determine the current gantry position."""
+
     mount: MountType
     critical_point: Optional[CriticalPoint]
 
 
-@dataclass
 class MotionState:
+    """Motion planning state and getter methods."""
+
     _labware_store: LabwareStore
     _pipette_store: PipetteStore
     _geometry_store: GeometryStore
-    _current_location: Optional[LocationData] = None
+    _current_location: Optional[LocationData]
+
+    def __init__(
+        self,
+        labware_store: LabwareStore,
+        pipette_store: PipetteStore,
+        geometry_store: GeometryStore,
+    ) -> None:
+        """Initialize a MotionState instance."""
+        self._labware_store = labware_store
+        self._pipette_store = pipette_store
+        self._geometry_store = geometry_store
+        self._current_location = None
 
     def get_current_location_data(self) -> Optional[LocationData]:
         """Get the current pipette and deck location the protocol is at."""
         return self._current_location
 
     def get_pipette_location(self, pipette_id: str) -> PipetteLocationData:
+        """Get the critical point of a pipette given the current location."""
+        current_loc = self.get_current_location_data()
         pipette_data = self._pipette_store.state.get_pipette_data_by_id(
             pipette_id
         )
-        current_loc = self.get_current_location_data()
+
+        mount = pipette_data.mount
         critical_point = None
 
+        # if the pipette was last used to move to a labware that requires
+        # centering, set the critical point to XY_CENTER
         if (
             current_loc is not None and
             current_loc.pipette_id == pipette_id and
@@ -59,10 +81,7 @@ class MotionState:
         ):
             critical_point = CriticalPoint.XY_CENTER
 
-        return PipetteLocationData(
-            mount=pipette_data.mount,
-            critical_point=critical_point,
-        )
+        return PipetteLocationData(mount=mount, critical_point=critical_point)
 
     def get_movement_waypoints(
         self,
@@ -73,6 +92,7 @@ class MotionState:
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float
     ) -> List[Waypoint]:
+        """Get the movement waypoints from an origin to a given location."""
         location = self.get_current_location_data()
         center_dest = self._labware_store.state.get_labware_has_quirk(
             labware_id,
@@ -119,16 +139,21 @@ class MotionState:
 
 
 class MotionStore(Substore[MotionState], CommandReactive):
+    """Motion state container."""
+
+    _state: MotionState
+
     def __init__(
         self,
         labware_store: LabwareStore,
         pipette_store: PipetteStore,
         geometry_store: GeometryStore,
-    ):
+    ) -> None:
+        """Initialize a MotionStore and its state."""
         self._state = MotionState(
-            _labware_store=labware_store,
-            _pipette_store=pipette_store,
-            _geometry_store=geometry_store,
+            labware_store=labware_store,
+            pipette_store=pipette_store,
+            geometry_store=geometry_store,
         )
 
     def handle_completed_command(

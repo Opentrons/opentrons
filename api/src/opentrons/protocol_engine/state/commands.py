@@ -1,15 +1,18 @@
 """Protocol engine commands sub-state."""
-from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 from .. import command_models as cmd
 from .substore import Substore
 
 
-@dataclass
 class CommandState:
     """Command state and getters."""
-    _commands_by_id: Dict[str, cmd.CommandType] = field(default_factory=dict)
+
+    _commands_by_id: Dict[str, cmd.CommandType]
+
+    def __init__(self) -> None:
+        """Initialize a CommandState instance."""
+        self._commands_by_id = {}
 
     def get_command_by_id(self, uid: str) -> Optional[cmd.CommandType]:
         """Get a command by its unique identifier."""
@@ -21,7 +24,12 @@ class CommandState:
 
 
 class CommandStore(Substore[CommandState]):
-    def __init__(self):
+    """Command state container."""
+
+    _state: CommandState
+
+    def __init__(self) -> None:
+        """Initialize a CommandStore and its state."""
         self._state = CommandState()
 
     def handle_command(

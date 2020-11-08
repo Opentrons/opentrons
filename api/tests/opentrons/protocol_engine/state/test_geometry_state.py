@@ -137,7 +137,7 @@ def test_get_well_position(
     mock_labware_store.state.get_well_definition.return_value = well_def
 
     point = geometry_store.state.get_well_position("plate-id", "B2")
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][3]["position"]
+    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
 
     mock_labware_store.state.get_labware_data_by_id.assert_called_with(
         "plate-id"
