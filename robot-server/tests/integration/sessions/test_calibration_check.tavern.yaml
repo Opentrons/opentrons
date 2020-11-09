@@ -347,7 +347,7 @@ stages:
               first:
                 tipLength: !anydict
                 pipetteOffset: !anydict
-                deck: !anydict
+                deck: null
               second:
                 tipLength: null
                 pipetteOffset: null
@@ -377,7 +377,7 @@ stages:
               first:
                 tipLength: !anydict
                 pipetteOffset: !anydict
-                deck: !anydict
+                deck: null
               second:
                 tipLength: null
                 pipetteOffset: null
@@ -407,7 +407,7 @@ stages:
               first:
                 tipLength: !anydict
                 pipetteOffset: !anydict
-                deck: !anydict
+                deck: null
               second:
                 tipLength: null
                 pipetteOffset: null
@@ -437,7 +437,7 @@ stages:
               first:
                 tipLength: !anydict
                 pipetteOffset: !anydict
-                deck: !anydict
+                deck: null
               second:
                 tipLength: null
                 pipetteOffset: null
@@ -468,7 +468,7 @@ stages:
               first:
                 tipLength: !anydict
                 pipetteOffset: !anydict
-                deck: !anydict
+                deck: null
               second:
                 tipLength: null
                 pipetteOffset: null

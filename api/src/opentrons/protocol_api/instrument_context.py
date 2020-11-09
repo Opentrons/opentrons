@@ -1567,6 +1567,6 @@ class InstrumentContext(CommandPublisher):
             return get.load_tip_length_calibration(
                 self.hw_pipette['pipette_id'],
                 tiprack._implementation.get_definition(),
-                parent)['tipLength']
+                parent).tip_length
         except TipLengthCalNotFound:
             return _build_length_from_overlap()

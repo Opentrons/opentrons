@@ -19,6 +19,14 @@ class RobotHealthCheck(Enum):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def status_from_string(
+            cls, status: str) -> 'RobotHealthCheck':
+        if status == 'IN_THRESHOLD':
+            return cls.IN_THRESHOLD
+        else:
+            return cls.OUTSIDE_THRESHOLD
+
 
 class PipetteRank(str, Enum):
     """The rank in the order of pipettes to use within flow"""
