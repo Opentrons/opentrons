@@ -795,7 +795,7 @@ class InstrumentContext(CommandPublisher):
                   your particular tips.
 
             The ejector shroud that pops the tip off the end of the pipette is
-            driven by the plunger's stepper motor.  Sometimes, the strain of
+            driven by the plunger's stepper motor. Sometimes, the strain of
             ejecting the tip can make that motor *skip* and fall out of sync
             with where the robot thinks it is.
 
@@ -811,7 +811,7 @@ class InstrumentContext(CommandPublisher):
             * The pipette might not fully drop subsequent tips.
 
             GEN1 pipettes are especially likely to have these problems, so we
-            strongly discourage using ``home_after=False`` with them.  (There's
+            strongly discourage using ``home_after=False`` with them. (There's
             still a risk with GEN2 pipettes---it's just smaller.)
 
         :returns: This instance
