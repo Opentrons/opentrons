@@ -856,7 +856,14 @@ def test_tip_length_for_caldata(loop, monkeypatch, use_new_calibration):
     instr = ctx.load_instrument('p20_single_gen2', 'left')
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
     mock_tip_length = mock.Mock()
-    mock_tip_length.return_value = {'tipLength': 2}
+    mock_tip_length.return_value =\
+        cs_types.TipLengthCalibration(
+            tip_length=2,
+            pipette='fake id',
+            tiprack='fake_hash',
+            last_modified='some time',
+            source=cs_types.SourceType.user,
+            status=cs_types.CalibrationStatus(markedBad=False))
     monkeypatch.setattr(get, 'load_tip_length_calibration', mock_tip_length)
     instr._tip_length_for.cache_clear()
     assert instr._tip_length_for(tiprack) == 2
