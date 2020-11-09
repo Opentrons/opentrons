@@ -4,7 +4,6 @@ import type {
   SessionCommandParams,
   CalibrationCheckSession,
   CalibrationLabware,
-  RobotCalibrationCheckStep,
 } from '../../sessions/types'
 
 export type CalibrationCheckParentProps = {|
