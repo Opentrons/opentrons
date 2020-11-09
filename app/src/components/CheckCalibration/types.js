@@ -1,10 +1,6 @@
 // @flow
 import type { Action } from '../../types'
-import type {
-  SessionCommandParams,
-  CalibrationCheckSession,
-  CalibrationLabware,
-} from '../../sessions/types'
+import type { CalibrationCheckSession } from '../../sessions/types'
 
 export type CalibrationCheckParentProps = {|
   robotName: string,
