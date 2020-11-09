@@ -811,10 +811,12 @@ class InstrumentContext(CommandPublisher):
             * The pipette might aspirate or dispense the wrong volumes.
             * The pipette might not fully drop subsequent tips.
 
-            GEN1 pipettes are much more vulnerable to this skipping. You should
-            never set this parameter to False on a GEN1 pipette. Even on GEN2
-            pipettes, the skip may still happen, so always test with your
-            particular pipette.
+            GEN1 pipettes are especially vulnerable to this skipping, so you
+            should never set ``home_after=False`` with a GEN1 pipette.
+
+            Even on GEN2 pipettes, the motor can still skip. So, always
+            extensively test ``home_after=False` with your particular pipette
+            and your particular tips before relying on it.
 
         :returns: This instance
         """
