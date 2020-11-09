@@ -48,7 +48,12 @@ const LOOKING_FOR_DATA = 'Looking for your detailed calibration data?'
 const DOWNLOAD_SUMMARY = 'Download JSON summary'
 
 export function ResultsSummary(props: CalibrationPanelProps): React.Node {
-  const { comparisonsByPipette, instruments, cleanUpAndExit } = props
+  const {
+    comparisonsByPipette,
+    instruments,
+    checkBothPipettes,
+    cleanUpAndExit,
+  } = props
 
   if (!comparisonsByPipette || !instruments) {
     return null
@@ -93,7 +98,10 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
     },
   }
 
-  const deckCalibrationResult = comparisonsByPipette.first.deck?.status ?? null
+  const getDeckCalibration = checkBothPipettes
+    ? comparisonsByPipette.second.deck?.status
+    : comparisonsByPipette.first.deck?.status
+  const deckCalibrationResult = getDeckCalibration ?? null
 
   return (
     <>
