@@ -12,6 +12,7 @@ import { useDispatchApiRequests } from '../../../robot-api'
 import { getUncalibratedTipracksByMount } from '../../../pipettes'
 import * as Sessions from '../../../sessions'
 import { CalibrateTipLengthControl } from '../CalibrateTipLengthControl'
+import * as Analytics from '../../../analytics/actions'
 
 import type { Labware } from '../../../robot/types'
 import type { State } from '../../../types'
@@ -21,6 +22,7 @@ jest.mock('../../../robot/selectors')
 jest.mock('../../../sessions/selectors')
 jest.mock('../../../config/selectors')
 jest.mock('../../../pipettes/selectors')
+jest.mock('../../../analytics/actions')
 
 const mockGetUncalibratedTipracksByMount: JestMockFn<
   [State, string],
@@ -102,8 +104,9 @@ describe('Testing calibrate tip length control', () => {
     jest.resetAllMocks()
   })
 
-  it('check dispatch is called with a tip length session', () => {
-    const { wrapper } = render()
+  it('check dispatch session and dispatch analytics are called with a tip length session', () => {
+    const { wrapper, store } = render()
+    const { dispatch } = store
     const beginButton = wrapper
       .find('UncalibratedInfo')
       .find('button')
@@ -127,10 +130,19 @@ describe('Testing calibrate tip length control', () => {
         }
       )
     )
+    expect(dispatch).toHaveBeenCalledWith(
+      Analytics.tipLengthCalibrationStarted(
+        'tip-length-in-protocol',
+        'left',
+        true,
+        'fixture/fixture_tiprack_300_ul/1'
+      )
+    )
   })
 
-  it('check dispatch is called with a pipette offset session', () => {
-    const { wrapper } = render({ isExtendedPipOffset: true })
+  it('check dispatch session and dispatch analytics are called with a pipette offset session', () => {
+    const { wrapper, store } = render({ isExtendedPipOffset: true })
+    const { dispatch } = store
     const beginButton = wrapper
       .find('UncalibratedInfo')
       .find('button')
@@ -153,6 +165,15 @@ describe('Testing calibrate tip length control', () => {
           shouldRecalibrateTipLength: true,
           tipRackDefinition: threehundredtiprack,
         }
+      )
+    )
+    expect(dispatch).toHaveBeenCalledWith(
+      Analytics.pipetteOffsetCalibrationStarted(
+        'tip-length-in-protocol',
+        'left',
+        true,
+        true,
+        'fixture/fixture_tiprack_300_ul/1'
       )
     )
   })
