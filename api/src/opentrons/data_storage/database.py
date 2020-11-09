@@ -1,4 +1,3 @@
-# pylama:ignore=E252
 import sqlite3
 # import warnings
 from typing import List

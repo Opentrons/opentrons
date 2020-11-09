@@ -1,4 +1,3 @@
-# pylama:ignore=W0612
 import json
 import os
 
@@ -40,22 +39,22 @@ minimalLabwareDef = {
     "ordering": [["A1"], ["A2"]],
     "wells": {
         "A1": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 0,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "shape": "circular"
         },
         "A2": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 10,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 10,
+            "y": 0,
+            "z": 0,
+            "shape": "circular"
         }
     },
     "dimensions": {
@@ -203,12 +202,11 @@ def test_load_nonexistent_tip_length_calibration_data(
 
     # file does not exist (FileNotFoundError)
     with pytest.raises(cs_types.TipLengthCalNotFound):
-        result = get.load_tip_length_calibration(
-            PIPETTE_ID, minimalLabwareDef, '')
+        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef, '')
 
     # labware hash not in calibration file (KeyError)
     calpath = config.get_tip_length_cal_path()
-    with open(calpath/f'{PIPETTE_ID}.json', 'w') as offset_file:
+    with open(calpath / f'{PIPETTE_ID}.json', 'w') as offset_file:
         test_offset = {
             'FAKE_HASH': {
                 'tipLength': 22.0,
@@ -217,8 +215,7 @@ def test_load_nonexistent_tip_length_calibration_data(
         }
         json.dump(test_offset, offset_file)
     with pytest.raises(cs_types.TipLengthCalNotFound):
-        result = get.load_tip_length_calibration(
-            PIPETTE_ID, minimalLabwareDef, '')
+        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef, '')
 
 
 def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
@@ -241,7 +238,7 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
 
 def test_clear_tip_length_calibration_data(monkeypatch):
     calpath = config.get_tip_length_cal_path()
-    with open(calpath/f'{PIPETTE_ID}.json', 'w') as offset_file:
+    with open(calpath / f'{PIPETTE_ID}.json', 'w') as offset_file:
         test_offset = {
             MOCK_HASH: {
                 'tipLength': 22.0,
@@ -278,8 +275,8 @@ def test_schema_shape(monkeypatch, clear_calibration):
     )
 
     monkeypatch.setattr(
-       helpers,
-       'hash_labware_def', mock_hash_labware
+        helpers,
+        'hash_labware_def', mock_hash_labware
     )
 
     expected = {"default": {"offset": [1, 1, 1], "lastModified": fake_time}}
@@ -338,21 +335,21 @@ def test_wells_rebuilt_with_offset():
     )
     old_wells = test_labware.wells()
     assert test_labware._implementation.get_geometry().offset ==\
-           Point(10, 10, 5)
+        Point(10, 10, 5)
     assert test_labware._implementation.get_calibrated_offset() ==\
-           Point(10, 10, 5)
+        Point(10, 10, 5)
     labware.save_calibration(test_labware, Point(2, 2, 2))
     new_wells = test_labware.wells()
     assert old_wells[0] != new_wells[0]
     assert test_labware._implementation.get_geometry().offset ==\
-           Point(10, 10, 5)
+        Point(10, 10, 5)
     assert test_labware._implementation.get_calibrated_offset() ==\
-           Point(12, 12, 7)
+        Point(12, 12, 7)
 
 
 def test_clear_calibrations():
     calpath = config.get_opentrons_path('labware_calibration_offsets_dir_v2')
-    with open(calpath/'1.json', 'w') as offset_file:
+    with open(calpath / '1.json', 'w') as offset_file:
         test_offset = {
             "default": {
                 "offset": [1, 2, 3],
@@ -368,10 +365,10 @@ def test_clear_calibrations():
 
 
 def testhash_labware_def():
-    def1a = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
-    def1aa = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
-    def1b = {"metadata": {"a": "blah"}, "importantStuff": [1.1, 0.00003, 1/3]}
-    def2 = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.000033, 1/3]}
+    def1a = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1 / 3]}
+    def1aa = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1 / 3]}
+    def1b = {"metadata": {"a": "blah"}, "importantStuff": [1.1, 0.00003, 1 / 3]}
+    def2 = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.000033, 1 / 3]}
 
     # identity preserved across json serialization+deserialization
     assert helpers.hash_labware_def(def1a) == \

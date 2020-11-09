@@ -120,7 +120,7 @@ def _parse_python(
     return result
 
 
-def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # noqa: C901
+def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:
     """ Parse a bundled Python protocol """
     if not ff.use_protocol_api_v2():
         raise RuntimeError(

@@ -227,7 +227,7 @@ def test_aspirate():
     instruments = {'somePipetteId': m.pipette_mock}
 
     with mock.patch(
-            'opentrons.protocols.execution.execute_json_v3._get_location_with_offset',  # noqa: e501
+            'opentrons.protocols.execution.execute_json_v3._get_location_with_offset',
             new=m.mock_get_location_with_offset):
         with mock.patch(
                 'opentrons.protocols.execution.execute_json_v3._set_flow_rate',
@@ -254,7 +254,7 @@ def test_dispense():
     instruments = {'somePipetteId': m.pipette_mock}
 
     with mock.patch(
-        'opentrons.protocols.execution.execute_json_v3._get_location_with_offset',  # noqa: e501
+        'opentrons.protocols.execution.execute_json_v3._get_location_with_offset',
             new=m.mock_get_location_with_offset):
         with mock.patch(
             'opentrons.protocols.execution.execute_json_v3._set_flow_rate',
@@ -303,7 +303,7 @@ def test_touch_tip():
     instruments = {'somePipetteId': pipette_mock}
 
     with mock.patch(
-        'opentrons.protocols.execution.execute_json_v3._get_location_with_offset',  # noqa: e501
+        'opentrons.protocols.execution.execute_json_v3._get_location_with_offset',
             new=mock_get_location_with_offset):
         with mock.patch(
             'opentrons.protocols.execution.execute_json_v3._get_well',

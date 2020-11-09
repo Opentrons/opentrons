@@ -1,4 +1,3 @@
-# pylama:ignore=E501
 # TODO: Modify all calls to get a Well to use the `wells` method
 from numpy import isclose
 from unittest import mock
@@ -44,9 +43,9 @@ def test_use_filter_tips(instruments, robot):
 def test_shake_during_pick_up(monkeypatch, robot, instruments):
     robot.reset()
     pip = instruments._create_pipette_from_config(
-            config=pipette_config.load('p1000_single_v2.0'),
-            mount='left',
-            name='p1000_single_v2.0')
+        config=pipette_config.load('p1000_single_v2.0'),
+        mount='left',
+        name='p1000_single_v2.0')
     tiprack = containers_load(robot, 'opentrons_96_tiprack_1000ul', '1')
 
     shake_tips_pick_up = mock.Mock(
@@ -78,9 +77,9 @@ def test_shake_during_pick_up(monkeypatch, robot, instruments):
 def test_shake_during_drop(monkeypatch, robot, instruments):
     robot.reset()
     pip = instruments._create_pipette_from_config(
-            config=pipette_config.load('p1000_single_v1.5'),
-            mount='left',
-            name='p1000_single_v2.0')
+        config=pipette_config.load('p1000_single_v1.5'),
+        mount='left',
+        name='p1000_single_v2.0')
     tiprack = containers_load(robot, 'opentrons_96_tiprack_1000ul', '1')
 
     shake_tips_drop = mock.Mock(
@@ -108,7 +107,7 @@ def test_shake_during_drop(monkeypatch, robot, instruments):
     assert actual_calls == expected_calls
 
     # Test drop tip shake at a well with diameter above upper limit (2.25 mm)
-    tiprack.wells(0).properties['width'] = 2.3*4
+    tiprack.wells(0).properties['width'] = 2.3 * 4
     actual_calls.clear()
     shake_tips_drop(tiprack.wells(0))
     expected_calls = [('x', -2.25), ('x', 4.5), ('x', -2.25),
@@ -117,7 +116,7 @@ def test_shake_during_drop(monkeypatch, robot, instruments):
 
     # Test drop tip shake at a well with diameter between upper limit
     # and lower limit (1.00 - 2.25 mm)
-    tiprack.wells(0).properties['width'] = 2*4
+    tiprack.wells(0).properties['width'] = 2 * 4
     actual_calls.clear()
     shake_tips_drop(tiprack.wells(0))
     expected_calls = [('x', -2), ('x', 4), ('x', -2),
@@ -125,7 +124,7 @@ def test_shake_during_drop(monkeypatch, robot, instruments):
     assert actual_calls == expected_calls
 
     # Test drop tip shake at a well with diameter below lower limit (1.00 mm)
-    tiprack.wells(0).properties['width'] = 0.9*4
+    tiprack.wells(0).properties['width'] = 0.9 * 4
     actual_calls.clear()
     shake_tips_drop(tiprack.wells(0))
     expected_calls = [('x', -1), ('x', 2), ('x', -1),
@@ -336,7 +335,7 @@ def test_aspirate_move_to(old_aspiration, robot, instruments):
     assert isclose(current_pos, (6.9, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
-    assert isclose(current_pos, (161,  116.7,   10.5)).all()
+    assert isclose(current_pos, (161, 116.7, 10.5)).all()
 
 
 @pytest.mark.api1_only
@@ -346,8 +345,8 @@ def test_dispense_move_to(old_aspiration, robot, instruments):
     robot.reset()
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p300 = instruments.P300_Single(
-                   mount='left',
-                   tip_racks=[tip_rack])
+        mount='left',
+        tip_racks=[tip_rack])
 
     x, y, z = (161.0, 116.7, 0.0)
     plate = containers_load(robot, '96-flat', '1')
@@ -367,7 +366,7 @@ def test_dispense_move_to(old_aspiration, robot, instruments):
     assert (current_pos == (1.5, 0.0, 0.0)).all()
 
     current_pos = pose_tracker.absolute(robot.poses, p300)
-    assert isclose(current_pos, (161,  116.7,   10.5)).all()
+    assert isclose(current_pos, (161, 116.7, 10.5)).all()
 
 
 @pytest.mark.api1_only
@@ -378,8 +377,8 @@ def test_trough_move_to(robot, instruments):
     robot.reset()
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p300 = instruments.P300_Single(
-                   mount='left',
-                   tip_racks=[tip_rack])
+        mount='left',
+        tip_racks=[tip_rack])
 
     trough = containers_load(robot, 'trough-12row', '1')
     p300.pick_up_tip()

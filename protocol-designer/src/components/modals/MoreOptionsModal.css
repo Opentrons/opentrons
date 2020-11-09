@@ -1,21 +1,19 @@
-.big_text_box {
-  height: 12rem;
+.modal_contents {
+  border-radius: 0;
 }
 
-.button_row {
-  /* TODO replicated in elsewhere -- does this pattern exist anywhere else? */
-  lost-utility: clearfix;
-  margin-top: 2rem;
+.form_group {
+  margin-bottom: 1rem;
+}
 
-  & > * {
-    lost-column: 1/6;
-  }
+.text_area_large {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  height: 12rem;
+  padding: 0.5rem;
+}
 
-  & > *:first-child {
-    lost-column: 2/6;
-  }
-
-  & > *:nth-child(2) {
-    lost-offset: 2/6;
-  }
+.cancel_button {
+  margin-right: 1rem;
 }

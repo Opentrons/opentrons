@@ -1,5 +1,3 @@
-# pylama:ignore=E731
-
 import itertools
 import warnings
 import logging

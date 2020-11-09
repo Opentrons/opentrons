@@ -1,15 +1,20 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { FlatButton, FormGroup, InputField, Modal } from '@opentrons/components'
+import {
+  FormGroup,
+  InputField,
+  Modal,
+  OutlineButton,
+} from '@opentrons/components'
 
 import { i18n } from '../../localization'
 import { actions as steplistActions } from '../../steplist'
 import type { StepFieldName } from '../../steplist/fieldLevel'
 import type { FormData } from '../../form-types'
 import type { ThunkDispatch } from '../../types'
-import styles from './MoreOptionsModal.css'
 import modalStyles from './modal.css'
+import styles from './MoreOptionsModal.css'
 
 type OP = {|
   close: (event: ?SyntheticEvent<>) => mixed,
@@ -44,38 +49,41 @@ class MoreOptionsModalComponent extends React.Component<Props, State> {
   render() {
     return (
       <Modal
-        onCloseClick={this.props.close}
+        heading={i18n.t('modal.step_notes.title')}
         className={modalStyles.modal}
-        contentsClassName={modalStyles.modal_contents}
+        contentsClassName={styles.modal_contents}
       >
         <div>
           <FormGroup
             label={i18n.t('form.step_edit_form.field.step_name.label')}
-            className={styles.column_1_2}
+            className={styles.form_group}
           >
             <InputField
               onChange={this.makeHandleChange('stepName')}
               value={String(this.state.stepName)}
             />
           </FormGroup>
+
           <FormGroup
             label={i18n.t('form.step_edit_form.field.step_notes.label')}
-            className={styles.column_1_2}
+            className={styles.form_group}
           >
-            {/* TODO: need textarea input in component library for big text boxes. */}
             <textarea
-              className={styles.big_text_box}
+              className={styles.text_area_large}
               onChange={this.makeHandleChange('stepDetails')}
               value={this.state.stepDetails}
             />
           </FormGroup>
-          <div className={styles.button_row}>
-            <FlatButton onClick={this.props.close}>
+          <div className={modalStyles.button_row}>
+            <OutlineButton
+              onClick={this.props.close}
+              className={styles.cancel_button}
+            >
               {i18n.t('button.cancel')}
-            </FlatButton>
-            <FlatButton onClick={this.handleSave}>
+            </OutlineButton>
+            <OutlineButton onClick={this.handleSave}>
               {i18n.t('button.save')}
-            </FlatButton>
+            </OutlineButton>
           </div>
         </div>
       </Modal>

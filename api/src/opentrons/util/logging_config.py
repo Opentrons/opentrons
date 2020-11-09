@@ -15,7 +15,7 @@ def _balena_config(level_value: int) -> Dict[str, Any]:
         'formatters': {
             'basic': {
                 'format':
-                '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  # noqa: E501
+                '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'
             },
         },
         'handlers': {

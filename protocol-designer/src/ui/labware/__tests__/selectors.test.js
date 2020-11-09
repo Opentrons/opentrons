@@ -7,8 +7,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT } from '../../../constants'
-import { getDisposalLabwareOptions, getLabwareOptions } from '../selectors'
+import { SPAN7_8_10_11_SLOT, FIXED_TRASH_ID } from '../../../constants'
+import {
+  getDisposalLabwareOptions,
+  getLabwareOptions,
+  _sortLabwareDropdownOptions,
+} from '../selectors'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
@@ -132,8 +136,8 @@ describe('labware selectors', () => {
         // $FlowFixMe(IL, 2020-03-12): resultFunc
         getLabwareOptions.resultFunc(labwareEntities, names, initialDeckSetup)
       ).toEqual([
-        { name: 'Trash', value: 'trashId' },
         { name: 'Source Plate', value: 'wellPlateId' },
+        { name: 'Trash', value: 'trashId' },
       ])
     })
 
@@ -198,11 +202,38 @@ describe('labware selectors', () => {
           initialDeckSetup
         )
       ).toEqual([
-        { name: 'Trash', value: 'trashId' },
         { name: 'MAG Well Plate', value: 'wellPlateId' },
         { name: 'TEMP Temp Plate', value: 'tempPlateId' },
         { name: 'THERMO TC Plate', value: 'tcPlateId' },
+        { name: 'Trash', value: 'trashId' },
       ])
+    })
+  })
+
+  describe('_sortLabwareDropdownOptions', () => {
+    const trashOption = {
+      name: 'Some kinda fixed trash',
+      value: FIXED_TRASH_ID,
+    }
+    const zzzPlateOption = { name: 'Zzz Plate', value: 'zzz' }
+    const aaaPlateOption = { name: 'Aaa Plate', value: 'aaa' }
+    it('should sort labware ids in alphabetical order but with fixed trash at the bottom', () => {
+      const result = _sortLabwareDropdownOptions([
+        trashOption,
+        aaaPlateOption,
+        zzzPlateOption,
+      ])
+      expect(result).toEqual([aaaPlateOption, zzzPlateOption, trashOption])
+    })
+
+    it('should handle {} case', () => {
+      const result = _sortLabwareDropdownOptions([])
+      expect(result).toEqual([])
+    })
+
+    it('should handle case w/o non-trash labware', () => {
+      const result = _sortLabwareDropdownOptions([trashOption])
+      expect(result).toEqual([trashOption])
     })
   })
 })
