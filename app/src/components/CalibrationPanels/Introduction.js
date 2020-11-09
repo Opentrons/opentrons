@@ -60,7 +60,7 @@ const PIP_OFFSET_CAL_INTRO_FRAGMENT = 'Calibrating'
 const PIP_OFFSET_CAL_EXPLANATION_FRAGMENT =
   'enables the robot to accurately establish the location of the mounted pipette’s nozzle, relative to the deck.'
 const PIP_OFFSET_REQUIRES_TIP_LENGTH =
-  'You don’t have a tip length saved with this pipette yet. You will need to calibrate tip length before calibrating you pipette offset.'
+  'You don’t have a tip length saved with this pipette yet. You will need to calibrate tip length before calibrating your pipette offset.'
 
 const TIP_LENGTH_CAL_HEADER = 'tip length calibration'
 const TIP_LENGTH_CAL_NAME_FRAGMENT = 'Tip length'
