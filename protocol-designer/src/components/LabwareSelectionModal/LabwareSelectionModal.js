@@ -68,10 +68,21 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: Array<string> } = {
     'opentrons_24_aluminumblock_nest_2ml_screwcap',
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
+    'opentrons_96_aluminumblock_nest_wellplate_100ul',
   ],
   [MAGNETIC_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
   [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
 }
+
+export const getLabwareIsRecommended = (
+  def: LabwareDefinition2,
+  moduleType: ?ModuleRealType
+): boolean =>
+  moduleType
+    ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
+        def.parameters.loadName
+      )
+    : false
 
 export const LabwareSelectionModal = (props: Props): React.Node => {
   const {
@@ -134,18 +145,6 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
     setFilterRecommended(moduleType != null)
   }, [moduleType])
 
-  const getLabwareRecommended = React.useCallback(
-    (def: LabwareDefinition2) => {
-      return (
-        moduleType &&
-        RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
-          def.parameters.loadName
-        )
-      )
-    },
-    [moduleType]
-  )
-
   const getLabwareCompatible = React.useCallback(
     (def: LabwareDefinition2) => {
       // assume that custom (non-standard) labware is (potentially) compatible
@@ -159,9 +158,9 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
 
   const getLabwareDisabled = React.useCallback(
     (labwareDef: LabwareDefinition2) =>
-      (filterRecommended && !getLabwareRecommended(labwareDef)) ||
+      (filterRecommended && !getLabwareIsRecommended(labwareDef, moduleType)) ||
       !getLabwareCompatible(labwareDef),
-    [filterRecommended, getLabwareCompatible, getLabwareRecommended]
+    [filterRecommended, getLabwareCompatible, moduleType]
   )
 
   const customLabwareURIs: Array<string> = React.useMemo(
@@ -254,7 +253,7 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
     'moduleCompatibility'
   > = null
   if (previewedLabware && moduleType) {
-    if (getLabwareRecommended(previewedLabware)) {
+    if (getLabwareIsRecommended(previewedLabware, moduleType)) {
       moduleCompatibility = 'recommended'
     } else if (getLabwareCompatible(previewedLabware)) {
       moduleCompatibility = 'potentiallyCompatible'
@@ -322,7 +321,7 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
                           <LabwareItem
                             key={index}
                             icon={
-                              getLabwareRecommended(labwareDef)
+                              getLabwareIsRecommended(labwareDef, moduleType)
                                 ? 'check-decagram'
                                 : null
                             }
