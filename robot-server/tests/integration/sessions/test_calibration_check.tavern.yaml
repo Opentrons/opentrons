@@ -340,18 +340,20 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          details:
-            <<: *session_data_attribute_details
-            currentStep: comparingPointOne
-            comparisonsByPipette:
-              first:
-                tipLength: !anydict
-                pipetteOffset: !anydict
-                deck: !anydict
-              second:
-                tipLength: null
-                pipetteOffset: null
-                deck: null
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: comparingPointOne
+              comparisonsByPipette:
+                first:
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: null
+                second:
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Go to next check
     request:
@@ -370,18 +372,20 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          details:
-            <<: *session_data_attribute_details
-            currentStep: comparingPointTwo
-            comparisonsByPipette:
-              first:
-                tipLength: !anydict
-                pipetteOffset: !anydict
-                deck: !anydict
-              second:
-                tipLength: null
-                pipetteOffset: null
-                deck: null
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: comparingPointTwo
+              comparisonsByPipette:
+                first:
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: null
+                second:
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Compare first pipette point two
     request:
@@ -400,18 +404,20 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          details:
-            <<: *session_data_attribute_details
-            currentStep: comparingPointTwo
-            comparisonsByPipette:
-              first:
-                tipLength: !anydict
-                pipetteOffset: !anydict
-                deck: !anydict
-              second:
-                tipLength: null
-                pipetteOffset: null
-                deck: null
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: comparingPointTwo
+              comparisonsByPipette:
+                first:
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: null
+                second:
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Go to next check
     request:
@@ -430,18 +436,20 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          details:
-            <<: *session_data_attribute_details
-            currentStep: comparingPointThree
-            comparisonsByPipette:
-              first:
-                tipLength: !anydict
-                pipetteOffset: !anydict
-                deck: !anydict
-              second:
-                tipLength: null
-                pipetteOffset: null
-                deck: null
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: comparingPointThree
+              comparisonsByPipette:
+                first:
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: null
+                second:
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Compare first pipette point three
     request:
@@ -461,18 +469,20 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          details:
-            <<: *session_data_attribute_details
-            currentStep: comparingPointThree
-            comparisonsByPipette:
-              first:
-                tipLength: !anydict
-                pipetteOffset: !anydict
-                deck: !anydict
-              second:
-                tipLength: null
-                pipetteOffset: null
-                deck: null
+          attributes:
+            <<: *session_data_attributes
+            details:
+              <<: *session_data_attribute_details
+              currentStep: comparingPointThree
+              comparisonsByPipette:
+                first:
+                  tipLength: !anydict
+                  pipetteOffset: !anydict
+                  deck: null
+                second:
+                  tipLength: null
+                  pipetteOffset: null
+                  deck: null
 
   - name: Delete the session
     request:
