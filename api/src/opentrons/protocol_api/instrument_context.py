@@ -810,9 +810,10 @@ class InstrumentContext(CommandPublisher):
             * The pipette might aspirate or dispense the wrong volumes.
             * The pipette might not fully drop subsequent tips.
 
-            GEN1 pipettes are especially likely to have these problems, so we
-            strongly discourage using ``home_after=False`` with them. (There's
-            still a risk with GEN2 pipettes---it's just smaller.)
+            GEN1 pipettes are much more vulnerable to this skipping. You should
+            never set this parameter to False on a GEN1 pipette. Even on GEN2
+            pipettes, the skip may still happen, so always test with your
+            particular pipette.
 
         :returns: This instance
         """
