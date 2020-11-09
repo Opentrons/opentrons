@@ -19,7 +19,7 @@ export function FileUploadMessageModal(props: Props): React.Node {
   if (!message) return null
 
   const { title, body, okButtonText } = getModalContents(message)
-  const buttons = [
+  let buttons = [
     {
       children: okButtonText || 'ok',
       onClick: dismissModal,
@@ -31,6 +31,16 @@ export function FileUploadMessageModal(props: Props): React.Node {
       className: modalStyles.bottom_button,
     },
   ]
+  if (title === 'Incorrect file type' || title === 'Invalid JSON file') {
+    buttons = [
+      {
+        children: okButtonText || 'ok',
+        onClick: dismissModal,
+        className: modalStyles.button_medium,
+      },
+    ]
+  }
+
   return (
     <AlertModal
       heading={title}
