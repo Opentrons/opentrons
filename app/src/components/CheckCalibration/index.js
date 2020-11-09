@@ -38,7 +38,7 @@ import type {
 } from '../../sessions/types'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
-import type { CalibrationHealthCheckParentProps } from './types'
+import type { CalibrationCheckParentProps } from './types'
 
 import styles from './styles.css'
 
@@ -100,8 +100,8 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.CHECK_STEP_COMPARING_POINT_THREE]: terminalContentsStyleProps,
 }
 
-export function CheckHealthCalibration(
-  props: CalibrationHealthCheckParentProps
+export function CheckCalibration(
+  props: CalibrationCheckParentProps
 ): React.Node {
   const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const {

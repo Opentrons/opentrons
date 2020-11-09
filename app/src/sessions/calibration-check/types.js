@@ -51,7 +51,7 @@ export type RobotCalibrationCheckStatus =
   | CHECK_STATUS_IN_THRESHOLD
   | CHECK_STATUS_OUTSIDE_THRESHOLD
 
-export type CalibrationHealthCheckInstrument = {|
+export type CalibrationCheckInstrument = {|
   model: string,
   name: string,
   tip_length: number,
@@ -63,38 +63,38 @@ export type CalibrationHealthCheckInstrument = {|
   serial: string,
 |}
 
-export type CalibrationHealthCheckComparison = {|
+export type CalibrationCheckComparison = {|
   differenceVector: [number, number, number],
   thresholdVector: [number, number, number],
   exceedsThreshold: boolean,
 |}
 
-export type CalibrationHealthCheckComparisonMap = {
+export type CalibrationCheckComparisonMap = {
   status: RobotCalibrationCheckStatus,
-  [RobotCalibrationCheckStep]: CalibrationHealthCheckComparison,
+  [RobotCalibrationCheckStep]: CalibrationCheckComparison,
 }
 
-export type CalibrationHealthCheckComparisonsPerCalibration = {
-  tipLength?: CalibrationHealthCheckComparisonMap,
-  pipetteOffset?: CalibrationHealthCheckComparisonMap,
-  deck?: CalibrationHealthCheckComparisonMap,
+export type CalibrationCheckComparisonsPerCalibration = {
+  tipLength?: CalibrationCheckComparisonMap,
+  pipetteOffset?: CalibrationCheckComparisonMap,
+  deck?: CalibrationCheckComparisonMap,
 }
 
-export type CalibrationHealthCheckComparisonByPipette = {
-  first: CalibrationHealthCheckComparisonsPerCalibration,
-  second: CalibrationHealthCheckComparisonsPerCalibration,
+export type CalibrationCheckComparisonByPipette = {
+  first: CalibrationCheckComparisonsPerCalibration,
+  second: CalibrationCheckComparisonsPerCalibration,
 }
 
-export type CheckCalibrationHealthSessionDetails = {|
-  instruments: Array<CalibrationHealthCheckInstrument>,
+export type CheckCalibrationSessionDetails = {|
+  instruments: Array<CalibrationCheckInstrument>,
   currentStep: RobotCalibrationCheckStep,
-  comparisonsByPipette: CalibrationHealthCheckComparisonByPipette,
+  comparisonsByPipette: CalibrationCheckComparisonByPipette,
   labware: Array<CalibrationLabware>,
-  activePipette: CalibrationHealthCheckInstrument,
+  activePipette: CalibrationCheckInstrument,
   activeTipRack: CalibrationLabware,
 |}
 
-export type CheckCalibrationHealthSessionParams = {|
+export type CheckCalibrationSessionParams = {|
   hasCalibrationBlock: boolean,
   tipRacks: Array<CalibrationLabware>,
 |}
