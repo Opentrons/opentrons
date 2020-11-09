@@ -13,20 +13,25 @@ type State = {|
   hasRoot: boolean,
 |}
 
-const PORTAL_ROOT_ID_BY_LEVEL: { [PortalLevel]: string } = {
-  page: '__otAppModalPortalRoot',
-  top: '__otAppTopPortalRoot',
+type PortalLevelInfo = {|
+  id: string,
+  zIndex: number | string,
+|}
+
+const PORTAL_INFO_BY_LEVEL: { [PortalLevel]: PortalLevelInfo } = {
+  page: { id: '__otAppModalPortalRoot', zIndex: 1 },
+  top: { id: '__otAppTopPortalRoot', zIndex: 10 },
 }
 
 const getPortalRoot = level =>
-  global.document.getElementById(PORTAL_ROOT_ID_BY_LEVEL[level])
+  global.document.getElementById(PORTAL_INFO_BY_LEVEL[level].id)
 
 export function PortalRoot(): React.Node {
-  return <div id={PORTAL_ROOT_ID_BY_LEVEL.page} />
+  return <div id={PORTAL_INFO_BY_LEVEL.page.id} />
 }
 
 export function TopPortalRoot(): React.Node {
-  return <div id={PORTAL_ROOT_ID_BY_LEVEL.top} />
+  return <div id={PORTAL_INFO_BY_LEVEL.top.id} />
 }
 
 // the children of Portal are rendered into the PortalRoot if it exists in DOM
