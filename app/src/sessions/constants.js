@@ -68,3 +68,6 @@ export const SESSION_TYPE_DECK_CALIBRATION: 'deckCalibration' =
   'deckCalibration'
 export const SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION: 'pipetteOffsetCalibration' =
   'pipetteOffsetCalibration'
+
+export const CLEAR_ALL_SESSIONS: 'sessions:CLEAR_ALL_SESSIONS' =
+  'sessions:CLEAR_ALL_SESSIONS'

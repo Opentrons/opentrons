@@ -82,6 +82,15 @@ export function sessionReducer(
         return state
       }
     }
+
+    case Constants.CLEAR_ALL_SESSIONS: {
+      const { robotName } = action.payload
+
+      return {
+        ...state,
+        [robotName]: INITIAL_PER_ROBOT_STATE,
+      }
+    }
   }
 
   return state

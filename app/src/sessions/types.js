@@ -16,6 +16,7 @@ import typeof {
   FETCH_ALL_SESSIONS_SUCCESS,
   FETCH_ALL_SESSIONS_FAILURE,
   ENSURE_SESSION,
+  CLEAR_ALL_SESSIONS,
   CREATE_SESSION_COMMAND,
   CREATE_SESSION_COMMAND_SUCCESS,
   CREATE_SESSION_COMMAND_FAILURE,
@@ -285,6 +286,11 @@ export type CreateSessionCommandFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type ClearAllSessionsAction = {|
+  type: CLEAR_ALL_SESSIONS,
+  payload: {| robotName: string |},
+|}
+
 export type SessionsAction =
   | CreateSessionAction
   | CreateSessionSuccessAction
@@ -302,6 +308,7 @@ export type SessionsAction =
   | CreateSessionCommandSuccessAction
   | CreateSessionCommandFailureAction
   | EnsureSessionAction
+  | ClearAllSessionsAction
 
 export type SessionsById = $Shape<{|
   [id: string]: Session,
