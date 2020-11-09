@@ -4,9 +4,9 @@ from mock import MagicMock
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import Point, DeckSlot
+from opentrons.types import Point, DeckSlotName
 
-from opentrons.protocol_engine import StateStore
+from opentrons.protocol_engine import StateStore, errors
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.state import LabwareData
 from opentrons.protocol_engine.state.labware import LabwareStore
@@ -39,12 +39,34 @@ def test_get_deck_definition(
     assert deck == standard_deck_def
 
 
+def test_get_slot_definition(
+    standard_deck_def: DeckDefinitionV2,
+    store: StateStore,
+) -> None:
+    """It should return a deck slot's definition."""
+    slot = store.geometry.get_slot_definition(DeckSlotName.SLOT_6)
+
+    assert slot["id"] == "6"
+    assert slot == standard_deck_def["locations"]["orderedSlots"][5]
+
+
+def test_get_slot_definition_raises_with_bad_slot_name(
+    standard_deck_def: DeckDefinitionV2,
+    store: StateStore,
+) -> None:
+    """It should raise a SlotDoesNotExistError if a bad slot name is given."""
+    with pytest.raises(errors.SlotDoesNotExistError):
+        # note: normally the typechecker should catch this, but clients may
+        # not be using typechecking or our enums
+        store.geometry.get_slot_definition(42)  # type: ignore[arg-type]
+
+
 def test_get_slot_position(
     standard_deck_def: DeckDefinitionV2,
     store: StateStore,
 ) -> None:
     """It should get the absolute location of a deck slot's origin."""
-    point = store.geometry.get_slot_position(3)
+    point = store.geometry.get_slot_position(DeckSlotName.SLOT_3)
     slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
 
     assert point == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
@@ -59,12 +81,12 @@ def test_get_labware_highest_z(
     """It should get the absolute location of a labware's highest Z point."""
     labware_data = LabwareData(
         definition=well_plate_def,
-        location=DeckSlotLocation(DeckSlot.SLOT_3),
+        location=DeckSlotLocation(DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
 
     mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
-    slot_pos = geometry_store.state.get_slot_position(3)
+    slot_pos = geometry_store.state.get_slot_position(DeckSlotName.SLOT_3)
 
     highest_z = geometry_store.state.get_labware_highest_z("labware-id")
 
@@ -88,12 +110,12 @@ def test_get_all_labware_highest_z(
     """It should get the highest Z amongst all labware."""
     plate_data = LabwareData(
         definition=well_plate_def,
-        location=DeckSlotLocation(DeckSlot.SLOT_3),
+        location=DeckSlotLocation(DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
     reservoir_data = LabwareData(
         definition=reservoir_def,
-        location=DeckSlotLocation(DeckSlot.SLOT_4),
+        location=DeckSlotLocation(DeckSlotName.SLOT_4),
         calibration=(1, -2, 3)
     )
 
@@ -128,7 +150,7 @@ def test_get_well_position(
     """It should be able to get the position of a well top in a labware."""
     labware_data = LabwareData(
         definition=well_plate_def,
-        location=DeckSlotLocation(DeckSlot.SLOT_3),
+        location=DeckSlotLocation(DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
     well_def = well_plate_def["wells"]["B2"]

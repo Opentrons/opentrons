@@ -5,7 +5,7 @@ from datetime import datetime
 from mock import AsyncMock  # type: ignore[attr-defined]
 from typing import Any, Optional, cast
 
-from opentrons.types import MountType, DeckSlot
+from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import errors, command_models as cmd
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.execution import CommandExecutor
@@ -50,7 +50,7 @@ class ExecutorRoutingSpec:
         ExecutorRoutingSpec(
             name="Successful load labware",
             request=cmd.LoadLabwareRequest(
-                location=DeckSlotLocation(DeckSlot.SLOT_1),
+                location=DeckSlotLocation(DeckSlotName.SLOT_1),
                 loadName="load-name",
                 namespace="opentrons-test",
                 version=1,
@@ -88,7 +88,7 @@ class ExecutorRoutingSpec:
             request=cmd.MoveToWellRequest(
                 pipetteId="pipette-id",
                 labwareId="labware-id",
-                wellId="A1",
+                wellName="A1",
             ),
             result=cmd.MoveToWellResult(),
             expected_handler="pipetting_handler",
@@ -99,7 +99,7 @@ class ExecutorRoutingSpec:
             request=cmd.MoveToWellRequest(
                 pipetteId="pipette-id",
                 labwareId="labware-id",
-                wellId="A1",
+                wellName="A1",
             ),
             error=errors.WellDoesNotExistError("oh no"),
             expected_handler="pipetting_handler",
@@ -167,7 +167,7 @@ async def test_executor_handles_unexpected_error(
             created_at=now,
             started_at=now,
             request=cmd.LoadLabwareRequest(
-                location=DeckSlotLocation(DeckSlot.SLOT_1),
+                location=DeckSlotLocation(DeckSlotName.SLOT_1),
                 loadName="load-name",
                 namespace="opentrons-test",
                 version=1,

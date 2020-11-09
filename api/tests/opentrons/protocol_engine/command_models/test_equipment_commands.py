@@ -1,19 +1,19 @@
 """Text creating equipment commands."""
 from opentrons.protocol_engine import command_models as commands
-from opentrons.types import MountType, DeckSlot
+from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine.types import DeckSlotLocation
 
 
 def test_load_labware_request():
     """It should have a LoadLabwareRequest model."""
     payload = commands.LoadLabwareRequest(
-        location=DeckSlotLocation(DeckSlot.SLOT_3),
+        location=DeckSlotLocation(DeckSlotName.SLOT_3),
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1
     )
 
-    assert payload.location == DeckSlotLocation(DeckSlot.SLOT_3)
+    assert payload.location == DeckSlotLocation(DeckSlotName.SLOT_3)
     assert payload.loadName == "some-load-name"
     assert payload.namespace == "opentrons-test"
     assert payload.version == 1

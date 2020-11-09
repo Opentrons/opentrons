@@ -14,7 +14,7 @@ class BasePipettingRequest(BaseModel):
         description="Identifier of pipette to use for liquid handling."
     )
     labwareId: str = Field(..., description="Identifier of labware to use.")
-    wellId: str = Field(..., description="Identifier of well to use.")
+    wellName: str = Field(..., description="Identifier of well to use.")
 
 
 class BaseLiquidHandlingRequest(BasePipettingRequest):

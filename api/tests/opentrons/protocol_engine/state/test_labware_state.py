@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime, timezone
 from typing import Tuple
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import DeckSlot
+from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine import command_models as cmd, errors, StateStore
 from opentrons.protocol_engine.types import LabwareLocation, DeckSlotLocation
@@ -50,7 +50,7 @@ def test_handles_load_labware(store, well_plate_def):
     command = load_labware(
         store=store,
         labware_id="plate-id",
-        location=DeckSlotLocation(DeckSlot.SLOT_1),
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -71,7 +71,7 @@ def test_get_all_labware(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=DeckSlotLocation(DeckSlot.SLOT_1),
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -79,7 +79,7 @@ def test_get_all_labware(
     load_labware(
         store=store,
         labware_id="reservoir-id",
-        location=DeckSlotLocation(DeckSlot.SLOT_2),
+        location=DeckSlotLocation(DeckSlotName.SLOT_2),
         definition=reservoir_def,
         calibration=(4, 5, 6),
     )
@@ -101,7 +101,7 @@ def test_get_labware_has_quirk(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=DeckSlotLocation(DeckSlot.SLOT_1),
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -109,7 +109,7 @@ def test_get_labware_has_quirk(
     load_labware(
         store=store,
         labware_id="reservoir-id",
-        location=DeckSlotLocation(DeckSlot.SLOT_2),
+        location=DeckSlotLocation(DeckSlotName.SLOT_2),
         definition=reservoir_def,
         calibration=(4, 5, 6),
     )
@@ -136,13 +136,13 @@ def test_get_well_definition_bad_id(
     load_labware(
         store=store,
         labware_id="uid",
-        location=DeckSlotLocation(DeckSlot.SLOT_1),
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
 
     with pytest.raises(errors.WellDoesNotExistError):
-        store.labware.get_well_definition(labware_id="uid", well_id="foobar")
+        store.labware.get_well_definition(labware_id="uid", well_name="foobar")
 
 
 def test_get_well_definition(
@@ -153,7 +153,7 @@ def test_get_well_definition(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=DeckSlotLocation(DeckSlot.SLOT_1),
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -161,7 +161,7 @@ def test_get_well_definition(
     expected_well_def = well_plate_def["wells"]["B2"]
     result = store.labware.get_well_definition(
         labware_id="plate-id",
-        well_id="B2",
+        well_name="B2",
     )
 
     assert result == expected_well_def

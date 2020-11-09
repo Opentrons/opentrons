@@ -93,7 +93,7 @@ def test_get_pipette_location_with_current_location_with_quirks(
         LocationData(
             pipette_id="pipette-id",
             labware_id="reservoir-id",
-            well_id="A1"
+            well_name="A1"
         ),
     )
 
@@ -126,7 +126,7 @@ def test_get_pipette_location_with_current_location_different_pipette(
         LocationData(
             pipette_id="other-pipette-id",
             labware_id="reservoir-id",
-            well_id="A1"
+            well_name="A1"
         ),
     )
 
@@ -152,7 +152,7 @@ class WaypointSpec:
     expected_move_type: MoveType
     pipette_id: str = "pipette-id"
     labware_id: str = "labware-id"
-    well_id: str = "A1"
+    well_name: str = "A1"
     origin: Point = field(default_factory=lambda: Point(1, 2, 3))
     dest: Point = field(default_factory=lambda: Point(4, 5, 6))
     origin_cp: Optional[CriticalPoint] = None
@@ -229,7 +229,7 @@ def test_get_movement_waypoints(
     result = motion_store.state.get_movement_waypoints(
         pipette_id=spec.pipette_id,
         labware_id=spec.labware_id,
-        well_id=spec.well_id,
+        well_name=spec.well_name,
         origin=spec.origin,
         origin_cp=spec.origin_cp,
         max_travel_z=spec.max_travel_z,
@@ -252,7 +252,7 @@ def test_get_movement_waypoints(
     )
     mock_geometry_store.state.get_well_position.assert_called_with(
         spec.labware_id,
-        spec.well_id,
+        spec.well_name,
     )
     if spec.labware_z is not None:
         mock_geometry_store.state.get_labware_highest_z.assert_called_with(
@@ -274,7 +274,7 @@ def test_get_movement_waypoints_raises(
         motion_store.state.get_movement_waypoints(
             pipette_id="pipette-id",
             labware_id="labware-id",
-            well_id="A1",
+            well_name="A1",
             origin=Point(1, 2, 3),
             origin_cp=None,
             # this max_travel_z is too low and will induce failure

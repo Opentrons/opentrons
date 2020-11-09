@@ -3,14 +3,14 @@ from pydantic.dataclasses import dataclass
 from typing import Union
 from typing_extensions import final
 
-from opentrons.types import DeckSlot
+from opentrons.types import DeckSlotName
 
 
 @final
 @dataclass(frozen=True)
 class DeckSlotLocation:
     """Location for labware placed in a single slot."""
-    slot: DeckSlot
+    slot: DeckSlotName
 
 
 LabwareLocation = Union[DeckSlotLocation]

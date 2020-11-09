@@ -1,7 +1,7 @@
 """Functional tests for the LabwareData provider."""
 from mock import patch
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import DeckSlot, Point
+from opentrons.types import DeckSlotName, Point
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.calibration_storage.helpers import hash_labware_def
 
@@ -38,7 +38,7 @@ async def test_labware_data_gets_calibration(
 
         result = await LabwareData().get_labware_calibration(
             minimal_labware_def,
-            DeckSlotLocation(DeckSlot.SLOT_5),
+            DeckSlotLocation(DeckSlotName.SLOT_5),
         )
 
         assert result == (1, 2, 3)

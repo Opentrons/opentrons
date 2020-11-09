@@ -1,7 +1,8 @@
 """Geometry state store and getters."""
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons.types import Point, DeckSlot
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV2, SlotDefV2
+from opentrons.types import Point, DeckSlotName
 
+from .. import errors
 from .substore import Substore, CommandReactive
 from .labware import LabwareStore, LabwareData
 
@@ -25,10 +26,22 @@ class GeometryState:
         """Get the current deck definition."""
         return self._deck_definition
 
-    def get_slot_position(self, slot: DeckSlot) -> Point:
-        """Get the position of a deck slot."""
+    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV2:
+        """Get the current deck definition."""
         deck_def = self.get_deck_definition()
-        position = deck_def["locations"]["orderedSlots"][slot - 1]["position"]
+
+        for slot_def in deck_def["locations"]["orderedSlots"]:
+            if slot_def["id"] == str(slot):
+                return slot_def
+
+        raise errors.SlotDoesNotExistError(
+            f"Slot ID {slot} does not exist in deck {deck_def['otId']}"
+        )
+
+    def get_slot_position(self, slot: DeckSlotName) -> Point:
+        """Get the position of a deck slot."""
+        slot_def = self.get_slot_definition(slot)
+        position = slot_def["position"]
 
         return Point(x=position[0], y=position[1], z=position[2])
 
@@ -47,7 +60,7 @@ class GeometryState:
             for uid, lw_data in self._labware_store.state.get_all_labware()
         ])
 
-    def get_well_position(self, labware_id: str, well_id: str) -> Point:
+    def get_well_position(self, labware_id: str, well_name: str) -> Point:
         """Get the absolute position of a well in a labware."""
         # TODO(mc, 2020-10-29): implement CSS-style key point + offset option
         # rather than defaulting to well top
@@ -56,7 +69,7 @@ class GeometryState:
         )
         well_def = self._labware_store.state.get_well_definition(
             labware_id,
-            well_id
+            well_name
         )
         slot_pos = self.get_slot_position(labware_data.location.slot)
         cal_offset = labware_data.calibration

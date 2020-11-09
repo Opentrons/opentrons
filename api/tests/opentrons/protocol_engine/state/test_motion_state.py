@@ -15,7 +15,7 @@ def test_initial_location(store: StateStore) -> None:
         cmd.MoveToWellRequest(
             pipetteId="pipette-id",
             labwareId="labware-id",
-            wellId="B4"
+            wellName="B4"
         ),
         cmd.MoveToWellResult()
     ),
@@ -23,7 +23,7 @@ def test_initial_location(store: StateStore) -> None:
         cmd.AspirateRequest(
             pipetteId="pipette-id",
             labwareId="labware-id",
-            wellId="B4",
+            wellName="B4",
             volume=50,
             flowRate=1.0,
         ),
@@ -33,7 +33,7 @@ def test_initial_location(store: StateStore) -> None:
         cmd.DispenseRequest(
             pipetteId="pipette-id",
             labwareId="labware-id",
-            wellId="B4",
+            wellName="B4",
             volume=50,
             flowRate=1.0,
         ),
@@ -60,5 +60,5 @@ def test_handles_move_to_well_result(
     assert store.motion.get_current_location_data() == LocationData(
         pipette_id="pipette-id",
         labware_id="labware-id",
-        well_id="B4"
+        well_name="B4"
     )

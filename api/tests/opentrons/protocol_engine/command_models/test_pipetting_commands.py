@@ -9,12 +9,12 @@ def test_move_to_well_command() -> None:
     payload = commands.MoveToWellRequest(
         pipetteId="abc",
         labwareId="123",
-        wellId="A3",
+        wellName="A3",
     )
 
     assert payload.pipetteId == "abc"
     assert payload.labwareId == "123"
-    assert payload.wellId == "A3"
+    assert payload.wellName == "A3"
 
 
 def test_pick_up_tip_command() -> None:
@@ -22,12 +22,12 @@ def test_pick_up_tip_command() -> None:
     payload = commands.PickUpTipRequest(
         pipetteId="abc",
         labwareId="123",
-        wellId="A3",
+        wellName="A3",
     )
 
     assert payload.pipetteId == "abc"
     assert payload.labwareId == "123"
-    assert payload.wellId == "A3"
+    assert payload.wellName == "A3"
 
 
 def test_drop_tip_command() -> None:
@@ -35,12 +35,12 @@ def test_drop_tip_command() -> None:
     payload = commands.DropTipRequest(
         pipetteId="abc",
         labwareId="123",
-        wellId="A3",
+        wellName="A3",
     )
 
     assert payload.pipetteId == "abc"
     assert payload.labwareId == "123"
-    assert payload.wellId == "A3"
+    assert payload.wellName == "A3"
 
 
 def test_aspirate_command() -> None:
@@ -48,14 +48,14 @@ def test_aspirate_command() -> None:
     payload = commands.AspirateRequest(
         pipetteId="abc",
         labwareId="123",
-        wellId="A3",
+        wellName="A3",
         volume=50,
         flowRate=1.0
     )
 
     assert payload.pipetteId == "abc"
     assert payload.labwareId == "123"
-    assert payload.wellId == "A3"
+    assert payload.wellName == "A3"
     assert payload.volume == 50
     assert payload.flowRate == 1.0
 
@@ -66,7 +66,7 @@ def test_aspirate_command_validation(key_under_test: str) -> None:
     init_args = {
         "pipetteId": "abc",
         "labwareId": "123",
-        "wellId": "A3",
+        "wellName": "A3",
         "volume": 50,
         "flowRate": 1.0
     }
@@ -81,13 +81,13 @@ def test_dispense_command() -> None:
     payload = commands.DispenseRequest(
         pipetteId="abc",
         labwareId="123",
-        wellId="A3",
+        wellName="A3",
         volume=50,
         flowRate=1.0
     )
 
     assert payload.pipetteId == "abc"
     assert payload.labwareId == "123"
-    assert payload.wellId == "A3"
+    assert payload.wellName == "A3"
     assert payload.volume == 50
     assert payload.flowRate == 1.0

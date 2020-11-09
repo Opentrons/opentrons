@@ -49,16 +49,16 @@ class LabwareState:
     def get_well_definition(
         self,
         labware_id: str,
-        well_id: str,
+        well_name: str,
     ) -> WellDefinition:
         """Get a well's definition by labware and well identifier."""
         labware_data = self.get_labware_data_by_id(labware_id)
 
         try:
-            return labware_data.definition["wells"][well_id]
+            return labware_data.definition["wells"][well_name]
         except KeyError:
             raise errors.WellDoesNotExistError(
-                f"{well_id} does not exist in {labware_id}."
+                f"{well_name} does not exist in {labware_id}."
             )
 
 

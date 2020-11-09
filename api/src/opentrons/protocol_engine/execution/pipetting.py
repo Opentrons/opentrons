@@ -44,7 +44,7 @@ class PipettingHandler:
         waypoints = self._state.motion.get_movement_waypoints(
             pipette_id=request.pipetteId,
             labware_id=request.labwareId,
-            well_id=request.wellId,
+            well_name=request.wellName,
             origin=origin,
             origin_cp=origin_cp,
             max_travel_z=max_travel_z,

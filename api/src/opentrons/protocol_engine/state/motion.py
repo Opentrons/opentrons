@@ -24,7 +24,7 @@ class LocationData:
 
     pipette_id: str
     labware_id: str
-    well_id: str
+    well_name: str
 
 
 @dataclass(frozen=True)
@@ -87,7 +87,7 @@ class MotionState:
         self,
         pipette_id: str,
         labware_id: str,
-        well_id: str,
+        well_name: str,
         origin: Point,
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float
@@ -101,7 +101,7 @@ class MotionState:
 
         dest = self._geometry_store.state.get_well_position(
             labware_id,
-            well_id
+            well_name
         )
         dest_cp = CriticalPoint.XY_CENTER if center_dest else None
 
@@ -112,7 +112,7 @@ class MotionState:
         ):
             move_type = (
                 MoveType.IN_LABWARE_ARC
-                if well_id != location.well_id else
+                if well_name != location.well_name else
                 MoveType.DIRECT
             )
             min_travel_z = self._geometry_store.state.get_labware_highest_z(
@@ -168,5 +168,5 @@ class MotionStore(Substore[MotionState], CommandReactive):
             self._state._current_location = LocationData(
                 pipette_id=command.request.pipetteId,
                 labware_id=command.request.labwareId,
-                well_id=command.request.wellId,
+                well_name=command.request.wellName,
             )

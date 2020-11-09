@@ -19,7 +19,7 @@ def move_to_well_request() -> MoveToWellRequest:
     return MoveToWellRequest(
         pipetteId="pipette-id",
         labwareId="labware-id",
-        wellId="B2"
+        wellName="B2"
     )
 
 
@@ -127,5 +127,5 @@ async def test_handle_move_to_gets_movement_data_from_state(
         max_travel_z=42.0,
         pipette_id=move_to_well_request.pipetteId,
         labware_id=move_to_well_request.labwareId,
-        well_id=move_to_well_request.wellId,
+        well_name=move_to_well_request.wellName,
     )
