@@ -790,9 +790,10 @@ class InstrumentContext(CommandPublisher):
             .. warning::
                 Only set ``home_after=False`` if:
 
+                * You're using a GEN2 pipette, not a GEN1 pipette.
+                * You've tested ``home_after=False` extensively with your
+                  particular pipette and your particular tips.
                 * You understand the risks described below.
-                * You've tested it extensively with your particular pipette and
-                  your particular tips.
 
             The ejector shroud that pops the tip off the end of the pipette is
             driven by the plunger's stepper motor. Sometimes, the strain of
