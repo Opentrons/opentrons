@@ -11,7 +11,7 @@ import logging
 import os
 import sys
 from typing import (Any, Callable, Dict, List, Optional, TextIO, Union,
-                    TYPE_CHECKING, cast)
+                    TYPE_CHECKING)
 
 import opentrons
 from opentrons import protocol_api, __version__
@@ -294,10 +294,7 @@ def execute(protocol_file: TextIO,
             bundled_data=bundled_data,
             extra_labware=gpa_extras)
         if emit_runlog:
-            # TODO amit 2020-9-4 remove this cast.
-            #  We will stop using Broker soon and not need this.
-            broker = cast('ProtocolContextImplementation',
-                          context._implementation).broker
+            broker = context.broker
             broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
         context.home()

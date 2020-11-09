@@ -13,7 +13,7 @@ import os
 import pathlib
 import queue
 from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
-                    Optional, Union, TYPE_CHECKING, cast)
+                    Optional, Union, TYPE_CHECKING)
 
 
 import opentrons
@@ -343,10 +343,7 @@ def simulate(protocol_file: TextIO,
             bundled_data=getattr(protocol, 'bundled_data', None),
             hardware_simulator=hardware_simulator,
             extra_labware=gpa_extras)
-        # TODO amit 2020-9-4 remove this cast.
-        #  We will stop using Broker soon and not need this.
-        broker = cast('ProtocolContextImplementation',
-                      context._implementation).broker
+        broker = context.broker
         scraper = CommandScraper(stack_logger,
                                  log_level,
                                  broker)

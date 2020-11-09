@@ -67,7 +67,7 @@ class PairedInstrumentContext(CommandPublisher):
         self.trash_container = trash
         self.paired_instrument_obj = PairedInstrument(
             primary_instrument, secondary_instrument, pair_policy,
-            ctx, hardware_manager, self._log)
+            ctx._implementation, hardware_manager, self._log)
 
     @property  # type: ignore
     @requires_version(2, 7)
@@ -239,7 +239,8 @@ class PairedInstrumentContext(CommandPublisher):
         # that tiprack with the second pipette attached.
         secondary_target = self._get_secondary_target(tiprack, target)
         primary_pipette = self._instruments[self._pair_policy.primary]
-        tip_length = primary_pipette._tip_length_for(tiprack)
+        # TODO FIX THIS
+        tip_length = primary_pipette.return_height  #primary_pipette._implementation._tip_length_for(tiprack)
 
         instruments = list(self._instruments.values())
         targets = [target, secondary_target]

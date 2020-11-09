@@ -1,4 +1,6 @@
 """ Utility functions and classes for the protocol api """
+from __future__ import annotations
+
 from collections import UserDict
 import functools
 import logging
@@ -11,7 +13,8 @@ from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
 if TYPE_CHECKING:
-    from opentrons.protocol_api.contexts import InstrumentContext
+    from opentrons.protocols.implementations.interfaces.instrument_context import \
+        InstrumentContextInterface
     from opentrons.protocol_api.labware import Well, Labware
     from opentrons.protocols.geometry.deck import Deck
     from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
@@ -116,47 +119,45 @@ def labware_column_shift(
 class FlowRates:
     """ Utility class for rich setters/getters for flow rates """
     def __init__(self,
-                 instr: 'InstrumentContext') -> None:
+                 instr: InstrumentContextInterface) -> None:
         self._instr = instr
 
     def set_defaults(self, api_level: APIVersion):
+        pipette = self._instr.get_pipette()
         self.aspirate = _find_value_for_api_version(
-            api_level, self._instr.hw_pipette['default_aspirate_flow_rates'])
+            api_level, pipette['default_aspirate_flow_rates'])
         self.dispense = _find_value_for_api_version(
-            api_level, self._instr.hw_pipette['default_dispense_flow_rates'])
+            api_level, pipette['default_dispense_flow_rates'])
         self.blow_out = _find_value_for_api_version(
-            api_level, self._instr.hw_pipette['default_blow_out_flow_rates'])
+            api_level, pipette['default_blow_out_flow_rates'])
 
     @property
     def aspirate(self) -> float:
-        return self._instr.hw_pipette['aspirate_flow_rate']
+        return self._instr.get_pipette()['aspirate_flow_rate']
 
     @aspirate.setter
     def aspirate(self, new_val: float):
-        self._instr._hw_manager.hardware.set_flow_rate(
-            mount=self._instr._mount,
+        self._instr.set_flow_rate(
             aspirate=_assert_gzero(
                 new_val, 'flow rate should be a numerical value in ul/s'))
 
     @property
     def dispense(self) -> float:
-        return self._instr.hw_pipette['dispense_flow_rate']
+        return self._instr.get_pipette()['dispense_flow_rate']
 
     @dispense.setter
     def dispense(self, new_val: float):
-        self._instr._hw_manager.hardware.set_flow_rate(
-            mount=self._instr._mount,
+        self._instr.set_flow_rate(
             dispense=_assert_gzero(
                 new_val, 'flow rate should be a numerical value in ul/s'))
 
     @property
     def blow_out(self) -> float:
-        return self._instr.hw_pipette['blow_out_flow_rate']
+        return self._instr.get_pipette()['blow_out_flow_rate']
 
     @blow_out.setter
     def blow_out(self, new_val: float):
-        self._instr._hw_manager.hardware.set_flow_rate(
-            mount=self._instr._mount,
+        self._instr.set_flow_rate(
             blow_out=_assert_gzero(
                 new_val, 'flow rate should be a numerical value in ul/s'))
 
@@ -183,39 +184,36 @@ def _find_value_for_api_version(for_version: APIVersion,
 class PlungerSpeeds:
     """ Utility class for rich setters/getters for speeds """
     def __init__(self,
-                 instr: 'InstrumentContext') -> None:
+                 instr: InstrumentContextInterface) -> None:
         self._instr = instr
 
     @property
     def aspirate(self) -> float:
-        return self._instr.hw_pipette['aspirate_speed']
+        return self._instr.get_pipette()['aspirate_speed']
 
     @aspirate.setter
     def aspirate(self, new_val: float):
-        self._instr._hw_manager.hardware.set_pipette_speed(
-            mount=self._instr._mount,
+        self._instr.set_pipette_speed(
             aspirate=_assert_gzero(
                 new_val, 'speed should be a numerical value in mm/s'))
 
     @property
     def dispense(self) -> float:
-        return self._instr.hw_pipette['dispense_speed']
+        return self._instr.get_pipette()['dispense_speed']
 
     @dispense.setter
     def dispense(self, new_val: float):
-        self._instr._hw_manager.hardware.set_pipette_speed(
-            mount=self._instr._mount,
+        self._instr.set_pipette_speed(
             dispense=_assert_gzero(
                 new_val, 'speed should be a numerical value in mm/s'))
 
     @property
     def blow_out(self) -> float:
-        return self._instr.hw_pipette['blow_out_speed']
+        return self._instr.get_pipette()['blow_out_speed']
 
     @blow_out.setter
     def blow_out(self, new_val: float):
-        self._instr._hw_manager.hardware.set_pipette_speed(
-            mount=self._instr._mount,
+        self._instr.set_pipette_speed(
             blow_out=_assert_gzero(
                 new_val, 'speed should be a numerical value in mm/s'))
 

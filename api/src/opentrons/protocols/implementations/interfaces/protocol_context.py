@@ -1,25 +1,37 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import (Dict, List, Optional, Union)
+from dataclasses import dataclass
+from typing import (Dict, Optional)
 
 from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.protocols.implementations.interfaces.modules.module_context import \
-    ModuleContextInterface
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.protocols.geometry.module_geometry import (
+    ModuleGeometry, ModuleType)
 from opentrons.protocols.implementations.interfaces.instrument_context \
     import InstrumentContextInterface
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds, HardwareManager)
 from opentrons.protocols.implementations.interfaces.labware import \
     LabwareInterface
-from opentrons.protocols.implementations.interfaces.versioned import \
-    ApiVersioned
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-class ProtocolContextInterface(ApiVersioned):
+InstrumentDict = Dict[types.Mount, Optional[InstrumentContextInterface]]
+
+
+@dataclass(frozen=True)
+class LoadModuleResult:
+    """The result of load_module"""
+    type: ModuleType
+    geometry: ModuleGeometry
+    module: AbstractModule
+
+
+class ProtocolContextInterface:
 
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:
@@ -79,20 +91,15 @@ class ProtocolContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
-    def get_loaded_labwares(self) -> \
-            Dict[int, Union[LabwareInterface, ModuleContextInterface]]:
-        ...
-
-    @abstractmethod
     def load_module(
             self,
             module_name: str,
             location: Optional[types.DeckLocation] = None,
-            configuration: str = None) -> ModuleContextInterface:
+            configuration: str = None) -> Optional[LoadModuleResult]:
         ...
 
     @abstractmethod
-    def get_loaded_modules(self) -> Dict[int, ModuleContextInterface]:
+    def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
         ...
 
     @abstractmethod
@@ -100,13 +107,11 @@ class ProtocolContextInterface(ApiVersioned):
             self,
             instrument_name: str,
             mount: types.Mount,
-            tip_racks: List[LabwareInterface] = None,
             replace: bool = False) -> InstrumentContextInterface:
         ...
 
     @abstractmethod
-    def get_loaded_instruments(self) \
-            -> Dict[str, Optional[InstrumentContextInterface]]:
+    def get_loaded_instruments(self) -> InstrumentDict:
         ...
 
     @abstractmethod
@@ -136,7 +141,7 @@ class ProtocolContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
-    def get_fixed_trash(self) -> LabwareInterface:
+    def get_fixed_trash(self) -> DeckItem:
         ...
 
     @abstractmethod
@@ -149,4 +154,12 @@ class ProtocolContextInterface(ApiVersioned):
 
     @abstractmethod
     def door_closed(self) -> bool:
+        ...
+
+    @abstractmethod
+    def get_last_location(self) -> Optional[types.Location]:
+        ...
+
+    @abstractmethod
+    def set_last_location(self, location: Optional[types.Location]) -> None:
         ...

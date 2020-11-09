@@ -67,8 +67,10 @@ class PairedInstrument:
                 speed: Optional[float] = None):
         if not speed:
             speed = self.p_instrument.default_speed
-        if self._ctx.location_cache:
-            from_lw = self._ctx.location_cache.labware
+
+        last_location = self._ctx.get_last_location()
+        if last_location:
+            from_lw = last_location.labware
         else:
             from_lw = LabwareLike(None)
 
@@ -80,9 +82,10 @@ class PairedInstrument:
                 self._pair_policy.primary, critical_point=cp_override),
             from_lw)
 
-        for mod in self._ctx._modules:
-            if isinstance(mod, ThermocyclerContext):
-                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+        # TODO FIX THIS
+        # for mod in self._ctx._modules:
+        #     if isinstance(mod, ThermocyclerContext):
+        #         mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
         primary_height = \
             self._hw_manager.hardware.get_instrument_max_height(
@@ -90,7 +93,7 @@ class PairedInstrument:
         secondary_height = \
             self._hw_manager.hardware.get_instrument_max_height(
                 self._pair_policy.secondary)
-        moves = planning.plan_moves(from_loc, location, self._ctx.deck,
+        moves = planning.plan_moves(from_loc, location, self._ctx.get_deck(),
                                     min(primary_height, secondary_height),
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height
@@ -101,22 +104,23 @@ class PairedInstrument:
             for move in moves:
                 self._hw_manager.hardware.move_to(
                     self._pair_policy, move[0], critical_point=move[1],
-                    speed=speed, max_speeds=self._ctx.max_speeds.data)
+                    speed=speed, max_speeds=self._ctx.get_max_speeds().data)
         except Exception:
-            self._ctx.location_cache = None
+            self._ctx.set_last_location(None)
             raise
         else:
-            self._ctx.location_cache = location
+            self._ctx.set_last_location(location)
         return self
 
     def aspirate(
             self, volume: Optional[float],
             location: Optional[types.Location] = None,
             rate: Optional[float] = 1.0) -> Tuple[types.Location, Callable]:
+        last_location = self._ctx.get_last_location()
         if location:
             loc = location
-        elif self._ctx.location_cache:
-            loc = self._ctx.location_cache
+        elif last_location:
+            loc = last_location
         else:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
@@ -144,7 +148,7 @@ class PairedInstrument:
                 self._hw_manager.hardware.prepare_for_aspirate(
                     self._pair_policy)
             self.move_to(loc)
-        elif loc != self._ctx.location_cache:
+        elif loc != last_location:
             self.move_to(loc)
 
         hw_aspirate = self._hw_manager.hardware.aspirate
@@ -154,11 +158,12 @@ class PairedInstrument:
             self, volume: Optional[float],
             location: Optional[types.Location],
             rate: float) -> Tuple[types.Location, Callable]:
+        last_location = self._ctx.get_last_location()
         if location:
             loc = location
             self.move_to(location)
-        elif self._ctx.location_cache:
-            loc = self._ctx.location_cache
+        elif last_location:
+            loc = last_location
             pass
         else:
             raise RuntimeError(
@@ -167,12 +172,12 @@ class PairedInstrument:
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
         hw_dispense = self._hw_manager.hardware.dispense
-        return (loc, partial(hw_dispense, self._pair_policy, volume, rate))
+        return loc, partial(hw_dispense, self._pair_policy, volume, rate)
 
     def blow_out(self, location: types.Location):
         if location:
             self.move_to(location)
-        elif self._ctx.location_cache:
+        elif self._ctx.get_last_location():
             # if location cache exists, pipette blows out immediately at
             # current location, no movement is needed
             pass
@@ -185,7 +190,7 @@ class PairedInstrument:
         self._hw_manager.hardware.blow_out(self._pair_policy)
 
     def air_gap(self, volume: Optional[float], height: float):
-        loc = self._ctx.location_cache
+        loc = self._ctx.get_last_location()
         if not loc or not loc.labware.is_well:
             raise RuntimeError('No previous Well cached to perform air gap')
         target = loc.labware.as_well().top(height)
@@ -199,10 +204,10 @@ class PairedInstrument:
             self, location: Optional[Well], radius: float,
             v_offset: float, speed: float):
         if location is None:
-            if not self._ctx.location_cache:
+            if not self._ctx.get_last_location():
                 raise RuntimeError('No valid current location cache present')
             else:
-                well = self._ctx.location_cache.labware  # type: ignore
+                well = self._ctx.get_last_location().labware  # type: ignore
                 # type checked below
         else:
             well = LabwareLike(location)
@@ -226,7 +231,7 @@ class PairedInstrument:
 
         edges = build_edges(
             well.as_well(), v_offset, self._pair_policy.primary,
-            self._ctx._deck_layout, radius)
+            self._ctx.get_deck(), radius)
         for edge in edges:
             self._hw_manager.hardware.move_to(
                 self._pair_policy, edge, speed)

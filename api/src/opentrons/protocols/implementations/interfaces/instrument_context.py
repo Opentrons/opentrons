@@ -4,27 +4,13 @@ from abc import abstractmethod
 import typing
 
 from opentrons import types
-from opentrons.protocols.api_support.util import (
-    FlowRates, PlungerSpeeds, Clearances)
-from opentrons.protocols.implementations.interfaces.versioned import \
-    ApiVersioned
+from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, \
+    FlowRates
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.protocols.implementations.interfaces.labware import LabwareInterface
 
 
-class InstrumentContextInterface(ApiVersioned):
-
-    @abstractmethod
-    def get_starting_tip(self) -> typing.Optional[WellImplementation]:
-        ...
-
-    @abstractmethod
-    def set_starting_tip(self, location: typing.Optional[WellImplementation]):
-        ...
-
-    @abstractmethod
-    def reset_tipracks(self) -> None:
-        ...
+class InstrumentContextInterface:
 
     @abstractmethod
     def get_default_speed(self) -> float:
@@ -37,19 +23,17 @@ class InstrumentContextInterface(ApiVersioned):
     @abstractmethod
     def aspirate(self,
                  volume: float,
-                 location: types.Location,
                  rate: float = 1.0) -> None:
         ...
 
     @abstractmethod
     def dispense(self,
                  volume: float,
-                 location: types.Location,
                  rate: float = 1.0) -> None:
         ...
 
     @abstractmethod
-    def blow_out(self, location: types.Location) -> None:
+    def blow_out(self) -> None:
         ...
 
     @abstractmethod
@@ -62,14 +46,13 @@ class InstrumentContextInterface(ApiVersioned):
 
     @abstractmethod
     def pick_up_tip(self,
-                    location: types.Location,
+                    well: WellImplementation,
                     presses: int = None,
                     increment: float = None) -> None:
         ...
 
     @abstractmethod
     def drop_tip(self,
-                 location: types.Location,
                  home_after: bool = True) -> None:
         ...
 
@@ -98,27 +81,11 @@ class InstrumentContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
-    def get_speed(self) -> PlungerSpeeds:
-        ...
-
-    @abstractmethod
-    def get_flow_rate(self) -> FlowRates:
-        ...
-
-    @abstractmethod
     def get_tip_racks(self) -> typing.List[LabwareInterface]:
         ...
 
     @abstractmethod
-    def set_tip_racks(self, racks: typing.List[LabwareInterface]):
-        ...
-
-    @abstractmethod
-    def get_trash_container(self) -> LabwareInterface:
-        ...
-
-    @abstractmethod
-    def set_trash_container(self, trash: LabwareInterface):
+    def set_tip_racks(self, racks: typing.List[LabwareInterface]) -> None:
         ...
 
     @abstractmethod
@@ -167,9 +134,41 @@ class InstrumentContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
+    def is_ready_to_aspirate(self) -> bool:
+        ...
+
+    @abstractmethod
+    def prepare_for_aspirate(self) -> None:
+        ...
+
+    @abstractmethod
     def get_return_height(self) -> float:
         ...
 
     @abstractmethod
     def get_well_bottom_clearance(self) -> Clearances:
+        ...
+
+    @abstractmethod
+    def get_speed(self) -> PlungerSpeeds:
+        ...
+
+    @abstractmethod
+    def get_flow_rate(self) -> FlowRates:
+        ...
+
+    @abstractmethod
+    def set_flow_rate(
+            self,
+            aspirate: float = None,
+            dispense: float = None,
+            blow_out: float = None) -> None:
+        ...
+
+    @abstractmethod
+    def set_pipette_speed(
+            self,
+            aspirate: float = None,
+            dispense: float = None,
+            blow_out: float = None) -> None:
         ...

@@ -139,7 +139,7 @@ def aspirate(instrument, volume, location, rate):
     location_text = stringify_location(location)
     template = 'Aspirating {volume} uL from {location} at {flow} uL/sec'
     try:
-        flow_rate = rate * FlowRates(instrument).aspirate
+        flow_rate = rate * FlowRates(instrument._implementation).aspirate
         text = template.format(
                 volume=float(volume), location=location_text, flow=flow_rate)
     except AttributeError:
@@ -169,7 +169,8 @@ def paired_aspirate(
         pub_type: str):
     loc_text = combine_locations(locations)
     flow_rate = min(
-        rate * FlowRates(instr).aspirate for instr in instruments)
+        rate * FlowRates(instr._implementation).aspirate
+        for instr in instruments)
     text_type = f'{pub_type}: Aspirating '
     text_content = f'{volume} uL from {loc_text} at {flow_rate} uL/sec'
     text = text_type + text_content
@@ -219,7 +220,9 @@ def paired_dispense(
         pub_type: str):
     loc_text = combine_locations(locations)
     flow_rate = min(
-        rate * FlowRates(instr).dispense for instr in instruments)
+        rate * FlowRates(instr._implementation).dispense
+        for instr in instruments
+    )
     text_type = f'{pub_type}: Dispensing '
     text_content = f'{volume} uL into {loc_text} at {flow_rate} uL/sec'
     text = text_type + text_content
