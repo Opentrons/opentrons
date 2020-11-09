@@ -21,14 +21,14 @@ export function FileUploadMessageModal(props: Props): React.Node {
   const { title, body, okButtonText } = getModalContents(message)
   let buttons = [
     {
-      children: okButtonText || 'ok',
-      onClick: dismissModal,
-      className: modalStyles.button_medium,
-    },
-    {
       children: i18n.t('button.cancel'),
       onClick: cancelProtocolMigration,
       className: modalStyles.bottom_button,
+    },
+    {
+      children: okButtonText || 'ok',
+      onClick: dismissModal,
+      className: modalStyles.button_medium,
     },
   ]
   if (title === 'Incorrect file type' || title === 'Invalid JSON file') {
