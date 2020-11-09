@@ -4,6 +4,7 @@ import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
+import * as pipetteSelectors from '../../pipettes/selectors'
 import * as discoverySelectors from '../../discovery/selectors'
 import * as selectors from '../selectors'
 
@@ -11,6 +12,7 @@ jest.mock('../selectors')
 jest.mock('../../robot/selectors')
 jest.mock('../../sessions')
 jest.mock('../../discovery/selectors')
+jest.mock('../../pipettes/selectors')
 
 describe('analytics events map', () => {
   beforeEach(() => {
@@ -223,6 +225,52 @@ describe('analytics events map', () => {
           ...protocolData,
           runTime: 4,
         },
+      })
+    })
+
+    it('analytics:PIPETTE_OFFSET_STARTED -> pipetteOffsetCalibrationStarted event', () => {
+      const state = {}
+      const action = {type: 'analytics:PIPETTE_OFFSET_STARTED',
+                      payload: {
+                        someStuff: 'some-other-stuff'
+                      }}
+      pipetteSelectors.getAttachedPipetteCalibrations.mockReturnValue(
+        {left: {offset: { status: {markedBad: true}}}})
+      pipetteSelectors.getAttachedPipettes.mockReturnValue(
+        {left: {model: 'my pipette model'}}
+      )
+      expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'pipetteOffsetCalibrationStarted',
+        properties: {
+          ...action.payload,
+          calibrationExists: true,
+          markedBad: true,
+          pipetteModel: 'my pipette model'
+        }
+      })
+
+    })
+
+    it('analytics:TIP_LENGTH_STARTED -> tipLengthCalibrationStarted event', () => {
+      const state = {}
+      const action = {type: 'analytics:TIP_LENGTH_STARTED',
+                      payload: {
+                        someStuff: 'some-other-stuff'
+                      }}
+      pipetteSelectors.getAttachedPipetteCalibrations.mockReturnValue(
+        {left: {tipLength: {status: {markedBad: true}}}}
+      )
+      pipetteSelectors.getAttachedPipettes.mockReturnValue(
+        {left: {model: 'my pipette model'}}
+      )
+      expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'tipLengthCalibrationStarted',
+        properties: {
+          ...action.payload,
+          calibrationExists: true,
+          markedBad: true,
+          pipetteModel: 'my pipette model'
+        }
       })
     })
   })

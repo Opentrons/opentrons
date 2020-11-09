@@ -26,7 +26,7 @@ import {
 } from '../buildroot'
 
 import { getRobotSettings } from '../robot-settings'
-import { getAttachedPipettes } from '../pipettes'
+import { getAttachedPipettes, getAttachedPipetteCalibrations } from '../pipettes'
 import { getPipettes, getModules } from '../robot/selectors'
 
 import { hash } from './hash'
@@ -39,6 +39,8 @@ import type {
   ProtocolAnalyticsData,
   RobotAnalyticsData,
   BuildrootAnalyticsData,
+  PipetteOffsetCalibrationAnalyticsData,
+  TipLengthCalibrationAnalyticsData,
 } from './types'
 
 type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
@@ -150,4 +152,34 @@ export function getAnalyticsOptedIn(state: State): boolean {
 
 export function getAnalyticsOptInSeen(state: State): boolean {
   return state.config?.analytics.seenOptIn ?? true
+}
+
+export function getAnalyticsPipetteCalibrationData(state: State, mount: string): PipetteOffsetCalibrationAnalyticsData | null {
+  const robot = getConnectedRobot(state)
+
+  if (robot) {
+    const pipcal = getAttachedPipetteCalibrations(state, robot.name)[mount]?.offset ?? null
+    const pip = getAttachedPipettes(state, robot.name)[mount]
+    return {
+      calibrationExists: Boolean(pipcal),
+      markedBad: pipcal?.status?.markedBad ?? false,
+      pipetteModel: pip.model
+    }
+  }
+  return null
+}
+
+export function getAnalyticsTipLengthCalibrationData(state: State, mount: string): TipLengthCalibrationAnalyticsData | null {
+  const robot = getConnectedRobot(state)
+
+  if (robot) {
+    const tipcal = getAttachedPipetteCalibrations(state, robot.name)[mount]?.tipLength ?? null
+    const pip = getAttachedPipettes(state, robot.name)[mount]
+    return {
+      calibrationExists: Boolean(tipcal),
+      markedBad: tipcal?.status?.markedBad ?? false,
+      pipetteModel: pip.model
+    }
+  }
+  return null
 }

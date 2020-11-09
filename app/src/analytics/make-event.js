@@ -8,11 +8,14 @@ import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
 import * as Sessions from '../sessions'
 import * as Alerts from '../alerts'
+import * as Constants from './constants'
 
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,
   getBuildrootAnalyticsData,
+  getAnalyticsPipetteCalibrationData,
+  getAnalyticsTipLengthCalibrationData,
 } from './selectors'
 
 import type { State, Action } from '../types'
@@ -299,6 +302,27 @@ export function makeEvent(
 
       return Promise.resolve(null)
     }
+
+    case Constants.ANALYTICS_PIPETTE_OFFSET_STARTED: {
+      return Promise.resolve({
+        name: 'pipetteOffsetCalibrationStarted',
+        properties: {
+          ...action.payload,
+          ...getAnalyticsPipetteCalibrationData(state, action.payload.mount)
+        }
+      })
+    }
+
+    case Constants.ANALYTICS_TIP_LENGTH_STARTED: {
+      return Promise.resolve({
+        name: 'tipLengthCalibrationStarted',
+        properties: {
+          ...action.payload,
+          ...getAnalyticsTipLengthCalibrationData(state, action.payload.mount)
+        }
+      })
+    }
+
   }
 
   return Promise.resolve(null)
