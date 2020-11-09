@@ -1,8 +1,8 @@
 from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION, MINIMUM_SUPPORTED_VERSION)
+    MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION)
 from opentrons import __version__, config
 
-minimum_version = list(MINIMUM_SUPPORTED_VERSION)
+minimum_version = list(MIN_SUPPORTED_VERSION)
 maximum_version = list(MAX_SUPPORTED_VERSION)
 
 

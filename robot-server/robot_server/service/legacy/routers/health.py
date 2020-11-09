@@ -31,7 +31,7 @@ async def get_health(
         fw_version = await fw_version
 
     max_supported = protocol_api.MAX_SUPPORTED_VERSION
-    min_supported = protocol_api.MINIMUM_SUPPORTED_VERSION
+    min_supported = protocol_api.MIN_SUPPORTED_VERSION
 
     return Health(name=config.name(),
                   api_version=__version__,

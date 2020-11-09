@@ -1,5 +1,5 @@
 from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
-from .api_support.definitions import MINIMUM_SUPPORTED_VERSION
+from .api_support.definitions import MIN_SUPPORTED_VERSION
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -91,7 +91,7 @@ class ApiDeprecationError(Exception):
 
     def __str__(self):
         return PYTHON_API_VERSION_DEPRECATED.format(
-            self.version, MINIMUM_SUPPORTED_VERSION)
+            self.version, MIN_SUPPORTED_VERSION)
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.version)
