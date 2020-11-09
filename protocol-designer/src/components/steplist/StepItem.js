@@ -13,7 +13,7 @@ import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
 import { i18n } from '../../localization'
 import { makeLidLabelText, makeTemperatureText } from '../../utils'
 import { PDListItem, PDTitledList } from '../lists'
-import { StepDescription } from '../StepDescription'
+import { TitledListNotes } from '../TitledListNotes'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
 import { MixHeader } from './MixHeader'
 import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
@@ -81,7 +81,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
     iconClassName = styles.warning_icon
   }
   const Description = props.description ? (
-    <StepDescription description={props.description} />
+    <TitledListNotes notes={props.description} />
   ) : null
 
   return (

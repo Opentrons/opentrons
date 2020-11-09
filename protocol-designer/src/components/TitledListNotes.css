@@ -1,13 +1,13 @@
 @import '@opentrons/components';
 
-.step_description {
+.notes {
   @apply --font-body-1-dark;
 
   padding: 0.5rem;
   border-bottom: var(--bd-light);
 }
 
-.step_description header {
+.notes header {
   font-style: italic;
   font-weight: bold;
 }
