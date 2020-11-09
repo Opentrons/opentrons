@@ -38,7 +38,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
                          model.instrument._context)]
 
     def new_fake_locate(self, mount, tip_length):
-        assert tip_length == pytest.approx(59.3-7.47)
+        assert tip_length == pytest.approx(59.3 - 7.47)
         return Point(0, 0, 0)
 
     monkeypatch.setattr(API, 'locate_tip_probe_center', new_fake_locate)
@@ -46,7 +46,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
     await main_router.wait_until(state('ready'))
 
     def new_fake_locate2(self, mount, tip_length):
-        assert tip_length == pytest.approx(59.3-7.47)
+        assert tip_length == pytest.approx(59.3 - 7.47)
         return Point(0, 0, 0)
 
     monkeypatch.setattr(API, 'locate_tip_probe_center', new_fake_locate2)
@@ -56,13 +56,13 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
 @pytest.mark.api1_only
 async def test_tip_probe_v1(main_router, model):
     with mock.patch(
-            'opentrons.util.calibration_functions.probe_instrument'
-         ) as probe_patch:
+        'opentrons.util.calibration_functions.probe_instrument'
+    ) as probe_patch:
         probe_patch.return_value = (0, 0, 0)
 
         with mock.patch(
-                'opentrons.util.calibration_functions.update_instrument_config'
-             ) as update_patch:
+            'opentrons.util.calibration_functions.update_instrument_config'
+        ) as update_patch:
 
             main_router.calibration_manager.tip_probe(model.instrument)
 
@@ -151,7 +151,8 @@ async def test_move_to_front_api1(main_router, model):
     robot.home()
 
     with mock.patch(
-            'opentrons.util.calibration_functions.move_instrument_for_probing_prep') as patch:  # NOQA(E501)
+        'opentrons.util.calibration_functions.move_instrument_for_probing_prep'
+    ) as patch:
         main_router.calibration_manager.move_to_front(model.instrument)
         patch.assert_called_with(
             model.instrument._instrument,
@@ -235,7 +236,7 @@ async def test_home_all_api2(main_router, model):
 
 @pytest.mark.api1_only
 async def test_home_all_api1(main_router, model):
-    with mock.patch.object(main_router.calibration_manager, '_hardware') as hardware:  # noqa: e501
+    with mock.patch.object(main_router.calibration_manager, '_hardware') as hardware:
         main_router.calibration_manager.home_all(
             model.instrument)
 
@@ -325,9 +326,9 @@ async def test_update_container_offset_v2(main_router, model):
                               'gantry_position') as gp:
         gp.return_value = Point(0, 0, 0)
         main_router.calibration_manager.update_container_offset(
-                model.container,
-                model.instrument
-            )
+            model.container,
+            model.instrument
+        )
         diff = (Point(0, 0, 0)
                 - model.container._container.wells()[0].top().point)
         call.assert_called_with(model.container._container,
@@ -340,9 +341,9 @@ async def test_update_container_offset_v1(main_router, model):
             model.robot,
             'calibrate_container_with_instrument') as call:
         main_router.calibration_manager.update_container_offset(
-                model.container,
-                model.instrument
-            )
+            model.container,
+            model.instrument
+        )
         call.assert_called_with(
             container=model.container._container,
             instrument=model.instrument._instrument,

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# pylama:ignore=C901,W0401
-
 import asyncio
 import urwid  # type: ignore
 import argparse
@@ -54,6 +52,7 @@ class CLITool:
         such as a web-server that would be able to call those functions behind
         HTTP endpoints.
     """
+
     def __init__(
             self,
             point_set,
@@ -210,8 +209,8 @@ class CLITool:
                 for key, (vX, vY) in populated_points.items()}
         else:
             expected_points = {
-                        key: (vX, vY, height)
-                        for key, (vX, vY, vZ) in self._expected_points.items()}
+                key: (vX, vY, height)
+                for key, (vX, vY, vZ) in self._expected_points.items()}
         return expected_points
 
     def print_instructions(self):
@@ -397,7 +396,7 @@ class CLITool:
         self.current_transform = add_z(flat_matrix, current_z)
 
         gantry_calibration = list(
-                map(lambda i: list(i), self.current_transform))
+            map(lambda i: list(i), self.current_transform))
         log.debug("save_transform calibration_matrix: {}".format(
             gantry_calibration))
 

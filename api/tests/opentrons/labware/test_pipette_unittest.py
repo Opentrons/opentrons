@@ -1,4 +1,3 @@
-# pylama:ignore=E501
 # TODO: Modify all calls to get a Well to use the `wells` method
 
 from unittest import mock
