@@ -623,6 +623,9 @@ class InstrumentContext(CommandPublisher):
         It will not reset tip tracking so the well flag will remain False.
 
         :returns: This instance
+
+        :param home_after:
+            See the ``home_after`` parameter in :py:obj:`drop_tip`.
         """
         if not self._has_tip:
             self._log.warning('Pipette has no tip to return')
@@ -773,15 +776,47 @@ class InstrumentContext(CommandPublisher):
               can be a :py:class:`.types.Location`; for instance, you can call
               `instr.drop_tip(tiprack.wells()[0].top())`.
 
-        :param location: The location to drop the tip
-        :type location: :py:class:`.types.Location` or :py:class:`.Well` or
-                        None
-        :param home_after: Whether to home the plunger after dropping the tip
-                           (defaults to ``True``). The plungeer must home after
-                           dropping tips because the ejector shroud that pops
-                           the tip off the end of the pipette is driven by the
-                           plunger motor, and may skip steps when dropping the
-                           tip.
+        :param location:
+            The location to drop the tip
+        :type location:
+            :py:class:`.types.Location` or :py:class:`.Well` or None
+        :param home_after:
+            Whether to home this pipette's plunger after dropping the tip.
+            Defaults to ``True``.
+
+            Setting ``home_after=False`` saves waiting a couple of seconds
+            after the pipette drops the tip, but risks causing other problems.
+
+            .. warning::
+                Only set ``home_after=False`` if:
+
+                * You're using a GEN2 pipette, not a GEN1 pipette.
+                * You've tested ``home_after=False` extensively with your
+                  particular pipette and your particular tips.
+                * You understand the risks described below.
+
+            The ejector shroud that pops the tip off the end of the pipette is
+            driven by the plunger's stepper motor. Sometimes, the strain of
+            ejecting the tip can make that motor *skip* and fall out of sync
+            with where the robot thinks it is.
+
+            Homing the plunger fixes this, so, to be safe, we normally do it
+            after every tip drop.
+
+            If you set ``home_after=False`` to disable homing the plunger, and
+            the motor happens to skip, you might see problems like these until
+            the next time the plunger is homed:
+
+            * The run might halt with a "hard limit" error message.
+            * The pipette might aspirate or dispense the wrong volumes.
+            * The pipette might not fully drop subsequent tips.
+
+            GEN1 pipettes are especially vulnerable to this skipping, so you
+            should never set ``home_after=False`` with a GEN1 pipette.
+
+            Even on GEN2 pipettes, the motor can still skip. So, always
+            extensively test ``home_after=False` with your particular pipette
+            and your particular tips before relying on it.
 
         :returns: This instance
         """
