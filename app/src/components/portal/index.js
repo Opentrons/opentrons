@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import ReactDom from 'react-dom'
+import { Box } from '@opentrons/components'
 
 type PortalLevel = 'page' | 'top'
 
@@ -18,20 +19,20 @@ type PortalLevelInfo = {|
   zIndex: number | string,
 |}
 
-const PORTAL_INFO_BY_LEVEL: { [PortalLevel]: PortalLevelInfo } = {
+const PORTAL_ROOT_PROPS_BY_LEVEL: { [PortalLevel]: PortalLevelInfo } = {
   page: { id: '__otAppModalPortalRoot', zIndex: 1 },
   top: { id: '__otAppTopPortalRoot', zIndex: 10 },
 }
 
 const getPortalRoot = level =>
-  global.document.getElementById(PORTAL_INFO_BY_LEVEL[level].id)
+  global.document.getElementById(PORTAL_ROOT_PROPS_BY_LEVEL[level].id)
 
 export function PortalRoot(): React.Node {
-  return <div id={PORTAL_INFO_BY_LEVEL.page.id} />
+  return <Box {...PORTAL_ROOT_PROPS_BY_LEVEL.page} />
 }
 
 export function TopPortalRoot(): React.Node {
-  return <div id={PORTAL_INFO_BY_LEVEL.top.id} />
+  return <Box {...PORTAL_ROOT_PROPS_BY_LEVEL.top} />
 }
 
 // the children of Portal are rendered into the PortalRoot if it exists in DOM
