@@ -44,9 +44,14 @@ class Health(BaseModel):
     system_version: str = \
         Field(...,
               description="The SemVer dotted-int version of the robot OS")
-    protocol_api_version: typing.List[int] = \
+    maximum_protocol_api_version: typing.List[int] = \
         Field(...,
-              description="A major.minor Protocol API version",
+              description="A major.minor maximum Protocol API version",
+              min_items=2,
+              max_items=2)
+    minimum_protocol_api_version: typing.List[int] = \
+        Field(...,
+              description="A major.minor minimum Protocol API version",
               min_items=2,
               max_items=2)
     links: Links
@@ -60,7 +65,8 @@ class Health(BaseModel):
                   "board_revision": "2.1",
                   "logs": ["/logs/serial.log", "/logs/api.log"],
                   "system_version": "1.2.1",
-                  "protocol_api_version": [2, 0],
+                  "maximum_protocol_api_version": [2, 8],
+                  "minimum_protocol_api_version": [2, 0],
                   "links": {
                     "apiLog": "/logs/api.log",
                     "serialLog": "/logs/serial.log",
