@@ -88,7 +88,7 @@ export function NavbarLink(props: NavbarLinkProps): React.Node {
         <NotificationIcon
           name={iconName}
           childName={
-            hasNotification ? 'circle' : hasWarning ? 'alert-circle' : null
+            hasWarning ? 'alert-circle' : hasNotification ? 'circle' : null
           }
           width="100%"
           paddingX={SPACING_2}
