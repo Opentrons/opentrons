@@ -7,6 +7,7 @@ import {
   getLabwareDisplayName,
   getLabwareHasQuirk,
 } from '@opentrons/shared-data'
+import { FIXED_TRASH_ID } from '../../constants'
 import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
 
@@ -29,15 +30,31 @@ export const getLabwareNicknamesById: Selector<{
     )
 )
 
-/** Returns options for dropdowns, excluding tiprack labware */
+export const _sortLabwareDropdownOptions = (options: Options): Options =>
+  options.sort((a, b) => {
+    // special case for fixed trash (always at the bottom of the list)
+    if (a.value === FIXED_TRASH_ID) return 1
+    if (b.value === FIXED_TRASH_ID) return -1
+
+    // sort by name everything else by name
+    return a.name.localeCompare(b.name)
+  })
+
+/** Returns options for labware dropdowns, excluding tiprack labware.
+ * Ordered by display name / nickname, but with fixed trash at the bottom.
+ */
 export const getLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
   stepFormSelectors.getInitialDeckSetup,
-  (labwareEntities, nicknamesById, initialDeckSetup) =>
-    reduce(
+  (labwareEntities, nicknamesById, initialDeckSetup) => {
+    const options = reduce(
       labwareEntities,
-      (acc: Options, l: LabwareEntity, labwareId: string): Options => {
+      (
+        acc: Options,
+        labwareEntity: LabwareEntity,
+        labwareId: string
+      ): Options => {
         const moduleOnDeck = getModuleUnderLabware(initialDeckSetup, labwareId)
         const prefix = moduleOnDeck
           ? i18n.t(
@@ -47,7 +64,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         const nickName = prefix
           ? `${prefix} ${nicknamesById[labwareId]}`
           : nicknamesById[labwareId]
-        return getIsTiprack(l.def)
+        return getIsTiprack(labwareEntity.def)
           ? acc
           : [
               ...acc,
@@ -59,6 +76,8 @@ export const getLabwareOptions: Selector<Options> = createSelector(
       },
       []
     )
+    return _sortLabwareDropdownOptions(options)
+  }
 )
 
 /** Returns options for disposal (e.g. fixed trash and trash box) */
