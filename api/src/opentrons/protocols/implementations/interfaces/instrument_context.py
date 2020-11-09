@@ -4,22 +4,22 @@ from abc import abstractmethod
 import typing
 
 from opentrons import types
-from opentrons.protocols.advanced_control.transfers import TransferOptions
-from opentrons.protocols.implementations.interfaces.versioned import \
-    ApiVersioned
-from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
-from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances)
+from opentrons.protocols.implementations.interfaces.versioned import \
+    ApiVersioned
+from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.implementations.interfaces.labware import LabwareInterface
 
 
 class InstrumentContextInterface(ApiVersioned):
 
     @abstractmethod
-    def get_starting_tip(self) -> typing.Optional[Well]:
+    def get_starting_tip(self) -> typing.Optional[WellImplementation]:
         ...
 
-    def set_starting_tip(self, location: typing.Optional[Well]):
+    @abstractmethod
+    def set_starting_tip(self, location: typing.Optional[WellImplementation]):
         ...
 
     @abstractmethod
@@ -49,34 +49,15 @@ class InstrumentContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
-    def mix(self,
-            volume: float,
-            location: types.Location,
-            repetitions: int = 1,
-            rate: float = 1.0) -> None:
-        ...
-
-    @abstractmethod
     def blow_out(self, location: types.Location) -> None:
         ...
 
     @abstractmethod
     def touch_tip(self,
-                  location: Well,
+                  location: WellImplementation,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
                   speed: float = 60.0) -> None:
-        ...
-
-    @abstractmethod
-    def air_gap(self,
-                location: types.Location,
-                volume: float,
-                height: float) -> None:
-        ...
-
-    @abstractmethod
-    def return_tip(self, home_after: bool = True) -> None:
         ...
 
     @abstractmethod
@@ -101,15 +82,6 @@ class InstrumentContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
-    def transfer(self,
-                 volume: typing.Union[float, typing.Sequence[float]],
-                 source: AdvancedLiquidHandling,
-                 dest: AdvancedLiquidHandling,
-                 mode: str,
-                 transfer_options: TransferOptions) -> None:
-        ...
-
-    @abstractmethod
     def delay(self) -> None:
         ...
 
@@ -122,7 +94,7 @@ class InstrumentContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
-    def get_mount_name(self) -> str:
+    def get_mount(self) -> types.Mount:
         ...
 
     @abstractmethod
@@ -134,27 +106,27 @@ class InstrumentContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
-    def get_type(self) -> str:
+    def get_tip_racks(self) -> typing.List[LabwareInterface]:
         ...
 
     @abstractmethod
-    def get_tip_racks(self) -> typing.List[Labware]:
+    def set_tip_racks(self, racks: typing.List[LabwareInterface]):
         ...
 
     @abstractmethod
-    def set_tip_racks(self, racks: typing.List[Labware]):
+    def get_trash_container(self) -> LabwareInterface:
         ...
 
     @abstractmethod
-    def get_trash_container(self) -> Labware:
+    def set_trash_container(self, trash: LabwareInterface):
         ...
 
     @abstractmethod
-    def set_trash_container(self, trash: Labware):
+    def get_instrument_name(self) -> str:
         ...
 
     @abstractmethod
-    def get_name(self) -> str:
+    def get_pipette_name(self) -> str:
         ...
 
     @abstractmethod
@@ -183,7 +155,7 @@ class InstrumentContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
-    def get_pipettes(self) -> typing.Dict[str, typing.Any]:
+    def get_pipette(self) -> typing.Dict[str, typing.Any]:
         ...
 
     @abstractmethod
@@ -191,7 +163,11 @@ class InstrumentContextInterface(ApiVersioned):
         ...
 
     @abstractmethod
-    def get_return_height(self) -> int:
+    def has_tip(self) -> bool:
+        ...
+
+    @abstractmethod
+    def get_return_height(self) -> float:
         ...
 
     @abstractmethod

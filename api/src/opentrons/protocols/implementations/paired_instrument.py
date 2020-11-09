@@ -12,9 +12,10 @@ from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges
+from opentrons.protocols.implementations.interfaces.protocol_context import \
+    ProtocolContextInterface
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.protocol_context import ProtocolContext
     from opentrons.protocol_api.instrument_context import InstrumentContext
     from opentrons.hardware_control import types as hc_types
     from opentrons.protocols.api_support.util import HardwareManager
@@ -26,7 +27,7 @@ class PairedInstrument:
                  primary_instrument: InstrumentContext,
                  secondary_instrument: InstrumentContext,
                  pair_policy: hc_types.PipettePair,
-                 ctx: ProtocolContext,
+                 ctx: ProtocolContextInterface,
                  hardware_manager: HardwareManager,
                  log_parent: logging.Logger):
         self.p_instrument = primary_instrument

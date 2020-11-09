@@ -5,6 +5,7 @@ import logging
 from typing import (
     Any, Dict, List, Optional, Tuple, Sequence, TYPE_CHECKING, Union)
 from opentrons import types, commands as cmds, hardware_control as hc
+from opentrons.broker import Broker
 from opentrons.commands import CommandPublisher
 from opentrons.hardware_control.types import CriticalPoint, PipettePair
 from opentrons.config.feature_flags import enable_calibration_overhaul
@@ -14,6 +15,10 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances,
     clamp_value, requires_version, build_edges)
+from opentrons.protocols.implementations.interfaces.protocol_context import \
+    ProtocolContextInterface
+from opentrons.protocols.implementations.location_cache import LocationCache
+
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
     BlowoutLocation, LiquidHandlingCommand)
@@ -27,7 +32,6 @@ from .paired_instrument_context import (
     PairedInstrumentContext, UnsupportedInstrumentPairingError)
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContext
     from opentrons.protocols.api_support.util import HardwareManager
 
 
@@ -66,8 +70,10 @@ class InstrumentContext(CommandPublisher):
     """
 
     def __init__(self,
-                 ctx: ProtocolContext,
-                 hardware_mgr: HardwareManager,
+                 ctx: ProtocolContextInterface,
+                 broker: Broker,
+                 location_cache: LocationCache,
+                 hardware_mgr: 'HardwareManager',
                  mount: types.Mount,
                  log_parent: logging.Logger,
                  at_version: APIVersion,
@@ -77,7 +83,7 @@ class InstrumentContext(CommandPublisher):
                  requested_as: str = None,
                  **config_kwargs) -> None:
 
-        super().__init__(ctx.broker)
+        super().__init__(broker)
         self._api_version = at_version
         self._hw_manager = hardware_mgr
         self._ctx = ctx
@@ -89,7 +95,7 @@ class InstrumentContext(CommandPublisher):
             assert tip_rack.is_tiprack
             self._validate_tiprack(tip_rack)
         if trash is None:
-            self.trash_container = self._ctx.fixed_trash
+            self.trash_container = self._ctx.get_fixed_trash()
         else:
             self.trash_container = trash
 
@@ -104,6 +110,7 @@ class InstrumentContext(CommandPublisher):
         self._starting_tip: Union[Well, None] = None
         self.requested_as = requested_as
         self._flow_rates.set_defaults(self._api_version)
+        self._location_cache = location_cache
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -241,8 +248,8 @@ class InstrumentContext(CommandPublisher):
             raise TypeError(
                 'location should be a Well or Location, but it is {}'
                 .format(location))
-        elif self._ctx.location_cache:
-            dest = self._ctx.location_cache
+        elif self._location_cache.location:
+            dest = self._location_cache.location
         else:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
@@ -269,7 +276,7 @@ class InstrumentContext(CommandPublisher):
                         "blow_out.")
                 self._hw_manager.hardware.prepare_for_aspirate(self._mount)
             self.move_to(dest)
-        elif dest != self._ctx.location_cache:
+        elif dest != self._location_cache.location:
             self.move_to(dest)
 
         c_vol = self.hw_pipette['available_volume'] if not volume else volume
@@ -347,8 +354,8 @@ class InstrumentContext(CommandPublisher):
             raise TypeError(
                 'location should be a Well or Location, but it is {}'
                 .format(location))
-        elif self._ctx.location_cache:
-            loc = self._ctx.location_cache
+        elif self._location_cache.location:
+            loc = self._location_cache.location
         else:
             raise RuntimeError(
                 "If dispense is called without an explicit location, another"
@@ -466,7 +473,7 @@ class InstrumentContext(CommandPublisher):
             raise TypeError(
                 'location should be a Well or Location, but it is {}'
                 .format(location))
-        elif self._ctx.location_cache:
+        elif self._location_cache.location:
             # if location cache exists, pipette blows out immediately at
             # current location, no movement is needed
             pass
@@ -533,10 +540,10 @@ class InstrumentContext(CommandPublisher):
 
         # If location is a valid well, move to the well first
         if location is None:
-            if not self._ctx.location_cache:
+            if not self._location_cache.location:
                 raise RuntimeError('No valid current location cache present')
             else:
-                well = self._ctx.location_cache.labware
+                well = self._location_cache.location_labware
                 # type checked below
         else:
             well = LabwareLike(location)
@@ -562,7 +569,7 @@ class InstrumentContext(CommandPublisher):
 
         edges = build_edges(
             well.as_well(), v_offset, self._mount,
-            self._ctx._deck_layout, radius, self._api_version)
+            self._ctx.get_deck(), radius, self._api_version)
         for edge in edges:
             self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
         return self
@@ -608,7 +615,7 @@ class InstrumentContext(CommandPublisher):
 
         if height is None:
             height = 5
-        loc = self._ctx.location_cache
+        loc = self._location_cache.location
         if not loc or not loc.labware.is_well:
             raise RuntimeError('No previous Well cached to perform air gap')
         target = loc.labware.as_well().top(height)
@@ -1182,8 +1189,8 @@ class InstrumentContext(CommandPublisher):
                       individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
-        if self._ctx.location_cache:
-            from_lw = self._ctx.location_cache.labware
+        if self._location_cache.location_labware:
+            from_lw = self._location_cache.location_labware
         else:
             from_lw = LabwareLike(None)
 
@@ -1198,13 +1205,13 @@ class InstrumentContext(CommandPublisher):
                 self._mount, critical_point=cp_override),
             from_lw)
 
-        for mod in self._ctx._modules:
+        for mod in self._ctx.get_loaded_instruments().values():
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
         instr_max_height = \
             self._hw_manager.hardware.get_instrument_max_height(self._mount)
-        moves = planning.plan_moves(from_loc, location, self._ctx.deck,
+        moves = planning.plan_moves(from_loc, location, self._ctx.get_deck(),
                                     instr_max_height,
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height
@@ -1215,12 +1222,12 @@ class InstrumentContext(CommandPublisher):
             for move in moves:
                 self._hw_manager.hardware.move_to(
                     self._mount, move[0], critical_point=move[1], speed=speed,
-                    max_speeds=self._ctx.max_speeds.data)
+                    max_speeds=self._ctx.get_max_speeds().data)
         except Exception:
-            self._ctx.location_cache = None
+            self._location_cache.clear()
             raise
         else:
-            self._ctx.location_cache = location
+            self._location_cache.location = location
         return self
 
     @property  # type: ignore

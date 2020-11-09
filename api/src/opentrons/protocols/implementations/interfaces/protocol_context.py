@@ -5,18 +5,17 @@ from typing import (Dict, List, Optional, Union)
 
 from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.protocols.implementations.interfaces.versioned import \
-    ApiVersioned
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocols.implementations.interfaces.modules.module_context import \
+    ModuleContextInterface
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.implementations.interfaces.instrument_context \
     import InstrumentContextInterface
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds, HardwareManager)
-from opentrons.protocol_api.module_contexts import (
-    ModuleContext, ModuleTypes)
 from opentrons.protocols.implementations.interfaces.labware import \
     LabwareInterface
+from opentrons.protocols.implementations.interfaces.versioned import \
+    ApiVersioned
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -41,14 +40,6 @@ class ProtocolContextInterface(ApiVersioned):
 
     @abstractmethod
     def get_max_speeds(self) -> AxisMaxSpeeds:
-        ...
-
-    @abstractmethod
-    def get_commands(self) -> List[str]:
-        ...
-
-    @abstractmethod
-    def clear_commands(self) -> None:
         ...
 
     @abstractmethod
@@ -89,7 +80,7 @@ class ProtocolContextInterface(ApiVersioned):
 
     @abstractmethod
     def get_loaded_labwares(self) -> \
-            Dict[int, Union[LabwareInterface, ModuleGeometry]]:
+            Dict[int, Union[LabwareInterface, ModuleContextInterface]]:
         ...
 
     @abstractmethod
@@ -97,11 +88,11 @@ class ProtocolContextInterface(ApiVersioned):
             self,
             module_name: str,
             location: Optional[types.DeckLocation] = None,
-            configuration: str = None) -> ModuleTypes:
+            configuration: str = None) -> ModuleContextInterface:
         ...
 
     @abstractmethod
-    def get_loaded_modules(self) -> Dict[int, ModuleContext]:
+    def get_loaded_modules(self) -> Dict[int, ModuleContextInterface]:
         ...
 
     @abstractmethod
