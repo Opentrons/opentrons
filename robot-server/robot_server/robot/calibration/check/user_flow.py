@@ -4,7 +4,8 @@ from typing import (
     Callable, Dict, Any, TYPE_CHECKING)
 from typing_extensions import Literal
 
-from opentrons.calibration_storage import get, helpers, modify, types as local_types
+from opentrons.calibration_storage import (
+    get, helpers, modify, types as cal_types)
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound, PipetteOffsetByPipetteMount, SourceType)
 from opentrons.types import Mount, Point, Location
@@ -290,7 +291,7 @@ class CheckCalibrationUserFlow:
 
     def _get_tip_length_from_pipette(
             self, mount: Mount, pipette: Pipette
-            ) -> Optional[local_types.TipLengthCalibration]:
+            ) -> Optional[cal_types.TipLengthCalibration]:
         if not pipette.pipette_id:
             return None
         pip_offset = get.get_pipette_offset(
@@ -569,7 +570,8 @@ class CheckCalibrationUserFlow:
                 deck = DeckComparisonMap(
                     status=status.value, comparingPointOne=info)
                 intermediate_map.set_value('deck', deck)
-        elif self.current_state == State.comparingPointTwo and deck_comparison_state:
+        elif self.current_state == State.comparingPointTwo\
+                and deck_comparison_state:
             old_status = RobotHealthCheck.status_from_string(
                 intermediate_map.deck.status)
             updated_status =\
@@ -577,7 +579,8 @@ class CheckCalibrationUserFlow:
                     status, old_status)
             intermediate_map.deck.status = updated_status
             intermediate_map.deck.comparingPointTwo = info
-        elif self.current_state == State.comparingPointThree and deck_comparison_state:
+        elif self.current_state == State.comparingPointThree\
+                and deck_comparison_state:
             old_status = RobotHealthCheck.status_from_string(
                 intermediate_map.deck.status)
             updated_status =\
@@ -605,22 +608,27 @@ class CheckCalibrationUserFlow:
             calibration = modify.mark_bad(
                 self._tip_lengths[active_mount],
                 SourceType.calibration_check)
-            tip_length_dict = {
-                'tipLength': calibration.tip_length,
-                'lastModified': calibration.last_modified,
-                'source': calibration.source,
-                'status': calibration.status
-            }
+            tip_definition =\
+                self.active_tiprack._implementation.get_definition()
+            parent = self.active_tiprack.parent
+            tip_length_dict = modify.create_tip_length_data(
+                definition=tip_definition,
+                parent=parent,
+                length=calibration.tip_length,
+                cal_status=calibration.status
+            )
             modify.save_tip_length_calibration(
                 calibration.pipette, tip_length_dict)
         elif self.current_state in pipette_offset_states:
             calibration = modify.mark_bad(
                 self._pipette_calibrations[active_mount],
                 SourceType.calibration_check)
+            pipette_id = self.hw_pipette.pipette_id
+            assert pipette_id, 'Cannot update pipette offset calibraion'
             modify.save_pipette_calibration(
                 offset=Point(*calibration.offset),
-                pip_id=calibration.pipette,
-                mount=Mount.string_to_mount(calibration.mount),
+                pip_id=pipette_id,
+                mount=active_mount,
                 tiprack_hash=calibration.tiprack,
                 tiprack_uri=calibration.uri,
                 cal_status=calibration.status)
@@ -673,9 +681,7 @@ class CheckCalibrationUserFlow:
     def _get_reference_points_by_state(self):
         saved_points = self._reference_points
         if self.current_state == State.comparingTip:
-            initial = saved_points.tip.initial_point +\
-                    Point(0, 0, self._get_tip_length())
-            return initial,\
+            return saved_points.tip.initial_point,\
                 saved_points.tip.final_point
         elif self.current_state == State.comparingHeight:
             return saved_points.height.initial_point,\
@@ -730,7 +736,14 @@ class CheckCalibrationUserFlow:
         critical_point = self.critical_point_override
         current_point = \
             await self.get_current_point(critical_point)
-        if self.current_state == State.comparingTip:
+        if self.current_state == State.comparingNozzle:
+            # The reference point is unique in that
+            # a user might jog after moving to this
+            # position so we need to do a final save
+            # every time a jog command is issued.
+            self._reference_points.tip.initial_point = \
+                current_point
+        elif self.current_state == State.comparingTip:
             self._reference_points.tip.final_point = \
                 current_point
         elif self.current_state == State.comparingHeight:
@@ -771,7 +784,6 @@ class CheckCalibrationUserFlow:
                 handler="move_to_tip_rack",
                 condition="active tiprack")
         await self.register_initial_point()
-        await self.register_final_point()
         await self._move(Location(self.tip_origin, None))
 
     async def move_to_deck(self):
@@ -804,6 +816,7 @@ class CheckCalibrationUserFlow:
             deck=self._deck,
             cal_block_target_well=cal_block_target_well)
         await self._move(ref_loc)
+        await self.register_final_point()
 
     async def move_to_point_one(self):
         await self._move(self._get_move_to_point_loc_by_state())
