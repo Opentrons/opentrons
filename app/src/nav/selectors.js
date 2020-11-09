@@ -12,12 +12,7 @@ import { selectors as RobotSelectors } from '../robot'
 import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
 import { getU2EWindowsDriverStatus, OUTDATED } from '../system-info'
-import {
-  getDeckCalibrationStatus,
-  DECK_CAL_STATUS_OK,
-  getPipetteOffsetCalibrations,
-  getDeckCalibrationData,
-} from '../calibration'
+import { getDeckCalibrationStatus, DECK_CAL_STATUS_OK } from '../calibration'
 
 import type { State } from '../types'
 import type { NavLocation } from './types'
