@@ -711,7 +711,7 @@ class CheckCalibrationUserFlow:
                 current_point
             self._reference_points.tip.final_point = \
                 current_point
-        elif self.current_state == State.inspectingTip:
+        elif self.current_state == State.comparingTip:
             self._reference_points.height.initial_point = \
                 current_point
             self._reference_points.height.final_point = \
