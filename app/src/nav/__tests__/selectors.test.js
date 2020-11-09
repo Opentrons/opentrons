@@ -97,6 +97,7 @@ const EXPECTED_ROBOTS = {
   title: 'Robot',
   iconName: 'ot-connect',
   notificationReason: null,
+  warningReason: null,
 }
 
 const EXPECTED_UPLOAD = {
@@ -295,7 +296,10 @@ describe('nav selectors', () => {
         mockGetDeckCalibrationStatus.mockReturnValue(DECK_CAL_STATUS_IDENTITY)
       },
       expected: [
-        EXPECTED_ROBOTS,
+        {
+          ...EXPECTED_ROBOTS,
+          warningReason: expect.stringMatching(/Robot calibration recommended/),
+        },
         {
           ...EXPECTED_UPLOAD,
           disabledReason: expect.stringMatching(/calibrate your deck/i),
