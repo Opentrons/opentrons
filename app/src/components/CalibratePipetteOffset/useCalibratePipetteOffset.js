@@ -149,10 +149,17 @@ export function useCalibratePipetteOffset(
         }
       )
     )
-    dispatch(pipetteOffsetCalibrationStarted(
-      withIntent, mount, hasCalibrationBlock, shouldRecalibrateTipLength,
-      tipRackDefinition ? `${tipRackDefinition.namespace}/${tipRackDefinition.parameters.loadName}/${tipRackDefinition.version}`: null
-    ))
+    dispatch(
+      pipetteOffsetCalibrationStarted(
+        withIntent,
+        mount,
+        hasCalibrationBlock,
+        shouldRecalibrateTipLength,
+        tipRackDefinition
+          ? `${tipRackDefinition.namespace}/${tipRackDefinition.parameters.loadName}/${tipRackDefinition.version}`
+          : null
+      )
+    )
   }
 
   const Wizard =

@@ -9,6 +9,7 @@ import * as brActions from '../buildroot/constants'
 import * as Sessions from '../sessions'
 import * as Alerts from '../alerts'
 import * as Constants from './constants'
+import { EXIT } from '../sessions/common-calibration/constants'
 
 import {
   getProtocolAnalyticsData,
@@ -18,6 +19,7 @@ import {
   getAnalyticsTipLengthCalibrationData,
   getAnalyticsHealthCheckData,
   getAnalyticsDeckCalibrationData,
+  getAnalyticsSessionExitDetails,
 } from './selectors'
 
 import type { State, Action } from '../types'
@@ -284,34 +286,46 @@ export function makeEvent(
       switch (action.payload.sessionType) {
         case Sessions.SESSION_TYPE_DECK_CALIBRATION:
           const dcAnalyticsProps = getAnalyticsDeckCalibrationData(state)
-          return Promise.resolve(dcAnalyticsProps
-            ? {
-              name: 'deckCalibrationStarted',
-              properties: dcAnalyticsProps
-            }
-                                 : null)
+          return Promise.resolve(
+            dcAnalyticsProps
+              ? {
+                  name: 'deckCalibrationStarted',
+                  properties: dcAnalyticsProps,
+                }
+              : null
+          )
         case Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK:
           const hcAnalyticsProps = getAnalyticsHealthCheckData(state)
           return Promise.resolve(
-              hcAnalyticsProps ?
-              {
-                name: 'calibrationHealthCheckStarted',
-                properties: hcAnalyticsProps
-              }
-            : null)
+            hcAnalyticsProps
+              ? {
+                  name: 'calibrationHealthCheckStarted',
+                  properties: hcAnalyticsProps,
+                }
+              : null
+          )
         default:
           return Promise.resolve(null)
       }
-
     }
 
-    case Sessions.DELETE_SESSION: {
-      const analyticsProps = null
-      if (analyticsProps) {
-        return Promise.resolve({
-          name: `${analyticsProps.sessionType}SessionExit`,
-          properties: analyticsProps,
-        })
+    case Sessions.CREATE_SESSION_COMMAND: {
+      if (action.payload.command.command === EXIT) {
+        const sessionDetails = getAnalyticsSessionExitDetails(
+          state,
+          action.payload.robotName,
+          action.payload.sessionId
+        )
+        return Promise.resolve(
+          sessionDetails
+            ? {
+                name: `${sessionDetails.sessionType}Exit`,
+                properties: {
+                  step: sessionDetails.step,
+                },
+              }
+            : null
+        )
       } else {
         return Promise.resolve(null)
       }
@@ -335,8 +349,8 @@ export function makeEvent(
         name: 'pipetteOffsetCalibrationStarted',
         properties: {
           ...action.payload,
-          ...getAnalyticsPipetteCalibrationData(state, action.payload.mount)
-        }
+          ...getAnalyticsPipetteCalibrationData(state, action.payload.mount),
+        },
       })
     }
 
@@ -345,11 +359,10 @@ export function makeEvent(
         name: 'tipLengthCalibrationStarted',
         properties: {
           ...action.payload,
-          ...getAnalyticsTipLengthCalibrationData(state, action.payload.mount)
-        }
+          ...getAnalyticsTipLengthCalibrationData(state, action.payload.mount),
+        },
       })
     }
-
   }
 
   return Promise.resolve(null)

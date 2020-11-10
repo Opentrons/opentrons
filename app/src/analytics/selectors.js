@@ -27,9 +27,15 @@ import {
 } from '../buildroot'
 
 import { getRobotSettings } from '../robot-settings'
-import { getAttachedPipettes, getAttachedPipetteCalibrations } from '../pipettes'
+import {
+  getAttachedPipettes,
+  getAttachedPipetteCalibrations,
+} from '../pipettes'
 import { getPipettes, getModules } from '../robot/selectors'
-import { getDeckCalibrationStatus, getDeckCalibrationData } from '../calibration/selectors'
+import {
+  getDeckCalibrationStatus,
+  getDeckCalibrationData,
+} from '../calibration/selectors'
 
 import { hash } from './hash'
 
@@ -46,6 +52,7 @@ import type {
   DeckCalibrationAnalyticsData,
   CalibrationHealthCheckAnalyticsData,
   ModelsByMount,
+  AnalyticsSessionExitDetails,
 } from './types'
 
 type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
@@ -159,31 +166,40 @@ export function getAnalyticsOptInSeen(state: State): boolean {
   return state.config?.analytics.seenOptIn ?? true
 }
 
-export function getAnalyticsPipetteCalibrationData(state: State, mount: string): PipetteOffsetCalibrationAnalyticsData | null {
+export function getAnalyticsPipetteCalibrationData(
+  state: State,
+  mount: string
+): PipetteOffsetCalibrationAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
   if (robot) {
-    const pipcal = getAttachedPipetteCalibrations(state, robot.name)[mount]?.offset ?? null
+    const pipcal =
+      getAttachedPipetteCalibrations(state, robot.name)[mount]?.offset ?? null
     const pip = getAttachedPipettes(state, robot.name)[mount]
     return {
       calibrationExists: Boolean(pipcal),
       markedBad: pipcal?.status?.markedBad ?? false,
-      pipetteModel: pip.model
+      pipetteModel: pip.model,
     }
   }
   return null
 }
 
-export function getAnalyticsTipLengthCalibrationData(state: State, mount: string): TipLengthCalibrationAnalyticsData | null {
+export function getAnalyticsTipLengthCalibrationData(
+  state: State,
+  mount: string
+): TipLengthCalibrationAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
   if (robot) {
-    const tipcal = getAttachedPipetteCalibrations(state, robot.name)[mount]?.tipLength ?? null
+    const tipcal =
+      getAttachedPipetteCalibrations(state, robot.name)[mount]?.tipLength ??
+      null
     const pip = getAttachedPipettes(state, robot.name)[mount]
     return {
       calibrationExists: Boolean(tipcal),
       markedBad: tipcal?.status?.markedBad ?? false,
-      pipetteModel: pip.model
+      pipetteModel: pip.model,
     }
   }
   return null
@@ -199,24 +215,45 @@ function getPipetteModels(state: State, robotName: string): ModelsByMount {
   )
 }
 
-export function getAnalyticsDeckCalibrationData(state: State): DeckCalibrationAnalyticsData | null{
+export function getAnalyticsDeckCalibrationData(
+  state: State
+): DeckCalibrationAnalyticsData | null {
   const robot = getConnectedRobot(state)
   if (robot) {
     const dcData = getDeckCalibrationData(state, robot.name)
     return {
       calibrationStatus: getDeckCalibrationStatus(state, robot.name),
-      markedBad: !Array.isArray(dcData) ? dcData?.status?.markedBad || null : null,
-      pipettes: getPipetteModels(state, robot.name)
-    }  
+      markedBad: !Array.isArray(dcData)
+        ? dcData?.status?.markedBad || null
+        : null,
+      pipettes: getPipetteModels(state, robot.name),
+    }
   }
   return null
 }
 
-export function getAnalyticsHealthCheckData(state: State): CalibrationHealthCheckAnalyticsData | null{
+export function getAnalyticsHealthCheckData(
+  state: State
+): CalibrationHealthCheckAnalyticsData | null {
   const robot = getConnectedRobot(state)
   if (robot) {
     return {
-      pipettes: getPipetteModels(state, robot.name)
+      pipettes: getPipetteModels(state, robot.name),
+    }
+  }
+  return null
+}
+
+export function getAnalyticsSessionExitDetails(
+  state: State,
+  robotName: string,
+  sessionId: string
+): AnalyticsSessionExitDetails | null {
+  const session = getRobotSessionById(state, robotName, sessionid)
+  if (session) {
+    return {
+      step: session.details.currentStep,
+      sessionType: session.sessionType,
     }
   }
   return null

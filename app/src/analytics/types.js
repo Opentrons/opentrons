@@ -56,16 +56,21 @@ export type TipLengthCalibrationAnalyticsData = {|
 export type DeckCalibrationAnalyticsData = {|
   calibrationStatus: DeckCalibrationStatus | null,
   markedBad: boolean | null,
-  pipettes: ModelsByMount
+  pipettes: ModelsByMount,
 |}
 
 export type CalibrationHealthCheckAnalyticsData = {|
-  pipettes: ModelsByMount
+  pipettes: ModelsByMount,
 |}
 
 export type ModelsByMount = {|
-  left: {model: string},
-  right: {model: string},
+  left: { model: string },
+  right: { model: string },
+|}
+
+export type AnalyticsSessionExitDetails = {|
+  sessionType: string,
+  step: string,
 |}
 
 export type AnalyticsEvent =
