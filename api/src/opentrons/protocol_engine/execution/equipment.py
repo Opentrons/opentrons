@@ -13,7 +13,7 @@ from ..command_models import (
 )
 
 
-class EquipmentHandler():
+class EquipmentHandler:
     """Implementation logic for labware, pipette, and module loading."""
 
     def __init__(

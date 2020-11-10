@@ -10,21 +10,24 @@ from .commands import CommandStore, CommandState
 from .labware import LabwareStore, LabwareState
 from .pipettes import PipetteStore, PipetteState
 from .geometry import GeometryStore, GeometryState
+from .motion import MotionStore, MotionState
 
 
-class StateView():
+class StateView:
     def __init__(
         self,
         command_store: CommandStore,
         labware_store: LabwareStore,
         pipette_store: PipetteStore,
         geometry_store: GeometryStore,
+        motion_store: MotionStore,
     ) -> None:
         """A StateView class provides a read-only interface to a StateStore."""
         self._command_store = command_store
         self._labware_store = labware_store
         self._pipette_store = pipette_store
         self._geometry_store = geometry_store
+        self._motion_store = motion_store
 
     @classmethod
     def create_view(cls, target: StateStore) -> StateView:
@@ -34,6 +37,7 @@ class StateView():
             labware_store=target._labware_store,
             pipette_store=target._pipette_store,
             geometry_store=target._geometry_store,
+            motion_store=target._motion_store,
         )
 
     @property
@@ -56,6 +60,11 @@ class StateView():
         """Get geometry sub-state."""
         return self._geometry_store.state
 
+    @property
+    def motion(self) -> MotionState:
+        """Get motion sub-state."""
+        return self._motion_store.state
+
 
 class StateStore(StateView):
     """
@@ -71,7 +80,15 @@ class StateStore(StateView):
         command_store = CommandStore()
         labware_store = LabwareStore()
         pipette_store = PipetteStore()
-        geometry_store = GeometryStore(deck_definition=deck_definition)
+        geometry_store = GeometryStore(
+            deck_definition=deck_definition,
+            labware_store=labware_store,
+        )
+        motion_store = MotionStore(
+            labware_store=labware_store,
+            pipette_store=pipette_store,
+            geometry_store=geometry_store,
+        )
 
         # attach stores to self via StateView constructor
         super().__init__(
@@ -79,12 +96,14 @@ class StateStore(StateView):
             labware_store=labware_store,
             pipette_store=pipette_store,
             geometry_store=geometry_store,
+            motion_store=motion_store
         )
 
         self._lifecycle_substores: List[CommandReactive] = [
-            self._labware_store,
-            self._pipette_store,
-            self._geometry_store,
+            labware_store,
+            pipette_store,
+            geometry_store,
+            motion_store,
         ]
 
     def handle_command(

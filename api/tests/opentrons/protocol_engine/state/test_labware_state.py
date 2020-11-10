@@ -3,14 +3,16 @@ import pytest
 from datetime import datetime, timezone
 from typing import Tuple
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine import command_models as cmd, errors, StateStore
+from opentrons.protocol_engine.types import LabwareLocation, DeckSlotLocation
 
 
 def load_labware(
     store: StateStore,
     labware_id: str,
-    location: int,
+    location: LabwareLocation,
     definition: LabwareDefinition,
     calibration: Tuple[float, float, float],
 ) -> cmd.CompletedCommand[cmd.LoadLabwareRequest, cmd.LoadLabwareResult]:
@@ -48,7 +50,7 @@ def test_handles_load_labware(store, well_plate_def):
     command = load_labware(
         store=store,
         labware_id="plate-id",
-        location=1,
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -69,7 +71,7 @@ def test_get_all_labware(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=1,
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -77,7 +79,7 @@ def test_get_all_labware(
     load_labware(
         store=store,
         labware_id="reservoir-id",
-        location=2,
+        location=DeckSlotLocation(DeckSlotName.SLOT_2),
         definition=reservoir_def,
         calibration=(4, 5, 6),
     )
@@ -90,6 +92,42 @@ def test_get_all_labware(
     ]
 
 
+def test_get_labware_has_quirk(
+    well_plate_def: LabwareDefinition,
+    reservoir_def: LabwareDefinition,
+    store: StateStore,
+) -> None:
+    """It should return whether a labware by ID has a given quirk."""
+    load_labware(
+        store=store,
+        labware_id="plate-id",
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
+        definition=well_plate_def,
+        calibration=(1, 2, 3),
+    )
+
+    load_labware(
+        store=store,
+        labware_id="reservoir-id",
+        location=DeckSlotLocation(DeckSlotName.SLOT_2),
+        definition=reservoir_def,
+        calibration=(4, 5, 6),
+    )
+
+    well_plate_has_center_quirk = store.labware.get_labware_has_quirk(
+        "plate-id",
+        "centerMultichannelOnWells"
+    )
+
+    reservoir_has_center_quirk = store.labware.get_labware_has_quirk(
+        "reservoir-id",
+        "centerMultichannelOnWells"
+    )
+
+    assert well_plate_has_center_quirk is False
+    assert reservoir_has_center_quirk is True
+
+
 def test_get_well_definition_bad_id(
     well_plate_def: LabwareDefinition,
     store: StateStore,
@@ -98,13 +136,13 @@ def test_get_well_definition_bad_id(
     load_labware(
         store=store,
         labware_id="uid",
-        location=1,
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
 
     with pytest.raises(errors.WellDoesNotExistError):
-        store.labware.get_well_definition(labware_id="uid", well_id="foobar")
+        store.labware.get_well_definition(labware_id="uid", well_name="foobar")
 
 
 def test_get_well_definition(
@@ -115,7 +153,7 @@ def test_get_well_definition(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=1,
+        location=DeckSlotLocation(DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -123,7 +161,7 @@ def test_get_well_definition(
     expected_well_def = well_plate_def["wells"]["B2"]
     result = store.labware.get_well_definition(
         labware_id="plate-id",
-        well_id="B2",
+        well_name="B2",
     )
 
     assert result == expected_well_def

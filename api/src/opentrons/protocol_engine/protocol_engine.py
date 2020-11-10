@@ -19,7 +19,7 @@ from .command_models import (
 )
 
 
-class ProtocolEngine():
+class ProtocolEngine:
     """
     Main ProtocolEngine class.
 

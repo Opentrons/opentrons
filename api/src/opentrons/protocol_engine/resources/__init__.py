@@ -9,8 +9,10 @@ from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.calibration_storage.get import get_labware_calibration
 from opentrons.calibration_storage.helpers import hash_labware_def
 
+from ..types import LabwareLocation
 
-class IdGenerator():
+
+class IdGenerator:
     """Unique ID generation provider."""
 
     def generate_id(self) -> str:
@@ -22,7 +24,7 @@ class IdGenerator():
         return str(uuid4())
 
 
-class LabwareData():
+class LabwareData:
     """Labware data provider."""
 
     # NOTE(mc, 2020-10-18): async to allow file reading and parsing to be
@@ -41,7 +43,7 @@ class LabwareData():
     async def get_labware_calibration(
         self,
         definition: LabwareDefinition,
-        location: int,
+        location: LabwareLocation,
     ) -> Tuple[float, float, float]:
         """Get a labware's calibration data given its definition."""
         # TODO(mc, 2020-10-18): Fetching labware calibration data is a little

@@ -95,6 +95,7 @@ class Location:
        If you only need to compare locations, compare the :py:attr:`point`
        of each item.
     """
+
     def __init__(self, point: Point, labware: LocationLabware):
         self._point = point
         self._labware = LabwareLike(labware)
@@ -113,8 +114,8 @@ class Location:
 
     def __eq__(self, other):
         return isinstance(other, Location) \
-               and other._point == self._point \
-               and other._labware == self._labware
+            and other._point == self._point \
+            and other._labware == self._labware
 
     def move(self, point: Point) -> 'Location':
         """
@@ -153,6 +154,29 @@ class MountType(str, enum.Enum):
 
     def to_hw_mount(self) -> Mount:
         return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
+
+
+# TODO(mc, 2020-11-09): this makes sense in shared-data or other common
+# model library
+# https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
+class DeckSlotName(int, enum.Enum):
+    """Deck slot identifiers."""
+    SLOT_1 = 1
+    SLOT_2 = 2
+    SLOT_3 = 3
+    SLOT_4 = 4
+    SLOT_5 = 5
+    SLOT_6 = 6
+    SLOT_7 = 7
+    SLOT_8 = 8
+    SLOT_9 = 9
+    SLOT_10 = 10
+    SLOT_11 = 11
+    FIXED_TRASH = 12
+
+    def __str__(self):
+        """Stringify to a simple integer string."""
+        return str(self.value)
 
 
 class TransferTipPolicy(enum.Enum):

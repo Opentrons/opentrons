@@ -14,7 +14,7 @@ from opentrons.protocol_engine.command_models import (
 )
 
 
-class CloseToNow():
+class CloseToNow:
     def __init__(self):
         self._now = datetime.now(tz=timezone.utc)
 
@@ -44,7 +44,7 @@ async def test_execute_command_creates_command(
     mock_state_store: MagicMock
 ) -> None:
     """It should create a command in the state store when executing."""
-    req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")
+    req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellName="A1")
 
     await engine.execute_command(req, command_id="unique-id")
     mock_state_store.handle_command.assert_any_call(
@@ -62,7 +62,7 @@ async def test_execute_command_calls_executor(
     mock_executor: AsyncMock,
 ) -> None:
     """It should create a command in the state store when executing."""
-    req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")
+    req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellName="A1")
 
     await engine.execute_command(req, command_id="unique-id")
 
@@ -81,7 +81,7 @@ async def test_execute_command_adds_result_to_state(
     mock_state_store: MagicMock,
 ) -> None:
     """It should upsert the completed command into state."""
-    req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellId="A1")
+    req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellName="A1")
     res = MoveToWellResult()
     later = datetime.now(tz=timezone.utc) + timedelta(seconds=42)
     completed_cmd = CompletedCommand(

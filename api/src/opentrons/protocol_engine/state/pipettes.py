@@ -1,5 +1,5 @@
 """Basic pipette data state and store."""
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -10,16 +10,21 @@ from .substore import Substore, CommandReactive
 
 
 @dataclass(frozen=True)
-class PipetteData():
+class PipetteData:
     """Pipette state data."""
+
     mount: MountType
     pipette_name: PipetteName
 
 
-@dataclass
-class PipetteState():
+class PipetteState:
     """Basic labware data state and getter methods."""
-    _pipettes_by_id: Dict[str, PipetteData] = field(default_factory=dict)
+
+    _pipettes_by_id: Dict[str, PipetteData]
+
+    def __init__(self) -> None:
+        """Initialize a PipetteState instance."""
+        self._pipettes_by_id = {}
 
     def get_pipette_data_by_id(self, pipette_id: str) -> PipetteData:
         """Get pipette data by the pipette's unique identifier."""
@@ -46,16 +51,22 @@ class PipetteState():
 
 
 class PipetteStore(Substore[PipetteState], CommandReactive):
-    def __init__(self):
+    """Pipette state container."""
+
+    _state: PipetteState
+
+    def __init__(self) -> None:
+        """Initialize a PipetteStore and its state."""
         self._state = PipetteState()
 
     def handle_completed_command(
         self,
         command: cmd.CompletedCommandType
     ) -> None:
+        """Modify state in reaction to a completed command."""
         if isinstance(command.result, cmd.LoadPipetteResult):
-            self._state._pipettes_by_id[command.result.pipetteId] = \
-                PipetteData(
-                    pipette_name=command.request.pipetteName,
-                    mount=command.request.mount
+            pipette_id = command.result.pipetteId
+            self._state._pipettes_by_id[pipette_id] = PipetteData(
+                pipette_name=command.request.pipetteName,
+                mount=command.request.mount
             )

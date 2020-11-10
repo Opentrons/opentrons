@@ -5,10 +5,12 @@ from datetime import datetime
 from mock import AsyncMock  # type: ignore[attr-defined]
 from typing import Any, Optional, cast
 
-from opentrons.types import MountType
+from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import errors, command_models as cmd
+from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.execution import CommandExecutor
 from opentrons.protocol_engine.execution.equipment import EquipmentHandler
+from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 
 
 @pytest.fixture
@@ -17,16 +19,23 @@ def mock_equipment_handler() -> AsyncMock:
 
 
 @pytest.fixture
+def mock_pipetting_handler() -> AsyncMock:
+    return AsyncMock(spec=PipettingHandler)
+
+
+@pytest.fixture
 def executor(
     mock_equipment_handler: AsyncMock,
+    mock_pipetting_handler: AsyncMock,
 ) -> CommandExecutor:
     return CommandExecutor(
         equipment_handler=mock_equipment_handler,
+        pipetting_handler=mock_pipetting_handler
     )
 
 
 @dataclass(frozen=True)
-class ExecutorRoutingSpec():
+class ExecutorRoutingSpec:
     name: str
     request: cmd.CommandRequestType
     expected_handler: str
@@ -41,7 +50,7 @@ class ExecutorRoutingSpec():
         ExecutorRoutingSpec(
             name="Successful load labware",
             request=cmd.LoadLabwareRequest(
-                location=1,
+                location=DeckSlotLocation(DeckSlotName.SLOT_1),
                 loadName="load-name",
                 namespace="opentrons-test",
                 version=1,
@@ -74,16 +83,40 @@ class ExecutorRoutingSpec():
             expected_handler="equipment_handler",
             expected_method="handle_load_pipette"
         ),
+        ExecutorRoutingSpec(
+            name="Successful move to well",
+            request=cmd.MoveToWellRequest(
+                pipetteId="pipette-id",
+                labwareId="labware-id",
+                wellName="A1",
+            ),
+            result=cmd.MoveToWellResult(),
+            expected_handler="pipetting_handler",
+            expected_method="handle_move_to_well"
+        ),
+        ExecutorRoutingSpec(
+            name="Failed move to well",
+            request=cmd.MoveToWellRequest(
+                pipetteId="pipette-id",
+                labwareId="labware-id",
+                wellName="A1",
+            ),
+            error=errors.WellDoesNotExistError("oh no"),
+            expected_handler="pipetting_handler",
+            expected_method="handle_move_to_well"
+        ),
     ]
 )
 async def test_command_executor_routing(
     executor: CommandExecutor,
     mock_equipment_handler: AsyncMock,
+    mock_pipetting_handler: AsyncMock,
     now: datetime,
     spec: ExecutorRoutingSpec,
 ) -> None:
     HANDLER_NAME_MAP = {
         "equipment_handler": mock_equipment_handler,
+        "pipetting_handler": mock_pipetting_handler,
     }
 
     req = spec.request
@@ -134,7 +167,7 @@ async def test_executor_handles_unexpected_error(
             created_at=now,
             started_at=now,
             request=cmd.LoadLabwareRequest(
-                location=1,
+                location=DeckSlotLocation(DeckSlotName.SLOT_1),
                 loadName="load-name",
                 namespace="opentrons-test",
                 version=1,
