@@ -8,7 +8,7 @@ import {
   mergeLiquid,
   splitLiquid,
   getWellsForTips,
-  totalVolume,
+  getLocationTotalVolume,
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
@@ -43,7 +43,7 @@ export function forAspirate(
     const sourceLiquidState = liquidState.labware[labwareId][commonWell]
 
     const isOveraspirate =
-      volume * pipetteSpec.channels > totalVolume(sourceLiquidState)
+      volume * pipetteSpec.channels > getLocationTotalVolume(sourceLiquidState)
 
     if (isEmpty(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateFromPristineWell())
@@ -52,7 +52,7 @@ export function forAspirate(
     }
 
     const volumePerTip = isOveraspirate
-      ? totalVolume(sourceLiquidState) / pipetteSpec.channels
+      ? getLocationTotalVolume(sourceLiquidState) / pipetteSpec.channels
       : volume
 
     // all tips get the same amount of the same liquid added to them, from the source well
@@ -95,7 +95,7 @@ export function forAspirate(
 
     if (isEmpty(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateFromPristineWell())
-    } else if (volume > totalVolume(sourceLiquidState)) {
+    } else if (volume > getLocationTotalVolume(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateMoreThanWellContents())
     }
 

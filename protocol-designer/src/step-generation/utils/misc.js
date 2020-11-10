@@ -35,11 +35,11 @@ export function repeatArray<T>(array: Array<T>, repeats: number): Array<T> {
 
 type Vol = { volume: number }
 
+/** Total volume of a location ("air" is not included in the sum) */
 export function getLocationTotalVolume(loc: LocationLiquidState): number {
   return reduce(
     loc,
     (acc: number, ingredState: Vol, ingredId: string) => {
-      // air is not included in the total volume
       return ingredId === AIR ? acc : acc + ingredState.volume
     },
     0
@@ -167,13 +167,6 @@ export function getWellsForTips(
   const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
 
   return { wellsForTips, allWellsShared }
-}
-
-/** Total volume of a location (air is not included in the sum) */
-export function totalVolume(location: LocationLiquidState): number {
-  return Object.keys(location).reduce((acc, ingredId) => {
-    return ingredId !== AIR ? acc + (location[ingredId].volume || 0) : acc
-  }, 0)
 }
 
 // Set blowout location depending on the 'blowoutLocation' arg: set it to

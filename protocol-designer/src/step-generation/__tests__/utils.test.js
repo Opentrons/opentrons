@@ -16,14 +16,15 @@ import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fix
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { TEMPERATURE_DEACTIVATED } from '../../constants'
 import {
-  splitLiquid,
-  mergeLiquid,
   AIR,
-  repeatArray,
-  makeInitialRobotState,
-  getDispenseAirGapLocation,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
+  getDispenseAirGapLocation,
+  getLocationTotalVolume,
+  makeInitialRobotState,
+  mergeLiquid,
+  repeatArray,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  splitLiquid,
 } from '../utils/misc'
 import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { FIXED_TRASH_ID } from '../__fixtures__'
@@ -716,5 +717,26 @@ describe('getDispenseAirGapLocation', () => {
       dispenseAirGapLabware: sourceLabware,
       dispenseAirGapWell: sourceWell,
     })
+  })
+})
+
+describe('getLocationTotalVolume', () => {
+  it('should return the sum of all non-AIR volumes', () => {
+    const result = getLocationTotalVolume({
+      a: { volume: 2 },
+      b: { volume: 4 },
+      [AIR]: { volume: 100 },
+    })
+    expect(result).toEqual(2 + 4)
+  })
+
+  it('should return 0 for empty location', () => {
+    const result = getLocationTotalVolume({})
+    expect(result).toEqual(0)
+  })
+
+  it('should return 0 location with only AIR', () => {
+    const result = getLocationTotalVolume({ [AIR]: { volume: 123 } })
+    expect(result).toEqual(0)
   })
 })
