@@ -36,6 +36,7 @@ import {
   getDeckCalibrationStatus,
   getDeckCalibrationData,
 } from '../calibration/selectors'
+import { getRobotSessionById } from '../sessions/selectors'
 
 import { hash } from './hash'
 
@@ -249,7 +250,7 @@ export function getAnalyticsSessionExitDetails(
   robotName: string,
   sessionId: string
 ): AnalyticsSessionExitDetails | null {
-  const session = getRobotSessionById(state, robotName, sessionid)
+  const session = getRobotSessionById(state, robotName, sessionId)
   if (session) {
     return {
       step: session.details.currentStep,

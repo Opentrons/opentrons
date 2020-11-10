@@ -9,7 +9,7 @@ import * as brActions from '../buildroot/constants'
 import * as Sessions from '../sessions'
 import * as Alerts from '../alerts'
 import * as Constants from './constants'
-import { EXIT } from '../sessions/common-calibration/constants'
+import { sharedCalCommands } from '../sessions/common-calibration/constants'
 
 import {
   getProtocolAnalyticsData,
@@ -310,7 +310,7 @@ export function makeEvent(
     }
 
     case Sessions.CREATE_SESSION_COMMAND: {
-      if (action.payload.command.command === EXIT) {
+      if (action.payload.command.command === sharedCalCommands.EXIT) {
         const sessionDetails = getAnalyticsSessionExitDetails(
           state,
           action.payload.robotName,
