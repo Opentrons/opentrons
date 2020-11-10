@@ -1,4 +1,5 @@
 import * as selectors from '../selectors'
+import * as Constants from '../constants'
 import { mockReachableRobot } from '../../discovery/__fixtures__'
 import {
   HEALTH_STATUS_NOT_OK,
@@ -202,6 +203,73 @@ describe('buildroot selectors', () => {
       port: 31950,
       serverHealth: { capabilities: { buildrootUpdate: '/' } },
     })
+  })
+
+  it('should be able to say if an update is in progress for a robot', () => {
+    const robot = {
+      name: 'robot-name',
+      host: '10.10.0.0',
+      port: 31950,
+      serverHealth: { capabilities: { buildrootUpdate: '/' } },
+    }
+
+    getViewableRobots.mockReturnValue([
+      { name: 'other-robot-name', host: '10.10.0.1', port: 31950 },
+      robot,
+      { name: 'another-robot-name', host: '10.10.0.2', port: 31950 },
+    ])
+
+    expect(
+      selectors.getBuildrootUpdateInProgress(
+        {
+          buildroot: {
+            session: {
+              robotName: 'opentrons-robot-name',
+              step: Constants.RESTARTING,
+              error: null,
+            },
+          },
+        },
+        robot
+      )
+    ).toBe(true)
+
+    expect(
+      selectors.getBuildrootUpdateInProgress(
+        {
+          buildroot: {
+            session: {
+              robotName: 'opentrons-robot-name',
+              step: Constants.RESTARTING,
+              error: { message: 'oh no!' },
+            },
+          },
+        },
+        robot
+      )
+    ).toBe(false)
+
+    expect(
+      selectors.getBuildrootUpdateInProgress(
+        {
+          buildroot: {
+            session: {
+              robotName: 'opentrons-robot-name',
+              step: Constants.FINISHED,
+              error: null,
+            },
+          },
+        },
+        robot
+      )
+    ).toBe(false)
+
+    expect(
+      selectors.getBuildrootUpdateInProgress(
+        { buildroot: { session: null } },
+        robot
+      )
+    ).toBe(false)
   })
 
   it('should return update disabled because not responding if no robot', () => {
