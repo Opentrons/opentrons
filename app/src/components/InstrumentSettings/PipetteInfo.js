@@ -8,7 +8,6 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import {
   LabeledValue,
-  OutlineButton,
   InstrumentDiagram,
   Box,
   Flex,
@@ -228,9 +227,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
       <Flex
         alignItems={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        css={css`
-          max-width: 14rem;
-        `}
+        maxWidth="14rem"
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
