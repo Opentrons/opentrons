@@ -10,10 +10,21 @@ import * as Sessions from '../../../sessions'
 import type { State } from '../../../types'
 import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
-import { Box, Flex, PrimaryBtn } from '@opentrons/components'
+import { Box, PrimaryBtn, Flex, Text } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 jest.mock('file-saver')
 jest.mock('../../../calibration/selectors')
+jest.mock('@opentrons/shared-data', () => ({
+  getAllPipetteNames: jest.fn(
+    jest.requireActual('@opentrons/shared-data').getAllPipetteNames
+  ),
+  getPipetteNameSpecs: jest.fn(
+    jest.requireActual('@opentrons/shared-data').getPipetteNameSpecs
+  ),
+  getPipetteModelSpecs: jest.fn(),
+}))
 
 const mockSaveAs: JestMockFn<
   [Blob, string],
@@ -27,6 +38,11 @@ const mockGetCalibrationStatus: JestMockFn<
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
+const mockGetPipetteModelSpecs: JestMockFn<
+  [string],
+  ?$Shape<PipetteModelSpecs>
+> = getPipetteModelSpecs
+
 describe('ResultsSummary', () => {
   let render
   let mockStore
@@ -35,7 +51,37 @@ describe('ResultsSummary', () => {
 
   const getExitButton = wrapper => wrapper.find(PrimaryBtn)
 
-  const getSaveLink = wrapper => wrapper.find('a').at(1)
+  const getSaveLink = wrapper =>
+    wrapper
+      .find('[children="Download detailed JSON Calibration Check summary"]')
+      .find('a')
+  const getDeckParent = wrapper => wrapper.children(Flex).at(1)
+  const getPipParent = wrapper =>
+    wrapper
+      .children(Flex)
+      .at(2)
+      .children()
+      .at(0)
+  const getLeftPipParent = wrapper =>
+    getPipParent(wrapper)
+      .children(Box)
+      .at(0)
+      .children()
+      .at(0)
+  const getLeftPipResultsParent = wrapper =>
+    getLeftPipParent(wrapper)
+      .children(Box)
+      .at(0)
+  const getRightPipParent = wrapper =>
+    getPipParent(wrapper)
+      .children(Box)
+      .at(1)
+      .children()
+      .at(0)
+  const getRightPipResultsParent = wrapper =>
+    getRightPipParent(wrapper)
+      .children(Box)
+      .at(0)
   beforeEach(() => {
     mockDeleteSession = jest.fn()
     const mockSendCommands = jest.fn()
@@ -48,6 +94,9 @@ describe('ResultsSummary', () => {
       }),
       dispatch,
     }
+    mockGetPipetteModelSpecs.mockReturnValue({
+      displayName: 'mock pipette display name',
+    })
     render = (
       props: $Shape<React.ElementProps<typeof ResultsSummary>> = {}
     ) => {
@@ -90,9 +139,10 @@ describe('ResultsSummary', () => {
 
   it('displays good deck calibration result', () => {
     const wrapper = render()
-    const deckParent = wrapper.find(Flex).at(2)
-
-    expect(deckParent.text()).toEqual(expect.stringContaining('Robot Deck'))
+    const deckParent = getDeckParent(wrapper)
+    expect(deckParent.text()).toEqual(
+      expect.stringContaining('robot deck calibration')
+    )
     expect(deckParent.find('RenderResult').text()).toEqual(
       expect.stringContaining('Good calibration')
     )
@@ -100,58 +150,70 @@ describe('ResultsSummary', () => {
 
   it('summarizes both pipettes & tip length calibrations if comparisons have been made', () => {
     const wrapper = render()
-    const pipParent = wrapper.find(Flex).at(4)
-    const leftPipParent = pipParent.find(Box).at(0)
-    const rightPipParent = pipParent.find(Box).at(3)
-
+    const leftPipParent = getLeftPipParent(wrapper)
+    const rightPipParent = getRightPipParent(wrapper)
+    const leftPipResults = getLeftPipResultsParent(wrapper)
+    const rightPipResults = getRightPipResultsParent(wrapper)
     // left pipette & tip length comparison
-    expect(leftPipParent.text()).toEqual(
-      expect.stringContaining('left pipette')
-    )
-    expect(leftPipParent.text()).toEqual(
-      expect.stringContaining('fake_pipette_model')
-    )
     expect(
       leftPipParent
+        .find(Text)
+        .at(0)
+        .text()
+    ).toEqual('left mount')
+    expect(leftPipResults.text()).toEqual(
+      expect.stringContaining('pipette offset calibration')
+    )
+    expect(
+      leftPipResults
         .find('RenderResult')
         .at(0)
         .text()
     ).toEqual(expect.stringContaining('Good calibration'))
-    expect(leftPipParent.text()).toEqual(
-      expect.stringContaining('fake tiprack display name')
+    expect(leftPipResults.text()).toEqual(
+      expect.stringContaining('tip length calibration')
+    )
+    expect(leftPipResults.text()).toEqual(
+      expect.stringContaining('mock pipette display name')
     )
     expect(
-      leftPipParent
+      leftPipResults
         .find('RenderResult')
         .at(1)
         .text()
     ).toEqual(expect.stringContaining('Good calibration'))
 
     // right pipette & tip length comparison
-    expect(rightPipParent.text()).toEqual(
-      expect.stringContaining('right pipette')
-    )
-    expect(rightPipParent.text()).toEqual(
-      expect.stringContaining('fake_pipette_model')
-    )
     expect(
       rightPipParent
+        .find(Text)
+        .at(0)
+        .text()
+    ).toEqual('right mount')
+    expect(rightPipResults.text()).toEqual(
+      expect.stringContaining('pipette offset calibration')
+    )
+    expect(
+      rightPipResults
         .find('RenderResult')
         .at(0)
         .text()
-    ).toEqual(expect.stringContaining('Bad calibration'))
-    expect(rightPipParent.text()).toEqual(
-      expect.stringContaining('fake tiprack display name 2')
+    ).toEqual(expect.stringContaining('Recalibration recommended'))
+    expect(rightPipResults.text()).toEqual(
+      expect.stringContaining('tip length calibration')
+    )
+    expect(rightPipResults.text()).toEqual(
+      expect.stringContaining('mock pipette display name')
     )
     expect(
-      rightPipParent
+      rightPipResults
         .find('RenderResult')
         .at(1)
         .text()
-    ).toEqual(expect.stringContaining('Bad calibration'))
+    ).toEqual(expect.stringContaining('Recalibration recommended'))
   })
 
-  it('summarizes both pipettes if no comparisons have been made', () => {
+  it('summarizes neither pipette if no comparisons have been made', () => {
     const emptyComparison = {
       first: {},
       second: {},
@@ -159,24 +221,10 @@ describe('ResultsSummary', () => {
     const wrapper = render({
       comparisonsByPipette: emptyComparison,
     })
-    const pipParent = wrapper.find(Flex).at(4)
-    const leftPipParent = pipParent.find(Box).at(0)
-    const rightPipParent = pipParent.find(Box).at(3)
-
-    expect(leftPipParent.exists()).toBe(false)
-    expect(rightPipParent.exists()).toBe(false)
-  })
-
-  it('does not summarize second pipette if none present', () => {
-    const wrapper = render({
-      instruments: [mockSessionDetails.instruments[0]],
-    })
-    const pipParent = wrapper.find(Flex).at(4)
-    const leftPipParent = pipParent.find(Box).at(0)
-    const rightPipParent = pipParent.find(Box).at(3)
-
-    expect(leftPipParent.exists()).toBe(true)
-    expect(rightPipParent.exists()).toBe(false)
+    const leftPipResults = getLeftPipResultsParent(wrapper)
+    const rightPipResults = getRightPipResultsParent(wrapper)
+    expect(leftPipResults.text()).toEqual('No pipette attached')
+    expect(rightPipResults.text()).toEqual('No pipette attached')
   })
 
   it('exits when button is clicked', () => {
@@ -192,10 +240,5 @@ describe('ResultsSummary', () => {
     act(() => getSaveLink(wrapper).invoke('onClick')())
     wrapper.update()
     expect(mockSaveAs).toHaveBeenCalled()
-  })
-
-  it('renders need help link', () => {
-    const wrapper = render()
-    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
   })
 })
