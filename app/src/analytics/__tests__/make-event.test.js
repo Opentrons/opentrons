@@ -229,7 +229,9 @@ describe('analytics events map', () => {
         },
       })
     })
+  })
 
+  describe('events with calibration data', () => {
     it('analytics:PIPETTE_OFFSET_STARTED -> pipetteOffsetCalibrationStarted event', () => {
       const state = {}
       const action = {type: 'analytics:PIPETTE_OFFSET_STARTED',
