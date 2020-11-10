@@ -31,34 +31,49 @@ import type { CalibrationPanelProps } from './types'
 import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
-import leftMultiBlockAsset from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
+import leftMultiBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
 import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_NO_TIP_(330x260)REV1.webm'
-import leftSingleBlockAsset from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
+import leftSingleBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
 import leftSingleTrashAsset from '../../assets/videos/tip-length-cal/Left_Single_Trash_NO_TIP_(330x260)REV1.webm'
-import rightMultiBlockAsset from '../../assets/videos/tip-length-cal/Right_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
+import rightMultiBlockAssetTLC from '../../assets/videos/tip-length-cal/Right_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
 import rightMultiTrashAsset from '../../assets/videos/tip-length-cal/Right_Multi_Trash_NO_TIP_(330x260)REV1.webm'
-import rightSingleBlockAsset from '../../assets/videos/tip-length-cal/Right_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
+import rightSingleBlockAssetTLC from '../../assets/videos/tip-length-cal/Right_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
 import rightSingleTrashAsset from '../../assets/videos/tip-length-cal/Right_Single_Trash_NO_TIP_(330x260)REV1.webm'
+import leftMultiBlockAssetHealth from '../../assets/videos/health-check/Left_Multi_CalBlock_NO_TIP_(330x260)REV2.webm'
+import rightMultiBlockAssetHealth from '../../assets/videos/health-check/Right_Multi_CalBlock_NO_TIP_(330x260)REV2.webm'
+import leftSingleBlockAssetHealth from '../../assets/videos/health-check/Left_Single_CalBlock_NO_TIP_(330x260)REV2.webm'
+import rightSingleBlockAssetHealth from '../../assets/videos/health-check/Right_Single_CalBlock_NO_TIP_(330x260)REV2.webm'
 
-const assetMap = {
-  block: {
+const assetMapTrash = {
+  left: {
+    multi: leftMultiTrashAsset,
+    single: leftSingleTrashAsset,
+  },
+  right: {
+    multi: rightMultiTrashAsset,
+    single: rightSingleTrashAsset,
+  },
+}
+
+const assetMapBlock = {
+  tipLength: {
     left: {
-      multi: leftMultiBlockAsset,
-      single: leftSingleBlockAsset,
+      multi: leftMultiBlockAssetTLC,
+      single: leftSingleBlockAssetTLC,
     },
     right: {
-      multi: rightMultiBlockAsset,
-      single: rightSingleBlockAsset,
+      multi: rightMultiBlockAssetTLC,
+      single: rightSingleBlockAssetTLC,
     },
   },
-  trash: {
+  healthCheck: {
     left: {
-      multi: leftMultiTrashAsset,
-      single: leftSingleTrashAsset,
+      multi: leftMultiBlockAssetHealth,
+      single: leftSingleBlockAssetHealth,
     },
     right: {
-      multi: rightMultiTrashAsset,
-      single: rightSingleTrashAsset,
+      multi: rightMultiBlockAssetHealth,
+      single: rightSingleBlockAssetHealth,
     },
   },
 }
@@ -92,10 +107,14 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
   const demoAsset = React.useMemo(
     () =>
       mount &&
-      assetMap[calBlock ? 'block' : 'trash'][mount][
-        isMulti ? 'multi' : 'single'
-      ],
-    [mount, isMulti, calBlock]
+      (calBlock
+        ? assetMapBlock[
+            sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+              ? 'healthCheck'
+              : 'tipLength'
+          ][mount][isMulti ? 'multi' : 'single']
+        : assetMapTrash[mount][isMulti ? 'multi' : 'single']),
+    [(mount, isMulti, calBlock, sessionType)]
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
