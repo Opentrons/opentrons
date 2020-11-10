@@ -48,7 +48,7 @@ const MOCK_MIN_PAPI_VERSION = '1.0'
 const MOCK_MAX_PAPI_VERSION = '2.8'
 describe('InformationCard', () => {
   const render = (robot = mockConnectableRobot) => {
-    const updateUrl = `/robot/${robot.name}/update`
+    const updateUrl = `/robots/${robot.name}/update`
     return mountWithStore(
       <InformationCard robot={robot} updateUrl={updateUrl} />
     )
