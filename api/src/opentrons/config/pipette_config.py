@@ -435,9 +435,9 @@ def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
     """
     cfg: Dict[str, Any] = {}
 
-    if pipette_id in known_pipettes():
+    try:
         config, model = load_config_dict(pipette_id)
-    else:
+    except FileNotFoundError:
         log.info(f'Pipette id {pipette_id} not found')
         return cfg
 
