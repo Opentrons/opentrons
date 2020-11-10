@@ -265,6 +265,17 @@ describe('/robots/:robotName page component', () => {
     )
   })
 
+  it('should not redirect if an upgrade has been seen ', () => {
+    getBuildrootUpdateInProgress.mockReturnValue(false)
+    getBuildrootUpdateSeen.mockReturnValue(true)
+    getBuildrootUpdateAvailable.mockReturnValue(Buildroot.UPGRADE)
+
+    const { wrapper } = render()
+    const redirect = wrapper.find(Redirect)
+
+    expect(redirect.exists()).toBe(false)
+  })
+
   it('should not redirect if an unseen downgrade is available', () => {
     getBuildrootUpdateInProgress.mockReturnValue(false)
     getBuildrootUpdateSeen.mockReturnValue(false)
