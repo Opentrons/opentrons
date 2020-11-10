@@ -20,9 +20,7 @@ import type {
   DeckCalibrationInfo,
   DeckCalibrationStatus,
 } from '../../calibration/types'
-import type {
-  DeckCalibrationSessionDetails
-} from '../../sessions/deck-calibration/types'
+import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
 
 type MockState = $Shape<{| ...State, config: null | $Shape<Config> |}>
 
@@ -454,18 +452,20 @@ describe('analytics selectors', () => {
     describe('getAnalyticsSessionExitDetails', () => {
       const mockGetRobotSessionById: JestMockFn<
         [State, string, string],
-          $Call<
-            typeof SessionsSelectors.getRobotSessionById,
-            State,
-            string,
-            string
-          >
+        $Call<
+          typeof SessionsSelectors.getRobotSessionById,
+          State,
+          string,
+          string
+        >
       > = SessionsSelectors.getRobotSessionById
       it('returns data if the session exists', () => {
         const mockState = ({}: $Shape<State>)
         mockGetRobotSessionById.mockReturnValue({
           sessionType: 'deckCalibration',
-          details: ({ currentStep: 'inspectingTip' }: $Shape<DeckCalibrationSessionDetails>),
+          details: ({
+            currentStep: 'inspectingTip',
+          }: $Shape<DeckCalibrationSessionDetails>),
           createParams: {},
           id: 'blah-bloo-blah',
         })
