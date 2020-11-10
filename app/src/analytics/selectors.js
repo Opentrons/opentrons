@@ -209,7 +209,9 @@ export function getAnalyticsTipLengthCalibrationData(
 function getPipetteModels(state: State, robotName: string): ModelsByMount {
   return Object.entries(getAttachedPipettes(state, robotName)).reduce(
     (obj, [mount, pipData]) => {
-      obj[mount] = pick(pipData, ['model'])
+      if (pipData) {
+        obj[mount] = pick(pipData, ['model'])
+      }
       return obj
     },
     ({}: $Shape<ModelsByMount>)

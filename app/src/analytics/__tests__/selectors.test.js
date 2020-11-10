@@ -11,6 +11,18 @@ import * as DiscoverySelectors from '../../discovery/selectors'
 import * as PipetteSelectors from '../../pipettes/selectors'
 
 import type { State } from '../../types'
+import type { Robot } from '../../discovery/types'
+import type { Config } from '../../config/types'
+import type { AttachedPipette } from '../../pipettes/types'
+import type {
+  PipetteOffsetCalibration,
+  TipLengthCalibration,
+  DeckCalibrationInfo,
+  DeckCalibrationStatus,
+} from '../../calibration/types'
+import type {
+  DeckCalibrationSessionDetails
+} from '../../sessions/deck-calibration/types'
 
 type MockState = $Shape<{| ...State, config: null | $Shape<Config> |}>
 
@@ -247,17 +259,48 @@ describe('analytics selectors', () => {
   })
 
   describe('analytics calibration selectors', () => {
+    const mockGetConnectedRobot: JestMockFn<
+      [$Shape<State>],
+      $Shape<Robot> | null
+    > = DiscoverySelectors.getConnectedRobot
+    const mockGetAttachedPipettes: JestMockFn<
+      [State, string],
+      {|
+        left: null | $Shape<AttachedPipette>,
+        right: null | $Shape<AttachedPipette>,
+      |}
+    > = PipetteSelectors.getAttachedPipettes
     describe('getAnalyticsPipetteCalibrationData', () => {
+      const mockGetAttachedPipetteCalibrations: JestMockFn<
+        [State, string],
+        {|
+          left: {|
+            offset: $Shape<PipetteOffsetCalibration> | null,
+            tipLength: any,
+          |},
+          right: {|
+            offset: $Shape<PipetteOffsetCalibration> | null,
+            tipLength: any,
+          |},
+        |}
+      > = PipetteSelectors.getAttachedPipetteCalibrations
       it('should get data if robot connected', () => {
-        const mockState = { state: 'hi' }
-        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+        const mockState = ({}: $Shape<State>)
+        mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
         })
-        PipetteSelectors.getAttachedPipetteCalibrations.mockReturnValue({
-          left: { offset: { status: { markedBad: false } } },
+        mockGetAttachedPipetteCalibrations.mockReturnValue({
+          left: {
+            offset: {
+              status: { markedBad: false, markedAt: null, source: null },
+            },
+            tipLength: null,
+          },
+          right: { offset: null, tipLength: null },
         })
-        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+        mockGetAttachedPipettes.mockReturnValue({
           left: { model: 'my pipette model' },
+          right: null,
         })
         expect(
           Selectors.getAnalyticsPipetteCalibrationData(mockState, 'left')
@@ -268,8 +311,8 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = { state: 'hi' }
-        DiscoverySelectors.getConnectedRobot.mockReturnValue(null)
+        const mockState = ({}: $Shape<State>)
+        mockGetConnectedRobot.mockReturnValue(null)
         expect(
           Selectors.getAnalyticsPipetteCalibrationData(mockState, 'right')
         ).toBeNull()
@@ -277,16 +320,37 @@ describe('analytics selectors', () => {
     })
 
     describe('getAnalyticsTipLengthCalibrationData', () => {
+      const mockGetAttachedPipetteCalibrations: JestMockFn<
+        [State, string],
+        {|
+          left: {|
+            offset: any,
+            tipLength: $Shape<TipLengthCalibration> | null,
+          |},
+          right: {|
+            offset: any,
+            tipLength: $Shape<TipLengthCalibration> | null,
+          |},
+        |}
+      > = PipetteSelectors.getAttachedPipetteCalibrations
+
       it('should get data if robot connected', () => {
-        const mockState = { state: 'hi' }
-        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+        const mockState = ({}: $Shape<State>)
+        mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
         })
-        PipetteSelectors.getAttachedPipetteCalibrations.mockReturnValue({
-          right: { tipLength: { status: { markedBad: true } } },
+        mockGetAttachedPipetteCalibrations.mockReturnValue({
+          right: {
+            tipLength: {
+              status: { markedBad: true, markedAt: null, source: null },
+            },
+            offset: null,
+          },
+          left: { offset: null, tipLength: null },
         })
-        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+        mockGetAttachedPipettes.mockReturnValue({
           right: { model: 'my pipette model' },
+          left: null,
         })
         expect(
           Selectors.getAnalyticsTipLengthCalibrationData(mockState, 'right')
@@ -297,26 +361,34 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = { state: 'hi' }
-        DiscoverySelectors.getConnectedRobot.mockReturnValue(null)
+        const mockState = ({}: $Shape<State>)
+        mockGetConnectedRobot.mockReturnValue(null)
         expect(
           Selectors.getAnalyticsTipLengthCalibrationData(mockState, 'left')
         ).toBeNull()
       })
     })
     describe('getAnalyticsDeckCalibrationData', () => {
+      const mockGetDeckCalibrationData: JestMockFn<
+        [State, string],
+        $Call<typeof CalibrationSelectors.getDeckCalibrationData, State, string>
+      > = CalibrationSelectors.getDeckCalibrationData
+      const mockGetDeckCalibrationStatus: JestMockFn<
+        [State, string],
+        DeckCalibrationStatus | null
+      > = CalibrationSelectors.getDeckCalibrationStatus
       it('should get data if robot connected and format ok', () => {
-        const mockState = { state: 'hi' }
-        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+        const mockState = ({}: $Shape<State>)
+        mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
         })
-        CalibrationSelectors.getDeckCalibrationData.mockReturnValue({
-          status: { markedBad: true },
-        })
-        CalibrationSelectors.getDeckCalibrationStatus.mockReturnValue(
-          'IDENTITY'
+        mockGetDeckCalibrationData.mockReturnValue(
+          ({
+            status: { markedBad: true, markedAt: null, source: null },
+          }: $Shape<DeckCalibrationInfo>)
         )
-        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+        mockGetDeckCalibrationStatus.mockReturnValue('IDENTITY')
+        mockGetAttachedPipettes.mockReturnValue({
           right: { model: 'my pipette model' },
           left: { model: 'my other pipette' },
         })
@@ -330,24 +402,22 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = { state: 'hi' }
-        DiscoverySelectors.getConnectedRobot.mockReturnValue(null)
+        const mockState = ({}: $Shape<State>)
+        mockGetConnectedRobot.mockReturnValue(null)
         expect(Selectors.getAnalyticsDeckCalibrationData(mockState)).toBeNull()
       })
       it('should handle old deck cal data', () => {
-        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+        mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
         })
-        CalibrationSelectors.getDeckCalibrationData.mockReturnValue([
+        mockGetDeckCalibrationData.mockReturnValue([
           [0, 1, 2, 3],
           [4, 5, 6, 7],
           [8, 9, 10, 11],
           [12, 13, 14, 15],
         ])
-        CalibrationSelectors.getDeckCalibrationStatus.mockReturnValue(
-          'IDENTITY'
-        )
-        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+        mockGetDeckCalibrationStatus.mockReturnValue('IDENTITY')
+        mockGetAttachedPipettes.mockReturnValue({
           right: { model: 'my pipette model' },
           left: { model: 'my other pipette' },
         })
@@ -363,47 +433,64 @@ describe('analytics selectors', () => {
     })
     describe('getAnalyticsHealthCheckData', () => {
       it('should get data if robot connected', () => {
-        const mockState = { state: 'hi' }
-        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+        const mockState = ({}: $Shape<State>)
+        mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
         })
-        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+        mockGetAttachedPipettes.mockReturnValue({
           right: { model: 'my model' },
+          left: null,
         })
         expect(Selectors.getAnalyticsHealthCheckData(mockState)).toEqual({
           pipettes: { right: { model: 'my model' } },
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = { state: 'hi' }
-        DiscoverySelectors.getConnectedRobot.mockReturnValue(null)
+        const mockState = ({}: $Shape<State>)
+        mockGetConnectedRobot.mockReturnValue(null)
         expect(Selectors.getAnalyticsHealthCheckData(mockState)).toBeNull()
       })
     })
     describe('getAnalyticsSessionExitDetails', () => {
+      const mockGetRobotSessionById: JestMockFn<
+        [State, string, string],
+          $Call<
+            typeof SessionsSelectors.getRobotSessionById,
+            State,
+            string,
+            string
+          >
+      > = SessionsSelectors.getRobotSessionById
       it('returns data if the session exists', () => {
-        const mockState = { state: 'hi' }
-        SessionsSelectors.getRobotSessionById.mockReturnValue({
-          sessionType: 'my-session-type',
-          details: { currentStep: 'session-step' },
+        const mockState = ({}: $Shape<State>)
+        mockGetRobotSessionById.mockReturnValue({
+          sessionType: 'deckCalibration',
+          details: ({ currentStep: 'inspectingTip' }: $Shape<DeckCalibrationSessionDetails>),
+          createParams: {},
+          id: 'blah-bloo-blah',
         })
         expect(
           Selectors.getAnalyticsSessionExitDetails(
             mockState,
             'my-robot',
-            'session-id'
+            'blah-bloo-blah'
           )
-        ).toEqual({ step: 'session-step', sessionType: 'my-session-type' })
+        ).toEqual({ step: 'inspectingTip', sessionType: 'deckCalibration' })
         expect(SessionsSelectors.getRobotSessionById).toHaveBeenCalledWith(
           mockState,
           'my-robot',
-          'session-id'
+          'blah-bloo-blah'
         )
       })
       it('returns null if the session cannot be found', () => {
-        SessionsSelectors.getRobotSessionById.mockReturnValue(null)
+        mockGetRobotSessionById.mockReturnValue(null)
+        const mockState = ({}: $Shape<State>)
         expect(
-          Selectors.getAnalyticsSessionExitDetails({}, 'my-robot', 'session-id')
+          Selectors.getAnalyticsSessionExitDetails(
+            mockState,
+            'my-robot',
+            'blah-bloo-blah'
+          )
         ).toBeNull()
       })
     })
