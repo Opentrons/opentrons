@@ -13,15 +13,20 @@ import type { State } from '../../../types'
 
 import { PipetteInfo } from '../PipetteInfo'
 import { mockAttachedPipette } from '../__fixtures__'
+import { mockConnectedRobot } from '../../../discovery/__fixtures__'
 import { mockPipetteOffsetCalibration1 } from '../../../calibration/pipette-offset/__fixtures__'
 import { mockTipLengthCalibration1 } from '../../../calibration/tip-length/__fixtures__'
 import { getCustomLabwareDefinitions } from '../../../custom-labware'
+import { getRobotByName } from '../../../discovery'
+import { getIsRunning } from '../../../robot/selectors'
 
 jest.mock('../../../calibration')
 jest.mock('../../../config')
 jest.mock('../../../custom-labware')
 jest.mock('../../CalibratePipetteOffset/useCalibratePipetteOffset')
 jest.mock('react-router-dom', () => ({ Link: () => <></> }))
+jest.mock('../../../discovery')
+jest.mock('../../../robot/selectors')
 
 const mockGetCustomLabwareDefinitions: JestMockFn<
   [State],
@@ -48,6 +53,16 @@ const mockGetHasCalibrationBlock: JestMockFn<
   $Call<typeof Config.getHasCalibrationBlock, State>
 > = Config.getHasCalibrationBlock
 
+const mockGetRobotByName: JestMockFn<
+  [State, string],
+  $Call<typeof getRobotByName, State, string>
+> = getRobotByName
+
+const mockGetIsRunning: JestMockFn<
+  [State],
+  $Call<typeof getIsRunning, State>
+> = getIsRunning
+
 describe('PipetteInfo', () => {
   const robotName = 'robot-name'
   let render
@@ -60,6 +75,8 @@ describe('PipetteInfo', () => {
     mockGetTipLengthForPipetteAndTiprack.mockReturnValue(null)
     mockGetCustomLabwareDefinitions.mockReturnValue([])
     mockGetHasCalibrationBlock.mockReturnValue(null)
+    mockGetIsRunning.mockReturnValue(false)
+    mockGetRobotByName.mockReturnValue(mockConnectedRobot)
 
     render = (props: $Shape<React.ElementProps<typeof PipetteInfo>> = {}) => {
       const { pipette = mockAttachedPipette } = props
