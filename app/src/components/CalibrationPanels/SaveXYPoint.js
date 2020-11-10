@@ -158,6 +158,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     sessionType,
     activePipette,
     instruments,
+    checkBothPipettes,
   } = props
 
   const {
@@ -193,7 +194,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     }
     if (
       finalCommand &&
-      instruments?.length &&
+      checkBothPipettes &&
       activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
     ) {
       commands = [...commands, { command: finalCommand }]
