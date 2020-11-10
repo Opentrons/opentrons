@@ -8,6 +8,7 @@ import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
 import * as Sessions from '../sessions'
 import * as Alerts from '../alerts'
+import * as RobotAdmin from '../robot-admin'
 
 import {
   getProtocolAnalyticsData,
@@ -298,6 +299,14 @@ export function makeEvent(
       }
 
       return Promise.resolve(null)
+    }
+
+    case RobotAdmin.RESET_CONFIG: {
+      const { resets } = action.payload
+      return Promise.resolve({
+        name: 'resetRobotConfig',
+        properties: { ...resets },
+      })
     }
   }
 
