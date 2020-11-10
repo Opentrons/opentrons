@@ -234,4 +234,23 @@ describe('PipetteInfo', () => {
       withIntent: 'tip-length-no-protocol',
     })
   })
+
+  it('buttons are disabled if robot is running', () => {
+    mockGetHasCalibrationBlock.mockReturnValue(true)
+
+    mockGetCalibrationForPipette.mockReturnValue(mockPipetteOffsetCalibration1)
+    mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
+      mockTipLengthCalibration1
+    )
+    mockGetIsRunning.mockReturnValue(true)
+    const { wrapper } = render()
+    expect(
+      wrapper.find('button[title="recalibrateTipButton"]').props()?.disabled
+    ).toEqual(expect.any(String))
+    // expect(
+    //   wrapper.find('button[title="pipetteOffsetCalButton"]')
+    // ).toBeDisabled()
+    // expect(wrapper.find('button[title="pipetteSettingsButton"]')).toBeDisabled()
+    // expect(wrapper.find('button[title="changePipetteButton"]')).toBeDisabled()
+  })
 })

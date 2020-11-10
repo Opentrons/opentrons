@@ -242,21 +242,23 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         </Flex>
 
         <SecondaryBtn
-          {...changePipTargetProps}
+          {...(buttonDisabledReason ? changePipTargetProps : {})}
           as={buttonDisabledReason ? 'button' : Link}
           to={changeUrl}
           disabled={buttonDisabledReason}
+          title="changePipetteButton"
         >
           {direction}
         </SecondaryBtn>
       </Flex>
       {settingsUrl !== null && (
         <SecondaryBtn
-          {...settingsTargetProps}
+          {...(buttonDisabledReason ? settingsTargetProps : {})}
           {...PER_PIPETTE_BTN_STYLE}
           as={buttonDisabledReason ? 'button' : Link}
           to={settingsUrl}
           disabled={buttonDisabledReason}
+          title="pipetteSettingsButton"
         >
           settings
         </SecondaryBtn>
