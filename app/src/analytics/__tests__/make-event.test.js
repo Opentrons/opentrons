@@ -6,6 +6,7 @@ import {
 } from '../../robot'
 import * as pipetteSelectors from '../../pipettes/selectors'
 import * as discoverySelectors from '../../discovery/selectors'
+import * as calibrationSelectors from '../../calibration/selectors'
 import * as selectors from '../selectors'
 
 jest.mock('../selectors')
@@ -13,6 +14,7 @@ jest.mock('../../robot/selectors')
 jest.mock('../../sessions')
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
+jest.mock('../../calibration/selectors')
 
 describe('analytics events map', () => {
   beforeEach(() => {
@@ -272,6 +274,55 @@ describe('analytics events map', () => {
           pipetteModel: 'my pipette model'
         }
       })
+    })
+
+    it('session:ENSURE_SESSION for deck cal -> deckCalibrationStarted event', () => {
+      const state = {}
+      const action = {type: 'session:ENSURE_SESSION',
+                      payload: {
+                        sessionType: 'deckCalibration',
+                      }}
+      pipetteSelectors.getAttachedPipettes.mockReturnValue(
+        {left: {model: 'my pipette model'}}
+      )
+      calibrationSelectors.getDeckCalibrationStatus.mockReturnValue('IDENTITY')
+      calibrationSelectors.getDeckCalibrationData.mockReturnValue({status: {markedBad: true}})
+
+      expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'deckCalibrationStarted',
+        properties: {
+          calibrationStatus: 'IDENTITY',
+          markedBad: true,
+          pipettes: {left: {model: 'my pipette model'}}
+        }
+      })
+    })
+
+    it('session:ENSURE_SESSION for health check -> calibrationHealthCheckStarted event', () => {
+      const state = {}
+      const action = {type: 'session:ENSURE_SESSION',
+                      payload: {
+                        sessionType: 'calibrationCheck',
+                      }}
+      pipetteSelectors.getAttachedPipettes.mockReturnValue(
+        {left: {model: 'my pipette model'}}
+      )
+
+      expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'deckCalibrationStarted',
+        properties: {
+          pipettes: {left: {model: 'my pipette model'}}
+        }
+      })
+    })
+
+    it('session:ENSURE_SESSION for other session -> no event', () => {
+      const state = {}
+      const action = {type: 'session:ENSURE_SESSION',
+                      payload: {
+                        sessionType: 'some-other-session'
+                      }}
+      expect(makeEvent(action, state)).resolves.toBeNull()
     })
   })
 })

@@ -1,5 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
+import pick from 'lodash/pick'
 
 import {
   getProtocolType,
@@ -28,6 +29,7 @@ import {
 import { getRobotSettings } from '../robot-settings'
 import { getAttachedPipettes, getAttachedPipetteCalibrations } from '../pipettes'
 import { getPipettes, getModules } from '../robot/selectors'
+import { getDeckCalibrationStatus, getDeckCalibrationData } from '../calibration/selectors'
 
 import { hash } from './hash'
 
@@ -41,6 +43,9 @@ import type {
   BuildrootAnalyticsData,
   PipetteOffsetCalibrationAnalyticsData,
   TipLengthCalibrationAnalyticsData,
+  DeckCalibrationAnalyticsData,
+  CalibrationHealthCheckAnalyticsData,
+  ModelsByMount,
 } from './types'
 
 type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
@@ -179,6 +184,39 @@ export function getAnalyticsTipLengthCalibrationData(state: State, mount: string
       calibrationExists: Boolean(tipcal),
       markedBad: tipcal?.status?.markedBad ?? false,
       pipetteModel: pip.model
+    }
+  }
+  return null
+}
+
+function getPipetteModels(state: State, robotName: string): ModelsByMount {
+  return Object.entries(getAttachedPipettes(state, robotName)).reduce(
+    (obj, [mount, pipData]) => {
+      obj[mount] = pick(pipData, ['model'])
+      return obj
+    },
+    ({}: $Shape<ModelsByMount>)
+  )
+}
+
+export function getAnalyticsDeckCalibrationData(state: State): DeckCalibrationAnalyticsData | null{
+  const robot = getConnectedRobot(state)
+  if (robot) {
+    const dcData = getDeckCalibrationData(state, robot.name)
+    return {
+      calibrationStatus: getDeckCalibrationStatus(state, robot.name),
+      markedBad: !Array.isArray(dcData) ? dcData?.status?.markedBad || null : null,
+      pipettes: getPipetteModels(state, robot.name)
+    }  
+  }
+  return null
+}
+
+export function getAnalyticsHealthCheckData(state: State): CalibrationHealthCheckAnalyticsData | null{
+  const robot = getConnectedRobot(state)
+  if (robot) {
+    return {
+      pipettes: getPipetteModels(state, robot.name)
     }
   }
   return null

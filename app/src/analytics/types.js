@@ -6,6 +6,7 @@ import typeof {
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
 import * as CalUITypes from '../components/CalibrationPanels/types'
+import type { DeckCalibrationStatus } from '../calibration/types'
 
 export type AnalyticsConfig = $PropertyType<Config, 'analytics'>
 
@@ -50,6 +51,21 @@ export type TipLengthCalibrationAnalyticsData = {|
   calibrationExists: boolean,
   markedBad: boolean | null,
   pipetteModel: string,
+|}
+
+export type DeckCalibrationAnalyticsData = {|
+  calibrationStatus: DeckCalibrationStatus | null,
+  markedBad: boolean | null,
+  pipettes: ModelsByMount
+|}
+
+export type CalibrationHealthCheckAnalyticsData = {|
+  pipettes: ModelsByMount
+|}
+
+export type ModelsByMount = {|
+  left: {model: string},
+  right: {model: string},
 |}
 
 export type AnalyticsEvent =

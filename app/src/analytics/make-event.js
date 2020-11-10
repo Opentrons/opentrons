@@ -16,6 +16,8 @@ import {
   getBuildrootAnalyticsData,
   getAnalyticsPipetteCalibrationData,
   getAnalyticsTipLengthCalibrationData,
+  getAnalyticsHealthCheckData,
+  getAnalyticsDeckCalibrationData,
 } from './selectors'
 
 import type { State, Action } from '../types'
@@ -276,6 +278,31 @@ export function makeEvent(
             }
           : null
       )
+    }
+
+    case Sessions.ENSURE_SESSION: {
+      switch (action.payload.sessionType) {
+        case Sessions.SESSION_TYPE_DECK_CALIBRATION:
+          const dcAnalyticsProps = getAnalyticsDeckCalibrationData(state)
+          return Promise.resolve(dcAnalyticsProps
+            ? {
+              name: 'deckCalibrationStarted',
+              properties: dcAnalyticsProps
+            }
+                                 : null)
+        case Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK:
+          const hcAnalyticsProps = getAnalyticsHealthCheckData(state)
+          return Promise.resolve(
+              hcAnalyticsProps ?
+              {
+                name: 'calibrationHealthCheckStarted',
+                properties: hcAnalyticsProps
+              }
+            : null)
+        default:
+          return Promise.resolve(null)
+      }
+
     }
 
     case Sessions.DELETE_SESSION: {
