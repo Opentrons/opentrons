@@ -5,14 +5,21 @@ import * as RobotSelectors from '../../robot/selectors'
 import * as Hash from '../hash'
 
 import * as Selectors from '../selectors'
+import * as CalibrationSelectors from '../../calibration/selectors'
+import * as SessionsSelectors from '../../sessions/selectors'
+import * as DiscoverySelectors from '../../discovery/selectors'
+import * as PipetteSelectors from '../../pipettes/selectors'
 
 import type { State } from '../../types'
-import type { Config } from '../../config/types'
 
 type MockState = $Shape<{| ...State, config: null | $Shape<Config> |}>
 
 jest.mock('../../protocol/selectors')
 jest.mock('../../robot/selectors')
+jest.mock('../../calibration/selectors')
+jest.mock('../../sessions/selectors')
+jest.mock('../../discovery/selectors')
+jest.mock('../../pipettes/selectors')
 jest.mock('../hash')
 
 describe('analytics selectors', () => {
@@ -235,6 +242,169 @@ describe('analytics selectors', () => {
 
       return expect(result).resolves.toMatchObject({
         modules: 'temperatureModuleV1,magneticModuleV2',
+      })
+    })
+  })
+
+  describe('analytics calibration selectors', () => {
+    describe('getAnalyticsPipetteCalibrationData', () => {
+      it('should get data if robot connected', () => {
+        const mockState = { state: 'hi' }
+        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+          name: 'my robot',
+        })
+        PipetteSelectors.getAttachedPipetteCalibrations.mockReturnValue({
+          left: { offset: { status: { markedBad: false } } },
+        })
+        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+          left: { model: 'my pipette model' },
+        })
+        expect(
+          Selectors.getAnalyticsPipetteCalibrationData(mockState, 'left')
+        ).toEqual({
+          calibrationExists: true,
+          markedBad: false,
+          pipetteModel: 'my pipette model',
+        })
+      })
+      it('should return null if no robot connected', () => {
+        const mockState = { state: 'hi' }
+        DiscoverySelectors.getConnectedRobot.mockReturnValue(null)
+        expect(
+          Selectors.getAnalyticsPipetteCalibrationData(mockState, 'right')
+        ).toBeNull()
+      })
+    })
+
+    describe('getAnalyticsTipLengthCalibrationData', () => {
+      it('should get data if robot connected', () => {
+        const mockState = { state: 'hi' }
+        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+          name: 'my robot',
+        })
+        PipetteSelectors.getAttachedPipetteCalibrations.mockReturnValue({
+          right: { tipLength: { status: { markedBad: true } } },
+        })
+        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+          right: { model: 'my pipette model' },
+        })
+        expect(
+          Selectors.getAnalyticsTipLengthCalibrationData(mockState, 'right')
+        ).toEqual({
+          calibrationExists: true,
+          markedBad: true,
+          pipetteModel: 'my pipette model',
+        })
+      })
+      it('should return null if no robot connected', () => {
+        const mockState = { state: 'hi' }
+        DiscoverySelectors.getConnectedRobot.mockReturnValue(null)
+        expect(
+          Selectors.getAnalyticsTipLengthCalibrationData(mockState, 'left')
+        ).toBeNull()
+      })
+    })
+    describe('getAnalyticsDeckCalibrationData', () => {
+      it('should get data if robot connected and format ok', () => {
+        const mockState = { state: 'hi' }
+        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+          name: 'my robot',
+        })
+        CalibrationSelectors.getDeckCalibrationData.mockReturnValue({
+          status: { markedBad: true },
+        })
+        CalibrationSelectors.getDeckCalibrationStatus.mockReturnValue(
+          'IDENTITY'
+        )
+        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+          right: { model: 'my pipette model' },
+          left: { model: 'my other pipette' },
+        })
+        expect(Selectors.getAnalyticsDeckCalibrationData(mockState)).toEqual({
+          calibrationStatus: 'IDENTITY',
+          markedBad: true,
+          pipettes: {
+            left: { model: 'my other pipette' },
+            right: { model: 'my pipette model' },
+          },
+        })
+      })
+      it('should return null if no robot connected', () => {
+        const mockState = { state: 'hi' }
+        DiscoverySelectors.getConnectedRobot.mockReturnValue(null)
+        expect(Selectors.getAnalyticsDeckCalibrationData(mockState)).toBeNull()
+      })
+      it('should handle old deck cal data', () => {
+        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+          name: 'my robot',
+        })
+        CalibrationSelectors.getDeckCalibrationData.mockReturnValue([
+          [0, 1, 2, 3],
+          [4, 5, 6, 7],
+          [8, 9, 10, 11],
+          [12, 13, 14, 15],
+        ])
+        CalibrationSelectors.getDeckCalibrationStatus.mockReturnValue(
+          'IDENTITY'
+        )
+        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+          right: { model: 'my pipette model' },
+          left: { model: 'my other pipette' },
+        })
+        expect(Selectors.getAnalyticsDeckCalibrationData(mockState)).toEqual({
+          calibrationStatus: 'IDENTITY',
+          markedBad: null,
+          pipettes: {
+            left: { model: 'my other pipette' },
+            right: { model: 'my pipette model' },
+          },
+        })
+      })
+    })
+    describe('getAnalyticsHealthCheckData', () => {
+      it('should get data if robot connected', () => {
+        const mockState = { state: 'hi' }
+        DiscoverySelectors.getConnectedRobot.mockReturnValue({
+          name: 'my robot',
+        })
+        PipetteSelectors.getAttachedPipettes.mockReturnValue({
+          right: { model: 'my model' },
+        })
+        expect(Selectors.getAnalyticsHealthCheckData(mockState)).toEqual({
+          pipettes: { right: { model: 'my model' } },
+        })
+      })
+      it('should return null if no robot connected', () => {
+        const mockState = { state: 'hi' }
+        DiscoverySelectors.getConnectedRobot.mockReturnValue(null)
+        expect(Selectors.getAnalyticsHealthCheckData(mockState)).toBeNull()
+      })
+    })
+    describe('getAnalyticsSessionExitDetails', () => {
+      it('returns data if the session exists', () => {
+        const mockState = { state: 'hi' }
+        SessionsSelectors.getRobotSessionById.mockReturnValue({
+          sessionType: 'my-session-type',
+          details: { currentStep: 'session-step' },
+        })
+        expect(
+          Selectors.getAnalyticsSessionExitDetails(
+            mockState,
+            'my-robot',
+            'session-id'
+          )
+        ).toEqual({ step: 'session-step', sessionType: 'my-session-type' })
+        expect(SessionsSelectors.getRobotSessionById).toHaveBeenCalledWith(
+          mockState,
+          'my-robot',
+          'session-id'
+        )
+      })
+      it('returns null if the session cannot be found', () => {
+        SessionsSelectors.getRobotSessionById.mockReturnValue(null)
+        expect(
+          Selectors.getAnalyticsSessionExitDetails({}, 'my-robot', 'session-id')
+        ).toBeNull()
       })
     })
   })
