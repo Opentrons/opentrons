@@ -66,7 +66,7 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
       instruments,
       savedAt: now.toISOString(),
     }
-    const data = new Blob([JSON.stringify(report)], {
+    const data = new Blob([JSON.stringify(report, null, 4)], {
       type: 'application/json',
     })
     saveAs(data, 'OT-2 Robot Calibration Check Report.json')
