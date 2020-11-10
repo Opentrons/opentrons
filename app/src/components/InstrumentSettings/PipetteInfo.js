@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import { Link } from 'react-router-dom'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -15,6 +14,8 @@ import {
   Flex,
   Text,
   SecondaryBtn,
+  useHoverTooltip,
+  Tooltip,
   DIRECTION_COLUMN,
   FONT_WEIGHT_SEMIBOLD,
   SPACING_1,
@@ -41,19 +42,23 @@ import {
   INTENT_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
 } from '../CalibrationPanels'
-import type { State } from '../../types'
-
 import {
   getCalibrationForPipette,
   getTipLengthForPipetteAndTiprack,
 } from '../../calibration'
-
-import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
-
-import type { Mount, AttachedPipette } from '../../pipettes/types'
+import { getRobotByName } from '../../discovery'
+import { getIsRunning } from '../../robot/selectors'
 import { findLabwareDefWithCustom } from '../../findLabware'
 import * as CustomLabware from '../../custom-labware'
 import { Portal } from '../portal'
+import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
+import {
+  DISABLED_CONNECT_TO_ROBOT,
+  DISABLED_PROTOCOL_IS_RUNNING,
+} from '../RobotSettings/constants'
+
+import type { State } from '../../types'
+import type { Mount, AttachedPipette } from '../../pipettes/types'
 
 export type PipetteInfoProps = {|
   robotName: string,
@@ -134,6 +139,23 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         )
       : null
   )
+
+  const isRunning = useSelector(getIsRunning)
+  const isConnected = useSelector(
+    (state: State) => getRobotByName(state, robotName)?.connected
+  )
+
+  const [tlcTargetProps, tlcTooltipProps] = useHoverTooltip()
+  const [pocTargetProps, pocTooltipProps] = useHoverTooltip()
+  const [settingsTargetProps, settingsTooltipProps] = useHoverTooltip()
+  const [changePipTargetProps, changePipTooltipProps] = useHoverTooltip()
+
+  let buttonDisabledReason = null
+  if (!isConnected) {
+    buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
+  } else if (isRunning) {
+    buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
+  }
 
   const [
     startPipetteOffsetCalibration,
@@ -222,18 +244,30 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           <LabeledValue label={SERIAL_NUMBER} value={serialNumber || 'None'} />
         </Flex>
 
-        <OutlineButton Component={Link} to={changeUrl}>
+        <SecondaryBtn
+          {...changePipTargetProps}
+          as={buttonDisabledReason ? 'button' : Link}
+          to={changeUrl}
+          disabled={buttonDisabledReason}
+        >
           {direction}
-        </OutlineButton>
+        </SecondaryBtn>
       </Flex>
       {settingsUrl !== null && (
-        <SecondaryBtn {...PER_PIPETTE_BTN_STYLE} as={Link} to={settingsUrl}>
+        <SecondaryBtn
+          {...settingsTargetProps}
+          {...PER_PIPETTE_BTN_STYLE}
+          as={buttonDisabledReason ? 'button' : Link}
+          to={settingsUrl}
+          disabled={buttonDisabledReason}
+        >
           settings
         </SecondaryBtn>
       )}
       {serialNumber && (
         <>
           <SecondaryBtn
+            {...pocTargetProps}
             {...PER_PIPETTE_BTN_STYLE}
             title="pipetteOffsetCalButton"
             onClick={
@@ -241,6 +275,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
                 ? startPipetteOffsetCalibrationDirectly
                 : () => startPipetteOffsetWizard({ keepTipLength: true })
             }
+            disabled={buttonDisabledReason}
           >
             {CALIBRATE_OFFSET}
           </SecondaryBtn>
@@ -302,11 +337,13 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
                   )}
                 </Text>
                 <SecondaryBtn
+                  {...tlcTargetProps}
                   {...PER_PIPETTE_BTN_STYLE}
                   title="recalibrateTipButton"
                   onClick={() =>
                     startPipetteOffsetWizard({ keepTipLength: false })
                   }
+                  disabled={buttonDisabledReason}
                 >
                   {RECALIBRATE_TIP}
                 </SecondaryBtn>
@@ -324,6 +361,14 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
               </Text>
             )}
           </Box>
+        </>
+      )}
+      {buttonDisabledReason !== null && (
+        <>
+          <Tooltip {...settingsTooltipProps}>{buttonDisabledReason}</Tooltip>
+          <Tooltip {...pocTooltipProps}>{buttonDisabledReason}</Tooltip>
+          <Tooltip {...tlcTooltipProps}>{buttonDisabledReason}</Tooltip>
+          <Tooltip {...changePipTooltipProps}>{buttonDisabledReason}</Tooltip>
         </>
       )}
     </Flex>
