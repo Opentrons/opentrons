@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field
 
 
 class BasePipettingRequest(BaseModel):
+    """Base class for pipetting requests that interact with wells."""
+
     pipetteId: str = Field(
         ...,
         description="Identifier of pipette to use for liquid handling."
@@ -18,6 +20,8 @@ class BasePipettingRequest(BaseModel):
 
 
 class BaseLiquidHandlingRequest(BasePipettingRequest):
+    """Base class for liquid handling requests."""
+
     volume: float = Field(
         ...,
         description="Amount of liquid in uL. Must be greater than 0 and less "
@@ -34,40 +38,60 @@ class BaseLiquidHandlingRequest(BasePipettingRequest):
 
 
 class MoveToWellRequest(BasePipettingRequest):
+    """A request to move a pipette to a specific well."""
+
     pass
 
 
 class MoveToWellResult(BaseModel):
+    """The result of a MoveToWellRequest."""
+
     pass
 
 
 class PickUpTipRequest(BasePipettingRequest):
+    """A request to pick up a tip."""
+
     pass
 
 
 class PickUpTipResult(BaseModel):
+    """The result of a PickUpTipRequest."""
+
     pass
 
 
 class DropTipRequest(BasePipettingRequest):
+    """A request to drop a tip."""
+
     pass
 
 
 class DropTipResult(BaseModel):
+    """The result of a DropTipRequest."""
+
     pass
 
 
 class AspirateRequest(BaseLiquidHandlingRequest):
+    """A request to aspirate liquid from a well."""
+
     pass
 
 
 class AspirateResult(BaseModel):
+    """The result of a AspirateRequest."""
+
     pass
 
 
 class DispenseRequest(BaseLiquidHandlingRequest):
+    """A request to dispense liquid into a well."""
+
     pass
 
 
 class DispenseResult(BaseModel):
+    """The result of a DispenseRequest."""
+
     pass

@@ -44,7 +44,7 @@ class ProtocolEngine:
         self,
         state_store: StateStore,
         executor: CommandExecutor,
-    ):
+    ) -> None:
         """
         Initialize a ProtocolEngine instance.
 

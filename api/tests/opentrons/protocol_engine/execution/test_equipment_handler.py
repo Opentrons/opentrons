@@ -1,6 +1,8 @@
 """Test equipment command execution side effects."""
 import pytest
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 
 from opentrons.protocol_engine import errors
@@ -17,7 +19,8 @@ from opentrons.protocol_engine.command_models import (
 
 
 @pytest.fixture
-def mock_labware_data(minimal_labware_def):
+def mock_labware_data(minimal_labware_def: LabwareDefinition) -> AsyncMock:
+    """Get a mock in the shape of the LabwareData resource primed with data."""
     mock = AsyncMock(spec=LabwareData)
     mock.get_labware_definition.return_value = minimal_labware_def
     mock.get_labware_calibration.return_value = (1, 2, 3)
@@ -25,7 +28,8 @@ def mock_labware_data(minimal_labware_def):
 
 
 @pytest.fixture
-def mock_id_generator():
+def mock_id_generator() -> MagicMock:
+    """Get a mock in the shape of an IdGenerator resource primed with data."""
     mock = MagicMock(spec=IdGenerator)
     mock.generate_id.return_value = "unique-id"
     return mock
@@ -33,11 +37,12 @@ def mock_id_generator():
 
 @pytest.fixture
 def handler(
-    mock_labware_data,
-    mock_id_generator,
-    mock_hardware,
-    mock_state_view,
-):
+    mock_hardware: AsyncMock,
+    mock_state_view: MagicMock,
+    mock_labware_data: AsyncMock,
+    mock_id_generator: MagicMock,
+) -> EquipmentHandler:
+    """Get an EquipmentHandler with its dependencies mocked out."""
     return EquipmentHandler(
         hardware=mock_hardware,
         state=mock_state_view,
@@ -46,8 +51,11 @@ def handler(
     )
 
 
-async def test_load_labware_assigns_id(mock_id_generator, handler):
-    """LoadLabwareRequest should create a resource ID for the labware."""
+async def test_load_labware_assigns_id(
+    mock_id_generator: MagicMock,
+    handler: EquipmentHandler,
+) -> None:
+    """A LoadLabwareRequest should create a resource ID for the labware."""
     req = LoadLabwareRequest(
         location=DeckSlotLocation(DeckSlotName.SLOT_3),
         loadName="load-name",
@@ -61,11 +69,11 @@ async def test_load_labware_assigns_id(mock_id_generator, handler):
 
 
 async def test_load_labware_gets_labware_def(
-    mock_labware_data,
-    handler,
-    minimal_labware_def
-):
-    """LoadLabwareRequest should create a resource ID for the labware."""
+    minimal_labware_def: LabwareDefinition,
+    mock_labware_data: AsyncMock,
+    handler: EquipmentHandler,
+) -> None:
+    """A LoadLabwareRequest should create a resource ID for the labware."""
     req = LoadLabwareRequest(
         location=DeckSlotLocation(DeckSlotName.SLOT_3),
         loadName="load-name",
@@ -84,11 +92,11 @@ async def test_load_labware_gets_labware_def(
 
 
 async def test_load_labware_gets_labware_cal_data(
-    mock_labware_data,
-    handler,
-    minimal_labware_def
-):
-    """LoadLabwareRequest should create a resource ID for the labware."""
+    minimal_labware_def: LabwareDefinition,
+    mock_labware_data: AsyncMock,
+    handler: EquipmentHandler,
+) -> None:
+    """A LoadLabwareRequest should create a resource ID for the labware."""
     req = LoadLabwareRequest(
         location=DeckSlotLocation(DeckSlotName.SLOT_3),
         loadName="load-name",
@@ -106,9 +114,10 @@ async def test_load_labware_gets_labware_cal_data(
 
 
 async def test_load_pipette_assigns_id(
-    mock_id_generator,
-    handler
-):
+    mock_id_generator: MagicMock,
+    handler: EquipmentHandler,
+) -> None:
+    """A LoadPipetteRequest should generate a unique identifier for the pipette."""
     req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
     res = await handler.handle_load_pipette(req)
 
@@ -117,10 +126,11 @@ async def test_load_pipette_assigns_id(
 
 
 async def test_load_pipette_checks_checks_existence(
-    mock_state_view,
-    mock_hardware,
-    handler
-):
+    mock_state_view: MagicMock,
+    mock_hardware: AsyncMock,
+    handler: EquipmentHandler,
+) -> None:
+    """A LoadPipetteRequest should cache hardware instruments."""
     mock_state_view.pipettes.get_pipette_data_by_mount.return_value = None
     req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
     await handler.handle_load_pipette(req)
@@ -134,10 +144,11 @@ async def test_load_pipette_checks_checks_existence(
 
 
 async def test_load_pipette_checks_checks_existence_with_already_loaded(
-    mock_state_view,
-    mock_hardware,
-    handler
-):
+    mock_state_view: MagicMock,
+    mock_hardware: AsyncMock,
+    handler: EquipmentHandler,
+) -> None:
+    """A LoadPipetteRequest should cache with pipettes already attached."""
     mock_state_view.pipettes.get_pipette_data_by_mount.return_value = \
         PipetteData(mount=MountType.LEFT, pipette_name="p300_multi")
     req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.RIGHT)
@@ -154,10 +165,11 @@ async def test_load_pipette_checks_checks_existence_with_already_loaded(
 
 
 async def test_load_pipette_raises_if_pipette_not_attached(
-    mock_state_view,
-    mock_hardware,
-    handler
-):
+    mock_state_view: MagicMock,
+    mock_hardware: AsyncMock,
+    handler: EquipmentHandler,
+) -> None:
+    """A LoadPipetteRequest should raise if unable to cache instruments."""
     mock_hardware.cache_instruments.side_effect = RuntimeError(
         'mount LEFT: instrument p300_single was requested, '
         'but no instrument is present'

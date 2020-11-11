@@ -19,7 +19,7 @@ def test_initial_pipette_data_by_mount(store: StateStore) -> None:
 
 
 def test_handles_load_pipette(store: StateStore, now: datetime) -> None:
-    """It should add the pipette data to the state"""
+    """It should add the pipette data to the state."""
     command = cmd.CompletedCommand(
         request=cmd.LoadPipetteRequest(
             pipetteName="p300_single",

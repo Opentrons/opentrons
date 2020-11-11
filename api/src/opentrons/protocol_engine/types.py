@@ -10,6 +10,7 @@ from opentrons.types import DeckSlotName
 @dataclass(frozen=True)
 class DeckSlotLocation:
     """Location for labware placed in a single slot."""
+
     slot: DeckSlotName
 
 

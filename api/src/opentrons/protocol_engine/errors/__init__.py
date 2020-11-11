@@ -3,6 +3,7 @@
 
 class ProtocolEngineError(RuntimeError):
     """Base Protocol Engine error class."""
+
     pass
 
 
@@ -15,7 +16,8 @@ class UnexpectedProtocolError(ProtocolEngineError):
     and wrapped.
     """
 
-    def __init__(self, original_error: Exception):
+    def __init__(self, original_error: Exception) -> None:
+        """Initialize an UnexpectedProtocolError with an original error."""
         super().__init__(str(original_error))
         self.original_error: Exception = original_error
 
@@ -28,27 +30,32 @@ class FailedToLoadPipetteError(ProtocolEngineError):
     - An incorrect pipette already attached to the mount
     - A missing pipette on the requested mount
     """
+
     # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
     pass
 
 
 class LabwareDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a labware that does not exist."""
+
     pass
 
 
 class WellDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a well that does not exist."""
+
     pass
 
 
 class PipetteDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a pipette that does not exist."""
+
     pass
 
 
 class SlotDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a deck slot that does not exist."""
+
     pass
 
 
@@ -56,4 +63,5 @@ class SlotDoesNotExistError(ProtocolEngineError):
 # existing LabwareHeightError
 class FailedToPlanMoveError(ProtocolEngineError):
     """An error raised when a requested movement could not be planned."""
+
     pass

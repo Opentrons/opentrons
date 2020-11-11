@@ -16,6 +16,7 @@ def load_labware(
     definition: LabwareDefinition,
     calibration: Tuple[float, float, float],
 ) -> cmd.CompletedCommand[cmd.LoadLabwareRequest, cmd.LoadLabwareResult]:
+    """Load a labware into state using a LoadLabwareRequest."""
     request = cmd.LoadLabwareRequest(
         loadName="load-name",
         namespace="opentrons-test",
@@ -39,14 +40,17 @@ def load_labware(
     return command
 
 
-def test_get_labware_data_bad_id(store):
+def test_get_labware_data_bad_id(store: StateStore) -> None:
     """get_labware_data_by_id should raise if labware ID doesn't exist."""
     with pytest.raises(errors.LabwareDoesNotExistError):
         store.labware.get_labware_data_by_id("asdfghjkl")
 
 
-def test_handles_load_labware(store, well_plate_def):
-    """It should add the labware data to the state"""
+def test_handles_load_labware(
+    store: StateStore,
+    well_plate_def: LabwareDefinition
+) -> None:
+    """It should add the labware data to the state."""
     command = load_labware(
         store=store,
         labware_id="plate-id",

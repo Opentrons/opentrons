@@ -39,7 +39,6 @@ per-file-ignores =
     src/opentrons/helpers/*:ANN,D
     src/opentrons/legacy_api/*:ANN,D
     src/opentrons/protocol_api/*:ANN,D
-    src/opentrons/protocol_engine/*:ANN,D
     src/opentrons/protocols/*:ANN,D
     src/opentrons/resources/*:ANN,D
     src/opentrons/system/*:ANN,D
@@ -70,7 +69,6 @@ per-file-ignores =
     tests/opentrons/labware/*:ANN,D
     tests/opentrons/performance/*:ANN,D
     tests/opentrons/protocol_api/*:ANN,D
-    tests/opentrons/protocol_engine/*:ANN,D
     tests/opentrons/protocols/*:ANN,D
     tests/opentrons/robot/*:ANN,D
     tests/opentrons/system/*:ANN,D
