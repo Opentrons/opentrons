@@ -19,7 +19,6 @@ export type FormWarning = {
   type: FormWarningType,
 }
 
-// TODO: Ian 2018-12-06 use i18n for title/body text
 const FORM_WARNINGS: { [FormWarningType]: (?number) => FormWarning } = {
   BELOW_MIN_AIR_GAP_VOLUME: min => ({
     type: 'BELOW_MIN_AIR_GAP_VOLUME',
