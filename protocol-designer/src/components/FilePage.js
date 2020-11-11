@@ -105,7 +105,10 @@ export class FilePage extends React.Component<Props, State> {
             }: FormikProps<FileMetadataFields>) => (
               <form onSubmit={handleSubmit} className={styles.card_content}>
                 <div
-                  className={cx(formStyles.row_wrapper, formStyles.stacked_row)}
+                  className={cx(
+                    formStyles.row_wrapper,
+                    formStyles.stacked_row_large
+                  )}
                 >
                   <FormGroup
                     label="Date Created"
