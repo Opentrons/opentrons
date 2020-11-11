@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
+import { i18n } from '../../localization'
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
 /*******************
@@ -17,41 +18,54 @@ export type FormWarning = {
   ...$Exact<FormError>,
   type: FormWarningType,
 }
+
 // TODO: Ian 2018-12-06 use i18n for title/body text
-const FORM_WARNINGS: { [FormWarningType]: FormWarning } = {
-  BELOW_MIN_AIR_GAP_VOLUME: {
+const FORM_WARNINGS: { [FormWarningType]: (?number) => FormWarning } = {
+  BELOW_MIN_AIR_GAP_VOLUME: min => ({
     type: 'BELOW_MIN_AIR_GAP_VOLUME',
-    title: 'Below recommended air gap',
+    title: i18n.t(`alert.form.warning.BELOW_MIN_AIR_GAP_VOLUME.title`, {
+      min,
+    }),
     body: (
       <React.Fragment>
-        For accuracy while using air gap we recommend you use a volume of at
-        least the pipette&apos;s minimum.
+        {i18n.t(`alert.form.warning.BELOW_MIN_AIR_GAP_VOLUME.body`)}
       </React.Fragment>
     ),
     dependentFields: ['disposalVolume_volume', 'pipette'],
-  },
-  BELOW_PIPETTE_MINIMUM_VOLUME: {
+  }),
+  BELOW_PIPETTE_MINIMUM_VOLUME: min => ({
     type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
-    title: 'Specified volume is below pipette minimum',
-    dependentFields: ['pipette', 'volume'],
-  },
-  OVER_MAX_WELL_VOLUME: {
-    type: 'OVER_MAX_WELL_VOLUME',
-    title: 'Dispense volume will overflow a destination well',
-    dependentFields: ['dispense_labware', 'dispense_wells', 'volume'],
-  },
-  BELOW_MIN_DISPOSAL_VOLUME: {
-    type: 'BELOW_MIN_DISPOSAL_VOLUME',
-    title: 'Below Recommended disposal volume',
+    title: i18n.t(`alert.form.warning.BELOW_PIPETTE_MINIMUM_VOLUME.title`, {
+      min,
+    }),
     body: (
       <React.Fragment>
-        For accuracy in multi-dispense actions we recommend you use a disposal
-        volume of at least the pipette&apos;s minimum. Read more{' '}
-        <KnowledgeBaseLink to="multiDispense">here</KnowledgeBaseLink>.
+        {i18n.t(`alert.form.warning.BELOW_PIPETTE_MINIMUM_VOLUME.body`)}
+      </React.Fragment>
+    ),
+    dependentFields: ['pipette', 'volume'],
+  }),
+  OVER_MAX_WELL_VOLUME: () => ({
+    type: 'OVER_MAX_WELL_VOLUME',
+    title: i18n.t(`alert.form.warning.OVER_MAX_WELL_VOLUME.title`),
+    dependentFields: ['dispense_labware', 'dispense_wells', 'volume'],
+  }),
+  BELOW_MIN_DISPOSAL_VOLUME: min => ({
+    type: 'BELOW_MIN_DISPOSAL_VOLUME',
+    title: i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.title`, {
+      min,
+    }),
+    body: (
+      <React.Fragment>
+        {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.body`)}
+        <KnowledgeBaseLink to="multiDispense">
+          {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.link`)}
+        </KnowledgeBaseLink>
+        .
       </React.Fragment>
     ),
     dependentFields: ['disposalVolume_volume', 'pipette'],
-  },
+  }),
 }
 
 export type WarningChecker = mixed => ?FormWarning
@@ -69,7 +83,7 @@ export const belowPipetteMinimumVolume = (
   const { pipette, volume } = fields
   if (!(pipette && pipette.spec)) return null
   return volume < pipette.spec.minVolume
-    ? FORM_WARNINGS.BELOW_PIPETTE_MINIMUM_VOLUME
+    ? FORM_WARNINGS.BELOW_PIPETTE_MINIMUM_VOLUME(pipette.spec.minVolume)
     : null
 }
 
@@ -82,7 +96,7 @@ export const maxDispenseWellVolume = (
     const maximum = getWellTotalVolume(dispense_labware.def, well)
     return maximum && volume > maximum
   })
-  return hasExceeded ? FORM_WARNINGS.OVER_MAX_WELL_VOLUME : null
+  return hasExceeded ? FORM_WARNINGS.OVER_MAX_WELL_VOLUME() : null
 }
 
 export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
@@ -94,9 +108,12 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   } = fields
   if (!(pipette && pipette.spec) || path !== 'multiDispense') return null
   const isUnselected = !disposalVolume_checkbox || !disposalVolume_volume
-  if (isUnselected) return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME
+  if (isUnselected)
+    return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME(pipette.spec.minVolume)
   const isBelowMin = disposalVolume_volume < pipette.spec.minVolume
-  return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
+  return isBelowMin
+    ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME(pipette.spec.minVolume)
+    : null
 }
 
 // both aspirate and dispense air gap volumes have the same minimums
@@ -113,7 +130,9 @@ export const _minAirGapVolume: (
   if (!checkboxValue || !volumeValue || !pipette || !pipette.spec) return null
 
   const isBelowMin = Number(volumeValue) < pipette.spec.minVolume
-  return isBelowMin ? FORM_WARNINGS.BELOW_MIN_AIR_GAP_VOLUME : null
+  return isBelowMin
+    ? FORM_WARNINGS.BELOW_MIN_AIR_GAP_VOLUME(pipette.spec.minVolume)
+    : null
 }
 
 export const minAspirateAirGapVolume: (
