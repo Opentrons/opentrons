@@ -114,7 +114,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
               : 'tipLength'
           ][mount][isMulti ? 'multi' : 'single']
         : assetMapTrash[mount][isMulti ? 'multi' : 'single']),
-    [(mount, isMulti, calBlock, sessionType)]
+    [mount, isMulti, calBlock, sessionType]
   )
 
   const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
