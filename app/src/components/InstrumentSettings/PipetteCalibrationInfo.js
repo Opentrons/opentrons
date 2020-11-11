@@ -174,7 +174,11 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
       {pipetteOffsetCalibration ? (
         <>
           {pipetteOffsetCalibration.status.markedBad && (
-            <InlineCalibrationWarning warningType="recommended" marginTop="0" />
+            <InlineCalibrationWarning
+              warningType="recommended"
+              marginTop={0}
+              marginBottom={SPACING_2}
+            />
           )}
           <Text
             fontStyle={FONT_STYLE_ITALIC}

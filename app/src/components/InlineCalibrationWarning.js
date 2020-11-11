@@ -14,6 +14,8 @@ import {
   SPACING_1,
   SPACING_2,
   ALIGN_CENTER,
+  type StyleProps,
+  styleProps,
 } from '@opentrons/components'
 
 export const REQUIRED: 'required' = 'required'
@@ -36,13 +38,13 @@ const CONTENT_MAP = {
 
 export type InlineCalibrationWarningProps = {|
   warningType: WarningType | null,
-  marginTop?: string,
+  ...StyleProps,
 |}
 
 export function InlineCalibrationWarning(
   props: InlineCalibrationWarningProps
 ): React.Node {
-  const { warningType, marginTop = SPACING_2 } = props
+  const { warningType, marginTop = SPACING_2, ...styleProps } = props
   return (
     <>
       {warningType && (
@@ -50,6 +52,7 @@ export function InlineCalibrationWarning(
           alignItems={ALIGN_CENTER}
           color={CONTENT_MAP[warningType].color}
           marginTop={marginTop}
+          {...styleProps}
         >
           <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
             <Icon name="alert-circle" />
