@@ -287,6 +287,9 @@ class CheckCalibrationUserFlow:
         tip_lengths = {
             m: self._get_tip_length_from_pipette(m, p)
             for m, p in self._filtered_hw_pips.items()}
+        MODULE_LOG.info(f"TIP LENGTH CAL {tip_lengths}")
+        MODULE_LOG.info(f"PIPETTE OFFSET CAL {pipette_offsets}")
+        MODULE_LOG.info(f"DECK CAL {deck}")
         return deck, pipette_offsets, tip_lengths
 
     def _get_tip_length_from_pipette(
@@ -706,6 +709,7 @@ class CheckCalibrationUserFlow:
         critical_point = self.critical_point_override
         current_point = \
             await self.get_current_point(critical_point)
+        MODULE_LOG.info(f"Current point in initial {current_point}")
         if self.current_state == State.comparingNozzle:
             self._reference_points.tip.initial_point = \
                 current_point
@@ -736,6 +740,7 @@ class CheckCalibrationUserFlow:
         critical_point = self.critical_point_override
         current_point = \
             await self.get_current_point(critical_point)
+        MODULE_LOG.info(f"CURRENT POINT {current_point}")
         if self.current_state == State.comparingNozzle:
             # The reference point is unique in that
             # a user might jog after moving to this
@@ -793,6 +798,7 @@ class CheckCalibrationUserFlow:
         new_pt = deck_pt - Point(0, (ydim/2), deck_pt.z) + \
             MOVE_TO_DECK_SAFETY_BUFFER
         to_loc = Location(new_pt, None)
+        MODULE_LOG.info(f"Deck location {to_loc}")
         await self._move(to_loc)
         await self.register_initial_point()
 
@@ -815,6 +821,7 @@ class CheckCalibrationUserFlow:
         ref_loc = uf.get_reference_location(
             deck=self._deck,
             cal_block_target_well=cal_block_target_well)
+        MODULE_LOG.info(f"Reference location {ref_loc}")
         await self._move(ref_loc)
         await self.register_final_point()
 
