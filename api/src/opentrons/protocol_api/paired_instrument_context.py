@@ -211,7 +211,7 @@ class PairedInstrumentContext(CommandPublisher):
         """
         if location and isinstance(location, types.Location):
             if location.labware.is_labware:
-                tiprack = location.labware
+                tiprack = location.labware.as_labware()
                 primary_channels =\
                     self._instruments[self._pair_policy.primary].channels
                 target: Well =\
