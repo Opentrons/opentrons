@@ -191,7 +191,11 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
           </Text>
         </>
       ) : (
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_START}>
+        <Flex
+          marginBottom={SPACING_2}
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_START}
+        >
           <Box size={SIZE_2} paddingRight={SPACING_2} paddingY={SPACING_1}>
             <Icon name="alert-circle" color={COLOR_ERROR} />
           </Box>
