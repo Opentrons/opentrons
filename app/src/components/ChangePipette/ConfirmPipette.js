@@ -20,7 +20,7 @@ const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
 const EXIT_WITHOUT_CAL = 'exit without calibrating'
 const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 
-type Props = {|
+export type Props = {|
   robotName: string,
   mount: Mount,
   title: string,
@@ -200,12 +200,20 @@ function TryAgainButton(props: Props) {
   )
 }
 
+const exitButtonMessage: (props: Props) => string = props => {
+  const { attachedWrong, actualPipette, actualPipetteOffset, success } = props
+  if (success && actualPipette && !Boolean(actualPipetteOffset)) {
+    return EXIT_WITHOUT_CAL
+  }
+  if (attachedWrong) {
+    return EXIT_BUTTON_MESSAGE_WRONG
+  }
+  return EXIT_BUTTON_MESSAGE
+}
+
 function ExitButton(props: Props) {
-  const { exit, attachedWrong, actualPipetteOffset, wantedPipette } = props
-  let buttonText = EXIT_BUTTON_MESSAGE
-  if (attachedWrong) buttonText = EXIT_BUTTON_MESSAGE_WRONG
-  else if (Boolean(wantedPipette) && !actualPipetteOffset)
-    buttonText = EXIT_WITHOUT_CAL
+  const { exit } = props
+  const buttonText = exitButtonMessage(props)
 
   return (
     <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
