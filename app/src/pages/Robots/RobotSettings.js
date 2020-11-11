@@ -47,6 +47,7 @@ import type { ShellUpdateState } from '../../shell/types'
 type OP = {|
   ...ContextRouter,
   robot: ViewableRobot,
+  // TODO(mc, 2020-11-10): this prop is unused and should be removed
   appUpdate: ShellUpdateState,
 |}
 

@@ -166,3 +166,10 @@ export const ensureSession = (
   payload: { robotName, sessionType, params },
   meta: {},
 })
+
+export const clearAllSessions = (
+  robotName: string
+): Types.ClearAllSessionsAction => ({
+  type: Constants.CLEAR_ALL_SESSIONS,
+  payload: { robotName },
+})

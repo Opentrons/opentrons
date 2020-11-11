@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { SpinnerModalPage } from '@opentrons/components'
 
@@ -20,6 +20,7 @@ import type { PipetteOffsetIntent } from '../CalibrationPanels/types'
 import { Portal } from '../portal'
 import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
 import { INTENT_PIPETTE_OFFSET } from '../CalibrationPanels'
+import { pipetteOffsetCalibrationStarted } from '../../analytics'
 
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [
@@ -46,6 +47,7 @@ export function useCalibratePipetteOffset(
   const deleteRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
   const spinnerRequestId = React.useRef<string | null>(null)
+  const dispatch = useDispatch()
 
   const pipOffsetCalSession: PipetteOffsetCalibrationSession | null = useSelector(
     (state: State) => {
@@ -145,6 +147,17 @@ export function useCalibratePipetteOffset(
           tipRackDefinition,
           ...overrideParams,
         }
+      )
+    )
+    dispatch(
+      pipetteOffsetCalibrationStarted(
+        withIntent,
+        mount,
+        hasCalibrationBlock,
+        shouldRecalibrateTipLength,
+        tipRackDefinition
+          ? `${tipRackDefinition.namespace}/${tipRackDefinition.parameters.loadName}/${tipRackDefinition.version}`
+          : null
       )
     )
   }

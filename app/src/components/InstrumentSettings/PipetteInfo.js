@@ -1,20 +1,17 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import { Link } from 'react-router-dom'
-
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import {
   LabeledValue,
-  OutlineButton,
   InstrumentDiagram,
   Box,
   Flex,
   Text,
   SecondaryBtn,
+  useHoverTooltip,
+  Tooltip,
   DIRECTION_COLUMN,
   FONT_WEIGHT_SEMIBOLD,
   SPACING_1,
@@ -33,27 +30,17 @@ import {
   JUSTIFY_START,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import * as Config from '../../config'
 import styles from './styles.css'
-import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { getRobotByName } from '../../discovery'
+import { getIsRunning } from '../../robot/selectors'
 import {
-  INTENT_PIPETTE_OFFSET,
-  INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-} from '../CalibrationPanels'
-import type { State } from '../../types'
-
-import {
-  getCalibrationForPipette,
-  getTipLengthForPipetteAndTiprack,
-} from '../../calibration'
-
-import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
-
-import type { Mount, AttachedPipette } from '../../pipettes/types'
-import { findLabwareDefWithCustom } from '../../findLabware'
-import * as CustomLabware from '../../custom-labware'
-import { Portal } from '../portal'
+  DISABLED_CONNECT_TO_ROBOT,
+  DISABLED_PROTOCOL_IS_RUNNING,
+} from '../RobotSettings/constants'
 import { PipetteCalibrationInfo } from './PipetteCalibrationInfo'
+
+import type { State } from '../../types'
+import type { Mount, AttachedPipette } from '../../pipettes/types'
 
 export type PipetteInfoProps = {|
   robotName: string,
@@ -84,6 +71,21 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const channels = pipette ? pipette.modelSpecs.channels : null
   const direction = pipette ? 'change' : 'attach'
 
+  const isRunning = useSelector(getIsRunning)
+  const isConnected = useSelector(
+    (state: State) => getRobotByName(state, robotName)?.connected
+  )
+
+  const [settingsTargetProps, settingsTooltipProps] = useHoverTooltip()
+  const [changePipTargetProps, changePipTooltipProps] = useHoverTooltip()
+
+  let disabledReason = null
+  if (!isConnected) {
+    disabledReason = DISABLED_CONNECT_TO_ROBOT
+  } else if (isRunning) {
+    disabledReason = DISABLED_PROTOCOL_IS_RUNNING
+  }
+
   return (
     <Flex width="50%" flexDirection={DIRECTION_COLUMN}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -95,9 +97,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           <Flex
             alignItems={ALIGN_FLEX_START}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            css={css`
-              max-width: 14rem;
-            `}
+            maxWidth="14rem"
           >
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -129,12 +129,25 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
                 />
               )}
             </Box>
-            <OutlineButton Component={Link} to={changeUrl}>
+            <SecondaryBtn
+              {...(disabledReason ? changePipTargetProps : {})}
+              as={disabledReason ? 'button' : Link}
+              to={changeUrl}
+              disabled={disabledReason}
+              title="changePipetteButton"
+            >
               {direction}
-            </OutlineButton>
+            </SecondaryBtn>
           </Flex>
           {settingsUrl !== null && (
-            <SecondaryBtn {...PER_PIPETTE_BTN_STYLE} as={Link} to={settingsUrl}>
+            <SecondaryBtn
+              {...(disabledReason ? settingsTargetProps : {})}
+              {...PER_PIPETTE_BTN_STYLE}
+              as={disabledReason ? 'button' : Link}
+              to={settingsUrl}
+              disabled={disabledReason}
+              title="pipetteSettingsButton"
+            >
               settings
             </SecondaryBtn>
           )}
@@ -143,10 +156,17 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
               robotName={robotName}
               serialNumber={serialNumber}
               mount={mount}
+              disabledReason={disabledReason}
             />
           )}
         </Flex>
       </Flex>
+      {disabledReason !== null && (
+        <>
+          <Tooltip {...settingsTooltipProps}>{disabledReason}</Tooltip>
+          <Tooltip {...changePipTooltipProps}>{disabledReason}</Tooltip>
+        </>
+      )}
     </Flex>
   )
 }

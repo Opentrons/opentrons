@@ -18,6 +18,7 @@ import {
 } from './constants'
 
 import type { Jog, Plane, StepSize } from './types'
+import type { StyleProps } from '@opentrons/components'
 
 export type { Jog }
 export type JogControlsProps = {|
@@ -25,6 +26,7 @@ export type JogControlsProps = {|
   planes?: Array<Plane>,
   stepSizes?: Array<StepSize>,
   auxiliaryControl?: React.Node | null,
+  ...StyleProps,
 |}
 
 export { HORIZONTAL_PLANE, VERTICAL_PLANE }
@@ -35,6 +37,7 @@ export function JogControls(props: JogControlsProps): React.Node {
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
     jog,
     auxiliaryControl = null,
+    ...styleProps
   } = props
   const [currentStepSize, setCurrentStepSize] = React.useState<number>(
     stepSizes[0]
@@ -46,6 +49,7 @@ export function JogControls(props: JogControlsProps): React.Node {
       paddingTop={SPACING_4}
       paddingBottom="2.5rem"
       alignSelf={ALIGN_STRETCH}
+      {...styleProps}
     >
       <StepSizeControl
         {...{ currentStepSize, setCurrentStepSize, stepSizes }}

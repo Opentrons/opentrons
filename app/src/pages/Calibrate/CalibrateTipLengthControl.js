@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   type Mount,
   useConditionalConfirm,
@@ -29,6 +29,10 @@ import { TipLengthCalibrationInfoBox } from '../../components/CalibrateTipLength
 import { Portal } from '../../components/portal'
 import { CalibratePipetteOffset } from '../../components/CalibratePipetteOffset'
 import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../components/CalibrationPanels'
+import {
+  tipLengthCalibrationStarted,
+  pipetteOffsetCalibrationStarted,
+} from '../../analytics'
 
 import type { State } from '../../types'
 import type {
@@ -65,10 +69,37 @@ export function CalibrateTipLengthControl({
   const createRequestId = React.useRef<string | null>(null)
   const trackedRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
+  const dispatch = useDispatch()
 
   const sessionType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
     : Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
+
+  const uriFromDef = (definition: LabwareDefinition2): string =>
+    `${definition.namespace}/${definition.parameters.loadName}/${definition.version}`
+
+  const dispatchAnalyticsEvent = isExtendedPipOffset
+    ? (calBlock: boolean): void => {
+        dispatch(
+          pipetteOffsetCalibrationStarted(
+            INTENT_TIP_LENGTH_IN_PROTOCOL,
+            mount,
+            calBlock,
+            true,
+            uriFromDef(tipRackDefinition)
+          )
+        )
+      }
+    : (calBlock: boolean): void => {
+        dispatch(
+          tipLengthCalibrationStarted(
+            INTENT_TIP_LENGTH_IN_PROTOCOL,
+            mount,
+            calBlock,
+            uriFromDef(tipRackDefinition)
+          )
+        )
+      }
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -124,6 +155,7 @@ export function CalibrateTipLengthControl({
         ? { ...sharedOptions, shouldRecalibrateTipLength: true }
         : sharedOptions
       dispatchRequests(Sessions.ensureSession(robotName, sessionType, options))
+      dispatchAnalyticsEvent(sharedOptions.hasCalibrationBlock)
     }
   }
 

@@ -7,6 +7,8 @@ import {
   Icon,
   Text,
   SecondaryBtn,
+  Tooltip,
+  useHoverTooltip,
   COLOR_ERROR,
   SIZE_2,
   SPACING_1,
@@ -71,10 +73,13 @@ type Props = {|
   robotName: string,
   serialNumber: string | null,
   mount: Mount,
+  disabledReason: string | null,
 |}
 
 export function PipetteCalibrationInfo(props: Props): React.Node {
-  const { robotName, serialNumber, mount } = props
+  const { robotName, serialNumber, mount, disabledReason } = props
+  const [tlcTargetProps, tlcTooltipProps] = useHoverTooltip()
+  const [pocTargetProps, pocTooltipProps] = useHoverTooltip()
   const pipetteOffsetCalibration = useSelector((state: State) =>
     serialNumber
       ? getCalibrationForPipette(state, robotName, serialNumber)
@@ -138,6 +143,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
     <Flex>
       <SecondaryBtn
         {...PER_PIPETTE_BTN_STYLE}
+        {...pocTargetProps}
         title="pipetteOffsetCalButton"
         onClick={
           pipetteOffsetCalibration
@@ -147,6 +153,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
                 })
             : () => startPipetteOffsetPossibleTLC({ keepTipLength: true })
         }
+        disabled={disabledReason}
       >
         {CALIBRATE_OFFSET}
       </SecondaryBtn>
@@ -202,10 +209,12 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
             </Text>
             <SecondaryBtn
               {...PER_PIPETTE_BTN_STYLE}
+              {...tlcTargetProps}
               title="recalibrateTipButton"
               onClick={() =>
                 startPipetteOffsetPossibleTLC({ keepTipLength: false })
               }
+              disabled={disabledReason}
             >
               {RECALIBRATE_TIP}
             </SecondaryBtn>
@@ -239,6 +248,12 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
           />
         </Portal>
       ) : null}
+      {disabledReason !== null && (
+        <>
+          <Tooltip {...pocTooltipProps}>{disabledReason}</Tooltip>
+          <Tooltip {...tlcTooltipProps}>{disabledReason}</Tooltip>
+        </>
+      )}
     </Flex>
   )
 }

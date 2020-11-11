@@ -343,6 +343,34 @@ const SPECS: Array<ReducerSpec> = [
       },
     },
   },
+  {
+    name: 'handles sessions:CLEAR_ALL_SESSIONS',
+    action: {
+      type: 'sessions:CLEAR_ALL_SESSIONS',
+      payload: {
+        robotName: 'blithering-idiot',
+      },
+    },
+    state: {
+      'blithering-idiot': {
+        robotSessions: {
+          existing_fake_session_id: {
+            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
+            id: 'existing_fake_session_id',
+          },
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
+            id: Fixtures.mockSessionId,
+          },
+        },
+      },
+    },
+    expected: {
+      'blithering-idiot': {
+        robotSessions: null,
+      },
+    },
+  },
 ]
 
 describe('robotSessionReducer', () => {

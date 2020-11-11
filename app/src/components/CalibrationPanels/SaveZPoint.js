@@ -62,6 +62,7 @@ const PIP_OFFSET_BUTTON_TEXT = 'save calibration and move to slot 1'
 const CALIBRATION_HEALTH_BUTTON_TEXT = 'check z-axis'
 const TO_USE_Z =
   'button to use this z position for the rest of deck calibration'
+const TO_CALIBRATE_Z = 'button to calibrate the z offset for this pipette'
 const CALIBRATION_HEALTH_TO_DETERMINE =
   'button to determine how this position compares to the previously saved z-axis calibration coordinate'
 const ALLOW_HORIZONTAL_TEXT = 'Reveal XY jog controls to move across deck'
@@ -72,29 +73,32 @@ const contentsBySessionType: {
   [SessionType]: {
     headerText: string,
     buttonText: string,
+    buttonEffectText: string,
   },
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     buttonText: DECK_CAL_BUTTON_TEXT,
     headerText: BASE_HEADER,
+    buttonEffectText: TO_USE_Z,
   },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     buttonText: PIP_OFFSET_BUTTON_TEXT,
     headerText: `${CALIBRATE} ${BASE_HEADER}`,
+    buttonEffectText: TO_CALIBRATE_Z,
   },
   [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
     buttonText: CALIBRATION_HEALTH_BUTTON_TEXT,
     headerText: `${CHECK} ${BASE_HEADER}`,
+    buttonEffectText: CALIBRATION_HEALTH_TO_DETERMINE,
   },
 }
 
 export function SaveZPoint(props: CalibrationPanelProps): React.Node {
   const { isMulti, mount, sendCommands, sessionType } = props
 
-  const { headerText, buttonText } = contentsBySessionType[sessionType]
-
-  const isHealthCheck =
-    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+  const { headerText, buttonText, buttonEffectText } = contentsBySessionType[
+    sessionType
+  ]
 
   const demoAsset = React.useMemo(
     () => mount && assetMap[mount][isMulti ? 'multi' : 'single'],
@@ -180,7 +184,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
           <br />
           {THEN}
           <b>{` '${buttonText}' `}</b>
-          {isHealthCheck ? CALIBRATION_HEALTH_TO_DETERMINE : TO_USE_Z}.
+          {buttonEffectText}.
           <br />
           <br />
           {ALLOW_XY_JOG_INSTRUCTIONS}
@@ -207,6 +211,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
             : [VERTICAL_PLANE]
         }
         auxiliaryControl={allowHorizontal ? null : <AllowHorizontalPrompt />}
+        width="100%"
       />
       <Flex
         width="100%"
