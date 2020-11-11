@@ -1,15 +1,16 @@
 // @flow
-// TODO(mc, 2020-10-08): this file needs a lot more tests
-// https://github.com/Opentrons/opentrons/issues/5174
 import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components/__utils__'
-import { AlertModal } from '@opentrons/components'
+import { AlertModal, OutlineButton } from '@opentrons/components'
 import { mockReachableRobot } from '../../../../discovery/__fixtures__'
 import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../buildroot'
 import * as Shell from '../../../../shell'
 import { Portal } from '../../../portal'
 import { UpdateAppModal } from '../../../app-settings'
+import { VersionList } from '../VersionList'
+import { SyncRobotMessage } from '../SyncRobotMessage'
+import { SkipAppUpdateMessage } from '../SkipAppUpdateMessage'
 import { VersionInfoModal } from '../VersionInfoModal'
 
 import type { State } from '../../../../types'
@@ -49,25 +50,91 @@ describe('VersionInfoModal', () => {
     jest.resetAllMocks()
   })
 
-  it('should render an AlertModal with the proper title for an upgrade', () => {
+  it('should render an AlertModal with the proper children for an upgrade', () => {
     const { wrapper } = render(UPGRADE)
     const alert = wrapper.find(AlertModal)
+    const versionList = alert.find(VersionList)
+    const syncRobot = alert.find(SyncRobotMessage)
+    const closeButton = alert.find(OutlineButton).at(0)
+    const primaryButton = alert.find(OutlineButton).at(1)
 
     expect(alert.prop('heading')).toBe('Robot Update Available')
+    expect(versionList.props()).toEqual({
+      robotVersion: '0.0.0-mock',
+      appVersion: Shell.CURRENT_VERSION,
+      availableUpdate: Shell.CURRENT_VERSION,
+    })
+    expect(syncRobot.props()).toEqual({
+      updateType: UPGRADE,
+      version: Shell.CURRENT_VERSION,
+    })
+
+    expect(closeButton.text()).toMatch(/not now/i)
+    expect(primaryButton.text()).toMatch(/view robot update/i)
+
+    expect(handleClose).not.toHaveBeenCalled()
+    closeButton.invoke('onClick')()
+    expect(handleClose).toHaveBeenCalled()
+    expect(handleProceed).not.toHaveBeenCalled()
+    primaryButton.invoke('onClick')()
+    expect(handleProceed).toHaveBeenCalled()
   })
 
-  it('should render an AlertModal with the proper title for a downgrade', () => {
+  it('should render an AlertModal with the proper children for a downgrade', () => {
     const { wrapper } = render(DOWNGRADE)
     const alert = wrapper.find(AlertModal)
+    const versionList = alert.find(VersionList)
+    const syncRobot = alert.find(SyncRobotMessage)
+    const closeButton = alert.find(OutlineButton).at(0)
+    const primaryButton = alert.find(OutlineButton).at(1)
 
     expect(alert.prop('heading')).toBe('Robot Update Available')
+    expect(versionList.props()).toEqual({
+      robotVersion: '0.0.0-mock',
+      appVersion: Shell.CURRENT_VERSION,
+      availableUpdate: Shell.CURRENT_VERSION,
+    })
+    expect(syncRobot.props()).toEqual({
+      updateType: DOWNGRADE,
+      version: Shell.CURRENT_VERSION,
+    })
+
+    expect(closeButton.text()).toMatch(/not now/i)
+    expect(primaryButton.text()).toMatch(/downgrade/i)
+
+    expect(handleClose).not.toHaveBeenCalled()
+    closeButton.invoke('onClick')()
+    expect(handleClose).toHaveBeenCalled()
+    expect(handleProceed).not.toHaveBeenCalled()
+    primaryButton.invoke('onClick')()
+    expect(handleProceed).toHaveBeenCalled()
   })
 
-  it('should render an AlertModal with the proper title for a reinstall', () => {
+  it('should render an AlertModal with the proper children for a reinstall', () => {
     const { wrapper } = render(REINSTALL)
     const alert = wrapper.find(AlertModal)
+    const versionList = alert.find(VersionList)
+    const syncRobot = alert.find(SyncRobotMessage)
+    const closeButton = alert.find(OutlineButton).at(0)
+    const primaryButton = alert.find(OutlineButton).at(1)
 
     expect(alert.prop('heading')).toBe('Robot is up to date')
+    expect(versionList.props()).toEqual({
+      robotVersion: '0.0.0-mock',
+      appVersion: Shell.CURRENT_VERSION,
+      availableUpdate: Shell.CURRENT_VERSION,
+    })
+    expect(syncRobot.exists()).toBe(false)
+
+    expect(closeButton.text()).toMatch(/not now/i)
+    expect(primaryButton.text()).toMatch(/reinstall/i)
+
+    expect(handleClose).not.toHaveBeenCalled()
+    closeButton.invoke('onClick')()
+    expect(handleClose).toHaveBeenCalled()
+    expect(handleProceed).not.toHaveBeenCalled()
+    primaryButton.invoke('onClick')()
+    expect(handleProceed).toHaveBeenCalled()
   })
 
   describe('with an app update available', () => {
@@ -78,8 +145,14 @@ describe('VersionInfoModal', () => {
     it('should render an AlertModal saying an app update is available', () => {
       const { wrapper } = render()
       const alert = wrapper.find(AlertModal)
+      const versionList = alert.find(VersionList)
 
       expect(alert.prop('heading')).toBe('App Version 1.2.3 Available')
+      expect(versionList.props()).toEqual({
+        robotVersion: '0.0.0-mock',
+        appVersion: Shell.CURRENT_VERSION,
+        availableUpdate: '1.2.3',
+      })
     })
 
     it('should have a "View Update" button that opens an UpdateAppModal', () => {
@@ -94,6 +167,15 @@ describe('VersionInfoModal', () => {
       viewUpdateButton.invoke('onClick')()
 
       expect(wrapper.find(Portal).exists(UpdateAppModal)).toBe(true)
+    })
+
+    it('should have a SkipAppUpdateMessage that runs the robot update', () => {
+      const { wrapper } = render()
+      const skipAppUpdate = wrapper.find(SkipAppUpdateMessage)
+
+      expect(handleProceed).not.toHaveBeenCalled()
+      skipAppUpdate.invoke('onClick')()
+      expect(handleProceed).toHaveBeenCalled()
     })
 
     it('should call props.close when the UpdateAppModal is closed', () => {
