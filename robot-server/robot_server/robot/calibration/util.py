@@ -141,6 +141,7 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
                                          abs_position=to_pt,
                                          critical_point=cp)
         await user_flow.hardware.drop_tip(user_flow.mount)
+        user_flow.reset_tip_origin()
 
 
 async def move(user_flow: CalibrationUserFlow,

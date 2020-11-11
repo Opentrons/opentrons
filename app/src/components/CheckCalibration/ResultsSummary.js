@@ -33,8 +33,8 @@ import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import type {
-  CalibrationHealthCheckInstrument,
-  CalibrationHealthCheckComparisonsPerCalibration,
+  CalibrationCheckInstrument,
+  CalibrationCheckComparisonsPerCalibration,
 } from '../../sessions/types'
 
 const GOOD_CALIBRATION = 'Good calibration'
@@ -48,7 +48,12 @@ const LOOKING_FOR_DATA = 'Looking for your detailed calibration data?'
 const DOWNLOAD_SUMMARY = 'Download JSON summary'
 
 export function ResultsSummary(props: CalibrationPanelProps): React.Node {
-  const { comparisonsByPipette, instruments, cleanUpAndExit } = props
+  const {
+    comparisonsByPipette,
+    instruments,
+    checkBothPipettes,
+    cleanUpAndExit,
+  } = props
 
   if (!comparisonsByPipette || !instruments) {
     return null
@@ -61,7 +66,7 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
       instruments,
       savedAt: now.toISOString(),
     }
-    const data = new Blob([JSON.stringify(report)], {
+    const data = new Blob([JSON.stringify(report, null, 4)], {
       type: 'application/json',
     })
     saveAs(data, 'OT-2 Robot Calibration Check Report.json')
@@ -69,11 +74,11 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
 
   const leftPipette = find(
     instruments,
-    (p: CalibrationHealthCheckInstrument) => p.mount.toLowerCase() === LEFT
+    (p: CalibrationCheckInstrument) => p.mount.toLowerCase() === LEFT
   )
   const rightPipette = find(
     instruments,
-    (p: CalibrationHealthCheckInstrument) => p.mount.toLowerCase() === RIGHT
+    (p: CalibrationCheckInstrument) => p.mount.toLowerCase() === RIGHT
   )
 
   const calibrationsByMount = {
@@ -93,7 +98,10 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
     },
   }
 
-  const deckCalibrationResult = comparisonsByPipette.first.deck?.status ?? null
+  const getDeckCalibration = checkBothPipettes
+    ? comparisonsByPipette.second.deck?.status
+    : comparisonsByPipette.first.deck?.status
+  const deckCalibrationResult = getDeckCalibration ?? null
 
   return (
     <>
@@ -198,8 +206,8 @@ function RenderResult(props: RenderResultProps): React.Node {
 }
 
 type PipetteResultProps = {|
-  pipetteInfo: CalibrationHealthCheckInstrument,
-  pipetteCalibration: CalibrationHealthCheckComparisonsPerCalibration,
+  pipetteInfo: CalibrationCheckInstrument,
+  pipetteCalibration: CalibrationCheckComparisonsPerCalibration,
 |}
 
 function PipetteResult(props: PipetteResultProps): React.Node {

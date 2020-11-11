@@ -227,6 +227,26 @@ describe('analytics events map', () => {
         },
       })
     })
+
+    it('robotAdmin:RESET_CONFIG -> resetRobotConfig event', () => {
+      const state = {}
+      const action = {
+        type: 'robotAdmin:RESET_CONFIG',
+        payload: {
+          robotName: 'robotName',
+          resets: {
+            foo: true,
+            bar: true,
+          },
+        },
+      }
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'resetRobotConfig',
+        properties: {
+          ...action.payload.resets,
+        },
+      })
+    })
   })
 
   describe('events with calibration data', () => {

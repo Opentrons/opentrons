@@ -5,6 +5,8 @@ import { getConnectedRobot } from '../discovery'
 import {
   getProtocolPipettesMatching,
   getProtocolPipettesCalibrated,
+  getAttachedPipetteCalibrations,
+  PIPETTE_MOUNTS,
 } from '../pipettes'
 import { selectors as RobotSelectors } from '../robot'
 import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
@@ -41,6 +43,7 @@ const CALIBRATE_DECK_TO_PROCEED = 'Calibrate your deck to proceed'
 const APP_UPDATE_AVAILABLE = 'An app update is available'
 const DRIVER_UPDATE_AVAILABLE = 'A driver update is available'
 const ROBOT_UPDATE_AVAILABLE = 'A robot software update is available'
+const ROBOT_CALIBRATION_RECOMMENDED = 'Robot calibration recommended'
 
 const getConnectedRobotPipettesMatch = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
@@ -75,6 +78,25 @@ const getDeckCalibrationOk = (state: State): boolean => {
   return deckCalStatus === DECK_CAL_STATUS_OK
 }
 
+const getRobotCalibrationOk = (state: State): boolean => {
+  const connectedRobot = getConnectedRobot(state)
+  if (!connectedRobot) return false
+
+  const deckCalOk = getDeckCalibrationOk(state)
+  const pipCal = getAttachedPipetteCalibrations(state, connectedRobot.name)
+  for (const m of PIPETTE_MOUNTS) {
+    if (pipCal) {
+      if (
+        pipCal[m]?.offset?.status?.markedBad ||
+        pipCal[m]?.tipLength?.status?.markedBad
+      ) {
+        return false
+      }
+    }
+  }
+  return deckCalOk
+}
+
 const getRunDisabledReason: State => string | null = createSelector(
   getConnectedRobot,
   RobotSelectors.getSessionIsLoaded,
@@ -94,13 +116,16 @@ const getRunDisabledReason: State => string | null = createSelector(
 )
 
 export const getRobotsLocation: State => NavLocation = createSelector(
+  getConnectedRobot,
   getConnectedRobotUpdateAvailable,
-  update => ({
+  getRobotCalibrationOk,
+  (robot, update, robotCalOk) => ({
     id: 'robots',
     path: '/robots',
     title: ROBOT,
     iconName: 'ot-connect',
     notificationReason: update ? ROBOT_UPDATE_AVAILABLE : null,
+    warningReason: robot && !robotCalOk ? ROBOT_CALIBRATION_RECOMMENDED : null,
   })
 )
 

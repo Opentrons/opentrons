@@ -9,6 +9,7 @@ export type NavLocation = {|
   iconName: IconName,
   disabledReason?: string | null,
   notificationReason?: string | null,
+  warningReason?: string | null,
 |}
 
 export type SubnavLocation = {|

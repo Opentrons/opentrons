@@ -1,10 +1,10 @@
 // @flow
 import type {
-  CheckCalibrationHealthSessionDetails,
-  CalibrationHealthCheckComparisonsPerCalibration,
-  CalibrationHealthCheckComparisonMap,
-  CalibrationHealthCheckComparison,
-  CheckCalibrationHealthSessionParams,
+  CheckCalibrationSessionDetails,
+  CalibrationCheckComparisonsPerCalibration,
+  CalibrationCheckComparisonMap,
+  CalibrationCheckComparison,
+  CheckCalibrationSessionParams,
   CalibrationLabware,
 } from '../types'
 
@@ -26,63 +26,63 @@ export const mockCalibrationCheckLabware: CalibrationLabware = {
   definition: tipRackFixture,
 }
 
-export const badZComparison: CalibrationHealthCheckComparison = {
+export const badZComparison: CalibrationCheckComparison = {
   differenceVector: [0, 0, 4],
   thresholdVector: [0, 0, 1],
   exceedsThreshold: true,
 }
-export const goodZComparison: CalibrationHealthCheckComparison = {
+export const goodZComparison: CalibrationCheckComparison = {
   differenceVector: [0, 0, 0.1],
   thresholdVector: [0, 0, 1],
   exceedsThreshold: false,
 }
-export const badXYComparison: CalibrationHealthCheckComparison = {
+export const badXYComparison: CalibrationCheckComparison = {
   differenceVector: [4, 4, 0],
   thresholdVector: [1, 1, 0],
   exceedsThreshold: true,
 }
-export const goodXYComparison: CalibrationHealthCheckComparison = {
+export const goodXYComparison: CalibrationCheckComparison = {
   differenceVector: [0.1, 0.1, 0],
   thresholdVector: [1, 1, 0],
   exceedsThreshold: false,
 }
 
-export const badTipLengthCalibration: CalibrationHealthCheckComparisonMap = {
+export const badTipLengthCalibration: CalibrationCheckComparisonMap = {
   status: 'OUTSIDE_THRESHOLD',
   [CHECK_STEP_COMPARING_TIP]: badZComparison,
 }
-export const badPipetteOffsetCalibration: CalibrationHealthCheckComparisonMap = {
+export const badPipetteOffsetCalibration: CalibrationCheckComparisonMap = {
   status: 'OUTSIDE_THRESHOLD',
   [CHECK_STEP_COMPARING_HEIGHT]: badZComparison,
   [CHECK_STEP_COMPARING_POINT_ONE]: badXYComparison,
 }
-export const goodTipLengthCalibration: CalibrationHealthCheckComparisonMap = {
+export const goodTipLengthCalibration: CalibrationCheckComparisonMap = {
   status: 'IN_THRESHOLD',
   [CHECK_STEP_COMPARING_TIP]: goodZComparison,
 }
-export const goodPipetteOffsetCalibration: CalibrationHealthCheckComparisonMap = {
+export const goodPipetteOffsetCalibration: CalibrationCheckComparisonMap = {
   status: 'IN_THRESHOLD',
   [CHECK_STEP_COMPARING_HEIGHT]: goodZComparison,
   [CHECK_STEP_COMPARING_POINT_ONE]: goodXYComparison,
 }
-export const goodDeckCalibration: CalibrationHealthCheckComparisonMap = {
+export const goodDeckCalibration: CalibrationCheckComparisonMap = {
   status: 'IN_THRESHOLD',
   [CHECK_STEP_COMPARING_POINT_ONE]: goodXYComparison,
   [CHECK_STEP_COMPARING_POINT_TWO]: goodXYComparison,
   [CHECK_STEP_COMPARING_POINT_THREE]: goodXYComparison,
 }
 
-export const mockSecondPipetteHealthCheckCalibration: CalibrationHealthCheckComparisonsPerCalibration = {
+export const mockSecondPipetteHealthCheckCalibration: CalibrationCheckComparisonsPerCalibration = {
   tipLength: badTipLengthCalibration,
   pipetteOffset: badPipetteOffsetCalibration,
 }
-export const mockFirstPipettteHealthCheckPerCalibration: CalibrationHealthCheckComparisonsPerCalibration = {
+export const mockFirstPipettteHealthCheckPerCalibration: CalibrationCheckComparisonsPerCalibration = {
   tipLength: goodTipLengthCalibration,
   pipetteOffset: goodPipetteOffsetCalibration,
   deck: goodDeckCalibration,
 }
 
-export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationHealthSessionDetails = {
+export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDetails = {
   instruments: [
     {
       model: 'fake_pipette_model',
@@ -127,7 +127,7 @@ export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationHealthSess
   activeTipRack: mockCalibrationCheckLabware,
 }
 
-export const mockRobotCalibrationCheckSessionParams: CheckCalibrationHealthSessionParams = {
+export const mockRobotCalibrationCheckSessionParams: CheckCalibrationSessionParams = {
   hasCalibrationBlock: true,
   tipRacks: [],
 }

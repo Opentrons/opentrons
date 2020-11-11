@@ -13,12 +13,11 @@ from . import (
     file_operators as io, helpers, migration, modify)
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from .dev_types import (
-        TipLengthCalibration, CalibrationIndexDict, CalibrationDict)
+    from .dev_types import CalibrationIndexDict, CalibrationDict
 
 
 def _format_calibration_type(
-        data: 'CalibrationDict') -> local_types.CalibrationTypes:
+        data: 'CalibrationDict') -> local_types.LabwareCalibrationTypes:
     offset = local_types.OffsetData(
         value=data['default']['offset'],
         last_modified=data['default']['lastModified']
@@ -27,7 +26,7 @@ def _format_calibration_type(
     # the labware calibraiton file. We should
     # have a follow-up PR to grab tip lengths
     # based on the loaded pips + labware
-    return local_types.CalibrationTypes(
+    return local_types.LabwareCalibrationTypes(
             offset=offset,
             tip_length=local_types.TipLengthData())
 
@@ -77,12 +76,19 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
 
 def _get_tip_length_data(
         pip_id: str, labware_hash: str, labware_load_name: str
-) -> 'TipLengthCalibration':
+) -> local_types.TipLengthCalibration:
     try:
         pip_tip_length_path = config.get_tip_length_cal_path()/f'{pip_id}.json'
-        tip_length_data =\
+        tip_rack_data =\
             io.read_cal_file(str(pip_tip_length_path))
-        return tip_length_data[labware_hash]
+        tip_length_info = tip_rack_data[labware_hash]
+        return local_types.TipLengthCalibration(
+            tip_length=tip_length_info['tipLength'],
+            pipette=pip_id,
+            tiprack=labware_hash,
+            last_modified=tip_length_info['lastModified'],
+            source=_get_calibration_source(tip_length_info),
+            status=_get_calibration_status(tip_length_info))
     except (FileNotFoundError, KeyError):
         raise local_types.TipLengthCalNotFound(
             f'Tip length of {labware_load_name} has not been '
@@ -118,7 +124,7 @@ def get_labware_calibration(
 def load_tip_length_calibration(
         pip_id: str,
         definition: 'LabwareDefinition',
-        parent: str) -> 'TipLengthCalibration':
+        parent: str) -> local_types.TipLengthCalibration:
     """
     Function used to grab the current tip length associated
     with a particular tiprack.

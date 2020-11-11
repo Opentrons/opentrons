@@ -10,6 +10,7 @@ import * as Sessions from '../sessions'
 import * as Alerts from '../alerts'
 import * as Constants from './constants'
 import { sharedCalCommands } from '../sessions/common-calibration/constants'
+import * as RobotAdmin from '../robot-admin'
 
 import {
   getProtocolAnalyticsData,
@@ -361,6 +362,14 @@ export function makeEvent(
           ...action.payload,
           ...getAnalyticsTipLengthCalibrationData(state, action.payload.mount),
         },
+      })
+    }
+
+    case RobotAdmin.RESET_CONFIG: {
+      const { resets } = action.payload
+      return Promise.resolve({
+        name: 'resetRobotConfig',
+        properties: { ...resets },
       })
     }
   }

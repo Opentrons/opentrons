@@ -7,7 +7,7 @@ import { act } from 'react-dom/test-utils'
 import * as Sessions from '../../../sessions'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
-import { CheckHealthCalibration } from '../index'
+import { CheckCalibration } from '../index'
 import { ResultsSummary } from '../ResultsSummary'
 import { ReturnTip } from '../ReturnTip'
 import {
@@ -93,7 +93,7 @@ describe('CheckCalibration', () => {
     render = (props = {}) => {
       const { showSpinner = false, isJogging = false } = props
       return mount(
-        <CheckHealthCalibration
+        <CheckCalibration
           robotName="robot-name"
           session={mockCalibrationCheckSession}
           dispatchRequests={dispatchRequests}

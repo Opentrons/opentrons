@@ -17,6 +17,8 @@ export type HealthResponse = {
   system_version?: string,
   logs?: Array<string>,
   protocol_api_version?: [number, number],
+  minimum_protocol_api_version?: [number, number],
+  maximum_protocol_api_version?: [number, number],
   ...
 }
 

@@ -4,8 +4,8 @@ import type {
   SessionType,
   CalibrationSessionStep,
   CalibrationLabware,
-  CalibrationHealthCheckInstrument,
-  CalibrationHealthCheckComparisonByPipette,
+  CalibrationCheckInstrument,
+  CalibrationCheckComparisonByPipette,
 } from '../../sessions/types'
 
 import typeof {
@@ -61,8 +61,8 @@ export type CalibrationPanelProps = {|
   calBlock?: CalibrationLabware | null,
   shouldPerformTipLength?: boolean | null,
   checkBothPipettes?: boolean | null,
-  instruments?: Array<CalibrationHealthCheckInstrument> | null,
-  comparisonsByPipette?: CalibrationHealthCheckComparisonByPipette | null,
-  activePipette?: CalibrationHealthCheckInstrument,
+  instruments?: Array<CalibrationCheckInstrument> | null,
+  comparisonsByPipette?: CalibrationCheckComparisonByPipette | null,
+  activePipette?: CalibrationCheckInstrument,
   intent?: Intent,
 |}

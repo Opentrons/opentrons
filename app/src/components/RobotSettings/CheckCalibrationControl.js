@@ -15,9 +15,9 @@ import {
 } from '@opentrons/components'
 
 import { Portal } from '../portal'
-import { CheckHealthCalibration } from '../CheckCalibration'
+import { CheckCalibration } from '../CheckCalibration'
 import { TitledControl } from '../TitledControl'
-import { AskForCalibrationBlockModal } from '../../components/CalibrateTipLength/AskForCalibrationBlockModal'
+import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 
 import type { SessionCommandString } from '../../sessions/types'
 import type { RequestState } from '../../robot-api/types'
@@ -44,11 +44,9 @@ export function CheckCalibrationControl({
   robotName,
   disabledReason,
 }: CheckCalibrationControlProps): React.Node {
-  const [showWizard, setShowWizard] = React.useState(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const trackedRequestId = React.useRef<string | null>(null)
-  const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
 
@@ -56,11 +54,6 @@ export function CheckCalibrationControl({
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
         createRequestId.current = dispatchedAction.meta.requestId
-      } else if (
-        dispatchedAction.type === Sessions.DELETE_SESSION &&
-        checkHealthSession?.id === dispatchedAction.payload.sessionId
-      ) {
-        deleteRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
@@ -78,12 +71,11 @@ export function CheckCalibrationControl({
     }
   )
 
-  const startingSession =
-    useSelector<State, RequestState | null>(state =>
-      createRequestId.current
-        ? RobotApi.getRequestById(state, createRequestId.current)
-        : null
-    )?.status === RobotApi.PENDING
+  const createStatus = useSelector<State, RequestState | null>(state =>
+    createRequestId.current
+      ? RobotApi.getRequestById(state, createRequestId.current)
+      : null
+  )?.status
 
   const showSpinner =
     useSelector<State, RequestState | null>(state =>
@@ -99,30 +91,11 @@ export function CheckCalibrationControl({
         : null
     )?.status === RobotApi.PENDING
 
-  const shouldClose =
-    useSelector<State, RequestState | null>(state =>
-      deleteRequestId.current
-        ? RobotApi.getRequestById(state, deleteRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
-
-  const shouldOpen =
-    useSelector((state: State) =>
-      createRequestId.current
-        ? RobotApi.getRequestById(state, createRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
-
   React.useEffect(() => {
-    if (shouldOpen) {
-      setShowWizard(true)
+    if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }
-    if (shouldClose) {
-      setShowWizard(false)
-      deleteRequestId.current = null
-    }
-  }, [shouldOpen, shouldClose])
+  }, [createStatus])
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
@@ -199,7 +172,7 @@ export function CheckCalibrationControl({
             closePrompt={() => setShowCalBlockModal(false)}
           />
         ) : null}
-        {startingSession ? (
+        {createStatus === RobotApi.PENDING ? (
           <SpinnerModalPage
             titleBar={{
               title: CAL_HEALTH_CHECK,
@@ -211,15 +184,13 @@ export function CheckCalibrationControl({
             }}
           />
         ) : null}
-        {showWizard && (
-          <CheckHealthCalibration
-            session={checkHealthSession}
-            robotName={robotName}
-            dispatchRequests={dispatchRequests}
-            showSpinner={showSpinner}
-            isJogging={isJogging}
-          />
-        )}
+        <CheckCalibration
+          session={checkHealthSession}
+          robotName={robotName}
+          dispatchRequests={dispatchRequests}
+          showSpinner={showSpinner}
+          isJogging={isJogging}
+        />
       </Portal>
     </>
   )

@@ -108,6 +108,35 @@ describe('NavbarLink component', () => {
     expect(icon.prop('childName')).toBe('circle')
   })
 
+  it('should render a warning if there is a reason to', () => {
+    const wrapper = render({
+      id: 'foo',
+      path: '/foo',
+      title: 'Foo',
+      iconName: 'alert',
+      warningReason: 'hello',
+    })
+    const icon = wrapper.find(NotificationIcon)
+
+    expect(icon.prop('name')).toBe('alert')
+    expect(icon.prop('childName')).toBe('alert-circle')
+  })
+
+  it('should render a warning icon if both notification and warning reasons exist', () => {
+    const wrapper = render({
+      id: 'foo',
+      path: '/foo',
+      title: 'Foo',
+      iconName: 'alert',
+      notificationReason: 'hi',
+      warningReason: 'hello',
+    })
+    const icon = wrapper.find(NotificationIcon)
+
+    expect(icon.prop('name')).toBe('alert')
+    expect(icon.prop('childName')).toBe('alert-circle')
+  })
+
   it('should render the link title', () => {
     const wrapper = render({
       id: 'foo',
