@@ -22,7 +22,8 @@ import {
 import type { StyleProps } from '@opentrons/components'
 
 const WARNING_HEADER = 'robot calibration required'
-const WARNING_TEXT = 'This OT-2 does not have a valid deck calibration.'
+const WARNING_TEXT =
+  'You need to calibrate your OT-2 before running a protocol.'
 
 type Props = {|
   ...StyleProps,
