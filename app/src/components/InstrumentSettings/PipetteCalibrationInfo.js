@@ -13,6 +13,7 @@ import {
   SIZE_2,
   SPACING_1,
   SPACING_2,
+  SPACING_3,
   ALIGN_FLEX_START,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -20,7 +21,10 @@ import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   FONT_STYLE_ITALIC,
+  FONT_HEADER_DARK,
   TEXT_TRANSFORM_CAPITALIZE,
+  FONT_SIZE_BODY_2,
+  OVERLAY_LIGHT_GRAY_50,
 } from '@opentrons/components'
 
 import * as Config from '../../config'
@@ -48,6 +52,7 @@ const CALIBRATE_NOW = 'Please calibrate offset now.'
 const DEFAULT_TIP = 'default tip'
 const RECALIBRATE_TIP = 'recalibrate tip'
 const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
+const TIP_LENGTH_CALIBRATION = 'tip length calibration'
 const TIP_NOT_CALIBRATED_BODY =
   'Not calibrated yet. The tip you use to calibrate your pipette offset will become your default tip.'
 
@@ -140,7 +145,18 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
   }
 
   return (
-    <Flex>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      backgroundColor={OVERLAY_LIGHT_GRAY_50}
+      padding={SPACING_3}
+    >
+      <Text
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        fontSize={FONT_SIZE_BODY_1}
+        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+      >
+        {PIPETTE_OFFSET_CALIBRATION}
+      </Text>
       <SecondaryBtn
         {...PER_PIPETTE_BTN_STYLE}
         {...pocTargetProps}
@@ -186,6 +202,13 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
           <Box size={SIZE_2} padding="0" />
         )}
       </Flex>
+      <Text
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        fontSize={FONT_SIZE_BODY_1}
+        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+      >
+        {TIP_LENGTH_CALIBRATION}
+      </Text>
       <Box>
         <Text
           marginTop={SPACING_2}

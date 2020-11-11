@@ -77,6 +77,7 @@ const LAYOUT_PROPS = [
   'overflow',
   'overflowX',
   'overflowY',
+  'wordSpacing',
 ]
 
 const POSITION_PROPS = ['position', 'zIndex', 'top', 'right', 'bottom', 'left']

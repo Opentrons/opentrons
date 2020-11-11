@@ -73,6 +73,7 @@ export type LayoutProps = {|
   height?: string | number,
   minHeight?: string | number,
   maxHeight?: string | number,
+  wordSpacing?: string | number,
 |}
 
 export type PositionProps = {|

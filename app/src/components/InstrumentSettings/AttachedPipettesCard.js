@@ -2,6 +2,7 @@
 // attached pipettes container card
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { Flex, JUSTIFY_SPACE_BETWEEN, SPACING_3 } from '@opentrons/components'
 
 import {
   LEFT,
@@ -58,7 +59,7 @@ export function AttachedPipettesCard(props: Props): React.Node {
 
   return (
     <Card title={PIPETTES}>
-      <CardContentFlex>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <PipetteInfo
           robotName={robotName}
           mount={LEFT}
@@ -73,7 +74,7 @@ export function AttachedPipettesCard(props: Props): React.Node {
           changeUrl={makeChangeUrl(RIGHT)}
           settingsUrl={settings.right ? makeConfigureUrl(RIGHT) : null}
         />
-      </CardContentFlex>
+      </Flex>
     </Card>
   )
 }

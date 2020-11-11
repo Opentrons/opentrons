@@ -9,16 +9,20 @@ import {
   Box,
   Flex,
   Text,
+  PrimaryBtn,
   SecondaryBtn,
   useHoverTooltip,
   Tooltip,
   DIRECTION_COLUMN,
   FONT_WEIGHT_SEMIBOLD,
+  FONT_WEIGHT_BOLD,
   SPACING_1,
   SPACING_2,
   SPACING_3,
+  SIZE_1,
   SIZE_2,
   SIZE_4,
+  SIZE_6,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_START,
   ALIGN_CENTER,
@@ -28,7 +32,8 @@ import {
   FONT_SIZE_BODY_1,
   FONT_STYLE_ITALIC,
   JUSTIFY_START,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TEXT_TRANSFORM_UPPERCASE,
+  FONT_SIZE_BODY_2,
 } from '@opentrons/components'
 import styles from './styles.css'
 import { getRobotByName } from '../../discovery'
@@ -50,22 +55,12 @@ export type PipetteInfoProps = {|
   settingsUrl: string | null,
 |}
 
-const LABEL_BY_MOUNT = {
-  left: 'Left pipette',
-  right: 'Right pipette',
-}
-
+const MOUNT = 'mount'
 const NOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
 const SERIAL_NUMBER = 'Serial number'
-const PER_PIPETTE_BTN_STYLE = {
-  width: '11rem',
-  marginTop: SPACING_2,
-  padding: SPACING_2,
-}
 
 export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const { robotName, mount, pipette, changeUrl, settingsUrl } = props
-  const label = LABEL_BY_MOUNT[mount]
   const displayName = pipette ? pipette.modelSpecs.displayName : null
   const serialNumber = pipette ? pipette.id : null
   const channels = pipette ? pipette.modelSpecs.channels : null
@@ -87,80 +82,82 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   }
 
   return (
-    <Flex width="50%" flexDirection={DIRECTION_COLUMN}>
+    <Flex width="48%" flexDirection={DIRECTION_COLUMN}>
+      <Text
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        fontSize={FONT_SIZE_BODY_1}
+        fontWeight={FONT_WEIGHT_BOLD}
+        marginBottom={SPACING_2}
+      >
+        {`${mount} ${MOUNT}`}
+      </Text>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex
-          key={`pipetteInfo${mount}`}
-          flex="1"
-          flexDirection={DIRECTION_COLUMN}
+        <Box
+          key={`pipetteImage${mount}`}
+          height={SIZE_4}
+          minWidth="2.25rem"
+          border={BORDER_SOLID_LIGHT}
+          marginX={SPACING_3}
         >
-          <Flex
-            alignItems={ALIGN_FLEX_START}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            maxWidth="14rem"
+          {channels && (
+            <InstrumentDiagram
+              pipetteSpecs={pipette?.modelSpecs}
+              mount={mount}
+              className={styles.pipette_diagram}
+            />
+          )}
+        </Box>
+        <Text
+          wordSpacing={SIZE_6} // always one word to a line
+          fontSize={FONT_SIZE_BODY_1}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+        >
+          {/* NOTE: non breaking hyphen */}
+          {(displayName || 'None').replace(/-/, '‑')}
+        </Text>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <PrimaryBtn
+            {...(disabledReason ? changePipTargetProps : {})}
+            as={disabledReason ? 'button' : Link}
+            to={changeUrl}
+            disabled={disabledReason}
+            title="changePipetteButton"
+            width={SIZE_4}
+            marginBottom={SPACING_2}
           >
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              height="10rem"
-            >
-              <LabeledValue
-                label={label}
-                value={(displayName || 'None').replace(/-/, '‑')} // non breaking hyphen
-              />
-              <LabeledValue
-                label={SERIAL_NUMBER}
-                value={serialNumber || 'None'}
-              />
-            </Flex>
-            <Box
-              key={`pipetteImage${mount}`}
-              height={SIZE_4}
-              width="2.25rem"
-              border={BORDER_SOLID_LIGHT}
-              marginRight={mount === 'right' ? SPACING_3 : SPACING_1}
-              marginLeft={mount === 'right' ? SPACING_1 : SPACING_3}
-            >
-              {channels && (
-                <InstrumentDiagram
-                  pipetteSpecs={pipette?.modelSpecs}
-                  mount={mount}
-                  className={styles.pipette_diagram}
-                />
-              )}
-            </Box>
-            <SecondaryBtn
-              {...(disabledReason ? changePipTargetProps : {})}
-              as={disabledReason ? 'button' : Link}
-              to={changeUrl}
-              disabled={disabledReason}
-              title="changePipetteButton"
-            >
-              {direction}
-            </SecondaryBtn>
-          </Flex>
+            {direction}
+          </PrimaryBtn>
           {settingsUrl !== null && (
             <SecondaryBtn
               {...(disabledReason ? settingsTargetProps : {})}
-              {...PER_PIPETTE_BTN_STYLE}
               as={disabledReason ? 'button' : Link}
               to={settingsUrl}
               disabled={disabledReason}
               title="pipetteSettingsButton"
+              width={SIZE_4}
             >
               settings
             </SecondaryBtn>
           )}
-          {serialNumber && (
-            <PipetteCalibrationInfo
-              robotName={robotName}
-              serialNumber={serialNumber}
-              mount={mount}
-              disabledReason={disabledReason}
-            />
-          )}
         </Flex>
       </Flex>
+      <Flex
+        fontSize={FONT_SIZE_BODY_1}
+        margin={`${SPACING_2} ${SPACING_2} ${SPACING_3}`}
+      >
+        <Text marginRight={SPACING_1} fontWeight={FONT_WEIGHT_SEMIBOLD}>
+          {SERIAL_NUMBER}:
+        </Text>
+        <Text>{serialNumber || 'None'}</Text>
+      </Flex>
+      {serialNumber && (
+        <PipetteCalibrationInfo
+          robotName={robotName}
+          serialNumber={serialNumber}
+          mount={mount}
+          disabledReason={disabledReason}
+        />
+      )}
       {disabledReason !== null && (
         <>
           <Tooltip {...settingsTooltipProps}>{disabledReason}</Tooltip>
