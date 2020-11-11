@@ -748,7 +748,7 @@ class CheckCalibrationUserFlow:
                 current_point
         elif self.current_state == State.comparingHeight:
             self._reference_points.height.final_point = \
-                current_point + MOVE_TO_DECK_SAFETY_BUFFER
+                current_point + MOVE_TO_DECK_SAFETY_BUFFER._replace(y=0.0)
             self._z_height_reference = current_point.z
         elif self.current_state == State.comparingPointOne:
             self._reference_points.one.final_point = \
