@@ -194,13 +194,12 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
             </Box>
           </Flex>
         </Box>
-        <div>
-          <JogControls
-            jog={jog}
-            stepSizes={[0.1, 1]}
-            planes={[VERTICAL_PLANE]}
-          />
-        </div>
+        <JogControls
+          jog={jog}
+          stepSizes={[0.1, 1]}
+          planes={[VERTICAL_PLANE]}
+          width="100%"
+        />
         <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
           <PrimaryBtn onClick={proceed} flex="1">
             {isHealthCheck ? CHECK_NOZZLE_Z_AXIS : SAVE_NOZZLE_Z_AXIS}
