@@ -76,6 +76,9 @@ def test_api_versioning(api_client, headers, expected_version):
         "/openapi.json",
         "/redoc",
         "/docs",
+        "/logs/serial.log",
+        "/logs/api.log",
+        "/logs/some-random-journald-thing",
         "/",
     ])
 def test_api_versioning_non_versions_endpoints(api_client, path):

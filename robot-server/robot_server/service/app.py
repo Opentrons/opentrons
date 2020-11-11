@@ -1,4 +1,5 @@
 import logging
+import re
 import traceback
 
 from opentrons import __version__
@@ -97,6 +98,9 @@ async def on_shutdown():
     get_protocol_manager().remove_all()
 
 
+NON_VERSIONED_RE = re.compile('|'.join(constants.NON_VERSIONED_ROUTES))
+
+
 @app.middleware("http")
 async def api_version_check(request: Request, call_next) -> Response:
     """Middleware to perform version check."""
@@ -107,7 +111,7 @@ async def api_version_check(request: Request, call_next) -> Response:
     # response migrations via decorator. Puting an allow-list in place for now
     # because allowing an endpoint to bypass versioning requirements in the
     # future is not a breaking change
-    if request.url.path not in constants.NON_VERSIONED_ROUTES:
+    if not NON_VERSIONED_RE.fullmatch(request.url.path):
         try:
             # Get the maximum version accepted by client
             header_value = request.headers.get(constants.API_VERSION_HEADER)

@@ -22,6 +22,8 @@ MIN_API_VERSION_HEADER = "Opentrons-Min-Version"
 # response migrations via decorator. Puting an allow-list in place for now
 # because allowing an endpoint to bypass versioning requirements in the future
 # is not a breaking change
+# These will be compiled into a regex and checked with regex.match(), so you
+# can use regex syntax
 NON_VERSIONED_ROUTES = {
     # keep the root RPC WebSocket path unversioned because browsers cannot
     # specify headers for WebSocket client requests
@@ -30,7 +32,9 @@ NON_VERSIONED_ROUTES = {
     "/openapi.json",
     "/docs",
     "/redoc",
+    "/logs/.*"
 }
+
 
 # Tag applied to legacy api endpoints
 V1_TAG = "v1"
