@@ -17,7 +17,7 @@ import type { Epic } from '../../types'
 
 export const clearAllSessionsOnDisconnectEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType('robot:DISCONNECT_RESPONSE', 'robot:UNEXPECTED_DISCONNECT'),
+    ofType('robot:DISCONNECT', 'robot:UNEXPECTED_DISCONNECT'),
     withLatestFrom(state$, (_a, s) => getConnectedRobotName(s)),
     filter(robotName => {
       console.log(robotName)

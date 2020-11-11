@@ -35,9 +35,9 @@ describe('clearAllSessionsOnDisconnectEpic', () => {
     jest.resetAllMocks()
   })
 
-  it('dispatches CLEAR_ALL_SESSIONS on robot:DISCONNECT_RESPONSE', () => {
+  it('dispatches CLEAR_ALL_SESSIONS on robot:DISCONNECT', () => {
     const action = {
-      type: 'robot:DISCONNECT_RESPONSE',
+      type: 'robot:DISCONNECT',
       payload: {},
     }
 

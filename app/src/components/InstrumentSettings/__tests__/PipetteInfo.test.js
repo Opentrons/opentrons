@@ -247,10 +247,14 @@ describe('PipetteInfo', () => {
     expect(
       wrapper.find('button[title="recalibrateTipButton"]').props()?.disabled
     ).toEqual(expect.any(String))
-    // expect(
-    //   wrapper.find('button[title="pipetteOffsetCalButton"]')
-    // ).toBeDisabled()
-    // expect(wrapper.find('button[title="pipetteSettingsButton"]')).toBeDisabled()
-    // expect(wrapper.find('button[title="changePipetteButton"]')).toBeDisabled()
+    expect(
+      wrapper.find('button[title="pipetteOffsetCalButton"]').props()?.disabled
+    ).toEqual(expect.any(String))
+    expect(
+      wrapper.find('button[title="pipetteSettingsButton"]').props()?.disabled
+    ).toEqual(expect.any(String))
+    expect(
+      wrapper.find('button[title="changePipetteButton"]').props()?.disabled
+    ).toEqual(expect.any(String))
   })
 })
