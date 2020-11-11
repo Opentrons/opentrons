@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
-  LabeledValue,
   InstrumentDiagram,
   Box,
   Flex,
@@ -15,25 +14,16 @@ import {
   Tooltip,
   DIRECTION_COLUMN,
   FONT_WEIGHT_SEMIBOLD,
-  FONT_WEIGHT_BOLD,
   SPACING_1,
   SPACING_2,
   SPACING_3,
-  SIZE_1,
   SIZE_2,
   SIZE_4,
   SIZE_6,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_START,
-  ALIGN_CENTER,
   BORDER_SOLID_LIGHT,
-  Icon,
-  COLOR_ERROR,
   FONT_SIZE_BODY_1,
-  FONT_STYLE_ITALIC,
-  JUSTIFY_START,
   TEXT_TRANSFORM_UPPERCASE,
-  FONT_SIZE_BODY_2,
 } from '@opentrons/components'
 import styles from './styles.css'
 import { getRobotByName } from '../../discovery'
@@ -56,15 +46,16 @@ export type PipetteInfoProps = {|
 |}
 
 const MOUNT = 'mount'
-const NOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
 const SERIAL_NUMBER = 'Serial number'
+const CHANGE = 'change'
+const ATTACH = 'attach'
+const NONE = 'none'
 
 export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const { robotName, mount, pipette, changeUrl, settingsUrl } = props
   const displayName = pipette ? pipette.modelSpecs.displayName : null
   const serialNumber = pipette ? pipette.id : null
   const channels = pipette ? pipette.modelSpecs.channels : null
-  const direction = pipette ? 'change' : 'attach'
 
   const isRunning = useSelector(getIsRunning)
   const isConnected = useSelector(
@@ -82,11 +73,11 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   }
 
   return (
-    <Flex width="48%" flexDirection={DIRECTION_COLUMN}>
+    <Flex width="49%" flexDirection={DIRECTION_COLUMN}>
       <Text
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         fontSize={FONT_SIZE_BODY_1}
-        fontWeight={FONT_WEIGHT_BOLD}
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_2}
       >
         {`${mount} ${MOUNT}`}
@@ -95,7 +86,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         <Box
           key={`pipetteImage${mount}`}
           height={SIZE_4}
-          minWidth="2.25rem"
+          minWidth={SIZE_2}
           border={BORDER_SOLID_LIGHT}
           marginX={SPACING_3}
         >
@@ -113,7 +104,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
           fontWeight={FONT_WEIGHT_SEMIBOLD}
         >
           {/* NOTE: non breaking hyphen */}
-          {(displayName || 'None').replace(/-/, '‑')}
+          {(displayName || NONE).replace(/-/, '‑')}
         </Text>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <PrimaryBtn
@@ -125,7 +116,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
             width={SIZE_4}
             marginBottom={SPACING_2}
           >
-            {direction}
+            {pipette ? CHANGE : ATTACH}
           </PrimaryBtn>
           {settingsUrl !== null && (
             <SecondaryBtn
@@ -148,16 +139,14 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         <Text marginRight={SPACING_1} fontWeight={FONT_WEIGHT_SEMIBOLD}>
           {SERIAL_NUMBER}:
         </Text>
-        <Text>{serialNumber || 'None'}</Text>
+        <Text>{serialNumber || NONE}</Text>
       </Flex>
-      {serialNumber && (
-        <PipetteCalibrationInfo
-          robotName={robotName}
-          serialNumber={serialNumber}
-          mount={mount}
-          disabledReason={disabledReason}
-        />
-      )}
+      <PipetteCalibrationInfo
+        robotName={robotName}
+        serialNumber={serialNumber}
+        mount={mount}
+        disabledReason={disabledReason}
+      />
       {disabledReason !== null && (
         <>
           <Tooltip {...settingsTooltipProps}>{disabledReason}</Tooltip>

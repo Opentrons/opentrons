@@ -2,7 +2,13 @@
 // attached pipettes container card
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Flex, JUSTIFY_SPACE_BETWEEN, SPACING_3 } from '@opentrons/components'
+import {
+  Card,
+  useInterval,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_3,
+} from '@opentrons/components'
 
 import {
   LEFT,
@@ -14,8 +20,6 @@ import {
 } from '../../pipettes'
 
 import { PipetteInfo } from './PipetteInfo'
-import { CardContentFlex } from '../layout'
-import { Card, useInterval } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
 import {

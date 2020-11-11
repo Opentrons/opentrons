@@ -11,19 +11,19 @@ import {
   useHoverTooltip,
   COLOR_ERROR,
   SIZE_2,
+  SIZE_5,
   SPACING_1,
   SPACING_2,
   SPACING_3,
-  ALIGN_FLEX_START,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   JUSTIFY_START,
+  JUSTIFY_CENTER,
   FONT_SIZE_BODY_1,
+  FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
   FONT_STYLE_ITALIC,
-  FONT_HEADER_DARK,
   TEXT_TRANSFORM_CAPITALIZE,
-  FONT_SIZE_BODY_2,
   OVERLAY_LIGHT_GRAY_50,
 } from '@opentrons/components'
 
@@ -41,26 +41,24 @@ import {
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
 } from '../CalibrationPanels'
 import { Portal } from '../portal'
-import { getDisplayNameForTipRack } from './utils'
+import { getDisplayNameForTipRack, formatLastModified } from './utils'
 
 import type { Mount } from '../../pipettes/types'
 import type { State } from '../../types'
 
+const NO_PIPETTE_ATTACHED = 'No pipette attached'
 const PIPETTE_OFFSET_MISSING = 'Pipette offset calibration missing.'
-const CALIBRATE_OFFSET = 'Calibrate offset'
 const CALIBRATE_NOW = 'Please calibrate offset now.'
-const DEFAULT_TIP = 'default tip'
-const RECALIBRATE_TIP = 'recalibrate tip'
+const CALIBRATE_OFFSET = 'Calibrate pipette offset'
+const RECALIBRATE_OFFSET = 'Recalibrate pipette offset'
+const RECALIBRATE_TIP = 'recalibrate tip length'
 const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 const TIP_LENGTH_CALIBRATION = 'tip length calibration'
 const TIP_NOT_CALIBRATED_BODY =
-  'Not calibrated yet. The tip you use to calibrate your pipette offset will become your default tip.'
-
-const PER_PIPETTE_BTN_STYLE = {
-  width: '11rem',
-  marginTop: SPACING_2,
-  padding: SPACING_2,
-}
+  "You will calibrate this tip length when you calibrate this pipette's offset."
+const LAST_CALIBRATED = 'Last calibrated'
+const TLC_INVALIDATES_POC_WARNING =
+  'If you recalibrate this tip length, you will need to recalibrate your pipette offset afterwards'
 
 const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
   'cal_block_modal_closed'
@@ -144,6 +142,21 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
     }
   }
 
+  if (!serialNumber) {
+    return (
+      <Flex
+        backgroundColor={OVERLAY_LIGHT_GRAY_50}
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
+        flex="1 1 auto"
+        fontStyle={FONT_STYLE_ITALIC}
+        fontSize={FONT_SIZE_CAPTION}
+      >
+        {NO_PIPETTE_ATTACHED}
+      </Flex>
+    )
+  }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -154,11 +167,45 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         fontSize={FONT_SIZE_BODY_1}
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        marginBottom={SPACING_2}
       >
         {PIPETTE_OFFSET_CALIBRATION}
       </Text>
+      {pipetteOffsetCalibration ? (
+        <>
+          {pipetteOffsetCalibration.status.markedBad && (
+            <InlineCalibrationWarning warningType="recommended" marginTop="0" />
+          )}
+          <Text
+            fontStyle={FONT_STYLE_ITALIC}
+            fontSize={FONT_SIZE_CAPTION}
+            marginBottom={SPACING_2}
+          >
+            {`${LAST_CALIBRATED}: ${formatLastModified(
+              pipetteOffsetCalibration.lastModified
+            )}`}
+          </Text>
+        </>
+      ) : (
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_START}>
+          <Box size={SIZE_2} paddingRight={SPACING_2} paddingY={SPACING_1}>
+            <Icon name="alert-circle" color={COLOR_ERROR} />
+          </Box>
+          <Flex
+            marginLeft={SPACING_1}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_START}
+          >
+            <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
+              {PIPETTE_OFFSET_MISSING}
+            </Text>
+            <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
+              {CALIBRATE_NOW}
+            </Text>
+          </Flex>
+        </Flex>
+      )}
       <SecondaryBtn
-        {...PER_PIPETTE_BTN_STYLE}
         {...pocTargetProps}
         title="pipetteOffsetCalButton"
         onClick={
@@ -170,91 +217,76 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
             : () => startPipetteOffsetPossibleTLC({ keepTipLength: true })
         }
         disabled={disabledReason}
+        width={SIZE_5}
+        paddingX={SPACING_2}
+        marginBottom={SPACING_1}
       >
-        {CALIBRATE_OFFSET}
+        {pipetteOffsetCalibration ? RECALIBRATE_OFFSET : CALIBRATE_OFFSET}
       </SecondaryBtn>
-      <Flex
-        marginTop={SPACING_2}
-        alignItems={ALIGN_FLEX_START}
-        justifyContent={JUSTIFY_START}
-      >
-        {!pipetteOffsetCalibration ? (
-          <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_START}>
-            <Box size={SIZE_2} paddingRight={SPACING_2} paddingY={SPACING_1}>
-              <Icon name="alert-circle" color={COLOR_ERROR} />
-            </Box>
-            <Flex
-              marginLeft={SPACING_1}
-              flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_START}
-            >
-              <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
-                {PIPETTE_OFFSET_MISSING}
-              </Text>
-              <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
-                {CALIBRATE_NOW}
-              </Text>
-            </Flex>
-          </Flex>
-        ) : pipetteOffsetCalibration.status.markedBad ? (
-          <InlineCalibrationWarning warningType="recommended" marginTop="0" />
-        ) : (
-          <Box size={SIZE_2} padding="0" />
-        )}
-      </Flex>
+
       <Text
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         fontSize={FONT_SIZE_BODY_1}
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        margin={`${SPACING_3} 0 ${SPACING_2}`}
       >
         {TIP_LENGTH_CALIBRATION}
       </Text>
-      <Box>
+      {pipetteOffsetCalibration && (
+        <Text
+          marginBottom={SPACING_2}
+          fontStyle={FONT_STYLE_ITALIC}
+          fontSize={FONT_SIZE_BODY_1}
+        >
+          {getDisplayNameForTipRack(
+            pipetteOffsetCalibration.tiprackUri,
+            customLabwareDefs
+          )}
+        </Text>
+      )}
+      {pipetteOffsetCalibration && tipLengthCalibration ? (
+        <>
+          <Text
+            marginBottom={SPACING_2}
+            fontStyle={FONT_STYLE_ITALIC}
+            fontSize={FONT_SIZE_CAPTION}
+          >
+            {`${LAST_CALIBRATED}: ${formatLastModified(
+              tipLengthCalibration.lastModified
+            )}`}
+          </Text>
+          {tipLengthCalibration.status.markedBad && (
+            <InlineCalibrationWarning warningType="recommended" />
+          )}
+          <SecondaryBtn
+            {...tlcTargetProps}
+            title="recalibrateTipButton"
+            onClick={() =>
+              startPipetteOffsetPossibleTLC({ keepTipLength: false })
+            }
+            disabled={disabledReason}
+            width={SIZE_5}
+            paddingX={SPACING_2}
+          >
+            {RECALIBRATE_TIP}
+          </SecondaryBtn>
+          <Text
+            marginTop={SPACING_3}
+            fontStyle={FONT_STYLE_ITALIC}
+            fontSize={FONT_SIZE_CAPTION}
+          >
+            {TLC_INVALIDATES_POC_WARNING}
+          </Text>
+        </>
+      ) : (
         <Text
           marginTop={SPACING_2}
-          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          fontStyle={FONT_STYLE_ITALIC}
           fontSize={FONT_SIZE_BODY_1}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
         >
-          {DEFAULT_TIP}
+          {TIP_NOT_CALIBRATED_BODY}
         </Text>
-        {pipetteOffsetCalibration && tipLengthCalibration ? (
-          <>
-            <Text
-              marginTop={SPACING_2}
-              fontStyle={FONT_STYLE_ITALIC}
-              fontSize={FONT_SIZE_BODY_1}
-            >
-              {getDisplayNameForTipRack(
-                pipetteOffsetCalibration.tiprackUri,
-                customLabwareDefs
-              )}
-            </Text>
-            <SecondaryBtn
-              {...PER_PIPETTE_BTN_STYLE}
-              {...tlcTargetProps}
-              title="recalibrateTipButton"
-              onClick={() =>
-                startPipetteOffsetPossibleTLC({ keepTipLength: false })
-              }
-              disabled={disabledReason}
-            >
-              {RECALIBRATE_TIP}
-            </SecondaryBtn>
-            {tipLengthCalibration.status.markedBad && (
-              <InlineCalibrationWarning warningType="recommended" />
-            )}
-          </>
-        ) : (
-          <Text
-            marginTop={SPACING_2}
-            fontStyle={FONT_STYLE_ITALIC}
-            fontSize={FONT_SIZE_BODY_1}
-          >
-            {TIP_NOT_CALIBRATED_BODY}
-          </Text>
-        )}
-      </Box>
+      )}
       {PipetteOffsetCalibrationWizard}
       {calBlockModalState !== CAL_BLOCK_MODAL_CLOSED ? (
         <Portal level="top">

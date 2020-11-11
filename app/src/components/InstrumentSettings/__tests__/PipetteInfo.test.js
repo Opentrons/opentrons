@@ -105,7 +105,7 @@ describe('PipetteInfo', () => {
   it('just launch POC w/o cal block modal if POC button clicked and data exists', () => {
     mockGetCalibrationForPipette.mockReturnValue(mockPipetteOffsetCalibration1)
     const { wrapper } = render()
-    wrapper.find('button[children="Calibrate offset"]').invoke('onClick')()
+    wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')()
     wrapper.update()
     expect(startWizard).toHaveBeenCalledWith({ withIntent: 'pipette-offset' })
   })
@@ -113,7 +113,7 @@ describe('PipetteInfo', () => {
   it('launch POC w/ cal block modal denied if POC button clicked and no existing data and no cal block pref saved', () => {
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[children="Calibrate offset"]').invoke('onClick')()
+    wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')()
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
     wrapper
@@ -131,7 +131,7 @@ describe('PipetteInfo', () => {
   it('launch POC w/ cal block modal confirmed if POC button clicked and no existing data and no cal block pref saved', () => {
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[children="Calibrate offset"]').invoke('onClick')()
+    wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')()
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
     wrapper.find('button[children="Use trash bin"]').invoke('onClick')()
@@ -144,13 +144,6 @@ describe('PipetteInfo', () => {
     })
   })
 
-  it('no recalibrate tip button if POC and TLC data not present', () => {
-    const { wrapper } = render()
-    expect(wrapper.find('button[children="recalibrate tip"]').exists()).toBe(
-      false
-    )
-  })
-
   it('launch POWT w/ cal block modal denied if recal tip button clicked and no cal block pref saved', () => {
     mockGetCalibrationForPipette.mockReturnValue(mockPipetteOffsetCalibration1)
     mockGetTipLengthForPipetteAndTiprack.mockReturnValue(
@@ -158,7 +151,7 @@ describe('PipetteInfo', () => {
     )
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[children="recalibrate tip"]').invoke('onClick')()
+    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')()
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
     wrapper
@@ -180,7 +173,7 @@ describe('PipetteInfo', () => {
     )
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[children="recalibrate tip"]').invoke('onClick')()
+    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')()
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
     wrapper.find('button[children="Use trash bin"]').invoke('onClick')()
@@ -202,7 +195,7 @@ describe('PipetteInfo', () => {
     )
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[children="recalibrate tip"]').invoke('onClick')()
+    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')()
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
     expect(startWizard).toHaveBeenCalledWith({
@@ -223,7 +216,7 @@ describe('PipetteInfo', () => {
     )
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[children="recalibrate tip"]').invoke('onClick')()
+    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')()
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
     expect(startWizard).toHaveBeenCalledWith({
