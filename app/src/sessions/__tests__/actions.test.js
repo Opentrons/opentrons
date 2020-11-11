@@ -188,6 +188,17 @@ describe('robot session check actions', () => {
         meta: {},
       },
     },
+    {
+      name: 'sessions:CLEAR_ALL_SESSIONS',
+      creator: Actions.clearAllSessions,
+      args: ['robot-name'],
+      expected: {
+        type: 'sessions:CLEAR_ALL_SESSIONS',
+        payload: {
+          robotName: 'robot-name',
+        },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

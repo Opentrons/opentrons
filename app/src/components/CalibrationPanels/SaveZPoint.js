@@ -211,6 +211,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
             : [VERTICAL_PLANE]
         }
         auxiliaryControl={allowHorizontal ? null : <AllowHorizontalPrompt />}
+        width="100%"
       />
       <Flex
         width="100%"
