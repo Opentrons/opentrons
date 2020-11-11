@@ -14,7 +14,7 @@ from .motion import MotionStore, MotionState
 
 
 class StateView:
-    """A read-only view of a collection of a StateStore."""
+    """A read-only view of a StateStore."""
 
     _command_store: CommandStore
     _labware_store: LabwareStore

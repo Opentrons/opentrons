@@ -72,7 +72,7 @@ class CommandExecutor:
         self,
         command: cmd.RunningCommandType,
     ) -> cmd.CompletedCommandType:
-        """Execute commands by routing to a specific handlers."""
+        """Execute commands by routing to specific handlers."""
         # call to correct implementation based on command request type
         # load labware
         if isinstance(command.request, cmd.LoadLabwareRequest):

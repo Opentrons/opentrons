@@ -1,1 +1,1 @@
-"""ProtocolEngine command models tests."""
+"""ProtocolEngine command model tests."""
