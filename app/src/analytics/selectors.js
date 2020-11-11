@@ -1,6 +1,7 @@
 // @flow
 import { createSelector } from 'reselect'
 import pick from 'lodash/pick'
+import some from 'lodash/some'
 
 import {
   getProtocolType,
@@ -37,14 +38,17 @@ import {
   getDeckCalibrationData,
 } from '../calibration/selectors'
 import { getRobotSessionById } from '../sessions/selectors'
+import { getCalibrationCheckSession } from '../sessions/calibration-check/selectors'
 
 import { hash } from './hash'
 
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
+import type { CalibrationCheckInstrument } from '../sessions/calibration-check/types'
 
 import type {
   AnalyticsConfig,
+  CalibrationCheckByMount,
   ProtocolAnalyticsData,
   RobotAnalyticsData,
   BuildrootAnalyticsData,
@@ -218,6 +222,31 @@ function getPipetteModels(state: State, robotName: string): ModelsByMount {
   )
 }
 
+function getCalibrationCheckData(
+  state: State,
+  robotName: string
+): CalibrationCheckByMount | null {
+  const session = getCalibrationCheckSession(state, robotName)
+  if (!session) {
+    return null
+  }
+  const { comparisonsByPipette, instruments } = session.details
+  return instruments.reduce((obj, instrument: CalibrationCheckInstrument) => {
+    const { rank, mount, model } = instrument
+    const succeeded = !some(
+      Object.keys(comparisonsByPipette[rank]).map(k =>
+        Boolean(comparisonsByPipette[rank][k]?.status === 'OUTSIDE_THRESHOLD')
+      )
+    )
+    obj[mount] = {
+      comparisons: comparisonsByPipette[rank],
+      succeeded: succeeded,
+      model: model,
+    }
+    return obj
+  }, ({}: $Shape<CalibrationCheckByMount>))
+}
+
 export function getAnalyticsDeckCalibrationData(
   state: State
 ): DeckCalibrationAnalyticsData | null {
@@ -241,7 +270,7 @@ export function getAnalyticsHealthCheckData(
   const robot = getConnectedRobot(state)
   if (robot) {
     return {
-      pipettes: getPipetteModels(state, robot.name),
+      pipettes: getCalibrationCheckData(state, robot.name),
     }
   }
   return null

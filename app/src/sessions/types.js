@@ -319,54 +319,6 @@ export type SessionState = $Shape<
   |}>
 >
 
-export type AnalyticsModelsByMount = {|
-  leftPipetteModel?: string,
-  rightPipetteModel?: string,
-|}
-
-export type CalibrationCheckCommonEventData = {|
-  comparingHeightExceedsThreshold?: boolean,
-  comparingPointOneExceedsThreshold?: boolean,
-  comparingPointTwoExceedsThreshold?: boolean,
-  comparingPointThreeExceedsThreshold?: boolean,
-|}
-
-export type CalibrationCheckIntercomData = {|
-  ...CalibrationCheckCommonEventData,
-  succeeded: boolean,
-|}
-
-export type CalibrationCheckAnalyticsData = {|
-  ...CalibrationCheckCommonEventData,
-  comparingHeightDifferenceVector?: VectorTuple,
-  comparingHeightThresholdVector?: VectorTuple,
-  comparingPointOneDifferenceVector?: VectorTuple,
-  comparingPointOneThresholdVector?: VectorTuple,
-  comparingPointTwoDifferenceVector?: VectorTuple,
-  comparingPointTwoThresholdVector?: VectorTuple,
-  comparingPointThreeDifferenceVector?: VectorTuple,
-  comparingPointThreeThresholdVector?: VectorTuple,
-|}
-
-export type SharedAnalyticsProps = {|
-  sessionType: SessionType,
-|}
-
-export type CalibrationCheckSessionAnalyticsProps = {|
-  ...SharedAnalyticsProps,
-  ...AnalyticsModelsByMount,
-  ...CalibrationCheckAnalyticsData,
-|}
-
-export type CalibrationCheckSessionIntercomProps = {|
-  ...SharedAnalyticsProps,
-  ...AnalyticsModelsByMount,
-  ...CalibrationCheckIntercomData,
-|}
-
-export type SessionAnalyticsProps = CalibrationCheckSessionAnalyticsProps
-export type SessionIntercomProps = CalibrationCheckSessionIntercomProps
-
 export type CalibrationLabware = {|
   slot: string,
   loadName: string,
