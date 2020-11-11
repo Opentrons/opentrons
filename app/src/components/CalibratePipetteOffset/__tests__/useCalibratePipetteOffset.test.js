@@ -10,6 +10,7 @@ import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../sessions
 
 import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
 import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../CalibrationPanels'
+import { pipetteOffsetCalibrationStarted } from '../../../analytics'
 
 import type { State } from '../../../types'
 import type { SessionType } from '../../../sessions'
@@ -84,6 +85,15 @@ describe('useCalibratePipetteOffset hook', () => {
       ),
       meta: { requestId: expect.any(String) },
     })
+    expect(store.dispatch).toHaveBeenCalledWith(
+      pipetteOffsetCalibrationStarted(
+        'pipette-offset',
+        mountString,
+        false,
+        false,
+        null
+      )
+    )
   })
 
   it('accepts createParam overrides in start callback', () => {

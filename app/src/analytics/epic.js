@@ -21,7 +21,7 @@ import type { State, Action, Epic } from '../types'
 import type { ConfigInitializedAction } from '../config/types'
 import type { TrackEventArgs, AnalyticsEvent, AnalyticsConfig } from './types'
 
-const initialzeAnalyticsEpic: Epic = (action$, state$) => {
+const initializeAnalyticsEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Cfg.INITIALIZED),
     tap((initAction: ConfigInitializedAction) => {
@@ -55,7 +55,7 @@ const optIntoAnalyticsEpic: Epic = (_, state$) => {
   return state$.pipe(
     map<State, AnalyticsConfig | null>(getAnalyticsConfig),
     // this epic is for runtime changes in opt-in (not initialization)
-    // ensure config exists so it doesn't conflict with initialzeAnalyticsEpic
+    // ensure config exists so it doesn't conflict with initializeAnalyticsEpic
     filter<AnalyticsConfig | null, AnalyticsConfig>(
       maybeConfig => maybeConfig !== null
     ),
@@ -67,7 +67,7 @@ const optIntoAnalyticsEpic: Epic = (_, state$) => {
 }
 
 export const analyticsEpic: Epic = combineEpics(
-  initialzeAnalyticsEpic,
+  initializeAnalyticsEpic,
   sendAnalyticsEventEpic,
   optIntoAnalyticsEpic
 )
