@@ -10,7 +10,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Opentrons App 4.0.0 is a major software release, bringing an entirely overhauled robot calibration process for the OT-2; a full switch to Opentrons Protocol API Version 2; and many look and feel improvements.
 
-**After you install this update, you must calibrate your OT-2 before running a protocol**. This will take approximately fifteen minutes, but you will not be able to run a protocol until your OT-2 is calibrated.
+**After you install this update, you must calibrate your OT-2's pipette offsets and tip lengths before running a protocol**. This will take approximately fifteen minutes, but you will not be able to run a protocol until your OT-2 is calibrated.
 
 ## OT-2 Calibration Changes
 

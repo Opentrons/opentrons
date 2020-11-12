@@ -10,7 +10,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Opentrons Robot Software 4.0.0 is a major software release, bringing an entirely overhauled robot calibration process for the OT-2; a full switch to Opentrons Protocol API Version 2; and improvements to the OT-2's HTTP API.
 
-**After you install this update, you must calibrate your OT-2 before running a protocol.** This will take approximately fifteen minutes, but you will not be able to run a protocol until your OT-2 is calibrated.
+**After you install this update, you must calibrate your OT-2's pipette offsets and tip lengths before running a protocol.** This will take approximately fifteen minutes, but you will not be able to run a protocol until your OT-2 is calibrated.
 
 In addition, **after you install this update, Opentrons Apps on version 3.21.2 or earlier will not be able to interact with this OT-2 beyond downgrading its software**. This is due to the HTTP API changes described below. Opentrons App Version 4.0.0 is designed to work with the changes, but 3.21.2 and previous cannot interact with an OT-2 on Robot Software 4.0.0 other than downgrading its software.
 
@@ -26,7 +26,7 @@ We released Python Protocol API Version 2 almost a year ago, and have been conti
 
 ## HTTP API Changes
 
-Robot Software 4.0.0 is a big step forward in a well-defined, stable, HTTP API for the OT-2. This API is what the Opentrons App uses to communicate with the OT-2, and documentation for it is available on the OT-2's IP address, port 31950 at ``/docs``. In Robot Software 4.0.0, interaction with this API now requires use of the `Opentrons-Version` header, set to either `*` (to accept any version) or `2`.
+Robot Software 4.0.0 is a big step forward in a well-defined, stable, HTTP API for the OT-2. This API is what the Opentrons App uses to communicate with the OT-2, and documentation for it is available on the OT-2's IP address, port 31950 at `/docs`. In Robot Software 4.0.0, interaction with this API now requires use of the `Opentrons-Version` header, set to either `*` (to accept any version) or `2`.
 
 We consider the HTTP API a core part of the OT-2's API, and changes to it will be documented in release notes just like Python Protocol API changes.
 
