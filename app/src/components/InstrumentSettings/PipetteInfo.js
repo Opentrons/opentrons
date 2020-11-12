@@ -3,15 +3,12 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-
 import {
-  LabeledValue,
   InstrumentDiagram,
   Box,
   Flex,
   Text,
+  PrimaryBtn,
   SecondaryBtn,
   useHoverTooltip,
   Tooltip,
@@ -22,39 +19,20 @@ import {
   SPACING_3,
   SIZE_2,
   SIZE_4,
+  SIZE_6,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_START,
-  ALIGN_CENTER,
   BORDER_SOLID_LIGHT,
-  Icon,
-  COLOR_ERROR,
   FONT_SIZE_BODY_1,
-  FONT_STYLE_ITALIC,
-  JUSTIFY_START,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import * as Config from '../../config'
 import styles from './styles.css'
-import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
-import {
-  INTENT_PIPETTE_OFFSET,
-  INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-} from '../CalibrationPanels'
-import {
-  getCalibrationForPipette,
-  getTipLengthForPipetteAndTiprack,
-} from '../../calibration'
 import { getRobotByName } from '../../discovery'
 import { getIsRunning } from '../../robot/selectors'
-import { findLabwareDefWithCustom } from '../../findLabware'
-import * as CustomLabware from '../../custom-labware'
-import { Portal } from '../portal'
-import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
 import {
   DISABLED_CONNECT_TO_ROBOT,
   DISABLED_PROTOCOL_IS_RUNNING,
 } from '../RobotSettings/constants'
+import { PipetteCalibrationInfo } from './PipetteCalibrationInfo'
 
 import type { State } from '../../types'
 import type { Mount, AttachedPipette } from '../../pipettes/types'
@@ -67,335 +45,114 @@ export type PipetteInfoProps = {|
   settingsUrl: string | null,
 |}
 
-const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
-  'cal_block_modal_closed'
-const CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC: 'cal_block_modal_redo' =
-  'cal_block_modal_redo'
-const CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC: 'cal_block_modal_keep' =
-  'cal_block_modal_keep'
-
-type CalBlockModalState =
-  | typeof CAL_BLOCK_MODAL_CLOSED
-  | typeof CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
-  | typeof CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
-
-const LABEL_BY_MOUNT = {
-  left: 'Left pipette',
-  right: 'Right pipette',
-}
-
-const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
-const UNKNOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
+const MOUNT = 'mount'
 const SERIAL_NUMBER = 'Serial number'
-const PIPETTE_OFFSET_MISSING = 'Pipette offset calibration missing.'
-const CALIBRATE_NOW = 'Please calibrate offset now.'
-const CALIBRATE_OFFSET = 'Calibrate offset'
-const DEFAULT_TIP = 'default tip'
-const TIP_NOT_CALIBRATED_BODY =
-  'Not calibrated yet. The tip you use to calibrate your pipette offset will become your default tip.'
-const PER_PIPETTE_BTN_STYLE = {
-  width: '11rem',
-  marginTop: SPACING_2,
-  padding: SPACING_2,
-}
-const RECALIBRATE_TIP = 'recalibrate tip'
-
-function getDisplayNameForTiprack(
-  tiprackUri: string,
-  customLabware: Array<LabwareDefinition2>
-): string {
-  const [namespace, loadName] = tiprackUri ? tiprackUri.split('/') : ['', '']
-  const definition = findLabwareDefWithCustom(
-    namespace,
-    loadName,
-    null,
-    customLabware
-  )
-  return definition
-    ? getLabwareDisplayName(definition)
-    : `${UNKNOWN_CUSTOM_LABWARE}`
-}
+const CHANGE = 'change'
+const ATTACH = 'attach'
+const NONE = 'none'
 
 export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const { robotName, mount, pipette, changeUrl, settingsUrl } = props
-  const label = LABEL_BY_MOUNT[mount]
   const displayName = pipette ? pipette.modelSpecs.displayName : null
   const serialNumber = pipette ? pipette.id : null
   const channels = pipette ? pipette.modelSpecs.channels : null
-  const direction = pipette ? 'change' : 'attach'
-  const pipetteOffsetCalibration = useSelector((state: State) =>
-    serialNumber
-      ? getCalibrationForPipette(state, robotName, serialNumber)
-      : null
-  )
-  const tipLengthCalibration = useSelector((state: State) =>
-    serialNumber && pipetteOffsetCalibration
-      ? getTipLengthForPipetteAndTiprack(
-          state,
-          robotName,
-          serialNumber,
-          pipetteOffsetCalibration?.tiprack
-        )
-      : null
-  )
 
   const isRunning = useSelector(getIsRunning)
   const isConnected = useSelector(
     (state: State) => getRobotByName(state, robotName)?.connected
   )
 
-  const [tlcTargetProps, tlcTooltipProps] = useHoverTooltip()
-  const [pocTargetProps, pocTooltipProps] = useHoverTooltip()
   const [settingsTargetProps, settingsTooltipProps] = useHoverTooltip()
   const [changePipTargetProps, changePipTooltipProps] = useHoverTooltip()
 
-  let buttonDisabledReason = null
+  let disabledReason = null
   if (!isConnected) {
-    buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
+    disabledReason = DISABLED_CONNECT_TO_ROBOT
   } else if (isRunning) {
-    buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
+    disabledReason = DISABLED_PROTOCOL_IS_RUNNING
   }
 
-  const [
-    startPipetteOffsetCalibration,
-    PipetteOffsetCalibrationWizard,
-  ] = useCalibratePipetteOffset(robotName, { mount })
-
-  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
-  const [
-    calBlockModalState,
-    setCalBlockModalState,
-  ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
-
-  type StartWizardOptions = {|
-    keepTipLength: boolean,
-    hasBlockModalResponse?: boolean | null,
-  |}
-  const startPipetteOffsetWizard = (options: StartWizardOptions) => {
-    const { keepTipLength, hasBlockModalResponse = null } = options
-    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
-      setCalBlockModalState(
-        keepTipLength
-          ? CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
-          : CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
-      )
-    } else {
-      startPipetteOffsetCalibration({
-        overrideParams: {
-          hasCalibrationBlock: Boolean(
-            configHasCalibrationBlock ?? hasBlockModalResponse
-          ),
-          shouldRecalibrateTipLength: !keepTipLength,
-        },
-        withIntent: keepTipLength
-          ? INTENT_PIPETTE_OFFSET
-          : INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-      })
-      setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)
-    }
-  }
-
-  const customLabwareDefs = useSelector((state: State) => {
-    return CustomLabware.getCustomLabwareDefinitions(state)
-  })
-
-  const startPipetteOffsetCalibrationDirectly = () => {
-    startPipetteOffsetCalibration({ withIntent: INTENT_PIPETTE_OFFSET })
-  }
-
-  const pipImage = (
-    <Box
-      key={`pipetteImage${mount}`}
-      height={SIZE_4}
-      width="2.25rem"
-      border={BORDER_SOLID_LIGHT}
-      marginRight={mount === 'right' ? SPACING_3 : SPACING_1}
-      marginLeft={mount === 'right' ? SPACING_1 : SPACING_3}
-    >
-      {channels && (
-        <InstrumentDiagram
-          pipetteSpecs={pipette?.modelSpecs}
-          mount={mount}
-          className={styles.pipette_diagram}
-        />
-      )}
-    </Box>
-  )
-
-  const pipInfo = (
-    <Flex key={`pipetteInfo${mount}`} flex="1" flexDirection={DIRECTION_COLUMN}>
-      <Flex
-        alignItems={ALIGN_FLEX_START}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        maxWidth="14rem"
+  return (
+    <Flex width="49%" flexDirection={DIRECTION_COLUMN}>
+      <Text
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        fontSize={FONT_SIZE_BODY_1}
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        marginBottom={SPACING_2}
       >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          height="10rem"
+        {`${mount} ${MOUNT}`}
+      </Text>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Box
+          key={`pipetteImage${mount}`}
+          height={SIZE_4}
+          minWidth={SIZE_2}
+          border={BORDER_SOLID_LIGHT}
+          marginX={SPACING_3}
         >
-          <LabeledValue
-            label={label}
-            value={(displayName || 'None').replace(/-/, '‑')} // non breaking hyphen
-          />
-          <LabeledValue label={SERIAL_NUMBER} value={serialNumber || 'None'} />
-        </Flex>
-
-        <SecondaryBtn
-          {...(buttonDisabledReason ? changePipTargetProps : {})}
-          as={buttonDisabledReason ? 'button' : Link}
-          to={changeUrl}
-          disabled={buttonDisabledReason}
-          title="changePipetteButton"
+          {channels && (
+            <InstrumentDiagram
+              pipetteSpecs={pipette?.modelSpecs}
+              mount={mount}
+              className={styles.pipette_diagram}
+            />
+          )}
+        </Box>
+        <Text
+          wordSpacing={SIZE_6} // always one word to a line
+          fontSize={FONT_SIZE_BODY_1}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
         >
-          {direction}
-        </SecondaryBtn>
-      </Flex>
-      {settingsUrl !== null && (
-        <SecondaryBtn
-          {...(buttonDisabledReason ? settingsTargetProps : {})}
-          {...PER_PIPETTE_BTN_STYLE}
-          as={buttonDisabledReason ? 'button' : Link}
-          to={settingsUrl}
-          disabled={buttonDisabledReason}
-          title="pipetteSettingsButton"
-        >
-          settings
-        </SecondaryBtn>
-      )}
-      {serialNumber && (
-        <>
-          <SecondaryBtn
-            {...pocTargetProps}
-            {...PER_PIPETTE_BTN_STYLE}
-            title="pipetteOffsetCalButton"
-            onClick={
-              pipetteOffsetCalibration
-                ? startPipetteOffsetCalibrationDirectly
-                : () => startPipetteOffsetWizard({ keepTipLength: true })
-            }
-            disabled={buttonDisabledReason}
+          {/* NOTE: non breaking hyphen */}
+          {(displayName || NONE).replace(/-/, '‑')}
+        </Text>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <PrimaryBtn
+            {...(disabledReason ? changePipTargetProps : {})}
+            as={disabledReason ? 'button' : Link}
+            to={changeUrl}
+            disabled={disabledReason}
+            title="changePipetteButton"
+            width={SIZE_4}
+            marginBottom={SPACING_2}
           >
-            {CALIBRATE_OFFSET}
-          </SecondaryBtn>
-          <Flex
-            marginTop={SPACING_2}
-            alignItems={ALIGN_FLEX_START}
-            justifyContent={JUSTIFY_START}
-          >
-            {!pipetteOffsetCalibration ? (
-              <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_START}>
-                <Box
-                  size={SIZE_2}
-                  paddingRight={SPACING_2}
-                  paddingY={SPACING_1}
-                >
-                  <Icon name="alert-circle" color={COLOR_ERROR} />
-                </Box>
-                <Flex
-                  marginLeft={SPACING_1}
-                  flexDirection={DIRECTION_COLUMN}
-                  justifyContent={JUSTIFY_START}
-                >
-                  <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
-                    {PIPETTE_OFFSET_MISSING}
-                  </Text>
-                  <Text fontSize={FONT_SIZE_BODY_1} color={COLOR_ERROR}>
-                    {CALIBRATE_NOW}
-                  </Text>
-                </Flex>
-              </Flex>
-            ) : pipetteOffsetCalibration.status.markedBad ? (
-              <InlineCalibrationWarning
-                warningType="recommended"
-                marginTop="0"
-              />
-            ) : (
-              <Box size={SIZE_2} padding="0" />
-            )}
-          </Flex>
-          <Box>
-            <Text
-              marginTop={SPACING_2}
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-              fontSize={FONT_SIZE_BODY_1}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            {pipette ? CHANGE : ATTACH}
+          </PrimaryBtn>
+          {settingsUrl !== null && (
+            <SecondaryBtn
+              {...(disabledReason ? settingsTargetProps : {})}
+              as={disabledReason ? 'button' : Link}
+              to={settingsUrl}
+              disabled={disabledReason}
+              title="pipetteSettingsButton"
+              width={SIZE_4}
             >
-              {DEFAULT_TIP}
-            </Text>
-            {pipetteOffsetCalibration && tipLengthCalibration ? (
-              <>
-                <Text
-                  marginTop={SPACING_2}
-                  fontStyle={FONT_STYLE_ITALIC}
-                  fontSize={FONT_SIZE_BODY_1}
-                >
-                  {getDisplayNameForTiprack(
-                    pipetteOffsetCalibration.tiprackUri,
-                    customLabwareDefs
-                  )}
-                </Text>
-                <SecondaryBtn
-                  {...tlcTargetProps}
-                  {...PER_PIPETTE_BTN_STYLE}
-                  title="recalibrateTipButton"
-                  onClick={() =>
-                    startPipetteOffsetWizard({ keepTipLength: false })
-                  }
-                  disabled={buttonDisabledReason}
-                >
-                  {RECALIBRATE_TIP}
-                </SecondaryBtn>
-                {tipLengthCalibration.status.markedBad && (
-                  <InlineCalibrationWarning warningType="recommended" />
-                )}
-              </>
-            ) : (
-              <Text
-                marginTop={SPACING_2}
-                fontStyle={FONT_STYLE_ITALIC}
-                fontSize={FONT_SIZE_BODY_1}
-              >
-                {TIP_NOT_CALIBRATED_BODY}
-              </Text>
-            )}
-          </Box>
-        </>
-      )}
-      {buttonDisabledReason !== null && (
+              settings
+            </SecondaryBtn>
+          )}
+        </Flex>
+      </Flex>
+      <Flex
+        fontSize={FONT_SIZE_BODY_1}
+        margin={`${SPACING_2} ${SPACING_2} ${SPACING_3}`}
+      >
+        <Text marginRight={SPACING_1} fontWeight={FONT_WEIGHT_SEMIBOLD}>
+          {SERIAL_NUMBER}:
+        </Text>
+        <Text>{serialNumber || NONE}</Text>
+      </Flex>
+      <PipetteCalibrationInfo
+        robotName={robotName}
+        serialNumber={serialNumber}
+        mount={mount}
+        disabledReason={disabledReason}
+      />
+      {disabledReason !== null && (
         <>
-          <Tooltip {...settingsTooltipProps}>{buttonDisabledReason}</Tooltip>
-          <Tooltip {...pocTooltipProps}>{buttonDisabledReason}</Tooltip>
-          <Tooltip {...tlcTooltipProps}>{buttonDisabledReason}</Tooltip>
-          <Tooltip {...changePipTooltipProps}>{buttonDisabledReason}</Tooltip>
+          <Tooltip {...settingsTooltipProps}>{disabledReason}</Tooltip>
+          <Tooltip {...changePipTooltipProps}>{disabledReason}</Tooltip>
         </>
       )}
     </Flex>
-  )
-
-  return (
-    <>
-      {PipetteOffsetCalibrationWizard}
-      {calBlockModalState !== CAL_BLOCK_MODAL_CLOSED ? (
-        <Portal level="top">
-          <AskForCalibrationBlockModal
-            onResponse={hasBlockModalResponse => {
-              startPipetteOffsetWizard({
-                hasBlockModalResponse,
-                keepTipLength:
-                  calBlockModalState === CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC,
-              })
-            }}
-            titleBarTitle={PIPETTE_OFFSET_CALIBRATION}
-            closePrompt={() => setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)}
-          />
-        </Portal>
-      ) : null}
-      <Flex width="50%" flexDirection={DIRECTION_COLUMN}>
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          {mount === 'right' ? [pipImage, pipInfo] : [pipInfo, pipImage]}
-        </Flex>
-      </Flex>
-    </>
   )
 }

@@ -1,15 +1,6 @@
 /* stylesheet for InstrumentSettings components */
 @import '@opentrons/components';
 
-.pipette_card {
-  display: flex;
-  position: relative;
-  flex-direction: row;
-  align-items: top;
-  justify-content: space-between;
-  width: 49.5%;
-}
-
 .pipette_diagram {
   height: 100%;
   padding: 0 0 0.5rem;
@@ -18,50 +9,5 @@
   & * {
     height: 100%;
     width: auto;
-  }
-}
-
-.pipette_info_block {
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.pipette_info_element {
-  width: min-content;
-}
-
-.image {
-  height: 8rem;
-  width: 2.25rem;
-  border: 1px solid var(--c-light-gray);
-}
-
-.right {
-  & > div {
-    order: 2;
-  }
-
-  & > .pipette_info_block {
-    margin-left: 0.5rem;
-  }
-
-  & > .image {
-    order: 1;
-  }
-
-  & > a {
-    order: 3;
-  }
-}
-
-.button_group {
-  max-width: 9rem;
-  text-align: right;
-
-  & > a {
-    width: 8rem;
-    margin-bottom: 1rem;
   }
 }
