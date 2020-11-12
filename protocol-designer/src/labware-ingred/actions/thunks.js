@@ -1,6 +1,8 @@
 // @flow
 import assert from 'assert'
+import { getIsTiprack } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
@@ -12,21 +14,71 @@ import type {
 } from './actions'
 import type { ThunkAction } from '../../types'
 
+export type RenameLabwareAction = {
+  type: 'RENAME_LABWARE',
+  payload: {
+    labwareId: string,
+    name?: ?string,
+  },
+}
+
+export const renameLabware: (
+  args: $PropertyType<RenameLabwareAction, 'payload'>
+) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
+  dispatch,
+  getState
+) => {
+  const { labwareId } = args
+  const state = getState()
+
+  const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
+  const defaultNickname = allNicknamesById[labwareId]
+  const nextNickname = getNextNickname(
+    Object.keys(allNicknamesById)
+      .filter((id: string) => id !== labwareId)
+      .map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
+    args.name || defaultNickname
+  )
+
+  return dispatch({
+    type: 'RENAME_LABWARE',
+    payload: {
+      labwareId,
+      name: nextNickname,
+    },
+  })
+}
+
 export const createContainer: (
   args: CreateContainerArgs
-) => ThunkAction<CreateContainerAction> = args => (dispatch, getState) => {
+) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
+  dispatch,
+  getState
+) => {
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const slot = args.slot || getNextAvailableDeckSlot(initialDeckSetup)
+  const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
+    args.labwareDefURI
+  ]
+  const isTiprack = getIsTiprack(labwareDef)
   if (slot) {
+    const id = `${uuid()}:${args.labwareDefURI}`
     dispatch({
       type: 'CREATE_CONTAINER',
       payload: {
         ...args,
-        id: `${uuid()}:${args.labwareDefURI}`,
+        id,
         slot,
       },
     })
+
+    if (isTiprack) {
+      // Tipracks cannot be named, but should auto-increment.
+      // We can't rely on reducers to do that themselves bc they don't have access
+      // to both the nickname state and the isTiprack condition
+      renameLabware({ labwareId: id })(dispatch, getState)
+    }
   } else {
     console.warn('no slots available, cannot create labware')
   }
@@ -71,36 +123,4 @@ export const duplicateLabware: (
       },
     })
   }
-}
-
-export type RenameLabwareAction = {
-  type: 'RENAME_LABWARE',
-  payload: {
-    labwareId: string,
-    name?: ?string,
-  },
-}
-
-export const renameLabware: (
-  args: $PropertyType<RenameLabwareAction, 'payload'>
-) => ThunkAction<RenameLabwareAction> = args => (dispatch, getState) => {
-  const { labwareId } = args
-  const state = getState()
-
-  const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
-  const defaultNickname = allNicknamesById[labwareId]
-  const nextNickname = getNextNickname(
-    Object.keys(allNicknamesById)
-      .filter((id: string) => id !== labwareId)
-      .map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
-    args.name || defaultNickname
-  )
-
-  return dispatch({
-    type: 'RENAME_LABWARE',
-    payload: {
-      labwareId,
-      name: nextNickname,
-    },
-  })
 }
