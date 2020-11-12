@@ -10,6 +10,9 @@ import * as SessionsSelectors from '../../sessions/selectors'
 import * as DiscoverySelectors from '../../discovery/selectors'
 import * as PipetteSelectors from '../../pipettes/selectors'
 
+import * as SessionFixtures from '../../sessions/__fixtures__'
+import * as SessionTypes from '../../sessions/types'
+
 import type { State } from '../../types'
 import type { Robot } from '../../discovery/types'
 import type { Config } from '../../config/types'
@@ -20,6 +23,7 @@ import type {
   DeckCalibrationInfo,
   DeckCalibrationStatus,
 } from '../../calibration/types'
+
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
 
 type MockState = $Shape<{| ...State, config: null | $Shape<Config> |}>
@@ -430,17 +434,43 @@ describe('analytics selectors', () => {
       })
     })
     describe('getAnalyticsHealthCheckData', () => {
+      const getRobotSessionOfType: JestMockFn<
+        [State, string, SessionTypes.SessionType],
+        $Call<
+          typeof SessionsSelectors.getRobotSessionOfType,
+          State,
+          string,
+          SessionTypes.SessionType
+        >
+      > = SessionsSelectors.getRobotSessionOfType
       it('should get data if robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockCalibrationCheckSession: SessionTypes.CalibrationCheckSession = {
+          id: 'fake_check_session_id',
+          ...SessionFixtures.mockCalibrationCheckSessionAttributes,
+        }
+        getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
         mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
         })
-        mockGetAttachedPipettes.mockReturnValue({
-          right: { model: 'my model' },
-          left: null,
-        })
+        const comparisonsLeft =
+          SessionFixtures.mockCalibrationCheckSessionAttributes.details
+            .comparisonsByPipette.first
+        const comparisonsRight =
+          SessionFixtures.mockCalibrationCheckSessionAttributes.details
+            .comparisonsByPipette.second
         expect(Selectors.getAnalyticsHealthCheckData(mockState)).toEqual({
-          pipettes: { right: { model: 'my model' } },
+          pipettes: {
+            right: {
+              model: 'fake_pipette_model',
+              comparisons: comparisonsRight,
+              succeeded: false,
+            },
+            left: {
+              model: 'fake_pipette_model',
+              comparisons: comparisonsLeft,
+              succeeded: true,
+            },
+          },
         })
       })
       it('should return null if no robot connected', () => {

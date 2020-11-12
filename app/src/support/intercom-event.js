@@ -1,10 +1,17 @@
 // @flow
 // functions for sending events to intercom, both for enriching user profiles
 // and for triggering contextual support conversations
+import * as Sessions from '../sessions'
+import * as AnalyticsSelectors from '../analytics'
+
 import type { Action, State } from '../types'
+
 import { sendIntercomEvent } from './intercom-binding'
 import type { IntercomEvent } from './types'
-import { INTERCOM_EVENT_NO_CAL_BLOCK } from './constants'
+import {
+  INTERCOM_EVENT_NO_CAL_BLOCK,
+  INTERCOM_EVENT_CALCHECK_COMPLETE,
+} from './constants'
 import * as Config from '../config'
 
 export function makeIntercomEvent(
@@ -20,6 +27,16 @@ export function makeIntercomEvent(
       return {
         eventName: INTERCOM_EVENT_NO_CAL_BLOCK,
         metadata: {},
+      }
+    }
+    case Sessions.DELETE_SESSION: {
+      const eventProps = AnalyticsSelectors.getAnalyticsHealthCheckData(state)
+      if (eventProps === null) {
+        return null
+      }
+      return {
+        eventName: INTERCOM_EVENT_CALCHECK_COMPLETE,
+        metadata: eventProps,
       }
     }
   }
