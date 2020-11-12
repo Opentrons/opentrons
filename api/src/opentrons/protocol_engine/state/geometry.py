@@ -131,7 +131,7 @@ class GeometryState:
         """
         Given a labware, well, and hardware pipette config, get the tip geometry.
 
-        Tip geometry includes effective tip length, tip diamter, and tip volume,
+        Tip geometry includes effective tip length, tip diameter, and tip volume,
         which is all data required by the hardware controller for proper tip handling.
         """
         effective_length = self.get_effective_tip_length(labware_id, pipette_config)
