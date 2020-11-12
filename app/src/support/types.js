@@ -7,6 +7,8 @@ import typeof {
   INTERCOM_EVENT_NO_CAL_BLOCK,
 } from './constants'
 
+import type { CalibrationHealthCheckAnalyticsData } from '../analytics/types'
+
 export type IntercomEventName =
   | INTERCOM_EVENT_CALCHECK_COMPLETE
   | INTERCOM_EVENT_NO_CAL_BLOCK
@@ -14,7 +16,12 @@ export type IntercomEventName =
 export type SupportConfig = $PropertyType<Config, 'support'>
 
 export type IntercomPayload = $Shape<{|
-  [propertyName: string]: string | number | boolean | null,
+  [propertyName: string]:
+    | string
+    | number
+    | boolean
+    | CalibrationHealthCheckAnalyticsData
+    | null,
 |}>
 
 export type SupportProfileUpdate = $Shape<{|
