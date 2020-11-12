@@ -69,6 +69,7 @@ describe('support event tests', () => {
       const selectorValue = {
         pipettes: {
           left: { succeeded: false, comparisons: {}, model: 'some model' },
+          right: null,
         },
       }
       getAnalyticsHealthCheckData.mockReturnValue(selectorValue)

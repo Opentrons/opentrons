@@ -244,7 +244,7 @@ function getCalibrationCheckData(
       model: model,
     }
     return obj
-  }, ({}: $Shape<CalibrationCheckByMount>))
+  }, ({ left: null, right: null }: $Shape<CalibrationCheckByMount>))
 }
 
 export function getAnalyticsDeckCalibrationData(

@@ -67,16 +67,16 @@ export type DeckCalibrationAnalyticsData = {|
 |}
 
 export type CalibrationCheckByMount = {|
-  left?: {
+  left: {
     model: string,
     comparisons: CalibrationCheckComparisonsPerCalibration,
     succeeded: boolean,
-  },
-  right?: {
+  } | null,
+  right: {
     model: string,
     comparisons: CalibrationCheckComparisonsPerCalibration,
     succeeded: boolean,
-  },
+  } | null,
 |}
 
 export type CalibrationHealthCheckAnalyticsData = {|
