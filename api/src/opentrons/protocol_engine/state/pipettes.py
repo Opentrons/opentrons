@@ -76,6 +76,7 @@ class PipetteState:
 
         if hw_config is None:
             raise errors.PipetteNotAttachedError(f"No pipetted attached on {mount}")
+        # TODO(mc, 2020-11-12): support hw_pipette.act_as
         elif hw_config["name"] != pipette_name:
             raise errors.PipetteNotAttachedError(
                 f"Found {hw_config['name']} on {mount}, "
