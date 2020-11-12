@@ -30,9 +30,6 @@ class PipettingHandler:
         labware_id = request.labwareId
         well_name = request.wellName
 
-        # move the pipette to the top of the tip
-        await self._movement_handler.handle_move_to_well(request)
-
         # get mount and config data from state and hardware controller
         hw_pipette = self._state.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
@@ -45,6 +42,9 @@ class PipettingHandler:
             well_name=well_name,
             pipette_config=hw_pipette.config,
         )
+
+        # move the pipette to the top of the tip
+        await self._movement_handler.handle_move_to_well(request)
 
         # perform the tip pickup routine
         await self._hardware.pick_up_tip(
