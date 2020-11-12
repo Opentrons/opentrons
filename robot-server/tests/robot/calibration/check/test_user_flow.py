@@ -343,7 +343,7 @@ async def test_compare_z_height(mock_user_flow):
     # difference and so it should exceed the threshold
     expected_status = ComparisonStatus(
         differenceVector=(0.0, 0.0, 0.0),
-        thresholdVector=(0.0, 0.0, 0.39),
+        thresholdVector=(0.0, 0.0, 1.0),
         exceedsThreshold=False)
     expected_tip_length = TipComparisonMap(
         status='IN_THRESHOLD', comparingTip=expected_status)

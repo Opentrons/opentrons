@@ -37,9 +37,9 @@ PIPETTE_TOLERANCES = {
     'p300_crosses': Point(1.8, 1.8, 0.0),
     'p20_crosses': Point(1.4, 1.4, 0.0),
     'other_height': Point(0.0, 0.0, 0.8),
-    'p20_tip': Point(0.0, 0.0, 0.20),
-    'p300_tip': Point(0.0, 0.0, 0.39),
-    'p1000_tip': Point(0.0, 0.0, 0.27)
+    'p20_tip': Point(0.0, 0.0, 0.50),
+    'p300_tip': Point(0.0, 0.0, 1.0),
+    'p1000_tip': Point(0.0, 0.0, 1.0)
 }
 
 TIPRACK_SLOT = '8'
