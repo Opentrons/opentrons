@@ -37,6 +37,21 @@ describe('support event tests', () => {
     expect(built).toBeNull()
   })
 
+  it('sendEvent should pass on its arguments', () => {
+    const props = {
+      eventName: Constants.INTERCOM_EVENT_CALCHECK_COMPLETE,
+      metadata: {
+        someKey: true,
+        someOtherKey: 'hi',
+      },
+    }
+    sendEvent(props)
+    expect(sendIntercomEvent).toHaveBeenCalledWith(
+      props.eventName,
+      props.metadata
+    )
+  })
+
   describe('calibration check deleted sessions', () => {
     it('makeIntercomEvent should ignore unhandled events', () => {
       const built = makeIntercomEvent(
@@ -75,21 +90,6 @@ describe('support event tests', () => {
       )
       expect(built).toBeNull()
     })
-
-    it('sendEvent should pass on its arguments', () => {
-      const props = {
-        eventName: Constants.INTERCOM_EVENT_CALCHECK_COMPLETE,
-        metadata: {
-          someKey: true,
-          someOtherKey: 'hi',
-        },
-      }
-      sendEvent(props)
-      expect(sendIntercomEvent).toHaveBeenCalledWith(
-        props.eventName,
-        props.metadata
-      )
-    })
   })
 
   describe('calibration block event', () => {
@@ -111,21 +111,6 @@ describe('support event tests', () => {
           MOCK_STATE
         )
       ).toBe(null)
-    })
-
-    it('sendEvent should pass on its arguments', () => {
-      const props = {
-        eventName: Constants.INTERCOM_EVENT_NO_CAL_BLOCK,
-        metadata: {
-          someKey: true,
-          someOtherKey: 'hi',
-        },
-      }
-      sendEvent(props)
-      expect(sendIntercomEvent).toHaveBeenCalledWith(
-        props.eventName,
-        props.metadata
-      )
     })
   })
 })
