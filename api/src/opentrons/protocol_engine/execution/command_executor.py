@@ -72,10 +72,7 @@ class CommandExecutor:
         self,
         command: cmd.RunningCommandType,
     ) -> cmd.CompletedCommandType:
-        """
-        Private method to execute commands by routing to a specific command
-        implementation class.
-        """
+        """Execute commands by routing to specific handlers."""
         # call to correct implementation based on command request type
         # load labware
         if isinstance(command.request, cmd.LoadLabwareRequest):

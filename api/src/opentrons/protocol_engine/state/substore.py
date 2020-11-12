@@ -9,6 +9,7 @@ SubstateT = TypeVar("SubstateT")
 
 class Substore(ABC, Generic[SubstateT]):
     """Abstract base class for a sub-store."""
+
     _state: SubstateT
 
     @property
@@ -18,7 +19,7 @@ class Substore(ABC, Generic[SubstateT]):
 
 
 class CommandReactive(ABC):
-    """Abstract base class for a class that reacts to commands."""
+    """Abstract base class for an interface that reacts to commands."""
 
     def handle_completed_command(self, command: CompletedCommandType) -> None:
         """React to a CompletedCommand."""

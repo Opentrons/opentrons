@@ -1,3 +1,4 @@
+"""ProtocolEngine shared test fixtures."""
 import pytest
 from datetime import datetime
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
@@ -20,46 +21,55 @@ from opentrons.protocol_engine import (
 
 @pytest.fixture
 def now() -> datetime:
+    """Get the current UTC time."""
     return utc_now()
 
 
 @pytest.fixture
 def mock_state_store() -> MagicMock:
+    """Get a mock in the shape of a StateStore."""
     return MagicMock(spec=StateStore)
 
 
 @pytest.fixture
 def mock_state_view() -> MagicMock:
+    """Get a mock in the shape of a StateView."""
     return MagicMock(spec=StateView)
 
 
 @pytest.fixture
 def mock_hardware() -> AsyncMock:
+    """Get an asynchronous mock in the shape of a HardwareController."""
     return AsyncMock(spec=HardwareController)
 
 
 @pytest.fixture
 def mock_executor() -> AsyncMock:
+    """Get an asynchronous mock in the shape of a CommandExecutor."""
     return AsyncMock(spec=CommandExecutor)
 
 
 @pytest.fixture(scope="session")
 def standard_deck_def() -> DeckDefinitionV2:
+    """Get the OT-2 standard deck definition."""
     return load_deck(STANDARD_DECK, 2)
 
 
 @pytest.fixture(scope="session")
 def well_plate_def() -> LabwareDefinition:
+    """Get the definition of a 96 well plate."""
     return load_definition("corning_96_wellplate_360ul_flat", 1)
 
 
 @pytest.fixture(scope="session")
 def reservoir_def() -> LabwareDefinition:
+    """Get the definition of single-row reservoir."""
     return load_definition("nest_12_reservoir_15ml", 1)
 
 
 @pytest.fixture
-def store(standard_deck_def) -> StateStore:
+def store(standard_deck_def: DeckDefinitionV2) -> StateStore:
+    """Get an actual StateStore."""
     return StateStore(deck_definition=standard_deck_def)
 
 
@@ -68,6 +78,7 @@ def engine(
     mock_state_store: MagicMock,
     mock_executor: AsyncMock
 ) -> ProtocolEngine:
+    """Get a ProtocolEngine with its dependencies mocked out."""
     return ProtocolEngine(
         state_store=mock_state_store,
         executor=mock_executor,

@@ -14,6 +14,7 @@ ResT = TypeVar("ResT", bound=BaseModel)
 @dataclass(frozen=True)
 class CompletedCommand(Generic[ReqT, ResT]):
     """A command that has been successfully executed."""
+
     created_at: datetime
     started_at: datetime
     completed_at: datetime
@@ -24,6 +25,7 @@ class CompletedCommand(Generic[ReqT, ResT]):
 @dataclass(frozen=True)
 class FailedCommand(Generic[ReqT]):
     """A command that was executed but failed."""
+
     created_at: datetime
     started_at: datetime
     failed_at: datetime
@@ -34,6 +36,7 @@ class FailedCommand(Generic[ReqT]):
 @dataclass(frozen=True)
 class RunningCommand(Generic[ReqT, ResT]):
     """A command that is currently being executed."""
+
     created_at: datetime
     started_at: datetime
     request: ReqT
@@ -43,6 +46,7 @@ class RunningCommand(Generic[ReqT, ResT]):
         result: ResT,
         completed_at: datetime,
     ) -> CompletedCommand[ReqT, ResT]:
+        """Create a CompletedCommand from a RunningCommand."""
         return CompletedCommand(
             created_at=self.created_at,
             started_at=self.started_at,
@@ -56,6 +60,7 @@ class RunningCommand(Generic[ReqT, ResT]):
         error: ProtocolEngineError,
         failed_at: datetime,
     ) -> FailedCommand[ReqT]:
+        """Create a FailedCommand from a RunningCommand."""
         return FailedCommand(
             created_at=self.created_at,
             started_at=self.started_at,
@@ -68,10 +73,12 @@ class RunningCommand(Generic[ReqT, ResT]):
 @dataclass(frozen=True)
 class PendingCommand(Generic[ReqT, ResT]):
     """A command that has not yet been started."""
+
     created_at: datetime
     request: ReqT
 
     def to_running(self, started_at: datetime) -> RunningCommand[ReqT, ResT]:
+        """Create a RunningCommand from a PendingCommand."""
         return RunningCommand(
             created_at=self.created_at,
             request=self.request,

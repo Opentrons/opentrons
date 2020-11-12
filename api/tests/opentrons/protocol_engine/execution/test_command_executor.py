@@ -15,11 +15,13 @@ from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 
 @pytest.fixture
 def mock_equipment_handler() -> AsyncMock:
+    """Get an asynchronous mock in the shape of an EquipmentHandler."""
     return AsyncMock(spec=EquipmentHandler)
 
 
 @pytest.fixture
 def mock_pipetting_handler() -> AsyncMock:
+    """Get an asynchronous mock in the shape of an PipettingHandler."""
     return AsyncMock(spec=PipettingHandler)
 
 
@@ -28,6 +30,7 @@ def executor(
     mock_equipment_handler: AsyncMock,
     mock_pipetting_handler: AsyncMock,
 ) -> CommandExecutor:
+    """Get a CommandExecutor with its dependencies mocked out."""
     return CommandExecutor(
         equipment_handler=mock_equipment_handler,
         pipetting_handler=mock_pipetting_handler
@@ -36,6 +39,8 @@ def executor(
 
 @dataclass(frozen=True)
 class ExecutorRoutingSpec:
+    """Data for a test of the CommandExector's routing logic."""
+
     name: str
     request: cmd.CommandRequestType
     expected_handler: str
@@ -114,6 +119,7 @@ async def test_command_executor_routing(
     now: datetime,
     spec: ExecutorRoutingSpec,
 ) -> None:
+    """The CommandExecutor should route commands to handlers properly."""
     HANDLER_NAME_MAP = {
         "equipment_handler": mock_equipment_handler,
         "pipetting_handler": mock_pipetting_handler,
@@ -158,7 +164,7 @@ async def test_executor_handles_unexpected_error(
     mock_equipment_handler: AsyncMock,
     now: datetime,
 ) -> None:
-    """CommandExecutor should handle unexpected errors."""
+    """The CommandExecutor should handle unexpected errors."""
     error = RuntimeError('I did not see this coming')
     mock_equipment_handler.handle_load_labware.side_effect = error
 

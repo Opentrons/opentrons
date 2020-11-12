@@ -15,16 +15,21 @@ from opentrons.protocol_engine.command_models import (
 
 
 class CloseToNow:
-    def __init__(self):
+    """Matcher for any datetime that is close to now."""
+
+    def __init__(self) -> None:
+        """Initialize a CloseToNow matcher."""
         self._now = datetime.now(tz=timezone.utc)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        """Check if a target object is a datetime that is close to now."""
         return (
             isinstance(other, datetime) and
             isclose(self._now.timestamp(), other.timestamp(), rel_tol=5)
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Represent the matcher as a string."""
         return f"<datetime close to {self._now}>"
 
 

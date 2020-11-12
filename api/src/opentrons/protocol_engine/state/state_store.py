@@ -14,6 +14,14 @@ from .motion import MotionStore, MotionState
 
 
 class StateView:
+    """A read-only view of a StateStore."""
+
+    _command_store: CommandStore
+    _labware_store: LabwareStore
+    _pipette_store: PipetteStore
+    _geometry_store: GeometryStore
+    _motion_store: MotionStore
+
     def __init__(
         self,
         command_store: CommandStore,
@@ -22,7 +30,7 @@ class StateView:
         geometry_store: GeometryStore,
         motion_store: MotionStore,
     ) -> None:
-        """A StateView class provides a read-only interface to a StateStore."""
+        """Initialize a StateView."""
         self._command_store = command_store
         self._labware_store = labware_store
         self._pipette_store = pipette_store
@@ -75,7 +83,7 @@ class StateStore(StateView):
     be allowed to modify State classes.
     """
 
-    def __init__(self, deck_definition: DeckDefinitionV2):
+    def __init__(self, deck_definition: DeckDefinitionV2) -> None:
         """Initialize a StateStore."""
         command_store = CommandStore()
         labware_store = LabwareStore()

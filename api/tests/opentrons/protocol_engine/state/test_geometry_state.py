@@ -15,6 +15,7 @@ from opentrons.protocol_engine.state.geometry import GeometryStore
 
 @pytest.fixture
 def mock_labware_store() -> MagicMock:
+    """Get a mock in the shape of a LabwareStore."""
     return MagicMock(spec=LabwareStore)
 
 
@@ -23,6 +24,7 @@ def geometry_store(
     mock_labware_store: MagicMock,
     standard_deck_def: DeckDefinitionV2,
 ) -> GeometryStore:
+    """Get a GeometryStore with its store dependencies mocked out."""
     return GeometryStore(
         labware_store=mock_labware_store,
         deck_definition=standard_deck_def,
