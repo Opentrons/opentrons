@@ -11,6 +11,7 @@ import {
   useHoverTooltip,
   COLOR_ERROR,
   SIZE_2,
+  SIZE_3,
   SIZE_5,
   SPACING_1,
   SPACING_2,
@@ -151,6 +152,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
         flex="1 1 auto"
         fontStyle={FONT_STYLE_ITALIC}
         fontSize={FONT_SIZE_CAPTION}
+        minHeight={SIZE_3}
       >
         {NO_PIPETTE_ATTACHED}
       </Flex>
@@ -241,11 +243,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
         {TIP_LENGTH_CALIBRATION}
       </Text>
       {pipetteOffsetCalibration && (
-        <Text
-          marginBottom={SPACING_2}
-          fontStyle={FONT_STYLE_ITALIC}
-          fontSize={FONT_SIZE_BODY_1}
-        >
+        <Text marginBottom={SPACING_2} fontSize={FONT_SIZE_BODY_1}>
           {getDisplayNameForTipRack(
             pipetteOffsetCalibration.tiprackUri,
             customLabwareDefs
