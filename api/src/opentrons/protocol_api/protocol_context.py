@@ -418,8 +418,7 @@ class ProtocolContext(CommandPublisher):
         }[module.type]
 
         module_context = mod_class(
-            self, self._broker, module.module, module.geometry,
-            self.api_version, self._loop
+            self, module.module, module.geometry, self.api_version, self._loop
         )
         self._modules.add(module_context)
         return module_context

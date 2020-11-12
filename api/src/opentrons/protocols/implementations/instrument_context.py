@@ -125,13 +125,13 @@ class InstrumentContextImplementation(InstrumentContextInterface):
         hw.set_current_tiprack_diameter(
             self._mount, geometry.diameter)
 
-        hw.hardware.pick_up_tip(
+        hw.pick_up_tip(
             self._mount,
             self._tip_length_for(geometry.parent),
             presses,
             increment
         )
-        hw.hardware.set_working_volume(
+        hw.set_working_volume(
             self._mount, geometry.max_volume)
 
     def drop_tip(self,

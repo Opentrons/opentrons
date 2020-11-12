@@ -3,9 +3,7 @@ from typing import Dict, Optional, Set
 
 from opentrons import types, API
 from opentrons.config import feature_flags as fflags
-from opentrons.drivers.mag_deck import MagDeck
-from opentrons.drivers.temp_deck import TempDeck
-from opentrons.drivers.thermocycler import Thermocycler
+from opentrons.hardware_control.modules import MagDeck, TempDeck, Thermocycler
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION

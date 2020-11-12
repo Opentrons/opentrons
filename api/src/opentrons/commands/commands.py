@@ -190,7 +190,7 @@ def dispense(instrument, volume, location, rate):
     location_text = stringify_location(location)
     template = 'Dispensing {volume} uL into {location} at {flow} uL/sec'
     try:
-        flow_rate = rate * FlowRates(instrument).dispense
+        flow_rate = rate * FlowRates(instrument._implementation).dispense
         text = template.format(
                 volume=float(volume), location=location_text, flow=flow_rate)
     except AttributeError:

@@ -1,14 +1,13 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, Union, cast
 
 from opentrons import types, commands as cmds
-from opentrons.broker import Broker
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import CommandPublisher
-from opentrons.protocols.implementations.interfaces.protocol_context import \
-    ProtocolContextInterface
 from opentrons.protocols.types import APIVersion
 
 from .labware import (
@@ -18,6 +17,7 @@ from opentrons.protocols.geometry.module_geometry import ModuleGeometry,\
 from opentrons.protocols.api_support.util import requires_version
 
 if TYPE_CHECKING:
+    from.protocol_context import ProtocolContext
     from opentrons_shared_data.labware.dev_types import (LabwareDefinition)
 
 
@@ -45,8 +45,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
     """
 
     def __init__(self,
-                 ctx: ProtocolContextInterface,
-                 broker: Broker,
+                 ctx: ProtocolContext,
                  geometry: GeometryType,
                  at_version: APIVersion) -> None:
         """ Build the ModuleContext.
@@ -57,7 +56,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
         :param ctx: The parent context for the module
         :param geometry: The :py:class:`.ModuleGeometry` for the module
         """
-        super().__init__(broker)
+        super().__init__(ctx.broker)
         self._geometry = geometry
         self._ctx = ctx
         self._api_version = at_version
@@ -79,7 +78,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
         :returns: The properly-linked labware object
         """
         mod_labware = self._geometry.add_labware(labware)
-        self._ctx.get_deck().recalculate_high_z()
+        self._ctx._implementation.get_deck().recalculate_high_z()
         return mod_labware
 
     @requires_version(2, 0)
@@ -113,8 +112,8 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
                 'are trying to utilize new load_labware parameters in 2.1')
         lw = load(name, self._geometry.location,
                   label, namespace, version,
-                  bundled_defs=self._ctx.get_bundled_labware(),
-                  extra_defs=self._ctx.get_extra_labware())
+                  bundled_defs=self._ctx._implementation.get_bundled_labware(),
+                  extra_defs=self._ctx._implementation.get_extra_labware())
         return self.load_labware_object(lw)
 
     @requires_version(2, 0)
@@ -201,15 +200,14 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
     """
     def __init__(self,
-                 ctx: ProtocolContextInterface,
-                 broker: Broker,
+                 ctx: ProtocolContext,
                  hw_module: modules.tempdeck.TempDeck,
                  geometry: ModuleGeometry,
                  at_version: APIVersion,
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, broker, geometry, at_version)
+        super().__init__(ctx, geometry, at_version)
 
     @cmds.publish.both(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -284,15 +282,14 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
     """
     def __init__(self,
-                 ctx: ProtocolContextInterface,
-                 broker: Broker,
+                 ctx: ProtocolContext,
                  hw_module: modules.magdeck.MagDeck,
                  geometry: ModuleGeometry,
                  at_version: APIVersion,
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, broker, geometry, at_version)
+        super().__init__(ctx, geometry, at_version)
 
     @cmds.publish.both(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
@@ -356,7 +353,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         if height is not None:
             dist = height
         elif height_from_base is not None and\
-                self._api_version >= APIVersion(2, 2):
+                self._ctx._api_version >= APIVersion(2, 2):
             dist = height_from_base +\
                 modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
         elif self.labware and self.labware.magdeck_engage_height is not None:
@@ -383,7 +380,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
         engage_height = self.labware.magdeck_engage_height
 
-        is_api_breakpoint = (self._api_version >= APIVersion(2, 3))
+        is_api_breakpoint = (self._ctx._api_version >= APIVersion(2, 3))
         is_v1_module = (self._module.model() == 'magneticModuleV1')
         is_standard_lw = self.labware.load_name in STANDARD_MAGDECK_LABWARE
 
@@ -417,19 +414,18 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     .. versionadded:: 2.0
     """
     def __init__(self,
-                 ctx: ProtocolContextInterface,
-                 broker: Broker,
+                 ctx: ProtocolContext,
                  hw_module: modules.thermocycler.Thermocycler,
                  geometry: ThermocyclerGeometry,
                  at_version: APIVersion,
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, broker, geometry, at_version)
+        super().__init__(ctx, geometry, at_version)
 
     def _prepare_for_lid_move(self):
         loaded_instruments = [instr for mount, instr in
-                              self._ctx.get_loaded_instruments().items()
+                              self._ctx._instruments.items()
                               if instr is not None]
         try:
             instr = loaded_instruments[0]
@@ -438,13 +434,16 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
                 "Cannot assure a safe gantry position to avoid colliding"
                 " with the lid of the Thermocycler Module.")
         else:
-            self._ctx.get_hardware().hardware.retract(instr.get_mount())
-            high_point = self._ctx.get_hardware().hardware.current_position(
-                    instr.get_mount())
-            trash = cast("Labware", self._ctx.get_fixed_trash())
+            ctx_impl = self._ctx._implementation
+            intr_impl = instr._implementation
+            hardware = ctx_impl.get_hardware().hardware
+
+            hardware.retract(intr_impl.get_mount())
+            high_point = hardware.current_position(intr_impl.get_mount())
+            trash = cast("Labware", ctx_impl.get_fixed_trash())
             trash_top = trash.wells()[0].top()
             safe_point = trash_top.point._replace(
-                    z=high_point[Axis.by_mount(instr.get_mount())])
+                    z=high_point[Axis.by_mount(intr_impl.get_mount())])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
     def flag_unsafe_move(self,

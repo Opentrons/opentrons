@@ -2,6 +2,8 @@ import pytest
 
 import opentrons.protocol_api as papi
 from opentrons.protocols.implementations.labware import LabwareImplementation
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 from opentrons.types import Point, Location, Mount
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api.labware import Labware, get_labware_definition
@@ -113,7 +115,8 @@ def test_build_edges():
 
 
 def test_build_edges_left_pipette(loop):
-    ctx = papi.ProtocolContext(loop)
+    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
+                               loop=loop)
     test_lw = ctx.load_labware('corning_96_wellplate_360ul_flat', '2')
     test_lw2 = ctx.load_labware('corning_96_wellplate_360ul_flat', '6')
     mod = ctx.load_module('magnetic module', '3')
@@ -128,7 +131,7 @@ def test_build_edges_left_pipette(loop):
     # Test that module in slot 3 results in modified edge list
     res = build_edges(
         test_lw['A12'], 1.0, Mount.LEFT,
-        ctx._deck_layout, version=APIVersion(2, 4))
+        ctx._implementation.get_deck(), version=APIVersion(2, 4))
     assert res == left_pip_edges
 
     left_pip_edges = [
@@ -140,12 +143,13 @@ def test_build_edges_left_pipette(loop):
     # Test that labware in slot 6 results in modified edge list
     res2 = build_edges(
         test_lw2['A12'], 1.0, Mount.LEFT,
-        ctx._deck_layout, version=APIVersion(2, 4))
+        ctx._implementation.get_deck(), version=APIVersion(2, 4))
     assert res2 == left_pip_edges
 
 
 def test_build_edges_right_pipette(loop):
-    ctx = papi.ProtocolContext(loop)
+    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
+                               loop=loop)
     test_lw = ctx.load_labware('corning_96_wellplate_360ul_flat', '2')
     test_lw2 = ctx.load_labware('corning_96_wellplate_360ul_flat', '6')
     mod = ctx.load_module('magnetic module', '1')

@@ -6,6 +6,8 @@ from unittest import mock
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 from opentrons_shared_data import load_shared_data
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
@@ -54,7 +56,8 @@ def get_labware_def(monkeypatch):
 
 @pytest.mark.parametrize('name', config_names)
 def test_load_instrument(loop, name):
-    ctx = papi.ProtocolContext(loop=loop)
+    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
+                               loop=loop)
     assert ctx.loaded_instruments == {}
     loaded = ctx.load_instrument(name, Mount.LEFT, replace=True)
     assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
