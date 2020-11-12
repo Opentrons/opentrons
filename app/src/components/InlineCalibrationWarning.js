@@ -15,7 +15,6 @@ import {
   SPACING_2,
   ALIGN_CENTER,
   type StyleProps,
-  styleProps,
 } from '@opentrons/components'
 
 export const REQUIRED: 'required' = 'required'
