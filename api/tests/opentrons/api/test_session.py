@@ -14,6 +14,8 @@ from functools import partial
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
+from opentrons.protocol_api.labware import load
+from opentrons.types import Location, Point
 
 state = partial(state, 'session')
 
@@ -103,7 +105,15 @@ def test_accumulate():
 
 
 def test_dedupe():
-    assert ''.join(_dedupe('aaaaabbbbcbbbbcccaa')) == 'abc'
+    first = load('opentrons_96_tiprack_300ul',
+                 Location(point=Point(0, 0, 0), labware='1'))
+    second = load('opentrons_96_tiprack_300ul',
+                  Location(point=Point(1, 2, 3), labware='2'))
+    third = load('opentrons_96_tiprack_20ul',
+                 Location(point=Point(4, 5, 6), labware='3'))
+    iterable = [first]*10 + [second]*10 + [third]*10
+    assert sorted(_dedupe(iterable), key=lambda lw: lw.name)\
+        == sorted([first, second, third], key=lambda lw: lw.name)
 
 
 @pytest.mark.parametrize('protocol_file', ['testosaur-gen2-v2.py'])

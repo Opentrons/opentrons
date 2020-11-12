@@ -640,12 +640,11 @@ def _accumulate(iterable):
 
 
 def _dedupe(iterable):
-    acc = set()  # type: ignore
-
-    for item in iterable:
-        if item not in acc:
-            acc.add(item)
-            yield item
+    def _dupecheck(accumulator, item):
+        if not any([item == accumulated for accumulated in accumulator]):
+            accumulator.append(item)
+        return accumulator
+    return reduce(_dupecheck, iterable, [])
 
 
 def now():
