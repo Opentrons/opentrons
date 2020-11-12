@@ -67,6 +67,12 @@ def reservoir_def() -> LabwareDefinition:
     return load_definition("nest_12_reservoir_15ml", 1)
 
 
+@pytest.fixture(scope="session")
+def tip_rack_def() -> LabwareDefinition:
+    """Get the definition of Opentrons 300 uL tip rack."""
+    return load_definition("opentrons_96_tiprack_300ul", 1)
+
+
 @pytest.fixture
 def store(standard_deck_def: DeckDefinitionV2) -> StateStore:
     """Get an actual StateStore."""

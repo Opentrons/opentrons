@@ -35,8 +35,21 @@ class FailedToLoadPipetteError(ProtocolEngineError):
     pass
 
 
+class PipetteNotAttachedError(ProtocolEngineError):
+    """An error raised when an operation's required pipette is not attached."""
+
+    # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
+    pass
+
+
 class LabwareDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a labware that does not exist."""
+
+    pass
+
+
+class LabwareIsNotTipRackError(ProtocolEngineError):
+    """An error raised when trying to use a regular labware as a tip rack."""
 
     pass
 
