@@ -67,7 +67,7 @@ class PairedInstrumentContext(CommandPublisher):
         self.trash_container = trash
         self.paired_instrument_obj = PairedInstrument(
             primary_instrument, secondary_instrument, pair_policy,
-            ctx._implementation, hardware_manager, self._log)
+            ctx, hardware_manager, self._log)
 
     @property  # type: ignore
     @requires_version(2, 7)

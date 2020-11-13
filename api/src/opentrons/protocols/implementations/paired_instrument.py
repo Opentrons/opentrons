@@ -6,15 +6,15 @@ from typing import TYPE_CHECKING, Union, Optional, Callable, Tuple
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocol_api.labware import (
     Labware, Well)
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges
-from opentrons.protocols.implementations.interfaces.protocol_context import \
-    ProtocolContextInterface
 
 if TYPE_CHECKING:
+    from opentrons.protocol_api.protocol_context import ProtocolContext
     from opentrons.protocol_api.instrument_context import InstrumentContext
     from opentrons.hardware_control import types as hc_types
     from opentrons.protocols.api_support.util import HardwareManager
@@ -26,7 +26,7 @@ class PairedInstrument:
                  primary_instrument: InstrumentContext,
                  secondary_instrument: InstrumentContext,
                  pair_policy: hc_types.PipettePair,
-                 ctx: ProtocolContextInterface,
+                 ctx: ProtocolContext,
                  hardware_manager: HardwareManager,
                  log_parent: logging.Logger):
         self.p_instrument = primary_instrument
@@ -67,7 +67,7 @@ class PairedInstrument:
         if not speed:
             speed = self.p_instrument.default_speed
 
-        last_location = self._ctx.get_last_location()
+        last_location = self._ctx.location_cache
         if last_location:
             from_lw = last_location.labware
         else:
@@ -81,10 +81,9 @@ class PairedInstrument:
                 self._pair_policy.primary, critical_point=cp_override),
             from_lw)
 
-        # TODO FIX THIS
-        # for mod in self._ctx._modules:
-        #     if isinstance(mod, ThermocyclerContext):
-        #         mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+        for mod in self._ctx._modules:
+            if isinstance(mod, ThermocyclerContext):
+                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
         primary_height = \
             self._hw_manager.hardware.get_instrument_max_height(
@@ -92,7 +91,9 @@ class PairedInstrument:
         secondary_height = \
             self._hw_manager.hardware.get_instrument_max_height(
                 self._pair_policy.secondary)
-        moves = planning.plan_moves(from_loc, location, self._ctx.get_deck(),
+        moves = planning.plan_moves(from_loc,
+                                    location,
+                                    self._ctx._implementation.get_deck(),
                                     min(primary_height, secondary_height),
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height
@@ -103,19 +104,20 @@ class PairedInstrument:
             for move in moves:
                 self._hw_manager.hardware.move_to(
                     self._pair_policy, move[0], critical_point=move[1],
-                    speed=speed, max_speeds=self._ctx.get_max_speeds().data)
+                    speed=speed,
+                    max_speeds=self._ctx._implementation.get_max_speeds().data)
         except Exception:
-            self._ctx.set_last_location(None)
+            self._ctx.location_cache = None
             raise
         else:
-            self._ctx.set_last_location(location)
+            self._ctx.location_cache = location
         return self
 
     def aspirate(
             self, volume: Optional[float],
             location: Optional[types.Location] = None,
             rate: Optional[float] = 1.0) -> Tuple[types.Location, Callable]:
-        last_location = self._ctx.get_last_location()
+        last_location = self._ctx.location_cache
         if location:
             loc = location
         elif last_location:
@@ -157,7 +159,7 @@ class PairedInstrument:
             self, volume: Optional[float],
             location: Optional[types.Location],
             rate: float) -> Tuple[types.Location, Callable]:
-        last_location = self._ctx.get_last_location()
+        last_location = self._ctx.location_cache
         if location:
             loc = location
             self.move_to(location)
@@ -176,7 +178,7 @@ class PairedInstrument:
     def blow_out(self, location: types.Location):
         if location:
             self.move_to(location)
-        elif self._ctx.get_last_location():
+        elif self._ctx.location_cache:
             # if location cache exists, pipette blows out immediately at
             # current location, no movement is needed
             pass
@@ -189,7 +191,7 @@ class PairedInstrument:
         self._hw_manager.hardware.blow_out(self._pair_policy)
 
     def air_gap(self, volume: Optional[float], height: float):
-        loc = self._ctx.get_last_location()
+        loc = self._ctx.location_cache
         if not loc or not loc.labware.is_well:
             raise RuntimeError('No previous Well cached to perform air gap')
         target = loc.labware.as_well().top(height)
@@ -203,10 +205,10 @@ class PairedInstrument:
             self, location: Optional[Well], radius: float,
             v_offset: float, speed: float):
         if location is None:
-            if not self._ctx.get_last_location():
+            if not self._ctx.location_cache:
                 raise RuntimeError('No valid current location cache present')
             else:
-                well = self._ctx.get_last_location().labware  # type: ignore
+                well = self._ctx.location_cache.labware  # type: ignore
                 # type checked below
         else:
             well = LabwareLike(location)
@@ -230,7 +232,7 @@ class PairedInstrument:
 
         edges = build_edges(
             well.as_well(), v_offset, self._pair_policy.primary,
-            self._ctx.get_deck(), radius)
+            self._ctx._implementation.get_deck(), radius)
         for edge in edges:
             self._hw_manager.hardware.move_to(
                 self._pair_policy, edge, speed)
