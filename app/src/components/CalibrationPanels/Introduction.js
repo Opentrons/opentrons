@@ -38,6 +38,7 @@ import {
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
   INTENT_PIPETTE_OFFSET,
+  TRASH_BIN_LOAD_NAME,
 } from './constants'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
@@ -82,6 +83,7 @@ const NOTE_BODY_PRE_PROTOCOL =
 const NOTE_HEALTH_CHECK_OUTCOMES =
   'This is the tip rack you used to calibrate your pipette offset. You need to use the same tip rack to check the calibration.'
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
+const TRASH_BIN = 'Removable black plastic trash bin'
 
 type BodySpec = {|
   preFragment: string | null,
@@ -405,7 +407,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
               linkToMeasurements={isKnownTiprack}
             />
           )}
-          {calBlock && (
+          {calBlock ? (
             <>
               <Box width={SPACING_2} />
               <RequiredLabwareCard
@@ -414,6 +416,16 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
                 linkToMeasurements={false}
               />
             </>
+          ) : (
+            (sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK ||
+              sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION ||
+              isExtendedPipOffset) && (
+              <RequiredLabwareCard
+                loadName={TRASH_BIN_LOAD_NAME}
+                displayName={TRASH_BIN}
+                linkToMeasurements={false}
+              />
+            )
           )}
           <Box fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_2}>
             <Text
