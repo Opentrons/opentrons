@@ -20,8 +20,7 @@ import type { Dispatch } from '../../types'
 
 const TITLE = 'Advanced Settings'
 
-const USE_TRASH_SURFACE_TIP_CAL_LABEL =
-  'Use Trash Bin surface for tip calibration'
+const USE_TRASH_SURFACE_TIP_CAL_LABEL = 'Tip Length Calibration Settings'
 const USE_TRASH_SURFACE_TIP_CAL_BODY =
   "An Opentrons Calibration Block makes tip length calibration easier. Contact us to request a calibration block. If you don't have one, use the Trash Bin."
 const ALWAYS_USE_BLOCK_LABEL = 'Always use Calibration Block to calibrate'
