@@ -15,3 +15,5 @@ export const INTENTS = [
   INTENT_DECK_CALIBRATION,
   INTENT_HEALTH_CHECK,
 ]
+
+export const TRASH_BIN_LOAD_NAME = 'removable_black_plastic_trash_bin'
