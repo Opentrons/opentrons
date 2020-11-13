@@ -7,7 +7,8 @@ from opentrons.calibration_storage import get, modify, helpers
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound, PipetteOffsetByPipetteMount)
 from opentrons.config import feature_flags as ff
-from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
+from opentrons.hardware_control import (
+    ThreadManager, CriticalPoint, Pipette, robot_calibration as robot_cal)
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
@@ -133,6 +134,9 @@ class PipetteOffsetCalibrationUserFlow:
             CalibrationCommand.invalidate_last_action:
                 self.invalidate_last_action,
         }
+
+        self._hw_pipette.update_pipette_offset(
+            robot_cal.load_pipette_offset(pip_id=None, mount=self._mount))
 
     @property
     def deck(self) -> Deck:

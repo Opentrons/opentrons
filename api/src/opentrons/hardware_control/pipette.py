@@ -66,8 +66,9 @@ class Pipette:
             self._instrument_offset = inst_offset_config
         self._log = mod_log.getChild(self._pipette_id
                                      if self._pipette_id else '<unknown>')
-        self._log.info("loaded: {}, instr offset {}"
-                       .format(config.model, self._instrument_offset))
+        self._log.info("loaded: {}, instr offset {}, pipette offset {}"
+                       .format(config.model, self._instrument_offset,
+                               self._pipette_offset.offset))
         self.ready_to_aspirate = False
         #: True if ready to aspirate
         self._aspirate_flow_rate\
@@ -100,6 +101,11 @@ class Pipette:
     def update_instrument_offset(self, new_offset: Point):
         self._log.info("updated instrument offset to {}".format(new_offset))
         self._instrument_offset = new_offset
+
+    def update_pipette_offset(self, offset_cal: PipetteOffsetByPipetteMount):
+        self._log.info("updating pipette offset to {}"
+                       .format(offset_cal.offset))
+        self._pipette_offset = offset_cal
 
     @property
     def config(self) -> pipette_config.PipetteConfig:
