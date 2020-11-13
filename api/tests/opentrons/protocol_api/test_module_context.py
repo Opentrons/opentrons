@@ -4,7 +4,7 @@ from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 import opentrons.protocol_api as papi
 import opentrons.protocols.geometry as papi_geometry
 from opentrons_shared_data import load_shared_data
-from opentrons.types import Point
+from opentrons.types import Point, Location
 
 import pytest
 
@@ -427,3 +427,22 @@ def test_thermocycler_semi_plate_configuration(ctx):
         tc_well_name = tc_well.display_name.split()[0]
         other_well_name = other_well.display_name.split()[0]
         assert tc_well_name == other_well_name
+
+
+def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler):
+    """Flag unsafe should raise if the lid is open and source or target is
+    the labware on thermocycler."""
+    mod = ctx_with_thermocycler.load_module('thermocycler',
+                                            configuration='semi')
+    labware_name = 'nest_96_wellplate_100ul_pcr_full_skirt'
+    tc_labware = mod.load_labware(labware_name)
+
+    with_tc_labware = Location(None, tc_labware)
+    without_tc_labware = Location(None, None)
+    mod.close_lid()
+    with pytest.raises(RuntimeError,
+                       match="Cannot move to labware"):
+        mod.flag_unsafe_move(with_tc_labware, without_tc_labware)
+    with pytest.raises(RuntimeError,
+                       match="Cannot move to labware"):
+        mod.flag_unsafe_move(without_tc_labware, with_tc_labware)
