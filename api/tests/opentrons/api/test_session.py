@@ -111,7 +111,13 @@ def test_dedupe():
                   Location(point=Point(1, 2, 3), labware='2'))
     third = load('opentrons_96_tiprack_20ul',
                  Location(point=Point(4, 5, 6), labware='3'))
-    iterable = [first]*10 + [second]*10 + [third]*10
+
+    iterable = (
+        [first]*10
+        + [second]*10
+        # This is the key part of this test. Well.parent now builds a new
+        # Labware item that therefore breaks identity checking.
+        + [third['A1'].parent for elem in range(10)])
     assert sorted(_dedupe(iterable), key=lambda lw: lw.name)\
         == sorted([first, second, third], key=lambda lw: lw.name)
 
