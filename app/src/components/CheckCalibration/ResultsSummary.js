@@ -41,7 +41,7 @@ const GOOD_CALIBRATION = 'Good calibration'
 const BAD_CALIBRATION = 'Bad calibration'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'health check results:'
-const DECK_CALIBRATION_HEADER = 'Robot Deck Calibration'
+const DECK_CALIBRATION_HEADER = 'Robot Deck'
 const PIPETTE = 'pipette'
 const HOME_AND_EXIT = 'Home robot and exit'
 const LOOKING_FOR_DATA = 'Looking for your detailed calibration data?'
