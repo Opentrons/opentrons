@@ -5,6 +5,7 @@ from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
+from opentrons.calibration_storage import types as cal_types
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import CalibrationCommand
@@ -12,6 +13,11 @@ from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
+
+PIP_CAL = cal_types.PipetteOffsetByPipetteMount(
+    offset=[0, 0, 0],
+    source=cal_types.SourceType.user,
+    status=cal_types.CalibrationStatus())
 
 pipette_map = {
     "p10_single_v1.5": "opentrons_96_tiprack_10ul",
@@ -37,6 +43,7 @@ def mock_hw_pipette_all_combos(request):
                                'single': [0, 0, 0],
                                'multi': [0, 0, 0]
                            },
+                           PIP_CAL,
                            'testId')
 
 
@@ -77,6 +84,7 @@ def mock_hw(hardware):
                               'single': [0, 0, 0],
                               'multi': [0, 0, 0]
                           },
+                          PIP_CAL,
                           'testId')
     hardware._attached_instruments = {Mount.RIGHT: pip}
     hardware._current_pos = Point(0, 0, 0)

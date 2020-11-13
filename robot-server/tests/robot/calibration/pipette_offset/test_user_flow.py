@@ -22,6 +22,11 @@ from robot_server.robot.calibration.pipette_offset.constants import (
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
 
+PIP_CAL = CSTypes.PipetteOffsetByPipetteMount(
+    offset=[0, 0, 0],
+    source=CSTypes.SourceType.user,
+    status=CSTypes.CalibrationStatus())
+
 pipette_map = {
     "p10_single_v1.5": "opentrons_96_tiprack_10ul",
     "p50_single_v1.5": "opentrons_96_tiprack_300ul",
@@ -77,6 +82,7 @@ def mock_hw_pipette_all_combos(request):
                                'single': [0, 0, 0],
                                'multi': [0, 0, 0]
                            },
+                           PIP_CAL,
                            'testId')
 
 
@@ -116,6 +122,7 @@ def mock_hw(hardware):
                               'single': [0, 0, 0],
                               'multi': [0, 0, 0]
                           },
+                          PIP_CAL,
                           'testId')
     hardware._attached_instruments = {Mount.RIGHT: pip}
     hardware._current_pos = Point(0, 0, 0)
