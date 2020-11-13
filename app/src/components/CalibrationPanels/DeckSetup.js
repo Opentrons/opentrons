@@ -88,7 +88,7 @@ function HealthCheckText({
     : DECK_SETUP_NO_BLOCK_PROMPT
   const secondCalBlockPortion = calBlock
     ? SECOND_RANK_WITH_BLOCK_PROMPT
-    : SECOND_RANK_WITH_BLOCK_PROMPT
+    : SECOND_RANK_NO_BLOCK_PROMPT
   return (
     <>
       {`${toCheck} ${mount.toLowerCase()} ${PIPETTE}, `}
