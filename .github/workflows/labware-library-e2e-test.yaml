@@ -10,6 +10,7 @@ on:
       - 'components/**'
       - 'webpack-config/**'
       - 'package.json'
+      - '.github/workflows/labware-library-e2e-test.yaml'
   push:
     paths:
       - 'labware-library/**'
