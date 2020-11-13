@@ -29,14 +29,15 @@ export const renameLabware: (
   getState
 ) => {
   const { labwareId } = args
-  const state = getState()
-
-  const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
+  const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(
+    getState()
+  )
   const defaultNickname = allNicknamesById[labwareId]
   const nextNickname = getNextNickname(
+    // NOTE: flow won't do Object.values here >:(
     Object.keys(allNicknamesById)
-      .filter((id: string) => id !== labwareId)
-      .map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
+      .filter((id: string) => id !== labwareId) // <- exclude the about-to-be-renamed labware from the nickname list
+      .map((id: string) => allNicknamesById[id]),
     args.name || defaultNickname
   )
 
