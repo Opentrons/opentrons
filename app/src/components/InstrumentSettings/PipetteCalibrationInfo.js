@@ -228,7 +228,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
             : () => startPipetteOffsetPossibleTLC({ keepTipLength: true })
         }
         disabled={disabledReason}
-        width={SIZE_5}
+        width="15rem"
         paddingX={SPACING_2}
         marginBottom={SPACING_1}
       >
@@ -272,7 +272,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
               startPipetteOffsetPossibleTLC({ keepTipLength: false })
             }
             disabled={disabledReason}
-            width={SIZE_5}
+            width="15rem"
             paddingX={SPACING_2}
           >
             {RECALIBRATE_TIP}
