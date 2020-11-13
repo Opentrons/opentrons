@@ -10,7 +10,7 @@ import * as Sessions from '../../../sessions'
 import type { State } from '../../../types'
 import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
-import { Box, PrimaryBtn, Flex, Text } from '@opentrons/components'
+import { PrimaryBtn, Flex, Text } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
@@ -52,36 +52,17 @@ describe('ResultsSummary', () => {
   const getExitButton = wrapper => wrapper.find(PrimaryBtn)
 
   const getSaveLink = wrapper =>
-    wrapper
-      .find('[children="Download detailed JSON Calibration Check summary"]')
-      .find('a')
+    wrapper.find('button[title="download-results-button"]')
+
   const getDeckParent = wrapper => wrapper.children(Flex).at(1)
-  const getPipParent = wrapper =>
-    wrapper
-      .children(Flex)
-      .at(2)
-      .children()
-      .at(0)
   const getLeftPipParent = wrapper =>
-    getPipParent(wrapper)
-      .children(Box)
-      .at(0)
-      .children()
-      .at(0)
+    wrapper.find('div[title="left-mount-container"]')
   const getLeftPipResultsParent = wrapper =>
-    getLeftPipParent(wrapper)
-      .children(Box)
-      .at(0)
+    wrapper.find('div[title="left-mount-results"]')
   const getRightPipParent = wrapper =>
-    getPipParent(wrapper)
-      .children(Box)
-      .at(1)
-      .children()
-      .at(0)
+    wrapper.find('div[title="right-mount-container"]')
   const getRightPipResultsParent = wrapper =>
-    getRightPipParent(wrapper)
-      .children(Box)
-      .at(0)
+    wrapper.find('div[title="right-mount-results"]')
   beforeEach(() => {
     mockDeleteSession = jest.fn()
     const mockSendCommands = jest.fn()
@@ -237,6 +218,7 @@ describe('ResultsSummary', () => {
 
   it('saves the calibration report when the button is clicked', () => {
     const wrapper = render()
+    console.log(getSaveLink(wrapper).debug())
     act(() => getSaveLink(wrapper).invoke('onClick')())
     wrapper.update()
     expect(mockSaveAs).toHaveBeenCalled()

@@ -1,10 +1,9 @@
 // @flow
 import * as React from 'react'
-import reduce from 'lodash/reduce'
-import { css } from 'styled-components'
 import {
   Icon,
   Box,
+  Btn,
   Flex,
   PrimaryBtn,
   Text,
@@ -30,7 +29,7 @@ import {
   SPACING_5,
   SPACING_4,
   SPACING_1,
-  SPACING_7,
+  SIZE_5,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
 } from '@opentrons/components'
@@ -155,7 +154,11 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
         >
           {ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}
         </Text>
-        <Box minHeight={SPACING_2} marginBottom={SPACING_3}>
+        <Box
+          minHeight={SPACING_2}
+          marginBottom={SPACING_3}
+          title="results-note-container"
+        >
           <WarningText
             deckCalibrationBad={
               deckCalibrationResult
@@ -169,22 +172,24 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
           />
         </Box>
       </Flex>
-      <Flex marginBottom={SPACING_4}>
-        <Box>
-          <Text
-            marginBottom={SPACING_2}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            fontSize={FONT_SIZE_BODY_2}
-          >
-            {DECK_CALIBRATION_HEADER}
-          </Text>
-          <RenderResult status={deckCalibrationResult} />
-        </Box>
+      <Flex
+        marginBottom={SPACING_4}
+        title="deck-calibration-container"
+        flexDirection={DIRECTION_COLUMN}
+      >
+        <Text
+          marginBottom={SPACING_2}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          fontSize={FONT_SIZE_BODY_2}
+        >
+          {DECK_CALIBRATION_HEADER}
+        </Text>
+        <RenderResult status={deckCalibrationResult} />
       </Flex>
       <Flex marginBottom={SPACING_2} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         {PIPETTE_MOUNTS.map(m => (
-          <Box key={m} width="48%">
+          <Box key={m} width="48%" title={`${m}-mount-container`}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               fontSize={FONT_SIZE_BODY_2}
@@ -195,7 +200,8 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
             <Box
               backgroundColor={OVERLAY_LIGHT_GRAY_50}
               paddingX="5%"
-              height={SPACING_7}
+              height={SIZE_5}
+              title={`${m}-mount-results`}
             >
               {calibrationsByMount[m].pipette &&
               calibrationsByMount[m].calibration &&
@@ -221,18 +227,15 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
         ))}
       </Flex>
       <Box>
-        <Text
-          as="a"
+        <Btn
           color={C_BLUE}
           onClick={handleDownloadButtonClick}
-          css={css`
-            cursor: pointer;
-          `}
           marginBottom={SPACING_5}
           fontSize={FONT_SIZE_BODY_2}
+          title="download-results-button"
         >
           {DOWNLOAD_SUMMARY}
-        </Text>
+        </Btn>
 
         <Flex
           marginTop={SPACING_4}
@@ -332,18 +335,14 @@ function WarningText(props: {|
     left: {| offsetBad: boolean, tipLengthBad: boolean |},
     right: {| offsetBad: boolean, tipLengthBad: boolean |},
   |},
-|}): React.Node {
-  const badCount = reduce(
-    [
-      props.deckCalibrationBad,
-      props.pipettes.left.offsetBad,
-      props.pipettes.left.tipLengthBad,
-      props.pipettes.right.offsetBad,
-      props.pipettes.right.tipLengthBad,
-    ],
-    (sum, item) => sum + (item === true ? 1 : 0),
-    0
-  )
+|}): React.Node | null {
+  const badCount = [
+    props.deckCalibrationBad,
+    props.pipettes.left.offsetBad,
+    props.pipettes.left.tipLengthBad,
+    props.pipettes.right.offsetBad,
+    props.pipettes.right.tipLengthBad,
+  ].reduce((sum, item) => sum + (item === true ? 1 : 0), 0)
   return badCount > 0 ? (
     <>
       <Box marginTop={SPACING_3} fontSize={FONT_SIZE_BODY_2}>
@@ -375,11 +374,7 @@ function WarningText(props: {|
         >{`${NOTE}: ${
           badCount > 1 ? DO_DECK_FIRST : ''
         } ${DECK_INVALIDATES}`}</Text>
-      ) : (
-        <React.Fragment />
-      )}
+      ) : null}
     </>
-  ) : (
-    <React.Fragment />
-  )
+  ) : null
 }
