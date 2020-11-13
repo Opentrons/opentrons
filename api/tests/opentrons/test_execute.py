@@ -225,7 +225,7 @@ def test_execute_extra_labware(protocol, protocol_file, monkeypatch,
                        match='.*FileNotFoundError.*'):
         execute.execute(protocol.filelike, 'custom_labware.py')
     no_lw = execute.get_protocol_api('2.0')
-    assert not no_lw._extra_labware
+    assert not no_lw._implementation._extra_labware
     protocol.filelike.seek(0)
     monkeypatch.setattr(execute, 'IS_ROBOT', True)
     monkeypatch.setattr(execute, 'JUPYTER_NOTEBOOK_LABWARE_DIR',
@@ -239,7 +239,8 @@ def test_execute_extra_labware(protocol, protocol_file, monkeypatch,
 
     # make sure the extra labware loaded by default is right
     ctx = execute.get_protocol_api('2.0')
-    assert len(ctx._extra_labware.keys()) == len(os.listdir(fixturedir))
+    assert len(ctx._implementation._extra_labware.keys()) ==\
+           len(os.listdir(fixturedir))
 
     assert ctx.load_labware('fixture_12_trough', 1, namespace='fixture')
 

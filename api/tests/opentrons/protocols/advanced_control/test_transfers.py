@@ -9,9 +9,7 @@ from opentrons.protocols.types import APIVersion
 
 
 @pytest.fixture
-def _instr_labware(loop):
-    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
-                               loop=loop)
+def _instr_labware(ctx):
     lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
     lw2 = ctx.load_labware('corning_96_wellplate_360ul_flat', 2)
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
@@ -977,9 +975,12 @@ def test_multichannel_transfer_old_version(loop):
 
 
 def test_multichannel_transfer_locs(loop):
-    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
-                               loop=loop,
-                               api_version=APIVersion(2, 2))
+    api_version = APIVersion(2, 2)
+    ctx = papi.ProtocolContext(
+        implementation=ProtocolContextImplementation(api_version=api_version),
+        loop=loop,
+        api_version=api_version
+    )
     lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
     lw2 = ctx.load_labware('corning_384_wellplate_112ul_flat', 2)
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)

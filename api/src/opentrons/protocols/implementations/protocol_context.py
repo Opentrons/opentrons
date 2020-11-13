@@ -4,7 +4,7 @@ from typing import Dict, Optional, Set
 from opentrons import types, API
 from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control.modules import MagDeck, TempDeck, Thermocycler
-from opentrons.hardware_control import ExecutionManager
+from opentrons.hardware_control import ExecutionManager, SynchronousAdapter
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
@@ -95,6 +95,8 @@ class ProtocolContextImplementation(ProtocolContextInterface):
         """
         kwargs['bundled_data'] = getattr(protocol, 'bundled_data', None)
         kwargs['bundled_labware'] = getattr(protocol, 'bundled_labware', None)
+        kwargs['api_version'] = getattr(
+            protocol, 'api_level', MAX_SUPPORTED_VERSION)
         return cls(*args, **kwargs)
 
     def get_bundled_data(self) -> Dict[str, bytes]:
@@ -188,7 +190,7 @@ class ProtocolContextImplementation(ProtocolContextInterface):
             if module_geometry.models_compatible(
                     module_geometry.module_model_from_string(mod.model()),
                     resolved_model):
-                hc_mod_instance = mod
+                hc_mod_instance = SynchronousAdapter(mod)
                 break
 
         if self.is_simulating() and hc_mod_instance is None:
@@ -197,13 +199,16 @@ class ProtocolContextImplementation(ProtocolContextInterface):
                 module_geometry.ModuleType.TEMPERATURE: TempDeck,
                 module_geometry.ModuleType.THERMOCYCLER: Thermocycler
                 }[resolved_type]
-            hc_mod_instance = mod_type(
-                port='',
-                simulating=True,
-                loop=self._hw_manager.hardware.loop,
-                execution_manager=ExecutionManager(
-                    loop=self._hw_manager.hardware.loop),
-                sim_model=resolved_model.value)
+            hc_mod_instance = SynchronousAdapter(
+                mod_type(
+                    port='',
+                    simulating=True,
+                    loop=self._hw_manager.hardware.loop,
+                    execution_manager=ExecutionManager(
+                        loop=self._hw_manager.hardware.loop),
+                    sim_model=resolved_model.value)
+            )
+            hc_mod_instance._connect()
 
         if not hc_mod_instance:
             return None

@@ -87,6 +87,7 @@ class InstrumentContext(CommandPublisher):
 
         self._last_tip_picked_up_from: Union[Well, None] = None
         self._starting_tip: Union[Well, None] = None
+        self.requested_as = self._implementation.get_instrument_name()
 
     @property  # type: ignore
     @requires_version(2, 0)

@@ -246,9 +246,12 @@ class Session(RobotBusy):
         self.metadata = getattr(self._protocol, 'metadata', {})
 
         self._hardware = hardware
-        self._simulating_ctx = ProtocolContext(
+        self._simulating_ctx = ProtocolContext.build_using(
             implementation=ProtocolContextImplementation.build_using(
-                self._protocol, loop=self._loop, broker=self._broker)
+                self._protocol),
+            protocol=self._protocol,
+            loop=self._loop,
+            broker=self._broker
         )
 
         self.state: 'State' = None
@@ -384,11 +387,14 @@ class Session(RobotBusy):
                 sync_sim.home()
                 ctx_impl = ProtocolContextImplementation.build_using(
                     self._protocol,
-                    loop=self._loop,
                     hardware=sync_sim,
-                    broker=self._broker,
                     extra_labware=getattr(self._protocol, 'extra_labware', {}))
-                self._simulating_ctx = ProtocolContext(implementation=ctx_impl)
+                self._simulating_ctx = ProtocolContext.build_using(
+                    protocol=self._protocol,
+                    loop=self._loop,
+                    broker=self._broker,
+                    implementation=ctx_impl
+                )
                 run_protocol(self._protocol,
                              context=self._simulating_ctx)
             else:
@@ -560,10 +566,13 @@ class Session(RobotBusy):
                 self._hardware.reset_instrument()
                 ctx_impl = ProtocolContextImplementation.build_using(
                     self._protocol,
-                    loop=self._loop,
-                    broker=self._broker,
                     extra_labware=getattr(self._protocol, 'extra_labware', {}))
-                ctx = ProtocolContext(implementation=ctx_impl)
+                ctx = ProtocolContext.build_using(
+                    protocol=self._protocol,
+                    implementation=ctx_impl,
+                    loop=self._loop,
+                    broker=self._broker
+                )
                 ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)

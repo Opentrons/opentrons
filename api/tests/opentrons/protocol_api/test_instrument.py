@@ -5,6 +5,8 @@ import opentrons.protocol_api as papi
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.advanced_control import transfers
 from opentrons.protocols.geometry.well_geometry import WellGeometry
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Mount, Point
 from opentrons.protocols.types import APIVersion
@@ -13,7 +15,12 @@ from opentrons.protocols.types import APIVersion
 @pytest.fixture
 def make_context_and_labware():
     def _make_context_and_labware(api_version):
-        ctx = papi.ProtocolContext(api_version=api_version)
+        ctx = papi.ProtocolContext(
+            implementation=ProtocolContextImplementation(
+                api_version=api_version
+            ),
+            api_version=api_version
+        )
         lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
         instr = ctx.load_instrument('p300_single', Mount.RIGHT)
 

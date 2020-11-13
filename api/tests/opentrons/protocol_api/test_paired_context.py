@@ -9,8 +9,7 @@ from opentrons.hardware_control.pipette import Pipette
 
 
 @pytest.fixture
-def set_up_paired_instrument(loop):
-    ctx = papi.ProtocolContext(loop)
+def set_up_paired_instrument(ctx):
     ctx.home()
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
     tiprack2 = ctx.load_labware('opentrons_96_tiprack_300ul', 2)
@@ -45,8 +44,7 @@ def test_incompatible_pickup_location(set_up_paired_instrument):
         paired.pick_up_tip(tipracks[2].columns_by_name()['12'][0])
 
 
-def test_pick_up_and_drop_tip_no_tipracks(loop):
-    ctx = papi.ProtocolContext(loop)
+def test_pick_up_and_drop_tip_no_tipracks(ctx):
     ctx.home()
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
     tip_length = tiprack.tip_length
@@ -342,8 +340,7 @@ def test_touch_tip_new_default_args(loop, monkeypatch):
     assert total_hw_moves[0][0].z == total_hw_moves[1][0].z
 
 
-def test_touch_tip_disabled(loop, monkeypatch, get_labware_fixture):
-    ctx = papi.ProtocolContext(loop)
+def test_touch_tip_disabled(ctx, monkeypatch, get_labware_fixture):
     ctx.home()
     trough1 = get_labware_fixture('fixture_12_trough')
     trough_lw = ctx.load_labware_from_definition(trough1, '1')

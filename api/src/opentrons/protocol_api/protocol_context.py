@@ -7,6 +7,8 @@ from typing import (Dict, Iterator, List,
 from opentrons import types, commands as cmds
 from opentrons.hardware_control import API
 from opentrons.commands import CommandPublisher
+from opentrons.protocols.implementations.interfaces.labware import \
+    LabwareInterface
 from opentrons.protocols.implementations.interfaces.protocol_context import \
     ProtocolContextInterface
 from opentrons.protocols.types import APIVersion, Protocol
@@ -87,6 +89,7 @@ class ProtocolContext(CommandPublisher):
 
     @classmethod
     def build_using(cls,
+                    implementation: ProtocolContextInterface,
                     protocol: Protocol,
                     *args, **kwargs):
         """ Build an API instance for the specified parsed protocol
@@ -94,10 +97,9 @@ class ProtocolContext(CommandPublisher):
         This is used internally to provision the context with bundle
         contents or api levels.
         """
-        kwargs['bundled_data'] = getattr(protocol, 'bundled_data', None)
-        kwargs['bundled_labware'] = getattr(protocol, 'bundled_labware', None)
         kwargs['api_version'] = getattr(
             protocol, 'api_level', MAX_SUPPORTED_VERSION)
+        kwargs['implementation'] = implementation
         return cls(*args, **kwargs)
 
     @property  # type: ignore
@@ -356,7 +358,10 @@ class ProtocolContext(CommandPublisher):
         def _only_labwares() -> Iterator[
                 Tuple[int, Union[Labware, ModuleGeometry]]]:
             for slotnum, slotitem in self._implementation.get_deck().items():
-                if isinstance(slotitem, Labware):
+                if isinstance(slotitem, LabwareInterface):
+                    yield slotnum, Labware(implementation=slotitem,
+                                           api_level=self.api_version)
+                elif isinstance(slotitem, Labware):
                     yield slotnum, slotitem
                 elif isinstance(slotitem, ModuleGeometry):
                     if slotitem.labware:

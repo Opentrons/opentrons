@@ -500,11 +500,10 @@ def test_dispatch_json_invalid_command(
         )
 
 
-def test_papi_execute_json_v4(monkeypatch, loop, get_json_protocol_fixture):
+def test_papi_execute_json_v4(monkeypatch, ctx, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture(
         '4', 'testModulesProtocol', False)
     protocol = parse(protocol_data, None)
-    ctx = ProtocolContext(loop=loop)
     ctx.home()
     # Check that we end up executing the protocol ok
     execute.run_protocol(protocol, ctx)

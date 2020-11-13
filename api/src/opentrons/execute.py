@@ -111,7 +111,10 @@ def get_protocol_api(
         api_version=checked_version
     )
 
-    context = protocol_api.ProtocolContext(implementation=context_imp)
+    context = protocol_api.ProtocolContext(
+        implementation=context_imp,
+        api_version=checked_version
+    )
     context_imp.get_hardware().hardware.cache_instruments()
     return context
 

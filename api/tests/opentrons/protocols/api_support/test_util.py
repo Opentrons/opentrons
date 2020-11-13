@@ -114,9 +114,7 @@ def test_build_edges():
     assert res2 == new_correct_edges
 
 
-def test_build_edges_left_pipette(loop):
-    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
-                               loop=loop)
+def test_build_edges_left_pipette(ctx):
     test_lw = ctx.load_labware('corning_96_wellplate_360ul_flat', '2')
     test_lw2 = ctx.load_labware('corning_96_wellplate_360ul_flat', '6')
     mod = ctx.load_module('magnetic module', '3')
@@ -147,9 +145,7 @@ def test_build_edges_left_pipette(loop):
     assert res2 == left_pip_edges
 
 
-def test_build_edges_right_pipette(loop):
-    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
-                               loop=loop)
+def test_build_edges_right_pipette(ctx):
     test_lw = ctx.load_labware('corning_96_wellplate_360ul_flat', '2')
     test_lw2 = ctx.load_labware('corning_96_wellplate_360ul_flat', '6')
     mod = ctx.load_module('magnetic module', '1')
@@ -164,7 +160,7 @@ def test_build_edges_right_pipette(loop):
     # Test that module in slot 1 results in modified edge list
     res = build_edges(
         test_lw['A1'], 1.0, Mount.RIGHT,
-        ctx._deck_layout, version=APIVersion(2, 4))
+        ctx._implementation._deck_layout, version=APIVersion(2, 4))
     assert res == right_pip_edges
 
     right_pip_edges = [
@@ -177,7 +173,7 @@ def test_build_edges_right_pipette(loop):
     # Test that labware in slot 6 results in unmodified edge list
     res2 = build_edges(
         test_lw2['A12'], 1.0, Mount.RIGHT,
-        ctx._deck_layout, version=APIVersion(2, 4))
+        ctx._implementation.get_deck(), version=APIVersion(2, 4))
     assert res2 == right_pip_edges
 
 

@@ -5,8 +5,7 @@ from dataclasses import dataclass
 from typing import (Dict, Optional)
 
 from opentrons import types
-from opentrons.hardware_control import API
-from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control import API, SynchronousAdapter
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import (
@@ -28,7 +27,7 @@ class LoadModuleResult:
     """The result of load_module"""
     type: ModuleType
     geometry: ModuleGeometry
-    module: AbstractModule
+    module: SynchronousAdapter
 
 
 class ProtocolContextInterface:
