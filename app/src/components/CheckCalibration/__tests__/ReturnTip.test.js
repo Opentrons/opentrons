@@ -1,15 +1,9 @@
 // @flow
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
-import * as Calibration from '../../../calibration'
-import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
 import * as Fixtures from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
-import type { State } from '../../../types'
 import { ReturnTip } from '../ReturnTip'
-import { Box, Flex, PrimaryBtn } from '@opentrons/components'
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 

@@ -15,9 +15,7 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   C_WHITE,
   C_NEAR_WHITE,
-  C_SELECTED_DARK,
   COLOR_WARNING,
-  COLOR_WARNING_LIGHT,
   SPACING_2,
   SPACING_3,
 } from '@opentrons/components'
@@ -25,8 +23,6 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../sessions'
-import type { Mount } from '../../pipettes/types'
-import type { RobotCalibrationCheckPipetteRank } from '../../sessions/calibration-check/types'
 import type {
   SessionType,
   SessionCommandString,
