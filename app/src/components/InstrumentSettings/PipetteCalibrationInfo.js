@@ -12,7 +12,6 @@ import {
   COLOR_ERROR,
   SIZE_2,
   SIZE_3,
-  SIZE_5,
   SPACING_1,
   SPACING_2,
   SPACING_3,
