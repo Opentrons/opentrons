@@ -1,7 +1,6 @@
 import pytest
 from unittest import mock
 
-import opentrons.protocol_api as papi
 from opentrons.hardware_control import API
 from opentrons.types import Mount, Point
 from opentrons.protocol_api import paired_instrument_context as pc
@@ -122,9 +121,10 @@ def test_aspirate(set_up_paired_instrument, monkeypatch, ctx):
             paired._pair_policy, dest_point, critical_point=None,
             speed=400, max_speeds={})
     fake_move.reset_mock()
-    ctx._implementation.get_hardware().hardware._obj_to_adapt\
-                            ._attached_instruments[Mount.RIGHT]\
-                            ._current_volume = 1
+    hardware = ctx._implementation.get_hardware().hardware
+    hardware._obj_to_adapt._attached_instruments[
+        Mount.RIGHT
+    ]._current_volume = 1
 
     paired.aspirate(2.0)
     fake_move.assert_not_called()

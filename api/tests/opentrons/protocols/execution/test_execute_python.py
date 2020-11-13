@@ -1,5 +1,4 @@
 import pytest
-from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution import execute, execute_python
 from opentrons.protocols.parse import parse
 

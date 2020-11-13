@@ -8,7 +8,6 @@ from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api.labware import (
     Labware, Well)
-from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges

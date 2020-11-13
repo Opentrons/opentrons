@@ -208,7 +208,7 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
 
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
     model_offset = Point(*pipette.config.model_offset)
     assert pipette.critical_point() == model_offset
     target_location = tiprack['A1'].top()
@@ -244,7 +244,7 @@ def test_return_tip_old_version(loop, get_labware_def):
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
 
     target_location = tiprack['A1'].top()
     instr.pick_up_tip(target_location)
@@ -270,7 +270,7 @@ def test_return_tip(ctx, get_labware_def):
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
 
     target_location = tiprack['A1'].top()
     instr.pick_up_tip(target_location)
@@ -294,7 +294,7 @@ def test_use_filter_tips(ctx, get_labware_def):
     mount = Mount.LEFT
 
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
 
     assert pipette.available_volume == pipette.config.max_volume
 
@@ -323,7 +323,7 @@ def test_pick_up_tip_no_location(ctx, get_labware_def,
     instr = ctx.load_instrument(
         pipette_model, mount, tip_racks=[tiprack1, tiprack2])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
     model_offset = Point(*pipette.config.model_offset)
     assert pipette.critical_point() == model_offset
 
@@ -399,9 +399,10 @@ def test_aspirate(ctx, get_labware_def, monkeypatch):
             Mount.RIGHT, dest_point, critical_point=None, speed=400,
             max_speeds={})
     fake_move.reset_mock()
-    ctx._implementation.get_hardware().hardware._obj_to_adapt\
-                            ._attached_instruments[Mount.RIGHT]\
-                            ._current_volume = 1
+    hardware = ctx._implementation.get_hardware().hardware
+    hardware._obj_to_adapt._attached_instruments[
+        Mount.RIGHT
+    ]._current_volume = 1
 
     instr.aspirate(2.0)
     fake_move.assert_not_called()
@@ -908,7 +909,8 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
 def test_bundled_data(loop):
     bundled_data = {'foo': b'1,2,3'}
     ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(bundled_data=bundled_data),
+        implementation=ProtocolContextImplementation(
+            bundled_data=bundled_data),
         loop=loop
     )
     assert ctx.bundled_data == bundled_data
