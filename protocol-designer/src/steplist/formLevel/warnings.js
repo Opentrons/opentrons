@@ -19,57 +19,57 @@ export type FormWarning = {
   type: FormWarningType,
 }
 
-const FORM_WARNINGS: { [FormWarningType]: (?number) => FormWarning } = {
-  BELOW_MIN_AIR_GAP_VOLUME: min => ({
-    type: 'BELOW_MIN_AIR_GAP_VOLUME',
-    title: i18n.t(`alert.form.warning.BELOW_MIN_AIR_GAP_VOLUME.title`, {
-      min,
-    }),
-    body: (
-      <React.Fragment>
-        {i18n.t(`alert.form.warning.BELOW_MIN_AIR_GAP_VOLUME.body`)}
-      </React.Fragment>
-    ),
-    dependentFields: ['disposalVolume_volume', 'pipette'],
+const belowMinAirGapVolumeWarning = (min: number): FormWarning => ({
+  type: 'BELOW_MIN_AIR_GAP_VOLUME',
+  title: i18n.t(`alert.form.warning.BELOW_MIN_AIR_GAP_VOLUME.title`, {
+    min,
   }),
-  BELOW_PIPETTE_MINIMUM_VOLUME: min => ({
-    type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
-    title: i18n.t(`alert.form.warning.BELOW_PIPETTE_MINIMUM_VOLUME.title`, {
-      min,
-    }),
-    body: (
-      <React.Fragment>
-        {i18n.t(`alert.form.warning.BELOW_PIPETTE_MINIMUM_VOLUME.body`)}
-      </React.Fragment>
-    ),
-    dependentFields: ['pipette', 'volume'],
+  body: (
+    <React.Fragment>
+      {i18n.t(`alert.form.warning.BELOW_MIN_AIR_GAP_VOLUME.body`)}
+    </React.Fragment>
+  ),
+  dependentFields: ['disposalVolume_volume', 'pipette'],
+})
+
+const belowPipetteMinVolumeWarning = (min: number): FormWarning => ({
+  type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
+  title: i18n.t(`alert.form.warning.BELOW_PIPETTE_MINIMUM_VOLUME.title`, {
+    min,
   }),
-  OVER_MAX_WELL_VOLUME: () => ({
-    type: 'OVER_MAX_WELL_VOLUME',
-    title: i18n.t(`alert.form.warning.OVER_MAX_WELL_VOLUME.title`),
-    dependentFields: ['dispense_labware', 'dispense_wells', 'volume'],
+  body: (
+    <React.Fragment>
+      {i18n.t(`alert.form.warning.BELOW_PIPETTE_MINIMUM_VOLUME.body`)}
+    </React.Fragment>
+  ),
+  dependentFields: ['pipette', 'volume'],
+})
+
+const overMaxWellVolumeWarning = (): FormWarning => ({
+  type: 'OVER_MAX_WELL_VOLUME',
+  title: i18n.t(`alert.form.warning.OVER_MAX_WELL_VOLUME.title`),
+  dependentFields: ['dispense_labware', 'dispense_wells', 'volume'],
+})
+
+const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
+  type: 'BELOW_MIN_DISPOSAL_VOLUME',
+  title: i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.title`, {
+    min,
   }),
-  BELOW_MIN_DISPOSAL_VOLUME: min => ({
-    type: 'BELOW_MIN_DISPOSAL_VOLUME',
-    title: i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.title`, {
-      min,
-    }),
-    body: (
-      <React.Fragment>
-        {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.body`)}
-        <KnowledgeBaseLink to="multiDispense">
-          {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.link`)}
-        </KnowledgeBaseLink>
-        .
-      </React.Fragment>
-    ),
-    dependentFields: ['disposalVolume_volume', 'pipette'],
-  }),
-}
+  body: (
+    <React.Fragment>
+      {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.body`)}
+      <KnowledgeBaseLink to="multiDispense">
+        {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.link`)}
+      </KnowledgeBaseLink>
+      .
+    </React.Fragment>
+  ),
+  dependentFields: ['disposalVolume_volume', 'pipette'],
+})
 
 export type WarningChecker = mixed => ?FormWarning
 
-// TODO: test these
 /*******************
  ** Warning Checkers **
  ********************/
@@ -82,7 +82,7 @@ export const belowPipetteMinimumVolume = (
   const { pipette, volume } = fields
   if (!(pipette && pipette.spec)) return null
   return volume < pipette.spec.minVolume
-    ? FORM_WARNINGS.BELOW_PIPETTE_MINIMUM_VOLUME(pipette.spec.minVolume)
+    ? belowPipetteMinVolumeWarning(pipette.spec.minVolume)
     : null
 }
 
@@ -95,7 +95,7 @@ export const maxDispenseWellVolume = (
     const maximum = getWellTotalVolume(dispense_labware.def, well)
     return maximum && volume > maximum
   })
-  return hasExceeded ? FORM_WARNINGS.OVER_MAX_WELL_VOLUME() : null
+  return hasExceeded ? overMaxWellVolumeWarning() : null
 }
 
 export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
@@ -107,11 +107,10 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   } = fields
   if (!(pipette && pipette.spec) || path !== 'multiDispense') return null
   const isUnselected = !disposalVolume_checkbox || !disposalVolume_volume
-  if (isUnselected)
-    return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME(pipette.spec.minVolume)
+  if (isUnselected) return belowMinDisposalVolumeWarning(pipette.spec.minVolume)
   const isBelowMin = disposalVolume_volume < pipette.spec.minVolume
   return isBelowMin
-    ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME(pipette.spec.minVolume)
+    ? belowMinDisposalVolumeWarning(pipette.spec.minVolume)
     : null
 }
 
@@ -129,9 +128,7 @@ export const _minAirGapVolume: (
   if (!checkboxValue || !volumeValue || !pipette || !pipette.spec) return null
 
   const isBelowMin = Number(volumeValue) < pipette.spec.minVolume
-  return isBelowMin
-    ? FORM_WARNINGS.BELOW_MIN_AIR_GAP_VOLUME(pipette.spec.minVolume)
-    : null
+  return isBelowMin ? belowMinAirGapVolumeWarning(pipette.spec.minVolume) : null
 }
 
 export const minAspirateAirGapVolume: (
