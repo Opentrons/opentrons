@@ -14,7 +14,7 @@ def test_tip_tracking():
     pip = pipette.Pipette(pipette_config.load('p10_single_v1'),
                           {'single': [0, 0, 0],
                            'multi': [0, 0, 0]},
-                           PIP_CAL,
+                          PIP_CAL,
                           'testID')
     with pytest.raises(AssertionError):
         pip.remove_tip()
