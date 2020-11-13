@@ -115,6 +115,7 @@ class InstrumentContextImplementation(InstrumentContextInterface):
 
     def pick_up_tip(self,
                     well: WellImplementation,
+                    tip_length: float,
                     presses: int = None,
                     increment: float = None) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
@@ -126,7 +127,7 @@ class InstrumentContextImplementation(InstrumentContextInterface):
 
         hw.pick_up_tip(
             self._mount,
-            self._tip_length_for(geometry.parent),
+            tip_length,
             presses,
             increment
         )
@@ -310,31 +311,3 @@ class InstrumentContextImplementation(InstrumentContextInterface):
             dispense=dispense,
             blow_out=blow_out,
         )
-
-    @lru_cache(maxsize=12)
-    def _tip_length_for(self, tiprack: LabwareInterface) -> float:
-        """ Get the tip length, including overlap, for a tip from this rack """
-
-        def _build_length_from_overlap() -> float:
-            tip_overlap = self.get_pipette()['tip_overlap'].get(
-                tiprack.get_uri(),
-                self.get_pipette()['tip_overlap']['default'])
-            tip_length = tiprack.get_tip_length()
-            return tip_length - tip_overlap
-
-        if not enable_calibration_overhaul():
-            return _build_length_from_overlap()
-        else:
-            try:
-                from opentrons.protocol_api.labware import Labware
-                # TODO AL 20201110 - Make LabwareLike interact with
-                #  LabwareInterface instead of Labware
-                parent = LabwareLike(Labware(implementation=tiprack,
-                                             api_level=self._api_version)
-                                     ).first_parent() or ''
-                return get.load_tip_length_calibration(
-                    self.get_pipette()['pipette_id'],
-                    tiprack.get_definition(),
-                    parent)['tipLength']
-            except TipLengthCalNotFound:
-                return _build_length_from_overlap()

@@ -191,6 +191,8 @@ def test_pipette_pairing(ctx):
     paired_object = right.pair_with(left)
     assert isinstance(paired_object, paired.PairedInstrumentContext)
 
+
+def test_pipette_pairing_unsupported_instrument(ctx):
     right = ctx.load_instrument('p300_multi', Mount.RIGHT)
     left = ctx.load_instrument('p300_multi_gen2', Mount.LEFT)
 

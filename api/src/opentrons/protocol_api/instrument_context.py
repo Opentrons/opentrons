@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import logging
+from functools import lru_cache
 from typing import (
     Any, Dict, List, Optional, Tuple, Sequence, Union, TYPE_CHECKING)
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.broker import Broker
+from opentrons.calibration_storage import get
+from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.commands import CommandPublisher
+from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
@@ -702,6 +706,7 @@ class InstrumentContext(CommandPublisher):
 
         self._implementation.pick_up_tip(
             well=target._impl,
+            tip_length=self._tip_length_for(tiprack),
             presses=presses,
             increment=increment
         )
@@ -1470,3 +1475,26 @@ class InstrumentContext(CommandPublisher):
             trash=self.trash_container,
             log_parent=self._log
         )
+
+    @lru_cache(maxsize=12)
+    def _tip_length_for(self, tiprack: Labware) -> float:
+        """ Get the tip length, including overlap, for a tip from this rack """
+
+        def _build_length_from_overlap() -> float:
+            tip_overlap = self.hw_pipette['tip_overlap'].get(
+                tiprack.uri,
+                self.hw_pipette['tip_overlap']['default'])
+            tip_length = tiprack.tip_length
+            return tip_length - tip_overlap
+
+        if not enable_calibration_overhaul():
+            return _build_length_from_overlap()
+        else:
+            try:
+                parent = LabwareLike(tiprack).first_parent() or ''
+                return get.load_tip_length_calibration(
+                    self.hw_pipette['pipette_id'],
+                    tiprack._implementation.get_definition(),
+                    parent)['tipLength']
+            except TipLengthCalNotFound:
+                return _build_length_from_overlap()
