@@ -435,15 +435,14 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
                 " with the lid of the Thermocycler Module.")
         else:
             ctx_impl = self._ctx._implementation
-            intr_impl = instr._implementation
+            instr_impl = instr._implementation
             hardware = ctx_impl.get_hardware().hardware
 
-            hardware.retract(intr_impl.get_mount())
-            high_point = hardware.current_position(intr_impl.get_mount())
-            trash = cast("Labware", ctx_impl.get_fixed_trash())
-            trash_top = trash.wells()[0].top()
+            hardware.retract(instr_impl.get_mount())
+            high_point = hardware.current_position(instr_impl.get_mount())
+            trash_top = self._ctx.fixed_trash.wells()[0].top()
             safe_point = trash_top.point._replace(
-                    z=high_point[Axis.by_mount(intr_impl.get_mount())])
+                    z=high_point[Axis.by_mount(instr_impl.get_mount())])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
     def flag_unsafe_move(self,

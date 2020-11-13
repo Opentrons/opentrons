@@ -625,7 +625,12 @@ class ProtocolContext(CommandPublisher):
         It has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
         """
-        return cast("Labware", self._implementation.get_fixed_trash())
+        trash = self._implementation.get_fixed_trash()
+        # TODO AL 20201113 - remove this when DeckLayout only holds
+        #  LabwareInterface instances.
+        if isinstance(trash, LabwareInterface):
+            return Labware(implementation=trash)
+        return cast("Labware", trash)
 
     @requires_version(2, 5)
     def set_rail_lights(self, on: bool):
