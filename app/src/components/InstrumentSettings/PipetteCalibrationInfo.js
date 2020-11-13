@@ -164,6 +164,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={OVERLAY_LIGHT_GRAY_50}
       padding={SPACING_3}
+      flex="1 1 auto"
     >
       <Text
         fontWeight={FONT_WEIGHT_SEMIBOLD}
