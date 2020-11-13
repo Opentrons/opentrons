@@ -12,7 +12,6 @@ import {
   COLOR_ERROR,
   SIZE_2,
   SIZE_3,
-  SIZE_5,
   SPACING_1,
   SPACING_2,
   SPACING_3,
@@ -228,7 +227,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
             : () => startPipetteOffsetPossibleTLC({ keepTipLength: true })
         }
         disabled={disabledReason}
-        width={SIZE_5}
+        width="15rem"
         paddingX={SPACING_2}
         marginBottom={SPACING_1}
       >
@@ -272,7 +271,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
               startPipetteOffsetPossibleTLC({ keepTipLength: false })
             }
             disabled={disabledReason}
-            width={SIZE_5}
+            width="15rem"
             paddingX={SPACING_2}
           >
             {RECALIBRATE_TIP}

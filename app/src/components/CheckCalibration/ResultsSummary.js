@@ -8,9 +8,13 @@ import {
   PrimaryBtn,
   Text,
   Link,
+  SPACING_1,
   SPACING_2,
   SPACING_3,
+  SPACING_4,
+  SPACING_5,
   ALIGN_CENTER,
+  ALIGN_STRETCH,
   C_BLUE,
   COLOR_SUCCESS,
   COLOR_WARNING,
@@ -21,15 +25,10 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_SPACE_AROUND,
   JUSTIFY_START,
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_STYLE_ITALIC,
-  SPACING_5,
-  SPACING_4,
-  SPACING_1,
-  SIZE_5,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
 } from '@opentrons/components'
@@ -193,15 +192,16 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               fontSize={FONT_SIZE_BODY_2}
-              marginBottom={SPACING_3}
+              fontWeight={FONT_WEIGHT_SEMIBOLD}
+              marginBottom={SPACING_2}
             >
               {`${m} ${MOUNT}`}
             </Text>
-            <Box
+            <Flex
               backgroundColor={OVERLAY_LIGHT_GRAY_50}
-              paddingX="5%"
-              height={SIZE_5}
+              padding={SPACING_2}
               title={`${m}-mount-results`}
+              alignItems={ALIGN_STRETCH}
             >
               {calibrationsByMount[m].pipette &&
               calibrationsByMount[m].calibration &&
@@ -222,7 +222,7 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
                   {NO_PIPETTE}
                 </Flex>
               )}
-            </Box>
+            </Flex>
           </Box>
         ))}
       </Flex>
@@ -289,12 +289,7 @@ function PipetteResult(props: PipetteResultProps): React.Node {
     getPipetteModelSpecs(pipetteInfo.model)?.displayName || pipetteInfo.model
   const tipRackDisplayName = pipetteInfo.tipRackDisplay
   return (
-    <Flex
-      paddingY={SPACING_2}
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_AROUND}
-      height="100%"
-    >
+    <Flex paddingY={SPACING_1} flexDirection={DIRECTION_COLUMN} height="100%">
       <Box>
         <Text
           fontSize={FONT_SIZE_BODY_2}
@@ -311,7 +306,7 @@ function PipetteResult(props: PipetteResultProps): React.Node {
           status={pipetteCalibration.pipetteOffset?.status ?? null}
         />
       </Box>
-      <Box>
+      <Box marginTop={SPACING_4}>
         <Text
           fontSize={FONT_SIZE_BODY_2}
           fontWeight={FONT_WEIGHT_SEMIBOLD}
