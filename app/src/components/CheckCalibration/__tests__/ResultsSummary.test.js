@@ -218,7 +218,6 @@ describe('ResultsSummary', () => {
 
   it('saves the calibration report when the button is clicked', () => {
     const wrapper = render()
-    console.log(getSaveLink(wrapper).debug())
     act(() => getSaveLink(wrapper).invoke('onClick')())
     wrapper.update()
     expect(mockSaveAs).toHaveBeenCalled()
