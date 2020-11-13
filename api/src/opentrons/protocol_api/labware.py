@@ -55,13 +55,13 @@ class Well:
     """
     def __init__(self,
                  well_implementation: WellImplementation,
-                 api_level: APIVersion):
+                 api_level: APIVersion = None):
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
 
         """
-        self._api_version = api_level
+        self._api_version = api_level or MAX_SUPPORTED_VERSION
         self._impl = well_implementation
         self._geometry = well_implementation.get_geometry()
 

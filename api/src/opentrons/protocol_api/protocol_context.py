@@ -276,8 +276,7 @@ class ProtocolContext(CommandPublisher):
             location=location,
             label=label
         )
-        return Labware(api_level=self.api_version,
-                       implementation=implementation)
+        return Labware(implementation=implementation)
 
     @requires_version(2, 0)
     def load_labware(
@@ -317,8 +316,7 @@ class ProtocolContext(CommandPublisher):
             namespace=namespace,
             version=version
         )
-        return Labware(api_level=self.api_version,
-                       implementation=implementation)
+        return Labware(implementation=implementation)
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -359,8 +357,7 @@ class ProtocolContext(CommandPublisher):
                 Tuple[int, Union[Labware, ModuleGeometry]]]:
             for slotnum, slotitem in self._implementation.get_deck().items():
                 if isinstance(slotitem, LabwareInterface):
-                    yield slotnum, Labware(implementation=slotitem,
-                                           api_level=self.api_version)
+                    yield slotnum, Labware(implementation=slotitem)
                 elif isinstance(slotitem, Labware):
                     yield slotnum, slotitem
                 elif isinstance(slotitem, ModuleGeometry):

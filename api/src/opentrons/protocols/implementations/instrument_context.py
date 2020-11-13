@@ -99,8 +99,7 @@ class InstrumentContextImplementation(InstrumentContextInterface):
         from opentrons.protocol_api.labware import Well
 
         edges = build_edges(
-            where=Well(well_implementation=location,
-                       api_level=self._api_version),
+            where=Well(well_implementation=location),
             offset=v_offset,
             mount=self._mount,
             deck=self._protocol_interface.get_deck(),
