@@ -19,6 +19,10 @@
   margin-bottom: 0.5rem;
 }
 
+.stacked_row_large {
+  margin-bottom: 1rem;
+}
+
 /* NOTE: explicit column classes should only be used for forms with a layout
  * that doesn't match the layout of transfer/distribute/consolidate/mix.
  * Eg the Pause form is an example of an exceptional layout.
