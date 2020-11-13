@@ -9,6 +9,7 @@ import {
   JUSTIFY_CENTER,
   SPACING_3,
 } from '@opentrons/components'
+import uniq from 'lodash/uniq'
 
 import * as Sessions from '../../sessions'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
@@ -20,19 +21,32 @@ const CONTINUE = 'continue to the next tiprack'
 const EXIT = 'continue to the result summary'
 
 export function ReturnTip(props: CalibrationPanelProps): React.Node {
-  const { sendCommands, checkBothPipettes, activePipette } = props
+  const { sendCommands, checkBothPipettes, activePipette, instruments } = props
   const onFinalPipette =
     !checkBothPipettes ||
     activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
-  const commandsList = onFinalPipette
-    ? [
-        { command: Sessions.checkCommands.RETURN_TIP },
-        { command: Sessions.checkCommands.TRANSITION },
+  let commandsList = [{ command: Sessions.checkCommands.RETURN_TIP }]
+  if (onFinalPipette) {
+    commandsList = [
+      ...commandsList,
+      { command: Sessions.checkCommands.TRANSITION },
+    ]
+  } else {
+    commandsList = [
+      ...commandsList,
+      { command: Sessions.checkCommands.CHECK_SWITCH_PIPETTE },
+    ]
+    if (
+      instruments &&
+      uniq(instruments.map(i => i.tipRackLoadName)).length === 1
+    ) {
+      // if second pipette has same tip rack as first skip deck setup
+      commandsList = [
+        ...commandsList,
+        { command: Sessions.checkCommands.MOVE_TO_REFERENCE_POINT },
       ]
-    : [
-        { command: Sessions.checkCommands.RETURN_TIP },
-        { command: Sessions.checkCommands.CHECK_SWITCH_PIPETTE },
-      ]
+    }
+  }
 
   const confirmReturnTip = () => {
     sendCommands(...commandsList)
