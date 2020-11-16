@@ -179,11 +179,6 @@ class InstrumentContextImplementation(InstrumentContextInterface):
                 self._mount, critical_point=cp_override),
             from_lw)
 
-        # TODO FIX THIS
-        # for mod in self._protocol_interface.get_loaded_instruments().values():
-        #     if isinstance(mod, ThermocyclerContext):
-        #         mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
-
         instr_max_height = hardware.get_instrument_max_height(self._mount)
         moves = planning.plan_moves(from_loc, location,
                                     self._protocol_interface.get_deck(),

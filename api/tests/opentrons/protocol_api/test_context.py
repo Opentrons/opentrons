@@ -974,3 +974,14 @@ def test_home_plunger(monkeypatch):
     ctx.home()
     instr = ctx.load_instrument('p1000_single', 'left')
     instr.home_plunger()
+
+
+def test_move_to_with_thermocycler(ctx):
+    def raiser(*args, **kwargs):
+        raise RuntimeError("Cannot")
+
+    mod = ctx.load_module('thermocycler')
+    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)
+    instr = ctx.load_instrument('p1000_single', 'left')
+    with pytest.raises(RuntimeError, match="Cannot"):
+        instr.move_to(Location(Point(0, 0, 0), None))

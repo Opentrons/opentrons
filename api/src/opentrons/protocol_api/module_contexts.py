@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, Union, cast
+from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, Union
 
 from opentrons import types, commands as cmds
 from opentrons.hardware_control import modules

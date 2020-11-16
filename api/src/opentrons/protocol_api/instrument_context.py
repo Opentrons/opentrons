@@ -12,6 +12,7 @@ from opentrons.commands import CommandPublisher
 from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances, clamp_value, requires_version)
 from opentrons.protocols.implementations.interfaces.instrument_context import \
@@ -1167,6 +1168,14 @@ class InstrumentContext(CommandPublisher):
                       individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
+        from_loc = self._ctx.location_cache
+        if not from_loc:
+            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
+
+        for mod in self._ctx._modules:
+            if isinstance(mod, ThermocyclerContext):
+                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+
         self._implementation.move_to(
             location=location,
             force_direct=force_direct,
