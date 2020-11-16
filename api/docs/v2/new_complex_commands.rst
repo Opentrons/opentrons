@@ -104,12 +104,14 @@ Parameters for the complex liquid handling are listed here in order of operation
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
 |         ``blow_out``           |  ``True`` or ``False``, if true blow out at dispense |        ``False``           |              ``False``             |           ``False``                |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
-|         ``blowout_location``   |  ``trash``, ``source well``, ``destination well``    | If pipette empty, blowout  | If pipette empty, blowout          | If pipette empty, blowout          |
-|                                |                                                      | into trash, otherwise      | into trash, otherwise              | into trash, otherwise              |
-|                                |                                                      | blowout into source well   | blowout into source well           | blowout into source well           |
-|                                |                                                      | If ``blow_out`` is false   | If ``blow_out`` is false           | If ``blowout`` is false            |
-|                                |                                                      | ``blowout_location`` will  | ``blowout_location`` will          | ``blowout_location`` will          |
-|                                |                                                      | be ignored                 | be ignored                         | be ignored                         |
+|         ``blowout_location``   |  ``trash``, ``source well``, ``destination well``    | If pipette empty or        | If pipette empty or                | If pipette empty or                |
+|                                |                                                      | ``disposal_volume``is      | ``disposal_volume`` is specified,  | ``disposal_volume`` is specified,  |
+|                                |                                                      | specified, blowout into    | blowout into trash. Otherwise      | blowout into trash. Otherwise      |
+|                                |                                                      | trash. Otherwise blowout   | blowout into source well. If       | blowout into source well. If       |
+|                                |                                                      | into source well. If       | ``blow_out`` is false              | ``blow_out`` is false              |
+|                                |                                                      | ``blow_out`` is false      | ``blowout_location`` will be       | ``blowout_location`` will be       |
+|                                |                                                      |``blowout_location`` will   | ignored                            | ignored                            | 
+|                                |                                                      | be ignored                 |                                    |                                    |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
 |          ``trash``             | ``True`` or ``False``, if false return tip to tiprack|         ``True``           |              ``True``              |            ``True``                |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
