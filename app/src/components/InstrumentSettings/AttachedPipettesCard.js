@@ -32,6 +32,7 @@ type Props = {|
   robotName: string,
   makeChangeUrl: (mount: Mount) => string,
   makeConfigureUrl: (mount: Mount) => string,
+  isChangingOrConfiguringPipette: boolean,
 |}
 
 // TODO(mc, 2019-12-09): i18n
@@ -40,7 +41,12 @@ const PIPETTES = 'Pipettes'
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 
 export function AttachedPipettesCard(props: Props): React.Node {
-  const { robotName, makeChangeUrl, makeConfigureUrl } = props
+  const {
+    robotName,
+    makeChangeUrl,
+    makeConfigureUrl,
+    isChangingOrConfiguringPipette,
+  } = props
   const dispatch = useDispatch<Dispatch>()
 
   const pipettes = useSelector((state: State) =>
@@ -70,6 +76,7 @@ export function AttachedPipettesCard(props: Props): React.Node {
           pipette={pipettes.left}
           changeUrl={makeChangeUrl(LEFT)}
           settingsUrl={settings.left ? makeConfigureUrl(LEFT) : null}
+          isChangingOrConfiguringPipette={isChangingOrConfiguringPipette}
         />
         <PipetteInfo
           robotName={robotName}
@@ -77,6 +84,7 @@ export function AttachedPipettesCard(props: Props): React.Node {
           pipette={pipettes.right}
           changeUrl={makeChangeUrl(RIGHT)}
           settingsUrl={settings.right ? makeConfigureUrl(RIGHT) : null}
+          isChangingOrConfiguringPipette={isChangingOrConfiguringPipette}
         />
       </Flex>
     </Card>

@@ -78,10 +78,17 @@ type Props = {|
   serialNumber: string | null,
   mount: Mount,
   disabledReason: string | null,
+  isChangingOrConfiguringPipette: boolean,
 |}
 
 export function PipetteCalibrationInfo(props: Props): React.Node {
-  const { robotName, serialNumber, mount, disabledReason } = props
+  const {
+    robotName,
+    serialNumber,
+    mount,
+    disabledReason,
+    isChangingOrConfiguringPipette,
+  } = props
   const [tlcTargetProps, tlcTooltipProps] = useHoverTooltip()
   const [pocTargetProps, pocTooltipProps] = useHoverTooltip()
   const pipetteOffsetCalibration = useSelector((state: State) =>
@@ -294,7 +301,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
           {TIP_NOT_CALIBRATED_BODY}
         </Text>
       )}
-      {PipetteOffsetCalibrationWizard}
+      {!isChangingOrConfiguringPipette && PipetteOffsetCalibrationWizard}
       {calBlockModalState !== CAL_BLOCK_MODAL_CLOSED ? (
         <Portal level="top">
           <AskForCalibrationBlockModal

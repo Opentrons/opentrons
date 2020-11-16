@@ -87,6 +87,7 @@ describe('PipetteInfo', () => {
           pipette={pipette}
           changeUrl="change/pipette"
           settingsUrl="settings/pipette"
+          isChangingOrConfiguringPipette={false}
         />
       )
     }

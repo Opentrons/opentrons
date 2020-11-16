@@ -12,10 +12,16 @@ type Props = {|
   robotName: string,
   makeChangePipetteUrl: (mount: Mount) => string,
   makeConfigurePipetteUrl: (mount: Mount) => string,
+  isChangingOrConfiguringPipette: boolean,
 |}
 
 export function InstrumentSettings(props: Props): React.Node {
-  const { robotName, makeChangePipetteUrl, makeConfigurePipetteUrl } = props
+  const {
+    robotName,
+    makeChangePipetteUrl,
+    makeConfigurePipetteUrl,
+    isChangingOrConfiguringPipette,
+  } = props
 
   return (
     <CardContainer>
@@ -24,6 +30,7 @@ export function InstrumentSettings(props: Props): React.Node {
           robotName={robotName}
           makeChangeUrl={makeChangePipetteUrl}
           makeConfigureUrl={makeConfigurePipetteUrl}
+          isChangingOrConfiguringPipette={isChangingOrConfiguringPipette}
         />
       </CardRow>
       <CardRow>

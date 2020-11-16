@@ -2,7 +2,7 @@
 // connect and configure robots page
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useRouteMatch, Redirect } from 'react-router-dom'
+import { useRouteMatch, Redirect, useLocation } from 'react-router-dom'
 
 import {
   CONNECTABLE,
@@ -21,6 +21,7 @@ import { InstrumentSettings } from './InstrumentSettings'
 export function Robots(): React.Node {
   const { path, url, params } = useRouteMatch()
   const instrumentsMatch = useRouteMatch(`${path}/instruments`)
+  const location = useLocation()
   const { name } = params
 
   const appUpdate = useSelector(getShellUpdateState)
@@ -53,6 +54,7 @@ export function Robots(): React.Node {
       robotDisplayName={robot.displayName}
       url={instrumentsMatch.url}
       path={instrumentsMatch.path}
+      pathname={location && location.pathname}
     />
   ) : (
     <RobotSettings robot={robot} appUpdate={appUpdate} />
