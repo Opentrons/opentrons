@@ -227,11 +227,8 @@ class InstrumentContextImplementation(InstrumentContextInterface):
         """Get the available volume."""
         return self.get_pipette()['available_volume']
 
-    def get_current_location(self) -> types.Location:
-        pass
-
     def get_pipette(self) -> typing.Dict[str, typing.Any]:
-        """Get the hardweare pipette dictionary."""
+        """Get the hardware pipette dictionary."""
         hw_manager = self._protocol_interface.get_hardware()
         pipette = hw_manager.hardware.attached_instruments[self._mount]
         if pipette is None:

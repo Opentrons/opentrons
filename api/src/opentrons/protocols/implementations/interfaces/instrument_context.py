@@ -109,11 +109,6 @@ class InstrumentContextInterface:
         ...
 
     @abstractmethod
-    def get_current_location(self) -> types.Location:
-        """The current location of the pipette: (ie location cache)"""
-        ...
-
-    @abstractmethod
     def get_pipette(self) -> typing.Dict[str, typing.Any]:
         ...
 
