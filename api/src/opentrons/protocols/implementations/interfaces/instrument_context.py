@@ -7,7 +7,6 @@ from opentrons import types
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, \
     FlowRates
 from opentrons.protocols.implementations.well import WellImplementation
-from opentrons.protocols.implementations.interfaces.labware import LabwareInterface
 
 
 class InstrumentContextInterface:
@@ -79,14 +78,6 @@ class InstrumentContextInterface:
 
     @abstractmethod
     def get_mount(self) -> types.Mount:
-        ...
-
-    @abstractmethod
-    def get_tip_racks(self) -> typing.List[LabwareInterface]:
-        ...
-
-    @abstractmethod
-    def set_tip_racks(self, racks: typing.List[LabwareInterface]) -> None:
         ...
 
     @abstractmethod

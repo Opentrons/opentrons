@@ -9,8 +9,6 @@ from opentrons.protocols.api_support.util import Clearances, build_edges, \
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.implementations.interfaces.instrument_context import \
     InstrumentContextInterface
-from opentrons.protocols.implementations.interfaces.labware import \
-    LabwareInterface
 from opentrons.protocols.implementations.interfaces.protocol_context import \
     ProtocolContextInterface
 from opentrons.protocols.implementations.well import WellImplementation
@@ -200,14 +198,6 @@ class InstrumentContextImplementation(InstrumentContextInterface):
     def get_mount(self) -> types.Mount:
         """Get the mount this pipette is attached to."""
         return self._mount
-
-    def get_tip_racks(self) -> typing.List[LabwareInterface]:
-        """Get the tip racks that have been linked to this pipette."""
-        return self._tip_racks
-
-    def set_tip_racks(self, racks: typing.List[LabwareInterface]) -> None:
-        """Set the tip racks that have been linked to this pipette."""
-        self._tip_racks = racks
 
     def get_instrument_name(self) -> str:
         """Get the instrument name."""
