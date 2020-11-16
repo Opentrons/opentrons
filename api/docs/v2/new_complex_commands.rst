@@ -778,8 +778,8 @@ the source well of your transfer function.
 ``blowout_location``
 --------------------
 
-Starting in Python API Version 2.8 and above, you can specify the well type you would like your to blow out in. Specifying
-a location will override any defaults from the ``blow_out`` argument.
+Starting in Python API Version 2.8 and above, you can specify the well type you would like your pipette to blow out in.
+Specifying a location will override any defaults from the ``blow_out`` argument.
 
 The code below is the same default behavior you would see utilizing ``blow_out=True`` only. It will blow out for
 every transfer into the trash.
