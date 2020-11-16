@@ -1,9 +1,11 @@
 """Test state getters for retrieving geometry views of state."""
 import pytest
 from mock import MagicMock
+from typing import cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.dev_types import LabwareDefinition, WellDefinition
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine import StateStore, errors
@@ -175,3 +177,79 @@ def test_get_well_position(
         y=slot_pos[1] - 2 + well_def["y"],
         z=slot_pos[2] + 3 + well_def["z"] + well_def["depth"],
     )
+
+
+def test_get_effective_tip_length(
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore
+) -> None:
+    """It should get the effective tip length from a labware ID and pipette config."""
+    pipette_config: PipetteDict = cast(PipetteDict, {
+        "tip_overlap": {
+            "default": 10,
+            "opentrons/opentrons_96_tiprack_300ul/1": 20,
+        }
+    })
+    mock_labware_store.state.get_tip_length.return_value = 50
+    mock_labware_store.state.get_definition_uri.return_value = (
+        "opentrons/opentrons_96_tiprack_300ul/1"
+    )
+
+    length_eff = geometry_store.state.get_effective_tip_length(
+        labware_id="tip-rack-id",
+        pipette_config=pipette_config
+    )
+
+    assert length_eff == 30
+    mock_labware_store.state.get_tip_length.assert_called_with("tip-rack-id")
+    mock_labware_store.state.get_definition_uri.assert_called_with("tip-rack-id")
+
+    mock_labware_store.state.get_definition_uri.return_value = (
+        "opentrons/something_else/1"
+    )
+    default_length_eff = geometry_store.state.get_effective_tip_length(
+        labware_id="tip-rack-id",
+        pipette_config=pipette_config
+    )
+
+    assert default_length_eff == 40
+
+
+def test_get_tip_geometry(
+    tip_rack_def: LabwareDefinition,
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore
+) -> None:
+    """It should get a "well's" tip geometry."""
+    pipette_config: PipetteDict = cast(PipetteDict, {"tip_overlap": {"default": 10}})
+    well_def = tip_rack_def["wells"]["B2"]
+
+    mock_labware_store.state.get_tip_length.return_value = 50
+    mock_labware_store.state.get_definition_uri.return_value = ""
+    mock_labware_store.state.get_well_definition.return_value = well_def
+
+    tip_geometry = geometry_store.state.get_tip_geometry(
+        labware_id="tip-rack-id",
+        well_name="B2",
+        pipette_config=pipette_config
+    )
+
+    assert tip_geometry.effective_length == 40
+    assert tip_geometry.diameter == well_def["diameter"]  # type: ignore[misc]
+    assert tip_geometry.volume == well_def["totalLiquidVolume"]
+    mock_labware_store.state.get_well_definition.assert_called_with(
+        "tip-rack-id",
+        "B2",
+    )
+
+    with pytest.raises(errors.LabwareIsNotTipRackError):
+        mock_labware_store.state.get_well_definition.return_value = cast(
+            WellDefinition,
+            {"shape": "rectangular"}
+        )
+
+        geometry_store.state.get_tip_geometry(
+            labware_id="tip-rack-id",
+            well_name="B2",
+            pipette_config=pipette_config
+        )

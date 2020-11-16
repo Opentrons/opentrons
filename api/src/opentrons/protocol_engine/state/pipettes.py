@@ -1,20 +1,32 @@
 """Basic pipette data state and store."""
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Mapping, Optional, Tuple
+from typing_extensions import final
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons.types import MountType
+from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.types import MountType, Mount as HwMount
 
 from .. import command_models as cmd, errors
 from .substore import Substore, CommandReactive
 
 
+@final
 @dataclass(frozen=True)
 class PipetteData:
     """Pipette state data."""
 
     mount: MountType
     pipette_name: PipetteName
+
+
+@final
+@dataclass(frozen=True)
+class HardwarePipette:
+    """Hardware pipette data."""
+
+    mount: HwMount
+    config: PipetteDict
 
 
 class PipetteState:
@@ -48,6 +60,30 @@ class PipetteState:
             if pipette.mount == mount:
                 return pipette
         return None
+
+    def get_hardware_pipette(
+        self,
+        pipette_id: str,
+        attached_pipettes: Mapping[HwMount, Optional[PipetteDict]],
+    ) -> HardwarePipette:
+        """Get a pipette's hardware configuration and state by ID."""
+        pipette_data = self.get_pipette_data_by_id(pipette_id)
+        pipette_name = pipette_data.pipette_name
+        mount = pipette_data.mount
+
+        hw_mount = mount.to_hw_mount()
+        hw_config = attached_pipettes[hw_mount]
+
+        if hw_config is None:
+            raise errors.PipetteNotAttachedError(f"No pipetted attached on {mount}")
+        # TODO(mc, 2020-11-12): support hw_pipette.act_as
+        elif hw_config["name"] != pipette_name:
+            raise errors.PipetteNotAttachedError(
+                f"Found {hw_config['name']} on {mount}, "
+                f"but {pipette_id} is a {pipette_name}"
+            )
+
+        return HardwarePipette(mount=hw_mount, config=hw_config)
 
 
 class PipetteStore(Substore[PipetteState], CommandReactive):

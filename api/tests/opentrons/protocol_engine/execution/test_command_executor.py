@@ -10,6 +10,7 @@ from opentrons.protocol_engine import errors, command_models as cmd
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.execution import CommandExecutor
 from opentrons.protocol_engine.execution.equipment import EquipmentHandler
+from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 
 
@@ -17,6 +18,12 @@ from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 def mock_equipment_handler() -> AsyncMock:
     """Get an asynchronous mock in the shape of an EquipmentHandler."""
     return AsyncMock(spec=EquipmentHandler)
+
+
+@pytest.fixture
+def mock_movement_handler() -> AsyncMock:
+    """Get an asynchronous mock in the shape of an MovementHandler."""
+    return AsyncMock(spec=MovementHandler)
 
 
 @pytest.fixture
@@ -28,12 +35,14 @@ def mock_pipetting_handler() -> AsyncMock:
 @pytest.fixture
 def executor(
     mock_equipment_handler: AsyncMock,
+    mock_movement_handler: AsyncMock,
     mock_pipetting_handler: AsyncMock,
 ) -> CommandExecutor:
     """Get a CommandExecutor with its dependencies mocked out."""
     return CommandExecutor(
         equipment_handler=mock_equipment_handler,
-        pipetting_handler=mock_pipetting_handler
+        movement_handler=mock_movement_handler,
+        pipetting_handler=mock_pipetting_handler,
     )
 
 
@@ -96,7 +105,7 @@ class ExecutorRoutingSpec:
                 wellName="A1",
             ),
             result=cmd.MoveToWellResult(),
-            expected_handler="pipetting_handler",
+            expected_handler="movement_handler",
             expected_method="handle_move_to_well"
         ),
         ExecutorRoutingSpec(
@@ -107,14 +116,37 @@ class ExecutorRoutingSpec:
                 wellName="A1",
             ),
             error=errors.WellDoesNotExistError("oh no"),
-            expected_handler="pipetting_handler",
+            expected_handler="movement_handler",
             expected_method="handle_move_to_well"
+        ),
+        ExecutorRoutingSpec(
+            name="Successful pick up tip",
+            request=cmd.PickUpTipRequest(
+                pipetteId="pipette-id",
+                labwareId="labware-id",
+                wellName="A1",
+            ),
+            result=cmd.PickUpTipResult(),
+            expected_handler="pipetting_handler",
+            expected_method="handle_pick_up_tip"
+        ),
+        ExecutorRoutingSpec(
+            name="Failed pick up tip",
+            request=cmd.PickUpTipRequest(
+                pipetteId="pipette-id",
+                labwareId="labware-id",
+                wellName="A1",
+            ),
+            error=errors.LabwareIsNotTipRackError("oh no"),
+            expected_handler="pipetting_handler",
+            expected_method="handle_pick_up_tip"
         ),
     ]
 )
 async def test_command_executor_routing(
     executor: CommandExecutor,
     mock_equipment_handler: AsyncMock,
+    mock_movement_handler: AsyncMock,
     mock_pipetting_handler: AsyncMock,
     now: datetime,
     spec: ExecutorRoutingSpec,
@@ -122,6 +154,7 @@ async def test_command_executor_routing(
     """The CommandExecutor should route commands to handlers properly."""
     HANDLER_NAME_MAP = {
         "equipment_handler": mock_equipment_handler,
+        "movement_handler": mock_movement_handler,
         "pipetting_handler": mock_pipetting_handler,
     }
 
