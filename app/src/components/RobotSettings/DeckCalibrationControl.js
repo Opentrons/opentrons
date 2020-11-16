@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { format } from 'date-fns'
 import {
   Icon,
   Text,
@@ -30,6 +29,7 @@ import {
   REQUIRED,
   RECOMMENDED,
 } from '../InlineCalibrationWarning'
+import { formatLastModified } from '../CalibrationPanels/utils'
 
 import type { State, Dispatch } from '../../types'
 import type {
@@ -66,7 +66,7 @@ const buildDeckLastCalibrated: (
   }
   const datestring =
     typeof data.lastModified === 'string'
-      ? format(new Date(data.lastModified), 'yyyy-MM-dd HH:mm')
+      ? formatLastModified(data.lastModified)
       : 'unknown'
   const prefix = calData =>
     typeof data?.source === 'string'
