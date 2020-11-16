@@ -283,7 +283,7 @@ class PipetteOffsetCalibrationUserFlow:
 
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
-        if stored_tip_length_cal is None:
+        if stored_tip_length_cal is None or self._should_perform_tip_length:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(
                 self._tip_rack.uri,
                 self._hw_pipette.config.tip_overlap['default'])
@@ -358,14 +358,12 @@ class PipetteOffsetCalibrationUserFlow:
             self._flag_unmet_transition_req(
                 command_handler="move_to_deck",
                 unmet_condition="tip length calibration data exists")
-        if self._current_state == self._state.calibrationComplete:
-            # recache tip length cal which has just been saved
-            self._has_calibrated_tip_length =\
-                (self._get_stored_tip_length_cal() is not None)
-            if self._saved_offset_this_session:
-                self._flag_unmet_transition_req(
-                    command_handler="move_to_deck",
-                    unmet_condition="offset not saved this session")
+        if self.should_perform_tip_length and \
+                self._current_state == self._state.tipLengthComplete and \
+                self._saved_offset_this_session:
+            self._flag_unmet_transition_req(
+                command_handler="move_to_deck",
+                unmet_condition="offset not saved this session")
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
         ydim = self._deck.get_slot_definition(
             JOG_TO_DECK_SLOT)['boundingBox']['yDimension']
@@ -415,8 +413,10 @@ class PipetteOffsetCalibrationUserFlow:
                 pipette_id=self._hw_pipette.pipette_id,
                 tip_length_offset=noz_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack)
-            self._has_calibrated_tip_length =\
-                (self._get_stored_tip_length_cal() is not None)
+            new_tip_length = self._get_stored_tip_length_cal()
+            self._has_calibrated_tip_length = new_tip_length is not None
+            # load the new tip length for the rest of the session
+            self._hw_pipette.current_tip_length = new_tip_length
             await self.hardware.retract(self._mount, 20)
 
     async def move_to_reference_point(self):
