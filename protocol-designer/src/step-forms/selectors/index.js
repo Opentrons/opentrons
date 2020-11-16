@@ -33,6 +33,7 @@ import {
   selectors as labwareDefSelectors,
   type LabwareDefByDefURI,
 } from '../../labware-defs'
+import { i18n } from '../../localization'
 
 import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
 import type {
@@ -278,11 +279,6 @@ function _getPipettesSame(
   return pipettes[0]?.name === pipettes[1]?.name
 }
 
-const PIPETTE_MOUNT_LABEL = {
-  left: '(L)',
-  right: '(R)',
-}
-
 // TODO: Ian 2018-12-20 EVENTUALLY make this `getEquippedPipetteOptionsForStepId`, so it tells you
 // equipped pipettes per step id instead of always using initial deck setup
 // (for when we support multiple deck setup steps)
@@ -296,11 +292,10 @@ export const getEquippedPipetteOptions: Selector<
     return reduce(
       pipettes,
       (acc: Array<DropdownOption>, pipette: PipetteOnDeck, id: string) => {
+        const mountLabel = i18n.t(`form.pipette_mount_label.${pipette.mount}`)
         const nextOption = {
           name: pipettesSame
-            ? `${_getPipetteDisplayName(pipette.name)} ${
-                PIPETTE_MOUNT_LABEL[pipette.mount]
-              }`
+            ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`
             : _getPipetteDisplayName(pipette.name),
           value: id,
         }
