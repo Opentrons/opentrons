@@ -65,7 +65,10 @@ class GateModalComponent extends React.Component<Props, State> {
     switch (this.state.gateStage) {
       case 'promptVerifyIdentity':
         return (
-          <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
+          <AlertModal
+            alertOverlay
+            className={cx(modalStyles.modal, modalStyles.blocking)}
+          >
             <h3>{i18n.t('modal.gate.sign_up_below')}</h3>
             <div className={settingsStyles.body_wrapper}>
               <SignUpForm />
@@ -84,6 +87,7 @@ class GateModalComponent extends React.Component<Props, State> {
       case 'promptOptForAnalytics':
         return (
           <AlertModal
+            alertOverlay
             className={cx(modalStyles.modal, modalStyles.blocking)}
             buttons={[
               { onClick: optOut, children: i18n.t('button.no') },
@@ -105,7 +109,10 @@ class GateModalComponent extends React.Component<Props, State> {
         )
       case 'failedIdentityVerification':
         return (
-          <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
+          <AlertModal
+            alertOverlay
+            className={cx(modalStyles.modal, modalStyles.blocking)}
+          >
             <h3>{i18n.t('modal.gate.failed_verification')}</h3>
             <div className={settingsStyles.body_wrapper}>
               <p className={settingsStyles.card_body}>
@@ -117,7 +124,10 @@ class GateModalComponent extends React.Component<Props, State> {
         )
       case 'promptCheckEmail':
         return (
-          <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
+          <AlertModal
+            alertOverlay
+            className={cx(modalStyles.modal, modalStyles.blocking)}
+          >
             <h3>{i18n.t('modal.gate.sign_up_success')}</h3>
             <div className={modalStyles.centered_icon_wrapper}>
               <img
@@ -137,7 +147,10 @@ class GateModalComponent extends React.Component<Props, State> {
       case 'loading':
       default:
         return (
-          <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
+          <AlertModal
+            alertOverlay
+            className={cx(modalStyles.modal, modalStyles.blocking)}
+          >
             <div className={settingsStyles.body_wrapper}>
               <div className={modalStyles.centered_icon_wrapper}>
                 <Icon
