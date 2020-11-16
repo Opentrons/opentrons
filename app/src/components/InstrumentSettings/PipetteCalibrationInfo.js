@@ -40,8 +40,9 @@ import {
   INTENT_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
 } from '../CalibrationPanels'
+import { formatLastModified } from '../CalibrationPanels/utils'
 import { Portal } from '../portal'
-import { getDisplayNameForTipRack, formatLastModified } from './utils'
+import { getDisplayNameForTipRack } from './utils'
 
 import type { Mount } from '../../pipettes/types'
 import type { State } from '../../types'

@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react'
-import { format } from 'date-fns'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -31,6 +30,7 @@ import {
   RECOMMENDED,
   REQUIRED,
 } from '../InlineCalibrationWarning'
+import { formatLastModified } from '../CalibrationPanels/utils'
 import type { AttachedPipette, PipetteCalibrations } from '../../pipettes/types'
 import type {
   PipetteOffsetCalibration,
@@ -78,10 +78,7 @@ function getCalibrationDate(
       fontStyle={FONT_STYLE_ITALIC}
       marginTop={SPACING_1}
     >
-      {`${LAST_CALIBRATED}: ${format(
-        new Date(calibration.lastModified),
-        'MMMM d y HH:mm'
-      )}`}
+      {`${LAST_CALIBRATED}: ${formatLastModified(calibration.lastModified)}`}
     </Text>
   )
 }
