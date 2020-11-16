@@ -101,7 +101,8 @@ class GeometryState:
 
         return z_dim + slot_pos[2] + lw_data.calibration[2]
 
-    # TODO(mc, 2020-11-12): reconcile with existing protocol logic
+    # TODO(mc, 2020-11-12): reconcile with existing protocol logic and include
+    # data from tip-length calibration once v4.0.0 is in `edge`
     def get_effective_tip_length(
         self,
         labware_id: str,
