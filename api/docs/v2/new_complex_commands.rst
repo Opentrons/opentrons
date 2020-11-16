@@ -105,7 +105,7 @@ Parameters for the complex liquid handling are listed here in order of operation
 |         ``blow_out``           |  ``True`` or ``False``, if true blow out at dispense |        ``False``           |              ``False``             |           ``False``                |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
 |         ``blowout_location``   |  ``trash``, ``source well``, ``destination well``    | If pipette empty or        | If pipette empty or                | If pipette empty or                |
-|                                |                                                      | ``disposal_volume``is      | ``disposal_volume`` is specified,  | ``disposal_volume`` is specified,  |
+|                                |                                                      | ``disposal_volume`` is     | ``disposal_volume`` is specified,  | ``disposal_volume`` is specified,  |
 |                                |                                                      | specified, blowout into    | blowout into trash. Otherwise      | blowout into trash. Otherwise      |
 |                                |                                                      | trash. Otherwise blowout   | blowout into source well. If       | blowout into source well. If       |
 |                                |                                                      | into source well. If       | ``blow_out`` is false              | ``blow_out`` is false              |
