@@ -1,5 +1,5 @@
 // @flow
-import { _hasFieldLevelErrors } from '../selectors'
+import { _hasFieldLevelErrors, getEquippedPipetteOptions } from '../selectors'
 import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 jest.mock('../../steplist/fieldLevel')
@@ -59,5 +59,66 @@ describe('_hasFieldLevelErrors', () => {
       const result = _hasFieldLevelErrors(formData)
       expect(result).toBe(expected)
     })
+  })
+})
+
+describe('getEquippedPipetteOptions', () => {
+  it('appends mount to pipette dropdown when pipettes are same model', () => {
+    const initialDeckState = {
+      pipettes: {
+        123: {
+          name: 'p20_single_gen2',
+          mount: 'left',
+        },
+        456: {
+          name: 'p20_single_gen2',
+          mount: 'right',
+        },
+      },
+    }
+    const expected = [
+      { name: 'P20 Single-Channel GEN2 (L)', value: '123' },
+      { name: 'P20 Single-Channel GEN2 (R)', value: '456' },
+    ]
+
+    const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
+    expect(result).toEqual(expected)
+  })
+
+  it('does NOT append mount to pipette dropdown when pipettes are different models', () => {
+    const initialDeckState = {
+      pipettes: {
+        123: {
+          name: 'p300_single_gen2',
+          mount: 'left',
+        },
+        456: {
+          name: 'p20_single_gen2',
+          mount: 'right',
+        },
+      },
+    }
+    const expected = [
+      { name: 'P300 Single-Channel GEN2', value: '123' },
+      { name: 'P20 Single-Channel GEN2', value: '456' },
+    ]
+
+    const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
+    expect(result).toEqual(expected)
+  })
+
+  it('does NOT append mount to pipette dropdown when only one pipette', () => {
+    const initialDeckState = {
+      pipettes: {
+        123: {
+          name: 'p300_single_gen2',
+          mount: 'left',
+        },
+      },
+    }
+    const expected = [{ name: 'P300 Single-Channel GEN2', value: '123' }]
+
+    const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
+    expect(result).toEqual(expected)
   })
 })
