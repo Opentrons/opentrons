@@ -42,6 +42,7 @@ env:
   CI: true
   OT_APP_DEPLOY_BUCKET: opentrons-app
   OT_APP_DEPLOY_FOLDER: builds
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
   js-unit-test:
@@ -50,6 +51,9 @@ jobs:
     runs-on: 'ubuntu-latest'
     name: 'opentrons app frontend unit tests'
     steps:
+      - name: 'set insecure variable to work around actions/github-script not being updated'
+        run: |
+          echo "::warning Remove the environment entry ACTIONS_ALLOW_UNSECURE_COMMANDS as soon as possible once https://github.com/actions/github-script/pull/91 gets merged, actions/github-script gets a release, and we rely on it later in this workflow"
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
