@@ -33,6 +33,10 @@ jobs:
     name: 'js checks'
     runs-on: 'ubuntu-latest'
     steps:
+      - name: 'set insecure variable to work around actions/github-script not being updated'
+        run: |
+          echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=true" >> $GITHUB_ENV
+          echo "::warning Remove this as soon as possible once https://github.com/actions/github-script/pull/91 gets merged, actions/github-script gets a release, and we rely on it later in this workflow"
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
