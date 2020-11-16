@@ -194,6 +194,10 @@ class Pipette:
         """ The length of the current tip attached (0.0 if no tip) """
         return self._current_tip_length
 
+    @current_tip_length.setter
+    def current_tip_length(self, tip_length: float):
+        self._current_tip_length = tip_length
+
     @property
     def current_tiprack_diameter(self) -> float:
         """ The diameter of the current tip rack (0.0 if no tip) """
