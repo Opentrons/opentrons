@@ -33,6 +33,7 @@ import {
   selectors as labwareDefSelectors,
   type LabwareDefByDefURI,
 } from '../../labware-defs'
+import { i18n } from '../../localization'
 
 import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
 import type {
@@ -269,6 +270,15 @@ function _getPipetteDisplayName(name: string): string {
   return pipetteSpecs.displayName
 }
 
+function _getPipettesSame(
+  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>
+) {
+  const pipettes = Object.keys(pipettesOnDeck).map(id => {
+    return pipettesOnDeck[id]
+  })
+  return pipettes[0]?.name === pipettes[1]?.name
+}
+
 // TODO: Ian 2018-12-20 EVENTUALLY make this `getEquippedPipetteOptionsForStepId`, so it tells you
 // equipped pipettes per step id instead of always using initial deck setup
 // (for when we support multiple deck setup steps)
@@ -276,18 +286,24 @@ export const getEquippedPipetteOptions: Selector<
   Array<DropdownOption>
 > = createSelector(
   getInitialDeckSetup,
-  initialDeckSetup =>
-    reduce(
-      initialDeckSetup.pipettes,
+  initialDeckSetup => {
+    const pipettes = initialDeckSetup.pipettes
+    const pipettesSame = _getPipettesSame(pipettes)
+    return reduce(
+      pipettes,
       (acc: Array<DropdownOption>, pipette: PipetteOnDeck, id: string) => {
+        const mountLabel = i18n.t(`form.pipette_mount_label.${pipette.mount}`)
         const nextOption = {
-          name: _getPipetteDisplayName(pipette.name),
+          name: pipettesSame
+            ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`
+            : _getPipetteDisplayName(pipette.name),
           value: id,
         }
         return [...acc, nextOption]
       },
       []
     )
+  }
 )
 
 // Formats pipette data specifically for file page InstrumentGroup component
