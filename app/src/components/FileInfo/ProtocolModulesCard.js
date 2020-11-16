@@ -7,21 +7,33 @@ import {
   getModuleDisplayName,
   checkModuleCompatibility,
 } from '@opentrons/shared-data'
+import {
+  Icon,
+  Flex,
+  Text,
+  FONT_BODY_1_DARK,
+  FONT_SIZE_BODY_1,
+  FONT_STYLE_ITALIC,
+  SPACING_1,
+  SPACING_3,
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+} from '@opentrons/components'
 import { selectors as robotSelectors } from '../../robot'
 import { getAttachedModules } from '../../modules'
 
 import { InfoSection } from './InfoSection'
 import { SectionContentHalf } from '../layout'
-import { InstrumentItem } from './InstrumentItem'
 import { MissingItemWarning } from './MissingItemWarning'
 
-import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { State, Dispatch } from '../../types'
 import type { SessionModule } from '../../robot/types'
 import type { Robot } from '../../discovery/types'
 import type { AttachedModule } from '../../modules/types'
+
+const NOT_ATTACHED = 'Not attached'
 
 type OP = {| robot: Robot |}
 
@@ -67,6 +79,7 @@ function ProtocolModulesCardComponent(props: Props) {
       : 'incompatible'
     return { ...module, displayName, modulesMatch }
   })
+  console.log(moduleInfo)
 
   const modulesMatch = moduleInfo.every(m => m.modulesMatch !== 'incompatible')
   const someInexact = moduleInfo.some(m => m.modulesMatch === 'inexact_match')
@@ -75,13 +88,32 @@ function ProtocolModulesCardComponent(props: Props) {
     <InfoSection title={TITLE}>
       <SectionContentHalf>
         {moduleInfo.map(m => (
-          <InstrumentItem
+          <Flex
             key={m.slot}
-            compatibility={m.modulesMatch}
-            needsOffsetCalibration={false}
+            alignItems={ALIGN_CENTER}
+            marginTop={SPACING_1}
+            marginBottom={SPACING_3}
           >
-            {m.displayName}{' '}
-          </InstrumentItem>
+            <Icon
+              name={
+                m.modulesMatch !== 'incompatible'
+                  ? 'check-circle'
+                  : 'checkbox-blank-circle-outline'
+              }
+              width="1.5rem"
+              marginRight={SPACING_3}
+            />
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <Text marginBottom={SPACING_1} css={FONT_BODY_1_DARK}>
+                {m.displayName}
+              </Text>
+              {m.modulesMatch === 'incompatible' && (
+                <Text fontSize={FONT_SIZE_BODY_1} fontStyle={FONT_STYLE_ITALIC}>
+                  {NOT_ATTACHED}
+                </Text>
+              )}
+            </Flex>
+          </Flex>
         ))}
       </SectionContentHalf>
       {!modulesMatch && (
