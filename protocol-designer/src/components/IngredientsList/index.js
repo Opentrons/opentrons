@@ -6,7 +6,7 @@ import { IconButton, SidePanel } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { PDTitledList, PDListItem } from '../lists'
-import { StepDescription } from '../StepDescription'
+import { TitledListNotes } from '../TitledListNotes'
 import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
@@ -18,102 +18,90 @@ type RemoveWellsContents = (args: {|
   wells: Array<string>,
 |}) => mixed
 
-// Props used by both IngredientsList and IngredGroupCard
+// Props used by both IngredientsList and LiquidGroupCard
 type CommonProps = {|
   removeWellsContents: RemoveWellsContents,
   selected?: boolean,
 |}
 
-type CardProps = {|
+type LiquidGroupCardProps = {|
   groupId: string,
   ingredGroup: LiquidGroup,
   labwareWellContents: SingleLabwareLiquidState,
   ...CommonProps,
 |}
 
-type CardState = {|
-  isExpanded: boolean,
-|}
+const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
+  const {
+    ingredGroup,
+    removeWellsContents,
+    selected,
+    groupId,
+    labwareWellContents,
+  } = props
 
-class IngredGroupCard extends React.Component<CardProps, CardState> {
-  constructor(props: CardProps) {
-    super(props)
-    this.state = { isExpanded: true } // TODO: rename to 'collapsed'
+  const showName = ingredGroup.serialize
+
+  const [expanded, setExpanded] = React.useState(true)
+
+  const toggleAccordion = () => setExpanded(!expanded)
+
+  const wellsWithIngred = Object.keys(labwareWellContents)
+    .sort(sortWells)
+    .filter(well => labwareWellContents[well][groupId])
+
+  if (wellsWithIngred.length < 1) {
+    // do not show liquid card if it has no instances for this labware
+    return null
   }
 
-  toggleAccordion = () => this.setState({ isExpanded: !this.state.isExpanded })
+  return (
+    <PDTitledList
+      title={ingredGroup.name || i18n.t('card.unnamedLiquid')}
+      iconProps={{ style: { fill: swatchColors(Number(groupId)) } }}
+      iconName="circle"
+      onCollapseToggle={toggleAccordion}
+      collapsed={!expanded}
+      selected={selected}
+      description={<TitledListNotes notes={ingredGroup.description} />}
+    >
+      <PDListItem className={styles.ingredient_row_header}>
+        <span>{i18n.t('card.well')}</span>
+        <span>{i18n.t('application.units.microliter')}</span>
+        {showName && <span>{i18n.t('card.name')}</span>}
+        <span />
+      </PDListItem>
 
-  render() {
-    const {
-      ingredGroup,
-      removeWellsContents,
-      selected,
-      groupId,
-      labwareWellContents,
-    } = this.props
-    const { serialize, description, name } = ingredGroup
-    const { isExpanded } = this.state
+      {wellsWithIngred.map((well, i) => {
+        const wellIngredForCard = labwareWellContents[well][groupId]
+        const volume = wellIngredForCard && wellIngredForCard.volume
 
-    const wellsWithIngred = Object.keys(labwareWellContents)
-      .sort(sortWells)
-      .filter(well => labwareWellContents[well][groupId])
-
-    if (wellsWithIngred.length < 1) {
-      // do not show ingred card if it has no instances for this labware
-      return null
-    }
-
-    return (
-      <PDTitledList
-        title={name || 'Unnamed Ingredient'}
-        iconProps={{ style: { fill: swatchColors(Number(groupId)) } }}
-        iconName="circle"
-        onCollapseToggle={() => this.toggleAccordion()}
-        collapsed={!isExpanded}
-        selected={selected}
-        onClick={() =>
-          console.log('TODO: do something with ', { groupId, wellName: null })
-        } // TODO: Ian 2018-10-19
-        description={<StepDescription description={description} />}
-      >
-        <PDListItem className={styles.ingredient_row_header}>
-          <span>Well</span>
-          <span>{i18n.t('application.units.microliter')}</span>
-          <span>Name</span>
-          <span />
-        </PDListItem>
-
-        {wellsWithIngred.map((well, i) => {
-          const wellIngredForCard = labwareWellContents[well][groupId]
-          const volume = wellIngredForCard && wellIngredForCard.volume
-
-          if (volume == null) {
-            // TODO: Ian 2018-06-07 use assert
-            console.warn(
-              `Got null-ish volume for well: ${well}, ingred: ${groupId}`
-            )
-            return null
-          }
-
-          return (
-            <IngredIndividual
-              key={well}
-              name={serialize ? `${ingredGroup.name || ''} ${i + 1}` : ''}
-              wellName={well}
-              canDelete
-              volume={volume}
-              groupId={groupId}
-              removeWellsContents={removeWellsContents}
-            />
+        if (volume == null) {
+          // TODO: Ian 2018-06-07 use assert
+          console.warn(
+            `Got null-ish volume for well: ${well}, ingred: ${groupId}`
           )
-        })}
-      </PDTitledList>
-    )
-  }
+          return null
+        }
+
+        return (
+          <IngredIndividual
+            key={well}
+            name={showName ? `${ingredGroup.name || ''} ${i + 1}` : null}
+            wellName={well}
+            canDelete
+            volume={volume}
+            groupId={groupId}
+            removeWellsContents={removeWellsContents}
+          />
+        )
+      })}
+    </PDTitledList>
+  )
 }
 
 type IndividProps = {|
-  name: string,
+  name: ?string,
   wellName: string,
   volume: number,
   // concentration?: string,
@@ -136,8 +124,10 @@ function IngredIndividual(props: IndividProps) {
   return (
     <PDListItem border hoverable>
       <span>{wellName}</span>
-      <span>{volume ? volume + ' μL' : '-'}</span>
-      <span>{name}</span>
+      <span>
+        {volume ? volume + ` ${i18n.t('application.units.microliter')}` : '-'}
+      </span>
+      {name && <span>{name}</span>}
       {canDelete && (
         <IconButton
           className={styles.close_icon}
@@ -170,11 +160,11 @@ export function IngredientsList(props: Props): React.Node {
   } = props
 
   return (
-    <SidePanel title="Name & Liquids">
+    <SidePanel title={i18n.t('nav.nameAndLiquids')}>
       <LabwareDetailsCard />
 
       {Object.keys(liquidGroupsById).map(groupIdForCard => (
-        <IngredGroupCard
+        <LiquidGroupCard
           key={groupIdForCard}
           removeWellsContents={removeWellsContents}
           labwareWellContents={labwareWellContents}
