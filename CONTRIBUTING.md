@@ -387,7 +387,7 @@ If `make term` complains about not having a key, you may need to install a publi
 
 ```shell
 ssh-keygen # note the path you save the key to
-make -C api install-key br_ssh_pubkey=/path/to/pubkey
+make -C robot-server install-key br_ssh_pubkey=/path/to/pubkey host=${some_other_ip_address}
 ```
 
 and subsequently, when you do `make term`, add the `br_ssh_key=/path/to/key` option:
@@ -422,7 +422,7 @@ Buildroot robots use [systemd-journald][] for log management. This is a single l
 
 ### State Management
 
-#### Balena
+#### Balena (Deprecated after Robot Server Version 3.11.0)
 
 You can't really restart anything from inside a shell on balena, since it all runs in a docker container. Instead, you can do `restart` and restart the docker container, but this will disconnect you. Stop ongoing processes by doing `ps`, finding the pid, and then doing `kill (pid)`. This can be useful to temporarily run one of the servers directly, to see what it prints out on the command line. Note that when you do this the environment won't be quite the same as what the server sees when it is run directly by balena due to the implementation details of `docker run`, `tini`, and our start scripts.
 
