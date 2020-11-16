@@ -161,13 +161,13 @@ export function useCalibratePipetteOffset(
       )
     )
   }
+  const isCorrectSession =
+    pipOffsetCalSession &&
+    mount === pipOffsetCalSession.createParams.mount &&
+    tipRackDefinition === pipOffsetCalSession.createParams.tipRackDefinition
 
   const Wizard =
-    startingSession ||
-    (pipOffsetCalSession &&
-      mount === pipOffsetCalSession.createParams.mount &&
-      tipRackDefinition ===
-        pipOffsetCalSession.createParams.tipRackDefinition) ? (
+    startingSession || isCorrectSession ? (
       <Portal level="top">
         {startingSession ? (
           <SpinnerModalPage

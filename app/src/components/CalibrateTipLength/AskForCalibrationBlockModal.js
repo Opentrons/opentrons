@@ -67,6 +67,7 @@ export function AskForCalibrationBlockModal(props: Props): React.Node {
         title: props.titleBarTitle,
         back: { onClick: props.closePrompt, title: EXIT, children: EXIT },
       }}
+      outerProps={{ padding: '4.5rem 1rem 1rem 1rem' }}
     >
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING_3}>
         <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>

@@ -43,6 +43,7 @@ export type PipetteInfoProps = {|
   pipette: AttachedPipette | null,
   changeUrl: string,
   settingsUrl: string | null,
+  isChangingOrConfiguringPipette: boolean,
 |}
 
 const MOUNT = 'mount'
@@ -52,7 +53,14 @@ const ATTACH = 'attach'
 const NONE = 'none'
 
 export function PipetteInfo(props: PipetteInfoProps): React.Node {
-  const { robotName, mount, pipette, changeUrl, settingsUrl } = props
+  const {
+    robotName,
+    mount,
+    pipette,
+    changeUrl,
+    settingsUrl,
+    isChangingOrConfiguringPipette,
+  } = props
   const displayName = pipette ? pipette.modelSpecs.displayName : null
   const serialNumber = pipette ? pipette.id : null
   const channels = pipette ? pipette.modelSpecs.channels : null
@@ -146,6 +154,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
         serialNumber={serialNumber}
         mount={mount}
         disabledReason={disabledReason}
+        isChangingOrConfiguringPipette={isChangingOrConfiguringPipette}
       />
       {disabledReason !== null && (
         <>
