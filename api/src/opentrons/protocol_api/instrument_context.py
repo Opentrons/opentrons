@@ -988,13 +988,13 @@ class InstrumentContext(CommandPublisher):
                 - 'destintation well': blowout excess liquid into destination
                    well
                 - 'trash': blowout excess liquid into the trash
-                If no `blow_out_location` specified and there is liquid left in
-                the pipette, a :py:meth:`blow_out` will occur into the source
-                well
+                If no `blow_out_location` specified, no `disposal_volume`
+                specified, and the pipette contains liquid,
+                a :py:meth:`blow_out` will occur into the source well
 
-                If no `blow_out_location` specified and there is no liquid
-                left in
-                the pipette, a :py:meth:`blow_out` will occur into the trash
+                If no `blow_out_location` specified and either
+                `disposal_volume` is specified or the pipette is empty,
+                a :py:meth:`blow_out` will occur into the trash
 
                 If `blow_out` is set to `False`, this parameter will be ignored
 
