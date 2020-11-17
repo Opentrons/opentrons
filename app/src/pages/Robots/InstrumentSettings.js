@@ -28,7 +28,7 @@ export function InstrumentSettings(props: InstrumentSettingsProps): React.Node {
       <Page titleBarProps={titleBarProps}>
         <SettingsContent
           robotName={robotName}
-          isChangingOrConfiguringPipette={pathname !== path}
+          isChangingOrConfiguringPipette={pathname !== url}
           makeChangePipetteUrl={mnt => `${url}/change-pipette/${mnt}`}
           makeConfigurePipetteUrl={mnt => `${url}/configure-pipette/${mnt}`}
         />
