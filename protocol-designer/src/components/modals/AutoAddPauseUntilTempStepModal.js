@@ -13,6 +13,7 @@ type Props = {|
 
 export const AutoAddPauseUntilTempStepModal = (props: Props): React.Node => (
   <AlertModal
+    alertOverlay
     className={modalStyles.modal}
     contentsClassName={modalStyles.modal_contents}
   >

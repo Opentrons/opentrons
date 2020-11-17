@@ -144,6 +144,7 @@ export class FlowRateInput extends React.Component<Props, State> {
     const FlowRateModal = pipetteDisplayName && (
       <Portal>
         <AlertModal
+          alertOverlay
           className={modalStyles.modal}
           buttons={[
             {

@@ -241,6 +241,7 @@ export function FileSidebar(props: Props): React.Node {
       {showExportWarningModal && (
         <Portal>
           <AlertModal
+            alertOverlay
             className={modalStyles.modal}
             heading={warning && warning.heading}
             onCloseClick={cancelModal}
