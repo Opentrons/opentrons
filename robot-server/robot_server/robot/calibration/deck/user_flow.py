@@ -290,6 +290,8 @@ class DeckCalibrationUserFlow:
 
             if self._current_state == State.savingPointThree:
                 self._save_attitude_matrix()
+                # clear all pipette offset data
+                delete.clear_pipette_offset_calibrations()
 
     def _save_attitude_matrix(self):
         e = tuplefy_cal_point_dicts(self._expected_points)
@@ -336,8 +338,6 @@ class DeckCalibrationUserFlow:
             await self.return_tip()
         # reload new deck calibration
         self._hardware.reset_robot_calibration()
-        # clear all pipette offset data and reset all instruments
-        delete.clear_pipette_offset_calibrations()
         self._hardware.reset_instrument()
         await self._hardware.home()
 
