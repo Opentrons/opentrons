@@ -1,7 +1,6 @@
-import typing
-
 from opentrons import types
 from opentrons.hardware_control import CriticalPoint
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import Clearances, build_edges, \
@@ -227,7 +226,7 @@ class InstrumentContextImplementation(InstrumentContextInterface):
         """Get the available volume."""
         return self.get_pipette()['available_volume']
 
-    def get_pipette(self) -> typing.Dict[str, typing.Any]:
+    def get_pipette(self) -> PipetteDict:
         """Get the hardware pipette dictionary."""
         hw_manager = self._protocol_interface.get_hardware()
         pipette = hw_manager.hardware.attached_instruments[self._mount]

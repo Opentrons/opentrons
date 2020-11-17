@@ -10,6 +10,7 @@ from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.commands import CommandPublisher
 from opentrons.config.feature_flags import enable_calibration_overhaul
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
@@ -1349,7 +1350,7 @@ class InstrumentContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def hw_pipette(self) -> Dict[str, Any]:
+    def hw_pipette(self) -> PipetteDict:
         """ View the information returned by the hardware API directly.
 
         :raises: a :py:class:`.types.PipetteNotAttachedError` if the pipette is

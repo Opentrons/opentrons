@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 import typing
 
 from opentrons import types
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, \
     FlowRates
 from opentrons.protocols.implementations.well import WellImplementation
 
 
-class InstrumentContextInterface:
+class InstrumentContextInterface(ABC):
 
     @abstractmethod
     def get_default_speed(self) -> float:
@@ -47,8 +48,8 @@ class InstrumentContextInterface:
     def pick_up_tip(self,
                     well: WellImplementation,
                     tip_length: float,
-                    presses: int = None,
-                    increment: float = None) -> None:
+                    presses: typing.Optional[int] = None,
+                    increment: typing.Optional[float] = None) -> None:
         ...
 
     @abstractmethod
@@ -72,8 +73,8 @@ class InstrumentContextInterface:
     def move_to(self,
                 location: types.Location,
                 force_direct: bool = False,
-                minimum_z_height: float = None,
-                speed: float = None) -> None:
+                minimum_z_height: typing.Optional[float] = None,
+                speed: typing.Optional[float] = None) -> None:
         ...
 
     @abstractmethod
@@ -109,7 +110,7 @@ class InstrumentContextInterface:
         ...
 
     @abstractmethod
-    def get_pipette(self) -> typing.Dict[str, typing.Any]:
+    def get_pipette(self) -> PipetteDict:
         ...
 
     @abstractmethod
@@ -147,15 +148,15 @@ class InstrumentContextInterface:
     @abstractmethod
     def set_flow_rate(
             self,
-            aspirate: float = None,
-            dispense: float = None,
-            blow_out: float = None) -> None:
+            aspirate: typing.Optional[float] = None,
+            dispense: typing.Optional[float] = None,
+            blow_out: typing.Optional[float] = None) -> None:
         ...
 
     @abstractmethod
     def set_pipette_speed(
             self,
-            aspirate: float = None,
-            dispense: float = None,
-            blow_out: float = None) -> None:
+            aspirate: typing.Optional[float] = None,
+            dispense: typing.Optional[float] = None,
+            blow_out: typing.Optional[float] = None) -> None:
         ...

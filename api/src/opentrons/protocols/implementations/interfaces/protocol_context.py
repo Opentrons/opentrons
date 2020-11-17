@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from typing import (Dict, Optional)
 
@@ -30,7 +30,7 @@ class LoadModuleResult:
     module: SynchronousAdapter
 
 
-class ProtocolContextInterface:
+class ProtocolContextInterface(ABC):
 
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:
@@ -74,7 +74,7 @@ class ProtocolContextInterface:
             self,
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
-            label: str = None,
+            label: Optional[str] = None,
     ) -> LabwareInterface:
         ...
 
@@ -83,9 +83,9 @@ class ProtocolContextInterface:
             self,
             load_name: str,
             location: types.DeckLocation,
-            label: str = None,
-            namespace: str = None,
-            version: int = None,
+            label: Optional[str] = None,
+            namespace: Optional[str] = None,
+            version: Optional[int] = None,
     ) -> LabwareInterface:
         ...
 
@@ -94,7 +94,7 @@ class ProtocolContextInterface:
             self,
             module_name: str,
             location: Optional[types.DeckLocation] = None,
-            configuration: str = None) -> Optional[LoadModuleResult]:
+            configuration: Optional[str] = None) -> Optional[LoadModuleResult]:
         ...
 
     @abstractmethod
@@ -114,7 +114,8 @@ class ProtocolContextInterface:
         ...
 
     @abstractmethod
-    def pause(self, msg: str = None) -> None:
+    def pause(self,
+              msg: Optional[str] = None) -> None:
         ...
 
     @abstractmethod
@@ -122,13 +123,14 @@ class ProtocolContextInterface:
         ...
 
     @abstractmethod
-    def comment(self, msg: str) -> None:
+    def comment(self,
+                msg: str) -> None:
         ...
 
     @abstractmethod
     def delay(self,
               seconds=0,
-              msg: str = None) -> None:
+              msg: Optional[str] = None) -> None:
         ...
 
     @abstractmethod
