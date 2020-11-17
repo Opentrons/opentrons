@@ -90,10 +90,10 @@ export const getAttachedPipetteCalibrations: (
   (attached, calibrations, tipLengths) => {
     const offsets = {
       left: attached.left
-        ? filterCalibrationForPipette(calibrations, attached.left.id)
+        ? filterCalibrationForPipette(calibrations, attached.left.id, 'left')
         : null,
       right: attached.right
-        ? filterCalibrationForPipette(calibrations, attached.right.id)
+        ? filterCalibrationForPipette(calibrations, attached.right.id, 'right')
         : null,
     }
     return {

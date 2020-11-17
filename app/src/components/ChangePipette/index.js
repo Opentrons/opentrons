@@ -83,7 +83,7 @@ export function ChangePipette(props: Props): React.Node {
   const actualPipette = attachedPipette?.modelSpecs || null
   const actualPipetteOffset = useSelector((state: State) =>
     attachedPipette?.id
-      ? getCalibrationForPipette(state, robotName, attachedPipette.id)
+      ? getCalibrationForPipette(state, robotName, attachedPipette.id, mount)
       : null
   )
 

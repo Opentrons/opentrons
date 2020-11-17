@@ -39,7 +39,8 @@ describe('getCalibrationForPipette', () => {
       Selectors.getCalibrationForPipette(
         mockState,
         'robot-name',
-        'P1KVS2108052020A02'
+        'P1KVS2108052020A02',
+        'right'
       )
     ).toEqual(Fixtures.mockPipetteOffsetCalibration3)
   })
@@ -48,7 +49,8 @@ describe('getCalibrationForPipette', () => {
       Selectors.getCalibrationForPipette(
         mockState,
         'robot-name',
-        'no such pipette'
+        'no such pipette',
+        'some mount'
       )
     ).toBeNull()
   })
@@ -57,7 +59,8 @@ describe('getCalibrationForPipette', () => {
       Selectors.getCalibrationForPipette(
         mockState,
         'some other robot',
-        'P20MV2008052020A02'
+        'P20MV2008052020A02',
+        'right'
       )
     ).toBeNull()
   })
