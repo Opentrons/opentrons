@@ -41,11 +41,15 @@ type Props = {|
   schemaVersion: number,
 |}
 
-const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
+const saveFile = (
+  downloadData: $PropertyType<Props, 'downloadData'>,
+  callback: () => mixed
+) => {
   const blob = new Blob([JSON.stringify(downloadData.fileData)], {
     type: 'application/json',
   })
   saveAs(blob, downloadData.fileName)
+  callback()
 }
 
 type WarningContent = {|
@@ -231,7 +235,7 @@ export function FileSidebar(props: Props): React.Node {
     handleCancel: () => setShowBlockingHint(false),
     handleContinue: () => {
       setShowBlockingHint(false)
-      saveFile(downloadData)
+      saveFile(downloadData, onDownload)
     },
   })
 
@@ -257,7 +261,7 @@ export function FileSidebar(props: Props): React.Node {
                     setShowExportWarningModal(false)
                     setShowBlockingHint(true)
                   } else {
-                    saveFile(downloadData)
+                    saveFile(downloadData, onDownload)
                     setShowExportWarningModal(false)
                   }
                 },
@@ -289,8 +293,7 @@ export function FileSidebar(props: Props): React.Node {
                   resetScrollElements()
                   setShowBlockingHint(true)
                 } else {
-                  saveFile(downloadData)
-                  onDownload()
+                  saveFile(downloadData, onDownload)
                 }
               }}
               disabled={!canDownload}

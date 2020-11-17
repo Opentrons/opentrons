@@ -140,6 +140,13 @@ describe('FileSidebar', () => {
 
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Your protocol has no steps')
+
+    const continueButton = alertModal
+      .dive()
+      .find(OutlineButton)
+      .at(1)
+    continueButton.simulate('click')
+    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('warning modal is shown when export is clicked with unused pipette', () => {
@@ -161,6 +168,13 @@ describe('FileSidebar', () => {
     expect(alertModal.html()).not.toContain(
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
+
+    const continueButton = alertModal
+      .dive()
+      .find(OutlineButton)
+      .at(1)
+    continueButton.simulate('click')
+    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('warning modal is shown when export is clicked with unused module', () => {
@@ -176,6 +190,13 @@ describe('FileSidebar', () => {
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Unused module')
     expect(alertModal.html()).toContain('Magnetic module')
+
+    const continueButton = alertModal
+      .dive()
+      .find(OutlineButton)
+      .at(1)
+    continueButton.simulate('click')
+    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('warning modal is shown when export is clicked with unused module and pipette', () => {
@@ -199,6 +220,13 @@ describe('FileSidebar', () => {
     expect(alertModal.html()).not.toContain(
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
+
+    const continueButton = alertModal
+      .dive()
+      .find(OutlineButton)
+      .at(1)
+    continueButton.simulate('click')
+    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('blocking hint is shown when protocol is v4', () => {
