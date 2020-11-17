@@ -29,7 +29,11 @@ async def _send_task(connection: Connection, queue: Queue) -> None:
     try:
         while True:
             entry: QueueEntry = await queue.get()
-            await connection.send_multipart(entry.to_frames())
+            log.info(f"_send: Got an entry!: {entry}")
+            _frames = entry.to_frames()
+            log.info(f"Entry to frame: {_frames}")
+            await connection.send_multipart(_frames)
+            log.info("Sent multipart frames")
     except asyncio.CancelledError:
         log.exception("Done")
     finally:
@@ -46,7 +50,16 @@ class Publisher:
 
     async def send(self, topic: str, event: Event) -> None:
         """Publish an event to a topic."""
+        log.info(f"Publisher: sending asynchronously: {topic}")
         await self._queue.put(QueueEntry(topic, event))
+
+    def send_nowait(self, topic: str, event: Event) -> None:
+        """Publish an event to a topic."""
+        log.info(f"Publisher: sending without wait: {topic}")
+        try:
+            self._queue.put_nowait(QueueEntry(topic, event))
+        except asyncio.QueueFull as e:
+            log.exception(f"QueueFull exception while sending publish event: {e}")
 
     async def stop(self) -> None:
         """Stop the publisher task."""

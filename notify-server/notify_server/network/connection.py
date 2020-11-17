@@ -70,10 +70,13 @@ class Connection:
     async def send_multipart(self, frames: List[bytes]) -> None:
         """Send a multipart message."""
         await self._socket.send_multipart(frames)
+        log.info(f"Connection: Sent multipart: {frames}")
 
     async def recv_multipart(self) -> Any:
         """Recv a multipart message."""
-        return await self._socket.recv_multipart()
+        res = await self._socket.recv_multipart()
+        log.info(f"Connection: Received multipart: {res}")
+        return res
 
     def close(self) -> None:
         """Close the socket."""
