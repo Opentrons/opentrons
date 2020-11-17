@@ -5,7 +5,7 @@ from typing import (
     Any, Awaitable, Callable, Dict, List, Optional, Tuple,
     Union, TYPE_CHECKING)
 
-from opentrons.calibration_storage import get
+from opentrons.calibration_storage import get, delete
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.calibration_storage import helpers
 from opentrons.config import feature_flags as ff
@@ -102,6 +102,8 @@ class DeckCalibrationUserFlow:
         }
         self.hardware.set_robot_calibration(
             robot_cal.build_temporary_identity_calibration())
+        self._hw_pipette.update_pipette_offset(
+            robot_cal.load_pipette_offset(pip_id=None, mount=self._mount))
 
     @property
     def deck(self) -> Deck:
@@ -288,6 +290,8 @@ class DeckCalibrationUserFlow:
 
             if self._current_state == State.savingPointThree:
                 self._save_attitude_matrix()
+                # clear all pipette offset data
+                delete.clear_pipette_offset_calibrations()
 
     def _save_attitude_matrix(self):
         e = tuplefy_cal_point_dicts(self._expected_points)
@@ -334,6 +338,7 @@ class DeckCalibrationUserFlow:
             await self.return_tip()
         # reload new deck calibration
         self._hardware.reset_robot_calibration()
+        self._hardware.reset_instrument()
         await self._hardware.home()
 
     async def invalidate_last_action(self):
