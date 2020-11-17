@@ -5,7 +5,7 @@ from typing import Tuple
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName
 
-from opentrons.protocol_engine import command_models as cmd, errors, StateStore
+from opentrons.protocol_engine import commands as cmd, errors, StateStore
 from opentrons.protocol_engine.types import LabwareLocation, DeckSlotLocation
 
 

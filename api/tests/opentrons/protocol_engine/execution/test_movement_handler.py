@@ -7,7 +7,6 @@ from opentrons.types import MountType, Mount, Point
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine import command_models as cmd
 from opentrons.protocol_engine.state import PipetteLocationData
 from opentrons.protocol_engine.execution.movement import MovementHandler
 
@@ -66,28 +65,16 @@ def handler(
     )
 
 
-MOVE_REQUESTS: List[cmd.BasePipettingRequest] = [
-    cmd.MoveToWellRequest(
-        pipetteId="pipette-id",
-        labwareId="labware-id",
-        wellName="B2"
-    ),
-    cmd.PickUpTipRequest(
-        pipetteId="pipette-id",
-        labwareId="labware-id",
-        wellName="B2"
-    ),
-]
-
-
-@pytest.mark.parametrize("move_request", MOVE_REQUESTS)
-async def test_move_requests_pass_waypoints_to_hc(
-    move_request: cmd.BasePipettingRequest,
+async def test_move_to_well_passes_waypoints_to_hc(
     hc_with_data: AsyncMock,
     handler: MovementHandler
 ) -> None:
     """Move requests should call hardware controller with movement data."""
-    await handler.handle_move_to_well(move_request)
+    await handler.move_to_well(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2"
+    )
 
     hc_with_data.gantry_position.assert_called_with(
         mount=Mount.LEFT,
@@ -113,36 +100,24 @@ async def test_move_requests_pass_waypoints_to_hc(
     ])
 
 
-@pytest.mark.parametrize("move_request", MOVE_REQUESTS)
-async def test_move_requests_get_data_from_state(
-    move_request: cmd.BasePipettingRequest,
+async def test_move_to_well_gets_data_from_state(
     state_with_data: MagicMock,
     handler: MovementHandler
 ) -> None:
     """Move requests should get move parameters from state."""
-    await handler.handle_move_to_well(move_request)
-
-    state_with_data.motion.get_pipette_location.assert_called_with(
-        move_request.pipetteId,
+    await handler.move_to_well(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2"
     )
+
+    state_with_data.motion.get_pipette_location.assert_called_with("pipette-id")
 
     state_with_data.motion.get_movement_waypoints.assert_called_with(
         origin=Point(1, 1, 1),
         origin_cp=CriticalPoint.FRONT_NOZZLE,
         max_travel_z=42.0,
-        pipette_id=move_request.pipetteId,
-        labware_id=move_request.labwareId,
-        well_name=move_request.wellName,
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2",
     )
-
-
-async def test_handle_move_to_well_result(handler: MovementHandler) -> None:
-    """It should return a MoveToWellResult for a MoveToWellRequest."""
-    request = cmd.MoveToWellRequest(
-        pipetteId="pipette-id",
-        labwareId="labware-id",
-        wellName="B2",
-    )
-    result = await handler.handle_move_to_well(request)
-
-    assert result == cmd.MoveToWellResult()

@@ -8,11 +8,11 @@ protocol state and side-effects like robot movements.
 
 from .protocol_engine import ProtocolEngine
 from .state import StateStore, StateView
-from .execution import CommandExecutor
+from .execution import CommandHandlers
 
 __all__ = [
     "ProtocolEngine",
     "StateStore",
     "StateView",
-    "CommandExecutor",
+    "CommandHandlers",
 ]

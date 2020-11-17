@@ -1,7 +1,7 @@
 """Tests for equipment state in the protocol_engine state store."""
 import pytest
 from datetime import datetime
-from opentrons.protocol_engine import StateStore, command_models as cmd
+from opentrons.protocol_engine import StateStore, commands as cmd
 from opentrons.protocol_engine.state import LocationData
 
 
@@ -20,24 +20,12 @@ def test_initial_location(store: StateStore) -> None:
         cmd.MoveToWellResult()
     ),
     (
-        cmd.AspirateRequest(
+        cmd.PickUpTipRequest(
             pipetteId="pipette-id",
             labwareId="labware-id",
-            wellName="B4",
-            volume=50,
-            flowRate=1.0,
+            wellName="B4"
         ),
-        cmd.AspirateResult()
-    ),
-    (
-        cmd.DispenseRequest(
-            pipetteId="pipette-id",
-            labwareId="labware-id",
-            wellName="B4",
-            volume=50,
-            flowRate=1.0,
-        ),
-        cmd.DispenseResult()
+        cmd.PickUpTipResult()
     ),
 ])
 def test_handles_move_to_well_result(

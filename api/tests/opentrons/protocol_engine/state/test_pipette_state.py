@@ -5,7 +5,7 @@ from typing import cast, Dict, Optional
 
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocol_engine import command_models as cmd, errors, StateStore
+from opentrons.protocol_engine import commands as cmd, errors, StateStore
 
 
 CompletedLoadLabware = cmd.CompletedCommand[

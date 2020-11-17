@@ -1,17 +1,20 @@
 """Tests for the ProtocolEngine class."""
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from math import isclose
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from typing import cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.command_models import (
+from opentrons.protocol_engine import ProtocolEngine, errors
+from opentrons.protocol_engine.commands import (
     MoveToWellRequest,
     MoveToWellResult,
+    PendingCommand,
     RunningCommand,
-    CompletedCommand
+    CompletedCommand,
+    FailedCommand,
 )
+from opentrons.protocol_engine.commands.move_to_well import MoveToWellImplementation
 
 
 class CloseToNow:
@@ -62,47 +65,113 @@ async def test_execute_command_creates_command(
     )
 
 
-async def test_execute_command_calls_executor(
+async def test_execute_command_calls_implementation_executor(
     engine: ProtocolEngine,
-    mock_executor: AsyncMock,
+    mock_handlers: AsyncMock,
 ) -> None:
     """It should create a command in the state store when executing."""
-    req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellName="A1")
+    mock_req = MagicMock(spec=MoveToWellRequest)
+    mock_impl = AsyncMock(spec=MoveToWellImplementation)
 
-    await engine.execute_command(req, command_id="unique-id")
+    mock_req.get_implementation.return_value = mock_impl
 
-    mock_executor.execute_command.assert_called_with(
-        RunningCommand(
-            created_at=cast(datetime, CloseToNow()),
-            started_at=cast(datetime, CloseToNow()),
-            request=req
-        )
-    )
+    await engine.execute_command(mock_req, command_id="unique-id")
+
+    mock_impl.execute.assert_called_with(mock_handlers)
 
 
 async def test_execute_command_adds_result_to_state(
     engine: ProtocolEngine,
-    mock_executor: AsyncMock,
+    mock_handlers: AsyncMock,
     mock_state_store: MagicMock,
+    now: datetime,
 ) -> None:
     """It should upsert the completed command into state."""
-    req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellName="A1")
-    res = MoveToWellResult()
-    later = datetime.now(tz=timezone.utc) + timedelta(seconds=42)
-    completed_cmd = CompletedCommand(
+    result = MoveToWellResult()
+    mock_req = MagicMock(spec=MoveToWellRequest)
+    mock_impl = AsyncMock(spec=MoveToWellImplementation)
+
+    mock_req.get_implementation.return_value = mock_impl
+    mock_impl.create_command.return_value = PendingCommand(
+        request=mock_req,
+        created_at=now
+    )
+    mock_impl.execute.return_value = result
+
+    cmd = await engine.execute_command(mock_req, command_id="unique-id")
+
+    assert cmd == CompletedCommand(
         created_at=cast(datetime, CloseToNow()),
         started_at=cast(datetime, CloseToNow()),
-        completed_at=later,
-        request=req,
-        result=res,
+        completed_at=cast(datetime, CloseToNow()),
+        request=mock_req,
+        result=result,
     )
 
-    mock_executor.execute_command.return_value = completed_cmd
-
-    result = await engine.execute_command(req, command_id="unique-id",)
-
-    assert result == completed_cmd
     mock_state_store.handle_command.assert_called_with(
-        completed_cmd,
+        cmd,
+        command_id="unique-id",
+    )
+
+
+async def test_execute_command_adds_error_to_state(
+    engine: ProtocolEngine,
+    mock_handlers: AsyncMock,
+    mock_state_store: MagicMock,
+    now: datetime,
+) -> None:
+    """It should upsert a failed command into state."""
+    error = errors.ProtocolEngineError("oh no!")
+    mock_req = MagicMock(spec=MoveToWellRequest)
+    mock_impl = AsyncMock(spec=MoveToWellImplementation)
+
+    mock_req.get_implementation.return_value = mock_impl
+    mock_impl.create_command.return_value = PendingCommand(
+        request=mock_req,
+        created_at=now
+    )
+    mock_impl.execute.side_effect = error
+
+    cmd = await engine.execute_command(mock_req, command_id="unique-id")
+
+    assert cmd == FailedCommand(
+        created_at=cast(datetime, CloseToNow()),
+        started_at=cast(datetime, CloseToNow()),
+        failed_at=cast(datetime, CloseToNow()),
+        request=mock_req,
+        error=error,
+    )
+
+    mock_state_store.handle_command.assert_called_with(
+        cmd,
+        command_id="unique-id",
+    )
+
+
+async def test_execute_command_adds_unexpected_error_to_state(
+    engine: ProtocolEngine,
+    mock_handlers: AsyncMock,
+    mock_state_store: MagicMock,
+    now: datetime,
+) -> None:
+    """It should upsert an unexpectedly failed command into state."""
+    error = RuntimeError("oh no!")
+    mock_req = MagicMock(spec=MoveToWellRequest)
+    mock_impl = AsyncMock(spec=MoveToWellImplementation)
+
+    mock_req.get_implementation.return_value = mock_impl
+    mock_impl.create_command.return_value = PendingCommand(
+        request=mock_req,
+        created_at=now
+    )
+    mock_impl.execute.side_effect = error
+
+    cmd = await engine.execute_command(mock_req, command_id="unique-id")
+
+    assert type(cmd.error) == errors.UnexpectedProtocolError  # type: ignore[union-attr]
+    assert cmd.error.original_error == error  # type: ignore[union-attr]
+
+    mock_state_store.handle_command.assert_called_with(
+        cmd,
         command_id="unique-id",
     )

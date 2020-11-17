@@ -2,7 +2,6 @@
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..state import StateView
-from ..command_models import BasePipettingRequest, MoveToWellResult
 
 
 class MovementHandler:
@@ -20,15 +19,13 @@ class MovementHandler:
         self._state = state
         self._hardware = hardware
 
-    async def handle_move_to_well(
+    async def move_to_well(
         self,
-        request: BasePipettingRequest,
-    ) -> MoveToWellResult:
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+    ) -> None:
         """Move to a specific well."""
-        pipette_id = request.pipetteId
-        labware_id = request.labwareId
-        well_name = request.wellName
-
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state.motion.get_pipette_location(pipette_id)
         hw_mount = pipette_location.mount.to_hw_mount()
@@ -58,5 +55,3 @@ class MovementHandler:
                 abs_position=wp.position,
                 critical_point=wp.critical_point
             )
-
-        return MoveToWellResult()
