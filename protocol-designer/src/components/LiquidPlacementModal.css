@@ -8,7 +8,7 @@
 .liquid_placement_modal {
   @apply (--absolute-fill);
 
-  background-color: rgba(100, 100, 100, 0.8);
+  background-color: rgba(0, 0, 0, 0.9);
   z-index: 1;
 
   /* make up lost space for overlay */
