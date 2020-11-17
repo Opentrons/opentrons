@@ -34,8 +34,8 @@ const mockGetCustomLabwareDefinitions: JestMockFn<
 > = getCustomLabwareDefinitions
 
 const mockGetCalibrationForPipette: JestMockFn<
-  [State, string, string],
-  $Call<typeof getCalibrationForPipette, State, string, string>
+  [State, string, string, string],
+  $Call<typeof getCalibrationForPipette, State, string, string, string>
 > = getCalibrationForPipette
 
 const mockGetTipLengthForPipetteAndTiprack: JestMockFn<

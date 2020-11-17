@@ -105,7 +105,12 @@ export function Pipettes(props: Props): React.Node {
   const convertRobotNameToString = robotName || 'unknown'
   const pipetteOffsetCalibration = useSelector((state: State) =>
     serialNumber
-      ? getCalibrationForPipette(state, convertRobotNameToString, serialNumber)
+      ? getCalibrationForPipette(
+          state,
+          convertRobotNameToString,
+          serialNumber,
+          currentMount
+        )
       : null
   )
 

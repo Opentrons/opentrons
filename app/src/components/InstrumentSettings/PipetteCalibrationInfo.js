@@ -93,7 +93,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
   const [pocTargetProps, pocTooltipProps] = useHoverTooltip()
   const pipetteOffsetCalibration = useSelector((state: State) =>
     serialNumber
-      ? getCalibrationForPipette(state, robotName, serialNumber)
+      ? getCalibrationForPipette(state, robotName, serialNumber, mount)
       : null
   )
   const tipLengthCalibration = useSelector((state: State) =>
