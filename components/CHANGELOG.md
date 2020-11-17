@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.12](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.11...v4.0.0-alpha.12) (2020-11-16)
+
+
+### Bug Fixes
+
+* **app:** fix post attach pipette calibration double wizard ([#7008](https://github.com/Opentrons/opentrons/issues/7008)) ([f4ec258](https://github.com/Opentrons/opentrons/commit/f4ec258))
+
+
+
+
+
 # [4.0.0-alpha.11](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.10...v4.0.0-alpha.11) (2020-11-13)
 
 **Note:** Version bump only for package @opentrons/components
