@@ -8,6 +8,8 @@ from opentrons.api import session
 from opentrons.api.session import (
     _accumulate, _dedupe)
 from opentrons.hardware_control import ThreadedAsyncForbidden
+from opentrons.protocol_api.labware import load
+from opentrons.types import Point, Location
 
 from tests.opentrons.conftest import state
 from functools import partial

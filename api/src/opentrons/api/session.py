@@ -666,7 +666,7 @@ def _get_parent_module(placeable):
 
 def _get_new_labware(loc):
     if isinstance(loc, Location):
-        return _get_new_labware(loc.labware)
+        return _get_new_labware(loc.labware.object)
     elif isinstance(loc, labware.Well):
         return loc.parent
     elif isinstance(loc, labware.Labware):
