@@ -394,7 +394,8 @@ class InstrumentContext(CommandPublisher):
         if not self._implementation.has_tip():
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
 
-        c_vol = self.hw_pipette['available_volume'] if not volume else volume
+        c_vol = self._implementation.get_available_volume() \
+            if not volume else volume
 
         cmds.do_publish(self.broker, cmds.mix, self.mix,
                         'before', None, None,
