@@ -3,7 +3,7 @@ from typing import (
     Any, Awaitable, Callable, Dict,
     List, Optional, Union, TYPE_CHECKING, Tuple)
 
-from opentrons.calibration_storage import get, modify, helpers
+from opentrons.calibration_storage import get, modify, helpers, delete
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound, PipetteOffsetByPipetteMount)
 from opentrons.config import feature_flags as ff
@@ -409,10 +409,13 @@ class PipetteOffsetCalibrationUserFlow:
             # set critical point explicitly to nozzle
             noz_pt = await self.get_current_point(
                 critical_point=CriticalPoint.NOZZLE)
+
             util.save_tip_length_calibration(
                 pipette_id=self._hw_pipette.pipette_id,
                 tip_length_offset=noz_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack)
+            delete.delete_pipette_offset_file(
+                self._hw_pipette.pipette_id, self.mount)
             new_tip_length = self._get_stored_tip_length_cal()
             self._has_calibrated_tip_length = new_tip_length is not None
             # load the new tip length for the rest of the session

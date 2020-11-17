@@ -112,6 +112,7 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
+    hardware.retract = MagicMock(side_effect=async_mock)
     return hardware
 
 
@@ -149,6 +150,7 @@ def mock_hw(hardware):
     hardware.get_instrument_max_height.return_value = 180
     hardware.home_plunger = MagicMock(side_effect=async_mock)
     hardware.home = MagicMock(side_effect=async_mock)
+    hardware.retract = MagicMock(side_effect=async_mock)
 
     return hardware
 
@@ -411,9 +413,44 @@ def test_no_pipette(hardware, mount):
 
 @pytest.fixture
 def mock_save_pipette():
-    with patch('opentrons.calibration_storage.modify.save_pipette_calibration',
+    with patch(
+            'opentrons.calibration_storage.modify.save_pipette_calibration',
+            autospec=True) as mock_save:
+        yield mock_save
+
+
+@pytest.fixture
+def mock_delete_pipette():
+    with patch(
+            'opentrons.calibration_storage.delete.delete_pipette_offset_file',
+            autospec=True) as mock_delete:
+        yield mock_delete
+
+
+@pytest.fixture
+def mock_save_tip_length():
+    with patch('robot_server.robot.calibration.util.save_tip_length_calibration',  # noqa(E501)
                autospec=True) as mock_save:
         yield mock_save
+
+
+async def test_save_tip_length(
+        mock_user_flow_fused, mock_save_tip_length, mock_delete_pipette):
+    uf = mock_user_flow_fused
+    uf._current_state = uf._state.measuringTipOffset
+    uf._nozzle_height_at_reference = 10
+    uf._hw_pipette.add_tip(50)
+    await uf._hardware.move_to(mount=uf._mount,
+                               abs_poition=Point(x=10, y=10, z=40),
+                               critical_point=uf.critical_point_override)
+    await uf.save_offset()
+    mock_save_tip_length.assert_called_with(
+        pipette_id=uf._hw_pipette.pipette_id,
+        tip_length_offset=-10,
+        tip_rack=uf._tip_rack
+    )
+    mock_delete_pipette.assert_called_with(
+        uf._hw_pipette.pipette_id, uf.mount)
 
 
 async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
