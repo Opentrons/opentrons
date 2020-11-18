@@ -44,14 +44,6 @@ def test_delete_pipette_offset_calibration(
         f'/calibration/pipette_offset?pipette_id={PIPETTE_ID}&'
         f'mount={WRONG_MOUNT}')
     assert resp.status_code == 200
-    body = resp.json()
-    assert body == {
-        'errors': [{
-            'status': '404',
-            'title': 'Resource Not Found',
-            'detail': "Resource type 'PipetteOffsetCalibration' with id "
-                      "'123&right' was not found"
-        }]}
 
     resp = api_client.delete(
         f'/calibration/pipette_offset?pipette_id={PIPETTE_ID}&'
