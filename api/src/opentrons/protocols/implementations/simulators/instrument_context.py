@@ -2,6 +2,7 @@ import typing
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, \
     Clearances
 from opentrons.protocols.implementations.interfaces.instrument_context import \
@@ -9,6 +10,7 @@ from opentrons.protocols.implementations.interfaces.instrument_context import \
 from opentrons.protocols.implementations.interfaces.protocol_context import \
     ProtocolContextInterface
 from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.types import APIVersion
 
 
 class SimInstrumentContext(InstrumentContextInterface):
@@ -17,26 +19,33 @@ class SimInstrumentContext(InstrumentContextInterface):
                  protocol_interface: ProtocolContextInterface,
                  pipette_dict: PipetteDict,
                  mount: types.Mount,
-                 instrument_name: str):
+                 instrument_name: str,
+                 default_speed: float = 400.0,
+                 api_version: APIVersion = None):
         self._protocol_interface = protocol_interface
         self._mount = mount
         self._pipette_dict = pipette_dict
         self._instrument_name = instrument_name
+        self._default_speed = default_speed
+        self._api_version = api_version or MAX_SUPPORTED_VERSION
+        self._flow_rate = FlowRates(self)
+        self._plunger_speeds = PlungerSpeeds(self)
 
     def get_default_speed(self) -> float:
-        return 40
+        return self._default_speed
 
     def set_default_speed(self, speed: float) -> None:
-        pass
+        self._default_speed = speed
 
     def aspirate(self, volume: float, rate: float = 1.0) -> None:
-        pass
+        self._pipette_dict['current_volume'] += volume
 
     def dispense(self, volume: float, rate: float = 1.0) -> None:
-        pass
+        self._pipette_dict['current_volume'] -= volume
 
     def blow_out(self) -> None:
-        pass
+        self._pipette_dict['current_volume'] = 0
+        self._pipette_dict['ready_to_aspirate'] = False
 
     def touch_tip(self, location: WellImplementation, radius: float = 1.0,
                   v_offset: float = -1.0, speed: float = 60.0) -> None:
@@ -45,13 +54,14 @@ class SimInstrumentContext(InstrumentContextInterface):
     def pick_up_tip(self, well: WellImplementation, tip_length: float,
                     presses: typing.Optional[int] = None,
                     increment: typing.Optional[float] = None) -> None:
-        pass
+        self._pipette_dict['has_tip'] = True
+        self._pipette_dict['current_volume'] = 0
 
     def drop_tip(self, home_after: bool = True) -> None:
-        pass
+        self._pipette_dict['has_tip'] = False
 
     def home(self) -> None:
-        pass
+        self._protocol_interface.set_last_location(None)
 
     def home_plunger(self) -> None:
         pass
@@ -62,7 +72,7 @@ class SimInstrumentContext(InstrumentContextInterface):
     def move_to(self, location: types.Location, force_direct: bool = False,
                 minimum_z_height: typing.Optional[float] = None,
                 speed: typing.Optional[float] = None) -> None:
-        pass
+        self._protocol_interface.set_last_location(location)
 
     def get_mount(self) -> types.Mount:
         return self._mount
@@ -110,17 +120,27 @@ class SimInstrumentContext(InstrumentContextInterface):
         return Clearances(default_aspirate=1, default_dispense=1)
 
     def get_speed(self) -> PlungerSpeeds:
-        return PlungerSpeeds(self)
+        return self._plunger_speeds
 
     def get_flow_rate(self) -> FlowRates:
-        return FlowRates(self)
+        return self._flow_rate
 
     def set_flow_rate(self, aspirate: typing.Optional[float] = None,
                       dispense: typing.Optional[float] = None,
                       blow_out: typing.Optional[float] = None) -> None:
-        pass
+        if aspirate is not None:
+            self._pipette_dict['aspirate_flow_rate'] = aspirate
+        if dispense is not None:
+            self._pipette_dict['dispense_flow_rate'] = dispense
+        if blow_out is not None:
+            self._pipette_dict['blow_out_flow_rate'] = blow_out
 
     def set_pipette_speed(self, aspirate: typing.Optional[float] = None,
                           dispense: typing.Optional[float] = None,
                           blow_out: typing.Optional[float] = None) -> None:
-        pass
+        if aspirate is not None:
+            self._pipette_dict['aspirate_speed'] = aspirate
+        if dispense is not None:
+            self._pipette_dict['dispense_speed'] = dispense
+        if blow_out is not None:
+            self._pipette_dict['blow_out_speed'] = blow_out
