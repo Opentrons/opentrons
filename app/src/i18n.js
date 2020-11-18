@@ -1,15 +1,27 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import * as resources from './localization'
+import { resources } from './assets/localization'
 
-i18n.use(initReactI18next).init({
-  resources,
-  fallbackLng: 'en',
-  debug: true,
+i18n.use(initReactI18next).init(
+  {
+    resources,
+    lng: 'en',
+    fallbackLng: 'en',
+    ns: ['button'],
+    debug: true,
 
-  interpolation: {
-    escapeValue: false, // not needed for react as it escapes by default
+    interpolation: {
+      escapeValue: false, // not needed for react as it escapes by default
+    },
   },
-})
+  (err, t) => {
+    if (err) {
+      console.error(
+        'Internationalization was not initialized properly. error: ',
+        err
+      )
+    }
+  }
+)
 
 export { i18n }

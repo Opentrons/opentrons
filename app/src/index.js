@@ -8,6 +8,9 @@ import thunk from 'redux-thunk'
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 
+import { I18nextProvider } from 'react-i18next'
+
+import { i18n } from './i18n'
 import { createLogger } from './logger'
 import { uiInitialized } from './shell'
 import { apiClientMiddleware as robotApiMiddleware } from './robot/api-client'
@@ -54,7 +57,9 @@ log.info('Rendering app UI')
 ReactDom.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <App />
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>
     </ConnectedRouter>
   </Provider>,
   document.getElementById('root')
