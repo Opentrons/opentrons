@@ -135,8 +135,11 @@ def delete_pipette_offset_file(pipette: str, mount: Mount):
     offset_dir = config.get_opentrons_path('pipette_calibration_dir')
     offset_path = offset_dir / mount.name.lower() / f'{pipette}.json'
 
-    _remove_pipette_offset_from_index(pipette, mount)
-    offset_path.unlink()
+    try:
+        _remove_pipette_offset_from_index(pipette, mount)
+        offset_path.unlink()
+    except FileNotFoundError:
+        pass
 
 
 def clear_pipette_offset_calibrations():
