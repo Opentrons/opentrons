@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.14](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.13...v4.0.0-alpha.14) (2020-11-18)
+
+
+### Bug Fixes
+
+* **api:** tolerate delete of nonexistent pip offset ([#7027](https://github.com/Opentrons/opentrons/issues/7027)) ([6fac6ce](https://github.com/Opentrons/opentrons/commit/6fac6ce))
+
+
+
+
+
 # [4.0.0-alpha.13](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.12...v4.0.0-alpha.13) (2020-11-17)
 
 
