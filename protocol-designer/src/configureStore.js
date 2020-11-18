@@ -2,6 +2,7 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { trackEventMiddleware } from './analytics/middleware'
+import { saveFileMiddleware } from './load-file/saveFileMiddleware'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
@@ -76,7 +77,12 @@ export function configureStore(): Store<
     reducer,
     /* preloadedState, */
     composeEnhancers(
-      applyMiddleware(trackEventMiddleware, timelineMiddleware, thunk)
+      applyMiddleware(
+        trackEventMiddleware,
+        timelineMiddleware,
+        saveFileMiddleware,
+        thunk
+      )
     )
   )
 
