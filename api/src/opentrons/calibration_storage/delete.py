@@ -121,10 +121,9 @@ def _remove_pipette_offset_from_index(pipette: str, mount: Mount):
     blob = io.read_cal_file(str(index_path))
 
     try:
-        if pipette in blob[mount.name.lower()]:
-            blob[mount.name.lower()].remove(pipette)
-            io.save_to_file(index_path, blob)
-    except KeyError:
+        blob[mount.name.lower()].remove(pipette)
+        io.save_to_file(index_path, blob)
+    except (KeyError, ValueError):
         # If the index file does not have a mount entry, you get
         # an error here
         pass
