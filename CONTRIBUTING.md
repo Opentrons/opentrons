@@ -345,16 +345,29 @@ Not every JavaScript package has an available flow-typed definition. In this cas
 
 ### Opentrons API
 
-Be sure to check out the [API `README`][api-readme] for additional instructions. To run the Opentrons API in development mode:
+Be sure to check out the [API `README`][api-readme] for additional instructions.
+
+### Robot Server
+
+To run the Opentrons HTTP API in development mode:
 
 ```shell
 # run API with virtual robot
-make -C api dev ENABLE_VIRTUAL_SMOOTHIE=true
+make -C robot-server dev OT_ROBOT_SERVER_simulator_configuration_file_path=simulators/test.json
 # run API with robot's motor driver connected via USB to UART cable
-make -C api dev
+make -C robot-server dev
 ```
 
-To put the API on a test robot, if it's on balena do:
+Generally to test your code on the robot, you will want to push the whole mono-repo to the robot
+in case there are large differences between your robot's server version and the code you are using
+from github. You can do this via:
+
+```shell
+# Use this command From the top level opentrons folder
+make push host=${some_other_ip_address}
+```
+
+To put the robot server on a test robot, if it's on buildroot do:
 
 ```shell
 # push the current contents of the api directory to robot for testing
