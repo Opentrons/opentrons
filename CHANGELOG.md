@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0-alpha.15](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.14...v4.0.0-alpha.15) (2020-11-18)
+
+
+### Bug Fixes
+
+* **api:** handle missing intermediate keys in poc index ([#7029](https://github.com/Opentrons/opentrons/issues/7029)) ([a123a5f](https://github.com/Opentrons/opentrons/commit/a123a5f))
+
+
+
+
+
 # [4.0.0-alpha.14](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.13...v4.0.0-alpha.14) (2020-11-18)
 
 
