@@ -43,7 +43,7 @@ def test_delete_pipette_offset_calibration(
     resp = api_client.delete(
         f'/calibration/pipette_offset?pipette_id={PIPETTE_ID}&'
         f'mount={WRONG_MOUNT}')
-    assert resp.status_code == 404
+    assert resp.status_code == 200
     body = resp.json()
     assert body == {
         'errors': [{
