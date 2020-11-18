@@ -494,20 +494,19 @@ class Session(RobotBusy):
             return self
 
     def _start_hardware_event_watcher(self):
-        # if not callable(self._event_watcher):
-        #     # initialize and update window switch state
-        #     self._update_window_state(self._hardware.door_state)
-        #     log.info('Starting hardware event watcher')
-        #     self._event_watcher = self._hardware.register_callback(
-        #         self._handle_hardware_event)
-        # else:
-        #     log.warning("Cannot start new hardware event watcher "
-        #                 "when one already exists")
-        pass
+        if not callable(self._event_watcher):
+            # initialize and update window switch state
+            self._update_window_state(self._hardware.door_state)
+            log.info('Starting hardware event watcher')
+            self._event_watcher = self._hardware.register_callback(
+                self._handle_hardware_event)
+        else:
+            log.warning("Cannot start new hardware event watcher "
+                        "when one already exists")
 
     def _remove_hardware_event_watcher(self):
         if callable(self._event_watcher):
-            self._event_watcher()   # Why is this being called?
+            self._event_watcher()
             self._event_watcher = None
 
     def _handle_hardware_event(self, hw_event: 'HardwareEvent'):

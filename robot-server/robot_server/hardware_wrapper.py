@@ -58,16 +58,7 @@ class HardwareWrapper:
                         "when one already exists")
 
     def _publish_door_event(self, hw_event: HardwareEvent):
-        log.info("1. Publishing door event!")
         if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
-            log.info("2. Publishing door event!")
-            # loop = asyncio.get_running_loop()
-            # asyncio.run_coroutine_threadsafe(self._event_publisher.send("Door_event", Event(
-            #     createdOn=utc_now(),
-            #     publisher="robot_server.hardware_wrapper."
-            #               "_publish_door_event",
-            #     data=DoorSwitchEvent(val=hw_event.new_state)
-            # )), loop)
             self._event_publisher.send_nowait("Door_event", Event(
                 createdOn=utc_now(),
                 publisher="robot_server.hardware_wrapper."
