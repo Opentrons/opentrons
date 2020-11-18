@@ -1,8 +1,8 @@
 """Protocol engine commands sub-state."""
 from typing import Dict, List, Optional, Tuple
 
-from .substore import Substore
 from ..commands import CommandType
+from .substore import Substore
 
 
 class CommandState:

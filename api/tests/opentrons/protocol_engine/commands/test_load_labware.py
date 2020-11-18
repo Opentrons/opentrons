@@ -40,25 +40,25 @@ def test_load_labware_result(well_plate_def: LabwareDefinition) -> None:
     assert result.calibration == (1, 2, 3)
 
 
-async def test_load_labware_implementation_execute(
+async def test_load_labware_implementation(
     well_plate_def: LabwareDefinition,
     mock_handlers: AsyncMock,
 ) -> None:
-    """A LoadLabwareRequest should have an impl. that executes the command."""
-    request = LoadLabwareRequest(
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
-        loadName="some-load-name",
-        namespace="opentrons-test",
-        version=1
-    )
-    impl = request.get_implementation()
-
+    """A LoadLabwareRequest should have an execution implementation."""
     mock_handlers.equipment.load_labware.return_value = LoadedLabware(
         labware_id="labware-id",
         definition=well_plate_def,
         calibration=(1, 2, 3)
     )
 
+    request = LoadLabwareRequest(
+        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        loadName="some-load-name",
+        namespace="opentrons-test",
+        version=1
+    )
+
+    impl = request.get_implementation()
     result = await impl.execute(mock_handlers)
 
     assert result == LoadLabwareResult(

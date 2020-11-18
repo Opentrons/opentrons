@@ -30,15 +30,15 @@ def test_pick_up_tip_result() -> None:
 
 async def test_pick_up_tip_implementation(mock_handlers: AsyncMock) -> None:
     """A PickUpTipRequest should have an execution implementation."""
+    mock_handlers.pipetting.pick_up_tip.return_value = None
+
     request = PickUpTipRequest(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
     )
+
     impl = request.get_implementation()
-
-    mock_handlers.pipetting.pick_up_tip.return_value = None
-
     result = await impl.execute(mock_handlers)
 
     assert result == PickUpTipResult()

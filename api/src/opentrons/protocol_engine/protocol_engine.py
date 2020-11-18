@@ -58,7 +58,7 @@ class ProtocolEngine:
     async def execute_command(
         self,
         request: CommandRequestType,
-        command_id: str
+        command_id: str,
     ) -> Union[CompletedCommandType, FailedCommandType]:
         """Execute a command request, waiting for it to complete."""
         cmd_impl = request.get_implementation()

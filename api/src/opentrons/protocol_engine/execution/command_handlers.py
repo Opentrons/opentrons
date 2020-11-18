@@ -1,4 +1,4 @@
-"""Command executor router class."""
+"""Command side-effect execution logic container."""
 from __future__ import annotations
 
 from opentrons.hardware_control.api import API as HardwareAPI

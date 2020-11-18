@@ -30,15 +30,15 @@ def test_move_to_well_result() -> None:
 
 async def test_move_to_well_implementation(mock_handlers: AsyncMock) -> None:
     """A MoveToWellRequest should have an execution implementation."""
+    mock_handlers.movement.move_to_well.return_value = None
+
     request = MoveToWellRequest(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
     )
+
     impl = request.get_implementation()
-
-    mock_handlers.movement.move_to_well.return_value = None
-
     result = await impl.execute(mock_handlers)
 
     assert result == MoveToWellResult()

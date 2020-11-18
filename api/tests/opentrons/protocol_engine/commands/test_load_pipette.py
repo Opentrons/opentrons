@@ -28,17 +28,13 @@ def test_load_pipette_result() -> None:
 
 
 async def test_load_pipette_implementation(mock_handlers: AsyncMock) -> None:
-    """A LoadLabwareRequest should have an impl. that executes the command."""
-    request = LoadPipetteRequest(
-        pipetteName="p300_single",
-        mount=MountType.LEFT
-    )
-    impl = request.get_implementation()
-
+    """A LoadPipetteRequest should have an execution implementation."""
     mock_handlers.equipment.load_pipette.return_value = LoadedPipette(
         pipette_id="pipette-id",
     )
 
+    request = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
+    impl = request.get_implementation()
     result = await impl.execute(mock_handlers)
 
     assert result == LoadPipetteResult(pipetteId="pipette-id")

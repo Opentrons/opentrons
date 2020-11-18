@@ -42,7 +42,7 @@ class EquipmentHandler:
         hardware: HardwareAPI,
         state: StateView,
         id_generator: IdGenerator,
-        labware_data: LabwareData
+        labware_data: LabwareData,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
         self._hardware = hardware
@@ -55,7 +55,7 @@ class EquipmentHandler:
         load_name: str,
         namespace: str,
         version: int,
-        location: LabwareLocation
+        location: LabwareLocation,
     ) -> LoadedLabware:
         """Load labware by assigning an identifier and pulling required data."""
         labware_id = self._id_generator.generate_id()
@@ -74,7 +74,7 @@ class EquipmentHandler:
         return LoadedLabware(
             labware_id=labware_id,
             definition=definition,
-            calibration=calibration
+            calibration=calibration,
         )
 
     async def load_pipette(
@@ -85,7 +85,7 @@ class EquipmentHandler:
         """Ensure the requested pipette is attached."""
         other_mount = mount.other_mount()
         other_pipette = self._state.pipettes.get_pipette_data_by_mount(
-            other_mount
+            other_mount,
         )
 
         cache_request = {mount.to_hw_mount(): pipette_name}
