@@ -26,7 +26,7 @@ describe('Desktop Navigation', () => {
     cy.get("div[class*='_main_nav_wrapper_']")
       .find('a')
       .should('have.prop', 'href')
-      .and('equal', 'https://opentrons.com/')
+      .and('equal', 'https://www.opentrons.com/')
     cy.get("div[class*='_main_nav_wrapper_']").contains('About')
     cy.get("div[class*='_main_nav_wrapper_']").contains('Products')
     cy.get("div[class*='_main_nav_wrapper_']").contains('Applications')
