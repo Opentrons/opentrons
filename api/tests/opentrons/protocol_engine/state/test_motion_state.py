@@ -27,6 +27,14 @@ def test_initial_location(store: StateStore) -> None:
         ),
         cmd.PickUpTipResult()
     ),
+    (
+        cmd.DropTipRequest(
+            pipetteId="pipette-id",
+            labwareId="labware-id",
+            wellName="B4"
+        ),
+        cmd.DropTipResult()
+    ),
 ])
 def test_handles_move_to_well_result(
     store: StateStore,

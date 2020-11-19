@@ -1,17 +1,24 @@
 """Geometry state store and getters."""
 from dataclasses import dataclass
+from typing import Optional
 from typing_extensions import final
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2, SlotDefV2
 from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from .. import errors
+from ..types import WellLocation, WellOrigin
 from .substore import Substore, CommandReactive
 from .labware import LabwareStore, LabwareData
 
 
+DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
+
 # TODO(mc, 2020-11-12): reconcile this data structure with WellGeometry
+
+
 @final
 @dataclass(frozen=True)
 class TipGeometry:
@@ -75,7 +82,12 @@ class GeometryState:
             for uid, lw_data in self._labware_store.state.get_all_labware()
         ])
 
-    def get_well_position(self, labware_id: str, well_name: str) -> Point:
+    def get_well_position(
+        self,
+        labware_id: str,
+        well_name: str,
+        well_location: Optional[WellLocation] = None,
+    ) -> Point:
         """Get the absolute position of a well in a labware."""
         # TODO(mc, 2020-10-29): implement CSS-style key point + offset option
         # rather than defaulting to well top
@@ -86,13 +98,23 @@ class GeometryState:
             labware_id,
             well_name
         )
+        well_depth = well_def["depth"]
         slot_pos = self.get_slot_position(labware_data.location.slot)
         cal_offset = labware_data.calibration
 
+        if well_location is not None:
+            offset = well_location.offset
+
+            if well_location.origin == WellOrigin.TOP:
+                offset = (offset[0], offset[1], offset[2] + well_depth)
+
+        else:
+            offset = (0, 0, well_depth)
+
         return Point(
-            x=slot_pos[0] + cal_offset[0] + well_def["x"],
-            y=slot_pos[1] + cal_offset[1] + well_def["y"],
-            z=slot_pos[2] + cal_offset[2] + well_def["z"] + well_def["depth"],
+            x=slot_pos[0] + cal_offset[0] + offset[0] + well_def["x"],
+            y=slot_pos[1] + cal_offset[1] + offset[1] + well_def["y"],
+            z=slot_pos[2] + cal_offset[2] + offset[2] + well_def["z"],
         )
 
     def _get_highest_z_from_labware_data(self, lw_data: LabwareData) -> float:
@@ -150,6 +172,23 @@ class GeometryState:
             # is a float, but hardware controller expects an int
             volume=int(well_def["totalLiquidVolume"]),
         )
+
+    # TODO(mc, 2020-11-12): support pre-PAPIv2.2/2.3 behavior of dropping the tip
+    # 10mm above well bottom
+    def get_tip_drop_location(
+        self,
+        labware_id: str,
+        pipette_config: PipetteDict
+    ) -> WellLocation:
+        """Get tip drop location given labware and hardware pipette."""
+        # return to top if labware is fixed trash
+        if labware_id == FIXED_TRASH_ID:
+            return WellLocation()
+
+        nominal_length = self._labware_store.state.get_tip_length(labware_id)
+        offset_factor = pipette_config["return_tip_height"]
+
+        return WellLocation(offset=(0, 0, -nominal_length * offset_factor))
 
 
 class GeometryStore(Substore[GeometryState], CommandReactive):
