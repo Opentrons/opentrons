@@ -45,7 +45,6 @@ import {
 } from './constants'
 import { DeckCalibrationControl } from './DeckCalibrationControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
-import { CalibrationCardWarning } from './CalibrationCardWarning'
 import { PipetteOffsets } from './PipetteOffsets'
 
 type Props = {|
@@ -152,12 +151,14 @@ export function CalibrationCard(props: Props): React.Node {
     )
   }
 
-  const warningInsteadOfCalcheck =
-    [
+  const displayCalCheck =
+    ![
       Calibration.DECK_CAL_STATUS_SINGULARITY,
       Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
       Calibration.DECK_CAL_STATUS_IDENTITY,
-    ].includes(deckCalStatus) || !pipetteCalPresent
+    ].includes(deckCalStatus) &&
+    pipetteCalPresent &&
+    pipettePresent
 
   const pipOffsetDataPresent = pipetteOffsetCalibrations
     ? pipetteOffsetCalibrations.length > 0
@@ -177,20 +178,17 @@ export function CalibrationCard(props: Props): React.Node {
         >
           {TITLE}
         </Text>
-        {!warningInsteadOfCalcheck ? (
-          <Link
-            href="#"
-            color={C_BLUE}
-            paddingTop={SPACING_3}
-            paddingX={SPACING_3}
-            fontSize={FONT_SIZE_BODY_1}
-            onClick={onClickSaveAs}
-          >
-            {DOWNLOAD_CALIBRATION}
-          </Link>
-        ) : null}
+        <Link
+          href="#"
+          color={C_BLUE}
+          paddingTop={SPACING_3}
+          paddingX={SPACING_3}
+          fontSize={FONT_SIZE_BODY_1}
+          onClick={onClickSaveAs}
+        >
+          {DOWNLOAD_CALIBRATION}
+        </Link>
       </Flex>
-      {warningInsteadOfCalcheck ? <CalibrationCardWarning /> : null}
       <DeckCalibrationControl
         robotName={robotName}
         disabledReason={buttonDisabledReason}
@@ -199,7 +197,7 @@ export function CalibrationCard(props: Props): React.Node {
         pipOffsetDataPresent={pipOffsetDataPresent}
       />
       <PipetteOffsets pipettesPageUrl={pipettesPageUrl} robot={robot} />
-      {!warningInsteadOfCalcheck && pipettePresent ? (
+      {displayCalCheck ? (
         <CheckCalibrationControl
           robotName={robotName}
           disabledReason={buttonDisabledReason}

@@ -13,7 +13,6 @@ import * as RobotSelectors from '../../../robot/selectors'
 
 import { CalibrationCard } from '../CalibrationCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
-import { CalibrationCardWarning } from '../CalibrationCardWarning'
 import { PipetteOffsets } from '../PipetteOffsets'
 import { mockAttachedPipette } from '../../../pipettes/__fixtures__'
 import { mockPipetteOffsetCalibration1 } from '../../../calibration/pipette-offset/__fixtures__'
@@ -257,7 +256,7 @@ describe('CalibrationCard', () => {
     Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
   ]
   cals.forEach(status => {
-    it(`CalibrationCardWarning component renders instead of check calibration if deck calibration is ${status}`, () => {
+    it(`check calibration does not render if deck calibration is ${status}`, () => {
       getDeckCalibrationStatus.mockImplementation((state, rName) => {
         expect(state).toEqual(MOCK_STATE)
         expect(rName).toEqual(mockRobot.name)
@@ -265,19 +264,17 @@ describe('CalibrationCard', () => {
       })
       const { wrapper } = render()
 
-      expect(wrapper.exists(CalibrationCardWarning)).toBe(true)
       expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
     })
   })
 
-  it('CalibrationCardWarning component renders instead of check calibration if pipette calibration is missing', () => {
+  it('check calibration does not render if pipette calibration is missing', () => {
     getAttachedPipetteCalibrations.mockReturnValue({
       left: { offset: null, tipLength: null },
       right: { offset: null, tipLength: null },
     })
     const { wrapper } = render()
 
-    expect(wrapper.exists(CalibrationCardWarning)).toBe(true)
     expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
   })
 
