@@ -3,33 +3,6 @@
 @import '../../styles/colors.css';
 @import '../../styles/typography.css';
 
-:root {
-  --bd-radius-default: 3px;
-  --bd-light: 1px solid var(--c-light-gray);
-  --bd-width-default: 1px;
-  --c-nav-gray: #7f858c;
-
-  --dropdown-caret-after: {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    border-width: 11px;
-    border-style: solid;
-    border-color: transparent transparent var(--c-light-gray) transparent;
-    z-index: 10;
-  }
-
-  --dropdown-caret-before: {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    border-width: 9px;
-    border-style: solid;
-    border-color: transparent transparent var(--c-white) transparent;
-    z-index: 20;
-  }
-}
-
 .main_nav_contents {
   display: flex;
   justify-content: space-between;
@@ -121,7 +94,7 @@
 
 .nav_list_submenu_open .nav_url_name {
   @media (--large) {
-    color: var(--c-nav-gray);
+    color: #7f858c;
   }
 }
 
@@ -164,7 +137,7 @@
 
 .nav_text {
   font-size: 14px;
-  color: var(--c-nav-gray);
+  color: #7f858c;
   font-weight: 600;
   text-align: center;
   padding: var(--spacing-6) 0;
@@ -204,8 +177,8 @@
     position: absolute;
     top: 2.5rem;
     background-color: var(--c-white);
-    border-radius: var(--bd-radius-default);
-    border: var(--bd-light);
+    border-radius: 3px;
+    border: 1px solid var(--c-light-gray);
     width: auto;
     height: auto;
     left: 26%;
@@ -214,14 +187,24 @@
   }
 
   &::after {
-    @apply --dropdown-caret-after;
-
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    border-width: 11px;
+    border-style: solid;
+    border-color: transparent transparent var(--c-light-gray) transparent;
+    z-index: 10;
     left: 50%;
   }
 
   &::before {
-    @apply --dropdown-caret-before;
-
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    border-width: 9px;
+    border-style: solid;
+    border-color: transparent transparent var(--c-white) transparent;
+    z-index: 20;
     left: calc(50% + 2px);
   }
 }
@@ -232,7 +215,7 @@
 
   @media (--large) {
     transform: translate(-50%, 0);
-    border-top: var(--bd-light);
+    border-top: 1px solid var(--c-light-gray);
   }
 }
 
@@ -374,7 +357,7 @@
 .nav_sub_description {
   font-weight: normal;
   font-family: var(--ff-open-sans);
-  color: var(--c-nav-gray);
+  color: #7f858c;
   margin-top: 3px;
   line-height: 1.625rem;
 
