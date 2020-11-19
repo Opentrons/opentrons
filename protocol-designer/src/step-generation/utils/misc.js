@@ -323,7 +323,10 @@ export function makeInitialRobotState(args: {|
         (acc, _, labwareId) => {
           const def = invariantContext.labwareEntities[labwareId].def
           if (!getIsTiprack(def)) return acc
-          const tipState = mapValues(def.wells, () => true)
+          const tipState: Set<string> = new Set()
+          Object.keys(def.wells).forEach(wellName => {
+            tipState.add(wellName)
+          })
           return { ...acc, [labwareId]: tipState }
         },
         {}

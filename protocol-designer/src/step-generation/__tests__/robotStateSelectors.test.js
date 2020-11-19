@@ -4,7 +4,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import {
   makeContext,
   makeState,
-  getTipColumn,
+  setTipColumn,
   getTiprackTipstate,
   DEFAULT_PIPETTE,
 } from '../__fixtures__'
@@ -51,10 +51,7 @@ describe('sortLabwareBySlot', () => {
 })
 
 describe('_getNextTip', () => {
-  const getNextTipHelper = (
-    channel: 1 | 8,
-    tiprackTipState: { [well: string]: boolean }
-  ) => {
+  const getNextTipHelper = (channel: 1 | 8, tiprackTipState: Set<string>) => {
     const pipetteId = channel === 1 ? DEFAULT_PIPETTE : 'p300MultiId'
     const tiprackId = 'testTiprack'
     const _invariantContext = makeContext()
@@ -83,48 +80,44 @@ describe('_getNextTip', () => {
   it('empty tiprack should return null', () => {
     const channels = [1, 8]
     channels.forEach(channel => {
-      const result = getNextTipHelper(channel, { ...getTiprackTipstate(false) })
+      const result = getNextTipHelper(channel, getTiprackTipstate(false))
       expect(result).toBe(null)
     })
   })
 
   it('full tiprack should start at A1', () => {
-    const result = getNextTipHelper(1, { ...getTiprackTipstate(true) })
+    const result = getNextTipHelper(1, getTiprackTipstate(true))
     expect(result).toEqual('A1')
   })
 
   it('missing A1, go to B1', () => {
-    const result = getNextTipHelper(1, {
-      ...getTiprackTipstate(true),
-      A1: false,
-    })
+    const tips: Set<string> = getTiprackTipstate(true)
+    tips.delete('A1')
+    const result = getNextTipHelper(1, tips)
     expect(result).toEqual('B1')
   })
 
   it('missing A1 and B1, go to C1', () => {
-    const result = getNextTipHelper(1, {
-      ...getTiprackTipstate(true),
-      A1: false,
-      B1: false,
-    })
+    const tips: Set<string> = getTiprackTipstate(true)
+    tips.delete('A1')
+    tips.delete('B1')
+    const result = getNextTipHelper(1, tips)
     expect(result).toEqual('C1')
   })
 
   it('missing first column, go to A2', () => {
-    const result = getNextTipHelper(1, {
-      ...getTiprackTipstate(true),
-      ...getTipColumn(1, false),
-    })
+    const tips: Set<string> = getTiprackTipstate(true)
+    setTipColumn(1, false, tips)
+    const result = getNextTipHelper(1, tips)
     expect(result).toEqual('A2')
   })
 
   it('missing a few random tips, go to lowest col, then lowest row', () => {
-    const result = getNextTipHelper(1, {
-      ...getTiprackTipstate(true),
-      ...getTipColumn(1, false),
-      ...getTipColumn(2, false),
-      D2: true,
-    })
+    const tips: Set<string> = getTiprackTipstate(true)
+    setTipColumn(1, false, tips)
+    setTipColumn(2, false, tips)
+    tips.add('D2')
+    const result = getNextTipHelper(1, tips)
     expect(result).toEqual('D2')
   })
 })
@@ -141,7 +134,7 @@ describe('getNextTiprack - single-channel', () => {
       tiprackSetting: { tiprack1Id: true },
     })
 
-    robotState.tipState.tipracks.tiprack1Id.A1 = false
+    robotState.tipState.tipracks.tiprack1Id.delete('A1')
 
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
 
@@ -188,8 +181,8 @@ describe('getNextTiprack - single-channel', () => {
       tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
     })
     // remove A1 tip from both racks
-    robotState.tipState.tipracks.tiprack1Id.A1 = false
-    robotState.tipState.tipracks.tiprack2Id.A1 = false
+    robotState.tipState.tipracks.tiprack1Id.delete('A1')
+    robotState.tipState.tipracks.tiprack2Id.delete('A1')
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack1Id')
@@ -238,12 +231,10 @@ describe('getNextTiprack - 8-channel', () => {
       },
       tiprackSetting: { tiprack1Id: true },
     })
-    robotState.tipState.tipracks.tiprack1Id = {
-      ...robotState.tipState.tipracks.tiprack1Id,
-      A1: false,
-      A2: false,
-      A5: false,
-    }
+
+    robotState.tipState.tipracks.tiprack1Id.delete('A1')
+    robotState.tipState.tipracks.tiprack1Id.delete('A2')
+    robotState.tipState.tipracks.tiprack1Id.delete('A5')
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack1Id')
@@ -273,21 +264,19 @@ describe('getNextTiprack - 8-channel', () => {
       },
       tiprackSetting: { tiprack1Id: true },
     })
-    robotState.tipState.tipracks.tiprack1Id = {
-      ...robotState.tipState.tipracks.tiprack1Id,
-      F1: false,
-      B2: false,
-      C3: false,
-      A4: false,
-      H5: false,
-      E6: false,
-      B7: false,
-      A8: false,
-      C9: false,
-      D10: false,
-      G11: false,
-      F12: false,
-    }
+
+    robotState.tipState.tipracks.tiprack1Id.delete('F1')
+    robotState.tipState.tipracks.tiprack1Id.delete('B2')
+    robotState.tipState.tipracks.tiprack1Id.delete('C3')
+    robotState.tipState.tipracks.tiprack1Id.delete('A4')
+    robotState.tipState.tipracks.tiprack1Id.delete('H5')
+    robotState.tipState.tipracks.tiprack1Id.delete('E6')
+    robotState.tipState.tipracks.tiprack1Id.delete('B7')
+    robotState.tipState.tipracks.tiprack1Id.delete('A8')
+    robotState.tipState.tipracks.tiprack1Id.delete('C9')
+    robotState.tipState.tipracks.tiprack1Id.delete('D10')
+    robotState.tipState.tipracks.tiprack1Id.delete('G11')
+    robotState.tipState.tipracks.tiprack1Id.delete('F12')
 
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
@@ -323,42 +312,35 @@ describe('getNextTiprack - 8-channel', () => {
       tiprackSetting: { tiprack1Id: true, tiprack2Id: true, tiprack3Id: true },
     })
     // remove tips from state
-    robotState.tipState.tipracks.tiprack1Id = {
-      ...robotState.tipState.tipracks.tiprack1Id,
-      // empty row, 8-channel cannot use
-      A1: false,
-      A2: false,
-      A3: false,
-      A4: false,
-      A5: false,
-      A6: false,
-      A7: false,
-      A8: false,
-      A9: false,
-      A10: false,
-      A11: false,
-      A12: false,
-    }
-    robotState.tipState.tipracks.tiprack2Id = {
-      ...robotState.tipState.tipracks.tiprack2Id,
-      // empty diagonal, 8-channel cannot use
-      F1: false,
-      B2: false,
-      C3: false,
-      A4: false,
-      H5: false,
-      E6: false,
-      B7: false,
-      A8: false,
-      C9: false,
-      D10: false,
-      G11: false,
-      F12: false,
-    }
-    robotState.tipState.tipracks.tiprack3Id = {
-      ...robotState.tipState.tipracks.tiprack3Id,
-      A1: false,
-    }
+    // empty row, 8-channel cannot use
+    robotState.tipState.tipracks.tiprack1Id.delete('A1')
+    robotState.tipState.tipracks.tiprack1Id.delete('A2')
+    robotState.tipState.tipracks.tiprack1Id.delete('A3')
+    robotState.tipState.tipracks.tiprack1Id.delete('A4')
+    robotState.tipState.tipracks.tiprack1Id.delete('A5')
+    robotState.tipState.tipracks.tiprack1Id.delete('A6')
+    robotState.tipState.tipracks.tiprack1Id.delete('A7')
+    robotState.tipState.tipracks.tiprack1Id.delete('A8')
+    robotState.tipState.tipracks.tiprack1Id.delete('A9')
+    robotState.tipState.tipracks.tiprack1Id.delete('A10')
+    robotState.tipState.tipracks.tiprack1Id.delete('A11')
+    robotState.tipState.tipracks.tiprack1Id.delete('A12')
+
+    // empty diagonal, 8-channel cannot use
+    robotState.tipState.tipracks.tiprack2Id.delete('F1')
+    robotState.tipState.tipracks.tiprack2Id.delete('B2')
+    robotState.tipState.tipracks.tiprack2Id.delete('C3')
+    robotState.tipState.tipracks.tiprack2Id.delete('A4')
+    robotState.tipState.tipracks.tiprack2Id.delete('H5')
+    robotState.tipState.tipracks.tiprack2Id.delete('E6')
+    robotState.tipState.tipracks.tiprack2Id.delete('B7')
+    robotState.tipState.tipracks.tiprack2Id.delete('A8')
+    robotState.tipState.tipracks.tiprack2Id.delete('C9')
+    robotState.tipState.tipracks.tiprack2Id.delete('D10')
+    robotState.tipState.tipracks.tiprack2Id.delete('G11')
+    robotState.tipState.tipracks.tiprack2Id.delete('F12')
+
+    robotState.tipState.tipracks.tiprack3Id.delete('A1')
 
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 

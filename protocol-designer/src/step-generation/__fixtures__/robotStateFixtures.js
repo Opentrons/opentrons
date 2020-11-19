@@ -36,33 +36,53 @@ import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
 import type { InvariantContext, RobotState, RobotStateAndWarnings } from '../'
 
-// Eg {A1: true, B1: true, ...}
-type WellTipState = { [wellName: string]: boolean }
+type WellTipState = Set<string>
 export function getTiprackTipstate(filled: ?boolean): WellTipState {
-  return tiprackWellNamesFlat.reduce<WellTipState>(
-    (acc, wellName: string) => ({
-      ...acc,
-      [wellName]: Boolean(filled),
-    }),
-    {}
-  )
+  const tips: Set<string> = new Set()
+  if (filled) {
+    tiprackWellNamesFlat.forEach((wellName: string) => {
+      tips.add(wellName)
+    })
+  }
+  return tips
 }
+
+// TODO IMMEDIATELY: REMOVE
+//
+// // Eg A2 B2 C2 D2 E2 F2 G2 H2 keys
+// // NOTE: this assumes standard 96-tiprack
+// export function getTipColumn<T>(
+//   index: number,
+//   filled: T
+// ): { [well: string]: T } {
+//   return Array.from('ABCDEFGH')
+//     .map(wellLetter => `${wellLetter}${index}`)
+//     .reduce(
+//       (acc, well) => ({
+//         ...acc,
+//         [well]: filled,
+//       }),
+//       {}
+//     )
+// }
 
 // Eg A2 B2 C2 D2 E2 F2 G2 H2 keys
 // NOTE: this assumes standard 96-tiprack
-export function getTipColumn<T>(
-  index: number,
-  filled: T
-): { [well: string]: T } {
-  return Array.from('ABCDEFGH')
-    .map(wellLetter => `${wellLetter}${index}`)
-    .reduce(
-      (acc, well) => ({
-        ...acc,
-        [well]: filled,
-      }),
-      {}
-    )
+export const setTipColumn = (
+  columnNumber: number,
+  value: boolean,
+  tips: Set<string>
+): void => {
+  const colWells = Array.from('ABCDEFGH').map(
+    wellLetter => `${wellLetter}${columnNumber}`
+  )
+  colWells.forEach(well => {
+    if (value) {
+      tips.add(well)
+    } else {
+      tips.delete(well)
+    }
+  })
 }
 
 // standard context fixtures to use across tests
@@ -230,7 +250,7 @@ export const getRobotStatePickedUpTipStandard = (
     tiprackSetting: { tiprack1Id: true },
   })
   robotStatePickedUpOneTip.tipState.pipettes[DEFAULT_PIPETTE] = true
-  robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = false
+  robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.delete('A1')
   return robotStatePickedUpOneTip
 }
 

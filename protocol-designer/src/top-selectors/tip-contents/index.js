@@ -1,8 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
 import noop from 'lodash/noop'
-import reduce from 'lodash/reduce'
-import mapValues from 'lodash/mapValues'
 import { getWellSetForMultichannel } from '../../utils'
 import * as StepGeneration from '../../step-generation'
 import {
@@ -78,7 +76,7 @@ function getTipEmpty(
 ): boolean {
   return !(
     robotState.tipState.tipracks[labwareId] &&
-    robotState.tipState.tipracks[labwareId][wellName]
+    robotState.tipState.tipracks[labwareId].has(wellName)
   )
 }
 
@@ -147,19 +145,37 @@ export const getMissingTipsByLabwareId: Selector<{
       if (prevFrame) robotState = prevFrame.robotState
     }
 
-    const missingTips =
-      robotState &&
-      robotState.tipState &&
-      // $FlowFixMe(bc, 2019-05-31): flow choking on mapValues
-      mapValues(robotState.tipState.tipracks, tipMap =>
-        reduce(
-          tipMap,
-          (acc, hasTip, wellName): WellGroup =>
-            hasTip ? acc : { ...acc, [wellName]: null },
-          {}
-        )
-      )
-    return missingTips || {}
+    // const missingTips =
+    //   robotState &&
+    //   robotState.tipState &&
+    //   // $FlowFixMe(bc, 2019-05-31): flow choking on mapValues
+    //   mapValues(robotState.tipState.tipracks, tipMap =>
+    //     reduce(
+    //       tipMap,
+    //       (acc, hasTip, wellName): WellGroup =>
+    //         hasTip ? acc : { ...acc, [wellName]: null },
+    //       {}
+    //     )
+    //   )
+    // return missingTips || {}
+
+    if (!robotState) return {}
+    const missingTips: { [tiprackId: string]: WellGroup } = {}
+    const tipracksTipState = robotState.tipState.tipracks
+    const tiprackIds: Array<string> = tipracksTipState
+      ? Object.keys(tipracksTipState)
+      : []
+    tiprackIds.forEach(tiprackId => {
+      missingTips[tiprackId] = {}
+      for (const well of tipracksTipState[tiprackId].values()) {
+        // !!!!!!!!!!!!!!
+        // TODO IMMEDIATELY this fn is backwards here, it's showing PRESENT tips,
+        // not missing tips!!!!!!!!!!!!!!!!!!!!!
+        missingTips[tiprackId][well] = null
+      }
+    })
+    return missingTips
+    // TODO IMMEDIATELY add unit test??
   }
 )
 

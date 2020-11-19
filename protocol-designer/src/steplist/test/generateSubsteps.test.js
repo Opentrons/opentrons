@@ -36,6 +36,7 @@ describe('generateSubstepItem', () => {
       },
       tiprackSetting: { tiprack1Id: false },
     })
+    console.log('DA TIPSATE', robotState.tipState)
   })
 
   it('null is returned when no robotState', () => {

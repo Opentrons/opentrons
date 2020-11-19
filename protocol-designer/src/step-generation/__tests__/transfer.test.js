@@ -204,7 +204,7 @@ describe('single transfer exceeding pipette max', () => {
       volume: 350,
     }
     // tip setup: tiprack's A1 has tip, pipette has no tip
-    robotStateWithTip.tipState.tipracks.tiprack1Id.A1 = true
+    robotStateWithTip.tipState.tipracks.tiprack1Id.add('A1')
     robotStateWithTip.tipState.pipettes.p300SingleId = false
     // liquid setup
     robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {

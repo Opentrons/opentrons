@@ -25,7 +25,7 @@ export function forPickUpTip(
 
   // remove tips from tiprack
   if (pipetteSpec.channels === 1) {
-    tipState.tipracks[labware][well] = false
+    tipState.tipracks[labware].delete(well)
   } else if (pipetteSpec.channels === 8) {
     const allWells = tiprackDef.ordering.find(col => col[0] === well)
     if (!allWells) {
@@ -33,7 +33,7 @@ export function forPickUpTip(
       throw new Error('Invalid primary well for tip pickup: ' + well)
     }
     allWells.forEach(function(well) {
-      tipState.tipracks[labware][well] = false
+      tipState.tipracks[labware].delete(well)
     })
   }
 }

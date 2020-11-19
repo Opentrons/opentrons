@@ -3,8 +3,9 @@ import merge from 'lodash/merge'
 import { makeImmutableStateUpdater } from '../__utils__'
 import {
   getInitialRobotStateStandard,
+  getTiprackTipstate,
   makeContext,
-  getTipColumn,
+  setTipColumn,
   DEFAULT_PIPETTE,
 } from '../__fixtures__'
 import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
@@ -37,14 +38,14 @@ describe('tip tracking', () => {
 
     const result = forPickUpTip(params, invariantContext, initialRobotState)
 
+    const tips = getTiprackTipstate(true)
+    tips.delete('A1')
     expect(result.warnings).toEqual([])
     expect(result.robotState).toEqual(
       merge({}, initialRobotState, {
         tipState: {
           tipracks: {
-            [tiprack1Id]: {
-              A1: false,
-            },
+            [tiprack1Id]: tips,
           },
           pipettes: {
             [p300SingleId]: true,
@@ -62,12 +63,14 @@ describe('tip tracking', () => {
     }
     const result = forPickUpTip(params, invariantContext, initialRobotState)
 
+    const tips = getTiprackTipstate(true)
+    setTipColumn(1, false, tips)
     expect(result.warnings).toEqual([])
     expect(result.robotState).toEqual(
       merge({}, initialRobotState, {
         tipState: {
           tipracks: {
-            [tiprack1Id]: getTipColumn(1, false),
+            [tiprack1Id]: tips,
           },
           pipettes: {
             [p300MultiId]: true,

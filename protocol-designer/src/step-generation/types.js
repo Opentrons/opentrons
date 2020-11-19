@@ -296,9 +296,7 @@ export type RobotState = {|
   },
   tipState: {
     tipracks: {
-      [labwareId: string]: {
-        [wellName: string]: boolean, // true if tip is in there
-      },
+      [labwareId: string]: Set<string>, // if well in set, tip is in tiprack
     },
     pipettes: {
       [pipetteId: string]: boolean, // true if pipette has tip(s)

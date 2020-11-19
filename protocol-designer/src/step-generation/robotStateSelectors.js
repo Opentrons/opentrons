@@ -34,7 +34,8 @@ export function _getNextTip(args: {|
     invariantContext.pipetteEntities[pipetteId]?.spec?.channels
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
-  const hasTip = wellName => tiprackWellsState[wellName]
+  const hasTip = (wellName: string): boolean =>
+    Boolean(tiprackWellsState) && tiprackWellsState.has(wellName)
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
 

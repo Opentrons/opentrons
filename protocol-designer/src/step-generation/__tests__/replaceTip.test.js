@@ -4,7 +4,7 @@ import {
   getInitialRobotStateStandard,
   makeContext,
   getTiprackTipstate,
-  getTipColumn,
+  setTipColumn,
   getSuccessResult,
   pickUpTipHelper,
   dropTipHelper,
@@ -38,15 +38,15 @@ describe('replaceTip', () => {
     })
 
     it('Single-channel: second tip B1', () => {
+      const tips = getTiprackTipstate(true)
+      tips.delete('A1')
       const result = replaceTip(
         { pipette: p300SingleId },
         invariantContext,
         merge({}, initialRobotState, {
           tipState: {
             tipracks: {
-              [tiprack1Id]: {
-                A1: false,
-              },
+              [tiprack1Id]: tips,
             },
             pipettes: {
               p300SingleId: false,
@@ -60,10 +60,12 @@ describe('replaceTip', () => {
     })
 
     it('Single-channel: ninth tip (next column)', () => {
+      const tips = getTiprackTipstate(true)
+      setTipColumn(1, false, tips)
       const initialTestRobotState = merge({}, initialRobotState, {
         tipState: {
           tipracks: {
-            [tiprack1Id]: getTipColumn(1, false),
+            [tiprack1Id]: tips,
           },
           pipettes: {
             p300SingleId: false,
@@ -82,12 +84,12 @@ describe('replaceTip', () => {
     })
 
     it('Single-channel: pipette already has tip, so tip will be replaced.', () => {
+      const tips = getTiprackTipstate(true)
+      tips.delete('A1')
       const initialTestRobotState = merge({}, initialRobotState, {
         tipState: {
           tipracks: {
-            [tiprack1Id]: {
-              A1: false,
-            },
+            [tiprack1Id]: tips,
           },
           pipettes: {
             p300SingleId: true,
@@ -149,11 +151,12 @@ describe('replaceTip', () => {
         tipState: {
           ...initialRobotState.tipState,
           tipracks: {
-            [tiprack1Id]: { ...getTiprackTipstate(true), A1: false },
+            [tiprack1Id]: getTiprackTipstate(true),
             [tiprack2Id]: getTiprackTipstate(true),
           },
         },
       }
+      robotStateWithTipA1Missing.tipState.tipracks[tiprack1Id].delete('A1')
 
       const result = replaceTip(
         { pipette: p300MultiId },
