@@ -18,7 +18,7 @@ In addition, **after you install this update, Opentrons Apps on version 3.21.2 o
 
 In Opentrons App and Robot Software 4.0.0, the calibration process for the OT-2 is different and improved from major version 3. With these changes, you'll calibrate less often; the calibration processes are shorter, easier, and more reliable; and you can finally use different kinds of tips on the same pipette in the same protocol accurately.
 
-For more in-depth information on the changes, check out our LINKME blogpost LINKME.
+For more in-depth information on the changes, [click here](https://support.opentrons.com/en/articles/3499692-how-calibration-works-on-the-ot-2).
 
 ## Full Use of Python Protocol API Version 2
 
