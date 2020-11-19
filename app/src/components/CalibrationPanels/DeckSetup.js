@@ -45,7 +45,7 @@ const DECK_SETUP_WITH_BLOCK_PROMPT =
 const DECK_SETUP_NO_BLOCK_PROMPT =
   'on the deck within the designated slot as illustrated below'
 const SECOND_RANK_WITH_BLOCK_PROMPT =
-  "and ensure Calibration Block is within it's designated slot as illustrated below"
+  'and ensure Calibration Block is within its designated slot as illustrated below'
 const SECOND_RANK_NO_BLOCK_PROMPT = 'as illustrated below'
 const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 const contentsBySessionType: {
