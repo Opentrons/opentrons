@@ -35,8 +35,8 @@ STANDARD_DECK = 'ot2_standard'
 class ProtocolContextImplementation(ProtocolContextInterface):
 
     def __init__(self,
-                 api_version: APIVersion = None,
-                 hardware: HardwareToManage = None,
+                 api_version: Optional[APIVersion] = None,
+                 hardware: Optional[HardwareToManage] = None,
                  bundled_labware: Dict[str, LabwareDefinition] = None,
                  bundled_data: Dict[str, bytes] = None,
                  extra_labware: Dict[str, LabwareDefinition] = None,
@@ -144,7 +144,7 @@ class ProtocolContextImplementation(ProtocolContextInterface):
             self,
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
-            label: str = None) -> LabwareInterface:
+            label: Optional[str] = None) -> LabwareInterface:
         """Load a labware from definition"""
         parent = self.get_deck().position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label)
@@ -155,9 +155,9 @@ class ProtocolContextImplementation(ProtocolContextInterface):
             self,
             load_name: str,
             location: types.DeckLocation,
-            label: str = None,
-            namespace: str = None,
-            version: int = None) -> LabwareInterface:
+            label: Optional[str] = None,
+            namespace: Optional[str] = None,
+            version: Optional[int] = None) -> LabwareInterface:
         """Load a labware."""
         labware_def = get_labware_definition(
             load_name, namespace, version,
@@ -170,7 +170,7 @@ class ProtocolContextImplementation(ProtocolContextInterface):
             self,
             module_name: str,
             location: Optional[types.DeckLocation] = None,
-            configuration: str = None) -> Optional[LoadModuleResult]:
+            configuration: Optional[str] = None) -> Optional[LoadModuleResult]:
         """Load a module."""
         resolved_model = module_geometry.resolve_module_model(module_name)
         resolved_type = module_geometry.resolve_module_type(resolved_model)
@@ -259,7 +259,7 @@ class ProtocolContextImplementation(ProtocolContextInterface):
         """Get a mapping of mount to instrument."""
         return self._instruments
 
-    def pause(self, msg: str = None) -> None:
+    def pause(self, msg: Optional[str] = None) -> None:
         """Pause the protocol."""
         self._hw_manager.hardware.pause()
 
@@ -271,7 +271,7 @@ class ProtocolContextImplementation(ProtocolContextInterface):
         """Add comment to run log."""
         pass
 
-    def delay(self, seconds=0, msg: str = None) -> None:
+    def delay(self, seconds=0, msg: Optional[str] = None) -> None:
         """Delay execution for x seconds."""
         self._hw_manager.hardware.delay(seconds)
 

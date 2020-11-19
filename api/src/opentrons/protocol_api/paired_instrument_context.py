@@ -130,8 +130,8 @@ class PairedInstrumentContext(CommandPublisher):
     @requires_version(2, 7)
     def pick_up_tip(
             self, location: Union[types.Location, Well] = None,
-            presses: int = None,
-            increment: float = None) -> PairedInstrumentContext:
+            presses: Optional[int] = None,
+            increment: Optional[float] = None) -> PairedInstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands with
         a paired pipette object.
@@ -347,7 +347,7 @@ class PairedInstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def aspirate(self,
-                 volume: float = None,
+                 volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> PairedInstrumentContext:
         """
@@ -438,7 +438,7 @@ class PairedInstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def dispense(self,
-                 volume: float = None,
+                 volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> PairedInstrumentContext:
         """
@@ -534,8 +534,8 @@ class PairedInstrumentContext(CommandPublisher):
     @cmds.publish.both(command=cmds.air_gap)
     @requires_version(2, 7)
     def air_gap(self,
-                volume: float = None,
-                height: float = None) -> PairedInstrumentContext:
+                volume: Optional[float] = None,
+                height: Optional[float] = None) -> PairedInstrumentContext:
         """
         Pull air into the pipette current tip at the current location
 
@@ -630,7 +630,7 @@ class PairedInstrumentContext(CommandPublisher):
     @requires_version(2, 7)
     def mix(self,
             repetitions: int = 1,
-            volume: float = None,
+            volume: Optional[float] = None,
             location: Union[types.Location, Well] = None,
             rate: float = 1.0) -> PairedInstrumentContext:
         """
@@ -697,7 +697,7 @@ class PairedInstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def touch_tip(self,
-                  location: Well = None,
+                  location: Optional[Well] = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
                   speed: float = 60.0) -> PairedInstrumentContext:
@@ -784,8 +784,8 @@ class PairedInstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def move_to(self, location: types.Location, force_direct: bool = False,
-                minimum_z_height: float = None,
-                speed: float = None
+                minimum_z_height: Optional[float] = None,
+                speed: Optional[float] = None
                 ) -> PairedInstrumentContext:
         """ Move the full gantry with the primary pipette used as the basis
         for the XY position within a given labware.

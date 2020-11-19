@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
@@ -18,7 +18,7 @@ class LabwareImplementation(LabwareInterface):
     def __init__(self,
                  definition: LabwareDefinition,
                  parent: Location,
-                 label: str = None):
+                 label: Optional[str] = None):
         """
         Construct an implementation of a labware object.
 

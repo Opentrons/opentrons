@@ -56,7 +56,7 @@ class ProtocolContext(CommandPublisher):
                  implementation: ProtocolContextInterface,
                  loop: asyncio.AbstractEventLoop = None,
                  broker=None,
-                 api_version: APIVersion = None,
+                 api_version: Optional[APIVersion] = None,
                  ) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 
@@ -255,7 +255,7 @@ class ProtocolContext(CommandPublisher):
             self,
             labware_def: 'LabwareDefinition',
             location: types.DeckLocation,
-            label: str = None,
+            label: Optional[str] = None,
     ) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
@@ -283,9 +283,9 @@ class ProtocolContext(CommandPublisher):
             self,
             load_name: str,
             location: types.DeckLocation,
-            label: str = None,
-            namespace: str = None,
-            version: int = None,
+            label: Optional[str] = None,
+            namespace: Optional[str] = None,
+            version: Optional[int] = None,
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -323,8 +323,8 @@ class ProtocolContext(CommandPublisher):
             self,
             load_name: str,
             location: types.DeckLocation,
-            label: str = None,
-            namespace: str = None,
+            label: Optional[str] = None,
+            namespace: Optional[str] = None,
             version: int = 1
     ) -> Labware:
         MODULE_LOG.warning(
@@ -370,7 +370,7 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: Optional[types.DeckLocation] = None,
-            configuration: str = None) -> ModuleTypes:
+            configuration: Optional[str] = None) -> ModuleTypes:
         """ Load a module onto the deck given its name.
 
         This is the function to call to use a module in your protocol, like

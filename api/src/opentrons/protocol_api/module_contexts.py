@@ -85,8 +85,8 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
     def load_labware(
             self,
             name: str,
-            label: str = None,
-            namespace: str = None,
+            label: Optional[str] = None,
+            namespace: Optional[str] = None,
             version: int = 1,
             ) -> Labware:
         """ Specify the presence of a piece of labware on the module.
@@ -120,7 +120,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
     def load_labware_from_definition(
             self,
             definition: 'LabwareDefinition',
-            label: str = None) -> Labware:
+            label: Optional[str] = None) -> Labware:
         """
         Specify the presence of a labware on the module, using an
         inline definition.
@@ -139,8 +139,8 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
     @requires_version(2, 1)
     def load_labware_by_name(self,
                              name: str,
-                             label: str = None,
-                             namespace: str = None,
+                             label: Optional[str] = None,
+                             namespace: Optional[str] = None,
                              version: int = 1,) -> Labware:
         MODULE_LOG.warning(
             'load_labware_by_name is deprecated and will be removed in '
@@ -316,9 +316,9 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     @cmds.publish.both(command=cmds.magdeck_engage)
     @requires_version(2, 0)
     def engage(self,
-               height: float = None,
-               offset: float = None,
-               height_from_base: float = None):
+               height: Optional[float] = None,
+               offset: Optional[float] = None,
+               height_from_base: Optional[float] = None):
         """ Raise the Magnetic Module's magnets.
 
         The destination of the magnets can be specified in several different
@@ -477,10 +477,10 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @requires_version(2, 0)
     def set_block_temperature(self,
                               temperature: float,
-                              hold_time_seconds: float = None,
-                              hold_time_minutes: float = None,
-                              ramp_rate: float = None,
-                              block_max_volume: float = None):
+                              hold_time_seconds: Optional[float] = None,
+                              hold_time_minutes: Optional[float] = None,
+                              ramp_rate: Optional[float] = None,
+                              block_max_volume: Optional[float] = None):
         """ Set the target temperature for the well block, in °C.
 
         Valid operational range yet to be determined.
@@ -538,7 +538,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def execute_profile(self,
                         steps: List[modules.ThermocyclerStep],
                         repetitions: int,
-                        block_max_volume: float = None):
+                        block_max_volume: Optional[float] = None):
         """ Execute a Thermocycler Profile defined as a cycle of
         :py:attr:`steps` to repeat for a given number of :py:attr:`repetitions`
 

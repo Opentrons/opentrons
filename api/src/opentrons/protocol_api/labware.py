@@ -55,7 +55,7 @@ class Well:
     """
     def __init__(self,
                  well_implementation: WellImplementation,
-                 api_level: APIVersion = None):
+                 api_level: Optional[APIVersion] = None):
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -216,7 +216,7 @@ class Labware(DeckItem):
     def __init__(
             self,
             implementation: LabwareInterface,
-            api_level: APIVersion = None) -> None:
+            api_level: Optional[APIVersion] = None) -> None:
         """
         :param implementation: The class that implements the public interface
                                of the class.
@@ -518,7 +518,7 @@ class Labware(DeckItem):
 
     def next_tip(self,
                  num_tips: int = 1,
-                 starting_tip: Well = None) -> Optional[Well]:
+                 starting_tip: Optional[Well] = None) -> Optional[Well]:
         """
         Find the next valid well for pick-up.
 
@@ -646,7 +646,7 @@ class Labware(DeckItem):
 def save_definition(
     labware_def: 'LabwareDefinition',
     force: bool = False,
-    location: Path = None
+    location: Optional[Path] = None
 ) -> None:
     """
     Save a labware definition
@@ -678,8 +678,8 @@ def verify_definition(contents: Union[
 
 def get_labware_definition(
     load_name: str,
-    namespace: str = None,
-    version: int = None,
+    namespace: Optional[str] = None,
+    version: Optional[int] = None,
     bundled_defs: Dict[str, 'LabwareDefinition'] = None,
     extra_defs: Dict[str, 'LabwareDefinition'] = None
 ) -> 'LabwareDefinition':
@@ -725,7 +725,7 @@ def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
 def select_tiprack_from_list(
         tip_racks: List[Labware],
         num_channels: int,
-        starting_point: Well = None) -> Tuple[Labware, Well]:
+        starting_point: Optional[Well] = None) -> Tuple[Labware, Well]:
 
     try:
         first, rest = split_tipracks(tip_racks)
@@ -752,7 +752,7 @@ def select_tiprack_from_list_paired_pipettes(
         tip_racks: List[Labware],
         p_channels: int,
         s_channels: int,
-        starting_point: Well = None) -> Tuple[Labware, Well]:
+        starting_point: Optional[Well] = None) -> Tuple[Labware, Well]:
     """
     Helper function utilized in :py:attr:`PairedInstrumentContext`
     to determine which pipette tiprack to pick up from.
@@ -819,8 +819,8 @@ def get_labware_hash_with_parent(labware: 'Labware') -> str:
 def load_from_definition(
         definition: 'LabwareDefinition',
         parent: Location,
-        label: str = None,
-        api_level: APIVersion = None) -> Labware:
+        label: Optional[str] = None,
+        api_level: Optional[APIVersion] = None) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
 
@@ -857,12 +857,12 @@ def save_calibration(labware: 'Labware', delta: Point):
 def load(
     load_name: str,
     parent: Location,
-    label: str = None,
-    namespace: str = None,
+    label: Optional[str] = None,
+    namespace: Optional[str] = None,
     version: int = 1,
-    bundled_defs: Dict[str, 'LabwareDefinition'] = None,
-    extra_defs: Dict[str, 'LabwareDefinition'] = None,
-    api_level: APIVersion = None
+    bundled_defs: Optional[Dict[str, 'LabwareDefinition']] = None,
+    extra_defs: Optional[Dict[str, 'LabwareDefinition']] = None,
+    api_level: Optional[APIVersion] = None
 ) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked

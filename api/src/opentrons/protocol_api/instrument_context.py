@@ -73,7 +73,7 @@ class InstrumentContext(CommandPublisher):
                  log_parent: logging.Logger,
                  at_version: APIVersion,
                  tip_racks: List[Labware] = None,
-                 trash: Labware = None,
+                 trash: Optional[Labware] = None,
                  ) -> None:
 
         super().__init__(broker)
@@ -178,7 +178,7 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 0)
     def aspirate(self,
-                 volume: float = None,
+                 volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> InstrumentContext:
         """
@@ -271,7 +271,7 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 0)
     def dispense(self,
-                 volume: float = None,
+                 volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> InstrumentContext:
         """
@@ -352,7 +352,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def mix(self,
             repetitions: int = 1,
-            volume: float = None,
+            volume: Optional[float] = None,
             location: Union[types.Location, Well] = None,
             rate: float = 1.0) -> InstrumentContext:
         """
@@ -473,7 +473,7 @@ class InstrumentContext(CommandPublisher):
     @cmds.publish.both(command=cmds.touch_tip)
     @requires_version(2, 0)
     def touch_tip(self,
-                  location: Well = None,
+                  location: Optional[Well] = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
                   speed: float = 60.0) -> InstrumentContext:
@@ -557,8 +557,8 @@ class InstrumentContext(CommandPublisher):
     @cmds.publish.both(command=cmds.air_gap)
     @requires_version(2, 0)
     def air_gap(self,
-                volume: float = None,
-                height: float = None) -> InstrumentContext:
+                volume: Optional[float] = None,
+                height: Optional[float] = None) -> InstrumentContext:
         """
         Pull air into the pipette current tip at the current location
 
@@ -638,8 +638,8 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def pick_up_tip(  # noqa(C901)
             self, location: Union[types.Location, Well] = None,
-            presses: int = None,
-            increment: float = None) -> InstrumentContext:
+            presses: Optional[int] = None,
+            increment: Optional[float] = None) -> InstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands with
 
@@ -723,7 +723,7 @@ class InstrumentContext(CommandPublisher):
 
     def _determine_drop_target(
             self, location: Well,
-            version_breakpoint: APIVersion = None) -> types.Location:
+            version_breakpoint: Optional[APIVersion] = None) -> types.Location:
         version_breakpoint = version_breakpoint or APIVersion(2, 2)
         if self.api_version < version_breakpoint:
             bot = location.bottom()
@@ -1152,9 +1152,11 @@ class InstrumentContext(CommandPublisher):
         return self._implementation.delay()
 
     @requires_version(2, 0)
-    def move_to(self, location: types.Location, force_direct: bool = False,
-                minimum_z_height: float = None,
-                speed: float = None
+    def move_to(self,
+                location: types.Location,
+                force_direct: bool = False,
+                minimum_z_height: Optional[float] = None,
+                speed: Optional[float] = None
                 ) -> InstrumentContext:
         """ Move the instrument.
 

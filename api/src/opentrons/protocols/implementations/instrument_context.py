@@ -1,3 +1,5 @@
+from typing import Optional
+
 from opentrons import types
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -31,7 +33,7 @@ class InstrumentContextImplementation(InstrumentContextInterface):
                  mount: types.Mount,
                  instrument_name: str,
                  default_speed: float,
-                 api_version: APIVersion = None):
+                 api_version: Optional[APIVersion] = None):
         """"Constructor"""
         # TODO AL 20201110 - Remove need for api_version in this module
         self._api_version = api_version or MAX_SUPPORTED_VERSION
@@ -48,11 +50,11 @@ class InstrumentContextImplementation(InstrumentContextInterface):
         self._flow_rates.set_defaults(api_level=self._api_version)
 
     def get_default_speed(self) -> float:
-        """Gets the speed at whcih the robot's gandry moves."""
+        """Gets the speed at which the robot's gantry moves."""
         return self._default_speed
 
     def set_default_speed(self, speed: float) -> None:
-        """Sets the speed at whcih the robot's gandry moves."""
+        """Sets the speed at which the robot's gantry moves."""
         self._default_speed = speed
 
     def aspirate(self,
@@ -109,8 +111,8 @@ class InstrumentContextImplementation(InstrumentContextInterface):
     def pick_up_tip(self,
                     well: WellImplementation,
                     tip_length: float,
-                    presses: int = None,
-                    increment: float = None) -> None:
+                    presses: Optional[int] = None,
+                    increment: Optional[float] = None) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
         hw = self._protocol_interface.get_hardware().hardware
         geometry = well.get_geometry()
@@ -153,8 +155,8 @@ class InstrumentContextImplementation(InstrumentContextInterface):
     def move_to(self,
                 location: types.Location,
                 force_direct: bool = False,
-                minimum_z_height: float = None,
-                speed: float = None) -> None:
+                minimum_z_height: Optional[float] = None,
+                speed: Optional[float] = None) -> None:
         """Move the instrument."""
         last_location = self._protocol_interface.get_last_location()
         if last_location:
@@ -265,9 +267,9 @@ class InstrumentContextImplementation(InstrumentContextInterface):
         return self._speeds
 
     def set_flow_rate(self,
-                      aspirate: float = None,
-                      dispense: float = None,
-                      blow_out: float = None) -> None:
+                      aspirate: Optional[float] = None,
+                      dispense: Optional[float] = None,
+                      blow_out: Optional[float] = None) -> None:
         """Set the flow rates."""
         self._protocol_interface.get_hardware().hardware.set_flow_rate(
             mount=self._mount,
@@ -278,9 +280,9 @@ class InstrumentContextImplementation(InstrumentContextInterface):
 
     def set_pipette_speed(
             self,
-            aspirate: float = None,
-            dispense: float = None,
-            blow_out: float = None) -> None:
+            aspirate: Optional[float] = None,
+            dispense: Optional[float] = None,
+            blow_out: Optional[float] = None) -> None:
         """Set pipette speeds."""
         self._protocol_interface.get_hardware().hardware.set_pipette_speed(
             mount=self._mount,
