@@ -1,8 +1,9 @@
 import pytest
 from http import HTTPStatus
-
+from mock import AsyncMock, patch, MagicMock
+from fastapi.testclient import TestClient
 from robot_server.constants import API_VERSION_HEADER, API_VERSION
-
+from robot_server.service.app import app
 
 def test_unhandled_exception_handler(api_client_no_errors):
     resp = api_client_no_errors.get('/alwaysRaise')
@@ -81,3 +82,11 @@ def test_custom_request_validation_exception_handler(api_client):
 def test_api_versioning(api_client, headers, expected_version):
     resp = api_client.get('/openapi', headers=headers)
     assert resp.headers.get(API_VERSION_HEADER) == str(expected_version)
+
+
+# def test_publisher_on_startup(override_hardware):
+#     # with patch.object(app.api_wrapper, 'publisher'):
+#     app.api_wrapper = MagicMock()
+#     # with patch.object(app, 'api_wrapper') as mock_init:
+#     TestClient(app)
+#     app.api_wrapper.assert_called_once()

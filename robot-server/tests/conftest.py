@@ -6,7 +6,7 @@ import os
 import shutil
 import json
 import pathlib
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import requests
 from fastapi import routing
@@ -58,7 +58,13 @@ def override_hardware(hardware):
 
 
 @pytest.fixture
-def api_client(override_hardware) -> TestClient:
+def mock_publisher():
+    with patch.object(app.api_wrapper, 'publisher') as mp:
+        yield mp
+
+
+@pytest.fixture
+def api_client(override_hardware, mock_publisher) -> TestClient:
     return TestClient(app)
 
 

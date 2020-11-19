@@ -4,14 +4,13 @@ from pathlib import Path
 
 from opentrons import ThreadManager, initialize as initialize_api
 from opentrons.hardware_control.simulator_setup import load_simulator
-from opentrons.hardware_control.types import (DoorState, HardwareEventType,
-                                              HardwareEvent)
+from opentrons.hardware_control.types import (HardwareEventType, HardwareEvent)
 from opentrons.util.helpers import utc_now
 from robot_server.main import log
 from robot_server.settings import get_settings
 from notify_server.clients import publisher
 from notify_server.models.event import Event
-from notify_server.models.sample_events import DoorSwitchEvent
+from notify_server.models.payload_type import DoorSwitchEventType
 from notify_server.settings import Settings as NotifyServerSettings
 
 
@@ -45,6 +44,11 @@ class HardwareWrapper:
         return self._tm
 
     async def _start_door_event_publisher(self, _tm: ThreadManager):
+        """
+        Create a notify-server publisher for safety door state,
+        publish the initial state, & register the publisher callback with
+        the hw thread manager.
+        """
         settings = NotifyServerSettings()
         if self._event_watcher is None:
             log.info("Starting door-switch-notify publisher")
@@ -61,9 +65,8 @@ class HardwareWrapper:
         if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
             self._event_publisher.send_nowait("Door_event", Event(
                 createdOn=utc_now(),
-                publisher="robot_server.hardware_wrapper."
-                          "_publish_door_event",
-                data=DoorSwitchEvent(val=hw_event.new_state)
+                publisher=self._publish_door_event.__qualname__,
+                data=DoorSwitchEventType(new_state=hw_event.new_state)
             ))
 
     def async_initialize(self):

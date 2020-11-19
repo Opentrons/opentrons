@@ -1,7 +1,6 @@
 """Sample event models."""
 from pydantic import BaseModel
 from typing_extensions import Literal
-from opentrons.hardware_control.types import DoorState
 
 
 class SampleOneData(BaseModel):
@@ -25,8 +24,3 @@ class SampleTwo(BaseModel):
     val1: int
     val2: str
 
-
-class DoorSwitchEvent(BaseModel):
-    """ Payload type of a Door switch update event. """
-
-    val: DoorState

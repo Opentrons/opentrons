@@ -1,10 +1,16 @@
 """The definition of payload types."""
 from typing import Union
+from pydantic import BaseModel
+from notify_server.models.sample_events import SampleTwo
+from opentrons.hardware_control.types import DoorState
 
-from notify_server.models.sample_events import SampleTwo, DoorSwitchEvent
+
+class DoorSwitchEventType(BaseModel):
+    """ Payload type of a Door switch update event. """
+    new_state: DoorState
 
 
 PayloadType = Union[
     SampleTwo,
-    DoorSwitchEvent,
+    DoorSwitchEventType,
 ]
