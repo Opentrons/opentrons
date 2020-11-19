@@ -619,6 +619,30 @@ class CheckCalibrationUserFlow:
             )
             modify.save_tip_length_calibration(
                 calibration.pipette, tip_length_dict)
+        elif self.current_state == State.comparingPointOne and pipette_state:
+            # Here if we're on the second pipette, but the first slot we
+            # should make sure we mark both pipette cal and deck cal as bad.
+            pip_calibration = modify.mark_bad(
+                self._pipette_calibrations[active_mount],
+                SourceType.calibration_check)
+            deck_calibration = modify.mark_bad(
+                self._deck_calibration,
+                SourceType.calibration_check)
+            pipette_id = self.hw_pipette.pipette_id
+            assert pipette_id, 'Cannot update pipette offset calibraion'
+            modify.save_pipette_calibration(
+                offset=Point(*pip_calibration.offset),
+                pip_id=pipette_id,
+                mount=active_mount,
+                tiprack_hash=pip_calibration.tiprack,
+                tiprack_uri=pip_calibration.uri,
+                cal_status=pip_calibration.status)
+            modify.save_robot_deck_attitude(
+                transform=deck_calibration.attitude,
+                pip_id=deck_calibration.pipette_calibrated_with,
+                lw_hash=deck_calibration.tiprack,
+                source=deck_calibration.source,
+                cal_status=deck_calibration.status)
         elif self.current_state in pipette_offset_states:
             calibration = modify.mark_bad(
                 self._pipette_calibrations[active_mount],
