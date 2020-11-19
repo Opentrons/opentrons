@@ -22,6 +22,9 @@ import { useTrackEvent } from '../../analytics'
 import {
   useInterval,
   Card,
+  Box,
+  BORDER_SOLID_LIGHT,
+  DISPLAY_INLINE,
   ALIGN_BASELINE,
   FONT_SIZE_BODY_1,
   Link,
@@ -56,6 +59,12 @@ const EVENT_CALIBRATION_DOWNLOADED = 'calibrationDataDownloaded'
 const TITLE = 'Robot Calibration'
 
 const DOWNLOAD_CALIBRATION = 'Download your calibration data'
+const CAL_EXPLANATION =
+  'Your OT-2 moves pipettes around in 3D space based on its calibration.'
+const LEARN_MORE = 'Learn more'
+const CAL_EXPLANATION_SUFFIX = 'about how calibration works on the OT-2.'
+const CAL_ARTICLE_URL =
+  'https://support.opentrons.com/en/articles/3499692-how-calibration-works-on-the-ot-2'
 
 const attachedPipetteCalPresent: (
   pipettes: AttachedPipettesByMount,
@@ -189,6 +198,24 @@ export function CalibrationCard(props: Props): React.Node {
           {DOWNLOAD_CALIBRATION}
         </Link>
       </Flex>
+      <Box
+        borderBottom={BORDER_SOLID_LIGHT}
+        fontSize={FONT_SIZE_BODY_1}
+        padding={SPACING_3}
+      >
+        <Text display={DISPLAY_INLINE}>{CAL_EXPLANATION}</Text>
+        &nbsp;
+        <Link
+          color={C_BLUE}
+          display={DISPLAY_INLINE}
+          external
+          href={CAL_ARTICLE_URL}
+        >
+          {LEARN_MORE}
+        </Link>
+        &nbsp;
+        <Text display={DISPLAY_INLINE}>{CAL_EXPLANATION_SUFFIX}</Text>
+      </Box>
       <DeckCalibrationControl
         robotName={robotName}
         disabledReason={buttonDisabledReason}
