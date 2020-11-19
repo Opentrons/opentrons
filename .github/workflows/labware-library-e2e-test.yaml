@@ -1,0 +1,59 @@
+# This workflow runs end to end tests in Labware Library
+
+name: 'Labware Library E2E Tests'
+
+on:
+  pull_request:
+    paths:
+      - 'labware-library/**'
+      - 'shared-data/**'
+      - 'components/**'
+      - 'webpack-config/**'
+      - 'package.json'
+      - '.github/workflows/labware-library-e2e-test.yaml'
+  push:
+    paths:
+      - 'labware-library/**'
+      - 'shared-data/**'
+      - 'components/**'
+      - 'webpack-config/**'
+      - 'package.json'
+      - '.github/workflows/labware-library-e2e-test.yaml'
+    tags:
+      - 'labware-library*'
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: true
+
+jobs:
+  checks:
+    name: 'LL e2e tests'
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'test-e2e'
+        run: make -C labware-library test-e2e
