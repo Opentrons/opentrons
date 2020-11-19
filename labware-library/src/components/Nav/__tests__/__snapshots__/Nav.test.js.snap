@@ -1,0 +1,418 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Nav component renders 1`] = `
+<Fragment>
+  <nav
+    className="nav"
+  >
+    <div
+      className="subdomain_nav_wrapper"
+    >
+      <div
+        className="nav_container"
+      >
+        <SubdomainNav
+          homeUrl="https://opentrons.com"
+          subdomainList={
+            Array [
+              Object {
+                "gtm": Object {
+                  "action": "click",
+                  "category": "toolbar",
+                  "label": "protocol-designer",
+                },
+                "linkout": true,
+                "name": "Protocol Designer",
+                "url": "https://designer.opentrons.com/",
+              },
+              Object {
+                "gtm": Object {
+                  "action": "click",
+                  "category": "toolbar",
+                  "label": "protocol-library",
+                },
+                "linkout": true,
+                "name": "Protocol Library",
+                "url": "https://protocols.opentrons.com/",
+              },
+              Object {
+                "gtm": Object {
+                  "action": "click",
+                  "category": "toolbar",
+                  "label": "opentrons-api",
+                },
+                "linkout": true,
+                "name": "Python API",
+                "url": "https://docs.opentrons.com/",
+              },
+              Object {
+                "gtm": Object {
+                  "action": "click",
+                  "category": "toolbar",
+                  "label": "labware-library",
+                },
+                "linkout": true,
+                "name": "Labware Library",
+                "url": "https://labware.opentrons.com/",
+              },
+              Object {
+                "gtm": Object {
+                  "action": "click",
+                  "category": "toolbar",
+                  "label": "github-protocols",
+                },
+                "linkout": true,
+                "name": "GitHub",
+                "url": "https://github.com/Opentrons",
+              },
+              Object {
+                "gtm": Object {
+                  "action": "click",
+                  "category": "toolbar",
+                  "label": "opentrons-app",
+                },
+                "linkout": false,
+                "name": "Opentrons App",
+                "url": "/ot-app",
+              },
+            ]
+          }
+        />
+      </div>
+    </div>
+    <div
+      className="main_nav_wrapper"
+    >
+      <div
+        className="nav_container"
+      >
+        <MainNav
+          homeUrl="https://opentrons.com"
+          navigationList={
+            Array [
+              Object {
+                "links": Array [
+                  Object {
+                    "links": Array [
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "about",
+                        },
+                        "linkout": false,
+                        "name": "Mission",
+                        "url": "/about",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "customers",
+                        },
+                        "linkout": false,
+                        "name": "Our Customers",
+                        "url": "/customers",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "press",
+                        },
+                        "linkout": true,
+                        "name": "Press",
+                        "url": "http://blog.opentrons.com/press",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "team",
+                        },
+                        "linkout": false,
+                        "name": "Our Team",
+                        "url": "/team",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "how-it-works",
+                        },
+                        "linkout": false,
+                        "name": "How it works",
+                        "url": "/how-it-works/",
+                      },
+                    ],
+                  },
+                ],
+                "name": "About",
+              },
+              Object {
+                "links": Array [
+                  Object {
+                    "links": Array [
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "ot-2",
+                        },
+                        "linkout": false,
+                        "name": "OT-2 Robot",
+                        "url": "/ot-2",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "ot-2-pipettes",
+                        },
+                        "linkout": false,
+                        "name": "OT-2 Pipettes",
+                        "url": "/pipettes",
+                      },
+                    ],
+                    "name": "OT-2 LAB ROBOT",
+                  },
+                  Object {
+                    "links": Array [
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "workstation-nac",
+                        },
+                        "linkout": false,
+                        "name": "Nucleic Acid Cleanup",
+                        "url": "/workstations/automated-nucleic-acid-cleanup",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "ngs-prep",
+                        },
+                        "linkout": false,
+                        "name": "NGS Library Prep",
+                        "url": "/workstations/automated-ngs-library-prep/",
+                      },
+                    ],
+                    "name": "OT-2 WORKSTATIONS",
+                  },
+                  Object {
+                    "links": Array [
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "thermocycler",
+                        },
+                        "linkout": false,
+                        "name": "Thermocycler Module",
+                        "url": "/modules/thermocycler-module",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "tempmod",
+                        },
+                        "linkout": false,
+                        "name": "Temperature Module",
+                        "url": "/modules/temperature-module",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "magmod",
+                        },
+                        "linkout": false,
+                        "name": "Magnetic Module",
+                        "url": "/modules/magnetic-module",
+                      },
+                    ],
+                    "name": "OT-2 HARDWARE MODULES",
+                  },
+                  Object {
+                    "links": Array [
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "tips",
+                        },
+                        "linkout": true,
+                        "name": "Tips & Filter Tips",
+                        "url": "https://shop.opentrons.com/collections/opentrons-tips",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "reagents",
+                        },
+                        "linkout": true,
+                        "name": "Reagents",
+                        "url": "https://shop.opentrons.com/collections/verified-reagents",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "tube",
+                        },
+                        "linkout": true,
+                        "name": "Tubes & Vials",
+                        "url": "https://shop.opentrons.com/collections/tubes",
+                      },
+                    ],
+                    "name": "CONSUMABLES & REAGENTS",
+                  },
+                  Object {
+                    "links": Array [
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "plates",
+                        },
+                        "linkout": true,
+                        "name": "Lab Plates",
+                        "url": "https://shop.opentrons.com/collections/lab-plates",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "reserv",
+                        },
+                        "linkout": true,
+                        "name": "Reservoirs",
+                        "url": "https://shop.opentrons.com/collections/reservoirs",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "tubes-racks",
+                        },
+                        "linkout": true,
+                        "name": "Tube Racks",
+                        "url": "https://shop.opentrons.com/collections/racks-and-adapters",
+                      },
+                    ],
+                    "name": "VERIFIED LABWARE",
+                  },
+                ],
+                "name": "Products",
+                "text": "100% transparent pricing. <a href=\\"https://shop.opentrons.com\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\" data-gtm-category=\\"b-header\\" data-gtm-label=\\"all-products\\" data-gtm-action=\\"click\\">Order online  ›</a>",
+              },
+              Object {
+                "gtm": Object {
+                  "action": "click",
+                  "category": "header",
+                  "label": "applications",
+                },
+                "linkout": false,
+                "name": "Applications",
+                "url": "/automated-lab-applications/",
+              },
+              Object {
+                "gtm": Object {
+                  "action": "click",
+                  "category": "header",
+                  "label": "blog",
+                },
+                "linkout": true,
+                "name": "Blog",
+                "url": "https://blog.opentrons.com",
+              },
+              Object {
+                "links": Array [
+                  Object {
+                    "links": Array [
+                      Object {
+                        "description": "Explore our in-depth support articles",
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "product-help",
+                        },
+                        "linkout": true,
+                        "name": "Product Help Center",
+                        "url": "https://support.opentrons.com/",
+                      },
+                      Object {
+                        "description": "You recieved your robot, here's what's next",
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "start-guide",
+                        },
+                        "linkout": true,
+                        "name": "OT-2 Start guide",
+                        "url": "https://support.opentrons.com/guide-for-getting-started-with-the-ot-2",
+                      },
+                    ],
+                  },
+                  Object {
+                    "links": Array [
+                      Object {
+                        "description": "Easily write new protocols using Python",
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "opentrons-api",
+                        },
+                        "linkout": true,
+                        "name": "Python API",
+                        "url": "https://docs.opentrons.com/",
+                      },
+                      Object {
+                        "description": "Manuals, white papers, eBooks, app notes, etc.",
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "documentation",
+                        },
+                        "linkout": true,
+                        "name": "Documentation",
+                        "url": "https://blog.opentrons.com/resources/",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "return-policy",
+                        },
+                        "linkout": true,
+                        "name": "Return Policy",
+                        "url": "https://support.opentrons.com/en/articles/3670461-our-risk-free-return-policy",
+                      },
+                      Object {
+                        "gtm": Object {
+                          "action": "click",
+                          "category": "header",
+                          "label": "warranty",
+                        },
+                        "linkout": true,
+                        "name": "Warranty",
+                        "url": "https://support.opentrons.com/en/articles/736748-what-is-your-warranty-and-return-policy",
+                      },
+                    ],
+                  },
+                ],
+                "name": "Support",
+                "text": "<a href=\\"https://opentrons.com/contact-support/\\"  target=\\"_blank\\" rel=\\"noopener noreferrer\\" data-gtm-category=\\"b-header\\" data-gtm-label=\\"contact-support\\" data-gtm-action=\\"click\\">Contact support  ›</a>",
+              },
+            ]
+          }
+        />
+      </div>
+    </div>
+  </nav>
+</Fragment>
+`;
