@@ -181,6 +181,11 @@ class DeckSlotName(int, enum.Enum):
     SLOT_11 = 11
     FIXED_TRASH = 12
 
+    @classmethod
+    def from_string(cls, value: str) -> DeckSlotName:
+        int_val = int(value)
+        return cls(int_val)
+
     def __str__(self):
         """Stringify to a simple integer string."""
         return str(self.value)

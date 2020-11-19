@@ -5,7 +5,11 @@ from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from typing import cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.types import DeckSlotName
+
 from opentrons.protocol_engine import ProtocolEngine, errors
+from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.commands import (
     MoveToWellRequest,
     MoveToWellResult,
@@ -14,6 +18,7 @@ from opentrons.protocol_engine.commands import (
     CompletedCommand,
     FailedCommand,
 )
+from opentrons.protocol_engine.state import LabwareData
 from opentrons.protocol_engine.commands.move_to_well import MoveToWellImplementation
 
 
@@ -39,12 +44,18 @@ class CloseToNow:
 async def test_create_engine_initializes_state_with_deck_geometry(
     mock_hardware: MagicMock,
     standard_deck_def: DeckDefinitionV2,
+    fixed_trash_def: LabwareDefinition,
 ) -> None:
     """It should load deck geometry data into the store on create."""
-    engine = ProtocolEngine.create(hardware=mock_hardware)
+    engine = await ProtocolEngine.create(hardware=mock_hardware)
+    state = engine.state_store
 
-    assert engine.state_store.geometry.get_deck_definition() == \
-        standard_deck_def
+    assert state.geometry.get_deck_definition() == standard_deck_def
+    assert state.labware.get_labware_data_by_id("fixedTrash") == LabwareData(
+        location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+        definition=fixed_trash_def,
+        calibration=(0, 0, 0),
+    )
 
 
 async def test_execute_command_creates_command(

@@ -1,6 +1,6 @@
 """Basic labware data state and store."""
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List, Sequence, Tuple
 from typing_extensions import final
 
 from opentrons_shared_data.labware.dev_types import (
@@ -10,6 +10,7 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons.calibration_storage.helpers import uri_from_definition
 
 from .. import errors
+from ..resources import DeckFixedLabware
 from ..commands import CompletedCommandType, LoadLabwareResult
 from ..types import LabwareLocation
 from .substore import Substore, CommandReactive
@@ -30,9 +31,15 @@ class LabwareState:
 
     _labware_by_id: Dict[str, LabwareData]
 
-    def __init__(self) -> None:
+    def __init__(self, deck_fixed_labware: Sequence[DeckFixedLabware]) -> None:
         """Initialize a LabwareState instance."""
-        self._labware_by_id = {}
+        self._labware_by_id = {
+            fixed_labware.labware_id: LabwareData(
+                location=fixed_labware.location,
+                definition=fixed_labware.definition,
+                calibration=(0, 0, 0),
+            ) for fixed_labware in deck_fixed_labware
+        }
 
     def get_labware_data_by_id(self, labware_id: str) -> LabwareData:
         """Get labware data by the labware's unique identifier."""
@@ -85,9 +92,9 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
 
     _state: LabwareState
 
-    def __init__(self) -> None:
+    def __init__(self, deck_fixed_labware: Sequence[DeckFixedLabware]) -> None:
         """Initialize a labware store and its state."""
-        self._state = LabwareState()
+        self._state = LabwareState(deck_fixed_labware=deck_fixed_labware)
 
     def handle_completed_command(self, command: CompletedCommandType) -> None:
         """Modify state in reaction to a completed command."""

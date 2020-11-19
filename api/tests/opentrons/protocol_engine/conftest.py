@@ -7,7 +7,7 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.protocols.api_support.constants import STANDARD_DECK
+from opentrons.protocols.api_support.constants import STANDARD_DECK, SHORT_TRASH_DECK
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control.api import API as HardwareController
 
@@ -16,11 +16,19 @@ from opentrons.protocol_engine import (
     StateStore,
     StateView,
     CommandHandlers,
+    ResourceProviders,
 )
+
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
     PipettingHandler,
+)
+
+from opentrons.protocol_engine.resources import (
+    IdGenerator,
+    LabwareDataProvider,
+    DeckDataProvider,
 )
 
 
@@ -73,10 +81,41 @@ def mock_handlers() -> AsyncMock:
     )
 
 
+@pytest.fixture
+def mock_resources() -> AsyncMock:
+    """Get an asynchronous mock in the shape of ResourceProviders."""
+    # TODO(mc, 2020-11-18): AsyncMock around ResourceProviders doesn't propagate
+    # async. mock downwards into children properly, so this has to be manually
+    # set up this way for now
+    return ResourceProviders(
+        id_generator=MagicMock(spec=IdGenerator),
+        labware_data=AsyncMock(spec=LabwareDataProvider),
+        deck_data=AsyncMock(spec=DeckDataProvider),
+    )
+
+
 @pytest.fixture(scope="session")
 def standard_deck_def() -> DeckDefinitionV2:
     """Get the OT-2 standard deck definition."""
     return load_deck(STANDARD_DECK, 2)
+
+
+@pytest.fixture(scope="session")
+def short_trash_deck_def() -> DeckDefinitionV2:
+    """Get the OT-2 short-trash deck definition."""
+    return load_deck(SHORT_TRASH_DECK, 2)
+
+
+@pytest.fixture(scope="session")
+def fixed_trash_def() -> LabwareDefinition:
+    """Get the definition of the OT-2 standard fixed trash."""
+    return load_definition("opentrons_1_trash_1100ml_fixed", 1)
+
+
+@pytest.fixture(scope="session")
+def short_fixed_trash_def() -> LabwareDefinition:
+    """Get the definition of the OT-2 short fixed trash."""
+    return load_definition("opentrons_1_trash_850ml_fixed", 1)
 
 
 @pytest.fixture(scope="session")
@@ -100,7 +139,10 @@ def tip_rack_def() -> LabwareDefinition:
 @pytest.fixture
 def store(standard_deck_def: DeckDefinitionV2) -> StateStore:
     """Get an actual StateStore."""
-    return StateStore(deck_definition=standard_deck_def)
+    return StateStore(
+        deck_definition=standard_deck_def,
+        deck_fixed_labware=[],
+    )
 
 
 @pytest.fixture
