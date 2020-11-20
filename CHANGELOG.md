@@ -66,7 +66,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/opentrons/opentrons/commit/4b9e582))
 * **protocol-designer:** cast mix tip offset to number ([#6629](https://github.com/opentrons/opentrons/issues/6629)) ([7b4ee9b](https://github.com/opentrons/opentrons/commit/7b4ee9b)), closes [#6552](https://github.com/opentrons/opentrons/issues/6552)
 * **protocol-designer:** fix 5.1.0 migration ([#6643](https://github.com/opentrons/opentrons/issues/6643)) ([cc7cd17](https://github.com/opentrons/opentrons/commit/cc7cd17))
-* **api:** Do not perform a transfer if a zero volume is passed in ([#6620](https://github.com/Opentrons/opentrons/issues/6620)) ([05e66b4](https://github.com/Opentrons/opentrons/commit/05e66b4))
 * **api:** Increase the tolerance on this test for how long a function takes to execute ([#6621](https://github.com/Opentrons/opentrons/issues/6621)) ([1b068c2](https://github.com/Opentrons/opentrons/commit/1b068c2))
 * **api,robot-server:** add pydantic to api, upgrade and add test dev deps ([#6673](https://github.com/Opentrons/opentrons/issues/6673)) ([2e4ad6a](https://github.com/Opentrons/opentrons/commit/2e4ad6a))
 * **app:** fix fetch-on-session-end epics for POC, TLC ([#6757](https://github.com/Opentrons/opentrons/issues/6757)) ([7124bd9](https://github.com/Opentrons/opentrons/commit/7124bd9)), closes [#6747](https://github.com/Opentrons/opentrons/issues/6747)

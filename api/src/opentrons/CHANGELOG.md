@@ -18,7 +18,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api,robot-server:** reload robot calibration on deck calibration exit ([#6815](https://github.com/Opentrons/opentrons/issues/6815)) ([254af66](https://github.com/Opentrons/opentrons/commit/254af66))
 * **app:** Display if DC was migrated ([#6812](https://github.com/Opentrons/opentrons/issues/6812)) ([d37c0c0](https://github.com/Opentrons/opentrons/commit/d37c0c0))
 * **api:** Do not perform a transfer if a zero volume is passed in ([#6620](https://github.com/Opentrons/opentrons/issues/6620)) ([05e66b4](https://github.com/Opentrons/opentrons/commit/05e66b4))
-* **api:** Do not perform a transfer if a zero volume is passed in ([#6620](https://github.com/Opentrons/opentrons/issues/6620)) ([05e66b4](https://github.com/Opentrons/opentrons/commit/05e66b4))
 
 
 
