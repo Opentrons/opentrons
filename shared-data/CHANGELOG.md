@@ -3,66 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.0.0-alpha.16](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.15...v4.0.0-alpha.16) (2020-11-19)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.15](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.14...v4.0.0-alpha.15) (2020-11-18)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.14](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.13...v4.0.0-alpha.14) (2020-11-18)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.13](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.12...v4.0.0-alpha.13) (2020-11-17)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.12](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.11...v4.0.0-alpha.12) (2020-11-16)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.11](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.10...v4.0.0-alpha.11) (2020-11-13)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.10](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.9...v4.0.0-alpha.10) (2020-11-13)
+# [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 
 ### Bug Fixes
 
 * **shared-data:** fix P300 GEN2 tip overlap values ([#6987](https://github.com/Opentrons/opentrons/issues/6987)) ([bc38f36](https://github.com/Opentrons/opentrons/commit/bc38f36))
+* **build:** Dont break make with weird deps in shared-data ([#6857](https://github.com/Opentrons/opentrons/issues/6857)) ([0681ae0](https://github.com/Opentrons/opentrons/commit/0681ae0))
+* **api,robot-server:** add pydantic to api, upgrade and add test dev deps ([#6673](https://github.com/Opentrons/opentrons/issues/6673)) ([2e4ad6a](https://github.com/Opentrons/opentrons/commit/2e4ad6a))
 
-
-
-
-
-# [4.0.0-alpha.9](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.8...v4.0.0-alpha.9) (2020-11-11)
 
 
 ### Performance Improvements
@@ -70,135 +19,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **shared-data,api:** speed up pipette settings ([#6952](https://github.com/Opentrons/opentrons/issues/6952)) ([f8b6266](https://github.com/Opentrons/opentrons/commit/f8b6266))
 
 
-
-
-
-# [4.0.0-alpha.8](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.7...v4.0.0-alpha.8) (2020-11-09)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.7](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.6...v4.0.0-alpha.7) (2020-11-06)
-
-
 ### Features
 
 * **api:** p1000_single_v2.2, p20_single_v2.2 ([#6922](https://github.com/Opentrons/opentrons/issues/6922)) ([14659b8](https://github.com/Opentrons/opentrons/commit/14659b8))
-
-
-
-
-
-# [4.0.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.2...v4.0.0-alpha.6) (2020-11-05)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.5...v4.0.0-beta.2) (2020-11-05)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.4...v4.0.0-alpha.5) (2020-11-04)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.3...v4.0.0-alpha.4) (2020-10-30)
-
-
-### Bug Fixes
-
-* **build:** Dont break make with weird deps in shared-data ([#6857](https://github.com/Opentrons/opentrons/issues/6857)) ([0681ae0](https://github.com/Opentrons/opentrons/commit/0681ae0))
-
-
-
-## [3.21.2](https://github.com/Opentrons/opentrons/compare/v3.21.2-alpha.1...v3.21.2) (2020-10-16)
-
-
-
-## [3.21.2-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.2-alpha.0...v3.21.2-alpha.1) (2020-10-16)
-
-
-
-## [3.21.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2-alpha.0) (2020-10-16)
-
-
-
-
-
-# [4.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.1...v4.0.0-alpha.3) (2020-10-26)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.2...v4.0.0-beta.1) (2020-10-21)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.0...v4.0.0-alpha.2) (2020-10-21)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.1...v4.0.0-beta.0) (2020-10-19)
-
-**Note:** Version bump only for package @opentrons/shared-data
-
-
-
-
-
-# [4.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.1) (2020-10-16)
-
-
-### Bug Fixes
-
-* **api,robot-server:** add pydantic to api, upgrade and add test dev deps ([#6673](https://github.com/Opentrons/opentrons/issues/6673)) ([2e4ad6a](https://github.com/Opentrons/opentrons/commit/2e4ad6a))
-
-
-### Features
-
 * **api:** add source blowout location option to transfer function ([#6670](https://github.com/Opentrons/opentrons/issues/6670)) ([811a767](https://github.com/Opentrons/opentrons/commit/811a767)), closes [#6576](https://github.com/Opentrons/opentrons/issues/6576)
-
-
-
-
-
-# [4.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.0) (2020-10-15)
-
-
-### Bug Fixes
-
-* **api,robot-server:** add pydantic to api, upgrade and add test dev deps ([#6673](https://github.com/Opentrons/opentrons/issues/6673)) ([2e4ad6a](https://github.com/Opentrons/opentrons/commit/2e4ad6a))
-
-
-### Features
-
-* **api:** add source blowout location option to transfer function ([#6670](https://github.com/Opentrons/opentrons/issues/6670)) ([811a767](https://github.com/Opentrons/opentrons/commit/811a767)), closes [#6576](https://github.com/Opentrons/opentrons/issues/6576)
-
 
 
 
