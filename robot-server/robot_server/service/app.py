@@ -84,7 +84,7 @@ async def on_startup():
     initialize_logging()
     # Initialize api
     api_wrapper.async_initialize()
-    await api_wrapper.init_door_event_publisher()
+    # await api_wrapper.init_door_event_publisher()
 
 
 @app.on_event("shutdown")

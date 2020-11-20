@@ -39,6 +39,7 @@ class HardwareWrapper:
                 hardware_server=app_settings.hardware_server_enable,
                 hardware_server_socket=app_settings.hardware_server_socket_path
             )
+        await self.init_door_event_publisher()
         log.info("Opentrons API initialized")
         return self._tm
 
