@@ -3,228 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.0.0-alpha.16](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.15...v4.0.0-alpha.16) (2020-11-19)
-
+# [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 ### Bug Fixes
 
 * **api:** Mark pipette and deck calibration as bad for slot one ([#7035](https://github.com/Opentrons/opentrons/issues/7035)) ([92f1cbf](https://github.com/Opentrons/opentrons/commit/92f1cbf))
-
-
-
-
-
-# [4.0.0-alpha.15](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.14...v4.0.0-alpha.15) (2020-11-18)
-
-**Note:** Version bump only for package @opentrons/robot-server
-
-
-
-
-
-# [4.0.0-alpha.14](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.13...v4.0.0-alpha.14) (2020-11-18)
-
-**Note:** Version bump only for package @opentrons/robot-server
-
-
-
-
-
-# [4.0.0-alpha.13](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.12...v4.0.0-alpha.13) (2020-11-17)
-
-
-### Bug Fixes
-
 * **robot-server:** deck cal: clear pipette offset cal when deck cal completes ([#7019](https://github.com/Opentrons/opentrons/issues/7019)) ([243c683](https://github.com/Opentrons/opentrons/commit/243c683))
 * **robot-server:** remove pip offset after tlc in fused flow ([#7020](https://github.com/Opentrons/opentrons/issues/7020)) ([858219e](https://github.com/Opentrons/opentrons/commit/858219e))
-
-
-
-
-
-# [4.0.0-alpha.12](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.11...v4.0.0-alpha.12) (2020-11-16)
-
-
-### Bug Fixes
-
 * **robot-server:** load tip length data correctly in pipette offset cal ([#7009](https://github.com/Opentrons/opentrons/issues/7009)) ([8c8ef89](https://github.com/Opentrons/opentrons/commit/8c8ef89))
-
-
-
-
-
-# [4.0.0-alpha.11](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.10...v4.0.0-alpha.11) (2020-11-13)
-
-**Note:** Version bump only for package @opentrons/robot-server
-
-
-
-
-
-# [4.0.0-alpha.10](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.9...v4.0.0-alpha.10) (2020-11-13)
-
-
-### Bug Fixes
-
 * **robot-server:** reset cal when starting pip offset cal ([#6991](https://github.com/Opentrons/opentrons/issues/6991)) ([d471900](https://github.com/Opentrons/opentrons/commit/d471900))
-
-
-
-
-
-# [4.0.0-alpha.9](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.8...v4.0.0-alpha.9) (2020-11-11)
-
-
-### Bug Fixes
-
 * **robot-server:** cal check: fix comparingHeight y-value ([#6981](https://github.com/Opentrons/opentrons/issues/6981)) ([dd393e9](https://github.com/Opentrons/opentrons/commit/dd393e9))
 * **robot-server:** Opt logs out of version requirements ([#6980](https://github.com/Opentrons/opentrons/issues/6980)) ([e73083d](https://github.com/Opentrons/opentrons/commit/e73083d))
+* **robot-server:** calcheck: fix invalidation, pickup, retract ([#6934](https://github.com/Opentrons/opentrons/issues/6934)) ([c351ea7](https://github.com/Opentrons/opentrons/commit/c351ea7))
+* **robot-server,api:** reset cal during dc process ([#6942](https://github.com/Opentrons/opentrons/issues/6942)) ([8d142d4](https://github.com/Opentrons/opentrons/commit/8d142d4))
+* **robot-server:** prefer smaller pipette in deck cal ([#6900](https://github.com/Opentrons/opentrons/issues/6900)) ([9f2830a](https://github.com/Opentrons/opentrons/commit/9f2830a))
+* **robot-server:** cache instruments before each calibration flow ([#6822](https://github.com/Opentrons/opentrons/issues/6822)) ([0d61b0e](https://github.com/Opentrons/opentrons/commit/0d61b0e))
+* **robot-server:** home plungers in cal flows ([#6823](https://github.com/Opentrons/opentrons/issues/6823)) ([c641d0f](https://github.com/Opentrons/opentrons/commit/c641d0f))
+* **api,robot-server:** reload robot calibration on deck calibration exit ([#6815](https://github.com/Opentrons/opentrons/issues/6815)) ([254af66](https://github.com/Opentrons/opentrons/commit/254af66))
+* **robot-server:** Fix return tip moves in cal flows ([#6814](https://github.com/Opentrons/opentrons/issues/6814)) ([3c94eef](https://github.com/Opentrons/opentrons/commit/3c94eef))
+* **robot-server:** Home pipettes after calibration flows ([#6813](https://github.com/Opentrons/opentrons/issues/6813)) ([1f378a2](https://github.com/Opentrons/opentrons/commit/1f378a2))
+* **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/Opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/Opentrons/opentrons/commit/4b9e582))
 
 
-
-
-
-# [4.0.0-alpha.8](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.7...v4.0.0-alpha.8) (2020-11-09)
 
 
 ### Features
 
 * **api:** Mark calibrations as bad when determined they exceed threshold ([#6918](https://github.com/Opentrons/opentrons/issues/6918)) ([ac3a866](https://github.com/Opentrons/opentrons/commit/ac3a866))
 * **app, robot-server:** Report both the minimum and maximum supported protocol api versions ([#6921](https://github.com/Opentrons/opentrons/issues/6921)) ([22fc36a](https://github.com/Opentrons/opentrons/commit/22fc36a))
-
-
-
-
-
-# [4.0.0-alpha.7](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.6...v4.0.0-alpha.7) (2020-11-06)
-
-
-### Bug Fixes
-
-* **robot-server:** calcheck: fix invalidation, pickup, retract ([#6934](https://github.com/Opentrons/opentrons/issues/6934)) ([c351ea7](https://github.com/Opentrons/opentrons/commit/c351ea7))
-* **robot-server,api:** reset cal during dc process ([#6942](https://github.com/Opentrons/opentrons/issues/6942)) ([8d142d4](https://github.com/Opentrons/opentrons/commit/8d142d4))
-
-
-
-
-
-# [4.0.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.2...v4.0.0-alpha.6) (2020-11-05)
-
-
-### Features
-
 * **robot-server:** increment HTTP API version ([#6917](https://github.com/Opentrons/opentrons/issues/6917)) ([601c3fb](https://github.com/Opentrons/opentrons/commit/601c3fb)), closes [#6851](https://github.com/Opentrons/opentrons/issues/6851)
-
-
-### BREAKING CHANGES
-
-* **robot-server:** Requests without Opentrons-Version or with a value lower than 2 will be rejected
-
-
-
-
-
-# [4.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.5...v4.0.0-beta.2) (2020-11-05)
-
-**Note:** Version bump only for package @opentrons/robot-server
-
-
-
-
-
-# [4.0.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.4...v4.0.0-alpha.5) (2020-11-04)
-
-
-### Bug Fixes
-
-* **robot-server:** prefer smaller pipette in deck cal ([#6900](https://github.com/Opentrons/opentrons/issues/6900)) ([9f2830a](https://github.com/Opentrons/opentrons/commit/9f2830a))
-
-
-
-
-
-# [4.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.3...v4.0.0-alpha.4) (2020-10-30)
-
-
-### Features
-
 * **notify-server:** Notify server subscriber client ([#6818](https://github.com/Opentrons/opentrons/issues/6818)) ([6611e07](https://github.com/Opentrons/opentrons/commit/6611e07)), closes [#6707](https://github.com/Opentrons/opentrons/issues/6707)
-
-
-
-## [3.21.2](https://github.com/Opentrons/opentrons/compare/v3.21.2-alpha.1...v3.21.2) (2020-10-16)
-
-
-
-## [3.21.2-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.2-alpha.0...v3.21.2-alpha.1) (2020-10-16)
-
-
-
-## [3.21.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2-alpha.0) (2020-10-16)
-
-
-
-
-
-# [4.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.1...v4.0.0-alpha.3) (2020-10-26)
-
-
-### Features
-
 * **api:** Prevent Python API v1 protocol upload in server version 4.0.0 ([#6841](https://github.com/Opentrons/opentrons/issues/6841)) ([054f037](https://github.com/Opentrons/opentrons/commit/054f037))
-
-
-
-
-
-# [4.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.2...v4.0.0-beta.1) (2020-10-21)
-
-**Note:** Version bump only for package @opentrons/robot-server
-
-
-
-
-
-# [4.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.0...v4.0.0-alpha.2) (2020-10-21)
-
-
-### Bug Fixes
-
-* **robot-server:** cache instruments before each calibration flow ([#6822](https://github.com/Opentrons/opentrons/issues/6822)) ([0d61b0e](https://github.com/Opentrons/opentrons/commit/0d61b0e))
-* **robot-server:** home plungers in cal flows ([#6823](https://github.com/Opentrons/opentrons/issues/6823)) ([c641d0f](https://github.com/Opentrons/opentrons/commit/c641d0f))
-
-
-### Features
-
 * **app,robot-server:** Retry cal actions ([#6830](https://github.com/Opentrons/opentrons/issues/6830)) ([86c729b](https://github.com/Opentrons/opentrons/commit/86c729b)), closes [#6729](https://github.com/Opentrons/opentrons/issues/6729)
-
-
-
-
-
-# [4.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.1...v4.0.0-beta.0) (2020-10-19)
-
-
-### Bug Fixes
-
-* **api,robot-server:** reload robot calibration on deck calibration exit ([#6815](https://github.com/Opentrons/opentrons/issues/6815)) ([254af66](https://github.com/Opentrons/opentrons/commit/254af66))
-* **robot-server:** Fix return tip moves in cal flows ([#6814](https://github.com/Opentrons/opentrons/issues/6814)) ([3c94eef](https://github.com/Opentrons/opentrons/commit/3c94eef))
-* **robot-server:** Home pipettes after calibration flows ([#6813](https://github.com/Opentrons/opentrons/issues/6813)) ([1f378a2](https://github.com/Opentrons/opentrons/commit/1f378a2))
-
-
-
-
-
-# [4.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.1) (2020-10-16)
-
-
-### Bug Fixes
-
 * **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/Opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/Opentrons/opentrons/commit/4b9e582))
-
-
-### Features
-
 * **api:** Add calibration status to all of the calibration data models ([#6648](https://github.com/Opentrons/opentrons/issues/6648)) ([2753734](https://github.com/Opentrons/opentrons/commit/2753734))
 * **api,robot-server:** Overhaul robot calibration flows ([#6797](https://github.com/Opentrons/opentrons/issues/6797)) ([f0f236f](https://github.com/Opentrons/opentrons/commit/f0f236f)), closes [#6738](https://github.com/Opentrons/opentrons/issues/6738) [#6739](https://github.com/Opentrons/opentrons/issues/6739)
 * **robot-server:** create models for basic pipetting session commands ([#6560](https://github.com/Opentrons/opentrons/issues/6560)) ([b31377b](https://github.com/Opentrons/opentrons/commit/b31377b)), closes [#6556](https://github.com/Opentrons/opentrons/issues/6556)
@@ -232,27 +43,22 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **robot-server:** http basic pipetting- load labware ([#6640](https://github.com/Opentrons/opentrons/issues/6640)) ([afeee2e](https://github.com/Opentrons/opentrons/commit/afeee2e))
 * **robot-server:** live protocol session handles LoadInstrument command ([#6639](https://github.com/Opentrons/opentrons/issues/6639)) ([969112c](https://github.com/Opentrons/opentrons/commit/969112c)), closes [#6602](https://github.com/Opentrons/opentrons/issues/6602)
 * **robot-server,app:** extend pipette offset cal to include tip length cal if needed ([#6641](https://github.com/Opentrons/opentrons/issues/6641)) ([5819f29](https://github.com/Opentrons/opentrons/commit/5819f29))
-
-
-
-
-
-# [4.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.0) (2020-10-15)
-
-
-### Bug Fixes
-
-* **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/Opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/Opentrons/opentrons/commit/4b9e582))
-
-
-### Features
-
 * **api:** Add calibration status to all of the calibration data models ([#6648](https://github.com/Opentrons/opentrons/issues/6648)) ([2753734](https://github.com/Opentrons/opentrons/commit/2753734))
 * **robot-server:** create models for basic pipetting session commands ([#6560](https://github.com/Opentrons/opentrons/issues/6560)) ([b31377b](https://github.com/Opentrons/opentrons/commit/b31377b)), closes [#6556](https://github.com/Opentrons/opentrons/issues/6556)
 * **robot-server:** http basic pipetting session - command routing and state store ([#6606](https://github.com/Opentrons/opentrons/issues/6606)) ([534f038](https://github.com/Opentrons/opentrons/commit/534f038)), closes [#6559](https://github.com/Opentrons/opentrons/issues/6559)
 * **robot-server:** http basic pipetting- load labware ([#6640](https://github.com/Opentrons/opentrons/issues/6640)) ([afeee2e](https://github.com/Opentrons/opentrons/commit/afeee2e))
 * **robot-server:** live protocol session handles LoadInstrument command ([#6639](https://github.com/Opentrons/opentrons/issues/6639)) ([969112c](https://github.com/Opentrons/opentrons/commit/969112c)), closes [#6602](https://github.com/Opentrons/opentrons/issues/6602)
 * **robot-server,app:** extend pipette offset cal to include tip length cal if needed ([#6641](https://github.com/Opentrons/opentrons/issues/6641)) ([5819f29](https://github.com/Opentrons/opentrons/commit/5819f29))
+
+
+
+
+
+### BREAKING CHANGES
+
+* **robot-server:** Requests without Opentrons-Version or with a value lower than 2 will be rejected
+
+
 
 
 

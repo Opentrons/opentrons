@@ -3,83 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.0.0-alpha.16](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.15...v4.0.0-alpha.16) (2020-11-19)
+# [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 
 ### Bug Fixes
 
 * **app:** cal check: fix deck setup typo ([#7037](https://github.com/Opentrons/opentrons/issues/7037)) ([0c0013e](https://github.com/Opentrons/opentrons/commit/0c0013e))
-
-
-
-
-
-# [4.0.0-alpha.15](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.14...v4.0.0-alpha.15) (2020-11-18)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [4.0.0-alpha.14](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.13...v4.0.0-alpha.14) (2020-11-18)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [4.0.0-alpha.13](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.12...v4.0.0-alpha.13) (2020-11-17)
-
-
-### Bug Fixes
-
 * **app:** Filter pipette offset calibrations by mount as well ([#7017](https://github.com/Opentrons/opentrons/issues/7017)) ([8bf5a71](https://github.com/Opentrons/opentrons/commit/8bf5a71))
 * **app:** fix pipette info page flag for configuring or changing pipette ([#7018](https://github.com/Opentrons/opentrons/issues/7018)) ([74d9cb4](https://github.com/Opentrons/opentrons/commit/74d9cb4))
-
-
-
-
-
-# [4.0.0-alpha.12](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.11...v4.0.0-alpha.12) (2020-11-16)
-
-
-### Bug Fixes
-
 * **app:** consistent date formatting for calibration last modified time ([#7003](https://github.com/Opentrons/opentrons/issues/7003)) ([3b3d75d](https://github.com/Opentrons/opentrons/commit/3b3d75d)), closes [#7002](https://github.com/Opentrons/opentrons/issues/7002)
 * **app:** fix post attach pipette calibration double wizard ([#7008](https://github.com/Opentrons/opentrons/issues/7008)) ([f4ec258](https://github.com/Opentrons/opentrons/commit/f4ec258))
 * **app:** fix required modules list on protocol info page ([#7012](https://github.com/Opentrons/opentrons/issues/7012)) ([47fdbb5](https://github.com/Opentrons/opentrons/commit/47fdbb5))
-
-
-
-
-
-# [4.0.0-alpha.11](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.10...v4.0.0-alpha.11) (2020-11-13)
-
-
-### Bug Fixes
-
 * **app:** misc cal overhaul sizing, font weight, and spacing tweaks ([#6999](https://github.com/Opentrons/opentrons/issues/6999)) ([ac07045](https://github.com/Opentrons/opentrons/commit/ac07045))
 * **app:** pipette calibration info sections show be same height ([#6996](https://github.com/Opentrons/opentrons/issues/6996)) ([bb9cfc4](https://github.com/Opentrons/opentrons/commit/bb9cfc4))
-
-
-
-
-
-# [4.0.0-alpha.10](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.9...v4.0.0-alpha.10) (2020-11-13)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [4.0.0-alpha.9](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.8...v4.0.0-alpha.9) (2020-11-11)
-
-
-### Bug Fixes
-
 * **app:** Accidental parens in react usememo deps ([#6968](https://github.com/Opentrons/opentrons/issues/6968)) ([df0a15e](https://github.com/Opentrons/opentrons/commit/df0a15e))
 * **app:** Correct text when saving z point for all sessions ([#6955](https://github.com/Opentrons/opentrons/issues/6955)) ([71d5ff9](https://github.com/Opentrons/opentrons/commit/71d5ff9))
 * **app:** Ensure we are using the correct logic for screen transitions in cal check ([#6960](https://github.com/Opentrons/opentrons/issues/6960)) ([2fbc872](https://github.com/Opentrons/opentrons/commit/2fbc872))
@@ -88,195 +24,43 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **app:** fix change pipette and add tests ([#6976](https://github.com/Opentrons/opentrons/issues/6976)) ([079b8c3](https://github.com/Opentrons/opentrons/commit/079b8c3))
 * **app:** full-width jog controls ([#6970](https://github.com/Opentrons/opentrons/issues/6970)) ([e41ab7a](https://github.com/Opentrons/opentrons/commit/e41ab7a))
 * **app:** prettyprint cal check results ([#6964](https://github.com/Opentrons/opentrons/issues/6964)) ([8ebb9f7](https://github.com/Opentrons/opentrons/commit/8ebb9f7))
-
-
-
-
-
-# [4.0.0-alpha.8](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.7...v4.0.0-alpha.8) (2020-11-09)
-
-
-### Bug Fixes
-
 * **app:** Fix a typo in introduction ([#6946](https://github.com/Opentrons/opentrons/issues/6946)) ([8cba814](https://github.com/Opentrons/opentrons/commit/8cba814))
 * **app:** place top portal at higher z index than page level portal ([#6950](https://github.com/Opentrons/opentrons/issues/6950)) ([b08c4d3](https://github.com/Opentrons/opentrons/commit/b08c4d3))
+* **app:** debounce jogs in calcheck ([#6933](https://github.com/Opentrons/opentrons/issues/6933)) ([f355397](https://github.com/Opentrons/opentrons/commit/f355397))
+* **app:** Fix intro screen layout with p1k tiprack ([#6932](https://github.com/Opentrons/opentrons/issues/6932)) ([431eacc](https://github.com/Opentrons/opentrons/commit/431eacc))
+* **app:** Handle cal data without status ([#6936](https://github.com/Opentrons/opentrons/issues/6936)) ([1cfc0a5](https://github.com/Opentrons/opentrons/commit/1cfc0a5))
+* **app:** suppress title bar exit in calcheck results ([#6941](https://github.com/Opentrons/opentrons/issues/6941)) ([e52c8db](https://github.com/Opentrons/opentrons/commit/e52c8db))
+* **app:** change pipette exit button text ([#6930](https://github.com/Opentrons/opentrons/issues/6930)) ([7d4a6bd](https://github.com/Opentrons/opentrons/commit/7d4a6bd))
+* **app:** Spinner for deck calibration button ([#6902](https://github.com/Opentrons/opentrons/issues/6902)) ([7df8b95](https://github.com/Opentrons/opentrons/commit/7df8b95))
+* **app:** put blocking user flows in new top level modal portal ([#6821](https://github.com/Opentrons/opentrons/issues/6821)) ([0e62ff4](https://github.com/Opentrons/opentrons/commit/0e62ff4))
+* **app:** Display if DC was migrated ([#6812](https://github.com/Opentrons/opentrons/issues/6812)) ([d37c0c0](https://github.com/Opentrons/opentrons/commit/d37c0c0))
+* **app:** debounce calibration jog requests while others are in flight ([#6794](https://github.com/Opentrons/opentrons/issues/6794)) ([d5ae8cd](https://github.com/Opentrons/opentrons/commit/d5ae8cd))
+* **app:** fix fetch-on-session-end epics for POC, TLC ([#6757](https://github.com/Opentrons/opentrons/issues/6757)) ([7124bd9](https://github.com/Opentrons/opentrons/commit/7124bd9)), closes [#6747](https://github.com/Opentrons/opentrons/issues/6747)
+* **app:** Fix the fetch epics for real this time ([#6761](https://github.com/Opentrons/opentrons/issues/6761)) ([0df6dc5](https://github.com/Opentrons/opentrons/commit/0df6dc5))
+* **app:** remove redundant tip rack display name from tooltip ([#6770](https://github.com/Opentrons/opentrons/issues/6770)) ([a81228a](https://github.com/Opentrons/opentrons/commit/a81228a))
+* **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/Opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/Opentrons/opentrons/commit/4b9e582))
+* **app:** fix fetch-on-session-end epics for POC, TLC ([#6757](https://github.com/Opentrons/opentrons/issues/6757)) ([7124bd9](https://github.com/Opentrons/opentrons/commit/7124bd9)), closes [#6747](https://github.com/Opentrons/opentrons/issues/6747)
+* **app:** Fix the fetch epics for real this time ([#6761](https://github.com/Opentrons/opentrons/issues/6761)) ([0df6dc5](https://github.com/Opentrons/opentrons/commit/0df6dc5))
+* **app:** remove redundant tip rack display name from tooltip ([#6770](https://github.com/Opentrons/opentrons/issues/6770)) ([a81228a](https://github.com/Opentrons/opentrons/commit/a81228a))
+* **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/Opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/Opentrons/opentrons/commit/4b9e582))
+
+
+
 
 
 ### Features
 
 * **api:** Mark calibrations as bad when determined they exceed threshold ([#6918](https://github.com/Opentrons/opentrons/issues/6918)) ([ac3a866](https://github.com/Opentrons/opentrons/commit/ac3a866))
 * **app, robot-server:** Report both the minimum and maximum supported protocol api versions ([#6921](https://github.com/Opentrons/opentrons/issues/6921)) ([22fc36a](https://github.com/Opentrons/opentrons/commit/22fc36a))
-
-
-
-
-
-# [4.0.0-alpha.7](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.6...v4.0.0-alpha.7) (2020-11-06)
-
-
-### Bug Fixes
-
-* **app:** debounce jogs in calcheck ([#6933](https://github.com/Opentrons/opentrons/issues/6933)) ([f355397](https://github.com/Opentrons/opentrons/commit/f355397))
-* **app:** Fix intro screen layout with p1k tiprack ([#6932](https://github.com/Opentrons/opentrons/issues/6932)) ([431eacc](https://github.com/Opentrons/opentrons/commit/431eacc))
-* **app:** Handle cal data without status ([#6936](https://github.com/Opentrons/opentrons/issues/6936)) ([1cfc0a5](https://github.com/Opentrons/opentrons/commit/1cfc0a5))
-* **app:** suppress title bar exit in calcheck results ([#6941](https://github.com/Opentrons/opentrons/issues/6941)) ([e52c8db](https://github.com/Opentrons/opentrons/commit/e52c8db))
-
-
-
-
-
-# [4.0.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.2...v4.0.0-alpha.6) (2020-11-05)
-
-
-### Bug Fixes
-
-* **app:** change pipette exit button text ([#6930](https://github.com/Opentrons/opentrons/issues/6930)) ([7d4a6bd](https://github.com/Opentrons/opentrons/commit/7d4a6bd))
-
-
-### Features
-
 * **app,discovery-client:** send Opentrons-Version header with HTTP requests ([#6914](https://github.com/Opentrons/opentrons/issues/6914)) ([089dd36](https://github.com/Opentrons/opentrons/commit/089dd36)), closes [#6852](https://github.com/Opentrons/opentrons/issues/6852)
-
-
-
-
-
-# [4.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.5...v4.0.0-beta.2) (2020-11-05)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [4.0.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.4...v4.0.0-alpha.5) (2020-11-04)
-
-
-### Bug Fixes
-
-* **app:** Spinner for deck calibration button ([#6902](https://github.com/Opentrons/opentrons/issues/6902)) ([7df8b95](https://github.com/Opentrons/opentrons/commit/7df8b95))
-
-
-### Features
-
 * **app:** Send intercom event on no-cal-block selected ([#6893](https://github.com/Opentrons/opentrons/issues/6893)) ([8e7059a](https://github.com/Opentrons/opentrons/commit/8e7059a)), closes [#6781](https://github.com/Opentrons/opentrons/issues/6781)
-
-
-
-
-
-# [4.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.3...v4.0.0-alpha.4) (2020-10-30)
-
-
-### Bug Fixes
-
 * **app:** cal wizards show if session exists, always ask for cal block if not saved ([#6870](https://github.com/Opentrons/opentrons/issues/6870)) ([e19b850](https://github.com/Opentrons/opentrons/commit/e19b850))
-
-
-
-## [3.21.2](https://github.com/Opentrons/opentrons/compare/v3.21.2-alpha.1...v3.21.2) (2020-10-16)
-
-
-
-## [3.21.2-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.2-alpha.0...v3.21.2-alpha.1) (2020-10-16)
-
-
-
-## [3.21.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2-alpha.0) (2020-10-16)
-
-
-### Bug Fixes
-
-* **app:** add analytics and support tracking to ignore app update ([#6790](https://github.com/Opentrons/opentrons/issues/6790)) ([079c2e9](https://github.com/Opentrons/opentrons/commit/079c2e9))
-
-
-
-
-
-# [4.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.1...v4.0.0-alpha.3) (2020-10-26)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [4.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.2...v4.0.0-beta.1) (2020-10-21)
-
-
-### Bug Fixes
-
-* **app:** Center start over in measure nozzle ([c875f3d](https://github.com/Opentrons/opentrons/commit/c875f3d))
-
-
-
-
-
-# [4.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.0.0-beta.0...v4.0.0-alpha.2) (2020-10-21)
-
-
-### Bug Fixes
-
-* **app:** put blocking user flows in new top level modal portal ([#6821](https://github.com/Opentrons/opentrons/issues/6821)) ([0e62ff4](https://github.com/Opentrons/opentrons/commit/0e62ff4))
-
-
-### Features
-
 * **app,robot-server:** Retry cal actions ([#6830](https://github.com/Opentrons/opentrons/issues/6830)) ([86c729b](https://github.com/Opentrons/opentrons/commit/86c729b)), closes [#6729](https://github.com/Opentrons/opentrons/issues/6729)
-
-
-
-
-
-# [4.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.0.0-alpha.1...v4.0.0-beta.0) (2020-10-19)
-
-
-### Bug Fixes
-
-* **app:** Display if DC was migrated ([#6812](https://github.com/Opentrons/opentrons/issues/6812)) ([d37c0c0](https://github.com/Opentrons/opentrons/commit/d37c0c0))
-
-
-
-
-
-# [4.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.1) (2020-10-16)
-
-
-### Bug Fixes
-
-* **app:** debounce calibration jog requests while others are in flight ([#6794](https://github.com/Opentrons/opentrons/issues/6794)) ([d5ae8cd](https://github.com/Opentrons/opentrons/commit/d5ae8cd))
-* **app:** fix fetch-on-session-end epics for POC, TLC ([#6757](https://github.com/Opentrons/opentrons/issues/6757)) ([7124bd9](https://github.com/Opentrons/opentrons/commit/7124bd9)), closes [#6747](https://github.com/Opentrons/opentrons/issues/6747)
-* **app:** Fix the fetch epics for real this time ([#6761](https://github.com/Opentrons/opentrons/issues/6761)) ([0df6dc5](https://github.com/Opentrons/opentrons/commit/0df6dc5))
-* **app:** remove redundant tip rack display name from tooltip ([#6770](https://github.com/Opentrons/opentrons/issues/6770)) ([a81228a](https://github.com/Opentrons/opentrons/commit/a81228a))
-* **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/Opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/Opentrons/opentrons/commit/4b9e582))
-
-
-### Features
-
 * **app:** Overhaul OT-2 calibration experience ([#6804](https://github.com/Opentrons/opentrons/issues/6804)) ([91f9e98](https://github.com/Opentrons/opentrons/commit/91f9e98)), closes [#6736](https://github.com/Opentrons/opentrons/issues/6736) [#6737](https://github.com/Opentrons/opentrons/issues/6737)
 * **app:** update pipette attach flow to include calibration ([#6760](https://github.com/Opentrons/opentrons/issues/6760)) ([c873113](https://github.com/Opentrons/opentrons/commit/c873113)), closes [#2130](https://github.com/Opentrons/opentrons/issues/2130)
 * **robot-server,app:** extend pipette offset cal to include tip length cal if needed ([#6641](https://github.com/Opentrons/opentrons/issues/6641)) ([5819f29](https://github.com/Opentrons/opentrons/commit/5819f29))
-
-
-
-
-
-# [4.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.21.1...v4.0.0-alpha.0) (2020-10-15)
-
-
-### Bug Fixes
-
-* **app:** fix fetch-on-session-end epics for POC, TLC ([#6757](https://github.com/Opentrons/opentrons/issues/6757)) ([7124bd9](https://github.com/Opentrons/opentrons/commit/7124bd9)), closes [#6747](https://github.com/Opentrons/opentrons/issues/6747)
-* **app:** Fix the fetch epics for real this time ([#6761](https://github.com/Opentrons/opentrons/issues/6761)) ([0df6dc5](https://github.com/Opentrons/opentrons/commit/0df6dc5))
-* **app:** remove redundant tip rack display name from tooltip ([#6770](https://github.com/Opentrons/opentrons/issues/6770)) ([a81228a](https://github.com/Opentrons/opentrons/commit/a81228a))
-* **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/Opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/Opentrons/opentrons/commit/4b9e582))
-
-
-### Features
-
 * **app:** update pipette attach flow to include calibration ([#6760](https://github.com/Opentrons/opentrons/issues/6760)) ([c873113](https://github.com/Opentrons/opentrons/commit/c873113)), closes [#2130](https://github.com/Opentrons/opentrons/issues/2130)
 * **robot-server,app:** extend pipette offset cal to include tip length cal if needed ([#6641](https://github.com/Opentrons/opentrons/issues/6641)) ([5819f29](https://github.com/Opentrons/opentrons/commit/5819f29))
-
 
 
 
