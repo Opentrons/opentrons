@@ -40,8 +40,6 @@ export const FileSidebar: React.AbstractComponent<{||}> = connect<
 )(FileSidebarComponent)
 
 function mapStateToProps(state: BaseState): SP {
-  // const protocolName =
-  //   fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
   const canDownload = selectors.getCurrentPage(state) !== 'file-splash'
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
