@@ -40,30 +40,33 @@ class HardwareWrapper:
                 hardware_server_socket=app_settings.hardware_server_socket_path
             )
         log.info("Opentrons API initialized")
-        await self._start_door_event_publisher(self._tm)
         return self._tm
 
-    async def _start_door_event_publisher(self, _tm: ThreadManager):
+    async def init_door_event_publisher(self):
         """
         Create a notify-server publisher for safety door state,
         publish the initial state, & register the publisher callback with
         the hw thread manager.
         """
+        if self._tm is None:
+            log.warning("HW Thread Manager not initialized")
+            return
         settings = NotifyServerSettings()
         if self._event_watcher is None:
             log.info("Starting door-switch-notify publisher")
             self._event_publisher = publisher.create(
                 settings.publisher_address.connection_string()
             )
-            self._event_watcher = await _tm.register_callback(
+            self._event_watcher = await self._tm.register_callback(
                 self._publish_door_event)
         else:
             log.warning("Cannot start new hardware event watcher "
                         "when one already exists")
 
     def _publish_door_event(self, hw_event: HardwareEvent):
-        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
-            self._event_publisher.send_nowait("Door_event", Event(
+        if self._event_publisher and \
+                hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+            self._event_publisher.send_nowait("hardware.door_event", Event(
                 createdOn=utc_now(),
                 publisher=self._publish_door_event.__qualname__,
                 data=DoorSwitchEventType(new_state=hw_event.new_state)

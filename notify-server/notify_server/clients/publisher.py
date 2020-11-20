@@ -45,14 +45,19 @@ class Publisher:
         self._queue = queue
 
     async def send(self, topic: str, event: Event) -> None:
-        """Publish an event to a topic. Waits until free slot is available
-           before adding the entry to the queue
+        """
+        Publish an event to a topic.
+
+        Waits until free slot is available before adding the entry to the
+        queue.
         """
         await self._queue.put(QueueEntry(topic, event))
 
     def send_nowait(self, topic: str, event: Event) -> None:
-        """Publish an event to a topic. Uses put_nowait to add queue entry
-           without blocking.
+        """
+        Publish an event to a topic.
+
+        Uses put_nowait to add queue entry without blocking.
         """
         try:
             self._queue.put_nowait(QueueEntry(topic, event))

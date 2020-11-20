@@ -6,7 +6,8 @@ from opentrons.hardware_control.types import DoorState
 
 
 class DoorSwitchEventType(BaseModel):
-    """ Payload type of a Door switch update event. """
+    """Payload type of a Door switch update event."""
+
     new_state: DoorState
 
 

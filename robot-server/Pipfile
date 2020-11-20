@@ -29,3 +29,4 @@ python-dotenv = "*"
 pydantic = "==1.4"
 wsproto = "==0.15.0"
 typing-extensions = "==3.7.4.3"
+notify-server = {editable = true, path = "./../notify-server"}

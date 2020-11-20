@@ -23,4 +23,3 @@ class SampleTwo(BaseModel):
     type: Literal["SampleTwo"] = "SampleTwo"
     val1: int
     val2: str
-
