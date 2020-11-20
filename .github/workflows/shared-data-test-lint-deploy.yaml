@@ -111,3 +111,4 @@ jobs:
         with:
           project: 'shared-data/python'
           repository_url: 'https://upload.pypi.org/legacy/'
+          password: '${{ secrets.OT_PYPI_PASSWORD }}'
