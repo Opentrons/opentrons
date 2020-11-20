@@ -261,8 +261,10 @@ export type CommandCreatorArgs =
  */
 type TipId = string
 
+// Volume of each "ingredient" in a location.
+// (Location = wells in a labware, or tips on a pipette.)
 export type LocationLiquidState = {
-  [ingredGroup: string]: {| volume: number |},
+  [ingredGroup: string]: number,
 }
 
 export type SingleLabwareLiquidState = { [well: string]: LocationLiquidState }

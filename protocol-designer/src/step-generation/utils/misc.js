@@ -33,14 +33,12 @@ export function repeatArray<T>(array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)
 }
 
-type Vol = { volume: number }
-
 /** Total volume of a location ("air" is not included in the sum) */
 export function getLocationTotalVolume(loc: LocationLiquidState): number {
   return reduce(
     loc,
-    (acc: number, ingredState: Vol, ingredId: string) => {
-      return ingredId === AIR ? acc : acc + ingredState.volume
+    (acc: number, ingredVol: number, ingredId: string) => {
+      return ingredId === AIR ? acc : acc + ingredVol
     },
     0
   )
@@ -57,17 +55,17 @@ export function splitLiquid(
     // Splitting from empty source
     return {
       source: sourceLiquidState,
-      dest: { [AIR]: { volume } },
+      dest: { [AIR]: volume },
     }
   }
 
   if (volume > totalSourceVolume) {
     // Take all of source, plus air
     return {
-      source: mapValues(sourceLiquidState, () => ({ volume: 0 })),
+      source: mapValues(sourceLiquidState, () => 0),
       dest: {
         ...sourceLiquidState,
-        [AIR]: { volume: volume - totalSourceVolume },
+        [AIR]: volume - totalSourceVolume,
       },
     }
   }
@@ -76,11 +74,11 @@ export function splitLiquid(
     sourceLiquidState,
     (
       acc: { [ingredId: string]: number },
-      ingredState: Vol,
+      ingredVol: number,
       ingredId: string
     ) => ({
       ...acc,
-      [ingredId]: ingredState.volume / totalSourceVolume,
+      [ingredId]: ingredVol / totalSourceVolume,
     }),
     {}
   )
@@ -91,11 +89,11 @@ export function splitLiquid(
       return {
         source: {
           ...acc.source,
-          [ingredId]: { volume: sourceLiquidState[ingredId].volume - destVol },
+          [ingredId]: sourceLiquidState[ingredId] - destVol,
         },
         dest: {
           ...acc.dest,
-          [ingredId]: { volume: destVol },
+          [ingredId]: destVol,
         },
       }
     },
@@ -116,17 +114,17 @@ export function mergeLiquid(
 
     ...reduce<LocationLiquidState, LocationLiquidState>(
       source,
-      (acc, ingredState: Vol, ingredId: string) => {
+      (acc, ingredVol: number, ingredId: string) => {
         const isCommonIngred = ingredId in dest
         const ingredVolume = isCommonIngred
           ? // sum volumes of ingredients common to 'source' and 'dest'
-            ingredState.volume + dest[ingredId].volume
+            ingredVol + dest[ingredId]
           : // include all ingreds exclusive to 'source'
-            ingredState.volume
+            ingredVol
 
         return {
           ...acc,
-          [ingredId]: { volume: ingredVolume },
+          [ingredId]: ingredVolume,
         }
       },
       {}

@@ -44,9 +44,7 @@ describe('...single-channel pipette', () => {
   describe('...fresh tip', () => {
     it('aspirate from single-ingredient well', () => {
       robotState.liquidState.labware[labwareId].A1 = {
-        ingred1: {
-          volume: 200,
-        },
+        ingred1: 200,
       }
 
       const result = forAspirate(
@@ -59,12 +57,12 @@ describe('...single-channel pipette', () => {
       expect(result.robotState.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': { ingred1: { volume: 50 } },
+            '0': { ingred1: 50 },
           },
         },
         labware: {
           [labwareId]: {
-            A1: { ingred1: { volume: 150 } },
+            A1: { ingred1: 150 },
             A2: {},
           },
         },
@@ -74,9 +72,7 @@ describe('...single-channel pipette', () => {
     it('aspirate everything + air from a single-ingredient well', () => {
       // aspirate 300 from well with 200, leaving 100 of air
       robotState.liquidState.labware[labwareId].A1 = {
-        ingred1: {
-          volume: 200,
-        },
+        ingred1: 200,
       }
       const args = {
         ...aspirateSingleCh50FromA1Args,
@@ -91,12 +87,12 @@ describe('...single-channel pipette', () => {
       expect(result.robotState.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': { ingred1: { volume: 200 }, [AIR]: { volume: 100 } },
+            '0': { ingred1: 200, [AIR]: 100 },
           },
         },
         labware: {
           [labwareId]: {
-            A1: { ingred1: { volume: 0 } },
+            A1: { ingred1: 0 },
             A2: {},
           },
         },
@@ -105,8 +101,8 @@ describe('...single-channel pipette', () => {
 
     it('aspirate from two-ingredient well', () => {
       robotState.liquidState.labware[labwareId].A1 = {
-        ingred1: { volume: 200 },
-        ingred2: { volume: 100 },
+        ingred1: 200,
+        ingred2: 100,
       }
       const args = {
         ...aspirateSingleCh50FromA1Args,
@@ -119,14 +115,14 @@ describe('...single-channel pipette', () => {
       expect(result.robotState.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': { ingred1: { volume: 40 }, ingred2: { volume: 20 } },
+            '0': { ingred1: 40, ingred2: 20 },
           },
         },
         labware: {
           [labwareId]: {
             A1: {
-              ingred1: { volume: 200 - 40 },
-              ingred2: { volume: 100 - 20 },
+              ingred1: 200 - 40,
+              ingred2: 100 - 20,
             },
           },
         },
@@ -135,8 +131,8 @@ describe('...single-channel pipette', () => {
 
     it('aspirate everything + air from two-ingredient well', () => {
       robotState.liquidState.labware[labwareId].A1 = {
-        ingred1: { volume: 60 },
-        ingred2: { volume: 70 },
+        ingred1: 60,
+        ingred2: 70,
       }
       const args = {
         ...aspirateSingleCh50FromA1Args,
@@ -152,15 +148,15 @@ describe('...single-channel pipette', () => {
         pipettes: {
           p300SingleId: {
             '0': {
-              ingred1: { volume: 60 },
-              ingred2: { volume: 70 },
-              [AIR]: { volume: 20 },
+              ingred1: 60,
+              ingred2: 70,
+              [AIR]: 20,
             },
           },
         },
         labware: {
           [labwareId]: {
-            A1: { ingred1: { volume: 0 }, ingred2: { volume: 0 } },
+            A1: { ingred1: 0, ingred2: 0 },
           },
         },
       })
@@ -170,10 +166,10 @@ describe('...single-channel pipette', () => {
   describe('...tip already containing liquid', () => {
     it('aspirate from single-ingredient well', () => {
       robotState.liquidState.labware[labwareId].A1 = {
-        ingred1: { volume: 200 },
+        ingred1: 200,
       }
       robotState.liquidState.pipettes.p300SingleId['0'] = {
-        ingred1: { volume: 30 },
+        ingred1: 30,
       }
 
       const result = forAspirate(
@@ -186,12 +182,12 @@ describe('...single-channel pipette', () => {
       expect(result.robotState.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': { ingred1: { volume: 30 + 50 } },
+            '0': { ingred1: 30 + 50 },
           },
         },
         labware: {
           [labwareId]: {
-            A1: { ingred1: { volume: 150 } },
+            A1: { ingred1: 150 },
           },
         },
       })
@@ -217,12 +213,12 @@ describe('...8-channel pipette', () => {
     // A1 and B1 have 1 ingred of different volumes, rest of column 1 is empty
     robotState.liquidState.labware[labwareId] = {
       ...robotState.liquidState.labware[labwareId],
-      A1: { ingred1: { volume: 200 } },
-      B1: { ingred1: { volume: 150 } },
+      A1: { ingred1: 200 },
+      B1: { ingred1: 150 },
     }
     // all pipette tips start with 30 of ingred 1
     robotState.liquidState.pipettes.p300MultiId = createTipLiquidState(8, {
-      ingred1: { volume: 30 },
+      ingred1: 30,
     })
 
     const result = forAspirate(
@@ -239,17 +235,17 @@ describe('...8-channel pipette', () => {
       pipettes: {
         p300MultiId: {
           ...createTipLiquidState(8, {
-            [AIR]: { volume: 50 },
-            ingred1: { volume: 30 },
+            [AIR]: 50,
+            ingred1: 30,
           }),
-          '0': { ingred1: { volume: 50 + 30 } },
-          '1': { ingred1: { volume: 50 + 30 } },
+          '0': { ingred1: 50 + 30 },
+          '1': { ingred1: 50 + 30 },
         },
       },
       labware: {
         [labwareId]: {
-          A1: { ingred1: { volume: 200 - 50 } },
-          B1: { ingred1: { volume: 150 - 50 } },
+          A1: { ingred1: 200 - 50 },
+          B1: { ingred1: 150 - 50 },
         },
       },
     })
@@ -259,8 +255,8 @@ describe('...8-channel pipette', () => {
     // A1 and B1 have 1 ingred of different volumes, rest of column 1 is empty
     robotState.liquidState.labware[labwareId] = {
       ...robotState.liquidState.labware[labwareId],
-      A1: { ingred1: { volume: 200 } },
-      B1: { ingred1: { volume: 150 } },
+      A1: { ingred1: 200 },
+      B1: { ingred1: 150 },
     }
     const args = {
       ...aspirate8Ch50FromA1Args,
@@ -277,15 +273,15 @@ describe('...8-channel pipette', () => {
     expect(result.robotState.liquidState).toMatchObject({
       pipettes: {
         p300MultiId: {
-          ...createTipLiquidState(8, { [AIR]: { volume: 250 } }),
-          '0': { ingred1: { volume: 200 }, [AIR]: { volume: 50 } },
-          '1': { ingred1: { volume: 150 }, [AIR]: { volume: 100 } },
+          ...createTipLiquidState(8, { [AIR]: 250 }),
+          '0': { ingred1: 200, [AIR]: 50 },
+          '1': { ingred1: 150, [AIR]: 100 },
         },
       },
       labware: {
         [labwareId]: {
-          A1: { ingred1: { volume: 0 } },
-          B1: { ingred1: { volume: 0 } },
+          A1: { ingred1: 0 },
+          B1: { ingred1: 0 },
         },
       },
     })
@@ -297,21 +293,21 @@ describe('8-channel trough', () => {
   const troughCases = [
     {
       testName: '20uLx8 from 300uL trough well',
-      initialWellContents: { ingred1: { volume: 300 } },
+      initialWellContents: { ingred1: 300 },
       aspirateVolume: 20,
       expectedWarnings: [],
-      expectedWellContents: { ingred1: { volume: 300 - 20 * 8 } },
-      expectedTipContents: { ingred1: { volume: 20 } },
+      expectedWellContents: { ingred1: 300 - 20 * 8 },
+      expectedTipContents: { ingred1: 20 },
     },
     {
       testName: 'over-aspirate 50uLx8 from 300uL trough well',
-      initialWellContents: { ingred1: { volume: 300 } },
+      initialWellContents: { ingred1: 300 },
       aspirateVolume: 50,
       expectedWarnings: [warningCreators.aspirateMoreThanWellContents()],
-      expectedWellContents: { ingred1: { volume: 0 } },
+      expectedWellContents: { ingred1: 0 },
       expectedTipContents: {
-        [AIR]: { volume: 50 - 300 / 8 },
-        ingred1: { volume: 300 / 8 },
+        [AIR]: 50 - 300 / 8,
+        ingred1: 300 / 8,
       },
     },
     {
@@ -320,7 +316,7 @@ describe('8-channel trough', () => {
       aspirateVolume: 20,
       expectedWarnings: [warningCreators.aspirateFromPristineWell()],
       expectedWellContents: {},
-      expectedTipContents: { [AIR]: { volume: 20 } },
+      expectedTipContents: { [AIR]: 20 },
     },
   ]
   troughCases.forEach(

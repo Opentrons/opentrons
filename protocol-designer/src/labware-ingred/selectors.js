@@ -141,7 +141,7 @@ const getLiquidGroupsOnDeck: MemoizedSelector<Array<string>> = createSelector(
               contents: $Values<typeof groupContents>,
               groupId: $Keys<typeof groupContents>
             ) => {
-              if (contents.volume > 0) {
+              if (contents > 0) {
                 liquidGroups.add(groupId)
               }
             }

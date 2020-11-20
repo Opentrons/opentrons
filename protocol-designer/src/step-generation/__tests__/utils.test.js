@@ -33,37 +33,37 @@ import type { RobotState } from '../'
 
 describe('splitLiquid', () => {
   const singleIngred = {
-    ingred1: { volume: 100 },
+    ingred1: 100,
   }
 
   const twoIngred = {
-    ingred1: { volume: 100 },
-    ingred2: { volume: 300 },
+    ingred1: 100,
+    ingred2: 300,
   }
 
   it('simple split with 1 ingredient in source', () => {
     expect(splitLiquid(60, singleIngred)).toEqual({
-      source: { ingred1: { volume: 40 } },
-      dest: { ingred1: { volume: 60 } },
+      source: { ingred1: 40 },
+      dest: { ingred1: 60 },
     })
   })
 
   it('get 0 volume in source when you split it all', () => {
     expect(splitLiquid(100, singleIngred)).toEqual({
-      source: { ingred1: { volume: 0 } },
-      dest: { ingred1: { volume: 100 } },
+      source: { ingred1: 0 },
+      dest: { ingred1: 100 },
     })
   })
 
   it('split with 2 ingredients in source', () => {
     expect(splitLiquid(20, twoIngred)).toEqual({
       source: {
-        ingred1: { volume: 95 },
-        ingred2: { volume: 285 },
+        ingred1: 95,
+        ingred2: 285,
       },
       dest: {
-        ingred1: { volume: 5 },
-        ingred2: { volume: 15 },
+        ingred1: 5,
+        ingred2: 15,
       },
     })
   })
@@ -71,8 +71,8 @@ describe('splitLiquid', () => {
   it('split all with 2 ingredients', () => {
     expect(splitLiquid(400, twoIngred)).toEqual({
       source: {
-        ingred1: { volume: 0 },
-        ingred2: { volume: 0 },
+        ingred1: 0,
+        ingred2: 0,
       },
       dest: twoIngred,
     })
@@ -82,8 +82,8 @@ describe('splitLiquid', () => {
     expect(splitLiquid(0, twoIngred)).toEqual({
       source: twoIngred,
       dest: {
-        ingred1: { volume: 0 },
-        ingred2: { volume: 0 },
+        ingred1: 0,
+        ingred2: 0,
       },
     })
   })
@@ -91,17 +91,17 @@ describe('splitLiquid', () => {
   it('split with 2 ingreds, one has 0 vol', () => {
     expect(
       splitLiquid(50, {
-        ingred1: { volume: 200 },
-        ingred2: { volume: 0 },
+        ingred1: 200,
+        ingred2: 0,
       })
     ).toEqual({
       source: {
-        ingred1: { volume: 150 },
-        ingred2: { volume: 0 },
+        ingred1: 150,
+        ingred2: 0,
       },
       dest: {
-        ingred1: { volume: 50 },
-        ingred2: { volume: 0 },
+        ingred1: 50,
+        ingred2: 0,
       },
     })
   })
@@ -114,12 +114,12 @@ describe('splitLiquid', () => {
       )
     ).toEqual({
       source: {
-        ingred1: { volume: 100 - (0.25 * 1000) / 3 },
-        ingred2: { volume: 50 },
+        ingred1: 100 - (0.25 * 1000) / 3,
+        ingred2: 50,
       },
       dest: {
-        ingred1: { volume: (0.25 * 1000) / 3 },
-        ingred2: { volume: 250 },
+        ingred1: (0.25 * 1000) / 3,
+        ingred2: 250,
       },
     })
   })
@@ -127,26 +127,24 @@ describe('splitLiquid', () => {
   it('splitting with no ingredients in source just splits "air"', () => {
     expect(splitLiquid(100, {})).toEqual({
       source: {},
-      dest: { [AIR]: { volume: 100 } },
+      dest: { [AIR]: 100 },
     })
   })
 
   it('splitting with 0 volume in source just splits "air"', () => {
-    expect(splitLiquid(100, { ingred1: { volume: 0 } })).toEqual({
-      source: { ingred1: { volume: 0 } },
-      dest: { [AIR]: { volume: 100 } },
+    expect(splitLiquid(100, { ingred1: 0 })).toEqual({
+      source: { ingred1: 0 },
+      dest: { [AIR]: 100 },
     })
   })
 
   it('splitting with excessive volume leaves "air" in dest', () => {
-    expect(
-      splitLiquid(100, { ingred1: { volume: 50 }, ingred2: { volume: 20 } })
-    ).toEqual({
-      source: { ingred1: { volume: 0 }, ingred2: { volume: 0 } },
+    expect(splitLiquid(100, { ingred1: 50, ingred2: 20 })).toEqual({
+      source: { ingred1: 0, ingred2: 0 },
       dest: {
-        ingred1: { volume: 50 },
-        ingred2: { volume: 20 },
-        [AIR]: { volume: 30 },
+        ingred1: 50,
+        ingred2: 20,
+        [AIR]: 30,
       },
     })
   })
@@ -154,7 +152,7 @@ describe('splitLiquid', () => {
   // TODO Ian 2018-03-19 figure out what to do with air warning reporting
   it.todo('splitting with air in source should do something (throw error???)')
   // expect(() =>
-  // splitLiquid(50, { ingred1: { volume: 100 }, [AIR]: { volume: 20 } })
+  // splitLiquid(50, { ingred1: 100, [AIR]: 20 })
   // ).toThrow(/source cannot contain air/)
 })
 
@@ -163,18 +161,18 @@ describe('mergeLiquid', () => {
     expect(
       mergeLiquid(
         {
-          ingred1: { volume: 30 },
-          ingred2: { volume: 40 },
+          ingred1: 30,
+          ingred2: 40,
         },
         {
-          ingred2: { volume: 15 },
-          ingred3: { volume: 25 },
+          ingred2: 15,
+          ingred3: 25,
         }
       )
     ).toEqual({
-      ingred1: { volume: 30 },
-      ingred2: { volume: 55 },
-      ingred3: { volume: 25 },
+      ingred1: 30,
+      ingred2: 55,
+      ingred3: 25,
     })
   })
 
@@ -182,17 +180,17 @@ describe('mergeLiquid', () => {
     expect(
       mergeLiquid(
         {
-          ingred3: { volume: 25 },
+          ingred3: 25,
         },
         {
-          ingred1: { volume: 30 },
-          ingred2: { volume: 40 },
+          ingred1: 30,
+          ingred2: 40,
         }
       )
     ).toEqual({
-      ingred1: { volume: 30 },
-      ingred2: { volume: 40 },
-      ingred3: { volume: 25 },
+      ingred1: 30,
+      ingred2: 40,
+      ingred3: 25,
     })
   })
 })
@@ -723,9 +721,9 @@ describe('getDispenseAirGapLocation', () => {
 describe('getLocationTotalVolume', () => {
   it('should return the sum of all non-AIR volumes', () => {
     const result = getLocationTotalVolume({
-      a: { volume: 2 },
-      b: { volume: 4 },
-      [AIR]: { volume: 100 },
+      a: 2,
+      b: 4,
+      [AIR]: 100,
     })
     expect(result).toEqual(2 + 4)
   })
@@ -736,7 +734,7 @@ describe('getLocationTotalVolume', () => {
   })
 
   it('should return 0 location with only AIR', () => {
-    const result = getLocationTotalVolume({ [AIR]: { volume: 123 } })
+    const result = getLocationTotalVolume({ [AIR]: 123 })
     expect(result).toEqual(0)
   })
 })

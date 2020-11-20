@@ -34,7 +34,7 @@ function _wellContentsForWell(
 ): WellContents {
   // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}
   const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(
-    groupId => liquidVolState[groupId] && liquidVolState[groupId].volume > 0
+    groupId => liquidVolState[groupId] && liquidVolState[groupId] > 0
   )
 
   return {
@@ -42,7 +42,7 @@ function _wellContentsForWell(
     groupIds: ingredGroupIdsWithContent, // TODO: BC 2018-09-21 remove in favor of volumeByGroupId
     ingreds: omitBy(
       liquidVolState,
-      ingredData => !ingredData || ingredData.volume <= 0
+      ingredData => !ingredData || ingredData <= 0
     ),
   }
 }
@@ -133,13 +133,11 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
     if (!hasCommonIngred || !initialIngredId || !initialWellContents) {
       return { ingredientId: null, volume: null }
     } else {
-      const initialVolume: ?number = initialWellContents[initialIngredId].volume
+      const initialVolume: ?number = initialWellContents[initialIngredId]
       const hasCommonVolume = Object.keys(selectedWells).every(
         (well: string) => {
           if (!ingredsInLabware[well] || !initialIngredId) return null
-          return (
-            ingredsInLabware[well][initialIngredId].volume === initialVolume
-          )
+          return ingredsInLabware[well][initialIngredId] === initialVolume
         }
       )
       return {

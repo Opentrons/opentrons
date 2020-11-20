@@ -25,11 +25,11 @@ export type WellIngredientNames = { [ingredId: string]: string }
 export type WellIngredientVolumeData =
   | {
       // single-channel format
-      [ingredId: string]: {| volume: number |},
+      [ingredId: string]: number,
     }
   | {
       // multi-channel 'by well' format
-      [well: string]: { [ingredId: string]: {| volume: number |} },
+      [well: string]: { [ingredId: string]: number },
     }
 
 export type TipLocation = { labware: string, well: string }

@@ -44,7 +44,7 @@ describe('...single-channel pipette', () => {
         pipettes: {
           p300SingleId: {
             '0': {
-              ingred1: { volume: 150 },
+              ingred1: 150,
             },
           },
         },
@@ -60,13 +60,13 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: { volume: 0 },
+            ingred1: 0,
           },
         },
       },
       labware: {
         sourcePlateId: {
-          A1: { ingred1: { volume: 150 } },
+          A1: { ingred1: 150 },
           A2: {},
           B1: {},
         },
@@ -82,7 +82,7 @@ describe('...single-channel pipette', () => {
         pipettes: {
           p300SingleId: {
             '0': {
-              ingred1: { volume: 150 },
+              ingred1: 150,
             },
           },
         },
@@ -101,13 +101,13 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: { volume: 0 },
+            ingred1: 0,
           },
         },
       },
       labware: {
         sourcePlateId: {
-          A1: { ingred1: { volume: 150 } },
+          A1: { ingred1: 150 },
           A2: {},
           B1: {},
         },
@@ -123,15 +123,15 @@ describe('...single-channel pipette', () => {
         pipettes: {
           p300SingleId: {
             '0': {
-              ingred1: { volume: 150 },
+              ingred1: 150,
             },
           },
         },
         labware: {
           sourcePlateId: {
             A1: {
-              ingred1: { volume: 30 },
-              ingred2: { volume: 50 },
+              ingred1: 30,
+              ingred2: 50,
             },
           },
         },
@@ -147,15 +147,15 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: { volume: 0 },
+            ingred1: 0,
           },
         },
       },
       labware: {
         sourcePlateId: {
           A1: {
-            ingred1: { volume: 150 + 30 },
-            ingred2: { volume: 50 },
+            ingred1: 150 + 30,
+            ingred2: 50,
           },
           A2: {},
           B1: {},
@@ -172,16 +172,16 @@ describe('...single-channel pipette', () => {
         pipettes: {
           p300SingleId: {
             '0': {
-              ingred1: { volume: 50 },
-              ingred2: { volume: 100 },
+              ingred1: 50,
+              ingred2: 100,
             },
           },
         },
         labware: {
           sourcePlateId: {
             A1: {
-              ingred2: { volume: 25 },
-              ingred3: { volume: 20 },
+              ingred2: 25,
+              ingred3: 20,
             },
           },
         },
@@ -197,17 +197,17 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: { volume: 0 },
-            ingred2: { volume: 0 },
+            ingred1: 0,
+            ingred2: 0,
           },
         },
       },
       labware: {
         sourcePlateId: {
           A1: {
-            ingred1: { volume: 50 },
-            ingred2: { volume: 100 + 25 },
-            ingred3: { volume: 20 },
+            ingred1: 50,
+            ingred2: 100 + 25,
+            ingred3: 20,
           },
           A2: {},
           B1: {},
@@ -224,16 +224,16 @@ describe('...single-channel pipette', () => {
         pipettes: {
           p300SingleId: {
             '0': {
-              ingred1: { volume: 50 },
-              ingred2: { volume: 200 },
+              ingred1: 50,
+              ingred2: 200,
             },
           },
         },
         labware: {
           sourcePlateId: {
             A1: {
-              ingred2: { volume: 25 },
-              ingred3: { volume: 20 },
+              ingred2: 25,
+              ingred3: 20,
             },
           },
         },
@@ -249,17 +249,17 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: { volume: 20 },
-            ingred2: { volume: 80 },
+            ingred1: 20,
+            ingred2: 80,
           },
         },
       },
       labware: {
         sourcePlateId: {
           A1: {
-            ingred1: { volume: 0 + (50 - 20) },
-            ingred2: { volume: 25 + (200 - 80) },
-            ingred3: { volume: 0 + 20 },
+            ingred1: 0 + (50 - 20),
+            ingred2: 25 + (200 - 80),
+            ingred3: 0 + 20,
           },
           A2: {},
           B1: {},
@@ -282,16 +282,16 @@ describe('...8-channel pipette', () => {
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
-              ingred2: { volume: 25 + 150 },
-              ingred3: { volume: 20 },
+              ingred2: 25 + 150,
+              ingred3: 20,
             },
             B1: {},
-            C1: { ingred1: { volume: 150 } },
-            D1: { ingred1: { volume: 150 } },
-            E1: { ingred1: { volume: 150 } },
-            F1: { ingred1: { volume: 150 } },
-            G1: { ingred1: { volume: 150 } },
-            H1: { ingred1: { volume: 150 } },
+            C1: { ingred1: 150 },
+            D1: { ingred1: 150 },
+            E1: { ingred1: 150 },
+            F1: { ingred1: 150 },
+            G1: { ingred1: 150 },
+            H1: { ingred1: 150 },
           },
         },
       },
@@ -301,9 +301,9 @@ describe('...8-channel pipette', () => {
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
-              ingred1: { volume: 6 * 150 },
-              ingred2: { volume: 25 + 150 },
-              ingred3: { volume: 20 },
+              ingred1: 6 * 150,
+              ingred2: 25 + 150,
+              ingred3: 20,
             },
             A2: {},
           },
@@ -315,16 +315,16 @@ describe('...8-channel pipette', () => {
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
-              ingred2: { volume: 25 + 150 },
-              ingred3: { volume: 20 },
+              ingred2: 25 + 150,
+              ingred3: 20,
             },
             C1: {},
-            E1: { ingred1: { volume: 150 } },
-            G1: { ingred1: { volume: 150 } },
-            I1: { ingred1: { volume: 150 } },
-            K1: { ingred1: { volume: 150 } },
-            M1: { ingred1: { volume: 150 } },
-            O1: { ingred1: { volume: 150 } },
+            E1: { ingred1: 150 },
+            G1: { ingred1: 150 },
+            I1: { ingred1: 150 },
+            K1: { ingred1: 150 },
+            M1: { ingred1: 150 },
+            O1: { ingred1: 150 },
 
             // odd rows out
             B1: {},
@@ -354,9 +354,9 @@ describe('...8-channel pipette', () => {
           pipettes: {
             p300MultiId: {
               // all tips have 150uL of ingred1, except tips 0 and 1
-              ...createTipLiquidState(8, { ingred1: { volume: 150 } }),
+              ...createTipLiquidState(8, { ingred1: 150 }),
               '0': {
-                ingred2: { volume: 200 },
+                ingred2: 200,
               },
               '1': {},
             },
@@ -364,8 +364,8 @@ describe('...8-channel pipette', () => {
           labware: {
             sourcePlateId: {
               A1: {
-                ingred2: { volume: 25 },
-                ingred3: { volume: 20 },
+                ingred2: 25,
+                ingred3: 20,
               },
             },
           },
@@ -386,9 +386,9 @@ describe('...8-channel pipette', () => {
         expect(result).toMatchObject({
           pipettes: {
             p300MultiId: {
-              ...createTipLiquidState(8, { ingred1: { volume: 0 } }),
+              ...createTipLiquidState(8, { ingred1: 0 }),
               '0': {
-                ingred2: { volume: 50 },
+                ingred2: 50,
               },
               '1': {},
             },

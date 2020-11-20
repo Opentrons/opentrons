@@ -276,7 +276,7 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
     ): LocationsState => {
       const { liquidGroupId, labwareId, wells, volume } = action.payload
       const newWellContents: LocationLiquidState = {
-        [liquidGroupId]: { volume },
+        [liquidGroupId]: volume,
       }
       const updatedWells = wells.reduce<SingleLabwareLiquidState>(
         (acc, wellName) => ({

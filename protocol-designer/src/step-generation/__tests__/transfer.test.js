@@ -123,7 +123,7 @@ test('single transfer: 1 source & 1 dest', () => {
   }
 
   robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
-    '0': { volume: 200 },
+    '0': 200,
   }
 
   const result = transfer(mixinArgs, invariantContext, robotStateWithTip)
@@ -208,10 +208,10 @@ describe('single transfer exceeding pipette max', () => {
     robotStateWithTip.tipState.pipettes.p300SingleId = false
     // liquid setup
     robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
-      '0': { volume: 400 },
+      '0': 400,
     }
     robotStateWithTip.liquidState.labware.sourcePlateId.B1 = {
-      '1': { volume: 400 },
+      '1': 400,
     }
   })
 

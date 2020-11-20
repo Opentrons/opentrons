@@ -74,7 +74,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
 
       {wellsWithIngred.map((well, i) => {
         const wellIngredForCard = labwareWellContents[well][groupId]
-        const volume = wellIngredForCard && wellIngredForCard.volume
+        const volume = wellIngredForCard
 
         if (volume == null) {
           // TODO: Ian 2018-06-07 use assert

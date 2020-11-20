@@ -97,7 +97,7 @@ describe('dropTip', () => {
         well: 'A1',
       }
       prevRobotState.liquidState.pipettes.p300MultiId['0'] = {
-        ingred1: { volume: 150 },
+        ingred1: 150,
       }
 
       const result = forDropTip(params, invariantContext, prevRobotState)
@@ -108,13 +108,13 @@ describe('dropTip', () => {
             pipettes: {
               p300MultiId: {
                 '0': {
-                  ingred1: { volume: 0 },
+                  ingred1: 0,
                 },
               },
             },
             labware: {
               [FIXED_TRASH_ID]: {
-                A1: { ingred1: { volume: 150 } },
+                A1: { ingred1: 150 },
               },
             },
           },

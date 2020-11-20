@@ -68,7 +68,7 @@ export function forAspirate(
       const nextTipLiquidState = isOveraspirate
         ? mergeLiquid(tipLiquidState, {
             ...newLiquidFromWell,
-            [AIR]: { volume: volume - volumePerTip },
+            [AIR]: volume - volumePerTip,
           })
         : mergeLiquid(tipLiquidState, newLiquidFromWell)
 

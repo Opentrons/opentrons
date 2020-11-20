@@ -181,9 +181,7 @@ describe('generateSubstepItem', () => {
               },
               dest: {
                 postIngreds: {
-                  __air__: {
-                    volume: 100,
-                  },
+                  __air__: 100,
                 },
                 preIngreds: {},
                 well: 'C1',
@@ -218,9 +216,7 @@ describe('generateSubstepItem', () => {
               },
               dest: {
                 postIngreds: {
-                  __air__: {
-                    volume: 50,
-                  },
+                  __air__: 50,
                 },
                 preIngreds: {},
                 well: 'A1',
@@ -240,9 +236,7 @@ describe('generateSubstepItem', () => {
               },
               dest: {
                 postIngreds: {
-                  __air__: {
-                    volume: 50,
-                  },
+                  __air__: 50,
                 },
                 preIngreds: {},
                 well: 'A2',
@@ -283,9 +277,7 @@ describe('generateSubstepItem', () => {
                 well: 'A1',
                 preIngreds: {},
                 postIngreds: {
-                  __air__: {
-                    volume: 50,
-                  },
+                  __air__: 50,
                 },
               },
               volume: 50,
@@ -300,9 +292,7 @@ describe('generateSubstepItem', () => {
               },
               dest: {
                 postIngreds: {
-                  __air__: {
-                    volume: 50,
-                  },
+                  __air__: 50,
                 },
                 preIngreds: {},
                 well: 'A2',
@@ -376,9 +366,7 @@ describe('generateSubstepItem', () => {
           },
           dest: {
             postIngreds: {
-              __air__: {
-                volume: 50,
-              },
+              __air__: 50,
             },
             preIngreds: {},
             well: 'A1',
@@ -398,27 +386,19 @@ describe('generateSubstepItem', () => {
           },
           dest: {
             postIngreds: {
-              __air__: {
-                volume: 100,
-              },
+              __air__: 100,
             },
             preIngreds: {
-              __air__: {
-                volume: 50,
-              },
+              __air__: 50,
             },
             well: 'A1',
           },
           source: {
             postIngreds: {
-              __air__: {
-                volume: 50,
-              },
+              __air__: 50,
             },
             preIngreds: {
-              __air__: {
-                volume: 50,
-              },
+              __air__: 50,
             },
             well: 'A1',
           },
@@ -432,9 +412,7 @@ describe('generateSubstepItem', () => {
           },
           dest: {
             postIngreds: {
-              __air__: {
-                volume: 50,
-              },
+              __air__: 50,
             },
             preIngreds: {},
             well: 'A2',
@@ -454,27 +432,19 @@ describe('generateSubstepItem', () => {
           },
           dest: {
             postIngreds: {
-              __air__: {
-                volume: 100,
-              },
+              __air__: 100,
             },
             preIngreds: {
-              __air__: {
-                volume: 50,
-              },
+              __air__: 50,
             },
             well: 'A2',
           },
           source: {
             postIngreds: {
-              __air__: {
-                volume: 50,
-              },
+              __air__: 50,
             },
             preIngreds: {
-              __air__: {
-                volume: 50,
-              },
+              __air__: 50,
             },
             well: 'A2',
           },

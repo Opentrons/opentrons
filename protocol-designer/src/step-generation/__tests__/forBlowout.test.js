@@ -31,7 +31,7 @@ describe('Blowout command', () => {
   describe('liquid tracking', () => {
     it('blowout updates with max volume of pipette', () => {
       robotStateWithTip.liquidState.pipettes.p300SingleId['0'] = {
-        ingred1: { volume: 150 },
+        ingred1: 150,
       }
 
       const result = forBlowout(params, invariantContext, robotStateWithTip)
@@ -42,13 +42,13 @@ describe('Blowout command', () => {
             pipettes: {
               p300SingleId: {
                 '0': {
-                  ingred1: { volume: 0 },
+                  ingred1: 0,
                 },
               },
             },
             labware: {
               sourcePlateId: {
-                A1: { ingred1: { volume: 150 } },
+                A1: { ingred1: 150 },
               },
             },
           },
