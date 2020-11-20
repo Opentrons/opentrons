@@ -8,7 +8,8 @@ runs:
   using: 'composite'
   steps:
     - shell: bash
-      run: '[[ "${OSTYPE}" =~ "linux" ]] && sudo apt-get install -y --no-install-recommends libsystemd-dev || echo "do nothing and avoid pipefail"'
+      run: |
+        [[ "${OSTYPE}" =~ "linux" ]] && sudo sed -i 's/azure\.//' /etc/apt/sources.list && sudo apt-get update && sudo apt-get install -y --no-install-recommends libsystemd-dev || echo "do nothing and avoid pipefail"
     - shell: bash
       run: |
         npm install --global shx@0.2.2
