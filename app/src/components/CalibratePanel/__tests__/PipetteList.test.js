@@ -4,7 +4,6 @@ import { StaticRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-import * as Config from '../../../config'
 import * as PipettesSelectors from '../../../pipettes/selectors'
 import * as robotSelectors from '../../../robot/selectors'
 import * as calibrateSelectors from '../../../nav/calibrate-selectors'
@@ -19,7 +18,6 @@ import {
 
 import type { State } from '../../../types'
 
-jest.mock('../../../config/selectors')
 jest.mock('../../../robot/selectors')
 jest.mock('../../../nav/calibrate-selectors')
 jest.mock('../../../pipettes/selectors')
@@ -36,11 +34,6 @@ const mockGetCalibratePipetteLocations: JestMockFn<
 
 const mockGetAttachedPipettes: JestMockFn<[any, string], mixed> =
   PipettesSelectors.getAttachedPipettes
-
-const mockGetFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof Config.getFeatureFlags, State>
-> = Config.getFeatureFlags
 
 const mockLeftSpecs: any = {
   displayName: 'Left Pipette',
@@ -132,7 +125,6 @@ describe('PipetteListComponent', () => {
     mockGetProtocolPipettes.mockReturnValue([mockLeftProtoPipette])
     mockGetCalibratePipetteLocations.mockReturnValue(mockPipetteLocations)
     mockGetAttachedPipettes.mockReturnValue(mockAttachedPipettes)
-    mockGetFeatureFlags.mockReturnValue({})
 
     render = (props: PipetteListComponentProps, location: string = '/') => {
       return mount(
@@ -162,22 +154,7 @@ describe('PipetteListComponent', () => {
     )
   })
 
-  it('renders pipette calibration when feature flag for calibration overhaul is falsy', () => {
-    const wrapper = render({
-      robotName: 'robotName',
-      tipracks: stubTipRacks,
-    })
-    const component = wrapper.find(PipetteListComponent)
-
-    expect(
-      component.find('TitledList[title="Pipette Calibration"]').exists()
-    ).toBe(true)
-
-    expect(component.find('PipetteListItem[mount="left"]').exists()).toBe(true)
-  })
-
-  it('render tip length calibration when feature flag for calibration overhaul is truthy ', () => {
-    mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
+  it('renders tip length calibration', () => {
     const wrapper = render({
       robotName: 'robotName',
       tipracks: stubTipRacks,

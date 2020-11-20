@@ -34,6 +34,13 @@ valid_commands: List[Tuple[str, str, str]] = [
     (CalCommand.exit, 'savingPointOne', 'sessionExited'),
     (CalCommand.exit, 'savingPointTwo', 'sessionExited'),
     (CalCommand.exit, 'savingPointThree', 'sessionExited'),
+    (CalCommand.invalidate_last_action,
+     'preparingPipette', 'preparingPipette'),
+    (CalCommand.invalidate_last_action, 'joggingToDeck', 'preparingPipette'),
+    (CalCommand.invalidate_last_action, 'savingPointOne', 'preparingPipette'),
+    (CalCommand.invalidate_last_action, 'savingPointTwo', 'preparingPipette'),
+    (CalCommand.invalidate_last_action,
+     'savingPointThree', 'preparingPipette'),
 ]
 
 

@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING
 from opentrons.types import Point
 from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount
 from opentrons.config import pipette_config
-from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.drivers.types import MoveSplit
 from opentrons.config.robot_configs import robot_config
 from .types import CriticalPoint
@@ -67,8 +66,9 @@ class Pipette:
             self._instrument_offset = inst_offset_config
         self._log = mod_log.getChild(self._pipette_id
                                      if self._pipette_id else '<unknown>')
-        self._log.info("loaded: {}, instr offset {}"
-                       .format(config.model, self._instrument_offset))
+        self._log.info("loaded: {}, instr offset {}, pipette offset {}"
+                       .format(config.model, self._instrument_offset,
+                               self._pipette_offset.offset))
         self.ready_to_aspirate = False
         #: True if ready to aspirate
         self._aspirate_flow_rate\
@@ -101,6 +101,11 @@ class Pipette:
     def update_instrument_offset(self, new_offset: Point):
         self._log.info("updated instrument offset to {}".format(new_offset))
         self._instrument_offset = new_offset
+
+    def update_pipette_offset(self, offset_cal: PipetteOffsetByPipetteMount):
+        self._log.info("updating pipette offset to {}"
+                       .format(offset_cal.offset))
+        self._pipette_offset = offset_cal
 
     @property
     def config(self) -> pipette_config.PipetteConfig:
@@ -142,12 +147,8 @@ class Pipette:
         we have a tip, or :py:attr:`CriticalPoint.XY_CENTER` - the specified
         critical point will be used.
         """
-        if enable_calibration_overhaul():
-            instr = Point(*self._pipette_offset.offset)
-            offsets = self.nozzle_offset
-        else:
-            instr = self._instrument_offset._replace(z=0)
-            offsets = self.model_offset
+        instr = Point(*self._pipette_offset.offset)
+        offsets = self.nozzle_offset
 
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
@@ -191,11 +192,11 @@ class Pipette:
     @property
     def current_tip_length(self) -> float:
         """ The length of the current tip attached (0.0 if no tip) """
-        if enable_calibration_overhaul():
-            return self._current_tip_length
-        else:
-            return (self._current_tip_length
-                    - self._instrument_offset.z)
+        return self._current_tip_length
+
+    @current_tip_length.setter
+    def current_tip_length(self, tip_length: float):
+        self._current_tip_length = tip_length
 
     @property
     def current_tiprack_diameter(self) -> float:
@@ -334,7 +335,8 @@ def _reload_and_check_skip(
     # are similar enough that we might skip, see if the configs
     # match closely enough.
     # Returns a pipette object and True if we may skip hw reconfig
-    if new_config == attached_instr.config:
+    if new_config == attached_instr.config\
+       and pipette_offset == attached_instr._pipette_offset:
         # Same config, good enough
         return attached_instr, True
     else:

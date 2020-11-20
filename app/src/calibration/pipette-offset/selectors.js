@@ -14,21 +14,34 @@ export const getPipetteOffsetCalibrations: (
   }
   const calibrations =
     state.calibration[robotName]?.pipetteOffsetCalibrations?.data || []
-  return calibrations.map(calibration => calibration.attributes)
+  return calibrations
 }
 
 export const getCalibrationForPipette: (
   state: State,
   robotName: string,
-  pipetteSerial: string
-) => PipetteOffsetCalibration | null = (state, robotName, pipetteSerial) => {
+  pipetteSerial: string,
+  mount: string | null
+) => PipetteOffsetCalibration | null = (
+  state,
+  robotName,
+  pipetteSerial,
+  mount
+) => {
   const allCalibrations = getPipetteOffsetCalibrations(state, robotName)
-  return filterCalibrationForPipette(allCalibrations, pipetteSerial)
+  return filterCalibrationForPipette(allCalibrations, pipetteSerial, mount)
 }
 
 export const filterCalibrationForPipette: (
   calibrations: Array<PipetteOffsetCalibration>,
-  pipetteSerial: string
-) => PipetteOffsetCalibration | null = (calibrations, pipetteSerial) => {
-  return head(calibrations.filter(cal => cal.pipette === pipetteSerial)) || null
+  pipetteSerial: string,
+  mount: string | null
+) => PipetteOffsetCalibration | null = (calibrations, pipetteSerial, mount) => {
+  return (
+    head(
+      calibrations.filter(
+        cal => cal.pipette === pipetteSerial && cal.mount === mount
+      )
+    ) || null
+  )
 }

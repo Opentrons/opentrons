@@ -44,5 +44,4 @@ class PipetteOffsetWithTipLengthCalibrationState(GenericState):
     WILDCARD = STATE_WILDCARD
 
 
-JOG_TO_DECK_SLOT: Final = '5'
 TIP_RACK_SLOT: Final = '8'

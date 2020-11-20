@@ -12,12 +12,19 @@ import * as Pipettes from '../../pipettes'
 import * as TipLength from '../../calibration/tip-length'
 import { CONNECTABLE } from '../../discovery'
 import type { ViewableRobot } from '../../discovery/types'
+import type {
+  AttachedPipettesByMount,
+  PipetteCalibrationsByMount,
+} from '../../pipettes/types'
 import { selectors as robotSelectors } from '../../robot'
 import { useTrackEvent } from '../../analytics'
 
 import {
   useInterval,
   Card,
+  Box,
+  BORDER_SOLID_LIGHT,
+  DISPLAY_INLINE,
   ALIGN_BASELINE,
   FONT_SIZE_BODY_1,
   Link,
@@ -29,6 +36,7 @@ import {
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_HEADER,
   C_DARK_GRAY,
+  C_BLUE,
 } from '@opentrons/components'
 
 import {
@@ -36,10 +44,10 @@ import {
   DISABLED_CANNOT_CONNECT,
   DISABLED_CONNECT_TO_ROBOT,
   DISABLED_PROTOCOL_IS_RUNNING,
+  DISABLED_NO_PIPETTE_ATTACHED,
 } from './constants'
 import { DeckCalibrationControl } from './DeckCalibrationControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
-import { CalibrationCardWarning } from './CalibrationCardWarning'
 import { PipetteOffsets } from './PipetteOffsets'
 
 type Props = {|
@@ -51,6 +59,26 @@ const EVENT_CALIBRATION_DOWNLOADED = 'calibrationDataDownloaded'
 const TITLE = 'Robot Calibration'
 
 const DOWNLOAD_CALIBRATION = 'Download your calibration data'
+const CAL_EXPLANATION =
+  'Your OT-2 moves pipettes around in 3D space based on its calibration.'
+const LEARN_MORE = 'Learn more'
+const CAL_EXPLANATION_SUFFIX = 'about how calibration works on the OT-2.'
+const CAL_ARTICLE_URL =
+  'https://support.opentrons.com/en/articles/3499692-how-calibration-works-on-the-ot-2'
+
+const attachedPipetteCalPresent: (
+  pipettes: AttachedPipettesByMount,
+  pipetteCalibrations: PipetteCalibrationsByMount
+) => boolean = (pipettes, pipetteCalibrations) => {
+  for (const m of Pipettes.PIPETTE_MOUNTS) {
+    if (pipettes[m]) {
+      if (!pipetteCalibrations[m].offset || !pipetteCalibrations[m].tipLength) {
+        return false
+      }
+    }
+  }
+  return true
+}
 
 export function CalibrationCard(props: Props): React.Node {
   const { robot, pipettesPageUrl } = props
@@ -91,6 +119,19 @@ export function CalibrationCard(props: Props): React.Node {
     return Calibration.getTipLengthCalibrations(state, robotName)
   })
 
+  const attachedPipettes = useSelector((state: State) => {
+    return Pipettes.getAttachedPipettes(state, robotName)
+  })
+  const pipettePresent = !!attachedPipettes.left || !!attachedPipettes.right
+
+  const attachedPipetteCalibrations = useSelector((state: State) => {
+    return Pipettes.getAttachedPipetteCalibrations(state, robotName)
+  })
+  const pipetteCalPresent = attachedPipetteCalPresent(
+    attachedPipettes,
+    attachedPipetteCalibrations
+  )
+
   const doTrackEvent = useTrackEvent()
 
   let buttonDisabledReason = null
@@ -100,6 +141,8 @@ export function CalibrationCard(props: Props): React.Node {
     buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
   } else if (isRunning) {
     buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
+  } else if (!pipettePresent) {
+    buttonDisabledReason = DISABLED_NO_PIPETTE_ATTACHED
   }
 
   const onClickSaveAs = e => {
@@ -117,11 +160,18 @@ export function CalibrationCard(props: Props): React.Node {
     )
   }
 
-  const warningInsteadOfCalcheck = [
-    Calibration.DECK_CAL_STATUS_SINGULARITY,
-    Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
-    Calibration.DECK_CAL_STATUS_IDENTITY,
-  ].includes(deckCalStatus)
+  const displayCalCheck =
+    ![
+      Calibration.DECK_CAL_STATUS_SINGULARITY,
+      Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
+      Calibration.DECK_CAL_STATUS_IDENTITY,
+    ].includes(deckCalStatus) &&
+    pipetteCalPresent &&
+    pipettePresent
+
+  const pipOffsetDataPresent = pipetteOffsetCalibrations
+    ? pipetteOffsetCalibrations.length > 0
+    : false
 
   return (
     <Card>
@@ -139,6 +189,7 @@ export function CalibrationCard(props: Props): React.Node {
         </Text>
         <Link
           href="#"
+          color={C_BLUE}
           paddingTop={SPACING_3}
           paddingX={SPACING_3}
           fontSize={FONT_SIZE_BODY_1}
@@ -147,21 +198,38 @@ export function CalibrationCard(props: Props): React.Node {
           {DOWNLOAD_CALIBRATION}
         </Link>
       </Flex>
-      {warningInsteadOfCalcheck ? (
-        <CalibrationCardWarning />
-      ) : (
-        <CheckCalibrationControl
-          robotName={robotName}
-          disabledReason={buttonDisabledReason}
-        />
-      )}
+      <Box
+        borderBottom={BORDER_SOLID_LIGHT}
+        fontSize={FONT_SIZE_BODY_1}
+        padding={SPACING_3}
+      >
+        <Text display={DISPLAY_INLINE}>{CAL_EXPLANATION}</Text>
+        &nbsp;
+        <Link
+          color={C_BLUE}
+          display={DISPLAY_INLINE}
+          external
+          href={CAL_ARTICLE_URL}
+        >
+          {LEARN_MORE}
+        </Link>
+        &nbsp;
+        <Text display={DISPLAY_INLINE}>{CAL_EXPLANATION_SUFFIX}</Text>
+      </Box>
       <DeckCalibrationControl
         robotName={robotName}
         disabledReason={buttonDisabledReason}
         deckCalStatus={deckCalStatus}
         deckCalData={deckCalData}
+        pipOffsetDataPresent={pipOffsetDataPresent}
       />
       <PipetteOffsets pipettesPageUrl={pipettesPageUrl} robot={robot} />
+      {displayCalCheck ? (
+        <CheckCalibrationControl
+          robotName={robotName}
+          disabledReason={buttonDisabledReason}
+        />
+      ) : null}
     </Card>
   )
 }

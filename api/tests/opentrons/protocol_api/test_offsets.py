@@ -232,8 +232,15 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
     modify.save_tip_length_calibration(PIPETTE_ID, test_data)
     result = get.load_tip_length_calibration(
         PIPETTE_ID, minimalLabwareDef, parent)
-
-    assert result == test_data[MOCK_HASH]
+    expected = cs_types.TipLengthCalibration(
+        tip_length=tip_length,
+        pipette=PIPETTE_ID,
+        source=cs_types.SourceType.user,
+        status=cs_types.CalibrationStatus(markedBad=False),
+        tiprack=MOCK_HASH,
+        last_modified=test_data[MOCK_HASH]['lastModified']
+    )
+    assert result == expected
 
 
 def test_clear_tip_length_calibration_data(monkeypatch):

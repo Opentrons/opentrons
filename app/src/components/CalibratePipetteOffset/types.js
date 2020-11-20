@@ -5,17 +5,19 @@ import type {
   PipetteOffsetCalibrationSession,
   CalibrationLabware,
 } from '../../sessions/types'
+import type { PipetteOffsetIntent } from '../CalibrationPanels/types'
 
 import type { PipetteOffsetCalibrationStep } from '../../sessions/pipette-offset-calibration/types'
 
 export type CalibratePipetteOffsetParentProps = {|
   robotName: string,
   session: PipetteOffsetCalibrationSession | null,
-  closeWizard: () => void,
   dispatchRequests: (
     ...Array<{ ...Action, meta: { requestId: string } }>
   ) => void,
   showSpinner: boolean,
+  isJogging: boolean,
+  intent: PipetteOffsetIntent,
 |}
 
 export type CalibratePipetteOffsetChildProps = {|

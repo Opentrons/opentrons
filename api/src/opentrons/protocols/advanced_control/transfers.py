@@ -4,7 +4,7 @@ from typing import (Any, Dict, List, Optional, Union, NamedTuple,
                     TYPE_CHECKING, TypeVar)
 from opentrons.protocol_api.labware import Well
 from opentrons import types
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.contexts import InstrumentContext  # noqa (F501)

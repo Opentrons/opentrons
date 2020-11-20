@@ -1,6 +1,7 @@
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
-from opentrons import commands
+from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.commands import module_commands as cmds
 
 LABWARE_ENGAGE_HEIGHT = {
     'biorad-hardshell-96-PCR': 18}  # mm
@@ -14,7 +15,7 @@ class MissingDevicePortError(Exception):
 # TODO: BC 2018-08-03 this class shares a fair amount verbatim from TempDeck,
 # there should be an upstream ABC in the future to contain shared logic
 # between modules
-class MagDeck(commands.CommandPublisher):
+class MagDeck(CommandPublisher):
     '''
     Under development. API subject to change
     '''
@@ -26,7 +27,7 @@ class MagDeck(commands.CommandPublisher):
         self._device_info = None
         self._height_shadow = 0
 
-    @commands.publish.both(command=commands.magdeck_calibrate)
+    @publish.both(command=cmds.magdeck_calibrate)
     def calibrate(self):
         '''
         Calibration involves probing for top plate to get the plate height
@@ -35,7 +36,7 @@ class MagDeck(commands.CommandPublisher):
             self._driver.probe_plate()
             # return if successful or not?
 
-    @commands.publish.both(command=commands.magdeck_engage)
+    @publish.both(command=cmds.magdeck_engage)
     def engage(self, **kwargs):
         '''
         Move the magnet to either:
@@ -69,7 +70,7 @@ class MagDeck(commands.CommandPublisher):
             self._driver.move(height)
         self._height_shadow = height
 
-    @commands.publish.both(command=commands.magdeck_disengage)
+    @publish.both(command=cmds.magdeck_disengage)
     def disengage(self):
         '''
         Home the magnet

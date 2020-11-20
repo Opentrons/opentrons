@@ -1,7 +1,6 @@
 from datetime import datetime
 from enum import Enum
 import typing
-from functools import lru_cache
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -10,7 +9,7 @@ from robot_server.service.session.models.common import (
 from pydantic import BaseModel, Field, validator
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.json_api import (
-    ResponseModel, RequestModel)
+    ResponseModel, RequestModel, ResponseDataModel)
 from opentrons.util.helpers import utc_now
 
 
@@ -32,11 +31,21 @@ class LoadLabwareRequest(BaseModel):
         description="The labware definition version")
 
 
+class LoadLabwareResponse(BaseModel):
+    labwareId: IdentifierType
+    definition: LabwareDefinition
+    calibration: OffsetVector
+
+
 class LoadInstrumentRequest(BaseModel):
     instrumentName: PipetteName = Field(
         ...,
         description="The name of the instrument model")
     mount: Mount
+
+
+class LoadInstrumentResponse(BaseModel):
+    instrumentId: IdentifierType
 
 
 class PipetteRequestBase(BaseModel):
@@ -70,16 +79,6 @@ class SetHasCalibrationBlockRequest(BaseModel):
     hasBlock: bool = Field(
         ...,
         description="whether or not there is a calibration block present")
-
-
-class LoadLabwareResponse(BaseModel):
-    labwareId: IdentifierType
-    definition: LabwareDefinition
-    calibration: OffsetVector
-
-
-class LoadInstrumentResponse(BaseModel):
-    instrumentId: IdentifierType
 
 
 class CommandStatus(str, Enum):
@@ -185,23 +184,11 @@ class CalibrationCommand(CommandDefinition):
     invalidate_tip = "invalidateTip"
     save_offset = "saveOffset"
     exit = "exitSession"
+    invalidate_last_action = "invalidateLastAction"
 
     @staticmethod
     def namespace():
         return "calibration"
-
-
-class CalibrationCheckCommand(CommandDefinition):
-    """Cal Check Specific"""
-    prepare_pipette = "preparePipette"
-    compare_point = "comparePoint"
-    go_to_next_check = "goToNextCheck"
-    # TODO: remove unused command name and trigger
-    reject_calibration = "rejectCalibration"
-
-    @staticmethod
-    def namespace():
-        return "calibration.check"
 
 
 class DeckCalibrationCommand(CommandDefinition):
@@ -212,6 +199,18 @@ class DeckCalibrationCommand(CommandDefinition):
     @staticmethod
     def namespace():
         return "calibration.deck"
+
+
+class CheckCalibrationCommand(CommandDefinition):
+    """Check Calibration Health Specific"""
+    compare_point = "comparePoint"
+    switch_pipette = "switchPipette"
+    return_tip = "returnTip"
+    transition = "transition"
+
+    @staticmethod
+    def namespace():
+        return "calibration.check"
 
 
 """
@@ -234,7 +233,7 @@ CommandDataType = typing.Union[
 CommandDefinitionType = typing.Union[
     RobotCommand,
     CalibrationCommand,
-    CalibrationCheckCommand,
+    CheckCalibrationCommand,
     DeckCalibrationCommand,
     ProtocolCommand,
     PipetteCommand,
@@ -265,26 +264,8 @@ class BasicSessionCommand(BaseModel):
                              f"Expecting {v.model}")
         return v
 
-    @validator('command', pre=True)
-    def pre_namespace_backwards_compatibility(cls, v):
-        """Support commands that were released before namespace."""
-        # TODO: AmitL 2020.7.9. Remove this backward compatibility once
-        #  clients reliably use fully namespaced command names
-        return BasicSessionCommand._pre_namespace_mapping().get(v, v)
 
-    @staticmethod
-    @lru_cache(maxsize=1)
-    def _pre_namespace_mapping() -> typing.Dict[str, CommandDefinition]:
-        """Create a dictionary of pre-namespace name to CommandDefinition"""
-        # A tuple of CommandDefinition enums which need to be identified by
-        # localname and full namespaced name
-        pre_namespace_ns = CalibrationCheckCommand, CalibrationCommand
-        # Flatten
-        t = tuple(v for k in pre_namespace_ns for v in k)
-        return {k.localname: k for k in t}
-
-
-class SessionCommand(BasicSessionCommand):
+class SessionCommand(ResponseDataModel, BasicSessionCommand):
     """A session command response"""
     status: CommandStatus
     createdAt: datetime = Field(..., default_factory=utc_now)
@@ -298,5 +279,5 @@ CommandRequest = RequestModel[
     BasicSessionCommand
 ]
 CommandResponse = ResponseModel[
-    SessionCommand, dict
+    SessionCommand
 ]

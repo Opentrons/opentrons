@@ -6,7 +6,7 @@ from opentrons.config.feature_flags import enable_http_protocol_sessions
 from robot_server.service.session.errors import UnsupportedFeature, \
     SessionCreationException
 from robot_server.service.session.models.session import SessionType, \
-    SessionDetails
+    ProtocolResponseAttributes
 from robot_server.service.session.session_types import BaseSession, \
     SessionMetaData
 from robot_server.service.session.command_execution import CommandQueue,\
@@ -50,11 +50,16 @@ class ProtocolSession(BaseSession):
         )
         return cls(configuration, instance_meta, protocol)
 
-    def _get_response_details(self) -> SessionDetails:
-        return ProtocolSessionDetails(
-            protocolId=self._uploaded_protocol.meta.identifier,
-            currentState=self._command_executor.current_state,
-            events=self._command_executor.events
+    def get_response_model(self) -> ProtocolResponseAttributes:
+        return ProtocolResponseAttributes(
+            id=self.meta.identifier,
+            createParams=cast(ProtocolCreateParams, self.meta.create_params),
+            createdAt=self.meta.created_at,
+            details=ProtocolSessionDetails(
+                protocolId=self._uploaded_protocol.meta.identifier,
+                currentState=self._command_executor.current_state,
+                events=self._command_executor.events
+            )
         )
 
     @property

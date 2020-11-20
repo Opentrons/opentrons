@@ -4,7 +4,12 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import startCase from 'lodash/startCase'
 
-import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
+import {
+  Card,
+  LabeledRadioGroup,
+  LabeledSelect,
+  LabeledToggle,
+} from '@opentrons/components'
 
 import * as Config from '../../config'
 import * as Calibration from '../../calibration'
@@ -15,10 +20,21 @@ import type { Dispatch } from '../../types'
 
 const TITLE = 'Advanced Settings'
 
-const USE_TRASH_SURFACE_TIP_CAL_LABEL =
-  'Use Trash Bin surface for tip calibration'
+const USE_TRASH_SURFACE_TIP_CAL_LABEL = 'Tip Length Calibration Settings'
 const USE_TRASH_SURFACE_TIP_CAL_BODY =
-  "Tip length calibration should be performed using a Calibration Block. If you don't have one, use this option"
+  "An Opentrons Calibration Block makes tip length calibration easier. Contact us to request a calibration block. If you don't have one, use the Trash Bin."
+const ALWAYS_USE_BLOCK_LABEL = 'Always use Calibration Block to calibrate'
+const ALWAYS_USE_TRASH_LABEL = 'Always use Trash Bin to calibrate'
+const ALWAYS_PROMPT_LABEL =
+  'Always show prompt to choose Calibration Block or Trash Bin'
+const ALWAYS_BLOCK: 'always-block' = 'always-block'
+const ALWAYS_TRASH: 'always-trash' = 'always-trash'
+const ALWAYS_PROMPT: 'always-prompt' = 'always-prompt'
+
+type BlockSelection =
+  | typeof ALWAYS_BLOCK
+  | typeof ALWAYS_TRASH
+  | typeof ALWAYS_PROMPT
 
 const UPDATE_CHANNEL_LABEL = 'Update Channel'
 const UPDATE_CHANNEL_BODY =
@@ -31,8 +47,8 @@ const ENABLE_DEV_TOOLS_BODY =
 const DEV_TITLE = 'Developer Only (unstable)'
 
 export function AppAdvancedSettingsCard(): React.Node {
-  const useTrashSurfaceForTipCal = useSelector(
-    Config.getUseTrashSurfaceForTipCal
+  const useTrashSurfaceForTipCal = useSelector(state =>
+    Config.getUseTrashSurfaceForTipCal(state)
   )
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const devInternalFlags = useSelector(Config.getFeatureFlags)
@@ -42,28 +58,54 @@ export function AppAdvancedSettingsCard(): React.Node {
   )
   const dispatch = useDispatch<Dispatch>()
 
-  const toggleUseTrashForTipCal = () =>
-    dispatch(Calibration.toggleUseTrashSurfaceForTipCal())
+  const handleUseTrashSelection: BlockSelection => void = selection => {
+    switch (selection) {
+      case ALWAYS_PROMPT:
+        dispatch(Calibration.resetUseTrashSurfaceForTipCal())
+        break
+      case ALWAYS_BLOCK:
+        dispatch(Calibration.setUseTrashSurfaceForTipCal(false))
+        break
+      case ALWAYS_TRASH:
+        dispatch(Calibration.setUseTrashSurfaceForTipCal(true))
+        break
+    }
+  }
   const toggleDevtools = () => dispatch(Config.toggleDevtools())
   const toggleDevInternalFlag = (flag: DevInternalFlag) =>
     dispatch(Config.toggleDevInternalFlag(flag))
   const handleChannel = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
-
   return (
     <>
       <Card title={TITLE}>
-        {devInternalFlags?.enableCalibrationOverhaul &&
-          useTrashSurfaceForTipCal != null && (
-            <LabeledToggle
-              data-test="useTrashSurfaceForTipCalToggle"
-              label={USE_TRASH_SURFACE_TIP_CAL_LABEL}
-              toggledOn={useTrashSurfaceForTipCal}
-              onClick={toggleUseTrashForTipCal}
-            >
-              <p>{USE_TRASH_SURFACE_TIP_CAL_BODY}</p>
-            </LabeledToggle>
-          )}
+        <LabeledRadioGroup
+          data-test="useTrashSurfaceForTipCalRadioGroup"
+          label={USE_TRASH_SURFACE_TIP_CAL_LABEL}
+          value={
+            useTrashSurfaceForTipCal === true
+              ? ALWAYS_TRASH
+              : useTrashSurfaceForTipCal === false
+              ? ALWAYS_BLOCK
+              : ALWAYS_PROMPT
+          }
+          onChange={event => {
+            // you know this is a limited-selection field whose values are only
+            // the elements of BlockSelection; i know this is a limited-selection
+            // field whose values are only the elements of BlockSelection; but sadly,
+            // neither of us can get Flow to know it
+            handleUseTrashSelection(
+              ((event.currentTarget.value: any): BlockSelection)
+            )
+          }}
+          options={[
+            { name: ALWAYS_USE_BLOCK_LABEL, value: ALWAYS_BLOCK },
+            { name: ALWAYS_USE_TRASH_LABEL, value: ALWAYS_TRASH },
+            { name: ALWAYS_PROMPT_LABEL, value: ALWAYS_PROMPT },
+          ]}
+        >
+          <p>{USE_TRASH_SURFACE_TIP_CAL_BODY}</p>
+        </LabeledRadioGroup>
         <LabeledSelect
           data-test="updateChannelSetting"
           label={UPDATE_CHANNEL_LABEL}

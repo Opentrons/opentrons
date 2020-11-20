@@ -2,15 +2,15 @@ import itertools
 import warnings
 import logging
 import time
-from opentrons import commands
 from ..containers import unpack_location, load_tip_length_calibration
 from ..containers.placeable import (
     Container, Placeable, WellSeries
 )
-from opentrons.commands import CommandPublisher, do_publish
+from opentrons.commands import commands as cmds
+from opentrons.commands.publisher import CommandPublisher, do_publish, publish
 from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
-from opentrons.config import pipette_config, feature_flags as ff
+from opentrons.config import pipette_config
 
 log = logging.getLogger(__name__)
 
@@ -453,7 +453,7 @@ class Pipette(CommandPublisher):
 
         display_location = location if location else self.previous_placeable
 
-        do_publish(self.broker, commands.aspirate, self.aspirate, 'before',
+        do_publish(self.broker, cmds.aspirate, self.aspirate, 'before',
                    None, None, self, volume, display_location, rate)
 
         # if volume is specified as 0uL, then do nothing
@@ -481,7 +481,7 @@ class Pipette(CommandPublisher):
             self.instrument_actuator.pop_speed()
             self.current_volume += volume  # update after actual aspirate
 
-        do_publish(self.broker, commands.aspirate, self.aspirate, 'after',
+        do_publish(self.broker, cmds.aspirate, self.aspirate, 'after',
                    self, None, self, volume, display_location, rate)
 
         return self
@@ -560,7 +560,7 @@ class Pipette(CommandPublisher):
 
         display_location = location if location else self.previous_placeable
 
-        do_publish(self.broker, commands.dispense, self.dispense, 'before',
+        do_publish(self.broker, cmds.dispense, self.dispense, 'before',
                    None, None, self, volume, display_location, rate)
 
         # if volume is specified as 0uL, then do nothing
@@ -581,7 +581,7 @@ class Pipette(CommandPublisher):
             self.instrument_actuator.pop_speed()
             self.current_volume -= volume  # update after actual dispense
 
-        do_publish(self.broker, commands.dispense, self.dispense, 'after',
+        do_publish(self.broker, cmds.dispense, self.dispense, 'after',
                    self, None, self, volume, display_location, rate)
 
         return self
@@ -707,7 +707,7 @@ class Pipette(CommandPublisher):
         if not location and self.previous_placeable:
             location = self.previous_placeable
 
-        do_publish(self.broker, commands.mix, self.mix, 'before',
+        do_publish(self.broker, cmds.mix, self.mix, 'before',
                    None, None, self, repetitions, volume, location, rate)
 
         self.aspirate(location=location, volume=volume, rate=rate)
@@ -716,12 +716,12 @@ class Pipette(CommandPublisher):
             self.aspirate(volume, rate=rate)
         self.dispense(volume, rate=rate)
 
-        do_publish(self.broker, commands.mix, self.mix, 'after',
+        do_publish(self.broker, cmds.mix, self.mix, 'after',
                    self, None, self, repetitions, volume, location, rate)
 
         return self
 
-    @commands.publish.both(command=commands.blow_out)
+    @publish.both(command=cmds.blow_out)
     def blow_out(self, location=None):
         """
         Force any remaining liquid to dispense, by moving
@@ -838,7 +838,7 @@ class Pipette(CommandPublisher):
         if location is None:
             location = self.previous_placeable
 
-        do_publish(self.broker, commands.touch_tip, self.touch_tip, 'before',
+        do_publish(self.broker, cmds.touch_tip, self.touch_tip, 'before',
                    None, None, self, location, radius, v_offset, speed)
 
         # move to location
@@ -861,7 +861,7 @@ class Pipette(CommandPublisher):
         [self.move_to((location, e), strategy='direct') for e in well_edges]
         self.robot.gantry.pop_speed()
 
-        do_publish(self.broker, commands.touch_tip, self.touch_tip, 'after',
+        do_publish(self.broker, cmds.touch_tip, self.touch_tip, 'after',
                    self, None, self, location, radius, v_offset, speed)
 
         return self
@@ -906,7 +906,7 @@ class Pipette(CommandPublisher):
         if height is None:
             height = 5
 
-        do_publish(self.broker, commands.air_gap, self.air_gap, 'before',
+        do_publish(self.broker, cmds.air_gap, self.air_gap, 'before',
                    self, None, self, volume, height)
 
         # if volumes is specified as 0uL, do nothing
@@ -917,12 +917,12 @@ class Pipette(CommandPublisher):
             self.move_to(location)
             self.aspirate(volume)
 
-        do_publish(self.broker, commands.air_gap, self.air_gap, 'after',
+        do_publish(self.broker, cmds.air_gap, self.air_gap, 'after',
                    self, None, self, volume, height)
 
         return self
 
-    @commands.publish.both(command=commands.return_tip)
+    @publish.both(command=cmds.return_tip)
     def return_tip(self, home_after=True):
         """
         Drop the pipette's current tip to it's originating tip rack
@@ -1050,7 +1050,7 @@ class Pipette(CommandPublisher):
                 self.move_to(
                     self.current_tip().top(0),
                     strategy='direct')
-            if ff.enable_calibration_overhaul() and self.pipette_id:
+            if self.pipette_id:
                 tip_length_cal = load_tip_length_calibration(
                     self.pipette_id, location)
                 self._tip_length = tip_length_cal['tipLength']
@@ -1065,11 +1065,11 @@ class Pipette(CommandPublisher):
                 self.robot.poses, self._pick_up_distance)
 
             return self
-        do_publish(self.broker, commands.pick_up_tip, self.pick_up_tip,
+        do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                    'before', None, None, self, location, presses, increment)
         _pick_up_tip(
             self, location=location, presses=presses, increment=increment)
-        do_publish(self.broker, commands.pick_up_tip, self.pick_up_tip,
+        do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                    'after', self, None, self, location, presses, increment)
 
         # update working volume
@@ -1160,13 +1160,13 @@ class Pipette(CommandPublisher):
             self.instrument_actuator.pop_speed()
             self._home_after_drop_tip(home_after)
 
-        do_publish(self.broker, commands.drop_tip, self.drop_tip,
+        do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                    'before', None, None, self, location)
         if 'doubleDropTip' in self.quirks:
             _drop_tip(location)
 
         _drop_tip(location)
-        do_publish(self.broker, commands.drop_tip, self.drop_tip,
+        do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                    'after', self, None, self, location)
 
         self._shake_off_tips_drop(location)
@@ -1287,14 +1287,14 @@ class Pipette(CommandPublisher):
         >>> p300.home() # doctest: +SKIP
         """
 
-        do_publish(self.broker, commands.home, self._home,
+        do_publish(self.broker, cmds.home, self._home,
                    'before', None, None, self, self.mount)
         self._home(self.mount, False)
-        do_publish(self.broker, commands.home, self._home,
+        do_publish(self.broker, cmds.home, self._home,
                    'after', self, None, self, self.mount)
         return self
 
-    @commands.publish.both(command=commands.distribute)
+    @publish.both(command=cmds.distribute)
     def distribute(self, volume, source, dest, *args, **kwargs):
         """
         Distribute will move a volume of liquid from a single of source
@@ -1326,7 +1326,7 @@ class Pipette(CommandPublisher):
             kwargs['disposal_vol'] = self.min_volume
         return self.transfer(*args, **kwargs)
 
-    @commands.publish.both(command=commands.consolidate)
+    @publish.both(command=cmds.consolidate)
     def consolidate(self, volume, source, dest, *args, **kwargs):
         """
         Consolidate will move a volume of liquid from a list of sources
@@ -1355,7 +1355,7 @@ class Pipette(CommandPublisher):
         args = [volume, source, dest, *args]
         return self.transfer(*args, **kwargs)
 
-    @commands.publish.both(command=commands.transfer)
+    @publish.both(command=cmds.transfer)
     def transfer(self, volume, source, dest, **kwargs):
         """
         Transfer will move a volume of liquid from a source location(s)
@@ -1385,7 +1385,7 @@ class Pipette(CommandPublisher):
         new_tip : str
             The number of clean tips this transfer command will use. If
             'never', no tips will be picked up nor dropped. If 'once', a
-            single tip will be used for all commands. If 'always', a new tip
+            single tip will be used for all cmds. If 'always', a new tip
             will be used for each transfer. Default is 'once'.
 
         trash : boolean
@@ -1483,7 +1483,6 @@ class Pipette(CommandPublisher):
 
         return self
 
-    @commands.publish.both(command=commands.delay)
     def delay(self, seconds=0, minutes=0):
         """
         Parameters

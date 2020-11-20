@@ -1,7 +1,6 @@
 from collections import OrderedDict
 import itertools
 import logging
-from typing import TYPE_CHECKING
 from opentrons.config import CONFIG
 from opentrons.data_storage import database
 from opentrons.util.vector import Vector
@@ -23,10 +22,8 @@ from opentrons.calibration_storage import (
     get,
     helpers as cal_helpers,
     file_operators as io,
+    types as cal_types,
     modify)
-
-if TYPE_CHECKING:
-    from opentrons.calibration_storage.dev_types import TipLengthCalibration
 
 
 __all__ = [
@@ -290,7 +287,7 @@ def load_new_labware_def(definition):
 
 
 def load_tip_length_calibration(
-        pip_id: str, location) -> 'TipLengthCalibration':
+        pip_id: str, location) -> cal_types.TipLengthCalibration:
     placeable, _ = unpack_location(location)
     lw = placeable.get_parent()
     return get._get_tip_length_data(

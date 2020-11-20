@@ -6,7 +6,6 @@ import {
   Flex,
   Text,
   ALIGN_CENTER,
-  C_DARK_GRAY,
   COLOR_ERROR,
   FONT_BODY_1_DARK,
   FONT_SIZE_BODY_1,
@@ -21,7 +20,7 @@ import styles from './styles.css'
 import type { PipetteCompatibility } from '../../pipettes/types'
 
 const NOT_CALIBRATED = 'Not yet calibrated'
-const NOT_CONNECTED = 'Not connected'
+const NOT_ATTACHED = 'Not attached'
 const CALIBRATION_DATA = 'Calibration data:'
 const AXIS_NAMES = ['x', 'y', 'z']
 
@@ -68,19 +67,17 @@ export function InstrumentItem(props: InstrumentItemProps): React.Node {
           </Flex>
           {!match ? (
             <Text fontSize={FONT_SIZE_BODY_1} fontStyle={FONT_STYLE_ITALIC}>
-              {NOT_CONNECTED}
+              {NOT_ATTACHED}
             </Text>
           ) : !!pipetteOffsetData ? (
-            <Text css={FONT_BODY_1_DARK}>
-              <BuildOffsetText offsetData={pipetteOffsetData} />
-            </Text>
+            <BuildOffsetText offsetData={pipetteOffsetData} />
           ) : (
             <Text
               fontSize={FONT_SIZE_BODY_1}
               fontStyle={FONT_STYLE_ITALIC}
-              color={match ? COLOR_ERROR : C_DARK_GRAY}
+              color={COLOR_ERROR}
             >
-              {match ? NOT_CALIBRATED : NOT_CONNECTED}
+              {NOT_CALIBRATED}
             </Text>
           )}
         </Box>
@@ -102,7 +99,7 @@ function BuildOffsetText(props: {|
 |}): React.Node {
   const { offsetData } = props
   return (
-    <Flex>
+    <Flex css={FONT_BODY_1_DARK}>
       <Text marginRight={SPACING_2}>{CALIBRATION_DATA}</Text>
       {AXIS_NAMES.map((key, index) => (
         <React.Fragment key={key}>

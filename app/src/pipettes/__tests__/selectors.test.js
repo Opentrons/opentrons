@@ -82,11 +82,11 @@ describe('getAttachedPipetteCalibrations', () => {
           attachedByMount: {
             left: {
               ...Fixtures.mockAttachedPipette,
-              id: POCFixtures.mockPipetteOffsetCalibration1.attributes.pipette,
+              id: POCFixtures.mockPipetteOffsetCalibration1.pipette,
             },
             right: {
               ...Fixtures.mockAttachedPipette,
-              id: POCFixtures.mockPipetteOffsetCalibration2.attributes.pipette,
+              id: POCFixtures.mockPipetteOffsetCalibration2.pipette,
             },
           },
           settingsById: null,
@@ -107,12 +107,12 @@ describe('getAttachedPipetteCalibrations', () => {
       Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
     ).toEqual({
       left: {
-        offset: POCFixtures.mockPipetteOffsetCalibration1.attributes,
-        tipLength: TLCFixtures.mockTipLengthCalibration1.attributes,
+        offset: POCFixtures.mockPipetteOffsetCalibration1,
+        tipLength: TLCFixtures.mockTipLengthCalibration1,
       },
       right: {
-        offset: POCFixtures.mockPipetteOffsetCalibration2.attributes,
-        tipLength: TLCFixtures.mockTipLengthCalibration2.attributes,
+        offset: POCFixtures.mockPipetteOffsetCalibration2,
+        tipLength: TLCFixtures.mockTipLengthCalibration2,
       },
     })
   })

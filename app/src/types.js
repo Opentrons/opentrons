@@ -42,6 +42,8 @@ import type { AlertsState, AlertsAction } from './alerts/types'
 
 import type { SessionState, SessionsAction } from './sessions/types'
 
+import type { AnalyticsTriggerAction } from './analytics/types'
+
 export type State = $ReadOnly<{|
   robot: RobotState,
   superDeprecatedRobotApi: SuperDeprecatedRobotApiState,
@@ -86,6 +88,7 @@ export type Action =
   | AlertsAction
   | SessionsAction
   | CalibrationAction
+  | AnalyticsTriggerAction
 
 export type GetState = () => State
 

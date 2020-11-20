@@ -2,11 +2,12 @@ import asyncio
 import logging
 from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar
 
-from opentrons import types, commands as cmds
+from opentrons import types
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import Axis
-from opentrons.commands import CommandPublisher
-from opentrons.protocols.types import APIVersion
+from opentrons.commands import module_commands as cmds
+from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.protocols.api_support.types import APIVersion
 
 from .labware import (
     Labware, load, load_from_definition)
@@ -199,7 +200,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         self._loop = loop
         super().__init__(ctx, geometry, at_version)
 
-    @cmds.publish.both(command=cmds.tempdeck_set_temp)
+    @publish.both(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
     def set_temperature(self, celsius: float):
         """ Set the target temperature, in C.
@@ -210,7 +211,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         """
         return self._module.set_temperature(celsius)
 
-    @cmds.publish.both(command=cmds.tempdeck_set_temp)
+    @publish.both(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
     def start_set_temperature(self, celsius: float):
         """ Start setting the target temperature, in C.
@@ -221,7 +222,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         """
         return self._module.start_set_temperature(celsius)
 
-    @cmds.publish.both(command=cmds.tempdeck_await_temp)
+    @publish.both(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
     def await_temperature(self, celsius: float):
         """ Wait until module reaches temperature, in C.
@@ -232,7 +233,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         """
         return self._module.await_temperature(celsius)
 
-    @cmds.publish.both(command=cmds.tempdeck_deactivate)
+    @publish.both(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
     def deactivate(self):
         """ Stop heating (or cooling) and turn off the fan.
@@ -281,7 +282,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         self._loop = loop
         super().__init__(ctx, geometry, at_version)
 
-    @cmds.publish.both(command=cmds.magdeck_calibrate)
+    @publish.both(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
     def calibrate(self):
         """ Calibrate the Magnetic Module.
@@ -303,7 +304,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
                 " calling engage().")
         return super().load_labware_object(labware)
 
-    @cmds.publish.both(command=cmds.magdeck_engage)
+    @publish.both(command=cmds.magdeck_engage)
     @requires_version(2, 0)
     def engage(self,
                height: float = None,
@@ -381,7 +382,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         else:
             return engage_height
 
-    @cmds.publish.both(command=cmds.magdeck_disengage)
+    @publish.both(command=cmds.magdeck_disengage)
     @requires_version(2, 0)
     def disengage(self):
         """ Lower the magnets back into the Magnetic Module.
@@ -444,7 +445,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
                 "Cannot move to labware loaded in Thermocycler"
                 " when lid is not fully open.")
 
-    @cmds.publish.both(command=cmds.thermocycler_open)
+    @publish.both(command=cmds.thermocycler_open)
     @requires_version(2, 0)
     def open_lid(self):
         """ Opens the lid"""
@@ -452,7 +453,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         self._geometry.lid_status = self._module.open()  # type: ignore
         return self._geometry.lid_status
 
-    @cmds.publish.both(command=cmds.thermocycler_close)
+    @publish.both(command=cmds.thermocycler_close)
     @requires_version(2, 0)
     def close_lid(self):
         """ Closes the lid"""
@@ -460,7 +461,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         self._geometry.lid_status = self._module.close()  # type: ignore
         return self._geometry.lid_status
 
-    @cmds.publish.both(command=cmds.thermocycler_set_block_temp)
+    @publish.both(command=cmds.thermocycler_set_block_temp)
     @requires_version(2, 0)
     def set_block_temperature(self,
                               temperature: float,
@@ -504,7 +505,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
                 ramp_rate=ramp_rate,
                 volume=block_max_volume)
 
-    @cmds.publish.both(command=cmds.thermocycler_set_lid_temperature)
+    @publish.both(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
     def set_lid_temperature(self, temperature: float):
         """ Set the target temperature for the heated lid, in °C.
@@ -520,7 +521,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         """
         self._module.set_lid_temperature(temperature)
 
-    @cmds.publish.both(command=cmds.thermocycler_execute_profile)
+    @publish.both(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)
     def execute_profile(self,
                         steps: List[modules.ThermocyclerStep],
@@ -562,19 +563,19 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
                                                repetitions=repetitions,
                                                volume=block_max_volume)
 
-    @cmds.publish.both(command=cmds.thermocycler_deactivate_lid)
+    @publish.both(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
     def deactivate_lid(self):
         """ Turn off the heated lid """
         self._module.deactivate_lid()
 
-    @cmds.publish.both(command=cmds.thermocycler_deactivate_block)
+    @publish.both(command=cmds.thermocycler_deactivate_block)
     @requires_version(2, 0)
     def deactivate_block(self):
         """ Turn off the well block temperature controller"""
         self._module.deactivate_block()
 
-    @cmds.publish.both(command=cmds.thermocycler_deactivate)
+    @publish.both(command=cmds.thermocycler_deactivate)
     @requires_version(2, 0)
     def deactivate(self):
         """ Turn off the well block temperature controller, and heated lid """

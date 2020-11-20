@@ -1,4 +1,5 @@
-PIPETTE_ID = 'pip_1'
+PIPETTE_ID = '123'
+LW_HASH = '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824'
 MOUNT = 'left'
 FAKE_PIPETTE_ID = 'fake'
 WRONG_MOUNT = 'right'
@@ -6,15 +7,16 @@ WRONG_MOUNT = 'right'
 
 def test_access_pipette_offset_calibration(
         api_client, set_up_pipette_offset_temp_directory,
-        apiclient_enable_calibration_overhaul, server_temp_directory):
+        server_temp_directory):
     expected = {
+        'id': f'{PIPETTE_ID}&{MOUNT}',
         'offset': [0, 0, 0],
-        'pipette': 'pip_1',
-        'mount': 'left',
-        'tiprack': 'hash',
+        'pipette': '123',
+        'mount': MOUNT,
+        'tiprack': LW_HASH,
         'lastModified': None,
         'source': 'user',
-        'tiprackUri': 'uri',
+        'tiprackUri': 'opentrons/opentrons_96_filtertiprack_200ul/1',
         'status': {
             'markedAt': None, 'markedBad': False, 'source': None}
     }
@@ -26,9 +28,8 @@ def test_access_pipette_offset_calibration(
         f'/calibration/pipette_offset?mount={MOUNT}&pipette_id={PIPETTE_ID}')
     assert resp.status_code == 200
     data = resp.json()['data'][0]
-    assert data['type'] == 'PipetteOffsetCalibration'
-    data['attributes']['lastModified'] = None
-    assert data['attributes'] == expected
+    data['lastModified'] = None
+    assert data == expected
 
     resp = api_client.get(
         f'/calibration/pipette_offset?mount={MOUNT}&'
@@ -38,20 +39,11 @@ def test_access_pipette_offset_calibration(
 
 
 def test_delete_pipette_offset_calibration(
-        api_client, set_up_pipette_offset_temp_directory,
-        apiclient_enable_calibration_overhaul):
+        api_client, set_up_pipette_offset_temp_directory):
     resp = api_client.delete(
         f'/calibration/pipette_offset?pipette_id={PIPETTE_ID}&'
         f'mount={WRONG_MOUNT}')
-    assert resp.status_code == 404
-    body = resp.json()
-    assert body == {
-        'errors': [{
-            'status': '404',
-            'title': 'Resource Not Found',
-            'detail': "Resource type 'PipetteOffsetCalibration' with id "
-                      "'pip_1&right' was not found"
-        }]}
+    assert resp.status_code == 200
 
     resp = api_client.delete(
         f'/calibration/pipette_offset?pipette_id={PIPETTE_ID}&'

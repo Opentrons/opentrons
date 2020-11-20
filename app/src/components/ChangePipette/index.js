@@ -9,6 +9,7 @@ import {
   SUCCESS,
   PENDING,
 } from '../../robot-api'
+import * as Config from '../../config'
 import { getCalibrationForPipette } from '../../calibration'
 import { getAttachedPipettes } from '../../pipettes'
 import {
@@ -24,7 +25,8 @@ import {
 } from '../../robot-controls'
 
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useAskForCalibrationBlock } from '../CalibrateTipLength/useAskForCalibrationBlock'
+import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
+import { INTENT_PIPETTE_OFFSET } from '../CalibrationPanels'
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
@@ -56,18 +58,19 @@ const PIPETTE_SETUP = 'Pipette Setup'
 const MOVE_PIPETTE_TO_FRONT = 'Move pipette to front'
 const CANCEL = 'Cancel'
 const MOUNT = 'mount'
+const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 
 export function ChangePipette(props: Props): React.Node {
   const { robotName, mount, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
-  const homePipRequestId = React.useRef<string | null>(null)
+  const finalRequestId = React.useRef<string | null>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
     if (
       dispatchedAction.type === HOME &&
       dispatchedAction.payload.target === PIPETTE
     ) {
       // track final home pipette request, its success closes modal
-      homePipRequestId.current = dispatchedAction.meta.requestId
+      finalRequestId.current = dispatchedAction.meta.requestId
     }
   })
   const [wizardStep, setWizardStep] = React.useState<WizardStep>(CLEAR_DECK)
@@ -80,7 +83,7 @@ export function ChangePipette(props: Props): React.Node {
   const actualPipette = attachedPipette?.modelSpecs || null
   const actualPipetteOffset = useSelector((state: State) =>
     attachedPipette?.id
-      ? getCalibrationForPipette(state, robotName, attachedPipette.id)
+      ? getCalibrationForPipette(state, robotName, attachedPipette.id, mount)
       : null
   )
 
@@ -89,8 +92,8 @@ export function ChangePipette(props: Props): React.Node {
   })
 
   const homePipStatus = useSelector((state: State) => {
-    return homePipRequestId.current
-      ? getRequestById(state, homePipRequestId.current)
+    return finalRequestId.current
+      ? getRequestById(state, finalRequestId.current)
       : null
   })?.status
 
@@ -110,12 +113,28 @@ export function ChangePipette(props: Props): React.Node {
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount }, closeModal)
 
-  const [
-    showAskForCalibrationBlock,
-    AskForCalibrationBlockModal,
-  ] = useAskForCalibrationBlock(calBlock => {
-    startPipetteOffsetCalibration({ hasCalibrationBlock: calBlock })
-  })
+  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
+  const [showCalBlockModal, setShowCalBlockModal] = React.useState<boolean>(
+    false
+  )
+
+  const startPipetteOffsetWizard = (
+    hasBlockModalResponse: boolean | null = null
+  ) => {
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setShowCalBlockModal(true)
+    } else {
+      startPipetteOffsetCalibration({
+        overrideParams: {
+          hasCalibrationBlock: Boolean(
+            configHasCalibrationBlock ?? hasBlockModalResponse
+          ),
+        },
+        withIntent: INTENT_PIPETTE_OFFSET,
+      })
+      setShowCalBlockModal(false)
+    }
+  }
 
   const baseProps = {
     title: PIPETTE_SETUP,
@@ -197,7 +216,7 @@ export function ChangePipette(props: Props): React.Node {
       // home before cal flow to account for skips when attaching pipette
       setWizardStep(CALIBRATE_PIPETTE)
       dispatchApiRequests(home(robotName, ROBOT))
-      showAskForCalibrationBlock(null)
+      startPipetteOffsetWizard()
     }
 
     if (success && wantedPipette && shouldLevel(wantedPipette)) {
@@ -235,7 +254,15 @@ export function ChangePipette(props: Props): React.Node {
   }
 
   if (wizardStep === CALIBRATE_PIPETTE) {
-    return AskForCalibrationBlockModal || PipetteOffsetCalibrationWizard
+    return showCalBlockModal ? (
+      <AskForCalibrationBlockModal
+        titleBarTitle={PIPETTE_OFFSET_CALIBRATION}
+        onResponse={startPipetteOffsetWizard}
+        closePrompt={homePipAndExit}
+      />
+    ) : (
+      PipetteOffsetCalibrationWizard
+    )
   }
 
   // this will never be reached

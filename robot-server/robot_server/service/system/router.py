@@ -19,11 +19,9 @@ def _create_response(dt: datetime) \
         -> time_models.SystemTimeResponse:
     """Create a SystemTimeResponse with system datetime"""
     return time_models.SystemTimeResponse(
-        data=time_models.SystemTimeResponseDataModel.create(
-            attributes=time_models.SystemTimeAttributes(
-                systemTime=dt
-            ),
-            resource_id="time"
+        data=time_models.SystemTimeAttributesResponse(
+                systemTime=dt,
+                id="time"
         ),
         links={
             ResourceLinkKey.self: ResourceLink(href='/system/time')
@@ -49,5 +47,5 @@ async def get_time() -> time_models.SystemTimeResponse:
             response_model=time_models.SystemTimeResponse)
 async def set_time(new_time: time_models.SystemTimeRequest) \
         -> time_models.SystemTimeResponse:
-    sys_time = await time.set_system_time(new_time.data.attributes.systemTime)
+    sys_time = await time.set_system_time(new_time.data.systemTime)
     return _create_response(sys_time)

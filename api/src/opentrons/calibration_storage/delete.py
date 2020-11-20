@@ -120,9 +120,13 @@ def _remove_pipette_offset_from_index(pipette: str, mount: Mount):
     index_path = offset_dir / 'index.json'
     blob = io.read_cal_file(str(index_path))
 
-    if pipette in blob[mount.name.lower()]:
+    try:
         blob[mount.name.lower()].remove(pipette)
         io.save_to_file(index_path, blob)
+    except (KeyError, ValueError):
+        # If the index file does not have a mount entry, you get
+        # an error here
+        pass
 
 
 def delete_pipette_offset_file(pipette: str, mount: Mount):
@@ -135,8 +139,11 @@ def delete_pipette_offset_file(pipette: str, mount: Mount):
     offset_dir = config.get_opentrons_path('pipette_calibration_dir')
     offset_path = offset_dir / mount.name.lower() / f'{pipette}.json'
 
-    _remove_pipette_offset_from_index(pipette, mount)
-    offset_path.unlink()
+    try:
+        _remove_pipette_offset_from_index(pipette, mount)
+        offset_path.unlink()
+    except FileNotFoundError:
+        pass
 
 
 def clear_pipette_offset_calibrations():

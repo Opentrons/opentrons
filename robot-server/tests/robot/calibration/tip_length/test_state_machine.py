@@ -31,6 +31,14 @@ valid_commands: List[Tuple[str, str, str]] = [
   (CalibrationCommand.exit, 'measuringNozzleOffset', 'sessionExited'),
   (CalibrationCommand.exit, 'preparingPipette', 'sessionExited'),
   (CalibrationCommand.exit, 'measuringTipOffset', 'sessionExited'),
+  (CalibrationCommand.invalidate_last_action,
+   'preparingPipette', 'preparingPipette'),
+  (CalibrationCommand.invalidate_last_action,
+   'measuringNozzleOffset', 'measuringNozzleOffset'),
+  (CalibrationCommand.invalidate_last_action,
+   'preparingPipette', 'preparingPipette'),
+  (CalibrationCommand.invalidate_last_action,
+   'measuringTipOffset', 'preparingPipette'),
 ]
 
 

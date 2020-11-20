@@ -21,7 +21,15 @@ import type {
   LogLevel,
 } from './types'
 
-const DEFAULT_REQUEST_OPTS = { timeout: 10000 }
+const DEFAULT_REQUEST_OPTS = {
+  timeout: 10000,
+  // NOTE(mc, 2020-11-04): This api version is slightly duplicated
+  // across the larger monorepo codebase and is a good argument for a
+  // standalone API client library that app, app-shell, and DC can share
+  // NOTE(mc, 2020-11-04): Discovery client should remain locked to the lowest
+  // available HTTP API version that satisfies its data needs
+  headers: { 'Opentrons-Version': '2' },
+}
 
 /**
  * Create a HealthPoller to monitor the health of a set of IP addresses

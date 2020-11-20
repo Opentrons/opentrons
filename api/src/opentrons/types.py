@@ -144,6 +144,13 @@ class Mount(enum.Enum):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def string_to_mount(cls, mount: str) -> 'Mount':
+        if mount == 'right':
+            return cls.RIGHT
+        else:
+            return cls.LEFT
+
 
 class MountType(str, enum.Enum):
     LEFT = "left"

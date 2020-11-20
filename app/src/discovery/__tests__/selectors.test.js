@@ -409,13 +409,38 @@ describe('discovery selectors', () => {
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
         serverHealth: {},
-        health: { protocol_api_version: [2, 0] },
+        health: { protocol_api_version: [2, 1] },
       },
       selector: discovery.getRobotProtocolApiVersion,
-      expected: '2.0',
+      expected: { min: '1.0', max: '2.1' },
     },
     {
-      name: 'getRobotProtocolApiVersion returns null if no healths',
+      name:
+        'getRobotProtocolApiVersion returns minimum and maximum protocol versions',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {
+        serverHealth: {},
+        health: {
+          minimum_protocol_api_version: [2, 0],
+          maximum_protocol_api_version: [2, 8],
+        },
+      },
+      selector: discovery.getRobotProtocolApiVersion,
+      expected: { min: '2.0', max: '2.8' },
+    },
+    {
+      name:
+        'getRobotProtocolApiVersion returns default protocol versions when none exists',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {
+        serverHealth: {},
+        health: {},
+      },
+      selector: discovery.getRobotProtocolApiVersion,
+      expected: { min: '1.0', max: '1.0' },
+    },
+    {
+      name: 'getRobotProtocolApiVersion returns null if no health exists',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: { serverHealth: null, health: null },
       selector: discovery.getRobotProtocolApiVersion,

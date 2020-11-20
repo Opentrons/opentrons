@@ -11,7 +11,6 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data: []
 ---
@@ -28,55 +27,43 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
-
 ---
 test_name: GET Labware Calibrations, Filter LoadName
 marks:
@@ -93,18 +80,15 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              calibrationData: !anydict
-              loadName: 'nest_96_wellplate_2ml_deep'
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: 'nest_96_wellplate_2ml_deep'
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
 ---
 test_name: GET Labware Calibrations, Filter Version & namespace
 marks:
@@ -123,53 +107,42 @@ stages:
       status_code: 200
       json:
         links: null
-        meta: null
         data:
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
-          - attributes:
-              calibrationData: !anydict
-              loadName: !anystr
-              parent: !anystr
-              namespace: 'opentrons'
-              version: 1
-              definitionHash: !anystr
+          - calibrationData: !anydict
+            loadName: !anystr
+            parent: !anystr
+            namespace: 'opentrons'
+            version: 1
+            definitionHash: !anystr
             id: !anystr
-            type: 'LabwareCalibration'
 ---
 test_name: GET Labware Calibrations, Version Does Not Exist
 marks:
@@ -187,5 +160,4 @@ stages:
       status_code: 200
       json:
         links: null
-        meta: null
         data: []

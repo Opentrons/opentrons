@@ -9,6 +9,8 @@ import * as Sessions from '../../../sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
 
 import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
+import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../CalibrationPanels'
+import { pipetteOffsetCalibrationStarted } from '../../../analytics'
 
 import type { State } from '../../../types'
 import type { SessionType } from '../../../sessions'
@@ -83,6 +85,15 @@ describe('useCalibratePipetteOffset hook', () => {
       ),
       meta: { requestId: expect.any(String) },
     })
+    expect(store.dispatch).toHaveBeenCalledWith(
+      pipetteOffsetCalibrationStarted(
+        'pipette-offset',
+        mountString,
+        false,
+        false,
+        null
+      )
+    )
   })
 
   it('accepts createParam overrides in start callback', () => {
@@ -93,7 +104,9 @@ describe('useCalibratePipetteOffset hook', () => {
     expect(CalWizardComponent).toBe(null)
 
     act(() =>
-      startCalibration({ mount: 'other-mount', hasCalibrationBlock: true })
+      startCalibration({
+        overrideParams: { mount: 'other-mount', hasCalibrationBlock: true },
+      })
     )
 
     expect(store.dispatch).toHaveBeenCalledWith({
@@ -109,6 +122,43 @@ describe('useCalibratePipetteOffset hook', () => {
       ),
       meta: { requestId: expect.any(String) },
     })
+  })
+
+  it('accepts intent in start callback', () => {
+    const { wrapper } = mountWithStore(<TestUseCalibratePipetteOffset />, {
+      initialState: { robotApi: {}, sessions: {} },
+    })
+    expect(typeof startCalibration).toBe('function')
+    expect(CalWizardComponent).toBe(null)
+    const seshId = 'fake-session-id'
+    const mockPipOffsetCalSession = {
+      id: seshId,
+      ...mockPipetteOffsetCalibrationSessionAttributes,
+      details: {
+        ...mockPipetteOffsetCalibrationSessionAttributes.details,
+        currentStep: Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
+      },
+    }
+    mockGetRobotSessionOfType.mockReturnValue(mockPipOffsetCalSession)
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.SUCCESS,
+      response: {
+        method: 'POST',
+        ok: true,
+        path: '/',
+        status: 200,
+      },
+    })
+    act(() =>
+      startCalibration({
+        withIntent: INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
+      })
+    )
+    wrapper.setProps({})
+    expect(CalWizardComponent).not.toBe(null)
+    expect(wrapper.find('CalibratePipetteOffset').prop('intent')).toEqual(
+      INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
+    )
   })
 
   it('wizard should appear after create request succeeds with session and close on closeWizard', () => {
@@ -149,7 +199,8 @@ describe('useCalibratePipetteOffset hook', () => {
       ...Sessions.deleteSession(robotName, seshId),
       meta: { requestId: expect.any(String) },
     })
-    wrapper.setProps({}) // update so delete request can be handled on success
+    mockGetRobotSessionOfType.mockReturnValue(null)
+    wrapper.setProps({})
     expect(CalWizardComponent).toBe(null)
     expect(onComplete).toHaveBeenCalled()
   })

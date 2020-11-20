@@ -12,14 +12,13 @@ import {
   getProtocolPipettesInfo,
 } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
-import { getFeatureFlags } from '../../config'
 import {
   getTipLengthForPipetteAndTiprack,
   getCalibrationForPipette,
 } from '../../calibration'
 
 import { Page } from '../../components/Page'
-import { TipProbe } from '../../components/TipProbe'
+
 import {
   PipetteTabs,
   Pipettes as PipettesContents,
@@ -38,7 +37,6 @@ export function Pipettes(props: Props): React.Node {
   const { mount, definitionHash } = props.match.params
   const dispatch = useDispatch<Dispatch>()
   const robot = useSelector(getConnectedRobot)
-  const ff = useSelector(getFeatureFlags)
   const robotName = robot?.name || null
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
   const pipettes = useSelector(
@@ -63,7 +61,7 @@ export function Pipettes(props: Props): React.Node {
   |}>(
     (mapToBuild, m) => {
       const tipracksForMount = tipracksByMount[m]
-      if (m === mount && ff.enableCalibrationOverhaul) {
+      if (m === mount) {
         // If this is the active mount, and if the feature flag is active,
         // definitionHash applies to this list
         mapToBuild[m] = definitionHash
@@ -107,7 +105,12 @@ export function Pipettes(props: Props): React.Node {
   const convertRobotNameToString = robotName || 'unknown'
   const pipetteOffsetCalibration = useSelector((state: State) =>
     serialNumber
-      ? getCalibrationForPipette(state, convertRobotNameToString, serialNumber)
+      ? getCalibrationForPipette(
+          state,
+          convertRobotNameToString,
+          serialNumber,
+          currentMount
+        )
       : null
   )
 
@@ -133,23 +136,15 @@ export function Pipettes(props: Props): React.Node {
         activeTipracks={activeTipracks}
         changePipetteUrl={changePipetteUrl}
       />
-      {robotName &&
-        currentMount &&
-        (ff.enableCalibrationOverhaul ? (
-          !!activeTipRackDef ? (
-            <CalibrateTipLengthControl
-              mount={currentMount}
-              robotName={robotName}
-              hasCalibrated={!!tipLengthDataForActivePipette}
-              tipRackDefinition={activeTipRackDef}
-              isExtendedPipOffset={isExtendedPipOffset}
-            />
-          ) : null
-        ) : (
-          currentPipette?.protocol && (
-            <TipProbe {...omit(currentPipette.protocol, 'displayName')} />
-          )
-        ))}
+      {robotName && currentMount && !!activeTipRackDef ? (
+        <CalibrateTipLengthControl
+          mount={currentMount}
+          robotName={robotName}
+          hasCalibrated={!!tipLengthDataForActivePipette}
+          tipRackDefinition={activeTipRackDef}
+          isExtendedPipOffset={isExtendedPipOffset}
+        />
+      ) : null}
     </Page>
   )
 }

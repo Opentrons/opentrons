@@ -6,6 +6,7 @@ export const CALIBRATION_SOURCE_USER: 'user' = 'user'
 export const CALIBRATION_SOURCE_CALIBRATION_CHECK: 'calibration_check' =
   'calibration_check'
 export const CALIBRATION_SOURCE_UNKNOWN: 'unknown' = 'unknown'
+export const CALIBRATION_SOURCE_LEGACY: 'legacy' = 'legacy'
 
 export const CALIBRATION_SOURCES = [
   CALIBRATION_SOURCE_DEFAULT,
@@ -13,6 +14,7 @@ export const CALIBRATION_SOURCES = [
   CALIBRATION_SOURCE_USER,
   CALIBRATION_SOURCE_CALIBRATION_CHECK,
   CALIBRATION_SOURCE_UNKNOWN,
+  CALIBRATION_SOURCE_LEGACY,
 ]
 
 export const DECK_CAL_STATUS_OK: 'OK' = 'OK'

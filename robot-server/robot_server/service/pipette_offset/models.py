@@ -2,11 +2,11 @@ import typing
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from opentrons.calibration_storage.types import SourceType
-from robot_server.service.json_api import ResponseModel
-from robot_server.service.json_api.response import MultiResponseModel
+from robot_server.service.json_api import (
+    ResponseModel, MultiResponseModel, ResponseDataModel)
 from robot_server.service.shared_models import calibration as cal_model
 
 OffsetVector = typing.Tuple[float, float, float]
@@ -18,7 +18,7 @@ class MountType(str, Enum):
     right = "right"
 
 
-class PipetteOffsetCalibration(BaseModel):
+class PipetteOffsetCalibration(ResponseDataModel):
     """
     A model describing pipette calibration based on the mount and
     the pipette's serial number
@@ -50,10 +50,10 @@ class PipetteOffsetCalibration(BaseModel):
 
 
 MultipleCalibrationsResponse = MultiResponseModel[
-    PipetteOffsetCalibration, dict
+    PipetteOffsetCalibration
 ]
 
 
 SingleCalibrationResponse = ResponseModel[
-    PipetteOffsetCalibration, dict
+    PipetteOffsetCalibration
 ]

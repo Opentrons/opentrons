@@ -53,17 +53,10 @@ class BaseSession(ABC):
         return cls(configuration=configuration,
                    instance_meta=instance_meta)
 
-    def get_response_model(self) -> models.Session:
-        """Get the response model"""
-        return models.Session(sessionType=self.session_type,
-                              details=self._get_response_details(),
-                              createdAt=self.meta.created_at,
-                              createParams=self.meta.create_params)
-
     @abstractmethod
-    def _get_response_details(self) -> models.SessionDetails:
-        """Get session type specific details"""
-        pass
+    def get_response_model(self) -> models.ResponseTypes:
+        """Get the response model"""
+        ...
 
     async def clean_up(self):
         """Called before session is deleted"""

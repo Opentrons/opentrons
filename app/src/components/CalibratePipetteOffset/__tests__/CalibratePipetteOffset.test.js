@@ -18,6 +18,7 @@ import {
   SaveZPoint,
   SaveXYPoint,
   CompleteConfirmation,
+  INTENT_PIPETTE_OFFSET,
 } from '../../CalibrationPanels'
 
 import type { PipetteOffsetCalibrationStep } from '../../../sessions/types'
@@ -42,10 +43,8 @@ describe('CalibratePipetteOffset', () => {
   let mockStore
   let render
   let dispatch
-  let mockPipOffsetCalSession: Sessions.PipetteOffsetCalibrationSession = {
-    id: 'fake_session_id',
-    ...mockPipetteOffsetCalibrationSessionAttributes,
-  }
+  let dispatchRequests
+  let mockPipOffsetCalSession: Sessions.PipetteOffsetCalibrationSession
 
   const getExitButton = wrapper =>
     wrapper.find({ title: 'exit' }).find('button')
@@ -72,6 +71,7 @@ describe('CalibratePipetteOffset', () => {
 
   beforeEach(() => {
     dispatch = jest.fn()
+    dispatchRequests = jest.fn()
     mockStore = {
       subscribe: () => {},
       getState: () => ({
@@ -87,14 +87,19 @@ describe('CalibratePipetteOffset', () => {
     }
 
     render = (props = {}) => {
-      const { showSpinner = false } = props
+      const {
+        showSpinner = false,
+        isJogging = false,
+        session = mockPipOffsetCalSession,
+      } = props
       return mount(
         <CalibratePipetteOffset
           robotName="robot-name"
-          session={mockPipOffsetCalSession}
-          closeWizard={jest.fn()}
-          dispatchRequests={jest.fn()}
+          session={session}
+          dispatchRequests={dispatchRequests}
           showSpinner={showSpinner}
+          isJogging={isJogging}
+          intent={INTENT_PIPETTE_OFFSET}
         />,
         {
           wrappingComponent: Provider,
@@ -146,5 +151,43 @@ describe('CalibratePipetteOffset', () => {
   it('renders spinner when showSpinner is true', () => {
     const wrapper = render({ showSpinner: true })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
+  })
+
+  it('does dispatch jog requests when not isJogging', () => {
+    const session = {
+      id: 'fake_session_id',
+      ...mockPipetteOffsetCalibrationSessionAttributes,
+      details: {
+        ...mockPipetteOffsetCalibrationSessionAttributes.details,
+        currentStep: Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE,
+      },
+    }
+    const wrapper = render({ isJogging: false, session })
+    wrapper.find('button[title="forward"]').invoke('onClick')()
+    expect(dispatchRequests).toHaveBeenCalledWith(
+      Sessions.createSessionCommand('robot-name', session.id, {
+        command: Sessions.sharedCalCommands.JOG,
+        data: { vector: [0, -0.1, 0] },
+      })
+    )
+  })
+
+  it('does not dispatch jog requests when isJogging', () => {
+    const session = {
+      id: 'fake_session_id',
+      ...mockPipetteOffsetCalibrationSessionAttributes,
+      details: {
+        ...mockPipetteOffsetCalibrationSessionAttributes.details,
+        currentStep: Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE,
+      },
+    }
+    const wrapper = render({ isJogging: true, session })
+    wrapper.find('button[title="forward"]').invoke('onClick')()
+    expect(dispatchRequests).not.toHaveBeenCalledWith(
+      Sessions.createSessionCommand('robot-name', session.id, {
+        command: Sessions.sharedCalCommands.JOG,
+        data: { vector: [0, -0.1, 0] },
+      })
+    )
   })
 })

@@ -42,6 +42,7 @@ describe('CalibrateDeck', () => {
   let mockStore
   let render
   let dispatch
+  let dispatchRequests
   let mockDeckCalSession: Sessions.DeckCalibrationSession = {
     id: 'fake_session_id',
     ...mockDeckCalibrationSessionAttributes,
@@ -74,6 +75,7 @@ describe('CalibrateDeck', () => {
 
   beforeEach(() => {
     dispatch = jest.fn()
+    dispatchRequests = jest.fn()
     mockStore = {
       subscribe: () => {},
       getState: () => ({
@@ -89,14 +91,18 @@ describe('CalibrateDeck', () => {
     }
 
     render = (props = {}) => {
-      const { showSpinner = false } = props
+      const {
+        showSpinner = false,
+        isJogging = false,
+        session = mockDeckCalSession,
+      } = props
       return mount(
         <CalibrateDeck
           robotName="robot-name"
-          session={mockDeckCalSession}
-          closeWizard={() => {}}
-          dispatchRequests={jest.fn()}
+          session={session}
+          dispatchRequests={dispatchRequests}
           showSpinner={showSpinner}
+          isJogging={isJogging}
         />,
         {
           wrappingComponent: Provider,
@@ -148,5 +154,42 @@ describe('CalibrateDeck', () => {
   it('renders spinner when showSpinner is true', () => {
     const wrapper = render({ showSpinner: true })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
+  })
+  it('does dispatch jog requests when not isJogging', () => {
+    const session = {
+      id: 'fake_session_id',
+      ...mockDeckCalibrationSessionAttributes,
+      details: {
+        ...mockDeckCalibrationSessionAttributes.details,
+        currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
+      },
+    }
+    const wrapper = render({ isJogging: false, session })
+    wrapper.find('button[title="forward"]').invoke('onClick')()
+    expect(dispatchRequests).toHaveBeenCalledWith(
+      Sessions.createSessionCommand('robot-name', session.id, {
+        command: Sessions.sharedCalCommands.JOG,
+        data: { vector: [0, -0.1, 0] },
+      })
+    )
+  })
+
+  it('does not dispatch jog requests when isJogging', () => {
+    const session = {
+      id: 'fake_session_id',
+      ...mockDeckCalibrationSessionAttributes,
+      details: {
+        ...mockDeckCalibrationSessionAttributes.details,
+        currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
+      },
+    }
+    const wrapper = render({ isJogging: true, session })
+    wrapper.find('button[title="forward"]').invoke('onClick')()
+    expect(dispatchRequests).not.toHaveBeenCalledWith(
+      Sessions.createSessionCommand('robot-name', session.id, {
+        command: Sessions.sharedCalCommands.JOG,
+        data: { vector: [0, -0.1, 0] },
+      })
+    )
   })
 })

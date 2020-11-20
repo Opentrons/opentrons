@@ -1,5 +1,6 @@
 from opentrons import __version__
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION)
 
 
 def test_health(api_client, hardware):
@@ -13,7 +14,8 @@ def test_health(api_client, hardware):
         'board_revision': 'BR2.1',
         'logs': ['/logs/serial.log', '/logs/api.log'],
         'system_version': '0.0.0',
-        'protocol_api_version': list(MAX_SUPPORTED_VERSION),
+        'minimum_protocol_api_version': list(MIN_SUPPORTED_VERSION),
+        'maximum_protocol_api_version': list(MAX_SUPPORTED_VERSION),
         "links": {
             "apiLog": "/logs/api.log",
             "serialLog": "/logs/serial.log",

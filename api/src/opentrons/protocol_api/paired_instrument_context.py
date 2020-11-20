@@ -3,10 +3,13 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Union, Tuple, List, Optional, Dict
 
-from opentrons import types, commands as cmds, hardware_control as hc
-from opentrons.commands import CommandPublisher
+
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocols.types import APIVersion
+from opentrons import types, hardware_control as hc
+from opentrons.commands import paired_commands as cmds
+from opentrons.commands.publisher import (
+    CommandPublisher, publish_paired, publish)
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.implementations.paired_instrument import\
     PairedInstrument
 
@@ -246,13 +249,13 @@ class PairedInstrumentContext(CommandPublisher):
 
         instruments = list(self._instruments.values())
         targets = [target, secondary_target]
-        cmds.publish_paired(self.broker, cmds.paired_pick_up_tip,
-                            'before', None, instruments, targets)
+        publish_paired(self.broker, cmds.paired_pick_up_tip,
+                       'before', None, instruments, targets)
         self.paired_instrument_obj.pick_up_tip(
             target, secondary_target, tiprack, presses, increment, tip_length)
         self._last_tip_picked_up_from = target
-        cmds.publish_paired(self.broker, cmds.paired_pick_up_tip,
-                            'after', self, instruments, targets)
+        publish_paired(self.broker, cmds.paired_pick_up_tip,
+                       'after', self, instruments, targets)
         return self
 
     @requires_version(2, 7)
@@ -340,11 +343,11 @@ class PairedInstrumentContext(CommandPublisher):
                 self._get_secondary_target(tiprack, target.labware.as_well())]
         else:
             targets = [target]
-        cmds.publish_paired(self.broker, cmds.paired_drop_tip,
-                            'before', None, instruments, targets)
+        publish_paired(self.broker, cmds.paired_drop_tip,
+                       'before', None, instruments, targets)
         self.paired_instrument_obj.drop_tip(target, home_after)
-        cmds.publish_paired(self.broker, cmds.paired_drop_tip,
-                            'after', self, instruments, targets)
+        publish_paired(self.broker, cmds.paired_drop_tip,
+                       'after', self, instruments, targets)
         self._last_tip_picked_up_from = None
         return self
 
@@ -432,11 +435,11 @@ class PairedInstrumentContext(CommandPublisher):
                 self._get_secondary_target(labware, well)]
         else:
             locations = [primary_loc]
-        cmds.publish_paired(self.broker, cmds.paired_aspirate, 'before',
-                            None, instruments, c_vol, locations, rate)
+        publish_paired(self.broker, cmds.paired_aspirate, 'before',
+                       None, instruments, c_vol, locations, rate)
         aspirate_func()
-        cmds.publish_paired(self.broker, cmds.paired_aspirate, 'after',
-                            self, instruments, c_vol, locations, rate)
+        publish_paired(self.broker, cmds.paired_aspirate, 'after',
+                       self, instruments, c_vol, locations, rate)
         return self
 
     @requires_version(2, 7)
@@ -527,14 +530,14 @@ class PairedInstrumentContext(CommandPublisher):
                 self._get_secondary_target(labware, well)]
         else:
             locations = [primary_loc]
-        cmds.publish_paired(self.broker, cmds.paired_dispense, 'before',
-                            None, instruments, c_vol, locations, rate)
+        publish_paired(self.broker, cmds.paired_dispense, 'before',
+                       None, instruments, c_vol, locations, rate)
         dispense_func()
-        cmds.publish_paired(self.broker, cmds.paired_dispense, 'after',
-                            self, instruments, c_vol, locations, rate)
+        publish_paired(self.broker, cmds.paired_dispense, 'after',
+                       self, instruments, c_vol, locations, rate)
         return self
 
-    @cmds.publish.both(command=cmds.air_gap)
+    @publish.both(command=cmds.air_gap)
     @requires_version(2, 7)
     def air_gap(self,
                 volume: float = None,
@@ -623,11 +626,11 @@ class PairedInstrumentContext(CommandPublisher):
             locations = self._get_locations(loc)
 
         instruments = list(self._instruments.values())
-        cmds.publish_paired(self.broker, cmds.paired_blow_out,
-                            'before', None, instruments, locations)
+        publish_paired(self.broker, cmds.paired_blow_out,
+                       'before', None, instruments, locations)
         self.paired_instrument_obj.blow_out(loc)
-        cmds.publish_paired(self.broker, cmds.paired_blow_out,
-                            'after', self, instruments, locations)
+        publish_paired(self.broker, cmds.paired_blow_out,
+                       'after', self, instruments, locations)
         return self
 
     @requires_version(2, 7)
@@ -686,16 +689,16 @@ class PairedInstrumentContext(CommandPublisher):
         locations: Optional[List] = None
         if location:
             locations = self._get_locations(location)
-        cmds.publish_paired(self.broker, cmds.paired_mix, 'before', None,
-                            instruments, locations, repetitions, c_vol)
+        publish_paired(self.broker, cmds.paired_mix, 'before', None,
+                       instruments, locations, repetitions, c_vol)
         self.aspirate(volume, location, rate)
         while repetitions - 1 > 0:
             self.dispense(volume, rate=rate)
             self.aspirate(volume, rate=rate)
             repetitions -= 1
         self.dispense(volume, rate=rate)
-        cmds.publish_paired(self.broker, cmds.paired_mix, 'after', self,
-                            instruments, locations, repetitions, c_vol)
+        publish_paired(self.broker, cmds.paired_mix, 'after', self,
+                       instruments, locations, repetitions, c_vol)
         return self
 
     @requires_version(2, 7)
@@ -753,15 +756,15 @@ class PairedInstrumentContext(CommandPublisher):
                 location,
                 self._get_secondary_target(location.parent, location)]
 
-        cmds.publish_paired(self.broker, cmds.paired_touch_tip,
-                            'before', None, instruments, locations)
+        publish_paired(self.broker, cmds.paired_touch_tip,
+                       'before', None, instruments, locations)
         self.paired_instrument_obj.touch_tip(
             location, radius, v_offset, checked_speed)
-        cmds.publish_paired(self.broker, cmds.paired_touch_tip,
-                            'after', self, instruments, locations)
+        publish_paired(self.broker, cmds.paired_touch_tip,
+                       'after', self, instruments, locations)
         return self
 
-    @cmds.publish.both(command=cmds.return_tip)
+    @publish.both(command=cmds.return_tip)
     @requires_version(2, 7)
     def return_tip(self,
                    home_after: bool = True) -> PairedInstrumentContext:

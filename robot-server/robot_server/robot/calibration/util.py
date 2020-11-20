@@ -1,32 +1,37 @@
+import logging
 import contextlib
 from typing import Set, Dict, Any, Union, TYPE_CHECKING
 
 from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.calibration_storage import modify
-from opentrons.types import Point, Location, Mount
+from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import (
     CommandDefinition)
-from .constants import STATE_WILDCARD, CAL_BLOCK_SETUP_BY_MOUNT, \
-    MOVE_TO_REF_POINT_SAFETY_BUFFER, TRASH_WELL, TRASH_REF_POINT_OFFSET
+from .constants import (
+    STATE_WILDCARD, MOVE_TO_REF_POINT_SAFETY_BUFFER,
+    TRASH_WELL, TRASH_REF_POINT_OFFSET)
 from .errors import CalibrationError
 from .tip_length.constants import TipCalibrationState
 from .pipette_offset.constants import (
     PipetteOffsetCalibrationState, PipetteOffsetWithTipLengthCalibrationState)
 from .deck.constants import DeckCalibrationState
+from .check.constants import CalibrationCheckState
 
 if TYPE_CHECKING:
     from .deck.user_flow import DeckCalibrationUserFlow
     from .tip_length.user_flow import TipCalibrationUserFlow
     from .pipette_offset.user_flow import PipetteOffsetCalibrationUserFlow
+    from .check.user_flow import CheckCalibrationUserFlow
 
 ValidState = Union[TipCalibrationState, DeckCalibrationState,
-                   PipetteOffsetCalibrationState,
+                   PipetteOffsetCalibrationState, CalibrationCheckState,
                    PipetteOffsetWithTipLengthCalibrationState]
 
 
@@ -40,6 +45,7 @@ class StateTransitionError(RobotServerError):
 
 
 TransitionMap = Dict[Any, Dict[Any, Any]]
+MODULE_LOG = logging.getLogger(__name__)
 
 
 class SimpleStateMachine:
@@ -83,11 +89,13 @@ class SimpleStateMachine:
 CalibrationUserFlow = Union[
     'DeckCalibrationUserFlow',
     'TipCalibrationUserFlow',
-    'PipetteOffsetCalibrationUserFlow']
+    'PipetteOffsetCalibrationUserFlow',
+    'CheckCalibrationUserFlow']
 
 
 async def invalidate_tip(user_flow: CalibrationUserFlow):
-    await user_flow._return_tip()
+    await user_flow.return_tip()
+    user_flow.reset_tip_origin()
     await user_flow.move_to_tip_rack()
 
 
@@ -105,16 +113,16 @@ def save_default_pick_up_current(instr: Pipette):
 
 async def pick_up_tip(user_flow: CalibrationUserFlow, tip_length: float):
     # grab position of active nozzle for ref when returning tip later
-    cp = user_flow._get_critical_point_override()
-    user_flow._tip_origin_pt = await user_flow._hardware.gantry_position(
-        user_flow._mount, critical_point=cp)
+    cp = user_flow.critical_point_override
+    user_flow.tip_origin = await user_flow.hardware.gantry_position(
+        user_flow.mount, critical_point=cp)
 
     with contextlib.ExitStack() as stack:
-        if user_flow._hw_pipette.config.channels > 1:
+        if user_flow.hw_pipette.config.channels > 1:
             stack.enter_context(
-                save_default_pick_up_current(user_flow._hw_pipette))
+                save_default_pick_up_current(user_flow.hw_pipette))
 
-        await user_flow._hardware.pick_up_tip(user_flow._mount, tip_length)
+        await user_flow.hardware.pick_up_tip(user_flow.mount, tip_length)
 
 
 async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
@@ -125,49 +133,48 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
     Each pipette config contains a coefficient to apply to an
     attached tip's length to determine proper z offset
     """
-    if user_flow._tip_origin_pt and user_flow._hw_pipette.has_tip:
-        coeff = user_flow._hw_pipette.config.return_tip_height
-        to_pt = user_flow._tip_origin_pt - Point(0, 0, tip_length * coeff)
-        cp = user_flow._get_critical_point_override()
-        await user_flow._hardware.move_to(mount=user_flow._mount,
-                                          abs_position=to_pt,
-                                          critical_point=cp)
-        await user_flow._hardware.drop_tip(user_flow._mount)
-        user_flow._tip_origin_pt = None
+    if user_flow.tip_origin and user_flow.hw_pipette.has_tip:
+        coeff = user_flow.hw_pipette.config.return_tip_height
+        to_pt = user_flow.tip_origin - Point(0, 0, tip_length * coeff)
+        cp = user_flow.critical_point_override
+        await user_flow.hardware.move_to(mount=user_flow.mount,
+                                         abs_position=to_pt,
+                                         critical_point=cp)
+        await user_flow.hardware.drop_tip(user_flow.mount)
+        user_flow.reset_tip_origin()
 
 
-async def move(user_flow: CalibrationUserFlow, to_loc: Location):
-    from_pt = await user_flow._get_current_point(None)
+async def move(user_flow: CalibrationUserFlow,
+               to_loc: Location,
+               this_move_cp: CriticalPoint = None):
+    from_pt = await user_flow.get_current_point(None)
     from_loc = Location(from_pt, None)
-    cp = user_flow._get_critical_point_override()
+    cp = this_move_cp or user_flow.critical_point_override
 
-    max_height = user_flow._hardware.get_instrument_max_height(
-        user_flow._mount)
+    max_height = user_flow.hardware.get_instrument_max_height(
+        user_flow.mount)
 
     safe = planning.safe_height(
-        from_loc, to_loc, user_flow._deck, max_height)
+        from_loc, to_loc, user_flow.deck, max_height)
     moves = plan_arc(from_pt, to_loc.point, safe,
                      origin_cp=None,
                      dest_cp=cp)
     for move in moves:
-        await user_flow._hardware.move_to(mount=user_flow._mount,
-                                          abs_position=move[0],
-                                          critical_point=move[1])
+        await user_flow.hardware.move_to(mount=user_flow.mount,
+                                         abs_position=move[0],
+                                         critical_point=move[1])
 
 
-def get_reference_location(mount: Mount,
-                           deck: Deck,
-                           has_calibration_block: bool) -> Location:
+def get_reference_location(
+        deck: Deck,
+        cal_block_target_well: labware.Well = None) -> Location:
     """
     Get location of static z reference point.
     Will be on Calibration Block if available, otherwise will be on
     flat surface of fixed trash insert.
     """
-    if has_calibration_block:
-        slot = CAL_BLOCK_SETUP_BY_MOUNT[mount].slot
-        well = CAL_BLOCK_SETUP_BY_MOUNT[mount].well
-        calblock: labware.Labware = deck[slot]  # type: ignore
-        calblock_loc = calblock.wells_by_name()[well].top()
+    if cal_block_target_well:
+        calblock_loc = cal_block_target_well.top()
         ref_loc = calblock_loc.move(point=MOVE_TO_REF_POINT_SAFETY_BUFFER)
     else:
         trash = deck.get_fixed_trash()

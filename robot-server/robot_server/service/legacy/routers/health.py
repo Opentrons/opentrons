@@ -3,9 +3,7 @@ import inspect
 from fastapi import APIRouter, Depends
 from opentrons import config, protocol_api
 from opentrons.hardware_control import ThreadManager
-from opentrons.protocols.types import APIVersion
 from opentrons import __version__
-from opentrons.config import feature_flags
 from robot_server.service.legacy.models.health import Health, Links
 from robot_server.service.dependencies import get_hardware
 
@@ -32,10 +30,8 @@ async def get_health(
     if inspect.isawaitable(fw_version):
         fw_version = await fw_version
 
-    if feature_flags.use_protocol_api_v2():
-        max_supported = protocol_api.MAX_SUPPORTED_VERSION
-    else:
-        max_supported = APIVersion(1, 0)
+    max_supported = protocol_api.MAX_SUPPORTED_VERSION
+    min_supported = protocol_api.MIN_SUPPORTED_VERSION
 
     return Health(name=config.name(),
                   api_version=__version__,
@@ -43,7 +39,8 @@ async def get_health(
                   board_revision=hardware.board_revision,
                   logs=static_paths,
                   system_version=config.OT_SYSTEM_VERSION,
-                  protocol_api_version=list(max_supported),
+                  maximum_protocol_api_version=list(max_supported),
+                  minimum_protocol_api_version=list(min_supported),
                   links=Links(
                       apiLog='/logs/api.log',
                       serialLog='/logs/serial.log',

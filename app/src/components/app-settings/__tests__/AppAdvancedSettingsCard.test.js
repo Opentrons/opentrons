@@ -42,8 +42,10 @@ describe('AppAdvancedSettingsCard', () => {
     })
   }
 
-  const getUseTrashForTipCalToggle = wrapper =>
-    wrapper.find('LabeledToggle[data-test="useTrashSurfaceForTipCalToggle"]')
+  const getUseTrashForTipCalRadioGroup = wrapper =>
+    wrapper.find(
+      'LabeledRadioGroup[data-test="useTrashSurfaceForTipCalRadioGroup"]'
+    )
 
   const getDevtoolsToggle = wrapper =>
     wrapper.find('LabeledToggle[data-test="enableDevToolsToggle"]')
@@ -60,8 +62,8 @@ describe('AppAdvancedSettingsCard', () => {
     ])
     getFeatureFlags.mockReturnValue({
       enableBundleUpload: false,
-      enableCalibrationOverhaul: true,
     })
+    getUseTrashSurfaceForTipCal.mockReturnValue(null)
   })
 
   afterEach(() => {
@@ -75,17 +77,91 @@ describe('AppAdvancedSettingsCard', () => {
     expect(getDevtoolsToggle(wrapper).exists()).toBe(true)
   })
 
-  it('does not render optional settings when not present', () => {
-    const { wrapper } = render()
+  const SPECS: Array<{|
+    originalSettingValue: boolean | null,
+    originalRadioValue: 'always-trash' | 'always-block' | 'always-prompt',
+    newSettingValue: boolean | null,
+    newRadioValue: 'always-trash' | 'always-block' | 'always-prompt',
+  |}> = [
+    {
+      originalSettingValue: true,
+      originalRadioValue: 'always-trash',
+      newSettingValue: null,
+      newRadioValue: 'always-prompt',
+    },
+    {
+      originalSettingValue: true,
+      originalRadioValue: 'always-trash',
+      newSettingValue: false,
+      newRadioValue: 'always-block',
+    },
+    {
+      originalSettingValue: false,
+      originalRadioValue: 'always-block',
+      newSettingValue: null,
+      newRadioValue: 'always-prompt',
+    },
+    {
+      originalSettingValue: false,
+      originalRadioValue: 'always-block',
+      newSettingValue: true,
+      newRadioValue: 'always-trash',
+    },
+    {
+      originalSettingValue: null,
+      originalRadioValue: 'always-prompt',
+      newSettingValue: true,
+      newRadioValue: 'always-trash',
+    },
+    {
+      originalSettingValue: null,
+      originalRadioValue: 'always-prompt',
+      newSettingValue: false,
+      newRadioValue: 'always-block',
+    },
+  ]
 
-    expect(getUseTrashForTipCalToggle(wrapper).exists()).toBe(false)
-  })
+  SPECS.forEach(spec => {
+    it(`calibration block picker renders when setting ${String(
+      spec.originalSettingValue
+    )} and changes to ${String(spec.newSettingValue)}`, () => {
+      getUseTrashSurfaceForTipCal.mockReturnValue(spec.originalSettingValue)
 
-  it('does render optional settings when present', () => {
-    getUseTrashSurfaceForTipCal.mockReturnValue(false)
-    const { wrapper } = render()
+      const { wrapper, store, refresh } = render()
 
-    expect(getUseTrashForTipCalToggle(wrapper).exists()).toBe(true)
+      expect(getUseTrashForTipCalRadioGroup(wrapper).exists()).toBe(true)
+      expect(
+        getUseTrashForTipCalRadioGroup(wrapper)
+          .find(`input[value="${spec.originalRadioValue}"]`)
+          .prop('checked')
+      ).toBe(true)
+
+      getUseTrashForTipCalRadioGroup(wrapper)
+        .find(`input[value="${spec.newRadioValue}"]`)
+        .simulate('change', { target: { value: spec.newRadioValue } })
+
+      if (spec.newSettingValue === null) {
+        expect(store.dispatch).toHaveBeenCalledWith(
+          Config.resetConfigValue('calibration.useTrashSurfaceForTipCal')
+        )
+      } else {
+        expect(store.dispatch).toHaveBeenCalledWith(
+          Config.updateConfigValue(
+            'calibration.useTrashSurfaceForTipCal',
+            spec.newSettingValue
+          )
+        )
+      }
+
+      getUseTrashSurfaceForTipCal.mockReturnValue(spec.newSettingValue)
+
+      refresh({ state: 'value' })
+      expect(
+        getUseTrashForTipCalRadioGroup(wrapper)
+          .find(`input[value="${spec.newRadioValue}"]`)
+          .prop('checked')
+      ).toBe(true)
+    })
   })
 
   it('does not render dev feature flags when dev tools not enabled', () => {
@@ -102,7 +178,6 @@ describe('AppAdvancedSettingsCard', () => {
   })
 
   it('switching toggles dispatches toggle action', () => {
-    getUseTrashSurfaceForTipCal.mockReturnValue(false)
     const { wrapper, store } = render()
     getDevtoolsToggle(wrapper).invoke('onClick')()
     wrapper.update()
@@ -116,12 +191,6 @@ describe('AppAdvancedSettingsCard', () => {
     wrapper.update()
     expect(store.dispatch).toHaveBeenCalledWith(
       Config.updateConfigValue('update.channel', 'alpha')
-    )
-
-    getUseTrashForTipCalToggle(wrapper).invoke('onClick')()
-    wrapper.update()
-    expect(store.dispatch).toHaveBeenCalledWith(
-      Config.toggleConfigValue('calibration.useTrashSurfaceForTipCal')
     )
   })
 })

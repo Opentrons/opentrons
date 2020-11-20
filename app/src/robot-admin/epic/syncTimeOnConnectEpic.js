@@ -25,8 +25,7 @@ const createUpdateRequest = (date: Date): RobotApiRequestOptions => {
     path: Constants.SYSTEM_TIME_PATH,
     body: {
       data: {
-        type: 'SystemTimeAttributes',
-        attributes: { systemTime: date.toISOString() },
+        systemTime: date.toISOString(),
       },
     },
   }
@@ -43,7 +42,7 @@ export const syncTimeOnConnectEpic: Epic = (action$, state$) => {
 
       return fetchRobotApi(robot, fetchSystemTimeReq).pipe(
         filter(response => response.ok),
-        map(response => response.body.data.attributes.systemTime),
+        map(response => response.body.data.systemTime),
         filter(systemTimeString => {
           const systemTime = parseISO(systemTimeString)
           const drift = differenceInSeconds(systemTime, new Date())

@@ -5,7 +5,6 @@ import { withRouter } from 'react-router-dom'
 import uniqBy from 'lodash/uniqBy'
 
 import { selectors as robotSelectors } from '../../robot'
-import { getFeatureFlags } from '../../config'
 import { PIPETTE_MOUNTS, getAttachedPipettes } from '../../pipettes'
 import { getCalibratePipettesLocations } from '../../nav'
 import { fetchTipLengthCalibrations } from '../../calibration'
@@ -20,14 +19,12 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { PipetteListItem } from './PipetteListItem'
 import { PipetteTiprackListItem } from './PipetteTiprackListItem'
 
 import type { BaseProtocolLabware } from '../../calibration/types'
 import type { Dispatch, State } from '../../types'
 
 // TODO(mc, 2019-12-10): i18n
-const PIPETTE_CALIBRATION = 'Pipette Calibration'
 const TIP_LENGTH_CALIBRATION = 'Tip Length Calibration'
 
 export type PipetteListComponentProps = {|
@@ -50,17 +47,13 @@ export function PipetteListComponent(
   const attachedPipettes = useSelector((state: State) =>
     getAttachedPipettes(state, robotName)
   )
-  const ff = useSelector(getFeatureFlags)
 
   React.useEffect(() => {
     robotName && dispatch(fetchTipLengthCalibrations(robotName))
   }, [dispatch, robotName])
 
-  const titleListTitle = !ff.enableCalibrationOverhaul
-    ? PIPETTE_CALIBRATION
-    : TIP_LENGTH_CALIBRATION
   return (
-    <TitledList key={titleListTitle} title={titleListTitle}>
+    <TitledList key={TIP_LENGTH_CALIBRATION} title={TIP_LENGTH_CALIBRATION}>
       {PIPETTE_MOUNTS.map(mount => {
         const protocolPipette =
           protocolPipettes.find(i => i.mount === mount) || null
@@ -86,16 +79,8 @@ export function PipetteListComponent(
             urlsByMount[mount]['default']
           return url.path
         }
-        return !ff.enableCalibrationOverhaul ? (
-          <PipetteListItem
-            key={mount}
-            mount={mount}
-            pipette={protocolPipette}
-            calibrateUrl={urlsByMount[mount].default.path}
-            disabledReason={disabledReason}
-          />
-        ) : (
-          <>
+        return (
+          <React.Fragment key={`${mount}`}>
             <Flex key={`${mount} box`}>
               <Text
                 key={`${mount} key`}
@@ -127,7 +112,7 @@ export function PipetteListComponent(
                   )
                 })
               : null}
-          </>
+          </React.Fragment>
         )
       })}
     </TitledList>

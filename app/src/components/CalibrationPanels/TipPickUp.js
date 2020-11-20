@@ -12,7 +12,9 @@ import {
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_2,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   POSITION_RELATIVE,
+  SPACING_1,
   SPACING_2,
   SPACING_3,
   TEXT_ALIGN_CENTER,
@@ -29,6 +31,9 @@ import { JogControls } from '../JogControls'
 import type { CalibrationPanelProps } from './types'
 import { formatJogVector } from './utils'
 
+import { NeedHelpLink } from './NeedHelpLink'
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+
 import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
 import singleDemoAsset from '../../assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
 
@@ -41,7 +46,7 @@ const CLOSEST = 'closest'
 const TO_YOU_IS_CENTERED = 'to you is centered above the'
 const POSITION = 'position'
 const AND = 'and'
-const FLUSH = 'flush'
+const FLUSH = 'even'
 const WITH_TOP_OF_TIP = 'with the top of the tip.'
 const TIP_WELL_NAME = 'A1'
 
@@ -81,72 +86,86 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
       },
     })
   }
+  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
+    requiresNewTip: false,
+    ...props,
+  })
 
   return (
-    <Flex
-      marginY={SPACING_2}
-      flexDirection={DIRECTION_COLUMN}
-      alignItems={ALIGN_FLEX_START}
-      position={POSITION_RELATIVE}
-      width="100%"
-    >
-      <Text
-        css={FONT_HEADER_DARK}
-        marginBottom={SPACING_3}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
-      >
-        {TIP_PICK_UP_HEADER}
-        {tipRackDef
-          ? getLabwareDisplayName(tipRackDef).replace('µL', 'uL')
-          : null}
-      </Text>
-      <Box
-        padding={SPACING_3}
-        border={BORDER_SOLID_LIGHT}
-        borderWidth="2px"
+    <>
+      <Flex
+        marginTop={SPACING_2}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_FLEX_START}
+        position={POSITION_RELATIVE}
         width="100%"
+        marginBottom="0"
       >
-        <Flex
-          justifyContent={JUSTIFY_CENTER}
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-          textAlign={TEXT_ALIGN_CENTER}
-        >
-          <Text fontSize={FONT_SIZE_BODY_2} paddingX={SPACING_2}>
-            {jogUntilAbove}
-          </Text>
+        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Text
-            fontSize={FONT_SIZE_BODY_2}
+            css={FONT_HEADER_DARK}
             marginBottom={SPACING_3}
-            paddingX={SPACING_2}
+            textTransform={TEXT_TRANSFORM_UPPERCASE}
           >
-            <Text as="strong">{` ${TIP_WELL_NAME} `}</Text>
-            {`${POSITION} ${AND}`}
-            <Text as="strong">{` ${FLUSH} `}</Text>
-            {WITH_TOP_OF_TIP}
+            {TIP_PICK_UP_HEADER}
+            {tipRackDef
+              ? getLabwareDisplayName(tipRackDef).replace('µL', 'uL')
+              : null}
           </Text>
-          <Box marginLeft={SPACING_3}>
-            <video
-              key={demoAsset}
-              css={css`
-                max-width: 100%;
-                max-height: 15rem;
-              `}
-              autoPlay={true}
-              loop={true}
-              controls={false}
-            >
-              <source src={demoAsset} />
-            </video>
-          </Box>
+          <NeedHelpLink />
         </Flex>
-      </Box>
-      <JogControls jog={jog} />
-      <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
-        <PrimaryBtn onClick={pickUpTip} flex="1" marginX={SPACING_5}>
-          {TIP_PICK_UP_BUTTON_TEXT}
-        </PrimaryBtn>
+        <Box
+          padding={SPACING_3}
+          border={BORDER_SOLID_LIGHT}
+          borderWidth="2px"
+          width="100%"
+        >
+          <Flex
+            justifyContent={JUSTIFY_CENTER}
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            textAlign={TEXT_ALIGN_CENTER}
+          >
+            <Text fontSize={FONT_SIZE_BODY_2} paddingX={SPACING_2}>
+              {jogUntilAbove}
+            </Text>
+            <Text
+              fontSize={FONT_SIZE_BODY_2}
+              marginBottom={SPACING_3}
+              paddingX={SPACING_2}
+            >
+              <Text as="strong">{` ${TIP_WELL_NAME} `}</Text>
+              {`${POSITION} ${AND}`}
+              <Text as="strong">{` ${FLUSH} `}</Text>
+              {WITH_TOP_OF_TIP}
+            </Text>
+            <Box marginLeft={SPACING_3}>
+              <video
+                key={demoAsset}
+                css={css`
+                  max-width: 100%;
+                  max-height: 15rem;
+                `}
+                autoPlay={true}
+                loop={true}
+                controls={false}
+              >
+                <source src={demoAsset} />
+              </video>
+            </Box>
+          </Flex>
+        </Box>
+        <JogControls jog={jog} />
+        <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
+          <PrimaryBtn onClick={pickUpTip} flex="1" marginX={SPACING_5}>
+            {TIP_PICK_UP_BUTTON_TEXT}
+          </PrimaryBtn>
+        </Flex>
+        <Box marginTop={SPACING_1} marginBottom="0" width="100%">
+          {confirmLink}
+        </Box>
       </Flex>
-    </Flex>
+      {confirmModal}
+    </>
   )
 }

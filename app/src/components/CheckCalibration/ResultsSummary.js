@@ -1,151 +1,375 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { PrimaryButton, OutlineButton } from '@opentrons/components'
-import find from 'lodash/find'
-import pick from 'lodash/pick'
-import partition from 'lodash/partition'
-import type { State } from '../../types'
-import * as Sessions from '../../sessions'
-import * as Calibration from '../../calibration'
-import styles from './styles.css'
-import { PipetteComparisons } from './PipetteComparisons'
-import { BadOutcomeBody } from './BadOutcomeBody'
-import { saveAs } from 'file-saver'
-import { getBadOutcomeHeader } from './utils'
+import {
+  Icon,
+  Box,
+  Btn,
+  Flex,
+  PrimaryBtn,
+  Text,
+  Link,
+  SPACING_1,
+  SPACING_2,
+  SPACING_3,
+  SPACING_4,
+  SPACING_5,
+  ALIGN_CENTER,
+  ALIGN_STRETCH,
+  C_BLUE,
+  COLOR_SUCCESS,
+  COLOR_WARNING,
+  OVERLAY_LIGHT_GRAY_50,
+  FONT_HEADER_DARK,
+  FONT_SIZE_BODY_2,
+  FONT_SIZE_BODY_1,
+  FONT_WEIGHT_SEMIBOLD,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_START,
+  TEXT_TRANSFORM_CAPITALIZE,
+  TEXT_TRANSFORM_UPPERCASE,
+  FONT_STYLE_ITALIC,
+  DIRECTION_COLUMN,
+  DISPLAY_INLINE_BLOCK,
+} from '@opentrons/components'
 
-import type { CalibrationStatus } from '../../calibration/types'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+
+import find from 'lodash/find'
+import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../pipettes'
+import { saveAs } from 'file-saver'
+
+import type { CalibrationPanelProps } from '../CalibrationPanels/types'
+import {
+  CHECK_STATUS_OUTSIDE_THRESHOLD,
+  CHECK_STATUS_IN_THRESHOLD,
+} from '../../sessions'
 import type {
-  RobotCalibrationCheckComparisonsByStep,
-  RobotCalibrationCheckComparison,
-  RobotCalibrationCheckInstrument,
+  CalibrationCheckInstrument,
+  CalibrationCheckComparisonsPerCalibration,
 } from '../../sessions/types'
 
-const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
-const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
-const DOWNLOAD_SUMMARY = 'Download JSON summary'
-const STILL_HAVING_PROBLEMS =
-  'If you are still experiencing issues, please download the JSON summary and share it with our support team who will then follow up with you.'
+const GOOD_CALIBRATION = 'Good calibration'
+const BAD_CALIBRATION = 'Recalibration recommended'
 
-type ResultsSummaryProps = {|
-  robotName: string,
-  deleteSession: () => mixed,
-  comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
-  instrumentsByMount: { [mount: string]: RobotCalibrationCheckInstrument, ... },
-|}
-export function ResultsSummary(props: ResultsSummaryProps): React.Node {
+const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER =
+  'calibration health check results'
+const DECK_CALIBRATION_HEADER = 'robot deck calibration'
+const MOUNT = 'mount'
+const HOME_AND_EXIT = 'Home robot and exit'
+const DOWNLOAD_SUMMARY = 'Download detailed JSON Calibration Check summary'
+const PIPETTE_OFFSET_CALIBRATION_HEADER = 'pipette offset calibration'
+const TIP_LENGTH_CALIBRATION_HEADER = 'tip length calibration'
+const NEED_HELP = 'If problems persist,'
+const CONTACT_SUPPORT = 'contact Opentrons support'
+const FOR_HELP = 'for help'
+const SUPPORT_URL = 'https://support.opentrons.com'
+
+const FOUND = 'Health check found'
+const ONE_ISSUE = 'an issue'
+const PLURAL_ISSUES = 'issues'
+const RECALIBRATE_AS_INDICATED =
+  'Redo the calibrations indicated below to troubleshoot'
+const NOTE = 'Note'
+const DO_DECK_FIRST = 'Recalibrate your deck before redoing other calibrations.'
+const DECK_INVALIDATES =
+  'Recalibrating your deck will invalidate Pipette Offsets, and you will need to recalibrate Pipette Offsets after redoing Deck Calibration.'
+const NO_PIPETTE = 'No pipette attached'
+
+export function ResultsSummary(props: CalibrationPanelProps): React.Node {
   const {
-    robotName,
-    deleteSession,
-    comparisonsByStep,
-    instrumentsByMount,
+    comparisonsByPipette,
+    instruments,
+    checkBothPipettes,
+    cleanUpAndExit,
   } = props
 
-  const calibrationStatus = useSelector<State, CalibrationStatus | null>(
-    state => Calibration.getCalibrationStatus(state, robotName)
-  )
+  if (!comparisonsByPipette || !instruments) {
+    return null
+  }
 
   const handleDownloadButtonClick = () => {
     const now = new Date()
     const report = {
-      comparisonsByStep,
-      instrumentsByMount,
-      calibrationStatus,
+      comparisonsByPipette,
+      instruments,
       savedAt: now.toISOString(),
     }
-    const data = new Blob([JSON.stringify(report)], {
+    const data = new Blob([JSON.stringify(report, null, 4)], {
       type: 'application/json',
     })
     saveAs(data, 'OT-2 Robot Calibration Check Report.json')
   }
 
-  const firstPipette = find(
-    instrumentsByMount,
-    (p: RobotCalibrationCheckInstrument) =>
-      p.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
+  const leftPipette = find(
+    instruments,
+    (p: CalibrationCheckInstrument) => p.mount.toLowerCase() === LEFT
   )
-  const secondPipette = find(
-    instrumentsByMount,
-    (p: RobotCalibrationCheckInstrument) =>
-      p.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
+  const rightPipette = find(
+    instruments,
+    (p: CalibrationCheckInstrument) => p.mount.toLowerCase() === RIGHT
   )
-  const [firstComparisonsByStep, secondComparisonsByStep] = partition(
-    Object.keys(comparisonsByStep),
-    compStep => Sessions.FIRST_PIPETTE_COMPARISON_STEPS.includes(compStep)
-  ).map(stepNames => pick(comparisonsByStep, stepNames))
 
-  const lastFailedComparison = [
-    ...Sessions.FIRST_PIPETTE_COMPARISON_STEPS,
-    ...Sessions.SECOND_PIPETTE_COMPARISON_STEPS,
-  ].reduce((acc, step): RobotCalibrationCheckComparison | null => {
-    const comparison = comparisonsByStep[step]
-    if (comparison && comparison.exceedsThreshold) {
-      return comparison
-    } else {
-      return acc
-    }
-  }, null)
+  const calibrationsByMount = {
+    left: {
+      pipette: leftPipette,
+      calibration: leftPipette
+        ? comparisonsByPipette?.[leftPipette.rank] ?? null
+        : null,
+    },
+    right: {
+      pipette: rightPipette,
+      calibration: rightPipette
+        ? comparisonsByPipette?.[rightPipette.rank] ?? null
+        : null,
+    },
+  }
+
+  const getDeckCalibration = checkBothPipettes
+    ? comparisonsByPipette.second.deck?.status
+    : comparisonsByPipette.first.deck?.status
+  const deckCalibrationResult = getDeckCalibration ?? null
+
+  const pipetteResultsBad = perPipette => ({
+    offsetBad: perPipette?.pipetteOffset?.status
+      ? perPipette.pipetteOffset.status === CHECK_STATUS_OUTSIDE_THRESHOLD
+      : false,
+    tipLengthBad: perPipette?.tipLength?.status
+      ? perPipette.tipLength.status === CHECK_STATUS_OUTSIDE_THRESHOLD
+      : false,
+  })
 
   return (
     <>
-      <h3 className={styles.summary_page_header}>
-        {ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}
-      </h3>
-
-      <div className={styles.summary_page_contents}>
-        <div className={styles.summary_section}>
-          <PipetteComparisons
-            pipette={firstPipette}
-            comparisonsByStep={firstComparisonsByStep}
-            allSteps={Sessions.FIRST_PIPETTE_COMPARISON_STEPS}
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_START}
+        flexDirection={DIRECTION_COLUMN}
+      >
+        <Text
+          css={FONT_HEADER_DARK}
+          marginTop={SPACING_2}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        >
+          {ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}
+        </Text>
+        <Box
+          minHeight={SPACING_2}
+          marginBottom={SPACING_3}
+          title="results-note-container"
+        >
+          <WarningText
+            deckCalibrationBad={
+              deckCalibrationResult
+                ? deckCalibrationResult === CHECK_STATUS_OUTSIDE_THRESHOLD
+                : false
+            }
+            pipettes={{
+              left: pipetteResultsBad(calibrationsByMount.left.calibration),
+              right: pipetteResultsBad(calibrationsByMount.right.calibration),
+            }}
           />
-        </div>
-        {secondPipette && (
-          <div className={styles.summary_section}>
-            <PipetteComparisons
-              pipette={secondPipette}
-              comparisonsByStep={secondComparisonsByStep}
-              allSteps={Sessions.SECOND_PIPETTE_COMPARISON_STEPS}
-            />
-          </div>
-        )}
-      </div>
-      <OutlineButton
-        className={styles.download_summary_button}
-        onClick={handleDownloadButtonClick}
+        </Box>
+      </Flex>
+      <Flex
+        marginBottom={SPACING_4}
+        title="deck-calibration-container"
+        flexDirection={DIRECTION_COLUMN}
       >
-        {DOWNLOAD_SUMMARY}
-      </OutlineButton>
-      {lastFailedComparison && (
-        <TroubleshootingInstructions comparison={lastFailedComparison} />
-      )}
+        <Text
+          marginBottom={SPACING_2}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          fontSize={FONT_SIZE_BODY_2}
+        >
+          {DECK_CALIBRATION_HEADER}
+        </Text>
+        <RenderResult status={deckCalibrationResult} />
+      </Flex>
+      <Flex marginBottom={SPACING_2} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        {PIPETTE_MOUNTS.map(m => (
+          <Box key={m} width="48%" title={`${m}-mount-container`}>
+            <Text
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              fontSize={FONT_SIZE_BODY_2}
+              fontWeight={FONT_WEIGHT_SEMIBOLD}
+              marginBottom={SPACING_2}
+            >
+              {`${m} ${MOUNT}`}
+            </Text>
+            <Flex
+              backgroundColor={OVERLAY_LIGHT_GRAY_50}
+              padding={SPACING_2}
+              title={`${m}-mount-results`}
+              alignItems={ALIGN_STRETCH}
+            >
+              {calibrationsByMount[m].pipette &&
+              calibrationsByMount[m].calibration &&
+              Object.entries(calibrationsByMount[m].calibration).length ? (
+                <PipetteResult
+                  pipetteInfo={calibrationsByMount[m].pipette}
+                  pipetteCalibration={calibrationsByMount[m].calibration}
+                />
+              ) : (
+                <Flex
+                  alignItems={ALIGN_CENTER}
+                  justifyContent={JUSTIFY_CENTER}
+                  fontStyle={FONT_STYLE_ITALIC}
+                  fontSize={FONT_SIZE_BODY_1}
+                  flexDirection={DIRECTION_COLUMN}
+                  height="100%"
+                >
+                  {NO_PIPETTE}
+                </Flex>
+              )}
+            </Flex>
+          </Box>
+        ))}
+      </Flex>
+      <Box>
+        <Btn
+          color={C_BLUE}
+          onClick={handleDownloadButtonClick}
+          marginBottom={SPACING_5}
+          fontSize={FONT_SIZE_BODY_2}
+          title="download-results-button"
+        >
+          {DOWNLOAD_SUMMARY}
+        </Btn>
 
-      <PrimaryButton
-        className={styles.summary_exit_button}
-        onClick={deleteSession}
-      >
-        {DROP_TIP_AND_EXIT}
-      </PrimaryButton>
+        <Flex
+          marginTop={SPACING_4}
+          marginBottom={SPACING_2}
+          justifyContent={JUSTIFY_CENTER}
+        >
+          <PrimaryBtn width="95%" onClick={cleanUpAndExit}>
+            {HOME_AND_EXIT}
+          </PrimaryBtn>
+        </Flex>
+      </Box>
     </>
   )
 }
 
-type TroubleshootingInstructionsProps = {
-  comparison: RobotCalibrationCheckComparison,
+type RenderResultProps = {|
+  status: string | null,
+|}
+
+function RenderResult(props: RenderResultProps): React.Node {
+  const { status } = props
+  if (!status) {
+    return null
+  } else {
+    const isGoodCal = status === CHECK_STATUS_IN_THRESHOLD
+    return (
+      <Flex>
+        <Icon
+          name={isGoodCal ? 'check-circle' : 'alert-circle'}
+          height="1.25rem"
+          width="1.25rem"
+          color={isGoodCal ? COLOR_SUCCESS : COLOR_WARNING}
+          marginRight="0.75rem"
+        />
+        <Text fontSize={FONT_SIZE_BODY_2}>
+          {isGoodCal ? GOOD_CALIBRATION : BAD_CALIBRATION}
+        </Text>
+      </Flex>
+    )
+  }
 }
-function TroubleshootingInstructions(
-  props: TroubleshootingInstructionsProps
-): React.Node {
-  const { comparison } = props
+
+type PipetteResultProps = {|
+  pipetteInfo: CalibrationCheckInstrument,
+  pipetteCalibration: CalibrationCheckComparisonsPerCalibration,
+|}
+
+function PipetteResult(props: PipetteResultProps): React.Node {
+  const { pipetteInfo, pipetteCalibration } = props
+  const displayName =
+    getPipetteModelSpecs(pipetteInfo.model)?.displayName || pipetteInfo.model
+  const tipRackDisplayName = pipetteInfo.tipRackDisplay
   return (
-    <div>
-      <p className={styles.summary_bad_outcome_header}>
-        {getBadOutcomeHeader(comparison.transformType)}
-      </p>
-      <p className={styles.summary_bad_outcome_body}>
-        <BadOutcomeBody transform={comparison.transformType} />
-      </p>
-      <p className={styles.summary_bad_outcome_body}>{STILL_HAVING_PROBLEMS}</p>
-    </div>
+    <Flex paddingY={SPACING_1} flexDirection={DIRECTION_COLUMN} height="100%">
+      <Box>
+        <Text
+          fontSize={FONT_SIZE_BODY_2}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          marginBottom={SPACING_1}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        >
+          {PIPETTE_OFFSET_CALIBRATION_HEADER}
+        </Text>
+        <Text fontSize={FONT_SIZE_BODY_1} marginBottom={SPACING_2}>
+          {displayName}
+        </Text>
+        <RenderResult
+          status={pipetteCalibration.pipetteOffset?.status ?? null}
+        />
+      </Box>
+      <Box marginTop={SPACING_4}>
+        <Text
+          fontSize={FONT_SIZE_BODY_2}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          marginBottom={SPACING_1}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        >
+          {TIP_LENGTH_CALIBRATION_HEADER}
+        </Text>
+        <Text fontSize={FONT_SIZE_BODY_1} marginBottom={SPACING_2}>
+          {tipRackDisplayName}
+        </Text>
+        <RenderResult status={pipetteCalibration.tipLength?.status ?? null} />
+      </Box>
+    </Flex>
   )
+}
+
+function WarningText(props: {|
+  deckCalibrationBad: boolean,
+  pipettes: {|
+    left: {| offsetBad: boolean, tipLengthBad: boolean |},
+    right: {| offsetBad: boolean, tipLengthBad: boolean |},
+  |},
+|}): React.Node | null {
+  const badCount = [
+    props.deckCalibrationBad,
+    props.pipettes.left.offsetBad,
+    props.pipettes.left.tipLengthBad,
+    props.pipettes.right.offsetBad,
+    props.pipettes.right.tipLengthBad,
+  ].reduce((sum, item) => sum + (item === true ? 1 : 0), 0)
+  return badCount > 0 ? (
+    <>
+      <Box marginTop={SPACING_3} fontSize={FONT_SIZE_BODY_2}>
+        <Text display={DISPLAY_INLINE_BLOCK}>
+          {`${FOUND}`}
+          &nbsp;
+          {badCount === 1 ? ONE_ISSUE : PLURAL_ISSUES}. &nbsp;
+          {`${RECALIBRATE_AS_INDICATED}.`}
+        </Text>
+        &nbsp;
+        <Text display={DISPLAY_INLINE_BLOCK}>{NEED_HELP}</Text>
+        &nbsp;
+        <Link
+          display={DISPLAY_INLINE_BLOCK}
+          color={C_BLUE}
+          external={true}
+          href={SUPPORT_URL}
+        >
+          {CONTACT_SUPPORT}
+        </Link>
+        &nbsp;
+        <Text display={DISPLAY_INLINE_BLOCK}>{`${FOR_HELP}.`}</Text>
+      </Box>
+      {props.deckCalibrationBad ? (
+        <Text
+          fontSize={FONT_SIZE_BODY_1}
+          marginTop={SPACING_2}
+          fontStyle={FONT_STYLE_ITALIC}
+        >{`${NOTE}: ${
+          badCount > 1 ? DO_DECK_FIRST : ''
+        } ${DECK_INVALIDATES}`}</Text>
+      ) : null}
+    </>
+  ) : null
 }

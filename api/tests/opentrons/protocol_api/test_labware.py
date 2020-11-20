@@ -14,7 +14,7 @@ from opentrons_shared_data import load_shared_data
 from opentrons.calibration_storage import (
     helpers, get, delete, file_operators)
 from opentrons.types import Point, Location
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, MagneticModuleModel, ModuleType)

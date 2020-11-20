@@ -7,7 +7,7 @@ from typing import (Any, Callable, Dict, Optional,
                     TYPE_CHECKING, Union, List)
 
 from opentrons import types as top_types
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
 if TYPE_CHECKING:

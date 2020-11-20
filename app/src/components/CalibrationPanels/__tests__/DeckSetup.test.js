@@ -77,7 +77,7 @@ describe('DeckSetup', () => {
       calBlock: mockTipLengthCalBlock,
     })
     expect(wrapper.text()).toContain(
-      'Place full tip rack and Calibration Block on'
+      'Clear the deck and place a full Opentrons GEB 300uL Tiprack and Calibration Block on'
     )
   })
 
@@ -86,6 +86,8 @@ describe('DeckSetup', () => {
       sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
       calBlock: null,
     })
-    expect(wrapper.text()).toContain('Place full tip rack on')
+    expect(wrapper.text()).toContain(
+      'Clear the deck and place a full Opentrons GEB 300uL Tiprack on'
+    )
   })
 })

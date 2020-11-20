@@ -9,11 +9,11 @@ export type ConfirmStartDeckCalModalProps = {|
   confirm: () => mixed,
 |}
 
-const HEADING = 'Are you sure you want to continue?'
+const HEADING = 'Are you sure you want to recalibrate your deck?'
 const CANCEL = 'cancel'
 const EXIT = 'continue'
 const WARNING =
-  'Performing a deck calibration will clear your pipette offset calibrations.'
+  'Performing a deck calibration will clear all of your pipette offset and tip length calibrations. You will need to recalibrate your pipette offset and tip length after completing a deck calibration.'
 
 export function ConfirmStartDeckCalModal(
   props: ConfirmStartDeckCalModalProps

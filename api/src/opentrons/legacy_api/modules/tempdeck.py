@@ -1,7 +1,8 @@
 from threading import Thread, Event
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
-from opentrons import commands
+from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.commands import module_commands as cmds
 
 
 TEMP_POLL_INTERVAL_SECS = 1
@@ -14,7 +15,7 @@ class MissingDevicePortError(Exception):
 # TODO: BC 2018-08-03 this class shares a fair amount verbatim from MagDeck,
 # there should be an upstream ABC in the future to contain shared logic
 # between modules
-class TempDeck(commands.CommandPublisher):
+class TempDeck(CommandPublisher):
     """
     Under development. API subject to change without a version bump
     """
@@ -27,7 +28,7 @@ class TempDeck(commands.CommandPublisher):
         self._device_info = None
         self._poll_stop_event = None
 
-    @commands.publish.both(command=commands.tempdeck_set_temp)
+    @publish.both(command=cmds.tempdeck_set_temp)
     def set_temperature(self, celsius):
         """
         Set temperature in degree Celsius
@@ -39,7 +40,7 @@ class TempDeck(commands.CommandPublisher):
         if self._driver and self._driver.is_connected():
             self._driver.legacy_set_temperature(celsius)
 
-    @commands.publish.both(command=commands.tempdeck_deactivate)
+    @publish.both(command=cmds.tempdeck_deactivate)
     def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
         if self._driver and self._driver.is_connected():

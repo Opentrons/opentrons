@@ -22,6 +22,7 @@ PIP_OFFSET_CAL_TRANSITIONS: PipetteOffsetTransitions = {
     POCState.preparingPipette: {
         CalibrationCommand.jog: POCState.preparingPipette,
         CalibrationCommand.pick_up_tip: POCState.inspectingTip,
+        CalibrationCommand.invalidate_last_action: POCState.preparingPipette,
     },
     POCState.inspectingTip: {
         CalibrationCommand.invalidate_tip: POCState.preparingPipette,
@@ -31,10 +32,12 @@ PIP_OFFSET_CAL_TRANSITIONS: PipetteOffsetTransitions = {
         CalibrationCommand.jog: POCState.joggingToDeck,
         CalibrationCommand.save_offset: POCState.joggingToDeck,
         CalibrationCommand.move_to_point_one: POCState.savingPointOne,
+        CalibrationCommand.invalidate_last_action: POCState.preparingPipette,
     },
     POCState.savingPointOne: {
         CalibrationCommand.jog: POCState.savingPointOne,
         CalibrationCommand.save_offset: POCState.calibrationComplete,
+        CalibrationCommand.invalidate_last_action: POCState.preparingPipette,
     },
     POCState.calibrationComplete: {
         CalibrationCommand.move_to_tip_rack: POCState.calibrationComplete,
@@ -55,11 +58,14 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
     POWTState.measuringNozzleOffset: {
         CalibrationCommand.save_offset: POWTState.measuringNozzleOffset,
         CalibrationCommand.jog: POWTState.measuringNozzleOffset,
-        CalibrationCommand.move_to_tip_rack: POWTState.preparingPipette
+        CalibrationCommand.move_to_tip_rack: POWTState.preparingPipette,
+        CalibrationCommand.invalidate_last_action:
+            POWTState.measuringNozzleOffset,
     },
     POWTState.preparingPipette: {
         CalibrationCommand.jog: POWTState.preparingPipette,
         CalibrationCommand.pick_up_tip: POWTState.inspectingTip,
+        CalibrationCommand.invalidate_last_action: POWTState.preparingPipette,
     },
     POWTState.inspectingTip: {
         CalibrationCommand.invalidate_tip: POWTState.preparingPipette,
@@ -68,7 +74,8 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
     },
     POWTState.measuringTipOffset: {
         CalibrationCommand.jog: POWTState.measuringTipOffset,
-        CalibrationCommand.save_offset: POWTState.tipLengthComplete
+        CalibrationCommand.save_offset: POWTState.tipLengthComplete,
+        CalibrationCommand.invalidate_last_action: POWTState.preparingPipette,
     },
     POWTState.tipLengthComplete: {
         CalibrationCommand.set_has_calibration_block:
@@ -79,10 +86,12 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
         CalibrationCommand.jog: POWTState.joggingToDeck,
         CalibrationCommand.save_offset: POWTState.joggingToDeck,
         CalibrationCommand.move_to_point_one: POWTState.savingPointOne,
+        CalibrationCommand.invalidate_last_action: POWTState.preparingPipette,
     },
     POWTState.savingPointOne: {
         CalibrationCommand.jog: POWTState.savingPointOne,
         CalibrationCommand.save_offset: POWTState.calibrationComplete,
+        CalibrationCommand.invalidate_last_action: POWTState.preparingPipette,
     },
     POWTState.calibrationComplete: {
         CalibrationCommand.move_to_tip_rack: POWTState.calibrationComplete,

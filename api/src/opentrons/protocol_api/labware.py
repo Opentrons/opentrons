@@ -25,7 +25,7 @@ from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols import labware as labware_module
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.types import Location, Point, LocationLabware
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION)
 from opentrons.protocols.geometry.deck_item import DeckItem

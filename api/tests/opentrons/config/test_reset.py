@@ -1,5 +1,4 @@
-from collections import namedtuple
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import pytest
 from opentrons.config import reset
 
@@ -16,48 +15,76 @@ def mock_reset_labware_calibration():
         yield m
 
 
-@pytest.fixture
-def mock_reset_tip_probe():
-    with patch("opentrons.config.reset.reset_tip_probe") as m:
-        yield m
-
-
 @pytest.fixture()
 def mock_db():
     with patch("opentrons.config.reset.db") as m:
         yield m
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_labware():
     with patch("opentrons.config.reset.delete") as m:
         yield m
 
 
-@pytest.fixture()
+@pytest.fixture
+def mock_reset_pipette_offset():
+    with patch('opentrons.config.reset.reset_pipette_offset') as m:
+        yield m
+
+
+@pytest.fixture
+def mock_reset_deck_calibration():
+    with patch('opentrons.config.reset.reset_deck_calibration') as m:
+        yield m
+
+
+@pytest.fixture
+def mock_reset_tip_length_calibrations():
+    with patch('opentrons.config.reset.reset_tip_length_calibrations') as m:
+        yield m
+
+
+@pytest.fixture
+def mock_cal_storage_delete():
+    with patch('opentrons.config.reset.delete', autospec=True) as m:
+        yield m
+
+
+@pytest.fixture
 def mock_robot_config():
-    with patch("opentrons.config.reset.rc") as m:
+    with patch('opentrons.config.reset.robot_configs', autospec=True) as m:
         yield m
 
 
 def test_reset_empty_set(mock_reset_boot_scripts,
                          mock_reset_labware_calibration,
-                         mock_reset_tip_probe):
+                         mock_reset_pipette_offset,
+                         mock_reset_deck_calibration,
+                         mock_reset_tip_length_calibrations):
     reset.reset(set())
     mock_reset_labware_calibration.assert_not_called()
     mock_reset_boot_scripts.assert_not_called()
-    mock_reset_tip_probe.assert_not_called()
+    mock_reset_pipette_offset.assert_not_called()
+    mock_reset_deck_calibration.assert_not_called()
+    mock_reset_tip_length_calibrations.assert_not_called()
 
 
 def test_reset_all_set(mock_reset_boot_scripts,
                        mock_reset_labware_calibration,
-                       mock_reset_tip_probe):
+                       mock_reset_pipette_offset,
+                       mock_reset_deck_calibration,
+                       mock_reset_tip_length_calibrations):
     reset.reset({reset.ResetOptionId.boot_scripts,
-                 reset.ResetOptionId.tip_probe,
-                 reset.ResetOptionId.labware_calibration})
+                 reset.ResetOptionId.labware_calibration,
+                 reset.ResetOptionId.deck_calibration,
+                 reset.ResetOptionId.pipette_offset,
+                 reset.ResetOptionId.tip_length_calibrations})
     mock_reset_labware_calibration.assert_called_once()
     mock_reset_boot_scripts.assert_called_once()
-    mock_reset_tip_probe.assert_called_once()
+    mock_reset_pipette_offset.assert_called_once()
+    mock_reset_deck_calibration.assert_called_once()
+    mock_reset_tip_length_calibrations.assert_called_once()
 
 
 def test_labware_calibration_reset(mock_db, mock_labware):
@@ -67,23 +94,23 @@ def test_labware_calibration_reset(mock_db, mock_labware):
     mock_labware.clear_calibrations.assert_called_once()
 
 
-def test_tip_probe_reset(mock_robot_config):
-    # Create a named tuple of the robot_config fields we care about
-    FakeRobotConfig = namedtuple("FakeRobotConfig",
-                                 ["instrument_offset", "tip_length"])
-    # Instantiate with None and a mock.
-    obj = FakeRobotConfig(None, MagicMock())
-    # Mock out build_fallback_instrument_offset
-    mock_robot_config.build_fallback_instrument_offset.return_value = 100
-    # Mock out load to return our fake robot config
-    mock_robot_config.load.return_value = obj
+def test_deck_calibration_reset(mock_cal_storage_delete, mock_robot_config):
+    reset.reset_deck_calibration()
+    mock_cal_storage_delete.delete_robot_deck_attitude.assert_called_once()
+    mock_cal_storage_delete.clear_pipette_offset_calibrations\
+                           .assert_called_once()
+    mock_robot_config.clear.assert_called_once_with(
+        calibration=True, robot=False)
 
-    # Call the test function
-    reset.reset_tip_probe()
 
-    # Check the side effects
-    obj.tip_length.clear.assert_called_once_with()
+def test_tip_length_calibrations_reset(mock_cal_storage_delete):
+    reset.reset_tip_length_calibrations()
+    mock_cal_storage_delete.clear_tip_length_calibration.assert_called_once()
+    mock_cal_storage_delete.clear_pipette_offset_calibrations\
+                           .assert_called_once()
 
-    mock_robot_config.save_robot_settings.assert_called_once_with(
-        FakeRobotConfig(100,
-                        obj.tip_length))
+
+def test_pipette_offset_reset(mock_cal_storage_delete):
+    reset.reset_pipette_offset()
+    mock_cal_storage_delete.clear_pipette_offset_calibrations\
+                           .assert_called_once()

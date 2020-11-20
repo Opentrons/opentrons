@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import cx from 'classnames'
-import { useSelector } from 'react-redux'
 
 import {
   Icon,
@@ -12,7 +11,6 @@ import {
   SPACING_2,
 } from '@opentrons/components'
 import styles from './styles.css'
-import { getFeatureFlags } from '../../config'
 
 import type {
   PipetteNameSpecs,
@@ -100,8 +98,6 @@ export function LevelPipette(props: Props): React.Node {
     startPipetteOffsetCalibration,
   } = props
 
-  const ff = useSelector(getFeatureFlags)
-
   return (
     <ModalPage
       titleBar={{
@@ -114,7 +110,7 @@ export function LevelPipette(props: Props): React.Node {
       <Status displayName={displayName} />
       <LevelingInstruction displayName={displayName} />
       <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
-      {ff.enableCalibrationOverhaul && !actualPipetteOffset && (
+      {!actualPipetteOffset && (
         <PrimaryBtn
           marginBottom={SPACING_2}
           width="100%"

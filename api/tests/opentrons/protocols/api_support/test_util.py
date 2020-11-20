@@ -3,7 +3,7 @@ import pytest
 import opentrons.protocol_api as papi
 from opentrons.protocols.implementations.labware import LabwareImplementation
 from opentrons.types import Point, Location, Mount
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.labware import Labware, get_labware_definition
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.util import (

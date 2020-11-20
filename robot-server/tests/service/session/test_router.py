@@ -16,8 +16,8 @@ from robot_server.service.session.errors import SessionCreationException, \
 from robot_server.service.session.models.common import EmptyModel, JogPosition
 from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.service.session.models.session import SessionType
-from robot_server.service.session.session_types import NullSession, \
-    SessionMetaData
+from robot_server.service.session.session_types import (
+    LiveProtocolSession, SessionMetaData)
 
 
 @pytest.fixture
@@ -29,15 +29,12 @@ def mock_session_meta():
 @pytest.fixture
 def session_response(mock_session_meta):
     return {
-        'attributes': {
-            'details': {
-            },
-            'sessionType': 'null',
-            'createdAt': mock_session_meta.created_at.isoformat(),
-            'createParams': None,
+        'details': {
         },
-        'type': 'Session',
-        'id': mock_session_meta.identifier
+        'sessionType': 'liveProtocol',
+        'createdAt': mock_session_meta.created_at.isoformat(),
+        'createParams': None,
+        'id': mock_session_meta.identifier,
     }
 
 
@@ -79,10 +76,11 @@ def mock_command_executor():
 
 @pytest.fixture
 def mock_session(mock_session_meta, mock_command_executor):
-    session = NullSession(configuration=MagicMock(),
-                          instance_meta=mock_session_meta)
+    session = LiveProtocolSession(
+        configuration=MagicMock(),
+        instance_meta=mock_session_meta)
 
-    session._command_executor = mock_command_executor
+    session._executor = mock_command_executor
 
     async def func(*args, **kwargs):
         pass
@@ -105,7 +103,8 @@ def patch_create_session(mock_session):
 @pytest.mark.asyncio
 async def session_manager_with_session(loop, patch_create_session):
     manager = get_session_manager()
-    session = await manager.add(SessionType.null, SessionMetaData())
+    session = await manager.add(SessionType.live_protocol,
+                                SessionMetaData())
 
     yield manager
 
@@ -123,10 +122,7 @@ def test_create_session_error(api_client,
 
     response = api_client.post("/sessions", json={
         "data": {
-            "type": "Session",
-            "attributes": {
-                "sessionType": "null"
-            }
+            "sessionType": "liveProtocol"
         }
     })
     assert response.json() == {
@@ -144,10 +140,7 @@ def test_create_session(api_client,
                         session_response):
     response = api_client.post("/sessions", json={
         "data": {
-            "type": "Session",
-            "attributes": {
-                "sessionType": "null"
-            }
+            "sessionType": "liveProtocol"
         }
     })
     assert response.json() == {
@@ -155,15 +148,17 @@ def test_create_session(api_client,
         'links': {
             'commandExecute': {
                 'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: E501
+                'meta': None,
             },
             'self': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
+                'meta': None,
             },
             'sessions': {
-                'href': '/sessions'
+                'href': '/sessions', 'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}', 'meta': None,
             }
         }
     }
@@ -199,10 +194,10 @@ def test_delete_session(api_client,
         'data': session_response,
         'links': {
             'self': {
-                'href': '/sessions',
+                'href': '/sessions', 'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}', 'meta': None,
             },
         }
     }
@@ -235,15 +230,19 @@ def test_get_session(api_client,
         'links': {
             'commandExecute': {
                 'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e5011
+                'meta': None,
             },
             'self': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
+                'meta': None,
             },
             'sessions': {
-                'href': '/sessions'
+                'href': '/sessions',
+                'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}',
+                'meta': None,
             }
         }
     }
@@ -253,7 +252,7 @@ def test_get_session(api_client,
 def test_get_sessions_no_sessions(api_client):
     response = api_client.get("/sessions")
     assert response.json() == {
-        'data': [],
+        'data': [], 'links': None
     }
     assert response.status_code == 200
 
@@ -263,7 +262,7 @@ def test_get_sessions(api_client,
                       session_response):
     response = api_client.get("/sessions")
     assert response.json() == {
-        'data': [session_response],
+        'data': [session_response], 'links': None
     }
     assert response.status_code == 200
 
@@ -272,11 +271,8 @@ def command(command_type: str, body: typing.Optional[BaseModel]):
     """Helper to create command"""
     return {
         "data": {
-            "type": "SessionCommand",
-            "attributes": {
-                "command": command_type,
-                "data": body.dict(exclude_unset=True) if body else {}
-            }
+            "command": command_type,
+            "data": body.dict(exclude_unset=True) if body else {}
         }
     }
 
@@ -285,7 +281,7 @@ def test_execute_command_no_session(api_client, mock_session_meta):
     """Test that command is rejected if there's no session"""
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("jog",
+        json=command("calibration.jog",
                      JogPosition(vector=(1, 2, 3,))))
     assert response.json() == {
         'errors': [{
@@ -326,31 +322,33 @@ def test_execute_command(api_client,
 
     assert response.json() == {
         'data': {
-            'attributes': {
-                'command': 'calibration.jog',
-                'data': {'vector': [1.0, 2.0, 3.0]},
-                'status': 'executed',
-                'createdAt': '2000-01-01T00:00:00',
-                'startedAt': '2019-01-01T00:00:00',
-                'completedAt': '2020-01-01T00:00:00',
-            },
-            'type': 'SessionCommand',
+            'command': 'calibration.jog',
+            'data': {'vector': [1.0, 2.0, 3.0]},
+            'status': 'executed',
+            'createdAt': '2000-01-01T00:00:00',
+            'startedAt': '2019-01-01T00:00:00',
+            'completedAt': '2020-01-01T00:00:00',
+            'result': None,
             'id': command_id,
         },
         'links': {
             'commandExecute': {
                 'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e501
+                'meta': None,
             },
             'self': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
+                'meta': None,
             },
             'sessions': {
-                'href': '/sessions'
+                'href': '/sessions',
+                'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}',
+                'meta': None,
             },
-        }
+        },
     }
     assert response.status_code == 200
 
@@ -379,31 +377,33 @@ def test_execute_command_no_body(api_client,
 
     assert response.json() == {
         'data': {
-            'attributes': {
-                'command': 'calibration.loadLabware',
-                'data': {},
-                'status': 'executed',
-                'createdAt': '2000-01-01T00:00:00',
-                'startedAt': '2019-01-01T00:00:00',
-                'completedAt': '2020-01-01T00:00:00',
-            },
-            'type': 'SessionCommand',
+            'command': 'calibration.loadLabware',
+            'data': {},
+            'status': 'executed',
+            'createdAt': '2000-01-01T00:00:00',
+            'startedAt': '2019-01-01T00:00:00',
+            'completedAt': '2020-01-01T00:00:00',
+            'result': None,
             'id': command_id
         },
         'links': {
             'commandExecute': {
                 'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e501
+                'meta': None,
             },
             'self': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
+                'meta': None,
             },
             'sessions': {
-                'href': '/sessions'
+                'href': '/sessions',
+                'meta': None,
             },
             'sessionById': {
-                'href': '/sessions/{sessionId}'
+                'href': '/sessions/{sessionId}',
+                'meta': None,
             },
-        }
+        },
     }
     assert response.status_code == 200
 
@@ -427,7 +427,7 @@ def test_execute_command_error(api_client,
 
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("jog",
+        json=command("calibration.jog",
                      JogPosition(vector=(1, 2, 3,)))
     )
 
@@ -453,7 +453,7 @@ def test_execute_command_session_inactive(
 
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("jog",
+        json=command("calibration.jog",
                      JogPosition(vector=(1, 2, 3,)))
     )
 

@@ -9,3 +9,8 @@
   flex-direction: column;
   justify-content: flex-end;
 }
+
+.confirm_crash_modal {
+  padding: 1rem;
+  max-width: 64rem;
+}

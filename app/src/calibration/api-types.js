@@ -10,6 +10,7 @@ import typeof {
   CALIBRATION_SOURCE_USER,
   CALIBRATION_SOURCE_CALIBRATION_CHECK,
   CALIBRATION_SOURCE_UNKNOWN,
+  CALIBRATION_SOURCE_LEGACY,
 } from './constants'
 
 import type { Mount } from '@opentrons/components'
@@ -39,6 +40,7 @@ export type CalibrationSource =
   | CALIBRATION_SOURCE_USER
   | CALIBRATION_SOURCE_CALIBRATION_CHECK
   | CALIBRATION_SOURCE_UNKNOWN
+  | CALIBRATION_SOURCE_LEGACY
 
 export type IndividualCalibrationStatus = {|
   markedBad: boolean,
@@ -97,17 +99,11 @@ export type LabwareCalibration = {|
   version: number,
   parent: string,
   definitionHash: string,
-|}
-
-export type LabwareCalibrationModel = {|
-  attributes: LabwareCalibration,
-  type: string,
   id: string,
 |}
 
 export type AllLabwareCalibrations = {|
-  data: Array<LabwareCalibrationModel>,
-  meta: { ... },
+  data: Array<LabwareCalibration>,
 |}
 
 export type PipetteOffsetCalibration = {|
@@ -119,17 +115,11 @@ export type PipetteOffsetCalibration = {|
   lastModified: string,
   source: CalibrationSource,
   status: IndividualCalibrationStatus,
-|}
-
-export type PipetteOffsetCalibrationModel = {|
-  attributes: PipetteOffsetCalibration,
-  type: string,
   id: string,
 |}
 
 export type AllPipetteOffsetCalibrations = {|
-  data: Array<PipetteOffsetCalibrationModel>,
-  meta: { ... },
+  data: Array<PipetteOffsetCalibration>,
 |}
 
 export type TipLengthCalibration = {|
@@ -139,15 +129,9 @@ export type TipLengthCalibration = {|
   lastModified: string,
   source: CalibrationSource,
   status: IndividualCalibrationStatus,
-|}
-
-export type TipLengthCalibrationModel = {|
-  attributes: TipLengthCalibration,
-  type: string,
   id: string,
 |}
 
 export type AllTipLengthCalibrations = {|
-  data: Array<TipLengthCalibrationModel>,
-  meta: { ... },
+  data: Array<TipLengthCalibration>,
 |}

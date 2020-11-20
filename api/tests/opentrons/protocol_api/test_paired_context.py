@@ -67,9 +67,9 @@ def test_pick_up_and_drop_tip_no_tipracks(loop):
         ctx._hw_manager.hardware._attached_instruments[Mount.RIGHT]
     l_pip: Pipette =\
         ctx._hw_manager.hardware._attached_instruments[Mount.LEFT]
-    model_offset = Point(*r_pip.config.model_offset)
-    assert r_pip.critical_point() == model_offset
-    assert l_pip.critical_point() == model_offset
+    nozzle_offset = Point(*r_pip.config.nozzle_offset)
+    assert r_pip.critical_point() == nozzle_offset
+    assert l_pip.critical_point() == nozzle_offset
     target_location = tiprack['A1'].top()
 
     paired.pick_up_tip(target_location)
@@ -78,8 +78,8 @@ def test_pick_up_and_drop_tip_no_tipracks(loop):
     assert not tiprack.wells()[0].has_tip
     assert not tiprack.columns()[4][0].has_tip
     overlap = right.hw_pipette['tip_overlap'][tiprack.uri]
-    new_offset = model_offset - Point(0, 0,
-                                      tip_length-overlap)
+    new_offset = nozzle_offset - Point(0, 0,
+                                       tip_length-overlap)
     assert r_pip.critical_point() == new_offset
     assert l_pip.critical_point() == new_offset
     assert r_pip.has_tip

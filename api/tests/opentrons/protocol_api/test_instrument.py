@@ -4,10 +4,10 @@ from unittest import mock
 import opentrons.protocol_api as papi
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.advanced_control import transfers
-from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Mount, Point
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture

@@ -10,13 +10,11 @@ from uuid import uuid4
 from opentrons.api.util import (RobotBusy, robot_is_busy,
                                 requires_http_protocols_disabled)
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons import robot
 from opentrons.broker import Broker
 from opentrons.config import feature_flags as ff
-from opentrons.commands import tree, types as command_types
-from opentrons.commands.commands import is_new_loc, listify
-from opentrons.protocols.types import PythonProtocol, APIVersion
+from opentrons.commands.util import from_list, session_listify
+from opentrons.commands import types as command_types
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.calibration_storage import helpers
@@ -30,11 +28,6 @@ from opentrons.hardware_control import (API, ThreadManager,
 from opentrons.hardware_control.types import (DoorState, HardwareEventType,
                                               HardwareEvent)
 from .models import Container, Instrument, Module
-
-from opentrons.legacy_api.containers.placeable import (
-    Module as ModulePlaceable, Placeable)
-
-from opentrons.legacy_api.containers import get_container, location_to_list
 
 if TYPE_CHECKING:
     from .dev_types import State, StateInfo
@@ -276,15 +269,9 @@ class Session(RobotBusy):
         return self._motion_lock
 
     def _hw_iface(self):
-        if self._use_v2:
-            return self._hardware
-        else:
-            return robot
+        return self._hardware
 
     def prepare(self):
-        if not self._use_v2:
-            robot.discover_modules()
-
         self.refresh()
 
     def get_instruments(self):
@@ -359,57 +346,33 @@ class Session(RobotBusy):
             else:
                 stack.pop()
         unsubscribe = self._broker.subscribe(command_types.COMMAND, on_command)
-        old_robot_connect = robot.connect
 
         try:
             # ensure actual pipettes are cached before driver is disconnected
             self._hardware.cache_instruments()
-            if self._use_v2:
-                instrs = {}
-                for mount, pip in self._hardware.attached_instruments.items():
-                    if pip:
-                        instrs[mount] = {'model': pip['model'],
-                                         'id': pip.get('pipette_id', '')}
-                sync_sim = ThreadManager(
-                        API.build_hardware_simulator,
-                        instrs,
-                        [mod.name()
-                            for mod in self._hardware.attached_modules],
-                        strict_attached_instruments=False
-                        ).sync
-                sync_sim.home()
-                self._simulating_ctx = ProtocolContext.build_using(
-                    self._protocol,
-                    loop=self._loop,
-                    hardware=sync_sim,
-                    broker=self._broker,
-                    extra_labware=getattr(self._protocol, 'extra_labware', {}))
-                run_protocol(self._protocol,
-                             context=self._simulating_ctx)
-            else:
-                robot.broker = self._broker
-                # we don't rely on being connected anymore so make sure we are
-                robot.connect()
-                robot._driver.gpio_chardev = SimulatingGPIOCharDev('sim_chip')
-                robot.cache_instrument_models()
-                robot.disconnect()
+            instrs = {}
+            for mount, pip in self._hardware.attached_instruments.items():
+                if pip:
+                    instrs[mount] = {'model': pip['model'],
+                                     'id': pip.get('pipette_id', '')}
+            sync_sim = ThreadManager(
+                    API.build_hardware_simulator,
+                    instrs,
+                    [mod.name()
+                        for mod in self._hardware.attached_modules],
+                    strict_attached_instruments=False
+                    ).sync
+            sync_sim.home()
+            self._simulating_ctx = ProtocolContext.build_using(
+                self._protocol,
+                loop=self._loop,
+                hardware=sync_sim,
+                broker=self._broker,
+                extra_labware=getattr(self._protocol, 'extra_labware', {}))
+            run_protocol(self._protocol,
+                         context=self._simulating_ctx)
 
-                def robot_connect_error(port=None, options=None):
-                    raise RuntimeError(
-                        'Protocols executed through the Opentrons App may not '
-                        'use robot.connect(). Allowing this call would cause '
-                        'the robot to execute commands during simulation, and '
-                        'then raise an error on execution.')
-                robot.connect = robot_connect_error  # type: ignore
-                exec(self._protocol.contents, {})
         finally:
-            # physically attached pipettes are re-cached during robot.connect()
-            # which is important, because during a simulation, the robot could
-            # think that it holds a pipette model that it actually does not
-            if not self._use_v2:
-                robot.connect = old_robot_connect  # type: ignore
-                robot.connect()
-
             unsubscribe()
 
             instruments, containers, modules, interactions = _accumulate(
@@ -429,8 +392,6 @@ class Session(RobotBusy):
             # we have to clear the tips if they are left on after simulation
             # to ensure that the instruments are in the expected state at the
             # beginning of the labware calibration flow
-            if not self._use_v2:
-                robot.clear_tips()
 
         return res
 
@@ -445,7 +406,7 @@ class Session(RobotBusy):
         finally:
             self._broker.set_logger(self._default_logger)
 
-        self.commands = tree.from_list(commands)
+        self.commands = from_list(commands)
 
         self.containers = self.get_containers()
         self.instruments = self.get_instruments()
@@ -469,13 +430,7 @@ class Session(RobotBusy):
               reason: str = None,
               user_message: str = None,
               duration: float = None):
-        if self._use_v2:
-            self._hardware.pause()
-        # robot.pause in the legacy API will publish commands to the broker
-        # use the broker-less execute_pause instead
-        else:
-            robot.execute_pause()
-
+        self._hardware.pause()
         self.set_state(
             'paused', reason=reason,
             user_message=user_message, duration=duration)
@@ -483,12 +438,7 @@ class Session(RobotBusy):
 
     def resume(self):
         if not self.blocked:
-            if self._use_v2:
-                self._hardware.resume()
-            # robot.resume in the legacy API will publish commands to the
-            # broker use the broker-less execute_resume instead
-            else:
-                robot.execute_resume()
+            self._hardware.resume()
 
             self.set_state('running')
             return self
@@ -548,35 +498,18 @@ class Session(RobotBusy):
         self.set_state('running')
 
         try:
-            if self._use_v2:
-                self.resume()
-                self._pre_run_hooks()
-                self._hardware.cache_instruments()
-                self._hardware.reset_instrument()
-                ctx = ProtocolContext.build_using(
-                    self._protocol,
-                    loop=self._loop,
-                    broker=self._broker,
-                    extra_labware=getattr(self._protocol, 'extra_labware', {}))
-                ctx.connect(self._hardware)
-                ctx.home()
-                run_protocol(self._protocol, context=ctx)
-            else:
-                robot.broker = self._broker
-                assert isinstance(self._protocol, PythonProtocol),\
-                    'Internal error: v1 should only be used for python'
-                if not robot.is_connected():
-                    robot.connect()
-                # backcompat patch: gpiod can only be used from one place so
-                # we have to give the instance of the smoothie driver used by
-                # the apiv1 singletons a reference to the main gpio driver
-                robot._driver.gpio_chardev\
-                    = self._hardware._backend.gpio_chardev
-                self.resume()
-                self._pre_run_hooks()
-                robot.cache_instrument_models()
-                robot.discover_modules()
-                exec(self._protocol.contents, {})
+            self.resume()
+            self._pre_run_hooks()
+            self._hardware.cache_instruments()
+            self._hardware.reset_instrument()
+            ctx = ProtocolContext.build_using(
+                self._protocol,
+                loop=self._loop,
+                broker=self._broker,
+                extra_labware=getattr(self._protocol, 'extra_labware', {}))
+            ctx.connect(self._hardware)
+            ctx.home()
+            run_protocol(self._protocol, context=ctx)
 
             # If the last command in a protocol was a pause, the protocol
             # will immediately finish executing because there's no smoothie
@@ -707,12 +640,11 @@ def _accumulate(iterable):
 
 
 def _dedupe(iterable):
-    acc = set()  # type: ignore
-
-    for item in iterable:
-        if item not in acc:
-            acc.add(item)
-            yield item
+    def _dupecheck(accumulator, item):
+        if not any([item == accumulated for accumulated in accumulator]):
+            accumulator.append(item)
+        return accumulator
+    return reduce(_dupecheck, iterable, [])
 
 
 def now():
@@ -723,7 +655,7 @@ def _get_parent_module(placeable):
     if not placeable or isinstance(placeable, (Point, str)):
         res = None
     elif isinstance(placeable,
-                    (ModulePlaceable, module_geometry.ModuleGeometry)):
+                    module_geometry.ModuleGeometry):
         res = placeable
     elif isinstance(placeable, List):
         res = _get_parent_module(placeable[0].parent)
@@ -765,28 +697,20 @@ def _get_labware(command):  # noqa(C901)
     multiple_instruments = command.get('instruments')
 
     if location:
-        if isinstance(location, (Placeable)) or type(location) == tuple:
-            # type()== used here instead of isinstance because a specific
-            # named tuple like location descends from tuple and therefore
-            # passes the check
-            containers.append(get_container(location))
-        elif isinstance(location, Location):
+        if isinstance(location, Location):
             if location.labware.is_well:
                 containers.append(location.labware.parent.as_labware())
             elif location.labware.is_labware:
                 containers.append(location.labware.as_labware())
+        elif isinstance(location, (labware.Well, labware.Labware)):
+            containers.append(_get_new_labware(location))
         else:
             log.error(f'Cant handle location {location!r}')
 
     if locations:
-        if is_new_loc(locations):
-            list_of_locations = listify(locations)
-            containers.extend(
-                [_get_new_labware(loc) for loc in list_of_locations])
-        else:
-            list_of_locations = location_to_list(locations)
-            containers.extend(
-                [get_container(location) for location in list_of_locations])
+        list_of_locations = session_listify(locations)
+        containers.extend(
+            [_get_new_labware(loc) for loc in list_of_locations])
 
     containers = [c for c in containers if c is not None]
     modules = [m for m in modules if m is not None]

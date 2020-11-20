@@ -4,9 +4,9 @@ from typing import (
     TYPE_CHECKING)
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
-from opentrons.hardware_control import ThreadManager, CriticalPoint
+from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry import deck
+from opentrons.protocols.geometry.deck import Deck
 
 from robot_server.robot.calibration import util
 from robot_server.service.errors import RobotServerError
@@ -61,7 +61,7 @@ class TipCalibrationUserFlow:
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck = deck.Deck(load_name=deck_load_name)
+        self._deck = Deck(load_name=deck_load_name)
         self._tip_rack = self._get_tip_rack_lw(tip_rack)
         self._initialize_deck()
 
@@ -76,11 +76,43 @@ class TipCalibrationUserFlow:
             CalibrationCommand.save_offset: self.save_offset,
             CalibrationCommand.move_to_reference_point: self.move_to_reference_point,  # noqa: E501
             CalibrationCommand.move_to_tip_rack: self.move_to_tip_rack,  # noqa: E501
+            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
         }
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
+
+    @property
+    def hardware(self) -> ThreadManager:
+        return self._hardware
+
+    @property
+    def mount(self) -> Mount:
+        return self._mount
+
+    @property
+    def deck(self) -> Deck:
+        return self._deck
+
+    @property
+    def hw_pipette(self) -> Pipette:
+        return self._hw_pipette
+
+    @property
+    def tip_origin(self) -> Point:
+        if self._tip_origin_pt:
+            return self._tip_origin_pt
+        else:
+            return self._tip_rack.wells()[0].top().point +\
+                MOVE_TO_TIP_RACK_SAFETY_BUFFER
+
+    @tip_origin.setter
+    def tip_origin(self, new_val: Point):
+        self._tip_origin_pt = new_val
+
+    def reset_tip_origin(self):
+        self._tip_origin_pt = None
 
     @property
     def current_state(self) -> State:
@@ -127,29 +159,19 @@ class TipCalibrationUserFlow:
         pass
 
     async def move_to_tip_rack(self):
-        # point safely above target tip well in tip rack
-        pt_above_well = self._tip_rack.wells()[0].top().point + \
-            MOVE_TO_TIP_RACK_SAFETY_BUFFER
-        if self._tip_origin_pt is not None:
-            # use jogged to x and y offsets only if returning tip to rack
-            await self._move(Location(Point(self._tip_origin_pt.x,
-                                            self._tip_origin_pt.y,
-                                            pt_above_well.z),
-                                      None))
-        else:
-            await self._move(Location(pt_above_well, None))
+        await self._move(Location(self.tip_origin, None))
 
     async def save_offset(self):
         if self._current_state == State.measuringNozzleOffset:
             # critical point would default to nozzle for z height
-            cur_pt = await self._get_current_point(
+            cur_pt = await self.get_current_point(
                 critical_point=None)
             self._nozzle_height_at_reference = cur_pt.z
         elif self._current_state == State.measuringTipOffset:
             assert self._hw_pipette.has_tip
             assert self._nozzle_height_at_reference is not None
             # set critical point explicitly to nozzle
-            cur_pt = await self._get_current_point(
+            cur_pt = await self.get_current_point(
                 critical_point=CriticalPoint.NOZZLE)
 
             util.save_tip_length_calibration(
@@ -166,11 +188,12 @@ class TipCalibrationUserFlow:
         overlap = overlap_dict.get(tiprack.uri, default)
         return full_length - overlap
 
-    def _get_critical_point_override(self) -> Optional[CriticalPoint]:
+    @property
+    def critical_point_override(self) -> Optional[CriticalPoint]:
         return (CriticalPoint.FRONT_NOZZLE if
                 self._hw_pipette.config.channels == 8 else None)
 
-    async def _get_current_point(
+    async def get_current_point(
             self,
             critical_point: CriticalPoint = None) -> Point:
         return await self._hardware.gantry_position(self._mount,
@@ -181,10 +204,16 @@ class TipCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def move_to_reference_point(self):
+        if self._has_calibration_block:
+            cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
+            calblock: labware.Labware = \
+                self._deck[cb_setup.slot]  # type: ignore
+            cal_block_target_well = calblock.wells_by_name()[cb_setup.well]
+        else:
+            cal_block_target_well = None
         ref_loc = util.get_reference_location(
-            mount=self._mount,
             deck=self._deck,
-            has_calibration_block=self._has_calibration_block)
+            cal_block_target_well=cal_block_target_well)
         await self._move(ref_loc)
 
     async def pick_up_tip(self):
@@ -194,8 +223,10 @@ class TipCalibrationUserFlow:
         await util.invalidate_tip(self)
 
     async def exit_session(self):
-        await self.move_to_tip_rack()
-        await self._return_tip()
+        if self.hw_pipette.has_tip:
+            await self.move_to_tip_rack()
+            await self.return_tip()
+        await self._hardware.home()
 
     def _get_tip_rack_lw(self,
                          tip_rack_def: 'LabwareDefinition') -> labware.Labware:
@@ -219,8 +250,26 @@ class TipCalibrationUserFlow:
                 cb_setup.load_name,
                 self._deck.position_for(cb_setup.slot))
 
-    async def _return_tip(self):
+    async def return_tip(self):
         await util.return_tip(self, tip_length=self._get_default_tip_length())
 
     async def _move(self, to_loc: Location):
         await util.move(self, to_loc)
+
+    async def invalidate_last_action(self):
+        if self._current_state == State.measuringNozzleOffset:
+            await self.hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
+            await self.move_to_reference_point()
+        elif self._current_state == State.preparingPipette:
+            await self.hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
+            await self.move_to_tip_rack()
+        else:
+            await self.hardware.home()
+            await self._hardware.gantry_position(self.mount, refresh=True)
+            trash = self._deck.get_fixed_trash()
+            assert trash, 'Bad deck setup'
+            await util.move(self, trash['A1'].top(), CriticalPoint.XY_CENTER)
+            await self.hardware.drop_tip(self.mount)
+            await self.move_to_tip_rack()

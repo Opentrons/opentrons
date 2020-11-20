@@ -47,8 +47,8 @@ export const ensureSessionEpic: Epic = (action$, state$) => {
               !ok ||
               body.data.some(
                 s =>
-                  s.attributes.sessionType === sessionType &&
-                  isEqual(s.attributes.createParams, params)
+                  s.sessionType === sessionType &&
+                  isEqual(s.createParams, params)
               )
             ) {
               return of(

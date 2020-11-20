@@ -8,32 +8,27 @@ import type { State } from '../../types'
 import * as Pipettes from '../../pipettes'
 import * as CustomLabware from '../../custom-labware'
 
+import { TitledControl } from '../TitledControl'
+
 import {
-  Box,
   Flex,
-  Link,
-  Text,
   ALIGN_START,
   BORDER_SOLID_LIGHT,
   DIRECTION_COLUMN,
-  FONT_SIZE_BODY_1,
-  FONT_WEIGHT_SEMIBOLD,
-  SPACING_2,
   SPACING_3,
   SPACING_4,
-  SPACING_AUTO,
-  TEXT_TRANSFORM_CAPITALIZE,
+  SecondaryBtn,
 } from '@opentrons/components'
 
 import type { ViewableRobot } from '../../discovery/types'
 
 import { PipetteOffsetItem } from './PipetteOffsetItem'
 
-const TITLE = 'pipette offset calibration'
+const TITLE = 'Attached Pipette Calibrations'
 const DESCRIPTION =
-  'Calibration for the position of each pipette. See information about all pipettes and calibrate under'
+  'Calibrate the position for the the default tip and pipette combination.'
 
-const LINK_TEXT = 'Robot > Pipettes and Modules'
+const BUTTON_TEXT = 'Manage Pipettes'
 
 type Props = {|
   pipettesPageUrl: string,
@@ -57,28 +52,22 @@ export function PipetteOffsets(props: Props): React.Node {
   })
 
   return (
-    <Box
+    <TitledControl
       padding={SPACING_3}
       borderBottom={BORDER_SOLID_LIGHT}
-      fontSize={FONT_SIZE_BODY_1}
+      title={TITLE}
+      description={DESCRIPTION}
+      control={
+        <SecondaryBtn as={RRDLink} to={pipettesPageUrl}>
+          {BUTTON_TEXT}
+        </SecondaryBtn>
+      }
     >
-      <Flex alignItems={ALIGN_START} flexDirection={DIRECTION_COLUMN}>
-        <Box paddingRight={SPACING_3} marginRight={SPACING_AUTO}>
-          <Text
-            as="h4"
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            marginBottom={SPACING_2}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          >
-            {TITLE}
-          </Text>
-          <Text>
-            {`${DESCRIPTION} `}
-            <Link as={RRDLink} to={pipettesPageUrl}>
-              {LINK_TEXT}
-            </Link>
-          </Text>
-        </Box>
+      <Flex
+        alignItems={ALIGN_START}
+        flexDirection={DIRECTION_COLUMN}
+        marginBottom={SPACING_3}
+      >
         <Flex width={'100%'} paddingTop={SPACING_4}>
           <PipetteOffsetItem
             mount={'left'}
@@ -94,6 +83,6 @@ export function PipetteOffsets(props: Props): React.Node {
           />
         </Flex>
       </Flex>
-    </Box>
+    </TitledControl>
   )
 }
