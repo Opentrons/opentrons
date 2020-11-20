@@ -83,22 +83,24 @@ export function splitLiquid(
     {}
   )
 
-  return Object.keys(sourceLiquidState).reduce(
-    (acc, ingredId) => {
+  const emptySourceAndDest = { source: {}, dest: {} }
+  if (!sourceLiquidState) {
+    return emptySourceAndDest
+  } else {
+    return Object.keys(sourceLiquidState).reduce((acc, ingredId) => {
       const destVol = ratios[ingredId] * volume
       return {
         source: {
           ...acc.source,
-          [ingredId]: sourceLiquidState[ingredId] - destVol,
+          [ingredId]: (sourceLiquidState[ingredId] || 0) - destVol,
         },
         dest: {
           ...acc.dest,
           [ingredId]: destVol,
         },
       }
-    },
-    { source: {}, dest: {} }
-  )
+    }, emptySourceAndDest)
+  }
 }
 
 /** The converse of splitLiquid. Adds all of one liquid to the other.
@@ -114,11 +116,11 @@ export function mergeLiquid(
 
     ...reduce<LocationLiquidState, LocationLiquidState>(
       source,
-      (acc, ingredVol: number, ingredId: string) => {
-        const isCommonIngred = ingredId in dest
+      (acc, ingredVol: number, ingredId: string): LocationLiquidState => {
+        const isCommonIngred = dest ? ingredId in dest : false
         const ingredVolume = isCommonIngred
           ? // sum volumes of ingredients common to 'source' and 'dest'
-            ingredVol + dest[ingredId]
+            ingredVol + dest?.[ingredId]
           : // include all ingreds exclusive to 'source'
             ingredVol
 

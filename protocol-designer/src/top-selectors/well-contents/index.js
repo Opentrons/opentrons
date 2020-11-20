@@ -17,7 +17,6 @@ import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 
 import type { Selector } from '../../types'
 import type {
-  WellContents,
   WellContentsByLabware,
   ContentsByWell,
 } from '../../labware-ingred/types'
@@ -31,10 +30,10 @@ export type { WellContentsByLabware }
 function _wellContentsForWell(
   liquidVolState: StepGeneration.LocationLiquidState,
   well: string
-): WellContents {
+): $Values<ContentsByWell> {
   // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}
   const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(
-    groupId => liquidVolState[groupId] && liquidVolState[groupId] > 0
+    groupId => liquidVolState?.[groupId] && liquidVolState[groupId] > 0
   )
 
   return {
@@ -55,13 +54,13 @@ export function _wellContentsForLabware(
 
   return reduce(
     allWellsForContainer,
-    (wellAcc, well: string): { [well: string]: WellContents } => {
+    (wellAcc, well: string): { [well: string]: $Values<ContentsByWell> } => {
       const wellHasContents = labwareLiquids && labwareLiquids[well]
       return {
         ...wellAcc,
         [well]: wellHasContents
           ? _wellContentsForWell(labwareLiquids[well], well)
-          : {},
+          : null,
       }
     },
     {}
@@ -78,8 +77,14 @@ export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = 
       (
         labwareLiquids: StepGeneration.SingleLabwareLiquidState,
         labwareId: string
-      ) =>
-        _wellContentsForLabware(labwareLiquids, labwareEntities[labwareId].def)
+      ) => {
+        const contentz = _wellContentsForLabware(
+          labwareLiquids,
+          labwareEntities[labwareId].def
+        )
+        console.log('getAllWellContentsForActiveItem', { contentz, labwareId })
+        return contentz
+      }
     )
     return wellContentsByLabwareId
   }

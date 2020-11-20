@@ -135,17 +135,11 @@ const getLiquidGroupsOnDeck: MemoizedSelector<Array<string>> = createSelector(
       ingredLocationsByLabware,
       (byWell: $Values<typeof ingredLocationsByLabware>) =>
         forEach(byWell, (groupContents: $Values<typeof byWell>) => {
-          forEach(
-            groupContents,
-            (
-              contents: $Values<typeof groupContents>,
-              groupId: $Keys<typeof groupContents>
-            ) => {
-              if (contents > 0) {
-                liquidGroups.add(groupId)
-              }
+          forEach(groupContents, (contents: number, groupId: string) => {
+            if (contents && contents > 0) {
+              liquidGroups.add(groupId)
             }
-          )
+          })
         })
     )
     return [...liquidGroups]

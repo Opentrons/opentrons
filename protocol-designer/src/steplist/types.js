@@ -23,11 +23,11 @@ export type WellIngredientNames = { [ingredId: string]: string }
 // We tried to unify them with Maybes and Unions, but really they should be
 // treated as 2 distinct paths
 export type WellIngredientVolumeData =
-  | {
+  | ?{
       // single-channel format
       [ingredId: string]: number,
     }
-  | {
+  | ?{
       // multi-channel 'by well' format
       [well: string]: { [ingredId: string]: number },
     }

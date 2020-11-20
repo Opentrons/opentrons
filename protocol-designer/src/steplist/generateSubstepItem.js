@@ -192,14 +192,15 @@ export const mergeSubstepRowsMultiChannel = (args: {|
         const source = currentMultiRow.source &&
           sourceChannelWell && {
             well: sourceChannelWell,
-            preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
-            postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
+            preIngreds: currentMultiRow.source.preIngreds?.[sourceChannelWell],
+            postIngreds:
+              currentMultiRow.source.postIngreds?.[sourceChannelWell],
           }
         const dest = nextMultiRow.dest &&
           destChannelWell && {
             well: destChannelWell,
-            preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
-            postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
+            preIngreds: nextMultiRow.dest.preIngreds?.[destChannelWell],
+            postIngreds: nextMultiRow.dest.postIngreds?.[destChannelWell],
           }
         const activeTips = currentMultiRow.activeTips
         return {
@@ -217,22 +218,22 @@ export const mergeSubstepRowsMultiChannel = (args: {|
         const source = currentMultiRow.source && {
           well: currentMultiRow.source.wells[channelIndex],
           preIngreds:
-            currentMultiRow.source.preIngreds[
+            currentMultiRow.source.preIngreds?.[
               currentMultiRow.source.wells[channelIndex]
             ],
           postIngreds:
-            currentMultiRow.source.postIngreds[
+            currentMultiRow.source.postIngreds?.[
               currentMultiRow.source.wells[channelIndex]
             ],
         }
         const dest = currentMultiRow.dest && {
           well: currentMultiRow.dest.wells[channelIndex],
           preIngreds:
-            currentMultiRow.dest.preIngreds[
+            currentMultiRow.dest.preIngreds?.[
               currentMultiRow.dest.wells[channelIndex]
             ],
           postIngreds:
-            currentMultiRow.dest.postIngreds[
+            currentMultiRow.dest.postIngreds?.[
               currentMultiRow.dest.wells[channelIndex]
             ],
         }

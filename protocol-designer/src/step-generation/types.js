@@ -263,7 +263,9 @@ type TipId = string
 
 // Volume of each "ingredient" in a location.
 // (Location = wells in a labware, or tips on a pipette.)
-export type LocationLiquidState = {
+// This is a sparse representation -- if LocationLiquidState is nullsy,
+// that means the well has no liquid contents.
+export type LocationLiquidState = ?{
   [ingredGroup: string]: number,
 }
 

@@ -37,37 +37,38 @@ type PillTooltipContentsProps = {
 export const PillTooltipContents = (
   props: PillTooltipContentsProps
 ): React.Node => {
-  const totalLiquidVolume = reduce(
-    props.ingreds,
-    (acc, ingred) => acc + ingred.volume,
-    0
-  )
-  const hasMultipleIngreds = Object.keys(props.ingreds).length > 1
+  const totalLiquidVolume = props.ingreds
+    ? reduce(props.ingreds, (acc, ingred) => acc + ingred.volume, 0)
+    : 0
+  const hasMultipleIngreds = props.ingreds
+    ? Object.keys(props.ingreds).length > 1
+    : false
   return (
     <div className={styles.liquid_tooltip_contents}>
       <table>
         <tbody>
-          {map(props.ingreds, (ingred, groupId) => (
-            <tr key={groupId} className={styles.ingred_row}>
-              <td>
-                <div
-                  className={styles.liquid_circle}
-                  style={{ backgroundColor: swatchColors(Number(groupId)) }}
-                />
-              </td>
-              <td className={styles.ingred_name}>
-                {props.ingredNames[groupId]}
-              </td>
-              {hasMultipleIngreds && (
-                <td className={styles.ingred_percentage}>
-                  {formatPercentage(ingred.volume, totalLiquidVolume)}
+          {props.ingreds &&
+            map(props.ingreds, (ingred, groupId) => (
+              <tr key={groupId} className={styles.ingred_row}>
+                <td>
+                  <div
+                    className={styles.liquid_circle}
+                    style={{ backgroundColor: swatchColors(Number(groupId)) }}
+                  />
                 </td>
-              )}
-              <td className={styles.ingred_partial_volume}>
-                {formatVolume(ingred.volume, 2)}µl
-              </td>
-            </tr>
-          ))}
+                <td className={styles.ingred_name}>
+                  {props.ingredNames[groupId]}
+                </td>
+                {hasMultipleIngreds && (
+                  <td className={styles.ingred_percentage}>
+                    {formatPercentage(ingred.volume, totalLiquidVolume)}
+                  </td>
+                )}
+                <td className={styles.ingred_partial_volume}>
+                  {formatVolume(ingred.volume, 2)}µl
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
       {hasMultipleIngreds && (
@@ -87,13 +88,13 @@ function SubstepRowComponent(props: SubstepRowProps) {
   const compactedSourcePreIngreds = props.source
     ? omitBy(
         props.source.preIngreds,
-        ingred => typeof ingred.volume === 'number' && ingred.volume <= 0
+        ingred => typeof ingred === 'number' && ingred <= 0
       )
     : {}
   const compactedDestPreIngreds = props.dest
     ? omitBy(
         props.dest.preIngreds,
-        ingred => typeof ingred.volume === 'number' && ingred.volume <= 0
+        ingred => typeof ingred === 'number' && ingred <= 0
       )
     : {}
   const selectSubstep = props.selectSubstep || noop

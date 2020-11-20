@@ -48,7 +48,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
 
   const wellsWithIngred = Object.keys(labwareWellContents)
     .sort(sortWells)
-    .filter(well => labwareWellContents[well][groupId])
+    .filter(well => labwareWellContents[well]?.[groupId])
 
   if (wellsWithIngred.length < 1) {
     // do not show liquid card if it has no instances for this labware
@@ -73,7 +73,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
       </PDListItem>
 
       {wellsWithIngred.map((well, i) => {
-        const wellIngredForCard = labwareWellContents[well][groupId]
+        const wellIngredForCard = labwareWellContents[well]?.[groupId]
         const volume = wellIngredForCard
 
         if (volume == null) {

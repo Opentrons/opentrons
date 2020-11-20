@@ -53,7 +53,7 @@ export class WellTooltip extends React.Component<Props, State> {
     if (target instanceof Element) {
       const wellBoundingRect = target.getBoundingClientRect()
       const { left, top, height, width } = wellBoundingRect
-      if (Object.keys(wellIngreds).length > 0 && left && top) {
+      if (wellIngreds && Object.keys(wellIngreds).length > 0 && left && top) {
         this.setState({
           tooltipX: left + width / 2,
           tooltipY: top + height / 2,

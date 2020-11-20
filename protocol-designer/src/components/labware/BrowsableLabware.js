@@ -43,7 +43,7 @@ export function BrowsableLabware(props: Props): React.Node {
             {}
           )}
           onMouseEnterWell={({ event, wellName }) =>
-            makeHandleMouseEnterWell(wellName, wellContents[wellName].ingreds)(
+            makeHandleMouseEnterWell(wellName, wellContents[wellName]?.ingreds)(
               event
             )
           }

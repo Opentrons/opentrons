@@ -4,7 +4,6 @@ import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import uniqBy from 'lodash/uniqBy'
-import { getAllWellsForLabware } from '../../constants'
 import * as StepGeneration from '../../step-generation'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -20,43 +19,44 @@ import type {
   PipetteTemporalProperties,
 } from '../../step-forms'
 
+// TODO IMMEDIATELY: remove
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
-export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
-  labwareIngredSelectors.getLiquidsByLabwareId,
-  stepFormSelectors.getLabwareEntities,
-  (ingredLocations, labwareEntities) => {
-    const allLabwareIds: Array<string> = Object.keys(labwareEntities)
-    return allLabwareIds.reduce(
-      (
-        acc: StepGeneration.LabwareLiquidState,
-        labwareId
-      ): StepGeneration.LabwareLiquidState => {
-        const labwareDef = labwareEntities[labwareId].def
-        const allWells = labwareDef ? getAllWellsForLabware(labwareDef) : []
-        const liquidStateForLabwareAllWells = allWells.reduce(
-          (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
-            ...innerAcc,
-            [well]:
-              (ingredLocations[labwareId] &&
-                ingredLocations[labwareId][well]) ||
-              {},
-          }),
-          {}
-        )
-        return {
-          ...acc,
-          [labwareId]: liquidStateForLabwareAllWells,
-        }
-      },
-      {}
-    )
-  }
-)
+// export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
+//   labwareIngredSelectors.getLiquidsByLabwareId,
+//   stepFormSelectors.getLabwareEntities,
+//   (ingredLocations, labwareEntities) => {
+//     const allLabwareIds: Array<string> = Object.keys(labwareEntities)
+//     return allLabwareIds.reduce(
+//       (
+//         acc: StepGeneration.LabwareLiquidState,
+//         labwareId
+//       ): StepGeneration.LabwareLiquidState => {
+//         const labwareDef = labwareEntities[labwareId].def
+//         const allWells = labwareDef ? getAllWellsForLabware(labwareDef) : []
+//         const liquidStateForLabwareAllWells = allWells.reduce(
+//           (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
+//             ...innerAcc,
+//             [well]:
+//               (ingredLocations[labwareId] &&
+//                 ingredLocations[labwareId][well]) ||
+//               {},
+//           }),
+//           {}
+//         )
+//         return {
+//           ...acc,
+//           [labwareId]: liquidStateForLabwareAllWells,
+//         }
+//       },
+//       {}
+//     )
+//   }
+// )
 
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getInvariantContext,
-  getLabwareLiquidState,
+  labwareIngredSelectors.getLiquidsByLabwareId,
   (initialDeckSetup, invariantContext, labwareLiquidState) => {
     const labware: {
       [labwareId: string]: LabwareTemporalProperties,

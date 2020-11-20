@@ -18,7 +18,7 @@ export type Wells = {
   ...,
 }
 
-export type WellContents = {|
+type WellContents = {|
   // non-ingredient well state, for SelectableLabware
   wellName: string, // eg 'A1', 'A2' etc
   groupIds: Array<string>,
@@ -26,7 +26,7 @@ export type WellContents = {|
 |}
 
 export type ContentsByWell = {
-  [wellName: string]: WellContents,
+  [wellName: string]: WellContents | null,
   ...,
 }
 
