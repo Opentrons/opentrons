@@ -125,8 +125,8 @@ describe('splitLiquid', () => {
   })
 
   it('splitting with no ingredients in source just splits "air"', () => {
-    expect(splitLiquid(100, {})).toEqual({
-      source: {},
+    expect(splitLiquid(100, null)).toEqual({
+      source: null,
       dest: { [AIR]: 100 },
     })
   })
@@ -728,7 +728,12 @@ describe('getLocationTotalVolume', () => {
     expect(result).toEqual(2 + 4)
   })
 
-  it('should return 0 for empty location', () => {
+  it('should return 0 for empty (null) location', () => {
+    const result = getLocationTotalVolume(null)
+    expect(result).toEqual(0)
+  })
+
+  it('should return 0 for empty ({}) location', () => {
     const result = getLocationTotalVolume({})
     expect(result).toEqual(0)
   })

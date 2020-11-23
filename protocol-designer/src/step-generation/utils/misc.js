@@ -83,7 +83,7 @@ export function splitLiquid(
     {}
   )
 
-  const emptySourceAndDest = { source: {}, dest: {} }
+  const emptySourceAndDest = { source: null, dest: null }
   if (!sourceLiquidState) {
     return emptySourceAndDest
   } else {
@@ -114,7 +114,8 @@ export function mergeLiquid(
     // include all ingreds exclusive to 'dest'
     ...dest,
 
-    ...reduce<LocationLiquidState, LocationLiquidState>(
+    // TODO IMMEDIATLELY don't use 'any' here
+    ...reduce<LocationLiquidState, any>(
       source,
       (acc, ingredVol: number, ingredId: string): LocationLiquidState => {
         const isCommonIngred = dest ? ingredId in dest : false
@@ -242,6 +243,7 @@ export function createEmptyLiquidState(
         const pipetteSpec = pipette.spec
         return {
           ...acc,
+          // TODO IMMEDIATELY should be OK with {}??
           [id]: createTipLiquidState(pipetteSpec.channels, {}),
         }
       },
@@ -250,7 +252,7 @@ export function createEmptyLiquidState(
     labware: reduce(
       labwareEntities,
       (acc, labware: LabwareEntity, id: string) => {
-        return { ...acc, [id]: mapValues(labware.def.wells, () => ({})) }
+        return { ...acc, [id]: {} }
       },
       {}
     ),

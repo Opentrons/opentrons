@@ -46,7 +46,7 @@ describe('generateSubstepItem', () => {
         commandCreatorFnName: 'deactivateTemperature',
         message: 'message',
       },
-      errors: {},
+      errors: null,
     }
 
     const result = generateSubstepItem(
@@ -98,7 +98,7 @@ describe('generateSubstepItem', () => {
 
   it('delay command returns pause substep data', () => {
     const stepArgsAndErrors = {
-      errors: {},
+      errors: null,
       stepArgs: {
         commandCreatorFnName: 'delay',
         message: 'test',
@@ -167,13 +167,13 @@ describe('generateSubstepItem', () => {
                 labware: tiprackId,
                 well: 'A1',
               },
-              source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+              source: { well: 'A1', preIngreds: null, postIngreds: null },
               dest: undefined,
               volume: 50,
             },
             {
               volume: 50,
-              source: { well: 'A2', preIngreds: {}, postIngreds: {} },
+              source: { well: 'A2', preIngreds: null, postIngreds: null },
               activeTips: {
                 pipette: pipetteId,
                 labware: tiprackId,
@@ -183,7 +183,7 @@ describe('generateSubstepItem', () => {
                 postIngreds: {
                   __air__: 100,
                 },
-                preIngreds: {},
+                preIngreds: null,
                 well: 'C1',
               },
             },
@@ -218,12 +218,12 @@ describe('generateSubstepItem', () => {
                 postIngreds: {
                   __air__: 50,
                 },
-                preIngreds: {},
+                preIngreds: null,
                 well: 'A1',
               },
               source: {
-                postIngreds: {},
-                preIngreds: {},
+                postIngreds: null,
+                preIngreds: null,
                 well: 'A1',
               },
               volume: 50,
@@ -238,7 +238,7 @@ describe('generateSubstepItem', () => {
                 postIngreds: {
                   __air__: 50,
                 },
-                preIngreds: {},
+                preIngreds: null,
                 well: 'A2',
               },
               source: undefined,
@@ -272,10 +272,10 @@ describe('generateSubstepItem', () => {
                 labware: tiprackId,
                 well: 'A1',
               },
-              source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+              source: { well: 'A1', preIngreds: null, postIngreds: null },
               dest: {
                 well: 'A1',
-                preIngreds: {},
+                preIngreds: null,
                 postIngreds: {
                   __air__: 50,
                 },
@@ -284,7 +284,7 @@ describe('generateSubstepItem', () => {
             },
             {
               volume: 50,
-              source: { well: 'A2', preIngreds: {}, postIngreds: {} },
+              source: { well: 'A2', preIngreds: null, postIngreds: null },
               activeTips: {
                 pipette: pipetteId,
                 labware: tiprackId,
@@ -294,7 +294,7 @@ describe('generateSubstepItem', () => {
                 postIngreds: {
                   __air__: 50,
                 },
-                preIngreds: {},
+                preIngreds: null,
                 well: 'A2',
               },
             },
@@ -304,7 +304,7 @@ describe('generateSubstepItem', () => {
     ].forEach(({ testName, stepArgs, expected }) => {
       it(testName, () => {
         const stepArgsAndErrors = {
-          errors: {},
+          errors: null,
           stepArgs: { ...sharedArgs, ...stepArgs },
         }
 
@@ -342,7 +342,7 @@ describe('generateSubstepItem', () => {
         aspirateFlowRateUlSec: 5,
         dispenseFlowRateUlSec: 5,
       },
-      errors: {},
+      errors: null,
     }
 
     const result = generateSubstepItem(
@@ -368,12 +368,12 @@ describe('generateSubstepItem', () => {
             postIngreds: {
               __air__: 50,
             },
-            preIngreds: {},
+            preIngreds: null,
             well: 'A1',
           },
           source: {
-            postIngreds: {},
-            preIngreds: {},
+            postIngreds: null,
+            preIngreds: null,
             well: 'A1',
           },
           volume: 50,
@@ -414,12 +414,12 @@ describe('generateSubstepItem', () => {
             postIngreds: {
               __air__: 50,
             },
-            preIngreds: {},
+            preIngreds: null,
             well: 'A2',
           },
           source: {
-            postIngreds: {},
-            preIngreds: {},
+            postIngreds: null,
+            preIngreds: null,
             well: 'A2',
           },
           volume: 50,
@@ -458,7 +458,7 @@ describe('generateSubstepItem', () => {
 
   it('engageMagnet returns substep data with engage = true', () => {
     const stepArgsAndErrors = {
-      errors: {},
+      errors: null,
       stepArgs: {
         module: 'magnet123',
         commandCreatorFnName: 'engageMagnet',
@@ -484,7 +484,7 @@ describe('generateSubstepItem', () => {
 
   it('disengageMagnet returns substep data with engage = false', () => {
     const stepArgsAndErrors = {
-      errors: {},
+      errors: null,
       stepArgs: {
         module: 'magnet123',
         commandCreatorFnName: 'disengageMagnet',
@@ -510,7 +510,7 @@ describe('generateSubstepItem', () => {
 
   it('setTemperature returns substep data with temperature', () => {
     const stepArgsAndErrors = {
-      errors: {},
+      errors: null,
       stepArgs: {
         module: 'tempId',
         commandCreatorFnName: 'setTemperature',
@@ -537,7 +537,7 @@ describe('generateSubstepItem', () => {
 
   it('setTemperature returns temperature when 0', () => {
     const stepArgsAndErrors = {
-      errors: {},
+      errors: null,
       stepArgs: {
         module: 'tempId',
         commandCreatorFnName: 'setTemperature',
@@ -564,7 +564,7 @@ describe('generateSubstepItem', () => {
 
   it('deactivateTemperature returns substep data with null temp', () => {
     const stepArgsAndErrors = {
-      errors: {},
+      errors: null,
       stepArgs: {
         module: 'tempId',
         commandCreatorFnName: 'deactivateTemperature',
@@ -590,7 +590,7 @@ describe('generateSubstepItem', () => {
 
   it('thermocyclerState returns substep data', () => {
     const stepArgsAndErrors = {
-      errors: {},
+      errors: null,
       stepArgs: {
         module: 'thermocyclerModuleId',
         commandCreatorFnName: THERMOCYCLER_STATE,
@@ -619,7 +619,7 @@ describe('generateSubstepItem', () => {
 
   it('null is returned when no matching command', () => {
     const stepArgsAndErrors = {
-      errors: {},
+      errors: null,
       stepArgs: {
         commandCreatorFnName: 'nonexistentCommand',
       },

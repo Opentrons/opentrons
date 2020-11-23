@@ -79,11 +79,13 @@ export const substepTimelineSingleChannel = (
 
       if (command.command === 'aspirate' || command.command === 'dispense') {
         const { well, volume, labware } = command.params
-        const wellInfo = {
+        const wellInfo: SourceDestData = {
           labware,
           wells: [well],
-          preIngreds: acc.prevRobotState.liquidState.labware[labware][well],
-          postIngreds: nextRobotState.liquidState.labware[labware][well],
+          preIngreds:
+            acc.prevRobotState.liquidState.labware[labware][well] || null,
+          postIngreds:
+            nextRobotState.liquidState.labware[labware][well] || null,
         }
 
         return {

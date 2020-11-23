@@ -67,8 +67,6 @@ describe('...single-channel pipette', () => {
       labware: {
         sourcePlateId: {
           A1: { ingred1: 150 },
-          A2: {},
-          B1: {},
         },
       },
     })
@@ -108,8 +106,6 @@ describe('...single-channel pipette', () => {
       labware: {
         sourcePlateId: {
           A1: { ingred1: 150 },
-          A2: {},
-          B1: {},
         },
       },
     })
@@ -157,8 +153,6 @@ describe('...single-channel pipette', () => {
             ingred1: 150 + 30,
             ingred2: 50,
           },
-          A2: {},
-          B1: {},
         },
       },
     })
@@ -209,8 +203,6 @@ describe('...single-channel pipette', () => {
             ingred2: 100 + 25,
             ingred3: 20,
           },
-          A2: {},
-          B1: {},
         },
       },
     })
@@ -261,8 +253,6 @@ describe('...single-channel pipette', () => {
             ingred2: 25 + (200 - 80),
             ingred3: 0 + 20,
           },
-          A2: {},
-          B1: {},
         },
       },
     })
@@ -305,7 +295,6 @@ describe('...8-channel pipette', () => {
               ingred2: 25 + 150,
               ingred3: 20,
             },
-            A2: {},
           },
         },
       },
@@ -318,23 +307,13 @@ describe('...8-channel pipette', () => {
               ingred2: 25 + 150,
               ingred3: 20,
             },
-            C1: {},
             E1: { ingred1: 150 },
             G1: { ingred1: 150 },
             I1: { ingred1: 150 },
             K1: { ingred1: 150 },
             M1: { ingred1: 150 },
             O1: { ingred1: 150 },
-
-            // odd rows out
-            B1: {},
-            D1: {},
-            F1: {},
-            H1: {},
-            J1: {},
-            L1: {},
-            N1: {},
-            P1: {},
+            // C1 and the even rows out
           },
         },
       },
@@ -358,7 +337,7 @@ describe('...8-channel pipette', () => {
               '0': {
                 ingred2: 200,
               },
-              '1': {},
+              '1': null,
             },
           },
           labware: {
@@ -390,7 +369,7 @@ describe('...8-channel pipette', () => {
               '0': {
                 ingred2: 50,
               },
-              '1': {},
+              '1': null,
             },
           },
           labware: expectedLabwareMatch,

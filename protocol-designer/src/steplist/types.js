@@ -22,15 +22,16 @@ export type WellIngredientNames = { [ingredId: string]: string }
 // TODO: IL 2019-11-26 untangle single vs multi-channel data types for substeps.
 // We tried to unify them with Maybes and Unions, but really they should be
 // treated as 2 distinct paths
-export type WellIngredientVolumeData =
-  | ?{
+export type WellIngredientVolumeData = ?(
+  | {
       // single-channel format
       [ingredId: string]: number,
     }
-  | ?{
+  | {
       // multi-channel 'by well' format
       [well: string]: { [ingredId: string]: number },
     }
+)
 
 export type TipLocation = { labware: string, well: string }
 
@@ -44,11 +45,12 @@ export type NamedIngred = {|
   name: string,
 |}
 
-export type SourceDestData = {
+export type SourceDestData = {|
+  labware?: string, // TODO IMMEDIATELY is labware really a key here?
   wells: Array<string>,
   preIngreds: WellIngredientVolumeData,
   postIngreds: WellIngredientVolumeData,
-}
+|}
 
 export type SubstepTimelineFrame = {|
   substepIndex?: number,

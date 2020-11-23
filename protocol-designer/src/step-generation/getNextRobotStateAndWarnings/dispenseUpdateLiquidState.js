@@ -58,6 +58,8 @@ export function dispenseUpdateLiquidState(
     well
   )
   const liquidLabware = prevLiquidState.labware[labware]
+  // TODO IMMEDIATELY left off here
+  console.log('dispenseUpdateLiquidState', { liquidLabware })
 
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states
@@ -69,7 +71,7 @@ export function dispenseUpdateLiquidState(
         const totalTipVolume = getLocationTotalVolume(prevTipLiquidState)
         return totalTipVolume > 0
           ? splitLiquid(totalTipVolume, prevTipLiquidState)
-          : { source: {}, dest: {} }
+          : { source: null, dest: null }
       }
       return splitLiquid(volume || 0, prevTipLiquidState)
     }
@@ -92,7 +94,7 @@ export function dispenseUpdateLiquidState(
         ...acc,
         [wellForTip]: mergeLiquid(
           splitLiquidStates[`${tipIdx}`].dest,
-          liquidLabware[wellForTip] || {} // TODO Ian 2018-04-02 use robotState selector. (Liquid state falls back to {} for empty well)
+          liquidLabware[wellForTip] || null
         ),
       }
     },

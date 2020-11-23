@@ -63,7 +63,6 @@ describe('...single-channel pipette', () => {
         labware: {
           [labwareId]: {
             A1: { ingred1: 150 },
-            A2: {},
           },
         },
       })
@@ -93,7 +92,6 @@ describe('...single-channel pipette', () => {
         labware: {
           [labwareId]: {
             A1: { ingred1: 0 },
-            A2: {},
           },
         },
       })
