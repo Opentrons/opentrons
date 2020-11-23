@@ -1,5 +1,7 @@
 // @flow
 import { migration } from './migration'
+import { selectors as fileDataSelectors } from '../file-data'
+import { saveFile } from './utils'
 import type { PDProtocolFile } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
 import type {
@@ -8,6 +10,7 @@ import type {
   LoadFileAction,
   NewProtocolFields,
 } from './types'
+
 export type FileUploadMessageAction = {|
   type: 'FILE_UPLOAD_MESSAGE',
   payload: FileUploadMessage,
@@ -90,6 +93,19 @@ export const createNewProtocol = (
 })
 
 export type SaveProtocolFileAction = {| type: 'SAVE_PROTOCOL_FILE' |}
-export const saveProtocolFile = (): SaveProtocolFileAction => ({
-  type: 'SAVE_PROTOCOL_FILE',
-})
+export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () => (
+  dispatch,
+  getState
+) => {
+  // dispatching this should update the state, eg lastModified timestamp
+  dispatch({ type: 'SAVE_PROTOCOL_FILE' })
+
+  const state = getState()
+  const fileData = fileDataSelectors.createFile(state)
+
+  const protocolName =
+    fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
+  const fileName = `${protocolName}.json`
+
+  saveFile(fileData, fileName)
+}

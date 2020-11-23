@@ -17,7 +17,7 @@ type Props = React.ElementProps<typeof FileSidebarComponent>
 
 type SP = {|
   canDownload: boolean,
-  downloadData: $PropertyType<Props, 'downloadData'>,
+  fileData: $PropertyType<Props, 'fileData'>,
   _canCreateNew: ?boolean,
   _hasUnsavedChanges: ?boolean,
   pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
@@ -40,18 +40,13 @@ export const FileSidebar: React.AbstractComponent<{||}> = connect<
 )(FileSidebarComponent)
 
 function mapStateToProps(state: BaseState): SP {
-  const protocolName =
-    fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
   const canDownload = selectors.getCurrentPage(state) !== 'file-splash'
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
 
   return {
     canDownload,
-    downloadData: {
-      fileData,
-      fileName: protocolName + '.json',
-    },
+    fileData,
     pipettesOnDeck: initialDeckSetup.pipettes,
     modulesOnDeck: initialDeckSetup.modules,
     savedStepForms: stepFormSelectors.getSavedStepForms(state),
@@ -70,7 +65,7 @@ function mergeProps(
     _canCreateNew,
     _hasUnsavedChanges,
     canDownload,
-    downloadData,
+    fileData,
     pipettesOnDeck,
     modulesOnDeck,
     savedStepForms,
@@ -91,7 +86,7 @@ function mergeProps(
       ? () => dispatch(actions.toggleNewProtocolModal(true))
       : undefined,
     onDownload: () => dispatch(loadFileActions.saveProtocolFile()),
-    downloadData,
+    fileData,
     pipettesOnDeck,
     modulesOnDeck,
     savedStepForms,

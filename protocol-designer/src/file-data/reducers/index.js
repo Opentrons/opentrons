@@ -69,6 +69,7 @@ function newProtocolMetadata(
     ...defaultFields,
     protocolName: action.payload.name || '',
     created: Date.now(),
+    lastModified: null,
   }
 }
 

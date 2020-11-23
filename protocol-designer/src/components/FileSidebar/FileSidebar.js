@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { saveAs } from 'file-saver'
 import {
   PrimaryButton,
   AlertModal,
@@ -31,22 +30,12 @@ type Props = {|
   createNewFile?: () => mixed,
   canDownload: boolean,
   onDownload: () => mixed,
-  downloadData: {
-    fileData: PDProtocolFile,
-    fileName: string,
-  },
+  fileData: ?PDProtocolFile,
   pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
   modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
   savedStepForms: SavedStepFormState,
   schemaVersion: number,
 |}
-
-const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
-  const blob = new Blob([JSON.stringify(downloadData.fileData)], {
-    type: 'application/json',
-  })
-  saveAs(blob, downloadData.fileName)
-}
 
 type WarningContent = {|
   content: React.Node,
@@ -168,7 +157,7 @@ export const v5WarningContent: React.Node = (
 export function FileSidebar(props: Props): React.Node {
   const {
     canDownload,
-    downloadData,
+    fileData,
     loadFile,
     createNewFile,
     onDownload,
@@ -186,7 +175,7 @@ export function FileSidebar(props: Props): React.Node {
 
   const cancelModal = () => setShowExportWarningModal(false)
 
-  const noCommands = downloadData && downloadData.fileData.commands.length === 0
+  const noCommands = fileData ? fileData.commands.length === 0 : true
   const pipettesWithoutStep = getUnusedEntities(
     pipettesOnDeck,
     savedStepForms,
@@ -231,7 +220,7 @@ export function FileSidebar(props: Props): React.Node {
     handleCancel: () => setShowBlockingHint(false),
     handleContinue: () => {
       setShowBlockingHint(false)
-      saveFile(downloadData)
+      onDownload()
     },
   })
 
@@ -258,7 +247,7 @@ export function FileSidebar(props: Props): React.Node {
                     setShowExportWarningModal(false)
                     setShowBlockingHint(true)
                   } else {
-                    saveFile(downloadData)
+                    onDownload()
                     setShowExportWarningModal(false)
                   }
                 },
@@ -290,7 +279,6 @@ export function FileSidebar(props: Props): React.Node {
                   resetScrollElements()
                   setShowBlockingHint(true)
                 } else {
-                  saveFile(downloadData)
                   onDownload()
                 }
               }}
