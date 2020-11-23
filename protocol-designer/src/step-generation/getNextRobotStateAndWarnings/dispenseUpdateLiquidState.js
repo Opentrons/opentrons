@@ -58,8 +58,6 @@ export function dispenseUpdateLiquidState(
     well
   )
   const liquidLabware = prevLiquidState.labware[labware]
-  // TODO IMMEDIATELY left off here
-  console.log('dispenseUpdateLiquidState', { liquidLabware })
 
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states

@@ -113,7 +113,6 @@ const mapStateToProps = (state: BaseState): SP => {
   wellContents = wellContentsSelectors.getWellContentsAllLabware(state)[
     labwareId
   ]
-  console.log('liquidplacementmodal', { wellContents })
 
   return {
     selectedWells,

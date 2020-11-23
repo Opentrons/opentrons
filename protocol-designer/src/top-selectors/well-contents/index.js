@@ -1,7 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
 import isEmpty from 'lodash/isEmpty'
-import mapValues from 'lodash/mapValues'
 import min from 'lodash/min'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
@@ -72,20 +71,21 @@ export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = 
   timelineFrameBeforeActiveItem,
   (labwareEntities, timelineFrame) => {
     const liquidState = timelineFrame.robotState.liquidState.labware
-    const wellContentsByLabwareId = mapValues(
-      liquidState,
+    const wellContentsByLabwareId = Object.keys(labwareEntities).reduce(
       (
-        labwareLiquids: StepGeneration.SingleLabwareLiquidState,
+        acc: WellContentsByLabware,
         labwareId: string
-      ) => {
-        const contentz = _wellContentsForLabware(
-          labwareLiquids,
+      ): WellContentsByLabware => {
+        const liquids = liquidState[labwareId]
+        const contents = _wellContentsForLabware(
+          liquids,
           labwareEntities[labwareId].def
         )
-        console.log('getAllWellContentsForActiveItem', { contentz, labwareId })
-        return contentz
-      }
+        return { ...acc, [labwareId]: contents }
+      },
+      {}
     )
+
     return wellContentsByLabwareId
   }
 )

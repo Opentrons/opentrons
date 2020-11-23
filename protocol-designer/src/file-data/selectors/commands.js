@@ -91,7 +91,19 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       moduleLocations: modules,
       pipetteLocations: pipettes,
     })
-    robotState.liquidState.labware = labwareLiquidState
+    // console.log('initial robot liq state, raw', {
+    //   ...robotState.liquidState.labware,
+    // })
+
+    // TODO IMMEDIATELY: this SHOULD be adding only empty labware keys (eg `trashId: {}` is not in labwareLiquidState)
+    // Trace better and see if you can do it more elegantly.
+    // Before, it was `robotState.liquidState.labware = labwareLiquidState`
+    robotState.liquidState.labware = {
+      ...robotState.liquidState.labware,
+      ...labwareLiquidState,
+    }
+
+    // console.log('initial robot state', robotState)
     return robotState
   }
 )

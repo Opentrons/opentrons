@@ -43,12 +43,13 @@ export const PillTooltipContents = (
   const hasMultipleIngreds = props.ingreds
     ? Object.keys(props.ingreds).length > 1
     : false
+
   return (
     <div className={styles.liquid_tooltip_contents}>
       <table>
         <tbody>
           {props.ingreds &&
-            map(props.ingreds, (ingred, groupId) => (
+            map(props.ingreds, (ingred: number, groupId): React.Node => (
               <tr key={groupId} className={styles.ingred_row}>
                 <td>
                   <div
@@ -61,11 +62,11 @@ export const PillTooltipContents = (
                 </td>
                 {hasMultipleIngreds && (
                   <td className={styles.ingred_percentage}>
-                    {formatPercentage(ingred.volume, totalLiquidVolume)}
+                    {formatPercentage(ingred, totalLiquidVolume)}
                   </td>
                 )}
                 <td className={styles.ingred_partial_volume}>
-                  {formatVolume(ingred.volume, 2)}µl
+                  {formatVolume(ingred, 2)}µl
                 </td>
               </tr>
             ))}
