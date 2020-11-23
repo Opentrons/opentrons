@@ -1,7 +1,8 @@
 """Base state store classes."""
 from abc import ABC
 from typing import Generic, TypeVar
-from ..command_models import CompletedCommandType
+
+from ..commands import CompletedCommandType
 
 
 SubstateT = TypeVar("SubstateT")

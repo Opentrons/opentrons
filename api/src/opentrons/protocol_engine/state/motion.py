@@ -11,7 +11,7 @@ from opentrons.motion_planning import (
     get_waypoints,
 )
 
-from .. import command_models as cmd, errors
+from .. import commands, errors
 from .substore import Substore, CommandReactive
 from .labware import LabwareStore
 from .pipettes import PipetteStore
@@ -158,12 +158,12 @@ class MotionStore(Substore[MotionState], CommandReactive):
 
     def handle_completed_command(
         self,
-        command: cmd.CompletedCommandType
+        command: commands.CompletedCommandType
     ) -> None:
         """Modify state in reaction to a CompletedCommand."""
         if isinstance(
             command.result,
-            (cmd.MoveToWellResult, cmd.AspirateResult, cmd.DispenseResult)
+            (commands.MoveToWellResult, commands.PickUpTipResult),
         ):
             self._state._current_location = LocationData(
                 pipette_id=command.request.pipetteId,

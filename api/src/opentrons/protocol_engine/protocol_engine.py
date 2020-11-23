@@ -7,15 +7,13 @@ from opentrons.protocols.api_support.constants import STANDARD_DECK
 from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.util.helpers import utc_now
 
-from .execution import CommandExecutor
+from .errors import ProtocolEngineError, UnexpectedProtocolError
+from .execution import CommandHandlers
 from .state import StateStore, StateView
-
-from .command_models import (
+from .commands import (
     CommandRequestType,
-    RunningCommandType,
     CompletedCommandType,
     FailedCommandType,
-    RunningCommand
 )
 
 
@@ -28,22 +26,25 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
+    state_store: StateStore
+    _handlers: CommandHandlers
+
     @classmethod
     def create(cls, hardware: HardwareAPI) -> ProtocolEngine:
         """Create a ProtocolEngine instance."""
         deck_definition = load_deck(STANDARD_DECK, 2)
         state_store = StateStore(deck_definition=deck_definition)
-        executor = CommandExecutor.create(
+        handlers = CommandHandlers.create(
             hardware=hardware,
             state=StateView.create_view(state_store)
         )
 
-        return cls(state_store=state_store, executor=executor)
+        return cls(state_store=state_store, handlers=handlers)
 
     def __init__(
         self,
         state_store: StateStore,
-        executor: CommandExecutor,
+        handlers: CommandHandlers,
     ) -> None:
         """
         Initialize a ProtocolEngine instance.
@@ -52,23 +53,35 @@ class ProtocolEngine:
         ProtocolEngine.create factory classmethod.
         """
         self.state_store = state_store
-        self.executor = executor
+        self._handlers = handlers
 
     async def execute_command(
         self,
         request: CommandRequestType,
         command_id: str,
     ) -> Union[CompletedCommandType, FailedCommandType]:
-        """Handle a command request by creating and executing the command."""
+        """Execute a command request, waiting for it to complete."""
+        cmd_impl = request.get_implementation()
         created_at = utc_now()
-        cmd: RunningCommandType = RunningCommand(  # type: ignore[assignment]
-            created_at=created_at,
-            started_at=created_at,
-            request=request,
-        )
+        cmd = cmd_impl.create_command(created_at).to_running(created_at)
+        done_cmd: Union[CompletedCommandType, FailedCommandType]
 
+        # store the command prior to execution
         self.state_store.handle_command(cmd, command_id=command_id)
-        completed_cmd = await self.executor.execute_command(cmd)
-        self.state_store.handle_command(completed_cmd, command_id=command_id)
 
-        return completed_cmd
+        # execute the command
+        try:
+            result = await cmd_impl.execute(self._handlers)
+            completed_at = utc_now()
+            done_cmd = cmd.to_completed(result, completed_at)
+
+        except Exception as error:
+            failed_at = utc_now()
+            if not isinstance(error, ProtocolEngineError):
+                error = UnexpectedProtocolError(error)
+            done_cmd = cmd.to_failed(error, failed_at)
+
+        # store the done command
+        self.state_store.handle_command(done_cmd, command_id=command_id)
+
+        return done_cmd

@@ -2,7 +2,6 @@
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..state import StateView
-from ..command_models import PickUpTipRequest, PickUpTipResult
 from .movement import MovementHandler
 
 
@@ -24,12 +23,13 @@ class PipettingHandler:
         self._hardware = hardware
         self._movement_handler = movement_handler
 
-    async def handle_pick_up_tip(self, request: PickUpTipRequest) -> PickUpTipResult:
+    async def pick_up_tip(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+    ) -> None:
         """Pick up a tip at the specified "well"."""
-        pipette_id = request.pipetteId
-        labware_id = request.labwareId
-        well_name = request.wellName
-
         # get mount and config data from state and hardware controller
         hw_pipette = self._state.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
@@ -44,7 +44,11 @@ class PipettingHandler:
         )
 
         # move the pipette to the top of the tip
-        await self._movement_handler.handle_move_to_well(request)
+        await self._movement_handler.move_to_well(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+        )
 
         # perform the tip pickup routine
         await self._hardware.pick_up_tip(
@@ -64,5 +68,3 @@ class PipettingHandler:
             mount=hw_pipette.mount,
             tip_volume=tip_geometry.volume
         )
-
-        return PickUpTipResult()

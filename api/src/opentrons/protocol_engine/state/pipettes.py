@@ -7,7 +7,8 @@ from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
-from .. import command_models as cmd, errors
+from .. import errors
+from ..commands import CompletedCommandType, LoadPipetteResult
 from .substore import Substore, CommandReactive
 
 
@@ -95,12 +96,9 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
         """Initialize a PipetteStore and its state."""
         self._state = PipetteState()
 
-    def handle_completed_command(
-        self,
-        command: cmd.CompletedCommandType
-    ) -> None:
+    def handle_completed_command(self, command: CompletedCommandType) -> None:
         """Modify state in reaction to a completed command."""
-        if isinstance(command.result, cmd.LoadPipetteResult):
+        if isinstance(command.result, LoadPipetteResult):
             pipette_id = command.result.pipetteId
             self._state._pipettes_by_id[pipette_id] = PipetteData(
                 pipette_name=command.request.pipetteName,

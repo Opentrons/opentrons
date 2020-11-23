@@ -4,7 +4,7 @@ from typing import List
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 
-from .. import command_models as cmd
+from .. import commands as cmd
 from .substore import CommandReactive
 from .commands import CommandStore, CommandState
 from .labware import LabwareStore, LabwareState

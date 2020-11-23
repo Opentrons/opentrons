@@ -1,11 +1,18 @@
-"""Command model and type definitions."""
+"""Base command data model and type definitions."""
 from __future__ import annotations
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Generic, TypeVar, Union
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from ..errors import ProtocolEngineError
+
+# convenience type alias to work around type-only circular dependency
+if TYPE_CHECKING:
+    from ..execution import CommandHandlers
+else:
+    CommandHandlers = None
 
 ReqT = TypeVar("ReqT", bound=BaseModel)
 ResT = TypeVar("ResT", bound=BaseModel)
@@ -86,9 +93,28 @@ class PendingCommand(Generic[ReqT, ResT]):
         )
 
 
-GenericCommandType = Union[
-    PendingCommand[ReqT, ResT],
-    RunningCommand[ReqT, ResT],
-    CompletedCommand[ReqT, ResT],
-    FailedCommand[ReqT]
-]
+class CommandImplementation(ABC, Generic[ReqT, ResT]):
+    """
+    Abstract command implementation.
+
+    A given command request should map to a specific command implementation,
+    which defines how to:
+
+    - Create a command resource from the request model
+    - Execute the command, mapping data from execution into the result model
+    """
+
+    _request: ReqT
+
+    def __init__(self, request: ReqT) -> None:
+        """Initialize a command implementation from a command request."""
+        self._request = request
+
+    def create_command(self, created_at: datetime) -> PendingCommand[ReqT, ResT]:
+        """Create a new command resource from the implementation's request."""
+        return PendingCommand(request=self._request, created_at=created_at)
+
+    @abstractmethod
+    async def execute(self, handlers: CommandHandlers) -> ResT:
+        """Execute the command, mapping data from execution into a response model."""
+        ...

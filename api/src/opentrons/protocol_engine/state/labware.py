@@ -9,7 +9,8 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons.calibration_storage.helpers import uri_from_definition
 
-from .. import command_models as cmd, errors
+from .. import errors
+from ..commands import CompletedCommandType, LoadLabwareResult
 from ..types import LabwareLocation
 from .substore import Substore, CommandReactive
 
@@ -88,12 +89,9 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
         """Initialize a labware store and its state."""
         self._state = LabwareState()
 
-    def handle_completed_command(
-        self,
-        command: cmd.CompletedCommandType
-    ) -> None:
+    def handle_completed_command(self, command: CompletedCommandType) -> None:
         """Modify state in reaction to a completed command."""
-        if isinstance(command.result, cmd.LoadLabwareResult):
+        if isinstance(command.result, LoadLabwareResult):
             self._state._labware_by_id[command.result.labwareId] = LabwareData(
                 location=command.request.location,
                 definition=command.result.definition,

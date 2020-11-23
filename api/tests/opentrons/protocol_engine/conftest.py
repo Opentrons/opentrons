@@ -1,6 +1,6 @@
 """ProtocolEngine shared test fixtures."""
 import pytest
-from datetime import datetime
+from datetime import datetime, timedelta
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 
 from opentrons_shared_data.deck import load as load_deck
@@ -15,7 +15,12 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     StateStore,
     StateView,
-    CommandExecutor
+    CommandHandlers,
+)
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
 )
 
 
@@ -23,6 +28,18 @@ from opentrons.protocol_engine import (
 def now() -> datetime:
     """Get the current UTC time."""
     return utc_now()
+
+
+@pytest.fixture
+def later(now: datetime) -> datetime:
+    """Get a future time."""
+    return utc_now() + timedelta(seconds=42)
+
+
+@pytest.fixture
+def even_later(later: datetime) -> datetime:
+    """Get a future time."""
+    return later + timedelta(minutes=42)
 
 
 @pytest.fixture
@@ -44,9 +61,16 @@ def mock_hardware() -> AsyncMock:
 
 
 @pytest.fixture
-def mock_executor() -> AsyncMock:
-    """Get an asynchronous mock in the shape of a CommandExecutor."""
-    return AsyncMock(spec=CommandExecutor)
+def mock_handlers() -> AsyncMock:
+    """Get an asynchronous mock in the shape of CommandHandlers."""
+    # TODO(mc, 2020-11-17): AsyncMock around CommandHandlers doesn't propagate
+    # async. mock downwards into children properly, so this has to be manually
+    # set up this way for now
+    return CommandHandlers(
+        equipment=AsyncMock(spec=EquipmentHandler),
+        movement=AsyncMock(spec=MovementHandler),
+        pipetting=AsyncMock(spec=PipettingHandler),
+    )
 
 
 @pytest.fixture(scope="session")
@@ -82,10 +106,10 @@ def store(standard_deck_def: DeckDefinitionV2) -> StateStore:
 @pytest.fixture
 def engine(
     mock_state_store: MagicMock,
-    mock_executor: AsyncMock
+    mock_handlers: AsyncMock
 ) -> ProtocolEngine:
     """Get a ProtocolEngine with its dependencies mocked out."""
     return ProtocolEngine(
         state_store=mock_state_store,
-        executor=mock_executor,
+        handlers=mock_handlers,
     )

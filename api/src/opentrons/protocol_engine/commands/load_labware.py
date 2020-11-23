@@ -1,15 +1,10 @@
-"""
-Equipment loading command request and result models.
-
-These models are defined using Pydantic because they are part of the public
-input / output of the engine, and need validation and/or scheme generation.
-"""
+"""Load labware command request, result, and implementation models."""
+from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Any, Tuple
-from opentrons.types import MountType
-from opentrons_shared_data.pipette.dev_types import PipetteName
 
 from ..types import LabwareLocation
+from .command import CommandImplementation, CommandHandlers
 
 
 class LoadLabwareRequest(BaseModel):
@@ -32,9 +27,13 @@ class LoadLabwareRequest(BaseModel):
         description="The labware definition version.",
     )
 
+    def get_implementation(self) -> LoadLabwareImplementation:
+        """Get the load labware request's command implementation."""
+        return LoadLabwareImplementation(self)
+
 
 class LoadLabwareResult(BaseModel):
-    """Result data for executing a LoadLabwareRequest."""
+    """Result data from the execution of a LoadLabwareRequest."""
 
     labwareId: str = Field(
         ...,
@@ -51,23 +50,22 @@ class LoadLabwareResult(BaseModel):
     )
 
 
-class LoadPipetteRequest(BaseModel):
-    """A request to load a pipette on to a mount."""
+class LoadLabwareImplementation(
+    CommandImplementation[LoadLabwareRequest, LoadLabwareResult]
+):
+    """Load labware command implementation."""
 
-    pipetteName: PipetteName = Field(
-        ...,
-        description="The name of the pipette to be required.",
-    )
-    mount: MountType = Field(
-        ...,
-        description="The mount the pipette should be present on.",
-    )
+    async def execute(self, handlers: CommandHandlers) -> LoadLabwareResult:
+        """Load definition and calibration data necessary for a labware."""
+        loaded_labware = await handlers.equipment.load_labware(
+            load_name=self._request.loadName,
+            namespace=self._request.namespace,
+            version=self._request.version,
+            location=self._request.location,
+        )
 
-
-class LoadPipetteResult(BaseModel):
-    """Result data for executing a LoadPipetteRequest."""
-
-    pipetteId: str = Field(
-        ...,
-        description="An ID to reference this pipette in subsequent commands.",
-    )
+        return LoadLabwareResult(
+            labwareId=loaded_labware.labware_id,
+            definition=loaded_labware.definition,
+            calibration=loaded_labware.calibration,
+        )

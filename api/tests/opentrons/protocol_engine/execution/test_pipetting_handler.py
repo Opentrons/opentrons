@@ -6,7 +6,6 @@ from typing import cast
 from opentrons.types import Mount
 from opentrons.hardware_control.dev_types import PipetteDict
 
-from opentrons.protocol_engine import command_models as cmd
 from opentrons.protocol_engine.state import TipGeometry, HardwarePipette
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
@@ -39,12 +38,6 @@ async def test_handle_pick_up_tip_request(
     handler: PipettingHandler,
 ) -> None:
     """It should handle a PickUpTipRequest properly."""
-    request = cmd.PickUpTipRequest(
-        pipetteId="pipette-id",
-        labwareId="labware-id",
-        wellName="B2",
-    )
-
     mock_config = cast(PipetteDict, {"name": "p300_single"})
     mock_attached_pipettes = {Mount.LEFT: mock_config, Mount.RIGHT: None}
 
@@ -61,11 +54,17 @@ async def test_handle_pick_up_tip_request(
         volume=300,
     )
 
-    result = await handler.handle_pick_up_tip(request)
+    await handler.pick_up_tip(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2",
+    )
 
-    assert result == cmd.PickUpTipResult()
-
-    mock_movement_handler.handle_move_to_well.assert_called_with(request)
+    mock_movement_handler.move_to_well.assert_called_with(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2",
+    )
 
     mock_hardware.assert_has_calls([
         call.pick_up_tip(
