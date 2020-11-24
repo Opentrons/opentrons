@@ -44,8 +44,8 @@
 
   @media (--large) {
     margin: auto;
-    max-width: var(--subdomain-nav-max-width);
-    padding: 0;
+    max-width: var(--screen-width-xlarge);
+    padding: 0 40px;
   }
 }
 
