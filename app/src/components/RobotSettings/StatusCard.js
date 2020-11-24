@@ -2,47 +2,46 @@
 // RobotSettings card for robot status
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import capitalize from 'lodash/capitalize'
+import { useTranslation } from 'react-i18next'
 
 import {
   selectors as robotSelectors,
   actions as robotActions,
 } from '../../robot'
 
-import { Card, LabeledValue, OutlineButton, Icon } from '@opentrons/components'
+import {
+  Card,
+  SecondaryBtn,
+  Icon,
+  TEXT_TRANSFORM_CAPITALIZE,
+} from '@opentrons/components'
 import { CONNECTABLE } from '../../discovery'
 import { CardContentHalf } from '../layout'
+import { LabeledValue } from '../structure'
 
 import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 
 type Props = {| robot: ViewableRobot |}
 
-// TODO(mc, 2020-03-30): i18n
-const TITLE = 'Status'
-const STATUS_LABEL = 'This robot is currently'
-const STATUS_VALUE_DISCONNECTED = 'Unknown - connect to view status'
-const STATUS_VALUE_NOT_CONNECTABLE = 'Not connectable'
-const STATUS_VALUE_DEFAULT = 'Idle'
-const CONNECT = 'connect'
-const DISCONNECT = 'disconnect'
-
 export function StatusCard(props: Props): React.Node {
   const { robot } = props
   const dispatch = useDispatch<Dispatch>()
+  const { t } = useTranslation()
+
   const connectable = robot.status === CONNECTABLE
   const connected = robot.connected != null && robot.connected === true
   const sessionStatus = useSelector(robotSelectors.getSessionStatus)
   const connectRequest = useSelector(robotSelectors.getConnectRequest)
   const connectButtonDisabled = !connectable || connectRequest.inProgress
-  let status = STATUS_VALUE_DEFAULT
 
+  let status = t('robot_settings.status.default')
   if (!connectable) {
-    status = STATUS_VALUE_NOT_CONNECTABLE
+    status = t('robot_settings.status.not_connectable')
   } else if (!connected) {
-    status = STATUS_VALUE_DISCONNECTED
+    status = t('robot_settings.status.disconnected')
   } else if (sessionStatus) {
-    status = capitalize(sessionStatus)
+    status = sessionStatus
   }
 
   const handleClick = () => {
@@ -54,20 +53,24 @@ export function StatusCard(props: Props): React.Node {
   }
 
   return (
-    <Card title={TITLE}>
+    <Card title={t('robot_settings.status.title')}>
       <CardContentHalf>
-        <LabeledValue label={STATUS_LABEL} value={status} />
+        <LabeledValue
+          label={t('robot_settings.status.label')}
+          value={status}
+          valueProps={{ textTransform: TEXT_TRANSFORM_CAPITALIZE }}
+        />
       </CardContentHalf>
       <CardContentHalf>
-        <OutlineButton onClick={handleClick} disabled={connectButtonDisabled}>
+        <SecondaryBtn onClick={handleClick} disabled={connectButtonDisabled}>
           {connected ? (
-            DISCONNECT
+            t('robot_settings.disconnect')
           ) : connectRequest.name === robot.name ? (
             <Icon name="ot-spinner" height="1em" spin />
           ) : (
-            CONNECT
+            t('robot_settings.connect')
           )}
-        </OutlineButton>
+        </SecondaryBtn>
       </CardContentHalf>
     </Card>
   )

@@ -13,16 +13,13 @@ export type ScanButtonProps = {|
 
 export function ScanButton(props: ScanButtonProps): React.Node {
   const { isScanning, onScanClick, found } = props
-  const { t } = useTranslation('button')
-  const buttonText = found ? t('refresh_list') : t('try_again')
+  const { t } = useTranslation()
 
-  if (isScanning) {
-    return <Icon name="ot-spinner" className={styles.scan_progress} spin />
-  }
-
-  return (
+  return isScanning ? (
+    <Icon name="ot-spinner" className={styles.scan_progress} spin />
+  ) : (
     <PrimaryButton onClick={onScanClick} className={styles.scan_button}>
-      {buttonText}
+      {found ? t('button.refresh_list') : t('button.try_again')}
     </PrimaryButton>
   )
 }

@@ -1,0 +1,25 @@
+{
+  "button" : {
+    "cancel": "cancel",
+    "continue": "continue",
+    "delete": "delete",
+    "done": "done",
+    "ok": "ok",
+    "refresh_list": "refresh list",
+    "try_again": "try again"
+  },
+  "nav" : {
+    "pipettes_and_modules": "pipettes & modules"
+  },
+  "robot_settings": {
+    "status": {
+      "title": "status",
+      "label": "this robot is currently",
+      "disconnected":"unknown - connect to view status",
+      "not_connectable": "not connectable",
+      "default": "idle"
+    },
+    "connect": "connect",
+    "disconnect": "disconnect"
+  }
+}

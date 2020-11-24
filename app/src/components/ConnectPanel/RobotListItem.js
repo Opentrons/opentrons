@@ -29,7 +29,7 @@ export function RobotListItem(props: RobotListItemProps): React.Node {
     isConnected,
     onToggleConnect,
   } = props
-  const { t } = useTranslation('nav')
+  const { t } = useTranslation()
 
   return (
     <li className={styles.robot_group}>
@@ -55,7 +55,7 @@ export function RobotListItem(props: RobotListItemProps): React.Node {
           url={`/robots/${name}/instruments`}
           className={styles.instrument_item}
         >
-          <p className={styles.link_text}>{t('pipettes_and_modules')}</p>
+          <p className={styles.link_text}>{t('nav.pipettes_and_modules')}</p>
           <Icon name="chevron-right" className={styles.robot_item_icon} />
         </RobotLink>
       )}

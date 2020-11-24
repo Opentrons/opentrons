@@ -1,9 +1,7 @@
 // @flow
 
-import button from './button.json'
-import nav from './nav.json'
+import shared from './shared.json'
 
 export const en = {
-  button,
-  nav,
+  shared,
 }
