@@ -14,15 +14,25 @@
   },
   "robot_settings": {
     "calibration" :{
-      "title": "robot calibration",
-      "download_calibration": "Download your calibration data",
+      "calibrate_deck": "calibrate deck",
+      "deck_calibration_description": "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots.",
+      "deck_calibration_error_occured": "An error occurred while trying to start deck calibration",
+      "deck_calibration_failure": "Failed to start deck calibration",
+      "deck_calibration_missing": "You haven't calibrated the deck yet",
+      "deck_calibration_redo": "recalibrate deck",
+      "deck_calibration_spinner": "Deck calibration is {{ongoing_action}}",
       "definition": "Your OT-2 moves pipettes around in 3D space based on its calibration. <a>Learn more</a> about how calibration works on the OT-2.",
+      "download_calibration": "Download your calibration data",
       "health_check_title": "calibration health check",
       "health_check_button": "check health",
-      "health_check_description": "Check the health of the current calibration settings."
+      "health_check_description": "Check the health of the current calibration settings.",
+      "last_calibrated": "Last calibrated",
+      "last_migration": "Last known calibration migrated",
+      "title": "robot calibration"
     },
     "connect": "connect",
     "disconnect": "disconnect",
+    "ending": "ending",
     "status": {
       "default": "idle",
       "disconnected":"unknown - connect to view status",
@@ -37,6 +47,7 @@
       "supported_api_versions": "supported protocol API versions",
       "title": "information"
     },
+    "starting": "starting",
     "unknown": "unknown"
   }
 }
