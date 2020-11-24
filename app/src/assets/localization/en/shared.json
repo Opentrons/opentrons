@@ -12,6 +12,11 @@
     "pipettes_and_modules": "pipettes & modules"
   },
   "robot_settings": {
+    "calibration" :{
+      "title": "robot calibration",
+      "download_calibration": "Download your calibration data",
+      "definition": "Your OT-2 moves pipettes around in 3D space based on its calibration. <a>Learn more</a> about how calibration works on the OT-2."
+    },
     "connect": "connect",
     "disconnect": "disconnect",
     "status": {

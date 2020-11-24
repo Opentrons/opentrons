@@ -4,6 +4,8 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { saveAs } from 'file-saver'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import type { Dispatch, State } from '../../types'
 import * as Calibration from '../../calibration'
@@ -33,6 +35,7 @@ import {
   SPACING_3,
   JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_CAPITALIZE,
+  TEXT_TRANSFORM_UPPERCASE,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_HEADER,
   C_DARK_GRAY,
@@ -55,14 +58,6 @@ type Props = {|
   pipettesPageUrl: string,
 |}
 
-const EVENT_CALIBRATION_DOWNLOADED = 'calibrationDataDownloaded'
-const TITLE = 'Robot Calibration'
-
-const DOWNLOAD_CALIBRATION = 'Download your calibration data'
-const CAL_EXPLANATION =
-  'Your OT-2 moves pipettes around in 3D space based on its calibration.'
-const LEARN_MORE = 'Learn more'
-const CAL_EXPLANATION_SUFFIX = 'about how calibration works on the OT-2.'
 const CAL_ARTICLE_URL =
   'https://support.opentrons.com/en/articles/3499692-how-calibration-works-on-the-ot-2'
 
@@ -85,6 +80,7 @@ export function CalibrationCard(props: Props): React.Node {
   const { name: robotName, status } = robot
   const notConnectable = status !== CONNECTABLE
 
+  const { t } = useTranslation()
   const dispatch = useDispatch<Dispatch>()
 
   // Poll deck cal status data
@@ -147,7 +143,10 @@ export function CalibrationCard(props: Props): React.Node {
 
   const onClickSaveAs = e => {
     e.preventDefault()
-    doTrackEvent({ name: EVENT_CALIBRATION_DOWNLOADED, properties: {} })
+    doTrackEvent({
+      name: Calibration.EVENT_CALIBRATION_DOWNLOADED,
+      properties: {},
+    })
     saveAs(
       new Blob([
         JSON.stringify({
@@ -185,7 +184,7 @@ export function CalibrationCard(props: Props): React.Node {
           paddingTop={SPACING_3}
           paddingX={SPACING_3}
         >
-          {TITLE}
+          {t('robot_settings.calibration.title')}
         </Text>
         <Link
           href="#"
@@ -195,7 +194,7 @@ export function CalibrationCard(props: Props): React.Node {
           fontSize={FONT_SIZE_BODY_1}
           onClick={onClickSaveAs}
         >
-          {DOWNLOAD_CALIBRATION}
+          {t('robot_settings.calibration.download_calibration')}
         </Link>
       </Flex>
       <Box
@@ -203,18 +202,21 @@ export function CalibrationCard(props: Props): React.Node {
         fontSize={FONT_SIZE_BODY_1}
         padding={SPACING_3}
       >
-        <Text display={DISPLAY_INLINE}>{CAL_EXPLANATION}</Text>
-        &nbsp;
-        <Link
-          color={C_BLUE}
-          display={DISPLAY_INLINE}
-          external
-          href={CAL_ARTICLE_URL}
-        >
-          {LEARN_MORE}
-        </Link>
-        &nbsp;
-        <Text display={DISPLAY_INLINE}>{CAL_EXPLANATION_SUFFIX}</Text>
+        <Text display={DISPLAY_INLINE}>
+          <Trans
+            i18nKey="robot_settings.calibration.definition"
+            components={{
+              a: (
+                <Link
+                  color={C_BLUE}
+                  display={DISPLAY_INLINE}
+                  external
+                  href={CAL_ARTICLE_URL}
+                />
+              ),
+            }}
+          />
+        </Text>
       </Box>
       <DeckCalibrationControl
         robotName={robotName}
