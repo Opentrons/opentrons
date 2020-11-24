@@ -75,19 +75,25 @@ export function dispenseUpdateLiquidState(
     }
   )
 
-  const mergeLiquidtoSingleWell = {
-    [well]: reduce(
-      splitLiquidStates,
-      (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
-        const res = mergeLiquid(wellLiquidStateAcc, splitLiquidStateForTip.dest)
-        return res
-      },
-      liquidLabware[well]
-    ),
-  }
-
-  const mergeTipLiquidToOwnWell = wellsForTips.reduce(
-    (acc, wellForTip, tipIdx) => {
+  let updatedWellsState = {}
+  if (allWellsShared) {
+    // merge liquid in all tips to single shared well
+    updatedWellsState = {
+      [well]: reduce(
+        splitLiquidStates,
+        (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
+          const res = mergeLiquid(
+            wellLiquidStateAcc,
+            splitLiquidStateForTip.dest
+          )
+          return res
+        },
+        liquidLabware[well]
+      ),
+    }
+  } else {
+    // merge each tip's liquid into its own corresponding well
+    updatedWellsState = wellsForTips.reduce((acc, wellForTip, tipIdx) => {
       return {
         ...acc,
         [wellForTip]: mergeLiquid(
@@ -95,18 +101,12 @@ export function dispenseUpdateLiquidState(
           liquidLabware[wellForTip] || null
         ),
       }
-    },
-    {}
-  )
-
-  // add liquid to well(s)
-  const labwareLiquidState = allWellsShared
-    ? mergeLiquidtoSingleWell
-    : mergeTipLiquidToOwnWell
+    }, {})
+  }
 
   prevLiquidState.pipettes[pipette] = mapValues(splitLiquidStates, 'source')
   prevLiquidState.labware[labware] = Object.assign(
     liquidLabware,
-    labwareLiquidState
+    updatedWellsState
   )
 }

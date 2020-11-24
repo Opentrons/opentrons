@@ -39,6 +39,7 @@ describe('dropTip', () => {
         makeRobotState({ singleHasTips: true, multiHasTips: true })
       )
       const res = getSuccessResult(result)
+
       expect(res.commands).toEqual([
         {
           command: 'dropTip',

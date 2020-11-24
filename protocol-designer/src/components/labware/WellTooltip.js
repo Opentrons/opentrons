@@ -31,7 +31,7 @@ type State = {
   tooltipX: ?number,
   tooltipY: ?number,
   tooltipWellName: ?string,
-  tooltipWellIngreds: ?LocationLiquidState,
+  tooltipWellIngreds: LocationLiquidState,
   tooltipOffset: ?number,
 }
 const initialState: State = {

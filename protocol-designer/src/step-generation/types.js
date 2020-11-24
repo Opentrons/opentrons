@@ -265,9 +265,15 @@ type TipId = string
 // (Location = wells in a labware, or tips on a pipette.)
 // This is a sparse representation -- if LocationLiquidState is nullsy,
 // that means the well has no liquid contents.
-export type LocationLiquidState = ?{
+//
+// TYPING NOTE: Generally, use LocationLiquidState. This kind of object access is
+// unsafe, and the Maybe typing captures that lack of safety.
+// Only use DefiniteLocationLiquidState eg an operation
+// that is guaranteed to return a non-nullsy result (eg to avoid any-typing a `reduce`)
+export type DefiniteLocationLiquidState = {
   [ingredGroup: string]: number,
 }
+export type LocationLiquidState = ?DefiniteLocationLiquidState
 
 export type SingleLabwareLiquidState = { [well: string]: LocationLiquidState }
 

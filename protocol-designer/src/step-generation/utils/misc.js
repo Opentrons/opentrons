@@ -15,6 +15,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { PipetteEntity, LabwareEntity } from '../../step-forms'
 import type {
+  DefiniteLocationLiquidState,
   LocationLiquidState,
   InvariantContext,
   RobotState,
@@ -110,14 +111,19 @@ export function mergeLiquid(
   source: LocationLiquidState,
   dest: LocationLiquidState
 ): LocationLiquidState {
+  if (source == null && dest == null) return null
+
   return {
     // include all ingreds exclusive to 'dest'
     ...dest,
 
-    // TODO IMMEDIATLELY don't use 'any' here
-    ...reduce<LocationLiquidState, any>(
+    ...reduce<LocationLiquidState, DefiniteLocationLiquidState>(
       source,
-      (acc, ingredVol: number, ingredId: string): LocationLiquidState => {
+      (
+        acc,
+        ingredVol: number,
+        ingredId: string
+      ): DefiniteLocationLiquidState => {
         const isCommonIngred = dest ? ingredId in dest : false
         const ingredVolume = isCommonIngred
           ? // sum volumes of ingredients common to 'source' and 'dest'
@@ -243,8 +249,8 @@ export function createEmptyLiquidState(
         const pipetteSpec = pipette.spec
         return {
           ...acc,
-          // TODO IMMEDIATELY should be OK with {}??
-          [id]: createTipLiquidState(pipetteSpec.channels, {}),
+          // TODO IMMEDIATELY should be OK with {} and no tips??
+          [id]: createTipLiquidState(pipetteSpec.channels, null),
         }
       },
       {}

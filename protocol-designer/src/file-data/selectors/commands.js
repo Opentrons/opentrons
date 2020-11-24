@@ -19,40 +19,6 @@ import type {
   PipetteTemporalProperties,
 } from '../../step-forms'
 
-// TODO IMMEDIATELY: remove
-// NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
-// export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
-//   labwareIngredSelectors.getLiquidsByLabwareId,
-//   stepFormSelectors.getLabwareEntities,
-//   (ingredLocations, labwareEntities) => {
-//     const allLabwareIds: Array<string> = Object.keys(labwareEntities)
-//     return allLabwareIds.reduce(
-//       (
-//         acc: StepGeneration.LabwareLiquidState,
-//         labwareId
-//       ): StepGeneration.LabwareLiquidState => {
-//         const labwareDef = labwareEntities[labwareId].def
-//         const allWells = labwareDef ? getAllWellsForLabware(labwareDef) : []
-//         const liquidStateForLabwareAllWells = allWells.reduce(
-//           (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
-//             ...innerAcc,
-//             [well]:
-//               (ingredLocations[labwareId] &&
-//                 ingredLocations[labwareId][well]) ||
-//               {},
-//           }),
-//           {}
-//         )
-//         return {
-//           ...acc,
-//           [labwareId]: liquidStateForLabwareAllWells,
-//         }
-//       },
-//       {}
-//     )
-//   }
-// )
-
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getInvariantContext,

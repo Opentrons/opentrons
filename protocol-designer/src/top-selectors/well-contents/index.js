@@ -124,7 +124,7 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
     if (!ingredsInLabware || isEmpty(selectedWells))
       return { ingredientId: null, volume: null }
 
-    const initialWellContents: ?StepGeneration.LocationLiquidState =
+    const initialWellContents: StepGeneration.LocationLiquidState =
       ingredsInLabware[Object.keys(selectedWells)[0]] // TODO IMMEDIATELY why arbitrary 0th???
     const initialIngredId: ?string =
       initialWellContents && Object.keys(initialWellContents)[0]
