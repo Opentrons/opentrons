@@ -5,7 +5,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { saveAs } from 'file-saver'
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import type { Dispatch, State } from '../../types'
 import * as Calibration from '../../calibration'

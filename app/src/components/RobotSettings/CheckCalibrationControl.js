@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 import * as Config from '../../config'
@@ -29,12 +30,6 @@ export type CheckCalibrationControlProps = {|
   disabledReason: string | null,
 |}
 
-const CAL_HEALTH_CHECK = 'Calibration Health Check'
-const CHECK_HEALTH = 'check health'
-const CAL_HEALTH_CHECK_DESCRIPTION =
-  'Check the health of the current calibration settings.'
-const EXIT = 'exit'
-
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
@@ -44,6 +39,7 @@ export function CheckCalibrationControl({
   robotName,
   disabledReason,
 }: CheckCalibrationControlProps): React.Node {
+  const { t } = useTranslation()
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const trackedRequestId = React.useRef<string | null>(null)
@@ -140,15 +136,15 @@ export function CheckCalibrationControl({
   const buttonChildren = showSpinner ? (
     <Icon name="ot-spinner" height="1em" spin />
   ) : (
-    CHECK_HEALTH
+    t('robot_settings.calibration.health_check_button')
   )
 
   return (
     <>
       <TitledControl
         borderBottom={BORDER_SOLID_LIGHT}
-        title={CAL_HEALTH_CHECK}
-        description={CAL_HEALTH_CHECK_DESCRIPTION}
+        title={t('robot_settings.calibration.health_check_title')}
+        description={t('robot_settings.calibration.health_check_description')}
         control={
           <SecondaryBtn
             {...targetProps}
@@ -168,18 +164,18 @@ export function CheckCalibrationControl({
         {showCalBlockModal ? (
           <AskForCalibrationBlockModal
             onResponse={handleStart}
-            titleBarTitle={CAL_HEALTH_CHECK}
+            titleBarTitle={t('robot_settings.calibration.health_check_title')}
             closePrompt={() => setShowCalBlockModal(false)}
           />
         ) : null}
         {createStatus === RobotApi.PENDING ? (
           <SpinnerModalPage
             titleBar={{
-              title: CAL_HEALTH_CHECK,
+              title: t('robot_settings.calibration.health_check_title'),
               back: {
                 disabled: true,
-                title: EXIT,
-                children: EXIT,
+                title: t('button.exit'),
+                children: t('button.exit'),
               },
             }}
           />

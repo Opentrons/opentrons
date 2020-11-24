@@ -4,6 +4,7 @@
     "continue": "continue",
     "delete": "delete",
     "done": "done",
+    "exit": "exit",
     "ok": "ok",
     "refresh_list": "refresh list",
     "try_again": "try again"
@@ -15,7 +16,10 @@
     "calibration" :{
       "title": "robot calibration",
       "download_calibration": "Download your calibration data",
-      "definition": "Your OT-2 moves pipettes around in 3D space based on its calibration. <a>Learn more</a> about how calibration works on the OT-2."
+      "definition": "Your OT-2 moves pipettes around in 3D space based on its calibration. <a>Learn more</a> about how calibration works on the OT-2.",
+      "health_check_title": "calibration health check",
+      "health_check_button": "check health",
+      "health_check_description": "Check the health of the current calibration settings."
     },
     "connect": "connect",
     "disconnect": "disconnect",
