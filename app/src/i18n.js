@@ -13,6 +13,10 @@ i18n.use(initReactI18next).init(
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
+    saveMissing: true,
+    missingKeyHandler: (lng, ns, key, fallbackValue) => {
+      console.warn(`Missing Translation: key={${key}} ns={${ns}}`)
+    },
   },
   (err, t) => {
     if (err) {

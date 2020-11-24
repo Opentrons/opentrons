@@ -14,6 +14,7 @@
   },
   "robot_settings": {
     "calibration" :{
+      "attached_pipettes": "attached pipette calibrations",
       "calibrate_deck": "calibrate deck",
       "deck_calibration_description": "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots.",
       "deck_calibration_error_occured": "An error occurred while trying to start deck calibration",
@@ -28,7 +29,15 @@
       "health_check_description": "Check the health of the current calibration settings.",
       "last_calibrated": "Last calibrated",
       "last_migration": "Last known calibration migrated",
-      "title": "robot calibration"
+      "manage_pipettes": "manage pipettes",
+      "no_pipette": "No pipette attached",
+      "no_tip_length": "Calibrate your pipette to see saved tip length",
+      "pipette_offset_description": "Calibrate the position for the the default tip and pipette combination.",
+      "pipette_offset_title": "pipette offset calibration",
+      "serial_number": "Serial number",
+      "tip_length": "tip length calibration",
+      "title": "robot calibration",
+      "unknown_custom_tiprack": "unknown custom tiprack"
     },
     "connect": "connect",
     "disconnect": "disconnect",
