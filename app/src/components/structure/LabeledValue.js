@@ -11,14 +11,21 @@ import {
 type Props = {|
   label: string,
   value: string,
+  wrapperProps?: React.ElementProps<typeof Box>,
   labelProps?: React.ElementProps<typeof Text>,
   valueProps?: React.ElementProps<typeof Text>,
 |}
 
 export function LabeledValue(props: Props): React.Node {
-  const { label, value, labelProps = {}, valueProps = {} } = props
+  const {
+    label,
+    value,
+    wrapperProps = {},
+    labelProps = {},
+    valueProps = {},
+  } = props
   return (
-    <Box css={FONT_BODY_1_DARK} lineHeight={1.5}>
+    <Box css={FONT_BODY_1_DARK} lineHeight={1.5} {...wrapperProps}>
       <Text
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         margin="0 0 0.25rem"

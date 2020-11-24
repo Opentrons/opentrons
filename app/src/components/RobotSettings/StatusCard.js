@@ -13,10 +13,12 @@ import {
   Card,
   SecondaryBtn,
   Icon,
+  Flex,
   TEXT_TRANSFORM_CAPITALIZE,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_3,
 } from '@opentrons/components'
 import { CONNECTABLE } from '../../discovery'
-import { CardContentHalf } from '../layout'
 import { LabeledValue } from '../structure'
 
 import type { Dispatch } from '../../types'
@@ -54,14 +56,12 @@ export function StatusCard(props: Props): React.Node {
 
   return (
     <Card title={t('robot_settings.status.title')}>
-      <CardContentHalf>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
           label={t('robot_settings.status.label')}
           value={status}
           valueProps={{ textTransform: TEXT_TRANSFORM_CAPITALIZE }}
         />
-      </CardContentHalf>
-      <CardContentHalf>
         <SecondaryBtn onClick={handleClick} disabled={connectButtonDisabled}>
           {connected ? (
             t('robot_settings.disconnect')
@@ -71,7 +71,7 @@ export function StatusCard(props: Props): React.Node {
             t('robot_settings.connect')
           )}
         </SecondaryBtn>
-      </CardContentHalf>
+      </Flex>
     </Card>
   )
 }
