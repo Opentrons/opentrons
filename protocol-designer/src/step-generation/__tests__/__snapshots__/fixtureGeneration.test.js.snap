@@ -12,32 +12,10 @@ Object {
     "troughId": Object {},
   },
   "pipettes": Object {
-    "p10MultiId": Object {
-      "0": null,
-      "1": null,
-      "2": null,
-      "3": null,
-      "4": null,
-      "5": null,
-      "6": null,
-      "7": null,
-    },
-    "p10SingleId": Object {
-      "0": null,
-    },
-    "p300MultiId": Object {
-      "0": null,
-      "1": null,
-      "2": null,
-      "3": null,
-      "4": null,
-      "5": null,
-      "6": null,
-      "7": null,
-    },
-    "p300SingleId": Object {
-      "0": null,
-    },
+    "p10MultiId": Object {},
+    "p10SingleId": Object {},
+    "p300MultiId": Object {},
+    "p300SingleId": Object {},
   },
 }
 `;
@@ -10636,32 +10614,10 @@ Object {
       "troughId": Object {},
     },
     "pipettes": Object {
-      "p10MultiId": Object {
-        "0": null,
-        "1": null,
-        "2": null,
-        "3": null,
-        "4": null,
-        "5": null,
-        "6": null,
-        "7": null,
-      },
-      "p10SingleId": Object {
-        "0": null,
-      },
-      "p300MultiId": Object {
-        "0": null,
-        "1": null,
-        "2": null,
-        "3": null,
-        "4": null,
-        "5": null,
-        "6": null,
-        "7": null,
-      },
-      "p300SingleId": Object {
-        "0": null,
-      },
+      "p10MultiId": Object {},
+      "p10SingleId": Object {},
+      "p300MultiId": Object {},
+      "p300SingleId": Object {},
     },
   },
   "modules": Object {},

@@ -48,15 +48,12 @@ describe('dropTip', () => {
 
       const result = forDropTip(params, invariantContext, prevRobotState)
 
-      const expectedRobotState = makeRobotState({
-        singleHasTips: false,
-        multiHasTips: true,
-      })
-      expectedRobotState.liquidState.labware[FIXED_TRASH_ID] = { A1: null }
-
       expect(result).toEqual({
         warnings: [],
-        robotState: expectedRobotState,
+        robotState: makeRobotState({
+          singleHasTips: false,
+          multiHasTips: true,
+        }),
       })
     })
 
@@ -78,15 +75,12 @@ describe('dropTip', () => {
 
       const result = forDropTip(params, invariantContext, prevRobotState)
 
-      const expectedRobotState = makeRobotState({
-        singleHasTips: true,
-        multiHasTips: false,
-      })
-      expectedRobotState.liquidState.labware[FIXED_TRASH_ID] = { A1: null }
-
       expect(result).toEqual({
         warnings: [],
-        robotState: expectedRobotState,
+        robotState: makeRobotState({
+          singleHasTips: true,
+          multiHasTips: false,
+        }),
       })
     })
   })

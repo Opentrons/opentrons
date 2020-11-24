@@ -46,7 +46,7 @@ export type NamedIngred = {|
 |}
 
 export type SourceDestData = {|
-  labware?: string, // TODO IMMEDIATELY is labware really a key here?
+  labware?: string,
   wells: Array<string>,
   preIngreds: WellIngredientVolumeData,
   postIngreds: WellIngredientVolumeData,

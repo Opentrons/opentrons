@@ -246,11 +246,9 @@ export function createEmptyLiquidState(
     pipettes: reduce(
       pipetteEntities,
       (acc, pipette: PipetteEntity, id: string) => {
-        const pipetteSpec = pipette.spec
         return {
           ...acc,
-          // TODO IMMEDIATELY should be OK with {} and no tips??
-          [id]: createTipLiquidState(pipetteSpec.channels, null),
+          [id]: {},
         }
       },
       {}

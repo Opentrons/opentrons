@@ -79,6 +79,7 @@ export const substepTimelineSingleChannel = (
 
       if (command.command === 'aspirate' || command.command === 'dispense') {
         const { well, volume, labware } = command.params
+
         const wellInfo: SourceDestData = {
           labware,
           wells: [well],
