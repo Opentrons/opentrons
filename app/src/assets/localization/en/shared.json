@@ -41,6 +41,7 @@
     },
     "connect": "connect",
     "connection": {
+      "success_banner": "{{robot}} successfully connected",
       "connected_description": "Your app is currently connected to your robot via {{type}} at IP address {{ip}}",
       "disconnected_description": "Your app is trying to connect to your robot via {{type}} at IP address {{ip}}",
       "ip": "<bold>{{type}} IP:</bold> {{ip}}",
