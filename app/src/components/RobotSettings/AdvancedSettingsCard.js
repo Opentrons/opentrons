@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
-  BORDER_SOLID_LIGHT,
   AlertModal,
   Card,
   Icon,
