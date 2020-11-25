@@ -2,7 +2,16 @@
 // "Robot Controls" card
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Card, LabeledToggle, LabeledButton } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import {
+  Flex,
+  Card,
+  ToggleButton,
+  SecondaryBtn,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_3,
+  SIZE_4,
+} from '@opentrons/components'
 
 import {
   home,
@@ -14,6 +23,7 @@ import {
 import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
+import { LabeledValue } from '../structure'
 import {
   DISABLED_CANNOT_CONNECT,
   DISABLED_CONNECT_TO_ROBOT,
@@ -27,9 +37,8 @@ type Props = {|
   robot: ViewableRobot,
 |}
 
-const TITLE = 'Robot Controls'
-
 export function ControlsCard(props: Props): React.Node {
+  const { t } = useTranslation()
   const dispatch = useDispatch<Dispatch>()
   const { robot } = props
   const { name: robotName, status } = robot
@@ -54,35 +63,43 @@ export function ControlsCard(props: Props): React.Node {
   const buttonDisabled = Boolean(buttonDisabledReason)
 
   return (
-    <Card title={TITLE}>
-      <LabeledButton
-        label="Home all axes"
-        buttonProps={{
-          onClick: () => dispatch(home(robotName, ROBOT)),
-          disabled: buttonDisabled,
-          children: 'Home',
-        }}
-      >
-        <p>Return robot to starting position.</p>
-      </LabeledButton>
-      <LabeledButton
-        label="Restart robot"
-        buttonProps={{
-          onClick: () => dispatch(restartRobot(robotName)),
-          disabled: buttonDisabled,
-          children: 'Restart',
-        }}
-      >
-        <p>Restart robot.</p>
-      </LabeledButton>
-      <LabeledToggle
-        label="Lights"
-        toggledOn={Boolean(lightsOn)}
-        onClick={toggleLights}
-        disabled={buttonDisabled}
-      >
-        <p>Control lights on deck.</p>
-      </LabeledToggle>
+    <Card title={t('robot_settings.controls.title')}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} margin={SPACING_3}>
+        <LabeledValue
+          label={t('robot_settings.controls.home_label')}
+          value={t('robot_settings.controls.home_description')}
+        />
+        <SecondaryBtn
+          onClick={() => dispatch(home(robotName, ROBOT))}
+          disabled={buttonDisabled}
+          width={SIZE_4}
+        >
+          {t('robot_settings.controls.home_button')}
+        </SecondaryBtn>
+      </Flex>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} margin={SPACING_3}>
+        <LabeledValue
+          label={t('robot_settings.controls.restart_label')}
+          value={t('robot_settings.controls.restart_description')}
+        />
+        <SecondaryBtn
+          onClick={() => dispatch(restartRobot(robotName))}
+          disabled={buttonDisabled}
+        >
+          {t('robot_settings.controls.restart_button')}
+        </SecondaryBtn>
+      </Flex>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} margin={SPACING_3}>
+        <LabeledValue
+          label={t('robot_settings.controls.lights_label')}
+          value={t('robot_settings.controls.lights_description')}
+        />
+        <ToggleButton
+          toggledOn={Boolean(lightsOn)}
+          onClick={toggleLights}
+          disabled={buttonDisabled}
+        />
+      </Flex>
     </Card>
   )
 }

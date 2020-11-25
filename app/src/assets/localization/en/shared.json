@@ -40,6 +40,17 @@
       "unknown_custom_tiprack": "unknown custom tiprack"
     },
     "connect": "connect",
+    "controls": {
+      "home_button": "home",
+      "home_description": "Return robot to starting position.",
+      "home_label": "home all axes",
+      "lights_label": "lights",
+      "lights_description": "Control lights on deck.",
+      "restart_button": "restart",
+      "restart_description": "Restart robot.",
+      "restart_label": "restart robot",
+      "title": "robot controls"
+    },
     "disconnect": "disconnect",
     "ending": "ending",
     "status": {
