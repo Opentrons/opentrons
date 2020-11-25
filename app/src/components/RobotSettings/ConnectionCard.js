@@ -2,6 +2,7 @@
 // RobotSettings card for wifi status
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import { Card, useInterval } from '@opentrons/components'
 import { CONNECTABLE } from '../../discovery'
@@ -16,14 +17,16 @@ import { ConnectionStatusMessage, ConnectionInfo } from './connection'
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 
-type Props = {| robot: ViewableRobot |}
+type Props = {|
+  robot: ViewableRobot,
+|}
 
-const CONNECTIVITY = 'Connectivity'
 const STATUS_REFRESH_MS = 5000
 
 export function ConnectionCard(props: Props): React.Node {
   const { robot } = props
   const { name: robotName, status, local, ip } = robot
+  const { t } = useTranslation()
   const dispatch = useDispatch<Dispatch>()
   const internetStatus = useSelector((state: State) =>
     getInternetStatus(state, robotName)
@@ -36,7 +39,7 @@ export function ConnectionCard(props: Props): React.Node {
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
 
   return (
-    <Card key={robotName} title={CONNECTIVITY}>
+    <Card key={robotName} title={t('robot_settings.connection.title')}>
       <ConnectionStatusMessage
         type={local ? 'USB' : 'Wi-Fi'}
         status={status}

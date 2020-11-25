@@ -1,7 +1,13 @@
 // @flow
 // UI components for displaying connection info
 import * as React from 'react'
+import { useTranslation, Trans } from 'react-i18next'
 import cx from 'classnames'
+import {
+  Text,
+  FONT_WEIGHT_SEMIBOLD,
+  TEXT_TRANSFORM_CAPITALIZE,
+} from '@opentrons/components'
 
 import { CONNECTABLE, REACHABLE } from '../../discovery'
 import { CardContentHalf } from '../layout'
@@ -15,37 +21,18 @@ import type {
 const USB: 'USB' = 'USB'
 const WI_FI: 'Wi-Fi' = 'Wi-Fi'
 
+const boldProps: React.ElementProps<typeof Text> = {
+  as: 'span',
+  fontWeight: FONT_WEIGHT_SEMIBOLD,
+  textTransform: TEXT_TRANSFORM_CAPITALIZE,
+}
+
 type ConnectionStatusProps = {|
   type: typeof USB | typeof WI_FI,
   ipAddress: string,
   status: typeof CONNECTABLE | typeof REACHABLE,
   internetStatus: InternetStatus | null,
 |}
-
-const statusToDescription = (
-  status: typeof CONNECTABLE | typeof REACHABLE,
-  type: typeof USB | typeof WI_FI,
-  ipAddress: string
-) => {
-  return `Your app is ${
-    status === CONNECTABLE ? 'currently connected' : 'trying to connect'
-  } to your robot via ${type} at IP address ${ipAddress}`
-}
-
-const internetStatusToDescription = (status: InternetStatus | null) => {
-  switch (status) {
-    case 'full':
-      return 'The robot is connected to a network and has full access to the Internet.'
-    case 'portal':
-      return 'The robot is behind a captive portal and cannot reach the full Internet.'
-    case 'limited':
-      return 'The  robot is connected to a network, but it has no access to the Internet.'
-    case 'none':
-      return 'The robot is not connected to any network.'
-  }
-
-  return 'Unknown'
-}
 
 export function ConnectionStatusMessage(
   props: ConnectionStatusProps
@@ -54,11 +41,26 @@ export function ConnectionStatusMessage(
 
   return (
     <div className={styles.connection_status}>
-      <p>{statusToDescription(status, type, ipAddress)}</p>
-      <p>
-        <strong>Internet: </strong>
-        {internetStatusToDescription(internetStatus)}
-      </p>
+      <Text>
+        <Trans
+          i18nKey={
+            status === CONNECTABLE
+              ? 'robot_settings.connection.connected_description'
+              : 'robot_settings.connection.disconnected_description'
+          }
+          tOptions={{
+            ip: ipAddress,
+            type: type,
+          }}
+        />
+      </Text>
+      <Text>
+        <Trans
+          i18nKey={`robot_settings.connection.status.${internetStatus ||
+            'unknown'}`}
+          components={{ bold: <Text {...boldProps} /> }}
+        />
+      </Text>
     </div>
   )
 }
@@ -101,28 +103,39 @@ type NetworkAddressProps = {
 }
 
 function NetworkAddresses(props: NetworkAddressProps) {
-  const type = props.wired ? 'Wired' : 'Wireless'
-  const ip = props.connection?.ipAddress || 'Unknown'
-  const subnet = props.connection?.subnetMask || 'Unknown'
-  const mac = props.connection?.macAddress || 'Unknown'
-  const classNames = cx(styles.wireless_info, {
-    [styles.disabled]: props.disabled,
-  })
+  const { wired, disabled, connection } = props
+  const { t } = useTranslation()
+  const unknown = t('robot_settings.unknown')
+  const type = wired
+    ? t('robot_settings.connection.wired')
+    : t('robot_settings.connection.wireless')
+  const ip = connection?.ipAddress || unknown
+  const subnet = connection?.subnetMask || unknown
+  const mac = connection?.macAddress || unknown
 
   return (
-    <div className={classNames}>
-      <p>
-        <span className={styles.connection_label}>{type} IP: </span>
-        {ip}
-      </p>
-      <p>
-        <span className={styles.connection_label}>{type} Subnet Mask: </span>
-        {subnet}
-      </p>
-      <p>
-        <span className={styles.connection_label}>{type} MAC Address: </span>
-        {mac}
-      </p>
+    <div className={cx(styles.wireless_info, { [styles.disabled]: disabled })}>
+      <Text>
+        <Trans
+          i18nKey="robot_settings.connection.ip"
+          tOptions={{ type, ip }}
+          components={{ bold: <Text {...boldProps} /> }}
+        />
+      </Text>
+      <Text>
+        <Trans
+          i18nKey="robot_settings.connection.subnet"
+          tOptions={{ type, subnet }}
+          components={{ bold: <Text {...boldProps} /> }}
+        />
+      </Text>
+      <Text>
+        <Trans
+          i18nKey="robot_settings.connection.mac"
+          tOptions={{ type, mac }}
+          components={{ bold: <Text {...boldProps} /> }}
+        />
+      </Text>
     </div>
   )
 }

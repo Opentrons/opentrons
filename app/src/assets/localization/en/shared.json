@@ -40,6 +40,23 @@
       "unknown_custom_tiprack": "unknown custom tiprack"
     },
     "connect": "connect",
+    "connection": {
+      "connected_description": "Your app is currently connected to your robot via {{type}} at IP address {{ip}}",
+      "disconnected_description": "Your app is trying to connect to your robot via {{type}} at IP address {{ip}}",
+      "ip": "<bold>{{type}} IP:</bold> {{ip}}",
+      "mac": "<bold>{{type}} MAC Address:</bold> {{mac}}",
+      "status": {
+        "full": "<bold>Internet:</bold> The robot is connected to a network and has full access to the Internet.",
+        "limited": "<bold>Internet:</bold> The  robot is connected to a network, but it has no access to the Internet.",
+        "none": "<bold>Internet:</bold> The robot is not connected to any network.",
+        "portal": "<bold>Internet:</bold> The robot is behind a captive portal and cannot reach the full Internet.",
+        "unknown": "<bold>Internet:</bold> Unknown"
+      },
+      "subnet": "<bold>{{type}} Subnet Mask:</bold> {{subnet}}",
+      "title": "connectivity",
+      "wired": "wired",
+      "wireless": "wireless"
+    },
     "controls": {
       "home_button": "home",
       "home_description": "Return robot to starting position.",
