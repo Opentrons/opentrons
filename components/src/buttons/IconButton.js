@@ -32,7 +32,7 @@ export function IconButton(props: Props): React.Node {
 
   return (
     <FlatButton {...buttonProps} className={className} iconName={undefined}>
-      <Icon {...iconProps} className={styles.button_only_icon} />
+      <Icon {...iconProps} />
     </FlatButton>
   )
 }

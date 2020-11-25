@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Card,
-  ToggleButton,
   SecondaryBtn,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_3,
+  SIZE_2,
   SIZE_4,
 } from '@opentrons/components'
 
@@ -24,6 +24,7 @@ import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
 import { LabeledValue } from '../structure'
+import { ToggleBtn } from '../ToggleBtn'
 import {
   DISABLED_CANNOT_CONNECT,
   DISABLED_CONNECT_TO_ROBOT,
@@ -64,7 +65,7 @@ export function ControlsCard(props: Props): React.Node {
 
   return (
     <Card title={t('robot_settings.controls.title')}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} margin={SPACING_3}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
           label={t('robot_settings.controls.home_label')}
           value={t('robot_settings.controls.home_description')}
@@ -77,7 +78,7 @@ export function ControlsCard(props: Props): React.Node {
           {t('robot_settings.controls.home_button')}
         </SecondaryBtn>
       </Flex>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} margin={SPACING_3}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
           label={t('robot_settings.controls.restart_label')}
           value={t('robot_settings.controls.restart_description')}
@@ -85,19 +86,22 @@ export function ControlsCard(props: Props): React.Node {
         <SecondaryBtn
           onClick={() => dispatch(restartRobot(robotName))}
           disabled={buttonDisabled}
+          width={SIZE_4}
         >
           {t('robot_settings.controls.restart_button')}
         </SecondaryBtn>
       </Flex>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} margin={SPACING_3}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
           label={t('robot_settings.controls.lights_label')}
           value={t('robot_settings.controls.lights_description')}
         />
-        <ToggleButton
+        <ToggleBtn
+          label={t('robot_settings.controls.lights_label')}
           toggledOn={Boolean(lightsOn)}
           onClick={toggleLights}
           disabled={buttonDisabled}
+          size={SIZE_2}
         />
       </Flex>
     </Card>
