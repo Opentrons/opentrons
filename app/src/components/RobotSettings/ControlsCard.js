@@ -23,7 +23,7 @@ import {
 import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
-import { LabeledValue } from '../structure'
+import { LabeledValue, Divider } from '../structure'
 import { ToggleBtn } from '../ToggleBtn'
 import {
   DISABLED_CANNOT_CONNECT,
@@ -78,6 +78,7 @@ export function ControlsCard(props: Props): React.Node {
           {t('robot_settings.controls.home_button')}
         </SecondaryBtn>
       </Flex>
+      <Divider />
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
           label={t('robot_settings.controls.restart_label')}
@@ -91,6 +92,7 @@ export function ControlsCard(props: Props): React.Node {
           {t('robot_settings.controls.restart_button')}
         </SecondaryBtn>
       </Flex>
+      <Divider />
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
           label={t('robot_settings.controls.lights_label')}

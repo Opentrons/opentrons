@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import { useTranslation, Trans } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -9,6 +10,10 @@ import {
   SecondaryBtn,
   Tooltip,
   useHoverTooltip,
+  Flex,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_3,
 } from '@opentrons/components'
 
 import {
@@ -16,23 +21,9 @@ import {
   startBuildrootUpdate,
 } from '../../buildroot'
 
-import { TitledControl } from '../TitledControl'
+import { LabeledValue } from '../structure'
 
-import type { StyleProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
-
-// TODO(mc, 2020-08-03): i18n
-const BROWSE = 'browse'
-const UPDATE_FROM_FILE = 'Update robot software from file'
-const UPDATE_FROM_FILE_DESCRIPTION = (
-  <>
-    If your app is unable to auto-download robot updates, you can{' '}
-    <Link external href="https://www.opentrons.com/ot-app/">
-      download the robot update yourself
-    </Link>{' '}
-    and update your robot manually
-  </>
-)
 
 const HIDDEN_CSS = css`
   position: fixed;
@@ -41,13 +32,13 @@ const HIDDEN_CSS = css`
 
 export type UpdateFromFileControlProps = {|
   robotName: string,
-  ...StyleProps,
 |}
 
 export function UpdateFromFileControl(
   props: UpdateFromFileControlProps
 ): React.Node {
-  const { robotName, ...styleProps } = props
+  const { robotName } = props
+  const { t } = useTranslation()
   const dispatch = useDispatch<Dispatch>()
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
@@ -67,32 +58,41 @@ export function UpdateFromFileControl(
   }
 
   return (
-    <TitledControl
-      title={UPDATE_FROM_FILE}
-      description={UPDATE_FROM_FILE_DESCRIPTION}
-      control={
-        <SecondaryBtn
-          as="label"
-          width="9rem"
-          className={cx({ disabled: updateDisabled })}
-          {...updateBtnProps}
-        >
-          {BROWSE}
-          <input
-            type="file"
-            onChange={handleChange}
-            disabled={updateDisabled}
-            css={HIDDEN_CSS}
-          />
-        </SecondaryBtn>
-      }
-      {...styleProps}
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING_3}
     >
+      <LabeledValue
+        label={t('robot_settings.advanced.update_from_file_label')}
+        value={
+          <Trans
+            i18nKey="robot_settings.advanced.update_from_file_description"
+            components={{
+              a: <Link external href="https://www.opentrons.com/ot-app/" />,
+            }}
+          />
+        }
+      />
+      <SecondaryBtn
+        as="label"
+        width="9rem"
+        className={cx({ disabled: updateDisabled })}
+        {...updateBtnProps}
+      >
+        {t('button.browse')}
+        <input
+          type="file"
+          onChange={handleChange}
+          disabled={updateDisabled}
+          css={HIDDEN_CSS}
+        />
+      </SecondaryBtn>
       {updateFromFileDisabledReason !== null && (
         <Tooltip {...updateBtnTooltipProps}>
           {updateFromFileDisabledReason}
         </Tooltip>
       )}
-    </TitledControl>
+    </Flex>
   )
 }

@@ -74,24 +74,24 @@ export function InformationCard(props: InformationCardProps): React.Node {
         <Box marginRight={SPACING_3}>
           <Box marginBottom={SPACING_3}>
             <LabeledValue
-              label={t('robot_settings.info.robot_name')}
+              label={`${t('robot_settings.info.robot_name')}:`}
               value={displayName}
             />
           </Box>
           <LabeledValue
-            label={t('robot_settings.info.firmware_version')}
+            label={`${t('robot_settings.info.firmware_version')}:`}
             value={firmwareVersion || unknown}
           />
         </Box>
         <Box marginRight={SPACING_AUTO}>
           <Box marginBottom={SPACING_3}>
             <LabeledValue
-              label={t('robot_settings.info.server_version')}
+              label={`${t('robot_settings.info.server_version')}:`}
               value={version || unknown}
             />
           </Box>
           <LabeledValue
-            label={t('robot_settings.info.supported_api_versions')}
+            label={`${t('robot_settings.info.supported_api_versions')}:`}
             value={API_VERSION_DISPLAY}
           />
         </Box>
