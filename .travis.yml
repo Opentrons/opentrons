@@ -60,15 +60,6 @@ jobs:
           bucket: opentrons-components
           upload-dir: $TRAVIS_BRANCH
 
-    # typecheck JavaScript projects
-    - stage: test
-      name: 'JS type checks'
-      language: node_js
-      install:
-        - make setup-js
-      script:
-        - make check-js
-
 env:
   global:
     # include $HOME/.local/bin for `aws`
