@@ -5,10 +5,9 @@ from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 
-from opentrons.protocol_engine import errors
+from opentrons.protocol_engine import errors, ResourceProviders
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.state import PipetteData
-from opentrons.protocol_engine.resources import IdGenerator, LabwareData
 
 from opentrons.protocol_engine.execution.equipment import (
     EquipmentHandler,
@@ -18,40 +17,36 @@ from opentrons.protocol_engine.execution.equipment import (
 
 
 @pytest.fixture
-def mock_labware_data(minimal_labware_def: LabwareDefinition) -> AsyncMock:
-    """Get a mock in the shape of the LabwareData resource primed with data."""
-    mock = AsyncMock(spec=LabwareData)
-    mock.get_labware_definition.return_value = minimal_labware_def
-    mock.get_labware_calibration.return_value = (1, 2, 3)
-    return mock
+def mock_resources_with_data(
+    minimal_labware_def: LabwareDefinition,
+    mock_resources: AsyncMock,
+) -> AsyncMock:
+    """Get a mock in the shape of the LabwareDataProvider primed with data."""
+    mock_resources.labware_data.get_labware_definition.return_value = (
+        minimal_labware_def
+    )
+    mock_resources.labware_data.get_labware_calibration.return_value = (1, 2, 3)
+    mock_resources.id_generator.generate_id.return_value = "unique-id"
 
-
-@pytest.fixture
-def mock_id_generator() -> MagicMock:
-    """Get a mock in the shape of an IdGenerator resource primed with data."""
-    mock = MagicMock(spec=IdGenerator)
-    mock.generate_id.return_value = "unique-id"
-    return mock
+    return mock_resources
 
 
 @pytest.fixture
 def handler(
     mock_hardware: AsyncMock,
     mock_state_view: MagicMock,
-    mock_labware_data: AsyncMock,
-    mock_id_generator: MagicMock,
+    mock_resources_with_data: AsyncMock,
 ) -> EquipmentHandler:
     """Get an EquipmentHandler with its dependencies mocked out."""
     return EquipmentHandler(
         hardware=mock_hardware,
         state=mock_state_view,
-        id_generator=mock_id_generator,
-        labware_data=mock_labware_data,
+        resources=mock_resources_with_data,
     )
 
 
 async def test_load_labware_assigns_id(
-    mock_id_generator: MagicMock,
+    mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
 ) -> None:
     """Loading labware should create a resource ID for the labware."""
@@ -68,7 +63,7 @@ async def test_load_labware_assigns_id(
 
 async def test_load_labware_gets_labware_def(
     minimal_labware_def: LabwareDefinition,
-    mock_labware_data: AsyncMock,
+    mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
 ) -> None:
     """Loading labware should load the labware's defintion."""
@@ -81,7 +76,7 @@ async def test_load_labware_gets_labware_def(
 
     assert type(res) == LoadedLabware
     assert res.definition == minimal_labware_def
-    mock_labware_data.get_labware_definition.assert_called_with(
+    mock_resources_with_data.labware_data.get_labware_definition.assert_called_with(
         load_name="load-name",
         namespace="opentrons-test",
         version=1
@@ -90,7 +85,7 @@ async def test_load_labware_gets_labware_def(
 
 async def test_load_labware_gets_labware_cal_data(
     minimal_labware_def: LabwareDefinition,
-    mock_labware_data: AsyncMock,
+    mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
 ) -> None:
     """Loading labware should load the labware's calibration data."""
@@ -103,14 +98,14 @@ async def test_load_labware_gets_labware_cal_data(
 
     assert type(res) == LoadedLabware
     assert res.calibration == (1, 2, 3)
-    mock_labware_data.get_labware_calibration.assert_called_with(
+    mock_resources_with_data.labware_data.get_labware_calibration.assert_called_with(
         definition=minimal_labware_def,
         location=DeckSlotLocation(DeckSlotName.SLOT_3),
     )
 
 
 async def test_load_pipette_assigns_id(
-    mock_id_generator: MagicMock,
+    mock_resources_with_data: ResourceProviders,
     handler: EquipmentHandler,
 ) -> None:
     """Loading a pipette should generate a unique identifier for the pipette."""

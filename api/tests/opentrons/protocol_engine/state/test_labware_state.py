@@ -2,11 +2,14 @@
 import pytest
 from datetime import datetime, timezone
 from typing import Tuple
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine import commands as cmd, errors, StateStore
 from opentrons.protocol_engine.types import LabwareLocation, DeckSlotLocation
+from opentrons.protocol_engine.resources import DeckFixedLabware
+from opentrons.protocol_engine.state import LabwareData
 
 
 def load_labware(
@@ -64,6 +67,29 @@ def test_handles_load_labware(
     assert data.location == command.request.location
     assert data.definition == command.result.definition
     assert data.calibration == command.result.calibration
+
+
+def test_loads_fixed_labware(
+    standard_deck_def: DeckDefinitionV2,
+    fixed_trash_def: LabwareDefinition,
+) -> None:
+    """It should create the labware substore with preloaded fixed labware."""
+    store = StateStore(
+        deck_definition=standard_deck_def,
+        deck_fixed_labware=[
+            DeckFixedLabware(
+                labware_id="fixedTrash",
+                location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+                definition=fixed_trash_def,
+            )
+        ]
+    )
+
+    assert store.labware.get_labware_data_by_id("fixedTrash") == LabwareData(
+        location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+        definition=fixed_trash_def,
+        calibration=(0, 0, 0),
+    )
 
 
 def test_get_all_labware(

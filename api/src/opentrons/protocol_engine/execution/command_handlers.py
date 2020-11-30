@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from opentrons.hardware_control.api import API as HardwareAPI
 
-from .. import resources
+from ..resources import ResourceProviders
 from ..state import StateView
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
@@ -26,17 +26,14 @@ class CommandHandlers:
     def create(
         cls,
         hardware: HardwareAPI,
-        state: StateView
+        state: StateView,
+        resources: ResourceProviders,
     ) -> CommandHandlers:
         """Create a CommandHandlers container and its child handlers."""
-        id_generator = resources.IdGenerator()
-        labware_data = resources.LabwareData()
-
         equipment = EquipmentHandler(
             state=state,
-            id_generator=id_generator,
-            labware_data=labware_data,
             hardware=hardware,
+            resources=resources,
         )
 
         movement = MovementHandler(

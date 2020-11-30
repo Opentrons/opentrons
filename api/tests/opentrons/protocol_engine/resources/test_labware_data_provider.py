@@ -6,7 +6,7 @@ from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.calibration_storage.helpers import hash_labware_def
 
 from opentrons.protocol_engine.types import DeckSlotLocation
-from opentrons.protocol_engine.resources import LabwareData
+from opentrons.protocol_engine.resources import LabwareDataProvider
 
 
 async def test_labware_data_gets_standard_definition() -> None:
@@ -16,7 +16,7 @@ async def test_labware_data_gets_standard_definition() -> None:
         namespace="opentrons",
         version=1
     )
-    result = await LabwareData().get_labware_definition(
+    result = await LabwareDataProvider().get_labware_definition(
         load_name="opentrons_96_tiprack_300ul",
         namespace="opentrons",
         version=1
@@ -32,11 +32,11 @@ async def test_labware_data_gets_calibration(
     # TODO(mc, 2020-10-18): this mock is a kinda code-smelly. Fetching labware
     # calibration data is a little convoluted and could use some clean up
     with patch(
-        'opentrons.protocol_engine.resources.get_labware_calibration'
+        'opentrons.protocol_engine.resources.labware_data_provider.get_labware_calibration'  # noqa[E501]
     ) as mock_get_lw_calibration:
         mock_get_lw_calibration.return_value = Point(1, 2, 3)
 
-        result = await LabwareData().get_labware_calibration(
+        result = await LabwareDataProvider().get_labware_calibration(
             minimal_labware_def,
             DeckSlotLocation(DeckSlotName.SLOT_5),
         )
