@@ -580,7 +580,7 @@ class Labware(DeckItem):
         return self._implementation == other._implementation
 
     def __hash__(self):
-        return hash((id(self._implementation), self._api_version))
+        return hash((self._implementation, self._api_version))
 
     def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
