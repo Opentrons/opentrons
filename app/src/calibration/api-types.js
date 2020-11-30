@@ -65,16 +65,6 @@ export type CalibrationStatus = {|
     status: DeckCalibrationStatus,
     data: DeckCalibrationData,
   |},
-  instrumentCalibration: {|
-    right: {|
-      single: [number, number, number],
-      multi: [number, number, number],
-    |},
-    left: {|
-      single: [number, number, number],
-      multi: [number, number, number],
-    |},
-  |},
 |}
 
 export type OffsetData = {|

@@ -185,7 +185,6 @@ robot_config = namedtuple(
         'gantry_steps_per_mm',
         'acceleration',
         'gantry_calibration',
-        'instrument_offset',
         'serial_speed',
         'tip_length',
         'default_current',
@@ -216,19 +215,6 @@ def _default_probe_dimensions():
     else:
         probe_height = DEFAULT_PROBE_HEIGHT
     return [35.0, 40.0, probe_height + 5.0]
-
-
-def build_fallback_instrument_offset(robot_settings: dict) -> dict:
-    # because `instrument_offset` is a dict of dicts, we must loop through it
-    # and replace empty values with the default offset
-    inst_offs: dict = {'right': {}, 'left': {}}
-    pip_types = ['single', 'multi']
-    prev_instrument_offset = robot_settings.get('instrument_offset', {})
-    for mount in inst_offs.keys():
-        mount_dict = prev_instrument_offset.get(mount, {})
-        for typ in pip_types:
-            inst_offs[mount][typ] = mount_dict.get(typ, DEFAULT_INST_OFFSET)
-    return inst_offs
 
 
 def _ensure_tip_probe_offsets(maybe_offsets):
@@ -297,7 +283,6 @@ def build_config(deck_cal: List[List[float]],
         acceleration=_build_conf_dict(
             robot_settings.get('acceleration'), DEFAULT_ACCELERATION),
         gantry_calibration=deck_cal or DEFAULT_DECK_CALIBRATION,
-        instrument_offset=build_fallback_instrument_offset(robot_settings),
         tip_length=robot_settings.get('tip_length', DEFAULT_TIP_LENGTH_DICT),
         mount_offset=robot_settings.get('mount_offset', DEFAULT_MOUNT_OFFSET),
         serial_speed=robot_settings.get('serial_speed', SERIAL_SPEED),

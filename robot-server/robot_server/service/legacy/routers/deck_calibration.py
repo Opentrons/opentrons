@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
 
-from opentrons.config import robot_configs
 from opentrons.hardware_control import ThreadManager
 from opentrons.calibration_storage import helpers
 
@@ -17,7 +16,6 @@ router = APIRouter()
             response_model=CalibrationStatus)
 async def get_calibration_status(
         hardware: ThreadManager = Depends(get_hardware)) -> CalibrationStatus:
-    robot_conf = robot_configs.load()
     deck_cal = hardware.robot_calibration.deck_calibration
     status = cal_model.CalibrationStatus(
         **helpers.convert_to_dict(deck_cal.status))
@@ -33,5 +31,4 @@ async def get_calibration_status(
     return CalibrationStatus(
         deckCalibration=DeckCalibrationStatus(
             status=hardware.validate_calibration(),
-            data=deck_cal_data),
-        instrumentCalibration=robot_conf.instrument_offset)
+            data=deck_cal_data))

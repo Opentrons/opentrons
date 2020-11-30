@@ -8,8 +8,6 @@ from pydantic import BaseModel, Field
 from robot_server.service.shared_models import calibration as cal_model
 
 
-Offset = typing.Tuple[float, float, float]
-
 AffineMatrix = typing.Tuple[
   typing.Tuple[float, float, float, float],
   typing.Tuple[float, float, float, float],
@@ -20,16 +18,6 @@ AttitudeMatrix = typing.Tuple[
   typing.Tuple[float, float, float],
   typing.Tuple[float, float, float],
   typing.Tuple[float, float, float]]
-
-
-class InstrumentOffset(BaseModel):
-    single: Offset
-    multi: Offset
-
-
-class InstrumentCalibrationStatus(BaseModel):
-    right: InstrumentOffset
-    left: InstrumentOffset
 
 
 class MatrixType(str, Enum):
@@ -78,4 +66,3 @@ class DeckCalibrationStatus(BaseModel):
 class CalibrationStatus(BaseModel):
     """The calibration status"""
     deckCalibration: DeckCalibrationStatus
-    instrumentCalibration: InstrumentCalibrationStatus
