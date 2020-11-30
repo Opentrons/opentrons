@@ -3,7 +3,6 @@ import logging
 from copy import copy
 from typing import Optional
 
-from opentrons.util import calibration_functions
 from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
@@ -73,43 +72,7 @@ class CalibrationManager(RobotBusy):
     @robot_is_busy
     @_home_if_first_call
     def tip_probe(self, instrument):
-        inst = instrument._instrument
-        log.info('Probing tip with {}'.format(instrument.name))
-        self._set_state('probing')
-
-        if instrument._context:
-            instrument._context.location_cache = None
-            mount = Mount[instrument._instrument.mount.upper()]
-            assert instrument.tip_racks,\
-                'No known tipracks for {}'.format(instrument)
-            tip_length = inst._tip_length_for(
-                instrument.tip_racks[0]._container)
-            # TODO (tm, 2019-04-22): This warns "coroutine not awaited" in
-            # TODO: test. The test fixture probably needs to be modified to get
-            # TODO: a synchronous adapter instead of a raw hardware_control API
-            #             finally:
-            measured_center = self._hardware.locate_tip_probe_center(
-                mount, tip_length)
-        else:
-            measured_center = calibration_functions.probe_instrument(
-                instrument=inst,
-                robot=inst.robot)
-
-        log.info('Measured probe top center: {0}'.format(measured_center))
-
-        if instrument._context:
-            self._hardware.update_instrument_offset(
-                Mount[instrument._instrument.mount.upper()],
-                from_tip_probe=measured_center)
-            config = self._hardware.config
-        else:
-            config = calibration_functions.update_instrument_config(
-                instrument=inst,
-                measured_center=measured_center)
-
-        log.info('New config: {0}'.format(config))
-
-        self._move_to_front(instrument)
+        log.warning("Deprecated call to tip_probe, update app")
         self._set_state('ready')
 
     @robot_is_busy
@@ -165,11 +128,8 @@ class CalibrationManager(RobotBusy):
         inst = instrument._instrument
         log.info('Returning tip from {}'.format(instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
-                inst.return_tip()
-        else:
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.location_cache = None
             inst.return_tip()
         self._set_state('ready')
 
@@ -184,24 +144,20 @@ class CalibrationManager(RobotBusy):
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            current = self._hardware.gantry_position(
-                Mount[inst.mount.upper()],
-                critical_point=CriticalPoint.NOZZLE,
-                refresh=True)
-            dest = instrument._context.deck.position_for(5) \
-                .point._replace(z=150)
-            self._hardware.move_to(Mount[inst.mount.upper()],
-                                   current,
-                                   critical_point=CriticalPoint.NOZZLE)
-            self._hardware.move_to(Mount[inst.mount.upper()],
-                                   dest._replace(z=current.z),
-                                   critical_point=CriticalPoint.NOZZLE)
-            self._hardware.move_to(Mount[inst.mount.upper()],
-                                   dest, critical_point=CriticalPoint.NOZZLE)
-        else:
-            calibration_functions.move_instrument_for_probing_prep(
-                inst, inst.robot)
+        current = self._hardware.gantry_position(
+            Mount[inst.mount.upper()],
+            critical_point=CriticalPoint.NOZZLE,
+            refresh=True)
+        dest = instrument._context.deck.position_for(5) \
+            .point._replace(z=150)
+        self._hardware.move_to(Mount[inst.mount.upper()],
+                               current,
+                               critical_point=CriticalPoint.NOZZLE)
+        self._hardware.move_to(Mount[inst.mount.upper()],
+                               dest._replace(z=current.z),
+                               critical_point=CriticalPoint.NOZZLE)
+        self._hardware.move_to(Mount[inst.mount.upper()],
+                               dest, critical_point=CriticalPoint.NOZZLE)
         self._set_state('ready')
 
     @robot_is_busy
@@ -220,11 +176,8 @@ class CalibrationManager(RobotBusy):
             instrument.name, container.name, container.slot))
         self._set_state('moving')
 
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
-                inst.move_to(target)
-        else:
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.location_cache = None
             inst.move_to(target)
 
         self._set_state('ready')
@@ -236,19 +189,12 @@ class CalibrationManager(RobotBusy):
         log.info('Jogging {} by {} in {}'.format(
             instrument.name, distance, axis))
         self._set_state('moving')
-        if instrument._context:
-            try:
-                self._hardware.move_rel(
-                    Mount[inst.mount.upper()], Point(**{axis: distance}),
-                    check_bounds=MotionChecks.HIGH)
-            except OutOfBoundsMove:
-                log.exception('Out of bounds jog')
-        else:
-            calibration_functions.jog_instrument(
-                instrument=inst,
-                distance=distance,
-                axis=axis,
-                robot=inst.robot)
+        try:
+            self._hardware.move_rel(
+                Mount[inst.mount.upper()], Point(**{axis: distance}),
+                check_bounds=MotionChecks.HIGH)
+        except OutOfBoundsMove:
+            log.exception('Out of bounds jog')
         self._set_state('ready')
 
     @robot_is_busy
@@ -257,11 +203,8 @@ class CalibrationManager(RobotBusy):
         inst = instrument._instrument
         log.info('Homing {}'.format(instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
-                inst.home()
-        else:
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.location_cache = None
             inst.home()
         self._set_state('ready')
 
@@ -272,41 +215,31 @@ class CalibrationManager(RobotBusy):
         # will be removed once sessions are managed better
         log.info('Homing via Calibration Manager')
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.home()
-        else:
-            self._hardware.home()
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.home()
         self._set_state('ready')
 
     @robot_is_busy
     def update_container_offset(self, container, instrument):
         inst = instrument._instrument
         log.info('Updating {} in {}'.format(container.name, container.slot))
-        if instrument._context:
-            if 'centerMultichannelOnWells' in container._container.quirks:
-                cp: Optional[CriticalPoint] = CriticalPoint.XY_CENTER
-            else:
-                cp = None
-            here = self._hardware.gantry_position(Mount[inst.mount.upper()],
-                                                  critical_point=cp,
-                                                  refresh=True)
-            # Reset calibration so we don’t actually calibrate the offset
-            # relative to the old calibration
-            container._container.set_calibration(Point(0, 0, 0))
-            if ff.calibrate_to_bottom() and not (
-                    container._container.is_tiprack):
-                orig = _well0(container._container).geometry.bottom()
-            else:
-                orig = _well0(container._container).geometry.top()
-            delta = here - orig
-            labware.save_calibration(container._container, delta)
+        if 'centerMultichannelOnWells' in container._container.quirks:
+            cp: Optional[CriticalPoint] = CriticalPoint.XY_CENTER
         else:
-            inst.robot.calibrate_container_with_instrument(
-                container=container._container,
-                instrument=inst,
-                save=True
-            )
+            cp = None
+        here = self._hardware.gantry_position(Mount[inst.mount.upper()],
+                                              critical_point=cp,
+                                              refresh=True)
+        # Reset calibration so we don’t actually calibrate the offset
+        # relative to the old calibration
+        container._container.set_calibration(Point(0, 0, 0))
+        if ff.calibrate_to_bottom() and not (
+                container._container.is_tiprack):
+            orig = _well0(container._container).geometry.bottom()
+        else:
+            orig = _well0(container._container).geometry.top()
+        delta = here - orig
+        labware.save_calibration(container._container, delta)
 
     def _snapshot(self):
         return {

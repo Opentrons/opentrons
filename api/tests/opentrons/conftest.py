@@ -15,7 +15,6 @@ import io
 import json
 import pathlib
 import re
-import shutil
 import tempfile
 from collections import namedtuple
 from functools import partial
@@ -25,7 +24,6 @@ import pytest
 
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
-from opentrons.data_storage import database_migration
 from opentrons import config
 from opentrons import hardware_control as hc
 from opentrons.hardware_control import API, ThreadManager, ThreadedAsyncLock
@@ -72,32 +70,11 @@ def log_by_axis(log, axis):
     return reduce(reducer, log, {axis: [] for axis in axis})
 
 
-@pytest.mark.apiv1
-@pytest.fixture(scope='session')
-def template_db(tmpdir_factory):
-    template_db = tmpdir_factory.mktemp('template_db.sqlite')\
-                                .join('opentrons.db')
-    config.CONFIG['labware_database_file'] = str(template_db)
-    database_migration.check_version_and_perform_full_migration()
-    return template_db
-
-
 @pytest.fixture
 def mock_config():
     """Robot config setup and teardown"""
     yield robot_configs.load()
     robot_configs.clear()
-
-
-@pytest.mark.apiv1
-@pytest.fixture(scope='function')
-def config_tempdir(tmpdir, template_db):
-    os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
-    config.reload()
-    if not os.path.exists(config.CONFIG['labware_database_file']):
-        shutil.copyfile(
-            template_db, config.CONFIG['labware_database_file'])
-    yield tmpdir, template_db
 
 
 @pytest.fixture

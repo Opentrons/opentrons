@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
 from opentrons.config import IS_ROBOT, robot_configs
-from opentrons.data_storage import database as db
 from opentrons.calibration_storage import delete
 
 DATA_BOOT_D = Path('/data/boot.d')
@@ -116,4 +115,3 @@ def reset_tip_length_calibrations():
 
 def reset_labware_calibration():
     delete.clear_calibrations()
-    db.reset()

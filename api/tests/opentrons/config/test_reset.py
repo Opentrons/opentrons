@@ -15,12 +15,6 @@ def mock_reset_labware_calibration():
         yield m
 
 
-@pytest.fixture()
-def mock_db():
-    with patch("opentrons.config.reset.db") as m:
-        yield m
-
-
 @pytest.fixture
 def mock_labware():
     with patch("opentrons.config.reset.delete") as m:
@@ -87,10 +81,9 @@ def test_reset_all_set(mock_reset_boot_scripts,
     mock_reset_tip_length_calibrations.assert_called_once()
 
 
-def test_labware_calibration_reset(mock_db, mock_labware):
+def test_labware_calibration_reset(mock_labware):
     reset.reset_labware_calibration()
     # Check side effecting function calls
-    mock_db.reset.assert_called_once()
     mock_labware.clear_calibrations.assert_called_once()
 
 
