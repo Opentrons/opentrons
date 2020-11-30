@@ -1,3 +1,4 @@
+from typing import Optional, List
 from typing_extensions import Literal, TypedDict
 
 State = Literal[
@@ -15,3 +16,28 @@ class StateInfo(TypedDict, total=False):
     userMessage: str
     #: If provided by the mechanism that changed the state, a message from the
     #: user
+
+
+class LastCommand(TypedDict):
+    id: int
+    handledAt: int
+
+
+class Error(TypedDict):
+    timestamp: int
+    error: Exception
+
+
+class SnapPayload(TypedDict):
+    state: State
+    stateInfo: StateInfo
+    startTime: Optional[float]
+    doorState: Optional[str]
+    blocked: Optional[bool]
+    errors: List[Error]
+    lastCommand: Optional[LastCommand]
+
+
+class Message(TypedDict):
+    topic: Literal['session']
+    payload: SnapPayload

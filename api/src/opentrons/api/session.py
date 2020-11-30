@@ -1,10 +1,12 @@
+from __future__ import annotations
 import asyncio
 import base64
 from copy import copy
 from functools import reduce
 import logging
 from time import time, sleep
-from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
+from typing import List, Dict, Any, Optional, Set
+from typing_extensions import Final
 from uuid import uuid4
 
 from opentrons.api.util import (RobotBusy, robot_is_busy,
@@ -28,13 +30,11 @@ from opentrons.hardware_control import (API, ThreadManager,
 from opentrons.hardware_control.types import (DoorState, HardwareEventType,
                                               HardwareEvent)
 from .models import Container, Instrument, Module
-
-if TYPE_CHECKING:
-    from .dev_types import State, StateInfo
+from .dev_types import State, StateInfo, Message, LastCommand, Error
 
 log = logging.getLogger(__name__)
 
-VALID_STATES: Set['State'] = {
+VALID_STATES: Set[State] = {
     'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
@@ -206,7 +206,7 @@ class SessionManager:
 
 
 class Session(RobotBusy):
-    TOPIC = 'session'
+    TOPIC: Final = 'session'
 
     @classmethod
     def build_and_prep(
@@ -245,8 +245,8 @@ class Session(RobotBusy):
         self.stateInfo: 'StateInfo' = {}
         #: A message associated with the current state
         self.commands = []
-        self.command_log = {}
-        self.errors = []
+        self.command_log: Dict[int, int] = {}
+        self.errors: List[Error] = []
 
         self._containers = []
         self._instruments = []
@@ -274,7 +274,7 @@ class Session(RobotBusy):
     def prepare(self):
         self.refresh()
 
-    def get_instruments(self):
+    def get_instruments(self) -> List[Instrument]:
         return [
             Instrument(
                 instrument=instrument,
@@ -288,7 +288,7 @@ class Session(RobotBusy):
             for instrument in self._instruments
         ]
 
-    def get_containers(self):
+    def get_containers(self) -> List[Container]:
         return [
             Container(
                 container=container,
@@ -302,7 +302,7 @@ class Session(RobotBusy):
             for container in self._containers
         ]
 
-    def get_modules(self):
+    def get_modules(self) -> List[Module]:
         return [
             Module(module=module,
                    context=self._use_v2 and self._simulating_ctx)
@@ -598,14 +598,14 @@ class Session(RobotBusy):
         self._remove_hardware_event_watcher()
         self._start_hardware_event_watcher()
 
-    def _snapshot(self):
+    def _snapshot(self) -> Message:
         if self.state == 'loaded':
             payload: Any = copy(self)
         else:
             if self.command_log.keys():
                 idx = sorted(self.command_log.keys())[-1]
                 timestamp = self.command_log[idx]
-                last_command: Optional[Dict[str, Any]]\
+                last_command: Optional[LastCommand]\
                     = {'id': idx, 'handledAt': timestamp}
             else:
                 last_command = None
@@ -648,7 +648,7 @@ def _dedupe(iterable):
             yield item
 
 
-def now():
+def now() -> int:
     return int(time() * 1000)
 
 

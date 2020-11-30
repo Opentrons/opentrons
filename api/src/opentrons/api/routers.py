@@ -1,13 +1,17 @@
+from typing import Union
 from opentrons.broker import Notifications, Broker
 from .session import SessionManager, Session
-from .calibration import CalibrationManager
+from .dev_types import Message as SessionMessage
+from .calibration import (CalibrationManager, Message as CalibrationMessage)
 
 
 class MainRouter:
     def __init__(self, hardware=None, loop=None, lock=None):
         topics = [Session.TOPIC, CalibrationManager.TOPIC]
         self._broker = Broker()
-        self._notifications = Notifications(topics, self._broker, loop=loop)
+        self._notifications: Notifications[
+            Union[SessionMessage, CalibrationMessage]] = Notifications(
+                topics, self._broker, loop=loop)
 
         checked_hw = None
         if hardware:

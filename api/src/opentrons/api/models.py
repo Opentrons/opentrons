@@ -1,4 +1,7 @@
-from opentrons.protocol_api import labware
+from typing import List
+from opentrons.protocol_api import (
+    labware, InstrumentContext, ProtocolContext)
+
 from opentrons.protocols.geometry import module_geometry
 
 
@@ -10,7 +13,11 @@ def _get_parent_slot_and_position(labware_obj):
 
 
 class Container:
-    def __init__(self, container, instruments=None, context=None):
+    def __init__(
+            self,
+            container: labware.Labware,
+            instruments: List[InstrumentContext] = None,
+            context: ProtocolContext = None):
         instruments = instruments or []
         self._container = container
         self._context = context
@@ -34,7 +41,11 @@ class Container:
 
 
 class Instrument:
-    def __init__(self, instrument, containers=None, context=None):
+    def __init__(
+            self,
+            instrument: InstrumentContext,
+            containers: List[labware.Labware] = None,
+            context: ProtocolContext = None):
         containers = containers or []
         self._instrument = instrument
         self._context = context
@@ -60,7 +71,10 @@ class Instrument:
 
 
 class Module:
-    def __init__(self, module, context=None):
+    def __init__(
+            self,
+            module: module_geometry.ModuleGeometry,
+            context: ProtocolContext = None):
         self.id = id(module)
         _type_lookup = {
             module_geometry.ModuleType.MAGNETIC: 'magdeck',

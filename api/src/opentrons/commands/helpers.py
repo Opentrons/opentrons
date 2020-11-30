@@ -8,6 +8,9 @@ def make_command(name, payload):
     return {'name': name, 'payload': payload}
 
 
+CommandLocation = Union[Location, None, Sequence, Well]
+
+
 def listify(location: Any) -> List:
     if isinstance(location, list):
         try:
@@ -30,8 +33,7 @@ def _stringify_new_loc(loc: Union[Location, Well]) -> str:
         raise TypeError(loc)
 
 
-def stringify_location(location: Union[Location, None,
-                                       Sequence]) -> str:
+def stringify_location(location: CommandLocation) -> str:
     loc_str_list = [_stringify_new_loc(loc)
                     for loc in listify(location)]
     return ', '.join(loc_str_list)

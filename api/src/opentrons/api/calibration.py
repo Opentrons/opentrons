@@ -1,7 +1,9 @@
+from __future__ import annotations
 import functools
 import logging
 from copy import copy
 from typing import Optional
+from typing_extensions import TypedDict, Literal, Final
 
 from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
@@ -43,12 +45,18 @@ def _home_if_first_call(func):
     return decorated
 
 
+class Message(TypedDict):
+    topic: Literal['calibration']
+    name: Literal['state']
+    payload: CalibrationManager
+
+
 class CalibrationManager(RobotBusy):
     """
     Serves endpoints that are primarily used in
     opentrons/app/ui/robot/api-client/client.js
     """
-    TOPIC = 'calibration'
+    TOPIC: Final = 'calibration'
 
     def __init__(self, hardware, loop=None, broker=None, lock=None):
         self._broker = broker or Broker()
@@ -235,7 +243,7 @@ class CalibrationManager(RobotBusy):
         delta = here - orig
         labware.save_calibration(container._container, delta)
 
-    def _snapshot(self):
+    def _snapshot(self) -> Message:
         return {
             'topic': CalibrationManager.TOPIC,
             'name': 'state',

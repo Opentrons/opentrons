@@ -1,89 +1,89 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING, List, Union
 
 
-from .helpers import make_command, stringify_location, listify
+from .helpers import stringify_location, listify
 from . import types as command_types
 
+from opentrons.types import Location
 from opentrons.protocols.api_support.util import FlowRates
 
+if TYPE_CHECKING:
+    from opentrons.protocol_api import InstrumentContext
+    from opentrons.protocol_api.labware import Well
 
-def home(mount):
-    text = 'Homing pipette plunger on mount {mount}'.format(mount=mount)
-    return make_command(
-        name=command_types.HOME,
-        payload={
+
+def home(mount: str) -> command_types.HomeCommand:
+    text = f'Homing pipette plunger on mount {mount}'
+    return {
+        'name': command_types.HOME,
+        'payload': {
             'axis': mount,
             'text': text
         }
-    )
+    }
 
 
-def aspirate(instrument, volume, location, rate):
+def aspirate(
+        instrument: InstrumentContext,
+        volume: float,
+        location: Union[Well, Location],
+        rate: float) -> command_types.AspirateCommand:
     location_text = stringify_location(location)
     template = 'Aspirating {volume} uL from {location} at {flow} uL/sec'
-    try:
-        flow_rate = rate * FlowRates(instrument).aspirate
-        text = template.format(
-                volume=float(volume), location=location_text, flow=flow_rate)
-    except AttributeError:
-        flow_mms = instrument.speeds['aspirate']
-        flow_ulsec = flow_mms * instrument._ul_per_mm(instrument.max_volume,
-                                                      'aspirate')
-        flow_rate = rate * flow_ulsec
-        flow_rate = round(flow_rate, 1)
-        text = template.format(
-                volume=float(volume), location=location_text, flow=flow_rate)
+    flow_rate = rate * FlowRates(instrument).aspirate
+    text = template.format(
+        volume=float(volume), location=location_text, flow=flow_rate)
 
-    return make_command(
-        name=command_types.ASPIRATE,
-        payload={
+    return {
+        'name': command_types.ASPIRATE,
+        'payload': {
             'instrument': instrument,
             'volume': volume,
             'location': location,
             'rate': rate,
             'text': text
         }
-    )
+    }
 
 
-def dispense(instrument, volume, location, rate):
+def dispense(
+        instrument: InstrumentContext,
+        volume: float,
+        location: Union[Well, Location],
+        rate: float) -> command_types.DispenseCommand:
     location_text = stringify_location(location)
     template = 'Dispensing {volume} uL into {location} at {flow} uL/sec'
-    try:
-        flow_rate = rate * FlowRates(instrument).dispense
-        text = template.format(
-                volume=float(volume), location=location_text, flow=flow_rate)
-    except AttributeError:
-        flow_mms = instrument.speeds['dispense']
-        flow_ulsec = flow_mms * instrument._ul_per_mm(instrument.max_volume,
-                                                      'dispense')
-        flow_rate = rate * flow_ulsec
-        flow_rate = round(flow_rate, 1)
-        text = template.format(
-                volume=float(volume), location=location_text, flow=flow_rate)
+    flow_rate = rate * FlowRates(instrument).dispense
+    text = template.format(
+        volume=float(volume), location=location_text, flow=flow_rate)
 
-    return make_command(
-        name=command_types.DISPENSE,
-        payload={
+    return {
+        'name': command_types.DISPENSE,
+        'payload': {
             'instrument': instrument,
             'volume': volume,
             'location': location,
             'rate': rate,
             'text': text
         }
-    )
+    }
 
 
-def consolidate(instrument, volume, source, dest):
+def consolidate(
+        instrument: InstrumentContext,
+        volume: Union[float, List[float]],
+        source: List[Union[Location, Well]],
+        dest: Union[Location, Well]) -> command_types.ConsolidateCommand:
     text = 'Consolidating {volume} from {source} to {dest}'.format(
         volume=transform_volumes(volume),
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
-    locations = [] + listify(source) + listify(dest)
-    return make_command(
-        name=command_types.CONSOLIDATE,
-        payload={
+    locations: List[Union[Location, Well]] = listify(source) + listify(dest)
+    return {
+        'name': command_types.CONSOLIDATE,
+        'payload': {
             'instrument': instrument,
             'locations': locations,
             'volume': volume,
@@ -91,19 +91,23 @@ def consolidate(instrument, volume, source, dest):
             'dest': dest,
             'text': text
         }
-    )
+    }
 
 
-def distribute(instrument, volume, source, dest):
+def distribute(
+        instrument: InstrumentContext,
+        volume: Union[float, List[float]],
+        source: Union[Location, Well],
+        dest: List[Union[Location, Well]]) -> command_types.DistributeCommand:
     text = 'Distributing {volume} from {source} to {dest}'.format(
         volume=transform_volumes(volume),
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
-    locations = [] + listify(source) + listify(dest)
-    return make_command(
-        name=command_types.DISTRIBUTE,
-        payload={
+    locations: List[Union[Location, Well]] = listify(source) + listify(dest)
+    return {
+        'name': command_types.DISTRIBUTE,
+        'payload': {
             'instrument': instrument,
             'locations': locations,
             'volume': volume,
@@ -111,19 +115,23 @@ def distribute(instrument, volume, source, dest):
             'dest': dest,
             'text': text
         }
-    )
+    }
 
 
-def transfer(instrument, volume, source, dest):
+def transfer(
+        instrument: InstrumentContext,
+        volume: Union[float, List[float]],
+        source: List[Union[Location, Well]],
+        dest: List[Union[Location, Well]]) -> command_types.TransferCommand:
     text = 'Transferring {volume} from {source} to {dest}'.format(
         volume=transform_volumes(volume),
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
-    locations = [] + listify(source) + listify(dest)
-    return make_command(
-        name=command_types.TRANSFER,
-        payload={
+    locations: List[Union[Location, Well]] = listify(source) + listify(dest)
+    return {
+        'name': command_types.TRANSFER,
+        'payload': {
             'instrument': instrument,
             'locations': locations,
             'volume': volume,
@@ -131,7 +139,7 @@ def transfer(instrument, volume, source, dest):
             'dest': dest,
             'text': text
         }
-    )
+    }
 
 
 def transform_volumes(volumes):
@@ -141,92 +149,101 @@ def transform_volumes(volumes):
         return [float(vol) for vol in volumes]
 
 
-def mix(instrument, repetitions, volume, location):
+def mix(instrument: InstrumentContext,
+        repetitions: int,
+        volume: float,
+        location: Union[Well, Location, None]) -> command_types.MixCommand:
     text = 'Mixing {repetitions} times with a volume of {volume} ul'.format(
         repetitions=repetitions, volume=float(volume)
     )
-    return make_command(
-        name=command_types.MIX,
-        payload={
+    return {
+        'name': command_types.MIX,
+        'payload': {
             'instrument': instrument,
             'location': location,
             'volume': volume,
             'repetitions': repetitions,
             'text': text
         }
-    )
+    }
 
 
-def blow_out(instrument, location):
+def blow_out(
+        instrument: InstrumentContext,
+        location: Union[Well, Location, None]) -> command_types.BlowOutCommand:
     location_text = stringify_location(location)
     text = 'Blowing out'
 
     if location is not None:
         text += ' at {location}'.format(location=location_text)
 
-    return make_command(
-        name=command_types.BLOW_OUT,
-        payload={
+    return {
+        'name': command_types.BLOW_OUT,
+        'payload': {
             'instrument': instrument,
             'location': location,
             'text': text
         }
-    )
+    }
 
 
-def touch_tip(instrument):
+def touch_tip(instrument: InstrumentContext) -> command_types.TouchTipCommand:
     text = 'Touching tip'
 
-    return make_command(
-        name=command_types.TOUCH_TIP,
-        payload={
+    return {
+        'name': command_types.TOUCH_TIP,
+        'payload': {
             'instrument': instrument,
             'text': text
         }
-    )
+    }
 
 
-def air_gap():
+def air_gap() -> command_types.AirGapCommand:
     text = 'Air gap'
-    return make_command(
-        name=command_types.AIR_GAP,
-        payload={
+    return {
+        'name': command_types.AIR_GAP,
+        'payload': {
             'text': text
         }
-    )
+    }
 
 
-def return_tip():
+def return_tip() -> command_types.ReturnTipCommand:
     text = 'Returning tip'
-    return make_command(
-        name=command_types.RETURN_TIP,
-        payload={
+    return {
+        'name': command_types.RETURN_TIP,
+        'payload': {
             'text': text
         }
-    )
+    }
 
 
-def pick_up_tip(instrument, location):
+def pick_up_tip(
+        instrument: InstrumentContext,
+        location: Union[Location, Well]) -> command_types.PickUpTipCommand:
     location_text = stringify_location(location)
-    text = 'Picking up tip from {location}'.format(location=location_text)
-    return make_command(
-        name=command_types.PICK_UP_TIP,
-        payload={
+    text = f'Picking up tip from {location_text}'
+    return {
+        'name': command_types.PICK_UP_TIP,
+        'payload': {
             'instrument': instrument,
             'location': location,
             'text': text
         }
-    )
+    }
 
 
-def drop_tip(instrument, location):
+def drop_tip(
+        instrument: InstrumentContext,
+        location: Union[Location, Well]) -> command_types.DropTipCommand:
     location_text = stringify_location(location)
     text = 'Dropping tip into {location}'.format(location=location_text)
-    return make_command(
-        name=command_types.DROP_TIP,
-        payload={
+    return {
+        'name': command_types.DROP_TIP,
+        'payload': {
             'instrument': instrument,
             'location': location,
             'text': text
         }
-    )
+    }

@@ -1,11 +1,12 @@
 import functools
 import inspect
+from typing import Any, Callable, cast
 from opentrons.broker import Broker
 from . import types as command_types
 
 
 class CommandPublisher:
-    def __init__(self, broker):
+    def __init__(self, broker: Broker):
         self._broker = broker or Broker()
 
     @property
@@ -17,7 +18,17 @@ class CommandPublisher:
         self._broker = broker
 
 
-def do_publish(broker, cmd, f, when, res, meta, *args, **kwargs):
+CmdFunction = Callable[..., command_types.Command]
+
+
+def do_publish(
+        broker: Broker,
+        cmd: CmdFunction,
+        f: Callable,
+        when: command_types.MessageSequenceId,
+        res: Any,
+        meta: Any,
+        *args, **kwargs):
     """ Implement the publish so it can be called outside the decorator """
     publish_command = functools.partial(
         broker.publish,
@@ -57,14 +68,17 @@ def do_publish(broker, cmd, f, when, res, meta, *args, **kwargs):
 
     payload = cmd(**command_args)
 
-    message = {**payload, '$': when}
-    if when == 'after':
-        message['return'] = res
     publish_command(
         message={**payload, '$': when})
 
 
-def publish_paired(broker, cmd, when, res, *args, pub_type='Paired Pipettes'):
+def publish_paired(
+        broker: Broker,
+        cmd: CmdFunction,
+        when: command_types.MessageSequenceId,
+        res: Any,
+        *args,
+        pub_type='Paired Pipettes'):
     """ Implement a second publisher outside of the decorator that
     relies on the method providing all of the arguments required
     rather than binding defaults to the signature"""
@@ -74,19 +88,18 @@ def publish_paired(broker, cmd, when, res, *args, pub_type='Paired Pipettes'):
 
     payload = cmd(*args, pub_type)
 
-    message = {**payload, '$': when}
-    if when == 'after':
-        message['return'] = res
-
-    publish_command(message=message)
+    publish_command(message={**payload, '$': when})
 
 
-def _publish_dec(before, after, command, meta=None):
-    def decorator(f):
-        @functools.wraps(f, updated=functools.WRAPPER_UPDATES+('__globals__',))
+def _publish_dec(
+        before: bool, after: bool, command: CmdFunction, meta: Any = None):
+    def decorator(f: Callable):
+        @functools.wraps(
+            f,
+            updated=functools.WRAPPER_UPDATES+('__globals__',))  # type: ignore
         def decorated(*args, **kwargs):
             try:
-                broker = args[0].broker
+                broker = cast(Broker, args[0].broker)
             except AttributeError:
                 raise RuntimeError("Only methods of CommandPublisher \
                     classes should be decorated.")
