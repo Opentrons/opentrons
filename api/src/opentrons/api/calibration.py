@@ -87,19 +87,16 @@ class CalibrationManager(RobotBusy):
         log.info('Picking up tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                loc = _well0(container._container)
-                instrument._context.location_cache =\
-                    Location(self._hardware.gantry_position(
-                        Mount[inst.mount.upper()],
-                        critical_point=CriticalPoint.NOZZLE,
-                        refresh=True),
-                        loc)
-                loc_leg = _well0(container._container)
-                inst.pick_up_tip(loc_leg)
-        else:
-            inst.pick_up_tip(_well0(container._container))
+        with instrument._context.temp_connect(self._hardware):
+            loc = _well0(container._container)
+            instrument._context.location_cache =\
+                Location(self._hardware.gantry_position(
+                    Mount[inst.mount.upper()],
+                    critical_point=CriticalPoint.NOZZLE,
+                    refresh=True),
+                    loc)
+            loc_leg = _well0(container._container)
+            inst.pick_up_tip(loc_leg)
         self._set_state('ready')
 
     @robot_is_busy
@@ -114,11 +111,8 @@ class CalibrationManager(RobotBusy):
         log.info('Dropping tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
-                inst.drop_tip(_well0(container._container))
-        else:
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.location_cache = None
             inst.drop_tip(_well0(container._container))
         self._set_state('ready')
 
