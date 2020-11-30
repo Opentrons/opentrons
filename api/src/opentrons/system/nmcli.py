@@ -475,7 +475,7 @@ async def configure(ssid: str,
     # regex out the name or the uuid to use later in connection up; the
     # uuid is slightly more regular, so that’s what we use.
     uuid_matches = re.search(  # noqa
-        "Connection '(.*)'[\s]+\(([\w\d-]+)\) successfully", res)  # noqa
+        r"Connection '(.*)'[\s]+\(([\w\d-]+)\) successfully", res)  # noqa
     if not uuid_matches:
         return False, err.split('\r')[-1]
     name = uuid_matches.group(1)
