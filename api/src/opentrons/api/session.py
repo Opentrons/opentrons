@@ -640,11 +640,12 @@ def _accumulate(iterable):
 
 
 def _dedupe(iterable):
-    def _dupecheck(accumulator, item):
-        if not any([item == accumulated for accumulated in accumulator]):
-            accumulator.append(item)
-        return accumulator
-    return reduce(_dupecheck, iterable, [])
+    acc = set()  # type: ignore
+
+    for item in iterable:
+        if item not in acc:
+            acc.add(item)
+            yield item
 
 
 def now():
@@ -666,7 +667,7 @@ def _get_parent_module(placeable):
 
 def _get_new_labware(loc):
     if isinstance(loc, Location):
-        return _get_new_labware(loc.labware)
+        return _get_new_labware(loc.labware.object)
     elif isinstance(loc, labware.Well):
         return loc.parent
     elif isinstance(loc, labware.Labware):

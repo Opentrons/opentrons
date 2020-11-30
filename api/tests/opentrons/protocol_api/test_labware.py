@@ -678,3 +678,45 @@ def test_get_parent_identifier():
     )
     assert _get_parent_identifier(lw._implementation)\
         == MagneticModuleModel.MAGNETIC_V1.value
+
+
+def test_labware_hash_func_same_implementation(minimal_labware_def):
+    """Test that multiple Labware objects with same implementation and version
+    have the same __hash__"""
+    impl = LabwareImplementation(minimal_labware_def,
+                                 Location(Point(0, 0, 0),
+                                          'Test Slot'))
+    s = set(labware.Labware(implementation=impl,
+                            api_level=APIVersion(2, 3)) for i in range(10))
+    assert len(s) == 1
+
+
+def test_labware_hash_func_same_implementation_different_version(
+        minimal_labware_def):
+    """Test that multiple Labware objects with same implementation yet
+    different version have different __hash__"""
+    impl = LabwareImplementation(minimal_labware_def,
+                                 Location(Point(0, 0, 0),
+                                          'Test Slot'))
+
+    l1 = labware.Labware(implementation=impl, api_level=APIVersion(2, 3))
+    l2 = labware.Labware(implementation=impl, api_level=APIVersion(2, 4))
+
+    assert len({l1, l2}) == 2
+
+
+def test_labware_hash_func_diff_implementation_same_version(
+        minimal_labware_def):
+    """Test that multiple Labware objects with different implementation yet
+    sane version have different __hash__"""
+    impl1 = LabwareImplementation(minimal_labware_def,
+                                  Location(Point(0, 0, 0),
+                                           'Test Slot'))
+    impl2 = LabwareImplementation(minimal_labware_def,
+                                  Location(Point(0, 0, 0),
+                                           'Test Slot2'))
+
+    l1 = labware.Labware(implementation=impl1, api_level=APIVersion(2, 3))
+    l2 = labware.Labware(implementation=impl2, api_level=APIVersion(2, 3))
+
+    assert len({l1, l2}) == 2
