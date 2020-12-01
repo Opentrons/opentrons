@@ -10,6 +10,7 @@
   position: absolute;
   left: 2rem;
   right: 2rem;
+  bottom: 3.25rem;
 }
 
 .step_button_disabled {
