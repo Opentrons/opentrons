@@ -353,7 +353,6 @@ class API(HardwareAPILike):
                 return
             new_p = Pipette(
                 p._config,
-                self._config.instrument_offset[m.name.lower()],
                 rb_cal.load_pipette_offset(p.pipette_id, m),
                 p.pipette_id)
             new_p.act_as(p.acting_as)
@@ -364,23 +363,6 @@ class API(HardwareAPILike):
                 _reset(m)
         else:
             _reset(mount)
-
-    def set_instrument_offset(
-            self, mount: top_types.Mount, new_offset: top_types.Point):
-        """
-        Temporarily (i.e., without saving to disk) override the instrument
-        offset of the instrument attached to ``mount``. This should only be
-        used in calibration workflows where the device under calibration
-        should be using no calibration at all, to avoid altering the saved
-        calibration.
-
-        To reload the saved value, call :py:meth:`cache_instruments` again.
-        """
-        pip = self._attached_instruments[mount]
-        if not pip:
-            raise top_types.PipetteNotAttachedError(
-                f'No pipette attached to {mount.name} mount')
-        pip.update_instrument_offset(new_offset)
 
     async def cache_instruments(
             self,
@@ -425,7 +407,6 @@ class API(HardwareAPILike):
                 self._attached_instruments[mount],
                 req_instr,
                 pip_id,
-                self._config.instrument_offset[mount.name.lower()],
                 pip_offset_cal)
             self._attached_instruments[mount] = p
             if req_instr and p:
@@ -1785,8 +1766,6 @@ class API(HardwareAPILike):
         :param mount: The mount on which the pipette is attached
         :type mount: opentrons.types.Mount
         """
-        # Clear the old offset during calibration
-        self.set_instrument_offset(mount, top_types.Point())
         # Hotspots based on our expectation of tip length and config
         hotspots = robot_configs.calculate_tip_probe_hotspots(
             pip.current_tip_length, self._config.tip_probe)
@@ -1906,47 +1885,6 @@ class API(HardwareAPILike):
 
         with _assure_tip():
             return await self._do_tp(pip, mount)
-
-    async def update_instrument_offset(self, mount,
-                                       new_offset: top_types.Point = None,
-                                       from_tip_probe: top_types.Point = None):
-        """ Update the instrument offset for a pipette on the specified mount.
-
-        This will update both the stored value in the robot settings and
-        the live value in the currently-loaded pipette.
-
-        If you just want to change the live value for the currently-attached
-        instrument without saving it, use :py:meth:`.set_instrument_offset`.
-
-        This can be specified either directly by using the new_offset arg
-        or using the result of a previous call to
-        :py:meth:`locate_tip_probe_center` with the same mount.
-
-        :note: Z differences in the instrument offset cannot be
-               disambiguated between differences in the position of the
-               nozzle and differences in the length of the nozzle/tip
-               interface (assuming that tips are of reasonably uniform
-               length). For this reason, they are saved as adjustments
-               to the nozzle interface length and only applied when a
-               tip is present.
-        """
-        if from_tip_probe:
-            new_offset = (top_types.Point(*self._config.tip_probe.center)
-                          - from_tip_probe)
-        elif not new_offset:
-            raise ValueError(
-                "Either from_tip_probe or new_offset must be specified")
-        opt_pip = self._attached_instruments[mount]
-        assert opt_pip, '{} has no pipette'.format(mount.name.lower())
-        pip = opt_pip
-        inst_offs = self._config.instrument_offset
-        pip_type = 'multi' if pip.config.channels > 1 else 'single'
-        inst_offs[mount.name.lower()][pip_type] = [new_offset.x,
-                                                   new_offset.y,
-                                                   new_offset.z]
-        await self.update_config(instrument_offset=inst_offs)
-        self.set_instrument_offset(mount, new_offset)
-        robot_configs.save_robot_settings(self._config)
 
     def get_instrument_max_height(
             self,

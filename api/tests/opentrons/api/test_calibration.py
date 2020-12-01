@@ -14,19 +14,10 @@ state = partial(state, 'calibration')
 
 @pytest.mark.api2_only  # noqa(C901)
 async def test_tip_probe_v2(main_router, model, monkeypatch):
-    def fake_update(self, mount, new_offset=None, from_tip_probe=None):
-        assert mount == Mount[model.instrument.mount.upper()]
-        if new_offset:
-            assert new_offset == Point(0, 0, 0)
-        elif from_tip_probe:
-            assert from_tip_probe == Point(0, 0, 0)
-        else:
-            assert False, "fake_update called with no args"
 
     def fake_move(instrument):
         assert instrument == model.instrument
 
-    monkeypatch.setattr(API, 'update_instrument_offset', fake_update)
     monkeypatch.setattr(main_router.calibration_manager,
                         '_move_to_front', fake_move)
 
