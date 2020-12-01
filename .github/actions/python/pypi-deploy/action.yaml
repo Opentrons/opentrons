@@ -20,16 +20,12 @@ runs:
         else if [[ ${{ inputs.repository_url }} =~ "upload.pypi.org" ]]; then
                  echo "Uploading to prod pypi"
                  # this needs to be cleared otherwise the makefiles append a dev tag
-                 echo 'OT_BUILD=' >> $GITHUB_ENV
+                 OT_BUILD=
              else
                  echo "::error ::Invalid repository url ${{ inputs.repository_url }}"
                  exit 1
              fi
         fi
-
-
-    - shell: bash
-      run: |
         status=0
         QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C ${{ inputs.project }} clean deploy twine_repository_url=${{ inputs.repository_url }} pypi_username=opentrons pypi_password=${{ inputs.password }} || status=$?
         if [[ ${status} != 0 ]] && [[ ${{ inputs.repository_url }} =~ "test.pypi.org" ]]; then
