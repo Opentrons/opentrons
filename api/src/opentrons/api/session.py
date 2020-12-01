@@ -5,7 +5,7 @@ from copy import copy
 from functools import reduce
 import logging
 from time import time, sleep
-from typing import List, Dict, Any, Optional, Set
+from typing import cast, List, Dict, Any, Optional, Set, Sequence, Tuple, TypeVar
 from typing_extensions import Final
 from uuid import uuid4
 
@@ -14,11 +14,11 @@ from opentrons.api.util import (RobotBusy, robot_is_busy,
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons.broker import Broker
 from opentrons.config import feature_flags as ff
-from opentrons.commands.util import from_list, session_listify
-from opentrons.commands import types as command_types
+from opentrons.commands.util import from_list
+from opentrons.commands import types as command_types, introspection
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import parse
-from opentrons.types import Location, Point
+from opentrons.protocols.types import Protocol
 from opentrons.calibration_storage import helpers
 from opentrons.protocol_api import (ProtocolContext,
                                     labware)
@@ -624,23 +624,36 @@ class Session(RobotBusy):
             'payload': payload
         }
 
-    def _on_state_changed(self):
+    def _on_state_changed(self) -> None:
         snap = self._snapshot()
         self._broker.publish(Session.TOPIC, snap)
 
-    def _pre_run_hooks(self):
+    def _pre_run_hooks(self) -> None:
         self._hw_iface().home_z()
 
 
-def _accumulate(iterable):
+CommandReferents = Tuple[
+    List[InstrumentContext], List[labware.Labware],
+    List[module_geometry.ModuleGeometry],
+    List[Tuple[InstrumentContext, labware.Labware]]]
+
+
+def _accumulate(iterable: Sequence[CommandReferents]) -> CommandReferents:
+
+    def _reducer(acc: CommandReferents, item: CommandReferents) -> CommandReferents:
+        return (acc[0] + item[0],
+                acc[1] + item[1],
+                acc[2] + item[2],
+                acc[3] + item[3])
+
     return reduce(
-        lambda x, y: tuple([x + y for x, y in zip(x, y)]),  # type: ignore
+        _reducer,
         iterable,
-        ([], [], [], []))
+        cast(CommandReferents, ([], [], [], [])))
 
 
-def _dedupe(iterable):
-    acc = set()  # type: ignore
+def _dedupe(iterable: Sequence[It]) -> Sequence[It]:
+    acc: Set[It] = set()
 
     for item in iterable:
         if item not in acc:
@@ -652,78 +665,19 @@ def now() -> int:
     return int(time() * 1000)
 
 
-def _get_parent_module(placeable):
-    if not placeable or isinstance(placeable, (Point, str)):
-        res = None
-    elif isinstance(placeable,
-                    module_geometry.ModuleGeometry):
-        res = placeable
-    elif isinstance(placeable, List):
-        res = _get_parent_module(placeable[0].parent)
-    else:
-        res = _get_parent_module(placeable.parent)
-    return res
+def _get_labware(
+        command: command_types.CommandPayload) -> CommandReferents:
+    interactions: List[Tuple[InstrumentContext, labware.Labware]] = []
 
+    try:
+        instruments, containers, modules = introspection.get_referred_objects(command)
+    except ValueError:
+        log.exception(f'Cant handle location in command {command!r}')
+        instruments = []
+        containers = []
+        modules = []
 
-def _get_new_labware(loc):
-    if isinstance(loc, Location):
-        return _get_new_labware(loc.labware.object)
-    elif isinstance(loc, labware.Well):
-        return loc.parent
-    elif isinstance(loc, labware.Labware):
-        return loc
-    else:
-        raise TypeError(loc)
-
-
-def _get_labware(command):  # noqa(C901)
-    containers = []
-    instruments = []
-    modules = []
-    interactions = []
-
-    location = command.get('location')
-    instrument = command.get('instrument')
-
-    placeable = location
-    if isinstance(location, Location):
-        placeable = location.labware.object
-    elif isinstance(location, tuple):
-        placeable = location[0]
-
-    maybe_module = _get_parent_module(placeable)
-    modules.append(maybe_module)
-
-    locations = command.get('locations')
-    multiple_instruments = command.get('instruments')
-
-    if location:
-        if isinstance(location, Location):
-            if location.labware.is_well:
-                containers.append(location.labware.parent.as_labware())
-            elif location.labware.is_labware:
-                containers.append(location.labware.as_labware())
-        elif isinstance(location, (labware.Well, labware.Labware)):
-            containers.append(_get_new_labware(location))
-        else:
-            log.error(f'Cant handle location {location!r}')
-
-    if locations:
-        list_of_locations = session_listify(locations)
-        containers.extend(
-            [_get_new_labware(loc) for loc in list_of_locations])
-
-    containers = [c for c in containers if c is not None]
-    modules = [m for m in modules if m is not None]
-
-    if instrument:
-        instruments.append(instrument)
-        interactions.extend(
-            [(instrument, container) for container in containers])
-    if multiple_instruments:
-        for instr in multiple_instruments:
-            instruments.append(instr)
-            interactions.extend(
-                [(instr, container) for container in containers])
+    for instrument in instruments:
+        interactions.extend([(instrument, container) for container in containers])
 
     return instruments, containers, modules, interactions

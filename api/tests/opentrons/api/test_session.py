@@ -96,11 +96,11 @@ async def test_load_and_run_v2(
 def test_accumulate():
     res = \
         _accumulate([
-            (['a'], ['d'], ['g', 'h']),
-            (['b', 'c'], ['e', 'f'], ['i'])
+            (['a'], ['d'], ['g', 'h'], [('l', 'm')]),
+            (['b', 'c'], ['e', 'f'], ['i'], [('m', 'n')])
         ])
 
-    assert res == (['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i'])
+    assert res == (['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i'], [('l', 'm'), ('m', 'n')])
     assert _accumulate([]) == ([], [], [], [])
 
 
