@@ -804,6 +804,20 @@ def filter_tipracks_to_start(
         lambda tr: starting_point.parent != tr, tipracks))
 
 
+def next_available_tip(
+        starting_tip: Optional[Well],
+        tip_racks: List[Labware],
+        channels: int) -> Tuple[Labware, Well]:
+    start = starting_tip
+    if start is None:
+        return select_tiprack_from_list(
+            tip_racks, channels)
+    else:
+        return select_tiprack_from_list(
+            filter_tipracks_to_start(start, tip_racks),
+            channels, start)
+
+
 def get_labware_hash(labware: 'Labware') -> str:
     return labware_module.get_labware_hash(
         labware._implementation
