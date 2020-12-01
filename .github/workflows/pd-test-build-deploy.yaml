@@ -85,7 +85,7 @@ jobs:
       - name: 'test-e2e'
         run: make -C protocol-designer test-e2e
   build-PD:
-    name: 'build protocol designer'
+    name: 'build protocol designer artifact'
     runs-on: 'ubuntu-latest'
     needs: [js-unit-test, e2e-test]
     if: github.event_name != 'pull_request'
@@ -119,7 +119,7 @@ jobs:
           name: 'pd-artifact'
           path: protocol-designer/dist
   deploy-pd:
-    name: 'Deploy built PD artifact to S3'
+    name: 'deploy PD artifact to S3'
     runs-on: 'ubuntu-latest'
     needs: build-PD
     if: github.event_name != 'pull_request'
